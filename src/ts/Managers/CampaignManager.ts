@@ -25,7 +25,7 @@ import { ProgrammaticVastParser } from 'Parsers/ProgrammaticVastParser';
 import { ProgrammaticMraidUrlParser } from 'Parsers/ProgrammaticMraidUrlParser';
 import { ProgrammaticMraidParser } from 'Parsers/ProgrammaticMraidParser';
 import { ProgrammaticStaticInterstitialParser } from 'Parsers/ProgrammaticStaticInterstitialParser';
-import { ProgrammaticGlyphParser } from 'Parsers/ProgrammaticGlyphParser';
+import { ProgrammaticAdMobParser } from 'Parsers/ProgrammaticAdMobParser';
 import { CampaignParser } from 'Parsers/CampaignParser';
 import { ProgrammaticVPAIDParser } from 'Parsers/ProgrammaticVPAIDParser';
 
@@ -248,8 +248,8 @@ export class CampaignManager {
             case 'programmatic/static-interstitial':
                 parser = new ProgrammaticStaticInterstitialParser();
                 break;
-            case 'programmatic/glyph':
-                parser = new ProgrammaticGlyphParser();
+            case 'programmatic/admob':
+                parser = new ProgrammaticAdMobParser();
                 break;
             case 'programmatic/vast-vpaid':
                 // vast-vpaid can be both VPAID or VAST, so in this case we use the VAST parser

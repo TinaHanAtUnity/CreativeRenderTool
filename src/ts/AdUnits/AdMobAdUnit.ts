@@ -1,18 +1,18 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
-import { GlyphCampaign } from 'Models/Campaigns/GlyphCampaign';
-import { GlyphView, IGlyphEventHandler } from 'Views/GlyphView';
+import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
+import { AdMobView, IAdMobEventHandler } from 'Views/AdMobView';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { FinishState } from 'Constants/FinishState';
-export interface IGlyphAdUnitParameters extends IAdUnitParameters<GlyphCampaign> {
-    view: GlyphView;
+export interface IAdMobAdUnitParameters extends IAdUnitParameters<AdMobCampaign> {
+    view: AdMobView;
 }
-export class GlyphAdUnit extends AbstractAdUnit<GlyphCampaign> implements IGlyphEventHandler {
+export class AdMobAdUnit extends AbstractAdUnit<AdMobCampaign> implements IAdMobEventHandler {
     private _operativeEventManager: OperativeEventManager;
-    private _view: GlyphView;
+    private _view: AdMobView;
     private _options: any;
 
-    constructor(nativeBridge: NativeBridge, parameters: IGlyphAdUnitParameters) {
+    constructor(nativeBridge: NativeBridge, parameters: IAdMobAdUnitParameters) {
         super(nativeBridge, parameters);
         this._operativeEventManager = parameters.operativeEventManager;
         this._view = parameters.view;
@@ -37,7 +37,7 @@ export class GlyphAdUnit extends AbstractAdUnit<GlyphCampaign> implements IGlyph
     }
 
     public description(): string {
-        return 'Glyph';
+        return 'AdMob';
     }
 
     public onSkip() {

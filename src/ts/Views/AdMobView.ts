@@ -1,40 +1,40 @@
 import { View } from 'Views/View';
-import GlyphContainer from 'html/glyph/GlyphContainer.html';
-import AFMAContainer from 'html/glyph/AFMAContainer.html';
+import AdMobContainer from 'html/admob/AdMobContainer.html';
+import AFMAContainer from 'html/admob/AFMAContainer.html';
 import NativeVideoPlayerBridgeContainer from 'html/NativeVideoPlayerBridge.html';
-import MRAIDContainer from 'html/glyph/MRAIDContainer.html';
+import MRAIDContainer from 'html/admob/MRAIDContainer.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { Placement } from 'Models/Placement';
-import { GlyphCampaign } from 'Models/Campaigns/GlyphCampaign';
+import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
 import { Template } from 'Utilities/Template';
 import { Overlay, IOverlayHandler } from 'Views/Overlay';
 import { NativeVideoPlayerBridge } from 'Utilities/NativeVideoPlayerBridge';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 
-export interface IGlyphEventHandler {
+export interface IAdMobEventHandler {
     onSkip(): void;
 }
 
-export class GlyphView extends View<IGlyphEventHandler> implements IOverlayHandler {
+export class AdMobView extends View<IAdMobEventHandler> implements IOverlayHandler {
     public readonly videoBridge: NativeVideoPlayerBridge;
 
     private _placement: Placement;
-    private _campaign: GlyphCampaign;
+    private _campaign: AdMobCampaign;
     private _iframe: HTMLIFrameElement;
 
     private _messageListener: EventListener;
     private _overlay: Overlay;
 
-    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: GlyphCampaign, language: string, gameId: string, abGroup: number) {
-        super(nativeBridge, 'glyph');
+    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: AdMobCampaign, language: string, gameId: string, abGroup: number) {
+        super(nativeBridge, 'admob');
 
         this._placement = placement;
         this._campaign = campaign;
         this._overlay = new Overlay(nativeBridge, false, language, gameId, abGroup);
         this._overlay.addEventHandler(this);
 
-        this._template = new Template(GlyphContainer);
+        this._template = new Template(AdMobContainer);
 
         this._messageListener = (e: Event) => this.onMessage(<MessageEvent>e);
 
@@ -81,7 +81,7 @@ export class GlyphView extends View<IGlyphEventHandler> implements IOverlayHandl
     }
 
     private setupIFrame() {
-        const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#glyph-iframe');
+        const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#admob-iframe');
         const markup = this.getIFrameSrcDoc();
         iframe.srcdoc = markup;
 

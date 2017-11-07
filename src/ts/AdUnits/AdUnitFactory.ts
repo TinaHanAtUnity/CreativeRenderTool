@@ -6,9 +6,9 @@ import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { DisplayInterstitialAdUnit, IDisplayInterstitialAdUnitParameters } from 'AdUnits/DisplayInterstitialAdUnit';
 import { DisplayInterstitial } from 'Views/DisplayInterstitial';
-import { GlyphView } from 'Views/GlyphView';
-import { GlyphCampaign } from 'Models/Campaigns/GlyphCampaign';
-import { GlyphAdUnit, IGlyphAdUnitParameters } from 'AdUnits/GlyphAdUnit';
+import { AdMobView } from 'Views/AdMobView';
+import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
+import { AdMobAdUnit, IAdMobAdUnitParameters } from 'AdUnits/AdMobAdUnit';
 import { VideoEventHandlers } from 'EventHandlers/VideoEventHandlers';
 import { VastVideoEventHandlers } from 'EventHandlers/VastVideoEventHandlers';
 import { VastEndScreen } from 'Views/VastEndScreen';
@@ -62,8 +62,8 @@ export class AdUnitFactory {
             return this.createDisplayInterstitialAdUnit(nativeBridge, <IAdUnitParameters<DisplayInterstitialCampaign>>parameters);
         } else if (parameters.campaign instanceof VPAIDCampaign) {
             return this.createVPAIDAdUnit(nativeBridge, <IAdUnitParameters<VPAIDCampaign>>parameters);
-        } else if (parameters.campaign instanceof GlyphCampaign) {
-            return this.createGlyphAdUnit(nativeBridge, <IAdUnitParameters<GlyphCampaign>>parameters);
+        } else if (parameters.campaign instanceof AdMobCampaign) {
+            return this.createAdMobAdUnit(nativeBridge, <IAdUnitParameters<AdMobCampaign>>parameters);
         } else {
             throw new Error('Unknown campaign instance type');
         }
@@ -386,16 +386,16 @@ export class AdUnitFactory {
         }
         return undefined;
     }
-    private static createGlyphAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<GlyphCampaign>): GlyphAdUnit {
-        const view = new GlyphView(nativeBridge, parameters.container, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup());
+    private static createAdMobAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<AdMobCampaign>): AdMobAdUnit {
+        const view = new AdMobView(nativeBridge, parameters.container, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup());
         view.render();
 
-        const adUnitParameters: IGlyphAdUnitParameters = {
+        const adUnitParameters: IAdMobAdUnitParameters = {
             ... parameters,
             view: view
         };
 
-        const programmaticAdUnit = new GlyphAdUnit(nativeBridge, adUnitParameters);
+        const programmaticAdUnit = new AdMobAdUnit(nativeBridge, adUnitParameters);
         return programmaticAdUnit;
     }
 }

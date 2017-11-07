@@ -2,14 +2,14 @@ import { Campaign, ICampaign } from 'Models/Campaign';
 import { Asset } from 'Models/Assets/Asset';
 import { Session } from 'Models/Session';
 
-interface IGlyphCampaign extends ICampaign {
+interface IAdMobCampaign extends ICampaign {
     dynamicMarkup: string;
     tracking: object | undefined;
 }
 
-export class GlyphCampaign extends Campaign<IGlyphCampaign> {
+export class AdMobCampaign extends Campaign<IAdMobCampaign> {
     constructor(markup: string, session: Session, gamerId: string, abGroup: number, cacheTTL: number | undefined, tracking?: { [eventName: string]: string[] }, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
-        super('GlyphCampaign', {
+        super('AdMobCampaign', {
             ... Campaign.Schema,
             dynamicMarkup: ['string'],
             tracking: ['object', 'undefined']
