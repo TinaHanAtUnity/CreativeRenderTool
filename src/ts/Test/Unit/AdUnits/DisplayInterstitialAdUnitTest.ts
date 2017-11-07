@@ -1,9 +1,9 @@
 import 'mocha';
 import * as sinon from 'sinon';
 
-import { DisplayInterstitialAdUnit } from "AdUnits/DisplayInterstitialAdUnit";
+import { DisplayInterstitialAdUnit, IDisplayInterstitialAdUnitParameters } from "AdUnits/DisplayInterstitialAdUnit";
 import { NativeBridge } from "Native/NativeBridge";
-import { AdUnitContainer } from "AdUnits/Containers/AdUnitContainer";
+import { AdUnitContainer, ForceOrientation } from "AdUnits/Containers/AdUnitContainer";
 import { SessionManager } from "Managers/SessionManager";
 import { Placement } from "Models/Placement";
 import { Request } from 'Utilities/Request';
@@ -35,6 +35,7 @@ describe('DisplayInterstitialAdUnit', () => {
     let thirdPartyEventManager: ThirdPartyEventManager;
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
+    let displayInterstitialAdUnitParameters: IDisplayInterstitialAdUnitParameters;
 
     beforeEach(() => {
         sandbox = sinon.sandbox.create();
@@ -61,10 +62,29 @@ describe('DisplayInterstitialAdUnit', () => {
         sandbox.stub(view, 'show');
         sandbox.stub(view, 'hide');
 
-        adUnit = new DisplayInterstitialAdUnit(nativeBridge, container, operativeEventManager, placement, campaign, view, {});
+        displayInterstitialAdUnitParameters = {
+            forceOrientation: ForceOrientation.LANDSCAPE,
+            focusManager: focusManager,
+            container: container,
+            deviceInfo: deviceInfo,
+            clientInfo: clientInfo,
+            thirdPartyEventManager: thirdPartyEventManager,
+            operativeEventManager: operativeEventManager,
+            placement: TestFixtures.getPlacement(),
+            campaign: campaign,
+            configuration: TestFixtures.getConfiguration(),
+            request: request,
+            options: {},
+            view: view
+        };
+
+        adUnit = new DisplayInterstitialAdUnit(nativeBridge, displayInterstitialAdUnitParameters);
     });
 
     afterEach(() => {
+        if(adUnit.isShowing()) {
+            adUnit.hide();
+        }
         sandbox.restore();
     });
 

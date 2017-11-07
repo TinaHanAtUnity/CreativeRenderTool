@@ -1,3 +1,42 @@
+# Mon Nov  6 22:22:45 UTC 2017
+
+* Revert "new" end screen & "new" dark end screen
+* Fix major UI issues in iPhone X
+* Add total background time into playable analytics events
+* Fix integration tests
+
+# Fri Nov  3 07:28:14 UTC 2017 (reverted)
+
+* Switch to "new" end screen
+* AB Test "new" dark end screen in groups 10 & 11
+* Fix major UI issues in iPhone X
+* Add total background time into playable analytics events
+
+# Thu Nov  2 20:13:31 UTC 2017
+
+* Refactor view event handlers
+* Remove ab test to dismiss performance ad completely when video is skipped in group 5
+
+# Wed Nov  1 20:09:28 UTC 2017
+
+* Moat integration
+
+# Tue Oct 31 10:55:28 UTC 2017
+
+* Add versionCode (for Android SDK 2.1.1+) and simulator (iOS only) to ad request parameters
+* Remove ab test for brand ad cta
+* Adjust performance ad to dismiss completely when video is skipped in group 5
+* Add parse duration to SdkStats
+* Refactor ad plan refreshing triggers to CampaignRefreshManager
+
+# Wed Oct 25 22:15:26 UTC 2017
+
+* Check ad plan refreshing when any app activity resumes
+* CTA styling A/B test on groups 10 and 11
+* Refactor endscreen layout
+* Add support for configUrl test metadata parameter
+* Fix kafkaUrl test metadata parameter
+
 # Mon Oct 23 21:35:15 UTC 2017
 
 * Integrate SDKStats into Webview
