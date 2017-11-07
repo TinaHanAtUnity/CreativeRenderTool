@@ -33,6 +33,14 @@ endif
 # Targets
 BUILD_DIR = build
 
+# Platform specific paths
+OS := $(shell uname)
+ifeq ($(OS),Darwin)
+    NGINX_MIME_PATH = /usr/local/etc/nginx/mime.types
+else
+    NGINX_MIME_PATH = /etc/nginx/mime.types
+endif
+
 .PHONY: build-browser build-dev build-release build-test build-dir build-ts build-js build-css build-static clean lint test test-unit test-integration test-coverage test-coveralls watch setup deploy
 
 build-browser: BUILD_DIR = build/browser
@@ -309,7 +317,7 @@ else
 endif
 
 start-nginx:
-	sed -e "s#DEVELOPMENT_DIR#$(shell pwd)#g" nginx/nginx.conf.template > nginx/nginx.conf
+	sed -e "s#DEVELOPMENT_DIR#$(shell pwd)#g; s#MIME_TYPES_PATH#$(NGINX_MIME_PATH)#g" nginx/nginx.conf.template > nginx/nginx.conf
 	nginx -c $(shell pwd)/nginx/nginx.conf
 
 stop-nginx:
