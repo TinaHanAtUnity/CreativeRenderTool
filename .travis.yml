@@ -7,7 +7,6 @@ addons:
   apt:
     packages:
     - libimage-exiftool-perl
-    - nginx
 
 install:
   - pip install --user awscli
