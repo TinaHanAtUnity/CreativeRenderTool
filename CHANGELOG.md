@@ -1,3 +1,9 @@
+# PENDING
+
+* Add safety checks for negative values when sending playable analytics
+* Fix most of problems with auction_request_failed diagnostics
+* Retry once after parsing error
+
 # Mon Nov  6 22:22:45 UTC 2017
 
 * Revert "new" end screen & "new" dark end screen

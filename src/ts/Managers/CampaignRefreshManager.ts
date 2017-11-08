@@ -16,6 +16,7 @@ import { Platform } from 'Constants/Platform';
 export class CampaignRefreshManager {
     public static NoFillDelay = 3600;
     public static ErrorRefillDelay = 3600;
+    public static ParsingErrorRefillDelay = 60;
 
     private _nativeBridge: NativeBridge;
     private _wakeUpManager: WakeUpManager;
@@ -26,6 +27,8 @@ export class CampaignRefreshManager {
     private _refillTimestamp: number;
     private _needsRefill = true;
     private _refreshAllowed = true;
+    private _campaignCount: number;
+    private _parsingErrorCount: number;
 
     // constant value that determines the delay for refreshing ads after backend has processed a start event
     // set to five seconds because backend should usually process start event in less than one second but
@@ -40,11 +43,13 @@ export class CampaignRefreshManager {
         this._configuration = configuration;
         this._focusManager = focusManager;
         this._refillTimestamp = 0;
+        this._campaignCount = 0;
+        this._parsingErrorCount = 0;
 
         this._campaignManager.onCampaign.subscribe((placementId, campaign) => this.onCampaign(placementId, campaign));
         this._campaignManager.onNoFill.subscribe(placementId => this.onNoFill(placementId));
         this._campaignManager.onError.subscribe((error, placementIds, rawAdPlan) => this.onError(error, placementIds, rawAdPlan));
-        this._campaignManager.onAdPlanReceived.subscribe((refreshDelay) => this.onAdPlanReceived(refreshDelay));
+        this._campaignManager.onAdPlanReceived.subscribe((refreshDelay, campaignCount) => this.onAdPlanReceived(refreshDelay, campaignCount));
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
             this._focusManager.onAppForeground.subscribe(() => this.onAppForeground());
         } else {
@@ -86,6 +91,7 @@ export class CampaignRefreshManager {
             this.setPlacementStates(PlacementState.WAITING, this._configuration.getPlacementIds());
             this._refillTimestamp = 0;
             this.invalidateCampaigns(false, this._configuration.getPlacementIds());
+            this._campaignCount = 0;
             return this._campaignManager.request();
         } else if(this.checkForExpiredCampaigns()) {
             return this.onCampaignExpired();
@@ -159,11 +165,15 @@ export class CampaignRefreshManager {
     }
 
     private onCampaign(placementId: string, campaign: Campaign) {
+        this._parsingErrorCount = 0;
+
         this.setCampaignForPlacement(placementId, campaign);
         this.handlePlacementState(placementId, PlacementState.READY);
     }
 
     private onNoFill(placementId: string) {
+        this._parsingErrorCount = 0;
+
         this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill, no ads to show, for placement: ' + placementId);
         this.setCampaignForPlacement(placementId, undefined);
         this.handlePlacementState(placementId, PlacementState.NO_FILL);
@@ -195,9 +205,27 @@ export class CampaignRefreshManager {
         } else {
             this.setPlacementStates(PlacementState.NO_FILL, placementIds);
         }
+
+        // for now, parsing errors are retried only if there is only one campaign in ad plan
+        // therefore all parsing error retry logic is written with the assumption that there is only one campaign
+        if(this._campaignCount === 1) {
+            this._parsingErrorCount++;
+
+            if(this._parsingErrorCount === 1 && CampaignRefreshManager.ParsingErrorRefillDelay > 0) {
+                const retryDelaySeconds: number = CampaignRefreshManager.ParsingErrorRefillDelay + Math.random() * CampaignRefreshManager.ParsingErrorRefillDelay;
+                this._nativeBridge.Sdk.logDebug('Unity Ads retrying failed campaign in ' + retryDelaySeconds + ' seconds');
+                this._refillTimestamp = Date.now() + CampaignRefreshManager.ParsingErrorRefillDelay * 1000;
+                setTimeout(() => {
+                    this._nativeBridge.Sdk.logDebug('Unity Ads retrying failed campaign now');
+                    this.refresh();
+                }, retryDelaySeconds * 1000);
+            }
+        }
     }
 
-    private onAdPlanReceived(refreshDelay: number) {
+    private onAdPlanReceived(refreshDelay: number, campaignCount: number) {
+        this._campaignCount = campaignCount;
+
         if(refreshDelay > 0) {
             this._refillTimestamp = Date.now() + refreshDelay * 1000;
             this._nativeBridge.Sdk.logDebug('Unity Ads ad plan will expire in ' + refreshDelay + ' seconds');
