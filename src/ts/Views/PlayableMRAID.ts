@@ -231,7 +231,8 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
                 this._playableStartTimestamp = Date.now();
                 const timeFromShow = this.checkIsNegative((this._playableStartTimestamp - this._showTimestamp) / 1000);
-                this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, 0, this._backgroundTime / 1000, 'playable_start', undefined));
+                const backgroundTime = this.checkIsNegative(this._backgroundTime / 1000);
+                this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_start', undefined));
                 this._iframe.contentWindow.postMessage({
                     type: 'viewable',
                     value: true
