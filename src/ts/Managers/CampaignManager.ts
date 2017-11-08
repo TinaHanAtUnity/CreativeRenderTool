@@ -212,6 +212,8 @@ export class CampaignManager {
                         promises.push(this.handleCampaign(auctionResponse, session).catch(error => {
                             if(error === CacheStatus.STOPPED) {
                                 return Promise.resolve();
+                            } else if(error === CacheStatus.FAILED) {
+                                return this.handleError(new WebViewError('Caching failed', 'CacheStatusFailed'), fill[mediaId], session);
                             }
 
                             return this.handleError(error, fill[mediaId], session);
