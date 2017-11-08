@@ -254,6 +254,22 @@ export class DeviceInfo {
         return DeviceInfo._screenScale;
     }
 
+    public static getDeviceMaxVolume() {
+        return DeviceInfo._maxVolume;
+    }
+
+    public static registerVolumeChangeListener() {
+        return undefined;
+    }
+
+    public static unregisterVolumeChangeListener() {
+        return undefined;
+    }
+
+    public static getPackageInfo() {
+        return {};
+    }
+
     public static isSimulator() {
         return DeviceInfo._simulator;
     }
@@ -297,6 +313,7 @@ export class DeviceInfo {
     private static _screenScale: number = 2;
     private static _simulator: boolean = false;
     private static _statusBarHeight: number = 0;
+    private static _maxVolume: number = 1;
 
     private static getGuid() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (char) => {

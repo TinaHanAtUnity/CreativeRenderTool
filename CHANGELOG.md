@@ -1,4 +1,11 @@
-# Fri Nov  3 07:28:14 UTC 2017
+# Mon Nov  6 22:22:45 UTC 2017
+
+* Revert "new" end screen & "new" dark end screen
+* Fix major UI issues in iPhone X
+* Add total background time into playable analytics events
+* Fix integration tests
+
+# Fri Nov  3 07:28:14 UTC 2017 (reverted)
 
 * Switch to "new" end screen
 * AB Test "new" dark end screen in groups 10 & 11
