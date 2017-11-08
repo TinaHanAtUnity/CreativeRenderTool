@@ -18,10 +18,10 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ComScoreTrackingService } from "Utilities/ComScoreTrackingService";
 import { SessionManager } from 'Managers/SessionManager';
 
 import EventTestVast from 'xml/EventTestVast.xml';
-import {ComScoreTrackingService} from "../../../Utilities/ComScoreTrackingService";
 
 describe('VastEndScreenEventHandlersTest', () => {
     const handleInvocation = sinon.spy();

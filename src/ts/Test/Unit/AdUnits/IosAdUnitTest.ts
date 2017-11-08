@@ -11,6 +11,7 @@ import { ForceOrientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitCo
 import { ViewController } from 'AdUnits/Containers/ViewController';
 import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ComScoreTrackingService } from "Utilities/ComScoreTrackingService";
 import { SessionManager } from 'Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { WakeUpManager } from 'Managers/WakeUpManager';
@@ -18,7 +19,6 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { Request } from 'Utilities/Request';
 import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
-import {ComScoreTrackingService} from "../../../Utilities/ComScoreTrackingService";
 
 describe('IosAdUnitTest', () => {
     let nativeBridge: NativeBridge;

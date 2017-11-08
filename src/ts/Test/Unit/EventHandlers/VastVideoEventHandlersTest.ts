@@ -21,9 +21,9 @@ import { Activity } from 'AdUnits/Containers/Activity';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ComScoreTrackingService } from "Utilities/ComScoreTrackingService";
 
 import EventTestVast from 'xml/EventTestVast.xml';
-import {ComScoreTrackingService} from "../../../Utilities/ComScoreTrackingService";
 
 describe('VastVideoEventHandlers tests', () => {
     const handleInvocation = sinon.spy();

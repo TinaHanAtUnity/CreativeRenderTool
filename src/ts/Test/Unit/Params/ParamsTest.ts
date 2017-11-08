@@ -13,6 +13,7 @@ import { RequestApi } from 'Native/Api/Request';
 import { ParamsTestData, IEventSpec } from './ParamsTestData';
 import { ConfigManager } from 'Managers/ConfigManager';
 import { SessionManager } from 'Managers/SessionManager';
+import { ComScoreTrackingService } from "Utilities/ComScoreTrackingService";
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { Configuration, CacheMode } from 'Models/Configuration';
@@ -35,7 +36,6 @@ import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { AndroidDeviceInfoApi, IPackageInfo } from 'Native/Api/AndroidDeviceInfo';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
-import {ComScoreTrackingService} from "../../../Utilities/ComScoreTrackingService";
 
 class TestStorageApi extends StorageApi {
     public get<T>(storageType: StorageType, key: string): Promise<T> {

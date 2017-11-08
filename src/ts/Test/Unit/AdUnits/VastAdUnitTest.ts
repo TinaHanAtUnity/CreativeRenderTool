@@ -21,11 +21,11 @@ import { FocusManager } from 'Managers/FocusManager';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ComScoreTrackingService } from "Utilities/ComScoreTrackingService";
 import { SessionManager } from 'Managers/SessionManager';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 
 import EventTestVast from 'xml/EventTestVast.xml';
-import {ComScoreTrackingService} from "../../../Utilities/ComScoreTrackingService";
 
 describe('VastAdUnit', () => {
 
