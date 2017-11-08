@@ -211,7 +211,7 @@ export class CampaignRefreshManager {
         if(this._campaignCount === 1) {
             this._parsingErrorCount++;
 
-            if(this._parsingErrorCount === 1) {
+            if(this._parsingErrorCount === 1 && CampaignRefreshManager.ParsingErrorRefillDelay > 0) {
                 const retryDelaySeconds: number = CampaignRefreshManager.ParsingErrorRefillDelay + Math.random() * CampaignRefreshManager.ParsingErrorRefillDelay;
                 this._nativeBridge.Sdk.logDebug('Unity Ads retrying failed campaign in ' + retryDelaySeconds + ' seconds');
                 this._refillTimestamp = Date.now() + CampaignRefreshManager.ParsingErrorRefillDelay * 1000;
