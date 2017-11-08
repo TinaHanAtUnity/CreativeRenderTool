@@ -92,12 +92,13 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
         }
     }
 
-    public onMraidAnalyticsEvent(timeFromShow: number, timeFromPlayableStart: number, event: string, eventData: any): void {
+    public onMraidAnalyticsEvent(timeFromShow: number, timeFromPlayableStart: number, backgroundTime: number, event: string, eventData: any): void {
         const kafkaObject: any = {};
         kafkaObject.type = event;
         kafkaObject.eventData = eventData;
         kafkaObject.timeFromShow = timeFromShow;
         kafkaObject.timeFromPlayableStart = timeFromPlayableStart;
+        kafkaObject.backgroundTime = backgroundTime;
 
         const resourceUrl = this._campaign.getResourceUrl();
         if(resourceUrl) {
