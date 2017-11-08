@@ -38,7 +38,7 @@
     "systemjs-plugin-text": "0.0.11",
     "tslint": "5.7.0",
     "tslint-microsoft-contrib": "5.0.1",
-    "typescript": "^2.5.2",
+    "typescript": "2.5.2",
     "stylint": "1.5.9",
     "xmldom": "0.1.27",
     "xmlhttprequest": "1.8.0"
