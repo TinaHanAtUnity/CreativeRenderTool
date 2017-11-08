@@ -3,12 +3,12 @@ import { Vast } from 'Models/Vast/Vast';
 import { VastCreativeCompanionAd } from 'Models/Vast/VastCreativeCompanionAd';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
+import { IVideoAdUnitParameters, VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { VastEndScreen } from 'Views/VastEndScreen';
-import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
-import { Placement } from 'Models/Placement';
-import { Overlay } from 'Views/Overlay';
-import { DeviceInfo } from 'Models/DeviceInfo';
+import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { MOAT } from 'Views/MOAT';
+import { StreamType } from 'Constants/Android/StreamType';
+import { Platform } from 'Constants/Platform';
 
 enum Orientation {
     LANDSCAPE,
@@ -26,23 +26,67 @@ class DeviceOrientation {
     }
 }
 
-export class VastAdUnit extends VideoAdUnit {
+export interface IVastAdUnitParameters extends IVideoAdUnitParameters<VastCampaign> {
+    endScreen?: VastEndScreen;
+}
+
+export class VastAdUnit extends VideoAdUnit<VastCampaign> {
+    protected _onPauseObserver: any;
 
     private _endScreen: VastEndScreen | null;
+    private _thirdPartyEventManager: ThirdPartyEventManager;
+    private _moat?: MOAT;
+    private _volume: number;
+    private _muted: boolean = false;
+    private _events: Array<[number, string]> = [[0.0, 'AdVideoStart'], [0.25, 'AdVideoFirstQuartile'], [0.5, 'AdVideoMidpoint'], [0.75, 'AdVideoThirdQuartile']];
+    private _realDuration: number;
 
-    constructor(nativeBridge: NativeBridge, forceOrientation: ForceOrientation = ForceOrientation.NONE, container: AdUnitContainer, placement: Placement, campaign: VastCampaign, overlay: Overlay, deviceInfo: DeviceInfo, options: any, endScreen?: VastEndScreen) {
-        super(nativeBridge, forceOrientation, container, placement, campaign, campaign.getVideo(), overlay, deviceInfo, options);
-        this._endScreen = endScreen || null;
+    constructor(nativeBridge: NativeBridge, parameters: IVastAdUnitParameters) {
+        super(nativeBridge, parameters);
+        this._onPauseObserver = this._container.onAndroidPause.subscribe(() => this.onSystemPause());
+
+        parameters.overlay.setSpinnerEnabled(!parameters.campaign.getVideo().isCached());
+
+        this._endScreen = parameters.endScreen || null;
+        this._thirdPartyEventManager = parameters.thirdPartyEventManager;
+
+        if(this._endScreen) {
+            this._endScreen.render();
+            this._endScreen.hide();
+            document.body.appendChild(this._endScreen.container());
+        }
+
+        if(nativeBridge.getPlatform() === Platform.ANDROID) {
+            Promise.all([
+                nativeBridge.DeviceInfo.Android.getDeviceVolume(StreamType.STREAM_MUSIC),
+                nativeBridge.DeviceInfo.Android.getDeviceMaxVolume(StreamType.STREAM_MUSIC)
+            ]).then(([volume, maxVolume]) => {
+                this.setVolume(volume / maxVolume);
+            });
+        } else if(nativeBridge.getPlatform() === Platform.IOS) {
+            nativeBridge.DeviceInfo.Ios.getDeviceVolume().then((volume) => {
+                this.setVolume(volume);
+            });
+        }
     }
 
     public hide(): Promise<void> {
-        const endScreen = this.getEndScreen();
-        if (endScreen) {
-            endScreen.hide();
-            endScreen.remove();
-        }
+        // note: this timeout is required for the MOAT integration to function as expected
+        return new Promise((resolve, reject) => {
+            setTimeout(resolve, 500);
+        }).then(() => {
+            const endScreen = this.getEndScreen();
+            if (endScreen) {
+                endScreen.hide();
+                endScreen.remove();
+            }
 
-        return super.hide();
+            if(this._moat) {
+                this._moat.container().parentElement!.removeChild(this._moat.container());
+            }
+
+            return super.hide();
+        });
     }
 
     public description(): string {
@@ -53,32 +97,71 @@ export class VastAdUnit extends VideoAdUnit {
         return (<VastCampaign> this.getCampaign()).getVast();
     }
 
+    public getMoat(): MOAT | undefined {
+        return this._moat;
+    }
+
+    public getEvents() {
+        return this._events;
+    }
+
+    public setEvents(events: Array<[number, string]>) {
+        this._events = events;
+    }
+
+    public getRealDuration() {
+        return this._realDuration;
+    }
+
+    public setRealDuration(duration: number) {
+        this._realDuration = duration;
+    }
+
+    public getVolume() {
+        if(this._muted) {
+            return 0;
+        }
+        return this._volume;
+    }
+
+    public setVolume(volume: number) {
+        this._volume = volume;
+    }
+
+    public setMuted(muted: boolean) {
+        this._muted = muted;
+    }
+
+    public getMuted() {
+        return this._muted;
+    }
+
     public getDuration(): number | null {
         return this.getVast().getDuration();
     }
 
-    public sendImpressionEvent(thirdPartyEventManager: ThirdPartyEventManager, sessionId: string, sdkVersion: number): void {
+    public sendImpressionEvent(sessionId: string, sdkVersion: number): void {
         const impressionUrls = this.getVast().getImpressionUrls();
         if (impressionUrls) {
             for (const impressionUrl of impressionUrls) {
-                this.sendThirdPartyEvent(thirdPartyEventManager, 'vast impression', sessionId, sdkVersion, impressionUrl);
+                this.sendThirdPartyEvent('vast impression', sessionId, sdkVersion, impressionUrl);
             }
         }
     }
 
-    public sendTrackingEvent(thirdPartyEventManager: ThirdPartyEventManager, eventName: string, sessionId: string, sdkVersion: number): void {
+    public sendTrackingEvent(eventName: string, sessionId: string, sdkVersion: number): void {
         const trackingEventUrls = this.getVast().getTrackingEventUrls(eventName);
         if (trackingEventUrls) {
             for (const url of trackingEventUrls) {
-                this.sendThirdPartyEvent(thirdPartyEventManager, `vast ${eventName}`, sessionId, sdkVersion, url);
+                this.sendThirdPartyEvent(`vast ${eventName}`, sessionId, sdkVersion, url);
             }
         }
     }
 
-    public sendProgressEvents(thirdPartyEventManager: ThirdPartyEventManager, sessionId: string, sdkVersion: number, position: number, oldPosition: number) {
-        this.sendQuartileEvent(thirdPartyEventManager, sessionId, sdkVersion, position, oldPosition, 1, 'firstQuartile');
-        this.sendQuartileEvent(thirdPartyEventManager, sessionId, sdkVersion, position, oldPosition, 2, 'midpoint');
-        this.sendQuartileEvent(thirdPartyEventManager, sessionId, sdkVersion, position, oldPosition, 3, 'thirdQuartile');
+    public sendProgressEvents(sessionId: string, sdkVersion: number, position: number, oldPosition: number) {
+        this.sendQuartileEvent(sessionId, sdkVersion, position, oldPosition, 1, 'firstQuartile');
+        this.sendQuartileEvent(sessionId, sdkVersion, position, oldPosition, 2, 'midpoint');
+        this.sendQuartileEvent(sessionId, sdkVersion, position, oldPosition, 3, 'thirdQuartile');
     }
 
     public getVideoClickThroughURL(): string | null {
@@ -99,12 +182,18 @@ export class VastAdUnit extends VideoAdUnit {
         }
     }
 
-    public sendVideoClickTrackingEvent(thirdPartyEventManager: ThirdPartyEventManager, sessionId: string, sdkVersion: number): void {
+    public initMoat() {
+        this._moat = new MOAT(this._nativeBridge);
+        this._moat.render();
+        document.body.appendChild(this._moat.container());
+    }
+
+    public sendVideoClickTrackingEvent(sessionId: string, sdkVersion: number): void {
         const clickTrackingEventUrls = this.getVast().getVideoClickTrackingURLs();
 
         if (clickTrackingEventUrls) {
             for (const clickTrackingEventUrl of clickTrackingEventUrls) {
-                this.sendThirdPartyEvent(thirdPartyEventManager, 'vast video click', sessionId, sdkVersion, clickTrackingEventUrl);
+                this.sendThirdPartyEvent('vast video click', sessionId, sdkVersion, clickTrackingEventUrl);
             }
         }
     }
@@ -113,13 +202,28 @@ export class VastAdUnit extends VideoAdUnit {
         return this._endScreen;
     }
 
-    public sendCompanionTrackingEvent(thirdPartyEventManager: ThirdPartyEventManager, sessionId: string, sdkVersion: number): void {
+    public sendCompanionTrackingEvent(sessionId: string, sdkVersion: number): void {
         const companion = this.getCompanionForOrientation();
         if (companion) {
             const urls = companion.getEventTrackingUrls('creativeView');
             for (const url of urls) {
-                this.sendThirdPartyEvent(thirdPartyEventManager, 'companion', sessionId, sdkVersion, url);
+                this.sendThirdPartyEvent('companion', sessionId, sdkVersion, url);
             }
+        }
+    }
+
+    protected onSystemInterrupt(interruptStarted: boolean): void {
+        super.onSystemInterrupt(interruptStarted);
+        if (this._moat) {
+            if (!interruptStarted) {
+                this._moat.resume(this.getVolume());
+            }
+        }
+    }
+
+    protected onSystemPause(): void {
+        if (this._moat && !this._container.isPaused()) {
+            this._moat.pause(this.getVolume());
         }
     }
 
@@ -138,19 +242,19 @@ export class VastAdUnit extends VideoAdUnit {
         }
     }
 
-    private sendQuartileEvent(thirdPartyEventManager: ThirdPartyEventManager, sessionId: string, sdkVersion: number, position: number, oldPosition: number, quartile: number, quartileEventName: string) {
+    private sendQuartileEvent(sessionId: string, sdkVersion: number, position: number, oldPosition: number, quartile: number, quartileEventName: string) {
         if (this.getTrackingEventUrls(quartileEventName)) {
             const duration = this.getDuration();
             if (duration && duration > 0 && position / 1000 > duration * 0.25 * quartile && oldPosition / 1000 < duration * 0.25 * quartile) {
-                this.sendTrackingEvent(thirdPartyEventManager, quartileEventName, sessionId, sdkVersion);
+                this.sendTrackingEvent(quartileEventName, sessionId, sdkVersion);
             }
         }
     }
 
-    private sendThirdPartyEvent(thirdPartyEventManager: ThirdPartyEventManager, event: string, sessionId: string, sdkVersion: number, url: string): void {
+    private sendThirdPartyEvent(event: string, sessionId: string, sdkVersion: number, url: string): void {
         url = url.replace(/%ZONE%/, this.getPlacement().getId());
         url = url.replace(/%SDK_VERSION%/, sdkVersion.toString());
-        thirdPartyEventManager.sendEvent(event, sessionId, url);
+        this._thirdPartyEventManager.sendEvent(event, sessionId, url);
     }
 
     private getTrackingEventUrls(eventName: string): string[] | null {

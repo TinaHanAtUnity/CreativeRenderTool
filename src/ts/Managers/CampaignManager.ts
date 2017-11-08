@@ -19,6 +19,7 @@ import { CampaignRefreshManager } from 'Managers/CampaignRefreshManager';
 import { CacheStatus } from 'Utilities/Cache';
 import { AuctionResponse } from 'Models/AuctionResponse';
 import { Session } from 'Models/Session';
+import { SdkStats } from 'Utilities/SdkStats';
 import { CometCampaignParser } from 'Parsers/CometCampaignParser';
 import { ProgrammaticVastParser } from 'Parsers/ProgrammaticVastParser';
 import { ProgrammaticMraidUrlParser } from 'Parsers/ProgrammaticMraidUrlParser';
@@ -61,7 +62,7 @@ export class CampaignManager {
     public readonly onCampaign = new Observable2<string, Campaign>();
     public readonly onNoFill = new Observable1<string>();
     public readonly onError = new Observable3<WebViewError, string[], Session | undefined>();
-    public readonly onAdPlanReceived = new Observable2<number, boolean>();
+    public readonly onAdPlanReceived = new Observable2<number, number>();
 
     protected _nativeBridge: NativeBridge;
     protected _requesting: boolean;
@@ -87,7 +88,7 @@ export class CampaignManager {
         this._requesting = false;
     }
 
-    public request(performanceDisabled?: boolean): Promise<INativeResponse | void> {
+    public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
         // prevent having more then one ad request in flight
         if(this._requesting) {
             return Promise.resolve();
@@ -102,9 +103,11 @@ export class CampaignManager {
         }
 
         return this._sessionManager.create().then((session) => {
-            return Promise.all([this.createRequestUrl(session), this.createRequestBody(performanceDisabled)]).then(([requestUrl, requestBody]) => {
+            return Promise.all([this.createRequestUrl(session), this.createRequestBody(nofillRetry)]).then(([requestUrl, requestBody]) => {
                 this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
                 const body = JSON.stringify(requestBody);
+                SdkStats.setAdRequestTimestamp();
+                const requestTimestamp: number = Date.now();
                 return Promise.resolve().then((): Promise<INativeResponse> => {
                     if(CampaignManager.CampaignResponse) {
                         return Promise.resolve({
@@ -122,6 +125,8 @@ export class CampaignManager {
                     });
                 }).then(response => {
                     if(response) {
+                        SdkStats.setAdRequestDuration(Date.now() - requestTimestamp);
+                        SdkStats.increaseAdRequestOrdinal();
                         this._rawResponse = response.response;
                         session.setAdPlan(this._rawResponse);
                         return this.parseCampaigns(response, session);
@@ -143,6 +148,14 @@ export class CampaignManager {
 
     public getPreviousPlacementId(): string | undefined {
         return this._previousPlacementId;
+    }
+
+    public getFullyCachedCampaigns(): Promise<string[]> {
+        return this._nativeBridge.Storage.getKeys(StorageType.PRIVATE, 'cache.campaigns', false).then((campaignKeys) => {
+            return campaignKeys;
+        }).catch(() => {
+            return [];
+        });
     }
 
     private parseCampaigns(response: INativeResponse, session: Session): Promise<void[]> {
@@ -176,10 +189,11 @@ export class CampaignManager {
                 refreshDelay = CampaignRefreshManager.NoFillDelay;
             }
 
-            let noFillOnly: boolean = true;
+            let campaigns: number = 0;
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
-                    noFillOnly = false;
+                    campaigns++;
+
                     const contentType = json.media[mediaId].contentType;
                     const cacheTTL = json.media[mediaId].cacheTTL ? json.media[mediaId].cacheTTL : 3600;
                     if(contentType && contentType !== 'comet/campaign' && cacheTTL > 0 && (cacheTTL < refreshDelay || refreshDelay === 0)) {
@@ -188,7 +202,7 @@ export class CampaignManager {
                 }
             }
 
-            this.onAdPlanReceived.trigger(refreshDelay, noFillOnly);
+            this.onAdPlanReceived.trigger(refreshDelay, campaigns);
 
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
@@ -198,6 +212,8 @@ export class CampaignManager {
                         promises.push(this.handleCampaign(auctionResponse, session).catch(error => {
                             if(error === CacheStatus.STOPPED) {
                                 return Promise.resolve();
+                            } else if(error === CacheStatus.FAILED) {
+                                return this.handleError(new WebViewError('Caching failed', 'CacheStatusFailed'), fill[mediaId], session);
                             }
 
                             return this.handleError(error, fill[mediaId], session);
@@ -243,7 +259,12 @@ export class CampaignManager {
                 throw new Error('Unsupported content-type: ' + response.getContentType());
         }
 
+        const parseTimestamp = Date.now();
         return parser.parse(this._nativeBridge, this._request, response, session, this._configuration.getGamerId(), this.getAbGroup()).then((campaign) => {
+            const parseDuration = Date.now() - parseTimestamp;
+            for(const placement of response.getPlacements()) {
+                SdkStats.setParseDuration(placement, parseDuration);
+            }
             return this.setupCampaignAssets(response.getPlacements(), campaign);
         });
     }
@@ -357,12 +378,15 @@ export class CampaignManager {
         });
     }
 
-    private createRequestBody(performanceDisabled?: boolean): Promise<any> {
+    private createRequestBody(nofillRetry?: boolean): Promise<any> {
         const promises: Array<Promise<any>> = [];
         promises.push(this._deviceInfo.getFreeSpace());
         promises.push(this._deviceInfo.getNetworkOperator());
         promises.push(this._deviceInfo.getNetworkOperatorName());
+        promises.push(this._deviceInfo.getHeadset());
+        promises.push(this._deviceInfo.getDeviceVolume());
         promises.push(this.getFullyCachedCampaigns());
+        promises.push(this.getVersionCode());
 
         const body: any = {
             bundleVersion: this._clientInfo.getApplicationVersion(),
@@ -370,7 +394,8 @@ export class CampaignManager {
             coppa: this._configuration.isCoppaCompliant(),
             language: this._deviceInfo.getLanguage(),
             gameSessionId: this._sessionManager.getGameSessionId(),
-            timeZone: this._deviceInfo.getTimeZone()
+            timeZone: this._deviceInfo.getTimeZone(),
+            simulator: this._deviceInfo.isSimulator()
         };
 
         if (this.getPreviousPlacementId()) {
@@ -381,17 +406,23 @@ export class CampaignManager {
             body.webviewUa = navigator.userAgent;
         }
 
-        if(performanceDisabled) {
-            body.performanceDisabled = true;
+        if(nofillRetry) {
+            body.nofillRetry = true;
         }
 
-        return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName, fullyCachedCampaignIds]) => {
+        return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName, headset, volume, fullyCachedCampaignIds, versionCode]) => {
             body.deviceFreeSpace = freeSpace;
             body.networkOperator = networkOperator;
             body.networkOperatorName = networkOperatorName;
+            body.wiredHeadset = headset;
+            body.volume = volume;
 
-            if (fullyCachedCampaignIds && fullyCachedCampaignIds.length > 0) {
+            if(fullyCachedCampaignIds && fullyCachedCampaignIds.length > 0) {
                 body.cachedCampaigns = fullyCachedCampaignIds;
+            }
+
+            if(versionCode) {
+                body.versionCode = versionCode;
             }
 
             const metaDataPromises: Array<Promise<any>> = [];
@@ -432,11 +463,19 @@ export class CampaignManager {
         });
     }
 
-    private getFullyCachedCampaigns(): Promise<string[]> {
-        return this._nativeBridge.Storage.getKeys(StorageType.PRIVATE, 'cache.campaigns', false).then((campaignKeys) => {
-            return campaignKeys;
-        }).catch(() => {
-            return [];
-        });
+    private getVersionCode(): Promise<number | undefined> {
+        if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            return this._nativeBridge.DeviceInfo.Android.getPackageInfo(this._clientInfo.getApplicationName()).then(packageInfo => {
+                if(packageInfo.versionCode) {
+                    return packageInfo.versionCode;
+                } else {
+                    return undefined;
+                }
+            }).catch(() => {
+                return undefined;
+            });
+        } else {
+            return Promise.resolve(undefined);
+        }
     }
 }

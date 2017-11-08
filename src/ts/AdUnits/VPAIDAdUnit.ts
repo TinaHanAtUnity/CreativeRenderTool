@@ -1,6 +1,4 @@
-import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
-import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
-import { Placement } from 'Models/Placement';
+import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
 import { NativeBridge } from 'Native/NativeBridge';
 import { VPAID } from 'Views/VPAID';
@@ -13,8 +11,16 @@ import { Timer } from 'Utilities/Timer';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { FocusManager } from 'Managers/FocusManager';
+import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
+import { Overlay } from 'Views/Overlay';
 
-export class VPAIDAdUnit extends AbstractAdUnit {
+export interface IVPAIDAdUnitParameters extends IAdUnitParameters<VPAIDCampaign> {
+    vpaid: VPAID;
+    endScreen?: VPAIDEndScreen;
+    overlay: Overlay;
+}
+
+export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
 
     public static setAdLoadTimeout(timeout: number) {
         VPAIDAdUnit._adLoadTimeout = timeout;
@@ -25,7 +31,6 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _view: VPAID;
-    private _vpaidEventHandlers: { [eventName: string]: () => void; } = {};
     private _vpaidCampaign: VPAIDCampaign;
     private _timer: Timer;
     private _options: any;
@@ -33,47 +38,43 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     private _onAppForegroundHandler: any;
     private _onAppBackgroundHandler: any;
 
-    constructor(view: VPAID, nativeBridge: NativeBridge, focusManager: FocusManager, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, forceOrientation: ForceOrientation, container: AdUnitContainer, placement: Placement, campaign: VPAIDCampaign, options: any) {
-        super(nativeBridge, forceOrientation, container, placement, campaign);
+    constructor(nativeBridge: NativeBridge, parameters: IVPAIDAdUnitParameters) {
+        super(nativeBridge, parameters);
 
-        this._focusManager = focusManager;
-        this._vpaidCampaign = campaign;
-        this._operativeEventManager = operativeEventManager;
-        this._thirdPartyEventManager = thirdPartyEventManager;
-        this._options = options;
+        this._focusManager = parameters.focusManager;
+        this._vpaidCampaign = parameters.campaign;
+        this._operativeEventManager = parameters.operativeEventManager;
+        this._thirdPartyEventManager = parameters.thirdPartyEventManager;
+        this._options = parameters.options;
+        this._view = parameters.vpaid;
 
-        this._view = view;
-        this._view.onVPAIDEvent.subscribe((eventType: string, args: any[]) => this.onVPAIDEvent(eventType, args));
-        this._view.onCompanionClick.subscribe(() => this.onCompanionClick());
-        this._view.onCompanionView.subscribe(() => this.onCompanionView());
-        this._view.onStuck.subscribe(() => this.onAdStuck());
-        this._view.onSkip.subscribe(() => this.onAdSkipped());
+        parameters.overlay.render();
+        parameters.overlay.setFadeEnabled(true);
+        parameters.overlay.setSkipEnabled(false);
+        parameters.overlay.setMuteEnabled(false);
+        const overlayContainer = parameters.overlay.container();
+        overlayContainer.style.position = 'absolute';
+        overlayContainer.style.top = '0px';
+        overlayContainer.style.left = '0px';
+        document.body.appendChild(overlayContainer);
 
-        if (campaign.hasEndScreen()) {
-            this._view.endScreen.onClick.subscribe(() => this.onCompanionClick());
-            this._view.endScreen.onClose.unsubscribe(() => this.onEndScreenClose());
+        if (this._placement.allowSkip()) {
+            parameters.overlay.setSkipEnabled(true);
+            parameters.overlay.setSkipDuration(this._placement.allowSkipInSeconds());
         }
 
-        this._vpaidEventHandlers.AdError = this.onAdError;
-        this._vpaidEventHandlers.AdLoaded = this.onAdLoaded;
-        this._vpaidEventHandlers.AdStarted = this.onAdStarted;
-        this._vpaidEventHandlers.AdStopped = this.onAdStopped;
-        this._vpaidEventHandlers.AdSkipped = this.onAdSkipped;
-        this._vpaidEventHandlers.AdImpression = this.onAdImpression;
-        this._vpaidEventHandlers.AdVideoStart = this.onAdVideoStart;
-        this._vpaidEventHandlers.AdVideoFirstQuartile = this.onAdVideoFirstQuartile;
-        this._vpaidEventHandlers.AdVideoMidpoint = this.onAdVideoMidpoint;
-        this._vpaidEventHandlers.AdVideoThirdQuartile = this.onAdVideoThirdQuartile;
-        this._vpaidEventHandlers.AdVideoComplete = this.onAdVideoComplete;
-        this._vpaidEventHandlers.AdPaused = this.onAdPaused;
-        this._vpaidEventHandlers.AdPlaying = this.onAdPlaying;
-        this._vpaidEventHandlers.AdClickThru = this.onAdClickThru;
-        this._vpaidEventHandlers.AdDurationChange = this.onAdDurationChange;
+        if(this._vpaidCampaign.hasEndScreen() && parameters.endScreen) {
+            parameters.endScreen.render();
+            parameters.endScreen.hide();
+            document.body.appendChild(parameters.endScreen.container());
+        }
 
         this._timer = new Timer(() => this.onAdUnitNotLoaded(), VPAIDAdUnit._adLoadTimeout);
 
         this._onAppBackgroundHandler = () => this.onAppBackground();
         this._onAppForegroundHandler = () => this.onAppForeground();
+
+        this._view.render();
     }
 
     public show(): Promise<void> {
@@ -96,6 +97,48 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         return false;
     }
 
+    public getAdUnitNotLoadedTimer(): Timer {
+        return this._timer;
+    }
+
+    public openUrl(url: string | null) {
+        if (url && Url.isProtocolWhitelisted(url)) {
+            if (this._nativeBridge.getPlatform() === Platform.IOS) {
+                this._nativeBridge.UrlScheme.open(url);
+            } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                this._nativeBridge.Intent.launch({
+                    'action': 'android.intent.action.VIEW',
+                    'uri': url
+                });
+            }
+        }
+    }
+
+    public sendTrackingEvent(eventType: string) {
+        const urls = this._vpaidCampaign.getTrackingEventUrls(eventType);
+
+        for (const url of urls) {
+            this.sendThirdPartyEvent(`vpaid ${eventType}`, url);
+        }
+    }
+
+    public sendImpressionTracking() {
+        const impressionUrls = this._vpaidCampaign.getImpressionUrls();
+        if (impressionUrls) {
+            for (const impressionUrl of impressionUrls) {
+                this.sendThirdPartyEvent('vpaid impression', impressionUrl);
+            }
+        }
+    }
+
+    public sendThirdPartyEvent(eventType: string, url: string) {
+        const sessionId = this._vpaidCampaign.getSession().getId();
+        const sdkVersion = this._operativeEventManager.getClientInfo().getSdkVersion();
+        url = url.replace(/%ZONE%/, this._placement.getId());
+        url = url.replace(/%SDK_VERSION%/, sdkVersion.toString());
+        this._thirdPartyEventManager.sendEvent(eventType, sessionId, url);
+    }
+
     private onAdUnitNotLoaded() {
         this.setFinishState(FinishState.ERROR);
         Diagnostics.trigger('vpaid_load_timeout', new DiagnosticError(new Error('VPAID failed to load within timeout'), {
@@ -106,6 +149,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
 
     private onShow() {
         this.setShowing(true);
+        this.onStart.trigger();
         this._timer.start();
 
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
@@ -142,190 +186,11 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         document.body.removeChild(this._view.container());
     }
 
-    private onVPAIDEvent(eventType: string, args: any[]) {
-        this._nativeBridge.Sdk.logInfo(`vpaid event ${eventType} with args ${args && args.length ? args.join(' '): 'None'}`);
-        const handler = this._vpaidEventHandlers[eventType];
-        if (handler) {
-            handler.apply(this, args);
-        }
-    }
-
-    private onAdLoaded() {
-        this._timer.stop();
-        this._view.updateTimeoutWidget();
-        this._view.showAd();
-        this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
-    }
-
-    private onAdError() {
-        this.sendTrackingEvent('error');
-        this.setFinishState(FinishState.ERROR);
-        this.hide();
-    }
-
-    private onAdSkipped() {
-        this.sendTrackingEvent('skip');
-        this._operativeEventManager.sendSkip(this);
-        this.setFinishState(FinishState.SKIPPED);
-        this.hide();
-    }
-
-    private onAdStopped() {
-        if (this._vpaidCampaign.hasEndScreen()) {
-            this._view.showEndScreen();
-        } else {
-            this.hide();
-        }
-    }
-
-    private onAdStuck() {
-        Diagnostics.trigger('vpaid_ad_stuck', new DiagnosticError(new Error('Ad playback stuck'), {
-            campaignId: this._campaign.getId()
-        }), this._campaign.getSession());
-        this.setFinishState(FinishState.ERROR);
-        this.hide();
-    }
-
-    private onEndScreenClose() {
-        this.hide();
-    }
-
-    private onAdStarted() {
-        this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
-        this.sendTrackingEvent('creativeView');
-        this._operativeEventManager.sendStart(this);
-    }
-
-    private onAdImpression() {
-        this.sendTrackingEvent('impression');
-        this.sendImpressionTracking();
-    }
-
-    private onAdVideoStart() {
-        this.sendTrackingEvent('start');
-    }
-
-    private onAdVideoFirstQuartile() {
-        this.sendTrackingEvent('firstQuartile');
-        this._operativeEventManager.sendFirstQuartile(this);
-    }
-
-    private onAdVideoMidpoint() {
-        this.sendTrackingEvent('midpoint');
-        this._operativeEventManager.sendMidpoint(this);
-    }
-
-    private onAdVideoThirdQuartile() {
-        this.sendTrackingEvent('thirdQuartile');
-        this._operativeEventManager.sendThirdQuartile(this);
-    }
-
-    private onAdVideoComplete() {
-        this.sendTrackingEvent('complete');
-        this.setFinishState(FinishState.COMPLETED);
-        this._operativeEventManager.sendView(this);
-    }
-
-    private onAdPaused() {
-        if (this.getFinishState() === FinishState.COMPLETED) {
-            this.onAdStopped();
-        } else {
-            this.sendTrackingEvent('paused');
-        }
-    }
-
     private onAppForeground() {
         this._view.resumeAd();
     }
 
     private onAppBackground() {
         this._view.pauseAd();
-    }
-
-    private onAdPlaying() {
-        this.sendTrackingEvent('resume');
-    }
-
-    private onAdClickThru(url?: string, id?: string, playerHandles?: boolean) {
-        this.sendClickTrackingEvents();
-        if (playerHandles) {
-            if (url) {
-                this.openUrl(url);
-            } else {
-                this.openUrl(this.getClickThroughURL());
-            }
-        }
-    }
-
-    private onAdDurationChange() {
-        this._view.updateTimeoutWidget();
-    }
-
-    private openUrl(url: string | null) {
-        if (url && Url.isProtocolWhitelisted(url)) {
-            if (this._nativeBridge.getPlatform() === Platform.IOS) {
-                this._nativeBridge.UrlScheme.open(url);
-            } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                this._nativeBridge.Intent.launch({
-                    'action': 'android.intent.action.VIEW',
-                    'uri': url
-                });
-            }
-        }
-    }
-
-    private onCompanionClick() {
-        const url = this.getCompanionClickThroughURL() || this.getClickThroughURL();
-        this.openUrl(url);
-    }
-
-    private onCompanionView() {
-        const companion = this._vpaidCampaign.getCompanionAd();
-        if (companion) {
-            const urls = companion.getEventTrackingUrls('creativeView');
-            for (const url of urls) {
-                this.sendThirdPartyEvent('vpaid companion creativeView', url);
-            }
-        }
-    }
-
-    private getCompanionClickThroughURL(): string | null {
-        return this._vpaidCampaign.getCompanionClickThroughURL();
-    }
-
-    private getClickThroughURL(): string | null {
-        return this._vpaidCampaign.getVideoClickThroughURL();
-    }
-
-    private sendClickTrackingEvents() {
-        const urls = this._vpaidCampaign.getVideoClickTrackingURLs();
-        for (const url of urls) {
-            this.sendThirdPartyEvent('vpaid video click', url);
-        }
-    }
-
-    private sendTrackingEvent(eventType: string) {
-        const urls = this._vpaidCampaign.getTrackingEventUrls(eventType);
-
-        for (const url of urls) {
-            this.sendThirdPartyEvent(`vpaid ${eventType}`, url);
-        }
-    }
-
-    private sendThirdPartyEvent(eventType: string, url: string) {
-        const sessionId = this._vpaidCampaign.getSession().getId();
-        const sdkVersion = this._operativeEventManager.getClientInfo().getSdkVersion();
-        url = url.replace(/%ZONE%/, this.getPlacement().getId());
-        url = url.replace(/%SDK_VERSION%/, sdkVersion.toString());
-        this._thirdPartyEventManager.sendEvent(eventType, sessionId, url);
-    }
-
-    private sendImpressionTracking() {
-        const impressionUrls = this._vpaidCampaign.getImpressionUrls();
-        if (impressionUrls) {
-            for (const impressionUrl of impressionUrls) {
-                this.sendThirdPartyEvent('vast impression', impressionUrl);
-            }
-        }
     }
 }

@@ -1,292 +1,360 @@
-#playable-mraid
+$hiding-delay = 1.5s;
+$progress-bar-width = 60%;
+$filling-bar-width = $progress-bar-width * .3;
 
-  @import "game-shared.styl";
+#playable-mraid {
 
-  hiding-delay = 1.5s;
+  .game-rating {
+    position: relative;
+    display: inline-block;
+    color: $end-screen-info-gray;
+    vertical-align: middle;
+    letter-spacing: 5px;
+    font-size: 20px;
+  }
 
-  progress-bar-width = 60%
-  filling-bar-width = progress-bar-width * 0.3
+  .game-rating-mask {
+    position: absolute;
+    left: 0;
+    overflow: hidden;
+    width: 0;
+    height: 100%;
+    color: $rating-orange;
+    white-space: nowrap;
+    font-size: inherit;
+  }
 
-  #mraid-iframe
-    position: absolute
-    top: 0
-    left: 0
-    border: none
+  .game-rating-count {
+    color: $gray;
+    font-size: 17px;
+  }
+
+  .game-icon {
+    margin-bottom: 20px;
+    width: 75px;
+    height: 75px;
+    border-radius: 18pt;
+    background-color: $white;
+    background-size: cover;
+  }
+
+  .unityads-logo {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    width: 68px;
+    height: 16px;
+    background-image: url("../img/unityads.png");
+    background-position: center;
+    background-size: cover;
+    transform: translate(-50%, 0);
+  }
+
+  .name-container {
+    overflow: hidden;
+    color: $black;
+    text-overflow: ellipsis;
+    font-size: 17pt;
+  }
+
+  #mraid-iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100vw;
     height: 100vh;
+    border: none;
+  }
 
-  .close-region
-    display: none
-    position: absolute
-    top: 2px
-    right: 2px
-    width: 50px
-    height: 50px
-    z-index: 9999
-    opacity: 0.4
+  .close-region {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    z-index: 9999;
+    display: none;
+    width: 50px;
+    height: 50px;
+    opacity: .4;
+  }
 
-  .icon-close
-    top: 4px
-    right: 2px
-    color: #fff
-    font-size: 28px
-    width: 32px
-    height: 32px
-    position: absolute
-    text-shadow: 2px 2px 20px #7c7c7c
-    text-align: center
-    line-height: 28px
+  .icon-close {
+    position: absolute;
+    top: 4px;
+    right: 2px;
+    width: 32px;
+    height: 32px;
+    color: $white;
+    text-align: center;
+    text-shadow: 2px 2px 20px $gray;
+    font-size: 28px;
+    line-height: 28px;
+  }
 
-  .close
-    position: absolute
-    top: 50%
-    left: 8px
-    width: 36px
-    height: 36px
-    -webkit-transform: translate(0, -50%)
+  .close {
+    position: absolute;
+    top: 50%;
+    left: 8px;
+    width: 36px;
+    height: 36px;
+    transform: translate(0, -50%);
+  }
 
-  .progress-wrapper
-    position: absolute
-    width: 36px
-    height: 36px
-    clip: rect(0px, 36px, 36px, 18px)
+  .progress-wrapper {
+    position: absolute;
+    clip: rect(0px, 36px, 36px, 18px);
+    width: 36px;
+    height: 36px;
+  }
 
-  .progress:after
-    position: absolute
-    display: block
-    left: 50%
-    top: 50%
-    font-size: 18px
-    color: white
-    -webkit-transform: translate(-50%, -50%)
+  .progress:after {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: block;
+    color: $white;
+    font-size: 18px;
+    transform: translate(-50%, -50%);
+  }
 
-  .circle-base
-  .circle-left
-  .circle-right
-    position: absolute
-    vertical-align: middle
-    background-color: transparent
-    width: 28px
-    height: 28px
-    border-radius: 100%
+  .circle-base,
+  .circle-left,
+  .circle-right {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    border-radius: 100%;
+    background-color: transparent;
+    vertical-align: middle;
+  }
 
-  .circle-base
-    border: 4px solid #696969
+  .circle-base {
+    border: 4px solid $dark-gray;
+  }
 
-  .circle-left
-  .circle-right
-    border: 4px solid #fff
-    clip: rect(0px, 18px, 36px, 0px)
+  .circle-left,
+  .circle-right {
+    clip: rect(0, 18px, 36px, 0);
+    border: 4px solid $white;
+  }
 
-  .progress-wrapper
-  .circle-left
-  .circle-right
-    -webkit-animation-iteration-count: 1
-    -webkit-animation-fill-mode: forwards
-    -webkit-animation-timing-function: linear
-    -webkit-animation-duration: 0.01s
+  .progress-wrapper,
+  .circle-left,
+  .circle-right {
+    animation-duration: .01s;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+    animation-timing-function: linear;
+  }
 
-  .loading-screen
-    display: none
-    position: absolute
-    top: 0
-    left: 0
-    width: 100vw
-    height 100vh
-    background-color: white
-    z-index: 100
-    opacity: 1
+  .loading-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    display: none;
+    width: 100vw;
+    height: 100vh;
+    background-color: $white;
+    opacity: 1;
 
-    &.hidden
-      -webkit-transition: opacity 200ms ease-out;
-      transition: opacity 200ms ease-out
+    &.hidden {
+      transition: opacity 200ms ease-out;
+      transition-delay: $hiding-delay;
 
-      -webkit-transition-delay: hiding-delay
-      transition-delay: hiding-delay
+      opacity: 0;
+      pointer-events: none;
+    }
 
-      opacity: 0
-      pointer-events: none
+    .container {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      display: flex;
+      margin: auto;
 
-    .container
-      display: -webkit-box
-      display: flex
+      -webkit-box-orient: vertical;
+      -webkit-box-direction: normal;
+      -webkit-box-pack: center;
+      -webkit-box-align: center;
 
-      -webkit-box-orient: vertical
-      -webkit-box-direction: normal
-      -webkit-box-pack: center
-      -webkit-box-align: center
-
-      flex-direction: column
-      justify-content: center
-      top: 0
-      bottom: 0
-      left: 0
-      right: 0
-      margin: auto
-      position: absolute
+      flex-direction: column;
+      justify-content: center;
 
       .user-text,
       .game-icon,
       .store-container,
       .name-container,
-      .progress-bar
-        -webkit-align-self: center
-        align-self: center
-        margin: 10px
+      .progress-bar {
+        align-self: center;
+        margin: 10px;
+      }
 
       .user-text,
-      .name-container
-        text-align: center
-
-    .user-text
-      font-size: 14.5pt
-      font-weight: 300
-      color: #1f1e1e
-
-    .progress-bar
-      height: 3pt
-      width: progress-bar-width
-      background-color: #e6e6e6
-      overflow: hidden
-
-      .filling
-        background-color: #167dfb
-        height: 5pt
-        width: filling-bar-width
-        display: block
-        position: relative
-        left: 0
-
-        -webkit-transform: translate3d(0, 0, 0)
-        transform: translate3d(0, 0, 0)
-
-        -webkit-backface-visibility: hidden;
-        backface-visibility: hidden
-
-        -webkit-animation: progress-bar-dynamic 1s linear infinite
-        animation: progress-bar-dynamic 1s linear infinite
-
-        will-change: left
-
-
-    @-webkit-keyframes progress-bar-dynamic {
-      0% {
-        left: filling-bar-width * -1
+      .name-container {
+        text-align: center;
       }
-
-      30% {
-        left: 55% - filling-bar-width * 0.5
-      }
-
-      32% {
-        left: 53% - filling-bar-width * 0.5
-      }
-
-      35%{
-        left: 35%
-      }
-
-      37% {
-        left: 38%
-      }
-
-      42% {
-        left: 51% - filling-bar-width * 0.5
-      }
-
-      45%, 60%, 70%, 80% {
-        left: 50% - filling-bar-width * 0.5
-      }
-
-      90% {
-        left: 80%
-      }
-
-      100% {
-        left: 100%
-      }
-
     }
 
-    @keyframes progress-bar-dynamic {
-      0% {
-        left: filling-bar-width * -1
-      }
-
-      30% {
-        left: 55% - filling-bar-width * 0.5
-      }
-
-      32% {
-        left: 53% - filling-bar-width * 0.5
-      }
-
-      35%{
-        left: 35%
-      }
-
-      37% {
-        left: 38%
-      }
-
-      42% {
-        left: 51% - filling-bar-width * 0.5
-      }
-
-      45%, 60%, 70%, 80% {
-        left: 50% - filling-bar-width * 0.5
-      }
-
-      90% {
-        left: 80%
-      }
-
-      100% {
-        left: 100%
-      }
-
+    .user-text {
+      color: $black;
+      font-weight: 300;
+      font-size: 14.5pt;
     }
 
-  @media screen and (min-height: 568px)
-    .loading-screen
-      .game-icon
-        height: 96px
-        width: 96px
+    .progress-bar {
+      overflow: hidden;
+      width: $progress-bar-width;
+      height: 3pt;
+      background-color: $end-screen-info-gray;
 
-  @media screen and (max-height: 240px)
-    .loading-screen
-      .container > div
-        margin: 3px
+      .filling {
+        position: relative;
+        left: 0;
+        display: block;
+        width: $filling-bar-width;
+        height: 5pt;
+        background-color: $blue;
+        backface-visibility: hidden;
+        transform: translate3d(0, 0, 0);
+        animation: progress-bar-dynamic 1s linear infinite;
+        will-change: left;
+      }
+    }
+  }
+}
 
-      .name-container
-        font-size: 12pt
+@keyframes progress-bar-dynamic {
+  0% {
+    left: $filling-bar-width * -1;
+  }
 
-      .game-rating
-        font-size: 10pt
+  30% {
+    left: 55% - $filling-bar-width * .5;
+  }
 
-      .user-text
-        font-size: 10.5pt
+  32% {
+    left: 53% - $filling-bar-width * .5;
+  }
 
-  // iPad
-  @media screen and (min-height: 768px) and (min-width: 1024px),  screen and (min-height: 1024px) and (min-width: 768px)
-    .loading-screen
-      .user-text
-        font-size: 18.5pt
-      .game-icon
-        height: 150px
-        width: 150px
+  35% {
+    left: 35%;
+  }
 
-      .progress-bar
-        width: progress-bar-width * 0.8
+  37% {
+    left: 38%;
+  }
 
-      .game-rating
-        font-size: 20pt
+  42% {
+    left: 51% - $filling-bar-width * .5;
+  }
 
-      .name-container
-        font-size: 30pt
+  45%, 60%, 70%, 80% {
+    left: 50% - $filling-bar-width * .5;
+  }
 
-      .unityads-logo
-        height: 32px
-        width: 136px
-        bottom: 20px
+  90% {
+    left: 80%;
+  }
 
+  100% {
+    left: 100%;
+  }
+}
+
+@keyframes progress-bar-dynamic {
+  0% {
+    left: $filling-bar-width * -1;
+  }
+
+  30% {
+    left: 55% - $filling-bar-width * .5;
+  }
+
+  32% {
+    left: 53% - $filling-bar-width * .5;
+  }
+
+  35% {
+    left: 35%;
+  }
+
+  37% {
+    left: 38%;
+  }
+
+  42% {
+    left: 51% - $filling-bar-width * .5;
+  }
+
+  45%, 60%, 70%, 80% {
+    left: 50% - $filling-bar-width * .5;
+  }
+
+  90% {
+    left: 80%;
+  }
+
+  100% {
+    left: 100%;
+  }
+}
+
+@media screen and (min-height: 568px) {
+  .loading-screen .game-icon {
+    width: 96px;
+    height: 96px;
+  }
+}
+
+@media screen and (max-height: 240px) {
+  .loading-screen {
+    .container > div {
+      margin: 3px;
+    }
+
+    .name-container {
+      font-size: 12pt;
+    }
+
+    .game-rating {
+      font-size: 10pt;
+    }
+
+    .user-text {
+      font-size: 10.5pt;
+    }
+  }
+}
+
+// iPad
+@media screen and (min-height: 768px) and (min-width: 1024px), screen and (min-height: 1024px) and (min-width: 768px) {
+  .loading-screen {
+    .user-text {
+      font-size: 18.5pt;
+    }
+    .game-icon {
+      width: 150px;
+      height: 150px;
+    }
+
+    .progress-bar {
+      width: $progress-bar-width * .8;
+    }
+
+    .game-rating {
+      font-size: 20pt;
+    }
+
+    .name-container {
+      font-size: 30pt;
+    }
+
+    .unityads-logo {
+      bottom: 20px;
+      width: 136px;
+      height: 32px;
+    }
+  }
+}

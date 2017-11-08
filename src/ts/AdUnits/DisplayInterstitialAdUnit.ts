@@ -1,35 +1,38 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
-import { Placement } from 'Models/Placement';
+import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { FinishState } from 'Constants/FinishState';
 import { IObserver0 } from 'Utilities/IObserver';
-import { Observable1, Observable0 } from 'Utilities/Observable';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { DisplayInterstitial } from 'Views/DisplayInterstitial';
-import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { Platform } from 'Constants/Platform';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 
-export class DisplayInterstitialAdUnit extends AbstractAdUnit {
-    public readonly onRedirect = new Observable1<string>();
-    public readonly onSkip = new Observable0();
+export interface IDisplayInterstitialAdUnitParameters extends IAdUnitParameters<DisplayInterstitialCampaign> {
+    view: DisplayInterstitial;
+}
+
+export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitialCampaign> {
 
     private _operativeEventManager: OperativeEventManager;
+    private _thirdPartyEventManager: ThirdPartyEventManager;
     private _view: DisplayInterstitial;
     private _options: any;
 
     private _onShowObserver: IObserver0;
     private _onSystemKillObserver: IObserver0;
 
-    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, operativeEventManager: OperativeEventManager, placement: Placement, campaign: DisplayInterstitialCampaign, view: DisplayInterstitial, options: any) {
-        super(nativeBridge, ForceOrientation.NONE, container, placement, campaign);
-        this._operativeEventManager = operativeEventManager;
-        this._view = view;
+    constructor(nativeBridge: NativeBridge, parameters: IDisplayInterstitialAdUnitParameters) {
+        super(nativeBridge, parameters);
+        this._operativeEventManager = parameters.operativeEventManager;
+        this._thirdPartyEventManager = parameters.thirdPartyEventManager;
+        this._view = parameters.view;
 
-        this._options = options;
+        this._view.render();
+        document.body.appendChild(this._view.container());
+
+        this._options = parameters.options;
         this.setShowing(false);
-
-        view.onClick.subscribe((href) => this.onRedirect.trigger(href));
-        view.onClose.subscribe(() => this.onClose.trigger());
     }
 
     public show(): Promise<void> {
@@ -37,7 +40,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
         this._view.show();
         this.onStart.trigger();
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
-        this._operativeEventManager.sendStart(this);
+        this.sendStartEvents();
 
         this._onShowObserver = this._container.onShow.subscribe(() => this.onShow());
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
@@ -76,7 +79,38 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
         return 'programmaticImage';
     }
 
-    private onShow() {
+    public openLink(href: string): void {
+        this._operativeEventManager.sendClick(this);
+
+        for (let url of this._campaign.getTrackingUrlsForEvent('click')) {
+            url = url.replace(/%ZONE%/, this.getPlacement().getId());
+            url = url.replace(/%SDK_VERSION%/, this._operativeEventManager.getClientInfo().getSdkVersion().toString());
+            this._thirdPartyEventManager.sendEvent('display click', this._campaign.getSession().getId(), url);
+        }
+
+        if (this.isWhiteListedLinkType(href)) {
+            if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                this._nativeBridge.Intent.launch({
+                    'action': 'android.intent.action.VIEW',
+                    'uri': href
+                });
+            } else {
+                this._nativeBridge.UrlScheme.open(href);
+            }
+        }
+    }
+
+    private isWhiteListedLinkType(href: string): boolean {
+        const whiteListedProtocols = ['http', 'market', 'itunes'];
+        for (const protocol of whiteListedProtocols) {
+            if (href.indexOf(protocol) === 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private onShow(): void {
         if(AbstractAdUnit.getAutoClose()) {
             setTimeout(() => {
                 this.setFinishState(FinishState.COMPLETED);
@@ -85,13 +119,22 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
         }
     }
 
-    private onSystemKill() {
+    private onSystemKill(): void {
         if(this.isShowing()) {
             this.onClose.trigger();
         }
     }
 
-    private unsetReferences() {
+    private unsetReferences(): void {
         delete this._view;
+    }
+
+    private sendStartEvents(): void {
+        for (let url of (this._campaign).getTrackingUrlsForEvent('impression')) {
+            url = url.replace(/%ZONE%/, (this.getCampaign()).getId());
+            url = url.replace(/%SDK_VERSION%/, this._operativeEventManager.getClientInfo().getSdkVersion().toString());
+            this._thirdPartyEventManager.sendEvent('display impression', (this.getCampaign()).getSession().getId(), url);
+        }
+        this._operativeEventManager.sendStart(this);
     }
 }

@@ -10,12 +10,21 @@ import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientation
 import { ForceOrientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 import { ViewController } from 'AdUnits/Containers/ViewController';
 import { FocusManager } from 'Managers/FocusManager';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { SessionManager } from 'Managers/SessionManager';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { WakeUpManager } from 'Managers/WakeUpManager';
+import { MetaDataManager } from 'Managers/MetaDataManager';
+import { Request } from 'Utilities/Request';
+import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
+import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 
 describe('IosAdUnitTest', () => {
     let nativeBridge: NativeBridge;
     let container: ViewController;
     let testAdUnit: TestAdUnit;
     let focusManager: FocusManager;
+    let adUnitParams: IAdUnitParameters<PerformanceCampaign>;
 
     const defaultOptions: any = {
         supportedOrientations: UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL,
@@ -25,14 +34,40 @@ describe('IosAdUnitTest', () => {
         statusBarHidden: false
     };
 
+    beforeEach(() => {
+        nativeBridge = TestFixtures.getNativeBridge(Platform.IOS);
+        const clientInfo = TestFixtures.getClientInfo();
+        focusManager = new FocusManager(nativeBridge);
+        const metaDataManager = new MetaDataManager(nativeBridge);
+        const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
+        const request = new Request(nativeBridge, wakeUpManager);
+        const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
+        const sessionManager = new SessionManager(nativeBridge);
+        const deviceInfo = TestFixtures.getDeviceInfo(Platform.IOS);
+        container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS), focusManager);
+        const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+
+        adUnitParams = {
+            forceOrientation: ForceOrientation.NONE,
+            focusManager: focusManager,
+            container: container,
+            deviceInfo: deviceInfo,
+            clientInfo: clientInfo,
+            thirdPartyEventManager: thirdPartyEventManager,
+            operativeEventManager: operativeEventManager,
+            placement: TestFixtures.getPlacement(),
+            campaign: TestFixtures.getCampaign(),
+            configuration: TestFixtures.getConfiguration(),
+            request: request,
+            options: {}
+        };
+    });
+
     describe('should open ad unit', () => {
         let stub: any;
 
         beforeEach(() => {
-            nativeBridge = TestFixtures.getNativeBridge(Platform.IOS);
-            focusManager = new FocusManager(nativeBridge);
-            container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS), focusManager);
-            testAdUnit = new TestAdUnit(nativeBridge, container, TestFixtures.getPlacement(), TestFixtures.getCampaign());
+            testAdUnit = new TestAdUnit(nativeBridge, adUnitParams);
             sinon.stub(nativeBridge.Sdk, 'logInfo').returns(Promise.resolve());
             stub = sinon.stub(nativeBridge.IosAdUnit, 'open').returns(Promise.resolve());
         });
@@ -80,10 +115,7 @@ describe('IosAdUnitTest', () => {
     });
 
     it('should trigger onShow', () => {
-        nativeBridge = TestFixtures.getNativeBridge(Platform.IOS);
-        focusManager = new FocusManager(nativeBridge);
-        container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS), focusManager);
-        testAdUnit = new TestAdUnit(nativeBridge, container, TestFixtures.getPlacement(), TestFixtures.getCampaign());
+        testAdUnit = new TestAdUnit(nativeBridge, adUnitParams);
         sinon.stub(nativeBridge.IosAdUnit, 'open').returns(Promise.resolve());
 
         let onShowTriggered: boolean = false;
@@ -100,10 +132,7 @@ describe('IosAdUnitTest', () => {
         let onSystemInterruptTriggered: boolean;
 
         beforeEach(() => {
-            nativeBridge = TestFixtures.getNativeBridge(Platform.IOS);
-            focusManager = new FocusManager(nativeBridge);
-            container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS), focusManager);
-            testAdUnit = new TestAdUnit(nativeBridge, container, TestFixtures.getPlacement(), TestFixtures.getCampaign());
+            testAdUnit = new TestAdUnit(nativeBridge, adUnitParams);
             sinon.stub(nativeBridge.IosAdUnit, 'open').returns(Promise.resolve());
             onSystemInterruptTriggered = false;
             container.onSystemInterrupt.subscribe(() => { onSystemInterruptTriggered = true; });

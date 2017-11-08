@@ -1,20 +1,21 @@
-import { View } from 'Views/View';
 import DisplayInterstitialTemplate from 'html/display/DisplayInterstitial.html';
 import DisplayContainer from 'html/display/DisplayContainer.html';
 
+import { View } from 'Views/View';
 import { NativeBridge } from 'Native/NativeBridge';
-import { Observable0, Observable1 } from 'Utilities/Observable';
 import { Placement } from 'Models/Placement';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { Platform } from 'Constants/Platform';
 import { Template } from 'Utilities/Template';
 
-export class DisplayInterstitial extends View {
+export interface IDisplayInterstitialHandler {
+    onDisplayInterstitialClick(url: string): void;
+    onDisplayInterstitialReward(): void;
+    onDisplayInterstitialSkip(): void;
+    onDisplayInterstitialClose(): void;
+}
 
-    public readonly onClick = new Observable1<string>();
-    public readonly onReward = new Observable0();
-    public readonly onSkip = new Observable0();
-    public readonly onClose = new Observable0();
+export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
 
     private _placement: Placement;
     private _campaign: DisplayInterstitialCampaign;
@@ -107,7 +108,7 @@ export class DisplayInterstitial extends View {
             const updateInterval = window.setInterval(() => {
                 const progress = (closeLength - closeRemaining) / closeLength;
                 if(progress >= 0.75 && !this._didReward) {
-                    this.onReward.trigger();
+                    this._handlers.forEach(handler => handler.onDisplayInterstitialReward());
                     this._didReward = true;
                 }
                 if(closeRemaining > 0) {
@@ -149,7 +150,7 @@ export class DisplayInterstitial extends View {
 
         const clickThroughUrl = this._campaign.getClickThroughUrl();
         if (clickThroughUrl) {
-            this.onClick.trigger(clickThroughUrl);
+            this._handlers.forEach(handler => handler.onDisplayInterstitialClick(clickThroughUrl));
         }
     }
 
@@ -182,16 +183,16 @@ export class DisplayInterstitial extends View {
         event.preventDefault();
         event.stopPropagation();
         if(this._canSkip && !this._canClose) {
-            this.onSkip.trigger();
+            this._handlers.forEach(handler => handler.onDisplayInterstitialSkip());
         } else if(this._canClose) {
-            this.onClose.trigger();
+            this._handlers.forEach(handler => handler.onDisplayInterstitialClose());
         }
     }
 
     private onMessage(e: MessageEvent) {
         switch (e.data.type) {
             case 'redirect':
-                this.onClick.trigger(e.data.href);
+                this._handlers.forEach(handler => handler.onDisplayInterstitialClick(e.data.href));
                 break;
             default:
                 this._nativeBridge.Sdk.logWarning(`Unknown message: ${e.data.type}`);

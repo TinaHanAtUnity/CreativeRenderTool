@@ -14,7 +14,7 @@ import { ParamsTestData, IEventSpec } from './ParamsTestData';
 import { ConfigManager } from 'Managers/ConfigManager';
 import { SessionManager } from 'Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
+import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { Configuration, CacheMode } from 'Models/Configuration';
 import { AdUnitFactory } from 'AdUnits/AdUnitFactory';
 import { IosAdUnitApi } from 'Native/Api/IosAdUnit';
@@ -29,10 +29,12 @@ import { ViewController } from 'AdUnits/Containers/ViewController';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { ClientInfo } from 'Models/ClientInfo';
 import { FocusManager } from 'Managers/FocusManager';
-
-import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { Session } from 'Models/Session';
+import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
+import { AndroidDeviceInfoApi, IPackageInfo } from 'Native/Api/AndroidDeviceInfo';
+
+import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 
 class TestStorageApi extends StorageApi {
     public get<T>(storageType: StorageType, key: string): Promise<T> {
@@ -80,6 +82,12 @@ class TestRequestApi extends RequestApi {
 class TestDeviceInfoApi extends DeviceInfoApi {
     public getUniqueEventId(): Promise<string> {
         return Promise.resolve('1234-ABCD');
+    }
+}
+
+class TestAndroidDeviceInfoApi extends AndroidDeviceInfoApi {
+    public getPackageInfo(packageName: string): Promise<IPackageInfo> {
+        return Promise.resolve(TestFixtures.getPackageInfo());
     }
 }
 
@@ -183,6 +191,7 @@ class TestHelper {
         nativeBridge.Storage = new TestStorageApi(nativeBridge);
         nativeBridge.Request = new TestRequestApi(nativeBridge);
         nativeBridge.DeviceInfo = new TestDeviceInfoApi(nativeBridge);
+        nativeBridge.DeviceInfo.Android = new TestAndroidDeviceInfoApi(nativeBridge);
         nativeBridge.IosAdUnit = new IosAdUnitApi(nativeBridge);
         nativeBridge.AndroidAdUnit = new AndroidAdUnitApi(nativeBridge);
         return nativeBridge;
@@ -208,7 +217,22 @@ class TestHelper {
             container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         }
 
-        return AdUnitFactory.createAdUnit(nativeBridge, focusManager, ForceOrientation.PORTRAIT, container, deviceInfo, clientInfo, thirdPartyEventManager, operativeEventManager, TestFixtures.getPlacement(), TestFixtures.getCampaign(), config, request, {});
+        const parameters: IAdUnitParameters<PerformanceCampaign> = {
+            forceOrientation: ForceOrientation.LANDSCAPE,
+            focusManager: focusManager,
+            container: container,
+            deviceInfo: deviceInfo,
+            clientInfo: clientInfo,
+            thirdPartyEventManager: thirdPartyEventManager,
+            operativeEventManager: operativeEventManager,
+            placement: TestFixtures.getPlacement(),
+            campaign: TestFixtures.getCampaign(),
+            configuration: config,
+            request: request,
+            options: {},
+        };
+
+        return AdUnitFactory.createAdUnit(nativeBridge, parameters);
     }
 }
 

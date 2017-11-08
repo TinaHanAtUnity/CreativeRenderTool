@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <script>
+        (function() {
+            var MoatMAPI = function() {
+                var state = 'loading';
+
+                var listeners = {
+                    stateChange: [],
+                    exposureChange: [],
+                    audioVolumeChange: []
+                };
+
+                var trigger = function(event, parameters) {
+                    if(!parameters) {
+                        parameters = [];
+                    }
+                    if(event in listeners) {
+                        listeners[event].forEach(function(listener) {
+                            listener.apply(window, parameters);
+                        });
+                    }
+                };
+
+                var width = window.innerWidth;
+                var height = window.innerHeight;
+
+                var setState = function(newState) {
+                    state = newState;
+                    trigger('stateChange', [newState]);
+                };
+
+                window.addEventListener('message', function(event) {
+                    switch(event.data.type) {
+                        case 'exposure':
+                            trigger('exposureChange', [
+                                event.data.payload ? 100 : 0,
+                                {
+                                    inFocus: event.data.payload ? 1 : 0,
+                                    isAttached: 1,
+                                    isHidden: 0,
+                                    opacity: 1,
+                                    isCovered: 0
+                                }
+                            ]);
+                            break;
+
+                        case 'volume':
+                            trigger('audioVolumeChange', [event.data.payload]);
+                            break;
+
+                        case 'resize':
+                            width = event.data.width;
+                            height = event.data.height;
+                            break;
+
+                        default:
+                            break;
+                    }
+                }, false);
+
+                window.addEventListener('DOMContentLoaded', function() {
+                    window.parent.postMessage({
+                        type: 'loaded'
+                    }, '*');
+                    setState('default');
+                    trigger('ready');
+                }, false);
+
+                this.addEventListener = function(event, listener) {
+                    if(event in listeners) {
+                        listeners[event].push(listener);
+                    }
+                };
+
+                this.removeEventListener = function(event, listener) {
+                    if(event in listeners) {
+                        var index = listeners[event].indexOf(listener);
+                        if(index !== -1) {
+                            listeners[event].splice(index, 1);
+                        }
+                    }
+                };
+
+                this.getScreenSize = function() {
+                    return {
+                        width: width,
+                        height: height
+                    };
+                };
+
+                this.getCurrentPosition = function() {
+                    return {
+                        x: 0,
+                        y: 0,
+                        width: width,
+                        height: height
+                    };
+                };
+
+                this.getState = function() {
+                    return state;
+                };
+
+                this.getVersion = function() {
+                    return '3.0';
+                };
+
+            };
+            window.MoatMAPI = new MoatMAPI();
+        })();
+
+        var moat = undefined;
+        document.addEventListener('DOMContentLoaded', function() {
+            window.addEventListener('message', function(event) {
+                if(event && event.data && event.data.type && event.data.data) {
+                    switch(event.data.type) {
+                        case 'init':
+                            var dummyElement = document.createElement('div');
+                            document.body.appendChild(dummyElement);
+                            window.MOATMAPI_ENV = event.data.data.moatData;
+                            moat = initMoatTracking(dummyElement, event.data.data.ids, event.data.data.duration, "unityinappvideo254672075459", event.data.data.url);
+                            break;
+
+                        case 'videoEvent':
+                            if(moat) {
+                                moat.dispatchEvent({
+                                    "type": event.data.data.type,
+                                    "adVolume": event.data.data.volume !== 0 ? 1 : 0,
+                                    "deviceVolume": event.data.data.volume
+                                });
+                            }
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+            }, false);
+
+        });
+    </script>
+    <script>
+        /*Copyright (c) 2011-2016 Moat Inc. All Rights Reserved.*/
+        function initMoatTracking(c, d, e, k, l) {
+            var g = document.createElement("script"), a = [];
+            d = {
+                adData: {ids: d, duration: e, url: l}, dispatchEvent: function(b) {
+                    this.sendEvent ? (a && (a.push(b), b = a, a = !1), this.sendEvent(b)) : a.push(b)
+                }
+            };
+            e = "_moatApi" + Math.floor(1E8 * Math.random());
+            var f, h;
+            try {
+                f = c.ownerDocument, h = f.defaultView || f.parentWindow
+            } catch(b) {
+                f = document, h = window
+            }
+            h[e] = d;
+            g.type = "text/javascript";
+            c && c.insertBefore(g, c.childNodes[0] || null);
+            g.src = "https://z.moatads.com/" + k + "/moatvideo.js#" + e;
+            return d
+        }
+    </script>
+</head>
+<body>
+</body>
+</html>

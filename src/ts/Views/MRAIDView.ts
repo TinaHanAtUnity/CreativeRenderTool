@@ -1,7 +1,6 @@
 import MRAIDContainer from 'html/mraid/container.html';
 
 import { View } from 'Views/View';
-import { Observable0, Observable1, Observable4 } from 'Utilities/Observable';
 import { Placement } from 'Models/Placement';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
@@ -13,14 +12,17 @@ export interface IOrientationProperties {
     forceOrientation: ForceOrientation;
 }
 
-export abstract class MRAIDView extends View {
+export interface IMRAIDViewHandler {
+    onMraidClick(url: string): void;
+    onMraidReward(): void;
+    onMraidSkip(): void;
+    onMraidClose(): void;
+    onMraidOrientationProperties(orientationProperties: IOrientationProperties): void;
+    onMraidAnalyticsEvent(timeFromShow: number|undefined, timeFromPlayableStart: number|undefined, backgroundTime: number|undefined, event: string, eventData: any): void;
+    onMraidShowEndScreen(): void;
+}
 
-    public readonly onClick = new Observable1<string>();
-    public readonly onReward = new Observable0();
-    public readonly onSkip = new Observable0();
-    public readonly onClose = new Observable0();
-    public readonly onOrientationProperties = new Observable1<IOrientationProperties>();
-    public readonly onAnalyticsEvent = new Observable4<number, number, string, any>();
+export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> {
 
     protected _placement: Placement;
     protected _campaign: MRAIDCampaign;
