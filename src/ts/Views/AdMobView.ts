@@ -9,16 +9,14 @@ import { Placement } from 'Models/Placement';
 import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
 import { Template } from 'Utilities/Template';
 import { Overlay, IOverlayHandler } from 'Views/Overlay';
-import { NativeVideoPlayerBridge } from 'Utilities/NativeVideoPlayerBridge';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { EventPublisher } from 'Utilities/EventPublisher';
 
 export interface IAdMobEventHandler {
     onSkip(): void;
 }
 
 export class AdMobView extends View<IAdMobEventHandler> implements IOverlayHandler {
-    public readonly videoBridge: NativeVideoPlayerBridge;
-
     private _placement: Placement;
     private _campaign: AdMobCampaign;
     private _iframe: HTMLIFrameElement;
@@ -36,13 +34,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IOverlayHandl
 
         this._template = new Template(AdMobContainer);
 
-        this._messageListener = (e: Event) => this.onMessage(<MessageEvent>e);
-
         this._bindings = [];
-
-        this.videoBridge = new NativeVideoPlayerBridge(this._nativeBridge, container);
-        this.videoBridge.onProgress.subscribe((progress) => this.onVideoProgress(progress));
-        this.videoBridge.onPrepare.subscribe((duration) => this.onVideoPrepared(duration));
     }
 
     public render() {
@@ -54,14 +46,11 @@ export class AdMobView extends View<IAdMobEventHandler> implements IOverlayHandl
     public show(): void {
         super.show();
         window.addEventListener('message', this._messageListener);
-        this.videoBridge.connect(this._iframe);
     }
 
     public hide() {
         window.removeEventListener('message', this._messageListener);
         super.hide();
-        this.videoBridge.stopVideo();
-        this.videoBridge.disconnect();
     }
 
     public onOverlayPauseForTesting(paused: boolean) {
@@ -72,8 +61,8 @@ export class AdMobView extends View<IAdMobEventHandler> implements IOverlayHandl
         // EMPTY
     }
 
-    public onOverlayMute(isMuted: boolean) {
-        isMuted ? this.onMute() : this.onUnmute();
+    public onOverlayMute(muted: boolean) {
+        // EMPTY
     }
 
     public onOverlaySkip() {
@@ -104,11 +93,6 @@ export class AdMobView extends View<IAdMobEventHandler> implements IOverlayHandl
         const overlayEl = this._overlay.container();
         overlayEl.style.position = 'absolute';
         this._container.insertBefore(overlayEl, this._container.firstChild);
-    }
-
-    private onMessage(e: MessageEvent) {
-        switch (e.data.type) {
-        }
     }
 
     private getIFrameSrcDoc(): string {
@@ -146,28 +130,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IOverlayHandl
     private injectScript(e: HTMLElement, script: string) {
         e.innerHTML = script + e.innerHTML;
     }
+}
 
-    private onVideoProgress(progress: number) {
-        this.updateTimerProgress(progress);
-    }
-
-    private updateTimerProgress(progress: number) {
-        this._overlay.setVideoProgress(progress);
-    }
-
-    private onVideoPrepared(duration: number) {
-        this.updateTimerDuration(duration);
-    }
-
-    private updateTimerDuration(duration: number) {
-        this._overlay.setVideoDuration(duration);
-    }
-
-    private onMute() {
-        this.videoBridge.muteVideo();
-    }
-
-    private onUnmute() {
-        this.videoBridge.unmuteVideo();
-    }
+export class IAFMAListener {
 }
