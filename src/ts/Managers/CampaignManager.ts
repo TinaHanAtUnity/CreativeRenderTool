@@ -27,6 +27,7 @@ import { ProgrammaticMraidParser } from 'Parsers/ProgrammaticMraidParser';
 import { ProgrammaticStaticInterstitialParser } from 'Parsers/ProgrammaticStaticInterstitialParser';
 import { CampaignParser } from 'Parsers/CampaignParser';
 import { ProgrammaticVPAIDParser } from 'Parsers/ProgrammaticVPAIDParser';
+import { XPromoCampaignParser } from "Parsers/XPromoCampaignParser";
 
 export class CampaignManager {
 
@@ -236,7 +237,7 @@ export class CampaignManager {
                 parser = new CometCampaignParser();
                 break;
             case 'xpromo/video':
-                parser = new CometCampaignParser();
+                parser = new XPromoCampaignParser();
                 break;
             case 'programmatic/vast':
                 parser = new ProgrammaticVastParser();

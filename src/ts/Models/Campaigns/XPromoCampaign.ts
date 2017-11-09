@@ -26,10 +26,11 @@ interface IXPromoCampaign extends ICampaign {
     clickAttributionUrlFollowsRedirects?: boolean;
     bypassAppSheet: boolean;
     store: StoreName;
+    trackingUrls: { [eventName: string]: string[] };
 }
 
 export class XPromoCampaign extends Campaign<IXPromoCampaign> {
-    constructor(campaign: any, session: Session, gamerId: string, abGroup: number) {
+    constructor(campaign: any, session: Session, gamerId: string, abGroup: number, trackingUrls: { [eventName: string]: string[] }) {
         super('XPromoCampaign', {
             ... Campaign.Schema,
             appStoreId: ['string'],
@@ -47,7 +48,8 @@ export class XPromoCampaign extends Campaign<IXPromoCampaign> {
             clickAttributionUrl: ['string', 'undefined'],
             clickAttributionUrlFollowsRedirects: ['boolean', 'undefined'],
             bypassAppSheet: ['boolean'],
-            store: ['number']
+            store: ['number'],
+            trackingUrls: ['object', 'undefined'],
         });
 
         this.set('id', campaign.id);
@@ -81,6 +83,8 @@ export class XPromoCampaign extends Campaign<IXPromoCampaign> {
         this.set('clickAttributionUrlFollowsRedirects', campaign.clickAttributionUrlFollowsRedirects);
 
         this.set('bypassAppSheet', campaign.bypassAppSheet);
+
+        this.set('trackingUrls', trackingUrls);
 
         const campaignStore = typeof campaign.store !== 'undefined' ? campaign.store : '';
         switch(campaignStore) {
