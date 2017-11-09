@@ -5,7 +5,7 @@ import { Platform } from 'Constants/Platform';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Diagnostics } from 'Utilities/Diagnostics';
 
-import { unity_proto } from 'Google/proto/unity_proto.js';
+import { unity_proto } from '../../proto/unity_proto.js';
 
 export class GoogleSignalFactory {
 

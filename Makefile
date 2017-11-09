@@ -9,6 +9,8 @@ ISTANBUL = $(BIN)/istanbul
 REMAP_ISTANBUL = $(BIN)/remap-istanbul
 COVERALLS = $(BIN)/coveralls
 STYLINT = $(BIN)/stylint
+PBJS = $(BIN)/pbjs
+PBTS = $(BIN)/pbts
 CC = java -jar node_modules/google-closure-compiler/compiler.jar
 ES6_PROMISE = node_modules/es6-promise/dist/es6-promise.auto.js
 SYSTEM_JS = node_modules/systemjs/dist/system.src.js
@@ -45,7 +47,7 @@ build-browser: build-dir build-static build-css build-ts
 build-dev: BUILD_DIR = build/dev
 build-dev: MODULE = system
 build-dev: TARGET = es5
-build-dev: build-dir build-static build-css build-ts
+build-dev: build-dir build-static build-css build-proto build-ts
 	echo "{\"url\":\"http://$(shell ifconfig |grep "inet" |fgrep -v "127.0.0.1"|grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}" |grep -v -E "^0|^127" -m 1):8000/build/dev/index.html\",\"hash\":null}" > $(BUILD_DIR)/config.json
 	cp src/dev-index.html $(BUILD_DIR)/index.html
 	node -e "\
@@ -169,6 +171,16 @@ build-dir:
 	@echo
 
 	mkdir -p $(BUILD_DIR)
+
+build-proto:
+	@echo
+	@echo Compiling .proto to .js and .d.ts
+	@echo
+
+	mkdir -p $(BUILD_DIR)/js/Proto
+	$(PBJS) -t static-module -w commonjs -o src/proto/unity_proto.js src/proto/unity_proto.proto
+	$(PBTS) -o src/proto/unity_proto.d.ts src/proto/unity_proto.js
+	cp src/proto/unity_proto.js $(BUILD_DIR)/js/Proto/unity_proto.js
 
 build-ts:
 	@echo

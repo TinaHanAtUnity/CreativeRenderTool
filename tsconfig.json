@@ -19,6 +19,7 @@
     "suppressImplicitAnyIndexErrors": true
   },
   "include": [
-    "src/ts/**/*.ts"
+    "src/ts/**/*.ts",
+    "src/proto/**/*.d.ts"
   ]
 }
