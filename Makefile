@@ -40,7 +40,7 @@ BUILD_DIR = build
 build-browser: BUILD_DIR = build/browser
 build-browser: MODULE = system
 build-browser: TARGET = es5
-build-browser: build-dir build-static build-css build-ts
+build-browser: build-dir build-static build-css build-proto build-ts
 	cp src/browser-index.html $(BUILD_DIR)/index.html
 	cp src/browser-iframe.html $(BUILD_DIR)/iframe.html
 
@@ -61,7 +61,7 @@ build-dev: build-dir build-static build-css build-proto build-ts
 build-release: BUILD_DIR = build/release
 build-release: MODULE = es2015
 build-release: TARGET = es5
-build-release: clean build-dir build-static build-css build-ts build-js
+build-release: clean build-dir build-static build-css build-proto build-ts build-js
 	@echo
 	@echo Copying release index.html to build
 	@echo
@@ -109,7 +109,7 @@ build-release: clean build-dir build-static build-css build-ts build-js
 build-test: BUILD_DIR = build/test
 build-test: MODULE = system
 build-test: TARGET = es5
-build-test: clean build-dir build-css build-static build-ts
+build-test: clean build-dir build-css build-static build-proto build-ts
 	@echo
 	@echo Generating test runner
 	@echo
@@ -239,7 +239,7 @@ test: test-unit test-integration
 
 test-unit: MODULE = system
 test-unit: TARGET = es5
-test-unit:
+test-unit: build-proto
 	@echo
 	@echo Transpiling .ts to .js for local tests
 	@echo
@@ -254,7 +254,7 @@ test-unit:
 
 test-integration: MODULE = system
 test-integration: TARGET = es5
-test-integration:
+test-integration: build-proto
 	@echo
 	@echo Transpiling .ts to .js for local tests
 	@echo
@@ -270,7 +270,7 @@ test-integration:
 test-coverage: BUILD_DIR = build/coverage
 test-coverage: MODULE = system
 test-coverage: TARGET = es5
-test-coverage: build-dir
+test-coverage: build-dir build-proto
 	@echo
 	@echo Transpiling .ts to .js for local tests
 	@echo
