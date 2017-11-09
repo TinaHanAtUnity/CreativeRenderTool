@@ -1,4 +1,4 @@
-import { IOverlayHandler } from 'Views/Overlay';
+import { IOverlayHandler } from 'Views/AbstractOverlay';
 import { NativeBridge } from 'Native/NativeBridge';
 import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
@@ -45,5 +45,9 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
 
     public onOverlayPauseForTesting(paused: boolean): void {
         // EMPTY
+    }
+
+    public onOverlayClose(): void {
+        // TODO
     }
 }

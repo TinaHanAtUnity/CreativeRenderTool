@@ -1,4 +1,4 @@
-import { IOverlayHandler } from 'Views/Overlay';
+import { IOverlayHandler } from 'Views/AbstractOverlay';
 import { FinishState } from 'Constants/FinishState';
 import { NativeBridge } from 'Native/NativeBridge';
 import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'AdUnits/VPAIDAdUnit';
@@ -30,5 +30,9 @@ export class VPAIDOverlayEventHandler implements IOverlayHandler {
 
     public onOverlayPauseForTesting(paused: boolean): void {
         // EMPTY
+    }
+
+    public onOverlayClose(): void {
+        // TODO
     }
 }

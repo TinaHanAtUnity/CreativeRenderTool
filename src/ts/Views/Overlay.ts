@@ -4,22 +4,9 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
 import { Platform } from 'Constants/Platform';
-import { View } from 'Views/View';
+import { AbstractOverlay } from 'Views/AbstractOverlay';
 
-export interface IOverlayHandler {
-    onOverlaySkip(position: number): void;
-    onOverlayMute(isMuted: boolean): void;
-    onOverlayPauseForTesting(paused: boolean): void;
-    onOverlayCallButton(): void;
-}
-
-export class Overlay extends View<IOverlayHandler> {
-
-    public static setAutoSkip(value: boolean) {
-        Overlay.AutoSkip = value;
-    }
-
-    protected static AutoSkip: boolean = false;
+export class Overlay extends AbstractOverlay {
 
     private _localization: Localization;
 
@@ -27,15 +14,11 @@ export class Overlay extends View<IOverlayHandler> {
 
     private _skipVisible: boolean = false;
     private _skipEnabled: boolean;
-    private _skipDuration: number;
-    private _skipRemaining: number;
 
     private _videoDurationEnabled: boolean = false;
-    private _videoDuration: number;
     private _videoProgress: number;
 
     private _muteEnabled: boolean = false;
-    private _muted: boolean;
 
     private _debugMessageVisible: boolean = false;
 
@@ -52,19 +35,15 @@ export class Overlay extends View<IOverlayHandler> {
     private _fadeTimer: any;
     private _fadeStatus: boolean = true;
     private _fadeEnabled: boolean = true;
-    private _abGroup: number;
 
     constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, abGroup: number = 0) {
-        super(nativeBridge, 'overlay');
+        super(nativeBridge, 'overlay', muted, abGroup);
 
         this._localization = new Localization(language, 'overlay');
         this._template = new Template(OverlayTemplate, this._localization);
 
-        this._muted = muted;
-        this._abGroup = abGroup;
-
         this._templateData = {
-            muted: this._muted
+            muted: muted
         };
 
         this._bindings = [
