@@ -1,5 +1,6 @@
 export enum AFMAEvents {
-    OPEN_URL = 'openUrl'
+    OPEN_URL = 'openUrl',
+    CLOSE    = 'close'
 }
 
 export class AFMABridge {
@@ -29,7 +30,10 @@ export class AFMABridge {
     private handleAFMAMessage(event: string, data?: any) {
         switch (event) {
             case AFMAEvents.OPEN_URL:
-                this._handler.onAFMAOpen(data.url);
+                this._handler.onAFMAOpenURL(data.url);
+                break;
+            case AFMAEvents.CLOSE:
+                this._handler.onAFMAClose();
                 break;
         }
     }
@@ -42,5 +46,6 @@ export interface IAFMAMessage {
 }
 
 export interface IAFMAHandler {
-    onAFMAOpen(url: string): void;
+    onAFMAOpenURL(url: string): void;
+    onAFMAClose(): void;
 }
