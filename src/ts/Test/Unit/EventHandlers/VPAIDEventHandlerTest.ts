@@ -167,6 +167,7 @@ describe('VPAIDEventHandlerTest', () => {
             sinon.spy(operativeEventManager, 'sendMidpoint');
             sinon.spy(operativeEventManager, 'sendThirdQuartile');
             sinon.spy(operativeEventManager, 'sendView');
+            sinon.spy(comScoreService, 'sendEvent');
         });
 
         // Generic events that translate to VAST tracking with
@@ -222,6 +223,9 @@ describe('VPAIDEventHandlerTest', () => {
             it('should trigger complete tracking', verifyTrackingEvent('complete'));
             it('should send the view operative event', () => {
                 sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendView);
+            });
+            it('should send the comscore end event', () => {
+                sinon.assert.called(<sinon.SinonSpy>comScoreService.sendEvent);
             });
             it('should set the finish state to COMPLETE', () => {
                 assert.isTrue(adUnit.getFinishState() === FinishState.COMPLETED);

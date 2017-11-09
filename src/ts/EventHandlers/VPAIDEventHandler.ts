@@ -5,6 +5,7 @@ import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
 import { Overlay } from 'Views/Overlay';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { ComScoreTrackingService } from "Utilities/ComScoreTrackingService";
 import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
@@ -15,6 +16,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     private _nativeBridge: NativeBridge;
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
+    private _comScoreTrackingService: ComScoreTrackingService;
     private _adUnit: VPAIDAdUnit;
     private _vpaidEventHandlers: { [eventName: string]: () => void; } = {};
     private _vpaidCampaign: VPAIDCampaign;
@@ -29,6 +31,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         this._nativeBridge = nativeBridge;
         this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
+        this._comScoreTrackingService = parameters.comScoreTrackingService;
         this._adUnit = adUnit;
         this._vpaidCampaign = parameters.campaign;
         this._placement = parameters.placement;
@@ -101,6 +104,14 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         }
     }
 
+    public getDuration() {
+        return this._adDuration;
+    }
+
+    public getPlayTime() {
+        return (this._adDuration - this._adRemainingTime) * 1000;
+    }
+
     private onAdLoaded() {
         this._adUnit.getAdUnitNotLoadedTimer().stop();
         this.onVPAIDProgress(this._adDuration, this._adRemainingTime);
@@ -132,6 +143,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
         this._adUnit.sendTrackingEvent('creativeView');
         this._operativeEventManager.sendStart(this._adUnit);
+        this.sendComscoreEvent('play', 0);
     }
 
     private onAdImpression() {
@@ -162,6 +174,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         this._adUnit.sendTrackingEvent('complete');
         this._adUnit.setFinishState(FinishState.COMPLETED);
         this._operativeEventManager.sendView(this._adUnit);
+        this.sendComscoreEvent('end', (this._adDuration - this._adRemainingTime) * 1000);
     }
 
     private onAdPaused() {
@@ -204,5 +217,19 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         for (const url of urls) {
             this._adUnit.sendThirdPartyEvent('vpaid video click', url);
         }
+    }
+
+    private sendComscoreEvent(eventName: string, position: number) {
+        const sessionId = this._adUnit.getCampaign().getSession().getId();
+        const creativeId = this._adUnit.getCampaign().getCreativeId();
+        const category = this._adUnit.getCampaign().getCategory();
+        const subCategory = this._adUnit.getCampaign().getSubCategory();
+        let adDuration = (this._adDuration * 1000);
+
+        if (adDuration < 0 || typeof adDuration === 'undefined') {
+            adDuration = 0;
+        }
+
+        this._comScoreTrackingService.sendEvent(eventName, sessionId, adDuration.toString(10), position, creativeId, category, subCategory);
     }
 }
