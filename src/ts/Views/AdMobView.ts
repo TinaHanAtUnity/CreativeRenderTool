@@ -8,21 +8,24 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Placement } from 'Models/Placement';
 import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
 import { Template } from 'Utilities/Template';
-import { Overlay, IOverlayHandler } from 'Views/Overlay';
+import { Overlay } from 'Views/Overlay';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
-import { EventPublisher } from 'Utilities/EventPublisher';
+import { AFMABridge } from 'Views/AFMABridge';
 
 export interface IAdMobEventHandler {
     onSkip(): void;
+    onClose(): void;
+    onOpenURL(url: string): void;
 }
 
-export class AdMobView extends View<IAdMobEventHandler> implements IOverlayHandler {
+export class AdMobView extends View<IAdMobEventHandler> {
     private _placement: Placement;
     private _campaign: AdMobCampaign;
     private _iframe: HTMLIFrameElement;
 
     private _messageListener: EventListener;
     private _overlay: Overlay;
+    private _afmaBridge: AFMABridge;
 
     constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: AdMobCampaign, language: string, gameId: string, abGroup: number) {
         super(nativeBridge, 'admob');
@@ -30,9 +33,18 @@ export class AdMobView extends View<IAdMobEventHandler> implements IOverlayHandl
         this._placement = placement;
         this._campaign = campaign;
         this._overlay = new Overlay(nativeBridge, false, language, gameId, abGroup);
-        this._overlay.addEventHandler(this);
+        this._overlay.addEventHandler({
+            onOverlayCallButton: () => { /**/ },
+            onOverlayMute: (muted: boolean) => { /**/ },
+            onOverlayPauseForTesting: (paused: boolean) => { /**/ },
+            onOverlaySkip: () => this.onSkip()
+        });
 
         this._template = new Template(AdMobContainer);
+        this._afmaBridge = new AFMABridge({
+            onAFMAClose: () => this.onClose(),
+            onAFMAOpenURL: (url: string) => this.onOpenURL(url)
+        });
 
         this._bindings = [];
     }
@@ -45,28 +57,14 @@ export class AdMobView extends View<IAdMobEventHandler> implements IOverlayHandl
 
     public show(): void {
         super.show();
+        this._afmaBridge.connect(this._iframe);
         window.addEventListener('message', this._messageListener);
     }
 
     public hide() {
         window.removeEventListener('message', this._messageListener);
+        this._afmaBridge.disconnect();
         super.hide();
-    }
-
-    public onOverlayPauseForTesting(paused: boolean) {
-        // EMPTY
-    }
-
-    public onOverlayCallButton() {
-        // EMPTY
-    }
-
-    public onOverlayMute(muted: boolean) {
-        // EMPTY
-    }
-
-    public onOverlaySkip() {
-        this._handlers.forEach((handler) => handler.onSkip());
     }
 
     private setupIFrame() {
@@ -130,7 +128,16 @@ export class AdMobView extends View<IAdMobEventHandler> implements IOverlayHandl
     private injectScript(e: HTMLElement, script: string) {
         e.innerHTML = script + e.innerHTML;
     }
-}
 
-export class IAFMAListener {
+    private onClose() {
+        this._handlers.forEach((h) => h.onClose());
+    }
+
+    private onOpenURL(url: string) {
+        this._handlers.forEach((h) => h.onOpenURL(url));
+    }
+
+    private onSkip() {
+        this._handlers.forEach((h) => h.onSkip());
+    }
 }
