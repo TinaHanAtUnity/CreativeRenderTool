@@ -291,6 +291,9 @@ test-browser: build-browser
 ifeq ($(TRAVIS_PULL_REQUEST), false)
 travis-browser-test:
 	@echo "Skipping travis browser tests, this is not a PR"
+else ifneq ($(BRANCH), master)
+travis-browser-test:
+	@echo "Skipping travis browser tests, the PR is not to master-branch it is for $(BRANCH)"
 else
 travis-browser-test: build-browser start-nginx test-browser stop-nginx
 endif
