@@ -36,9 +36,9 @@ const FORBIDDEN_MESSAGES = [
 const ALL_MESSAGES = REQUIRED_MESSAGES.concat(FORBIDDEN_MESSAGES);
 
 // Returns true if all expected messages have been seen
-let checkMessage = function(message) {
+const checkMessage = (message) => {
     let allMatched = true;
-    ALL_MESSAGES.forEach(function(msgObj) {
+    ALL_MESSAGES.forEach( (msgObj) => {
         if(message.match(msgObj.regexp)) {
             msgObj.seen += 1;
             msgObj.matchedMessages.push(message);
@@ -54,10 +54,10 @@ let checkMessage = function(message) {
 };
 
 // Returns count of failed steps (max 99)
-let evaluateSuccess = function() {
+const evaluateSuccess = () => {
     let passedSteps = 0;
     let totalSteps = 0;
-    REQUIRED_MESSAGES.forEach(function(reqMsg) {
+    REQUIRED_MESSAGES.forEach( (reqMsg) => {
         totalSteps += 1;
         if(reqMsg.seen === reqMsg.expected) {
             passedSteps += 1;
@@ -66,7 +66,7 @@ let evaluateSuccess = function() {
             console.log("FAIL " + reqMsg.description + ": Was seen " + reqMsg.seen + " times, expected " + reqMsg.expected);
         }
     });
-    FORBIDDEN_MESSAGES.forEach(function(forbiddenMsg) {
+    FORBIDDEN_MESSAGES.forEach( (forbiddenMsg) => {
         totalSteps += 1;
         if(forbiddenMsg.seen > 0) {
             console.log("FAIL " + forbiddenMsg.description + ": Was seen " + forbiddenMsg.seen + " times " +
@@ -84,13 +84,13 @@ let evaluateSuccess = function() {
     return failedSteps;
 };
 
-puppeteer.launch().then(async browser => {
+puppeteer.launch().then(async (browser) => {
     let testRunning = true;
     console.log("### Browser Tests ###");
 
     const page = await browser.newPage();
     await page.setViewport(SCREEN_VIEWPORT_PROP);
-    await page.goto(SERVER_ADDRESS).catch(function(e) {
+    await page.goto(SERVER_ADDRESS).catch( (e) => {
         console.log("## Failed to connect to server at " + SERVER_ADDRESS);
         console.log("   Consider running `make clean build-browser start-nginx");
         process.exit(255);
