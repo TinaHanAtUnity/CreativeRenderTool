@@ -62,7 +62,7 @@ export class CampaignManager {
     public readonly onCampaign = new Observable2<string, Campaign>();
     public readonly onNoFill = new Observable1<string>();
     public readonly onError = new Observable3<WebViewError, string[], Session | undefined>();
-    public readonly onAdPlanReceived = new Observable1<number>();
+    public readonly onAdPlanReceived = new Observable2<number, number>();
 
     protected _nativeBridge: NativeBridge;
     protected _requesting: boolean;
@@ -88,7 +88,7 @@ export class CampaignManager {
         this._requesting = false;
     }
 
-    public request(): Promise<INativeResponse | void> {
+    public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
         // prevent having more then one ad request in flight
         if(this._requesting) {
             return Promise.resolve();
@@ -103,7 +103,7 @@ export class CampaignManager {
         }
 
         return this._sessionManager.create().then((session) => {
-            return Promise.all([this.createRequestUrl(session), this.createRequestBody()]).then(([requestUrl, requestBody]) => {
+            return Promise.all([this.createRequestUrl(session), this.createRequestBody(nofillRetry)]).then(([requestUrl, requestBody]) => {
                 this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
                 const body = JSON.stringify(requestBody);
                 SdkStats.setAdRequestTimestamp();
@@ -189,8 +189,11 @@ export class CampaignManager {
                 refreshDelay = CampaignRefreshManager.NoFillDelay;
             }
 
+            let campaigns: number = 0;
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
+                    campaigns++;
+
                     const contentType = json.media[mediaId].contentType;
                     const cacheTTL = json.media[mediaId].cacheTTL ? json.media[mediaId].cacheTTL : 3600;
                     if(contentType && contentType !== 'comet/campaign' && cacheTTL > 0 && (cacheTTL < refreshDelay || refreshDelay === 0)) {
@@ -199,7 +202,7 @@ export class CampaignManager {
                 }
             }
 
-            this.onAdPlanReceived.trigger(refreshDelay);
+            this.onAdPlanReceived.trigger(refreshDelay, campaigns);
 
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
@@ -375,7 +378,7 @@ export class CampaignManager {
         });
     }
 
-    private createRequestBody(): Promise<any> {
+    private createRequestBody(nofillRetry?: boolean): Promise<any> {
         const promises: Array<Promise<any>> = [];
         promises.push(this._deviceInfo.getFreeSpace());
         promises.push(this._deviceInfo.getNetworkOperator());
@@ -401,6 +404,10 @@ export class CampaignManager {
 
         if(typeof navigator !== 'undefined' && navigator.userAgent && typeof navigator.userAgent === 'string') {
             body.webviewUa = navigator.userAgent;
+        }
+
+        if(nofillRetry) {
+            body.nofillRetry = true;
         }
 
         return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName, headset, volume, fullyCachedCampaignIds, versionCode]) => {

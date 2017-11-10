@@ -15,6 +15,7 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
+import { ClientInfo } from 'Models/ClientInfo';
 
 interface ISdkStatsEvent {
     eventTimestamp: number;
@@ -68,16 +69,19 @@ interface IEventInfo {
     delayInitToReady: number;
     delayReadyToShow?: number;
     delayInitToShow?: number;
+    delaySDKInitToWebViewInit?: number;
+    reinitializedSDK?: boolean;
 }
 
 export class SdkStats {
-    public static initialize(nativeBridge: NativeBridge, request: Request, configuration: Configuration, sessionManager: SessionManager, campaignManager: CampaignManager, metaDataManager: MetaDataManager) {
+    public static initialize(nativeBridge: NativeBridge, request: Request, configuration: Configuration, sessionManager: SessionManager, campaignManager: CampaignManager, metaDataManager: MetaDataManager, clientInfo: ClientInfo) {
         SdkStats._nativeBridge = nativeBridge;
         SdkStats._request = request;
         SdkStats._configuration = configuration;
         SdkStats._sessionManager = sessionManager;
         SdkStats._campaignManager = campaignManager;
         SdkStats._metaDataManager = metaDataManager;
+        SdkStats._clientInfo = clientInfo;
 
         SdkStats._initialized = true;
     }
@@ -137,6 +141,7 @@ export class SdkStats {
     private static _sessionManager: SessionManager;
     private static _campaignManager: CampaignManager;
     private static _metaDataManager: MetaDataManager;
+    private static _clientInfo: ClientInfo;
     private static _topic: string = 'events.sdktimeline.json';
 
     private static _initialized: boolean = false;
@@ -210,7 +215,9 @@ export class SdkStats {
                 delayInitToRequest: SdkStats._latestAdRequestTimestamp - SdkStats._initTimestamp,
                 parseDuration: SdkStats._parseDuration[placementId],
                 requestDuration: SdkStats._latestAdRequestDuration,
-                delayInitToReady: SdkStats._readyEventSent[placementId] - SdkStats._initTimestamp
+                delayInitToReady: SdkStats._readyEventSent[placementId] - SdkStats._initTimestamp,
+                delaySDKInitToWebViewInit: SdkStats._initTimestamp - SdkStats._clientInfo.getInitTimestamp(),
+                reinitializedSDK: SdkStats._clientInfo.isReinitialized()
             };
 
             if(eventType === 'show') {
