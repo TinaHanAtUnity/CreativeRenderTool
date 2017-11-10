@@ -228,7 +228,7 @@ export class CampaignRefreshManager {
     private onAdPlanReceived(refreshDelay: number, campaignCount: number) {
         this._campaignCount = campaignCount;
 
-        if(campaignCount === 0) { // todo: add check for A/B group
+        if(campaignCount === 0 && this._configuration.getAbGroup() === 5) {
             this._noFills++;
 
             let delay: number = 0;
