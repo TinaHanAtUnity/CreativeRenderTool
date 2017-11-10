@@ -301,7 +301,8 @@ export class OperativeEventManager {
             'meta': adUnit.getCampaign().getMeta(),
             'screenDensity': this._deviceInfo.getScreenDensity(),
             'screenSize': this._deviceInfo.getScreenLayout(),
-            'platform': Platform[this._clientInfo.getPlatform()].toLowerCase()
+            'platform': Platform[this._clientInfo.getPlatform()].toLowerCase(),
+            'language': this._deviceInfo.getLanguage()
         };
 
         const campaign = adUnit.getCampaign();
