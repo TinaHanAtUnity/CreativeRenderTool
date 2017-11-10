@@ -16,7 +16,7 @@ cache:
   directories:
     - node_modules
 
-script: make lint && make test-coveralls && make test-integration && make build-test && make build-release && make deploy
+script: make lint && make test-coveralls && make test-integration && make build-test && make travis-browser-test && make build-release && make deploy
 
 notifications:
   slack:
