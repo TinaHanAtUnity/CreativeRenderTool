@@ -67,6 +67,26 @@
   @media only screen and (device-width : 375px) and (device-height : 812px) and (-webkit-device-pixel-ratio : 3) {
     html {
       font-size: $default-px-size * 1.25;
+
+      #new-end-screen {
+        .btn-close-region {
+          top: $default-size * .5;
+          right: $default-size * .5;
+        }
+
+        .unityads-logo {
+          bottom: $default-size * .5;
+        }
+      }
+    }
+
+    body {
+      &.portrait #new-end-screen {
+        .privacy-button {
+          bottom: $default-size * .5;
+          left: $default-size * .5;
+        }
+      }
     }
   }
 
@@ -90,7 +110,14 @@
   /* iPhone X */
   @media only screen and (device-width : 375px) and (device-height : 812px) and (-webkit-device-pixel-ratio : 3) {
     html {
-      font-size: $default-px-size * 1.2;
+      font-size: $default-px-size * 1.25;
+
+      #new-end-screen {
+        .btn-close-region {
+          top: $default-size * .5;
+          right: $default-size * .5;
+        }
+      }
     }
   }
 
