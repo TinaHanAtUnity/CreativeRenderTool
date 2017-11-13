@@ -1,17 +1,17 @@
 import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
-import { DisplayInterstitial } from "Views/DisplayInterstitial";
-import { NativeBridge } from "Native/NativeBridge";
-import { Placement } from "Models/Placement";
-import { DisplayInterstitialCampaign } from "Models/Campaigns/DisplayInterstitialCampaign";
+import { DisplayInterstitial } from 'Views/DisplayInterstitial';
+import { NativeBridge } from 'Native/NativeBridge';
+import { Placement } from 'Models/Placement';
+import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 
-import { Platform } from "Constants/Platform";
-import { TestFixtures } from "Test/Unit/TestHelpers/TestFixtures";
+import { Platform } from 'Constants/Platform';
+import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 import { FocusManager } from 'Managers/FocusManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { ComScoreTrackingService } from "Utilities/ComScoreTrackingService";
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { Request } from 'Utilities/Request';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { DisplayInterstitialAdUnit, IDisplayInterstitialAdUnitParameters } from 'AdUnits/DisplayInterstitialAdUnit';

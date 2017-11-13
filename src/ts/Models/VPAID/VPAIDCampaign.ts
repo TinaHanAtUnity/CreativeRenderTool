@@ -1,8 +1,8 @@
-import { ICampaign, Campaign } from "Models/Campaign";
-import { VPAID } from "Models/VPAID/VPAID";
-import { IAsset, Asset } from "Models/Assets/Asset";
-import { Session } from "Models/Session";
-import { VastCreativeCompanionAd } from "Models/Vast/VastCreativeCompanionAd";
+import { ICampaign, Campaign } from 'Models/Campaign';
+import { VPAID } from 'Models/VPAID/VPAID';
+import { IAsset, Asset } from 'Models/Assets/Asset';
+import { Session } from 'Models/Session';
+import { VastCreativeCompanionAd } from 'Models/Vast/VastCreativeCompanionAd';
 
 interface IVPAIDCampaign extends ICampaign {
     vpaid: VPAID;

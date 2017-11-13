@@ -5,7 +5,7 @@ import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
 import { Overlay } from 'Views/Overlay';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { ComScoreTrackingService } from "Utilities/ComScoreTrackingService";
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';

@@ -23,7 +23,7 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 
 import VPAIDTestXML from 'xml/VPAID.xml';
 import VPAIDCampaignJson from 'json/OnProgrammaticVPAIDCampaign.json';
-import { ComScoreTrackingService } from "Utilities/ComScoreTrackingService";
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 
 describe('VPAIDAdUnit', () => {
     let campaign: VPAIDCampaign;

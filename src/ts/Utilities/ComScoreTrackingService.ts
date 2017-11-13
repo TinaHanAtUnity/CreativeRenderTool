@@ -1,7 +1,7 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { Platform } from 'Constants/Platform';
-import { ThirdPartyEventManager } from "Managers/ThirdPartyEventManager";
-import { DeviceInfo } from "Models/DeviceInfo";
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { DeviceInfo } from 'Models/DeviceInfo';
 import { hex_sha1 } from 'Utilities/sha1';
 
 export class ComScoreTrackingService {

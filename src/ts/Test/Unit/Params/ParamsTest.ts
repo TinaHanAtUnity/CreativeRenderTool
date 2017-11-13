@@ -13,7 +13,7 @@ import { RequestApi } from 'Native/Api/Request';
 import { ParamsTestData, IEventSpec } from './ParamsTestData';
 import { ConfigManager } from 'Managers/ConfigManager';
 import { SessionManager } from 'Managers/SessionManager';
-import { ComScoreTrackingService } from "Utilities/ComScoreTrackingService";
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { Configuration, CacheMode } from 'Models/Configuration';
