@@ -1,13 +1,13 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
-import { AdMobView, IAdMobEventHandler } from 'Views/AdMobView';
+import { AdMobView } from 'Views/AdMobView';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { FinishState } from 'Constants/FinishState';
 export interface IAdMobAdUnitParameters extends IAdUnitParameters<AdMobCampaign> {
     view: AdMobView;
 }
-export class AdMobAdUnit extends AbstractAdUnit<AdMobCampaign> implements IAdMobEventHandler {
+export class AdMobAdUnit extends AbstractAdUnit<AdMobCampaign> {
     private _operativeEventManager: OperativeEventManager;
     private _view: AdMobView;
     private _options: any;

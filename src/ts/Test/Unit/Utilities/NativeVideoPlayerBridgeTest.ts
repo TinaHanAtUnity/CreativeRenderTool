@@ -5,9 +5,11 @@ import { assert } from 'chai';
 import { NativeVideoPlayerBridge, IPlayerEventData } from 'Utilities/NativeVideoPlayerBridge';
 import { VideoPlayerApi } from 'Native/Api/VideoPlayer';
 import { NativeBridge } from 'Native/NativeBridge';
-import { Observable1, Observable4 } from 'Utilities/Observable';
+import { Observable1, Observable4, Observable0 } from 'Utilities/Observable';
 import { Double } from 'Utilities/Double';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { AndroidVideoPlayerApi } from 'Native/Api/AndroidVideoPlayer';
+import { IosVideoPlayerApi } from 'Native/Api/IosVideoPlayer';
 
 describe('NativeVideoPlayerBridge', () => {
     const src = 'https://wiki.yoctoproject.org/wiki/images/a/a6/Big-buck-bunny_trailer.webm';
@@ -21,13 +23,18 @@ describe('NativeVideoPlayerBridge', () => {
         nativeBridge = sinon.createStubInstance(NativeBridge);
 
         videoPlayer = sinon.createStubInstance(VideoPlayerApi);
-        (<any>videoPlayer).onProgress = new Observable1<number>();
-        (<any>videoPlayer).onCompleted = new Observable1<string>();
         (<any>videoPlayer).onPrepared = new Observable4<string, number, number, number>();
+        (<any>videoPlayer).onProgress = new Observable1<number>();
         (<any>videoPlayer).onPlay = new Observable1<string>();
         (<any>videoPlayer).onPause = new Observable1<string>();
+        (<any>videoPlayer).onCompleted = new Observable1<string>();
+        (<any>videoPlayer).Android = sinon.createStubInstance(AndroidVideoPlayerApi);
+        (<any>videoPlayer.Android.onGenericError) = new Observable0();
+        (<any>videoPlayer).Ios = sinon.createStubInstance(IosVideoPlayerApi);
+        (<any>videoPlayer.Ios.onGenericError) = new Observable0();
 
         container = sinon.createStubInstance(AdUnitContainer);
+        (<any>container.onShow) = new Observable0();
 
         nativeBridge.VideoPlayer = videoPlayer;
 
