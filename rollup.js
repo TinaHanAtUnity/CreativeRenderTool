@@ -1,6 +1,5 @@
 import include from 'rollup-plugin-includepaths';
 import string from 'rollup-plugin-string';
-import resolve from 'rollup-plugin-node-resolve';
 import html from 'rollup-plugin-html';
 import alias from 'rollup-plugin-alias';
 
@@ -8,7 +7,10 @@ export default {
     input: 'build/release/js/Device.js',
     output: {
         format: 'iife',
-        file: 'build/release/bundle.js'
+        file: 'build/release/bundle.js',
+        globals: {
+            'protobufjs/minimal': 'protobuf'
+        }
     },
     plugins: [
         include({
@@ -33,10 +35,8 @@ export default {
         }),
         alias({
             'es6-promise': 'node_modules/es6-promise/dist/es6-promise.auto.js',
-            'protobufjs/minimal': 'node_modules/protobufjs/dist/minimal/protobuf.js',
             '../../proto/unity_proto.js': 'build/release/js/Proto/unity_proto.js'
-        }),
-        resolve()
+        })
     ],
     context: 'window'
 };

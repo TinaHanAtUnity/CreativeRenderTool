@@ -1,6 +1,6 @@
 import { Model } from 'Models/Model';
 import { unity_proto } from '../../proto/unity_proto.js';
-import { util } from "protobufjs/minimal";
+import * as protobuf from 'protobufjs/minimal';
 
 interface IAdMobSignal {
     sdkVersion: string;
@@ -565,7 +565,7 @@ export class AdMobSignal extends Model<IAdMobSignal> {
             field_50: this.getDeviceOrientation()
         };
         const buffer = unity_proto.UnityInfo.encode(signalObject).finish();
-        return util.base64.encode(buffer, 0, buffer.byteLength);
+        return protobuf.util.base64.encode(buffer, 0, buffer.byteLength);
     }
 
     public getDTO(): { [key: string]: any } {

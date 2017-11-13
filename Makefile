@@ -78,7 +78,8 @@ build-release: clean build-dir build-static build-css build-proto build-ts build
 		var s=fs.readFileSync('$(BUILD_DIR)/css/main.css', o);\
 		var j=fs.readFileSync('$(BUILD_DIR)/bundle.min.js', o);\
 		var i=fs.readFileSync('$(BUILD_DIR)/index.html', o);\
-		fs.writeFileSync('$(BUILD_DIR)/index.html', i.replace('{COMPILED_CSS}', s).replace('{COMPILED_JS}', j), o);"
+		var b=fs.readFileSync('node_modules/protobufjs/dist/minimal/protobuf.js', o);\
+		fs.writeFileSync('$(BUILD_DIR)/index.html', i.replace('{COMPILED_CSS}', s).replace('{COMPILED_JS}', j).replace('{PROTOBUF_JS}', b), o);"
 
 	@echo
 	@echo Cleaning release build
