@@ -564,7 +564,7 @@ export class GoogleSignal extends Model<IGoogleSignal> {
             field_49: this.getScreenHeight(),
             field_50: this.getDeviceOrientation()
         };
-        let buffer = unity_proto.UnityInfo.encode(signalObject).finish();
+        const buffer = unity_proto.UnityInfo.encode(signalObject).finish();
         return util.base64.encode(buffer, 0, buffer.byteLength);
     }
 
