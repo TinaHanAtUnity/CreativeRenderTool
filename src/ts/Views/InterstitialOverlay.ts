@@ -14,7 +14,6 @@ export class InterstitialOverlay extends AbstractOverlay {
     private _muteButtonElement: HTMLElement;
     private _debugMessageElement: HTMLElement;
     private _callButtonElement: HTMLElement;
-    private _progressElement: HTMLElement;
 
     private _canClose: boolean = false;
 
@@ -95,6 +94,14 @@ export class InterstitialOverlay extends AbstractOverlay {
         if(AbstractOverlay.AutoSkip) {
             this._handlers.forEach(handler => handler.onOverlaySkip(value));
         }
+
+        if(this._fadeEnabled && !this._fadeTimer && this._skipRemaining <= 0) {
+            this._fadeTimer = setTimeout(() => {
+                this.fade(true);
+                this._fadeTimer = undefined;
+            }, 3000);
+        }
+
         this._skipRemaining = this._skipDuration - value;
         if(this._skipRemaining > 0) {
             this._skipRemaining--;
@@ -159,13 +166,6 @@ export class InterstitialOverlay extends AbstractOverlay {
         this._handlers.forEach(handler => handler.onOverlayCallButton());
     }
 
-    private resetFadeTimer() {
-        if (this._fadeTimer) {
-            clearTimeout(this._fadeTimer);
-            this._fadeTimer = undefined;
-        }
-    }
-
     private onPauseForTestingEvent(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
@@ -183,12 +183,17 @@ export class InterstitialOverlay extends AbstractOverlay {
         }
     }
 
+    private resetFadeTimer() {
+        if (this._fadeTimer) {
+            clearTimeout(this._fadeTimer);
+            this._fadeTimer = undefined;
+        }
+    }
+
     private fade(value: boolean) {
         if (value) {
             this._closeElement.classList.remove('slide-back-in-place');
             this._closeElement.classList.add('slide-up');
-            this._progressElement.classList.remove('slide-back-in-place');
-            this._progressElement.classList.add('slide-up');
             this._muteButtonElement.classList.remove('slide-back-in-place');
             this._muteButtonElement.classList.add('slide-down');
             this._container.style.pointerEvents = 'auto';
@@ -197,8 +202,6 @@ export class InterstitialOverlay extends AbstractOverlay {
             this._container.style.pointerEvents = 'none';
             this._closeElement.classList.remove('slide-up');
             this._closeElement.classList.add('slide-back-in-place');
-            this._progressElement.classList.remove('slide-up');
-            this._progressElement.classList.add('slide-back-in-place');
             this._muteButtonElement.classList.remove('slide-down');
             this._muteButtonElement.classList.add('slide-back-in-place');
             this._fadeStatus = true;
