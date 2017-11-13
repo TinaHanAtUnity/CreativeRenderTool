@@ -1,3 +1,7 @@
+# Pending
+
+* Faster init by converting some promise chains to be parallel 
+
 # Mon Nov 13 09:23:05 UTC 2017
 
 * Add browser build tests to CI
