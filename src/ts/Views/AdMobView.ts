@@ -43,7 +43,15 @@ export class AdMobView extends View<IAdMobEventHandler> {
         this._template = new Template(AdMobContainer);
         this._afmaBridge = new AFMABridge({
             onAFMAClose: () => this.onClose(),
-            onAFMAOpenURL: (url: string) => this.onOpenURL(url)
+            onAFMAOpenURL: (url: string) => this.onOpenURL(url),
+            onAFMADisableBackButton: () => { /**/ },
+            onAFMAClick: (url) => this.onOpenURL(url),
+            onAFMAFetchAppStoreOverlay: () => { /**/ },
+            onAFMAForceOrientation: () => { /**/ },
+            onAFMAGrantReward: () => { /**/ },
+            onAFMAOpenInAppStore: () => { /**/ },
+            onAFMAOpenStoreOverlay: () => { /**/ },
+            onAFMARewardedVideoStart: () => { /**/ }
         });
 
         this._bindings = [];
