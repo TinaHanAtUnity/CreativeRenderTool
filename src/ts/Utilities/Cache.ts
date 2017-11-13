@@ -123,15 +123,10 @@ export class Cache {
     }
 
     public cache(url: string, diagnostics: ICacheDiagnostics, campaign: Campaign): Promise<string[]> {
-        return this._nativeBridge.Cache.isCaching().then(isCaching => {
-            if(isCaching) {
-                throw CacheStatus.FAILED;
-            }
-            return Promise.all<boolean, string>([
-                this.isCached(url),
-                this.getFileId(url)
-            ]);
-        }).then(([isCached, fileId]) => {
+        return Promise.all<boolean, string>([
+            this.isCached(url),
+            this.getFileId(url)
+        ]).then(([isCached, fileId]) => {
             if(isCached) {
                 return Promise.resolve([CacheStatus.OK, fileId]);
             }
