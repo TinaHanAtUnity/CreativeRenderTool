@@ -1,3 +1,15 @@
+# Pending
+
+* Faster init by converting some promise chains to be parallel 
+
+# Mon Nov 13 09:23:05 UTC 2017
+
+* Add browser build tests to CI
+* Add init time and reinit flag to SDK stats
+* Add language parameter to operative events
+* Add AB test for quick no fill refresh to group 5
+* Adjust endcard button position on iPhoneX
+
 # Thu Nov  9 10:00:00 UTC 2017
 
 * Add safety checks for negative values when sending playable analytics

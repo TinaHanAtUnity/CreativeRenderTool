@@ -26,6 +26,7 @@ window.addEventListener('resize', resizeHandler, false);
 
 const toInt = (element: HTMLInputElement): number => parseInt(element.value, 10);
 const toBoolean = (element: HTMLInputElement): boolean => element.checked;
+const JS_FUNC_NAME_GET_HEADLESS = 'getHeadless';
 
 const setClientInfo = () => {
     const fields = [
@@ -130,9 +131,7 @@ if(window.parent !== window) {
     const initializeButton = <HTMLButtonElement>window.parent.document.getElementById('initialize');
     const campaignResponseElement = <HTMLInputElement>window.parent.document.getElementById('campaignResponse');
 
-    initializeButton.addEventListener('click', (event: Event) => {
-        event.preventDefault();
-
+    const initialize = () => {
         abGroupElement.disabled = true;
         campaignIdElement.disabled = true;
         countryElement.disabled = true;
@@ -225,6 +224,14 @@ if(window.parent !== window) {
             default:
                 throw new Error('Unity Ads webview init failure: no platform defined, unable to initialize native bridge');
         }
+    };
 
-    }, false);
+    if(window.parent[JS_FUNC_NAME_GET_HEADLESS]()) {
+        initialize();
+    } else {
+        initializeButton.addEventListener('click', (event: Event) => {
+            event.preventDefault();
+            initialize();
+        }, false);
+    }
 }

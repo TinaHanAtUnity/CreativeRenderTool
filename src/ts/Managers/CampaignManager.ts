@@ -90,7 +90,7 @@ export class CampaignManager {
         this._requesting = false;
     }
 
-    public request(): Promise<INativeResponse | void> {
+    public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
         // prevent having more then one ad request in flight
         if(this._requesting) {
             return Promise.resolve();
@@ -105,7 +105,7 @@ export class CampaignManager {
         }
 
         return this._sessionManager.create().then((session) => {
-            return Promise.all([this.createRequestUrl(session), this.createRequestBody()]).then(([requestUrl, requestBody]) => {
+            return Promise.all([this.createRequestUrl(session), this.createRequestBody(nofillRetry)]).then(([requestUrl, requestBody]) => {
                 this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
                 const body = JSON.stringify(requestBody);
                 SdkStats.setAdRequestTimestamp();
@@ -383,7 +383,7 @@ export class CampaignManager {
         });
     }
 
-    private createRequestBody(): Promise<any> {
+    private createRequestBody(nofillRetry?: boolean): Promise<any> {
         const promises: Array<Promise<any>> = [];
         promises.push(this._deviceInfo.getFreeSpace());
         promises.push(this._deviceInfo.getNetworkOperator());
@@ -412,6 +412,10 @@ export class CampaignManager {
 
         if(typeof navigator !== 'undefined' && navigator.userAgent && typeof navigator.userAgent === 'string') {
             body.webviewUa = navigator.userAgent;
+        }
+
+        if(nofillRetry) {
+            body.nofillRetry = true;
         }
 
         return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName, headset, volume, fullyCachedCampaignIds, versionCode, requestSignal]) => {

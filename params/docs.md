@@ -188,6 +188,7 @@
 | screenDensity | android | False | True | number | Screen density in DPI | SDK | android |
 | screenSize | android | False | True | number | Android raw screen layout value | SDK | android |
 | platform | all | False | True | string | "android" or "ios" | SDK | all |
+| language | all | False | True | string | Device language code (e.g. en_US or fr_CA) | SDK | all |
 
 
 
@@ -226,4 +227,5 @@
 | screenDensity | android | False | True | number | Screen density in DPI | SDK | android |
 | screenSize | android | False | True | number | Android raw screen layout value | SDK | android |
 | platform | all | False | True | string | "android" or "ios" | SDK | all |
+| language | all | False | True | string | Device language code (e.g. en_US or fr_CA) | SDK | all |
 
