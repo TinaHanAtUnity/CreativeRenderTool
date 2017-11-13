@@ -177,10 +177,10 @@ build-proto:
 	@echo Compiling .proto to .js and .d.ts
 	@echo
 
-	mkdir -p $(BUILD_DIR)/js/Proto
+	mkdir -p $(BUILD_DIR)/proto
 	$(PBJS) -t static-module -w $$(if [ $(MODULE) = es2015 ]; then echo es6; else echo commonjs; fi) -o src/proto/unity_proto.js src/proto/unity_proto.proto
 	$(PBTS) -o src/proto/unity_proto.d.ts src/proto/unity_proto.js
-	cp src/proto/unity_proto.js $(BUILD_DIR)/js/Proto/unity_proto.js
+	cp src/proto/unity_proto.js $(BUILD_DIR)/proto/unity_proto.js
 
 build-ts:
 	@echo
