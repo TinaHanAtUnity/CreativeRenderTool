@@ -87,8 +87,6 @@ export class CampaignManager {
         this._deviceInfo = deviceInfo;
         this._metaDataManager = metaDataManager;
         this._requesting = false;
-
-        AdMobSignalFactory.createSomething();
     }
 
     public request(): Promise<INativeResponse | void> {
