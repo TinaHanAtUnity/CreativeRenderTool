@@ -44,6 +44,7 @@ import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 import { MRAIDEndScreen } from 'Views/MRAIDEndScreen';
 import { MRAIDEndScreenEventHandler } from 'EventHandlers/MRAIDEndScreenEventHandler';
 import { PerformanceEndScreenEventHandler } from 'EventHandlers/PerformanceEndScreenEventHandler';
+import { InterstitialOverlay } from 'Views/InterstitialOverlay';
 
 export class AdUnitFactory {
 
@@ -65,7 +66,7 @@ export class AdUnitFactory {
     }
 
     private static createPerformanceAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PerformanceCampaign>): AbstractAdUnit<PerformanceCampaign> {
-        const overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+        const overlay = this.createOverlay(nativeBridge, parameters);
         const endScreen = new PerformanceEndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         const video = this.getOrientedVideo(<PerformanceCampaign>parameters.campaign, parameters.forceOrientation);
 
@@ -104,7 +105,7 @@ export class AdUnitFactory {
     }
 
     private static createVastAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<VastCampaign>): AbstractAdUnit<VastCampaign> {
-        const overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+        const overlay = this.createOverlay(nativeBridge, parameters);
         let vastEndScreen: VastEndScreen | undefined;
 
         const vastAdUnitParameters: IVastAdUnitParameters = {
@@ -380,5 +381,17 @@ export class AdUnitFactory {
             }
         }
         return undefined;
+    }
+
+    private static createOverlay(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>) {
+        if(parameters.placement.allowSkip()) {
+            if(parameters.campaign.getAbGroup() !== -1) {
+                return new InterstitialOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+            }  else {
+                return new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+            }
+        } else {
+            return new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+        }
     }
 }

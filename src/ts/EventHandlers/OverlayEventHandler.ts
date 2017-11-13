@@ -48,6 +48,14 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
     }
 
     public onOverlayClose(): void {
-        // TODO
+        this._nativeBridge.VideoPlayer.pause();
+        this._adUnit.setActive(false);
+        this._adUnit.setFinishState(FinishState.SKIPPED);
+        this._operativeEventManager.sendSkip(this._adUnit, this._adUnit.getVideo().getPosition());
+
+        this._adUnit.onFinish.trigger();
+        this._adUnit.onClose.trigger();
+
+        this._adUnit.hide();
     }
 }

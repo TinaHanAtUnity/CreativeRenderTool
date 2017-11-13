@@ -25,6 +25,8 @@ export abstract class AbstractOverlay extends View<IOverlayHandler> {
 
     protected _muted: boolean;
 
+    protected _fadeEnabled: boolean = true;
+
     constructor(nativeBridge: NativeBridge, containerId: string, muted: boolean, abGroup: number = 0) {
         super(nativeBridge, containerId);
         this._abGroup = abGroup;
@@ -43,6 +45,12 @@ export abstract class AbstractOverlay extends View<IOverlayHandler> {
         return this._muted;
     }
 
+    public setFadeEnabled(value: boolean) {
+        if(this._fadeEnabled !== value) {
+            this._fadeEnabled = value;
+        }
+    }
+
     public abstract setSpinnerEnabled(value: boolean): void;
 
     public abstract setSkipEnabled(value: boolean): void;
@@ -58,6 +66,4 @@ export abstract class AbstractOverlay extends View<IOverlayHandler> {
     public abstract setDebugMessageVisible(value: boolean): void;
 
     public abstract setCallButtonVisible(value: boolean): void;
-
-    public abstract setFadeEnabled(value: boolean): void;
 }
