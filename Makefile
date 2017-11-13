@@ -178,8 +178,7 @@ build-proto:
 	@echo
 
 	mkdir -p $(BUILD_DIR)/js/Proto
-	@echo $(MODULE)
-	if [ $(MODULE) = es2015 ]; then $(PBJS) -t static-module -w es6 -o src/proto/unity_proto.js src/proto/unity_proto.proto; else $(PBJS) -t static-module -w commonjs -o src/proto/unity_proto.js src/proto/unity_proto.proto; fi
+	$(PBJS) -t static-module -w $$(if [ $(MODULE) = es2015 ]; then echo es6; else echo commonjs; fi) -o src/proto/unity_proto.js src/proto/unity_proto.proto
 	$(PBTS) -o src/proto/unity_proto.d.ts src/proto/unity_proto.js
 	cp src/proto/unity_proto.js $(BUILD_DIR)/js/Proto/unity_proto.js
 
