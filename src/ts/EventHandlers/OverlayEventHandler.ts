@@ -54,7 +54,6 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
         this._operativeEventManager.sendSkip(this._adUnit, this._adUnit.getVideo().getPosition());
 
         this._adUnit.onFinish.trigger();
-        this._adUnit.onClose.trigger();
 
         this._adUnit.hide();
     }
