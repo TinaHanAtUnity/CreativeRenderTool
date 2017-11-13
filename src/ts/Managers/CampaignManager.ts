@@ -390,6 +390,9 @@ export class CampaignManager {
         promises.push(this._deviceInfo.getDeviceVolume());
         promises.push(this.getFullyCachedCampaigns());
         promises.push(this.getVersionCode());
+        promises.push(GoogleSignalFactory.getAdRequestSignal(this._nativeBridge, this._clientInfo, this._deviceInfo).then(signal => {
+            return signal.getBase64ProtoBuf();
+        }));
 
         const body: any = {
             bundleVersion: this._clientInfo.getApplicationVersion(),
@@ -409,12 +412,13 @@ export class CampaignManager {
             body.webviewUa = navigator.userAgent;
         }
 
-        return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName, headset, volume, fullyCachedCampaignIds, versionCode]) => {
+        return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName, headset, volume, fullyCachedCampaignIds, versionCode, requestSignal]) => {
             body.deviceFreeSpace = freeSpace;
             body.networkOperator = networkOperator;
             body.networkOperatorName = networkOperatorName;
             body.wiredHeadset = headset;
             body.volume = volume;
+            body.requestSignal = requestSignal;
 
             if(fullyCachedCampaignIds && fullyCachedCampaignIds.length > 0) {
                 body.cachedCampaigns = fullyCachedCampaignIds;
