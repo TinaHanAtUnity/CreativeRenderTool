@@ -113,7 +113,7 @@ export class MOAT extends View<VastCampaign> {
         }
     }
 
-    private onMessage(e : MessageEvent) {
+    private onMessage(e: MessageEvent) {
         switch(e.data.type) {
             case 'MOATVideoError':
                 Diagnostics.trigger('MOATVideoError', e.data.error);
