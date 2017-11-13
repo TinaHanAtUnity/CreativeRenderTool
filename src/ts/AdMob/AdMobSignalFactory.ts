@@ -1,4 +1,4 @@
-import { GoogleSignal } from 'Models/GoogleSignal';
+import { AdMobSignal } from 'Models/AdMobSignal';
 import { ClientInfo } from 'Models/ClientInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Platform } from 'Constants/Platform';
@@ -7,20 +7,20 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 
 import { unity_proto } from '../../proto/unity_proto.js';
 
-export class GoogleSignalFactory {
+export class AdMobSignalFactory {
 
     public static createSomething() {
         return unity_proto.UnityInfo.create();
     }
 
-    public static getAdRequestSignal(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo): Promise<GoogleSignal> {
-        return GoogleSignalFactory.getCommonSignal(nativeBridge, clientInfo, deviceInfo).then(signal => {
+    public static getAdRequestSignal(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo): Promise<AdMobSignal> {
+        return AdMobSignalFactory.getCommonSignal(nativeBridge, clientInfo, deviceInfo).then(signal => {
             return signal;
         });
     }
 
-    public static getClickSignal(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo): Promise<GoogleSignal> {
-        return GoogleSignalFactory.getCommonSignal(nativeBridge, clientInfo, deviceInfo).then(signal => {
+    public static getClickSignal(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo): Promise<AdMobSignal> {
+        return AdMobSignalFactory.getCommonSignal(nativeBridge, clientInfo, deviceInfo).then(signal => {
             // todo: touchXUp
             // todo: touchYUp
             // todo: touchXDown
@@ -36,11 +36,11 @@ export class GoogleSignalFactory {
 
             if(signal.getScreenWidth() && signal.getScreenHeight()) {
                 if(clientInfo.getPlatform() === Platform.IOS && deviceInfo.getScreenScale()) {
-                    signal.setAdViewWidth(GoogleSignalFactory.getIosViewWidth(signal.getScreenWidth(), deviceInfo.getScreenScale()));
-                    signal.setAdViewHeight(GoogleSignalFactory.getIosViewHeight(signal.getScreenHeight(), deviceInfo.getScreenScale()));
+                    signal.setAdViewWidth(AdMobSignalFactory.getIosViewWidth(signal.getScreenWidth(), deviceInfo.getScreenScale()));
+                    signal.setAdViewHeight(AdMobSignalFactory.getIosViewHeight(signal.getScreenHeight(), deviceInfo.getScreenScale()));
                 } else if(deviceInfo.getScreenDensity()) {
-                    signal.setAdViewWidth(GoogleSignalFactory.getAndroidViewWidth(signal.getScreenWidth(), deviceInfo.getScreenDensity()));
-                    signal.setAdViewHeight(GoogleSignalFactory.getAndroidViewHeight(signal.getScreenHeight(), deviceInfo.getScreenDensity()));
+                    signal.setAdViewWidth(AdMobSignalFactory.getAndroidViewWidth(signal.getScreenWidth(), deviceInfo.getScreenDensity()));
+                    signal.setAdViewHeight(AdMobSignalFactory.getAndroidViewHeight(signal.getScreenHeight(), deviceInfo.getScreenDensity()));
                 }
             }
 
@@ -51,16 +51,16 @@ export class GoogleSignalFactory {
         });
     }
 
-    private static getCommonSignal(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo): Promise<GoogleSignal> {
-        const signal: GoogleSignal = new GoogleSignal();
-        signal.setEventTimestamp(GoogleSignalFactory.getEventTimestamp());
-        signal.setSdkVersion(GoogleSignalFactory.getSdkVersion(clientInfo));
-        signal.setOsVersion(GoogleSignalFactory.getOsVersion(clientInfo, deviceInfo));
-        signal.setTimeZoneOffset(GoogleSignalFactory.getTimeZoneOffset());
+    private static getCommonSignal(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo): Promise<AdMobSignal> {
+        const signal: AdMobSignal = new AdMobSignal();
+        signal.setEventTimestamp(AdMobSignalFactory.getEventTimestamp());
+        signal.setSdkVersion(AdMobSignalFactory.getSdkVersion(clientInfo));
+        signal.setOsVersion(AdMobSignalFactory.getOsVersion(clientInfo, deviceInfo));
+        signal.setTimeZoneOffset(AdMobSignalFactory.getTimeZoneOffset());
         // todo: signal app active
-        signal.setAppUptime(GoogleSignalFactory.getAppUptime(clientInfo));
-        signal.setAppStartTime(GoogleSignalFactory.getAppStartTime(clientInfo));
-        signal.setRooted(GoogleSignalFactory.getRooted(deviceInfo));
+        signal.setAppUptime(AdMobSignalFactory.getAppUptime(clientInfo));
+        signal.setAppStartTime(AdMobSignalFactory.getAppStartTime(clientInfo));
+        signal.setRooted(AdMobSignalFactory.getRooted(deviceInfo));
         signal.setAppVersionName(clientInfo.getApplicationVersion());
         // todo: device orientation
         signal.setAppIdName(clientInfo.getApplicationName());
@@ -68,29 +68,29 @@ export class GoogleSignalFactory {
         const promises = [];
 
         promises.push(deviceInfo.getBatteryLevel().then(batteryLevel => {
-            signal.setBatteryLevel(GoogleSignalFactory.getBatteryLevel(batteryLevel));
+            signal.setBatteryLevel(AdMobSignalFactory.getBatteryLevel(batteryLevel));
         }).catch(() => {
-            GoogleSignalFactory.logFailure(nativeBridge, 'batteryLevel');
+            AdMobSignalFactory.logFailure(nativeBridge, 'batteryLevel');
         }));
 
         promises.push(deviceInfo.getBatteryStatus().then(batteryStatus => {
-            signal.setBatteryState(GoogleSignalFactory.getBatteryStatus(clientInfo, batteryStatus));
+            signal.setBatteryState(AdMobSignalFactory.getBatteryStatus(clientInfo, batteryStatus));
         }).catch(() => {
-            GoogleSignalFactory.logFailure(nativeBridge, 'batteryStatus');
+            AdMobSignalFactory.logFailure(nativeBridge, 'batteryStatus');
         }));
 
         promises.push(deviceInfo.getConnectionType().then(connectionType => {
-            signal.setNetworkType(GoogleSignalFactory.getNetworkType(connectionType));
+            signal.setNetworkType(AdMobSignalFactory.getNetworkType(connectionType));
         }).catch(() => {
-            GoogleSignalFactory.logFailure(nativeBridge, 'connectionType');
+            AdMobSignalFactory.logFailure(nativeBridge, 'connectionType');
         }));
 
         promises.push(Promise.all([deviceInfo.getScreenWidth(),deviceInfo.getScreenHeight()]).then(([width, height]) => {
             signal.setScreenWidth(width);
             signal.setScreenHeight(height);
-            signal.setDeviceOrientation(GoogleSignalFactory.getDeviceScreenOrientation(width, height));
+            signal.setDeviceOrientation(AdMobSignalFactory.getDeviceScreenOrientation(width, height));
         }).catch(() => {
-            GoogleSignalFactory.logFailure(nativeBridge, 'screenWidth');
+            AdMobSignalFactory.logFailure(nativeBridge, 'screenWidth');
         }));
 
         if(nativeBridge.getPlatform() === Platform.ANDROID) {
@@ -103,7 +103,7 @@ export class GoogleSignalFactory {
                     signal.setAppVersionCode(packageInfo.versionCode);
                 }
             }).catch(() => {
-                GoogleSignalFactory.logFailure(nativeBridge, 'packageInfo');
+                AdMobSignalFactory.logFailure(nativeBridge, 'packageInfo');
             }));
         }
 

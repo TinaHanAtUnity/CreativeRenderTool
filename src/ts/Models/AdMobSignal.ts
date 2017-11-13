@@ -2,7 +2,7 @@ import { Model } from 'Models/Model';
 import { unity_proto } from '../../proto/unity_proto.js';
 import { util } from "protobufjs/minimal";
 
-interface IGoogleSignal {
+interface IAdMobSignal {
     sdkVersion: string;
     batteryLevel: number;
     batteryState: number;
@@ -55,9 +55,9 @@ interface IGoogleSignal {
     screenHeight: number;
 }
 
-export class GoogleSignal extends Model<IGoogleSignal> {
+export class AdMobSignal extends Model<IAdMobSignal> {
     constructor() {
-        super('GoogleSignal', {
+        super('AdMobSignal', {
             sdkVersion: ['string'],
             batteryLevel: ['number'],
             batteryState: ['number'],

@@ -27,7 +27,7 @@ import { ProgrammaticMraidParser } from 'Parsers/ProgrammaticMraidParser';
 import { ProgrammaticStaticInterstitialParser } from 'Parsers/ProgrammaticStaticInterstitialParser';
 import { CampaignParser } from 'Parsers/CampaignParser';
 import { ProgrammaticVPAIDParser } from 'Parsers/ProgrammaticVPAIDParser';
-import { GoogleSignalFactory} from 'Google/GoogleSignalFactory';
+import { AdMobSignalFactory} from 'AdMob/AdMobSignalFactory';
 
 export class CampaignManager {
 
@@ -88,7 +88,7 @@ export class CampaignManager {
         this._metaDataManager = metaDataManager;
         this._requesting = false;
 
-        GoogleSignalFactory.createSomething();
+        AdMobSignalFactory.createSomething();
     }
 
     public request(): Promise<INativeResponse | void> {
@@ -390,7 +390,7 @@ export class CampaignManager {
         promises.push(this._deviceInfo.getDeviceVolume());
         promises.push(this.getFullyCachedCampaigns());
         promises.push(this.getVersionCode());
-        promises.push(GoogleSignalFactory.getAdRequestSignal(this._nativeBridge, this._clientInfo, this._deviceInfo).then(signal => {
+        promises.push(AdMobSignalFactory.getAdRequestSignal(this._nativeBridge, this._clientInfo, this._deviceInfo).then(signal => {
             return signal.getBase64ProtoBuf();
         }));
 

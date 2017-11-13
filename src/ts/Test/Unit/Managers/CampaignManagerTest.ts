@@ -62,8 +62,8 @@ import OnProgrammaticVastPlcCampaignCustomTracking from 'json/OnProgrammaticVast
 import OnStaticInterstitialDisplayCampaign from 'json/OnStaticInterstitialDisplayCampaign.json';
 import OnStaticInterstitialDisplayCampaignNoClick from 'json/OnStaticInterstitialDisplayCampaignNoClick.json';
 import { ProgrammaticVastParser } from 'Parsers/ProgrammaticVastParser';
-import { GoogleSignalFactory } from 'Google/GoogleSignalFactory';
-import { GoogleSignal } from 'Models/GoogleSignal';
+import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
+import { AdMobSignal } from 'Models/AdMobSignal';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -194,7 +194,7 @@ describe('CampaignManager', () => {
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         sessionManager = new SessionManager(nativeBridge);
 
-        signalFactoryStub = sinon.stub(GoogleSignalFactory, 'getAdRequestSignal').returns(Promise.resolve(new GoogleSignal()));
+        signalFactoryStub = sinon.stub(AdMobSignalFactory, 'getAdRequestSignal').returns(Promise.resolve(new AdMobSignal()));
     });
 
     afterEach(() => {
