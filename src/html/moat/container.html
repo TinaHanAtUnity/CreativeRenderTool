@@ -166,7 +166,7 @@
             return d
         }
 
-        function loadError (e) {
+        function loadError(e) {
             window.parent.postMessage({
                 type: 'MOATVideoError',
                 error: e.target.src + ' failed to download'
