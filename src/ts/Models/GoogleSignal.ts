@@ -1,4 +1,6 @@
 import { Model } from 'Models/Model';
+import { unity_proto } from '../../proto/unity_proto.js';
+import { util } from "protobufjs/minimal";
 
 interface IGoogleSignal {
     sdkVersion: string;
@@ -507,6 +509,63 @@ export class GoogleSignal extends Model<IGoogleSignal> {
 
     public setScreenHeight(screenHeight: number): void {
         this.set('screenHeight', screenHeight);
+    }
+
+    public getBase64ProtoBuf(): string {
+        const signalObject = {
+            field_1: this.getSdkVersion(),
+            field_2: this.getBatteryLevel(),
+            field_3: this.getBatteryState(),
+            field_4: this.getAccelerometerX(),
+            field_5: this.getAccelerometerY(),
+            field_6: this.getAccelerometerZ(),
+            field_7: this.getTouchXUp(),
+            field_8: this.getTouchYUp(),
+            field_9: this.getTouchXDown(),
+            field_10: this.getTouchYDown(),
+            field_11: this.getTouchDuration(),
+            field_12: this.getTouchPressure(),
+            field_13: this.getTouchDiameter(),
+            field_14: this.getAndroidTouchObscured(),
+            field_15: this.getTouchToolType(),
+            field_16: this.getTouchSource(),
+            field_17: this.getTouchDeviceId(),
+            field_18: this.getTouchDistance(),
+            field_19: this.getTouchUpTotal(),
+            field_20: this.getTouchDownTotal(),
+            field_21: this.getTouchMoveTotal(),
+            field_22: this.getTouchCancelTotal(),
+            field_23: this.getOsVersion(),
+            field_24: this.getCpuCount(),
+            field_25: this.getDeviceUptime(),
+            field_26: this.getDeviceElapsedRealtime(),
+            field_27: this.getTimeZoneOffset(),
+            field_28: this.getUsbConnected(),
+            field_29: this.getAdbEnabled(),
+            field_30: this.getRooted(),
+            field_31: this.getNetworkType(),
+            field_32: this.getAppActive(),
+            field_33: this.getAppUptime(),
+            field_34: this.getAppStartTime(),
+            field_35: this.getEventTimestamp(),
+            field_36: this.getTimeOnScreen(),
+            field_37: this.getApkHash(),
+            field_38: this.getApkDeveloperSigningCertificateHash(),
+            field_39: this.getAppVersionName(),
+            field_40: this.getAppVersionCode(),
+            field_41: this.getAppIdName(),
+            field_42: this.getAppInstaller(),
+            field_43: this.getAdViewWidth(),
+            field_44: this.getAdViewHeight(),
+            field_45: this.getAdViewX(),
+            field_46: this.getAdViewY(),
+            field_47: this.getMinimumAlpha(),
+            field_48: this.getScreenWidth(),
+            field_49: this.getScreenHeight(),
+            field_50: this.getDeviceOrientation()
+        };
+        let buffer = unity_proto.UnityInfo.encode(signalObject).finish();
+        return util.base64.encode(buffer, 0, buffer.byteLength);
     }
 
     public getDTO(): { [key: string]: any } {
