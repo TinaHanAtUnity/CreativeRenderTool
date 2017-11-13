@@ -62,6 +62,8 @@ import OnProgrammaticVastPlcCampaignCustomTracking from 'json/OnProgrammaticVast
 import OnStaticInterstitialDisplayCampaign from 'json/OnStaticInterstitialDisplayCampaign.json';
 import OnStaticInterstitialDisplayCampaignNoClick from 'json/OnStaticInterstitialDisplayCampaignNoClick.json';
 import { ProgrammaticVastParser } from 'Parsers/ProgrammaticVastParser';
+import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
+import { AdMobSignal } from 'Models/AdMobSignal';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -76,6 +78,7 @@ describe('CampaignManager', () => {
     let thirdPartyEventManager: ThirdPartyEventManager;
     let sessionManager: SessionManager;
     let focusManager: FocusManager;
+    let signalFactoryStub: sinon.SinonStub;
 
     beforeEach(() => {
         configuration = new Configuration(JSON.parse(ConfigurationAuctionPlc));
@@ -190,6 +193,12 @@ describe('CampaignManager', () => {
         metaDataManager = new MetaDataManager(nativeBridge);
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         sessionManager = new SessionManager(nativeBridge);
+
+        signalFactoryStub = sinon.stub(AdMobSignalFactory, 'getAdRequestSignal').returns(Promise.resolve(new AdMobSignal()));
+    });
+
+    afterEach(() => {
+        signalFactoryStub.restore();
     });
 
     describe('on VAST campaign', () => {

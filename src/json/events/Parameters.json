@@ -418,5 +418,12 @@
     "description": "If device is a simulator, not a real device",
     "provider": "SDK",
     "platforms": "ios"
+  },
+  {
+    "key": "requestSignal",
+    "type": "string",
+    "description": "Base64 encoded string from AdMob protobuf signals",
+    "provider": "SDK",
+    "platforms": "all"
   }
 ]

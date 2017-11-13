@@ -11,6 +11,7 @@
   "dependencies": {
     "es6-promise": "4.1.1",
     "google-closure-compiler": "20170806.0.0",
+    "protobufjs": "6.8.0",
     "stylus": "0.54.5",
     "systemjs": "0.19.47",
     "systemjs-plugin-text": "0.0.11",

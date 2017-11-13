@@ -1,4 +1,4 @@
-# PENDING
+# Thu Nov  9 10:00:00 UTC 2017
 
 * Add safety checks for negative values when sending playable analytics
 * Fix most of problems with auction_request_failed diagnostics
