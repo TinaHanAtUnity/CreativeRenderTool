@@ -32,7 +32,9 @@ export default {
             ]
         }),
         alias({
-            'es6-promise': 'node_modules/es6-promise/dist/es6-promise.auto.js'
+            'es6-promise': 'node_modules/es6-promise/dist/es6-promise.auto.js',
+            'protobufjs/minimal': 'node_modules/protobufjs/dist/minimal/protobuf.js',
+            '../../proto/unity_proto.js': 'build/release/js/Proto/unity_proto.js'
         }),
         resolve()
     ],
