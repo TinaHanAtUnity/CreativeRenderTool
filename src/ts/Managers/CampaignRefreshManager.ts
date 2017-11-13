@@ -29,6 +29,7 @@ export class CampaignRefreshManager {
     private _refreshAllowed = true;
     private _campaignCount: number;
     private _parsingErrorCount: number;
+    private _noFills: number;
 
     // constant value that determines the delay for refreshing ads after backend has processed a start event
     // set to five seconds because backend should usually process start event in less than one second but
@@ -45,6 +46,7 @@ export class CampaignRefreshManager {
         this._refillTimestamp = 0;
         this._campaignCount = 0;
         this._parsingErrorCount = 0;
+        this._noFills = 0;
 
         this._campaignManager.onCampaign.subscribe((placementId, campaign) => this.onCampaign(placementId, campaign));
         this._campaignManager.onNoFill.subscribe(placementId => this.onNoFill(placementId));
@@ -83,7 +85,7 @@ export class CampaignRefreshManager {
         this._refreshAllowed = bool;
     }
 
-    public refresh(): Promise<INativeResponse | void> {
+    public refresh(nofillRetry?: boolean): Promise<INativeResponse | void> {
         if(!this._refreshAllowed) {
             return Promise.resolve();
         }
@@ -92,7 +94,7 @@ export class CampaignRefreshManager {
             this._refillTimestamp = 0;
             this.invalidateCampaigns(false, this._configuration.getPlacementIds());
             this._campaignCount = 0;
-            return this._campaignManager.request();
+            return this._campaignManager.request(nofillRetry);
         } else if(this.checkForExpiredCampaigns()) {
             return this.onCampaignExpired();
         }
@@ -225,6 +227,36 @@ export class CampaignRefreshManager {
 
     private onAdPlanReceived(refreshDelay: number, campaignCount: number) {
         this._campaignCount = campaignCount;
+
+        if(campaignCount === 0 && this._configuration.getAbGroup() === 5) {
+            this._noFills++;
+
+            let delay: number = 0;
+
+            if(this._noFills === 1) {
+                delay = 60;
+            } else if(this._noFills === 2) {
+                delay = 120;
+            } else if(this._noFills === 3) {
+                delay = 240;
+            } else if(this._noFills === 4) {
+                delay = 480;
+            } else if(this._noFills === 5) {
+                delay = 960;
+            }
+
+            if(delay > 0) {
+                this._refillTimestamp = Date.now() + delay * 1000;
+                delay = delay + Math.random() * 60; // add 0-60 second random delay
+                this._nativeBridge.Sdk.logDebug('Unity Ads ad plan will be refreshed in ' + delay + ' seconds');
+                setTimeout(() => {
+                    this.refresh(true);
+                }, delay * 1000);
+                return;
+            }
+        } else {
+            this._noFills = 0;
+        }
 
         if(refreshDelay > 0) {
             this._refillTimestamp = Date.now() + refreshDelay * 1000;
