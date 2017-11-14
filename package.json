@@ -12,7 +12,7 @@
     "@types/chai": "4.0.4",
     "@types/jsdom": "11.0.4",
     "@types/mocha": "2.2.44",
-    "@types/sinon": "2.3.7",
+    "@types/sinon": "4.0.0",
     "autoprefixer-stylus": "0.14.0",
     "chai": "4.1.2",
     "coveralls": "3.0.0",
