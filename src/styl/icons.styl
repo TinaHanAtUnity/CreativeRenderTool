@@ -13,12 +13,18 @@
   font-family: "unityicons" !important; // @stylint ignore
 }
 
-
+/*
+    Dummy icon that won't be rendered on android 4.2 and 4.3,
+    so always make sre that your font is packed so first icon will
+    no be visible on those old androids.
+*/
 .icon-android:before {
   content: "\e000";
 }
 
 .icon-star:before {
+  display: inline-block;
+  width: 1em;
   content: "\e001";
 }
 
