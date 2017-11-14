@@ -102,7 +102,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         return this._video.isCached();
     }
 
-    public getOverlay(): AbstractOverlay| undefined {
+    public getOverlay(): AbstractOverlay | undefined {
         return this._overlay;
     }
 

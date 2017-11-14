@@ -45,6 +45,7 @@ import { MRAIDEndScreen } from 'Views/MRAIDEndScreen';
 import { MRAIDEndScreenEventHandler } from 'EventHandlers/MRAIDEndScreenEventHandler';
 import { PerformanceEndScreenEventHandler } from 'EventHandlers/PerformanceEndScreenEventHandler';
 import { InterstitialOverlay } from 'Views/InterstitialOverlay';
+import { AbstractOverlay } from 'Views/AbstractOverlay';
 
 export class AdUnitFactory {
 
@@ -383,7 +384,7 @@ export class AdUnitFactory {
         return undefined;
     }
 
-    private static createOverlay(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>) {
+    private static createOverlay(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractOverlay {
         if(parameters.placement.allowSkip()) {
             if(parameters.campaign.getAbGroup() === 12 || parameters.campaign.getAbGroup() === 13) {
                 return new InterstitialOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
