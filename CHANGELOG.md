@@ -1,3 +1,7 @@
+# Tue Nov 14 09:32:33 UTC 2017
+
+* Faster init by converting some promise chains to be parallel 
+
 # Mon Nov 13 09:23:05 UTC 2017
 
 * Add browser build tests to CI

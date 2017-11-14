@@ -25,16 +25,16 @@ describe('MraidTest', () => {
             onUnityAdsStart: (placement: string) => {
                 return;
             },
-            onUnityAdsFinish: (placement: string, state: FinishState) => {
+            onUnityAdsFinish: (placement: string, state: string) => {
                 return;
             },
-            onUnityAdsError: (error: UnityAdsError, message: string) => {
+            onUnityAdsError: (error: string, message: string) => {
                 return;
             },
             onUnityAdsClick: (placement: string) => {
                 return;
             },
-            onUnityAdsPlacementStateChanged: (placement: string, oldState: PlacementState, newState: PlacementState) => {
+            onUnityAdsPlacementStateChanged: (placement: string, oldState: string, newState: string) => {
                 return;
             }
         };
@@ -66,16 +66,16 @@ describe('MraidTest', () => {
             onUnityAdsStart: (placement: string) => {
                 return;
             },
-            onUnityAdsFinish: (placement: string, state: FinishState) => {
+            onUnityAdsFinish: (placement: string, state: string) => {
                 return;
             },
-            onUnityAdsError: (error: UnityAdsError, message: string) => {
+            onUnityAdsError: (error: string, message: string) => {
                 return;
             },
             onUnityAdsClick: (placement: string) => {
                 return;
             },
-            onUnityAdsPlacementStateChanged: (placement: string, oldState: PlacementState, newState: PlacementState) => {
+            onUnityAdsPlacementStateChanged: (placement: string, oldState: string, newState: string) => {
                 return;
             }
         };
