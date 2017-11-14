@@ -62,7 +62,6 @@ export class AdMobSignalFactory {
         signal.setAppStartTime(AdMobSignalFactory.getAppStartTime(clientInfo));
         signal.setRooted(AdMobSignalFactory.getRooted(deviceInfo));
         signal.setAppVersionName(clientInfo.getApplicationVersion());
-        // todo: device orientation
         signal.setAppIdName(clientInfo.getApplicationName());
 
         const promises = [];
