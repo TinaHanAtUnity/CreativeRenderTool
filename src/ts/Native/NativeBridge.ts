@@ -231,7 +231,7 @@ export class NativeBridge implements INativeBridge {
         parameters.push((status: CallbackStatus, ...callbackParameters: any[]) => {
             this.invokeCallback(callback, CallbackStatus[status], ...callbackParameters);
         });
-        window[className][methodName].apply(window[className], parameters);
+        (<any>window)[className][methodName].apply((<any>window)[className], parameters);
     }
 
     public setApiLevel(apiLevel: number) {
