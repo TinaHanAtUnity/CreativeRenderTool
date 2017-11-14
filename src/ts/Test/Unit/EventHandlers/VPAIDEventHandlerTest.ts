@@ -167,7 +167,7 @@ describe('VPAIDEventHandlerTest', () => {
 
         // Generic events that translate to VAST tracking with
         // no additional processing on our end.
-        const vpaidToVASTTracking = {
+        const vpaidToVASTTracking: { [key: string]: string } = {
             AdImpression: 'impression',
             AdVideoStart: 'start',
             AdPaused: 'paused',
