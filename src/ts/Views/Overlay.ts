@@ -3,6 +3,7 @@ import OverlayTemplate from 'html/Overlay.html';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
+import { Platform } from 'Constants/Platform';
 import { AbstractOverlay } from 'Views/AbstractOverlay';
 
 export class Overlay extends AbstractOverlay {
@@ -211,6 +212,16 @@ export class Overlay extends AbstractOverlay {
 
     private updateProgressCircle(container: HTMLElement, value: number) {
         const wrapperElement = <HTMLElement>container.querySelector('.progress-wrapper');
+
+        if(this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() < 15) {
+            wrapperElement.style.display = 'none';
+            this._container.style.display = 'none';
+            /* tslint:disable:no-unused-expression */
+            this._container.offsetHeight;
+            /* tslint:enable:no-unused-expression */
+            this._container.style.display = 'block';
+            return;
+        }
 
         const leftCircleElement = <HTMLElement>container.querySelector('.circle-left');
         const rightCircleElement = <HTMLElement>container.querySelector('.circle-right');
