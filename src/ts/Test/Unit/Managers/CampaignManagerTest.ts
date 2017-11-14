@@ -62,7 +62,6 @@ import OnProgrammaticVastPlcCampaignCustomTracking from 'json/OnProgrammaticVast
 import OnStaticInterstitialDisplayCampaign from 'json/OnStaticInterstitialDisplayCampaign.json';
 import OnStaticInterstitialDisplayCampaignNoClick from 'json/OnStaticInterstitialDisplayCampaignNoClick.json';
 import { ProgrammaticVastParser } from 'Parsers/ProgrammaticVastParser';
-import { MRAID } from '../../../Views/MRAID';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
