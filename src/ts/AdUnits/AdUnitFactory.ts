@@ -236,7 +236,7 @@ export class AdUnitFactory {
     }
 
     private static createVPAIDAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<VPAIDCampaign>): AbstractAdUnit<VPAIDCampaign> {
-        const overlay = new Overlay(nativeBridge, false, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+        const overlay = this.createOverlay(nativeBridge, parameters);
         const vpaid = new VPAID(nativeBridge, <VPAIDCampaign>parameters.campaign, parameters.placement, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         let endScreen: VPAIDEndScreen | undefined;
 

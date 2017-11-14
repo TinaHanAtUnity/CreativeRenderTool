@@ -33,6 +33,9 @@ export class VPAIDOverlayEventHandler implements IOverlayHandler {
     }
 
     public onOverlayClose(): void {
-        // TODO
+        this._adUnit.sendTrackingEvent('skip');
+        this._operativeEventManager.sendSkip(this._adUnit);
+        this._adUnit.setFinishState(FinishState.SKIPPED);
+        this._adUnit.hide();
     }
 }
