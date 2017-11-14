@@ -385,7 +385,7 @@ export class AdUnitFactory {
 
     private static createOverlay(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>) {
         if(parameters.placement.allowSkip()) {
-            if(parameters.campaign.getAbGroup() === 10 || parameters.campaign.getAbGroup() === 11) {
+            if(parameters.campaign.getAbGroup() === 12 || parameters.campaign.getAbGroup() === 13) {
                 return new InterstitialOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
             }  else {
                 return new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
