@@ -79,8 +79,8 @@ describe('EventsTest', () => {
             onUnityAdsStart: (placement: string) => {
                 ++startCount;
             },
-            onUnityAdsFinish: (placement: string, state: FinishState) => {
-                if(state === FinishState.COMPLETED) {
+            onUnityAdsFinish: (placement: string, state: string) => {
+                if(state === FinishState[FinishState.COMPLETED]) {
                     if(startCount === 2) {
                         setTimeout(() => {
                             validateRequestLog(Request.getLog(), validationRegexps);
@@ -90,13 +90,13 @@ describe('EventsTest', () => {
                     }
                 }
             },
-            onUnityAdsError: (error: UnityAdsError, message: string) => {
+            onUnityAdsError: (error: string, message: string) => {
                 done(new Error(message));
             },
             onUnityAdsClick: (placement: string) => {
                 return;
             },
-            onUnityAdsPlacementStateChanged: (placement: string, oldState: PlacementState, newState: PlacementState) => {
+            onUnityAdsPlacementStateChanged: (placement: string, oldState: string, newState: string) => {
                 return;
             }
         };
@@ -137,8 +137,8 @@ describe('EventsTest', () => {
             onUnityAdsStart: (placement: string) => {
                 ++startCount;
             },
-            onUnityAdsFinish: (placement: string, state: FinishState) => {
-                if(state === FinishState.COMPLETED) {
+            onUnityAdsFinish: (placement: string, state: string) => {
+                if(state === FinishState[FinishState.COMPLETED]) {
                     if(startCount === 2) {
                         setTimeout(() => {
                             validateRequestLog(Request.getLog(), validationRegexps);
@@ -148,13 +148,13 @@ describe('EventsTest', () => {
                     }
                 }
             },
-            onUnityAdsError: (error: UnityAdsError, message: string) => {
+            onUnityAdsError: (error: string, message: string) => {
                 done(new Error(message));
             },
             onUnityAdsClick: (placement: string) => {
                 return;
             },
-            onUnityAdsPlacementStateChanged: (placement: string, oldState: PlacementState, newState: PlacementState) => {
+            onUnityAdsPlacementStateChanged: (placement: string, oldState: string, newState: string) => {
                 return;
             }
         };

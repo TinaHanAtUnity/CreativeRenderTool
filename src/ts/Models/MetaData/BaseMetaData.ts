@@ -38,7 +38,7 @@ export abstract class BaseMetaData<T extends IMetaData = IMetaData> extends Mode
         });
     }
 
-    protected setValues(data: {}): boolean {
+    protected setValues(data: { [key: string]: any }): boolean {
         let success = false;
         for (const key in data) {
             if (data.hasOwnProperty(key)) {
@@ -56,7 +56,7 @@ export abstract class BaseMetaData<T extends IMetaData = IMetaData> extends Mode
     }
 
     private getValues(nativeBridge: NativeBridge, keys: string[]): Promise<{}> {
-        const returnObject = {};
+        const returnObject: { [key: string]: any } = {};
         const metaData: MetaData = new MetaData(nativeBridge);
         return metaData.hasCategory(this.getCategory()).then(exists => {
             if(!exists) {

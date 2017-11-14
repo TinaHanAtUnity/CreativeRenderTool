@@ -42,7 +42,7 @@ export class DisplayInterstitialCampaign extends Campaign<IDisplayInterstitialCa
     public getTrackingUrlsForEvent(eventName: string): string[] {
         const tracking = this.get('tracking');
         if (tracking) {
-            return tracking[eventName] || [];
+            return (<any>tracking)[eventName] || [];
         }
         return [];
     }
