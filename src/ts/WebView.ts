@@ -103,13 +103,7 @@ export class WebView {
             HttpKafka.setClientInfo(this._clientInfo);
             SdkStats.setInitTimestamp();
 
-            return this._deviceInfo.fetch();
-        }).then(() => {
-            return this._cache.cleanCache().catch(error => {
-                // don't fail init due to cache cleaning issues, instead just log and report diagnostics
-                this._nativeBridge.Sdk.logError('Unity Ads cleaning cache failed: ' + error);
-                Diagnostics.trigger('cleaning_cache_failed', error);
-            });
+            return Promise.all([this._deviceInfo.fetch(), this.setupTestEnvironment()]);
         }).then(() => {
             if(this._clientInfo.getPlatform() === Platform.ANDROID) {
                 document.body.classList.add('android');
@@ -140,14 +134,21 @@ export class WebView {
                 this._focusManager.setListenAndroidLifecycle(true);
             }
 
-            return this.setupTestEnvironment();
-        }).then(() => {
+            let configPromise;
             if(this._creativeUrl) {
-                return new Configuration(JsonParser.parse(CreativeUrlConfiguration));
+                configPromise = Promise.resolve(new Configuration(JsonParser.parse(CreativeUrlConfiguration)));
             } else {
-                return ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, this._metadataManager);
+                configPromise = ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, this._metadataManager);
             }
-        }).then((configuration) => {
+
+            const cachePromise = this._cache.cleanCache().catch(error => {
+                // don't fail init due to cache cleaning issues, instead just log and report diagnostics
+                this._nativeBridge.Sdk.logError('Unity Ads cleaning cache failed: ' + error);
+                Diagnostics.trigger('cleaning_cache_failed', error);
+            });
+
+            return Promise.all([configPromise, cachePromise]);
+        }).then(([configuration]) => {
             this._configuration = configuration;
             HttpKafka.setConfiguration(this._configuration);
 
@@ -183,7 +184,7 @@ export class WebView {
             this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._request, this._clientInfo, this._deviceInfo, this._metadataManager);
             this._campaignRefreshManager = new CampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration, this._focusManager);
 
-            SdkStats.initialize(this._nativeBridge, this._request, this._configuration, this._sessionManager, this._campaignManager, this._metadataManager);
+            SdkStats.initialize(this._nativeBridge, this._request, this._configuration, this._sessionManager, this._campaignManager, this._metadataManager, this._clientInfo);
 
             return this._campaignRefreshManager.refresh();
         }).then(() => {

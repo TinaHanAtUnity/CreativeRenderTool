@@ -282,15 +282,18 @@ test-coveralls: test-coverage
 	$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage.json -o $(BUILD_DIR)/lcov.info -t lcovonly
 	cat $(BUILD_DIR)/lcov.info | $(COVERALLS) --verbose
 
-test-browser:
+test-browser: build-browser
 	@echo
-	@echo Running browserbuild tests
+	@echo Running browser build tests
 	@echo
 	node test-utils/headless.js
 
 ifeq ($(TRAVIS_PULL_REQUEST), false)
 travis-browser-test:
 	@echo "Skipping travis browser tests, this is not a PR"
+else ifneq ($(BRANCH), master)
+travis-browser-test:
+	@echo "Skipping travis browser tests, the PR is not to master-branch it is for $(BRANCH)"
 else
 travis-browser-test: build-browser start-nginx test-browser stop-nginx
 endif
