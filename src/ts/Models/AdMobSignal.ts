@@ -1,8 +1,6 @@
 import { Model } from 'Models/Model';
 import { unity_proto } from '../../proto/unity_proto.js';
 import * as protobuf from 'protobufjs/minimal';
-import IUnityInfo = unity_proto.IUnityInfo;
-import IUnityProto = unity_proto.IUnityProto;
 
 interface IAdMobSignal {
     sdkVersion: string;
@@ -514,7 +512,7 @@ export class AdMobSignal extends Model<IAdMobSignal> {
     }
 
     public getBase64ProtoBuf(): string {
-        const signalObject: IUnityInfo = {
+        const signalObject: unity_proto.IUnityInfo = {
             field_1: this.getSdkVersion(),
             field_2: this.getBatteryLevel(),
             field_3: this.getBatteryState(),
@@ -568,7 +566,7 @@ export class AdMobSignal extends Model<IAdMobSignal> {
         };
         const signalBuffer = unity_proto.UnityInfo.encode(signalObject).finish();
 
-        const protocolObject: IUnityProto = {
+        const protocolObject: unity_proto.IUnityProto = {
             encryptedBlobs: [signalBuffer],
             encryptionMethod: unity_proto.UnityProto.EncryptionMethod.UNENCRYPTED,
             protoName: unity_proto.UnityProto.ProtoName.UNITY_INFO
