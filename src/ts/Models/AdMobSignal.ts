@@ -512,11 +512,6 @@ export class AdMobSignal extends Model<IAdMobSignal> {
     }
 
     public getBase64ProtoBuf(): string {
-        const writer = unity_proto.UnityProto.encode({
-            encryptionMethod: unity_proto.UnityProto.EncryptionMethod.UNENCRYPTED,
-            protoName: unity_proto.UnityProto.ProtoName.UNITY_INFO
-        });
-
         const signalObject = {
             field_1: this.getSdkVersion(),
             field_2: this.getBatteryLevel(),
@@ -569,7 +564,7 @@ export class AdMobSignal extends Model<IAdMobSignal> {
             field_49: this.getScreenHeight(),
             field_50: this.getDeviceOrientation()
         };
-        const buffer = unity_proto.UnityInfo.encode(signalObject, writer).finish();
+        const buffer = unity_proto.UnityInfo.encode(signalObject).finish();
 
         return protobuf.util.base64.encode(buffer, 0, buffer.byteLength);
     }

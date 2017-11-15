@@ -5,14 +5,7 @@ import { Platform } from 'Constants/Platform';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Diagnostics } from 'Utilities/Diagnostics';
 
-import { unity_proto } from '../../proto/unity_proto.js';
-
 export class AdMobSignalFactory {
-
-    public static createSomething() {
-        return unity_proto.UnityInfo.create();
-    }
-
     public static getAdRequestSignal(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo): Promise<AdMobSignal> {
         return AdMobSignalFactory.getCommonSignal(nativeBridge, clientInfo, deviceInfo).then(signal => {
             return signal;
