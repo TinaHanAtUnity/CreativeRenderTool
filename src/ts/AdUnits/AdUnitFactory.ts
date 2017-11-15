@@ -44,6 +44,8 @@ import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 import { MRAIDEndScreen } from 'Views/MRAIDEndScreen';
 import { MRAIDEndScreenEventHandler } from 'EventHandlers/MRAIDEndScreenEventHandler';
 import { PerformanceEndScreenEventHandler } from 'EventHandlers/PerformanceEndScreenEventHandler';
+import { InterstitialOverlay } from 'Views/InterstitialOverlay';
+import { AbstractOverlay } from 'Views/AbstractOverlay';
 
 export class AdUnitFactory {
 
@@ -65,7 +67,7 @@ export class AdUnitFactory {
     }
 
     private static createPerformanceAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PerformanceCampaign>): AbstractAdUnit<PerformanceCampaign> {
-        const overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+        const overlay = this.createOverlay(nativeBridge, parameters);
         const endScreen = new PerformanceEndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         const video = this.getOrientedVideo(<PerformanceCampaign>parameters.campaign, parameters.forceOrientation);
 
@@ -104,7 +106,7 @@ export class AdUnitFactory {
     }
 
     private static createVastAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<VastCampaign>): AbstractAdUnit<VastCampaign> {
-        const overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+        const overlay = this.createOverlay(nativeBridge, parameters);
         let vastEndScreen: VastEndScreen | undefined;
 
         const vastAdUnitParameters: IVastAdUnitParameters = {
@@ -234,7 +236,7 @@ export class AdUnitFactory {
     }
 
     private static createVPAIDAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<VPAIDCampaign>): AbstractAdUnit<VPAIDCampaign> {
-        const overlay = new Overlay(nativeBridge, false, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+        const overlay = this.createOverlay(nativeBridge, parameters);
         const vpaid = new VPAID(nativeBridge, <VPAIDCampaign>parameters.campaign, parameters.placement, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         let endScreen: VPAIDEndScreen | undefined;
 
@@ -380,5 +382,38 @@ export class AdUnitFactory {
             }
         }
         return undefined;
+    }
+
+    private static createOverlay(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractOverlay {
+        if(!parameters.placement.allowSkip()) {
+            return new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+        } else {
+            // Scopely's game IDs
+            const enabledGameIds = ['15334',
+                '15333',
+                '24447',
+                '11595',
+                '11591',
+                '1178487',
+                '50650',
+                '130204',
+                '1413314',
+                '1307778',
+                '1413315',
+                '130205',
+                '24446',
+                '17671',
+                '130854',
+                '1307777',
+                '1495013'];
+
+            if(enabledGameIds.indexOf(parameters.clientInfo.getGameId()) !== -1) {
+                return new InterstitialOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+            } else if(parameters.campaign.getAbGroup() === 12 || parameters.campaign.getAbGroup() === 13) {
+                return new InterstitialOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+            } else {
+                return new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+            }
+        }
     }
 }
