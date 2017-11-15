@@ -1,7 +1,6 @@
 import { View } from 'Views/View';
 import AdMobContainer from 'html/admob/AdMobContainer.html';
 import AFMAContainer from 'html/admob/AFMAContainer.html';
-import NativeVideoPlayerBridgeContainer from 'html/NativeVideoPlayerBridge.html';
 import MRAIDContainer from 'html/admob/MRAIDContainer.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
@@ -114,8 +113,7 @@ export class AdMobView extends View<IAdMobEventHandler> {
 
     private removeScriptTags(dom: Document) {
         this.removeScriptTag(dom, 'mraid.js');
-        this.removeScriptTag(dom, 'unity_afma.js');
-        this.removeScriptTag(dom, 'unity_video_player.js');
+        this.removeScriptTag(dom, 'afma_unity_stub.js');
         return dom.documentElement.outerHTML;
     }
 
@@ -129,7 +127,6 @@ export class AdMobView extends View<IAdMobEventHandler> {
     private injectScripts(dom: Document) {
         const e = dom.head || document.body;
         this.injectScript(e, AFMAContainer);
-        this.injectScript(e, NativeVideoPlayerBridgeContainer);
         this.injectScript(e, MRAIDContainer);
     }
 
