@@ -10,7 +10,7 @@ import { unity_proto } from '../../../../proto/unity_proto.js';
 import * as protobuf from 'protobufjs/minimal';
 
 describe('AdMobSignalFactoryTest', () => {
-    it('should work', () => {
+    it('basic test', () => {
         const nativeBridge: NativeBridge = TestFixtures.getNativeBridge();
         const clientInfo: ClientInfo = TestFixtures.getClientInfo();
         const deviceInfo: DeviceInfo = TestFixtures.getDeviceInfo();
@@ -20,8 +20,13 @@ describe('AdMobSignalFactoryTest', () => {
 
             const buffer = new Uint8Array(protobuf.util.base64.length(encodedMsg));
             protobuf.util.base64.decode(encodedMsg, buffer, 0);
-            const decodedInfo = unity_proto.UnityInfo.decode(buffer);
-            assert.equal(decodedInfo.field_41, clientInfo.getApplicationName());
+            const decodedProtoBuf = unity_proto.UnityProto.decode(buffer);
+
+            assert.equal(decodedProtoBuf.protoName, unity_proto.UnityProto.ProtoName.UNITY_INFO);
+            assert.equal(decodedProtoBuf.encryptionMethod, unity_proto.UnityProto.EncryptionMethod.UNENCRYPTED);
+
+            const decodedSignal = unity_proto.UnityInfo.decode(decodedProtoBuf.encryptedBlobs[0]);
+            assert.equal(decodedSignal.field_41, clientInfo.getApplicationName());
         });
     });
 });
