@@ -90,6 +90,10 @@ export class MOAT extends View<VastCampaign> {
         }
     }
 
+    public deInit() {
+        window.removeEventListener('message', this._messageListener);
+    }
+
     public triggerVideoEvent(type: string, volume: number) {
         this._nativeBridge.Sdk.logDebug('Calling MOAT video event "' + type + '" with volume: ' + volume);
         if (this._iframe.contentWindow) {
