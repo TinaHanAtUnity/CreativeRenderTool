@@ -1,3 +1,10 @@
+# Pending
+
+* Upgrade to TS 2.6 & upgrade all other dependencies
+* Reorder regexp to prevent matched string replacement ($&) in build
+* New interstitial overlay view with the close button (AB test in groups 12 & 13, enabled directly for selected gameIds)
+* Retry refactored end screen AB test (groups 8 & 9)
+
 # Tue Nov 14 09:32:33 UTC 2017
 
 * Faster init by converting some promise chains to be parallel 
