@@ -512,7 +512,7 @@ export class AdMobSignal extends Model<IAdMobSignal> {
     }
 
     public getBase64ProtoBuf(): string {
-        const signalObject = {
+        const signalObject: unity_proto.IUnityInfo = {
             field_1: this.getSdkVersion(),
             field_2: this.getBatteryLevel(),
             field_3: this.getBatteryState(),
@@ -564,8 +564,16 @@ export class AdMobSignal extends Model<IAdMobSignal> {
             field_49: this.getScreenHeight(),
             field_50: this.getDeviceOrientation()
         };
-        const buffer = unity_proto.UnityInfo.encode(signalObject).finish();
-        return protobuf.util.base64.encode(buffer, 0, buffer.byteLength);
+        const signalBuffer = unity_proto.UnityInfo.encode(signalObject).finish();
+
+        const protocolObject: unity_proto.IUnityProto = {
+            encryptedBlobs: [signalBuffer],
+            encryptionMethod: unity_proto.UnityProto.EncryptionMethod.UNENCRYPTED,
+            protoName: unity_proto.UnityProto.ProtoName.UNITY_INFO
+        };
+        const protocolBuffer = unity_proto.UnityProto.encode(protocolObject).finish();
+
+        return protobuf.util.base64.encode(protocolBuffer, 0, protocolBuffer.byteLength);
     }
 
     public getDTO(): { [key: string]: any } {
