@@ -385,14 +385,35 @@ export class AdUnitFactory {
     }
 
     private static createOverlay(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractOverlay {
-        if(parameters.placement.allowSkip()) {
-            if(parameters.campaign.getAbGroup() === 12 || parameters.campaign.getAbGroup() === 13) {
+        if(!parameters.placement.allowSkip()) {
+            return new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+        } else {
+            // Scopely's game IDs
+            const enabledGameIds = ['15334',
+                '15333',
+                '24447',
+                '11595',
+                '11591',
+                '1178487',
+                '50650',
+                '130204',
+                '1413314',
+                '1307778',
+                '1413315',
+                '130205',
+                '24446',
+                '17671',
+                '130854',
+                '1307777',
+                '1495013'];
+
+            if(enabledGameIds.indexOf(parameters.clientInfo.getGameId()) !== -1) {
                 return new InterstitialOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
-            }  else {
+            } else if(parameters.campaign.getAbGroup() === 12 || parameters.campaign.getAbGroup() === 13) {
+                return new InterstitialOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+            } else {
                 return new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
             }
-        } else {
-            return new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         }
     }
 }
