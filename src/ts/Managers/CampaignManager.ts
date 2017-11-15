@@ -252,7 +252,7 @@ export class CampaignManager {
             case 'programmatic/static-interstitial':
                 parser = new ProgrammaticStaticInterstitialParser();
                 break;
-            case 'programmatic/admob':
+            case 'programmatic/admob-video':
                 parser = new ProgrammaticAdMobParser();
                 break;
             case 'programmatic/vast-vpaid':

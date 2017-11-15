@@ -8,7 +8,7 @@ import { Session } from 'Models/Session';
 
 export class ProgrammaticAdMobParser extends CampaignParser {
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
-        const markup = decodeURIComponent(response.getContent());
+        const markup = response.getContent();
         return Promise.resolve(new AdMobCampaign(markup, session, gamerId, abGroup, response.getCacheTTL(), response.getTrackingUrls(), response.getAdType(), response.getCreativeId(), response.getSeatId(), response.getCorrelationId()));
     }
 }
