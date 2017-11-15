@@ -18,7 +18,13 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
                 {json: jsonDisplay}
             );
         }
+
         const displayMarkup = decodeURIComponent(jsonDisplay.markup);
+
+        if (!jsonDisplay.clickThroughURL) {
+            jsonDisplay.clickThroughURL = this.getClickThroughUrlFromMarkup(displayMarkup);
+        }
+
         if(!jsonDisplay.clickThroughURL) {
             throw new DiagnosticError(
                 new Error('No clickThroughURL for programmatic/static-interstitial'),
@@ -28,5 +34,12 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
 
         const clickThroughUrl = jsonDisplay.clickThroughURL;
         return Promise.resolve(new DisplayInterstitialCampaign(displayMarkup, session, gamerId, abGroup, response.getCacheTTL(), response.getTrackingUrls(), clickThroughUrl, response.getAdType(), response.getCreativeId(), response.getSeatId(), response.getCorrelationId()));
+    }
+
+    private getClickThroughUrlFromMarkup(markup: string): string | null {
+        const doc = new DOMParser().parseFromString(markup, 'text/html');
+        const clickThroughUrl = doc.body.querySelectorAll('a')[0].getAttribute('href');
+
+        return clickThroughUrl;
     }
 }
