@@ -11,9 +11,9 @@ import * as protobuf from 'protobufjs/minimal';
 
 describe('AdMobSignalFactoryTest', () => {
     it('should work', () => {
-        let nativeBridge: NativeBridge = TestFixtures.getNativeBridge();
-        let clientInfo: ClientInfo = TestFixtures.getClientInfo();
-        let deviceInfo: DeviceInfo = TestFixtures.getDeviceInfo();
+        const nativeBridge: NativeBridge = TestFixtures.getNativeBridge();
+        const clientInfo: ClientInfo = TestFixtures.getClientInfo();
+        const deviceInfo: DeviceInfo = TestFixtures.getDeviceInfo();
 
         return AdMobSignalFactory.getAdRequestSignal(nativeBridge, clientInfo, deviceInfo).then(signal => {
             const encodedMsg: string = signal.getBase64ProtoBuf();
