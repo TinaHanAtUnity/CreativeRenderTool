@@ -60,7 +60,6 @@ export class VastVideoEventHandlers {
         const moat = adUnit.getMoat();
         if(moat) {
             moat.triggerVideoEvent('AdVideoComplete', adUnit.getVolume());
-            moat.deInit();
         }
 
         const endScreen = adUnit.getEndScreen();
@@ -75,7 +74,6 @@ export class VastVideoEventHandlers {
         const moat = adUnit.getMoat();
         if(moat) {
             moat.triggerVideoEvent('AdStopped', adUnit.getVolume());
-            moat.deInit();
         }
     }
 
@@ -98,10 +96,6 @@ export class VastVideoEventHandlers {
 
     public static onVideoError(adUnit: VastAdUnit) {
         const endScreen = adUnit.getEndScreen();
-        const moat = adUnit.getMoat();
-        if (moat) {
-            moat.deInit();
-        }
         if(endScreen) {
             endScreen.show();
         } else {

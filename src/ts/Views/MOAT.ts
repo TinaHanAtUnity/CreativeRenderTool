@@ -43,7 +43,6 @@ export class MOAT extends View<VastCampaign> {
     }
 
     public init(ids: { [key: string]: string }, duration: number, url: string, moatData: any, volume: number) {
-        window.addEventListener('message', this._messageListener);
         if (!this._didInitMoat) {
             this._didInitMoat = true;
             this._resizeDelayer = (event: Event) => {
@@ -90,7 +89,11 @@ export class MOAT extends View<VastCampaign> {
         }
     }
 
-    public deInit() {
+    public addMessageListener() {
+        window.addEventListener('message', this._messageListener);
+    }
+
+    public removeMessageListener() {
         window.removeEventListener('message', this._messageListener);
     }
 
@@ -120,7 +123,7 @@ export class MOAT extends View<VastCampaign> {
     private onMessage(e: MessageEvent) {
         switch(e.data.type) {
             case 'MOATVideoError':
-                Diagnostics.trigger('MOATVideoError', e.data.error);
+                Diagnostics.trigger('moat_video_error', e.data.error);
                 break;
             default:
                 this._nativeBridge.Sdk.logWarning(`MOAT Unknown message type ${e.data.type}`);
