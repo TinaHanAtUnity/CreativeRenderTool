@@ -144,7 +144,7 @@ export class AdUnitFactory {
             level1: campaign.getAdvertiserDomain(),
             level2: campaign.getAdvertiserCampaignId(),
             level3: campaign.getCreativeId(),
-            slicer1: campaign.getAdvertiserBundleId(),
+            slicer1: parameters.clientInfo.getApplicationName(),
             slicer2: parameters.placement.getName()
         };
 
