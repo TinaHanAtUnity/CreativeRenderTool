@@ -113,13 +113,24 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         const platform = this._nativeBridge.getPlatform();
 
         if(parameters.clickAttributionUrlFollowsRedirects && parameters.clickAttributionUrl) {
-            this._thirdPartyEventManager.clickAttributionEvent(parameters.clickAttributionUrl, true).then(response => {
+            this._thirdPartyEventManager.clickAttributionEvent(parameters.clickAttributionUrl, (url: string) => {
+                if(url.match(/^https?/i) && !url.match(/^https:\/\/itunes\.apple\.com/i) && !url.match(/\.apk$/i)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }).then(response => {
                 const location = Request.getHeader(response.headers, 'location');
                 if(location) {
                     if(platform === Platform.ANDROID) {
                         this._nativeBridge.Intent.launch({
-                            'action': 'android.intent.action.VIEW',
-                            'uri': location
+                            'action': 'android.intent.action.WEB_SEARCH',
+                            'extras': [
+                                {
+                                    'key': 'query',
+                                    'value': location
+                                }
+                            ]
                         });
                     } else if(platform === Platform.IOS) {
                         this._nativeBridge.UrlScheme.open(location);

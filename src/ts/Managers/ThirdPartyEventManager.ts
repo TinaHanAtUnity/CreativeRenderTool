@@ -14,7 +14,7 @@ export class ThirdPartyEventManager {
         this._request = request;
     }
 
-    public clickAttributionEvent(url: string, redirects: boolean): Promise<INativeResponse> {
+    public clickAttributionEvent(url: string, redirects: boolean | ((url: string) => boolean)): Promise<INativeResponse> {
         return this._request.get(url, [], {
             retries: 0,
             retryDelay: 0,
