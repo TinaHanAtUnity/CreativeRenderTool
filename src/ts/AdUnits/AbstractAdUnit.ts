@@ -11,6 +11,7 @@ import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { Configuration } from 'Models/Configuration';
 import { Request } from 'Utilities/Request';
 import { FocusManager } from 'Managers/FocusManager';
+import { Platform } from "Constants/Platform";
 
 export interface IAdUnitParameters<T extends Campaign> {
     forceOrientation: ForceOrientation;
@@ -113,6 +114,15 @@ export abstract class AbstractAdUnit<T extends Campaign = Campaign> {
     public setFinishState(finishState: FinishState) {
         if(this._finishState !== FinishState.COMPLETED) {
             this._finishState = finishState;
+        }
+    }
+
+    private setWebPlayerUrl(url: string): Promise<void> {
+        // TODO: prepare for exception if the view for webplayer does not exist and handle gracefully
+        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            return this._nativeBridge.AndroidAdUnit.setWebPlayerUrl(url);
+        } else {
+            return this._nativeBridge.IosAdUnit.setWebPlayerUrl(url);
         }
     }
 }

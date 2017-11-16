@@ -114,6 +114,10 @@ export class Activity extends AdUnitContainer {
                     promises.push(this._nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_LANDSCAPE));
                     promises.push(this._nativeBridge.AndroidAdUnit.setViewFrame('videoplayer', 0, 0, screenHeight, screenWidth));
                     break;
+                case ViewConfiguration.WEB_PLAYER:
+                    promises.push(this._nativeBridge.AndroidAdUnit.setViews(['webview', 'webplayer']));
+                    promises.push(this._nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR));
+                    break;
                 default:
                     break;
             }

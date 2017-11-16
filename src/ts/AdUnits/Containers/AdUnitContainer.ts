@@ -9,7 +9,8 @@ export enum ForceOrientation {
 
 export const enum ViewConfiguration {
     ENDSCREEN,
-    LANDSCAPE_VIDEO
+    LANDSCAPE_VIDEO,
+    WEB_PLAYER
 }
 
 export abstract class AdUnitContainer {

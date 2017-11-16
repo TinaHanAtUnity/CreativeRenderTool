@@ -1,5 +1,4 @@
 import DisplayInterstitialTemplate from 'html/display/DisplayInterstitial.html';
-import DisplayContainer from 'html/display/DisplayContainer.html';
 
 import { View } from 'Views/View';
 import { NativeBridge } from 'Native/NativeBridge';
@@ -21,7 +20,6 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
     private _campaign: DisplayInterstitialCampaign;
 
     private _closeElement: HTMLElement;
-    private _iframe: HTMLIFrameElement;
 
     private _canClose = false;
     private _canSkip = false;
@@ -64,12 +62,13 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
 
         this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
 
-        const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#display-iframe');
 
         if (this._campaign.getClickThroughUrl()) {
-            iframe.srcdoc = this._markup;
+
         } else {
-            iframe.srcdoc = DisplayContainer.replace('<body></body>', '<body>' + this._markup + '</body>');
+            // TODO: We only support URLs in our second webview, do we need to have a way to send content instead of url?
+            // const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#display-iframe');
+            // iframe.srcdoc = DisplayContainer.replace('<body></body>', '<body>' + this._markup + '</body>');
         }
     }
 
