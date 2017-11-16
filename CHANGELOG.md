@@ -1,4 +1,4 @@
-# Pending
+# Thu Nov 16 13:37:39 UTC 2017
 
 * Upgrade to TS 2.6 & upgrade all other dependencies
 * Reorder regexp to prevent matched string replacement ($&) in build
