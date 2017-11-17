@@ -8,7 +8,6 @@ import { Platform } from 'Constants/Platform';
 import { StoreName } from 'Models/Campaigns/PerformanceCampaign';
 import { IosUtils } from 'Utilities/IosUtils';
 import { DeviceInfo } from 'Models/DeviceInfo';
-import { EventType } from 'Models/Session';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { RequestError } from 'Errors/RequestError';
 import { DiagnosticError } from 'Errors/DiagnosticError';
@@ -103,13 +102,6 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
 
     private handleClickAttribution(parameters: IEndScreenDownloadParameters) {
         const currentSession = this._campaign.getSession();
-        if(currentSession) {
-            if(currentSession.getEventSent(EventType.CLICK_ATTRIBUTION)) {
-                return;
-            }
-            currentSession.setEventSent(EventType.CLICK_ATTRIBUTION);
-        }
-
         const platform = this._nativeBridge.getPlatform();
 
         if(parameters.clickAttributionUrlFollowsRedirects && parameters.clickAttributionUrl) {
