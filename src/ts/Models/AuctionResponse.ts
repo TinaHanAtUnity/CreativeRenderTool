@@ -13,6 +13,7 @@ export interface IAuctionResponse {
     advertiserCampaignId: string | undefined;
     advertiserDomain: string | undefined;
     advertiserBundleId: string | undefined;
+    ext: string | undefined;
 }
 
 export class AuctionResponse extends Model<IAuctionResponse> {
@@ -29,7 +30,8 @@ export class AuctionResponse extends Model<IAuctionResponse> {
             correlationId: ['string'],
             advertiserCampaignId: ['string', 'undefined'],
             advertiserDomain: ['string', 'undefined'],
-            advertiserBundleId: ['string', 'undefined']
+            advertiserBundleId: ['string', 'undefined'],
+            ext: ['string', 'undefined']
         });
 
         this.set('placements', placements);
@@ -44,6 +46,7 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         this.set('advertiserCampaignId', data.campaignId);
         this.set('advertiserDomain', data.advDomain);
         this.set('advertiserBundleId', data.bundleId);
+        this.set('ext', data.ext);
     }
 
     public getPlacements(): string[] {
@@ -94,6 +97,10 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         return this.get('advertiserBundleId');
     }
 
+    public getExt(): string | undefined {
+        return this.get('ext');
+    }
+
     public getDTO(): {[key: string]: any } {
         return {
             'placements': this.getPlacements(),
@@ -104,7 +111,8 @@ export class AuctionResponse extends Model<IAuctionResponse> {
             'adType': this.getAdType(),
             'creativeId': this.getCreativeId(),
             'seatId': this.getSeatId(),
-            'correlationId': this.getCorrelationId()
+            'correlationId': this.getCorrelationId(),
+            'ext': this.getExt()
         };
     }
 }

@@ -22,6 +22,7 @@ interface IPlacement {
     muteVideo: boolean;
 
     adTypes: string[] | undefined;
+    realtime: boolean;
 
     state: PlacementState;
     previousState: PlacementState;
@@ -41,6 +42,7 @@ export class Placement extends Model<IPlacement> {
             disableBackButton: ['boolean'],
             muteVideo: ['boolean'],
             adTypes: ['array', 'undefined'],
+            realtime: ['boolean'],
             state: ['number'],
             previousState: ['number'],
             placementStateChanged: ['boolean'],
@@ -63,6 +65,8 @@ export class Placement extends Model<IPlacement> {
         this.set('muteVideo', data.muteVideo);
 
         this.set('adTypes', data.adTypes);
+
+        this.set('realtime', data.realtime ? true : false);
 
         this.set('state', PlacementState.NOT_AVAILABLE);
     }
@@ -97,6 +101,10 @@ export class Placement extends Model<IPlacement> {
 
     public getAdTypes(): string[] | undefined {
         return this.get('adTypes');
+    }
+
+    public isRealtime(): boolean {
+        return this.get('realtime');
     }
 
     public getState(): PlacementState {

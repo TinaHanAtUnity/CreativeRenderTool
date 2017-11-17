@@ -103,7 +103,7 @@ export class CampaignManager {
         }
 
         return this._sessionManager.create().then((session) => {
-            return Promise.all([this.createRequestUrl(session), this.createRequestBody(nofillRetry)]).then(([requestUrl, requestBody]) => {
+            return Promise.all([this.createRequestUrl(session, false), this.createRequestBody(nofillRetry)]).then(([requestUrl, requestBody]) => {
                 this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
                 const body = JSON.stringify(requestBody);
                 SdkStats.setAdRequestTimestamp();
@@ -302,7 +302,7 @@ export class CampaignManager {
         return CampaignManager.AbGroup ? CampaignManager.AbGroup : this._configuration.getAbGroup();
     }
 
-    private createRequestUrl(session: Session): Promise<string> {
+    private createRequestUrl(session: Session, realtime: boolean): Promise<string> {
         let url: string = this.getBaseUrl();
 
         if(this._deviceInfo.getAdvertisingIdentifier()) {
@@ -324,7 +324,8 @@ export class CampaignManager {
             screenDensity: this._deviceInfo.getScreenDensity(),
             sdkVersion: this._clientInfo.getSdkVersion(),
             screenSize: this._deviceInfo.getScreenLayout(),
-            stores: this._deviceInfo.getStores()
+            stores: this._deviceInfo.getStores(),
+            realtime: realtime
         });
 
         if(this._clientInfo.getPlatform() === Platform.IOS) {
@@ -450,7 +451,8 @@ export class CampaignManager {
                     if(placements.hasOwnProperty(placement)) {
                         placementRequest[placement] = {
                             adTypes: placements[placement].getAdTypes(),
-                            allowSkip: placements[placement].allowSkip()
+                            allowSkip: placements[placement].allowSkip(),
+                            realtime: placements[placement].isRealtime()
                         };
                     }
                 }
