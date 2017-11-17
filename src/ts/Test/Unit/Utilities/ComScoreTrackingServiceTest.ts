@@ -200,7 +200,7 @@ describe('ComScoreTrackingServiceTest', () => {
 
     function getDictFromQueryString(queryString: string) {
         const keyValues: string[] = queryString.split('&');
-        const dict = {};
+        const dict: any = {};
         let splitKeyValue: string[];
         keyValues.forEach((el: string) => {
             splitKeyValue = el.split('=');

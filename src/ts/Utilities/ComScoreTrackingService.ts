@@ -92,7 +92,7 @@ export class ComScoreTrackingService {
         return this.appendQueryParams('https://sb.scorecardresearch.com/p', queryParamsDict);
     }
 
-    private appendQueryParams(front: string, queryParams: object): string {
+    private appendQueryParams(front: string, queryParams: any): string {
         const back = Object.keys(queryParams).map(key => {
             return `${key}=${encodeURIComponent(queryParams[key])}`;
         }).join('&');
