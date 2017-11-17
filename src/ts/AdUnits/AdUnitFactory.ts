@@ -144,7 +144,7 @@ export class AdUnitFactory {
             level1: campaign.getAdvertiserDomain(),
             level2: campaign.getAdvertiserCampaignId(),
             level3: campaign.getCreativeId(),
-            slicer1: campaign.getAdvertiserBundleId(),
+            slicer1: parameters.clientInfo.getApplicationName(),
             slicer2: parameters.placement.getName()
         };
 
@@ -408,8 +408,6 @@ export class AdUnitFactory {
                 '1495013'];
 
             if(enabledGameIds.indexOf(parameters.clientInfo.getGameId()) !== -1) {
-                return new InterstitialOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
-            } else if(parameters.campaign.getAbGroup() === 12 || parameters.campaign.getAbGroup() === 13) {
                 return new InterstitialOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
             } else {
                 return new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
