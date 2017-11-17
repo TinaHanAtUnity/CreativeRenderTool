@@ -1,3 +1,28 @@
+# Thu Nov 16 13:37:39 UTC 2017
+
+* Upgrade to TS 2.6 & upgrade all other dependencies
+* Reorder regexp to prevent matched string replacement ($&) in build
+* New interstitial overlay view with the close button (AB test in groups 12 & 13, enabled directly for selected gameIds)
+* Retry refactored end screen AB test (groups 8 & 9)
+
+# Tue Nov 14 09:32:33 UTC 2017
+
+* Faster init by converting some promise chains to be parallel 
+
+# Mon Nov 13 09:23:05 UTC 2017
+
+* Add browser build tests to CI
+* Add init time and reinit flag to SDK stats
+* Add language parameter to operative events
+* Add AB test for quick no fill refresh to group 5
+* Adjust endcard button position on iPhoneX
+
+# Thu Nov  9 10:00:00 UTC 2017
+
+* Add safety checks for negative values when sending playable analytics
+* Fix most of problems with auction_request_failed diagnostics
+* Retry once after parsing error
+
 # Mon Nov  6 22:22:45 UTC 2017
 
 * Revert "new" end screen & "new" dark end screen

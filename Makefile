@@ -33,6 +33,9 @@ endif
 # Targets
 BUILD_DIR = build
 
+# For platform specific operations
+OS := $(shell uname)
+
 .PHONY: build-browser build-dev build-release build-test build-dir build-ts build-js build-css build-static clean lint test test-unit test-integration test-coverage test-coveralls watch setup deploy
 
 build-browser: BUILD_DIR = build/browser
@@ -278,6 +281,22 @@ test-coveralls: test-coverage
 	$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage.json -o $(BUILD_DIR)/lcov.info -t lcovonly
 	cat $(BUILD_DIR)/lcov.info | $(COVERALLS) --verbose
 
+test-browser: build-browser
+	@echo
+	@echo Running browser build tests
+	@echo
+	node test-utils/headless.js
+
+ifeq ($(TRAVIS_PULL_REQUEST), false)
+travis-browser-test:
+	@echo "Skipping travis browser tests, this is not a PR"
+else ifneq ($(BRANCH), master)
+travis-browser-test:
+	@echo "Skipping travis browser tests, the PR is not to master-branch it is for $(BRANCH)"
+else
+travis-browser-test: build-browser start-nginx test-browser stop-nginx
+endif
+
 watch:
 	watchman-make -p 'src/index.html' 'src/ts/**/*.ts' 'src/styl/*.styl' 'src/html/*.html' -t build-dev -p 'src/ts/Test/**/*.ts' -t test
 
@@ -295,8 +314,17 @@ else
 endif
 
 start-nginx:
+ifeq ($(OS),Darwin)
 	sed -e "s#DEVELOPMENT_DIR#$(shell pwd)#g" nginx/nginx.conf.template > nginx/nginx.conf
 	nginx -c $(shell pwd)/nginx/nginx.conf
+else
+	python3 -m http.server 8000 & echo $$! > nginx/server.PID
+	@echo "Started Python static webserver"
+endif
 
 stop-nginx:
+ifeq ($(OS),Darwin)
 	nginx -s stop
+else
+	kill $$(cat nginx/server.PID)
+endif

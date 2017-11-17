@@ -123,17 +123,12 @@ export class Cache {
     }
 
     public cache(url: string, diagnostics: ICacheDiagnostics, campaign: Campaign): Promise<string[]> {
-        return this._nativeBridge.Cache.isCaching().then(isCaching => {
-            if(isCaching) {
-                throw CacheStatus.FAILED;
-            }
-            return Promise.all<boolean, string>([
-                this.isCached(url),
-                this.getFileId(url)
-            ]);
-        }).then(([isCached, fileId]) => {
+        return Promise.all<boolean, string>([
+            this.isCached(url),
+            this.getFileId(url)
+        ]).then(([isCached, fileId]) => {
             if(isCached) {
-                return Promise.resolve([CacheStatus.OK, fileId]);
+                return Promise.resolve<[CacheStatus, string]>([CacheStatus.OK, fileId]);
             }
             const promise = this.registerCallback(url, fileId, this._paused, diagnostics);
             if(!this._paused) {
@@ -281,7 +276,7 @@ export class Cache {
                     }));
                 });
 
-                return Promise.all([this._nativeBridge.Cache.getFiles(), this.getCacheCampaigns()]).then(([cacheFilesLeft, campaignsLeft]: [IFileInfo[], object]) => {
+                return Promise.all([this._nativeBridge.Cache.getFiles(), this.getCacheCampaigns()]).then(([cacheFilesLeft, campaignsLeft]: [IFileInfo[], { [key: string]: any }]) => {
                     const cacheFilesLeftIds: string[] = [];
                     cacheFilesLeft.map(currentFile => {
                         cacheFilesLeftIds.push(this.getFileIdHash(currentFile.id));

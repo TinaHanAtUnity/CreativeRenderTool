@@ -55,7 +55,7 @@ class TestStorageApi extends StorageApi {
         return this._dirty;
     }
 
-    private setInMemoryValue(storage: {}, key: string, value: any): {} {
+    private setInMemoryValue(storage: { [key: string]: any }, key: string, value: any): {} {
         const keyArray: string[] = key.split('.');
 
         if(keyArray.length > 1) {
@@ -71,7 +71,7 @@ class TestStorageApi extends StorageApi {
         }
     }
 
-    private getInMemoryValue(storage: {}, key: string): any {
+    private getInMemoryValue(storage: { [key: string]: any }, key: string): any {
         const keyArray: string[] = key.split('.');
 
         if(keyArray.length > 1) {
@@ -85,7 +85,7 @@ class TestStorageApi extends StorageApi {
         }
     }
 
-    private getInMemoryKeys(storage: {}, key: string): string[] {
+    private getInMemoryKeys(storage: { [key: string]: any }, key: string): string[] {
         const keyArray: string[] = key.split('.');
 
         if(keyArray.length > 1) {
@@ -110,7 +110,7 @@ class TestStorageApi extends StorageApi {
         }
     }
 
-    private deleteInMemoryValue(storage: {}, key: string): {} {
+    private deleteInMemoryValue(storage: { [key: string]: any }, key: string): {} {
         const keyArray: string[] = key.split('.');
 
         if(keyArray.length > 1) {

@@ -29,15 +29,15 @@ export class UnityAds {
         UnityAds._listener = listener;
 
         // tslint:disable:no-string-literal
-        window['nativebridge'] = nativeBridge;
-        window['webview'] = new WebView(nativeBridge);
-        window['webview'].initialize();
+        (<any>window)['nativebridge'] = nativeBridge;
+        (<any>window)['webview'] = new WebView(nativeBridge);
+        (<any>window)['webview'].initialize();
         // tslint:enable:no-string-literal
     }
 
     public static show(placement?: string) {
         // tslint:disable:no-string-literal
-        window['webview'].show(placement, {}, () => {
+        (<any>window)['webview'].show(placement, {}, () => {
             return;
         });
         // tslint:enable:no-string-literal

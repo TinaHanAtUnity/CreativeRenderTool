@@ -26,35 +26,36 @@ window.addEventListener('resize', resizeHandler, false);
 
 const toInt = (element: HTMLInputElement): number => parseInt(element.value, 10);
 const toBoolean = (element: HTMLInputElement): boolean => element.checked;
+const JS_FUNC_NAME_GET_HEADLESS = 'getHeadless';
 
 const setClientInfo = () => {
-    const fields = [
-        ['appName', 'setAppName'],
-        ['appVersion', 'setAppVersion'],
+    const fields: Array<[string, string, ((element: HTMLInputElement) => any) | undefined]> = [
+        ['appName', 'setAppName', undefined],
+        ['appVersion', 'setAppVersion', undefined],
         ['sdkVersion', 'setSdkVersion', toInt],
-        ['sdkVersionName', 'setSdkVersionName'],
+        ['sdkVersionName', 'setSdkVersionName', undefined],
         ['debuggable', 'setDebuggable', toBoolean],
-        ['configUrl', 'setConfigUrl'],
-        ['webViewUrl', 'setWebViewUrl'],
-        ['webViewHash', 'setWebViewHash'],
-        ['webViewVersion', 'setWebViewVersion'],
+        ['configUrl', 'setConfigUrl', undefined],
+        ['webViewUrl', 'setWebViewUrl', undefined],
+        ['webViewHash', 'setWebViewHash', undefined],
+        ['webViewVersion', 'setWebViewVersion', undefined],
         ['initTimeStamp', 'setInitTimeStamp', toInt],
         ['reinitialized', 'setReinitialized', toBoolean]
     ];
-    fields.forEach(([field, setter, parser]: [string, string, (element: HTMLInputElement) => any]) => {
+    fields.forEach(([field, setter, parser]: [string, string, ((element: HTMLInputElement) => any) | undefined]) => {
         const element = <HTMLInputElement>window.parent.document.getElementById(field);
-        Sdk[setter](parser ? parser(element) : element.value);
+        (<any>Sdk)[setter](parser ? parser(element) : element.value);
     });
 };
 
 const setAndroidDeviceInfo = () => {
-    const fields = [
-        ['AdvertisingTrackingId'],
+    const fields: Array<[string, ((element: HTMLInputElement) => any) | undefined]> = [
+        ['AdvertisingTrackingId', undefined],
         ['LimitAdTrackingFlag', toBoolean],
-        ['AndroidId'],
-        ['Manufacturer'],
-        ['Model'],
-        ['OsVersion'],
+        ['AndroidId', undefined],
+        ['Manufacturer', undefined],
+        ['Model', undefined],
+        ['OsVersion', undefined],
         ['ApiLevel', toInt],
         ['Rooted', toBoolean],
         ['ScreenWidth', toInt],
@@ -62,50 +63,50 @@ const setAndroidDeviceInfo = () => {
         ['ScreenDensity', toInt],
         ['ScreenLayout', toInt],
         ['ScreenBrightness', toInt],
-        ['SystemLanguage'],
-        ['TimeZone'],
+        ['SystemLanguage', undefined],
+        ['TimeZone', undefined],
         ['TotalSpace', toInt],
         ['FreeSpace', toInt],
         ['TotalMemory', toInt],
         ['FreeMemory', toInt],
-        ['ConnectionType'],
+        ['ConnectionType', undefined],
         ['NetworkType', toInt],
-        ['NetworkOperator'],
-        ['NetworkOperatorName'],
+        ['NetworkOperator', undefined],
+        ['NetworkOperatorName', undefined],
         ['Headset', toBoolean],
         ['DeviceVolume', toInt],
         ['BatteryLevel', toInt],
         ['BatteryStatus', toInt],
         ['RingerMode', toInt]
     ];
-    fields.forEach(([field, parser]: [string, (element: HTMLInputElement) => any]) => {
+    fields.forEach(([field, parser]: [string, ((element: HTMLInputElement) => any) | undefined]) => {
         const element = <HTMLInputElement>window.parent.document.getElementById('android' + field);
-        DeviceInfo['set' + field](parser ? parser(element) : element.value);
+        (<any>DeviceInfo)['set' + field](parser ? parser(element) : element.value);
     });
 };
 
 const setIosDeviceInfo = () => {
-    const fields = [
-        ['AdvertisingTrackingId'],
+    const fields: Array<[string, ((element: HTMLInputElement) => any) | undefined]> = [
+        ['AdvertisingTrackingId', undefined],
         ['LimitAdTrackingFlag', toBoolean],
-        ['Manufacturer'],
-        ['Model'],
-        ['OsVersion'],
+        ['Manufacturer', undefined],
+        ['Model', undefined],
+        ['OsVersion', undefined],
         ['Rooted', toBoolean],
         ['ScreenWidth', toInt],
         ['ScreenHeight', toInt],
         ['ScreenScale', toInt],
         ['ScreenBrightness', toInt],
-        ['SystemLanguage'],
-        ['TimeZone'],
+        ['SystemLanguage', undefined],
+        ['TimeZone', undefined],
         ['TotalSpace', toInt],
         ['FreeSpace', toInt],
         ['TotalMemory', toInt],
         ['FreeMemory', toInt],
-        ['ConnectionType'],
+        ['ConnectionType', undefined],
         ['NetworkType', toInt],
-        ['NetworkOperator'],
-        ['NetworkOperatorName'],
+        ['NetworkOperator', undefined],
+        ['NetworkOperatorName', undefined],
         ['Headset', toBoolean],
         ['DeviceVolume', toInt],
         ['BatteryLevel', toInt],
@@ -113,9 +114,9 @@ const setIosDeviceInfo = () => {
         ['UserInterfaceIdiom', toInt],
         ['Simulator', toBoolean]
     ];
-    fields.forEach(([field, parser]: [string, (element: HTMLInputElement) => any]) => {
+    fields.forEach(([field, parser]: [string, ((element: HTMLInputElement) => any) | undefined]) => {
         const element = <HTMLInputElement>window.parent.document.getElementById('ios' + field);
-        DeviceInfo['set' + field](parser ? parser(element) : element.value);
+        (<any>DeviceInfo)['set' + field](parser ? parser(element) : element.value);
     });
 };
 
@@ -130,9 +131,7 @@ if(window.parent !== window) {
     const initializeButton = <HTMLButtonElement>window.parent.document.getElementById('initialize');
     const campaignResponseElement = <HTMLInputElement>window.parent.document.getElementById('campaignResponse');
 
-    initializeButton.addEventListener('click', (event: Event) => {
-        event.preventDefault();
-
+    const initialize = () => {
         abGroupElement.disabled = true;
         campaignIdElement.disabled = true;
         countryElement.disabled = true;
@@ -196,17 +195,17 @@ if(window.parent !== window) {
             onUnityAdsStart: (placement: string) => {
                 console.log('onUnityAdsStart: ' + placement);
             },
-            onUnityAdsFinish: (placement: string, state: FinishState) => {
+            onUnityAdsFinish: (placement: string, state: string) => {
                 console.log('onUnityAdsFinish: ' + placement + ' - ' + state);
             },
-            onUnityAdsError: (error: UnityAdsError, message: string) => {
+            onUnityAdsError: (error: string, message: string) => {
                 console.log('onUnityAdsError: ' + error + ' - ' + message);
             },
             onUnityAdsClick: (placement: string) => {
                 console.log('onUnityAdsClick: ' + placement);
             },
-            onUnityAdsPlacementStateChanged: (placement: string, oldState: PlacementState, newState: PlacementState) => {
-                console.log('onUnityAdsPlacementStateChanged: ' + placement + ' ' + PlacementState[oldState] + ' -> ' + PlacementState[newState]);
+            onUnityAdsPlacementStateChanged: (placement: string, oldState: string, newState: string) => {
+                console.log('onUnityAdsPlacementStateChanged: ' + placement + ' ' + oldState + ' -> ' + newState);
             }
         };
         // tslint:enable:no-console
@@ -225,6 +224,14 @@ if(window.parent !== window) {
             default:
                 throw new Error('Unity Ads webview init failure: no platform defined, unable to initialize native bridge');
         }
+    };
 
-    }, false);
+    if((<any>window).parent[JS_FUNC_NAME_GET_HEADLESS]()) {
+        initialize();
+    } else {
+        initializeButton.addEventListener('click', (event: Event) => {
+            event.preventDefault();
+            initialize();
+        }, false);
+    }
 }

@@ -2,7 +2,7 @@ import { IVPAIDHandler, VPAID } from 'Views/VPAID';
 import { NativeBridge } from 'Native/NativeBridge';
 import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'AdUnits/VPAIDAdUnit';
 import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
-import { Overlay } from 'Views/Overlay';
+import { AbstractOverlay } from 'Views/AbstractOverlay';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
@@ -23,7 +23,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     private _placement: Placement;
     private _vpaidView: VPAID;
     private _vpaidEndScreen: VPAIDEndScreen | undefined;
-    private _overlay: Overlay;
+    private _overlay: AbstractOverlay;
     private _adDuration: number = -2;
     private _adRemainingTime: number = -2;
 

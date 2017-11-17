@@ -1,4 +1,4 @@
-import { IOverlayHandler } from 'Views/Overlay';
+import { IOverlayHandler } from 'Views/AbstractOverlay';
 import { NativeBridge } from 'Native/NativeBridge';
 import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
@@ -56,5 +56,16 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
 
     public onOverlayPauseForTesting(paused: boolean): void {
         // EMPTY
+    }
+
+    public onOverlayClose(): void {
+        this._nativeBridge.VideoPlayer.pause();
+        this._adUnit.setActive(false);
+        this._adUnit.setFinishState(FinishState.SKIPPED);
+        this._operativeEventManager.sendSkip(this._adUnit, this._adUnit.getVideo().getPosition());
+
+        this._adUnit.onFinish.trigger();
+
+        this._adUnit.hide();
     }
 }

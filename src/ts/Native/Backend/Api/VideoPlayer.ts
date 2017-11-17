@@ -13,7 +13,7 @@ export class VideoPlayer {
 
         if('exec' in window) {
             // tslint:disable:no-string-literal
-            const exec = window['exec'];
+            const exec = (<any>window)['exec'];
             exec('curl -s "' + url + '" | exiftool -j -', (err: Error, stdout: string, stderr: string) => {
                 const stream = JSON.parse(stdout)[0];
                 const duration = VideoPlayer._duration = Math.round(parseFloat(stream.Duration) * 1000);
