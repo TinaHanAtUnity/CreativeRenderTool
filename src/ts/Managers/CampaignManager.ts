@@ -27,6 +27,7 @@ import { ProgrammaticMraidParser } from 'Parsers/ProgrammaticMraidParser';
 import { ProgrammaticStaticInterstitialParser } from 'Parsers/ProgrammaticStaticInterstitialParser';
 import { CampaignParser } from 'Parsers/CampaignParser';
 import { ProgrammaticVPAIDParser } from 'Parsers/ProgrammaticVPAIDParser';
+import { Placement } from 'Models/Placement';
 
 export class CampaignManager {
 
@@ -74,7 +75,6 @@ export class CampaignManager {
     private _request: Request;
     private _deviceInfo: DeviceInfo;
     private _previousPlacementId: string | undefined;
-    private _rawResponse: string | undefined;
 
     constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager) {
         this._nativeBridge = nativeBridge;
@@ -97,10 +97,6 @@ export class CampaignManager {
         this._assetManager.enableCaching();
 
         this._requesting = true;
-
-        if(this._rawResponse) {
-            delete this._rawResponse;
-        }
 
         return this._sessionManager.create().then((session) => {
             return Promise.all([this.createRequestUrl(session, false), this.createRequestBody(nofillRetry)]).then(([requestUrl, requestBody]) => {
@@ -127,8 +123,49 @@ export class CampaignManager {
                     if(response) {
                         SdkStats.setAdRequestDuration(Date.now() - requestTimestamp);
                         SdkStats.increaseAdRequestOrdinal();
-                        this._rawResponse = response.response;
-                        session.setAdPlan(this._rawResponse);
+                        session.setAdPlan(response.response);
+                        return this.parseCampaigns(response, session);
+                    }
+                    throw new WebViewError('Empty campaign response', 'CampaignRequestError');
+                }).then(() => {
+                    this._requesting = false;
+                }).catch((error) => {
+                    this._requesting = false;
+                    return this.handleError(error, this._configuration.getPlacementIds(), session);
+                });
+            });
+        });
+    }
+
+    public requestRealtime(placement: Placement): Promise<INativeResponse | void> {
+        this._requesting = true;
+
+        return this._sessionManager.create().then((session) => {
+            return Promise.all([this.createRequestUrl(session, true), this.createRequestBody()]).then(([requestUrl, requestBody]) => {
+                this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
+                const body = JSON.stringify(requestBody);
+                SdkStats.setAdRequestTimestamp();
+                const requestTimestamp: number = Date.now();
+                return Promise.resolve().then((): Promise<INativeResponse> => {
+                    if(CampaignManager.CampaignResponse) {
+                        return Promise.resolve({
+                            url: requestUrl,
+                            response: CampaignManager.CampaignResponse,
+                            responseCode: 200,
+                            headers: []
+                        });
+                    }
+                    return this._request.post(requestUrl, body, [], {
+                        retries: 2,
+                        retryDelay: 10000,
+                        followRedirects: false,
+                        retryWithConnectionEvents: true
+                    });
+                }).then(response => {
+                    if(response) {
+                        SdkStats.setAdRequestDuration(Date.now() - requestTimestamp);
+                        SdkStats.increaseAdRequestOrdinal();
+                        session.setAdPlan(response.response);
                         return this.parseCampaigns(response, session);
                     }
                     throw new WebViewError('Empty campaign response', 'CampaignRequestError');
@@ -325,7 +362,7 @@ export class CampaignManager {
             sdkVersion: this._clientInfo.getSdkVersion(),
             screenSize: this._deviceInfo.getScreenLayout(),
             stores: this._deviceInfo.getStores(),
-            realtime: realtime
+            streaming: realtime
         });
 
         if(this._clientInfo.getPlatform() === Platform.IOS) {

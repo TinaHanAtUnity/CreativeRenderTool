@@ -251,6 +251,10 @@ export class WebView {
             return;
         }
 
+        if(placement.isRealtime()) {
+            this._campaignManager.requestRealtime(placement);
+        }
+
         this._showing = true;
 
         this.shouldReinitialize().then((reinitialize) => {
