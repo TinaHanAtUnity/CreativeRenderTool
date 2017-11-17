@@ -409,8 +409,6 @@ export class AdUnitFactory {
 
             if(enabledGameIds.indexOf(parameters.clientInfo.getGameId()) !== -1) {
                 return new InterstitialOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
-            } else if(parameters.campaign.getAbGroup() === 12 || parameters.campaign.getAbGroup() === 13) {
-                return new InterstitialOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
             } else {
                 return new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
             }
