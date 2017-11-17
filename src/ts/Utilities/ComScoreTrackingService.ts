@@ -2,6 +2,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Platform } from 'Constants/Platform';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { DeviceInfo } from 'Models/DeviceInfo';
+import { Url } from 'Utilities/Url';
 import { hex_sha1 } from 'Utilities/sha1';
 
 export class ComScoreTrackingService {
@@ -89,14 +90,6 @@ export class ComScoreTrackingService {
             ns_ts: <string> `${Date.now()}`
         };
 
-        return this.appendQueryParams('https://sb.scorecardresearch.com/p', queryParamsDict);
-    }
-
-    private appendQueryParams(front: string, queryParams: any): string {
-        const back = Object.keys(queryParams).map(key => {
-            return `${key}=${encodeURIComponent(queryParams[key])}`;
-        }).join('&');
-
-        return `${front}?${back}`;
+        return Url.addParameters('https://sb.scorecardresearch.com/p', queryParamsDict);
     }
 }
