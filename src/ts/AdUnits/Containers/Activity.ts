@@ -56,7 +56,7 @@ export class Activity extends AdUnitContainer {
         this._currentActivityFinished = false;
         this._androidOptions = options;
 
-        let views: string[] = ['webview'];
+        let views: string[] = ['webview', 'webplayer'];
         if(videoplayer) {
             views = ['videoplayer', 'webview'];
         }
@@ -115,8 +115,9 @@ export class Activity extends AdUnitContainer {
                     promises.push(this._nativeBridge.AndroidAdUnit.setViewFrame('videoplayer', 0, 0, screenHeight, screenWidth));
                     break;
                 case ViewConfiguration.WEB_PLAYER:
-                    promises.push(this._nativeBridge.AndroidAdUnit.setViews(['webview', 'webplayer']));
+                    promises.push(this._nativeBridge.AndroidAdUnit.setViews(['webplayer', 'webview']));
                     promises.push(this._nativeBridge.AndroidAdUnit.setOrientation(ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR));
+
                     break;
                 default:
                     break;
@@ -132,6 +133,14 @@ export class Activity extends AdUnitContainer {
 
     public isPaused() {
         return false;
+    }
+
+    public setViewFrame(view: string, x: number, y: number, width: number, height: number): Promise<void> {
+        return this._nativeBridge.AndroidAdUnit.setViewFrame(view, x, y, width, height);
+    }
+
+    public getViews(): Promise<string[]> {
+        return this._nativeBridge.AndroidAdUnit.getViews();
     }
 
     private getOrientation(allowRotation: boolean, forceOrientation: ForceOrientation, options: IAndroidOptions) {

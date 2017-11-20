@@ -40,6 +40,8 @@ export abstract class AdUnitContainer {
     public abstract reconfigure(configuration: ViewConfiguration): Promise<any[]>;
     public abstract reorient(allowRotation: boolean, forceOrientation: ForceOrientation): Promise<any[]>;
     public abstract isPaused(): boolean;
+    public abstract setViewFrame(view: string, x: number, y: number, width: number, height: number): Promise<void>;
+    public abstract getViews(): Promise<string[]>;
 
     public getLockedOrientation() {
         return this._lockedOrientation;

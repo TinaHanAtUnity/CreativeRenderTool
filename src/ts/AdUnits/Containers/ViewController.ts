@@ -141,6 +141,14 @@ export class ViewController extends AdUnitContainer {
         this._paused = false;
     }
 
+    public setViewFrame(view: string, x: number, y: number, width: number, height: number): Promise<void> {
+        return this._nativeBridge.IosAdUnit.setViewFrame(view, new Double(x), new Double(y), new Double(width), new Double(height));
+    }
+
+    public getViews(): Promise<string[]> {
+        return this._nativeBridge.IosAdUnit.getViews();
+    }
+
     private getOrientation(options: IIosOptions, allowRotation: boolean, forceOrientation: ForceOrientation) {
         let orientation: UIInterfaceOrientationMask = options.supportedOrientations;
         if(forceOrientation === ForceOrientation.LANDSCAPE) {

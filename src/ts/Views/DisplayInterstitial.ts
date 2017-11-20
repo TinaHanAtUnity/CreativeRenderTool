@@ -1,4 +1,5 @@
 import DisplayInterstitialTemplate from 'html/display/DisplayInterstitial.html';
+import DisplayContainer from 'html/display/DisplayContainer.html';
 
 import { View } from 'Views/View';
 import { NativeBridge } from 'Native/NativeBridge';
@@ -24,6 +25,7 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
     private _canClose = false;
     private _canSkip = false;
     private _didReward = false;
+    private _webPlayerPrepared = false;
     private _markup: string;
 
     private _messageListener: EventListener;
@@ -61,20 +63,23 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
         this._markup = this._campaign.getDynamicMarkup();
 
         this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
-
-
-        if (this._campaign.getClickThroughUrl()) {
-
-        } else {
-            // TODO: We only support URLs in our second webview, do we need to have a way to send content instead of url?
-            // const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#display-iframe');
-            // iframe.srcdoc = DisplayContainer.replace('<body></body>', '<body>' + this._markup + '</body>');
-        }
     }
 
     public show(): void {
         super.show();
+/*
+        let webPlayerContent: Promise<void>;
+        if (this._campaign.getClickThroughUrl()) {
+            webPlayerContent = this.setWebPlayerData(this._markup, 'text/html', 'UTF-8');
+        } else {
+            const content = DisplayContainer.replace('<body></body>', '<body>' + this._markup + '</body>');
+            webPlayerContent = this.setWebPlayerData(content, 'text/html', 'UTF-8');
+        }
+        webPlayerContent.then(() => {
+            this._webPlayerPrepared = true;
+        });
 
+        */
         window.addEventListener('message', this._messageListener);
 
         const closeLength = 30;
