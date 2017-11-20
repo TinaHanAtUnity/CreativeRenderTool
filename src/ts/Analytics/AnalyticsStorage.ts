@@ -22,7 +22,9 @@ export class AnalyticsStorage {
             if(userId) {
                 return userId;
             } else {
-                return this._nativeBridge.DeviceInfo.getUniqueEventId();
+                return this._nativeBridge.DeviceInfo.getUniqueEventId().then(id => {
+                    return id.toLowerCase().replace(/-/g, '');
+                });
             }
         });
     }

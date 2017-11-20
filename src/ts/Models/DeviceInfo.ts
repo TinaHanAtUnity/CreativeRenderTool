@@ -99,7 +99,7 @@ export class DeviceInfo extends Model<IDeviceInfo> {
     public fetch(): Promise<any[]> {
         const promises: Array<Promise<any>> = [];
 
-        promises.push(this._nativeBridge.DeviceInfo.getAdvertisingTrackingId().then(advertisingIdentifier => this.set('advertisingIdentifier', advertisingIdentifier)).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._nativeBridge.DeviceInfo.getAdvertisingTrackingId().then(advertisingIdentifier => this.set('advertisingIdentifier', advertisingIdentifier.toLowerCase())).catch(err => this.handleDeviceInfoError(err)));
         promises.push(this._nativeBridge.DeviceInfo.getLimitAdTrackingFlag().then(limitAdTracking => this.set('limitAdTracking', limitAdTracking)).catch(err => this.handleDeviceInfoError(err)));
         promises.push(this._nativeBridge.DeviceInfo.getOsVersion().then(osVersion => this.set('osVersion', osVersion)).catch(err => this.handleDeviceInfoError(err)));
         promises.push(this._nativeBridge.DeviceInfo.getModel().then(model => this.set('model', model)).catch(err => this.handleDeviceInfoError(err)));
