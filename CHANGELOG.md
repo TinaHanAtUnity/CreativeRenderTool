@@ -1,4 +1,4 @@
-# Pending
+# Mon Nov 20 09:36:12 UTC 2017
 
 * Change use of advertiser bundleID to game bundleID for MOAT
 * Use more aggressive retrying in A/B group 5
