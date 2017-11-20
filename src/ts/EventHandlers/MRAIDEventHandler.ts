@@ -117,16 +117,7 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
     }
 
     private handleClickAttribution() {
-        const currentSession = this._campaign.getSession();
-        if(currentSession) {
-            if(currentSession.getEventSent(EventType.CLICK_ATTRIBUTION)) {
-                return;
-            }
-            currentSession.setEventSent(EventType.CLICK_ATTRIBUTION);
-        }
-
         const clickAttributionUrl = this._campaign.getClickAttributionUrl();
-
         if(this._campaign.getClickAttributionUrlFollowsRedirects() && clickAttributionUrl) {
             this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, true).then(response => {
                 const location = Request.getHeader(response.headers, 'location');
