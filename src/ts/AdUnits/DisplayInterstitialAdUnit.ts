@@ -159,13 +159,13 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
             const webviewYPos = screenHeight - (screenHeight - webviewYSize);
             return this._container.open(this, false, false, this._forceOrientation, true, false, true, false, this._options).then( () => {
                 return this._container.reconfigure(ViewConfiguration.WEB_PLAYER).then( () => {
-                    // return this._container.setViewFrame('webview', Math.floor(webviewXPos), Math.floor(webviewYPos), Math.floor(webviewXSize), Math.floor(webviewYSize)).then(() => {
-                        return this._container.setViewFrame('webplayer', Math.floor(screenWidth/2), Math.floor(screenHeight/2), Math.floor(screenWidth), Math.floor(screenHeight)).then(() => {
+                    return this._container.setViewFrame('webview', Math.floor(webviewXPos), Math.floor(webviewYPos), Math.floor(webviewXSize), Math.floor(webviewYSize)).then(() => {
+                        return this._container.setViewFrame('webplayer', Math.floor(screenWidth), Math.floor(screenHeight), Math.floor(screenWidth), Math.floor(screenHeight)).then(() => {
                             this._container.getViews().then((arr) => {
                                 this._nativeBridge.Sdk.logDebug("my_views: " + JSON.stringify(arr));
                             });
                         });
-                    // });
+                    });
                 });
             });
         });
