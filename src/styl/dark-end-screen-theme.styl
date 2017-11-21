@@ -1,0 +1,78 @@
+@import "vars.styl";
+
+#end-screen {
+
+  .btn-close-region.dark-end-screen {
+    z-index: 30;
+  }
+
+  .campaign-container.dark-end-screen {
+
+    background: transparent;
+
+    .end-screen-info-background,
+    .game-background {
+      z-index: 10;
+    }
+
+    .name-container,
+    .game-rating-count {
+      color: $white;
+    }
+
+    .download-container {
+      border-radius: $default-scale-size * $default-size * 5;
+      background-color: $dark-end-card-blue;
+    }
+
+    .game-background-landscape,
+    .game-background-portrait {
+      margin: auto;
+      border-radius: .2rem;
+      box-shadow: 0 0 100px 5px rgba(0, 0, 0, .75);
+    }
+
+    .game-background-landscape {
+      width: 45%;
+      height: 90%;
+    }
+
+    .game-background-portrait {
+      position: relative;
+      margin: 10% auto -5% auto;
+      width: 90%;
+    }
+
+    .end-screen-info {
+      z-index: 20;
+    }
+
+    .underlay {
+      position: absolute;
+      z-index: 5;
+      width: 100vw;
+      height: 100vh;
+      filter: brightness(100%) blur(20px);
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+      transform: scale(1.5);
+
+      &:before {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background-image: linear-gradient(rgba(255, 255, 255, 0), $black 80%);
+        content: "";
+      }
+    }
+
+    .unityads-logo {
+      bottom: 0;
+      height: $default-scale-size * $default-size * 1.5;
+      background-image: url("../img/unityads-white.png");
+    }
+  }
+}
