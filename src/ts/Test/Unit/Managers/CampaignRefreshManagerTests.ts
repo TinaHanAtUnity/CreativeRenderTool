@@ -306,7 +306,7 @@ describe('CampaignRefreshManager', () => {
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('premium', new PerformanceCampaign(campaignObject, TestFixtures.getSession(), 'TestGamerId', 12345));
-                campaignManager.onNoFill.trigger('premium');
+                campaignManager.onNoFill.trigger('premium', TestFixtures.getSession());
                 return Promise.resolve();
             });
 
@@ -318,7 +318,7 @@ describe('CampaignRefreshManager', () => {
                 assert.equal(configuration.getPlacement('premium').getState(), PlacementState.NO_FILL);
                 assert.equal(configuration.getPlacement('video').getState(), PlacementState.WAITING);
 
-                campaignManager.onNoFill.trigger('video');
+                campaignManager.onNoFill.trigger('video', TestFixtures.getSession());
 
                 assert.equal(configuration.getPlacement('video').getState(), PlacementState.NO_FILL);
             });

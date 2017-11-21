@@ -252,7 +252,7 @@ export class WebView {
         }
 
         if(placement.isRealtime()) {
-            this._campaignManager.requestRealtime(placement);
+            this._campaignManager.requestRealtime(placement, campaign.getSession());
         }
 
         this._showing = true;

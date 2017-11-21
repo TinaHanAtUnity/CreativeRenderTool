@@ -270,6 +270,12 @@
       "required": "ios",
       "queryString": false,
       "body": true
+    },
+    {
+      "parameter": "streaming",
+      "required": "all",
+      "queryString": true,
+      "body": false
     }
   ]
 }

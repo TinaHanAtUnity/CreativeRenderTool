@@ -418,5 +418,12 @@
     "description": "If device is a simulator, not a real device",
     "provider": "SDK",
     "platforms": "ios"
+  },
+  {
+    "key": "streaming",
+    "type": "boolean",
+    "description": "If ad request is done at show time for immediate streaming",
+    "provider": "SDK",
+    "platforms": "all"
   }
 ]

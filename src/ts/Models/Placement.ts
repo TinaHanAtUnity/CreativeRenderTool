@@ -1,5 +1,6 @@
 import { Model } from 'Models/Model';
 import { Campaign } from 'Models/Campaign';
+import { Session } from 'Models/Session';
 
 export enum PlacementState {
     READY,
@@ -46,7 +47,7 @@ export class Placement extends Model<IPlacement> {
             state: ['number'],
             previousState: ['number'],
             placementStateChanged: ['boolean'],
-            currentCampaign: ['object', 'undefined']
+            currentCampaign: ['object', 'undefined'],
         });
 
         this.set('id', data.id);

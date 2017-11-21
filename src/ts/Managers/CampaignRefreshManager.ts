@@ -3,7 +3,7 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { CampaignManager } from 'Managers/CampaignManager';
 import { Campaign } from 'Models/Campaign';
 import { WebViewError } from 'Errors/WebViewError';
-import { PlacementState } from 'Models/Placement';
+import { Placement, PlacementState } from 'Models/Placement';
 import { Configuration } from 'Models/Configuration';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
@@ -12,6 +12,7 @@ import { Session } from 'Models/Session';
 import { FocusManager } from 'Managers/FocusManager';
 import { SdkStats } from 'Utilities/SdkStats';
 import { Platform } from 'Constants/Platform';
+import { RealtimeCampaign } from 'Models/Campaigns/RealtimeCampaign';
 
 export class CampaignRefreshManager {
     public static NoFillDelay = 3600;
@@ -49,7 +50,7 @@ export class CampaignRefreshManager {
         this._noFills = 0;
 
         this._campaignManager.onCampaign.subscribe((placementId, campaign) => this.onCampaign(placementId, campaign));
-        this._campaignManager.onNoFill.subscribe(placementId => this.onNoFill(placementId));
+        this._campaignManager.onNoFill.subscribe((placementId, session) => this.onNoFill(placementId, session));
         this._campaignManager.onError.subscribe((error, placementIds, rawAdPlan) => this.onError(error, placementIds, rawAdPlan));
         this._campaignManager.onAdPlanReceived.subscribe((refreshDelay, campaignCount) => this.onAdPlanReceived(refreshDelay, campaignCount));
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
@@ -173,12 +174,20 @@ export class CampaignRefreshManager {
         this.handlePlacementState(placementId, PlacementState.READY);
     }
 
-    private onNoFill(placementId: string) {
+    private onNoFill(placementId: string, session: Session) {
         this._parsingErrorCount = 0;
 
-        this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill, no ads to show, for placement: ' + placementId);
-        this.setCampaignForPlacement(placementId, undefined);
-        this.handlePlacementState(placementId, PlacementState.NO_FILL);
+        const placement: Placement = this._configuration.getPlacement(placementId);
+
+        if(placement.isRealtime()) {
+            this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill, waiting realtime auction, for placement: ' + placementId);
+            this.setCampaignForPlacement(placementId, new RealtimeCampaign(session));
+            this.handlePlacementState(placementId, PlacementState.READY);
+        } else {
+            this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill, no ads to show, for placement: ' + placementId);
+            this.setCampaignForPlacement(placementId, undefined);
+            this.handlePlacementState(placementId, PlacementState.NO_FILL);
+        }
     }
 
     private onError(error: WebViewError | Error, placementIds: string[], session?: Session) {
