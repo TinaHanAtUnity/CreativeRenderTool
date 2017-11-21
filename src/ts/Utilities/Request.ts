@@ -18,7 +18,7 @@ const enum RequestMethod {
 interface IRequestOptions {
     retries: number;
     retryDelay: number;
-    followRedirects: boolean | ((url: string) => boolean);
+    followRedirects: boolean;
     retryWithConnectionEvents: boolean;
 }
 
@@ -247,7 +247,7 @@ export class Request {
         } else if(Request.RedirectResponseCodes.exec(responseCode.toString())) {
             if(nativeRequest.options.followRedirects) {
                 const location = Request.getHeader(headers, 'location');
-                if(location && (typeof nativeRequest.options.followRedirects === 'function' ? nativeRequest.options.followRedirects(location) : this.followRedirects(location))) {
+                if(location && this.followRedirects(location)) {
                     nativeRequest.url = location;
                     this.invokeRequest(id, nativeRequest);
                 } else {
@@ -264,7 +264,7 @@ export class Request {
     }
 
     private followRedirects(location: string) {
-        if(location.match(/^https?/i) && !location.match(/^https:\/\/itunes\.apple\.com/i)) {
+        if(location.match(/^https?/i) && !location.match(/^https:\/\/itunes\.apple\.com/i) && !location.match(/\.apk$/i)) {
             return true;
         } else {
             return false;
