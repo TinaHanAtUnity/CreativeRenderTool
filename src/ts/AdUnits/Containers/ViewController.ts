@@ -112,7 +112,7 @@ export class ViewController extends AdUnitContainer {
                     promises.push(this._nativeBridge.IosAdUnit.setViewFrame('adunit', new Double(0), new Double(0), new Double(width), new Double(height)));
                     break;
                 case ViewConfiguration.WEB_PLAYER:
-                    promises.push(this._nativeBridge.IosAdUnit.setViews(['webview', 'webplayer']));
+                    promises.push(this._nativeBridge.IosAdUnit.setViews(['webplayer', 'webview']));
                     promises.push(this._nativeBridge.IosAdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL));
                     break;
                 default:
