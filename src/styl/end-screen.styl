@@ -482,4 +482,18 @@ body.android
           padding: 40px 20px
           font-size: 30pt
           line-height: 30pt
+
+  /* Temporary fix for iPhone X */
+  @media (orientation: portrait)
+    @media only screen and (device-width : 375px) and (device-height : 812px) and (-webkit-device-pixel-ratio : 3) {
+      #end-screen {
+        .btn-close-region {
+          width: 85px;
+          height: 85px;
+        }
+        .btn-close {
+          top: 30px;
+        }
+      }
+    }
 // @stylint on
