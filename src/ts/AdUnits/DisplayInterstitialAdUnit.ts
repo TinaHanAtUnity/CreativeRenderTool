@@ -157,10 +157,12 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
             const webviewYSize = screenHeight * closeAreaSizePercent;
             const webviewXPos = screenWidth - webviewXSize;
             const webviewYPos = 0;
-            return this._container.open(this, false, false, this._forceOrientation, true, false, true, false, this._options).then( () => {
-                return this._container.reconfigure(ViewConfiguration.WEB_PLAYER).then( () => {
+            return this._container.open(this, ['webplayer', 'webview'], false, this._forceOrientation, true, false, true, false, this._options).then( () => {
+                const onShowObserver = this._container.onShow.subscribe(() => {
                     return this._container.setViewFrame('webview', Math.floor(webviewXPos), Math.floor(webviewYPos), Math.floor(webviewXSize), Math.floor(webviewYSize)).then(() => {
-                        return this._container.setViewFrame('webplayer', Math.floor(screenWidth), Math.floor(screenHeight), Math.floor(screenWidth), Math.floor(screenHeight));
+                        return this._container.setViewFrame('webplayer', Math.floor(screenWidth), Math.floor(screenHeight), Math.floor(screenWidth), Math.floor(screenHeight)).then(() => {
+                            this._container.onShow.unsubscribe(onShowObserver);
+                        });
                     });
                 });
             });

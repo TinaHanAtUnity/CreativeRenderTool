@@ -80,7 +80,7 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
     public show(): Promise<void> {
         this.onShow();
         this.showView();
-        return this._container.open(this, false, false, this._forceOrientation, false, false, true, false, this._options);
+        return this._container.open(this, ['webview'], false, this._forceOrientation, false, false, true, false, this._options);
     }
 
     public hide(): Promise<void> {
