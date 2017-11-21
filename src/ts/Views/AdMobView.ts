@@ -7,12 +7,10 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Placement } from 'Models/Placement';
 import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
 import { Template } from 'Utilities/Template';
-import { Overlay } from 'Views/Overlay';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { AFMABridge } from 'Views/AFMABridge';
 
 export interface IAdMobEventHandler {
-    onSkip(): void;
     onClose(): void;
     onOpenURL(url: string): void;
 }
@@ -23,7 +21,6 @@ export class AdMobView extends View<IAdMobEventHandler> {
     private _iframe: HTMLIFrameElement;
 
     private _messageListener: EventListener;
-    private _overlay: Overlay;
     private _afmaBridge: AFMABridge;
 
     constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: AdMobCampaign, language: string, gameId: string, abGroup: number) {
@@ -31,15 +28,8 @@ export class AdMobView extends View<IAdMobEventHandler> {
 
         this._placement = placement;
         this._campaign = campaign;
-        this._overlay = new Overlay(nativeBridge, false, language, gameId, abGroup);
-        this._overlay.addEventHandler({
-            onOverlayCallButton: () => { /**/ },
-            onOverlayMute: (muted: boolean) => { /**/ },
-            onOverlayPauseForTesting: (paused: boolean) => { /**/ },
-            onOverlaySkip: () => this.onSkip()
-        });
-
         this._template = new Template(AdMobContainer);
+
         this._afmaBridge = new AFMABridge({
             onAFMAClose: () => this.onClose(),
             onAFMAOpenURL: (url: string) => this.onOpenURL(url),
@@ -59,7 +49,6 @@ export class AdMobView extends View<IAdMobEventHandler> {
     public render() {
         super.render();
         this.setupIFrame();
-        this.setupOverlay();
     }
 
     public show(): void {
@@ -80,24 +69,6 @@ export class AdMobView extends View<IAdMobEventHandler> {
         iframe.srcdoc = markup;
 
         this._iframe = iframe;
-    }
-
-    private setupOverlay() {
-        this._overlay.render();
-        this._overlay.setFadeEnabled(true);
-        this._overlay.setVideoDurationEnabled(true);
-        this._overlay.setMuteEnabled(true);
-
-        if (this._placement.allowSkip()) {
-            this._overlay.setSkipEnabled(true);
-            this._overlay.setSkipDuration(this._placement.allowSkipInSeconds());
-        } else {
-            this._overlay.setSkipEnabled(false);
-        }
-
-        const overlayEl = this._overlay.container();
-        overlayEl.style.position = 'absolute';
-        this._container.insertBefore(overlayEl, this._container.firstChild);
     }
 
     private getIFrameSrcDoc(): string {
@@ -140,9 +111,5 @@ export class AdMobView extends View<IAdMobEventHandler> {
 
     private onOpenURL(url: string) {
         this._handlers.forEach((h) => h.onOpenURL(url));
-    }
-
-    private onSkip() {
-        this._handlers.forEach((h) => h.onSkip());
     }
 }
