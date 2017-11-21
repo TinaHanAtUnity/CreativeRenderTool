@@ -1,12 +1,14 @@
 @import "vars.styl";
 
-#end-screen {
+#end-screen.dark-end-screen {
 
-  .btn-close-region.dark-end-screen {
+  overflow: hidden;
+
+  .btn-close-region {
     z-index: 30;
   }
 
-  .campaign-container.dark-end-screen {
+  .campaign-container {
 
     background: transparent;
 
@@ -27,7 +29,8 @@
 
     .game-background-landscape,
     .game-background-portrait {
-      margin: auto;
+      top: 5%;
+      margin: 0 auto;
       border-radius: .2rem;
       box-shadow: 0 0 100px 5px rgba(0, 0, 0, .75);
     }
@@ -39,7 +42,6 @@
 
     .game-background-portrait {
       position: relative;
-      margin: 10% auto -5% auto;
       width: 90%;
     }
 

@@ -78,6 +78,11 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         if (this._isSwipeToCloseEnabled) {
             (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';
         }
+
+        const endScreenAlt = this.getEndscreenAlt();
+        if (typeof endScreenAlt === "string") {
+            this._container.classList.add(endScreenAlt);
+        }
     }
 
     public show(): void {
