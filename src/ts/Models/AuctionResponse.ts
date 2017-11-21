@@ -14,10 +14,12 @@ export interface IAuctionResponse {
     advertiserDomain: string | undefined;
     advertiserBundleId: string | undefined;
     ext: string | undefined;
+    mediaId: string;
+    rawData: any;
 }
 
 export class AuctionResponse extends Model<IAuctionResponse> {
-    constructor(placements: string[], data: any, correlationId: string) {
+    constructor(placements: string[], data: any, mediaId: string, correlationId: string) {
         super('AuctionResponse', {
             placements: ['array'],
             contentType: ['string'],
@@ -31,7 +33,9 @@ export class AuctionResponse extends Model<IAuctionResponse> {
             advertiserCampaignId: ['string', 'undefined'],
             advertiserDomain: ['string', 'undefined'],
             advertiserBundleId: ['string', 'undefined'],
-            ext: ['string', 'undefined']
+            ext: ['string', 'undefined'],
+            mediaId: ['string'],
+            rawData: ['object']
         });
 
         this.set('placements', placements);
@@ -47,6 +51,8 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         this.set('advertiserDomain', data.advDomain);
         this.set('advertiserBundleId', data.bundleId);
         this.set('ext', data.ext);
+        this.set('mediaId', mediaId);
+        this.set('rawData', data);
     }
 
     public getPlacements(): string[] {
@@ -99,6 +105,14 @@ export class AuctionResponse extends Model<IAuctionResponse> {
 
     public getExt(): string | undefined {
         return this.get('ext');
+    }
+
+    public getMediaId(): string {
+        return this.get('mediaId');
+    }
+
+    public getRawData(): any {
+        return this.get('rawData');
     }
 
     public getDTO(): {[key: string]: any } {

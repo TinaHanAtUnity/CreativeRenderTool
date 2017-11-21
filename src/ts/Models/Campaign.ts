@@ -18,6 +18,8 @@ export interface ICampaign {
     advertiserCampaignId: string | undefined;
     advertiserBundleId: string | undefined;
     session: Session;
+    mediaId: string;
+    rawMedia: any;
 }
 
 export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T> {
@@ -34,7 +36,9 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         advertiserDomain: ['string', 'undefined'],
         advertiserCampaignId: ['string', 'undefined'],
         advertiserBundleId: ['string', 'undefined'],
-        session: ['object']
+        session: ['object'],
+        mediaId: ['string'],
+        rawMedia: ['object']
     };
 
     constructor(name: string, schema: ISchema<T>) {
@@ -96,6 +100,22 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
     public isExpired(): boolean {
         const willExpireAt = this.get('willExpireAt');
         return willExpireAt !== undefined && Date.now() > willExpireAt;
+    }
+
+    public setMediaId(id: string) {
+        this.set('mediaId', id);
+    }
+
+    public getMediaId(): string {
+        return this.get('mediaId');
+    }
+
+    public setRawMedia(media: any): void {
+        this.set('rawMedia', media);
+    }
+
+    public getRawMedia(): any {
+        return this.get('rawMedia');
     }
 
     public getDTO(): { [key: string]: any } {

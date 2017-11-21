@@ -28,6 +28,7 @@ import { ProgrammaticStaticInterstitialParser } from 'Parsers/ProgrammaticStatic
 import { CampaignParser } from 'Parsers/CampaignParser';
 import { ProgrammaticVPAIDParser } from 'Parsers/ProgrammaticVPAIDParser';
 import { Placement } from 'Models/Placement';
+import { RealtimeCampaign } from 'Models/Campaigns/RealtimeCampaign';
 
 export class CampaignManager {
 
@@ -243,7 +244,7 @@ export class CampaignManager {
                 if(fill.hasOwnProperty(mediaId)) {
                     let auctionResponse: AuctionResponse;
                     try {
-                        auctionResponse = new AuctionResponse(fill[mediaId], json.media[mediaId], json.correlationId);
+                        auctionResponse = new AuctionResponse(fill[mediaId], json.media[mediaId], mediaId, json.correlationId);
                         promises.push(this.handleCampaign(auctionResponse, session).catch(error => {
                             if(error === CacheStatus.STOPPED) {
                                 return Promise.resolve();
@@ -300,6 +301,10 @@ export class CampaignManager {
             for(const placement of response.getPlacements()) {
                 SdkStats.setParseDuration(placement, parseDuration);
             }
+
+            campaign.setMediaId(response.getMediaId());
+            campaign.setRawMedia(response.getRawData());
+
             return this.setupCampaignAssets(response.getPlacements(), campaign);
         });
     }
@@ -488,7 +493,13 @@ export class CampaignManager {
                         realtime: realtimePlacement.isRealtime()
                     };
 
-                    // todo: media
+                    const campaign = realtimePlacement.getCurrentCampaign();
+
+                    if(campaign && !(campaign instanceof RealtimeCampaign)) {
+                        const media = campaign.getRawMedia();
+                        delete media.content;
+                        body.media[campaign.getMediaId()] = media;
+                    }
                 } else {
                     const placements = this._configuration.getPlacements();
                     for(const placement in placements) {

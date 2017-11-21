@@ -8,7 +8,8 @@ describe('AuctionResponse', () => {
     describe('when created with response json', () => {
         it('should have correct data from the json', () => {
             const json: any = JSON.parse(OnProgrammaticMraidPlcCampaign);
-            const campaignObject: any = json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'];
+            const mediaId: string = 'UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85';
+            const campaignObject: any = json.media[mediaId];
             const correlationId = json.correlationId;
             const placements: string[] = [];
 
@@ -18,7 +19,7 @@ describe('AuctionResponse', () => {
                 }
             }
 
-            const auctionResponse = new AuctionResponse(placements, campaignObject, correlationId);
+            const auctionResponse = new AuctionResponse(placements, campaignObject, mediaId, correlationId);
             assert.equal(auctionResponse.getPlacements(), placements, 'Placements not what was expected');
             assert.equal(auctionResponse.getContentType(), campaignObject.contentType, 'ContentType not what was expected');
             assert.equal(auctionResponse.getContent(), campaignObject.content, 'Content not what was expected');
