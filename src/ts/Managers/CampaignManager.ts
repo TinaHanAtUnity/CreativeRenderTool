@@ -144,8 +144,6 @@ export class CampaignManager {
         return Promise.all([this.createRequestUrl(session, true), this.createRequestBody(false, placement)]).then(([requestUrl, requestBody]) => {
             this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
             const body = JSON.stringify(requestBody);
-            SdkStats.setAdRequestTimestamp();
-            const requestTimestamp: number = Date.now();
             return Promise.resolve().then((): Promise<INativeResponse> => {
                 if(CampaignManager.CampaignResponse) {
                     return Promise.resolve({
@@ -163,9 +161,7 @@ export class CampaignManager {
                 });
             }).then(response => {
                 if(response) {
-                    SdkStats.setAdRequestDuration(Date.now() - requestTimestamp);
-                    SdkStats.increaseAdRequestOrdinal();
-                    session.setAdPlan(response.response);
+                    // todo: set realtime ad plan to session
                     return this.parseCampaigns(response, session);
                 }
                 throw new WebViewError('Empty campaign response', 'CampaignRequestError');
