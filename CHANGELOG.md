@@ -1,3 +1,10 @@
+# Pending
+
+* Stop AB test in groups 8 & 9 - set new end screen to the whole network
+* AB test persistent overlay in groups 10 & 11 and enable for selected games
+* Add local_time_offset to appRunning analytics events
+* Experimental APK redirect feature
+
 # Wed Nov 22 10:28:21 UTC 2017
 
 * Add loading error diagnostic to MOAT integration
