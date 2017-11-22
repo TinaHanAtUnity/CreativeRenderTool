@@ -1,4 +1,4 @@
-# Pending
+# Wed Nov 22 10:28:21 UTC 2017
 
 * Add loading error diagnostic to MOAT integration
 * Minor iPhone X layout tweaks
