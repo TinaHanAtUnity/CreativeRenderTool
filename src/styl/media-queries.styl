@@ -68,9 +68,9 @@
     html {
       font-size: $default-px-size * 1.25;
 
-      #new-end-screen {
+      #end-screen {
         .btn-close-region {
-          top: $default-size * .5;
+          top: $default-size;
           right: $default-size * .5;
         }
 
@@ -78,15 +78,55 @@
           bottom: $default-size * .5;
         }
       }
+
+      #overlay {
+        .skip {
+          top: $default-size * 1.5;
+        }
+
+        .progress {
+          top: $default-size * 1.5;
+        }
+      }
+
+      #interstitial-overlay {
+        .close-region {
+          top: $default-size * 1.5;
+        }
+      }
+
+      #mraid {
+        .close-region {
+          top: $default-size * 1.5;
+        }
+      }
+
+      #playable-mraid {
+        top: $default-size * 1.5;
+      }
+
+      #display-interstitial {
+        .close-region {
+          top: $default-size * 1.5;
+        }
+      }
     }
 
     body {
-      &.portrait #new-end-screen {
+      &.portrait #end-screen {
         .privacy-button {
           bottom: $default-size * .5;
           left: $default-size * .5;
         }
       }
+    }
+
+    .slide-up {
+      slide-animation(.4s, ease-in, -200%);
+    }
+
+    .slide-down {
+      slide-animation(.4s, ease-in, 200%);
     }
   }
 
@@ -112,7 +152,7 @@
     html {
       font-size: $default-px-size * 1.25;
 
-      #new-end-screen {
+      #end-screen {
         .btn-close-region {
           top: $default-size * .5;
           right: $default-size * .5;

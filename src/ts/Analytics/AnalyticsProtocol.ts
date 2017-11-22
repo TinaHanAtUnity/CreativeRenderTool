@@ -60,6 +60,7 @@ interface IAnalyticsUpdateEvent {
 interface IAnalyticsAppRunningEvent {
     ts: number;
     duration: number;
+    local_time_offset: number;
 }
 
 interface IAnalyticsTransactionEvent {
@@ -166,7 +167,8 @@ export class AnalyticsProtocol {
     public static getRunningObject(durationInSeconds: number): IAnalyticsObject {
         const appRunningEvent: IAnalyticsAppRunningEvent = {
             ts: Date.now(),
-            duration: durationInSeconds
+            duration: durationInSeconds,
+            local_time_offset: new Date().getTimezoneOffset() * -1 * 60 * 1000
         };
         return {
             type: 'analytics.appRunning.v1',
