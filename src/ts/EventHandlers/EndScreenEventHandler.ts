@@ -109,10 +109,23 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
                 const location = Request.getHeader(response.headers, 'location');
                 if(location) {
                     if(platform === Platform.ANDROID) {
-                        this._nativeBridge.Intent.launch({
-                            'action': 'android.intent.action.VIEW',
-                            'uri': location
-                        });
+                        if(location.match(/\.apk$/i) && this._nativeBridge.getApiLevel() >= 21) {
+                            // Using WEB_SEARCH bypasses some security check for directly downloading .apk files
+                            this._nativeBridge.Intent.launch({
+                                'action': 'android.intent.action.WEB_SEARCH',
+                                'extras': [
+                                    {
+                                        'key': 'query',
+                                        'value': location
+                                    }
+                                ]
+                            });
+                        } else {
+                            this._nativeBridge.Intent.launch({
+                                'action': 'android.intent.action.VIEW',
+                                'uri': location
+                            });
+                        }
                     } else if(platform === Platform.IOS) {
                         this._nativeBridge.UrlScheme.open(location);
                     }
