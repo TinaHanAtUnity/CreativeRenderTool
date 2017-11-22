@@ -109,7 +109,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
                 const location = Request.getHeader(response.headers, 'location');
                 if(location) {
                     if(platform === Platform.ANDROID) {
-                        if(location.match(/\.apk$/i)) {
+                        if(location.match(/\.apk$/i) && this._nativeBridge.getApiLevel() >= 21) {
                             // Using WEB_SEARCH bypasses some security check for directly downloading .apk files
                             this._nativeBridge.Intent.launch({
                                 'action': 'android.intent.action.WEB_SEARCH',
