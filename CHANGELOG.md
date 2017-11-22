@@ -1,3 +1,16 @@
+# Wed Nov 22 10:28:21 UTC 2017
+
+* Add loading error diagnostic to MOAT integration
+* Minor iPhone X layout tweaks
+* Minor adjustments to the analytics protocol
+
+# Mon Nov 20 09:36:12 UTC 2017
+
+* Change use of advertiser bundleID to game bundleID for MOAT
+* Use more aggressive retrying in A/B group 5
+* Remove operative event diagnostics & fix click attribution after first click
+* Remove interstitial overlay ab test in groups 12 & 13
+
 # Thu Nov 16 13:37:39 UTC 2017
 
 * Upgrade to TS 2.6 & upgrade all other dependencies

@@ -253,7 +253,6 @@ export class Request {
                 } else {
                     this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
                 }
-
             } else {
                 this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
             }
@@ -265,7 +264,7 @@ export class Request {
     }
 
     private followRedirects(location: string) {
-        if(location.match(/^https?/i) && !location.match(/^https:\/\/itunes\.apple\.com/i)) {
+        if(location.match(/^https?/i) && !location.match(/^https:\/\/itunes\.apple\.com/i) && !location.match(/\.apk$/i)) {
             return true;
         } else {
             return false;

@@ -47,6 +47,7 @@ import { PerformanceEndScreenEventHandler } from 'EventHandlers/PerformanceEndSc
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { InterstitialOverlay } from 'Views/InterstitialOverlay';
 import { AbstractOverlay } from 'Views/AbstractOverlay';
+import { ABTest } from 'Utilities/ABTest';
 
 export class AdUnitFactory {
 
@@ -145,7 +146,7 @@ export class AdUnitFactory {
             level1: campaign.getAdvertiserDomain(),
             level2: campaign.getAdvertiserCampaignId(),
             level3: campaign.getCreativeId(),
-            slicer1: campaign.getAdvertiserBundleId(),
+            slicer1: parameters.clientInfo.getApplicationName(),
             slicer2: parameters.placement.getName()
         };
 
@@ -389,6 +390,8 @@ export class AdUnitFactory {
         if(!parameters.placement.allowSkip()) {
             return new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         } else {
+            let overlay: AbstractOverlay;
+
             // Scopely's game IDs
             const enabledGameIds = ['15334',
                 '15333',
@@ -409,12 +412,15 @@ export class AdUnitFactory {
                 '1495013'];
 
             if(enabledGameIds.indexOf(parameters.clientInfo.getGameId()) !== -1) {
-                return new InterstitialOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
-            } else if(parameters.campaign.getAbGroup() === 12 || parameters.campaign.getAbGroup() === 13) {
-                return new InterstitialOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+                overlay = new InterstitialOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
             } else {
-                return new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+                overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
             }
+
+            if(ABTest.isInterstitialFadeTest(parameters.campaign.getAbGroup(), parameters.clientInfo.getGameId())) {
+                overlay.setFadeEnabled(false);
+            }
+            return overlay;
         }
     }
 }
