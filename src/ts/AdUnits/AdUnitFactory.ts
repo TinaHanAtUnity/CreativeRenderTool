@@ -46,6 +46,7 @@ import { MRAIDEndScreenEventHandler } from 'EventHandlers/MRAIDEndScreenEventHan
 import { PerformanceEndScreenEventHandler } from 'EventHandlers/PerformanceEndScreenEventHandler';
 import { InterstitialOverlay } from 'Views/InterstitialOverlay';
 import { AbstractOverlay } from 'Views/AbstractOverlay';
+import { ABTest } from 'Utilities/ABTest';
 
 export class AdUnitFactory {
 
@@ -388,6 +389,8 @@ export class AdUnitFactory {
         if(!parameters.placement.allowSkip()) {
             return new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         } else {
+            let overlay: AbstractOverlay;
+
             // Scopely's game IDs
             const enabledGameIds = ['15334',
                 '15333',
@@ -408,10 +411,15 @@ export class AdUnitFactory {
                 '1495013'];
 
             if(enabledGameIds.indexOf(parameters.clientInfo.getGameId()) !== -1) {
-                return new InterstitialOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+                overlay = new InterstitialOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
             } else {
-                return new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+                overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
             }
+
+            if(ABTest.isInterstitialFadeTest(parameters.campaign.getAbGroup(), parameters.clientInfo.getGameId())) {
+                overlay.setFadeEnabled(false);
+            }
+            return overlay;
         }
     }
 }
