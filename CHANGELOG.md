@@ -1,4 +1,4 @@
-# Pending
+# Thu Nov 23 10:20:20 UTC 2017
 
 * Stop AB test in groups 8 & 9 - set new end screen to the whole network
 * AB test persistent overlay in groups 10 & 11 and enable for selected games
