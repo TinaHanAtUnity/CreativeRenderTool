@@ -38,6 +38,7 @@ import { StorageType } from 'Native/Api/Storage';
 import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { SdkStats } from 'Utilities/SdkStats';
+import { Campaign } from 'Models/Campaign';
 
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
@@ -252,9 +253,28 @@ export class WebView {
         }
 
         if(placement.isRealtime()) {
-            this._campaignManager.requestRealtime(placement, campaign.getSession());
+            this._nativeBridge.Sdk.logInfo('Unity Ads is requesting realtime fill for placement ' + placement.getId());
+            this._campaignManager.requestRealtime(placement, campaign.getSession()).then(realtimeCampaign => {
+                if(realtimeCampaign) {
+                    this._nativeBridge.Sdk.logInfo('Unity Ads received new fill for placement ' + placement.getId() + ', streaming new ad unit');
+                    placement.setCurrentCampaign(realtimeCampaign);
+                    this.showAd(placement, realtimeCampaign, options);
+                } else {
+                    this._nativeBridge.Sdk.logInfo('Unity Ads received no new fill for placement ' + placement.getId() + ', opening old ad unit');
+                    this.showAd(placement, campaign, options);
+                    // todo: never show RealtimeCampaigns
+                }
+            }).catch(() => {
+                this._nativeBridge.Sdk.logInfo('Unity Ads realtime fill request for placement ' + placement.getId() + ' failed, opening old ad unit');
+                this.showAd(placement, campaign, options);
+                // todo: never show RealtimeCampaigns
+            });
+        } else {
+            this.showAd(placement, campaign, options);
         }
+    }
 
+    private showAd(placement: Placement, campaign: Campaign, options: any) {
         this._showing = true;
 
         this.shouldReinitialize().then((reinitialize) => {
@@ -273,7 +293,7 @@ export class WebView {
         ]).then(([screenWidth, screenHeight, connectionType]) => {
             if(campaign.isConnectionNeeded() && connectionType === 'none') {
                 this._showing = false;
-                this.showError(true, placementId, 'No connection');
+                this.showError(true, placement.getId(), 'No connection');
 
                 const error = new DiagnosticError(new Error('No connection is available'), {
                     id: campaign.getId(),
@@ -318,7 +338,7 @@ export class WebView {
             }
 
             this._operativeEventManager.setPreviousPlacementId(this._campaignManager.getPreviousPlacementId());
-            this._campaignManager.setPreviousPlacementId(placementId);
+            this._campaignManager.setPreviousPlacementId(placement.getId());
             this._currentAdUnit.show();
         });
     }

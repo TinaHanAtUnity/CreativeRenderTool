@@ -138,38 +138,21 @@ export class CampaignManager {
         });
     }
 
-    public requestRealtime(placement: Placement, session: Session): Promise<INativeResponse | void> {
-        this._requesting = true;
-
+    public requestRealtime(placement: Placement, session: Session): Promise<Campaign | void> {
         return Promise.all([this.createRequestUrl(session, true), this.createRequestBody(false, placement)]).then(([requestUrl, requestBody]) => {
-            this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
+            this._nativeBridge.Sdk.logInfo('Requesting realtime ad plan from ' + requestUrl);
             const body = JSON.stringify(requestBody);
-            return Promise.resolve().then((): Promise<INativeResponse> => {
-                if(CampaignManager.CampaignResponse) {
-                    return Promise.resolve({
-                        url: requestUrl,
-                        response: CampaignManager.CampaignResponse,
-                        responseCode: 200,
-                        headers: []
-                    });
-                }
-                return this._request.post(requestUrl, body, [], {
-                    retries: 2,
-                    retryDelay: 10000,
-                    followRedirects: false,
-                    retryWithConnectionEvents: true
-                });
+            // todo: set short timeouts
+            return this._request.post(requestUrl, body, [], {
+                retries: 0,
+                retryDelay: 0,
+                followRedirects: false,
+                retryWithConnectionEvents: false
             }).then(response => {
                 if(response) {
-                    // todo: set realtime ad plan to session
-                    return this.parseCampaigns(response, session);
+                    return this.parseRealtimeCampaign(response, session, placement);
                 }
-                throw new WebViewError('Empty campaign response', 'CampaignRequestError');
-            }).then(() => {
-                this._requesting = false;
-            }).catch((error) => {
-                this._requesting = false;
-                return this.handleError(error, this._configuration.getPlacementIds(), session);
+                throw new WebViewError('Empty realtime campaign response', 'CampaignRequestError');
             });
         });
     }
@@ -262,34 +245,34 @@ export class CampaignManager {
         }
     }
 
+    private parseRealtimeCampaign(response: INativeResponse, session: Session, placement: Placement): Promise<Campaign | void> {
+        const json = JsonParser.parse(response.response);
+
+        if('placements' in json) {
+            const mediaId: string = json.placements[placement.getId()];
+
+            if(mediaId) {
+                const oldCampaign = placement.getCurrentCampaign();
+
+                if(oldCampaign && oldCampaign.getMediaId() === mediaId) {
+                    // todo: update tracking urls for old campaign
+                    return Promise.resolve(oldCampaign);
+                }
+
+                const auctionResponse = new AuctionResponse([placement.getId()], json.media[mediaId], mediaId, json.correlationId);
+
+                return this.handleRealtimeCampaign(auctionResponse, session);
+            } else {
+                return Promise.resolve(); // no fill
+            }
+        } else {
+            throw Error('No placements found');
+        }
+    }
+
     private handleCampaign(response: AuctionResponse, session: Session): Promise<void> {
         this._nativeBridge.Sdk.logDebug('Parsing campaign ' + response.getContentType() + ': ' + response.getContent());
-        let parser: CampaignParser;
-
-        switch (response.getContentType()) {
-            case 'comet/campaign':
-                parser = new CometCampaignParser();
-                break;
-            case 'programmatic/vast':
-                parser = new ProgrammaticVastParser();
-                break;
-            case 'programmatic/mraid-url':
-                parser = new ProgrammaticMraidUrlParser();
-                break;
-            case 'programmatic/mraid':
-                parser = new ProgrammaticMraidParser();
-                break;
-            case 'programmatic/static-interstitial':
-                parser = new ProgrammaticStaticInterstitialParser();
-                break;
-            case 'programmatic/vast-vpaid':
-                // vast-vpaid can be both VPAID or VAST, so in this case we use the VAST parser
-                // which can parse both.
-                parser = new ProgrammaticVPAIDParser();
-                break;
-            default:
-                throw new Error('Unsupported content-type: ' + response.getContentType());
-        }
+        const parser: CampaignParser = this.getCampaignParser(response.getContentType());
 
         const parseTimestamp = Date.now();
         return parser.parse(this._nativeBridge, this._request, response, session, this._configuration.getGamerId(), this.getAbGroup()).then((campaign) => {
@@ -311,6 +294,40 @@ export class CampaignManager {
                 this.onCampaign.trigger(placement, campaign);
             }
         });
+    }
+
+    private handleRealtimeCampaign(response: AuctionResponse, session: Session): Promise<Campaign> {
+        this._nativeBridge.Sdk.logDebug('Parsing campaign ' + response.getContentType() + ': ' + response.getContent());
+
+        const parser: CampaignParser = this.getCampaignParser(response.getContentType());
+
+        return parser.parse(this._nativeBridge, this._request, response, session, this._configuration.getGamerId(), this.getAbGroup()).then((campaign) => {
+            campaign.setMediaId(response.getMediaId());
+            campaign.setRawMedia(response.getRawData());
+
+            return campaign;
+        });
+    }
+
+    private getCampaignParser(contentType: string): CampaignParser {
+        switch(contentType) {
+            case 'comet/campaign':
+                return new CometCampaignParser();
+            case 'programmatic/vast':
+                return new ProgrammaticVastParser();
+            case 'programmatic/mraid-url':
+                return new ProgrammaticMraidUrlParser();
+            case 'programmatic/mraid':
+                return new ProgrammaticMraidParser();
+            case 'programmatic/static-interstitial':
+                return new ProgrammaticStaticInterstitialParser();
+            case 'programmatic/vast-vpaid':
+                // vast-vpaid can be both VPAID or VAST, so in this case we use the VAST parser
+                // which can parse both.
+                return new ProgrammaticVPAIDParser();
+            default:
+                throw new Error('Unsupported content-type: ' + contentType);
+        }
     }
 
     private handleNoFill(placement: string, session: Session): Promise<void> {
@@ -494,7 +511,9 @@ export class CampaignManager {
                     if(campaign && !(campaign instanceof RealtimeCampaign)) {
                         const media = campaign.getRawMedia();
                         delete media.content;
-                        body.media[campaign.getMediaId()] = media;
+                        const mediaObject: any = {};
+                        mediaObject[campaign.getMediaId()] = media;
+                        body.media = mediaObject;
                     }
                 } else {
                     const placements = this._configuration.getPlacements();
