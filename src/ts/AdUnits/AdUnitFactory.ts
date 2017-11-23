@@ -47,6 +47,7 @@ import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 import { MRAIDEndScreen } from 'Views/MRAIDEndScreen';
 import { MRAIDEndScreenEventHandler } from 'EventHandlers/MRAIDEndScreenEventHandler';
 import { PerformanceEndScreenEventHandler } from 'EventHandlers/PerformanceEndScreenEventHandler';
+import { AdMobEventHandler } from 'EventHandlers/AdmobEventHandler';
 
 export class AdUnitFactory {
 
@@ -394,8 +395,13 @@ export class AdUnitFactory {
             ... parameters,
             view: view
         };
+        const adUnit = new AdMobAdUnit(nativeBridge, adUnitParameters);
 
-        const programmaticAdUnit = new AdMobAdUnit(nativeBridge, adUnitParameters);
-        return programmaticAdUnit;
+        const eventHandler = new AdMobEventHandler({
+            nativeBridge, adUnit
+        });
+        view.addEventHandler(eventHandler);
+
+        return adUnit;
     }
 }
