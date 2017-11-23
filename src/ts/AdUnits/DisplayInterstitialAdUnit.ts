@@ -9,6 +9,8 @@ import { Platform } from 'Constants/Platform';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { ViewConfiguration } from "./Containers/AdUnitContainer";
 import { DeviceInfo } from 'Models/DeviceInfo';
+import { DiagnosticError } from 'Errors/DiagnosticError';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export interface IDisplayInterstitialAdUnitParameters extends IAdUnitParameters<DisplayInterstitialCampaign> {
     view: DisplayInterstitial;
@@ -169,13 +171,21 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
     }
 
     private setWebPlayerUrl(url: string): Promise<void> {
-        // TODO: prepare for exception if the view for webplayer does not exist and handle gracefully
-        return this._nativeBridge.WebPlayer.setUrl(url);
+        return this._nativeBridge.WebPlayer.setUrl(url).catch( (error) => {
+            this._nativeBridge.Sdk.logError(JSON.stringify(error));
+            Diagnostics.trigger('webplayer_set_url_error', new DiagnosticError(error, { url: url}));
+            this.setFinishState(FinishState.ERROR);
+            this.hide();
+        });
     }
 
     private setWebPlayerData(data: string, mimeType: string, encoding: string): Promise<void> {
-        // TODO: prepare for exception if the view for webplayer does not exist and handle gracefully
-        return this._nativeBridge.WebPlayer.setData(data, mimeType, encoding);
+        return this._nativeBridge.WebPlayer.setData(data, mimeType, encoding).catch( (error) => {
+            this._nativeBridge.Sdk.logError(JSON.stringify(error));
+            Diagnostics.trigger('webplayer_set_data_error', new DiagnosticError(error, {data: data, mimeType: mimeType, encoding: encoding}));
+            this.setFinishState(FinishState.ERROR);
+            this.hide();
+        });
     }
 
     private setWebPlayerContent(): Promise<void> {
