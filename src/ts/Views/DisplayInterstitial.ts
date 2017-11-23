@@ -71,7 +71,7 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
 
         window.addEventListener('message', this._messageListener);
 
-        const closeLength = 30;
+        const closeLength = 5;
 
         if(this._placement.allowSkip()) {
             const skipLength = this._placement.allowSkipInSeconds();

@@ -68,14 +68,16 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
         this._container.onSystemKill.unsubscribe(this._onSystemKillObserver);
 
         this._view.hide();
-
         this.onFinish.trigger();
+
         this._view.container().parentElement!.removeChild(this._view.container());
         this.unsetReferences();
 
         this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
         return this.setWebPlayerUrl("").then(() => {
-            return this._container.close();
+            return this._container.close().then( () => {
+                this.onClose.trigger();
+            });
         });
     }
 
