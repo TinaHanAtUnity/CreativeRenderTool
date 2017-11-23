@@ -39,6 +39,7 @@ import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { SdkStats } from 'Utilities/SdkStats';
 import { Campaign } from 'Models/Campaign';
+import { RealtimeCampaign } from 'Models/Campaigns/RealtimeCampaign';
 
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
@@ -260,14 +261,20 @@ export class WebView {
                     placement.setCurrentCampaign(realtimeCampaign);
                     this.showAd(placement, realtimeCampaign, options);
                 } else {
-                    this._nativeBridge.Sdk.logInfo('Unity Ads received no new fill for placement ' + placement.getId() + ', opening old ad unit');
-                    this.showAd(placement, campaign, options);
-                    // todo: never show RealtimeCampaigns
+                    if(campaign instanceof RealtimeCampaign) {
+                        this.showError(true, placement.getId(), 'No fill for realtime placement');
+                    } else {
+                        this._nativeBridge.Sdk.logInfo('Unity Ads received no new fill for placement ' + placement.getId() + ', opening old ad unit');
+                        this.showAd(placement, campaign, options);
+                    }
                 }
             }).catch(() => {
-                this._nativeBridge.Sdk.logInfo('Unity Ads realtime fill request for placement ' + placement.getId() + ' failed, opening old ad unit');
-                this.showAd(placement, campaign, options);
-                // todo: never show RealtimeCampaigns
+                if(campaign instanceof RealtimeCampaign) {
+                    this.showError(true, placement.getId(), 'No fill for realtime placement');
+                } else {
+                    this._nativeBridge.Sdk.logInfo('Unity Ads realtime fill request for placement ' + placement.getId() + ' failed, opening old ad unit');
+                    this.showAd(placement, campaign, options);
+                }
             });
         } else {
             this.showAd(placement, campaign, options);
