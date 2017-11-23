@@ -28,7 +28,7 @@ import EventTestVast from 'xml/EventTestVast.xml';
 export class TestFixtures {
     public static getDisplayInterstitialCampaign(): DisplayInterstitialCampaign {
         const json = JSON.parse(DummyDisplayInterstitialCampaign);
-        return new DisplayInterstitialCampaign(json.display.markup, this.getSession(), json.gamerId, json.abGroup, undefined, json.display.tracking, json.display.clickThroughURL);
+        return new DisplayInterstitialCampaign(json.display.markup, json.display.markupUrl, this.getSession(), json.gamerId, json.abGroup, undefined, json.display.tracking, json.display.clickThroughURL);
     }
 
     public static getPlacement(): Placement {

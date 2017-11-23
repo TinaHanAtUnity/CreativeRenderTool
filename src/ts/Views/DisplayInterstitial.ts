@@ -26,7 +26,6 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
     private _canSkip = false;
     private _didReward = false;
     private _webPlayerPrepared = false;
-    private _markup: string;
 
     private _messageListener: EventListener;
     private _timers: number[] = [];
@@ -49,6 +48,10 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
         ];
     }
 
+    public getContentHtml(): string {
+        return DisplayContainer.replace('<body></body>', '<body>' + this._campaign.getDynamicMarkup() + '</body>');
+    }
+
     public render() {
         super.render();
 
@@ -60,26 +63,12 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
             clickCatcher.addEventListener('click', (e: Event) => this.onIFrameClicked(e));
         }
 
-        this._markup = this._campaign.getDynamicMarkup();
-
         this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
     }
 
     public show(): void {
         super.show();
-/*
-        let webPlayerContent: Promise<void>;
-        if (this._campaign.getClickThroughUrl()) {
-            webPlayerContent = this.setWebPlayerData(this._markup, 'text/html', 'UTF-8');
-        } else {
-            const content = DisplayContainer.replace('<body></body>', '<body>' + this._markup + '</body>');
-            webPlayerContent = this.setWebPlayerData(content, 'text/html', 'UTF-8');
-        }
-        webPlayerContent.then(() => {
-            this._webPlayerPrepared = true;
-        });
 
-        */
         window.addEventListener('message', this._messageListener);
 
         const closeLength = 30;

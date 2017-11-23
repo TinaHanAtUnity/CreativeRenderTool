@@ -41,6 +41,8 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
 
     public show(): Promise<void> {
         this.setShowing(true);
+        const onShowObserver = this._container.onShow.subscribe(() => this.onShow);
+
         return this.setWebPlayerViews().then( () => {
             this._view.show();
             this.onStart.trigger();
@@ -52,11 +54,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
 
             // Display ads are always completed.
             this.setFinishState(FinishState.COMPLETED);
-            this._nativeBridge.Sdk.logDebug("MBNET will be set");
-            return this.setWebPlayerUrl("https://mbnet.fi").then( () => {
-                this._nativeBridge.Sdk.logDebug("MBNET should be loading!");
-            });
-
+            return Promise.resolve();
         });
     }
 
@@ -76,8 +74,9 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
         this.unsetReferences();
 
         this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
-
-        return this._container.close();
+        return this.setWebPlayerUrl("").then(() => {
+            return this._container.close();
+        });
     }
 
     public isCached(): boolean {
@@ -126,6 +125,22 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
                 this.hide();
             }, AbstractAdUnit.getAutoCloseDelay());
         }
+        Promise.all([
+            this._deviceInfo.getScreenWidth(),
+            this._deviceInfo.getScreenHeight()
+        ]).then(([screenWidth, screenHeight]) => {
+            const closeAreaSizePercent = 0.1;
+            const webviewXSize = screenWidth * closeAreaSizePercent;
+            const webviewYSize = screenHeight * closeAreaSizePercent;
+            const webviewXPos = screenWidth - webviewXSize;
+            const webviewYPos = 0;
+            // TODO: do we want to redo this every time android resumes or not?
+            this._container.setViewFrame('webview', Math.floor(webviewXPos), Math.floor(webviewYPos), Math.floor(webviewXSize), Math.floor(webviewYSize)).then(() => {
+                return this._container.setViewFrame('webplayer', Math.floor(screenWidth), Math.floor(screenHeight), Math.floor(screenWidth), Math.floor(screenHeight)).then(() => {
+                    this.setWebPlayerContent();
+                })
+            });
+        });
     }
 
     private onSystemKill(): void {
@@ -148,43 +163,24 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
     }
 
     private setWebPlayerViews(): Promise<void> {
-        return Promise.all([
-            this._deviceInfo.getScreenWidth(),
-            this._deviceInfo.getScreenHeight()
-        ]).then(([screenWidth, screenHeight]) => {
-            const closeAreaSizePercent = 0.1;
-            const webviewXSize = screenWidth * closeAreaSizePercent;
-            const webviewYSize = screenHeight * closeAreaSizePercent;
-            const webviewXPos = screenWidth - webviewXSize;
-            const webviewYPos = 0;
-            return this._container.open(this, ['webplayer', 'webview'], false, this._forceOrientation, true, false, true, false, this._options).then( () => {
-                const onShowObserver = this._container.onShow.subscribe(() => {
-                    return this._container.setViewFrame('webview', Math.floor(webviewXPos), Math.floor(webviewYPos), Math.floor(webviewXSize), Math.floor(webviewYSize)).then(() => {
-                        return this._container.setViewFrame('webplayer', Math.floor(screenWidth), Math.floor(screenHeight), Math.floor(screenWidth), Math.floor(screenHeight)).then(() => {
-                            this._container.onShow.unsubscribe(onShowObserver);
-                        });
-                    });
-                });
-            });
-        });
+        return this._container.open(this, ['webplayer', 'webview'], false, this._forceOrientation, true, false, true, false, this._options);
     }
-
 
     private setWebPlayerUrl(url: string): Promise<void> {
         // TODO: prepare for exception if the view for webplayer does not exist and handle gracefully
-        if(this._nativeBridge.getPlatform() === Platform.IOS) {
-            return this._nativeBridge.IosAdUnit.setWebPlayerUrl(url);
-        } else {
-            return this._nativeBridge.AndroidAdUnit.setWebPlayerUrl(url);
-        }
+        return this._nativeBridge.WebPlayer.setUrl(url);
     }
 
     private setWebPlayerData(data: string, mimeType: string, encoding: string): Promise<void> {
         // TODO: prepare for exception if the view for webplayer does not exist and handle gracefully
-        if(this._nativeBridge.getPlatform() === Platform.IOS) {
-            return this._nativeBridge.IosAdUnit.setWebPlayerData(data, mimeType, encoding);
-        } else {
-            return this._nativeBridge.AndroidAdUnit.setWebPlayerData(data, mimeType, encoding);
+        return this._nativeBridge.WebPlayer.setData(data, mimeType, encoding);
+    }
+
+    private setWebPlayerContent(): Promise<void> {
+        const markupUrl = this._campaign.getMarkupUrl();
+        if (markupUrl) {
+            return this.setWebPlayerUrl(markupUrl);
         }
+        return this.setWebPlayerData(this._view.getContentHtml(), 'text/html', 'UTF-8');
     }
 }

@@ -12,13 +12,14 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
         const jsonDisplay = JsonParser.parse(response.getContent());
 
-        if(!jsonDisplay.markup) {
+        if(!jsonDisplay.markup && !jsonDisplay.markupUrl) {
             throw new DiagnosticError(
-                new Error('No markup for programmatic/static-interstitial'),
+                new Error('No markup or markupUrl for programmatic/static-interstitial'),
                 {json: jsonDisplay}
             );
         }
         const displayMarkup = decodeURIComponent(jsonDisplay.markup);
+        const displayMarkupUrl = decodeURIComponent(jsonDisplay.markupUrl);
         if(!jsonDisplay.clickThroughURL) {
             throw new DiagnosticError(
                 new Error('No clickThroughURL for programmatic/static-interstitial'),
@@ -27,6 +28,6 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
         }
 
         const clickThroughUrl = jsonDisplay.clickThroughURL;
-        return Promise.resolve(new DisplayInterstitialCampaign(displayMarkup, session, gamerId, abGroup, response.getCacheTTL(), response.getTrackingUrls(), clickThroughUrl, response.getAdType(), response.getCreativeId(), response.getSeatId(), response.getCorrelationId()));
+        return Promise.resolve(new DisplayInterstitialCampaign(displayMarkup, displayMarkupUrl, session, gamerId, abGroup, response.getCacheTTL(), response.getTrackingUrls(), clickThroughUrl, response.getAdType(), response.getCreativeId(), response.getSeatId(), response.getCorrelationId()));
     }
 }

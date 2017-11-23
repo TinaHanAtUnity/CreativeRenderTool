@@ -91,18 +91,6 @@ export class AndroidAdUnitApi extends NativeApi {
         return this._nativeBridge.invoke<number[]>(this._apiClass, 'getViewFrame', [view]);
     }
 
-    public setWebPlayerUrl(url: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setWebPlayerUrl', [url]);
-    }
-
-    public setWebPlayerData(data: string, mimeType: string, encoding: string) {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setWebPlayerData', [data, mimeType, encoding]);
-    }
-
-    public setWebPlayerDataWithUrl(baseUrl: string, data: string, mimeType: string, encoding: string, historyUrl: string) {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setWebPlayerDataWithUrl', [baseUrl, data, mimeType, encoding, historyUrl]);
-    }
-
     public handleEvent(event: string, parameters: any[]): void {
         switch(event) {
             case AdUnitEvent[AdUnitEvent.ON_START]:

@@ -3,23 +3,26 @@ import { Asset } from 'Models/Assets/Asset';
 import { Session } from 'Models/Session';
 
 interface IDisplayInterstitialCampaign extends ICampaign {
-    dynamicMarkup: string;
+    dynamicMarkup: string | undefined;
     clickThroughUrl: string | undefined;
     tracking: object | undefined;
+    markupUrl: string | undefined;
 }
 
 export class DisplayInterstitialCampaign extends Campaign<IDisplayInterstitialCampaign> {
-    constructor(markup: string, session: Session, gamerId: string, abGroup: number, cacheTTL: number | undefined, tracking?: { [eventName: string]: string[] }, clickThroughUrl?: string, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
+    constructor(markup: string | undefined, markupUrl: string, session: Session, gamerId: string, abGroup: number, cacheTTL: number | undefined, tracking?: { [eventName: string]: string[] }, clickThroughUrl?: string, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
         super('DisplayInterstitialCampaign', {
             ... Campaign.Schema,
-            dynamicMarkup: ['string'],
+            dynamicMarkup: ['string', 'undefined'],
             clickThroughUrl: ['string', 'undefined'],
-            tracking: ['object', 'undefined']
+            tracking: ['object', 'undefined'],
+            markupUrl: ['string', 'undefined']
         });
         if(cacheTTL) {
             this.set('willExpireAt', Date.now() + cacheTTL * 1000);
         }
-        this.set('dynamicMarkup', markup);
+        this.set('dynamicMarkup', markup || undefined);
+        this.set('markupUrl', markupUrl || undefined);
         this.set('clickThroughUrl', clickThroughUrl || undefined);
         this.set('gamerId', gamerId);
         this.set('abGroup', abGroup);
@@ -31,8 +34,12 @@ export class DisplayInterstitialCampaign extends Campaign<IDisplayInterstitialCa
         this.set('session', session);
     }
 
-    public getDynamicMarkup(): string {
+    public getDynamicMarkup(): string | undefined {
         return this.get('dynamicMarkup');
+    }
+
+    public getMarkupUrl(): string | undefined {
+        return this.get('markupUrl');
     }
 
     public getClickThroughUrl(): string | undefined {
