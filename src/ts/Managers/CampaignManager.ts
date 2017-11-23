@@ -142,12 +142,12 @@ export class CampaignManager {
         return Promise.all([this.createRequestUrl(session, true), this.createRequestBody(false, placement)]).then(([requestUrl, requestBody]) => {
             this._nativeBridge.Sdk.logInfo('Requesting realtime ad plan from ' + requestUrl);
             const body = JSON.stringify(requestBody);
-            // todo: set short timeouts
             return this._request.post(requestUrl, body, [], {
                 retries: 0,
                 retryDelay: 0,
                 followRedirects: false,
-                retryWithConnectionEvents: false
+                retryWithConnectionEvents: false,
+                timeout: 2000
             }).then(response => {
                 if(response) {
                     return this.parseRealtimeCampaign(response, session, placement);
