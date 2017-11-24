@@ -132,11 +132,12 @@ const testPaths = getTestPaths('src/ts/Test', testFilter);
 
 if(isolated) {
     testPaths.forEach((testPath) => {
+        let env = process.env;
+        delete env.ISOLATED;
+        env.TEST_FILTER = testPath;
         exec('node test-utils/node_runner.js', {
             cwd: process.cwd(),
-            env: {
-                TEST_FILTER: testPath
-            }
+            env: env
         }, (error, stdout, stderr) => {
             console.dir(error);
             console.dir(stdout);
