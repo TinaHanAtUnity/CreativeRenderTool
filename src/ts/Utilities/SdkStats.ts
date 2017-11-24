@@ -106,6 +106,10 @@ export class SdkStats {
         SdkStats._adRequestOrdinal++;
     }
 
+    public static getAdRequestOrdinal(): number {
+        return SdkStats._adRequestOrdinal;
+    }
+
     public static setInitTimestamp(): void {
         SdkStats._initTimestamp = Date.now();
     }
