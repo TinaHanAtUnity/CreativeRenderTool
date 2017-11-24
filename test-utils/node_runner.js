@@ -8,6 +8,7 @@ const DOMParser = require('xmldom').DOMParser;
 const XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
 const LocalStorage = require('node-localstorage').LocalStorage;
 const exec = require('child_process').exec;
+const spawn = require('child_process').spawnSync;
 
 const { document } = new JSDOM('').window;
 
@@ -135,14 +136,19 @@ if(isolated) {
         let env = process.env;
         delete env.ISOLATED;
         env.TEST_FILTER = testPath;
-        exec('node test-utils/node_runner.js', {
+
+        const test = spawn('node', ['test-utils/node_runner.js'], {
             cwd: process.cwd(),
-            env: env
-        }, (error, stdout, stderr) => {
-            console.dir(error);
-            console.dir(stdout);
-            console.dir(stderr);
+            env: env,
+            stdio: 'inherit'
         });
+
+        if(test.status !== 0) {
+            if(test.error) {
+                console.error(error);
+            }
+            process.exit(test.status);
+        }
     });
 } else {
     Promise.all(sourcePaths.concat(testPaths).map((testPath) => {
