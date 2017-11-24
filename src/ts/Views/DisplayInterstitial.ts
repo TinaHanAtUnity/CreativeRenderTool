@@ -48,10 +48,6 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
         ];
     }
 
-    public getContentHtml(): string {
-        return DisplayContainer.replace('<body></body>', '<body>' + this._campaign.getDynamicMarkup() + '</body>');
-    }
-
     public render() {
         super.render();
 

@@ -138,7 +138,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
             const webviewYSize = screenHeight * closeAreaSizePercent;
             const webviewXPos = screenWidth - webviewXSize;
             const webviewYPos = 0;
-            // TODO: do we want to redo this every time android resumes or not?
+            // TODO: leave the webplayer running in background, don't reopen on return
             this._container.setViewFrame('webview', Math.floor(webviewXPos), Math.floor(webviewYPos), Math.floor(webviewXSize), Math.floor(webviewYSize)).then(() => {
                 return this._container.setViewFrame('webplayer', Math.floor(screenWidth), Math.floor(screenHeight), Math.floor(screenWidth), Math.floor(screenHeight)).then(() => {
                     this.setWebPlayerContent();
@@ -193,6 +193,14 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
         if (markupUrl) {
             return this.setWebPlayerUrl(markupUrl);
         }
-        return this.setWebPlayerData(this._view.getContentHtml(), 'text/html', 'UTF-8');
+        const markup = this._campaign.getDynamicMarkup();
+        if (markup) {
+            return this.setWebPlayerData(markup, 'text/html', 'UTF-8');
+        }
+        this._nativeBridge.Sdk.logError("Display Interstitial: Neither markupUrl or Markup was defined in campaign");
+        Diagnostics.trigger('display_interstitial_campaign_error', {markupUrl: markupUrl, markup: markup});
+        this.setFinishState(FinishState.ERROR);
+        this.hide();
+        return Promise.reject(new Error("Display Interstitial: Neither markupUrl or Markup was defined in campaign"));
     }
 }

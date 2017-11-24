@@ -18,8 +18,11 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
                 {json: jsonDisplay}
             );
         }
-        const displayMarkup = decodeURIComponent(jsonDisplay.markup);
-        const displayMarkupUrl = decodeURIComponent(jsonDisplay.markupUrl);
+        const displayMarkup = jsonDisplay.markup;
+        let displayMarkupUrl = undefined;
+        if (jsonDisplay.markupUrl){
+            displayMarkupUrl = decodeURIComponent(jsonDisplay.markupUrl);
+        }
         if(!jsonDisplay.clickThroughURL) {
             throw new DiagnosticError(
                 new Error('No clickThroughURL for programmatic/static-interstitial'),
