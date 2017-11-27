@@ -5,7 +5,12 @@
   overflow: hidden;
 
   .btn-close-region {
-    z-index: 30;
+    z-index: 100;
+  }
+
+  /* iOS 8 fix */
+  .row-container {
+    z-index: 20;
   }
 
   .campaign-container {
@@ -23,25 +28,31 @@
     }
 
     .download-container {
+      /* iOS 8 fix: position and z-index */
+      position: relative;
+      z-index: 20;
       border-radius: $default-scale-size * $default-size * 5;
-      background-color: $dark-end-card-blue;
+      background-color: darken($blue, 10%);
     }
 
     .game-background-landscape,
     .game-background-portrait {
+      position: relative;
       top: 5%;
-      margin: 0 auto;
       border-radius: .2rem;
       box-shadow: 0 0 100px 5px rgba(0, 0, 0, .75);
     }
 
     .game-background-landscape {
+      /* iOS8 fix: right and margin */
+      right: 2.5%;
+      margin-left: 5%;
       width: 45%;
       height: 90%;
     }
 
     .game-background-portrait {
-      position: relative;
+      margin: 0 auto;
       width: 90%;
     }
 
@@ -52,8 +63,8 @@
     .underlay {
       position: absolute;
       z-index: 5;
-      width: 100vw;
-      height: 100vh;
+      width: 100%;
+      height: 100%;
       filter: brightness(100%) blur(20px);
       background-position: center;
       background-size: cover;
