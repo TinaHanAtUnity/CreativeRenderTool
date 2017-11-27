@@ -1,3 +1,8 @@
+# Pending
+
+* Disable nofill retrying test in AB group 5
+* Use % for endscreen width and height instead of vh and vw due to ios7 partial support
+
 # Mon Nov 27 09:52:53 UTC 2017
 
 * Add ad request ordinal to session_start_failed diagnostic message
