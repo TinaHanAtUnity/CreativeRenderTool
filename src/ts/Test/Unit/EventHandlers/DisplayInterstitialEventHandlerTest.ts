@@ -45,7 +45,7 @@ describe('DisplayInterstitialEventHandler', () => {
             muteVideo: false
         });
 
-        campaign = new DisplayInterstitialCampaign(json.display.markup, json.display.markupUrl, TestFixtures.getSession(), json.gamerId, json.abGroup, undefined);
+        campaign = new DisplayInterstitialCampaign(json.display.markup, json.display.markupUrl, json.display.markupBaseUrl, TestFixtures.getSession(), json.gamerId, json.abGroup, undefined);
         view = new DisplayInterstitial(nativeBridge, placement, campaign);
 
         sandbox.stub(nativeBridge, 'getApiLevel').returns(16);

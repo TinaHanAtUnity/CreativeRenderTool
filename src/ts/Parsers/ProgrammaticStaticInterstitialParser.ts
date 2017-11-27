@@ -19,10 +19,12 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
             );
         }
         const displayMarkup = jsonDisplay.markup;
+        const displayMarkupBaseUrl = jsonDisplay.markupBaseUrl;
         let displayMarkupUrl = undefined;
-        if (jsonDisplay.markupUrl){
+        if (jsonDisplay.markupUrl) {
             displayMarkupUrl = decodeURIComponent(jsonDisplay.markupUrl);
         }
+
         if(!jsonDisplay.clickThroughURL) {
             throw new DiagnosticError(
                 new Error('No clickThroughURL for programmatic/static-interstitial'),
@@ -31,6 +33,6 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
         }
 
         const clickThroughUrl = jsonDisplay.clickThroughURL;
-        return Promise.resolve(new DisplayInterstitialCampaign(displayMarkup, displayMarkupUrl, session, gamerId, abGroup, response.getCacheTTL(), response.getTrackingUrls(), clickThroughUrl, response.getAdType(), response.getCreativeId(), response.getSeatId(), response.getCorrelationId()));
+        return Promise.resolve(new DisplayInterstitialCampaign(displayMarkup, displayMarkupUrl, displayMarkupBaseUrl, session, gamerId, abGroup, response.getCacheTTL(), response.getTrackingUrls(), clickThroughUrl, response.getAdType(), response.getCreativeId(), response.getSeatId(), response.getCorrelationId()));
     }
 }

@@ -7,22 +7,25 @@ interface IDisplayInterstitialCampaign extends ICampaign {
     clickThroughUrl: string | undefined;
     tracking: object | undefined;
     markupUrl: string | undefined;
+    markupBaseUrl: string | undefined;
 }
 
 export class DisplayInterstitialCampaign extends Campaign<IDisplayInterstitialCampaign> {
-    constructor(markup: string | undefined, markupUrl: string | undefined, session: Session, gamerId: string, abGroup: number, cacheTTL: number | undefined, tracking?: { [eventName: string]: string[] }, clickThroughUrl?: string, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
+    constructor(markup: string | undefined, markupUrl: string | undefined, markupBaseUrl: string | undefined, session: Session, gamerId: string, abGroup: number, cacheTTL: number | undefined, tracking?: { [eventName: string]: string[] }, clickThroughUrl?: string, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
         super('DisplayInterstitialCampaign', {
             ... Campaign.Schema,
             dynamicMarkup: ['string', 'undefined'],
             clickThroughUrl: ['string', 'undefined'],
             tracking: ['object', 'undefined'],
-            markupUrl: ['string', 'undefined']
+            markupUrl: ['string', 'undefined'],
+            markupBaseUrl: ['string', 'undefined']
         });
         if(cacheTTL) {
             this.set('willExpireAt', Date.now() + cacheTTL * 1000);
         }
         this.set('dynamicMarkup', markup || undefined);
         this.set('markupUrl', markupUrl || undefined);
+        this.set('markupBaseUrl', markupBaseUrl || undefined);
         this.set('clickThroughUrl', clickThroughUrl || undefined);
         this.set('gamerId', gamerId);
         this.set('abGroup', abGroup);
@@ -40,6 +43,10 @@ export class DisplayInterstitialCampaign extends Campaign<IDisplayInterstitialCa
 
     public getMarkupUrl(): string | undefined {
         return this.get('markupUrl');
+    }
+
+    public getMarkupBaseUrl(): string | undefined {
+        return this.get('markupBaseUrl')
     }
 
     public getClickThroughUrl(): string | undefined {

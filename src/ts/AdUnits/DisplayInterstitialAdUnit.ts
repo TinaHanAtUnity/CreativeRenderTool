@@ -179,8 +179,15 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
         });
     }
 
-    private setWebPlayerData(data: string, mimeType: string, encoding: string): Promise<void> {
-        return this._nativeBridge.WebPlayer.setData(data, mimeType, encoding).catch( (error) => {
+    private setWebPlayerData(data: string, mimeType: string, encoding: string, markupBaseUrl?: string): Promise<void> {
+        let dataPromise: Promise<void>;
+        if(markupBaseUrl) {
+            dataPromise = this._nativeBridge.WebPlayer.setDataWithUrl(markupBaseUrl, data, mimeType, encoding, markupBaseUrl);
+        } else {
+            dataPromise = this._nativeBridge.WebPlayer.setData(data, mimeType, encoding);
+        }
+
+        return dataPromise.catch( (error) => {
             this._nativeBridge.Sdk.logError(JSON.stringify(error));
             Diagnostics.trigger('webplayer_set_data_error', new DiagnosticError(error, {data: data, mimeType: mimeType, encoding: encoding}));
             this.setFinishState(FinishState.ERROR);
@@ -190,11 +197,15 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
 
     private setWebPlayerContent(): Promise<void> {
         const markupUrl = this._campaign.getMarkupUrl();
+        const markupBaseUrl = this._campaign.getMarkupBaseUrl();
         if (markupUrl) {
             return this.setWebPlayerUrl(markupUrl);
         }
         const markup = this._campaign.getDynamicMarkup();
         if (markup) {
+            if(markupBaseUrl){
+                return this.setWebPlayerData(markup, 'text/html', 'UTF-8', markupBaseUrl);
+            }
             return this.setWebPlayerData(markup, 'text/html', 'UTF-8');
         }
         this._nativeBridge.Sdk.logError("Display Interstitial: Neither markupUrl or Markup was defined in campaign");

@@ -54,7 +54,7 @@ describe('DisplayInterstitialAdUnit', () => {
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         sessionManager = new SessionManager(nativeBridge);
         operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
-        campaign = new DisplayInterstitialCampaign(json.display.markup, json.display.markupUrl, TestFixtures.getSession(), json.gamerId, json.abGroup, undefined);
+        campaign = new DisplayInterstitialCampaign(json.display.markup, json.display.markupUrl, json.display.markupBaseUrl, TestFixtures.getSession(), json.gamerId, json.abGroup, undefined);
 
         view = new DisplayInterstitial(nativeBridge, placement, campaign);
         view.render();
