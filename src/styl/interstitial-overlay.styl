@@ -1,0 +1,188 @@
+#interstitial-overlay {
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  color: $white;
+  pointer-events: none;
+
+  .mute-button {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    display: none;
+    width: 70px;
+    height: 55px;
+    pointer-events: auto;
+
+    .mute-icon,
+    .unmute-icon {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      height: 27px;
+      font-size: 27px;
+    }
+
+    .unmute-icon {
+      display: none;
+    }
+
+    &.muted {
+      .mute-icon {
+        display: none;
+      }
+
+      .unmute-icon {
+        display: block;
+      }
+    }
+  }
+
+  .call-button {
+    position: fixed;
+    right: 10px;
+    bottom: 10px;
+    display: none;
+    font-weight: bold;
+    transform: translate(0, -50%);
+    pointer-events: auto;
+  }
+
+  .buffering-spinner {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: none;
+    margin: auto;
+    width: 100px;
+    height: 65px;
+  }
+
+  .spinner-animation {
+    margin: 0 auto;
+    width: 24px;
+    height: 24px;
+    border: 4px solid $white;
+    border-right-color: transparent;
+    border-left-color: transparent;
+    border-radius: 200px;
+    animation: spinner 1s linear infinite;
+  }
+
+  .debug-message-text {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    display: none;
+    pointer-events: auto;
+  }
+
+  @keyframes spinner {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .spinner-text {
+    margin-top: 10px;
+    color: $white;
+    text-align: center;
+    text-shadow: 1px 1px $black;
+    font-weight: bold;
+  }
+
+  .close-region {
+    position: fixed;
+    top: 2px;
+    right: 2px;
+    width: 50px;
+    height: 50px;
+    opacity: .4;
+    pointer-events: auto;
+  }
+
+  .icon-close {
+    position: absolute;
+    top: 4px;
+    right: 2px;
+    width: 32px;
+    height: 32px;
+    color: $white;
+    text-align: center;
+    text-shadow: 2px 2px 20px $gray;
+    font-size: 28px;
+    line-height: 28px;
+  }
+  .close {
+    position: absolute;
+    top: 50%;
+    left: 8px;
+    width: 36px;
+    height: 36px;
+    transform: translate(0, -50%);
+  }
+  .progress-wrapper {
+    position: absolute;
+    clip: rect(0px, 36px, 36px, 18px);
+    width: 36px;
+    height: 36px;
+  }
+  .progress:after {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: block;
+    color: white;
+    font-size: 18px;
+    transform: translate(-50%, -50%);
+  }
+  .circle-base,
+  .circle-left,
+  .circle-right {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    border-radius: 100%;
+    background-color: transparent;
+    vertical-align: middle;
+  }
+  .circle-base {
+    border: 4px solid $dark-gray;
+  }
+  .circle-left,
+  .circle-right {
+    clip: rect(0, 18px, 36px, 0);
+    border: 4px solid $white;
+  }
+  .progress-wrapper,
+  .circle-left,
+  .circle-right {
+    -webkit-animation-iteration-count: 1;
+    -webkit-animation-fill-mode: forwards;
+    -webkit-animation-timing-function: linear;
+    -webkit-animation-duration: .01s;
+  }
+}
+
+slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
+  transform: translateY($translation);
+  transition: transform $duration $function;
+}
+
+.slide-up {
+  slide-animation(.4s, ease-in, -150%);
+}
+
+.slide-down {
+  slide-animation(.4s, ease-in, 150%);
+}
+
+.slide-back-in-place {
+  slide-animation(.2s, ease-in-out, 0);
+}
+

@@ -4,7 +4,7 @@ import { Session } from 'Models/Session';
 
 interface IAdMobCampaign extends ICampaign {
     dynamicMarkup: string;
-    tracking: object | undefined;
+    tracking: { [eventName: string]: string[] } | undefined;
 }
 
 export class AdMobCampaign extends Campaign<IAdMobCampaign> {

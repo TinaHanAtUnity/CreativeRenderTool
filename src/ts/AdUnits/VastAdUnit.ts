@@ -82,6 +82,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
             }
 
             if(this._moat) {
+                this._moat.removeMessageListener();
                 this._moat.container().parentElement!.removeChild(this._moat.container());
             }
 
@@ -185,6 +186,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     public initMoat() {
         this._moat = new MOAT(this._nativeBridge);
         this._moat.render();
+        this._moat.addMessageListener();
         document.body.appendChild(this._moat.container());
     }
 

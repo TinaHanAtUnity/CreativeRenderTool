@@ -4,12 +4,10 @@ import { assert } from 'chai';
 import { Platform } from 'Constants/Platform';
 import { UnityAds } from 'Native/Backend/UnityAds';
 import { IUnityAdsListener } from 'Native/Backend/IUnityAdsListener';
-import { UnityAdsError } from 'Constants/UnityAdsError';
 import { FinishState } from 'Constants/FinishState';
 import { DeviceInfo } from 'Native/Backend/Api/DeviceInfo';
 import { Request } from 'Native/Backend/Api/Request';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
-import { PlacementState } from 'Models/Placement';
 import { ConfigManager } from 'Managers/ConfigManager';
 import { CampaignManager } from 'Managers/CampaignManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
@@ -22,9 +20,9 @@ describe('EventsTest', () => {
     const findEventCount = (requestLog: string[], regexp: string) => {
         let count = 0;
         requestLog.forEach(log => {
-             if(log.match(regexp)) {
-                 ++count;
-             }
+            if(log.match(regexp)) {
+                ++count;
+            }
         });
         return count;
     };
@@ -79,8 +77,8 @@ describe('EventsTest', () => {
             onUnityAdsStart: (placement: string) => {
                 ++startCount;
             },
-            onUnityAdsFinish: (placement: string, state: FinishState) => {
-                if(state === FinishState.COMPLETED) {
+            onUnityAdsFinish: (placement: string, state: string) => {
+                if(state === FinishState[FinishState.COMPLETED]) {
                     if(startCount === 2) {
                         setTimeout(() => {
                             validateRequestLog(Request.getLog(), validationRegexps);
@@ -90,13 +88,13 @@ describe('EventsTest', () => {
                     }
                 }
             },
-            onUnityAdsError: (error: UnityAdsError, message: string) => {
+            onUnityAdsError: (error: string, message: string) => {
                 done(new Error(message));
             },
             onUnityAdsClick: (placement: string) => {
                 return;
             },
-            onUnityAdsPlacementStateChanged: (placement: string, oldState: PlacementState, newState: PlacementState) => {
+            onUnityAdsPlacementStateChanged: (placement: string, oldState: string, newState: string) => {
                 return;
             }
         };
@@ -120,61 +118,4 @@ describe('EventsTest', () => {
         UnityAds.initialize(Platform.ANDROID, currentGameId.toString(), listener, true);
     });
 
-    it('should include all operational events on iOS', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
-        this.timeout(60000);
-        const validationRegexps = ['/ack/{GAME_ID}\\?campaignId=000000000000000000000000&event={EVENT_NAME}', '/mobile/gamers/[0-9a-f]+/video/{EVENT_NAME}/00005472656d6f7220694f53/{GAME_ID}'];
-        let readyCount = 0;
-        let startCount = 0;
-        const listener: IUnityAdsListener = {
-            onUnityAdsReady: (placement: string) => {
-                if(++readyCount === 1) {
-                    UnityAds.show(placement);
-                }
-                if(startCount === 1) {
-                    UnityAds.show(placement);
-                }
-            },
-            onUnityAdsStart: (placement: string) => {
-                ++startCount;
-            },
-            onUnityAdsFinish: (placement: string, state: FinishState) => {
-                if(state === FinishState.COMPLETED) {
-                    if(startCount === 2) {
-                        setTimeout(() => {
-                            validateRequestLog(Request.getLog(), validationRegexps);
-                            assert.equal(startCount, 2, 'onUnityAdsStart was not called exactly 2 times');
-                            done();
-                        }, 2500);
-                    }
-                }
-            },
-            onUnityAdsError: (error: UnityAdsError, message: string) => {
-                done(new Error(message));
-            },
-            onUnityAdsClick: (placement: string) => {
-                return;
-            },
-            onUnityAdsPlacementStateChanged: (placement: string, oldState: PlacementState, newState: PlacementState) => {
-                return;
-            }
-        };
-
-        Request.setLog([]);
-
-        DeviceInfo.setAdvertisingTrackingId('DA276DED-8DFE-4C57-A75E-9D7F7BBF2D21');
-        DeviceInfo.setManufacturer('Apple');
-        DeviceInfo.setModel('iPhone7,2');
-        DeviceInfo.setOsVersion('10.1.1');
-        DeviceInfo.setScreenWidth(647);
-        DeviceInfo.setScreenHeight(357);
-        DeviceInfo.setTimeZone('+0200');
-
-        AbstractAdUnit.setAutoClose(true);
-
-        ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
-        CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
-        OperativeEventManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
-
-        UnityAds.initialize(Platform.IOS, currentGameId.toString(), listener, true);
-    });
 });

@@ -48,6 +48,9 @@ import { MRAIDEndScreen } from 'Views/MRAIDEndScreen';
 import { MRAIDEndScreenEventHandler } from 'EventHandlers/MRAIDEndScreenEventHandler';
 import { PerformanceEndScreenEventHandler } from 'EventHandlers/PerformanceEndScreenEventHandler';
 import { AdMobEventHandler } from 'EventHandlers/AdmobEventHandler';
+import { InterstitialOverlay } from 'Views/InterstitialOverlay';
+import { AbstractOverlay } from 'Views/AbstractOverlay';
+import { ABTest } from 'Utilities/ABTest';
 
 export class AdUnitFactory {
 
@@ -71,7 +74,7 @@ export class AdUnitFactory {
     }
 
     private static createPerformanceAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PerformanceCampaign>): AbstractAdUnit<PerformanceCampaign> {
-        const overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+        const overlay = this.createOverlay(nativeBridge, parameters);
         const endScreen = new PerformanceEndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         const video = this.getOrientedVideo(<PerformanceCampaign>parameters.campaign, parameters.forceOrientation);
 
@@ -110,7 +113,7 @@ export class AdUnitFactory {
     }
 
     private static createVastAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<VastCampaign>): AbstractAdUnit<VastCampaign> {
-        const overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+        const overlay = this.createOverlay(nativeBridge, parameters);
         let vastEndScreen: VastEndScreen | undefined;
 
         const vastAdUnitParameters: IVastAdUnitParameters = {
@@ -148,7 +151,7 @@ export class AdUnitFactory {
             level1: campaign.getAdvertiserDomain(),
             level2: campaign.getAdvertiserCampaignId(),
             level3: campaign.getCreativeId(),
-            slicer1: campaign.getAdvertiserBundleId(),
+            slicer1: parameters.clientInfo.getApplicationName(),
             slicer2: parameters.placement.getName()
         };
 
@@ -240,7 +243,7 @@ export class AdUnitFactory {
     }
 
     private static createVPAIDAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<VPAIDCampaign>): AbstractAdUnit<VPAIDCampaign> {
-        const overlay = new Overlay(nativeBridge, false, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+        const overlay = this.createOverlay(nativeBridge, parameters);
         const vpaid = new VPAID(nativeBridge, <VPAIDCampaign>parameters.campaign, parameters.placement, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         let endScreen: VPAIDEndScreen | undefined;
 
@@ -403,5 +406,43 @@ export class AdUnitFactory {
         view.addEventHandler(eventHandler);
 
         return adUnit;
+    }
+
+    private static createOverlay(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractOverlay {
+        if(!parameters.placement.allowSkip()) {
+            return new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+        } else {
+            let overlay: AbstractOverlay;
+
+            // Scopely's game IDs
+            const enabledGameIds = ['15334',
+                '15333',
+                '24447',
+                '11595',
+                '11591',
+                '1178487',
+                '50650',
+                '130204',
+                '1413314',
+                '1307778',
+                '1413315',
+                '130205',
+                '24446',
+                '17671',
+                '130854',
+                '1307777',
+                '1495013'];
+
+            if(enabledGameIds.indexOf(parameters.clientInfo.getGameId()) !== -1) {
+                overlay = new InterstitialOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+            } else {
+                overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+            }
+
+            if(ABTest.isInterstitialFadeTest(parameters.campaign.getAbGroup(), parameters.clientInfo.getGameId())) {
+                overlay.setFadeEnabled(false);
+            }
+            return overlay;
+        }
     }
 }
