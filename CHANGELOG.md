@@ -1,3 +1,8 @@
+# Mon Nov 27 09:52:53 UTC 2017
+
+* Add ad request ordinal to session_start_failed diagnostic message
+* Run integration tests in separate processes
+
 # Thu Nov 23 10:20:20 UTC 2017
 
 * Stop AB test in groups 8 & 9 - set new end screen to the whole network
