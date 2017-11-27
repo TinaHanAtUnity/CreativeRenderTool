@@ -1,4 +1,4 @@
-# PENDING
+# Mon Nov 27 09:52:53 UTC 2017
 
 * Add ad request ordinal to session_start_failed diagnostic message
 * Run integration tests in separate processes
