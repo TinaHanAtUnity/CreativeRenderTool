@@ -1,4 +1,4 @@
-# Pending
+# Tue Nov 28 09:12:34 UTC 2017
 
 * Disable nofill retrying test in AB group 5
 * Use % for endscreen width and height instead of vh and vw due to ios7 partial support
