@@ -1,3 +1,9 @@
+# Pending
+
+* Fix MRAID layout on iPhone X
+* Dark close button in landscape
+* Disable Android hardware acceleration on Android 4.2 devices
+
 # Tue Nov 28 09:12:34 UTC 2017
 
 * Disable nofill retrying test in AB group 5
