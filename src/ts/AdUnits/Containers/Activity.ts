@@ -202,13 +202,9 @@ export class Activity extends AdUnitContainer {
     }
 
     private isHardwareAccelerationAllowed(): boolean {
-        if(this._nativeBridge.getApiLevel() < 17) {
-            // hardware acceleration does not work reliably before Android 4.2
-            return false;
-        }
-
-        if(this._nativeBridge.getApiLevel() === 17 && this._deviceInfo.getModel() === 'DARKSIDE') {
-            // specific device reported by GameLoft, ticket ABT-91
+        if(this._nativeBridge.getApiLevel() < 18) {
+            // hardware acceleration does not work reliably on Android 4.0 and 4.1
+            // since there have been at least two reports from Android 4.2 devices being broken, it's also disabled on Android 4.2
             return false;
         }
 
