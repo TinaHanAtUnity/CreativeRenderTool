@@ -71,6 +71,7 @@ export class CampaignManager {
     protected _assetManager: AssetManager;
     protected _configuration: Configuration;
     protected _clientInfo: ClientInfo;
+    private _adMobSignalFactory: AdMobSignalFactory;
     private _sessionManager: SessionManager;
     private _metaDataManager: MetaDataManager;
     private _request: Request;
@@ -78,7 +79,7 @@ export class CampaignManager {
     private _previousPlacementId: string | undefined;
     private _rawResponse: string | undefined;
 
-    constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager) {
+    constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager) {
         this._nativeBridge = nativeBridge;
         this._configuration = configuration;
         this._assetManager = assetManager;
@@ -87,6 +88,7 @@ export class CampaignManager {
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._metaDataManager = metaDataManager;
+        this._adMobSignalFactory = adMobSignalFactory;
         this._requesting = false;
     }
 
@@ -392,7 +394,7 @@ export class CampaignManager {
         promises.push(this._deviceInfo.getDeviceVolume());
         promises.push(this.getFullyCachedCampaigns());
         promises.push(this.getVersionCode());
-        promises.push(AdMobSignalFactory.getAdRequestSignal(this._nativeBridge, this._clientInfo, this._deviceInfo).then(signal => {
+        promises.push(this._adMobSignalFactory.getAdRequestSignal().then(signal => {
             return signal.getBase64ProtoBuf();
         }));
 

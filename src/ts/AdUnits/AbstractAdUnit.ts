@@ -11,6 +11,7 @@ import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { Configuration } from 'Models/Configuration';
 import { Request } from 'Utilities/Request';
 import { FocusManager } from 'Managers/FocusManager';
+import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 
 export interface IAdUnitParameters<T extends Campaign> {
     forceOrientation: ForceOrientation;
@@ -25,6 +26,10 @@ export interface IAdUnitParameters<T extends Campaign> {
     configuration: Configuration;
     request: Request;
     options: any;
+}
+
+export interface IAdUnitParametersExt<T extends Campaign> extends IAdUnitParameters<T> {
+    adMobSignalFactory: AdMobSignalFactory;
 }
 
 export abstract class AbstractAdUnit<T extends Campaign = Campaign> {

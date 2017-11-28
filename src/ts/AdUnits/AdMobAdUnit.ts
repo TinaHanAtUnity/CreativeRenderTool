@@ -17,6 +17,10 @@ export class AdMobAdUnit extends AbstractAdUnit<AdMobCampaign> {
         this._operativeEventManager = parameters.operativeEventManager;
         this._view = parameters.view;
         this._options = parameters.options;
+
+        // TODO, we skip initial because the AFMA grantReward event tells us the video
+        // has been completed. Is there a better way to do this with AFMA right now?
+        this.setFinishState(FinishState.SKIPPED);
     }
 
     public show(): Promise<void> {

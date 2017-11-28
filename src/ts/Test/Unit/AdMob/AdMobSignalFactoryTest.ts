@@ -15,7 +15,7 @@ describe('AdMobSignalFactoryTest', () => {
         const clientInfo: ClientInfo = TestFixtures.getClientInfo();
         const deviceInfo: DeviceInfo = TestFixtures.getDeviceInfo();
 
-        return AdMobSignalFactory.getAdRequestSignal(nativeBridge, clientInfo, deviceInfo).then(signal => {
+        return new AdMobSignalFactory(nativeBridge, clientInfo, deviceInfo).getAdRequestSignal().then(signal => {
             const encodedMsg: string = signal.getBase64ProtoBuf();
 
             const buffer = new Uint8Array(protobuf.util.base64.length(encodedMsg));

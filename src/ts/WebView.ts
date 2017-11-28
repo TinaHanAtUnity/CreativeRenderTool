@@ -11,7 +11,7 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { FinishState } from 'Constants/FinishState';
-import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
+import { AbstractAdUnit, IAdUnitParametersExt } from 'AdUnits/AbstractAdUnit';
 import { UnityAdsError } from 'Constants/UnityAdsError';
 import { Platform } from 'Constants/Platform';
 import { Resolve } from 'Utilities/Resolve';
@@ -42,6 +42,8 @@ import { SdkStats } from 'Utilities/SdkStats';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
+import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
+import { Campaign } from 'Models/Campaign';
 
 export class WebView {
 
@@ -68,6 +70,7 @@ export class WebView {
     private _wakeUpManager: WakeUpManager;
     private _focusManager: FocusManager;
     private _analyticsManager: AnalyticsManager;
+    private _adMobSignalFactory: AdMobSignalFactory;
 
     private _showing: boolean = false;
     private _initialized: boolean = false;
@@ -98,6 +101,7 @@ export class WebView {
             this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
             this._thirdPartyEventManager = new ThirdPartyEventManager(this._nativeBridge, this._request);
             this._metadataManager = new MetaDataManager(this._nativeBridge);
+            this._adMobSignalFactory = new AdMobSignalFactory(this._nativeBridge, this._clientInfo, this._deviceInfo);
 
             HttpKafka.setRequest(this._request);
             HttpKafka.setClientInfo(this._clientInfo);
@@ -181,7 +185,7 @@ export class WebView {
             this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
 
             this._assetManager = new AssetManager(this._cache, this._configuration.getCacheMode(), this._deviceInfo);
-            this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._request, this._clientInfo, this._deviceInfo, this._metadataManager);
+            this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._adMobSignalFactory, this._request, this._clientInfo, this._deviceInfo, this._metadataManager);
             this._campaignRefreshManager = new CampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration, this._focusManager);
 
             SdkStats.initialize(this._nativeBridge, this._request, this._configuration, this._sessionManager, this._campaignManager, this._metadataManager, this._clientInfo);
@@ -279,7 +283,7 @@ export class WebView {
             }
 
             const orientation = screenWidth >= screenHeight ? ForceOrientation.LANDSCAPE : ForceOrientation.PORTRAIT;
-            this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, {
+            this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, <IAdUnitParametersExt<Campaign>>{
                 forceOrientation: orientation,
                 focusManager: this._focusManager,
                 container: this._container,
@@ -291,7 +295,8 @@ export class WebView {
                 campaign: campaign,
                 configuration: this._configuration,
                 request: this._request,
-                options: options
+                options: options,
+                adMobSignalFactory: this._adMobSignalFactory
             });
             this._campaignRefreshManager.setCurrentAdUnit(this._currentAdUnit);
             this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());

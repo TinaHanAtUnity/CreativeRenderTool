@@ -9,26 +9,36 @@ import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
 import { Template } from 'Utilities/Template';
 import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
 import { AFMABridge } from 'Views/AFMABridge';
+import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
+import { DeviceInfo } from 'Models/DeviceInfo';
+import { ClientInfo } from 'Models/ClientInfo';
 
 export interface IAdMobEventHandler {
     onClose(): void;
     onOpenURL(url: string): void;
+    onGrantReward(): void;
 }
+
+const AFMAClickStringMacro = '{{AFMA_CLICK_SIGNALS_PLACEHOLDER}}';
 
 export class AdMobView extends View<IAdMobEventHandler> {
     private _placement: Placement;
     private _campaign: AdMobCampaign;
+    private _clientInfo: ClientInfo;
+    private _deviceInfo: DeviceInfo;
     private _iframe: HTMLIFrameElement;
+    private _adMobSignalFactory: AdMobSignalFactory;
 
     private _messageListener: EventListener;
     private _afmaBridge: AFMABridge;
 
-    constructor(nativeBridge: NativeBridge, container: AdUnitContainer, placement: Placement, campaign: AdMobCampaign, language: string, gameId: string, abGroup: number) {
+    constructor(nativeBridge: NativeBridge, adMobSignalFactory: AdMobSignalFactory, container: AdUnitContainer, placement: Placement, campaign: AdMobCampaign, language: string, gameId: string, abGroup: number) {
         super(nativeBridge, 'admob');
 
         this._placement = placement;
         this._campaign = campaign;
         this._template = new Template(AdMobContainer);
+        this._adMobSignalFactory = adMobSignalFactory;
 
         this._afmaBridge = new AFMABridge({
             onAFMAClose: () => this.onClose(),
@@ -65,21 +75,22 @@ export class AdMobView extends View<IAdMobEventHandler> {
 
     private setupIFrame() {
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#admob-iframe');
-        const markup = this.getIFrameSrcDoc();
-        iframe.srcdoc = markup;
-
         this._iframe = iframe;
+        this.getIFrameSrcDoc().then((markup) => {
+            iframe.srcdoc = markup;
+        });
     }
 
-    private getIFrameSrcDoc(): string {
+    private getIFrameSrcDoc(): Promise<string> {
         const markup = this._campaign.getDynamicMarkup();
         const dom = new DOMParser().parseFromString(markup, "text/html");
         if (!dom) {
-            return markup;
+            return Promise.reject(new Error('Not a valid HTML document => ' + markup));
         }
         this.removeScriptTags(dom);
-        this.injectScripts(dom);
-        return dom.documentElement.outerHTML;
+        return this.injectScripts(dom).then(() => {
+            return dom.documentElement.outerHTML;
+        });
     }
 
     private removeScriptTags(dom: Document) {
@@ -95,10 +106,14 @@ export class AdMobView extends View<IAdMobEventHandler> {
         }
     }
 
-    private injectScripts(dom: Document) {
+    private injectScripts(dom: Document): Promise<void> {
         const e = dom.head || document.body;
-        this.injectScript(e, AFMAContainer);
-        this.injectScript(e, MRAIDContainer);
+        return this._adMobSignalFactory.getClickSignal().then((signal) => {
+            this.injectScript(e, MRAIDContainer);
+
+            const signalProto = signal.getBase64ProtoBuf();
+            this.injectScript(e, AFMAContainer.replace(AFMAClickStringMacro, signalProto));
+        });
     }
 
     private injectScript(e: HTMLElement, script: string) {

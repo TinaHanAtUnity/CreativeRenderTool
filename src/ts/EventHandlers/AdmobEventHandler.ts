@@ -2,6 +2,7 @@ import { IAdMobEventHandler } from 'Views/AdMobView';
 import { AdMobAdUnit } from 'AdUnits/AdMobAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Platform } from 'Constants/Platform';
+import { FinishState } from 'Constants/FinishState';
 
 export interface IAdMobEventHandlerParameters {
     adUnit: AdMobAdUnit;
@@ -30,5 +31,9 @@ export class AdMobEventHandler implements IAdMobEventHandler {
                 uri: url
             });
         }
+    }
+
+    public onGrantReward(): void {
+        this._adUnit.setFinishState(FinishState.COMPLETED);
     }
 }
