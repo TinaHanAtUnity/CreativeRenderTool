@@ -3,6 +3,26 @@
         // This string will be replaced prior to the source being inserted into the iframe
         var clickSignals = '{{AFMA_CLICK_SIGNALS_PLACEHOLDER}}';
 
+        function getQueryParams(url) {
+            var a = document.createElement('a');
+            a.href = url;
+            var params = {};
+            if (a.search) {
+                var tuples = a.search.substring(1).split(/&/);
+                for (var i = 0; i < tuples.length; i++) {
+                    var parts = tuples[i].split(/=/);
+                    var key = parts[0];
+                    var value = parts[1];
+                    if (params[key]) {
+                        params[key].push(value);
+                    } else {
+                        params[key] = [value];
+                    }
+                }
+            }
+            return params;
+        }
+
         var AFMA = function() {
             this.forceOrientation = function(orientation, override, animationDuration) {
                 this.postMessage('forceOrientation', {
@@ -14,7 +34,7 @@
 
             this.click = function(url) {
                 this.postMessage('click', {
-                    url: url
+                    url: this.appendClickSignals(url, clickSignals)
                 });
             };
 
@@ -23,7 +43,18 @@
             };
 
             this.appendClickSignals = function(url, spamSignals) {
-                return url + spamSignals;
+                spamSignals = spamSignals || clickSignals;
+                var query = getQueryParams(url);
+                if (query.ms) {
+                    return url;
+                } else {
+                    if (Object.keys(query).length) {
+                        url = url + '&ms=' + spamSignals;
+                    } else {
+                        url = url + '?ms=' + spamSignals;
+                    }
+                }
+                return url;
             };
 
             this.notifyRewardedVideoStart = function() {
