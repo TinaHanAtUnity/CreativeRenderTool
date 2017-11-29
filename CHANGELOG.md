@@ -1,3 +1,26 @@
+# Pending
+
+* Fix MRAID layout on iPhone X
+* Dark close button in landscape
+* Disable Android hardware acceleration on Android 4.2 devices
+
+# Tue Nov 28 09:12:34 UTC 2017
+
+* Disable nofill retrying test in AB group 5
+* Use % for endscreen width and height instead of vh and vw due to ios7 partial support
+
+# Mon Nov 27 09:52:53 UTC 2017
+
+* Add ad request ordinal to session_start_failed diagnostic message
+* Run integration tests in separate processes
+
+# Thu Nov 23 10:20:20 UTC 2017
+
+* Stop AB test in groups 8 & 9 - set new end screen to the whole network
+* AB test persistent overlay in groups 10 & 11 and enable for selected games
+* Add local_time_offset to appRunning analytics events
+* Experimental APK redirect feature
+
 # Wed Nov 22 10:28:21 UTC 2017
 
 * Add loading error diagnostic to MOAT integration

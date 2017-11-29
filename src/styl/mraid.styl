@@ -1,20 +1,11 @@
+@import "components.styl";
+
 #mraid {
   #mraid-iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    border: none;
+    $iframe-default();
   }
   .close-region {
-    position: absolute;
-    top: 2px;
-    right: 2px;
-    z-index: 9999;
-    width: 50px;
-    height: 50px;
-    opacity: .4;
+    $iframe-close-region-default();
   }
   .icon-close {
     position: absolute;
