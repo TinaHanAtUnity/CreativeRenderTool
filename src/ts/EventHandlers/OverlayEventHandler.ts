@@ -14,11 +14,13 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
     private _adUnit: VideoAdUnit<T>;
     private _operativeEventManager: OperativeEventManager;
     private _comScoreTrackingService: ComScoreTrackingService;
+    private _abGroup: number;
 
     constructor(nativeBridge: NativeBridge, adUnit: VideoAdUnit<T>, parameters: IAdUnitParameters<T>) {
         this._nativeBridge = nativeBridge;
         this._operativeEventManager = parameters.operativeEventManager;
         this._comScoreTrackingService = parameters.comScoreTrackingService;
+        this._abGroup = parameters.configuration.getAbGroup();
         this._adUnit = adUnit;
     }
 
@@ -28,13 +30,15 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
         this._adUnit.setFinishState(FinishState.SKIPPED);
         this._operativeEventManager.sendSkip(this._adUnit, this._adUnit.getVideo().getPosition());
 
-        const sessionId = this._adUnit.getCampaign().getSession().getId();
-        const positionAtSkip = this._adUnit.getVideo().getPosition();
-        const comScoreDuration = (this._adUnit.getVideo().getDuration()).toString(10);
-        const creativeId = this._adUnit.getCampaign().getCreativeId();
-        const category = this._adUnit.getCampaign().getCategory();
-        const subCategory = this._adUnit.getCampaign().getSubCategory();
-        this._comScoreTrackingService.sendEvent('end', sessionId, comScoreDuration, positionAtSkip, creativeId, category, subCategory);
+        if (this._abGroup === 16) {
+            const sessionId = this._adUnit.getCampaign().getSession().getId();
+            const positionAtSkip = this._adUnit.getVideo().getPosition();
+            const comScoreDuration = (this._adUnit.getVideo().getDuration()).toString(10);
+            const creativeId = this._adUnit.getCampaign().getCreativeId();
+            const category = this._adUnit.getCampaign().getCategory();
+            const subCategory = this._adUnit.getCampaign().getSubCategory();
+            this._comScoreTrackingService.sendEvent('end', sessionId, comScoreDuration, positionAtSkip, creativeId, category, subCategory);
+        }
 
         this._adUnit.getContainer().reconfigure(ViewConfiguration.ENDSCREEN);
 

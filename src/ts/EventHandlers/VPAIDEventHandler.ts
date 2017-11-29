@@ -26,6 +26,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     private _overlay: AbstractOverlay;
     private _adDuration: number = -2;
     private _adRemainingTime: number = -2;
+    private _abGroup: number;
 
     constructor(nativeBridge: NativeBridge, adUnit: VPAIDAdUnit, parameters: IVPAIDAdUnitParameters) {
         this._nativeBridge = nativeBridge;
@@ -38,6 +39,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         this._vpaidView = parameters.vpaid;
         this._overlay = parameters.overlay;
         this._vpaidEndScreen = parameters.endScreen;
+        this._abGroup = parameters.configuration.getAbGroup();
 
         this._vpaidEventHandlers.AdError = this.onAdError;
         this._vpaidEventHandlers.AdLoaded = this.onAdLoaded;
@@ -143,7 +145,9 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
         this._adUnit.sendTrackingEvent('creativeView');
         this._operativeEventManager.sendStart(this._adUnit);
-        this.sendComscoreEvent('play', 0);
+        if (this._abGroup === 16) {
+            this.sendComscoreEvent('play', 0);
+        }
     }
 
     private onAdImpression() {
@@ -174,7 +178,9 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         this._adUnit.sendTrackingEvent('complete');
         this._adUnit.setFinishState(FinishState.COMPLETED);
         this._operativeEventManager.sendView(this._adUnit);
-        this.sendComscoreEvent('end', (this._adDuration - this._adRemainingTime) * 1000);
+        if (this._abGroup === 16) {
+            this.sendComscoreEvent('end', (this._adDuration - this._adRemainingTime) * 1000);
+        }
     }
 
     private onAdPaused() {

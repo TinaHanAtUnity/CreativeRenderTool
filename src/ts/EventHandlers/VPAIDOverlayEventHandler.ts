@@ -9,17 +9,21 @@ export class VPAIDOverlayEventHandler implements IOverlayHandler {
     private _adUnit: VPAIDAdUnit;
     private _operativeEventManager: OperativeEventManager;
     private _comScoreTrackingService: ComScoreTrackingService;
+    private _abGroup: number;
 
     constructor(nativeBridge: NativeBridge, adUnit: VPAIDAdUnit, parameters: IVPAIDAdUnitParameters) {
         this._adUnit = adUnit;
         this._operativeEventManager = parameters.operativeEventManager;
         this._comScoreTrackingService = parameters.comScoreTrackingService;
+        this._abGroup = parameters.configuration.getAbGroup();
     }
 
     public onOverlaySkip(position: number): void {
         this._adUnit.sendTrackingEvent('skip');
         this._operativeEventManager.sendSkip(this._adUnit);
-        this.sendComscoreEvent('end', 0);
+        if (this._abGroup === 16) {
+            this.sendComscoreEvent('end', 0);
+        }
         this._adUnit.setFinishState(FinishState.SKIPPED);
         this._adUnit.hide();
     }
