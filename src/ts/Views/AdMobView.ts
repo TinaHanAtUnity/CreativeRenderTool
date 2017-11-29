@@ -47,7 +47,7 @@ export class AdMobView extends View<IAdMobEventHandler> {
             onAFMAClick: (url) => this.onOpenURL(url),
             onAFMAFetchAppStoreOverlay: () => { /**/ },
             onAFMAForceOrientation: () => { /**/ },
-            onAFMAGrantReward: () => { /**/ },
+            onAFMAGrantReward: () => this.onGrantReward(),
             onAFMAOpenInAppStore: () => { /**/ },
             onAFMAOpenStoreOverlay: () => { /**/ },
             onAFMARewardedVideoStart: () => { /**/ }
@@ -126,5 +126,9 @@ export class AdMobView extends View<IAdMobEventHandler> {
 
     private onOpenURL(url: string) {
         this._handlers.forEach((h) => h.onOpenURL(url));
+    }
+
+    private onGrantReward() {
+        this._handlers.forEach((h) => h.onGrantReward());
     }
 }
