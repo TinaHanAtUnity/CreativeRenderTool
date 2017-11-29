@@ -1,4 +1,4 @@
-# Pending
+# Wed Nov 29 09:17:59 UTC 2017
 
 * Fix MRAID layout on iPhone X
 * Dark close button in landscape
