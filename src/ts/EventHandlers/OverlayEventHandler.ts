@@ -30,7 +30,7 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
         this._adUnit.setFinishState(FinishState.SKIPPED);
         this._operativeEventManager.sendSkip(this._adUnit, this._adUnit.getVideo().getPosition());
 
-        if (this._abGroup === 16) {
+        if (this._abGroup === 5) {
             const sessionId = this._adUnit.getCampaign().getSession().getId();
             const positionAtSkip = this._adUnit.getVideo().getPosition();
             const comScoreDuration = (this._adUnit.getVideo().getDuration()).toString(10);

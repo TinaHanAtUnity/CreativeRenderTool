@@ -162,7 +162,7 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('should send comscore play event', () => {
-            VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, comScoreService, performanceAdUnit, 1, TestFixtures.getConfiguration(), 16);
+            VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, comScoreService, performanceAdUnit, 1, TestFixtures.getConfiguration(), 5);
 
             const positionAtSkip = performanceAdUnit.getVideo().getPosition();
             const comScoreDuration = (performanceAdUnit.getVideo().getDuration()).toString(10);
@@ -264,7 +264,7 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('should send comscore end event', () => {
-            VideoEventHandlers.onVideoCompleted(operativeEventManager, comScoreService, performanceAdUnit, 16);
+            VideoEventHandlers.onVideoCompleted(operativeEventManager, comScoreService, performanceAdUnit, 5);
             const positionAtSkip = performanceAdUnit.getVideo().getPosition();
             const comScoreDuration = (performanceAdUnit.getVideo().getDuration()).toString(10);
             const sessionId = performanceAdUnit.getCampaign().getSession().getId();

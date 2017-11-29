@@ -103,7 +103,7 @@ describe('VPAIDEventHandlerTest', () => {
             overlay: overlay
         };
 
-        sinon.stub(vpaidAdUnitParameters.configuration, 'getAbGroup').returns(16);
+        sinon.stub(vpaidAdUnitParameters.configuration, 'getAbGroup').returns(5);
 
         adUnit = new VPAIDAdUnit(nativeBridge, vpaidAdUnitParameters);
         vpaidEventHandler = new VPAIDEventHandler(nativeBridge, adUnit, vpaidAdUnitParameters);

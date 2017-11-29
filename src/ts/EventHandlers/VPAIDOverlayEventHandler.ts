@@ -21,7 +21,7 @@ export class VPAIDOverlayEventHandler implements IOverlayHandler {
     public onOverlaySkip(position: number): void {
         this._adUnit.sendTrackingEvent('skip');
         this._operativeEventManager.sendSkip(this._adUnit);
-        if (this._abGroup === 16) {
+        if (this._abGroup === 5) {
             this.sendComscoreEvent('end', 0);
         }
         this._adUnit.setFinishState(FinishState.SKIPPED);

@@ -98,7 +98,7 @@ export class VideoEventHandlers {
             adUnit.getVideo().setStarted(true);
 
             operativeEventManager.sendStart(adUnit);
-            if (abGroup === 16) {
+            if (abGroup === 5) {
                 comScoreTrackingService.sendEvent('play', sessionId, comScoreDuration, position, creativeId, category, subCategory);
             }
 
@@ -235,7 +235,7 @@ export class VideoEventHandlers {
         adUnit.setActive(false);
         adUnit.setFinishState(FinishState.COMPLETED);
         operativeEventManager.sendView(adUnit);
-        if (abGroup === 16) {
+        if (abGroup === 5) {
             comScoreTrackingService.sendEvent('end', sessionId, comScoreDuration, comScorePlayedTime, creativeId, category, subCategory);
         }
 

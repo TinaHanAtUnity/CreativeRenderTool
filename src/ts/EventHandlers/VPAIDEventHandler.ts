@@ -145,7 +145,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
         this._adUnit.sendTrackingEvent('creativeView');
         this._operativeEventManager.sendStart(this._adUnit);
-        if (this._abGroup === 16) {
+        if (this._abGroup === 5) {
             this.sendComscoreEvent('play', 0);
         }
     }
@@ -178,7 +178,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         this._adUnit.sendTrackingEvent('complete');
         this._adUnit.setFinishState(FinishState.COMPLETED);
         this._operativeEventManager.sendView(this._adUnit);
-        if (this._abGroup === 16) {
+        if (this._abGroup === 5) {
             this.sendComscoreEvent('end', (this._adDuration - this._adRemainingTime) * 1000);
         }
     }

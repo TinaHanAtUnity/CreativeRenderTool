@@ -87,7 +87,7 @@ describe('OverlayEventHandlerTest', () => {
             overlay: overlay,
             video: video
         };
-        sinon.stub(performanceAdUnitParameters.configuration, 'getAbGroup').returns(16);
+        sinon.stub(performanceAdUnitParameters.configuration, 'getAbGroup').returns(5);
 
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
         overlayEventHandler = new OverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
