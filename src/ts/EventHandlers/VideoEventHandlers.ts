@@ -83,7 +83,7 @@ export class VideoEventHandlers {
         });
     }
 
-    public static onVideoProgress(nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, comScoreTrackingService: ComScoreTrackingService, adUnit: VideoAdUnit, position: number, configuration: Configuration, abGroup?: number): void {
+    public static onVideoProgress(nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, comScoreTrackingService: ComScoreTrackingService, adUnit: VideoAdUnit, position: number, configuration: Configuration): void {
         adUnit.getContainer().addDiagnosticsEvent({type: 'onVideoProgress', position: position});
         const overlay = adUnit.getOverlay();
 
@@ -93,6 +93,7 @@ export class VideoEventHandlers {
             const creativeId = adUnit.getCampaign().getCreativeId();
             const category = adUnit.getCampaign().getCategory();
             const subCategory = adUnit.getCampaign().getSubCategory();
+            const abGroup = adUnit.getCampaign().getAbGroup();
 
             adUnit.getContainer().addDiagnosticsEvent({type: 'videoStarted'});
             adUnit.getVideo().setStarted(true);
@@ -223,13 +224,15 @@ export class VideoEventHandlers {
         nativeBridge.VideoPlayer.setProgressEventInterval(adUnit.getProgressInterval());
     }
 
-    public static onVideoCompleted(operativeEventManager: OperativeEventManager, comScoreTrackingService: ComScoreTrackingService, adUnit: VideoAdUnit, abGroup?: number): void {
+    public static onVideoCompleted(operativeEventManager: OperativeEventManager, comScoreTrackingService: ComScoreTrackingService, adUnit: VideoAdUnit): void {
         const comScorePlayedTime = adUnit.getVideo().getPosition();
         const comScoreDuration = (adUnit.getVideo().getDuration()).toString(10);
         const sessionId = adUnit.getCampaign().getSession().getId();
         const creativeId = adUnit.getCampaign().getCreativeId();
         const category = adUnit.getCampaign().getCategory();
         const subCategory = adUnit.getCampaign().getSubCategory();
+
+        const abGroup = adUnit.getCampaign().getAbGroup();
 
         adUnit.getContainer().addDiagnosticsEvent({type: 'onVideoCompleted'});
         adUnit.setActive(false);

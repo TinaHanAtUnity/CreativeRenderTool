@@ -39,7 +39,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         this._vpaidView = parameters.vpaid;
         this._overlay = parameters.overlay;
         this._vpaidEndScreen = parameters.endScreen;
-        this._abGroup = parameters.configuration.getAbGroup();
+        this._abGroup = parameters.campaign.getAbGroup();
 
         this._vpaidEventHandlers.AdError = this.onAdError;
         this._vpaidEventHandlers.AdLoaded = this.onAdLoaded;
