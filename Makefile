@@ -231,7 +231,6 @@ clean:
 
 	rm -rf $(BUILD_DIR)
 	find $(TS_SRC) -type f -name "*.js" -or -name "*.map" | xargs rm -rf
-
 lint:
 	@echo
 	@echo Running linter

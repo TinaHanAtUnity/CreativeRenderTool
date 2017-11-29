@@ -12,6 +12,7 @@ import { Configuration } from 'Models/Configuration';
 import { Request } from 'Utilities/Request';
 import { FocusManager } from 'Managers/FocusManager';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 
 export interface IAdUnitParameters<T extends Campaign> {
     forceOrientation: ForceOrientation;
@@ -21,6 +22,7 @@ export interface IAdUnitParameters<T extends Campaign> {
     clientInfo: ClientInfo;
     thirdPartyEventManager: ThirdPartyEventManager;
     operativeEventManager: OperativeEventManager;
+    comScoreTrackingService: ComScoreTrackingService;
     placement: Placement;
     campaign: T;
     configuration: Configuration;

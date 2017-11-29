@@ -1,14 +1,14 @@
 import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
-import { DisplayInterstitial } from "Views/DisplayInterstitial";
-import { NativeBridge } from "Native/NativeBridge";
-import { Placement } from "Models/Placement";
-import { DisplayInterstitialCampaign } from "Models/Campaigns/DisplayInterstitialCampaign";
+import { DisplayInterstitial } from 'Views/DisplayInterstitial';
+import { NativeBridge } from 'Native/NativeBridge';
+import { Placement } from 'Models/Placement';
+import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 
 import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
-import { Platform } from "Constants/Platform";
-import { TestFixtures } from "Test/Unit/TestHelpers/TestFixtures";
+import { Platform } from 'Constants/Platform';
+import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 const json = JSON.parse(DummyDisplayInterstitialCampaign);
 
 describe('DisplayInterstitial', () => {

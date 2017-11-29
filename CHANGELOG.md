@@ -1,5 +1,10 @@
 # Pending
 
+* Fix end screen layout on iPhone X
+* Comscore AB test in group 5
+
+# Wed Nov 29 09:17:59 UTC 2017
+
 * Fix MRAID layout on iPhone X
 * Dark close button in landscape
 * Disable Android hardware acceleration on Android 4.2 devices
