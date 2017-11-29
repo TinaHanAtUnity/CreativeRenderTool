@@ -231,7 +231,6 @@ export class VideoEventHandlers {
         const creativeId = adUnit.getCampaign().getCreativeId();
         const category = adUnit.getCampaign().getCategory();
         const subCategory = adUnit.getCampaign().getSubCategory();
-
         const abGroup = adUnit.getCampaign().getAbGroup();
 
         adUnit.getContainer().addDiagnosticsEvent({type: 'onVideoCompleted'});
