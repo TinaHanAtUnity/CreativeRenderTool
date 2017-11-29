@@ -31,6 +31,8 @@ describe('PerformanceCampaign', () => {
             assert.equal(campaign.getId(), campaignObject.id);
             assert.equal(campaign.getRating(), campaignObject.rating);
             assert.equal(campaign.getRatingCount(), campaignObject.ratingCount);
+            assert.equal(campaign.getCategory(), campaignObject.appCategory);
+            assert.equal(campaign.getSubCategory(), campaignObject.appSubCategory);
         });
     });
 });
