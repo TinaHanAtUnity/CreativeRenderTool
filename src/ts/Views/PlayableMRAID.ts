@@ -331,10 +331,10 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
     }
 
-    private checkIsValid(time: number): number | undefined {
-        if (time < 0 || time > 600) {
+    private checkIsValid(timeInSeconds: number): number | undefined {
+        if (timeInSeconds < 0 || timeInSeconds > 600) {
             return undefined;
         }
-        return time;
+        return timeInSeconds;
     }
 }
