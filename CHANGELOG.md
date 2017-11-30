@@ -1,4 +1,4 @@
-# Pending
+# Thu Nov 30 10:04:19 UTC 2017
 
 * Fix end screen layout on iPhone X
 * Comscore AB test in group 5
