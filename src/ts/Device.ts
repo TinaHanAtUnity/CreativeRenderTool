@@ -19,31 +19,31 @@ interface IExtendedWindow extends Window {
     screen: IExtendedScreen;
 }
 
-let platform: string | null = "";
+const isIOS7: RegExpMatchArray | null = navigator.userAgent.match(/(iPad|iPhone|iPod);.*CPU.*OS 7_\d/i);
 
 const animationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
 let runningResizeEvent = false;
 
 const changeOrientation = () => {
 
-    let orientation: string = "";
     const screen = <IExtendedScreen>window.screen;
 
+    /* Calculate orientation based on width and height by default */
+    let orientation: string = window.innerWidth / window.innerHeight >= 1 ? 'landscape' : 'portrait';
+
     if (typeof window.orientation !== "undefined") {
-        if (platform === "ios") {
+        /* Use window.orientation if available, works better for ios devices, exclude ios 7 */
+        if(!isIOS7) {
             orientation = (Math.abs(<number>window.orientation) === 90) ? "landscape" : "portrait";
         }
 
-        /* Use screen API for androids if available */
-        if (platform === "android" && screen && screen.orientation && screen.orientation.type) {
+        /* Use screen API if available */
+        if (screen && screen.orientation && screen.orientation.type) {
+            console.log('Use screen API', screen.orientation.type);
             orientation = /landscape/g.test(screen.orientation.type) ? "landscape" : "portrait";
         }
     }
-
-    if (!orientation) {
-        orientation = window.innerWidth / window.innerHeight >= 1 ? 'landscape' : 'portrait';
-    }
-
+    
     document.body.classList.remove("landscape");
     document.body.classList.remove("portrait");
     document.body.classList.add(orientation);
@@ -71,8 +71,7 @@ window.addEventListener('resize', resizeHandler, false);
 
 if(typeof location !== 'undefined') {
     let nativeBridge: NativeBridge;
-    platform = Url.getQueryParameter(location.search, 'platform');
-    switch(platform) {
+    switch(Url.getQueryParameter(location.search, 'platform')) {
         case 'android':
             nativeBridge = new NativeBridge(window.webviewbridge, Platform.ANDROID);
             break;
