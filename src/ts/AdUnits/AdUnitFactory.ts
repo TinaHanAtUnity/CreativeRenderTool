@@ -47,7 +47,7 @@ import { PerformanceEndScreenEventHandler } from 'EventHandlers/PerformanceEndSc
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { InterstitialOverlay } from 'Views/InterstitialOverlay';
 import { AbstractOverlay } from 'Views/AbstractOverlay';
-import { ABTest } from 'Utilities/ABTest';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
 
 export class AdUnitFactory {
 
@@ -417,7 +417,7 @@ export class AdUnitFactory {
                 overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
             }
 
-            if(ABTest.isInterstitialFadeTest(parameters.campaign.getAbGroup(), parameters.clientInfo.getGameId())) {
+            if(CustomFeatures.isFadeDisabled(parameters.clientInfo.getGameId())) {
                 overlay.setFadeEnabled(false);
             }
             return overlay;
