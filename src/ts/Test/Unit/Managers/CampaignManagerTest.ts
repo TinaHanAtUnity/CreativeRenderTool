@@ -902,7 +902,6 @@ describe('CampaignManager', () => {
         });
 
         it('should trigger onError when there is no clickThroughURL in markup or json', () => {
-
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve({
                 response: OnStaticInterstitialDisplayCampaignNoClick
