@@ -76,10 +76,8 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
         this.unsetReferences();
 
         this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
-        return this.setWebPlayerUrl("").then(() => {
-            return this._container.close().then( () => {
-                this.onClose.trigger();
-            });
+        return this._container.close().then( () => {
+            this.onClose.trigger();
         });
     }
 
