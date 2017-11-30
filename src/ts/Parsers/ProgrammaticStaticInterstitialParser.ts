@@ -21,15 +21,16 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
 
         const displayMarkup = decodeURIComponent(jsonDisplay.markup);
 
-        if (!jsonDisplay.clickThroughURL) {
-            jsonDisplay.clickThroughURL = this.getClickThroughUrlFromMarkup(displayMarkup);
-        }
-
         if(!jsonDisplay.clickThroughURL) {
-            throw new DiagnosticError(
-                new Error('No clickThroughURL for programmatic/static-interstitial'),
-                {json: jsonDisplay}
-            );
+            const clickThroughFromMarkup = this.getClickThroughUrlFromMarkup(displayMarkup);
+            if (clickThroughFromMarkup) {
+                jsonDisplay.clickThroughURL = clickThroughFromMarkup;
+            } else {
+                throw new DiagnosticError(
+                    new Error('No clickThroughURL for programmatic/static-interstitial'),
+                    {json: jsonDisplay}
+                );
+            }
         }
 
         const clickThroughUrl = jsonDisplay.clickThroughURL;
@@ -38,7 +39,10 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
 
     private getClickThroughUrlFromMarkup(markup: string): string | null {
         const doc = new DOMParser().parseFromString(markup, 'text/html');
-        const clickThroughUrl = doc.body.querySelectorAll('a')[0].getAttribute('href');
+        let clickThroughUrl = null;
+        if (doc.body.querySelectorAll('a')[0]) {
+            clickThroughUrl = doc.body.querySelectorAll('a')[0].getAttribute('href');
+        }
 
         return clickThroughUrl;
     }
