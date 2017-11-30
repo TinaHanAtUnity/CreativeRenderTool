@@ -33,17 +33,16 @@ const changeOrientation = () => {
 
     if (typeof window.orientation !== "undefined") {
         /* Use window.orientation if available, works better for ios devices, exclude ios 7 */
-        if(!isIOS7) {
+        if (!isIOS7) {
             orientation = (Math.abs(<number>window.orientation) === 90) ? "landscape" : "portrait";
         }
 
         /* Use screen API if available */
         if (screen && screen.orientation && screen.orientation.type) {
-            console.log('Use screen API', screen.orientation.type);
             orientation = /landscape/g.test(screen.orientation.type) ? "landscape" : "portrait";
         }
     }
-    
+
     document.body.classList.remove("landscape");
     document.body.classList.remove("portrait");
     document.body.classList.add(orientation);
