@@ -17,6 +17,8 @@ export interface IAdMobEventHandler {
     onClose(): void;
     onOpenURL(url: string): void;
     onGrantReward(): void;
+    onShow(): void;
+    onVideoStart(): void;
 }
 
 const AFMAClickStringMacro = '{{AFMA_CLICK_SIGNALS_PLACEHOLDER}}';
@@ -24,8 +26,6 @@ const AFMAClickStringMacro = '{{AFMA_CLICK_SIGNALS_PLACEHOLDER}}';
 export class AdMobView extends View<IAdMobEventHandler> {
     private _placement: Placement;
     private _campaign: AdMobCampaign;
-    private _clientInfo: ClientInfo;
-    private _deviceInfo: DeviceInfo;
     private _iframe: HTMLIFrameElement;
     private _adMobSignalFactory: AdMobSignalFactory;
 
@@ -50,7 +50,7 @@ export class AdMobView extends View<IAdMobEventHandler> {
             onAFMAGrantReward: () => this.onGrantReward(),
             onAFMAOpenInAppStore: () => { /**/ },
             onAFMAOpenStoreOverlay: () => { /**/ },
-            onAFMARewardedVideoStart: () => { /**/ }
+            onAFMARewardedVideoStart: () => this.onVideoStart()
         });
 
         this._bindings = [];
@@ -65,6 +65,7 @@ export class AdMobView extends View<IAdMobEventHandler> {
         super.show();
         this._afmaBridge.connect(this._iframe);
         window.addEventListener('message', this._messageListener);
+        this._handlers.forEach((h) => h.onShow());
     }
 
     public hide() {
@@ -130,5 +131,9 @@ export class AdMobView extends View<IAdMobEventHandler> {
 
     private onGrantReward() {
         this._handlers.forEach((h) => h.onGrantReward());
+    }
+
+    private onVideoStart() {
+        this._handlers.forEach((h) => h.onVideoStart());
     }
 }

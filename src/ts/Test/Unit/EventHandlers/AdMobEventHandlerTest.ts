@@ -6,17 +6,24 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { IntentApi } from 'Native/Api/Intent';
 import { UrlSchemeApi } from 'Native/Api/UrlScheme';
 import { Platform } from 'Constants/Platform';
+import { FinishState } from 'Constants/FinishState';
+
+const resolveAfter = (timeout: number): Promise<void> => {
+    return new Promise((resolve, reject) => setTimeout(resolve, timeout));
+};
 
 describe('AdMobEventHandler', () => {
     let admobEventHandler: AdMobEventHandler;
     let adUnit: AdMobAdUnit;
     let nativeBridge: NativeBridge;
+    const testTimeout = 250;
 
     beforeEach(() => {
         adUnit = sinon.createStubInstance(AdMobAdUnit);
         nativeBridge = sinon.createStubInstance(NativeBridge);
         nativeBridge.Intent = sinon.createStubInstance(IntentApi);
         nativeBridge.UrlScheme = sinon.createStubInstance(UrlSchemeApi);
+        AdMobEventHandler.setLoadTimeout(testTimeout);
         admobEventHandler = new AdMobEventHandler({
             adUnit, nativeBridge
         });
@@ -48,6 +55,16 @@ describe('AdMobEventHandler', () => {
                     action: 'android.intent.action.VIEW',
                     uri: url
                 });
+            });
+        });
+    });
+
+    describe('detecting a timeout', () => {
+        it('should hide and error the AdUnit if the video does not load', () => {
+            admobEventHandler.onShow();
+            return resolveAfter(testTimeout).then(() => {
+                sinon.assert.calledWith(<sinon.SinonSpy>adUnit.setFinishState, FinishState.ERROR);
+                sinon.assert.called(<sinon.SinonSpy>adUnit.hide);
             });
         });
     });

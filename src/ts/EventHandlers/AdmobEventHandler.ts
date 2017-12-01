@@ -3,6 +3,7 @@ import { AdMobAdUnit } from 'AdUnits/AdMobAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Platform } from 'Constants/Platform';
 import { FinishState } from 'Constants/FinishState';
+import { Timer } from 'Utilities/Timer';
 
 export interface IAdMobEventHandlerParameters {
     adUnit: AdMobAdUnit;
@@ -10,12 +11,19 @@ export interface IAdMobEventHandlerParameters {
 }
 
 export class AdMobEventHandler implements IAdMobEventHandler {
+    // Abstracted for testing
+    public static setLoadTimeout(timeout: number) {
+        AdMobEventHandler._loadTimeout = timeout;
+    }
+    private static _loadTimeout: number = 5000;
     private _adUnit: AdMobAdUnit;
     private _nativeBridge: NativeBridge;
+    private _timeoutTimer: Timer;
 
     constructor(parameters: IAdMobEventHandlerParameters) {
         this._adUnit = parameters.adUnit;
         this._nativeBridge = parameters.nativeBridge;
+        this._timeoutTimer = new Timer(() => this.onFailureToLoad(), AdMobEventHandler._loadTimeout);
     }
 
     public onClose(): void {
@@ -35,5 +43,18 @@ export class AdMobEventHandler implements IAdMobEventHandler {
 
     public onGrantReward(): void {
         this._adUnit.setFinishState(FinishState.COMPLETED);
+    }
+
+    public onVideoStart(): void {
+        this._timeoutTimer.stop();
+    }
+
+    public onShow(): void {
+        this._timeoutTimer.start();
+    }
+
+    private onFailureToLoad(): void {
+        this._adUnit.setFinishState(FinishState.ERROR);
+        this._adUnit.hide();
     }
 }
