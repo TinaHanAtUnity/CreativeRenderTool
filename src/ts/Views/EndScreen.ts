@@ -102,6 +102,19 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
                 this._handlers.forEach(handler => handler.onEndScreenClose());
             }, AbstractAdUnit.getAutoCloseDelay());
         }
+
+        if (this.getEndscreenAlt() === darkEndScreenId) {
+            const el = <HTMLElement>this._container.querySelector(".underlay");
+            const style: CSSStyleDeclaration = window.getComputedStyle(el);
+
+            const isFilterSupported = ["filter", "webkitFilter"].filter((cssProp: string) => {
+                return style.hasOwnProperty(cssProp) && style.getPropertyValue(cssProp) && style.getPropertyValue(cssProp) !== "none";
+            }) || [];
+
+            if(!isFilterSupported.length) {
+                this._container.classList.add("filter-fallback");
+            }
+        }
     }
 
     public hide(): void {
