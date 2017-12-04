@@ -11,16 +11,19 @@ interface IExtendedWindow extends Window {
     webview: WebView;
 }
 
+const platform = Url.getQueryParameter(location.search, 'platform');
+const isIOS7: RegExpMatchArray | null = navigator.userAgent.match(/(iPad|iPhone|iPod);.*CPU.*OS 7_\d/i);
+
 const animationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
 let runningResizeEvent = false;
 
 const changeOrientation = () => {
 
-    let orientation: string = "";
-    if (typeof window.orientation !== "undefined") {
+    /* Calculate orientation based on width and height by default */
+    let orientation: string = window.innerWidth / window.innerHeight >= 1 ? 'landscape' : 'portrait';
+
+    if (typeof window.orientation !== "undefined" && platform === "ios" && !isIOS7) {
         orientation = (Math.abs(<number>window.orientation) === 90) ? "landscape" : "portrait";
-    } else {
-        orientation = window.innerWidth / window.innerHeight >= 1 ? 'landscape' : 'portrait';
     }
 
     document.body.classList.remove("landscape");
@@ -30,7 +33,7 @@ const changeOrientation = () => {
     runningResizeEvent = false;
 };
 
-const resizeHandler = (event?: Event) => {
+const resizeHandler = () => {
 
     if (runningResizeEvent) {
         return;
@@ -50,7 +53,7 @@ window.addEventListener('resize', resizeHandler, false);
 
 if(typeof location !== 'undefined') {
     let nativeBridge: NativeBridge;
-    switch(Url.getQueryParameter(location.search, 'platform')) {
+    switch(platform) {
         case 'android':
             nativeBridge = new NativeBridge(window.webviewbridge, Platform.ANDROID);
             break;
