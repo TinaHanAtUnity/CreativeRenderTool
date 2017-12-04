@@ -1,5 +1,14 @@
 @import "vars.styl";
 
+body.landscape #end-screen.dark-end-screen .btn-close-region {
+  color: $white;
+}
+
+body.portrait #end-screen.dark-end-screen .end-screen-info {
+  position: relative;
+  top: $default-scale-size * $default-size * 1.5;
+}
+
 #end-screen.dark-end-screen {
 
   overflow: hidden;
@@ -38,13 +47,13 @@
     .game-background-landscape,
     .game-background-portrait {
       position: relative;
-      top: 5%;
       border-radius: .2rem;
       box-shadow: 0 0 100px 5px rgba(0, 0, 0, .75);
     }
 
     .game-background-landscape {
       /* iOS8 fix: right and margin */
+      top: 5%;
       right: 2.5%;
       margin-left: 5%;
       width: 45%;
@@ -52,6 +61,7 @@
     }
 
     .game-background-portrait {
+      top: $default-scale-size * $default-size * 2.75;
       margin: 0 auto;
       width: 90%;
     }
@@ -89,3 +99,15 @@
     }
   }
 }
+
+#end-screen.dark-end-screen.filter-fallback {
+
+  .underlay {
+    opacity: .5;
+
+    &:before {
+      background-image: linear-gradient(rgba(255, 255, 255, 0), $black 40%);
+    }
+  }
+}
+
