@@ -1,4 +1,20 @@
-# PENDING
+# Thu Nov 30 10:04:19 UTC 2017
+
+* Fix end screen layout on iPhone X
+* Comscore AB test in group 5
+
+# Wed Nov 29 09:17:59 UTC 2017
+
+* Fix MRAID layout on iPhone X
+* Dark close button in landscape
+* Disable Android hardware acceleration on Android 4.2 devices
+
+# Tue Nov 28 09:12:34 UTC 2017
+
+* Disable nofill retrying test in AB group 5
+* Use % for endscreen width and height instead of vh and vw due to ios7 partial support
+
+# Mon Nov 27 09:52:53 UTC 2017
 
 * Add ad request ordinal to session_start_failed diagnostic message
 * Run integration tests in separate processes
