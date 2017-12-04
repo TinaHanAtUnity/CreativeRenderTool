@@ -25,6 +25,7 @@ import { ProgrammaticVastParser } from 'Parsers/ProgrammaticVastParser';
 import { ProgrammaticMraidUrlParser } from 'Parsers/ProgrammaticMraidUrlParser';
 import { ProgrammaticMraidParser } from 'Parsers/ProgrammaticMraidParser';
 import { ProgrammaticStaticInterstitialParser } from 'Parsers/ProgrammaticStaticInterstitialParser';
+import { ProgrammaticStaticInterstitialUrlParser } from 'Parsers/ProgrammaticStaticInterstitialUrlParser';
 import { CampaignParser } from 'Parsers/CampaignParser';
 import { ProgrammaticVPAIDParser } from 'Parsers/ProgrammaticVPAIDParser';
 
@@ -249,6 +250,9 @@ export class CampaignManager {
                 break;
             case 'programmatic/static-interstitial':
                 parser = new ProgrammaticStaticInterstitialParser();
+                break;
+            case 'programmatic/static-interstitial-url':
+                parser = new ProgrammaticStaticInterstitialUrlParser();
                 break;
             case 'programmatic/vast-vpaid':
                 // vast-vpaid can be both VPAID or VAST, so in this case we use the VAST parser
