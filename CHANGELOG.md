@@ -1,3 +1,9 @@
+# Pending
+
+* Change comscore ABGroup to check campaign ABGroup
+* Fix bugs in orientation detection
+* Fix overlay layout on iPhone X
+
 # Tue Dec  5 10:15:34 UTC 2017
 
 * Remove persistent skip button ab test in groups 10 & 11
