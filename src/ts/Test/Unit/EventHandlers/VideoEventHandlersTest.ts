@@ -118,6 +118,7 @@ describe('VideoEventHandlersTest', () => {
 
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
         sinon.stub(performanceAdUnit, 'isPrepareCalled').returns(true);
+        sinon.stub(performanceAdUnitParameters.campaign, 'getAbGroup').returns(5);
         spyComScore = sinon.spy(comScoreService, 'sendEvent');
     });
 
@@ -162,7 +163,7 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('should send comscore play event', () => {
-            VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, comScoreService, performanceAdUnit, 1, TestFixtures.getConfiguration(), 5);
+            VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, comScoreService, performanceAdUnit, 1, TestFixtures.getConfiguration());
 
             const positionAtSkip = performanceAdUnit.getVideo().getPosition();
             const comScoreDuration = (performanceAdUnit.getVideo().getDuration()).toString(10);
@@ -264,7 +265,7 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('should send comscore end event', () => {
-            VideoEventHandlers.onVideoCompleted(operativeEventManager, comScoreService, performanceAdUnit, 5);
+            VideoEventHandlers.onVideoCompleted(operativeEventManager, comScoreService, performanceAdUnit);
             const positionAtSkip = performanceAdUnit.getVideo().getPosition();
             const comScoreDuration = (performanceAdUnit.getVideo().getDuration()).toString(10);
             const sessionId = performanceAdUnit.getCampaign().getSession().getId();

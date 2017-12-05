@@ -20,7 +20,7 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
         this._nativeBridge = nativeBridge;
         this._operativeEventManager = parameters.operativeEventManager;
         this._comScoreTrackingService = parameters.comScoreTrackingService;
-        this._abGroup = parameters.configuration.getAbGroup();
+        this._abGroup = parameters.campaign.getAbGroup();
         this._adUnit = adUnit;
     }
 
