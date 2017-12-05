@@ -15,7 +15,7 @@ export class VPAIDOverlayEventHandler implements IOverlayHandler {
         this._adUnit = adUnit;
         this._operativeEventManager = parameters.operativeEventManager;
         this._comScoreTrackingService = parameters.comScoreTrackingService;
-        this._abGroup = parameters.configuration.getAbGroup();
+        this._abGroup = parameters.campaign.getAbGroup();
     }
 
     public onOverlaySkip(position: number): void {
