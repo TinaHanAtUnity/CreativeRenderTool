@@ -107,7 +107,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             const el = <HTMLElement>this._container.querySelector(".underlay");
             const style: CSSStyleDeclaration = window.getComputedStyle(el);
 
-            const isFilterSupported = ["filter", "webkitFilter"].filter((cssProp: string) => {
+            const isFilterSupported = ["filter", "webkitFilter", "-webkit-filter"].filter((cssProp: string) => {
                 return style.hasOwnProperty(cssProp) && style.getPropertyValue(cssProp) && style.getPropertyValue(cssProp) !== "none";
             }) || [];
 

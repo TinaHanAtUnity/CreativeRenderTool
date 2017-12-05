@@ -19,6 +19,7 @@ body.portrait #end-screen.dark-end-screen .end-screen-info {
 
   /* iOS 8 fix */
   .row-container {
+    bottom: $default-scale-size * $default-size * .25;
     z-index: 20;
   }
 
@@ -79,7 +80,10 @@ body.portrait #end-screen.dark-end-screen .end-screen-info {
       background-position: center;
       background-size: cover;
       background-repeat: no-repeat;
-      transform: scale(1.5);
+      /* Help android to render blur faster */
+      transform: scale(1.5) translateZ(0);
+      perspective: 1000;
+      backface-visibility: hidden;
 
       &:before {
         position: absolute;
@@ -104,6 +108,9 @@ body.portrait #end-screen.dark-end-screen .end-screen-info {
 
   .underlay {
     opacity: .5;
+    transform: none;
+    perspective: none;
+    backface-visibility: visible;
 
     &:before {
       background-image: linear-gradient(rgba(255, 255, 255, 0), $black 40%);
