@@ -1,7 +1,7 @@
 
-export class ABTest {
+export class CustomFeatures {
 
-    public static isInterstitialFadeTest(abgroup: number, gameId: string) {
+    public static isFadeDisabled(gameId: string) {
         const enabledGameIDs = ['1536139', // Outfit7
             '1536140', // Outfit7
             '1536129', // Outfit7
@@ -93,9 +93,7 @@ export class ABTest {
             '1541863',
             '1540877'];
 
-        if(abgroup === 10 || abgroup === 11) {
-            return true;
-        } else if (enabledGameIDs.indexOf(gameId) !== -1) {
+        if(enabledGameIDs.indexOf(gameId) !== -1) {
             return true;
         } else {
             return false;
