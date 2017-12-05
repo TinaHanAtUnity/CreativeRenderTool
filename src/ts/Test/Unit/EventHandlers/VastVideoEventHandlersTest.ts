@@ -21,6 +21,7 @@ import { Activity } from 'AdUnits/Containers/Activity';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 
 import EventTestVast from 'xml/EventTestVast.xml';
 
@@ -75,6 +76,7 @@ describe('VastVideoEventHandlers tests', () => {
         sessionManager = new SessionManager(nativeBridge);
 
         const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+        const comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         vastAdUnitParameters = {
             forceOrientation: ForceOrientation.LANDSCAPE,
@@ -84,6 +86,7 @@ describe('VastVideoEventHandlers tests', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
+            comScoreTrackingService: comScoreService,
             placement: placement,
             campaign: campaign,
             configuration: TestFixtures.getConfiguration(),

@@ -1,3 +1,20 @@
+# Tue Dec  5 10:15:34 UTC 2017
+
+* Remove persistent skip button ab test in groups 10 & 11
+* Add max value check for playable analytics
+* Add session objects for cache diagnostic errors
+
+# Thu Nov 30 10:04:19 UTC 2017
+
+* Fix end screen layout on iPhone X
+* Comscore AB test in group 5
+
+# Wed Nov 29 09:17:59 UTC 2017
+
+* Fix MRAID layout on iPhone X
+* Dark close button in landscape
+* Disable Android hardware acceleration on Android 4.2 devices
+
 # Tue Nov 28 09:12:34 UTC 2017
 
 * Disable nofill retrying test in AB group 5
