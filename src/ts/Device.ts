@@ -11,8 +11,15 @@ interface IExtendedWindow extends Window {
     webview: WebView;
 }
 
-const platform = Url.getQueryParameter(location.search, 'platform');
-const isIOS7: RegExpMatchArray | null = navigator.userAgent.match(/(iPad|iPhone|iPod);.*CPU.*OS 7_\d/i);
+let platform: string | null = null;
+if (typeof location !== 'undefined') {
+    platform = Url.getQueryParameter(location.search, 'platform');
+}
+
+let isIOS7: RegExpMatchArray | null = null;
+if (typeof navigator !== 'undefined') {
+    isIOS7 = navigator.userAgent.match(/(iPad|iPhone|iPod);.*CPU.*OS 7_\d/i);
+}
 
 const animationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
 let runningResizeEvent = false;
