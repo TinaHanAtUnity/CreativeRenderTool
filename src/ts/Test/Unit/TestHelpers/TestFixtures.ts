@@ -30,11 +30,6 @@ export class TestFixtures {
         return this.getDisplayInterstitialMarkupCampaign();
     }
 
-    private static getDisplayInterstitialMarkupCampaign(): DisplayInterstitialMarkupCampaign {
-        const json = JSON.parse(DummyDisplayInterstitialCampaign);
-        return new DisplayInterstitialMarkupCampaign(json.display.markup, this.getSession(), json.gamerId, json.abGroup, undefined, json.display.tracking, json.display.clickThroughURL);
-    }
-
     public static getPlacement(): Placement {
         return new Placement({
             id: 'fooId',
@@ -180,5 +175,10 @@ export class TestFixtures {
             versionName: '1.2.3',
             packageName: 'com.package.name'
         };
+    }
+
+    private static getDisplayInterstitialMarkupCampaign(): DisplayInterstitialMarkupCampaign {
+        const json = JSON.parse(DummyDisplayInterstitialCampaign);
+        return new DisplayInterstitialMarkupCampaign(json.display.markup, this.getSession(), json.gamerId, json.abGroup, undefined, json.display.tracking, json.display.clickThroughURL);
     }
 }
