@@ -1,4 +1,5 @@
 import { ForceOrientation } from "AdUnits/Containers/AdUnitContainer";
+import { NativeBridge } from "Native/NativeBridge";
 
 export enum AFMAEvents {
     OPEN_URL                = 'openUrl',
@@ -33,11 +34,13 @@ export interface IAFMAHandler {
 }
 
 export class AFMABridge {
+    private _nativeBridge: NativeBridge;
     private _handler: IAFMAHandler;
     private _messageListener: (e: Event) => void;
     private _afmaHandlers: { [eventName: string]: (msg: IAFMAMessage) => void };
 
-    constructor(handler: IAFMAHandler) {
+    constructor(nativeBridge: NativeBridge, handler: IAFMAHandler) {
+        this._nativeBridge = nativeBridge;
         this._handler = handler;
         this._messageListener = (e: Event) => this.onMessage(<MessageEvent>e);
         this._afmaHandlers = {};
@@ -64,6 +67,7 @@ export class AFMABridge {
     private onMessage(e: MessageEvent) {
         const message = <IAFMAMessage>e.data;
         if (message.type === 'afma') {
+            this._nativeBridge.Sdk.logInfo(`afma: event=${message.event}, data=${message.data}`);
             if (message.event in this._afmaHandlers) {
                 const handler = this._afmaHandlers[message.event];
                 handler(message);

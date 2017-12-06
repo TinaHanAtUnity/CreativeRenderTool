@@ -46,11 +46,11 @@ export class AdMobEventHandler implements IAdMobEventHandler {
     }
 
     public onVideoStart(): void {
-        this._timeoutTimer.stop();
+        // this._timeoutTimer.stop();
     }
 
     public onShow(): void {
-        this._timeoutTimer.start();
+        // this._timeoutTimer.start();
     }
 
     private onFailureToLoad(): void {

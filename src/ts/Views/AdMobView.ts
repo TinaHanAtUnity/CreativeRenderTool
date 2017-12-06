@@ -40,7 +40,7 @@ export class AdMobView extends View<IAdMobEventHandler> {
         this._template = new Template(AdMobContainer);
         this._adMobSignalFactory = adMobSignalFactory;
 
-        this._afmaBridge = new AFMABridge({
+        this._afmaBridge = new AFMABridge(nativeBridge, {
             onAFMAClose: () => this.onClose(),
             onAFMAOpenURL: (url: string) => this.onOpenURL(url),
             onAFMADisableBackButton: () => { /**/ },
