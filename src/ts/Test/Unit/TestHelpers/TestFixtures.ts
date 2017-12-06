@@ -10,7 +10,8 @@ import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Configuration } from 'Models/Configuration';
 import { ICacheDiagnostics } from 'Utilities/Cache';
-// import { DisplayInterstitialCampaign, IDisplayInterstitialCampaign } from "Models/Campaigns/DisplayInterstitialCampaign";
+import { DisplayInterstitialCampaign, IDisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
+import { DisplayInterstitialMarkupCampaign } from 'Models/Campaigns/DisplayInterstitialMarkupCampaign';
 import { Session } from 'Models/Session';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { IPackageInfo } from 'Native/Api/AndroidDeviceInfo';
@@ -20,15 +21,19 @@ import OnCometVideoPlcCampaignFollowsRedirects from 'json/OnCometVideoPlcCampaig
 import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
 import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCampaign.json';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
-// import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
+import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
 import VastCompanionXml from 'xml/VastCompanionAd.xml';
 import EventTestVast from 'xml/EventTestVast.xml';
 
 export class TestFixtures {
-    // public static getDisplayInterstitialCampaign(): DisplayInterstitialCampaign<IDisplayInterstitialCampaign> {
-    //     const json = JSON.parse(DummyDisplayInterstitialCampaign);
-    //     return new DisplayInterstitialCampaign(json.display.markup, this.getSession(), json.gamerId, json.abGroup, undefined, json.display.tracking, json.display.clickThroughURL);
-    // }
+    public static getDisplayInterstitialCampaign(): DisplayInterstitialCampaign<IDisplayInterstitialCampaign> {
+        return this.getDisplayInterstitialMarkupCampaign();
+    }
+
+    private static getDisplayInterstitialMarkupCampaign(): DisplayInterstitialMarkupCampaign {
+        const json = JSON.parse(DummyDisplayInterstitialCampaign);
+        return new DisplayInterstitialMarkupCampaign(json.display.markup, this.getSession(), json.gamerId, json.abGroup, undefined, json.display.tracking, json.display.clickThroughURL);
+    }
 
     public static getPlacement(): Placement {
         return new Placement({
