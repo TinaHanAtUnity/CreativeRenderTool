@@ -1,5 +1,4 @@
 import DisplayInterstitialTemplate from 'html/display/DisplayInterstitial.html';
-import DisplayContainer from 'html/display/DisplayContainer.html';
 import { View } from 'Views/View';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Placement } from 'Models/Placement';
@@ -9,7 +8,6 @@ import { DisplayInterstitialMarkupUrlCampaign } from 'Models/Campaigns/DisplayIn
 
 import { Platform } from 'Constants/Platform';
 import { Template } from 'Utilities/Template';
-import { WebViewError } from 'Errors/WebViewError';
 
 export interface IDisplayInterstitialHandler {
     onDisplayInterstitialClick(url: string): void;
@@ -29,7 +27,6 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
     private _canClose = false;
     private _canSkip = false;
     private _didReward = false;
-    private _markup: string;
 
     private _messageListener: EventListener;
     private _timers: number[] = [];
@@ -54,38 +51,12 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
 
     public render() {
         super.render();
+        this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
+        this.enableClickThroughCatcher();
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#display-iframe');
-
-        if (this._campaign instanceof DisplayInterstitialMarkupCampaign) {
-
-            if (this._campaign.getClickThroughUrl()) {
-                const clickCatcher = document.createElement('div');
-                clickCatcher.classList.add('iframe-click-catcher');
-                this._container.appendChild(clickCatcher);
-
-                clickCatcher.addEventListener('click', (e: Event) => this.onIFrameClicked(e));
-            }
-            this._markup = this._campaign.getDynamicMarkup();
-            this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
-
-            if (this._campaign.getClickThroughUrl()) {
-                iframe.srcdoc = this._markup;
-            } else {
-                // This situation is fixed with the addition to the programmaticStaticInterstitialParser
-                // getClickThroughUrlFromMarkup
-                // but we still need to include it in case an advertiser has a clickthroughurl that
-                // may be window.onload
-                iframe.srcdoc = DisplayContainer.replace('<body></body>', '<body>' + this._markup + '</body>');
-            }
-        }
-
-        if (this._campaign instanceof DisplayInterstitialMarkupUrlCampaign) {
-            this.createDisplayWithoutClickThroughUrl(this._campaign).then(displayFromUrl => {
-                // get clickThroughUrlFromMarkupUrl? get the clickthrough url from the displayMarkupFromUrl or
-                // is that already handled with the post message?
-                iframe.srcdoc = displayFromUrl;
-            });
-        }
+        this.getIFrameSrcDoc().then((srcdoc) => {
+            iframe.srcdoc = srcdoc;
+        });
     }
 
     public show(): void {
@@ -215,7 +186,7 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
     }
 
     // call this when we get a campaign that is DisplayInterstitialMarkupUrlCampaign
-    private requestDisplay(url: string): Promise<string | undefined> {
+    private requestMarkupFromURL(url: string): Promise<string> {
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
             xhr.addEventListener('load', () => {
@@ -230,57 +201,55 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
         });
     }
 
-    // use this to fetch Display plain text from a url
-    private fetchDisplayFromUrl(campaign: DisplayInterstitialMarkupUrlCampaign): Promise<string | undefined> {
-        const resourceUrl = campaign.getMarkupUrl();
-        return this.requestDisplay(resourceUrl);
-    }
-
     // call this once we get the markup/plain text from our fetch
-    private getClickThroughUrlFromMarkup(markup: string): string | null {
+    private getClickThroughUrlFromMarkup(markup: string): string {
         const doc = new DOMParser().parseFromString(markup, 'text/html');
-        let clickThroughUrl = null;
-        if (doc.body.querySelectorAll('a')[0]) {
-            clickThroughUrl = doc.body.querySelectorAll('a')[0].getAttribute('href');
+        const a = doc.querySelector('a');
+        if (a) {
+            const href = a.getAttribute('href');
+            if (href) {
+                return href;
+            }
         }
 
-        return clickThroughUrl;
+        throw new Error('No clickthrough URL was found');
     }
 
-    // this.fetchDisplayFromUrl().then(displayMarkup => {
-    //     if (displayMarkup) {
-    //         console.log(displayMarkup);
-    //         const clickThroughFromMarkup = this.getClickThroughUrlFromMarkup(displayMarkup);
-    //         if (clickThroughFromMarkup) {
-    //             const clickCatcher = document.createElement('div');
-    //             clickCatcher.classList.add('iframe-click-catcher');
-    //             this._container.appendChild(clickCatcher);
-    //
-    //             clickCatcher.addEventListener('click', (e: Event) => this.onIFrameClicked(e));
-    //         }
-    //         iframe.srcdoc = displayMarkup;
-    //     }
-    //     throw new WebViewError('Unable to fetch Display');
-    // });
-    // Or do it using the redirect event listener done by Ross
-    // this.createDisplayWithoutClickThroughUrl().then(displayFromUrl => {
-    //     // get clickThroughUrlFromMarkupUrl? get the clickthrough url from the displayMarkupFromUrl or
-    //     // is that already handled with the post message?
-    //     iframe.srcdoc = displayFromUrl;
-    // });
-    private createDisplayWithoutClickThroughUrl(campaign: DisplayInterstitialMarkupUrlCampaign): Promise<string> {
-        return this.fetchDisplayFromUrl(campaign).then(displayMarkup => {
-            if (displayMarkup) {
-                const clickThroughFromMarkup = this.getClickThroughUrlFromMarkup(displayMarkup);
-                if (clickThroughFromMarkup) {
-                    const clickCatcher = document.createElement('div');
-                    clickCatcher.classList.add('iframe-click-catcher');
-                    this._container.appendChild(clickCatcher);
-
-                    clickCatcher.addEventListener('click', (e: Event) => this.onIFrameClicked(e));
-                }
-            }
-            throw new WebViewError('Unable to fetch Display');
+    private fetchMarkupAndParseClickThroughURL(): Promise<string> {
+        const markupUrlCampaign = <DisplayInterstitialMarkupUrlCampaign>this._campaign;
+        return this.requestMarkupFromURL(markupUrlCampaign.getMarkupUrl()).then(displayMarkup => {
+            const clickThroughURL = this.getClickThroughUrlFromMarkup(displayMarkup);
+            markupUrlCampaign.setClickThroughUrl(clickThroughURL);
+            return displayMarkup;
         });
+    }
+
+    private enableClickThroughCatcher() {
+        const clickCatcher = document.createElement('div');
+        clickCatcher.classList.add('iframe-click-catcher');
+        this._container.appendChild(clickCatcher);
+
+        clickCatcher.addEventListener('click', (e: Event) => this.onIFrameClicked(e));
+    }
+
+    private getIFrameSrcDoc(): Promise<string> {
+        if (this._campaign instanceof DisplayInterstitialMarkupCampaign) {
+
+            if (this._campaign.getClickThroughUrl()) {
+                return Promise.resolve(this._campaign.getDynamicMarkup());
+            } else {
+                return new Promise((resolve, reject) => {
+                    const campaign = <DisplayInterstitialMarkupCampaign>this._campaign;
+                    const clickThroughURL = this.getClickThroughUrlFromMarkup(campaign.getDynamicMarkup());
+                    this._campaign.setClickThroughUrl(clickThroughURL);
+                    resolve(campaign.getDynamicMarkup());
+                });
+            }
+        }
+
+        if (this._campaign instanceof DisplayInterstitialMarkupUrlCampaign) {
+            return this.fetchMarkupAndParseClickThroughURL();
+        }
+        return Promise.reject('Unknown campaign type?');
     }
 }
