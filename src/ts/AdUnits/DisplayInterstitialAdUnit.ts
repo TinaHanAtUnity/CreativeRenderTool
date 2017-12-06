@@ -2,17 +2,17 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { FinishState } from 'Constants/FinishState';
 import { IObserver0 } from 'Utilities/IObserver';
-import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
+import { DisplayInterstitialCampaign, IDisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { DisplayInterstitial } from 'Views/DisplayInterstitial';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { Platform } from 'Constants/Platform';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 
-export interface IDisplayInterstitialAdUnitParameters extends IAdUnitParameters<DisplayInterstitialCampaign> {
+export interface IDisplayInterstitialAdUnitParameters extends IAdUnitParameters<DisplayInterstitialCampaign<IDisplayInterstitialCampaign>> {
     view: DisplayInterstitial;
 }
 
-export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitialCampaign> {
+export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitialCampaign<IDisplayInterstitialCampaign>> {
 
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;

@@ -1,26 +1,25 @@
 import { Campaign, ICampaign } from 'Models/Campaign';
 import { Asset } from 'Models/Assets/Asset';
-import { Session } from 'Models/Session';
+import {ISchema} from "../Model";
+import {Session} from "../Session";
 
-interface IDisplayInterstitialCampaign extends ICampaign {
-    dynamicMarkup: string;
+export interface IDisplayInterstitialCampaign extends ICampaign {
     clickThroughUrl: string | undefined;
     tracking: object | undefined;
 }
 
-export class DisplayInterstitialCampaign extends Campaign<IDisplayInterstitialCampaign> {
-    constructor(markup: string, session: Session, gamerId: string, abGroup: number, cacheTTL: number | undefined, tracking?: { [eventName: string]: string[] }, clickThroughUrl?: string, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
-        super('DisplayInterstitialCampaign', {
-            ... Campaign.Schema,
-            dynamicMarkup: ['string'],
-            clickThroughUrl: ['string', 'undefined'],
-            tracking: ['object', 'undefined']
-        });
+export class DisplayInterstitialCampaign<V extends IDisplayInterstitialCampaign> extends Campaign<V> {
+    public static Schema: ISchema<IDisplayInterstitialCampaign> = {
+        ... Campaign.Schema,
+        clickThroughUrl: ['string', 'undefined'],
+        tracking: ['object', 'undefined']
+    };
+
+    constructor(clazz: string, schema: ISchema<V>, session: Session, gamerId: string, abGroup: number, cacheTTL: number | undefined, tracking?: { [eventName: string]: string[] }, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
+        super(clazz, schema);
         if(cacheTTL) {
             this.set('willExpireAt', Date.now() + cacheTTL * 1000);
         }
-        this.set('dynamicMarkup', markup);
-        this.set('clickThroughUrl', clickThroughUrl || undefined);
         this.set('gamerId', gamerId);
         this.set('abGroup', abGroup);
         this.set('adType', adType || undefined);
@@ -31,12 +30,12 @@ export class DisplayInterstitialCampaign extends Campaign<IDisplayInterstitialCa
         this.set('session', session);
     }
 
-    public getDynamicMarkup(): string {
-        return this.get('dynamicMarkup');
-    }
-
     public getClickThroughUrl(): string | undefined {
         return this.get('clickThroughUrl');
+    }
+
+    public setClickThroughUrl(clickThroughUrl: string) {
+        this.set('clickThroughUrl', clickThroughUrl);
     }
 
     public getTrackingUrlsForEvent(eventName: string): string[] {

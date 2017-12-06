@@ -1,12 +1,15 @@
 import DisplayInterstitialTemplate from 'html/display/DisplayInterstitial.html';
 import DisplayContainer from 'html/display/DisplayContainer.html';
-
 import { View } from 'Views/View';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Placement } from 'Models/Placement';
-import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
+import { IDisplayInterstitialCampaign, DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
+import { DisplayInterstitialMarkupCampaign } from 'Models/Campaigns/DisplayInterstitialMarkupCampaign';
+import { DisplayInterstitialMarkupUrlCampaign } from 'Models/Campaigns/DisplayInterstitialMarkupUrlCampaign';
+
 import { Platform } from 'Constants/Platform';
 import { Template } from 'Utilities/Template';
+import { WebViewError } from 'Errors/WebViewError';
 
 export interface IDisplayInterstitialHandler {
     onDisplayInterstitialClick(url: string): void;
@@ -18,7 +21,7 @@ export interface IDisplayInterstitialHandler {
 export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
 
     private _placement: Placement;
-    private _campaign: DisplayInterstitialCampaign;
+    private _campaign: DisplayInterstitialCampaign<IDisplayInterstitialCampaign>;
 
     private _closeElement: HTMLElement;
     private _iframe: HTMLIFrameElement;
@@ -31,7 +34,7 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
     private _messageListener: EventListener;
     private _timers: number[] = [];
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: DisplayInterstitialCampaign) {
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: DisplayInterstitialCampaign<IDisplayInterstitialCampaign>) {
         super(nativeBridge, 'display-interstitial');
 
         this._placement = placement;
@@ -51,25 +54,37 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
 
     public render() {
         super.render();
-
-        if (this._campaign.getClickThroughUrl()) {
-            const clickCatcher = document.createElement('div');
-            clickCatcher.classList.add('iframe-click-catcher');
-            this._container.appendChild(clickCatcher);
-
-            clickCatcher.addEventListener('click', (e: Event) => this.onIFrameClicked(e));
-        }
-
-        this._markup = this._campaign.getDynamicMarkup();
-
-        this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
-
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#display-iframe');
 
-        if (this._campaign.getClickThroughUrl()) {
-            iframe.srcdoc = this._markup;
-        } else {
-            iframe.srcdoc = DisplayContainer.replace('<body></body>', '<body>' + this._markup + '</body>');
+        if (this._campaign instanceof DisplayInterstitialMarkupCampaign) {
+
+            if (this._campaign.getClickThroughUrl()) {
+                const clickCatcher = document.createElement('div');
+                clickCatcher.classList.add('iframe-click-catcher');
+                this._container.appendChild(clickCatcher);
+
+                clickCatcher.addEventListener('click', (e: Event) => this.onIFrameClicked(e));
+            }
+            this._markup = this._campaign.getDynamicMarkup();
+            this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
+
+            if (this._campaign.getClickThroughUrl()) {
+                iframe.srcdoc = this._markup;
+            } else {
+                // This situation is fixed with the addition to the programmaticStaticInterstitialParser
+                // getClickThroughUrlFromMarkup
+                // but we still need to include it in case an advertiser has a clickthroughurl that
+                // may be window.onload
+                iframe.srcdoc = DisplayContainer.replace('<body></body>', '<body>' + this._markup + '</body>');
+            }
+        }
+
+        if (this._campaign instanceof DisplayInterstitialMarkupUrlCampaign) {
+            this.createDisplayWithoutClickThroughUrl(this._campaign).then(displayFromUrl => {
+                // get clickThroughUrlFromMarkupUrl? get the clickthrough url from the displayMarkupFromUrl or
+                // is that already handled with the post message?
+                iframe.srcdoc = displayFromUrl;
+            });
         }
     }
 
@@ -197,5 +212,75 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
             default:
                 this._nativeBridge.Sdk.logWarning(`Unknown message: ${e.data.type}`);
         }
+    }
+
+    // call this when we get a campaign that is DisplayInterstitialMarkupUrlCampaign
+    private requestDisplay(url: string): Promise<string | undefined> {
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.addEventListener('load', () => {
+                if ((this._nativeBridge.getPlatform() === Platform.ANDROID && xhr.status === 0) || (xhr.status >= 200 && xhr.status <= 299)) {
+                    resolve(xhr.responseText);
+                } else {
+                    reject(new Error(`XHR returned with unknown status code ${xhr.status}`));
+                }
+            }, false);
+            xhr.open('GET', decodeURIComponent(url));
+            xhr.send();
+        });
+    }
+
+    // use this to fetch Display plain text from a url
+    private fetchDisplayFromUrl(campaign: DisplayInterstitialMarkupUrlCampaign): Promise<string | undefined> {
+        const resourceUrl = campaign.getMarkupUrl();
+        return this.requestDisplay(resourceUrl);
+    }
+
+    // call this once we get the markup/plain text from our fetch
+    private getClickThroughUrlFromMarkup(markup: string): string | null {
+        const doc = new DOMParser().parseFromString(markup, 'text/html');
+        let clickThroughUrl = null;
+        if (doc.body.querySelectorAll('a')[0]) {
+            clickThroughUrl = doc.body.querySelectorAll('a')[0].getAttribute('href');
+        }
+
+        return clickThroughUrl;
+    }
+
+    // this.fetchDisplayFromUrl().then(displayMarkup => {
+    //     if (displayMarkup) {
+    //         console.log(displayMarkup);
+    //         const clickThroughFromMarkup = this.getClickThroughUrlFromMarkup(displayMarkup);
+    //         if (clickThroughFromMarkup) {
+    //             const clickCatcher = document.createElement('div');
+    //             clickCatcher.classList.add('iframe-click-catcher');
+    //             this._container.appendChild(clickCatcher);
+    //
+    //             clickCatcher.addEventListener('click', (e: Event) => this.onIFrameClicked(e));
+    //         }
+    //         iframe.srcdoc = displayMarkup;
+    //     }
+    //     throw new WebViewError('Unable to fetch Display');
+    // });
+    // Or do it using the redirect event listener done by Ross
+    // this.createDisplayWithoutClickThroughUrl().then(displayFromUrl => {
+    //     // get clickThroughUrlFromMarkupUrl? get the clickthrough url from the displayMarkupFromUrl or
+    //     // is that already handled with the post message?
+    //     iframe.srcdoc = displayFromUrl;
+    // });
+    private createDisplayWithoutClickThroughUrl(campaign: DisplayInterstitialMarkupUrlCampaign): Promise<string> {
+        return this.fetchDisplayFromUrl(campaign).then(displayMarkup => {
+            if (displayMarkup) {
+                const clickThroughFromMarkup = this.getClickThroughUrlFromMarkup(displayMarkup);
+                if (clickThroughFromMarkup) {
+                    const clickCatcher = document.createElement('div');
+                    clickCatcher.classList.add('iframe-click-catcher');
+                    this._container.appendChild(clickCatcher);
+
+                    clickCatcher.addEventListener('click', (e: Event) => this.onIFrameClicked(e));
+                }
+            }
+            throw new WebViewError('Unable to fetch Display');
+        });
     }
 }

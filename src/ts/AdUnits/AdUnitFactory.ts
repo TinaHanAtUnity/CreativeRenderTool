@@ -3,7 +3,7 @@ import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { IVastAdUnitParameters, VastAdUnit } from 'AdUnits/VastAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
-import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
+import { IDisplayInterstitialCampaign, DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { DisplayInterstitialAdUnit, IDisplayInterstitialAdUnitParameters } from 'AdUnits/DisplayInterstitialAdUnit';
 import { DisplayInterstitial } from 'Views/DisplayInterstitial';
 import { VideoEventHandlers } from 'EventHandlers/VideoEventHandlers';
@@ -56,7 +56,7 @@ export class AdUnitFactory {
         } else if(parameters.campaign instanceof PerformanceCampaign) {
             return this.createPerformanceAdUnit(nativeBridge, <IAdUnitParameters<PerformanceCampaign>>parameters);
         } else if (parameters.campaign instanceof DisplayInterstitialCampaign) {
-            return this.createDisplayInterstitialAdUnit(nativeBridge, <IAdUnitParameters<DisplayInterstitialCampaign>>parameters);
+            return this.createDisplayInterstitialAdUnit(nativeBridge, <IAdUnitParameters<DisplayInterstitialCampaign<IDisplayInterstitialCampaign>>>parameters);
         } else if (parameters.campaign instanceof VPAIDCampaign) {
             return this.createVPAIDAdUnit(nativeBridge, <IAdUnitParameters<VPAIDCampaign>>parameters);
         } else {
@@ -264,8 +264,8 @@ export class AdUnitFactory {
         return vpaidAdUnit;
     }
 
-    private static createDisplayInterstitialAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<DisplayInterstitialCampaign>): AbstractAdUnit<DisplayInterstitialCampaign> {
-        const view = new DisplayInterstitial(nativeBridge, parameters.placement, <DisplayInterstitialCampaign>parameters.campaign);
+    private static createDisplayInterstitialAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<DisplayInterstitialCampaign<IDisplayInterstitialCampaign>>): AbstractAdUnit<DisplayInterstitialCampaign<IDisplayInterstitialCampaign>> {
+        const view = new DisplayInterstitial(nativeBridge, parameters.placement, <DisplayInterstitialCampaign<IDisplayInterstitialCampaign>>parameters.campaign);
 
         const displayInterstitialParameters: IDisplayInterstitialAdUnitParameters = {
             ... parameters,
