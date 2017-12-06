@@ -13,6 +13,7 @@ export class DisplayInterstitialMarkupCampaign extends DisplayInterstitialCampai
         }, session, gamerId, abGroup, cacheTTL, tracking, adType, creativeId, seatId, correlationId);
 
         this.set('markup', markup);
+        this.set('clickThroughUrl', clickThroughUrl);
     }
 
     public getDynamicMarkup() {
