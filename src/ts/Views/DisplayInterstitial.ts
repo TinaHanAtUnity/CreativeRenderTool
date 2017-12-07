@@ -232,16 +232,8 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
 
     private getIFrameSrcDoc(): Promise<string> {
         if (this._campaign instanceof DisplayInterstitialMarkupCampaign) {
-
             if (this._campaign.getClickThroughUrl()) {
                 return Promise.resolve(this._campaign.getDynamicMarkup());
-            } else {
-                return new Promise((resolve, reject) => {
-                    const campaign = <DisplayInterstitialMarkupCampaign>this._campaign;
-                    const clickThroughURL = this.getClickThroughUrlFromMarkup(campaign.getDynamicMarkup());
-                    this._campaign.setClickThroughUrl(clickThroughURL);
-                    resolve(campaign.getDynamicMarkup());
-                });
             }
         }
 

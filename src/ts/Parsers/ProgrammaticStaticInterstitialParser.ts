@@ -39,11 +39,13 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
 
     private getClickThroughUrlFromMarkup(markup: string): string | null {
         const doc = new DOMParser().parseFromString(markup, 'text/html');
-        let clickThroughUrl = null;
-        if (doc.body.querySelectorAll('a')[0]) {
-            clickThroughUrl = doc.body.querySelectorAll('a')[0].getAttribute('href');
+        const a = doc.querySelector('a');
+        if (a) {
+            const href = a.getAttribute('href');
+            if (href) {
+                return href;
+            }
         }
-
-        return clickThroughUrl;
+        return null;
     }
 }

@@ -67,7 +67,4 @@ describe('DisplayInterstitial View', () => {
             view.hide();
         });
     }
-
-    // write unit tests to cover DisplayInterstitialMarkupUrlCampaign - programmatic/static-interstitial-url
-    // 'should throw no clickthrough url was found error when the mark nor json do not contain a clickthrough url'
 });

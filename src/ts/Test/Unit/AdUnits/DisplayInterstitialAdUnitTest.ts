@@ -130,7 +130,4 @@ describe('DisplayInterstitialAdUnit', () => {
             });
         });
     }
-
-    // write unit tests to cover when there is no clickthorugh url separated out nor in markup for DisplayInterstitialMarkupCampaign
-    // write unit tests to cover DisplayInterstitialMarkupUrlCampaign -programmatic/static-interstitial-url
 });
