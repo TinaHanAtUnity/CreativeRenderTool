@@ -155,7 +155,7 @@ export class AdUnitFactory {
         const moatIds = {
             level1: campaign.getSeatId(),
             level2: 'unity buyer id - will get from auction once it is sorted out',
-            level3: campaign.getAdvertiserDomain(),
+            level3: campaign.getAdvertiserBundleId() ? campaign.getAdvertiserBundleId() : campaign.getAdvertiserDomain(),
             level4: campaign.getCreativeId(),
             slicer1: parameters.clientInfo.getSdkVersionName(),
             slicer2: 'Unity placements bundle Id - not sure what that corresponds to',
