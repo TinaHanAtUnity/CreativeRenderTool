@@ -37,7 +37,7 @@ describe('DisplayInterstitialEventHandler', () => {
         eventHandlerTests(isDisplayInterstitialUrlCampaign);
     });
 
-    function eventHandlerTests(isDisplayInterstitialUrlCampaign: boolean) {
+    function eventHandlerTests(isUrlCampaign: boolean) {
         beforeEach(() => {
             sandbox = sinon.sandbox.create();
             nativeBridge = TestFixtures.getNativeBridge();
@@ -52,7 +52,7 @@ describe('DisplayInterstitialEventHandler', () => {
                 muteVideo: false
             });
 
-            campaign = TestFixtures.getDisplayInterstitialCampaign(isDisplayInterstitialUrlCampaign);
+            campaign = TestFixtures.getDisplayInterstitialCampaign(isUrlCampaign);
             view = new DisplayInterstitial(nativeBridge, placement, campaign);
 
             sandbox.stub(nativeBridge, 'getApiLevel').returns(16);

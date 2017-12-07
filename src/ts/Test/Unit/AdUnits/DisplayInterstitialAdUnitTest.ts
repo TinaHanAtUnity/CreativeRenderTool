@@ -44,9 +44,9 @@ describe('DisplayInterstitialAdUnit', () => {
         adUnitTests(isStaticInterstitialUrlCampaign);
     });
 
-    function adUnitTests(isStaticInterstitialUrlCampaign: boolean) {
+    function adUnitTests(isUrlCampaign: boolean) {
         beforeEach(() => {
-            campaign = TestFixtures.getDisplayInterstitialCampaign(isStaticInterstitialUrlCampaign);
+            campaign = TestFixtures.getDisplayInterstitialCampaign(isUrlCampaign);
             sandbox = sinon.sandbox.create();
             nativeBridge = TestFixtures.getNativeBridge(Platform.ANDROID);
             placement = TestFixtures.getPlacement();

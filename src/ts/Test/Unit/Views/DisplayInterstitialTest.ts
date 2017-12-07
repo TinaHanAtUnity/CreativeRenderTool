@@ -27,7 +27,7 @@ describe('DisplayInterstitial View', () => {
         viewUnitTests(isDisplayInterstitialUrlCampaign);
     });
 
-    function viewUnitTests(isDisplayInterstitialUrlCampaign: boolean) {
+    function viewUnitTests(isUrlCampaign: boolean) {
         beforeEach(() => {
             sandbox = sinon.sandbox.create();
             nativeBridge = TestFixtures.getNativeBridge();
@@ -41,7 +41,7 @@ describe('DisplayInterstitial View', () => {
                 useDeviceOrientationForVideo: false,
                 muteVideo: false
             });
-            campaign = TestFixtures.getDisplayInterstitialCampaign(isDisplayInterstitialUrlCampaign);
+            campaign = TestFixtures.getDisplayInterstitialCampaign(isUrlCampaign);
             view = new DisplayInterstitial(nativeBridge, placement, campaign);
 
             sandbox.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
