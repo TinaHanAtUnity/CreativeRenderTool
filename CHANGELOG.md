@@ -1,4 +1,4 @@
-# Pending
+# Thu Dec  7 10:05:11 UTC 2017
 
 * Change comscore ABGroup to check campaign ABGroup
 * Fix bugs in orientation detection
