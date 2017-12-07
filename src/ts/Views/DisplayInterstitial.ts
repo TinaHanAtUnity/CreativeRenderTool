@@ -185,7 +185,6 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
         }
     }
 
-    // call this when we get a campaign that is DisplayInterstitialMarkupUrlCampaign
     private requestMarkupFromURL(url: string): Promise<string> {
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
@@ -201,7 +200,6 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
         });
     }
 
-    // call this once we get the markup/plain text from our fetch
     private getClickThroughUrlFromMarkup(markup: string): string {
         const doc = new DOMParser().parseFromString(markup, 'text/html');
         const a = doc.querySelector('a');
@@ -250,6 +248,6 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
         if (this._campaign instanceof DisplayInterstitialMarkupUrlCampaign) {
             return this.fetchMarkupAndParseClickThroughURL();
         }
-        return Promise.reject('Unknown campaign type?');
+        return Promise.reject('Unknown campaign type');
     }
 }

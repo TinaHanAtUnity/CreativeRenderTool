@@ -221,9 +221,10 @@ describe('AdUnitFactoryTest', () => {
     describe('DisplayInterstitialAdUnit', () => {
         let adUnit: DisplayInterstitialAdUnit;
         let campaign: DisplayInterstitialCampaign<IDisplayInterstitialCampaign>;
+        let isStaticInterstitialUrlCampaign = true;
 
         beforeEach(() => {
-            campaign = TestFixtures.getDisplayInterstitialCampaign();
+            campaign = TestFixtures.getDisplayInterstitialCampaign(!isStaticInterstitialUrlCampaign);
             adUnitParameters.campaign = campaign;
             adUnit = <DisplayInterstitialAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
         });

@@ -34,6 +34,7 @@ describe('DisplayInterstitialAdUnit', () => {
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
     let displayInterstitialAdUnitParameters: IDisplayInterstitialAdUnitParameters;
+    let isStaticInterstitialUrlCampaign = true;
 
     beforeEach(() => {
         sandbox = sinon.sandbox.create();
@@ -52,7 +53,7 @@ describe('DisplayInterstitialAdUnit', () => {
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         sessionManager = new SessionManager(nativeBridge);
         operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
-        campaign = TestFixtures.getDisplayInterstitialCampaign();
+        campaign = TestFixtures.getDisplayInterstitialCampaign(!isStaticInterstitialUrlCampaign);
 
         view = new DisplayInterstitial(nativeBridge, placement, campaign);
         view.render();

@@ -27,6 +27,7 @@ describe('DisplayInterstitialEventHandler', () => {
     let displayInterstitialAdUnit: DisplayInterstitialAdUnit;
     let displayInterstitialEventHandler: DisplayInterstitialEventHandler;
     let operativeEventManager: OperativeEventManager;
+    let isStaticInterstitialUrlCampaign = true;
 
     beforeEach(() => {
         sandbox = sinon.sandbox.create();
@@ -43,7 +44,7 @@ describe('DisplayInterstitialEventHandler', () => {
         });
 
         // write tests to cover DisplayInterstitialMarkupUrlCampaign - programmatic/static-interstitial-url
-        campaign = TestFixtures.getDisplayInterstitialCampaign();
+        campaign = TestFixtures.getDisplayInterstitialCampaign(!isStaticInterstitialUrlCampaign);
         view = new DisplayInterstitial(nativeBridge, placement, campaign);
 
         sandbox.stub(nativeBridge, 'getApiLevel').returns(16);

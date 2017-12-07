@@ -9,7 +9,6 @@ import { DisplayInterstitialCampaign, IDisplayInterstitialCampaign } from 'Model
 import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
 import { Platform } from 'Constants/Platform';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
-import { DisplayInterstitialMarkupUrlCampaign } from 'Models/Campaigns/DisplayInterstitialMarkupUrlCampaign';
 const json = JSON.parse(DummyDisplayInterstitialCampaign);
 
 describe('DisplayInterstitial View', () => {
@@ -18,6 +17,7 @@ describe('DisplayInterstitial View', () => {
     let placement: Placement;
     let campaign: DisplayInterstitialCampaign<IDisplayInterstitialCampaign>;
     let sandbox: sinon.SinonSandbox;
+    let isDisplayInterstitialUrlCampaign = true;
 
     beforeEach(() => {
         sandbox = sinon.sandbox.create();
@@ -32,7 +32,7 @@ describe('DisplayInterstitial View', () => {
             useDeviceOrientationForVideo: false,
             muteVideo: false
         });
-        campaign = new DisplayInterstitialMarkupUrlCampaign(json.display.markup, TestFixtures.getSession(), json.gamerId, json.abGroup, undefined);
+        campaign = TestFixtures.getDisplayInterstitialCampaign(!isDisplayInterstitialUrlCampaign);
         view = new DisplayInterstitial(nativeBridge, placement, campaign);
 
         sandbox.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
@@ -57,6 +57,14 @@ describe('DisplayInterstitial View', () => {
         view.show();
         view.hide();
     });
+
+    // describe('Display Interstitial Markup Campaign',() => {
+    //
+    // });
+    //
+    // describe('Display Interstitial MarkupUrl Campaign', () => {
+    //
+    // });
 
     // write unit tests to cover DisplayInterstitialMarkupUrlCampaign - programmatic/static-interstitial-url
     // 'should throw no clickthrough url was found error when the mark nor json do not contain a clickthrough url'

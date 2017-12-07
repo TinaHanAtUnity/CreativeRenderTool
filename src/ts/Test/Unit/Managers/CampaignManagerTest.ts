@@ -6,8 +6,8 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Campaign } from 'Models/Campaign';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
-// import { DisplayInterstitialCampaign, IDisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { DisplayInterstitialMarkupCampaign } from 'Models/Campaigns/DisplayInterstitialMarkupCampaign';
+import { DisplayInterstitialMarkupUrlCampaign } from 'Models/Campaigns/DisplayInterstitialMarkupUrlCampaign';
 import { ClientInfo } from 'Models/ClientInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Request } from 'Utilities/Request';
@@ -64,7 +64,6 @@ import OnStaticInterstitialDisplayCampaign from 'json/OnStaticInterstitialDispla
 import OnStaticInterstitialDisplayCampaignNoClick from 'json/OnStaticInterstitialDisplayCampaignNoClick.json';
 import OnStaticInterstitialDisplayCampaignNoClickMarkupUrl from 'json/OnStaticInterstitialDisplayCampaignNoClickMarkupUrl.json';
 import { ProgrammaticVastParser } from 'Parsers/ProgrammaticVastParser';
-import {DisplayInterstitialMarkupUrlCampaign} from "../../../Models/Campaigns/DisplayInterstitialMarkupUrlCampaign";
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -937,7 +936,7 @@ describe('CampaignManager', () => {
             });
         });
 
-        it('should trigger onError when there is no clickThroughURL in markup or auction json', () => {
+        it('should trigger onError when there is no clickThroughURL in programmatic/static-interstitial markup or auction json', () => {
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve({
                 response: OnStaticInterstitialDisplayCampaignNoClick
