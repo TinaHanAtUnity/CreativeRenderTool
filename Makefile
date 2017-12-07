@@ -218,7 +218,6 @@ clean:
 
 	rm -rf $(BUILD_DIR)
 	find $(TS_SRC) -type f -name "*.js" -or -name "*.map" | xargs rm -rf
-
 lint:
 	@echo
 	@echo Running linter
@@ -241,7 +240,7 @@ test-unit:
 	@echo Running unit tests
 	@echo
 
-	TEST_FILTER=Unit node --trace-warnings test-utils/node_runner.js
+	TEST_FILTER=Test/Unit node --trace-warnings test-utils/node_runner.js
 
 test-integration: MODULE = system
 test-integration: TARGET = es5
@@ -256,7 +255,7 @@ test-integration:
 	@echo Running integration tests
 	@echo
 
-	TEST_FILTER=Integration node test-utils/node_runner.js
+	ISOLATED=true TEST_FILTER=Test/Integration node test-utils/node_runner.js
 
 test-coverage: BUILD_DIR = build/coverage
 test-coverage: MODULE = system
@@ -272,7 +271,7 @@ test-coverage: build-dir
 	@echo Running unit tests with coverage
 	@echo
 
-	COVERAGE_DIR=$(BUILD_DIR) TEST_FILTER=Unit node test-utils/node_runner.js
+	COVERAGE_DIR=$(BUILD_DIR) TEST_FILTER=Test/Unit node test-utils/node_runner.js
 	@$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage.json -o $(BUILD_DIR)/summary -t text-summary
 	@cat $(BUILD_DIR)/summary && echo \n
 	@$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage.json -o $(BUILD_DIR)/report -t html

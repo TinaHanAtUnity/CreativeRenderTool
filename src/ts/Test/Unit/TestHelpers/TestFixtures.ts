@@ -10,7 +10,7 @@ import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Configuration } from 'Models/Configuration';
 import { ICacheDiagnostics } from 'Utilities/Cache';
-import { DisplayInterstitialCampaign } from "Models/Campaigns/DisplayInterstitialCampaign";
+import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { Session } from 'Models/Session';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { IPackageInfo } from 'Native/Api/AndroidDeviceInfo';

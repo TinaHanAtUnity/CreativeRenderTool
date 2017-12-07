@@ -8,6 +8,7 @@ import { SessionManager } from 'Managers/SessionManager';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { Request, INativeResponse } from 'Utilities/Request';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
@@ -15,7 +16,7 @@ import { Platform } from 'Constants/Platform';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { ViewController } from 'AdUnits/Containers/ViewController';
-import { PerformanceCampaign, StoreName } from "Models/Campaigns/PerformanceCampaign";
+import { PerformanceCampaign, StoreName } from 'Models/Campaigns/PerformanceCampaign';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { Video } from 'Models/Assets/Video';
 import { FocusManager } from 'Managers/FocusManager';
@@ -39,6 +40,7 @@ describe('EndScreenEventHandlerTest', () => {
     let thirdPartyEventManager: ThirdPartyEventManager;
     let performanceAdUnitParameters: IPerformanceAdUnitParameters;
     let endScreenEventHandler: PerformanceEndScreenEventHandler;
+    let comScoreService: ComScoreTrackingService;
 
     describe('with onDownloadAndroid', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -60,6 +62,7 @@ describe('EndScreenEventHandlerTest', () => {
             sessionManager = new SessionManager(nativeBridge);
             operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
+            comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
             sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
             sinon.spy(nativeBridge.Intent, 'launch');
@@ -76,6 +79,7 @@ describe('EndScreenEventHandlerTest', () => {
                 clientInfo: clientInfo,
                 thirdPartyEventManager: thirdPartyEventManager,
                 operativeEventManager: operativeEventManager,
+                comScoreTrackingService: comScoreService,
                 placement: TestFixtures.getPlacement(),
                 campaign: TestFixtures.getCampaign(),
                 configuration: TestFixtures.getConfiguration(),
@@ -226,6 +230,7 @@ describe('EndScreenEventHandlerTest', () => {
                 clientInfo: clientInfo,
                 thirdPartyEventManager: thirdPartyEventManager,
                 operativeEventManager: operativeEventManager,
+                comScoreTrackingService: comScoreService,
                 placement: TestFixtures.getPlacement(),
                 campaign: campaign,
                 configuration: TestFixtures.getConfiguration(),

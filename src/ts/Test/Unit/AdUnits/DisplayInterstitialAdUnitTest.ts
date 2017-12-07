@@ -1,25 +1,26 @@
 import 'mocha';
 import * as sinon from 'sinon';
 
-import { DisplayInterstitialAdUnit, IDisplayInterstitialAdUnitParameters } from "AdUnits/DisplayInterstitialAdUnit";
-import { NativeBridge } from "Native/NativeBridge";
-import { AdUnitContainer, ForceOrientation } from "AdUnits/Containers/AdUnitContainer";
-import { SessionManager } from "Managers/SessionManager";
-import { Placement } from "Models/Placement";
+import { DisplayInterstitialAdUnit, IDisplayInterstitialAdUnitParameters } from 'AdUnits/DisplayInterstitialAdUnit';
+import { NativeBridge } from 'Native/NativeBridge';
+import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { SessionManager } from 'Managers/SessionManager';
+import { Placement } from 'Models/Placement';
 import { Request } from 'Utilities/Request';
-import { DisplayInterstitialCampaign } from "Models/Campaigns/DisplayInterstitialCampaign";
-import { DisplayInterstitial } from "Views/DisplayInterstitial";
-import { TestFixtures } from "Test/Unit/TestHelpers/TestFixtures";
-import { Activity } from "AdUnits/Containers/Activity";
-import { Platform } from "Constants/Platform";
-import { ThirdPartyEventManager } from "Managers/ThirdPartyEventManager";
-import { DeviceInfo } from "Models/DeviceInfo";
-import { MetaDataManager } from "Managers/MetaDataManager";
-import { WakeUpManager } from "Managers/WakeUpManager";
-import { FocusManager } from "Managers/FocusManager";
+import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
+import { DisplayInterstitial } from 'Views/DisplayInterstitial';
+import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
+import { Activity } from 'AdUnits/Containers/Activity';
+import { Platform } from 'Constants/Platform';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { DeviceInfo } from 'Models/DeviceInfo';
+import { MetaDataManager } from 'Managers/MetaDataManager';
+import { WakeUpManager } from 'Managers/WakeUpManager';
+import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 
 const json = JSON.parse(DummyDisplayInterstitialCampaign);
 describe('DisplayInterstitialAdUnit', () => {
@@ -36,6 +37,7 @@ describe('DisplayInterstitialAdUnit', () => {
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
     let displayInterstitialAdUnitParameters: IDisplayInterstitialAdUnitParameters;
+    let comScoreService: ComScoreTrackingService;
 
     beforeEach(() => {
         sandbox = sinon.sandbox.create();
@@ -55,6 +57,7 @@ describe('DisplayInterstitialAdUnit', () => {
         sessionManager = new SessionManager(nativeBridge);
         operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
         campaign = new DisplayInterstitialCampaign(json.display.markup, json.display.markupUrl, json.display.markupBaseUrl, TestFixtures.getSession(), json.gamerId, json.abGroup, undefined);
+        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         view = new DisplayInterstitial(nativeBridge, placement, campaign);
         view.render();
@@ -70,6 +73,7 @@ describe('DisplayInterstitialAdUnit', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
+            comScoreTrackingService: comScoreService,
             placement: TestFixtures.getPlacement(),
             campaign: campaign,
             configuration: TestFixtures.getConfiguration(),
