@@ -68,55 +68,40 @@
     html {
       font-size: $default-px-size * 1.25;
 
-      #end-screen {
-        .btn-close-region {
-          top: $default-size;
-          right: $default-size * .5;
-        }
-
-        .unityads-logo {
-          bottom: $default-size * .5;
-        }
-      }
-
       #overlay {
+        .skip-hit-area {
+          padding-top: constant(safe-area-inset-top);
+          padding-left: constant(safe-area-inset-top);
+        }
+
         .skip {
-          top: $default-size * 1.5;
+          top: constant(safe-area-inset-top);
+          left: constant(safe-area-inset-left);
         }
 
         .progress {
-          top: $default-size * 1.5;
+          top: constant(safe-area-inset-top);
+          right: constant(safe-area-inset-right);
         }
-      }
 
-      #interstitial-overlay {
-        .close-region {
-          top: $default-size * 1.5;
+        .mute-button {
+          bottom: constant(safe-area-inset-bottom);
+          left: constant(safe-area-inset-left);
         }
-      }
 
-      #display-interstitial {
-        .close-region {
-          top: $default-size * 1.5;
-        }
-      }
-    }
-
-    body {
-      &.portrait #end-screen {
-        .privacy-button {
-          bottom: $default-size * .5;
-          left: $default-size * .5;
+        .call-button {
+          right: constant(safe-area-inset-right);
+          bottom: constant(safe-area-inset-bottom);
         }
       }
     }
 
     .slide-up {
-      slide-animation(.4s, ease-in, -200%);
+      slide-animation(.4s, ease-in, -250%);
     }
 
     .slide-down {
-      slide-animation(.4s, ease-in, 200%);
+      slide-animation(.4s, ease-in, 250%);
     }
   }
 
@@ -141,13 +126,6 @@
   @media only screen and (device-width : 375px) and (device-height : 812px) and (-webkit-device-pixel-ratio : 3) {
     html {
       font-size: $default-px-size * 1.25;
-
-      #end-screen {
-        .btn-close-region {
-          top: $default-size * .5;
-          right: $default-size * .5;
-        }
-      }
     }
   }
 
@@ -170,6 +148,47 @@
         right: constant(safe-area-inset-right);
       }
     }
+
+    #end-screen {
+      padding-top: constant(safe-area-inset-top);
+      padding-right: constant(safe-area-inset-right);
+      padding-bottom: constant(safe-area-inset-bottom);
+      padding-left: constant(safe-area-inset-left);
+      width: calc(100% - constant(safe-area-inset-left) - constant(safe-area-inset-right));
+      height: calc(100% - constant(safe-area-inset-top) - constant(safe-area-inset-bottom));
+
+      .btn-close-region {
+        top: constant(safe-area-inset-top);
+        right: constant(safe-area-inset-right);
+      }
+
+      .unityads-logo {
+        bottom: constant(safe-area-inset-bottom);
+      }
+
+      .privacy-button {
+        bottom: constant(safe-area-inset-bottom);
+        left: constant(safe-area-inset-left);
+      }
+    }
+
+    #privacy {
+      padding-top: constant(safe-area-inset-top);
+      padding-right: constant(safe-area-inset-right);
+      padding-bottom: constant(safe-area-inset-bottom);
+      padding-left: constant(safe-area-inset-left);
+      width: calc(100% - constant(safe-area-inset-left) - constant(safe-area-inset-right));
+      height: calc(100% - constant(safe-area-inset-top) - constant(safe-area-inset-bottom));
+    }
+
+    #display-interstitial,
+    #interstitial-overlay {
+      .close-region {
+        top: constant(safe-area-inset-top);
+        right: constant(safe-area-inset-right);
+      }
+    }
   }
 }
+
 

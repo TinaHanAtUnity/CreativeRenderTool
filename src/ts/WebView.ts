@@ -38,6 +38,7 @@ import { StorageType } from 'Native/Api/Storage';
 import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { SdkStats } from 'Utilities/SdkStats';
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
@@ -65,6 +66,7 @@ export class WebView {
     private _sessionManager: SessionManager;
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
+    private _comScoreTrackingService: ComScoreTrackingService;
     private _wakeUpManager: WakeUpManager;
     private _focusManager: FocusManager;
     private _analyticsManager: AnalyticsManager;
@@ -279,6 +281,7 @@ export class WebView {
             }
 
             const orientation = screenWidth >= screenHeight ? ForceOrientation.LANDSCAPE : ForceOrientation.PORTRAIT;
+            this._comScoreTrackingService = new ComScoreTrackingService(this._thirdPartyEventManager, this._nativeBridge, this._deviceInfo);
             this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, {
                 forceOrientation: orientation,
                 focusManager: this._focusManager,
@@ -287,6 +290,7 @@ export class WebView {
                 clientInfo: this._clientInfo,
                 thirdPartyEventManager: this._thirdPartyEventManager,
                 operativeEventManager: this._operativeEventManager,
+                comScoreTrackingService: this._comScoreTrackingService,
                 placement: placement,
                 campaign: campaign,
                 configuration: this._configuration,
