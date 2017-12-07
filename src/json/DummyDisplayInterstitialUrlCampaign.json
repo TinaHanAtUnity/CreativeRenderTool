@@ -1,0 +1,13 @@
+{
+    "abGroup": 0,
+    "display": {
+      "id": "583dfda0d933a3630a53249c",
+      "markupUrl": "https://unity3d.com",
+      "clickThroughURL": "https://unity3d.com",
+      "tracking": {
+        "impression": [ "https://unity3d.com/impression" ]
+      }
+    },
+    "gamerId": "583dfda0d933a3630a53249c",
+    "cacheTTL": 7200
+  }

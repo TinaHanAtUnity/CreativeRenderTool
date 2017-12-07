@@ -12,59 +12,61 @@ import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 const json = JSON.parse(DummyDisplayInterstitialCampaign);
 
 describe('DisplayInterstitial View', () => {
+    const isDisplayInterstitialUrlCampaign = true;
     let view: DisplayInterstitial;
     let nativeBridge: NativeBridge;
     let placement: Placement;
     let campaign: DisplayInterstitialCampaign<IDisplayInterstitialCampaign>;
     let sandbox: sinon.SinonSandbox;
-    let isDisplayInterstitialUrlCampaign = true;
 
-    beforeEach(() => {
-        sandbox = sinon.sandbox.create();
-        nativeBridge = TestFixtures.getNativeBridge();
-        placement = new Placement({
-            id: '123',
-            name: 'test',
-            default: true,
-            allowSkip: true,
-            skipInSeconds: 5,
-            disableBackButton: true,
-            useDeviceOrientationForVideo: false,
-            muteVideo: false
+    describe('on Display Interstitial Markup Campaign',() => {
+        viewUnitTests(!isDisplayInterstitialUrlCampaign);
+    });
+
+    describe('on Display Interstitial MarkupUrl Campaign', () => {
+        viewUnitTests(isDisplayInterstitialUrlCampaign);
+    });
+
+    function viewUnitTests(isDisplayInterstitialUrlCampaign: boolean) {
+        beforeEach(() => {
+            sandbox = sinon.sandbox.create();
+            nativeBridge = TestFixtures.getNativeBridge();
+            placement = new Placement({
+                id: '123',
+                name: 'test',
+                default: true,
+                allowSkip: true,
+                skipInSeconds: 5,
+                disableBackButton: true,
+                useDeviceOrientationForVideo: false,
+                muteVideo: false
+            });
+            campaign = TestFixtures.getDisplayInterstitialCampaign(isDisplayInterstitialUrlCampaign);
+            view = new DisplayInterstitial(nativeBridge, placement, campaign);
+
+            sandbox.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
+            sandbox.stub(nativeBridge, 'getApiLevel').returns(16);
         });
-        campaign = TestFixtures.getDisplayInterstitialCampaign(!isDisplayInterstitialUrlCampaign);
-        view = new DisplayInterstitial(nativeBridge, placement, campaign);
 
-        sandbox.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
-        sandbox.stub(nativeBridge, 'getApiLevel').returns(16);
-    });
+        afterEach(() => {
+            sandbox.restore();
+        });
 
-    afterEach(() => {
-        sandbox.restore();
-    });
+        // Disabled because of missing srcdoc support on Android < 4.4
+        xit('should render', () => {
+            view.render();
+            const srcdoc = view.container().querySelector('#display-iframe')!.getAttribute('srcdoc');
 
-    // Disabled because of missing srcdoc support on Android < 4.4
-    xit('should render', () => {
-        view.render();
-        const srcdoc = view.container().querySelector('#display-iframe')!.getAttribute('srcdoc');
+            assert.isNotNull(srcdoc);
+            assert.isTrue(srcdoc!.indexOf(json.display.markup) !== -1);
+        });
 
-        assert.isNotNull(srcdoc);
-        assert.isTrue(srcdoc!.indexOf(json.display.markup) !== -1);
-    });
-
-    it('should show', () => {
-        view.render();
-        view.show();
-        view.hide();
-    });
-
-    // describe('Display Interstitial Markup Campaign',() => {
-    //
-    // });
-    //
-    // describe('Display Interstitial MarkupUrl Campaign', () => {
-    //
-    // });
+        it('should show', () => {
+            view.render();
+            view.show();
+            view.hide();
+        });
+    }
 
     // write unit tests to cover DisplayInterstitialMarkupUrlCampaign - programmatic/static-interstitial-url
     // 'should throw no clickthrough url was found error when the mark nor json do not contain a clickthrough url'

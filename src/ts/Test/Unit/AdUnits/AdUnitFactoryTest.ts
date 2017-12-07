@@ -219,12 +219,22 @@ describe('AdUnitFactoryTest', () => {
     });
 
     describe('DisplayInterstitialAdUnit', () => {
+        const isStaticInterstitialUrlCampaign = true;
+
+        describe('On static-interstial campaign', () => {
+            displayUnitTests(!isStaticInterstitialUrlCampaign);
+        });
+
+        describe('On static-interstial-url campaign', () => {
+            displayUnitTests(isStaticInterstitialUrlCampaign);
+        });
+    });
+
+    function displayUnitTests(isStaticInterstitialUrlCampaign: boolean): void {
         let adUnit: DisplayInterstitialAdUnit;
         let campaign: DisplayInterstitialCampaign<IDisplayInterstitialCampaign>;
-        let isStaticInterstitialUrlCampaign = true;
-
         beforeEach(() => {
-            campaign = TestFixtures.getDisplayInterstitialCampaign(!isStaticInterstitialUrlCampaign);
+            campaign = TestFixtures.getDisplayInterstitialCampaign(isStaticInterstitialUrlCampaign);
             adUnitParameters.campaign = campaign;
             adUnit = <DisplayInterstitialAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
         });
@@ -236,7 +246,5 @@ describe('AdUnitFactoryTest', () => {
                 adUnit.hide();
             });
         });
-
-        // write unit tests to cover DisplayInterstitialMarkupUrlCampaign programmatic/static-interstitial-url
-    });
+    }
 });

@@ -23,7 +23,7 @@ import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
 import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCampaign.json';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
-import OnStaticInterstitialDisplayCampaignNoClickMarkupUrl from 'json/OnStaticInterstitialDisplayCampaignNoClickMarkupUrl.json';
+import DummyDisplayInterstitialUrlCampaign from 'json/DummyDisplayInterstitialCampaign.json';
 import VastCompanionXml from 'xml/VastCompanionAd.xml';
 import EventTestVast from 'xml/EventTestVast.xml';
 
@@ -188,8 +188,7 @@ export class TestFixtures {
     }
 
     private static getDisplayInterstitialMarkupUrlCampaign(): DisplayInterstitialMarkupUrlCampaign {
-        const json = JSON.parse(OnStaticInterstitialDisplayCampaignNoClickMarkupUrl);
-        const content = JSON.parse(json.media.B0JMQwI7mlsbtAeTSrUjC4.content);
-        return new DisplayInterstitialMarkupUrlCampaign(content.markupUrl, this.getSession(), json.gamerId, json.abGroup, undefined, json.display.tracking);
+        const json = JSON.parse(DummyDisplayInterstitialUrlCampaign);
+        return new DisplayInterstitialMarkupUrlCampaign(json.display.markup, this.getSession(), json.gamerId, json.abGroup, undefined, json.display.tracking);
     }
 }
