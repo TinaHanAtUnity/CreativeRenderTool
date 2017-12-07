@@ -21,6 +21,7 @@ import { FocusManager } from 'Managers/FocusManager';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { SessionManager } from 'Managers/SessionManager';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 
@@ -36,6 +37,7 @@ describe('VastAdUnit', () => {
     let vastAdUnitParameters: IVastAdUnitParameters;
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
+    let comScoreService: ComScoreTrackingService;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -74,6 +76,7 @@ describe('VastAdUnit', () => {
         const metaDataManager = new MetaDataManager(nativeBridge);
         const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
         const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
+        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         vastAdUnitParameters = {
             forceOrientation: ForceOrientation.LANDSCAPE,
@@ -83,6 +86,7 @@ describe('VastAdUnit', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
+            comScoreTrackingService: comScoreService,
             placement: placement,
             campaign: vastCampaign,
             configuration: TestFixtures.getConfiguration(),

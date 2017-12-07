@@ -11,6 +11,7 @@ import { ForceOrientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitCo
 import { ViewController } from 'AdUnits/Containers/ViewController';
 import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { SessionManager } from 'Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { WakeUpManager } from 'Managers/WakeUpManager';
@@ -46,6 +47,7 @@ describe('IosAdUnitTest', () => {
         const deviceInfo = TestFixtures.getDeviceInfo(Platform.IOS);
         container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS), focusManager);
         const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+        const comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         adUnitParams = {
             forceOrientation: ForceOrientation.NONE,
@@ -55,6 +57,7 @@ describe('IosAdUnitTest', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
+            comScoreTrackingService: comScoreService,
             placement: TestFixtures.getPlacement(),
             campaign: TestFixtures.getCampaign(),
             configuration: TestFixtures.getConfiguration(),
