@@ -897,7 +897,7 @@ describe('CampaignManager', () => {
                 assert.equal(triggeredCampaign.getAbGroup(), configuration.getAbGroup());
                 assert.equal(triggeredCampaign.getGamerId(), configuration.getGamerId());
                 assert.deepEqual(triggeredCampaign.getOptionalAssets(), []);
-                assert.equal(triggeredCampaign.getDynamicMarkup(), decodeURIComponent(content.markup));
+                assert.equal(triggeredCampaign.getDynamicMarkup(), content.markup);
             });
         });
 

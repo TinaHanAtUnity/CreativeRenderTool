@@ -43,7 +43,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
 
     public show(): Promise<void> {
         this.setShowing(true);
-        const onShowObserver = this._container.onShow.subscribe(() => this.onShow);
+        this._container.onShow.subscribe(() => this.onShow);
 
         return this.setWebPlayerViews().then( () => {
             this._view.show();
@@ -159,6 +159,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
         for (let url of (this._campaign).getTrackingUrlsForEvent('impression')) {
             url = url.replace(/%ZONE%/, (this.getCampaign()).getId());
             url = url.replace(/%SDK_VERSION%/, this._operativeEventManager.getClientInfo().getSdkVersion().toString());
+            this._nativeBridge.Sdk.logDebug("todo: remove - sendStartEvents - sending " + url);
             this._thirdPartyEventManager.sendEvent('display impression', (this.getCampaign()).getSession().getId(), url);
         }
         this._operativeEventManager.sendStart(this);

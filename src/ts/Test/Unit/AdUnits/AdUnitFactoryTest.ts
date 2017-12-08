@@ -235,9 +235,10 @@ describe('AdUnitFactoryTest', () => {
 
         describe('on show', () => {
             it('should send tracking events', () => {
-                adUnit.show();
-                sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendEvent, 'display impression', campaign.getSession().getId(), 'https://unity3d.com/impression');
-                adUnit.hide();
+                adUnit.show().then( () => {
+                    sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendEvent, 'display impression', campaign.getSession().getId(), 'https://unity3d.com/impression');
+                    adUnit.hide();
+                });
             });
         });
     });
