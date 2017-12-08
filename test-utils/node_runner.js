@@ -8,6 +8,7 @@ const DOMParser = require('xmldom').DOMParser;
 const XMLHttpRequest = require('xmlhttprequest').XMLHttpRequest;
 const LocalStorage = require('node-localstorage').LocalStorage;
 const exec = require('child_process').exec;
+const spawn = require('child_process').spawnSync;
 
 const { document } = new JSDOM('').window;
 
@@ -32,6 +33,7 @@ global.window.exec = exec;
 
 const coverageDir = process.env.COVERAGE_DIR;
 const testFilter = process.env.TEST_FILTER;
+const isolated = process.env.ISOLATED;
 
 let getSourcePaths = (root) => {
     let paths = [];
@@ -50,9 +52,9 @@ let getTestPaths = (root, filter) => {
     let paths = [];
     fs.readdirSync(root).forEach((file) => {
         let fullPath = path.join(root, file);
-        if (fs.statSync(fullPath).isDirectory() && fullPath.indexOf('Test/' + filter) !== -1) {
+        if (fs.statSync(fullPath).isDirectory()) {
             paths = paths.concat(getTestPaths(fullPath, filter));
-        } else if(fullPath.indexOf('.js') !== -1) {
+        } else if(fullPath.match(filter) && fullPath.indexOf('.js') !== -1) {
             paths.push(fullPath.replace('src/ts/', '').replace('.js', ''));
         }
     });
@@ -126,24 +128,43 @@ process.on('unhandledRejection', (error, promise) => {
     process.exit(1);
 });
 
-const file = process.argv.length === 3 ? process.argv[2] : null;
-
 const sourcePaths = getSourcePaths('src/ts');
-const testPaths = [file] ? file.replace('.ts', '.js') : getTestPaths('src/ts/Test', testFilter);
+const testPaths = getTestPaths('src/ts/Test', testFilter);
 
-Promise.all(sourcePaths.concat(testPaths).map((testPath) => {
-    return System.import(testPath);
-})).then(() => {
-    return new Promise((resolve, reject) => {
-        runner.run((failures) => {
-            failures ? reject(failures) : resolve();
+if(isolated) {
+    testPaths.forEach((testPath) => {
+        let env = process.env;
+        delete env.ISOLATED;
+        env.TEST_FILTER = testPath;
+
+        const test = spawn('node', ['test-utils/node_runner.js'], {
+            cwd: process.cwd(),
+            env: env,
+            stdio: 'inherit'
         });
+
+        if(test.status !== 0) {
+            if(test.error) {
+                console.error(error);
+            }
+            process.exit(test.status);
+        }
     });
-}).then(() => {
-    if(coverageDir) {
-        fs.writeFileSync(coverageDir + '/coverage.json', JSON.stringify(__coverage__));
-    }
-}).catch(error => {
-    console.error(error);
-    process.exit(1);
-});
+} else {
+    Promise.all(sourcePaths.concat(testPaths).map((testPath) => {
+        return System.import(testPath);
+    })).then(() => {
+        return new Promise((resolve, reject) => {
+            runner.run((failures) => {
+                failures ? reject(failures) : resolve();
+            });
+        });
+    }).then(() => {
+        if(coverageDir) {
+            fs.writeFileSync(coverageDir + '/coverage.json', JSON.stringify(__coverage__));
+        }
+    }).catch(error => {
+        console.error(error);
+        process.exit(1);
+    });
+}
