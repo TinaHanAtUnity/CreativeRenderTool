@@ -193,6 +193,10 @@ export class CampaignManager {
                     } else {
                         noFill.push(placement);
                     }
+
+                    if(json.realtimeData && json.realtimeData[placement]) {
+                        this._configuration.getPlacement(placement).setRealtimeData(json.realtimeData[placement]);
+                    }
                 }
             }
 
@@ -282,7 +286,6 @@ export class CampaignManager {
             }
 
             campaign.setMediaId(response.getMediaId());
-            campaign.setRawMedia(response.getRawData());
 
             return this.setupCampaignAssets(response.getPlacements(), campaign);
         });
@@ -303,7 +306,6 @@ export class CampaignManager {
 
         return parser.parse(this._nativeBridge, this._request, response, session, this._configuration.getGamerId(), this.getAbGroup()).then((campaign) => {
             campaign.setMediaId(response.getMediaId());
-            campaign.setRawMedia(response.getRawData());
 
             return campaign;
         });
@@ -506,14 +508,10 @@ export class CampaignManager {
                         realtime: realtimePlacement.isRealtime()
                     };
 
-                    const campaign = realtimePlacement.getCurrentCampaign();
-
-                    if(campaign && !(campaign instanceof RealtimeCampaign)) {
-                        const media = campaign.getRawMedia();
-                        delete media.content;
-                        const mediaObject: any = {};
-                        mediaObject[campaign.getMediaId()] = media;
-                        body.media = mediaObject;
+                    if(realtimePlacement.getRealtimeData()) {
+                        const realtimeDataObject: any = {};
+                        realtimeDataObject[realtimePlacement.getId()] = realtimePlacement.getRealtimeData();
+                        body.realtimeData = realtimeDataObject;
                     }
                 } else {
                     const placements = this._configuration.getPlacements();

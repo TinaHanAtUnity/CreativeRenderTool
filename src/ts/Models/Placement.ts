@@ -24,6 +24,7 @@ interface IPlacement {
 
     adTypes: string[] | undefined;
     realtime: boolean;
+    realtimeData: string | undefined;
 
     state: PlacementState;
     previousState: PlacementState;
@@ -44,10 +45,11 @@ export class Placement extends Model<IPlacement> {
             muteVideo: ['boolean'],
             adTypes: ['array', 'undefined'],
             realtime: ['boolean'],
+            realtimeData: ['string', 'undefined'],
             state: ['number'],
             previousState: ['number'],
             placementStateChanged: ['boolean'],
-            currentCampaign: ['object', 'undefined'],
+            currentCampaign: ['object', 'undefined']
         });
 
         this.set('id', data.id);
@@ -138,6 +140,14 @@ export class Placement extends Model<IPlacement> {
 
     public setCurrentCampaign(campaign: Campaign | undefined): void {
         this.set('currentCampaign', campaign);
+    }
+
+    public getRealtimeData(): string | undefined {
+        return this.get('realtimeData');
+    }
+
+    public setRealtimeData(value: string | undefined) {
+        this.set('realtimeData', value);
     }
 
     public getDTO(): { [key: string]: any } {
