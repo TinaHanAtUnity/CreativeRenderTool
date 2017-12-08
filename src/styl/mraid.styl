@@ -1,4 +1,5 @@
 @import "components.styl";
+@import "vars.styl";
 
 #mraid {
   #mraid-iframe {
@@ -67,5 +68,11 @@
     -webkit-animation-fill-mode: forwards;
     -webkit-animation-timing-function: linear;
     -webkit-animation-duration: .01s;
+  }
+
+  .privacy-button {
+    $privacy-button-default($default-scale-size);
+    left: 0;
+    margin: 0 0 0 $default-size * $default-scale-size * .25;
   }
 }
