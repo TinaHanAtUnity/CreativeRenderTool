@@ -5,6 +5,7 @@ import { AdMobView } from 'Views/AdMobView';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { FinishState } from 'Constants/FinishState';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { Placement } from 'Models/Placement';
 
 export interface IAdMobAdUnitParameters extends IAdUnitParameters<AdMobCampaign> {
     view: AdMobView;
@@ -24,7 +25,7 @@ export class AdMobAdUnit extends AbstractAdUnit<AdMobCampaign> {
 
         // TODO, we skip initial because the AFMA grantReward event tells us the video
         // has been completed. Is there a better way to do this with AFMA right now?
-        this.setFinishState(FinishState.SKIPPED);
+        this.setFinishState(this._placement.allowSkip() ? FinishState.COMPLETED : FinishState.SKIPPED);
     }
 
     public show(): Promise<void> {
