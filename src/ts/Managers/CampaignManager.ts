@@ -372,7 +372,7 @@ export class CampaignManager {
         }
 
         url = Url.addParameters(url, {
-            auctionId: session ? session.getId() : undefined,
+            auctionId: session.getId(),
             deviceMake: this._deviceInfo.getManufacturer(),
             deviceModel: this._deviceInfo.getModel(),
             platform: Platform[this._clientInfo.getPlatform()].toLowerCase(),
