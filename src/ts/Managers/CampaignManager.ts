@@ -378,7 +378,7 @@ export class CampaignManager {
             sdkVersion: this._clientInfo.getSdkVersion(),
             screenSize: this._deviceInfo.getScreenLayout(),
             stores: this._deviceInfo.getStores(),
-            streaming: realtime
+            realtimeRequest: realtime
         });
 
         if(this._clientInfo.getPlatform() === Platform.IOS) {

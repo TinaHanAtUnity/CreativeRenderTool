@@ -272,7 +272,7 @@
       "body": true
     },
     {
-      "parameter": "streaming",
+      "parameter": "realtimeRequest",
       "required": "all",
       "queryString": true,
       "body": false

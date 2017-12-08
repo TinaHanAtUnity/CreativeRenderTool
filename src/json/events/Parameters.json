@@ -420,7 +420,7 @@
     "platforms": "ios"
   },
   {
-    "key": "streaming",
+    "key": "realtimeRequest",
     "type": "boolean",
     "description": "If ad request is done at show time for immediate streaming",
     "provider": "SDK",
