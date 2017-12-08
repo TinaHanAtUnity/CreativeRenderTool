@@ -140,7 +140,7 @@ export class AuctionResponse extends Model<IAuctionResponse> {
             'creativeId': this.getCreativeId(),
             'seatId': this.getSeatId(),
             'correlationId': this.getCorrelationId(),
-            'ext': this.getExt()
+            'ext': this.getExt(),
             'appCategory': this.getCategory(),
             'appSubCategory': this.getSubCategory()
         };
