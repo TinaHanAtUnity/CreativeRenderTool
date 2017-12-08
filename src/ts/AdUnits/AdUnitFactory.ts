@@ -149,7 +149,7 @@ export class AdUnitFactory {
             level4: campaign.getCreativeId(),
             slicer1: parameters.clientInfo.getSdkVersionName(),
             slicer2: 'Unity placements bundle Id - not sure what that corresponds to',
-            slicer3: parameters.placement.getName(),
+            slicer3: parameters.placement.getName()
         };
 
         const moatData = {
