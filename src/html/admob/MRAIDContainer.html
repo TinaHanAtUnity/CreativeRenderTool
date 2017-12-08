@@ -38,7 +38,8 @@
             };
 
             window.addEventListener('message', function(event) {
-                switch(event.data.type) {
+                if (event.data.type && event.data.type === 'mraid') {
+                    switch(event.data.event) {
                     case 'viewable':
                         viewable = event.data.value;
                         trigger('viewableChange', [viewable]);
@@ -52,6 +53,7 @@
 
                     default:
                         break;
+                    }
                 }
             }, false);
 
@@ -62,12 +64,18 @@
             });
 
             window.addEventListener('DOMContentLoaded', function() {
-                window.parent.postMessage({
-                    type: 'loaded'
-                }, '*');
+                window.mraid.postMessage('loaded');
                 setState('default');
                 trigger('ready');
             }, false);
+
+            this.postMessage = function(event, data) {
+                window.parent.postMessage({
+                    type: 'mraid',
+                    event: event,
+                    data: data
+                }, '*');
+            };
 
             this.addEventListener = function(event, listener) {
                 if(event in listeners) {
@@ -81,9 +89,7 @@
 
             this.close = function() {
                 setState('hidden');
-                window.parent.postMessage({
-                    type: 'close'
-                }, '*');
+                this.postMessage('close');
             };
 
             this.expand = function() {
@@ -135,10 +141,9 @@
             };
 
             this.open = function(url) {
-                window.parent.postMessage({
-                    type: 'open',
-                    url: url
-                }, '*');
+                this.postMessage('open', {
+                    url: url,
+                });
             };
 
             this.playVideo = function() {
@@ -164,10 +169,9 @@
 
             this.setOrientationProperties = function(properties) {
                 orientationProperties = properties;
-                window.parent.postMessage({
-                    type: 'orientation',
-                    properties: properties
-                }, '*');
+                this.postMessage('orientation', {
+                    properties: properties,
+                });
             };
 
             this.setResizeProperties = function() {
@@ -183,18 +187,16 @@
             };
 
             this.sendAnalyticsEvent = function(event, eventData) {
-                window.parent.postMessage({
-                    type: 'analyticsEvent',
+                this.postMessage('analyticsEvent', {
                     event: event,
-                    eventData: eventData
-                }, '*');
+                    eventData: eventData,
+                });
             };
 
             this.setCustomMraidState = function(state) {
-                window.parent.postMessage({
-                    type: 'customMraidState',
-                    state: state
-                }, '*');
+                this.postMessage('customMraidState', {
+                    state: state,
+                });
             };
         };
         window.mraid = new MRAID();

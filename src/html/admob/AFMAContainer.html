@@ -164,7 +164,15 @@
                     event: event,
                     data: data
                 }, '*');
-            }
+            };
+
+            // MRAID proxy functions
+            this.setOrienationProperties = function(properties) {
+                window.mraid.setOrienationProperties(properties);
+            };
+
+            this.useCustomClose = function(uses) {
+            };
         };
 
         window.unity = window.unity || {};

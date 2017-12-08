@@ -4,6 +4,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Platform } from 'Constants/Platform';
 import { FinishState } from 'Constants/FinishState';
 import { Timer } from 'Utilities/Timer';
+import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 
 export interface IAdMobEventHandlerParameters {
     adUnit: AdMobAdUnit;
@@ -51,6 +52,14 @@ export class AdMobEventHandler implements IAdMobEventHandler {
 
     public onShow(): void {
         // this._timeoutTimer.start();
+    }
+
+    public onSetOrientationProperties(allowOrientation: boolean, forceOrientation: ForceOrientation) {
+        if (this._nativeBridge.getPlatform() === Platform.IOS) {
+            this._adUnit.getContainer().reorient(true, forceOrientation);
+        } else {
+            this._adUnit.getContainer().reorient(allowOrientation, forceOrientation);
+        }
     }
 
     private onFailureToLoad(): void {

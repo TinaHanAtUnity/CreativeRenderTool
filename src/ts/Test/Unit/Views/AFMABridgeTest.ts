@@ -2,14 +2,18 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { IAFMAHandler, AFMABridge, AFMAEvents } from 'Views/AFMABridge';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { NativeBridge } from 'Native/NativeBridge';
+import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 
 describe('AFMABridge', () => {
 
     let handler: IAFMAHandler;
     let afmaBridge: AFMABridge;
     let iframe: HTMLIFrameElement;
+    let nativeBridge: NativeBridge;
 
     beforeEach(() => {
+        nativeBridge = TestFixtures.getNativeBridge();
         handler = {
             onAFMAClose: sinon.spy(),
             onAFMAOpenURL: sinon.spy(),
@@ -22,7 +26,7 @@ describe('AFMABridge', () => {
             onAFMAOpenStoreOverlay: sinon.spy(),
             onAFMARewardedVideoStart: sinon.spy(),
         };
-        afmaBridge = new AFMABridge(handler);
+        afmaBridge = new AFMABridge(nativeBridge, handler);
         iframe = document.createElement('iframe');
         document.body.appendChild(iframe);
         afmaBridge.connect(iframe);

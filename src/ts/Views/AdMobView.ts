@@ -7,11 +7,12 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Placement } from 'Models/Placement';
 import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
 import { Template } from 'Utilities/Template';
-import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { AFMABridge } from 'Views/AFMABridge';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
+import { MRAIDBridge } from 'Views/MRAIDBridge';
 
 export interface IAdMobEventHandler {
     onClose(): void;
@@ -19,6 +20,7 @@ export interface IAdMobEventHandler {
     onGrantReward(): void;
     onShow(): void;
     onVideoStart(): void;
+    onSetOrientationProperties(allowOrientation: boolean, forceOrientation: ForceOrientation): void;
 }
 
 const AFMAClickStringMacro = '{{AFMA_CLICK_SIGNALS_PLACEHOLDER}}';
@@ -29,8 +31,8 @@ export class AdMobView extends View<IAdMobEventHandler> {
     private _iframe: HTMLIFrameElement;
     private _adMobSignalFactory: AdMobSignalFactory;
 
-    private _messageListener: EventListener;
     private _afmaBridge: AFMABridge;
+    private _mraidBridge: MRAIDBridge;
 
     constructor(nativeBridge: NativeBridge, adMobSignalFactory: AdMobSignalFactory, container: AdUnitContainer, placement: Placement, campaign: AdMobCampaign, language: string, gameId: string, abGroup: number) {
         super(nativeBridge, 'admob');
@@ -52,6 +54,9 @@ export class AdMobView extends View<IAdMobEventHandler> {
             onAFMAOpenStoreOverlay: () => { /**/ },
             onAFMARewardedVideoStart: () => this.onVideoStart()
         });
+        this._mraidBridge = new MRAIDBridge(nativeBridge, {
+            onSetOrientationProperties: (allowOrientation: boolean, forceOrientation: ForceOrientation) => this.onSetOrientationProperties(allowOrientation, forceOrientation)
+        });
 
         this._bindings = [];
     }
@@ -64,12 +69,12 @@ export class AdMobView extends View<IAdMobEventHandler> {
     public show(): void {
         super.show();
         this._afmaBridge.connect(this._iframe);
-        window.addEventListener('message', this._messageListener);
+        this._mraidBridge.connect(this._iframe);
         this._handlers.forEach((h) => h.onShow());
     }
 
     public hide() {
-        window.removeEventListener('message', this._messageListener);
+        this._mraidBridge.disconnect();
         this._afmaBridge.disconnect();
         super.hide();
     }
@@ -135,5 +140,9 @@ export class AdMobView extends View<IAdMobEventHandler> {
 
     private onVideoStart() {
         this._handlers.forEach((h) => h.onVideoStart());
+    }
+
+    private onSetOrientationProperties(allowOrientation: boolean, forceOrientation: ForceOrientation) {
+        this._handlers.forEach((h) => h.onSetOrientationProperties(allowOrientation, forceOrientation));
     }
 }
