@@ -126,8 +126,10 @@ process.on('unhandledRejection', (error, promise) => {
     process.exit(1);
 });
 
+const file = process.argv.length === 3 ? process.argv[2] : null;
+
 const sourcePaths = getSourcePaths('src/ts');
-const testPaths = getTestPaths('src/ts/Test', testFilter);
+const testPaths = [file] ? file.replace('.ts', '.js') : getTestPaths('src/ts/Test', testFilter);
 
 Promise.all(sourcePaths.concat(testPaths).map((testPath) => {
     return System.import(testPath);

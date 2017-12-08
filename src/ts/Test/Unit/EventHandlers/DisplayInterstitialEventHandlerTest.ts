@@ -84,6 +84,7 @@ describe('DisplayInterstitialEventHandler', () => {
             displayInterstitialAdUnit = new DisplayInterstitialAdUnit(nativeBridge, displayInterstitialAdUnitParameters);
             displayInterstitialEventHandler = new DisplayInterstitialEventHandler(nativeBridge, displayInterstitialAdUnit, displayInterstitialAdUnitParameters);
             view.addEventHandler(displayInterstitialEventHandler);
+            return view.render().then(() => view.show());
         });
 
         afterEach(() => {
@@ -96,12 +97,7 @@ describe('DisplayInterstitialEventHandler', () => {
             const spy = sinon.spy();
 
             displayInterstitialEventHandler.onDisplayInterstitialClick = spy;
-
-            view.render();
-            view.show();
-
             window.postMessage({ type: 'redirect', href: 'https://unity3d.com' }, '*');
-
             return new Promise((resolve, reject) => {
                 setTimeout(() => {
                     try {
@@ -122,9 +118,6 @@ describe('DisplayInterstitialEventHandler', () => {
 
             const spy = sinon.spy();
             displayInterstitialEventHandler.onDisplayInterstitialClick = spy;
-
-            view.render();
-            view.show();
 
             (<HTMLElement>view.container().querySelector('.iframe-click-catcher')!).click();
 

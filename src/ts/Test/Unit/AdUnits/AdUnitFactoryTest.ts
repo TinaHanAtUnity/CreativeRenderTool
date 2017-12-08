@@ -64,6 +64,7 @@ describe('AdUnitFactoryTest', () => {
         request = new Request(nativeBridge, wakeUpManager);
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         sandbox.stub(container, 'close').returns(Promise.resolve());
+        sandbox.stub(container, 'open').returns(Promise.resolve());
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         config = new Configuration(JSON.parse(ConfigurationJson));
         deviceInfo = <DeviceInfo>{getLanguage: () => 'en', getAdvertisingIdentifier: () => '000', getLimitAdTracking: () => false};
@@ -218,6 +219,39 @@ describe('AdUnitFactoryTest', () => {
         });
     });
 
+    const displayUnitTests = (isStaticInterstitialUrlCampaign: boolean): void => {
+        let adUnit: DisplayInterstitialAdUnit;
+        let campaign: DisplayInterstitialCampaign<IDisplayInterstitialCampaign>;
+        let server: sinon.SinonFakeServer;
+
+        beforeEach(() => {
+            campaign = TestFixtures.getDisplayInterstitialCampaign(isStaticInterstitialUrlCampaign);
+            adUnitParameters.campaign = campaign;
+            adUnit = <DisplayInterstitialAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+
+            if (isStaticInterstitialUrlCampaign) {
+                server = sinon.fakeServer.create();
+                server.respondImmediately = true;
+                server.respondWith('<a href="http://unity3d.com"></a>');
+            }
+        });
+
+        afterEach(() => {
+            if (server) {
+                server.restore();
+            }
+        });
+
+        describe('on show', () => {
+            it('should send tracking events', () => {
+                return adUnit.show().then(() => {
+                    sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendEvent, 'display impression', campaign.getSession().getId(), 'https://unity3d.com/impression');
+                    return adUnit.hide();
+                });
+            });
+        });
+    };
+
     describe('DisplayInterstitialAdUnit', () => {
         const isStaticInterstitialUrlCampaign = true;
 
@@ -229,23 +263,4 @@ describe('AdUnitFactoryTest', () => {
             displayUnitTests(isStaticInterstitialUrlCampaign);
         });
     });
-
-    function displayUnitTests(isStaticInterstitialUrlCampaign: boolean): void {
-        let adUnit: DisplayInterstitialAdUnit;
-        let campaign: DisplayInterstitialCampaign<IDisplayInterstitialCampaign>;
-        beforeEach(() => {
-            campaign = TestFixtures.getDisplayInterstitialCampaign(isStaticInterstitialUrlCampaign);
-            adUnitParameters.campaign = campaign;
-            adUnit = <DisplayInterstitialAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
-        });
-
-        describe('on show', () => {
-            it('should send tracking events', () => {
-                return adUnit.show().then(() => {
-                    sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendEvent, 'display impression', campaign.getSession().getId(), 'https://unity3d.com/impression');
-                    adUnit.hide();
-                });
-            });
-        });
-    }
 });

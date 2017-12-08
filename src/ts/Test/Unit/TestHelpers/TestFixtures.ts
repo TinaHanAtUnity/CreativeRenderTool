@@ -186,6 +186,11 @@ export class TestFixtures {
         };
     }
 
+    public static getDisplayMarkup(): string {
+        const json = JSON.parse(DummyDisplayInterstitialCampaign);
+        return decodeURIComponent(json.display.markup);
+    }
+
     private static getDisplayInterstitialMarkupCampaign(): DisplayInterstitialMarkupCampaign {
         const json = JSON.parse(DummyDisplayInterstitialCampaign);
         return new DisplayInterstitialMarkupCampaign(json.display.markup, this.getSession(), json.gamerId, json.abGroup, undefined, json.display.tracking, json.display.clickThroughURL);
