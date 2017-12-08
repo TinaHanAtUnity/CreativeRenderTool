@@ -21,6 +21,7 @@ import { FocusManager } from 'Managers/FocusManager';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { SessionManager } from 'Managers/SessionManager';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 
@@ -36,6 +37,7 @@ describe('VastAdUnit', () => {
     let vastAdUnitParameters: IVastAdUnitParameters;
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
+    let comScoreService: ComScoreTrackingService;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -74,6 +76,7 @@ describe('VastAdUnit', () => {
         const metaDataManager = new MetaDataManager(nativeBridge);
         const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
         const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
+        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         vastAdUnitParameters = {
             forceOrientation: ForceOrientation.LANDSCAPE,
@@ -83,6 +86,7 @@ describe('VastAdUnit', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
+            comScoreTrackingService: comScoreService,
             placement: placement,
             campaign: vastCampaign,
             configuration: TestFixtures.getConfiguration(),
@@ -232,11 +236,13 @@ describe('VastAdUnit', () => {
             const mockEventManager = sinon.mock(thirdPartyEventManager);
             mockEventManager.expects('sendEvent').withArgs(`vast ${quartileEventName}`, '123', `http://localhost:3500/brands/14851/${quartileEventName}?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123`);
 
-            const duration = campaign.getVast().getDuration();
+            let duration = campaign.getVast().getDuration();
             if(!duration) {
                 assert.fail('Missing duration in VAST ad');
             } else {
-                const quartilePosition = duration * 0.25 * quartile * 1000;
+                duration = duration * 1000;
+                vastAdUnit.setRealDuration(duration);
+                const quartilePosition = duration * 0.25 * quartile;
                 vastAdUnit.sendProgressEvents('123', 2000, quartilePosition + 100, quartilePosition - 100);
                 mockEventManager.verify();
             }

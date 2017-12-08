@@ -18,6 +18,7 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { SessionManager } from 'Managers/SessionManager';
 
 import EventTestVast from 'xml/EventTestVast.xml';
@@ -29,6 +30,7 @@ describe('VastEndScreenEventHandlersTest', () => {
     let container: AdUnitContainer;
     let request: Request;
     let vastAdUnitParameters: IVastAdUnitParameters;
+    let comScoreService: ComScoreTrackingService;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -53,6 +55,7 @@ describe('VastEndScreenEventHandlersTest', () => {
         const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
         const video = new Video('');
         const overlay = new Overlay(nativeBridge, true, 'en', 'testGameId');
+        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         vastAdUnitParameters = {
             forceOrientation: ForceOrientation.LANDSCAPE,
@@ -62,6 +65,7 @@ describe('VastEndScreenEventHandlersTest', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
+            comScoreTrackingService: comScoreService,
             placement: TestFixtures.getPlacement(),
             campaign: campaign,
             configuration: TestFixtures.getConfiguration(),

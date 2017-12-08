@@ -230,8 +230,8 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 this._closeElement.style.display = 'block';
 
                 this._playableStartTimestamp = Date.now();
-                const timeFromShow = this.checkIsNegative((this._playableStartTimestamp - this._showTimestamp) / 1000);
-                const backgroundTime = this.checkIsNegative(this._backgroundTime / 1000);
+                const timeFromShow = this.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
+                const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
                 this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_start', undefined));
                 this._iframe.contentWindow.postMessage({
                     type: 'viewable',
@@ -308,9 +308,9 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 }));
                 break;
             case 'analyticsEvent':
-                const timeFromShow = this.checkIsNegative((Date.now() - this._showTimestamp) / 1000);
-                const timeFromPlayableStart = this.checkIsNegative((Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000);
-                const backgroundTime = this.checkIsNegative(this._backgroundTime / 1000);
+                const timeFromShow = this.checkIsValid((Date.now() - this._showTimestamp) / 1000);
+                const timeFromPlayableStart = this.checkIsValid((Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000);
+                const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
                 this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, event.data.event, event.data.eventData));
                 break;
             case 'customMraidState':
@@ -331,10 +331,10 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
     }
 
-    private checkIsNegative(time: number): number | undefined {
-        if (time < 0) {
+    private checkIsValid(timeInSeconds: number): number | undefined {
+        if (timeInSeconds < 0 || timeInSeconds > 600) {
             return undefined;
         }
-        return time;
+        return timeInSeconds;
     }
 }

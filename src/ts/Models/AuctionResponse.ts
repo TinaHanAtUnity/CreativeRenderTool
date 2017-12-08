@@ -10,6 +10,8 @@ export interface IAuctionResponse {
     creativeId: string | undefined;
     seatId: number | undefined;
     correlationId: string;
+    appCategory: string | undefined;
+    appSubCategory: string | undefined;
     advertiserCampaignId: string | undefined;
     advertiserDomain: string | undefined;
     advertiserBundleId: string | undefined;
@@ -29,6 +31,8 @@ export class AuctionResponse extends Model<IAuctionResponse> {
             adType: ['string'],
             creativeId: ['string', 'undefined'],
             seatId: ['integer', 'undefined'],
+            appCategory: ['string', 'undefined'],
+            appSubCategory: ['string', 'undefined'],
             correlationId: ['string'],
             advertiserCampaignId: ['string', 'undefined'],
             advertiserDomain: ['string', 'undefined'],
@@ -47,6 +51,8 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         this.set('creativeId', data.creativeId);
         this.set('seatId', data.seatId);
         this.set('correlationId', correlationId);
+        this.set('appCategory', data.appCategory);
+        this.set('appSubCategory', data.appSubCategory);
         this.set('advertiserCampaignId', data.campaignId);
         this.set('advertiserDomain', data.advDomain);
         this.set('advertiserBundleId', data.bundleId);
@@ -91,6 +97,14 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         return this.get('correlationId');
     }
 
+    public getCategory(): string | undefined {
+        return this.get('appCategory');
+    }
+
+    public getSubCategory(): string | undefined {
+        return this.get('appSubCategory');
+    }
+
     public getAdvertiserDomain(): string | undefined {
         return this.get('advertiserDomain');
     }
@@ -127,6 +141,8 @@ export class AuctionResponse extends Model<IAuctionResponse> {
             'seatId': this.getSeatId(),
             'correlationId': this.getCorrelationId(),
             'ext': this.getExt()
+            'appCategory': this.getCategory(),
+            'appSubCategory': this.getSubCategory()
         };
     }
 }

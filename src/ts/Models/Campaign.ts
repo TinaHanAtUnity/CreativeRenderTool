@@ -14,6 +14,8 @@ export interface ICampaign {
     creativeId: string | undefined;
     seatId: number | undefined;
     meta: string | undefined;
+    appCategory: string | undefined;
+    appSubCategory: string | undefined;
     advertiserDomain: string | undefined;
     advertiserCampaignId: string | undefined;
     advertiserBundleId: string | undefined;
@@ -33,6 +35,8 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         creativeId: ['string', 'undefined'],
         seatId: ['number', 'undefined'],
         meta: ['string', 'undefined'],
+        appCategory: ['string', 'undefined'],
+        appSubCategory: ['string', 'undefined'],
         advertiserDomain: ['string', 'undefined'],
         advertiserCampaignId: ['string', 'undefined'],
         advertiserBundleId: ['string', 'undefined'],
@@ -95,6 +99,14 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
 
     public getWillExpireAt(): number | undefined {
         return this.get('willExpireAt');
+    }
+
+    public getCategory(): string | undefined {
+        return this.get('appCategory');
+    }
+
+    public getSubCategory(): string | undefined {
+        return this.get('appSubCategory');
     }
 
     public isExpired(): boolean {

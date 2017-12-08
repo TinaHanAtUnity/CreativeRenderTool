@@ -1,16 +1,17 @@
 import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
-import { DisplayInterstitial } from "Views/DisplayInterstitial";
-import { NativeBridge } from "Native/NativeBridge";
-import { Placement } from "Models/Placement";
-import { DisplayInterstitialCampaign } from "Models/Campaigns/DisplayInterstitialCampaign";
+import { DisplayInterstitial } from 'Views/DisplayInterstitial';
+import { NativeBridge } from 'Native/NativeBridge';
+import { Placement } from 'Models/Placement';
+import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 
-import { Platform } from "Constants/Platform";
-import { TestFixtures } from "Test/Unit/TestHelpers/TestFixtures";
+import { Platform } from 'Constants/Platform';
+import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 import { FocusManager } from 'Managers/FocusManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { Request } from 'Utilities/Request';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { DisplayInterstitialAdUnit, IDisplayInterstitialAdUnitParameters } from 'AdUnits/DisplayInterstitialAdUnit';
@@ -30,6 +31,7 @@ describe('DisplayInterstitialEventHandler', () => {
     let displayInterstitialAdUnit: DisplayInterstitialAdUnit;
     let displayInterstitialEventHandler: DisplayInterstitialEventHandler;
     let operativeEventManager: OperativeEventManager;
+    let comScoreService: ComScoreTrackingService;
 
     beforeEach(() => {
         sandbox = sinon.sandbox.create();
@@ -57,6 +59,7 @@ describe('DisplayInterstitialEventHandler', () => {
         const deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
         const thirdPartyEventManager = sinon.createStubInstance(ThirdPartyEventManager);
         operativeEventManager = sinon.createStubInstance(OperativeEventManager);
+        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         displayInterstitialAdUnitParameters = {
             forceOrientation: ForceOrientation.LANDSCAPE,
@@ -66,6 +69,7 @@ describe('DisplayInterstitialEventHandler', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
+            comScoreTrackingService: comScoreService,
             placement: placement,
             campaign: campaign,
             configuration: TestFixtures.getConfiguration(),
