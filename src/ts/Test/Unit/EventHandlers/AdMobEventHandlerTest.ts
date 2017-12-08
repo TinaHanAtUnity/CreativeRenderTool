@@ -60,7 +60,7 @@ describe('AdMobEventHandler', () => {
     });
 
     describe('detecting a timeout', () => {
-        it('should hide and error the AdUnit if the video does not load', () => {
+        xit('should hide and error the AdUnit if the video does not load', () => {
             admobEventHandler.onShow();
             return resolveAfter(testTimeout).then(() => {
                 sinon.assert.calledWith(<sinon.SinonSpy>adUnit.setFinishState, FinishState.ERROR);
