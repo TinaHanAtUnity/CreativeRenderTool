@@ -62,7 +62,7 @@ export class VPAID extends View<IVPAIDHandler> {
         }];
     }
 
-    public render() {
+    public render(): Promise<void> {
         super.render();
 
         const iframeSrcDoc = VPAIDContainerTemplate.replace(this.vpaidSrcTag, this._campaign.getVPAID().getScriptUrl());
@@ -86,6 +86,7 @@ export class VPAID extends View<IVPAIDHandler> {
                 }
             }
         }
+        return Promise.resolve();
     }
 
     public show() {

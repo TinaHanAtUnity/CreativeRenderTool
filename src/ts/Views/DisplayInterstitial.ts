@@ -49,13 +49,14 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
         ];
     }
 
-    public render() {
-        super.render();
-        this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
-        this.enableClickThroughCatcher();
-        const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#display-iframe');
-        this.getIFrameSrcDoc().then((srcdoc) => {
-            iframe.srcdoc = srcdoc;
+    public render(): Promise<void> {
+        return super.render().then(() => {
+            this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
+            this.enableClickThroughCatcher();
+            const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#display-iframe');
+            return this.getIFrameSrcDoc().then((srcdoc) => {
+                iframe.srcdoc = srcdoc;
+            });
         });
     }
 

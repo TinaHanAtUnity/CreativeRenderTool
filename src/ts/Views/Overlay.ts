@@ -102,7 +102,7 @@ export class Overlay extends View<IOverlayHandler> {
         }
     }
 
-    public render(): void {
+    public render(): Promise<void> {
         super.render();
         this._skipElement = <HTMLElement>this._container.querySelector('.skip-hit-area');
         this._spinnerElement = <HTMLElement>this._container.querySelector('.buffering-spinner');
@@ -110,6 +110,7 @@ export class Overlay extends View<IOverlayHandler> {
         this._debugMessageElement = <HTMLElement>this._container.querySelector('.debug-message-text');
         this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
         this._progressElement = <HTMLElement>this._container.querySelector('.progress');
+        return Promise.resolve();
     }
 
     public setSpinnerEnabled(value: boolean): void {

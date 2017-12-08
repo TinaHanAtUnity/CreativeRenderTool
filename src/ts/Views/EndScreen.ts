@@ -76,7 +76,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         }
     }
 
-    public render(): void {
+    public render(): Promise<void> {
         super.render();
 
         if (this._isSwipeToCloseEnabled) {
@@ -86,7 +86,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         if (this.getEndscreenAlt() === newEndScreenId) {
             this._container.id = newEndScreenId;
         }
-
+        return Promise.resolve();
     }
 
     public show(): void {

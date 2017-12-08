@@ -25,6 +25,31 @@ describe('DisplayInterstitial View', () => {
 
     describe('on Display Interstitial MarkupUrl Campaign', () => {
         viewUnitTests(isDisplayInterstitialUrlCampaign);
+
+        it('should throw error when no clickthroughurl is in the markupurl', () => {
+            sandbox = sinon.sandbox.create();
+            nativeBridge = TestFixtures.getNativeBridge();
+            placement = new Placement({
+                id: '123',
+                name: 'test',
+                default: true,
+                allowSkip: true,
+                skipInSeconds: 5,
+                disableBackButton: true,
+                useDeviceOrientationForVideo: false,
+                muteVideo: false
+            });
+            campaign = TestFixtures.getBadMarkupUrlAd();
+            view = new DisplayInterstitial(nativeBridge, placement, campaign);
+
+            sandbox.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
+            sandbox.stub(nativeBridge, 'getApiLevel').returns(16);
+
+            return new Promise((resolve, reject) => {
+                return view.render().then(reject).catch(resolve);
+            });
+        });
+
     });
 
     function viewUnitTests(isUrlCampaign: boolean) {

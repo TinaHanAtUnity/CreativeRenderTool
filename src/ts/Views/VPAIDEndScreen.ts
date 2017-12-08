@@ -54,12 +54,14 @@ export class VPAIDEndScreen extends View<IVPAIDEndScreenHandler> {
         }
     }
 
-    public render(): void {
+    public render(): Promise<void> {
         super.render();
 
         if(this._isSwipeToCloseEnabled) {
             (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';
         }
+
+        return Promise.resolve();
     }
 
     public show(): void {
