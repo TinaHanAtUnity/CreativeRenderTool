@@ -141,7 +141,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         const sdkVersion = this._operativeEventManager.getClientInfo().getSdkVersion();
         url = url.replace(/%ZONE%/, this._placement.getId());
         url = url.replace(/%SDK_VERSION%/, sdkVersion.toString());
-        this._thirdPartyEventManager.sendEvent(eventType, sessionId, url);
+        this._thirdPartyEventManager.sendEvent(eventType, sessionId, url, this._vpaidCampaign.getUseWebViewUserAgentForTracking());
     }
 
     private onAdUnitNotLoaded() {

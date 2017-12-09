@@ -1,3 +1,4 @@
+import { JsonParser } from 'Utilities/JsonParser';
 import { Model } from 'Models/Model';
 
 export interface IAuctionResponse {
@@ -15,6 +16,7 @@ export interface IAuctionResponse {
     advertiserCampaignId: string | undefined;
     advertiserDomain: string | undefined;
     advertiserBundleId: string | undefined;
+    useWebViewUserAgentForTracking: boolean | undefined;
 }
 
 export class AuctionResponse extends Model<IAuctionResponse> {
@@ -33,7 +35,8 @@ export class AuctionResponse extends Model<IAuctionResponse> {
             correlationId: ['string'],
             advertiserCampaignId: ['string', 'undefined'],
             advertiserDomain: ['string', 'undefined'],
-            advertiserBundleId: ['string', 'undefined']
+            advertiserBundleId: ['string', 'undefined'],
+            useWebViewUserAgentForTracking: ['boolean', 'undefined']
         });
 
         this.set('placements', placements);
@@ -50,6 +53,7 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         this.set('advertiserCampaignId', data.campaignId);
         this.set('advertiserDomain', data.advDomain);
         this.set('advertiserBundleId', data.bundleId);
+        this.set('useWebViewUserAgentForTracking', data.useWebViewUserAgentForTracking || false);
     }
 
     public getPlacements(): string[] {
@@ -62,6 +66,10 @@ export class AuctionResponse extends Model<IAuctionResponse> {
 
     public getContent(): string {
         return this.get('content');
+    }
+
+    public getJsonContent(): any {
+        return JsonParser.parse(this.getContent());
     }
 
     public getCacheTTL(): number | undefined {
@@ -108,6 +116,10 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         return this.get('advertiserBundleId');
     }
 
+    public getUseWebViewUserAgentForTracking(): boolean | undefined {
+        return this.get('useWebViewUserAgentForTracking');
+    }
+
     public getDTO(): {[key: string]: any } {
         return {
             'placements': this.getPlacements(),
@@ -120,7 +132,8 @@ export class AuctionResponse extends Model<IAuctionResponse> {
             'seatId': this.getSeatId(),
             'correlationId': this.getCorrelationId(),
             'appCategory': this.getCategory(),
-            'appSubCategory': this.getSubCategory()
+            'appSubCategory': this.getSubCategory(),
+            'useWebViewUserAgentForTracking': this.getUseWebViewUserAgentForTracking()
         };
     }
 }
