@@ -14,12 +14,15 @@ export class FocusManager {
     public readonly onScreenOff = new Observable0();
 
     private _nativeBridge: NativeBridge;
+    private _appForeground: boolean;
+    private _topActivity: string;
     private _screenListener: string = 'screenListener';
     private ACTION_SCREEN_ON: string = 'android.intent.action.SCREEN_ON';
     private ACTION_SCREEN_OFF: string = 'android.intent.action.SCREEN_OFF';
 
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
+        this._appForeground = true;
         this._nativeBridge.Broadcast.onBroadcastAction.subscribe((name, action, data, extra) => this.onBroadcastAction(name, action, data, extra));
         this._nativeBridge.Notification.onNotification.subscribe((event, parameters) => this.onNotification(event, parameters));
         this._nativeBridge.Lifecycle.onActivityResumed.subscribe((activity) => this.onResume(activity));
@@ -59,19 +62,31 @@ export class FocusManager {
         }
     }
 
+    public isAppForeground(): boolean {
+        return this._appForeground;
+    }
+
     private onNotification(event: string, parameters: any): void {
         if(event === FocusManager._appForegroundNotification) {
+            this._appForeground = true;
             this.onAppForeground.trigger();
         } else if(event === FocusManager._appBackgroundNotification) {
+            this._appForeground = false;
             this.onAppBackground.trigger();
         }
     }
 
     private onResume(activity: string) {
+        this._appForeground = true;
+        this._topActivity = activity;
         this.onActivityResumed.trigger(activity);
     }
 
     private onPause(activity: string) {
+        if(!this._topActivity || activity === this._topActivity) {
+            this._appForeground = false;
+            delete this._topActivity;
+        }
         this.onActivityPaused.trigger(activity);
     }
 
