@@ -15,6 +15,7 @@ export class AdMobAdUnit extends AbstractAdUnit<AdMobCampaign> {
     private _view: AdMobView;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _options: any;
+    private _onSystemKillObserver: any;
 
     constructor(nativeBridge: NativeBridge, parameters: IAdMobAdUnitParameters) {
         super(nativeBridge, parameters);
@@ -29,8 +30,12 @@ export class AdMobAdUnit extends AbstractAdUnit<AdMobCampaign> {
     }
 
     public show(): Promise<void> {
+        this.setShowing(true);
+        this.onStart.trigger();
+
+        this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
+
         return this._container.open(this, true, false, this._forceOrientation, true, false, true, false, this._options).then(() => {
-            this.onShow();
             this.showView();
         });
     }
@@ -69,10 +74,6 @@ export class AdMobAdUnit extends AbstractAdUnit<AdMobCampaign> {
         this.sendTrackingEvent('complete');
     }
 
-    private onShow() {
-        this.setShowing(true);
-    }
-
     private showView() {
         this._view.show();
         document.body.appendChild(this._view.container());
@@ -107,5 +108,12 @@ export class AdMobAdUnit extends AbstractAdUnit<AdMobCampaign> {
     private hideView() {
         this._view.hide();
         document.body.removeChild(this._view.container());
+    }
+
+    private onSystemKill() {
+        if(this.isShowing()) {
+            this.setFinishState(FinishState.SKIPPED);
+            this.hide();
+        }
     }
 }
