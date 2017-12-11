@@ -9,6 +9,7 @@ import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { MOAT } from 'Views/MOAT';
 import { StreamType } from 'Constants/Android/StreamType';
 import { Platform } from 'Constants/Platform';
+import { Placement } from 'Models/Placement';
 
 enum Orientation {
     LANDSCAPE,
@@ -40,6 +41,8 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     private _muted: boolean = false;
     private _events: Array<[number, string]> = [[0.0, 'AdVideoStart'], [0.25, 'AdVideoFirstQuartile'], [0.5, 'AdVideoMidpoint'], [0.75, 'AdVideoThirdQuartile']];
     private _realDuration: number;
+    private _vastCampaign: VastCampaign;
+    private _vastPlacement: Placement;
 
     constructor(nativeBridge: NativeBridge, parameters: IVastAdUnitParameters) {
         super(nativeBridge, parameters);
@@ -49,6 +52,8 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
 
         this._endScreen = parameters.endScreen || null;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
+        this._vastCampaign = parameters.campaign;
+        this._vastPlacement = parameters.placement;
 
         if(this._endScreen) {
             this._endScreen.render();
@@ -94,10 +99,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         return 'VAST';
     }
 
-    public getVast(): Vast {
-        return (<VastCampaign> this.getCampaign()).getVast();
-    }
-
     public getMoat(): MOAT | undefined {
         return this._moat;
     }
@@ -138,11 +139,11 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     }
 
     public getDuration(): number | null {
-        return this.getVast().getDuration();
+        return this._vastCampaign.getVast().getDuration();
     }
 
     public sendImpressionEvent(sessionId: string, sdkVersion: number): void {
-        const impressionUrls = this.getVast().getImpressionUrls();
+        const impressionUrls = this._vastCampaign.getVast().getImpressionUrls();
         if (impressionUrls) {
             for (const impressionUrl of impressionUrls) {
                 this.sendThirdPartyEvent('vast impression', sessionId, sdkVersion, impressionUrl);
@@ -151,7 +152,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     }
 
     public sendTrackingEvent(eventName: string, sessionId: string, sdkVersion: number): void {
-        const trackingEventUrls = this.getVast().getTrackingEventUrls(eventName);
+        const trackingEventUrls = this._vastCampaign.getVast().getTrackingEventUrls(eventName);
         if (trackingEventUrls) {
             for (const url of trackingEventUrls) {
                 this.sendThirdPartyEvent(`vast ${eventName}`, sessionId, sdkVersion, url);
@@ -166,7 +167,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     }
 
     public getVideoClickThroughURL(): string | null {
-        const url = this.getVast().getVideoClickThroughURL();
+        const url = this._vastCampaign.getVast().getVideoClickThroughURL();
         if (this.isValidURL(url)) {
             return url;
         } else {
@@ -175,7 +176,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     }
 
     public getCompanionClickThroughUrl(): string | null {
-        const url = this.getVast().getCompanionClickThroughUrl();
+        const url = this._vastCampaign.getVast().getCompanionClickThroughUrl();
         if (this.isValidURL(url)) {
             return url;
         } else {
@@ -191,7 +192,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     }
 
     public sendVideoClickTrackingEvent(sessionId: string, sdkVersion: number): void {
-        const clickTrackingEventUrls = this.getVast().getVideoClickTrackingURLs();
+        const clickTrackingEventUrls = this._vastCampaign.getVast().getVideoClickTrackingURLs();
 
         if (clickTrackingEventUrls) {
             for (const clickTrackingEventUrl of clickTrackingEventUrls) {
@@ -238,9 +239,9 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         }
 
         if (orientation === Orientation.LANDSCAPE) {
-            return this.getVast().getLandscapeOrientedCompanionAd();
+            return this._vastCampaign.getVast().getLandscapeOrientedCompanionAd();
         } else {
-            return this.getVast().getPortraitOrientedCompanionAd();
+            return this._vastCampaign.getVast().getPortraitOrientedCompanionAd();
         }
     }
 
@@ -254,13 +255,13 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     }
 
     private sendThirdPartyEvent(event: string, sessionId: string, sdkVersion: number, url: string): void {
-        url = url.replace(/%ZONE%/, this.getPlacement().getId());
+        url = url.replace(/%ZONE%/, this._vastPlacement.getId());
         url = url.replace(/%SDK_VERSION%/, sdkVersion.toString());
         this._thirdPartyEventManager.sendEvent(event, sessionId, url);
     }
 
     private getTrackingEventUrls(eventName: string): string[] | null {
-        return this.getVast().getTrackingEventUrls(eventName);
+        return this._vastCampaign.getVast().getTrackingEventUrls(eventName);
     }
 
     private isValidURL(url: string | null): boolean {
