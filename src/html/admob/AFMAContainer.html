@@ -58,9 +58,9 @@
                     return url;
                 } else {
                     if (isObjectEmpty(query)) {
-                        url = url + '&ms=' + spamSignals;
-                    } else {
                         url = url + '?ms=' + spamSignals;
+                    } else {
+                        url = url + '&ms=' + spamSignals;
                     }
                 }
                 return url;
