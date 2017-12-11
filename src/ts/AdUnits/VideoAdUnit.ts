@@ -3,7 +3,7 @@ import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { FinishState } from 'Constants/FinishState';
 import { Double } from 'Utilities/Double';
 import { Video } from 'Models/Assets/Video';
-import { Overlay } from 'Views/Overlay';
+import { AbstractOverlay } from 'Views/AbstractOverlay';
 import { IosUtils } from 'Utilities/IosUtils';
 import { Platform } from 'Constants/Platform';
 import { DeviceInfo } from 'Models/DeviceInfo';
@@ -16,7 +16,7 @@ import { Campaign } from 'Models/Campaign';
 
 export interface IVideoAdUnitParameters<T extends Campaign> extends IAdUnitParameters<T> {
     video: Video;
-    overlay: Overlay;
+    overlay: AbstractOverlay;
 }
 
 export abstract class VideoAdUnit<T extends Campaign = Campaign> extends AbstractAdUnit<T> {
@@ -31,7 +31,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     protected _options: any;
     private _video: Video;
     private _active: boolean;
-    private _overlay: Overlay | undefined;
+    private _overlay: AbstractOverlay | undefined;
     private _deviceInfo: DeviceInfo;
     private _videoOrientation: 'landscape' | 'portrait' | undefined;
     private _lowMemory: boolean;
@@ -102,7 +102,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         return this._video.isCached();
     }
 
-    public getOverlay(): Overlay | undefined {
+    public getOverlay(): AbstractOverlay | undefined {
         return this._overlay;
     }
 

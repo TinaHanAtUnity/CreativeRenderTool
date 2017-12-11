@@ -82,6 +82,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
             }
 
             if(this._moat) {
+                this._moat.removeMessageListener();
                 this._moat.container().parentElement!.removeChild(this._moat.container());
             }
 
@@ -109,14 +110,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         this._events = events;
     }
 
-    public getRealDuration() {
-        return this._realDuration;
-    }
-
-    public setRealDuration(duration: number) {
-        this._realDuration = duration;
-    }
-
     public getVolume() {
         if(this._muted) {
             return 0;
@@ -134,10 +127,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
 
     public getMuted() {
         return this._muted;
-    }
-
-    public getDuration(): number | null {
-        return this.getVast().getDuration();
     }
 
     public sendImpressionEvent(sessionId: string, sdkVersion: number): void {
@@ -185,6 +174,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     public initMoat() {
         this._moat = new MOAT(this._nativeBridge);
         this._moat.render();
+        this._moat.addMessageListener();
         document.body.appendChild(this._moat.container());
     }
 
@@ -244,8 +234,8 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
 
     private sendQuartileEvent(sessionId: string, sdkVersion: number, position: number, oldPosition: number, quartile: number, quartileEventName: string) {
         if (this.getTrackingEventUrls(quartileEventName)) {
-            const duration = this.getDuration();
-            if (duration && duration > 0 && position / 1000 > duration * 0.25 * quartile && oldPosition / 1000 < duration * 0.25 * quartile) {
+            const duration = (<VastCampaign> this.getCampaign()).getVideo().getDuration();
+            if (duration && duration > 0 && position > duration * 0.25 * quartile && oldPosition < duration * 0.25 * quartile) {
                 this.sendTrackingEvent(quartileEventName, sessionId, sdkVersion);
             }
         }

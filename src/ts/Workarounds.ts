@@ -35,16 +35,16 @@ if(!('classList' in document.documentElement) && Object.defineProperty && typeof
             }
 
             const ret = {
-                add: update(function(classes: string[], index: number, value: string) {
-                    ~index || classes.push(value);
+                add: update(function(classes: string[], index: number, value?: string) {
+                    ~index || value && classes.push(value);
                 }),
 
                 remove: update(function(classes: string[], index: number) {
                     ~index && classes.splice(index, 1);
                 }),
 
-                toggle: update(function(classes: string[], index: number, value: string) {
-                    ~index ? classes.splice(index, 1) : classes.push(value);
+                toggle: update(function(classes: string[], index: number, value?: string) {
+                    ~index ? classes.splice(index, 1) : value && classes.push(value);
                 }),
 
                 contains: function(value: string) {

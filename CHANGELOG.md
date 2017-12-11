@@ -1,4 +1,71 @@
-# Pending
+# Staged
+
+* Do not use video duration reported in vast xml and use the REAL video duration
+* New dark end screen AB test in groups 8 & 9
+* Add info button and privacy pop-up to MRAID overlay
+* Add isAppForeground to FocusManager
+
+# Thu Dec  7 10:05:11 UTC 2017
+
+* Change comscore ABGroup to check campaign ABGroup
+* Fix bugs in orientation detection
+* Fix overlay layout on iPhone X
+
+# Tue Dec  5 10:15:34 UTC 2017
+
+* Remove persistent skip button ab test in groups 10 & 11
+* Add max value check for playable analytics
+* Add session objects for cache diagnostic errors
+
+# Thu Nov 30 10:04:19 UTC 2017
+
+* Fix end screen layout on iPhone X
+* Comscore AB test in group 5
+
+# Wed Nov 29 09:17:59 UTC 2017
+
+* Fix MRAID layout on iPhone X
+* Dark close button in landscape
+* Disable Android hardware acceleration on Android 4.2 devices
+
+# Tue Nov 28 09:12:34 UTC 2017
+
+* Disable nofill retrying test in AB group 5
+* Use % for endscreen width and height instead of vh and vw due to ios7 partial support
+
+# Mon Nov 27 09:52:53 UTC 2017
+
+* Add ad request ordinal to session_start_failed diagnostic message
+* Run integration tests in separate processes
+
+# Thu Nov 23 10:20:20 UTC 2017
+
+* Stop AB test in groups 8 & 9 - set new end screen to the whole network
+* AB test persistent overlay in groups 10 & 11 and enable for selected games
+* Add local_time_offset to appRunning analytics events
+* Experimental APK redirect feature
+
+# Wed Nov 22 10:28:21 UTC 2017
+
+* Add loading error diagnostic to MOAT integration
+* Minor iPhone X layout tweaks
+* Minor adjustments to the analytics protocol
+
+# Mon Nov 20 09:36:12 UTC 2017
+
+* Change use of advertiser bundleID to game bundleID for MOAT
+* Use more aggressive retrying in A/B group 5
+* Remove operative event diagnostics & fix click attribution after first click
+* Remove interstitial overlay ab test in groups 12 & 13
+
+# Thu Nov 16 13:37:39 UTC 2017
+
+* Upgrade to TS 2.6 & upgrade all other dependencies
+* Reorder regexp to prevent matched string replacement ($&) in build
+* New interstitial overlay view with the close button (AB test in groups 12 & 13, enabled directly for selected gameIds)
+* Retry refactored end screen AB test (groups 8 & 9)
+
+# Tue Nov 14 09:32:33 UTC 2017
 
 * Faster init by converting some promise chains to be parallel 
 

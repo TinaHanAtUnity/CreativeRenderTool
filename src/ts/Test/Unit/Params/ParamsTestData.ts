@@ -58,7 +58,7 @@ export class ParamsTestData {
         const parsedSpec: IRawEventJson = JSON.parse(rawData);
         const parsedParams: IRawParamDesc[] = JSON.parse(ParameterSpec);
         const params: IRawEventParameter[] = parsedSpec.parameters;
-        const types = {};
+        const types: { [key: string]: any } = {};
 
         for(const parsedParam of parsedParams) {
             types[parsedParam.key] = parsedParam.type;

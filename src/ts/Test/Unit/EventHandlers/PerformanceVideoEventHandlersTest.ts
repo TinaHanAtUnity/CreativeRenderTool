@@ -14,6 +14,7 @@ import { Request } from 'Utilities/Request';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { SessionManager } from 'Managers/SessionManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { FocusManager } from 'Managers/FocusManager';
 import { WakeUpManager } from 'Managers/WakeUpManager';
@@ -28,6 +29,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
     let performanceAdUnit: PerformanceAdUnit;
     let video: Video;
     let performanceAdUnitParameters: IPerformanceAdUnitParameters;
+    let comScoreService: ComScoreTrackingService;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -47,6 +49,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
         const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         const sessionManager = new SessionManager(nativeBridge);
         const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         const campaign = TestFixtures.getCampaign();
         endScreen = new PerformanceEndScreen(nativeBridge, campaign, TestFixtures.getConfiguration().isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
@@ -60,6 +63,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
+            comScoreTrackingService: comScoreService,
             placement: TestFixtures.getPlacement(),
             campaign: campaign,
             configuration: TestFixtures.getConfiguration(),

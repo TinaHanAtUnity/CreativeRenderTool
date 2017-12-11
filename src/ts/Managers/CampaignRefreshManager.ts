@@ -228,35 +228,8 @@ export class CampaignRefreshManager {
     private onAdPlanReceived(refreshDelay: number, campaignCount: number) {
         this._campaignCount = campaignCount;
 
-        if(campaignCount === 0 && this._configuration.getAbGroup() === 5) {
-            this._noFills++;
-
-            let delay: number = 0;
-
-            if(this._noFills === 1) {
-                delay = 60;
-            } else if(this._noFills === 2) {
-                delay = 120;
-            } else if(this._noFills === 3) {
-                delay = 240;
-            } else if(this._noFills === 4) {
-                delay = 480;
-            } else if(this._noFills === 5) {
-                delay = 960;
-            }
-
-            if(delay > 0) {
-                this._refillTimestamp = Date.now() + delay * 1000;
-                delay = delay + Math.random() * 60; // add 0-60 second random delay
-                this._nativeBridge.Sdk.logDebug('Unity Ads ad plan will be refreshed in ' + delay + ' seconds');
-                setTimeout(() => {
-                    this.refresh(true);
-                }, delay * 1000);
-                return;
-            }
-        } else {
-            this._noFills = 0;
-        }
+        // todo: waiting for decision whether no fill retrying should be properly implemented or removed altogether
+        this._noFills = 0;
 
         if(refreshDelay > 0) {
             this._refillTimestamp = Date.now() + refreshDelay * 1000;

@@ -20,6 +20,7 @@ import { Cache } from 'Utilities/Cache';
 import { Placement, PlacementState } from 'Models/Placement';
 import { SessionManager } from 'Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { AdUnitContainer, ForceOrientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
@@ -54,6 +55,7 @@ describe('CampaignRefreshManager', () => {
     let focusManager: FocusManager;
     let adUnitParams: IAdUnitParameters<Campaign>;
     let operativeEventManager: OperativeEventManager;
+    let comScoreService: ComScoreTrackingService;
 
     beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo();
@@ -136,6 +138,7 @@ describe('CampaignRefreshManager', () => {
         assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
         container = new TestContainer();
         operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         adUnitParams = {
             forceOrientation: ForceOrientation.NONE,
@@ -145,6 +148,7 @@ describe('CampaignRefreshManager', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
+            comScoreTrackingService: comScoreService,
             placement: TestFixtures.getPlacement(),
             campaign: TestFixtures.getCampaign(),
             configuration: configuration,

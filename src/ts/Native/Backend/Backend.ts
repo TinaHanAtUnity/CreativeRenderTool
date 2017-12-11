@@ -34,17 +34,17 @@ export class Backend implements IWebViewBridge {
 
     public static sendEvent(category: string, name: string, ...parameters: any[]) {
         // tslint:disable:no-string-literal
-        window['nativebridge']['handleEvent']([category, name].concat(parameters));
+        (<any>window)['nativebridge']['handleEvent']([category, name].concat(parameters));
         // tslint:enable:no-string-literal
     }
 
     public static getPlatform(): Platform {
         // tslint:disable:no-string-literal
-        return window['nativebridge']['getPlatform']();
+        return (<any>window)['nativebridge']['getPlatform']();
         // tslint:enable:no-string-literal
     }
 
-    private static _apiMap = {
+    private static _apiMap: { [key: string]: any } = {
         '.*AdUnit': AdUnit,
         '.*AppSheet': AppSheet,
         '.*Broadcast': Broadcast,
@@ -67,7 +67,7 @@ export class Backend implements IWebViewBridge {
         const invocations: IInvocation[] = JSON.parse(rawInvocations).map((invocation: any) => this.parseInvocation(invocation));
         const results = invocations.map((invocation) => this.executeInvocation(invocation));
         // tslint:disable:no-string-literal
-        window['nativebridge']['handleCallback'](results.map(result => [result.callbackId.toString(), CallbackStatus[result.callbackStatus], result.parameters]));
+        (<any>window)['nativebridge']['handleCallback'](results.map(result => [result.callbackId.toString(), CallbackStatus[result.callbackStatus], result.parameters]));
         // tslint:enable:no-string-literal
     }
 

@@ -8,7 +8,6 @@ export enum EventType {
     VIEW,
     SKIP,
     CLICK,
-    CLICK_ATTRIBUTION,
     IMPRESSION,
     VAST_COMPLETE
 }

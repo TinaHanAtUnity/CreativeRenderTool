@@ -205,9 +205,9 @@ describe('CampaignManager', () => {
 
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
-            let triggeredCampaign: VastCampaign;
+            let triggeredCampaign: Campaign;
             let triggeredError: any;
-            campaignManager.onCampaign.subscribe((placementId: string, campaign: VastCampaign) => {
+            campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
                 triggeredCampaign = campaign;
             });
             campaignManager.onError.subscribe(error => {
@@ -224,7 +224,7 @@ describe('CampaignManager', () => {
                 mockRequest.verify();
                 assert.equal(triggeredCampaign.getAbGroup(), 99);
                 assert.equal(triggeredCampaign.getGamerId(), '57a35671bb58271e002d93c9');
-                assert.equal(triggeredCampaign.getVideo().getUrl(), 'https://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
+                assert.equal((<VastCampaign>triggeredCampaign).getVideo().getUrl(), 'https://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
             });
         });
 
@@ -243,9 +243,9 @@ describe('CampaignManager', () => {
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
             let triggeredCampaign: VastCampaign;
-            campaignManager.onCampaign.subscribe((placementId: string, campaign: VastCampaign) => {
+            campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
                 if (!triggeredCampaign && campaign) {
-                    triggeredCampaign = campaign;
+                    triggeredCampaign = <VastCampaign>campaign;
                     // then the onVastCampaign observable is triggered with the correct campaign data
                     mockRequest.verify();
 
@@ -325,8 +325,8 @@ describe('CampaignManager', () => {
             campaignManager.onError.subscribe((error) => {
                 assert.equal(1, 2, error.message);
             });
-            campaignManager.onCampaign.subscribe((placementId: string, campaign: VastCampaign) => {
-                triggeredCampaign = campaign;
+            campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
+                triggeredCampaign = <VastCampaign>campaign;
                 // then the onVastCampaign observable is triggered with the correct campaign data
                 mockRequest.verify();
 
@@ -433,7 +433,7 @@ describe('CampaignManager', () => {
 
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
-            campaignManager.onError.subscribe((err: Error) => {
+            campaignManager.onError.subscribe((err: WebViewError) => {
                 assert.equal(err.message, 'VAST wrapper depth exceeded');
                 done();
             });
@@ -450,7 +450,7 @@ describe('CampaignManager', () => {
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
             let triggeredError: any;
-            campaignManager.onError.subscribe((error: Error) => {
+            campaignManager.onError.subscribe((error: WebViewError) => {
                 triggeredError = error;
             });
 
@@ -483,7 +483,7 @@ describe('CampaignManager', () => {
                 }
             };
 
-            campaignManager.onError.subscribe((error: Error) => {
+            campaignManager.onError.subscribe((error: WebViewError) => {
                 triggeredError = error;
                 if (done) {
                     // then the onError observable is triggered with an appropriate error
@@ -611,8 +611,8 @@ describe('CampaignManager', () => {
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
             let triggeredCampaign: VastCampaign;
             let triggeredError: any;
-            campaignManager.onCampaign.subscribe((placementId: string, campaign: VastCampaign) => {
-                triggeredCampaign = campaign;
+            campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
+                triggeredCampaign = <VastCampaign>campaign;
             });
             campaignManager.onError.subscribe(error => {
                 triggeredError = error;
@@ -672,8 +672,8 @@ describe('CampaignManager', () => {
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
             let triggeredCampaign: VastCampaign;
             let triggeredError: any;
-            campaignManager.onCampaign.subscribe((placementId: string, campaign: VastCampaign) => {
-                triggeredCampaign = campaign;
+            campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
+                triggeredCampaign = <VastCampaign>campaign;
             });
             campaignManager.onError.subscribe(error => {
                 triggeredError = error;
@@ -726,8 +726,8 @@ describe('CampaignManager', () => {
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
             let triggeredCampaign: MRAIDCampaign;
             let triggeredError: any;
-            campaignManager.onCampaign.subscribe((placementId: string, campaign: MRAIDCampaign) => {
-                triggeredCampaign = campaign;
+            campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
+                triggeredCampaign = <MRAIDCampaign>campaign;
             });
             campaignManager.onError.subscribe(error => {
                 triggeredError = error;
@@ -768,8 +768,8 @@ describe('CampaignManager', () => {
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
             let triggeredCampaign: MRAIDCampaign;
             let triggeredError: any;
-            campaignManager.onCampaign.subscribe((placementId: string, campaign: MRAIDCampaign) => {
-                triggeredCampaign = campaign;
+            campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
+                triggeredCampaign = <MRAIDCampaign>campaign;
             });
             campaignManager.onError.subscribe(error => {
                 triggeredError = error;

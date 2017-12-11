@@ -4,12 +4,12 @@ import { CallbackContainer } from './CallbackContainer';
 export class Resolve {
 
     private static _callbackId = 1;
-    private static _callbacks: { [key: number]: CallbackContainer<[string, string, string]> } = {};
+    private static _callbacks: { [key: string]: CallbackContainer<[string, string, string]> } = {};
 
     private static onResolveComplete(id: string, host: string, ip: string): void {
         const callbackObject = Resolve._callbacks[id];
         if(callbackObject) {
-            callbackObject.resolve([host, ip]);
+            callbackObject.resolve([id, host, ip]);
             delete Resolve._callbacks[id];
         }
     }

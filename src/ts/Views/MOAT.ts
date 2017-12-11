@@ -6,6 +6,7 @@ import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
 import { Platform } from 'Constants/Platform';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class MOAT extends View<VastCampaign> {
     private _iframe: HTMLIFrameElement;
@@ -13,11 +14,13 @@ export class MOAT extends View<VastCampaign> {
     private _resizeDelayer: any;
     private _resizeTimeout: any;
     private _didInitMoat = false;
+    private _messageListener: (e: MessageEvent) => void;
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'moat');
         this._template = new Template(MOATTemplate);
         this._bindings = [];
+        this._messageListener = (e: MessageEvent) => this.onMessage(e);
     }
 
     public render(): Promise<void> {
@@ -86,7 +89,14 @@ export class MOAT extends View<VastCampaign> {
                 this.resume(volume);
             }
         }
+    }
 
+    public addMessageListener() {
+        window.addEventListener('message', this._messageListener);
+    }
+
+    public removeMessageListener() {
+        window.removeEventListener('message', this._messageListener);
     }
 
     public triggerVideoEvent(type: string, volume: number) {
@@ -109,6 +119,17 @@ export class MOAT extends View<VastCampaign> {
                 type: type,
                 payload: payload
             }, '*');
+        }
+    }
+
+    private onMessage(e: MessageEvent) {
+        switch(e.data.type) {
+            case 'MOATVideoError':
+                Diagnostics.trigger('moat_video_error', e.data.error);
+                break;
+            default:
+                this._nativeBridge.Sdk.logWarning(`MOAT Unknown message type ${e.data.type}`);
+                break;
         }
     }
 }

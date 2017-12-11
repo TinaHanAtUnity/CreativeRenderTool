@@ -70,7 +70,7 @@ To build and test continuously (on file changes), use:
 - `make build-test`
 - Run hybrid test suite from the SDK
 
-### Browser Build tests
+### Browser build tests
 
 - `make clean build-browser start-nginx`
 - `make test-browser`

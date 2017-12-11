@@ -8,7 +8,6 @@ import { Platform } from 'Constants/Platform';
 import { StoreName } from 'Models/Campaigns/PerformanceCampaign';
 import { IosUtils } from 'Utilities/IosUtils';
 import { DeviceInfo } from 'Models/DeviceInfo';
-import { EventType } from 'Models/Session';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { RequestError } from 'Errors/RequestError';
 import { DiagnosticError } from 'Errors/DiagnosticError';
@@ -103,13 +102,6 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
 
     private handleClickAttribution(parameters: IEndScreenDownloadParameters) {
         const currentSession = this._campaign.getSession();
-        if(currentSession) {
-            if(currentSession.getEventSent(EventType.CLICK_ATTRIBUTION)) {
-                return;
-            }
-            currentSession.setEventSent(EventType.CLICK_ATTRIBUTION);
-        }
-
         const platform = this._nativeBridge.getPlatform();
 
         if(parameters.clickAttributionUrlFollowsRedirects && parameters.clickAttributionUrl) {
@@ -117,10 +109,23 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
                 const location = Request.getHeader(response.headers, 'location');
                 if(location) {
                     if(platform === Platform.ANDROID) {
-                        this._nativeBridge.Intent.launch({
-                            'action': 'android.intent.action.VIEW',
-                            'uri': location
-                        });
+                        if(location.match(/\.apk$/i) && this._nativeBridge.getApiLevel() >= 21) {
+                            // Using WEB_SEARCH bypasses some security check for directly downloading .apk files
+                            this._nativeBridge.Intent.launch({
+                                'action': 'android.intent.action.WEB_SEARCH',
+                                'extras': [
+                                    {
+                                        'key': 'query',
+                                        'value': location
+                                    }
+                                ]
+                            });
+                        } else {
+                            this._nativeBridge.Intent.launch({
+                                'action': 'android.intent.action.VIEW',
+                                'uri': location
+                            });
+                        }
                     } else if(platform === Platform.IOS) {
                         this._nativeBridge.UrlScheme.open(location);
                     }

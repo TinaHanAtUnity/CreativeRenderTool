@@ -41,7 +41,7 @@ export abstract class DisplayInterstitialCampaign<V extends IDisplayInterstitial
     public getTrackingUrlsForEvent(eventName: string): string[] {
         const tracking = this.get('tracking');
         if (tracking) {
-            return tracking[eventName] || [];
+            return (<any>tracking)[eventName] || [];
         }
         return [];
     }

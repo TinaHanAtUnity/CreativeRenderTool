@@ -1,5 +1,8 @@
-<div class="btn-close-region<%= data.endscreenAlt ? ' ' + data.endscreenAlt : '' %>"><a class="btn-close"><span class="icon-close"></span></a></div>
+<div class="btn-close-region<%= data.endscreenAlt ? ' ' + data.endscreenAlt : '' %>">
+  <span class="icon-close"></span>
+</div>
 <div class="campaign-container<%= data.endscreenAlt ? ' ' + data.endscreenAlt : '' %>">
+  <div class="underlay" style="background-image: url(<%= data.endScreenLandscape && data.endScreenLandscape.replace("file://", "") %>)"></div>
   <div class="game-background game-background-landscape" style="background-image: url(<%= data.endScreenLandscape && data.endScreenLandscape.replace("file://", "") %>)"></div>
   <div class="game-background game-background-portrait" style="background-image: url(<%= data.endScreenPortrait && data.endScreenPortrait.replace("file://", "") %>)"></div>
   <div class="end-screen-info-background">

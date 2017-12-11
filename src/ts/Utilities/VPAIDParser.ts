@@ -1,7 +1,7 @@
-import { VastParser } from "Utilities/VastParser";
-import { VPAID } from "Models/VPAID/VPAID";
-import { Vast } from "Models/Vast/Vast";
-import { VastMediaFile } from "Models/Vast/VastMediaFile";
+import { VastParser } from 'Utilities/VastParser';
+import { VPAID } from 'Models/VPAID/VPAID';
+import { Vast } from 'Models/Vast/Vast';
+import { VastMediaFile } from 'Models/Vast/VastMediaFile';
 
 const VPAIDApiFramework = 'VPAID';
 const VPAIDJavascriptType = 'application/javascript';

@@ -116,17 +116,19 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
         }
     }
 
-    private handleClickAttribution() {
-        const currentSession = this._campaign.getSession();
-        if(currentSession) {
-            if(currentSession.getEventSent(EventType.CLICK_ATTRIBUTION)) {
-                return;
-            }
-            currentSession.setEventSent(EventType.CLICK_ATTRIBUTION);
+    public onMraidPrivacy(url: string): void {
+        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            this._nativeBridge.UrlScheme.open(url);
+        } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            this._nativeBridge.Intent.launch({
+                'action': 'android.intent.action.VIEW',
+                'uri': url
+            });
         }
+    }
 
+    private handleClickAttribution() {
         const clickAttributionUrl = this._campaign.getClickAttributionUrl();
-
         if(this._campaign.getClickAttributionUrlFollowsRedirects() && clickAttributionUrl) {
             this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, true).then(response => {
                 const location = Request.getHeader(response.headers, 'location');

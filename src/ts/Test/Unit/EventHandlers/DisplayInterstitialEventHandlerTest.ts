@@ -6,11 +6,12 @@ import { NativeBridge } from "Native/NativeBridge";
 import { Placement } from "Models/Placement";
 import { DisplayInterstitialCampaign, IDisplayInterstitialCampaign } from "Models/Campaigns/DisplayInterstitialCampaign";
 
-import { Platform } from "Constants/Platform";
-import { TestFixtures } from "Test/Unit/TestHelpers/TestFixtures";
+import { Platform } from 'Constants/Platform';
+import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 import { FocusManager } from 'Managers/FocusManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { Request } from 'Utilities/Request';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { DisplayInterstitialAdUnit, IDisplayInterstitialAdUnitParameters } from 'AdUnits/DisplayInterstitialAdUnit';
@@ -28,6 +29,7 @@ describe('DisplayInterstitialEventHandler', () => {
     let displayInterstitialAdUnit: DisplayInterstitialAdUnit;
     let displayInterstitialEventHandler: DisplayInterstitialEventHandler;
     let operativeEventManager: OperativeEventManager;
+    let comScoreService: ComScoreTrackingService;
 
     describe('on Display Interstitial Markup Campaign',() => {
         eventHandlerTests(!isDisplayInterstitialUrlCampaign);
@@ -57,29 +59,31 @@ describe('DisplayInterstitialEventHandler', () => {
 
             sandbox.stub(nativeBridge, 'getApiLevel').returns(16);
 
-            const container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
-            const focusManager = sinon.createStubInstance(FocusManager);
-            const request = sinon.createStubInstance(Request);
-            const clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-            const deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
-            const thirdPartyEventManager = sinon.createStubInstance(ThirdPartyEventManager);
-            operativeEventManager = sinon.createStubInstance(OperativeEventManager);
+        const container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+        const focusManager = sinon.createStubInstance(FocusManager);
+        const request = sinon.createStubInstance(Request);
+        const clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
+        const deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
+        const thirdPartyEventManager = sinon.createStubInstance(ThirdPartyEventManager);
+        operativeEventManager = sinon.createStubInstance(OperativeEventManager);
+        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
-            displayInterstitialAdUnitParameters = {
-                forceOrientation: ForceOrientation.LANDSCAPE,
-                focusManager: focusManager,
-                container: container,
-                deviceInfo: deviceInfo,
-                clientInfo: clientInfo,
-                thirdPartyEventManager: thirdPartyEventManager,
-                operativeEventManager: operativeEventManager,
-                placement: placement,
-                campaign: campaign,
-                configuration: TestFixtures.getConfiguration(),
-                request: request,
-                options: {},
-                view: view
-            };
+        displayInterstitialAdUnitParameters = {
+            forceOrientation: ForceOrientation.LANDSCAPE,
+            focusManager: focusManager,
+            container: container,
+            deviceInfo: deviceInfo,
+            clientInfo: clientInfo,
+            thirdPartyEventManager: thirdPartyEventManager,
+            operativeEventManager: operativeEventManager,
+            comScoreTrackingService: comScoreService,
+            placement: placement,
+            campaign: campaign,
+            configuration: TestFixtures.getConfiguration(),
+            request: request,
+            options: {},
+            view: view
+        };
 
             displayInterstitialAdUnit = new DisplayInterstitialAdUnit(nativeBridge, displayInterstitialAdUnitParameters);
             displayInterstitialEventHandler = new DisplayInterstitialEventHandler(nativeBridge, displayInterstitialAdUnit, displayInterstitialAdUnitParameters);

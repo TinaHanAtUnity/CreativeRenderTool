@@ -19,6 +19,7 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { SessionManager } from 'Managers/SessionManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 
@@ -37,6 +38,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
     let request: Request;
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
+    let comScoreService: ComScoreTrackingService;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -59,6 +61,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
         const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
         endScreen = new PerformanceEndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
+        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         performanceAdUnitParameters = {
             forceOrientation: ForceOrientation.LANDSCAPE,
@@ -68,6 +71,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
+            comScoreTrackingService: comScoreService,
             placement: TestFixtures.getPlacement(),
             campaign: campaign,
             configuration: TestFixtures.getConfiguration(),

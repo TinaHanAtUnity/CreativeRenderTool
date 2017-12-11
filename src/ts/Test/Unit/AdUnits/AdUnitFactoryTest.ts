@@ -35,6 +35,7 @@ import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { Campaign } from 'Models/Campaign';
 
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 
 describe('AdUnitFactoryTest', () => {
 
@@ -51,6 +52,7 @@ describe('AdUnitFactoryTest', () => {
     let thirdPartyEventManager: ThirdPartyEventManager;
     let request: Request;
     let adUnitParameters: IAdUnitParameters<Campaign>;
+    let comScoreService: ComScoreTrackingService;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -71,6 +73,8 @@ describe('AdUnitFactoryTest', () => {
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         sessionManager = new SessionManager(nativeBridge);
         operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
+
         adUnitParameters = {
             forceOrientation: ForceOrientation.LANDSCAPE,
             focusManager: focusManager,
@@ -79,6 +83,7 @@ describe('AdUnitFactoryTest', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
+            comScoreTrackingService: comScoreService,
             placement: TestFixtures.getPlacement(),
             campaign: TestFixtures.getCampaign(),
             configuration: config,

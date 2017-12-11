@@ -12,6 +12,7 @@ import { Configuration } from 'Models/Configuration';
 import { VideoInfo } from 'Utilities/VideoInfo';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 
 export class VideoEventHandlers {
 
@@ -82,15 +83,25 @@ export class VideoEventHandlers {
         });
     }
 
-    public static onVideoProgress(nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, adUnit: VideoAdUnit, position: number, configuration: Configuration): void {
+    public static onVideoProgress(nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, comScoreTrackingService: ComScoreTrackingService, adUnit: VideoAdUnit, position: number, configuration: Configuration): void {
         adUnit.getContainer().addDiagnosticsEvent({type: 'onVideoProgress', position: position});
         const overlay = adUnit.getOverlay();
 
         if(position > 0 && !adUnit.getVideo().hasStarted()) {
+            const comScoreDuration = (adUnit.getVideo().getDuration()).toString(10);
+            const sessionId = adUnit.getCampaign().getSession().getId();
+            const creativeId = adUnit.getCampaign().getCreativeId();
+            const category = adUnit.getCampaign().getCategory();
+            const subCategory = adUnit.getCampaign().getSubCategory();
+            const abGroup = adUnit.getCampaign().getAbGroup();
+
             adUnit.getContainer().addDiagnosticsEvent({type: 'videoStarted'});
             adUnit.getVideo().setStarted(true);
 
             operativeEventManager.sendStart(adUnit);
+            if (abGroup === 5) {
+                comScoreTrackingService.sendEvent('play', sessionId, comScoreDuration, position, creativeId, category, subCategory);
+            }
 
             if(overlay) {
                 overlay.setSpinnerEnabled(false);
@@ -213,11 +224,22 @@ export class VideoEventHandlers {
         nativeBridge.VideoPlayer.setProgressEventInterval(adUnit.getProgressInterval());
     }
 
-    public static onVideoCompleted(operativeEventManager: OperativeEventManager, adUnit: VideoAdUnit): void {
+    public static onVideoCompleted(operativeEventManager: OperativeEventManager, comScoreTrackingService: ComScoreTrackingService, adUnit: VideoAdUnit): void {
+        const comScorePlayedTime = adUnit.getVideo().getPosition();
+        const comScoreDuration = (adUnit.getVideo().getDuration()).toString(10);
+        const sessionId = adUnit.getCampaign().getSession().getId();
+        const creativeId = adUnit.getCampaign().getCreativeId();
+        const category = adUnit.getCampaign().getCategory();
+        const subCategory = adUnit.getCampaign().getSubCategory();
+        const abGroup = adUnit.getCampaign().getAbGroup();
+
         adUnit.getContainer().addDiagnosticsEvent({type: 'onVideoCompleted'});
         adUnit.setActive(false);
         adUnit.setFinishState(FinishState.COMPLETED);
         operativeEventManager.sendView(adUnit);
+        if (abGroup === 5) {
+            comScoreTrackingService.sendEvent('end', sessionId, comScoreDuration, comScorePlayedTime, creativeId, category, subCategory);
+        }
 
         this.afterVideoCompleted(adUnit);
     }

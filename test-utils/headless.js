@@ -104,8 +104,8 @@ puppeteer.launch().then(async (browser) => {
         setTimeout(reject, TEST_TIMEOUT);
     });
     page.on("console", (message) => {
-        console.log("* Browser output: " + message);
-        if(checkMessage(message)) {
+        console.log("* Browser output: " + message.text);
+        if(checkMessage(message.text)) {
             if(!testRunning) {
                 return;
             }
