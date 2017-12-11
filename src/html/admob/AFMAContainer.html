@@ -23,6 +23,15 @@
             return params;
         }
 
+        function isObjectEmpty(obj) {
+            for (var prop in obj) {
+                if (obj.hasOwnProperty(prop)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         var AFMA = function() {
             this.forceOrientation = function(orientation, override, animationDuration) {
                 this.postMessage('forceOrientation', {
@@ -48,7 +57,7 @@
                 if (query.ms) {
                     return url;
                 } else {
-                    if (Object.keys(query).length) {
+                    if (isObjectEmpty(query)) {
                         url = url + '&ms=' + spamSignals;
                     } else {
                         url = url + '?ms=' + spamSignals;
