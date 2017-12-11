@@ -73,22 +73,22 @@ describe('DisplayInterstitialAdUnit', () => {
             sandbox.stub(view, 'show');
             sandbox.stub(view, 'hide');
 
-        displayInterstitialAdUnitParameters = {
-            forceOrientation: ForceOrientation.LANDSCAPE,
-            focusManager: focusManager,
-            container: container,
-            deviceInfo: deviceInfo,
-            clientInfo: clientInfo,
-            thirdPartyEventManager: thirdPartyEventManager,
-            operativeEventManager: operativeEventManager,
-            comScoreTrackingService: comScoreService,
-            placement: TestFixtures.getPlacement(),
-            campaign: campaign,
-            configuration: TestFixtures.getConfiguration(),
-            request: request,
-            options: {},
-            view: view
-        };
+            displayInterstitialAdUnitParameters = {
+                forceOrientation: ForceOrientation.LANDSCAPE,
+                focusManager: focusManager,
+                container: container,
+                deviceInfo: deviceInfo,
+                clientInfo: clientInfo,
+                thirdPartyEventManager: thirdPartyEventManager,
+                operativeEventManager: operativeEventManager,
+                comScoreTrackingService: comScoreService,
+                placement: TestFixtures.getPlacement(),
+                campaign: campaign,
+                configuration: TestFixtures.getConfiguration(),
+                request: request,
+                options: {},
+                view: view
+            };
 
             adUnit = new DisplayInterstitialAdUnit(nativeBridge, displayInterstitialAdUnitParameters);
         });
