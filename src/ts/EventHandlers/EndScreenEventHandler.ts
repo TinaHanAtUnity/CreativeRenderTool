@@ -24,7 +24,7 @@ export interface IEndScreenDownloadParameters {
     gamerId: string;
 }
 
-export abstract class EndScreenEventHandler<T extends Campaign, T2 extends AbstractAdUnit<T>> implements IEndScreenHandler {
+export abstract class EndScreenEventHandler<T extends Campaign, T2 extends AbstractAdUnit> implements IEndScreenHandler {
     protected _adUnit: T2;
     private _nativeBridge: NativeBridge;
     private _operativeEventManager: OperativeEventManager;
@@ -73,7 +73,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     private onDownloadAndroid(parameters: IEndScreenDownloadParameters): void {
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
 
-        this._operativeEventManager.sendClick(this._adUnit);
+        this._operativeEventManager.sendClick(this._campaign.getSession(), this._campaign);
         if(parameters.clickAttributionUrl) {
             this.handleClickAttribution(parameters);
 
@@ -88,7 +88,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     private onDownloadIos(parameters: IEndScreenDownloadParameters): void {
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
 
-        this._operativeEventManager.sendClick(this._adUnit);
+        this._operativeEventManager.sendClick(this._campaign.getSession(), this._campaign);
         if(parameters.clickAttributionUrl) {
             this.handleClickAttribution(parameters);
 
