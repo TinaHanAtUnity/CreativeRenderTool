@@ -49,7 +49,6 @@ describe('VastAdUnit', () => {
         const vastXml = EventTestVast;
 
         const vast = vastParser.parseVast(vastXml);
-        // campaign = new VastCampaign(vast, '12345', TestFixtures.getSession(), 'gamerId', 1);
 
         const placement = new Placement({
             id: '123',
