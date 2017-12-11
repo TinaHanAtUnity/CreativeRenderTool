@@ -33,7 +33,6 @@ export class AdMobAdUnit extends AbstractAdUnit<AdMobCampaign> {
     public show(): Promise<void> {
         this.setShowing(true);
         this.onStart.trigger();
-        this._operativeEventManager.sendView(this);
         this._operativeEventManager.sendStart(this);
 
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
@@ -104,6 +103,7 @@ export class AdMobAdUnit extends AbstractAdUnit<AdMobCampaign> {
         this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
         this.onClose.trigger();
         this._operativeEventManager.sendThirdQuartile(this);
+        this._operativeEventManager.sendView(this);
         if (this.getFinishState() === FinishState.SKIPPED) {
             this.sendSkipEvent();
         } else if (this.getFinishState() === FinishState.COMPLETED) {
