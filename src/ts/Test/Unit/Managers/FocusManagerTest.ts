@@ -198,4 +198,36 @@ describe('FocusManagerTest', () => {
         nativeBridge.Lifecycle.handleEvent('PAUSED', ['com.test.activity']);
         sinon.assert.calledOnce(spy);
     });
+
+    it('should handle app foreground status when initialized', () => {
+        assert.isTrue(focusManager.isAppForeground(), 'appForeground was false after FocusManager was initialized');
+    });
+
+    it('should handle app foreground status after going to background (on iOS)', () => {
+        nativeBridge.Notification.handleEvent('ACTION', ['UIApplicationWillResignActiveNotification', {}]);
+        assert.isFalse(focusManager.isAppForeground(), 'appForeground was true after going to background (on iOS)');
+    });
+
+    it('should handle app foreground status after going to background (on Android)', () => {
+        nativeBridge.Lifecycle.handleEvent('PAUSED', ['com.test.activity']);
+        assert.isFalse(focusManager.isAppForeground(), 'appForeground was true after going to background (on Android)');
+    });
+
+    it('should handle app foreground status after returning to foreground (on iOS)', () => {
+        nativeBridge.Notification.handleEvent('ACTION', ['UIApplicationWillResignActiveNotification', {}]);
+        nativeBridge.Notification.handleEvent('ACTION', ['UIApplicationDidBecomeActiveNotification', {}]);
+        assert.isTrue(focusManager.isAppForeground(), 'appForeground was false after returning to foreground (on iOS)');
+    });
+
+    it('should handle app foreground status after returning to foreground (on Android)', () => {
+        nativeBridge.Lifecycle.handleEvent('PAUSED', ['com.test.activity']);
+        nativeBridge.Lifecycle.handleEvent('RESUMED', ['com.test.activity']);
+        assert.isTrue(focusManager.isAppForeground(), 'appForeground was false after returning to foreground (on Android)');
+    });
+
+    it('should handle app foreground status when changing Android activities', () => {
+        nativeBridge.Lifecycle.handleEvent('RESUMED', ['com.test.newactivity']);
+        nativeBridge.Lifecycle.handleEvent('PAUSED', ['com.test.oldactivity']);
+        assert.isTrue(focusManager.isAppForeground(), 'appForeground was false after changing Android activities');
+    });
 });
