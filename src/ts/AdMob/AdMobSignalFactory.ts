@@ -114,7 +114,6 @@ export class AdMobSignalFactory {
     }
 
     private logFailure(nativeBridge: NativeBridge, field: string) {
-        nativeBridge.Sdk.logDebug('Fetching ' + field + ' failed');
         Diagnostics.trigger('signal_failed', {
             signal: field
         });
