@@ -245,7 +245,6 @@ describe('VastAdUnit', () => {
 
             const duration = vastCampaign.getVideo().getDuration();
             const quartilePosition = duration * 0.25 * quartile;
-            console.log('DUR: ' + duration + ' POS: ' + quartilePosition);
             vastAdUnit.sendProgressEvents('123', 2000, quartilePosition + 100, quartilePosition - 100);
             mockEventManager.verify();
         };
