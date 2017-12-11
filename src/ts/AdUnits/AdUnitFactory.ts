@@ -1,4 +1,4 @@
-import { AbstractAdUnit, IAdUnitParameters, IAdUnitParametersExt } from 'AdUnits/AbstractAdUnit';
+import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { IVastAdUnitParameters, VastAdUnit } from 'AdUnits/VastAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
@@ -392,7 +392,11 @@ export class AdUnitFactory {
         return undefined;
     }
     private static createAdMobAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<AdMobCampaign>): AdMobAdUnit {
-        const view = new AdMobView(nativeBridge, (<IAdUnitParametersExt<AdMobCampaign>>parameters).adMobSignalFactory, parameters.container, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup());
+        // AdMobSignalFactory will always be defined, checking and throwing just to remove the undefined type.
+        if (!parameters.adMobSignalFactory) {
+            throw new Error('AdMobSignalFactory is undefined, should not get here.');
+        }
+        const view = new AdMobView(nativeBridge, parameters.adMobSignalFactory, parameters.container, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup());
         view.render();
 
         const adUnitParameters: IAdMobAdUnitParameters = {

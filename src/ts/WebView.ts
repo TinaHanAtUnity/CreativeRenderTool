@@ -11,7 +11,7 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { FinishState } from 'Constants/FinishState';
-import { AbstractAdUnit, IAdUnitParametersExt } from 'AdUnits/AbstractAdUnit';
+import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { UnityAdsError } from 'Constants/UnityAdsError';
 import { Platform } from 'Constants/Platform';
 import { Resolve } from 'Utilities/Resolve';
@@ -286,7 +286,7 @@ export class WebView {
 
             const orientation = screenWidth >= screenHeight ? ForceOrientation.LANDSCAPE : ForceOrientation.PORTRAIT;
             this._comScoreTrackingService = new ComScoreTrackingService(this._thirdPartyEventManager, this._nativeBridge, this._deviceInfo);
-            this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, <IAdUnitParametersExt<Campaign>>{
+            this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, {
                 forceOrientation: orientation,
                 focusManager: this._focusManager,
                 container: this._container,

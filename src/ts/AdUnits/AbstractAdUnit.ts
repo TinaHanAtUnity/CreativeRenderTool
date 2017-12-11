@@ -28,10 +28,7 @@ export interface IAdUnitParameters<T extends Campaign> {
     configuration: Configuration;
     request: Request;
     options: any;
-}
-
-export interface IAdUnitParametersExt<T extends Campaign> extends IAdUnitParameters<T> {
-    adMobSignalFactory: AdMobSignalFactory;
+    adMobSignalFactory?: AdMobSignalFactory;
 }
 
 export abstract class AbstractAdUnit<T extends Campaign = Campaign> {
