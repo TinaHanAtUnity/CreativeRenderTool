@@ -35,6 +35,7 @@ export class AdMobEventHandler implements IAdMobEventHandler {
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
             this._nativeBridge.UrlScheme.open(url);
         } else {
+            this._adUnit.sendClickEvent();
             this._nativeBridge.Intent.launch({
                 action: 'android.intent.action.VIEW',
                 uri: url
@@ -48,6 +49,8 @@ export class AdMobEventHandler implements IAdMobEventHandler {
 
     public onVideoStart(): void {
         // this._timeoutTimer.stop();
+        this._adUnit.sendStartEvent();
+        this._adUnit.sendImpressionEvent();
     }
 
     public onShow(): void {
