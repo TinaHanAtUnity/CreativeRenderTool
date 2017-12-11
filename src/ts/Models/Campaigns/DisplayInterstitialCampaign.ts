@@ -1,7 +1,7 @@
 import { Campaign, ICampaign } from 'Models/Campaign';
 import { Asset } from 'Models/Assets/Asset';
-import {ISchema} from "../Model";
-import {Session} from "../Session";
+import { ISchema } from 'Models/Model';
+import { Session } from 'Models/Session';
 
 export interface IDisplayInterstitialCampaign extends ICampaign {
     clickThroughUrl: string | undefined;
