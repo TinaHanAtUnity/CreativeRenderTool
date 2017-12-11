@@ -38,6 +38,7 @@ describe('VastAdUnit', () => {
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
     let comScoreService: ComScoreTrackingService;
+    let placement: Placement;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -51,7 +52,7 @@ describe('VastAdUnit', () => {
         const vast = vastParser.parseVast(vastXml);
         campaign = new VastCampaign(vast, '12345', TestFixtures.getSession(), 'gamerId', 1);
 
-        const placement = new Placement({
+        placement = new Placement({
             id: '123',
             name: 'test',
             default: true,
@@ -104,8 +105,7 @@ describe('VastAdUnit', () => {
 
     describe('sendTrackingEvent', () => {
         it('should replace "%ZONE%" in the url with the placement id', () => {
-            const placement = vastAdUnit.getPlacement();
-            const vast = (<VastCampaign> vastAdUnit.getCampaign()).getVast();
+            const vast = campaign.getVast();
             const urlTemplate = 'http://foo.biz/%ZONE%/123';
             sandbox.stub(vast, 'getTrackingEventUrls').returns([ urlTemplate ]);
             sandbox.stub(thirdPartyEventManager, 'sendEvent').returns(null);
@@ -116,9 +116,8 @@ describe('VastAdUnit', () => {
         });
 
         it('should replace "%SDK_VERSION%" in the url with the SDK version as a query parameter', () => {
-            const placement = vastAdUnit.getPlacement();
             const urlTemplate = 'http://ads-brand-postback.unityads.unity3d.com/brands/2002/defaultVideoAndPictureZone/%ZONE%/impression/common?adSourceId=2&advertiserDomain=appnexus.com&advertisingTrackingId=49f7acaa-81f2-4887-9f3b-cd124854879c&cc=USD&creativeId=54411305&dealCode=&demandSeatId=1&fillSource=appnexus&floor=0&gamerId=5834bc21b54e3b0100f44c92&gross=0&networkId=&precomputedFloor=0&seatId=958&value=1.01&sdkVersion=%SDK_VERSION%';
-            const vast = (<VastCampaign> vastAdUnit.getCampaign()).getVast();
+            const vast = campaign.getVast();
             sandbox.stub(vast, 'getTrackingEventUrls').returns([ urlTemplate ]);
             sandbox.stub(thirdPartyEventManager, 'sendEvent').returns(null);
             vastAdUnit.sendTrackingEvent('start', 'sessionId', 1234);
@@ -129,12 +128,10 @@ describe('VastAdUnit', () => {
     });
 
     describe('sendImpressionEvent', () => {
-        let placement: Placement;
         let vast: Vast;
 
         beforeEach(() => {
-            placement = vastAdUnit.getPlacement();
-            vast = (<VastCampaign> vastAdUnit.getCampaign()).getVast();
+            vast = campaign.getVast();
             sandbox.stub(thirdPartyEventManager, 'sendEvent').returns(null);
         });
 
