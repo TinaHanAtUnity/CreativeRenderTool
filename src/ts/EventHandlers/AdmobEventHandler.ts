@@ -32,10 +32,14 @@ export class AdMobEventHandler implements IAdMobEventHandler {
     }
 
     public onOpenURL(url: string): void {
+        const isAboutPage = url.indexOf('mobile-about') !== -1;
+
+        if (!isAboutPage) {
+            this._adUnit.sendClickEvent();
+        }
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
             this._nativeBridge.UrlScheme.open(url);
         } else {
-            this._adUnit.sendClickEvent();
             this._nativeBridge.Intent.launch({
                 action: 'android.intent.action.VIEW',
                 uri: url

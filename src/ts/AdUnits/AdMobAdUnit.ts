@@ -23,6 +23,7 @@ export class AdMobAdUnit extends AbstractAdUnit<AdMobCampaign> {
         this._view = parameters.view;
         this._options = parameters.options;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
+        this._operativeEventManager = parameters.operativeEventManager;
 
         // TODO, we skip initial because the AFMA grantReward event tells us the video
         // has been completed. Is there a better way to do this with AFMA right now?
@@ -32,6 +33,8 @@ export class AdMobAdUnit extends AbstractAdUnit<AdMobCampaign> {
     public show(): Promise<void> {
         this.setShowing(true);
         this.onStart.trigger();
+        this._operativeEventManager.sendView(this);
+        this._operativeEventManager.sendStart(this);
 
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
 
@@ -60,6 +63,7 @@ export class AdMobAdUnit extends AbstractAdUnit<AdMobCampaign> {
 
     public sendClickEvent() {
         this.sendTrackingEvent('click');
+        this._operativeEventManager.sendClick(this);
     }
 
     public sendStartEvent() {
@@ -68,6 +72,7 @@ export class AdMobAdUnit extends AbstractAdUnit<AdMobCampaign> {
 
     public sendSkipEvent() {
         this.sendTrackingEvent('skip');
+        this._operativeEventManager.sendSkip(this);
     }
 
     public sendCompleteEvent() {
@@ -98,6 +103,7 @@ export class AdMobAdUnit extends AbstractAdUnit<AdMobCampaign> {
         this.setShowing(false);
         this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
         this.onClose.trigger();
+        this._operativeEventManager.sendThirdQuartile(this);
         if (this.getFinishState() === FinishState.SKIPPED) {
             this.sendSkipEvent();
         } else if (this.getFinishState() === FinishState.COMPLETED) {
