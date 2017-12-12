@@ -1,4 +1,11 @@
-# Pending
+# Staged
+
+* Do not use video duration reported in vast xml and use the REAL video duration
+* New dark end screen AB test in groups 8 & 9
+* Add info button and privacy pop-up to MRAID overlay
+* Add isAppForeground to FocusManager
+
+# Thu Dec  7 10:05:11 UTC 2017
 
 * Change comscore ABGroup to check campaign ABGroup
 * Fix bugs in orientation detection
