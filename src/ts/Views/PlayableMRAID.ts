@@ -9,7 +9,6 @@ import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
-import { IBuildInformation } from 'Views/Privacy';
 
 export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
