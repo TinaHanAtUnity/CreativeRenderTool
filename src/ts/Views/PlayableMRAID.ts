@@ -37,8 +37,8 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _backgroundTime: number = 0;
     private _backgroundTimestamp: number;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string, coppaCompliant: boolean, buildInformation: IBuildInformation) {
-        super(nativeBridge, 'playable-mraid', placement, campaign, coppaCompliant, buildInformation);
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string, coppaCompliant: boolean) {
+        super(nativeBridge, 'playable-mraid', placement, campaign, coppaCompliant);
 
         this._placement = placement;
         this._campaign = campaign;

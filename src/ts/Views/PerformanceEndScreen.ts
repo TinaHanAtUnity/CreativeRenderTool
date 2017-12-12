@@ -6,8 +6,8 @@ import { IBuildInformation } from 'Views/Privacy';
 export class PerformanceEndScreen extends EndScreen {
     private _campaign: PerformanceCampaign;
 
-    constructor(nativeBridge: NativeBridge, campaign: PerformanceCampaign, coppaCompliant: boolean, language: string, gameId: string, buildInformation: IBuildInformation) {
-        super(nativeBridge, coppaCompliant, language, gameId, campaign.getGameName(), campaign.getAbGroup(), buildInformation);
+    constructor(nativeBridge: NativeBridge, campaign: PerformanceCampaign, coppaCompliant: boolean, language: string, gameId: string) {
+        super(nativeBridge, coppaCompliant, language, gameId, campaign.getGameName(), campaign.getAbGroup());
 
         const adjustedRating: number = campaign.getRating() * 20;
         this._templateData = {

@@ -30,8 +30,8 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
     private _showTimestamp: number;
     private _updateInterval: any;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, coppaCompliant: boolean, buildInformation: IBuildInformation) {
-        super(nativeBridge, 'mraid', placement, campaign, coppaCompliant, buildInformation);
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, coppaCompliant: boolean) {
+        super(nativeBridge, 'mraid', placement, campaign, coppaCompliant);
 
         this._placement = placement;
         this._campaign = campaign;

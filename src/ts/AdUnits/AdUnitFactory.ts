@@ -53,6 +53,9 @@ import { Privacy } from 'Views/Privacy';
 export class AdUnitFactory {
 
     public static createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractAdUnit {
+
+        Privacy.createBuildInformation(parameters.clientInfo, parameters.campaign, nativeBridge);
+
         // todo: select ad unit based on placement
         if (parameters.campaign instanceof VastCampaign) {
             return this.createVastAdUnit(nativeBridge, <IAdUnitParameters<VastCampaign>>parameters);
@@ -71,7 +74,7 @@ export class AdUnitFactory {
 
     private static createPerformanceAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PerformanceCampaign>): AbstractAdUnit<PerformanceCampaign> {
         const overlay = this.createOverlay(nativeBridge, parameters);
-        const endScreen = new PerformanceEndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), Privacy.getBuildInformation(parameters.clientInfo, parameters.campaign, nativeBridge));
+        const endScreen = new PerformanceEndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         const video = this.getOrientedVideo(<PerformanceCampaign>parameters.campaign, parameters.forceOrientation);
 
         const performanceAdUnitParameters: IPerformanceAdUnitParameters = {
@@ -211,13 +214,13 @@ export class AdUnitFactory {
 
         let mraid: MRAIDView<IMRAIDViewHandler>;
         if(resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity|roll-the-ball/)) {
-            mraid = new PlayableMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.configuration.isCoppaCompliant(), Privacy.getBuildInformation(parameters.clientInfo, parameters.campaign, nativeBridge));
+            mraid = new PlayableMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.configuration.isCoppaCompliant());
         } else {
-            mraid = new MRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.configuration.isCoppaCompliant(), Privacy.getBuildInformation(parameters.clientInfo, parameters.campaign, nativeBridge));
+            mraid = new MRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.configuration.isCoppaCompliant());
         }
 
         if(resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) {
-            endScreen = new MRAIDEndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), Privacy.getBuildInformation(parameters.clientInfo, parameters.campaign, nativeBridge));
+            endScreen = new MRAIDEndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         }
 
         const mraidAdUnitParameters: IMRAIDAdUnitParameters = {

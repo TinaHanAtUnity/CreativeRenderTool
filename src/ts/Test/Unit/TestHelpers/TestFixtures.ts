@@ -178,20 +178,4 @@ export class TestFixtures {
             packageName: 'com.package.name'
         };
     }
-
-    public static getBuildInformation(): IBuildInformation {
-        return {
-            UA: 'window.navigator.userAgent',
-            Platform: 'iOS',
-            Campaign: 'campaign.getId()',
-            APILevel: 99,
-            Group: 99,
-            SDK: "9.9.9",
-            WebView: null,
-            WebviewHash: null,
-            App: "Test",
-            AppVersion: "Test",
-            Game: "Test"
-        };
-    }
 }

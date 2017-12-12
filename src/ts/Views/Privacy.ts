@@ -27,9 +27,11 @@ export interface IBuildInformation {
     Game: string;
 }
 
+let buildInformation: IBuildInformation;
+
 export class Privacy extends View<IPrivacyHandler> {
-     public static getBuildInformation(clientInfo: ClientInfo, campaign: Campaign, nativeBridge: NativeBridge): IBuildInformation {
-        return {
+     public static createBuildInformation(clientInfo: ClientInfo, campaign: Campaign, nativeBridge: NativeBridge) {
+        buildInformation = {
             UA: window.navigator.userAgent,
             Platform: clientInfo.getPlatform() === Platform.IOS ? 'iOS' : 'Android',
             Campaign: campaign.getId(),
@@ -44,7 +46,7 @@ export class Privacy extends View<IPrivacyHandler> {
         };
     }
 
-    constructor(nativeBridge: NativeBridge, isCoppaCompliant: boolean, buildInformation?: IBuildInformation) {
+    constructor(nativeBridge: NativeBridge, isCoppaCompliant: boolean) {
         super(nativeBridge, 'privacy');
 
         this._template = new Template(PrivacyTemplate);
