@@ -101,6 +101,7 @@ export class MRAIDAdUnit extends AbstractAdUnit {
         this._mraid.hide();
         if(this._endScreen) {
             this._endScreen.hide();
+            this._endScreen.container().parentElement!.removeChild(this._endScreen.container());
         }
 
         const finishState = this.getFinishState();

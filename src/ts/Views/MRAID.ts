@@ -29,8 +29,8 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
     private _showTimestamp: number;
     private _updateInterval: any;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign) {
-        super(nativeBridge, 'mraid');
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, coppaCompliant: boolean) {
+        super(nativeBridge, 'mraid', placement, campaign, coppaCompliant);
 
         this._placement = placement;
         this._campaign = campaign;
@@ -42,6 +42,11 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
                 event: 'click',
                 listener: (event: Event) => this.onCloseEvent(event),
                 selector: '.close-region'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onPrivacyEvent(event),
+                selector: '.privacy-button'
             }
         ];
     }

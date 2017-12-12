@@ -7,7 +7,6 @@ import { VastCampaign } from 'Models/Vast/VastCampaign';
 export class VastVideoEventHandlers {
 
     public static onVideoPrepared(adUnit: VastAdUnit, url: string, duration: number, moatData: any, moatIds: any) {
-        adUnit.setRealDuration(duration);
         const moat = adUnit.getMoat();
         if(moat) {
             moat.init(moatIds, duration / 1000, url, moatData, adUnit.getVolume());
@@ -33,13 +32,13 @@ export class VastVideoEventHandlers {
         }
     }
 
-    public static onVideoProgress(adUnit: VastAdUnit, position: number) {
+    public static onVideoProgress(adUnit: VastAdUnit, campaign: VastCampaign, position: number) {
         const moat = adUnit.getMoat();
         if(moat) {
             const events = adUnit.getEvents();
             const event = events.shift();
             if(event) {
-                if(position / adUnit.getRealDuration() >= event[0]) {
+                if(position / campaign.getVideo().getDuration() >= event[0]) {
                     moat.triggerVideoEvent(event[1], adUnit.getVolume());
                 } else {
                     events.unshift(event);
