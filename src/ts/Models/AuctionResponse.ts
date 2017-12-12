@@ -15,6 +15,7 @@ export interface IAuctionResponse {
     advertiserCampaignId: string | undefined;
     advertiserDomain: string | undefined;
     advertiserBundleId: string | undefined;
+    buyerId: string | undefined;
 }
 
 export class AuctionResponse extends Model<IAuctionResponse> {
@@ -33,7 +34,8 @@ export class AuctionResponse extends Model<IAuctionResponse> {
             correlationId: ['string'],
             advertiserCampaignId: ['string', 'undefined'],
             advertiserDomain: ['string', 'undefined'],
-            advertiserBundleId: ['string', 'undefined']
+            advertiserBundleId: ['string', 'undefined'],
+            buyerId: ['string', 'undefined']
         });
 
         this.set('placements', placements);
@@ -106,6 +108,13 @@ export class AuctionResponse extends Model<IAuctionResponse> {
 
     public getAdvertiserBundleId(): string | undefined {
         return this.get('advertiserBundleId');
+    }
+
+    // we need to add this to our parsers
+    // however, why don't we just pass in the entire response object for our campaigns
+    // instead of individual response getters (seems needlessly verbose)
+    public getBuyerId(): string | undefined {
+        return this.get('buyerId');
     }
 
     public getDTO(): {[key: string]: any } {
