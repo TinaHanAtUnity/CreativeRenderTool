@@ -130,10 +130,6 @@ export class Activity extends AdUnitContainer {
         return false;
     }
 
-    public setViewFrame(view: string, x: number, y: number, width: number, height: number): Promise<void> {
-        return this._nativeBridge.AndroidAdUnit.setViewFrame(view, x, y, width, height);
-    }
-
     private getOrientation(allowRotation: boolean, forceOrientation: ForceOrientation, options: IAndroidOptions) {
         let orientation = ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR;
         if(allowRotation) {
