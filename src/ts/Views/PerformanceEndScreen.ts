@@ -1,7 +1,6 @@
 import { EndScreen } from 'Views/EndScreen';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { NativeBridge } from 'Native/NativeBridge';
-import { IBuildInformation } from 'Views/Privacy';
 
 export class PerformanceEndScreen extends EndScreen {
     private _campaign: PerformanceCampaign;

@@ -1,7 +1,6 @@
 import { EndScreen } from 'Views/EndScreen';
 import { NativeBridge } from 'Native/NativeBridge';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
-import { IBuildInformation } from 'Views/Privacy';
 
 export class MRAIDEndScreen extends EndScreen {
     private _campaign: MRAIDCampaign;

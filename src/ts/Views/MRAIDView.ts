@@ -7,7 +7,7 @@ import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { WebViewError } from 'Errors/WebViewError';
 import { Platform } from 'Constants/Platform';
 import { NativeBridge } from 'Native/NativeBridge';
-import {IBuildInformation, IPrivacyHandler, Privacy} from 'Views/Privacy';
+import { IPrivacyHandler, Privacy } from 'Views/Privacy';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
