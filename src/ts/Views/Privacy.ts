@@ -4,27 +4,46 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
 
+import { ClientInfo } from 'Models/ClientInfo';
+import {Campaign} from "../Models/Campaign";
+import {Platform} from "../Constants/Platform";
+
 export interface IPrivacyHandler {
     onPrivacy(url: string): void;
     onPrivacyClose(): void;
 }
 
 export interface IBuildInformation {
-    userAgent: string;
-    platform: string;
-    campaignId: string;
-    apiLevel: number;
-    abGroup: number;
-    sdkVersion: number;
-    sdkVersionName: string;
+    UA: string;
+    Platform: string;
+    Campaign: string;
+    APILevel: number;
+    Group: number;
+    SDK: string;
     webviewVersion: string | null;
     webviewHash: string | null;
-    applicationName: string;
-    applicationVersion: string;
-    gameId: string;
+    App: string;
+    AppVersion: string;
+    Game: string;
 }
 
 export class Privacy extends View<IPrivacyHandler> {
+     public static getBuildInformation(clientInfo: ClientInfo, campaign: Campaign, nativeBridge: NativeBridge): IBuildInformation {
+        return {
+            UA: window.navigator.userAgent,
+            Platform: clientInfo.getPlatform() === Platform.IOS ? 'iOS' : 'Android',
+            Campaign: campaign.getId(),
+            APILevel: nativeBridge.getApiLevel(),
+            Group: campaign.getAbGroup(),
+            SDK: clientInfo.getSdkVersionName(),
+            webviewVersion: clientInfo.getWebviewVersion(),
+            webviewHash: clientInfo.getWebviewHash(),
+            App: clientInfo.getApplicationName(),
+            AppVersion: clientInfo.getApplicationVersion(),
+            Game: clientInfo.getGameId()
+        };
+    }
+
     constructor(nativeBridge: NativeBridge, isCoppaCompliant: boolean, buildInformation?: IBuildInformation) {
         super(nativeBridge, 'privacy');
 

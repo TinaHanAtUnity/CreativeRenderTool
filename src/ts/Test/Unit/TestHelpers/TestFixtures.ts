@@ -181,18 +181,17 @@ export class TestFixtures {
 
     public static getBuildInformation(): IBuildInformation {
         return {
-            userAgent: 'string',
-            platform: 'Android',
-            campaignId: 'string',
-            apiLevel: 22,
-            abGroup: 1,
-            sdkVersion: 99,
-            sdkVersionName: 'string',
-            webviewVersion: 'string',
-            webviewHash: 'string',
-            applicationName: 'string',
-            applicationVersion: 'string',
-            gameId: 'string'
+            UA: 'window.navigator.userAgent',
+            Platform: 'iOS',
+            Campaign: 'campaign.getId()',
+            APILevel: 99,
+            Group: 99,
+            SDK: "9.9.9",
+            webviewVersion: null,
+            webviewHash: null,
+            App: "Test",
+            AppVersion: "Test",
+            Game: "Test"
         };
     }
 }
