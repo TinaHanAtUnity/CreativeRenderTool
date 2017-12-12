@@ -29,6 +29,7 @@ import { ProgrammaticAdMobParser } from 'Parsers/ProgrammaticAdMobParser';
 import { CampaignParser } from 'Parsers/CampaignParser';
 import { ProgrammaticVPAIDParser } from 'Parsers/ProgrammaticVPAIDParser';
 import { AdMobSignalFactory} from 'AdMob/AdMobSignalFactory';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class CampaignManager {
 
@@ -256,6 +257,7 @@ export class CampaignManager {
                 break;
             case 'programmatic/admob-video':
                 parser = new ProgrammaticAdMobParser();
+                Diagnostics.trigger('admob_ad_received', {}, session);
                 break;
             case 'programmatic/vast-vpaid':
                 // vast-vpaid can be both VPAID or VAST, so in this case we use the VAST parser

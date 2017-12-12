@@ -5,7 +5,7 @@ import { AdMobView } from 'Views/AdMobView';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { FinishState } from 'Constants/FinishState';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { Placement } from 'Models/Placement';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export interface IAdMobAdUnitParameters extends IAdUnitParameters<AdMobCampaign> {
     view: AdMobView;
@@ -34,6 +34,10 @@ export class AdMobAdUnit extends AbstractAdUnit<AdMobCampaign> {
         this.setShowing(true);
         this.onStart.trigger();
         this._operativeEventManager.sendStart(this);
+
+        Diagnostics.trigger('admob_ad_show', {
+            placement: this.getPlacement().getId()
+        }, this.getCampaign().getSession());
 
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
 
@@ -104,6 +108,12 @@ export class AdMobAdUnit extends AbstractAdUnit<AdMobCampaign> {
         this.onClose.trigger();
         this._operativeEventManager.sendThirdQuartile(this);
         this._operativeEventManager.sendView(this);
+
+        Diagnostics.trigger('admob_ad_close', {
+            placement: this.getPlacement().getId(),
+            finishState: this.getFinishState()
+        }, this.getCampaign().getSession());
+
         if (this.getFinishState() === FinishState.SKIPPED) {
             this.sendSkipEvent();
         } else if (this.getFinishState() === FinishState.COMPLETED) {
