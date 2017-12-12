@@ -187,8 +187,8 @@ export class TestFixtures {
             APILevel: 99,
             Group: 99,
             SDK: "9.9.9",
-            webviewVersion: null,
-            webviewHash: null,
+            WebView: null,
+            WebviewHash: null,
             App: "Test",
             AppVersion: "Test",
             Game: "Test"

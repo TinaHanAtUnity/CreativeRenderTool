@@ -20,8 +20,8 @@ export interface IBuildInformation {
     APILevel: number;
     Group: number;
     SDK: string;
-    webviewVersion: string | null;
-    webviewHash: string | null;
+    WebView: string | null;
+    WebviewHash: string | null;
     App: string;
     AppVersion: string;
     Game: string;
@@ -36,8 +36,8 @@ export class Privacy extends View<IPrivacyHandler> {
             APILevel: nativeBridge.getApiLevel(),
             Group: campaign.getAbGroup(),
             SDK: clientInfo.getSdkVersionName(),
-            webviewVersion: clientInfo.getWebviewVersion(),
-            webviewHash: clientInfo.getWebviewHash(),
+            WebView: clientInfo.getWebviewVersion(),
+            WebviewHash: clientInfo.getWebviewHash(),
             App: clientInfo.getApplicationName(),
             AppVersion: clientInfo.getApplicationVersion(),
             Game: clientInfo.getGameId()
