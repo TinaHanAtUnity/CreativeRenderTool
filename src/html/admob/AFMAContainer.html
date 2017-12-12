@@ -1,9 +1,7 @@
 <script>
     (function() {
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(function() {
-                AFMA_ReceiveMessage('onshow');
-            });
+        window.addEventListener('pageshow', function() {
+            AFMA_ReceiveMessage('onshow');
         });
 
         // This string will be replaced prior to the source being inserted into the iframe
