@@ -17,6 +17,7 @@ export interface IAuctionResponse {
     advertiserDomain: string | undefined;
     advertiserBundleId: string | undefined;
     useWebViewUserAgentForTracking: boolean | undefined;
+    buyerId: string | undefined;
 }
 
 export class AuctionResponse extends Model<IAuctionResponse> {
@@ -36,7 +37,8 @@ export class AuctionResponse extends Model<IAuctionResponse> {
             advertiserCampaignId: ['string', 'undefined'],
             advertiserDomain: ['string', 'undefined'],
             advertiserBundleId: ['string', 'undefined'],
-            useWebViewUserAgentForTracking: ['boolean', 'undefined']
+            useWebViewUserAgentForTracking: ['boolean', 'undefined'],
+            buyerId: ['string', 'undefined']
         });
 
         this.set('placements', placements);
@@ -118,6 +120,13 @@ export class AuctionResponse extends Model<IAuctionResponse> {
 
     public getUseWebViewUserAgentForTracking(): boolean | undefined {
         return this.get('useWebViewUserAgentForTracking');
+    }
+
+    // we need to add this to our parsers
+    // however, why don't we just pass in the entire response object for our campaigns
+    // instead of individual response getters (seems needlessly verbose)
+    public getBuyerId(): string | undefined {
+        return this.get('buyerId');
     }
 
     public getDTO(): {[key: string]: any } {
