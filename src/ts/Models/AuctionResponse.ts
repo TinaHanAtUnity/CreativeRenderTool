@@ -56,6 +56,7 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         this.set('advertiserDomain', data.advDomain);
         this.set('advertiserBundleId', data.bundleId);
         this.set('useWebViewUserAgentForTracking', data.useWebViewUserAgentForTracking || false);
+        this.set('buyerId', data.buyerId);
     }
 
     public getPlacements(): string[] {
@@ -122,9 +123,6 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         return this.get('useWebViewUserAgentForTracking');
     }
 
-    // we need to add this to our parsers
-    // however, why don't we just pass in the entire response object for our campaigns
-    // instead of individual response getters (seems needlessly verbose)
     public getBuyerId(): string | undefined {
         return this.get('buyerId');
     }
