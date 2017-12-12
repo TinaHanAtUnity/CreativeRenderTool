@@ -148,7 +148,7 @@ export class AdUnitFactory {
             level3: campaign.getAdvertiserBundleId() ? campaign.getAdvertiserBundleId() : campaign.getAdvertiserDomain(),
             level4: campaign.getCreativeId(),
             slicer1: parameters.clientInfo.getSdkVersionName(),
-            slicer2: 'Unity placements bundle Id - not sure what that corresponds to',
+            slicer2: parameters.placement.getId(),
             slicer3: parameters.placement.getName()
         };
 
