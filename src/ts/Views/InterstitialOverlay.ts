@@ -65,15 +65,13 @@ export class InterstitialOverlay extends AbstractOverlay {
 
     }
 
-    public render(): Promise<void> {
+    public render(): void {
         super.render();
         this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
         this._spinnerElement = <HTMLElement>this._container.querySelector('.buffering-spinner');
         this._muteButtonElement = <HTMLElement>this._container.querySelector('.mute-button');
         this._debugMessageElement = <HTMLElement>this._container.querySelector('.debug-message-text');
         this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
-
-        return Promise.resolve();
     }
 
     public setSpinnerEnabled(value: boolean): void {

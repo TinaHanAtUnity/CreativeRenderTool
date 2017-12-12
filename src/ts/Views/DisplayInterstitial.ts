@@ -50,7 +50,8 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
     }
 
     public render(): Promise<void> {
-        return super.render().then(() => {
+        super.render();
+        return Promise.resolve().then(() => {
             this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
             this.enableClickThroughCatcher();
             const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#display-iframe');

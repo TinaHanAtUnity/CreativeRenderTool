@@ -48,7 +48,7 @@ export abstract class View<T extends object> {
         }
     }
 
-    public render(): Promise<void> {
+    public render(): void {
         this._container = document.createElement('div');
         this._container.id = this._id;
         this._container.innerHTML = this._template.render(this._templateData ? this._templateData : {});
@@ -68,8 +68,6 @@ export abstract class View<T extends object> {
                 View.addEventListener(binding, this._container, attachTap);
             }
         });
-
-        return Promise.resolve();
     }
 
     public container(): HTMLElement {

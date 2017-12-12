@@ -55,13 +55,12 @@ export class VastEndScreen extends View<IVastEndScreenHandler> {
         }
     }
 
-    public render(): Promise<void> {
+    public render(): void {
         super.render();
 
         if(this._isSwipeToCloseEnabled) {
             (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';
         }
-        return Promise.resolve();
     }
 
     public show(): void {

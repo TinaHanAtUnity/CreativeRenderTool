@@ -78,7 +78,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         ];
     }
 
-    public render(): Promise<void> {
+    public render(): void {
         super.render();
 
         this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
@@ -93,7 +93,6 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         this._messageListener = (event: MessageEvent) => this.onMessage(event);
         window.addEventListener('message', this._messageListener, false);
-        return Promise.resolve();
     }
 
     public show(): void {

@@ -23,12 +23,10 @@ export class MOAT extends View<VastCampaign> {
         this._messageListener = (e: MessageEvent) => this.onMessage(e);
     }
 
-    public render(): Promise<void> {
+    public render(): void {
         super.render();
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#moat-iframe');
         iframe.srcdoc = MOATContainer;
-
-        return Promise.resolve();
     }
 
     public resume(volume: number) {
