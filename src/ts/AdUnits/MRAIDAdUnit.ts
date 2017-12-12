@@ -205,7 +205,7 @@ export class MRAIDAdUnit extends AbstractAdUnit {
 
     private sendTrackingEvent(eventName: string): void {
         const sdkVersion = this._clientInfo.getSdkVersion();
-        const placementId = this._campaign.getId();
+        const placementId = this._placement.getId();
         const sessionId = this._campaign.getSession().getId();
         const trackingEventUrls = this._additionalTrackingEvents[eventName];
 
