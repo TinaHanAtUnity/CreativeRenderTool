@@ -48,6 +48,8 @@ import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { InterstitialOverlay } from 'Views/InterstitialOverlay';
 import { AbstractOverlay } from 'Views/AbstractOverlay';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { ClientInfo } from 'Models/ClientInfo';
+import { IBuildInformation } from 'Views/Privacy';
 
 export class AdUnitFactory {
 
@@ -70,7 +72,7 @@ export class AdUnitFactory {
 
     private static createPerformanceAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PerformanceCampaign>): AbstractAdUnit<PerformanceCampaign> {
         const overlay = this.createOverlay(nativeBridge, parameters);
-        const endScreen = new PerformanceEndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+        const endScreen = new PerformanceEndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), this.getBuildInformation(parameters.clientInfo, parameters.campaign, nativeBridge));
         const video = this.getOrientedVideo(<PerformanceCampaign>parameters.campaign, parameters.forceOrientation);
 
         const performanceAdUnitParameters: IPerformanceAdUnitParameters = {
@@ -210,13 +212,13 @@ export class AdUnitFactory {
 
         let mraid: MRAIDView<IMRAIDViewHandler>;
         if(resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity|roll-the-ball/)) {
-            mraid = new PlayableMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.configuration.isCoppaCompliant());
+            mraid = new PlayableMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.configuration.isCoppaCompliant(), this.getBuildInformation(parameters.clientInfo, parameters.campaign, nativeBridge));
         } else {
-            mraid = new MRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.configuration.isCoppaCompliant());
+            mraid = new MRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.configuration.isCoppaCompliant(), this.getBuildInformation(parameters.clientInfo, parameters.campaign, nativeBridge));
         }
 
         if(resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) {
-            endScreen = new MRAIDEndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+            endScreen = new MRAIDEndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), this.getBuildInformation(parameters.clientInfo, parameters.campaign, nativeBridge));
         }
 
         const mraidAdUnitParameters: IMRAIDAdUnitParameters = {
@@ -422,5 +424,22 @@ export class AdUnitFactory {
             }
             return overlay;
         }
+    }
+
+    private static getBuildInformation(clientInfo: ClientInfo, campaign: Campaign, nativeBridge: NativeBridge): IBuildInformation {
+        return {
+            userAgent: window.navigator.userAgent,
+            platform: clientInfo.getPlatform() === Platform.IOS ? 'iOS' : 'Android',
+            campaignId: campaign.getId(),
+            apiLevel: nativeBridge.getApiLevel(),
+            abGroup: campaign.getAbGroup(),
+            sdkVersion: clientInfo.getSdkVersion(),
+            sdkVersionName: clientInfo.getSdkVersionName(),
+            webviewVersion: clientInfo.getWebviewVersion(),
+            webviewHash: clientInfo.getWebviewHash(),
+            applicationName: clientInfo.getApplicationName(),
+            applicationVersion: clientInfo.getApplicationVersion(),
+            gameId: clientInfo.getGameId()
+        };
     }
 }

@@ -52,7 +52,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
         comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         const campaign = TestFixtures.getCampaign();
-        endScreen = new PerformanceEndScreen(nativeBridge, campaign, TestFixtures.getConfiguration().isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
+        endScreen = new PerformanceEndScreen(nativeBridge, campaign, TestFixtures.getConfiguration().isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId(), TestFixtures.getBuildInformation());
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
 
         performanceAdUnitParameters = {

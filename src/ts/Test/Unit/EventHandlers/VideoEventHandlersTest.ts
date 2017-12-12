@@ -76,7 +76,7 @@ describe('VideoEventHandlersTest', () => {
         const vastCampaign = TestFixtures.getEventVastCampaign();
         const performanceCampaign = TestFixtures.getCampaign();
         overlay = new Overlay(nativeBridge, false, 'en', configuration.getGamerId(), configuration.getAbGroup());
-        endScreen = new PerformanceEndScreen(nativeBridge, performanceCampaign, true, 'en', '12345');
+        endScreen = new PerformanceEndScreen(nativeBridge, performanceCampaign, true, 'en', '12345', TestFixtures.getBuildInformation());
 
         vastAdUnitParameters = {
             forceOrientation: ForceOrientation.LANDSCAPE,

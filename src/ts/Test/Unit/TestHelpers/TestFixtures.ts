@@ -14,6 +14,7 @@ import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitia
 import { Session } from 'Models/Session';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { IPackageInfo } from 'Native/Api/AndroidDeviceInfo';
+import { IBuildInformation } from "Views/Privacy";
 
 import OnCometMraidPlcCampaignFollowsRedirects from 'json/OnCometMraidPlcCampaignFollowsRedirects.json';
 import OnCometMraidPlcCampaign from 'json/OnCometMraidPlcCampaign.json';
@@ -175,6 +176,23 @@ export class TestFixtures {
             versionCode: 123,
             versionName: '1.2.3',
             packageName: 'com.package.name'
+        };
+    }
+
+    public static getBuildInformation(): IBuildInformation {
+        return {
+            userAgent: 'string',
+            platform: 'Android',
+            campaignId: 'string',
+            apiLevel: 22,
+            abGroup: 1,
+            sdkVersion: 99,
+            sdkVersionName: 'string',
+            webviewVersion: 'string',
+            webviewHash: 'string',
+            applicationName: 'string',
+            applicationVersion: 'string',
+            gameId: 'string'
         };
     }
 }

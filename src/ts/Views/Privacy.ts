@@ -9,14 +9,30 @@ export interface IPrivacyHandler {
     onPrivacyClose(): void;
 }
 
+export interface IBuildInformation {
+    userAgent: string;
+    platform: string;
+    campaignId: string;
+    apiLevel: number;
+    abGroup: number;
+    sdkVersion: number;
+    sdkVersionName: string;
+    webviewVersion: string | null;
+    webviewHash: string | null;
+    applicationName: string;
+    applicationVersion: string;
+    gameId: string;
+}
+
 export class Privacy extends View<IPrivacyHandler> {
-    constructor(nativeBridge: NativeBridge, isCoppaCompliant: boolean) {
+    constructor(nativeBridge: NativeBridge, isCoppaCompliant: boolean, buildInformation?: IBuildInformation) {
         super(nativeBridge, 'privacy');
 
         this._template = new Template(PrivacyTemplate);
 
         this._templateData = {
-            'isCoppaCompliant': isCoppaCompliant
+            'isCoppaCompliant': isCoppaCompliant,
+            'buildInformation': buildInformation
         };
 
         this._bindings = [
@@ -29,6 +45,11 @@ export class Privacy extends View<IPrivacyHandler> {
                 event: 'click',
                 listener: (event: Event) => this.onPrivacyEvent(event),
                 selector: 'a'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onBuildInformationEvent(event),
+                selector: '.build-information-link'
             }
         ];
     }
@@ -41,5 +62,10 @@ export class Privacy extends View<IPrivacyHandler> {
     private onOkEvent(event: Event): void {
         event.preventDefault();
         this._handlers.forEach(handler => handler.onPrivacyClose());
+    }
+
+    private onBuildInformationEvent(event: Event): void {
+        event.preventDefault();
+        this._container.classList.toggle('show-build-information');
     }
 }

@@ -21,7 +21,7 @@ export abstract class View<T extends object> {
     protected _nativeBridge: NativeBridge;
 
     protected _template: Template;
-    protected _templateData: { [key: string]: string | number | boolean | undefined; };
+    protected _templateData: { [key: string]: string | number | boolean | undefined | object ; };
     protected _bindings: IViewBinding[];
     protected _container: HTMLElement;
     protected _handlers: T[] = [];

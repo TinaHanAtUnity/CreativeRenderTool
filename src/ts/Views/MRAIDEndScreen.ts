@@ -1,12 +1,13 @@
 import { EndScreen } from 'Views/EndScreen';
 import { NativeBridge } from 'Native/NativeBridge';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
+import { IBuildInformation } from 'Views/Privacy';
 
 export class MRAIDEndScreen extends EndScreen {
     private _campaign: MRAIDCampaign;
 
-    constructor(nativeBridge: NativeBridge, campaign: MRAIDCampaign, coppaCompliant: boolean, language: string, gameId: string) {
-        super(nativeBridge, coppaCompliant, language, gameId, campaign.getGameName(), campaign.getAbGroup());
+    constructor(nativeBridge: NativeBridge, campaign: MRAIDCampaign, coppaCompliant: boolean, language: string, gameId: string, buildInformation: IBuildInformation) {
+        super(nativeBridge, coppaCompliant, language, gameId, campaign.getGameName(), campaign.getAbGroup(), buildInformation);
 
         this._templateData = {
             'gameName': campaign.getGameName(),

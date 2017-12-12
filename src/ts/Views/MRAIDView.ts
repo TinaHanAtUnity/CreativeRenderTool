@@ -7,7 +7,7 @@ import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { WebViewError } from 'Errors/WebViewError';
 import { Platform } from 'Constants/Platform';
 import { NativeBridge } from 'Native/NativeBridge';
-import { IPrivacyHandler, Privacy } from 'Views/Privacy';
+import {IBuildInformation, IPrivacyHandler, Privacy} from 'Views/Privacy';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
@@ -33,13 +33,15 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     private _coppaCompliant: boolean;
 
     private _privacy: Privacy;
+    private _buildInformation: IBuildInformation;
 
-    constructor(nativeBridge: NativeBridge, id: string, placement: Placement, campaign: MRAIDCampaign, coppaCompliant: boolean) {
+    constructor(nativeBridge: NativeBridge, id: string, placement: Placement, campaign: MRAIDCampaign, coppaCompliant: boolean, buildInformation: IBuildInformation) {
         super(nativeBridge, id);
 
         this._placement = placement;
         this._campaign = campaign;
         this._coppaCompliant = coppaCompliant;
+        this._buildInformation = buildInformation;
 
     }
 
@@ -86,7 +88,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     protected onPrivacyEvent(event: Event): void {
         event.preventDefault();
-        this._privacy = new Privacy(this._nativeBridge, this._coppaCompliant);
+        this._privacy = new Privacy(this._nativeBridge, this._coppaCompliant, this._buildInformation);
         this._privacy.render();
         document.body.appendChild(this._privacy.container());
         this._privacy.addEventHandler(this);

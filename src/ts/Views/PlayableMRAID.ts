@@ -9,6 +9,7 @@ import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
+import { IBuildInformation } from 'Views/Privacy';
 
 export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -36,8 +37,8 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _backgroundTime: number = 0;
     private _backgroundTimestamp: number;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string, coppaCompliant: boolean) {
-        super(nativeBridge, 'playable-mraid', placement, campaign, coppaCompliant);
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string, coppaCompliant: boolean, buildInformation: IBuildInformation) {
+        super(nativeBridge, 'playable-mraid', placement, campaign, coppaCompliant, buildInformation);
 
         this._placement = placement;
         this._campaign = campaign;

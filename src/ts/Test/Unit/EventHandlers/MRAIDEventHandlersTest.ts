@@ -135,7 +135,7 @@ describe('MRAIDEventHandlersTest', () => {
                     headers: [['location', 'market://foobar.com']]
                 }));
 
-                mraidView = new MRAID(nativeBridge, placement, mraidCampaign, false);
+                mraidView = new MRAID(nativeBridge, placement, mraidCampaign, false, TestFixtures.getBuildInformation());
                 sinon.stub(mraidView, 'createMRAID').callsFake(() => {
                     return Promise.resolve();
                 });

@@ -9,6 +9,7 @@ import { Localization } from 'Utilities/Localization';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { Campaign } from 'Models/Campaign';
 import { IEndScreenDownloadParameters } from 'EventHandlers/EndScreenEventHandler';
+import { IBuildInformation } from 'Views/Privacy';
 
 export interface IEndScreenHandler {
     onEndScreenDownload(parameters: IEndScreenDownloadParameters): void;
@@ -27,13 +28,15 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     private _privacy: Privacy;
     private _isSwipeToCloseEnabled: boolean = false;
     private _abGroup: number;
+    private _buildInformation: IBuildInformation;
 
-    constructor(nativeBridge: NativeBridge, coppaCompliant: boolean, language: string, gameId: string, gameName: string | undefined, abGroup: number) {
+    constructor(nativeBridge: NativeBridge, coppaCompliant: boolean, language: string, gameId: string, gameName: string | undefined, abGroup: number, buildInformation: IBuildInformation) {
         super(nativeBridge, 'end-screen');
         this._coppaCompliant = coppaCompliant;
         this._localization = new Localization(language, 'endscreen');
         this._abGroup = abGroup;
         this._gameName = gameName;
+        this._buildInformation = buildInformation;
 
         this._template = new Template(EndScreenTemplate, this._localization);
 
@@ -157,7 +160,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
     private onPrivacyEvent(event: Event): void {
         event.preventDefault();
-        this._privacy = new Privacy(this._nativeBridge, this._coppaCompliant);
+        this._privacy = new Privacy(this._nativeBridge, this._coppaCompliant, this._buildInformation);
         this._privacy.render();
         document.body.appendChild(this._privacy.container());
         this._privacy.addEventHandler(this);

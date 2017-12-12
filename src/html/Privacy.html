@@ -1,15 +1,27 @@
 <div class="pop-up">
-  <% if(!data.isCoppaCompliant) { %>
-  <div class="privacy-text">
-    This advertisement has been served by Unity Ads.
-    Unity Ads collects and uses information gathered through your use of your apps in order to create an individualized and more relevant user experience, to predict your preferences, and to show you ads that are more likely to interest you (“personalized ads”).
-    Please read our <a href="https://unity3d.com/legal/privacy-policy">Privacy Policy</a> for a full description of our data practices.
-    You may be able to opt-out of Unity Ads’ collection and use of your mobile app data for personalized ads through your device settings.
-  </div>
-  <% } else { %>
-  <div class="privacy-simple-text">
-    This advertisement has been served by Unity Ads. Please read our <a href="https://unity3d.com/legal/privacy-policy">Privacy Policy</a> for a full description of our data practices.
-  </div>
-  <% } %>
-  <div class="ok-button">OK</div>
+    <% if(!data.isCoppaCompliant) { %>
+    <div class="privacy-text">
+        This advertisement has been served by Unity Ads.
+        Unity Ads collects and uses information gathered through your use of your apps in order to create an
+        individualized and more relevant user experience, to predict your preferences, and to show you ads that are more
+        likely to interest you (“personalized ads”).
+        Please read our <a href="https://unity3d.com/legal/privacy-policy">Privacy Policy</a> for a full description of
+        our data practices.
+        You may be able to opt-out of Unity Ads’ collection and use of your mobile app data for personalized ads through
+        your device settings.
+    </div>
+    <% } else { %>
+    <div class="privacy-simple-text">
+        This advertisement has been served by Unity Ads. Please read our <a
+            href="https://unity3d.com/legal/privacy-policy">Privacy Policy</a> for a full description of our data
+        practices.
+    </div>
+    <% } %>
+    <div class="build-information-container">
+        <% for (var k in data.buildInformation) { %>
+            <span class="build-information-key"><%= k %>:</span> <span class="build-information-value"> <%= data.buildInformation[k] %></span>
+        <% } %>
+    </div>
+    <div class="ok-button">OK</div>
+    <div class="build-information-link">Show build information</div>
 </div>

@@ -1,12 +1,13 @@
 import { EndScreen } from 'Views/EndScreen';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { NativeBridge } from 'Native/NativeBridge';
+import { IBuildInformation } from 'Views/Privacy';
 
 export class PerformanceEndScreen extends EndScreen {
     private _campaign: PerformanceCampaign;
 
-    constructor(nativeBridge: NativeBridge, campaign: PerformanceCampaign, coppaCompliant: boolean, language: string, gameId: string) {
-        super(nativeBridge, coppaCompliant, language, gameId, campaign.getGameName(), campaign.getAbGroup());
+    constructor(nativeBridge: NativeBridge, campaign: PerformanceCampaign, coppaCompliant: boolean, language: string, gameId: string, buildInformation: IBuildInformation) {
+        super(nativeBridge, coppaCompliant, language, gameId, campaign.getGameName(), campaign.getAbGroup(), buildInformation);
 
         const adjustedRating: number = campaign.getRating() * 20;
         this._templateData = {

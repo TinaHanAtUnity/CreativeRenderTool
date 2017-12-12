@@ -8,6 +8,7 @@ import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Platform } from 'Constants/Platform';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Template } from 'Utilities/Template';
+import {IBuildInformation} from "./Privacy";
 
 export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -29,8 +30,8 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
     private _showTimestamp: number;
     private _updateInterval: any;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, coppaCompliant: boolean) {
-        super(nativeBridge, 'mraid', placement, campaign, coppaCompliant);
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, coppaCompliant: boolean, buildInformation: IBuildInformation) {
+        super(nativeBridge, 'mraid', placement, campaign, coppaCompliant, buildInformation);
 
         this._placement = placement;
         this._campaign = campaign;

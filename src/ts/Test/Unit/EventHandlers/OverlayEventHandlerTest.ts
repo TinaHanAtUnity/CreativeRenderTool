@@ -65,7 +65,7 @@ describe('OverlayEventHandlerTest', () => {
         operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         video = new Video('');
-        endScreen = new PerformanceEndScreen(nativeBridge, TestFixtures.getCampaign(), TestFixtures.getConfiguration().isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
+        endScreen = new PerformanceEndScreen(nativeBridge, TestFixtures.getCampaign(), TestFixtures.getConfiguration().isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId(), TestFixtures.getBuildInformation());
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
         comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
