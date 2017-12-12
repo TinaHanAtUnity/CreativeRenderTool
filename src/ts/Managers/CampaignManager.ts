@@ -373,6 +373,14 @@ export class CampaignManager {
         promises.push(this._deviceInfo.getNetworkType());
 
         return Promise.all(promises).then(([screenWidth, screenHeight, connectionType, networkType]) => {
+            if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                const density = this._deviceInfo.getScreenDensity();
+                if (density) {
+                    screenWidth = Math.ceil(screenWidth / (density / 160));
+                    screenHeight = Math.ceil(screenHeight / (density / 160));
+                }
+            }
+
             url = Url.addParameters(url, {
                 screenWidth: screenWidth,
                 screenHeight: screenHeight,

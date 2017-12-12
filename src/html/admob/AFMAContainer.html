@@ -1,5 +1,11 @@
 <script>
     (function() {
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                AFMA_ReceiveMessage('onshow');
+            });
+        });
+
         // This string will be replaced prior to the source being inserted into the iframe
         var clickSignals = '{{AFMA_CLICK_SIGNALS_PLACEHOLDER}}';
 
