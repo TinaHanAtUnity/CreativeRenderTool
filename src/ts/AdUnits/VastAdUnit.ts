@@ -110,14 +110,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         this._events = events;
     }
 
-    public getRealDuration() {
-        return this._realDuration;
-    }
-
-    public setRealDuration(duration: number) {
-        this._realDuration = duration;
-    }
-
     public getVolume() {
         if(this._muted) {
             return 0;
@@ -242,7 +234,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
 
     private sendQuartileEvent(sessionId: string, sdkVersion: number, position: number, oldPosition: number, quartile: number, quartileEventName: string) {
         if (this.getTrackingEventUrls(quartileEventName)) {
-            const duration = this.getRealDuration();
+            const duration = (<VastCampaign> this.getCampaign()).getVideo().getDuration();
             if (duration && duration > 0 && position > duration * 0.25 * quartile && oldPosition < duration * 0.25 * quartile) {
                 this.sendTrackingEvent(quartileEventName, sessionId, sdkVersion);
             }
