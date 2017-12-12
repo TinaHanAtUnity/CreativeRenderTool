@@ -4,16 +4,19 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { Platform } from 'Constants/Platform';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Diagnostics } from 'Utilities/Diagnostics';
+import { FocusManager } from 'Managers/FocusManager';
 
 export class AdMobSignalFactory {
     private _nativeBridge: NativeBridge;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
+    private _focusManager: FocusManager;
 
-    constructor(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo) {
+    constructor(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo, focusManager: FocusManager) {
         this._nativeBridge = nativeBridge;
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
+        this._focusManager = focusManager;
     }
 
     public getAdRequestSignal(): Promise<AdMobSignal> {
@@ -59,7 +62,7 @@ export class AdMobSignalFactory {
         signal.setSdkVersion(this.getSdkVersion(this._clientInfo));
         signal.setOsVersion(this.getOsVersion(this._clientInfo, this._deviceInfo));
         signal.setTimeZoneOffset(this.getTimeZoneOffset());
-        // todo: signal app active
+        signal.setAppActive(this._focusManager.isAppForeground());
         signal.setAppUptime(this.getAppUptime(this._clientInfo));
         signal.setAppStartTime(this.getAppStartTime(this._clientInfo));
         signal.setRooted(this.getRooted(this._deviceInfo));

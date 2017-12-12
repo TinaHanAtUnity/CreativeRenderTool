@@ -5,6 +5,7 @@ import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { ClientInfo } from 'Models/ClientInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
+import { FocusManager } from 'Managers/FocusManager';
 import { NativeBridge } from 'Native/NativeBridge';
 import { unity_proto } from '../../../../proto/unity_proto.js';
 import * as protobuf from 'protobufjs/minimal';
@@ -14,8 +15,9 @@ describe('AdMobSignalFactoryTest', () => {
         const nativeBridge: NativeBridge = TestFixtures.getNativeBridge();
         const clientInfo: ClientInfo = TestFixtures.getClientInfo();
         const deviceInfo: DeviceInfo = TestFixtures.getDeviceInfo();
+        const focusManager: FocusManager = new FocusManager(nativeBridge);
 
-        return new AdMobSignalFactory(nativeBridge, clientInfo, deviceInfo).getAdRequestSignal().then(signal => {
+        return new AdMobSignalFactory(nativeBridge, clientInfo, deviceInfo, focusManager).getAdRequestSignal().then(signal => {
             const encodedMsg: string = signal.getBase64ProtoBuf();
 
             const buffer = new Uint8Array(protobuf.util.base64.length(encodedMsg));

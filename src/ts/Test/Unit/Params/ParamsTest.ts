@@ -288,7 +288,7 @@ describe('Event parameters should match specifications', () => {
             const deviceInfo: DeviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
             const sessionManager = new SessionManager(nativeBridge);
-            const adMobSignalFactory = new AdMobSignalFactory(nativeBridge, clientInfo, deviceInfo);
+            const adMobSignalFactory = new AdMobSignalFactory(nativeBridge, clientInfo, deviceInfo, focusManager);
             sinon.stub(nativeBridge.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));
             sinon.stub(sessionManager, 'startNewSession').returns(Promise.resolve(new Session('abdce-12345')));
             sessionManager.setGameSessionId(1234);
@@ -313,7 +313,7 @@ describe('Event parameters should match specifications', () => {
             const deviceInfo: DeviceInfo = TestFixtures.getDeviceInfo(Platform.IOS);
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
             const sessionManager = new SessionManager(nativeBridge);
-            const adMobSignalFactory = new AdMobSignalFactory(nativeBridge, clientInfo, deviceInfo);
+            const adMobSignalFactory = new AdMobSignalFactory(nativeBridge, clientInfo, deviceInfo, focusManager);
             sinon.stub(nativeBridge.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));
             sinon.stub(sessionManager, 'startNewSession').returns(Promise.resolve(new Session('abdce-12345')));
             sessionManager.setGameSessionId(1234);

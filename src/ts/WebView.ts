@@ -103,7 +103,7 @@ export class WebView {
             this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
             this._thirdPartyEventManager = new ThirdPartyEventManager(this._nativeBridge, this._request);
             this._metadataManager = new MetaDataManager(this._nativeBridge);
-            this._adMobSignalFactory = new AdMobSignalFactory(this._nativeBridge, this._clientInfo, this._deviceInfo);
+            this._adMobSignalFactory = new AdMobSignalFactory(this._nativeBridge, this._clientInfo, this._deviceInfo, this._focusManager);
 
             HttpKafka.setRequest(this._request);
             HttpKafka.setClientInfo(this._clientInfo);
