@@ -326,7 +326,6 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                         }
                         break;
                     case 'showEndScreen':
-                        this._handlers.forEach(handler => handler.onMraidShowEndScreen());
                         break;
                     default:
                         break;
