@@ -41,7 +41,7 @@ describe('EndScreenEventHandlerTest', () => {
     let performanceAdUnitParameters: IPerformanceAdUnitParameters;
     let endScreenEventHandler: PerformanceEndScreenEventHandler;
     let comScoreService: ComScoreTrackingService;
-    let campaign: PerformanceCampaign = TestFixtures.getCampaign();
+    let campaign: PerformanceCampaign;
 
     describe('with onDownloadAndroid', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -52,6 +52,7 @@ describe('EndScreenEventHandlerTest', () => {
                 handleCallback
             }, Platform.ANDROID);
 
+            campaign = TestFixtures.getCampaign();
             focusManager = new FocusManager(nativeBridge);
             container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
             metaDataManager = new MetaDataManager(nativeBridge);
@@ -105,7 +106,7 @@ describe('EndScreenEventHandlerTest', () => {
                 clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
             });
 
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, performanceAdUnit);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, campaign.getSession(), campaign);
         });
 
         describe('with follow redirects', () => {
@@ -179,7 +180,7 @@ describe('EndScreenEventHandlerTest', () => {
             });
 
             it('should send a click with session manager', () => {
-                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, performanceAdUnit);
+                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, campaign.getSession(), campaign);
             });
 
             it('should launch market view', () => {
@@ -261,7 +262,7 @@ describe('EndScreenEventHandlerTest', () => {
                 clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
             });
 
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, performanceAdUnit);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, campaign.getSession(), campaign);
         });
 
         describe('with follow redirects', () => {
@@ -416,7 +417,7 @@ describe('EndScreenEventHandlerTest', () => {
             });
 
             it('should send a click with session manager', () => {
-                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, performanceAdUnit);
+                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, campaign.getSession(), campaign);
             });
         });
     });
