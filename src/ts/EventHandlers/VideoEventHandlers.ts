@@ -15,6 +15,8 @@ import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { Campaign } from 'Models/Campaign';
 import { Placement } from 'Models/Placement';
+import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
+import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 
 export class VideoEventHandlers {
 
@@ -99,7 +101,7 @@ export class VideoEventHandlers {
             adUnit.getContainer().addDiagnosticsEvent({type: 'videoStarted'});
             adUnit.getVideo().setStarted(true);
 
-            operativeEventManager.sendStart(campaign.getSession(), campaign).then(() => {
+            operativeEventManager.sendStart(campaign.getSession(), campaign, this.getAdditionalEventData(adUnit)).then(() => {
                 adUnit.onStartProcessed.trigger();
             });
             if (abGroup === 5) {
@@ -209,11 +211,11 @@ export class VideoEventHandlers {
             adUnit.getVideo().setPosition(position);
 
             if(previousQuartile === 0 && adUnit.getVideo().getQuartile() === 1) {
-                operativeEventManager.sendFirstQuartile(campaign.getSession(), campaign);
+                operativeEventManager.sendFirstQuartile(campaign.getSession(), campaign, this.getAdditionalEventData(adUnit));
             } else if(previousQuartile === 1 && adUnit.getVideo().getQuartile() === 2) {
-                operativeEventManager.sendMidpoint(campaign.getSession(), campaign);
+                operativeEventManager.sendMidpoint(campaign.getSession(), campaign, this.getAdditionalEventData(adUnit));
             } else if(previousQuartile === 2 && adUnit.getVideo().getQuartile() === 3) {
-                operativeEventManager.sendThirdQuartile(campaign.getSession(), campaign);
+                operativeEventManager.sendThirdQuartile(campaign.getSession(), campaign, this.getAdditionalEventData(adUnit));
             }
         }
 
@@ -239,7 +241,7 @@ export class VideoEventHandlers {
         adUnit.getContainer().addDiagnosticsEvent({type: 'onVideoCompleted'});
         adUnit.setActive(false);
         adUnit.setFinishState(FinishState.COMPLETED);
-        operativeEventManager.sendView(campaign.getSession(), campaign);
+        operativeEventManager.sendView(campaign.getSession(), campaign, this.getAdditionalEventData(adUnit));
         if (abGroup === 5) {
             comScoreTrackingService.sendEvent('end', sessionId, comScoreDuration, comScorePlayedTime, creativeId, category, subCategory);
         }
@@ -370,5 +372,15 @@ export class VideoEventHandlers {
                 nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.VIDEO_PLAYER_ERROR], 'Video player error');
             }
         }
+    }
+
+    private static getAdditionalEventData(adUnit: AbstractAdUnit): { [id: string]: any } {
+        const data: { [id: string]: any } = {};
+
+        if(adUnit instanceof PerformanceAdUnit) {
+            data.videoOrientation = adUnit.getVideoOrientation();
+        }
+
+        return data;
     }
 }
