@@ -14,33 +14,33 @@ export interface IPrivacyHandler {
 }
 
 export interface IBuildInformation {
-    UA: string;
-    Platform: string;
-    Campaign: string;
-    APILevel: number;
-    Group: number;
-    SDK: string;
-    WebView: string | null;
-    WebviewHash: string | null;
-    App: string;
-    AppVersion: string;
-    Game: string;
+    userAgent: string;
+    platform: string;
+    campaign: string;
+    apiLevel: number;
+    group: number;
+    sdk: string;
+    webview: string | null;
+    webviewHash: string | null;
+    app: string;
+    appVersion: string;
+    game: string;
 }
 
 export class Privacy extends View<IPrivacyHandler> {
     public static createBuildInformation(clientInfo: ClientInfo, campaign: Campaign, nativeBridge: NativeBridge) {
         Privacy.buildInformation = {
-            UA: window.navigator.userAgent,
-            Platform: clientInfo.getPlatform() === Platform.IOS ? 'iOS' : 'Android',
-            Campaign: campaign.getId(),
-            APILevel: nativeBridge.getApiLevel(),
-            Group: campaign.getAbGroup(),
-            SDK: clientInfo.getSdkVersionName(),
-            WebView: clientInfo.getWebviewVersion(),
-            WebviewHash: clientInfo.getWebviewHash(),
-            App: clientInfo.getApplicationName(),
-            AppVersion: clientInfo.getApplicationVersion(),
-            Game: clientInfo.getGameId()
+            userAgent: window.navigator.userAgent,
+            platform: clientInfo.getPlatform() === Platform.IOS ? 'iOS' : 'Android',
+            campaign: campaign.getId(),
+            apiLevel: nativeBridge.getApiLevel(),
+            group: campaign.getAbGroup(),
+            sdk: clientInfo.getSdkVersionName(),
+            webview: clientInfo.getWebviewVersion(),
+            webviewHash: clientInfo.getWebviewHash(),
+            app: clientInfo.getApplicationName(),
+            appVersion: clientInfo.getApplicationVersion(),
+            game: clientInfo.getGameId()
         };
     }
 
