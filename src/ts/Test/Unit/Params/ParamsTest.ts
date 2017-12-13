@@ -203,41 +203,6 @@ class TestHelper {
         const sessionManager: SessionManager = new SessionManager(nativeBridge);
         return sessionManager;
     }
-/*
-    public static getAdUnit(nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, request: Request): AbstractAdUnit {
-        const config: Configuration = TestFixtures.getConfiguration();
-        let deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
-        let clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-
-        let container: AdUnitContainer;
-        const focusManager = new FocusManager(nativeBridge);
-        if(nativeBridge.getPlatform() === Platform.IOS) {
-            deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
-            clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-            container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS), focusManager);
-        } else {
-            container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
-        }
-        const comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
-
-        const parameters: IAdUnitParameters<PerformanceCampaign> = {
-            forceOrientation: ForceOrientation.LANDSCAPE,
-            focusManager: focusManager,
-            container: container,
-            deviceInfo: deviceInfo,
-            clientInfo: clientInfo,
-            thirdPartyEventManager: thirdPartyEventManager,
-            operativeEventManager: operativeEventManager,
-            comScoreTrackingService: comScoreService,
-            placement: TestFixtures.getPlacement(),
-            campaign: TestFixtures.getCampaign(),
-            configuration: config,
-            request: request,
-            options: {},
-        };
-
-        return AdUnitFactory.createAdUnit(nativeBridge, parameters);
-    }*/
 }
 
 describe('Event parameters should match specifications', () => {
