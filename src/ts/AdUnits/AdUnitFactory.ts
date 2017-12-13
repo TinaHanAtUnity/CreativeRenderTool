@@ -6,6 +6,9 @@ import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { DisplayInterstitialAdUnit, IDisplayInterstitialAdUnitParameters } from 'AdUnits/DisplayInterstitialAdUnit';
 import { DisplayInterstitial } from 'Views/DisplayInterstitial';
+import { AdMobView } from 'Views/AdMobView';
+import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
+import { AdMobAdUnit, IAdMobAdUnitParameters } from 'AdUnits/AdMobAdUnit';
 import { VideoEventHandlers } from 'EventHandlers/VideoEventHandlers';
 import { VastVideoEventHandlers } from 'EventHandlers/VastVideoEventHandlers';
 import { VastEndScreen } from 'Views/VastEndScreen';
@@ -44,6 +47,7 @@ import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 import { MRAIDEndScreen } from 'Views/MRAIDEndScreen';
 import { MRAIDEndScreenEventHandler } from 'EventHandlers/MRAIDEndScreenEventHandler';
 import { PerformanceEndScreenEventHandler } from 'EventHandlers/PerformanceEndScreenEventHandler';
+import { AdMobEventHandler } from 'EventHandlers/AdmobEventHandler';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { InterstitialOverlay } from 'Views/InterstitialOverlay';
 import { AbstractOverlay } from 'Views/AbstractOverlay';
@@ -63,6 +67,8 @@ export class AdUnitFactory {
             return this.createDisplayInterstitialAdUnit(nativeBridge, <IAdUnitParameters<DisplayInterstitialCampaign>>parameters);
         } else if (parameters.campaign instanceof VPAIDCampaign) {
             return this.createVPAIDAdUnit(nativeBridge, <IAdUnitParameters<VPAIDCampaign>>parameters);
+        } else if (parameters.campaign instanceof AdMobCampaign) {
+            return this.createAdMobAdUnit(nativeBridge, <IAdUnitParameters<AdMobCampaign>>parameters);
         } else {
             throw new Error('Unknown campaign instance type');
         }
@@ -384,6 +390,27 @@ export class AdUnitFactory {
             }
         }
         return undefined;
+    }
+    private static createAdMobAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<AdMobCampaign>): AdMobAdUnit {
+        // AdMobSignalFactory will always be defined, checking and throwing just to remove the undefined type.
+        if (!parameters.adMobSignalFactory) {
+            throw new Error('AdMobSignalFactory is undefined, should not get here.');
+        }
+        const view = new AdMobView(nativeBridge, parameters.adMobSignalFactory, parameters.container, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup());
+        view.render();
+
+        const adUnitParameters: IAdMobAdUnitParameters = {
+            ... parameters,
+            view: view
+        };
+        const adUnit = new AdMobAdUnit(nativeBridge, adUnitParameters);
+
+        const eventHandler = new AdMobEventHandler({
+            nativeBridge, adUnit
+        });
+        view.addEventHandler(eventHandler);
+
+        return adUnit;
     }
 
     private static createOverlay(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractOverlay {

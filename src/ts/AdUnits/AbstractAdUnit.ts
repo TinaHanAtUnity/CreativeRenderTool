@@ -11,6 +11,7 @@ import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { Configuration } from 'Models/Configuration';
 import { Request } from 'Utilities/Request';
 import { FocusManager } from 'Managers/FocusManager';
+import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 
 export interface IAdUnitParameters<T extends Campaign> {
@@ -27,6 +28,7 @@ export interface IAdUnitParameters<T extends Campaign> {
     configuration: Configuration;
     request: Request;
     options: any;
+    adMobSignalFactory?: AdMobSignalFactory;
 }
 
 export abstract class AbstractAdUnit {
