@@ -1,3 +1,13 @@
+# Staged
+
+* Refactor/cleanup ad unit model abuse
+* No fill retrying for production
+* Show build info in privacy pop up on end screen
+* Show playable end screen on Roll the Ball campaign
+* Add URL parser & parse APK redirect location correctly
+* Adjust video overlay safety margins in landscape mode
+* Sample SdkStats with game session ID
+
 # Tue Dec 12 19:04:39 UTC 2017
 
 * Initial support for AdMob ad units
