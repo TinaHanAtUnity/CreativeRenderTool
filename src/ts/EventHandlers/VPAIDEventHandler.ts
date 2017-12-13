@@ -27,6 +27,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     private _adDuration: number = -2;
     private _adRemainingTime: number = -2;
     private _abGroup: number;
+    private _campaign: VPAIDCampaign;
 
     constructor(nativeBridge: NativeBridge, adUnit: VPAIDAdUnit, parameters: IVPAIDAdUnitParameters) {
         this._nativeBridge = nativeBridge;
@@ -40,6 +41,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         this._overlay = parameters.overlay;
         this._vpaidEndScreen = parameters.endScreen;
         this._abGroup = parameters.campaign.getAbGroup();
+        this._campaign = parameters.campaign;
 
         this._vpaidEventHandlers.AdError = this.onAdError;
         this._vpaidEventHandlers.AdLoaded = this.onAdLoaded;
@@ -128,7 +130,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
 
     private onAdSkipped() {
         this._adUnit.sendTrackingEvent('skip');
-        this._operativeEventManager.sendSkip(this._adUnit);
+        this._operativeEventManager.sendSkip(this._campaign.getSession(), this._campaign);
         this._adUnit.setFinishState(FinishState.SKIPPED);
         this._adUnit.hide();
     }
@@ -144,7 +146,9 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     private onAdStarted() {
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
         this._adUnit.sendTrackingEvent('creativeView');
-        this._operativeEventManager.sendStart(this._adUnit);
+        this._operativeEventManager.sendStart(this._campaign.getSession(), this._campaign).then(() => {
+            this._adUnit.onStartProcessed.trigger();
+        });
         if (this._abGroup === 5) {
             this.sendComscoreEvent('play', 0);
         }
@@ -161,23 +165,23 @@ export class VPAIDEventHandler implements IVPAIDHandler {
 
     private onAdVideoFirstQuartile() {
         this._adUnit.sendTrackingEvent('firstQuartile');
-        this._operativeEventManager.sendFirstQuartile(this._adUnit);
+        this._operativeEventManager.sendFirstQuartile(this._campaign.getSession(), this._campaign);
     }
 
     private onAdVideoMidpoint() {
         this._adUnit.sendTrackingEvent('midpoint');
-        this._operativeEventManager.sendMidpoint(this._adUnit);
+        this._operativeEventManager.sendMidpoint(this._campaign.getSession(), this._campaign);
     }
 
     private onAdVideoThirdQuartile() {
         this._adUnit.sendTrackingEvent('thirdQuartile');
-        this._operativeEventManager.sendThirdQuartile(this._adUnit);
+        this._operativeEventManager.sendThirdQuartile(this._campaign.getSession(), this._campaign);
     }
 
     private onAdVideoComplete() {
         this._adUnit.sendTrackingEvent('complete');
         this._adUnit.setFinishState(FinishState.COMPLETED);
-        this._operativeEventManager.sendView(this._adUnit);
+        this._operativeEventManager.sendView(this._campaign.getSession(), this._campaign);
         if (this._abGroup === 5) {
             this.sendComscoreEvent('end', (this._adDuration - this._adRemainingTime) * 1000);
         }
@@ -226,10 +230,10 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     }
 
     private sendComscoreEvent(eventName: string, position: number) {
-        const sessionId = this._adUnit.getCampaign().getSession().getId();
-        const creativeId = this._adUnit.getCampaign().getCreativeId();
-        const category = this._adUnit.getCampaign().getCategory();
-        const subCategory = this._adUnit.getCampaign().getSubCategory();
+        const sessionId = this._campaign.getSession().getId();
+        const creativeId = this._campaign.getCreativeId();
+        const category = this._campaign.getCategory();
+        const subCategory = this._campaign.getSubCategory();
         let adDuration = (this._adDuration * 1000);
 
         if (adDuration < 0 || typeof adDuration === 'undefined') {
