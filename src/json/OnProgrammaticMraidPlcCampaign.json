@@ -15,7 +15,8 @@
         "impression": [
           "https://ads-brand-postback.unityads.unity3d.com/brands/2000/%ZONE%/impression/common?data=Kz2J"
         ]
-      }
+      },
+      "useWebViewUserAgentForTracking": true
     }
   }
 }

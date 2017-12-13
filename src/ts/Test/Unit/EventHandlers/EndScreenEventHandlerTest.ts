@@ -69,7 +69,7 @@ describe('EndScreenEventHandlerTest', () => {
             sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
             sinon.spy(nativeBridge.Intent, 'launch');
 
-            const video = new Video('');
+            const video = new Video('', TestFixtures.getSession());
             endScreen = new PerformanceEndScreen(nativeBridge, TestFixtures.getCampaign(), TestFixtures.getConfiguration().isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
 
@@ -216,7 +216,7 @@ describe('EndScreenEventHandlerTest', () => {
             sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
             sinon.spy(nativeBridge.UrlScheme, 'open');
 
-            const video = new Video('');
+            const video = new Video('', TestFixtures.getSession());
             campaign = TestFixtures.getCampaign();
             campaign.set('store', StoreName.APPLE);
             campaign.set('appStoreId', '11111');

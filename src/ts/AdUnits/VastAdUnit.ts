@@ -244,7 +244,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     private sendThirdPartyEvent(event: string, sessionId: string, sdkVersion: number, url: string): void {
         url = url.replace(/%ZONE%/, this._vastPlacement.getId());
         url = url.replace(/%SDK_VERSION%/, sdkVersion.toString());
-        this._thirdPartyEventManager.sendEvent(event, sessionId, url);
+        this._thirdPartyEventManager.sendEvent(event, sessionId, url, this._vastCampaign.getUseWebViewUserAgentForTracking());
     }
 
     private getTrackingEventUrls(eventName: string): string[] | null {
