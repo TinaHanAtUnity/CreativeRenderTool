@@ -1,7 +1,7 @@
 import { ISchema, Model } from 'Models/Model';
 import { Session } from 'Models/Session';
-import { WebViewError } from "../../Errors/WebViewError";
-import { Diagnostics } from "../../Utilities/Diagnostics";
+import { WebViewError } from 'Errors/WebViewError';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export interface IAsset {
     url: string;
