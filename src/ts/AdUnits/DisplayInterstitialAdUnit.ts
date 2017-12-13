@@ -7,7 +7,6 @@ import { DisplayInterstitial } from 'Views/DisplayInterstitial';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { Platform } from 'Constants/Platform';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { ViewConfiguration } from "./Containers/AdUnitContainer";
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Diagnostics } from 'Utilities/Diagnostics';
@@ -16,6 +15,10 @@ export interface IDisplayInterstitialAdUnitParameters extends IAdUnitParameters<
     view: DisplayInterstitial;
 }
 
+// TODO: Open questions:
+// - Do we want to use the clickThroughUrl? How should it be used?
+// - What will the campaign content look like? (for parser)
+
 export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitialCampaign> {
 
     private _operativeEventManager: OperativeEventManager;
@@ -23,6 +26,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
     private _view: DisplayInterstitial;
     private _options: any;
     private _deviceInfo: DeviceInfo;
+    private _receivedOnPageStart: boolean = false;
 
     private _onShowObserver: IObserver0;
     private _onSystemKillObserver: IObserver0;
@@ -89,6 +93,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
         return 'programmaticImage';
     }
 
+    // TODO: do we need this?
     public openLink(href: string): void {
         this._operativeEventManager.sendClick(this);
 
@@ -151,13 +156,28 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
         }
     }
 
+    private onPageStarted(): void {
+        this._nativeBridge.Sdk.logDebug("DisplayInterstitialAdUnit: onPageStarted triggered");
+        if(!this._receivedOnPageStart) {
+            this._receivedOnPageStart = true;
+            return;
+        }
+        this._operativeEventManager.sendClick(this);
+
+        for (let url of this._campaign.getTrackingUrlsForEvent('click')) {
+            url = url.replace(/%ZONE%/, this.getPlacement().getId());
+            url = url.replace(/%SDK_VERSION%/, this._operativeEventManager.getClientInfo().getSdkVersion().toString());
+            this._thirdPartyEventManager.sendEvent('display click', this._campaign.getSession().getId(), url);
+        }
+    }
+
     private unsetReferences(): void {
         delete this._view;
     }
 
     private sendStartEvents(): void {
         for (let url of (this._campaign).getTrackingUrlsForEvent('impression')) {
-            url = url.replace(/%ZONE%/, (this.getCampaign()).getId());
+            url = url.replace(/ /, (this.getCampaign()).getId());
             url = url.replace(/%SDK_VERSION%/, this._operativeEventManager.getClientInfo().getSdkVersion().toString());
             this._nativeBridge.Sdk.logDebug("todo: remove - sendStartEvents - sending " + url);
             this._thirdPartyEventManager.sendEvent('display impression', (this.getCampaign()).getSession().getId(), url);
@@ -170,7 +190,15 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
     }
 
     private setWebPlayerUrl(url: string): Promise<void> {
-        return this._nativeBridge.WebPlayer.setUrl(url).catch( (error) => {
+        return this._nativeBridge.WebPlayer.setUrl(url).then( () => {
+            // TODO: make generic so it works with iOS also
+            // TODO: place the magic settings in some sensible place
+            const eventSettings = {'onPageStarted': {'sendEvent':true},
+                'onPageFinished': {'sendEvent': true},
+                'onReceivedError': {'sendEvent' :true}};
+            this._nativeBridge.WebPlayer.onPageStarted.subscribe( (event) => this.onPageStarted);
+            return this._nativeBridge.WebPlayer.setEventSettings(eventSettings);
+        }).catch( (error) => {
             this._nativeBridge.Sdk.logError(JSON.stringify(error));
             Diagnostics.trigger('webplayer_set_url_error', new DiagnosticError(error, { url: url}));
             this.setFinishState(FinishState.ERROR);
