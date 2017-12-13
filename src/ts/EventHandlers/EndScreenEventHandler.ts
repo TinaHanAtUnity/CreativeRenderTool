@@ -14,6 +14,7 @@ import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Request } from 'Utilities/Request';
 import { Campaign } from 'Models/Campaign';
 import { Placement } from 'Models/Placement';
+import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 
 export interface IEndScreenDownloadParameters {
     clickAttributionUrl: string | undefined;
@@ -73,7 +74,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     private onDownloadAndroid(parameters: IEndScreenDownloadParameters): void {
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
 
-        this._operativeEventManager.sendClick(this._campaign.getSession(), this._campaign);
+        this._operativeEventManager.sendClick(this._campaign.getSession(), this._campaign, this.getVideoOrientation());
         if(parameters.clickAttributionUrl) {
             this.handleClickAttribution(parameters);
 
@@ -88,7 +89,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     private onDownloadIos(parameters: IEndScreenDownloadParameters): void {
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
 
-        this._operativeEventManager.sendClick(this._campaign.getSession(), this._campaign);
+        this._operativeEventManager.sendClick(this._campaign.getSession(), this._campaign, this.getVideoOrientation());
         if(parameters.clickAttributionUrl) {
             this.handleClickAttribution(parameters);
 
@@ -203,6 +204,14 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
                 });
             }
         }
+    }
+
+    private getVideoOrientation(): string | undefined {
+        if(this._adUnit instanceof PerformanceAdUnit) {
+            return (<PerformanceAdUnit>this._adUnit).getVideoOrientation();
+        }
+
+        return undefined;
     }
 
     private getAppStoreUrl(parameters: IEndScreenDownloadParameters, packageName?: string): string | undefined {

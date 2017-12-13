@@ -1,4 +1,4 @@
-import { EndScreenEventHandler, IEndScreenDownloadParameters } from 'EventHandlers/EndScreenEventHandler';
+import { EndScreenEventHandler } from 'EventHandlers/EndScreenEventHandler';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
@@ -22,18 +22,5 @@ export class PerformanceEndScreenEventHandler extends EndScreenEventHandler<Perf
         if (keyCode === KeyCode.BACK && this._adUnit.isShowing() && !this._adUnit.isActive()) {
             this._adUnit.hide();
         }
-    }
-
-    public onEndScreenDownload(parameters: IEndScreenDownloadParameters): void {
-        this._performanceOperativeEventManager.sendClick(this._performanceCampaign.getSession(), this._performanceCampaign, this.getAdditionalEventData());
-
-        super.onEndScreenDownload(parameters);
-    }
-
-    private getAdditionalEventData(): { [id: string]: any } {
-        const data: { [id: string]: any } = {};
-        data.videoOrientation = this._performanceAdUnit.getVideoOrientation();
-
-        return data;
     }
 }
