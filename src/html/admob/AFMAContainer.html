@@ -1,0 +1,196 @@
+<script>
+    (function() {
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                AFMA_ReceiveMessage('onshow');
+            });
+        });
+
+        // This string will be replaced prior to the source being inserted into the iframe
+        var clickSignals = '{{AFMA_CLICK_SIGNALS_PLACEHOLDER}}';
+
+        function getQueryParams(url) {
+            var a = document.createElement('a');
+            a.href = url;
+            var params = {};
+            if (a.search) {
+                var tuples = a.search.substring(1).split(/&/);
+                for (var i = 0; i < tuples.length; i++) {
+                    var parts = tuples[i].split(/=/);
+                    var key = parts[0];
+                    var value = parts[1];
+                    if (params[key]) {
+                        params[key].push(value);
+                    } else {
+                        params[key] = [value];
+                    }
+                }
+            }
+            return params;
+        }
+
+        function isObjectEmpty(obj) {
+            for (var prop in obj) {
+                if (obj.hasOwnProperty(prop)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        var AFMA = function() {
+            this.forceOrientation = function(orientation, override, animationDuration) {
+                this.postMessage('forceOrientation', {
+                    orientation: orientation,
+                    override: override,
+                    animationDuration: animationDuration
+                });
+            };
+
+            this.click = function(url) {
+                this.postMessage('click', {
+                    url: url,
+                });
+            };
+
+            this.getClickSignals = function(clickString) {
+                return clickSignals;
+            };
+
+            this.appendClickSignals = function(url, spamSignals) {
+                spamSignals = spamSignals || clickSignals;
+                var query = getQueryParams(url);
+                if (query.ms) {
+                    return url;
+                } else {
+                    if (isObjectEmpty(query)) {
+                        url = url + '?ms=' + spamSignals;
+                    } else {
+                        url = url + '&ms=' + spamSignals;
+                    }
+                }
+                return url;
+            };
+
+            this.notifyRewardedVideoStart = function() {
+                this.postMessage('rewardedVideoStart');
+            };
+
+            this.grantReward = function() {
+                this.postMessage('grantReward');
+            };
+
+            this.close = function(notifyParent) {
+                this.postMessage('close');
+            };
+
+            this.disableBackButton = function(disabled) {
+                this.postMessage('disableBackButton', {
+                    disabled: disabled
+                });
+            };
+
+            this.openIntent = function(url, action, mimeType) {
+                this.postMessage('openIntent', {
+                    url: url,
+                    action: action,
+                    mimeType: mimeType
+                });
+                return false;
+            };
+
+            this.openIntentExtended = function(params) {
+                return this.openIntent(params.url, params.action, params.mimeType);
+            };
+
+            this.openUrl = function(url) {
+                this.postMessage('openUrl', {
+                    url: url
+                });
+            };
+
+            this.openDeepLinkUrl = function(url, callback, failIfUnsure, packageName) {
+                this.postMessage('openUrl', {
+                    url: url
+                });
+                callback();
+            };
+
+            this.openBrowser = function(url) {
+                this.postMessage('openUrl', {
+                    url: url
+                });
+            };
+
+            this.openNativeApp = function(url) {
+                this.postMessage('openUrl', {
+                    url: url
+                });
+            };
+
+            this.openSystemBrowser = function(url, options) {
+                this.postMessage('openUrl', {
+                    url: url
+                });
+            };
+
+            this.openStoreOverlay = function(url) {
+                this.postMessage('openStoreOverlay', {
+                    url: url
+                });
+            };
+
+            this.openInAppStore = function(productId, url, waitForFetch) {
+                this.postMessage('openInAppStore', {
+                    productId: productId,
+                    url: url
+                });
+            };
+
+            this.fetchAppStoreOverlay = function(productId) {
+                this.postMessage('fetchAppStoreOverlay', {
+                    productId: productId
+                });
+            };
+
+            this.canOpenUrls = function(urls, callback, timeoutCallback, timeoutMillis) {
+                var canDo = {};
+                if (urls.length) {
+                    for (var i = 0; i < urls.length; i++) {
+                        canDo[urls[i]] = true;
+                    }
+                } else {
+                    canDo[urls] = true;
+                }
+                callback('openableURLs', canDo);
+            };
+
+            this.canOpenIntents = function(intents, callback, timeoutCallback, timeoutMillis) {
+                var canDo = {};
+                for (var i = 0; i < intents.length; i++) {
+                    canDo[intents[i].id] = true;
+                }
+                callback('openableIntents', canDo);
+            };
+
+            this.postMessage = function(event, data) {
+                window.parent.postMessage({
+                    type: 'afma',
+                    event: event,
+                    data: data
+                }, '*');
+            };
+
+            // MRAID proxy functions
+            this.setOrienationProperties = function(properties) {
+                window.mraid.setOrienationProperties(properties);
+            };
+
+            this.useCustomClose = function(uses) {
+            };
+        };
+
+        window.unity = window.unity || {};
+        window.unity.afma = new AFMA();
+    })();
+</script>

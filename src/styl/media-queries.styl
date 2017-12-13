@@ -67,41 +67,6 @@
   @media only screen and (device-width : 375px) and (device-height : 812px) and (-webkit-device-pixel-ratio : 3) {
     html {
       font-size: $default-px-size * 1.25;
-
-      #overlay {
-        .skip-hit-area {
-          padding-top: constant(safe-area-inset-top);
-          padding-left: constant(safe-area-inset-top);
-        }
-
-        .skip {
-          top: constant(safe-area-inset-top);
-          left: constant(safe-area-inset-left);
-        }
-
-        .progress {
-          top: constant(safe-area-inset-top);
-          right: constant(safe-area-inset-right);
-        }
-
-        .mute-button {
-          bottom: constant(safe-area-inset-bottom);
-          left: constant(safe-area-inset-left);
-        }
-
-        .call-button {
-          right: constant(safe-area-inset-right);
-          bottom: constant(safe-area-inset-bottom);
-        }
-      }
-    }
-
-    .slide-up {
-      slide-animation(.4s, ease-in, -250%);
-    }
-
-    .slide-down {
-      slide-animation(.4s, ease-in, 250%);
     }
   }
 
@@ -193,6 +158,40 @@
         right: constant(safe-area-inset-right);
       }
     }
+
+    #overlay {
+      .skip-hit-area {
+        padding-top: constant(safe-area-inset-top);
+        padding-left: constant(safe-area-inset-top);
+      }
+
+      .skip {
+        top: constant(safe-area-inset-top);
+        left: constant(safe-area-inset-left);
+      }
+
+      .progress {
+        top: constant(safe-area-inset-top);
+        right: constant(safe-area-inset-right);
+      }
+
+      .mute-button {
+        bottom: constant(safe-area-inset-bottom);
+        left: constant(safe-area-inset-left);
+      }
+
+      .call-button {
+        right: constant(safe-area-inset-right);
+        bottom: constant(safe-area-inset-bottom);
+      }
+    }
+  }
+  .slide-up {
+    slide-animation(.4s, ease-in, -250%);
+  }
+
+  .slide-down {
+    slide-animation(.4s, ease-in, 250%);
   }
 }
 
