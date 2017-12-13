@@ -14,6 +14,7 @@ import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Request } from 'Utilities/Request';
 import { Campaign } from 'Models/Campaign';
 import { Placement } from 'Models/Placement';
+import { Url } from 'Utilities/Url';
 
 export interface IEndScreenDownloadParameters {
     clickAttributionUrl: string | undefined;
@@ -109,7 +110,8 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
                 const location = Request.getHeader(response.headers, 'location');
                 if(location) {
                     if(platform === Platform.ANDROID) {
-                        if(location.match(/\.apk$/i) && this._nativeBridge.getApiLevel() >= 21) {
+                        const parsedLocation = Url.parse(location);
+                        if(parsedLocation.pathname.match(/\.apk$/i) && this._nativeBridge.getApiLevel() >= 21) {
                             // Using WEB_SEARCH bypasses some security check for directly downloading .apk files
                             this._nativeBridge.Intent.launch({
                                 'action': 'android.intent.action.WEB_SEARCH',
