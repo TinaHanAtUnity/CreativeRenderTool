@@ -6,6 +6,8 @@ import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { FinishState } from 'Constants/FinishState';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { Diagnostics } from 'Utilities/Diagnostics';
+import { Platform } from 'Constants/Platform';
+import { KeyCode } from 'Constants/Android/KeyCode';
 
 export interface IAdMobAdUnitParameters extends IAdUnitParameters<AdMobCampaign> {
     view: AdMobView;
@@ -16,6 +18,7 @@ export class AdMobAdUnit extends AbstractAdUnit<AdMobCampaign> {
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _options: any;
     private _onSystemKillObserver: any;
+    private _keyDownListener: (kc: number) => void;
 
     constructor(nativeBridge: NativeBridge, parameters: IAdMobAdUnitParameters) {
         super(nativeBridge, parameters);
@@ -24,6 +27,7 @@ export class AdMobAdUnit extends AbstractAdUnit<AdMobCampaign> {
         this._options = parameters.options;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._operativeEventManager = parameters.operativeEventManager;
+        this._keyDownListener = (kc: number) => this.onKeyDown(kc);
 
         // TODO, we skip initial because the AFMA grantReward event tells us the video
         // has been completed. Is there a better way to do this with AFMA right now?
@@ -38,6 +42,10 @@ export class AdMobAdUnit extends AbstractAdUnit<AdMobCampaign> {
         Diagnostics.trigger('admob_ad_show', {
             placement: this.getPlacement().getId()
         }, this.getCampaign().getSession());
+
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            this._nativeBridge.AndroidAdUnit.onKeyDown.subscribe(this._keyDownListener);
+        }
 
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
 
@@ -109,6 +117,10 @@ export class AdMobAdUnit extends AbstractAdUnit<AdMobCampaign> {
         this._operativeEventManager.sendThirdQuartile(this);
         this._operativeEventManager.sendView(this);
 
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            this._nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(this._keyDownListener);
+        }
+
         Diagnostics.trigger('admob_ad_close', {
             placement: this.getPlacement().getId(),
             finishState: this.getFinishState()
@@ -130,6 +142,12 @@ export class AdMobAdUnit extends AbstractAdUnit<AdMobCampaign> {
         if(this.isShowing()) {
             this.setFinishState(FinishState.SKIPPED);
             this.hide();
+        }
+    }
+
+    private onKeyDown(key: number) {
+        if (key === KeyCode.BACK) {
+            this._view.onBackPressed();
         }
     }
 }

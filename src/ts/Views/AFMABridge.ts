@@ -34,6 +34,7 @@ export interface IAFMAHandler {
 }
 
 export class AFMABridge {
+    private _iframe: HTMLIFrameElement;
     private _nativeBridge: NativeBridge;
     private _handler: IAFMAHandler;
     private _messageListener: (e: Event) => void;
@@ -57,11 +58,16 @@ export class AFMABridge {
     }
 
     public connect(iframe: HTMLIFrameElement) {
+        this._iframe = iframe;
         window.addEventListener('message', this._messageListener);
     }
 
     public disconnect() {
         window.removeEventListener('message', this._messageListener);
+    }
+
+    public onBackPressed() {
+        this.postMessage('back');
     }
 
     private onMessage(e: MessageEvent) {
@@ -73,5 +79,12 @@ export class AFMABridge {
                 handler(message);
             }
         }
+    }
+
+    private postMessage(event: string) {
+        this._iframe.contentWindow.postMessage({
+            type: 'afma',
+            event: event
+        }, '*');
     }
 }

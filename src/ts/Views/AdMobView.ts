@@ -79,6 +79,10 @@ export class AdMobView extends View<IAdMobEventHandler> {
         super.hide();
     }
 
+    public onBackPressed() {
+        this._afmaBridge.onBackPressed();
+    }
+
     private setupIFrame() {
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#admob-iframe');
         this._iframe = iframe;
