@@ -81,5 +81,4 @@ export abstract class View<T extends object> {
     public hide(): void {
         this._container.style.visibility = 'hidden';
     }
-
 }

@@ -68,7 +68,9 @@ System.config({
         'sinon': './node_modules/sinon/pkg/sinon.js',
         'chai': './node_modules/chai/chai.js',
         'text': './node_modules/systemjs-plugin-text/text.js',
-        'es6-promise': './node_modules/es6-promise/dist/es6-promise.auto.js'
+        'es6-promise': './node_modules/es6-promise/dist/es6-promise.auto.js',
+        'long': './node_modules/long/dist/long.js',
+        'protobufjs/minimal': './node_modules/protobufjs/dist/minimal/protobuf.js'
     },
     meta: {
         'mocha': {
