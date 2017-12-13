@@ -99,4 +99,8 @@ export class CustomFeatures {
             return false;
         }
     }
+
+    public static isPlayableEndScreenTest(abGroup: number, url: string) {
+        return url.match(/playables\/production\/unity\/roll-the-ball-v3\.1/) && (abGroup === 10 || abGroup === 11);
+    }
 }
