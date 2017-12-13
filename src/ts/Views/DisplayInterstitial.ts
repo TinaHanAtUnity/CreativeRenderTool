@@ -19,7 +19,7 @@ export interface IDisplayInterstitialHandler {
 export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
 
     private _placement: Placement;
-    private _campaign: DisplayInterstitialCampaign<IDisplayInterstitialCampaign>;
+    private _campaign: DisplayInterstitialCampaign;
 
     private _closeElement: HTMLElement;
     private _iframe: HTMLIFrameElement;
@@ -31,7 +31,7 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
     private _messageListener: EventListener;
     private _timers: number[] = [];
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: DisplayInterstitialCampaign<IDisplayInterstitialCampaign>) {
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: DisplayInterstitialCampaign) {
         super(nativeBridge, 'display-interstitial');
 
         this._placement = placement;

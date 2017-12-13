@@ -66,10 +66,6 @@ import OnStaticInterstitialDisplayCampaignNoClickMarkupUrl from 'json/OnStaticIn
 import { ProgrammaticVastParser } from 'Parsers/ProgrammaticVastParser';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { AdMobSignal } from 'Models/AdMobSignal';
-import {
-    DisplayInterstitialCampaign,
-    IDisplayInterstitialCampaign
-} from '../../../Models/Campaigns/DisplayInterstitialCampaign';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
