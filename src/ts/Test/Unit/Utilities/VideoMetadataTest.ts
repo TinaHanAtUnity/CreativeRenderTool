@@ -47,7 +47,7 @@ describe('VideoMetadataTest', () => {
                 [VideoMetadata.METADATA_KEY_DURATION, 10000]
             ]));
 
-            const video: Video = new Video(validVideo);
+            const video: Video = new Video(validVideo, TestFixtures.getSession());
             return cache.isVideoValid(video, TestFixtures.getCampaign()).then(valid => {
                 assert.isTrue(valid, 'Valid video failed to validate on Android');
             });
@@ -57,7 +57,7 @@ describe('VideoMetadataTest', () => {
             sinon.stub(nativeBridge.Cache, 'getHash').withArgs(invalidVideo).returns(Promise.resolve(invalidHash));
             sinon.stub(nativeBridge.Cache.Android, 'getMetaData').withArgs(invalidId, metadataKeys).returns(Promise.resolve([CacheError.FILE_IO_ERROR, 'File not found']));
 
-            const video: Video = new Video(invalidVideo);
+            const video: Video = new Video(invalidVideo, TestFixtures.getSession());
             return cache.isVideoValid(video, TestFixtures.getCampaign()).then(valid => {
                 assert.isFalse(valid, 'Invalid video was validated on Android');
             });
@@ -77,7 +77,7 @@ describe('VideoMetadataTest', () => {
             sinon.stub(nativeBridge.Cache, 'getHash').withArgs(validVideo).returns(Promise.resolve(validHash));
             sinon.stub(nativeBridge.Cache.Ios, 'getVideoInfo').withArgs(validId).returns(Promise.resolve([640, 360, 10000]));
 
-            const video: Video = new Video(validVideo);
+            const video: Video = new Video(validVideo, TestFixtures.getSession());
             return cache.isVideoValid(video, TestFixtures.getCampaign()).then(valid => {
                 assert.isTrue(valid, 'Valid video failed to validate on iOS');
             });
@@ -87,7 +87,7 @@ describe('VideoMetadataTest', () => {
             sinon.stub(nativeBridge.Cache, 'getHash').withArgs(invalidVideo).returns(Promise.resolve(invalidHash));
             sinon.stub(nativeBridge.Cache.Ios, 'getVideoInfo').withArgs(invalidId).returns(Promise.reject(['INVALID_ARGUMENT']));
 
-            const video: Video = new Video(invalidVideo);
+            const video: Video = new Video(invalidVideo, TestFixtures.getSession());
             return cache.isVideoValid(video, TestFixtures.getCampaign()).then(valid => {
                 assert.isFalse(valid, 'Invalid video was validated on iOS');
             });

@@ -726,7 +726,6 @@ describe('CampaignManager', () => {
 
             const json = JSON.parse(OnProgrammaticMraidUrlPlcCampaignJson);
             const content = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
-            const asset = new HTML(content.inlinedUrl);
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager);
             let triggeredCampaign: MRAIDCampaign;
@@ -748,6 +747,9 @@ describe('CampaignManager', () => {
                 assert.equal(triggeredCampaign.getId(), 'UNKNOWN');
                 assert.equal(triggeredCampaign.getAbGroup(), configuration.getAbGroup());
                 assert.equal(triggeredCampaign.getGamerId(), configuration.getGamerId());
+
+                const asset = new HTML(content.inlinedUrl, triggeredCampaign.getSession());
+
                 assert.deepEqual(triggeredCampaign.getResourceUrl(), asset);
                 assert.deepEqual(triggeredCampaign.getRequiredAssets(), [asset]);
                 assert.deepEqual(triggeredCampaign.getOptionalAssets(), []);
@@ -1019,7 +1021,7 @@ describe('CampaignManager', () => {
                     assert.equal(triggeredPlacement, 'mraid');
                     assert.equal(triggeredCampaign.getGamerId(), '57a35671bb58271e002d93c9');
                     assert.equal(triggeredCampaign.getAbGroup(), 99);
-                    assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getResourceUrl(), new HTML('https://cdn.unityads.unity3d.com/playables/sma_re2.0.0_ios/index.html'));
+                    assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getResourceUrl(), new HTML('https://cdn.unityads.unity3d.com/playables/sma_re2.0.0_ios/index.html', triggeredCampaign.getSession()));
                 });
             });
         });
@@ -1071,7 +1073,7 @@ describe('CampaignManager', () => {
                     assert.equal(triggeredCampaign.getCreativeId(), 'mraid-url-sample-creative-id');
                     assert.equal(triggeredCampaign.getSeatId(), 901);
                     assert.equal(triggeredCampaign.getCorrelationId(), '0zGg2TfRsBNbqlc7AVdhLAw');
-                    assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getResourceUrl(), new HTML('https://img.serveroute.com/mini_8ball_fast/inlined.html'));
+                    assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getResourceUrl(), new HTML('https://img.serveroute.com/mini_8ball_fast/inlined.html', triggeredCampaign.getSession()));
                     assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getDynamicMarkup(), 'var markup = \'dynamic\';');
                     assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getTrackingEventUrls(), {
                         "impression": [

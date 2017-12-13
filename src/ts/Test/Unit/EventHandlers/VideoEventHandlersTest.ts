@@ -76,7 +76,7 @@ describe('VideoEventHandlersTest', () => {
         sessionManager = new SessionManager(nativeBridge);
         operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
         comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
-        video = new Video('');
+        video = new Video('', TestFixtures.getSession());
 
         vastCampaign = TestFixtures.getEventVastCampaign();
         performanceCampaign = TestFixtures.getCampaign();
@@ -142,7 +142,7 @@ describe('VideoEventHandlersTest', () => {
 
     describe('with video start', () => {
         beforeEach(() => {
-            video = new Video('');
+            video = new Video('', TestFixtures.getSession());
             performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
         });
 
