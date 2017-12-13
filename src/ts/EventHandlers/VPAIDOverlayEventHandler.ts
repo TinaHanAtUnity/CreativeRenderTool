@@ -5,6 +5,7 @@ import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'AdUnits/VPAIDAdUnit';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
+import { Placement } from 'Models/Placement';
 
 export class VPAIDOverlayEventHandler implements IOverlayHandler {
     private _adUnit: VPAIDAdUnit;
@@ -12,6 +13,7 @@ export class VPAIDOverlayEventHandler implements IOverlayHandler {
     private _comScoreTrackingService: ComScoreTrackingService;
     private _abGroup: number;
     private _campaign: VPAIDCampaign;
+    private _placement: Placement;
 
     constructor(nativeBridge: NativeBridge, adUnit: VPAIDAdUnit, parameters: IVPAIDAdUnitParameters) {
         this._adUnit = adUnit;
@@ -19,11 +21,12 @@ export class VPAIDOverlayEventHandler implements IOverlayHandler {
         this._comScoreTrackingService = parameters.comScoreTrackingService;
         this._abGroup = parameters.campaign.getAbGroup();
         this._campaign = parameters.campaign;
+        this._placement = parameters.placement;
     }
 
     public onOverlaySkip(position: number): void {
         this._adUnit.sendTrackingEvent('skip');
-        this._operativeEventManager.sendSkip(this._campaign.getSession(), this._campaign);
+        this._operativeEventManager.sendSkip(this._campaign.getSession(), this._placement, this._campaign);
         if (this._abGroup === 5) {
             this.sendComscoreEvent('end', 0);
         }
@@ -45,7 +48,7 @@ export class VPAIDOverlayEventHandler implements IOverlayHandler {
 
     public onOverlayClose(): void {
         this._adUnit.sendTrackingEvent('skip');
-        this._operativeEventManager.sendSkip(this._campaign.getSession(), this._campaign);
+        this._operativeEventManager.sendSkip(this._campaign.getSession(), this._placement, this._campaign);
         this._adUnit.setFinishState(FinishState.SKIPPED);
         this._adUnit.hide();
     }

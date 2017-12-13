@@ -88,7 +88,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
     }
 
     public openLink(href: string): void {
-        this._operativeEventManager.sendClick(this._campaign.getSession(), this._campaign);
+        this._operativeEventManager.sendClick(this._campaign.getSession(), this._placement, this._campaign);
 
         for (let url of this._campaign.getTrackingUrlsForEvent('click')) {
             url = url.replace(/%ZONE%/, this._placement.getId());
@@ -143,7 +143,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
             url = url.replace(/%SDK_VERSION%/, this._operativeEventManager.getClientInfo().getSdkVersion().toString());
             this._thirdPartyEventManager.sendEvent('display impression', this._campaign.getSession().getId(), url);
         }
-        this._operativeEventManager.sendStart(this._campaign.getSession(), this._campaign).then(() => {
+        this._operativeEventManager.sendStart(this._campaign.getSession(), this._placement, this._campaign).then(() => {
             this.onStartProcessed.trigger();
         });
     }

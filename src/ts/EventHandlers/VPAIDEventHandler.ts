@@ -130,7 +130,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
 
     private onAdSkipped() {
         this._adUnit.sendTrackingEvent('skip');
-        this._operativeEventManager.sendSkip(this._campaign.getSession(), this._campaign);
+        this._operativeEventManager.sendSkip(this._campaign.getSession(), this._placement, this._campaign);
         this._adUnit.setFinishState(FinishState.SKIPPED);
         this._adUnit.hide();
     }
@@ -146,7 +146,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     private onAdStarted() {
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
         this._adUnit.sendTrackingEvent('creativeView');
-        this._operativeEventManager.sendStart(this._campaign.getSession(), this._campaign).then(() => {
+        this._operativeEventManager.sendStart(this._campaign.getSession(), this._placement, this._campaign).then(() => {
             this._adUnit.onStartProcessed.trigger();
         });
         if (this._abGroup === 5) {
@@ -165,23 +165,23 @@ export class VPAIDEventHandler implements IVPAIDHandler {
 
     private onAdVideoFirstQuartile() {
         this._adUnit.sendTrackingEvent('firstQuartile');
-        this._operativeEventManager.sendFirstQuartile(this._campaign.getSession(), this._campaign);
+        this._operativeEventManager.sendFirstQuartile(this._campaign.getSession(), this._placement, this._campaign);
     }
 
     private onAdVideoMidpoint() {
         this._adUnit.sendTrackingEvent('midpoint');
-        this._operativeEventManager.sendMidpoint(this._campaign.getSession(), this._campaign);
+        this._operativeEventManager.sendMidpoint(this._campaign.getSession(), this._placement, this._campaign);
     }
 
     private onAdVideoThirdQuartile() {
         this._adUnit.sendTrackingEvent('thirdQuartile');
-        this._operativeEventManager.sendThirdQuartile(this._campaign.getSession(), this._campaign);
+        this._operativeEventManager.sendThirdQuartile(this._campaign.getSession(), this._placement, this._campaign);
     }
 
     private onAdVideoComplete() {
         this._adUnit.sendTrackingEvent('complete');
         this._adUnit.setFinishState(FinishState.COMPLETED);
-        this._operativeEventManager.sendView(this._campaign.getSession(), this._campaign);
+        this._operativeEventManager.sendView(this._campaign.getSession(), this._placement, this._campaign);
         if (this._abGroup === 5) {
             this.sendComscoreEvent('end', (this._adDuration - this._adRemainingTime) * 1000);
         }
