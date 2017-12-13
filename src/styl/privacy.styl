@@ -48,6 +48,7 @@
 
   .build-information-container {
     display: none;
+    overflow: scroll;
     text-align: left;
     word-wrap: break-word;
     font-size: .75rem;
@@ -68,6 +69,17 @@
       display: none;
     }
   }
+}
 
+body.portrait {
+  #privacy .build-information-container {
+    max-height: 20rem;
+  }
+}
+
+body.landscape {
+  #privacy .build-information-container {
+    max-height: 11rem;
+  }
 }
 
