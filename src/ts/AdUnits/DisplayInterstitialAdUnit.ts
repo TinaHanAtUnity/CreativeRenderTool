@@ -33,27 +33,30 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
         this._campaign = parameters.campaign;
         this._placement = parameters.placement;
 
-        this._view.render();
-        document.body.appendChild(this._view.container());
-
         this._options = parameters.options;
         this.setShowing(false);
     }
 
     public show(): Promise<void> {
         this.setShowing(true);
-        this._view.show();
         this.onStart.trigger();
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
         this.sendStartEvents();
 
-        this._onShowObserver = this._container.onShow.subscribe(() => this.onShow());
-        this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
+        return this._view.render().then(() => {
+            document.body.appendChild(this._view.container());
+            this._view.show();
 
-        // Display ads are always completed.
-        this.setFinishState(FinishState.COMPLETED);
+            this._onShowObserver = this._container.onShow.subscribe(() => this.onShow());
+            this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
 
-        return this._container.open(this, false, false, this._forceOrientation, true, false, true, false, this._options);
+            // Display ads are always completed.
+            this.setFinishState(FinishState.COMPLETED);
+            return this._container.open(this, false, false, this._forceOrientation, true, false, true, false, this._options);
+        }).catch((e) => {
+            this.hide();
+            // TODO: Trigger Diagnostic error for above
+        });
     }
 
     public hide(): Promise<void> {

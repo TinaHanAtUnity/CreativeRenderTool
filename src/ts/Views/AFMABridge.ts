@@ -1,5 +1,5 @@
-import { ForceOrientation } from "AdUnits/Containers/AdUnitContainer";
-import { NativeBridge } from "Native/NativeBridge";
+import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { NativeBridge } from 'Native/NativeBridge';
 
 export enum AFMAEvents {
     OPEN_URL                = 'openUrl',

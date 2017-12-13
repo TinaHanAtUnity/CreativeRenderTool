@@ -79,7 +79,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         ];
     }
 
-    public render() {
+    public render(): void {
         super.render();
 
         this._closeElement = <HTMLElement>this._container.querySelector('.close-region');

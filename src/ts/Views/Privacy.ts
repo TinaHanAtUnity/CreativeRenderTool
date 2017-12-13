@@ -5,8 +5,8 @@ import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
 
 import { ClientInfo } from 'Models/ClientInfo';
-import { Campaign } from "Models/Campaign";
-import { Platform } from "Constants/Platform";
+import { Campaign } from 'Models/Campaign';
+import { Platform } from 'Constants/Platform';
 
 export interface IPrivacyHandler {
     onPrivacy(url: string): void;
