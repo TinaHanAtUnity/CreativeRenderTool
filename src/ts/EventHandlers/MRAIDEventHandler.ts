@@ -14,6 +14,7 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { RequestError } from 'Errors/RequestError';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { FinishState } from 'Constants/FinishState';
+import { Placement } from 'Models/Placement';
 
 export class MRAIDEventHandler implements IMRAIDViewHandler {
 
@@ -25,6 +26,7 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
     private _deviceInfo: DeviceInfo;
     private _campaign: MRAIDCampaign;
     private _request: Request;
+    private _placement: Placement;
 
     constructor(nativeBridge: NativeBridge, adUnit: MRAIDAdUnit, parameters: IMRAIDAdUnitParameters) {
         this._nativeBridge = nativeBridge;
@@ -33,20 +35,21 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
         this._adUnit = adUnit;
         this._clientInfo = parameters.clientInfo;
         this._deviceInfo = parameters.deviceInfo;
-        this._campaign = <MRAIDCampaign>parameters.campaign;
+        this._campaign = parameters.campaign;
+        this._placement = parameters.placement;
         this._request = parameters.request;
     }
 
     public onMraidClick(url: string): Promise<void> {
-        this._nativeBridge.Listener.sendClickEvent(this._adUnit.getPlacement().getId());
-        if(!this._adUnit.getCampaign().getSession().getEventSent(EventType.THIRD_QUARTILE)) {
-            this._operativeEventManager.sendThirdQuartile(this._adUnit);
+        this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
+        if(!this._campaign.getSession().getEventSent(EventType.THIRD_QUARTILE)) {
+            this._operativeEventManager.sendThirdQuartile(this._campaign.getSession(), this._campaign);
         }
-        if(!this._adUnit.getCampaign().getSession().getEventSent(EventType.VIEW)) {
-            this._operativeEventManager.sendView(this._adUnit);
+        if(!this._campaign.getSession().getEventSent(EventType.VIEW)) {
+            this._operativeEventManager.sendView(this._campaign.getSession(), this._campaign);
         }
-        if(!this._adUnit.getCampaign().getSession().getEventSent(EventType.CLICK)) {
-            this._operativeEventManager.sendClick(this._adUnit);
+        if(!this._campaign.getSession().getEventSent(EventType.CLICK)) {
+            this._operativeEventManager.sendClick(this._campaign.getSession(), this._campaign);
         }
 
         this._adUnit.sendClick();
@@ -67,7 +70,7 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
     }
 
     public onMraidReward(): void {
-        this._operativeEventManager.sendThirdQuartile(this._adUnit);
+        this._operativeEventManager.sendThirdQuartile(this._campaign.getSession(), this._campaign);
     }
 
     public onMraidSkip(): void {

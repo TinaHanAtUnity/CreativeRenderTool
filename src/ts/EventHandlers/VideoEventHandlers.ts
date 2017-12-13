@@ -13,10 +13,13 @@ import { VideoInfo } from 'Utilities/VideoInfo';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
+import { Campaign } from 'Models/Campaign';
+import { Placement } from 'Models/Placement';
+import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 
 export class VideoEventHandlers {
 
-    public static onVideoPrepared(nativeBridge: NativeBridge, adUnit: VideoAdUnit, duration: number): void {
+    public static onVideoPrepared(nativeBridge: NativeBridge, adUnit: VideoAdUnit, duration: number, campaign: Campaign): void {
         if(adUnit.getVideo().getErrorStatus() || !adUnit.isPrepareCalled()) {
             // there can be a small race condition window with prepare timeout and canceling video prepare
             return;
@@ -27,7 +30,6 @@ export class VideoEventHandlers {
         adUnit.setVideoReady(true);
 
         if(duration > 40000) {
-            const campaign = adUnit.getCampaign();
             const url = adUnit.getVideo().getUrl();
             const originalUrl = adUnit.getVideo().getOriginalUrl();
             const error: DiagnosticError = new DiagnosticError(new Error('Too long video'), {
@@ -83,22 +85,24 @@ export class VideoEventHandlers {
         });
     }
 
-    public static onVideoProgress(nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, comScoreTrackingService: ComScoreTrackingService, adUnit: VideoAdUnit, position: number, configuration: Configuration): void {
+    public static onVideoProgress(nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, comScoreTrackingService: ComScoreTrackingService, adUnit: VideoAdUnit, position: number, configuration: Configuration, campaign: Campaign, placement: Placement): void {
         adUnit.getContainer().addDiagnosticsEvent({type: 'onVideoProgress', position: position});
         const overlay = adUnit.getOverlay();
 
         if(position > 0 && !adUnit.getVideo().hasStarted()) {
             const comScoreDuration = (adUnit.getVideo().getDuration()).toString(10);
-            const sessionId = adUnit.getCampaign().getSession().getId();
-            const creativeId = adUnit.getCampaign().getCreativeId();
-            const category = adUnit.getCampaign().getCategory();
-            const subCategory = adUnit.getCampaign().getSubCategory();
-            const abGroup = adUnit.getCampaign().getAbGroup();
+            const sessionId = campaign.getSession().getId();
+            const creativeId = campaign.getCreativeId();
+            const category = campaign.getCategory();
+            const subCategory = campaign.getSubCategory();
+            const abGroup = campaign.getAbGroup();
 
             adUnit.getContainer().addDiagnosticsEvent({type: 'videoStarted'});
             adUnit.getVideo().setStarted(true);
 
-            operativeEventManager.sendStart(adUnit);
+            operativeEventManager.sendStart(campaign.getSession(), campaign, this.getVideoOrientation(adUnit)).then(() => {
+                adUnit.onStartProcessed.trigger();
+            });
             if (abGroup === 5) {
                 comScoreTrackingService.sendEvent('play', sessionId, comScoreDuration, position, creativeId, category, subCategory);
             }
@@ -107,12 +111,12 @@ export class VideoEventHandlers {
                 overlay.setSpinnerEnabled(false);
             }
 
-            nativeBridge.Listener.sendStartEvent(adUnit.getPlacement().getId());
+            nativeBridge.Listener.sendStartEvent(placement.getId());
         }
 
-        if(adUnit.getCampaign().getSession() && adUnit instanceof VastAdUnit) {
+        if(campaign.getSession() && adUnit instanceof VastAdUnit) {
             (<VastAdUnit>adUnit).sendProgressEvents(
-                adUnit.getCampaign().getSession().getId(),
+                campaign.getSession().getId(),
                 operativeEventManager.getClientInfo().getSdkVersion(),
                 position,
                 adUnit.getVideo().getPosition());
@@ -132,7 +136,7 @@ export class VideoEventHandlers {
                     lastPosition: lastPosition,
                     duration: adUnit.getVideo().getDuration()
                 });
-                Diagnostics.trigger('video_player_too_large_progress', error, adUnit.getCampaign().getSession());
+                Diagnostics.trigger('video_player_too_large_progress', error, campaign.getSession());
 
                 return;
             }
@@ -178,12 +182,12 @@ export class VideoEventHandlers {
                                 return error;
                             }
                         }).then((videoError) => {
-                            this.handleVideoError(nativeBridge, adUnit, 'video_player_stuck', videoError);
+                            this.handleVideoError(nativeBridge, adUnit, campaign, 'video_player_stuck', videoError);
                         }).catch(() => {
-                            this.handleVideoError(nativeBridge, adUnit, 'video_player_stuck', error);
+                            this.handleVideoError(nativeBridge, adUnit, campaign, 'video_player_stuck', error);
                         });
                     } else {
-                        this.handleVideoError(nativeBridge, adUnit, 'video_player_stuck', error);
+                        this.handleVideoError(nativeBridge, adUnit, campaign, 'video_player_stuck', error);
                     }
 
                     return;
@@ -206,11 +210,11 @@ export class VideoEventHandlers {
             adUnit.getVideo().setPosition(position);
 
             if(previousQuartile === 0 && adUnit.getVideo().getQuartile() === 1) {
-                operativeEventManager.sendFirstQuartile(adUnit);
+                operativeEventManager.sendFirstQuartile(campaign.getSession(), campaign, this.getVideoOrientation(adUnit));
             } else if(previousQuartile === 1 && adUnit.getVideo().getQuartile() === 2) {
-                operativeEventManager.sendMidpoint(adUnit);
+                operativeEventManager.sendMidpoint(campaign.getSession(), campaign, this.getVideoOrientation(adUnit));
             } else if(previousQuartile === 2 && adUnit.getVideo().getQuartile() === 3) {
-                operativeEventManager.sendThirdQuartile(adUnit);
+                operativeEventManager.sendThirdQuartile(campaign.getSession(), campaign, this.getVideoOrientation(adUnit));
             }
         }
 
@@ -224,19 +228,19 @@ export class VideoEventHandlers {
         nativeBridge.VideoPlayer.setProgressEventInterval(adUnit.getProgressInterval());
     }
 
-    public static onVideoCompleted(operativeEventManager: OperativeEventManager, comScoreTrackingService: ComScoreTrackingService, adUnit: VideoAdUnit): void {
+    public static onVideoCompleted(operativeEventManager: OperativeEventManager, comScoreTrackingService: ComScoreTrackingService, adUnit: VideoAdUnit, campaign: Campaign): void {
         const comScorePlayedTime = adUnit.getVideo().getPosition();
         const comScoreDuration = (adUnit.getVideo().getDuration()).toString(10);
-        const sessionId = adUnit.getCampaign().getSession().getId();
-        const creativeId = adUnit.getCampaign().getCreativeId();
-        const category = adUnit.getCampaign().getCategory();
-        const subCategory = adUnit.getCampaign().getSubCategory();
-        const abGroup = adUnit.getCampaign().getAbGroup();
+        const sessionId = campaign.getSession().getId();
+        const creativeId = campaign.getCreativeId();
+        const category = campaign.getCategory();
+        const subCategory = campaign.getSubCategory();
+        const abGroup = campaign.getAbGroup();
 
         adUnit.getContainer().addDiagnosticsEvent({type: 'onVideoCompleted'});
         adUnit.setActive(false);
         adUnit.setFinishState(FinishState.COMPLETED);
-        operativeEventManager.sendView(adUnit);
+        operativeEventManager.sendView(campaign.getSession(), campaign, this.getVideoOrientation(adUnit));
         if (abGroup === 5) {
             comScoreTrackingService.sendEvent('end', sessionId, comScoreDuration, comScorePlayedTime, creativeId, category, subCategory);
         }
@@ -244,11 +248,11 @@ export class VideoEventHandlers {
         this.afterVideoCompleted(adUnit);
     }
 
-    public static onAndroidGenericVideoError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, what: number, extra: number, url: string) {
+    public static onAndroidGenericVideoError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, campaign: Campaign, what: number, extra: number, url: string) {
         videoAdUnit.getContainer().addDiagnosticsEvent({type: 'onAndroidGenericVideoError', what: what, extra: extra});
         nativeBridge.Sdk.logError('Unity Ads video player error ' + ' ' + what + ' ' + extra + ' ' + url);
 
-        this.handleVideoError(nativeBridge, videoAdUnit, 'video_player_generic_error', {
+        this.handleVideoError(nativeBridge, videoAdUnit, campaign, 'video_player_generic_error', {
             'url': url,
             'position': videoAdUnit.getVideo().getPosition(),
             'what': what,
@@ -256,62 +260,62 @@ export class VideoEventHandlers {
         });
     }
 
-    public static onIosGenericVideoError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, url: string, description: string) {
+    public static onIosGenericVideoError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, campaign: Campaign, url: string, description: string) {
         videoAdUnit.getContainer().addDiagnosticsEvent({type: 'onIosGenericVideoError', description: description});
         nativeBridge.Sdk.logError('Unity Ads video player generic error '  + url + ' ' + description);
 
-        this.handleVideoError(nativeBridge, videoAdUnit, 'video_player_generic_error', {
+        this.handleVideoError(nativeBridge, videoAdUnit, campaign, 'video_player_generic_error', {
             'url': url,
             'position': videoAdUnit.getVideo().getPosition(),
             'description': description
         });
     }
 
-    public static onVideoPrepareTimeout(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, url: string): void {
+    public static onVideoPrepareTimeout(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, campaign: Campaign, url: string): void {
         videoAdUnit.getContainer().addDiagnosticsEvent({type: 'onVideoPrepareTimeout'});
         nativeBridge.Sdk.logError('Unity Ads video player prepare timeout '  + url);
 
-        this.handleVideoError(nativeBridge, videoAdUnit, 'video_player_prepare_timeout', {
+        this.handleVideoError(nativeBridge, videoAdUnit, campaign, 'video_player_prepare_timeout', {
             'url': url,
             'position': videoAdUnit.getVideo().getPosition()
         });
     }
 
-    public static onPrepareError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, url: string) {
+    public static onPrepareError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, campaign: Campaign, url: string) {
         videoAdUnit.getContainer().addDiagnosticsEvent({type: 'onPrepareError'});
         nativeBridge.Sdk.logError('Unity Ads video player prepare error '  + url);
 
-        this.handleVideoError(nativeBridge, videoAdUnit, 'video_player_prepare_error', {
+        this.handleVideoError(nativeBridge, videoAdUnit, campaign, 'video_player_prepare_error', {
             'url': url,
             'position': videoAdUnit.getVideo().getPosition()
         });
     }
 
-    public static onSeekToError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, url: string) {
+    public static onSeekToError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, campaign: Campaign, url: string) {
         videoAdUnit.getContainer().addDiagnosticsEvent({type: 'onSeekToError'});
         nativeBridge.Sdk.logError('Unity Ads video player seek to error '  + url);
 
-        this.handleVideoError(nativeBridge, videoAdUnit, 'video_player_seek_to_error', {
+        this.handleVideoError(nativeBridge, videoAdUnit, campaign, 'video_player_seek_to_error', {
             'url': url,
             'position': videoAdUnit.getVideo().getPosition()
         });
     }
 
-    public static onPauseError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, url: string) {
+    public static onPauseError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, campaign: Campaign, url: string) {
         videoAdUnit.getContainer().addDiagnosticsEvent({type: 'onPauseError'});
         nativeBridge.Sdk.logError('Unity Ads video player pause error '  + url);
 
-        this.handleVideoError(nativeBridge, videoAdUnit, 'video_player_pause_error', {
+        this.handleVideoError(nativeBridge, videoAdUnit, campaign, 'video_player_pause_error', {
             'url': url,
             'position': videoAdUnit.getVideo().getPosition()
         });
     }
 
-    public static onIllegalStateError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit) {
+    public static onIllegalStateError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, campaign: Campaign) {
         videoAdUnit.getContainer().addDiagnosticsEvent({type: 'onIllegalStateError'});
         nativeBridge.Sdk.logError('Unity Ads video player illegal state error');
 
-        this.handleVideoError(nativeBridge, videoAdUnit, 'video_player_illegal_state_error', {
+        this.handleVideoError(nativeBridge, videoAdUnit, campaign, 'video_player_illegal_state_error', {
             'position': videoAdUnit.getVideo().getPosition()
         });
     }
@@ -339,12 +343,12 @@ export class VideoEventHandlers {
         videoAdUnit.getContainer().reconfigure(ViewConfiguration.ENDSCREEN);
     }
 
-    private static handleVideoError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, errorType?: string, errorData?: any) {
+    private static handleVideoError(nativeBridge: NativeBridge, videoAdUnit: VideoAdUnit, campaign: Campaign, errorType?: string, errorData?: any) {
         if(!videoAdUnit.getVideo().getErrorStatus()) {
             videoAdUnit.getVideo().setErrorStatus(true);
 
             if(errorType && errorData) {
-                Diagnostics.trigger(errorType, errorData, videoAdUnit.getCampaign().getSession());
+                Diagnostics.trigger(errorType, errorData, campaign.getSession());
             }
 
             videoAdUnit.setActive(false);
@@ -367,5 +371,13 @@ export class VideoEventHandlers {
                 nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.VIDEO_PLAYER_ERROR], 'Video player error');
             }
         }
+    }
+
+    private static getVideoOrientation(adUnit: VideoAdUnit): string | undefined {
+        if(adUnit instanceof PerformanceAdUnit) {
+            return adUnit.getVideoOrientation();
+        }
+
+        return undefined;
     }
 }

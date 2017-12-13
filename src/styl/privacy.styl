@@ -18,7 +18,8 @@
   }
 
   .privacy-text,
-  .privacy-simple-text {
+  .privacy-simple-text,
+  .build-information-container {
     color: $black;
     text-align: justify;
     font-size: 12px;
@@ -35,4 +36,50 @@
     font-size: 18px;
     line-height: 20px;
   }
+
+  .build-information-link {
+    margin-top: 20px;
+    background: $white;
+    color: $blue;
+    text-align: center;
+    text-decoration: underline;
+    font-size: 12px;
+  }
+
+  .build-information-container {
+    display: none;
+    overflow: scroll;
+    text-align: left;
+    word-wrap: break-word;
+    font-size: .75rem;
+    line-height: 1rem;
+  }
+
+  &.show-build-information {
+    .build-information-container {
+      display: block;
+
+      .build-information-key {
+        font-weight: 800;
+      }
+    }
+
+    .pop-up .privacy-text,
+    .pop-up .privacy-simple-text {
+      display: none;
+    }
+  }
 }
+
+body.portrait {
+  #privacy .build-information-container {
+    max-height: 20rem;
+  }
+}
+
+body.landscape {
+  #privacy .build-information-container {
+    max-height: 11rem;
+  }
+}
+
