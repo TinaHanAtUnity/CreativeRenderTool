@@ -52,10 +52,14 @@ import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { InterstitialOverlay } from 'Views/InterstitialOverlay';
 import { AbstractOverlay } from 'Views/AbstractOverlay';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { Privacy } from 'Views/Privacy';
 
 export class AdUnitFactory {
 
     public static createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractAdUnit {
+
+        Privacy.createBuildInformation(parameters.clientInfo, parameters.campaign, nativeBridge);
+
         // todo: select ad unit based on placement
         if (parameters.campaign instanceof VastCampaign) {
             return this.createVastAdUnit(nativeBridge, <IAdUnitParameters<VastCampaign>>parameters);
