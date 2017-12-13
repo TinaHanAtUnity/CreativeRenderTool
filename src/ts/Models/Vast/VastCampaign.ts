@@ -27,17 +27,17 @@ export class VastCampaign extends Campaign<IVastCampaign> {
         const portraitUrl = vast.getCompanionPortraitUrl();
         let portraitAsset;
         if(portraitUrl) {
-            portraitAsset = new Image(portraitUrl);
+            portraitAsset = new Image(portraitUrl, session);
         }
 
         const landscapeUrl = vast.getCompanionLandscapeUrl();
         let landscapeAsset;
         if(landscapeUrl) {
-            landscapeAsset = new Image(landscapeUrl);
+            landscapeAsset = new Image(landscapeUrl, session);
         }
 
         this.set('vast', vast);
-        this.set('video', new Video(vast.getVideoUrl()));
+        this.set('video', new Video(vast.getVideoUrl(), session));
         this.set('hasEndscreen', !!vast.getCompanionPortraitUrl() || !!vast.getCompanionLandscapeUrl());
         this.set('portrait', portraitAsset);
         this.set('landscape', landscapeAsset);
@@ -68,7 +68,7 @@ export class VastCampaign extends Campaign<IVastCampaign> {
 
     public getVideo() {
         if(!this.get('video')) {
-            this.set('video', new Video(this.get('vast').getVideoUrl()));
+            this.set('video', new Video(this.get('vast').getVideoUrl(), this.getSession()));
         }
         return this.get('video');
     }

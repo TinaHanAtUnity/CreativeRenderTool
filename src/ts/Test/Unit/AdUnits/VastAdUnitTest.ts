@@ -182,7 +182,7 @@ describe('VastAdUnit', () => {
 
         beforeEach(() => {
             vast = new Vast([], []);
-            const video = new Video('');
+            const video = new Video('', TestFixtures.getSession());
             sinon.stub(vast, 'getVideoUrl').returns(video.getUrl());
             vastCampaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 12);
             sinon.stub(vastCampaign, 'getVideo').returns(video);
@@ -281,7 +281,7 @@ describe('VastAdUnit', () => {
 
         beforeEach(() => {
             vast = new Vast([], []);
-            const video = new Video('');
+            const video = new Video('', TestFixtures.getSession());
             sinon.stub(vast, 'getVideoUrl').returns(video.getUrl());
             vastCampaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 12);
             sinon.stub(vastCampaign, 'getVideo').returns(video);
