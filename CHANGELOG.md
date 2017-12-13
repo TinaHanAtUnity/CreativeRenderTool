@@ -1,4 +1,25 @@
-# Pending
+# Wed Dec 13 21:24:50 UTC 2017
+
+* Refactor/cleanup ad unit model abuse
+* No fill retrying for production
+* Show build info in privacy pop up on end screen
+* Show playable end screen on Roll the Ball campaign
+* Add URL parser & parse APK redirect location correctly
+* Adjust video overlay safety margins in landscape mode
+* Sample SdkStats with game session ID
+
+# Tue Dec 12 19:04:39 UTC 2017
+
+* Initial support for AdMob ad units
+
+# Tue Dec 12 11:07:50 UTC 2017
+
+* Do not use video duration reported in vast xml and use the REAL video duration
+* New dark end screen AB test in groups 8 & 9
+* Add info button and privacy pop-up to MRAID overlay
+* Add isAppForeground to FocusManager
+
+# Thu Dec  7 10:05:11 UTC 2017
 
 * Change comscore ABGroup to check campaign ABGroup
 * Fix bugs in orientation detection
@@ -133,7 +154,7 @@
 
 # Mon Oct 16 20:19:29 UTC 2017
 
-* Adds ad response to all diagnostic messages
+* Adds ad response to all diagnostic messages.
 
 # Thu Oct 12 20:04:06 UTC 2017
 

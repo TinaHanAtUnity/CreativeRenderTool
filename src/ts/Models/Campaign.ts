@@ -19,6 +19,7 @@ export interface ICampaign {
     advertiserDomain: string | undefined;
     advertiserCampaignId: string | undefined;
     advertiserBundleId: string | undefined;
+    useWebViewUserAgentForTracking: boolean | undefined;
     buyerId: string | undefined;
     session: Session;
 }
@@ -39,6 +40,7 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         advertiserDomain: ['string', 'undefined'],
         advertiserCampaignId: ['string', 'undefined'],
         advertiserBundleId: ['string', 'undefined'],
+        useWebViewUserAgentForTracking: ['boolean', 'undefined'],
         buyerId: ['string', 'undefined'],
         session: ['object']
     };
@@ -93,6 +95,10 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
 
     public getAdvertiserBundleId(): string | undefined {
         return this.get('advertiserBundleId');
+    }
+
+    public getUseWebViewUserAgentForTracking(): boolean | undefined {
+        return this.get('useWebViewUserAgentForTracking');
     }
 
     public getWillExpireAt(): number | undefined {

@@ -1,3 +1,4 @@
+import { JsonParser } from 'Utilities/JsonParser';
 import { Model } from 'Models/Model';
 
 export interface IAuctionResponse {
@@ -15,6 +16,7 @@ export interface IAuctionResponse {
     advertiserCampaignId: string | undefined;
     advertiserDomain: string | undefined;
     advertiserBundleId: string | undefined;
+    useWebViewUserAgentForTracking: boolean | undefined;
     buyerId: string | undefined;
 }
 
@@ -35,6 +37,7 @@ export class AuctionResponse extends Model<IAuctionResponse> {
             advertiserCampaignId: ['string', 'undefined'],
             advertiserDomain: ['string', 'undefined'],
             advertiserBundleId: ['string', 'undefined'],
+            useWebViewUserAgentForTracking: ['boolean', 'undefined'],
             buyerId: ['string', 'undefined']
         });
 
@@ -52,6 +55,7 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         this.set('advertiserCampaignId', data.campaignId);
         this.set('advertiserDomain', data.advDomain);
         this.set('advertiserBundleId', data.bundleId);
+        this.set('useWebViewUserAgentForTracking', data.useWebViewUserAgentForTracking || false);
         this.set('buyerId', data.buyerId);
     }
 
@@ -65,6 +69,10 @@ export class AuctionResponse extends Model<IAuctionResponse> {
 
     public getContent(): string {
         return this.get('content');
+    }
+
+    public getJsonContent(): any {
+        return JsonParser.parse(this.getContent());
     }
 
     public getCacheTTL(): number | undefined {
@@ -111,6 +119,10 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         return this.get('advertiserBundleId');
     }
 
+    public getUseWebViewUserAgentForTracking(): boolean | undefined {
+        return this.get('useWebViewUserAgentForTracking');
+    }
+
     public getBuyerId(): string | undefined {
         return this.get('buyerId');
     }
@@ -127,7 +139,9 @@ export class AuctionResponse extends Model<IAuctionResponse> {
             'seatId': this.getSeatId(),
             'correlationId': this.getCorrelationId(),
             'appCategory': this.getCategory(),
-            'appSubCategory': this.getSubCategory()
+            'appSubCategory': this.getSubCategory(),
+            'useWebViewUserAgentForTracking': this.getUseWebViewUserAgentForTracking(),
+            'buyerId': this.getBuyerId()
         };
     }
 }

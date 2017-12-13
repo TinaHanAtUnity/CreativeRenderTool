@@ -270,6 +270,12 @@
       "required": "ios",
       "queryString": false,
       "body": true
+    },
+    {
+      "parameter": "requestSignal",
+      "required": "all",
+      "queryString": false,
+      "body": true
     }
   ]
 }

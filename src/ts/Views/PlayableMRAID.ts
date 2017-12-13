@@ -9,6 +9,7 @@ import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
 
 export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -36,8 +37,8 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _backgroundTime: number = 0;
     private _backgroundTimestamp: number;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string) {
-        super(nativeBridge, 'playable-mraid');
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string, coppaCompliant: boolean) {
+        super(nativeBridge, 'playable-mraid', placement, campaign, coppaCompliant);
 
         this._placement = placement;
         this._campaign = campaign;
@@ -69,11 +70,16 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 event: 'click',
                 listener: (event: Event) => this.onCloseEvent(event),
                 selector: '.close-region'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onPrivacyEvent(event),
+                selector: '.privacy-button'
             }
         ];
     }
 
-    public render() {
+    public render(): void {
         super.render();
 
         this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
@@ -321,7 +327,10 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                         }
                         break;
                     case 'showEndScreen':
-                        this._handlers.forEach(handler => handler.onMraidShowEndScreen());
+                        const resourceUrl = this._campaign.getResourceUrl();
+                        if(resourceUrl && CustomFeatures.isPlayableEndScreenTest(this._campaign.getAbGroup(), resourceUrl.getOriginalUrl())) {
+                            this._handlers.forEach(handler => handler.onMraidShowEndScreen());
+                        }
                         break;
                     default:
                         break;
