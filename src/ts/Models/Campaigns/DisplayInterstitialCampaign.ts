@@ -9,7 +9,7 @@ interface IDisplayInterstitialCampaign extends ICampaign {
 }
 
 export class DisplayInterstitialCampaign extends Campaign<IDisplayInterstitialCampaign> {
-    constructor(markup: string, session: Session, gamerId: string, abGroup: number, cacheTTL: number | undefined, tracking?: { [eventName: string]: string[] }, clickThroughUrl?: string, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
+    constructor(markup: string, session: Session, gamerId: string, abGroup: number, cacheTTL: number | undefined, tracking?: { [eventName: string]: string[] }, clickThroughUrl?: string, adType?: string, creativeId?: string, seatId?: number, correlationId?: string, useWebViewUserAgentForTracking?: boolean) {
         super('DisplayInterstitialCampaign', {
             ... Campaign.Schema,
             dynamicMarkup: ['string'],
@@ -29,6 +29,7 @@ export class DisplayInterstitialCampaign extends Campaign<IDisplayInterstitialCa
         this.set('seatId', seatId || undefined);
         this.set('tracking', tracking || undefined);
         this.set('session', session);
+        this.set('useWebViewUserAgentForTracking', useWebViewUserAgentForTracking);
     }
 
     public getDynamicMarkup(): string {

@@ -23,7 +23,8 @@
         "click": [
           "http://test.complete.com/click1"
         ]
-      }
+      },
+      "useWebViewUserAgentForTracking": true
     }
   }
 }
