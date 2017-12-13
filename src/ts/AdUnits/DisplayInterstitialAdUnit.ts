@@ -208,7 +208,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
     private setWebPlayerData(data: string, mimeType: string, encoding: string, markupBaseUrl?: string): Promise<void> {
         let dataPromise: Promise<void>;
         if(markupBaseUrl) {
-            dataPromise = this._nativeBridge.WebPlayer.setDataWithUrl(markupBaseUrl, data, mimeType, encoding, markupBaseUrl);
+            dataPromise = this._nativeBridge.WebPlayer.setDataWithUrl(markupBaseUrl, data, mimeType, encoding);
         } else {
             dataPromise = this._nativeBridge.WebPlayer.setData(data, mimeType, encoding);
         }
