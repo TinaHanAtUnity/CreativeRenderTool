@@ -53,7 +53,7 @@ describe('VastEndScreenEventHandlersTest', () => {
         const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         const sessionManager = new SessionManager(nativeBridge);
         const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
-        const video = new Video('');
+        const video = new Video('', TestFixtures.getSession());
         const overlay = new Overlay(nativeBridge, true, 'en', 'testGameId');
         comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
@@ -101,7 +101,7 @@ describe('VastEndScreenEventHandlersTest', () => {
 
         beforeEach(() => {
 
-            video = new Video('');
+            video = new Video('', TestFixtures.getSession());
             campaign = new VastCampaign(vast, '12345', TestFixtures.getSession(), 'gamerId', 1);
 
             vastAdUnitParameters.video = video;
