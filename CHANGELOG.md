@@ -1,4 +1,4 @@
-# Staged
+# Wed Dec 13 21:24:50 UTC 2017
 
 * Refactor/cleanup ad unit model abuse
 * No fill retrying for production
