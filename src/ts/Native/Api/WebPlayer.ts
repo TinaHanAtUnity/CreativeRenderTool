@@ -35,6 +35,7 @@ export enum WebplayerEvent {
 export class WebPlayerApi extends NativeApi {
 
     public readonly onPageStarted = new Observable1<string>();
+    public readonly onPageFinished = new Observable1<string>();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'WebPlayer');
@@ -60,16 +61,23 @@ export class WebPlayerApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._apiClass, 'clearSettings');
     }
 
-    public setEventSettings<T>(eventSettings: object): Promise<void> {
+    public setEventSettings<T>(eventSettings: T): Promise<void> {
         this._nativeBridge.Sdk.logDebug("WebPlayerApi: setEventSettings()");
         return this._nativeBridge.invoke<void>(this._apiClass, 'setEventSettings', [eventSettings]);
     }
 
     public handleEvent(event: string, parameters: any[]): void {
-        this._nativeBridge.Sdk.logDebug("WebPlayerApi: handleEvent(" + event + ")");
         switch(event) {
             case WebplayerEvent[WebplayerEvent.PAGE_STARTED]:
                 this.onPageStarted.trigger(parameters[0]);
+                break;
+
+            case WebplayerEvent[WebplayerEvent.PAGE_FINISHED]:
+                this.onPageFinished.trigger(parameters[0]);
+                break;
+
+            case WebplayerEvent[WebplayerEvent.ERROR]:
+                this.onPageFinished.trigger(parameters[0]);
                 break;
 
             default:

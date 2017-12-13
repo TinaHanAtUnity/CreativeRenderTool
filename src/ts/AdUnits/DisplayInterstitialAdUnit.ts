@@ -27,6 +27,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
     private _options: any;
     private _deviceInfo: DeviceInfo;
     private _receivedOnPageStart: boolean = false;
+    private _clickEventHasBeenSent: boolean = false;
 
     private _onShowObserver: IObserver0;
     private _onSystemKillObserver: IObserver0;
@@ -81,7 +82,9 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
 
         this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
         return this._container.close().then( () => {
-            this.onClose.trigger();
+            return this._nativeBridge.WebPlayer.clearSettings().then( () => {
+                this.onClose.trigger();
+            });
         });
     }
 
@@ -145,7 +148,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
             this._container.setViewFrame('webview', Math.floor(webviewXPos), Math.floor(webviewYPos), Math.floor(webviewXSize), Math.floor(webviewYSize)).then(() => {
                 return this._container.setViewFrame('webplayer', Math.floor(screenWidth), Math.floor(screenHeight), Math.floor(screenWidth), Math.floor(screenHeight)).then(() => {
                     this.setWebPlayerContent();
-                })
+                });
             });
         });
     }
@@ -156,18 +159,22 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
         }
     }
 
-    private onPageStarted(): void {
-        this._nativeBridge.Sdk.logDebug("DisplayInterstitialAdUnit: onPageStarted triggered");
+    private onPageStarted(url: string): void {
+        this._nativeBridge.Sdk.logDebug("DisplayInterstitialAdUnit: onPageStarted triggered for url: " + url);
         if(!this._receivedOnPageStart) {
             this._receivedOnPageStart = true;
             return;
         }
+        if(this._clickEventHasBeenSent) {
+            return;
+        }
         this._operativeEventManager.sendClick(this);
+        this._clickEventHasBeenSent = true;
 
-        for (let url of this._campaign.getTrackingUrlsForEvent('click')) {
-            url = url.replace(/%ZONE%/, this.getPlacement().getId());
-            url = url.replace(/%SDK_VERSION%/, this._operativeEventManager.getClientInfo().getSdkVersion().toString());
-            this._thirdPartyEventManager.sendEvent('display click', this._campaign.getSession().getId(), url);
+        for (let trackingUrl of this._campaign.getTrackingUrlsForEvent('click')) {
+            trackingUrl = trackingUrl.replace(/%ZONE%/, this.getPlacement().getId());
+            trackingUrl = trackingUrl.replace(/%SDK_VERSION%/, this._operativeEventManager.getClientInfo().getSdkVersion().toString());
+            this._thirdPartyEventManager.sendEvent('display click', this._campaign.getSession().getId(), trackingUrl);
         }
     }
 
@@ -190,15 +197,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
     }
 
     private setWebPlayerUrl(url: string): Promise<void> {
-        return this._nativeBridge.WebPlayer.setUrl(url).then( () => {
-            // TODO: make generic so it works with iOS also
-            // TODO: place the magic settings in some sensible place
-            const eventSettings = {'onPageStarted': {'sendEvent':true},
-                'onPageFinished': {'sendEvent': true},
-                'onReceivedError': {'sendEvent' :true}};
-            this._nativeBridge.WebPlayer.onPageStarted.subscribe( (event) => this.onPageStarted);
-            return this._nativeBridge.WebPlayer.setEventSettings(eventSettings);
-        }).catch( (error) => {
+        return this._nativeBridge.WebPlayer.setUrl(url).catch( (error) => {
             this._nativeBridge.Sdk.logError(JSON.stringify(error));
             Diagnostics.trigger('webplayer_set_url_error', new DiagnosticError(error, { url: url}));
             this.setFinishState(FinishState.ERROR);
@@ -222,23 +221,34 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
         });
     }
 
+    private setWebplayerSettings(): Promise<void> {
+        const eventSettings = { 'onPageStarted': {'sendEvent':true} };
+        this._nativeBridge.WebPlayer.onPageStarted.subscribe( (url) => this.onPageStarted(url));
+        return this._nativeBridge.WebPlayer.setSettings({}, {}).then( () => {
+            return this._nativeBridge.WebPlayer.setEventSettings(eventSettings);
+        });
+    }
+
     private setWebPlayerContent(): Promise<void> {
         const markupUrl = this._campaign.getMarkupUrl();
         const markupBaseUrl = this._campaign.getMarkupBaseUrl();
-        if (markupUrl) {
-            return this.setWebPlayerUrl(markupUrl);
-        }
-        const markup = this._campaign.getDynamicMarkup();
-        if (markup) {
-            if(markupBaseUrl){
-                return this.setWebPlayerData(markup, 'text/html', 'UTF-8', markupBaseUrl);
+
+        return this.setWebplayerSettings().then( () => {
+            if (markupUrl) {
+                return this.setWebPlayerUrl(markupUrl);
             }
-            return this.setWebPlayerData(markup, 'text/html', 'UTF-8');
-        }
-        this._nativeBridge.Sdk.logError("Display Interstitial: Neither markupUrl or Markup was defined in campaign");
-        Diagnostics.trigger('display_interstitial_campaign_error', {markupUrl: markupUrl, markup: markup});
-        this.setFinishState(FinishState.ERROR);
-        this.hide();
-        return Promise.reject(new Error("Display Interstitial: Neither markupUrl or Markup was defined in campaign"));
+            const markup = this._campaign.getDynamicMarkup();
+            if (markup) {
+                if(markupBaseUrl){
+                    return this.setWebPlayerData(markup, 'text/html', 'UTF-8', markupBaseUrl);
+                }
+                return this.setWebPlayerData(markup, 'text/html', 'UTF-8');
+            }
+            this._nativeBridge.Sdk.logError("Display Interstitial: Neither markupUrl or Markup was defined in campaign");
+            Diagnostics.trigger('display_interstitial_campaign_error', {markupUrl: markupUrl, markup: markup});
+            this.setFinishState(FinishState.ERROR);
+            this.hide();
+            return Promise.reject(new Error("Display Interstitial: Neither markupUrl or Markup was defined in campaign"));
+        });
     }
 }

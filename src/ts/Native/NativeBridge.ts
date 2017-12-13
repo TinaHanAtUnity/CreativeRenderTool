@@ -222,6 +222,10 @@ export class NativeBridge implements INativeBridge {
                 }
                 break;
 
+            case EventCategory[EventCategory.WEBPLAYER]:
+                this.WebPlayer.handleEvent(event, parameters);
+                break;
+
             default:
                 throw new Error('Unknown event category: ' + category);
         }
