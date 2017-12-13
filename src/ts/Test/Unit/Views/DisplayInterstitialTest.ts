@@ -4,7 +4,7 @@ import { assert } from 'chai';
 import { DisplayInterstitial } from 'Views/DisplayInterstitial';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Placement } from 'Models/Placement';
-import { DisplayInterstitialCampaign, IDisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
+import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 
 import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
 import { Platform } from 'Constants/Platform';
@@ -16,7 +16,7 @@ describe('DisplayInterstitial View', () => {
     let view: DisplayInterstitial;
     let nativeBridge: NativeBridge;
     let placement: Placement;
-    let campaign: DisplayInterstitialCampaign<IDisplayInterstitialCampaign>;
+    let campaign: DisplayInterstitialCampaign;
     let sandbox: sinon.SinonSandbox;
 
     describe('on Display Interstitial Markup Campaign',() => {

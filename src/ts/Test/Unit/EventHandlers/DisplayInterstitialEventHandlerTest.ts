@@ -1,10 +1,10 @@
 import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
-import { DisplayInterstitial } from "Views/DisplayInterstitial";
-import { NativeBridge } from "Native/NativeBridge";
-import { Placement } from "Models/Placement";
-import { DisplayInterstitialCampaign, IDisplayInterstitialCampaign } from "Models/Campaigns/DisplayInterstitialCampaign";
+import { DisplayInterstitial } from 'Views/DisplayInterstitial';
+import { NativeBridge } from 'Native/NativeBridge';
+import { Placement } from 'Models/Placement';
+import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 
 import { Platform } from 'Constants/Platform';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
@@ -23,7 +23,7 @@ describe('DisplayInterstitialEventHandler', () => {
     let view: DisplayInterstitial;
     let nativeBridge: NativeBridge;
     let placement: Placement;
-    let campaign: DisplayInterstitialCampaign<IDisplayInterstitialCampaign>;
+    let campaign: DisplayInterstitialCampaign;
     let sandbox: sinon.SinonSandbox;
     let displayInterstitialAdUnitParameters: IDisplayInterstitialAdUnitParameters;
     let displayInterstitialAdUnit: DisplayInterstitialAdUnit;

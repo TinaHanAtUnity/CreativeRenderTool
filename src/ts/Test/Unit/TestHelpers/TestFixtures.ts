@@ -10,7 +10,7 @@ import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Configuration } from 'Models/Configuration';
 import { ICacheDiagnostics } from 'Utilities/Cache';
-import { DisplayInterstitialCampaign, IDisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
+import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { DisplayInterstitialMarkupCampaign } from 'Models/Campaigns/DisplayInterstitialMarkupCampaign';
 import { DisplayInterstitialMarkupUrlCampaign } from 'Models/Campaigns/DisplayInterstitialMarkupUrlCampaign';
 import { Session } from 'Models/Session';
@@ -28,14 +28,14 @@ import VastCompanionXml from 'xml/VastCompanionAd.xml';
 import EventTestVast from 'xml/EventTestVast.xml';
 
 export class TestFixtures {
-    public static getDisplayInterstitialCampaign(isStaticInterstitialUrlCampaign: boolean): DisplayInterstitialCampaign<IDisplayInterstitialCampaign> {
+    public static getDisplayInterstitialCampaign(isStaticInterstitialUrlCampaign: boolean): DisplayInterstitialCampaign {
         if (isStaticInterstitialUrlCampaign) {
             return this.getDisplayInterstitialMarkupUrlCampaign();
         }
         return this.getDisplayInterstitialMarkupCampaign();
     }
 
-    public static getBadMarkupUrlAd(): DisplayInterstitialCampaign<IDisplayInterstitialCampaign> {
+    public static getBadMarkupUrlAd(): DisplayInterstitialCampaign {
         return new DisplayInterstitialMarkupUrlCampaign('https://wisesm0.github.io/', this.getSession(), 'bad', 0, undefined);
     }
 

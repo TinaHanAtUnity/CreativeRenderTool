@@ -8,14 +8,14 @@ export interface IDisplayInterstitialCampaign extends ICampaign {
     tracking: object | undefined;
 }
 
-export abstract class DisplayInterstitialCampaign<V extends IDisplayInterstitialCampaign> extends Campaign<V> {
+export abstract class DisplayInterstitialCampaign<T extends IDisplayInterstitialCampaign = IDisplayInterstitialCampaign> extends Campaign<T> {
     public static Schema: ISchema<IDisplayInterstitialCampaign> = {
         ... Campaign.Schema,
         clickThroughUrl: ['string', 'undefined'],
         tracking: ['object', 'undefined']
     };
 
-    constructor(classname: string, schema: ISchema<V>, session: Session, gamerId: string, abGroup: number, cacheTTL: number | undefined, tracking?: { [eventName: string]: string[] }, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
+    constructor(classname: string, schema: ISchema<T>, session: Session, gamerId: string, abGroup: number, cacheTTL: number | undefined, tracking?: { [eventName: string]: string[] }, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
         super(classname, schema);
         if(cacheTTL) {
             this.set('willExpireAt', Date.now() + cacheTTL * 1000);

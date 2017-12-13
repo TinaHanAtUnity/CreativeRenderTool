@@ -28,7 +28,7 @@ import { FinishState } from 'Constants/FinishState';
 import { FocusManager } from 'Managers/FocusManager';
 
 import { DisplayInterstitialAdUnit } from 'AdUnits/DisplayInterstitialAdUnit';
-import { DisplayInterstitialCampaign, IDisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
+import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
@@ -226,7 +226,7 @@ describe('AdUnitFactoryTest', () => {
 
     const displayUnitTests = (isStaticInterstitialUrlCampaign: boolean): void => {
         let adUnit: DisplayInterstitialAdUnit;
-        let campaign: DisplayInterstitialCampaign<IDisplayInterstitialCampaign>;
+        let campaign: DisplayInterstitialCampaign;
         let server: sinon.SinonFakeServer;
 
         beforeEach(() => {
