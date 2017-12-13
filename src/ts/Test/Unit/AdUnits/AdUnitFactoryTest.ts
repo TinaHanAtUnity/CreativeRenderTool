@@ -35,6 +35,7 @@ import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { Campaign } from 'Models/Campaign';
 
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
+import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 
 describe('AdUnitFactoryTest', () => {

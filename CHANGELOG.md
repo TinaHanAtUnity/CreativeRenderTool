@@ -1,3 +1,7 @@
+# Tue Dec 12 19:04:39 UTC 2017
+
+* Initial support for AdMob ad units
+
 # Tue Dec 12 11:07:50 UTC 2017
 
 * Do not use video duration reported in vast xml and use the REAL video duration
@@ -140,7 +144,7 @@
 
 # Mon Oct 16 20:19:29 UTC 2017
 
-* Adds ad response to all diagnostic messages
+* Adds ad response to all diagnostic messages.
 
 # Thu Oct 12 20:04:06 UTC 2017
 

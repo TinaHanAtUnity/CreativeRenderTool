@@ -36,6 +36,7 @@ import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { AndroidDeviceInfoApi, IPackageInfo } from 'Native/Api/AndroidDeviceInfo';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
+import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 
 class TestStorageApi extends StorageApi {
     public get<T>(storageType: StorageType, key: string): Promise<T> {
@@ -202,41 +203,6 @@ class TestHelper {
         const sessionManager: SessionManager = new SessionManager(nativeBridge);
         return sessionManager;
     }
-
-    public static getAdUnit(nativeBridge: NativeBridge, operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, request: Request): AbstractAdUnit {
-        const config: Configuration = TestFixtures.getConfiguration();
-        let deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
-        let clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-
-        let container: AdUnitContainer;
-        const focusManager = new FocusManager(nativeBridge);
-        if(nativeBridge.getPlatform() === Platform.IOS) {
-            deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
-            clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-            container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS), focusManager);
-        } else {
-            container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
-        }
-        const comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
-
-        const parameters: IAdUnitParameters<PerformanceCampaign> = {
-            forceOrientation: ForceOrientation.LANDSCAPE,
-            focusManager: focusManager,
-            container: container,
-            deviceInfo: deviceInfo,
-            clientInfo: clientInfo,
-            thirdPartyEventManager: thirdPartyEventManager,
-            operativeEventManager: operativeEventManager,
-            comScoreTrackingService: comScoreService,
-            placement: TestFixtures.getPlacement(),
-            campaign: TestFixtures.getCampaign(),
-            configuration: config,
-            request: request,
-            options: {},
-        };
-
-        return AdUnitFactory.createAdUnit(nativeBridge, parameters);
-    }
 }
 
 describe('Event parameters should match specifications', () => {
@@ -287,10 +253,11 @@ describe('Event parameters should match specifications', () => {
             const deviceInfo: DeviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
             const sessionManager = new SessionManager(nativeBridge);
+            const adMobSignalFactory = new AdMobSignalFactory(nativeBridge, clientInfo, deviceInfo, focusManager);
             sinon.stub(nativeBridge.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));
             sinon.stub(sessionManager, 'startNewSession').returns(Promise.resolve(new Session('abdce-12345')));
             sessionManager.setGameSessionId(1234);
-            const campaignManager: CampaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
+            const campaignManager: CampaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager);
             return campaignManager.request().then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];
@@ -311,10 +278,11 @@ describe('Event parameters should match specifications', () => {
             const deviceInfo: DeviceInfo = TestFixtures.getDeviceInfo(Platform.IOS);
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
             const sessionManager = new SessionManager(nativeBridge);
+            const adMobSignalFactory = new AdMobSignalFactory(nativeBridge, clientInfo, deviceInfo, focusManager);
             sinon.stub(nativeBridge.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));
             sinon.stub(sessionManager, 'startNewSession').returns(Promise.resolve(new Session('abdce-12345')));
             sessionManager.setGameSessionId(1234);
-            const campaignManager: CampaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
+            const campaignManager: CampaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager);
             return campaignManager.request().then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];
@@ -337,9 +305,8 @@ describe('Event parameters should match specifications', () => {
             const deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
             sessionManager.setGameSessionId(1234);
             const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
-            const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-            const adUnit: AbstractAdUnit = TestHelper.getAdUnit(nativeBridge, operativeEventManager, thirdPartyEventManager, request);
-            return operativeEventManager.sendClick(adUnit).then(() => {
+            const campaign: PerformanceCampaign = TestFixtures.getCampaign();
+            return operativeEventManager.sendClick(campaign.getSession(), campaign).then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];
 
@@ -359,9 +326,8 @@ describe('Event parameters should match specifications', () => {
             const deviceInfo = TestFixtures.getDeviceInfo(Platform.IOS);
             sessionManager.setGameSessionId(1234);
             const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
-            const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-            const adUnit: AbstractAdUnit = TestHelper.getAdUnit(nativeBridge, operativeEventManager, thirdPartyEventManager, request);
-            return operativeEventManager.sendClick(adUnit).then(() => {
+            const campaign: PerformanceCampaign = TestFixtures.getCampaign();
+            return operativeEventManager.sendClick(campaign.getSession(), campaign).then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];
 
@@ -376,8 +342,8 @@ describe('Event parameters should match specifications', () => {
         let request: Request;
         let requestSpy: any;
         let sessionManager: SessionManager;
-        let adUnit: AbstractAdUnit;
         let operativeEventManager: OperativeEventManager;
+        let campaign: PerformanceCampaign;
 
         describe('on Android', () => {
             beforeEach(() => {
@@ -391,12 +357,11 @@ describe('Event parameters should match specifications', () => {
                 const deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
                 sessionManager.setGameSessionId(1234);
                 operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
-                const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-                adUnit = TestHelper.getAdUnit(nativeBridge, operativeEventManager, thirdPartyEventManager, request);
+                campaign = TestFixtures.getCampaign();
             });
 
             it('with start event', () => {
-                return operativeEventManager.sendStart(adUnit).then(() => {
+                return operativeEventManager.sendStart(campaign.getSession(), campaign).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -406,7 +371,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with first quartile event', () => {
-                return operativeEventManager.sendFirstQuartile(adUnit).then(() => {
+                return operativeEventManager.sendFirstQuartile(campaign.getSession(), campaign).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -416,7 +381,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with midpoint event', () => {
-                return operativeEventManager.sendMidpoint(adUnit).then(() => {
+                return operativeEventManager.sendMidpoint(campaign.getSession(), campaign).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -426,7 +391,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with third quartile event', () => {
-                return operativeEventManager.sendThirdQuartile(adUnit).then(() => {
+                return operativeEventManager.sendThirdQuartile(campaign.getSession(), campaign).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -436,7 +401,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with end event', () => {
-                return operativeEventManager.sendView(adUnit).then(() => {
+                return operativeEventManager.sendView(campaign.getSession(), campaign).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -458,12 +423,11 @@ describe('Event parameters should match specifications', () => {
                 const deviceInfo = TestFixtures.getDeviceInfo(Platform.IOS);
                 sessionManager.setGameSessionId(1234);
                 operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
-                const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-                adUnit = TestHelper.getAdUnit(nativeBridge, operativeEventManager, thirdPartyEventManager, request);
+                campaign = TestFixtures.getCampaign();
             });
 
             it('with start event', () => {
-                return operativeEventManager.sendStart(adUnit).then(() => {
+                return operativeEventManager.sendStart(campaign.getSession(), campaign).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -473,7 +437,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with first quartile event', () => {
-                return operativeEventManager.sendFirstQuartile(adUnit).then(() => {
+                return operativeEventManager.sendFirstQuartile(campaign.getSession(), campaign).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -483,7 +447,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with midpoint event', () => {
-                return operativeEventManager.sendMidpoint(adUnit).then(() => {
+                return operativeEventManager.sendMidpoint(campaign.getSession(), campaign).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -493,7 +457,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with third quartile event', () => {
-                return operativeEventManager.sendThirdQuartile(adUnit).then(() => {
+                return operativeEventManager.sendThirdQuartile(campaign.getSession(), campaign).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -503,7 +467,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with end event', () => {
-                return operativeEventManager.sendView(adUnit).then(() => {
+                return operativeEventManager.sendView(campaign.getSession(), campaign).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
