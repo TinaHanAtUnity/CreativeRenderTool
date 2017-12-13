@@ -11,49 +11,85 @@ import { Platform } from 'Constants/Platform';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 const json = JSON.parse(DummyDisplayInterstitialCampaign);
 
-describe('DisplayInterstitial', () => {
+describe('DisplayInterstitial View', () => {
+    const isDisplayInterstitialUrlCampaign = true;
     let view: DisplayInterstitial;
     let nativeBridge: NativeBridge;
     let placement: Placement;
     let campaign: DisplayInterstitialCampaign;
     let sandbox: sinon.SinonSandbox;
 
-    beforeEach(() => {
-        sandbox = sinon.sandbox.create();
-        nativeBridge = TestFixtures.getNativeBridge();
-        placement = new Placement({
-            id: '123',
-            name: 'test',
-            default: true,
-            allowSkip: true,
-            skipInSeconds: 5,
-            disableBackButton: true,
-            useDeviceOrientationForVideo: false,
-            muteVideo: false
+    describe('on Display Interstitial Markup Campaign',() => {
+        viewUnitTests(!isDisplayInterstitialUrlCampaign);
+    });
+
+    describe('on Display Interstitial MarkupUrl Campaign', () => {
+        viewUnitTests(isDisplayInterstitialUrlCampaign);
+
+        it('should throw error when no clickthroughurl is in the markupurl', () => {
+            sandbox = sinon.sandbox.create();
+            nativeBridge = TestFixtures.getNativeBridge();
+            placement = new Placement({
+                id: '123',
+                name: 'test',
+                default: true,
+                allowSkip: true,
+                skipInSeconds: 5,
+                disableBackButton: true,
+                useDeviceOrientationForVideo: false,
+                muteVideo: false
+            });
+            campaign = TestFixtures.getBadMarkupUrlAd();
+            view = new DisplayInterstitial(nativeBridge, placement, campaign);
+
+            sandbox.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
+            sandbox.stub(nativeBridge, 'getApiLevel').returns(16);
+
+            return new Promise((resolve, reject) => {
+                return view.render().then(reject).catch(resolve);
+            });
         });
-        campaign = new DisplayInterstitialCampaign(json.display.markup, TestFixtures.getSession(), json.gamerId, json.abGroup, undefined);
-        view = new DisplayInterstitial(nativeBridge, placement, campaign);
 
-        sandbox.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
-        sandbox.stub(nativeBridge, 'getApiLevel').returns(16);
     });
 
-    afterEach(() => {
-        sandbox.restore();
-    });
+    function viewUnitTests(isUrlCampaign: boolean) {
+        beforeEach(() => {
+            sandbox = sinon.sandbox.create();
+            nativeBridge = TestFixtures.getNativeBridge();
+            placement = new Placement({
+                id: '123',
+                name: 'test',
+                default: true,
+                allowSkip: true,
+                skipInSeconds: 5,
+                disableBackButton: true,
+                useDeviceOrientationForVideo: false,
+                muteVideo: false
+            });
+            campaign = TestFixtures.getDisplayInterstitialCampaign(isUrlCampaign);
+            view = new DisplayInterstitial(nativeBridge, placement, campaign);
 
-    // Disabled because of missing srcdoc support on Android < 4.4
-    xit('should render', () => {
-        view.render();
-        const srcdoc = view.container().querySelector('#display-iframe')!.getAttribute('srcdoc');
+            sandbox.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
+            sandbox.stub(nativeBridge, 'getApiLevel').returns(16);
+        });
 
-        assert.isNotNull(srcdoc);
-        assert.isTrue(srcdoc!.indexOf(json.display.markup) !== -1);
-    });
+        afterEach(() => {
+            sandbox.restore();
+        });
 
-    it('should show', () => {
-        view.render();
-        view.show();
-        view.hide();
-    });
+        // Disabled because of missing srcdoc support on Android < 4.4
+        xit('should render', () => {
+            view.render();
+            const srcdoc = view.container().querySelector('#display-iframe')!.getAttribute('srcdoc');
+
+            assert.isNotNull(srcdoc);
+            assert.isTrue(srcdoc!.indexOf(json.display.markup) !== -1);
+        });
+
+        it('should show', () => {
+            view.render();
+            view.show();
+            view.hide();
+        });
+    }
 });

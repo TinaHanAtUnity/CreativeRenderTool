@@ -33,7 +33,7 @@ export class ProgrammaticVastParser extends CampaignParser {
     }
 
     protected parseVastToCampaign(vast: Vast, nativeBridge: NativeBridge, campaignId: string, session: Session, gamerId: string, abGroup: number, response: AuctionResponse): Promise<Campaign> {
-        const campaign = new VastCampaign(vast, campaignId, session, gamerId, abGroup, response.getCacheTTL(), response.getTrackingUrls(), response.getAdType(), response.getCreativeId(), response.getSeatId(), response.getCorrelationId(), response.getAdvertiserCampaignId(), response.getAdvertiserBundleId(), response.getAdvertiserDomain(), response.getCategory(), response.getSubCategory());
+        const campaign = new VastCampaign(vast, campaignId, session, gamerId, abGroup, response.getCacheTTL(), response.getTrackingUrls(), response.getAdType(), response.getCreativeId(), response.getSeatId(), response.getCorrelationId(), response.getAdvertiserCampaignId(), response.getAdvertiserBundleId(), response.getAdvertiserDomain(), response.getCategory(), response.getSubCategory(), response.getUseWebViewUserAgentForTracking());
         if(campaign.getVast().getImpressionUrls().length === 0) {
             throw new Error('Campaign does not have an impression url');
         }

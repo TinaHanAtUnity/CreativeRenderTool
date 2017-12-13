@@ -29,7 +29,7 @@ export interface IMRAIDCampaign extends ICampaign {
 }
 
 export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
-    constructor(campaign: any, session: Session, gamerId: string, abGroup: number, cacheTTL: number | undefined, resourceUrl?: string, resource?: string, additionalTrackingEvents?: { [eventName: string]: string[] }, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
+    constructor(campaign: any, session: Session, gamerId: string, abGroup: number, cacheTTL: number | undefined, resourceUrl?: string, resource?: string, additionalTrackingEvents?: { [eventName: string]: string[] }, adType?: string, creativeId?: string, seatId?: number, correlationId?: string, useWebViewUserAgentForTracking?: boolean) {
         super('MRAIDCampaign', {
             ... Campaign.Schema,
             resourceAsset: ['object', 'undefined'],
@@ -55,8 +55,9 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         this.set('session', session);
         this.set('gamerId', gamerId);
         this.set('abGroup', abGroup);
+        this.set('useWebViewUserAgentForTracking', useWebViewUserAgentForTracking);
 
-        this.set('resourceAsset', resourceUrl ? new HTML(resourceUrl) : undefined);
+        this.set('resourceAsset', resourceUrl ? new HTML(resourceUrl, session) : undefined);
         this.set('resource', resource);
         this.set('dynamicMarkup', campaign.dynamicMarkup);
         this.set('additionalTrackingEvents', additionalTrackingEvents || {});
@@ -83,16 +84,16 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         }
 
         if(campaign.gameIcon) {
-            this.set('gameIcon', new Image(campaign.gameIcon));
+            this.set('gameIcon', new Image(campaign.gameIcon, session));
         }
         this.set('rating', campaign.rating);
         this.set('ratingCount', campaign.ratingCount);
 
         if(campaign.endScreenLandscape) {
-            this.set('landscapeImage', new Image(campaign.endScreenLandscape));
+            this.set('landscapeImage', new Image(campaign.endScreenLandscape, session));
         }
         if(campaign.endScreenPortrait) {
-            this.set('portraitImage', new Image(campaign.endScreenPortrait));
+            this.set('portraitImage', new Image(campaign.endScreenPortrait, session));
         }
         this.set('bypassAppSheet', campaign.bypassAppSheet);
 
@@ -113,8 +114,8 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         this.set('appStoreId', campaign.appStoreId);
 
         if(resourceUrl && CustomFeatures.isPlayableEndScreenTest(abGroup, resourceUrl)) {
-            this.set('landscapeImage', new Image('https://cdn.unityads.unity3d.com/impact/images/130393/4729d640d83d4a18/unityads600x800-b.jpg'));
-            this.set('portraitImage', new Image('https://cdn.unityads.unity3d.com/impact/images/130393/98c14b54d4c51801/unityads800x600-b.jpg'));
+            this.set('landscapeImage', new Image('https://cdn.unityads.unity3d.com/impact/images/130393/4729d640d83d4a18/unityads600x800-b.jpg', session));
+            this.set('portraitImage', new Image('https://cdn.unityads.unity3d.com/impact/images/130393/98c14b54d4c51801/unityads800x600-b.jpg', session));
         }
     }
 
@@ -122,8 +123,8 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         return this.get('resourceAsset');
     }
 
-    public setResourceUrl(url: string): void {
-        this.set('resourceAsset', new HTML(url));
+    public setResourceUrl(url: string,): void {
+        this.set('resourceAsset', new HTML(url, this.getSession()));
     }
 
     public setResource(resource: string): void {

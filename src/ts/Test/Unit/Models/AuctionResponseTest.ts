@@ -30,6 +30,7 @@ describe('AuctionResponse', () => {
             assert.equal(auctionResponse.getCategory(), campaignObject.appCategory, 'AppCategory not what was expected');
             assert.equal(auctionResponse.getSubCategory(), campaignObject.appSubCategory, 'AppSubCategory not what was expected');
             assert.equal(auctionResponse.getCorrelationId(), correlationId, 'CorrelationId not what was expected');
+            assert.equal(auctionResponse.getUseWebViewUserAgentForTracking(), campaignObject.useWebViewUserAgentForTracking, 'UseWebViewUserAgentForTracking not what was expected');
         });
     });
 });
