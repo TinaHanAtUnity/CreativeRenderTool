@@ -110,7 +110,7 @@ describe('VastVideoEventHandlers tests', () => {
         mockEventManager.expects('sendEvent').withArgs('vast impression', '12345', 'http://b.scorecardresearch.com/b?C1=1&C2=6000003&C3=0000000200500000197000000&C4=us&C7=http://www.scanscout.com&C8=scanscout.com&C9=http://www.scanscout.com&C10=xn&rn=-103217130&zone=123');
         mockEventManager.expects('sendEvent').withArgs('vast creativeView', '12345', 'http://localhost:3500/brands/14851/creativeView?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123');
 
-        VastVideoEventHandlers.onVideoStart(thirdPartyEventManager, testAdUnit, clientInfo);
+        VastVideoEventHandlers.onVideoStart(thirdPartyEventManager, testAdUnit, clientInfo, campaign.getSession());
 
         mockEventManager.verify();
     });
@@ -142,7 +142,7 @@ describe('VastVideoEventHandlers tests', () => {
         mockEventManager.expects('sendEvent').withArgs('vast impression', '12345', 'http://b.scorecardresearch.com/b?C1=1&C2=6000003&C3=0000000200500000197000000&C4=us&C7=http://www.scanscout.com&C8=scanscout.com&C9=http://www.scanscout.com&C10=xn&rn=-103217130&zone=123');
         mockEventManager.expects('sendEvent').withArgs('vast creativeView', '12345', 'http://localhost:3500/brands/14851/creativeView?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123');
 
-        VastVideoEventHandlers.onVideoStart(thirdPartyEventManager, adUnitWithTrackers, clientInfo);
+        VastVideoEventHandlers.onVideoStart(thirdPartyEventManager, adUnitWithTrackers, clientInfo, campaign.getSession());
 
         mockEventManager.verify();
     });
@@ -154,13 +154,13 @@ describe('VastVideoEventHandlers tests', () => {
         const mockEventManager = sinon.mock(thirdPartyEventManager);
         mockEventManager.expects('sendEvent').withArgs('vast complete', '12345', 'http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123');
 
-        VastVideoEventHandlers.onVideoCompleted(thirdPartyEventManager, testAdUnit, clientInfo);
+        VastVideoEventHandlers.onVideoCompleted(thirdPartyEventManager, testAdUnit, clientInfo, campaign.getSession());
 
         mockEventManager.verify();
     });
 
     it('should hide ad unit when onVideoCompleted', () => {
-        VastVideoEventHandlers.onVideoCompleted(thirdPartyEventManager, testAdUnit, clientInfo);
+        VastVideoEventHandlers.onVideoCompleted(thirdPartyEventManager, testAdUnit, clientInfo, campaign.getSession());
         sinon.assert.called(<sinon.SinonSpy>testAdUnit.hide);
     });
 
@@ -179,7 +179,7 @@ describe('VastVideoEventHandlers tests', () => {
         });
 
         it('should show end screen when onVideoCompleted', () => {
-            VastVideoEventHandlers.onVideoCompleted(thirdPartyEventManager, vastAdUnit, clientInfo);
+            VastVideoEventHandlers.onVideoCompleted(thirdPartyEventManager, vastAdUnit, clientInfo, campaign.getSession());
 
             sinon.assert.called(<sinon.SinonSpy>vastEndScreen.show);
             sinon.assert.notCalled(<sinon.SinonSpy>testAdUnit.hide);

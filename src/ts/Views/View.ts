@@ -4,6 +4,7 @@ import { Tap } from 'Utilities/Tap';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Platform } from 'Constants/Platform';
 import { Swipe } from 'Utilities/Swipe';
+import { IBuildInformation } from 'Views/Privacy';
 
 export abstract class View<T extends object> {
 
@@ -21,7 +22,7 @@ export abstract class View<T extends object> {
     protected _nativeBridge: NativeBridge;
 
     protected _template: Template;
-    protected _templateData: { [key: string]: string | number | boolean | undefined; };
+    protected _templateData: { [key: string]: string | number | boolean | undefined | IBuildInformation ; };
     protected _bindings: IViewBinding[];
     protected _container: HTMLElement;
     protected _handlers: T[] = [];

@@ -13,6 +13,7 @@ import { DiagnosticError } from 'Errors/DiagnosticError';
 import { FocusManager } from 'Managers/FocusManager';
 import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
 import { AbstractOverlay } from 'Views/AbstractOverlay';
+import { Placement } from 'Models/Placement';
 
 export interface IVPAIDAdUnitParameters extends IAdUnitParameters<VPAIDCampaign> {
     vpaid: VPAID;
@@ -20,7 +21,7 @@ export interface IVPAIDAdUnitParameters extends IAdUnitParameters<VPAIDCampaign>
     overlay: AbstractOverlay;
 }
 
-export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
+export class VPAIDAdUnit extends AbstractAdUnit {
 
     public static setAdLoadTimeout(timeout: number) {
         VPAIDAdUnit._adLoadTimeout = timeout;
@@ -35,6 +36,7 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
     private _timer: Timer;
     private _options: any;
     private _overlay: AbstractOverlay;
+    private _placement: Placement;
 
     private _onAppForegroundHandler: any;
     private _onAppBackgroundHandler: any;
@@ -49,6 +51,7 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
         this._options = parameters.options;
         this._view = parameters.vpaid;
         this._overlay = parameters.overlay;
+        this._placement = parameters.placement;
 
         this._overlay.render();
         this._overlay.setFadeEnabled(true);

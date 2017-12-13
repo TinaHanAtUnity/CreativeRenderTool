@@ -8,17 +8,20 @@ import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { Platform } from 'Constants/Platform';
 import { KeyCode } from 'Constants/Android/KeyCode';
+import { Placement } from 'Models/Placement';
 
 export interface IAdMobAdUnitParameters extends IAdUnitParameters<AdMobCampaign> {
     view: AdMobView;
 }
-export class AdMobAdUnit extends AbstractAdUnit<AdMobCampaign> {
+export class AdMobAdUnit extends AbstractAdUnit {
     private _operativeEventManager: OperativeEventManager;
     private _view: AdMobView;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _options: any;
     private _onSystemKillObserver: any;
     private _keyDownListener: (kc: number) => void;
+    private _campaign: AdMobCampaign;
+    private _placement: Placement;
 
     constructor(nativeBridge: NativeBridge, parameters: IAdMobAdUnitParameters) {
         super(nativeBridge, parameters);
@@ -28,6 +31,8 @@ export class AdMobAdUnit extends AbstractAdUnit<AdMobCampaign> {
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._operativeEventManager = parameters.operativeEventManager;
         this._keyDownListener = (kc: number) => this.onKeyDown(kc);
+        this._campaign = parameters.campaign;
+        this._placement = parameters.placement;
 
         // TODO, we skip initial because the AFMA grantReward event tells us the video
         // has been completed. Is there a better way to do this with AFMA right now?
@@ -37,11 +42,11 @@ export class AdMobAdUnit extends AbstractAdUnit<AdMobCampaign> {
     public show(): Promise<void> {
         this.setShowing(true);
         this.onStart.trigger();
-        this._operativeEventManager.sendStart(this);
+        this._operativeEventManager.sendStart(this._campaign.getSession(), this._campaign);
 
         Diagnostics.trigger('admob_ad_show', {
-            placement: this.getPlacement().getId()
-        }, this.getCampaign().getSession());
+            placement: this._placement.getId()
+        }, this._campaign.getSession());
 
         if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
             this._nativeBridge.AndroidAdUnit.onKeyDown.subscribe(this._keyDownListener);
@@ -74,7 +79,7 @@ export class AdMobAdUnit extends AbstractAdUnit<AdMobCampaign> {
 
     public sendClickEvent() {
         this.sendTrackingEvent('click');
-        this._operativeEventManager.sendClick(this);
+        this._operativeEventManager.sendClick(this._campaign.getSession(), this._campaign);
     }
 
     public sendStartEvent() {
@@ -83,7 +88,7 @@ export class AdMobAdUnit extends AbstractAdUnit<AdMobCampaign> {
 
     public sendSkipEvent() {
         this.sendTrackingEvent('skip');
-        this._operativeEventManager.sendSkip(this);
+        this._operativeEventManager.sendSkip(this._campaign.getSession(), this._campaign);
     }
 
     public sendCompleteEvent() {
@@ -114,17 +119,17 @@ export class AdMobAdUnit extends AbstractAdUnit<AdMobCampaign> {
         this.setShowing(false);
         this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
         this.onClose.trigger();
-        this._operativeEventManager.sendThirdQuartile(this);
-        this._operativeEventManager.sendView(this);
+        this._operativeEventManager.sendThirdQuartile(this._campaign.getSession(), this._campaign);
+        this._operativeEventManager.sendView(this._campaign.getSession(), this._campaign);
 
         if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
             this._nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(this._keyDownListener);
         }
 
         Diagnostics.trigger('admob_ad_close', {
-            placement: this.getPlacement().getId(),
+            placement: this._placement.getId(),
             finishState: this.getFinishState()
-        }, this.getCampaign().getSession());
+        }, this._campaign.getSession());
 
         if (this.getFinishState() === FinishState.SKIPPED) {
             this.sendSkipEvent();

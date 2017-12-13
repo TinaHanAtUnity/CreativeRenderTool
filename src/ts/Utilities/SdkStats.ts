@@ -159,9 +159,9 @@ export class SdkStats {
     private static _cachingFinished: { [id: string]: number } = {};
 
     private static isTestActive(): boolean {
-        const abGroup: number = SdkStats._configuration.getAbGroup();
+        const gameSessionId: number = SdkStats._sessionManager.getGameSessionId();
 
-        if(abGroup === 1 || abGroup === 2 || abGroup === 12 || abGroup === 13) {
+        if(gameSessionId % 1000 === 0) {
             return true;
         }
 
