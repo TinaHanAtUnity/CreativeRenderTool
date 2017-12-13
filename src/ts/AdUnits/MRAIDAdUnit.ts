@@ -214,7 +214,7 @@ export class MRAIDAdUnit extends AbstractAdUnit {
             for (let url of trackingEventUrls) {
                 url = url.replace(/%ZONE%/, placementId);
                 url = url.replace(/%SDK_VERSION%/, sdkVersion.toString());
-                this._thirdPartyEventManager.sendEvent(`mraid ${eventName}`, sessionId, url);
+                this._thirdPartyEventManager.sendEvent(`mraid ${eventName}`, sessionId, url, this._campaign.getUseWebViewUserAgentForTracking());
             }
         }
     }

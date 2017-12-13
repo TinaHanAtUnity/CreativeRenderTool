@@ -10,7 +10,7 @@ import { DisplayInterstitialMarkupCampaign } from 'Models/Campaigns/DisplayInter
 
 export class ProgrammaticStaticInterstitialParser extends CampaignParser {
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
-        const jsonDisplay = JsonParser.parse(response.getContent());
+        const jsonDisplay = response.getJsonContent();
 
         if(!jsonDisplay.markup) {
             throw new DiagnosticError(

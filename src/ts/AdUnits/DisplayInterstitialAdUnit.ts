@@ -93,7 +93,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
         for (let url of this._campaign.getTrackingUrlsForEvent('click')) {
             url = url.replace(/%ZONE%/, this._placement.getId());
             url = url.replace(/%SDK_VERSION%/, this._operativeEventManager.getClientInfo().getSdkVersion().toString());
-            this._thirdPartyEventManager.sendEvent('display click', this._campaign.getSession().getId(), url);
+            this._thirdPartyEventManager.sendEvent('display click', this._campaign.getSession().getId(), url, this._campaign.getUseWebViewUserAgentForTracking());
         }
 
         if (this.isWhiteListedLinkType(href)) {

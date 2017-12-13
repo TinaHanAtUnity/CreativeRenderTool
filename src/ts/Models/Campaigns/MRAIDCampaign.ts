@@ -29,7 +29,7 @@ export interface IMRAIDCampaign extends ICampaign {
 }
 
 export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
-    constructor(campaign: any, session: Session, gamerId: string, abGroup: number, cacheTTL: number | undefined, resourceUrl?: string, resource?: string, additionalTrackingEvents?: { [eventName: string]: string[] }, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
+    constructor(campaign: any, session: Session, gamerId: string, abGroup: number, cacheTTL: number | undefined, resourceUrl?: string, resource?: string, additionalTrackingEvents?: { [eventName: string]: string[] }, adType?: string, creativeId?: string, seatId?: number, correlationId?: string, useWebViewUserAgentForTracking?: boolean) {
         super('MRAIDCampaign', {
             ... Campaign.Schema,
             resourceAsset: ['object', 'undefined'],
@@ -55,6 +55,7 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         this.set('session', session);
         this.set('gamerId', gamerId);
         this.set('abGroup', abGroup);
+        this.set('useWebViewUserAgentForTracking', useWebViewUserAgentForTracking);
 
         this.set('resourceAsset', resourceUrl ? new HTML(resourceUrl) : undefined);
         this.set('resource', resource);
