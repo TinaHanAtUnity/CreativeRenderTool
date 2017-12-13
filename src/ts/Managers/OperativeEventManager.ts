@@ -58,7 +58,7 @@ export class OperativeEventManager {
         this._request = request;
     }
 
-    public sendStart(session: Session, campaign: Campaign, additionalData?: { [id: string]: any }): Promise<void> {
+    public sendStart(session: Session, campaign: Campaign, videoOrientation?: string): Promise<void> {
         if(session.getEventSent(EventType.START)) {
             return Promise.resolve();
         }
@@ -72,7 +72,7 @@ export class OperativeEventManager {
 
             return this._metaDataManager.fetch(MediationMetaData, true, ['ordinal']);
         }).then(() => {
-            return this.createUniqueEventMetadata(session, campaign, this._sessionManager.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId(), additionalData);
+            return this.createUniqueEventMetadata(session, campaign, this._sessionManager.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId(), videoOrientation);
         }).then(([id, infoJson]) => {
             return this.sendEvent('start', id, infoJson.sessionId, this.createVideoEventUrl(campaign, 'video_start'), JSON.stringify(infoJson));
         }).then(() => {
@@ -80,7 +80,7 @@ export class OperativeEventManager {
         });
     }
 
-    public sendFirstQuartile(session: Session, campaign: Campaign, additionalData?: { [id: string]: any }): Promise<void> {
+    public sendFirstQuartile(session: Session, campaign: Campaign, videoOrientation?: string): Promise<void> {
         if(session.getEventSent(EventType.FIRST_QUARTILE)) {
             return Promise.resolve(void(0));
         }
@@ -91,10 +91,10 @@ export class OperativeEventManager {
             this.sendEvent('first_quartile', id, infoJson.sessionId, this.createVideoEventUrl(campaign, 'first_quartile'), JSON.stringify(infoJson));
         };
 
-        return this.createUniqueEventMetadata(session, campaign, this._sessionManager.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId(), additionalData).then(fulfilled);
+        return this.createUniqueEventMetadata(session, campaign, this._sessionManager.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId(), videoOrientation).then(fulfilled);
     }
 
-    public sendMidpoint(session: Session, campaign: Campaign, additionalData?: { [id: string]: any }): Promise<void> {
+    public sendMidpoint(session: Session, campaign: Campaign, videoOrientation?: string): Promise<void> {
         if(session.getEventSent(EventType.MIDPOINT)) {
             return Promise.resolve(void(0));
         }
@@ -105,10 +105,10 @@ export class OperativeEventManager {
             this.sendEvent('midpoint', id, infoJson.sessionId, this.createVideoEventUrl(campaign, 'midpoint'), JSON.stringify(infoJson));
         };
 
-        return this.createUniqueEventMetadata(session, campaign, this._sessionManager.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId(), additionalData).then(fulfilled);
+        return this.createUniqueEventMetadata(session, campaign, this._sessionManager.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId(), videoOrientation).then(fulfilled);
     }
 
-    public sendThirdQuartile(session: Session, campaign: Campaign, additionalData?: { [id: string]: any }): Promise<void> {
+    public sendThirdQuartile(session: Session, campaign: Campaign, videoOrientation?: string): Promise<void> {
         if(session.getEventSent(EventType.THIRD_QUARTILE)) {
             return Promise.resolve(void(0));
         }
@@ -119,10 +119,10 @@ export class OperativeEventManager {
             this.sendEvent('third_quartile', id, infoJson.sessionId, this.createVideoEventUrl(campaign, 'third_quartile'), JSON.stringify(infoJson));
         };
 
-        return this.createUniqueEventMetadata(session, campaign, this._sessionManager.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId(), additionalData).then(fulfilled);
+        return this.createUniqueEventMetadata(session, campaign, this._sessionManager.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId(), videoOrientation).then(fulfilled);
     }
 
-    public sendSkip(session: Session, campaign: Campaign, videoProgress?: number, additionalData?: { [id: string]: any }): Promise<void> {
+    public sendSkip(session: Session, campaign: Campaign, videoProgress?: number, videoOrientation?: string): Promise<void> {
         if(session.getEventSent(EventType.SKIP)) {
             return Promise.resolve(void(0));
         }
@@ -153,10 +153,10 @@ export class OperativeEventManager {
             HttpKafka.sendEvent('events.skip.json', infoJson);
         };
 
-        return this.createUniqueEventMetadata(session, campaign, this._sessionManager.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId(), additionalData).then(fulfilled);
+        return this.createUniqueEventMetadata(session, campaign, this._sessionManager.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId(), videoOrientation).then(fulfilled);
     }
 
-    public sendView(session: Session, campaign: Campaign, additionalData?: { [id: string]: any }): Promise<void> {
+    public sendView(session: Session, campaign: Campaign, videoOrientation?: string): Promise<void> {
         if(session.getEventSent(EventType.VIEW)) {
             return Promise.resolve(void(0));
         }
@@ -166,10 +166,10 @@ export class OperativeEventManager {
             this.sendEvent('view', id, infoJson.sessionId, this.createVideoEventUrl(campaign, 'video_end'), JSON.stringify(infoJson));
         };
 
-        return this.createUniqueEventMetadata(session, campaign, this._sessionManager.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId(), additionalData).then(fulfilled);
+        return this.createUniqueEventMetadata(session, campaign, this._sessionManager.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId(), videoOrientation).then(fulfilled);
     }
 
-    public sendClick(session: Session, campaign: Campaign, additionalData?: { [id: string]: any }): Promise<void> {
+    public sendClick(session: Session, campaign: Campaign, videoOrientation?: string): Promise<void> {
         if(session.getEventSent(EventType.CLICK)) {
             return Promise.resolve(void(0));
         }
@@ -179,7 +179,7 @@ export class OperativeEventManager {
             this.sendEvent('click', id, session.getId(), this.createClickEventUrl(campaign), JSON.stringify(infoJson));
         };
 
-        return this.createUniqueEventMetadata(session, campaign, this._sessionManager.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId(), additionalData).then(fulfilled);
+        return this.createUniqueEventMetadata(session, campaign, this._sessionManager.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId(), videoOrientation).then(fulfilled);
     }
 
     public sendUnsentEvents(sessionId: string): Promise<any[]> {
@@ -221,9 +221,9 @@ export class OperativeEventManager {
         });
     }
 
-    private createUniqueEventMetadata(session: Session, campaign: Campaign, gameSession: number, gamerSid: string, previousPlacementId?: string, additionalData?: { [id: string]: any }): Promise<[string, any]> {
+    private createUniqueEventMetadata(session: Session, campaign: Campaign, gameSession: number, gamerSid: string, previousPlacementId?: string, videoOrientation?: string): Promise<[string, any]> {
         return this._nativeBridge.DeviceInfo.getUniqueEventId().then(id => {
-            return this.getInfoJson(session, campaign, id, gameSession, gamerSid, previousPlacementId, additionalData);
+            return this.getInfoJson(session, campaign, id, gameSession, gamerSid, previousPlacementId, videoOrientation);
         });
     }
 
@@ -252,7 +252,7 @@ export class OperativeEventManager {
         ]);
     }
 
-    private getInfoJson(session: Session, campaign: Campaign, id: string, gameSession: number, gamerSid: string, previousPlacementId?: string, additionalData?: { [id: string]: any }): Promise<[string, any]> {
+    private getInfoJson(session: Session, campaign: Campaign, id: string, gameSession: number, gamerSid: string, previousPlacementId?: string, videoOrientation?: string): Promise<[string, any]> {
         const infoJson: any = {
             'eventId': id,
             'auctionId': session.getId(),
@@ -306,13 +306,7 @@ export class OperativeEventManager {
             infoJson.cached = false;
         }
 
-        if(additionalData) {
-            for(const key in additionalData) {
-                if (additionalData.hasOwnProperty(key)) {
-                    infoJson[key] = additionalData[key];
-                }
-            }
-        }
+        infoJson.videoOrientation = videoOrientation;
 
         if(typeof navigator !== 'undefined' && navigator.userAgent) {
             infoJson.webviewUa = navigator.userAgent;
