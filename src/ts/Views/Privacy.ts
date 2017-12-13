@@ -5,8 +5,8 @@ import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
 
 import { ClientInfo } from 'Models/ClientInfo';
-import { Campaign } from "../Models/Campaign";
-import { Platform } from "../Constants/Platform";
+import { Campaign } from "Models/Campaign";
+import { Platform } from "Constants/Platform";
 
 export interface IPrivacyHandler {
     onPrivacy(url: string): void;
@@ -27,11 +27,9 @@ export interface IBuildInformation {
     Game: string;
 }
 
-let buildInformation: IBuildInformation;
-
 export class Privacy extends View<IPrivacyHandler> {
-     public static createBuildInformation(clientInfo: ClientInfo, campaign: Campaign, nativeBridge: NativeBridge) {
-        buildInformation = {
+    public static createBuildInformation(clientInfo: ClientInfo, campaign: Campaign, nativeBridge: NativeBridge) {
+        Privacy.buildInformation = {
             UA: window.navigator.userAgent,
             Platform: clientInfo.getPlatform() === Platform.IOS ? 'iOS' : 'Android',
             Campaign: campaign.getId(),
@@ -46,6 +44,8 @@ export class Privacy extends View<IPrivacyHandler> {
         };
     }
 
+    private static buildInformation: IBuildInformation;
+
     constructor(nativeBridge: NativeBridge, isCoppaCompliant: boolean) {
         super(nativeBridge, 'privacy');
 
@@ -53,7 +53,7 @@ export class Privacy extends View<IPrivacyHandler> {
 
         this._templateData = {
             'isCoppaCompliant': isCoppaCompliant,
-            'buildInformation': buildInformation
+            'buildInformation': Privacy.buildInformation
         };
 
         this._bindings = [
