@@ -10,7 +10,7 @@ import { Session } from 'Models/Session';
 
 export class ProgrammaticStaticInterstitialParser extends CampaignParser {
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
-        const jsonDisplay = JsonParser.parse(response.getContent());
+        const jsonDisplay = response.getJsonContent();
 
         if(!jsonDisplay.markup) {
             throw new DiagnosticError(
@@ -27,6 +27,6 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
         }
 
         const clickThroughUrl = jsonDisplay.clickThroughURL;
-        return Promise.resolve(new DisplayInterstitialCampaign(displayMarkup, session, gamerId, abGroup, response.getCacheTTL(), response.getTrackingUrls(), clickThroughUrl, response.getAdType(), response.getCreativeId(), response.getSeatId(), response.getCorrelationId()));
+        return Promise.resolve(new DisplayInterstitialCampaign(displayMarkup, session, gamerId, abGroup, response.getCacheTTL(), response.getTrackingUrls(), clickThroughUrl, response.getAdType(), response.getCreativeId(), response.getSeatId(), response.getCorrelationId(), response.getUseWebViewUserAgentForTracking()));
     }
 }
