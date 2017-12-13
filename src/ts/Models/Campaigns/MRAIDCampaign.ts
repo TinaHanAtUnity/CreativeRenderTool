@@ -113,8 +113,8 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         this.set('appStoreId', campaign.appStoreId);
 
         if(resourceUrl && CustomFeatures.isPlayableEndScreenTest(abGroup, resourceUrl)) {
-            this.set('landscapeImage', new Image('https://static.everyplay.com/impact/images/130393/4729d640d83d4a18/unityads600x800-b.jpg'));
-            this.set('portraitImage', new Image('https://static.everyplay.com/impact/images/130393/98c14b54d4c51801/unityads800x600-b.jpg'));
+            this.set('landscapeImage', new Image('https://cdn.unityads.unity3d.com/impact/images/130393/4729d640d83d4a18/unityads600x800-b.jpg'));
+            this.set('portraitImage', new Image('https://cdn.unityads.unity3d.com/impact/images/130393/98c14b54d4c51801/unityads800x600-b.jpg'));
         }
     }
 
