@@ -1,5 +1,5 @@
 import { Session } from 'Models/Session';
-import {DisplayInterstitialCampaign, IDisplayInterstitialCampaign} from "Models/Campaigns/DisplayInterstitialCampaign";
+import {DisplayInterstitialCampaign, IDisplayInterstitialCampaign} from 'Models/Campaigns/DisplayInterstitialCampaign';
 
 interface IDisplayInterstitialMarkupUrlCampaign extends IDisplayInterstitialCampaign {
     markupUrl: string;
