@@ -36,7 +36,7 @@ describe('DisplayInterstitialEventHandler', () => {
         eventHandlerTests(!isDisplayInterstitialUrlCampaign);
     });
 
-    describe.skip('on Display Interstitial MarkupUrl Campaign', () => {
+    describe('on Display Interstitial MarkupUrl Campaign', () => {
         eventHandlerTests(isDisplayInterstitialUrlCampaign);
     });
 
