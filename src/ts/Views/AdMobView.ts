@@ -122,7 +122,7 @@ export class AdMobView extends View<IAdMobEventHandler> {
         return this._adMobSignalFactory.getClickSignal().then((signal) => {
             this.injectScript(e, MRAIDContainer);
 
-            const signalProto = signal.getBase64ProtoBuf();
+            const signalProto = signal.getBase64ProtoBufNonEncoded();
             this.injectScript(e, AFMAContainer.replace(AFMAClickStringMacro, signalProto));
  //           this.injectScript(e, `<script>AFMA_ReceiveMessage('onshow');</script>`);
         });

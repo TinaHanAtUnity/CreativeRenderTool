@@ -573,9 +573,11 @@ export class AdMobSignal extends Model<IAdMobSignal> {
         };
         const protocolBuffer = unity_proto.UnityProto.encode(protocolObject).finish();
 
-        let str = protobuf.util.base64.encode(protocolBuffer, 0, protocolBuffer.byteLength);
+        return protobuf.util.base64.encode(protocolBuffer, 0, protocolBuffer.byteLength);
+    }
 
-        // replacing all uri unsafe characters with safe characters.
+    public getBase64ProtoBufNonEncoded(): string {
+        let str = this.getBase64ProtoBuf();
         str = str.replace('/', '_');
         str = str.replace('+', '-');
         str = str.replace('=', '');
