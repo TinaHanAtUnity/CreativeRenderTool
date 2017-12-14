@@ -1,4 +1,4 @@
-# Pending
+# Thu Dec 14 19:04:21 UTC 2017
 
 * Fix VAST end screen layout
 * Xmas endscreen theme on groups 18 and 19
