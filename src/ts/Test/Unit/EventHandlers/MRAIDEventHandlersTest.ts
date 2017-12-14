@@ -43,6 +43,7 @@ describe('MRAIDEventHandlersTest', () => {
     let mraidAdUnitParameters: IMRAIDAdUnitParameters;
     let mraidEventHandler: MRAIDEventHandler;
     let comScoreService: ComScoreTrackingService;
+    let mraidCampaign: MRAIDCampaign;
 
     describe('with onClick', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -76,7 +77,7 @@ describe('MRAIDEventHandlersTest', () => {
 
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 
-            const mraidCampaign = TestFixtures.getPlayableMRAIDCampaign();
+            mraidCampaign = TestFixtures.getPlayableMRAIDCampaign();
             mraidView = sinon.createStubInstance(MRAID);
             (<sinon.SinonSpy>mraidView.container).restore();
             sinon.stub(mraidView, 'container').returns(document.createElement('div'));
@@ -106,17 +107,17 @@ describe('MRAIDEventHandlersTest', () => {
 
         it('should send a click with session manager', () => {
             mraidEventHandler.onMraidClick('http://example.net');
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, mraidAdUnit);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, mraidCampaign.getSession(), placement, mraidCampaign);
         });
 
         it('should send a view with session manager', () => {
             mraidEventHandler.onMraidClick('http://example.net');
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendView, mraidAdUnit);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendView, mraidCampaign.getSession(), placement, mraidCampaign);
         });
 
         it('should send a third quartile event with session manager', () => {
             mraidEventHandler.onMraidClick('http://example.net');
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile, mraidAdUnit);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile, mraidCampaign.getSession(), placement, mraidCampaign);
         });
 
         it('should send a native click event', () => {
@@ -126,7 +127,7 @@ describe('MRAIDEventHandlersTest', () => {
 
         describe('with follow redirects', () => {
             it('with response that contains location, it should launch intent', () => {
-                const mraidCampaign = TestFixtures.getPlayableMRAIDCampaignFollowsRedirects();
+                mraidCampaign = TestFixtures.getPlayableMRAIDCampaignFollowsRedirects();
                 (<sinon.SinonSpy>thirdPartyEventManager.clickAttributionEvent).restore();
                 sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').returns(Promise.resolve({
                     url: 'http://foo.url.com',
@@ -159,7 +160,7 @@ describe('MRAIDEventHandlersTest', () => {
             });
 
             it('with response that does not contain location, it should not launch intent', () => {
-                const mraidCampaign = TestFixtures.getPlayableMRAIDCampaignFollowsRedirects();
+                mraidCampaign = TestFixtures.getPlayableMRAIDCampaignFollowsRedirects();
                 (<sinon.SinonSpy>thirdPartyEventManager.clickAttributionEvent).restore();
                 sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').returns(Promise.resolve());
                 mraidAdUnitParameters.mraid = mraidView;
@@ -185,7 +186,6 @@ describe('MRAIDEventHandlersTest', () => {
         });
 
         describe('with onAnalyticsEvent', () => {
-            let mraidCampaign: MRAIDCampaign;
             let sandbox: sinon.SinonSandbox;
 
             before(() => {

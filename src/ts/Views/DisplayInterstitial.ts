@@ -1,10 +1,11 @@
 import DisplayInterstitialTemplate from 'html/display/DisplayInterstitial.html';
-import DisplayContainer from 'html/display/DisplayContainer.html';
-
 import { View } from 'Views/View';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Placement } from 'Models/Placement';
-import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
+import { IDisplayInterstitialCampaign, DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
+import { DisplayInterstitialMarkupCampaign } from 'Models/Campaigns/DisplayInterstitialMarkupCampaign';
+import { DisplayInterstitialMarkupUrlCampaign } from 'Models/Campaigns/DisplayInterstitialMarkupUrlCampaign';
+
 import { Platform } from 'Constants/Platform';
 import { Template } from 'Utilities/Template';
 
@@ -26,7 +27,6 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
     private _canClose = false;
     private _canSkip = false;
     private _didReward = false;
-    private _markup: string;
 
     private _messageListener: EventListener;
     private _timers: number[] = [];
@@ -49,28 +49,16 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
         ];
     }
 
-    public render() {
+    public render(): Promise<void> {
         super.render();
-
-        if (this._campaign.getClickThroughUrl()) {
-            const clickCatcher = document.createElement('div');
-            clickCatcher.classList.add('iframe-click-catcher');
-            this._container.appendChild(clickCatcher);
-
-            clickCatcher.addEventListener('click', (e: Event) => this.onIFrameClicked(e));
-        }
-
-        this._markup = this._campaign.getDynamicMarkup();
-
-        this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
-
-        const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#display-iframe');
-
-        if (this._campaign.getClickThroughUrl()) {
-            iframe.srcdoc = this._markup;
-        } else {
-            iframe.srcdoc = DisplayContainer.replace('<body></body>', '<body>' + this._markup + '</body>');
-        }
+        return Promise.resolve().then(() => {
+            this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
+            this.enableClickThroughCatcher();
+            const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#display-iframe');
+            return this.getIFrameSrcDoc().then((srcdoc) => {
+                iframe.srcdoc = srcdoc;
+            });
+        });
     }
 
     public show(): void {
@@ -197,5 +185,63 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
             default:
                 this._nativeBridge.Sdk.logWarning(`Unknown message: ${e.data.type}`);
         }
+    }
+
+    private requestMarkupFromURL(url: string): Promise<string> {
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.addEventListener('load', () => {
+                if ((this._nativeBridge.getPlatform() === Platform.ANDROID && xhr.status === 0) || (xhr.status >= 200 && xhr.status <= 299)) {
+                    resolve(xhr.responseText);
+                } else {
+                    reject(new Error(`XHR returned with unknown status code ${xhr.status}`));
+                }
+            }, false);
+            xhr.open('GET', decodeURIComponent(url));
+            xhr.send();
+        });
+    }
+
+    private getClickThroughUrlFromMarkup(markup: string): string {
+        const doc = new DOMParser().parseFromString(markup, 'text/html');
+        const a = doc.querySelector('a');
+        if (a) {
+            const href = a.getAttribute('href');
+            if (href) {
+                return href;
+            }
+        }
+
+        throw new Error('No clickthrough URL was found');
+    }
+
+    private fetchMarkupAndParseClickThroughURL(): Promise<string> {
+        const markupUrlCampaign = <DisplayInterstitialMarkupUrlCampaign>this._campaign;
+        return this.requestMarkupFromURL(markupUrlCampaign.getMarkupUrl()).then(displayMarkup => {
+            const clickThroughURL = this.getClickThroughUrlFromMarkup(displayMarkup);
+            markupUrlCampaign.setClickThroughUrl(clickThroughURL);
+            return displayMarkup;
+        });
+    }
+
+    private enableClickThroughCatcher() {
+        const clickCatcher = document.createElement('div');
+        clickCatcher.classList.add('iframe-click-catcher');
+        this._container.appendChild(clickCatcher);
+
+        clickCatcher.addEventListener('click', (e: Event) => this.onIFrameClicked(e));
+    }
+
+    private getIFrameSrcDoc(): Promise<string> {
+        if (this._campaign instanceof DisplayInterstitialMarkupCampaign) {
+            if (this._campaign.getClickThroughUrl()) {
+                return Promise.resolve(this._campaign.getDynamicMarkup());
+            }
+        }
+
+        if (this._campaign instanceof DisplayInterstitialMarkupUrlCampaign) {
+            return this.fetchMarkupAndParseClickThroughURL();
+        }
+        return Promise.reject('Unknown campaign type');
     }
 }

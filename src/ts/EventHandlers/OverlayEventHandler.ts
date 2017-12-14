@@ -8,13 +8,17 @@ import { FinishState } from 'Constants/FinishState';
 import { Double } from 'Utilities/Double';
 import { Campaign } from 'Models/Campaign';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
+import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
+import { Placement } from 'Models/Placement';
 
 export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler {
+    protected _placement: Placement;
     protected _nativeBridge: NativeBridge;
     private _adUnit: VideoAdUnit<T>;
     private _operativeEventManager: OperativeEventManager;
     private _comScoreTrackingService: ComScoreTrackingService;
     private _abGroup: number;
+    private _campaign: T;
 
     constructor(nativeBridge: NativeBridge, adUnit: VideoAdUnit<T>, parameters: IAdUnitParameters<T>) {
         this._nativeBridge = nativeBridge;
@@ -22,21 +26,23 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
         this._comScoreTrackingService = parameters.comScoreTrackingService;
         this._abGroup = parameters.campaign.getAbGroup();
         this._adUnit = adUnit;
+        this._campaign = parameters.campaign;
+        this._placement = parameters.placement;
     }
 
     public onOverlaySkip(position: number): void {
         this._nativeBridge.VideoPlayer.pause();
         this._adUnit.setActive(false);
         this._adUnit.setFinishState(FinishState.SKIPPED);
-        this._operativeEventManager.sendSkip(this._adUnit, this._adUnit.getVideo().getPosition());
+        this._operativeEventManager.sendSkip(this._campaign.getSession(), this._placement, this._campaign, this._adUnit.getVideo().getPosition(), this.getVideoOrientation());
 
         if (this._abGroup === 5) {
-            const sessionId = this._adUnit.getCampaign().getSession().getId();
+            const sessionId = this._campaign.getSession().getId();
             const positionAtSkip = this._adUnit.getVideo().getPosition();
             const comScoreDuration = (this._adUnit.getVideo().getDuration()).toString(10);
-            const creativeId = this._adUnit.getCampaign().getCreativeId();
-            const category = this._adUnit.getCampaign().getCategory();
-            const subCategory = this._adUnit.getCampaign().getSubCategory();
+            const creativeId = this._campaign.getCreativeId();
+            const category = this._campaign.getCategory();
+            const subCategory = this._campaign.getSubCategory();
             this._comScoreTrackingService.sendEvent('end', sessionId, comScoreDuration, positionAtSkip, creativeId, category, subCategory);
         }
 
@@ -66,10 +72,18 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
         this._nativeBridge.VideoPlayer.pause();
         this._adUnit.setActive(false);
         this._adUnit.setFinishState(FinishState.SKIPPED);
-        this._operativeEventManager.sendSkip(this._adUnit, this._adUnit.getVideo().getPosition());
+        this._operativeEventManager.sendSkip(this._campaign.getSession(), this._placement, this._campaign, this._adUnit.getVideo().getPosition(), this.getVideoOrientation());
 
         this._adUnit.onFinish.trigger();
 
         this._adUnit.hide();
+    }
+
+    private getVideoOrientation(): string | undefined {
+        if(this._adUnit instanceof PerformanceAdUnit) {
+            return (<PerformanceAdUnit>this._adUnit).getVideoOrientation();
+        }
+
+        return undefined;
     }
 }

@@ -30,6 +30,9 @@ global.XMLHttpRequest = XMLHttpRequest;
 global.window.localStorage = new LocalStorage('./localStorage');
 global.window.sessionStorage = new LocalStorage('./sessionStorage');
 global.window.exec = exec;
+global.navigator = {
+    userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_2 like Mac OS X) AppleWebKit/603.2.4 (KHTML, like Gecko) Mobile/14F89'
+}
 
 const coverageDir = process.env.COVERAGE_DIR;
 const testFilter = process.env.TEST_FILTER;

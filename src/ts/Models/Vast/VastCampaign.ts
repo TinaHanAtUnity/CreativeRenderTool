@@ -14,7 +14,7 @@ interface IVastCampaign extends ICampaign {
 }
 
 export class VastCampaign extends Campaign<IVastCampaign> {
-    constructor(vast: Vast, campaignId: string, session: Session, gamerId: string, abGroup: number, cacheTTL?: number, tracking?: any, adType?: string, creativeId?: string, seatId?: number, correlationId?: string, advertiserCampaignId?: string, advertiserBundleId?: string, advertiserDomain?: string, appCategory?: string, appSubCategory?: string) {
+    constructor(vast: Vast, campaignId: string, session: Session, gamerId: string, abGroup: number, cacheTTL?: number, tracking?: any, adType?: string, creativeId?: string, seatId?: number, correlationId?: string, advertiserCampaignId?: string, advertiserBundleId?: string, advertiserDomain?: string, appCategory?: string, appSubCategory?: string, useWebViewUserAgentForTracking?: boolean) {
         super('VastCampaign', {
             ... Campaign.Schema,
             vast: ['object'],
@@ -27,17 +27,17 @@ export class VastCampaign extends Campaign<IVastCampaign> {
         const portraitUrl = vast.getCompanionPortraitUrl();
         let portraitAsset;
         if(portraitUrl) {
-            portraitAsset = new Image(portraitUrl);
+            portraitAsset = new Image(portraitUrl, session);
         }
 
         const landscapeUrl = vast.getCompanionLandscapeUrl();
         let landscapeAsset;
         if(landscapeUrl) {
-            landscapeAsset = new Image(landscapeUrl);
+            landscapeAsset = new Image(landscapeUrl, session);
         }
 
         this.set('vast', vast);
-        this.set('video', new Video(vast.getVideoUrl()));
+        this.set('video', new Video(vast.getVideoUrl(), session));
         this.set('hasEndscreen', !!vast.getCompanionPortraitUrl() || !!vast.getCompanionLandscapeUrl());
         this.set('portrait', portraitAsset);
         this.set('landscape', landscapeAsset);
@@ -46,6 +46,7 @@ export class VastCampaign extends Campaign<IVastCampaign> {
         this.set('session', session);
         this.set('gamerId', gamerId);
         this.set('abGroup', abGroup);
+        this.set('useWebViewUserAgentForTracking', useWebViewUserAgentForTracking);
         const timeout = cacheTTL || 3600;
         this.set('willExpireAt', Date.now() + timeout * 1000);
         this.set('adType', adType || undefined);
@@ -67,7 +68,7 @@ export class VastCampaign extends Campaign<IVastCampaign> {
 
     public getVideo() {
         if(!this.get('video')) {
-            this.set('video', new Video(this.get('vast').getVideoUrl()));
+            this.set('video', new Video(this.get('vast').getVideoUrl(), this.getSession()));
         }
         return this.get('video');
     }
