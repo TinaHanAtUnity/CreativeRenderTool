@@ -35,16 +35,7 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
         this._adUnit.setActive(false);
         this._adUnit.setFinishState(FinishState.SKIPPED);
         this._operativeEventManager.sendSkip(this._campaign.getSession(), this._placement, this._campaign, this._adUnit.getVideo().getPosition(), this.getVideoOrientation());
-
-        if (this._abGroup === 5) {
-            const sessionId = this._campaign.getSession().getId();
-            const positionAtSkip = this._adUnit.getVideo().getPosition();
-            const comScoreDuration = (this._adUnit.getVideo().getDuration()).toString(10);
-            const creativeId = this._campaign.getCreativeId();
-            const category = this._campaign.getCategory();
-            const subCategory = this._campaign.getSubCategory();
-            this._comScoreTrackingService.sendEvent('end', sessionId, comScoreDuration, positionAtSkip, creativeId, category, subCategory);
-        }
+        this.sendComscoreEvent();
 
         this._adUnit.getContainer().reconfigure(ViewConfiguration.ENDSCREEN);
 
@@ -85,5 +76,15 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
         }
 
         return undefined;
+    }
+
+    private sendComscoreEvent() {
+        const sessionId = this._campaign.getSession().getId();
+        const positionAtSkip = this._adUnit.getVideo().getPosition();
+        const comScoreDuration = (this._adUnit.getVideo().getDuration()).toString(10);
+        const creativeId = this._campaign.getCreativeId();
+        const category = this._campaign.getCategory();
+        const subCategory = this._campaign.getSubCategory();
+        this._comScoreTrackingService.sendEvent('end', sessionId, comScoreDuration, positionAtSkip, creativeId, category, subCategory);
     }
 }

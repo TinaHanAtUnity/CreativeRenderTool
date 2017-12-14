@@ -149,9 +149,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         this._operativeEventManager.sendStart(this._campaign.getSession(), this._placement, this._campaign).then(() => {
             this._adUnit.onStartProcessed.trigger();
         });
-        if (this._abGroup === 5) {
-            this.sendComscoreEvent('play', 0);
-        }
+        this.sendComscoreEvent('play', 0);
     }
 
     private onAdImpression() {
@@ -182,9 +180,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         this._adUnit.sendTrackingEvent('complete');
         this._adUnit.setFinishState(FinishState.COMPLETED);
         this._operativeEventManager.sendView(this._campaign.getSession(), this._placement, this._campaign);
-        if (this._abGroup === 5) {
-            this.sendComscoreEvent('end', (this._adDuration - this._adRemainingTime) * 1000);
-        }
+        this.sendComscoreEvent('end', (this._adDuration - this._adRemainingTime) * 1000);
     }
 
     private onAdPaused() {
