@@ -17,6 +17,7 @@ import { MRAIDBridge } from 'Views/MRAIDBridge';
 export interface IAdMobEventHandler {
     onClose(): void;
     onOpenURL(url: string): void;
+    onAttribution(url: string): void;
     onGrantReward(): void;
     onShow(): void;
     onVideoStart(): void;
@@ -46,7 +47,7 @@ export class AdMobView extends View<IAdMobEventHandler> {
             onAFMAClose: () => this.onClose(),
             onAFMAOpenURL: (url: string) => this.onOpenURL(url),
             onAFMADisableBackButton: () => { /**/ },
-            onAFMAClick: (url) => this.onOpenURL(url),
+            onAFMAClick: (url) => this.onAttribution(url),
             onAFMAFetchAppStoreOverlay: () => { /**/ },
             onAFMAForceOrientation: () => { /**/ },
             onAFMAGrantReward: () => this.onGrantReward(),
@@ -77,6 +78,10 @@ export class AdMobView extends View<IAdMobEventHandler> {
         this._mraidBridge.disconnect();
         this._afmaBridge.disconnect();
         super.hide();
+    }
+
+    public onBackPressed() {
+        this._afmaBridge.onBackPressed();
     }
 
     private setupIFrame() {
@@ -117,7 +122,7 @@ export class AdMobView extends View<IAdMobEventHandler> {
         return this._adMobSignalFactory.getClickSignal().then((signal) => {
             this.injectScript(e, MRAIDContainer);
 
-            const signalProto = signal.getBase64ProtoBuf();
+            const signalProto = signal.getBase64ProtoBufNonEncoded();
             this.injectScript(e, AFMAContainer.replace(AFMAClickStringMacro, signalProto));
  //           this.injectScript(e, `<script>AFMA_ReceiveMessage('onshow');</script>`);
         });
@@ -129,6 +134,10 @@ export class AdMobView extends View<IAdMobEventHandler> {
 
     private onClose() {
         this._handlers.forEach((h) => h.onClose());
+    }
+
+    private onAttribution(url: string) {
+        this._handlers.forEach((h) => h.onAttribution(url));
     }
 
     private onOpenURL(url: string) {
