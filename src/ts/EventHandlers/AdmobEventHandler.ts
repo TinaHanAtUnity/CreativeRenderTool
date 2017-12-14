@@ -5,9 +5,11 @@ import { Platform } from 'Constants/Platform';
 import { FinishState } from 'Constants/FinishState';
 import { Timer } from 'Utilities/Timer';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { Request } from 'Utilities/Request';
 
 export interface IAdMobEventHandlerParameters {
     adUnit: AdMobAdUnit;
+    request: Request;
     nativeBridge: NativeBridge;
 }
 
@@ -20,10 +22,12 @@ export class AdMobEventHandler implements IAdMobEventHandler {
     private _adUnit: AdMobAdUnit;
     private _nativeBridge: NativeBridge;
     private _timeoutTimer: Timer;
+    private _request: Request;
 
     constructor(parameters: IAdMobEventHandlerParameters) {
         this._adUnit = parameters.adUnit;
         this._nativeBridge = parameters.nativeBridge;
+        this._request = parameters.request;
         this._timeoutTimer = new Timer(() => this.onFailureToLoad(), AdMobEventHandler._loadTimeout);
     }
 
@@ -38,7 +42,9 @@ export class AdMobEventHandler implements IAdMobEventHandler {
             this._adUnit.sendClickEvent();
         }
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            this._nativeBridge.UrlScheme.open(url);
+            this._request.followRedirectChain(url).then((storeURL) => {
+                this._nativeBridge.UrlScheme.open(storeURL);
+            });
         } else {
             this._nativeBridge.Intent.launch({
                 action: 'android.intent.action.VIEW',
