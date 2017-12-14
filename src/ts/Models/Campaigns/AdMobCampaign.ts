@@ -8,7 +8,7 @@ interface IAdMobCampaign extends ICampaign {
 }
 
 export class AdMobCampaign extends Campaign<IAdMobCampaign> {
-    constructor(markup: string, session: Session, gamerId: string, abGroup: number, cacheTTL: number | undefined, tracking?: { [eventName: string]: string[] }, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
+    constructor(markup: string, session: Session, campaignId: string, gamerId: string, abGroup: number, cacheTTL: number | undefined, tracking?: { [eventName: string]: string[] }, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
         super('AdMobCampaign', {
             ... Campaign.Schema,
             dynamicMarkup: ['string'],
@@ -17,6 +17,7 @@ export class AdMobCampaign extends Campaign<IAdMobCampaign> {
         if(cacheTTL) {
             this.set('willExpireAt', Date.now() + cacheTTL * 1000);
         }
+        this.set('id', campaignId);
         this.set('dynamicMarkup', markup);
         this.set('gamerId', gamerId);
         this.set('abGroup', abGroup);
