@@ -24,18 +24,19 @@ export class VastCampaign extends Campaign<IVastCampaign> {
             landscape: ['object', 'undefined']
         });
 
-        const portraitUrl = vast.getCompanionPortraitUrl();
+        // const portraitUrl = vast.getCompanionPortraitUrl();
+        const portraitUrl = 'http://10.35.4.189:8000/images/3.jpg';
         let portraitAsset;
         if(portraitUrl) {
             portraitAsset = new Image(portraitUrl, session);
         }
 
-        const landscapeUrl = vast.getCompanionLandscapeUrl();
+        // const landscapeUrl = vast.getCompanionLandscapeUrl();
+        const landscapeUrl = 'http://10.35.4.189:8000/images/1.jpg';
         let landscapeAsset;
         if(landscapeUrl) {
             landscapeAsset = new Image(landscapeUrl, session);
         }
-
         this.set('vast', vast);
         this.set('video', new Video(vast.getVideoUrl(), session));
         this.set('hasEndscreen', !!vast.getCompanionPortraitUrl() || !!vast.getCompanionLandscapeUrl());
