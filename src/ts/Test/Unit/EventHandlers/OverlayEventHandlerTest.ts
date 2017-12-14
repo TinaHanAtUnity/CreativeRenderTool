@@ -25,6 +25,7 @@ import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
+import { Placement } from 'Models/Placement';
 
 describe('OverlayEventHandlerTest', () => {
 
@@ -47,6 +48,7 @@ describe('OverlayEventHandlerTest', () => {
     let overlayEventHandler: OverlayEventHandler<PerformanceCampaign>;
     let comScoreService: ComScoreTrackingService;
     let campaign: PerformanceCampaign;
+    let placement: Placement;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -70,6 +72,7 @@ describe('OverlayEventHandlerTest', () => {
         endScreen = new PerformanceEndScreen(nativeBridge, campaign, TestFixtures.getConfiguration().isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
         comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
+        placement = TestFixtures.getPlacement();
 
         performanceAdUnitParameters = {
             forceOrientation: ForceOrientation.LANDSCAPE,
@@ -80,7 +83,7 @@ describe('OverlayEventHandlerTest', () => {
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
             comScoreTrackingService: comScoreService,
-            placement: TestFixtures.getPlacement(),
+            placement: placement,
             campaign: campaign,
             configuration: TestFixtures.getConfiguration(),
             request: request,
@@ -120,7 +123,7 @@ describe('OverlayEventHandlerTest', () => {
         });
 
         it('should send skip', () => {
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendSkip, campaign.getSession(), campaign, performanceAdUnit.getVideo().getPosition());
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendSkip, campaign.getSession(), placement, campaign, performanceAdUnit.getVideo().getPosition());
         });
 
         it('should call reconfigure', () => {

@@ -24,6 +24,7 @@ import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { PerformanceEndScreenEventHandler } from 'EventHandlers/PerformanceEndScreenEventHandler';
 import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
+import { Placement } from 'Models/Placement';
 
 describe('EndScreenEventHandlerTest', () => {
 
@@ -42,6 +43,7 @@ describe('EndScreenEventHandlerTest', () => {
     let endScreenEventHandler: PerformanceEndScreenEventHandler;
     let comScoreService: ComScoreTrackingService;
     let campaign: PerformanceCampaign;
+    let placement: Placement;
 
     describe('with onDownloadAndroid', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -72,6 +74,7 @@ describe('EndScreenEventHandlerTest', () => {
             const video = new Video('', TestFixtures.getSession());
             endScreen = new PerformanceEndScreen(nativeBridge, TestFixtures.getCampaign(), TestFixtures.getConfiguration().isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
+            placement = TestFixtures.getPlacement();
 
             performanceAdUnitParameters = {
                 forceOrientation: ForceOrientation.LANDSCAPE,
@@ -82,7 +85,7 @@ describe('EndScreenEventHandlerTest', () => {
                 thirdPartyEventManager: thirdPartyEventManager,
                 operativeEventManager: operativeEventManager,
                 comScoreTrackingService: comScoreService,
-                placement: TestFixtures.getPlacement(),
+                placement: placement,
                 campaign: campaign,
                 configuration: TestFixtures.getConfiguration(),
                 request: request,
@@ -106,7 +109,7 @@ describe('EndScreenEventHandlerTest', () => {
                 clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
             });
 
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, campaign.getSession(), campaign);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, campaign.getSession(), placement, campaign);
         });
 
         describe('with follow redirects', () => {
@@ -180,7 +183,7 @@ describe('EndScreenEventHandlerTest', () => {
             });
 
             it('should send a click with session manager', () => {
-                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, campaign.getSession(), campaign);
+                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, campaign.getSession(), placement, campaign);
             });
 
             it('should launch market view', () => {
@@ -262,7 +265,7 @@ describe('EndScreenEventHandlerTest', () => {
                 clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
             });
 
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, campaign.getSession(), campaign);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, campaign.getSession(), placement, campaign);
         });
 
         describe('with follow redirects', () => {
@@ -417,7 +420,7 @@ describe('EndScreenEventHandlerTest', () => {
             });
 
             it('should send a click with session manager', () => {
-                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, campaign.getSession(), campaign);
+                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, campaign.getSession(), placement, campaign);
             });
         });
     });

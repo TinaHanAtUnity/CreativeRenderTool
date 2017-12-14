@@ -9,8 +9,10 @@ import { Double } from 'Utilities/Double';
 import { Campaign } from 'Models/Campaign';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
+import { Placement } from 'Models/Placement';
 
 export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler {
+    protected _placement: Placement;
     protected _nativeBridge: NativeBridge;
     private _adUnit: VideoAdUnit<T>;
     private _operativeEventManager: OperativeEventManager;
@@ -25,13 +27,14 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
         this._abGroup = parameters.campaign.getAbGroup();
         this._adUnit = adUnit;
         this._campaign = parameters.campaign;
+        this._placement = parameters.placement;
     }
 
     public onOverlaySkip(position: number): void {
         this._nativeBridge.VideoPlayer.pause();
         this._adUnit.setActive(false);
         this._adUnit.setFinishState(FinishState.SKIPPED);
-        this._operativeEventManager.sendSkip(this._campaign.getSession(), this._campaign, this._adUnit.getVideo().getPosition(), this.getVideoOrientation());
+        this._operativeEventManager.sendSkip(this._campaign.getSession(), this._placement, this._campaign, this._adUnit.getVideo().getPosition(), this.getVideoOrientation());
 
         if (this._abGroup === 5) {
             const sessionId = this._campaign.getSession().getId();
@@ -69,7 +72,7 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
         this._nativeBridge.VideoPlayer.pause();
         this._adUnit.setActive(false);
         this._adUnit.setFinishState(FinishState.SKIPPED);
-        this._operativeEventManager.sendSkip(this._campaign.getSession(), this._campaign, this._adUnit.getVideo().getPosition(), this.getVideoOrientation());
+        this._operativeEventManager.sendSkip(this._campaign.getSession(), this._placement, this._campaign, this._adUnit.getVideo().getPosition(), this.getVideoOrientation());
 
         this._adUnit.onFinish.trigger();
 

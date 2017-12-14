@@ -298,7 +298,7 @@ export class AdUnitFactory {
         const onPrepareTimeoutObserver = nativeBridge.VideoPlayer.onPrepareTimeout.subscribe((url) => VideoEventHandlers.onVideoPrepareTimeout(nativeBridge, adUnit, parameters.campaign, url));
         const onProgressObserver = nativeBridge.VideoPlayer.onProgress.subscribe((position) => VideoEventHandlers.onVideoProgress(nativeBridge, parameters.operativeEventManager, parameters.thirdPartyEventManager, parameters.comScoreTrackingService, adUnit, position, parameters.configuration, parameters.campaign, parameters.placement));
         const onPlayObserver = nativeBridge.VideoPlayer.onPlay.subscribe(() => VideoEventHandlers.onVideoPlay(nativeBridge, adUnit));
-        const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VideoEventHandlers.onVideoCompleted(parameters.operativeEventManager, parameters.comScoreTrackingService, adUnit, parameters.campaign));
+        const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VideoEventHandlers.onVideoCompleted(parameters.operativeEventManager, parameters.comScoreTrackingService, adUnit, parameters.campaign, parameters.placement));
 
         adUnit.onClose.subscribe(() => {
             nativeBridge.VideoPlayer.onPrepared.unsubscribe(onPreparedObserver);

@@ -14,7 +14,6 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _clientInfo: ClientInfo;
     private _request: Request;
     private _vastCampaign: VastCampaign;
-    private _placement: Placement;
     private _paused: boolean = false;
 
     constructor(nativeBridge: NativeBridge, adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
