@@ -1,3 +1,12 @@
+# Pending
+
+* Fix VAST end screen layout
+* Xmas endscreen theme on groups 18 and 19
+* Rearrange MOAT parameters
+* Add session to every asset for better diagnostics
+* Send webview user agent for tracking events based on auction response
+* Clickthrough parse on Display Interstitial Campaign and Display Interstitial Url Campaign
+
 # Thu Dec 14 12:03:50 UTC 2017
 
 * Redeployment of previous deployment with fixed placement ID handling
