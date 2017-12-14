@@ -6,11 +6,15 @@ import { FinishState } from 'Constants/FinishState';
 import { Timer } from 'Utilities/Timer';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Request } from 'Utilities/Request';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { Session } from 'Models/Session';
 
 export interface IAdMobEventHandlerParameters {
     adUnit: AdMobAdUnit;
     request: Request;
     nativeBridge: NativeBridge;
+    session: Session;
+    thirdPartyEventManager: ThirdPartyEventManager;
 }
 
 export class AdMobEventHandler implements IAdMobEventHandler {
@@ -23,11 +27,15 @@ export class AdMobEventHandler implements IAdMobEventHandler {
     private _nativeBridge: NativeBridge;
     private _timeoutTimer: Timer;
     private _request: Request;
+    private _session: Session;
+    private _thirdPartyEventManager: ThirdPartyEventManager;
 
     constructor(parameters: IAdMobEventHandlerParameters) {
         this._adUnit = parameters.adUnit;
         this._nativeBridge = parameters.nativeBridge;
         this._request = parameters.request;
+        this._thirdPartyEventManager = parameters.thirdPartyEventManager;
+        this._session = parameters.session;
         this._timeoutTimer = new Timer(() => this.onFailureToLoad(), AdMobEventHandler._loadTimeout);
     }
 
@@ -42,9 +50,7 @@ export class AdMobEventHandler implements IAdMobEventHandler {
             this._adUnit.sendClickEvent();
         }
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            this._request.followRedirectChain(url).then((storeURL) => {
-                this._nativeBridge.UrlScheme.open(storeURL);
-            });
+            this._nativeBridge.UrlScheme.open(url);
         } else {
             this._nativeBridge.Intent.launch({
                 action: 'android.intent.action.VIEW',
@@ -52,6 +58,10 @@ export class AdMobEventHandler implements IAdMobEventHandler {
             });
         }
     }
+
+    public onAttribution(url: string): void {
+        this._thirdPartyEventManager.sendEvent('admob click', this._session.getId(), url);
+   }
 
     public onGrantReward(): void {
         this._adUnit.setFinishState(FinishState.COMPLETED);

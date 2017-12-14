@@ -412,7 +412,9 @@ export class AdUnitFactory {
         const eventHandler = new AdMobEventHandler({
             nativeBridge: nativeBridge,
             adUnit: adUnit,
-            request: parameters.request
+            request: parameters.request,
+            thirdPartyEventManager: parameters.thirdPartyEventManager,
+            session: parameters.campaign.getSession()
         });
         view.addEventHandler(eventHandler);
 

@@ -17,6 +17,7 @@ import { MRAIDBridge } from 'Views/MRAIDBridge';
 export interface IAdMobEventHandler {
     onClose(): void;
     onOpenURL(url: string): void;
+    onAttribution(url: string): void;
     onGrantReward(): void;
     onShow(): void;
     onVideoStart(): void;
@@ -46,7 +47,7 @@ export class AdMobView extends View<IAdMobEventHandler> {
             onAFMAClose: () => this.onClose(),
             onAFMAOpenURL: (url: string) => this.onOpenURL(url),
             onAFMADisableBackButton: () => { /**/ },
-            onAFMAClick: (url) => this.onOpenURL(url),
+            onAFMAClick: (url) => this.onAttribution(url),
             onAFMAFetchAppStoreOverlay: () => { /**/ },
             onAFMAForceOrientation: () => { /**/ },
             onAFMAGrantReward: () => this.onGrantReward(),
@@ -133,6 +134,10 @@ export class AdMobView extends View<IAdMobEventHandler> {
 
     private onClose() {
         this._handlers.forEach((h) => h.onClose());
+    }
+
+    private onAttribution(url: string) {
+        this._handlers.forEach((h) => h.onAttribution(url));
     }
 
     private onOpenURL(url: string) {
