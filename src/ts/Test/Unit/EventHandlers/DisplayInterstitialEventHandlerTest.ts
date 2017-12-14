@@ -18,8 +18,7 @@ import { DisplayInterstitialAdUnit, IDisplayInterstitialAdUnitParameters } from 
 import { Activity } from 'AdUnits/Containers/Activity';
 import { DisplayInterstitialEventHandler } from 'EventHandlers/DisplayInterstitialEventHandler';
 
-// todo: temporarily disabled due to test affected by random variations in network latency
-describe.skip('DisplayInterstitialEventHandler', () => {
+describe('DisplayInterstitialEventHandler', () => {
     const isDisplayInterstitialUrlCampaign = true;
     let view: DisplayInterstitial;
     let nativeBridge: NativeBridge;
@@ -31,12 +30,13 @@ describe.skip('DisplayInterstitialEventHandler', () => {
     let displayInterstitialEventHandler: DisplayInterstitialEventHandler;
     let operativeEventManager: OperativeEventManager;
     let comScoreService: ComScoreTrackingService;
+    let server: sinon.SinonFakeServer;
 
     describe('on Display Interstitial Markup Campaign',() => {
         eventHandlerTests(!isDisplayInterstitialUrlCampaign);
     });
 
-    describe('on Display Interstitial MarkupUrl Campaign', () => {
+    describe.skip('on Display Interstitial MarkupUrl Campaign', () => {
         eventHandlerTests(isDisplayInterstitialUrlCampaign);
     });
 
@@ -56,6 +56,13 @@ describe.skip('DisplayInterstitialEventHandler', () => {
             });
 
             campaign = TestFixtures.getDisplayInterstitialCampaign(isUrlCampaign);
+
+            if (isUrlCampaign) {
+                server = sinon.fakeServer.create();
+                server.respondImmediately = true;
+                server.respondWith('<div><a href="http://unity3d.com"></a></div>');
+            }
+
             view = new DisplayInterstitial(nativeBridge, placement, campaign);
 
             sandbox.stub(nativeBridge, 'getApiLevel').returns(16);
@@ -95,6 +102,10 @@ describe.skip('DisplayInterstitialEventHandler', () => {
         afterEach(() => {
             view.hide();
             sandbox.restore();
+
+            if (server) {
+                server.restore();
+            }
         });
 
         it('should redirect when the redirect message is sent', () => {
