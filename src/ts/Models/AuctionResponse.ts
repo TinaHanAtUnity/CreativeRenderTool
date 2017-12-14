@@ -17,6 +17,7 @@ export interface IAuctionResponse {
     advertiserDomain: string | undefined;
     advertiserBundleId: string | undefined;
     useWebViewUserAgentForTracking: boolean | undefined;
+    buyerId: string | undefined;
 }
 
 export class AuctionResponse extends Model<IAuctionResponse> {
@@ -36,7 +37,8 @@ export class AuctionResponse extends Model<IAuctionResponse> {
             advertiserCampaignId: ['string', 'undefined'],
             advertiserDomain: ['string', 'undefined'],
             advertiserBundleId: ['string', 'undefined'],
-            useWebViewUserAgentForTracking: ['boolean', 'undefined']
+            useWebViewUserAgentForTracking: ['boolean', 'undefined'],
+            buyerId: ['string', 'undefined']
         });
 
         this.set('placements', placements);
@@ -54,6 +56,7 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         this.set('advertiserDomain', data.advDomain);
         this.set('advertiserBundleId', data.bundleId);
         this.set('useWebViewUserAgentForTracking', data.useWebViewUserAgentForTracking || false);
+        this.set('buyerId', data.buyerId);
     }
 
     public getPlacements(): string[] {
@@ -120,6 +123,10 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         return this.get('useWebViewUserAgentForTracking');
     }
 
+    public getBuyerId(): string | undefined {
+        return this.get('buyerId');
+    }
+
     public getDTO(): {[key: string]: any } {
         return {
             'placements': this.getPlacements(),
@@ -133,7 +140,8 @@ export class AuctionResponse extends Model<IAuctionResponse> {
             'correlationId': this.getCorrelationId(),
             'appCategory': this.getCategory(),
             'appSubCategory': this.getSubCategory(),
-            'useWebViewUserAgentForTracking': this.getUseWebViewUserAgentForTracking()
+            'useWebViewUserAgentForTracking': this.getUseWebViewUserAgentForTracking(),
+            'buyerId': this.getBuyerId()
         };
     }
 }
