@@ -1,3 +1,7 @@
+# Thu Dec 14 12:03:50 UTC 2017
+
+* Redeployment of previous deployment with fixed placement ID handling
+
 # Wed Dec 13 21:24:50 UTC 2017
 
 * Refactor/cleanup ad unit model abuse
