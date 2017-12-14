@@ -128,7 +128,7 @@ export class AdUnitFactory {
         };
 
         if(parameters.campaign.hasEndscreen()) {
-            vastEndScreen = new VastEndScreen(nativeBridge, parameters.campaign, parameters.clientInfo.getGameId());
+            vastEndScreen = new VastEndScreen(nativeBridge, parameters.configuration.isCoppaCompliant(), parameters.campaign, parameters.clientInfo.getGameId());
             vastAdUnitParameters.endScreen = vastEndScreen;
         }
 

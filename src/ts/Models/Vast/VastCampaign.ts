@@ -35,7 +35,6 @@ export class VastCampaign extends Campaign<IVastCampaign> {
         if(landscapeUrl) {
             landscapeAsset = new Image(landscapeUrl, session);
         }
-
         this.set('vast', vast);
         this.set('video', new Video(vast.getVideoUrl(), session));
         this.set('hasEndscreen', !!vast.getCompanionPortraitUrl() || !!vast.getCompanionLandscapeUrl());
