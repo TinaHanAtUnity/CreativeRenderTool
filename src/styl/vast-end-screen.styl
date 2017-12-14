@@ -1,0 +1,65 @@
+@import "vars.styl";
+@import "components.styl";
+
+$end-screen-mixin($scale-size = $default-scale-size) {
+
+  #vast-end-screen {
+    .btn-close-region {
+      $close-button-default($scale-size);
+      padding: $default-size * $scale-size * .25;
+    }
+
+    .privacy-button {
+      $privacy-button-default($scale-size);
+      margin: 0 0 0 $default-size * $scale-size * .25;
+    }
+  }
+}
+
+#vast-end-screen {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  .campaign-container {
+    width: 100%;
+    height: 100%;
+  }
+
+  .game-background {
+    width: 100%;
+    height: 100%;
+    background-color: $black;
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+}
+
+body {
+  &.portrait #vast-end-screen {
+    .game-background-portrait {
+      display: block;
+    }
+    .game-background-landscape {
+      display: none;
+    }
+  }
+
+  &.landscape #vast-end-screen {
+    .game-background-portrait {
+      display: none;
+    }
+    .game-background-landscape {
+      display: block;
+    }
+  }
+}
+
+$end-screen-mixin();
+
+
