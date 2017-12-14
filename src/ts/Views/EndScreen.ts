@@ -1,5 +1,6 @@
 import EndScreenTemplate from 'html/EndScreen.html';
 import DarkEndScreenTemplate from 'html/DarkEndScreen.html';
+import XmasEndScreenTemplate from 'html/XmasEndScreen.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -18,6 +19,7 @@ export interface IEndScreenHandler {
 }
 
 const darkEndScreenId = "dark-end-screen";
+const xMasEndScreenId = "xmas-end-screen";
 
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
 
@@ -39,6 +41,8 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
         if (this.getEndscreenAlt() === darkEndScreenId) {
             this._template = new Template(DarkEndScreenTemplate, this._localization);
+        } else if (this.getEndscreenAlt() === xMasEndScreenId) {
+            this._template = new Template(XmasEndScreenTemplate, this._localization);
         } else {
             this._template = new Template(EndScreenTemplate, this._localization);
         }
@@ -143,6 +147,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     protected getEndscreenAlt(campaign?: Campaign) {
         if (this._abGroup === 8 || this._abGroup === 9) {
             return darkEndScreenId;
+        }
+
+        if(this._abGroup === 18 || this._abGroup === 19) {
+            return xMasEndScreenId;
         }
 
         return undefined;

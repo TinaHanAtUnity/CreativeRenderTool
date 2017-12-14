@@ -1,12 +1,17 @@
 @import "vars.styl";
 
-$set-image($width = 1rem, $height = 1rem, $border-radius = .5rem, $url = "", $backgroundSize = cover) {
+$set-image($width, $height, $border-radius = .5rem, $url = "", $backgroundSize = cover) {
   if($url) {
     background-image: url($url);
   }
 
-  width: $width;
-  height: $height;
+  if($width) {
+    width: $width;
+  }
+  if($height) {
+    height: $height;
+  }
+
   border-radius: $border-radius;
   background-position: center;
   background-size: $backgroundSize;
