@@ -77,7 +77,7 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
         }
 
         if(campaign.trailerPortraitDownloadable && campaign.trailerPortraitDownloadableSize && campaign.trailerPortraitStreaming) {
-            this.set('videoPortrait', new Video(campaign.trailerPortraitDownloadable, campaign.trailerPortraitDownloadableSize));
+            this.set('videoPortrait', new Video(campaign.trailerPortraitDownloadable, session, campaign.trailerPortraitDownloadableSize));
             this.set('streamingPortraitVideo', new Video(campaign.trailerPortraitStreaming, session));
         }
 
