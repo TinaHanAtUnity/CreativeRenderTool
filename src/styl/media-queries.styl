@@ -119,7 +119,8 @@
       }
     }
 
-    #end-screen {
+    #end-screen,
+    #vast-end-screen {
       padding-top: constant(safe-area-inset-top);
       padding-right: constant(safe-area-inset-right);
       padding-bottom: constant(safe-area-inset-bottom);
@@ -132,13 +133,15 @@
         right: constant(safe-area-inset-right);
       }
 
-      .unityads-logo {
-        bottom: constant(safe-area-inset-bottom);
-      }
-
       .privacy-button {
         bottom: constant(safe-area-inset-bottom);
         left: constant(safe-area-inset-left);
+      }
+    }
+
+    #end-screen {
+      .unityads-logo {
+        bottom: constant(safe-area-inset-bottom);
       }
     }
 
