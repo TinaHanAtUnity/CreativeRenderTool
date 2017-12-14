@@ -193,7 +193,10 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
     }
 
     private setWebPlayerViews(): Promise<void> {
-        return this._container.open(this, ['webplayer', 'webview'], false, this._forceOrientation, true, false, true, false, this._options);
+        return this._nativeBridge.WebPlayer.setSettings({}, {}).then( () => {
+            this._nativeBridge.Sdk.logDebug("DisplayInterstitalAdUnit: WebPlayer settings have been set");
+            return this._container.open(this, ['webplayer', 'webview'], false, this._forceOrientation, true, false, true, false, this._options);
+        });
     }
 
     private setWebPlayerUrl(url: string): Promise<void> {
@@ -224,9 +227,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
     private setWebplayerSettings(): Promise<void> {
         const eventSettings = { 'onPageStarted': {'sendEvent':true} };
         this._nativeBridge.WebPlayer.onPageStarted.subscribe( (url) => this.onPageStarted(url));
-        return this._nativeBridge.WebPlayer.setSettings({}, {}).then( () => {
-            return this._nativeBridge.WebPlayer.setEventSettings(eventSettings);
-        });
+        return this._nativeBridge.WebPlayer.setEventSettings(eventSettings);
     }
 
     private setWebPlayerContent(): Promise<void> {
