@@ -75,7 +75,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     private onDownloadAndroid(parameters: IEndScreenDownloadParameters): void {
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
 
-        this._operativeEventManager.sendClick(this._campaign.getSession(), this._campaign, this.getVideoOrientation());
+        this._operativeEventManager.sendClick(this._campaign.getSession(), this._placement, this._campaign, this.getVideoOrientation());
         if(parameters.clickAttributionUrl) {
             this.handleClickAttribution(parameters);
 
@@ -90,7 +90,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     private onDownloadIos(parameters: IEndScreenDownloadParameters): void {
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
 
-        this._operativeEventManager.sendClick(this._campaign.getSession(), this._campaign, this.getVideoOrientation());
+        this._operativeEventManager.sendClick(this._campaign.getSession(), this._placement, this._campaign, this.getVideoOrientation());
         if(parameters.clickAttributionUrl) {
             this.handleClickAttribution(parameters);
 

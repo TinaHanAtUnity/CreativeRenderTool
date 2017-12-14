@@ -100,7 +100,7 @@ export class VideoEventHandlers {
             adUnit.getContainer().addDiagnosticsEvent({type: 'videoStarted'});
             adUnit.getVideo().setStarted(true);
 
-            operativeEventManager.sendStart(campaign.getSession(), campaign, this.getVideoOrientation(adUnit)).then(() => {
+            operativeEventManager.sendStart(campaign.getSession(), placement, campaign, this.getVideoOrientation(adUnit)).then(() => {
                 adUnit.onStartProcessed.trigger();
             });
             if (abGroup === 5) {
@@ -210,11 +210,11 @@ export class VideoEventHandlers {
             adUnit.getVideo().setPosition(position);
 
             if(previousQuartile === 0 && adUnit.getVideo().getQuartile() === 1) {
-                operativeEventManager.sendFirstQuartile(campaign.getSession(), campaign, this.getVideoOrientation(adUnit));
+                operativeEventManager.sendFirstQuartile(campaign.getSession(), placement, campaign, this.getVideoOrientation(adUnit));
             } else if(previousQuartile === 1 && adUnit.getVideo().getQuartile() === 2) {
-                operativeEventManager.sendMidpoint(campaign.getSession(), campaign, this.getVideoOrientation(adUnit));
+                operativeEventManager.sendMidpoint(campaign.getSession(), placement, campaign, this.getVideoOrientation(adUnit));
             } else if(previousQuartile === 2 && adUnit.getVideo().getQuartile() === 3) {
-                operativeEventManager.sendThirdQuartile(campaign.getSession(), campaign, this.getVideoOrientation(adUnit));
+                operativeEventManager.sendThirdQuartile(campaign.getSession(), placement, campaign, this.getVideoOrientation(adUnit));
             }
         }
 
@@ -228,7 +228,7 @@ export class VideoEventHandlers {
         nativeBridge.VideoPlayer.setProgressEventInterval(adUnit.getProgressInterval());
     }
 
-    public static onVideoCompleted(operativeEventManager: OperativeEventManager, comScoreTrackingService: ComScoreTrackingService, adUnit: VideoAdUnit, campaign: Campaign): void {
+    public static onVideoCompleted(operativeEventManager: OperativeEventManager, comScoreTrackingService: ComScoreTrackingService, adUnit: VideoAdUnit, campaign: Campaign, placement: Placement): void {
         const comScorePlayedTime = adUnit.getVideo().getPosition();
         const comScoreDuration = (adUnit.getVideo().getDuration()).toString(10);
         const sessionId = campaign.getSession().getId();
@@ -240,7 +240,7 @@ export class VideoEventHandlers {
         adUnit.getContainer().addDiagnosticsEvent({type: 'onVideoCompleted'});
         adUnit.setActive(false);
         adUnit.setFinishState(FinishState.COMPLETED);
-        operativeEventManager.sendView(campaign.getSession(), campaign, this.getVideoOrientation(adUnit));
+        operativeEventManager.sendView(campaign.getSession(), placement, campaign, this.getVideoOrientation(adUnit));
         if (abGroup === 5) {
             comScoreTrackingService.sendEvent('end', sessionId, comScoreDuration, comScorePlayedTime, creativeId, category, subCategory);
         }
