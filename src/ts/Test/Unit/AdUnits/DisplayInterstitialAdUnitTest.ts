@@ -37,19 +37,26 @@ describe('DisplayInterstitialAdUnit', () => {
     let clientInfo: ClientInfo;
     let displayInterstitialAdUnitParameters: IDisplayInterstitialAdUnitParameters;
     let comScoreService: ComScoreTrackingService;
+    let server: sinon.SinonFakeServer;
 
-    // todo: refactor xhr usage to not let random variations in network latency to cause unit test failures
-    describe.skip('On static-interstial campaign', () => {
+    describe('On static-interstial campaign', () => {
         adUnitTests(!isStaticInterstitialUrlCampaign);
     });
 
-    describe.skip('On static-interstial-url campaign', () => {
+    describe('On static-interstial-url campaign', () => {
         adUnitTests(isStaticInterstitialUrlCampaign);
     });
 
-    function adUnitTests(isUrlCampaign: boolean) {
+    function adUnitTests(isUrlCampaign: boolean): void {
         beforeEach(() => {
             campaign = TestFixtures.getDisplayInterstitialCampaign(isUrlCampaign);
+
+            if (isUrlCampaign) {
+                server = sinon.fakeServer.create();
+                server.respondImmediately = true;
+                server.respondWith('<div><a href="http://unity3d.com"></a></div>');
+            }
+
             sandbox = sinon.sandbox.create();
             nativeBridge = TestFixtures.getNativeBridge(Platform.ANDROID);
             placement = TestFixtures.getPlacement();
@@ -99,6 +106,10 @@ describe('DisplayInterstitialAdUnit', () => {
                 adUnit.hide();
             }
             sandbox.restore();
+
+            if (server) {
+                server.restore();
+            }
         });
 
         describe('showing', () => {
