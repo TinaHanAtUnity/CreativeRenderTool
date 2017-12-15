@@ -6,6 +6,8 @@ import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { FinishState } from 'Constants/FinishState';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { Diagnostics } from 'Utilities/Diagnostics';
+import { Platform } from 'Constants/Platform';
+import { KeyCode } from 'Constants/Android/KeyCode';
 import { Placement } from 'Models/Placement';
 
 export interface IAdMobAdUnitParameters extends IAdUnitParameters<AdMobCampaign> {
@@ -17,6 +19,7 @@ export class AdMobAdUnit extends AbstractAdUnit {
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _options: any;
     private _onSystemKillObserver: any;
+    private _keyDownListener: (kc: number) => void;
     private _campaign: AdMobCampaign;
     private _placement: Placement;
 
@@ -27,6 +30,7 @@ export class AdMobAdUnit extends AbstractAdUnit {
         this._options = parameters.options;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._operativeEventManager = parameters.operativeEventManager;
+        this._keyDownListener = (kc: number) => this.onKeyDown(kc);
         this._campaign = parameters.campaign;
         this._placement = parameters.placement;
 
@@ -43,6 +47,10 @@ export class AdMobAdUnit extends AbstractAdUnit {
         Diagnostics.trigger('admob_ad_show', {
             placement: this._placement.getId()
         }, this._campaign.getSession());
+
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            this._nativeBridge.AndroidAdUnit.onKeyDown.subscribe(this._keyDownListener);
+        }
 
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
 
@@ -114,6 +122,10 @@ export class AdMobAdUnit extends AbstractAdUnit {
         this._operativeEventManager.sendThirdQuartile(this._campaign.getSession(), this._placement, this._campaign);
         this._operativeEventManager.sendView(this._campaign.getSession(), this._placement, this._campaign);
 
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            this._nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(this._keyDownListener);
+        }
+
         Diagnostics.trigger('admob_ad_close', {
             placement: this._placement.getId(),
             finishState: this.getFinishState()
@@ -135,6 +147,12 @@ export class AdMobAdUnit extends AbstractAdUnit {
         if(this.isShowing()) {
             this.setFinishState(FinishState.SKIPPED);
             this.hide();
+        }
+    }
+
+    private onKeyDown(key: number) {
+        if (key === KeyCode.BACK) {
+            this._view.onBackPressed();
         }
     }
 }

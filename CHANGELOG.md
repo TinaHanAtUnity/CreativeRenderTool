@@ -1,4 +1,8 @@
-# Pending
+# Thu Dec 14 20:09:09 UTC 2017
+
+* Redeployment of previous deployment with fixed Video model handling for portrait videos
+
+# Thu Dec 14 19:04:21 UTC 2017
 
 * Fix VAST end screen layout
 * Xmas endscreen theme on groups 18 and 19
