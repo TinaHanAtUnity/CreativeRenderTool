@@ -1,3 +1,7 @@
+# Fri Dec 15 11:12:36 UTC 2017
+
+* Fix for iOS AdMob spam signals
+
 # Fri Dec 15 05:53:39 UTC 2017
 
 * Fixes various issues reported by AdMob

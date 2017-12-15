@@ -92,14 +92,17 @@ describe('ThirdPartyEventManagerTest', () => {
 
     it('should send headers for event', () => {
         const url: string = 'https://www.example.net/third_party_event';
-        const userAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_2 like Mac OS X) AppleWebKit/603.2.4 (KHTML, like Gecko) Mobile/14F89';
-        const headers = [['User-Agent', userAgent]];
-
         const requestSpy = sinon.spy(request, 'get');
 
         return thirdPartyEventManager.sendEvent('click', 'abcde-12345', url, true).then(() => {
             assert(requestSpy.calledOnce, 'Click attribution event did not try sending GET request');
-            assert.deepEqual(headers, requestSpy.getCall(0).args[1], 'Click attribution event headers do not match');
+            let userAgentHeaderExists = false;
+            for(const header of requestSpy.getCall(0).args[1]) {
+                if(header[0] === 'User-Agent') {
+                    userAgentHeaderExists = true;
+                }
+            }
+            assert.isTrue(userAgentHeaderExists, 'User-Agent header should exist in headers');
         });
     });
 });
