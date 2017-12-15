@@ -1,4 +1,4 @@
-# Pending
+# Fri Dec 15 11:12:36 UTC 2017
 
 * Fix for iOS AdMob spam signals
 
