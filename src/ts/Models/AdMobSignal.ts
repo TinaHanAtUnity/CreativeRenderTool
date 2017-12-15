@@ -579,7 +579,7 @@ export class AdMobSignal extends Model<IAdMobSignal> {
     public getBase64ProtoBufNonEncoded(): string {
         let str = this.getBase64ProtoBuf();
         str = str.replace(/\//g, '_');
-        str = str.replace(/+/g, '-');
+        str = str.replace(/\+/g, '-');
         str = str.replace(/[=]+$/, '');
         return str;
     }
