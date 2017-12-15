@@ -42,7 +42,7 @@ export class AdMobAdUnit extends AbstractAdUnit {
     public show(): Promise<void> {
         this.setShowing(true);
         this.onStart.trigger();
-        this._operativeEventManager.sendStart(this._campaign.getSession(), this._campaign);
+        this._operativeEventManager.sendStart(this._campaign.getSession(), this._placement, this._campaign);
 
         Diagnostics.trigger('admob_ad_show', {
             placement: this._placement.getId()
@@ -79,7 +79,7 @@ export class AdMobAdUnit extends AbstractAdUnit {
 
     public sendClickEvent() {
         this.sendTrackingEvent('click');
-        this._operativeEventManager.sendClick(this._campaign.getSession(), this._campaign);
+        this._operativeEventManager.sendClick(this._campaign.getSession(), this._placement, this._campaign);
     }
 
     public sendStartEvent() {
@@ -88,7 +88,7 @@ export class AdMobAdUnit extends AbstractAdUnit {
 
     public sendSkipEvent() {
         this.sendTrackingEvent('skip');
-        this._operativeEventManager.sendSkip(this._campaign.getSession(), this._campaign);
+        this._operativeEventManager.sendSkip(this._campaign.getSession(), this._placement, this._campaign);
     }
 
     public sendCompleteEvent() {
@@ -119,8 +119,8 @@ export class AdMobAdUnit extends AbstractAdUnit {
         this.setShowing(false);
         this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
         this.onClose.trigger();
-        this._operativeEventManager.sendThirdQuartile(this._campaign.getSession(), this._campaign);
-        this._operativeEventManager.sendView(this._campaign.getSession(), this._campaign);
+        this._operativeEventManager.sendThirdQuartile(this._campaign.getSession(), this._placement, this._campaign);
+        this._operativeEventManager.sendView(this._campaign.getSession(), this._placement, this._campaign);
 
         if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
             this._nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(this._keyDownListener);

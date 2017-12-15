@@ -306,7 +306,7 @@ describe('Event parameters should match specifications', () => {
             sessionManager.setGameSessionId(1234);
             const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
             const campaign: PerformanceCampaign = TestFixtures.getCampaign();
-            return operativeEventManager.sendClick(campaign.getSession(), campaign).then(() => {
+            return operativeEventManager.sendClick(campaign.getSession(), TestFixtures.getPlacement(), campaign).then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];
 
@@ -327,7 +327,7 @@ describe('Event parameters should match specifications', () => {
             sessionManager.setGameSessionId(1234);
             const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
             const campaign: PerformanceCampaign = TestFixtures.getCampaign();
-            return operativeEventManager.sendClick(campaign.getSession(), campaign).then(() => {
+            return operativeEventManager.sendClick(campaign.getSession(), TestFixtures.getPlacement(), campaign).then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];
 
@@ -361,7 +361,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with start event', () => {
-                return operativeEventManager.sendStart(campaign.getSession(), campaign).then(() => {
+                return operativeEventManager.sendStart(campaign.getSession(), TestFixtures.getPlacement(), campaign).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -371,7 +371,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with first quartile event', () => {
-                return operativeEventManager.sendFirstQuartile(campaign.getSession(), campaign).then(() => {
+                return operativeEventManager.sendFirstQuartile(campaign.getSession(), TestFixtures.getPlacement(), campaign).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -381,7 +381,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with midpoint event', () => {
-                return operativeEventManager.sendMidpoint(campaign.getSession(), campaign).then(() => {
+                return operativeEventManager.sendMidpoint(campaign.getSession(), TestFixtures.getPlacement(), campaign).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -391,7 +391,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with third quartile event', () => {
-                return operativeEventManager.sendThirdQuartile(campaign.getSession(), campaign).then(() => {
+                return operativeEventManager.sendThirdQuartile(campaign.getSession(), TestFixtures.getPlacement(), campaign).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -401,7 +401,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with end event', () => {
-                return operativeEventManager.sendView(campaign.getSession(), campaign).then(() => {
+                return operativeEventManager.sendView(campaign.getSession(), TestFixtures.getPlacement(), campaign).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -427,7 +427,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with start event', () => {
-                return operativeEventManager.sendStart(campaign.getSession(), campaign).then(() => {
+                return operativeEventManager.sendStart(campaign.getSession(), TestFixtures.getPlacement(), campaign).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -437,7 +437,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with first quartile event', () => {
-                return operativeEventManager.sendFirstQuartile(campaign.getSession(), campaign).then(() => {
+                return operativeEventManager.sendFirstQuartile(campaign.getSession(), TestFixtures.getPlacement(),campaign).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -447,7 +447,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with midpoint event', () => {
-                return operativeEventManager.sendMidpoint(campaign.getSession(), campaign).then(() => {
+                return operativeEventManager.sendMidpoint(campaign.getSession(), TestFixtures.getPlacement(), campaign).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -457,7 +457,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with third quartile event', () => {
-                return operativeEventManager.sendThirdQuartile(campaign.getSession(), campaign).then(() => {
+                return operativeEventManager.sendThirdQuartile(campaign.getSession(), TestFixtures.getPlacement(), campaign).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -467,7 +467,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with end event', () => {
-                return operativeEventManager.sendView(campaign.getSession(), campaign).then(() => {
+                return operativeEventManager.sendView(campaign.getSession(), TestFixtures.getPlacement(), campaign).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 

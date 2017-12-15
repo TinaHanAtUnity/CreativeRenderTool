@@ -38,11 +38,12 @@ describe('DisplayInterstitialAdUnit', () => {
     let displayInterstitialAdUnitParameters: IDisplayInterstitialAdUnitParameters;
     let comScoreService: ComScoreTrackingService;
 
-    describe('On static-interstial campaign', () => {
+    // todo: refactor xhr usage to not let random variations in network latency to cause unit test failures
+    describe.skip('On static-interstial campaign', () => {
         adUnitTests(!isStaticInterstitialUrlCampaign);
     });
 
-    describe('On static-interstial-url campaign', () => {
+    describe.skip('On static-interstial-url campaign', () => {
         adUnitTests(isStaticInterstitialUrlCampaign);
     });
 

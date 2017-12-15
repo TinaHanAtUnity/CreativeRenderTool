@@ -5,20 +5,26 @@ import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
+import { IPrivacyHandler, Privacy } from 'Views/Privacy';
 
 export interface IVastEndScreenHandler {
     onVastEndScreenClick(): void;
     onVastEndScreenClose(): void;
     onVastEndScreenShow(): void;
     onKeyEvent(keyCode: number): void;
+    onEndScreenPrivacy(url: string): void;
 }
 
-export class VastEndScreen extends View<IVastEndScreenHandler> {
+export class VastEndScreen extends View<IVastEndScreenHandler> implements IPrivacyHandler {
+
     private _isSwipeToCloseEnabled: boolean = false;
+    private _coppaCompliant: boolean;
+    private _privacy: Privacy;
 
-    constructor(nativeBridge: NativeBridge, campaign: VastCampaign, gameId: string) {
-        super(nativeBridge, 'end-screen');
+    constructor(nativeBridge: NativeBridge, coppaCompliant: boolean, campaign: VastCampaign, gameId: string) {
+        super(nativeBridge, 'vast-end-screen');
 
+        this._coppaCompliant = coppaCompliant;
         this._template = new Template(VastEndScreenTemplate);
 
         if(campaign) {
@@ -41,6 +47,11 @@ export class VastEndScreen extends View<IVastEndScreenHandler> {
                 event: 'click',
                 listener: (event: Event) => this.onCloseEvent(event),
                 selector: '.btn-close-region'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onPrivacyEvent(event),
+                selector: '.privacy-button'
             }
         ];
 
@@ -75,8 +86,31 @@ export class VastEndScreen extends View<IVastEndScreenHandler> {
         }
     }
 
+    public hide(): void {
+        super.hide();
+
+        if (this._privacy) {
+            this._privacy.hide();
+            this._privacy.container().parentElement!.removeChild(this._privacy.container());
+            delete this._privacy;
+        }
+    }
+
     public remove(): void {
         this.container().parentElement!.removeChild(this.container());
+    }
+
+    public onPrivacyClose(): void {
+        if (this._privacy) {
+            this._privacy.removeEventHandler(this);
+            this._privacy.hide();
+            this._privacy.container().parentElement!.removeChild(this._privacy.container());
+            delete this._privacy;
+        }
+    }
+
+    public onPrivacy(url: string): void {
+        this._handlers.forEach(handler => handler.onEndScreenPrivacy(url));
     }
 
     private onCloseEvent(event: Event): void {
@@ -87,5 +121,13 @@ export class VastEndScreen extends View<IVastEndScreenHandler> {
     private onClickEvent(event: Event): void {
         event.preventDefault();
         this._handlers.forEach(handler => handler.onVastEndScreenClick());
+    }
+
+    private onPrivacyEvent(event: Event): void {
+        event.preventDefault();
+        this._privacy = new Privacy(this._nativeBridge, this._coppaCompliant);
+        this._privacy.render();
+        document.body.appendChild(this._privacy.container());
+        this._privacy.addEventHandler(this);
     }
 }
