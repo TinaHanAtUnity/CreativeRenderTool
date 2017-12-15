@@ -140,12 +140,11 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
             this._deviceInfo.getScreenHeight()
         ]).then(([screenWidth, screenHeight]) => {
             const closeAreaSizePercent = 0.1;
-            const webviewXSize = screenWidth * closeAreaSizePercent;
-            const webviewYSize = screenHeight * closeAreaSizePercent;
-            const webviewXPos = screenWidth - webviewXSize;
+            const webviewAreaSize = Math.min(screenWidth, screenHeight) * closeAreaSizePercent;
+            const webviewXPos = screenWidth - webviewAreaSize;
             const webviewYPos = 0;
             // TODO: leave the webplayer running in background, don't reopen on return
-            this._container.setViewFrame('webview', Math.floor(webviewXPos), Math.floor(webviewYPos), Math.floor(webviewXSize), Math.floor(webviewYSize)).then(() => {
+            this._container.setViewFrame('webview', Math.floor(webviewXPos), Math.floor(webviewYPos), Math.floor(webviewAreaSize), Math.floor(webviewAreaSize)).then(() => {
                 return this._container.setViewFrame('webplayer', Math.floor(screenWidth), Math.floor(screenHeight), Math.floor(screenWidth), Math.floor(screenHeight)).then(() => {
                     this.setWebPlayerContent();
                 });
