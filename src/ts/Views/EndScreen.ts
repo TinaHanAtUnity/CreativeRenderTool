@@ -1,5 +1,4 @@
 import EndScreenTemplate from 'html/EndScreen.html';
-import DarkEndScreenTemplate from 'html/DarkEndScreen.html';
 import XmasEndScreenTemplate from 'html/XmasEndScreen.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
