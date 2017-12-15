@@ -52,7 +52,7 @@ export class ViewController extends AdUnitContainer {
         this._showing = true;
 
         let nativeViews: string[] = views;
-        if(nativeViews.length === 0){
+        if(nativeViews.length === 0) {
             nativeViews = ['webview'];
         }
 

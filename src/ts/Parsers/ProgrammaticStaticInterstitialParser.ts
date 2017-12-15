@@ -20,7 +20,7 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
         }
         const displayMarkup = jsonDisplay.markup;
         const displayMarkupBaseUrl = jsonDisplay.markupBaseUrl;
-        let displayMarkupUrl = undefined;
+        let displayMarkupUrl;
         if (jsonDisplay.markupUrl) {
             displayMarkupUrl = decodeURIComponent(jsonDisplay.markupUrl);
         }

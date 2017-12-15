@@ -57,7 +57,7 @@ export class Activity extends AdUnitContainer {
         this._androidOptions = options;
 
         let nativeViews: string[] = views;
-        if(nativeViews.length === 0){
+        if(nativeViews.length === 0) {
             nativeViews = ['webview'];
         }
 

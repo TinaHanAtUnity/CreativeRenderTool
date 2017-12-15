@@ -106,7 +106,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
             this._thirdPartyEventManager.sendEvent('display click', this._campaign.getSession().getId(), url);
         }
 
-        if (this.isWhiteListedLinkType(href)) {
+        if(this.isWhiteListedLinkType(href)) {
             if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
                 this._nativeBridge.Intent.launch({
                     'action': 'android.intent.action.VIEW',
@@ -121,7 +121,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
     private isWhiteListedLinkType(href: string): boolean {
         const whiteListedProtocols = ['http', 'market', 'itunes'];
         for (const protocol of whiteListedProtocols) {
-            if (href.indexOf(protocol) === 0) {
+            if(href.indexOf(protocol) === 0) {
                 return true;
             }
         }
@@ -234,12 +234,12 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
         const markupBaseUrl = this._campaign.getMarkupBaseUrl();
 
         return this.setWebplayerSettings().then( () => {
-            if (markupUrl) {
+            if(markupUrl) {
                 return this.setWebPlayerUrl(markupUrl);
             }
             const markup = this._campaign.getDynamicMarkup();
-            if (markup) {
-                if(markupBaseUrl){
+            if(markup) {
+                if(markupBaseUrl) {
                     return this.setWebPlayerData(markup, 'text/html', 'UTF-8', markupBaseUrl);
                 }
                 return this.setWebPlayerData(markup, 'text/html', 'UTF-8');

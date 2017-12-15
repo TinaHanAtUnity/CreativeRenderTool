@@ -46,7 +46,7 @@ export class DisplayInterstitialCampaign extends Campaign<IDisplayInterstitialCa
     }
 
     public getMarkupBaseUrl(): string | undefined {
-        return this.get('markupBaseUrl')
+        return this.get('markupBaseUrl');
     }
 
     public getClickThroughUrl(): string | undefined {
