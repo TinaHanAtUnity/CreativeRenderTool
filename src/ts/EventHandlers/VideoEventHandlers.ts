@@ -90,22 +90,19 @@ export class VideoEventHandlers {
         const overlay = adUnit.getOverlay();
 
         if(position > 0 && !adUnit.getVideo().hasStarted()) {
-            const comScoreDuration = (adUnit.getVideo().getDuration()).toString(10);
-            const sessionId = campaign.getSession().getId();
-            const creativeId = campaign.getCreativeId();
-            const category = campaign.getCategory();
-            const subCategory = campaign.getSubCategory();
-            const abGroup = campaign.getAbGroup();
-
             adUnit.getContainer().addDiagnosticsEvent({type: 'videoStarted'});
             adUnit.getVideo().setStarted(true);
 
             operativeEventManager.sendStart(campaign.getSession(), placement, campaign, this.getVideoOrientation(adUnit)).then(() => {
                 adUnit.onStartProcessed.trigger();
             });
-            if (abGroup === 5) {
-                comScoreTrackingService.sendEvent('play', sessionId, comScoreDuration, position, creativeId, category, subCategory);
-            }
+
+            const comScoreDuration = (adUnit.getVideo().getDuration()).toString(10);
+            const sessionId = campaign.getSession().getId();
+            const creativeId = campaign.getCreativeId();
+            const category = campaign.getCategory();
+            const subCategory = campaign.getSubCategory();
+            comScoreTrackingService.sendEvent('play', sessionId, comScoreDuration, position, creativeId, category, subCategory);
 
             if(overlay) {
                 overlay.setSpinnerEnabled(false);
@@ -229,21 +226,18 @@ export class VideoEventHandlers {
     }
 
     public static onVideoCompleted(operativeEventManager: OperativeEventManager, comScoreTrackingService: ComScoreTrackingService, adUnit: VideoAdUnit, campaign: Campaign, placement: Placement): void {
+        adUnit.getContainer().addDiagnosticsEvent({type: 'onVideoCompleted'});
+        adUnit.setActive(false);
+        adUnit.setFinishState(FinishState.COMPLETED);
+        operativeEventManager.sendView(campaign.getSession(), placement, campaign, this.getVideoOrientation(adUnit));
+
         const comScorePlayedTime = adUnit.getVideo().getPosition();
         const comScoreDuration = (adUnit.getVideo().getDuration()).toString(10);
         const sessionId = campaign.getSession().getId();
         const creativeId = campaign.getCreativeId();
         const category = campaign.getCategory();
         const subCategory = campaign.getSubCategory();
-        const abGroup = campaign.getAbGroup();
-
-        adUnit.getContainer().addDiagnosticsEvent({type: 'onVideoCompleted'});
-        adUnit.setActive(false);
-        adUnit.setFinishState(FinishState.COMPLETED);
-        operativeEventManager.sendView(campaign.getSession(), placement, campaign, this.getVideoOrientation(adUnit));
-        if (abGroup === 5) {
-            comScoreTrackingService.sendEvent('end', sessionId, comScoreDuration, comScorePlayedTime, creativeId, category, subCategory);
-        }
+        comScoreTrackingService.sendEvent('end', sessionId, comScoreDuration, comScorePlayedTime, creativeId, category, subCategory);
 
         this.afterVideoCompleted(adUnit);
     }
