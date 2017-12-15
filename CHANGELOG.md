@@ -1,3 +1,7 @@
+# Fri Dec 15 05:53:39 UTC 2017
+
+* Fixes various issues reported by AdMob
+
 # Thu Dec 14 20:09:09 UTC 2017
 
 * Redeployment of previous deployment with fixed Video model handling for portrait videos
