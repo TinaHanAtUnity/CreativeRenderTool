@@ -154,7 +154,8 @@ export class AdMobSignalFactory {
 
     private getOsVersion(clientInfo: ClientInfo, deviceInfo: DeviceInfo): string {
         if(clientInfo.getPlatform() === Platform.IOS) {
-            return deviceInfo.getModel().split(' ')[0] + ' ' + deviceInfo.getOsVersion();
+            const model = deviceInfo.getModel().split(' ')[0];
+            return model.replace(/[0-9]+,[0-9]+$/, '') + ' ' + deviceInfo.getOsVersion();
         } else {
             return deviceInfo.getOsVersion();
         }
