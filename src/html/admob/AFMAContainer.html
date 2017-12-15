@@ -1,9 +1,16 @@
 <script>
     (function() {
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(function() {
-                AFMA_ReceiveMessage('onshow');
-            });
+        window.addEventListener('pageshow', function() {
+            AFMA_ReceiveMessage('onshow');
+        });
+
+        window.addEventListener('message', function(e) {
+            if (e.data.type === 'afma') {
+                if (e.data.event === 'back') {
+                    console.log('calling AFMA back function', e);
+                    AFMA_ReceiveMessage('onbackblocked');
+                }
+            }
         });
 
         // This string will be replaced prior to the source being inserted into the iframe

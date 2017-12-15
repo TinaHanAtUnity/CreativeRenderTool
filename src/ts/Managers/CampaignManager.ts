@@ -401,7 +401,7 @@ export class CampaignManager {
         promises.push(this.getFullyCachedCampaigns());
         promises.push(this.getVersionCode());
         promises.push(this._adMobSignalFactory.getAdRequestSignal().then(signal => {
-            return signal.getBase64ProtoBuf();
+            return signal.getBase64ProtoBufNonEncoded();
         }));
 
         const body: any = {

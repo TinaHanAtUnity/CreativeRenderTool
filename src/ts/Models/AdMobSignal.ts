@@ -576,6 +576,14 @@ export class AdMobSignal extends Model<IAdMobSignal> {
         return protobuf.util.base64.encode(protocolBuffer, 0, protocolBuffer.byteLength);
     }
 
+    public getBase64ProtoBufNonEncoded(): string {
+        let str = this.getBase64ProtoBuf();
+        str = str.replace(/\//g, '_');
+        str = str.replace(/\+/g, '-');
+        str = str.replace(/[=]+$/, '');
+        return str;
+    }
+
     public getDTO(): { [key: string]: any } {
         return {
             'sdkVersion': this.getSdkVersion(),
