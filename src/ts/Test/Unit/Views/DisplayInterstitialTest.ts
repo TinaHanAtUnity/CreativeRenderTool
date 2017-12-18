@@ -18,6 +18,7 @@ describe('DisplayInterstitial View', () => {
     let placement: Placement;
     let campaign: DisplayInterstitialCampaign;
     let sandbox: sinon.SinonSandbox;
+    let server: sinon.SinonFakeServer;
 
     describe('on Display Interstitial Markup Campaign',() => {
         viewUnitTests(!isDisplayInterstitialUrlCampaign);
@@ -39,7 +40,12 @@ describe('DisplayInterstitial View', () => {
                 useDeviceOrientationForVideo: false,
                 muteVideo: false
             });
-            campaign = TestFixtures.getBadMarkupUrlAd();
+            campaign = TestFixtures.getDisplayInterstitialCampaign(isDisplayInterstitialUrlCampaign);
+
+            server = sinon.fakeServer.create();
+            server.respondImmediately = true;
+            server.respondWith('<div>cool beans</div>');
+
             view = new DisplayInterstitial(nativeBridge, placement, campaign);
 
             sandbox.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
@@ -49,7 +55,6 @@ describe('DisplayInterstitial View', () => {
                 return view.render().then(reject).catch(resolve);
             });
         });
-
     });
 
     function viewUnitTests(isUrlCampaign: boolean) {
@@ -67,6 +72,7 @@ describe('DisplayInterstitial View', () => {
                 muteVideo: false
             });
             campaign = TestFixtures.getDisplayInterstitialCampaign(isUrlCampaign);
+
             view = new DisplayInterstitial(nativeBridge, placement, campaign);
 
             sandbox.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
@@ -75,6 +81,10 @@ describe('DisplayInterstitial View', () => {
 
         afterEach(() => {
             sandbox.restore();
+
+            if (server) {
+                server.restore();
+            }
         });
 
         // Disabled because of missing srcdoc support on Android < 4.4

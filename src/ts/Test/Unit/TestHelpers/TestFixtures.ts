@@ -35,10 +35,6 @@ export class TestFixtures {
         return this.getDisplayInterstitialMarkupCampaign();
     }
 
-    public static getBadMarkupUrlAd(): DisplayInterstitialCampaign {
-        return new DisplayInterstitialMarkupUrlCampaign('https://wisesm0.github.io/', this.getSession(), 'bad', 0, undefined);
-    }
-
     public static getPlacement(): Placement {
         return new Placement({
             id: 'fooId',
