@@ -1,3 +1,11 @@
+# Staged
+
+* Fix failing hybrid test
+* Remove ComScore AB groups, enable on whole network
+* Fix display unit tests
+* Set xmas end screen by default except groups 10 & 11 
+* Remove dark end screen
+
 # Fri Dec 15 11:12:36 UTC 2017
 
 * Fix for iOS AdMob spam signals
