@@ -1,32 +1,25 @@
 import { Campaign, ICampaign } from 'Models/Campaign';
 import { Asset } from 'Models/Assets/Asset';
+import { ISchema } from 'Models/Model';
 import { Session } from 'Models/Session';
 
-interface IDisplayInterstitialCampaign extends ICampaign {
-    dynamicMarkup: string | undefined;
+export interface IDisplayInterstitialCampaign extends ICampaign {
     clickThroughUrl: string | undefined;
     tracking: object | undefined;
-    markupUrl: string | undefined;
-    markupBaseUrl: string | undefined;
 }
 
-export class DisplayInterstitialCampaign extends Campaign<IDisplayInterstitialCampaign> {
-    constructor(markup: string | undefined, markupUrl: string | undefined, markupBaseUrl: string | undefined, session: Session, gamerId: string, abGroup: number, cacheTTL: number | undefined, tracking?: { [eventName: string]: string[] }, clickThroughUrl?: string, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
-        super('DisplayInterstitialCampaign', {
-            ... Campaign.Schema,
-            dynamicMarkup: ['string', 'undefined'],
-            clickThroughUrl: ['string', 'undefined'],
-            tracking: ['object', 'undefined'],
-            markupUrl: ['string', 'undefined'],
-            markupBaseUrl: ['string', 'undefined']
-        });
+export abstract class DisplayInterstitialCampaign<T extends IDisplayInterstitialCampaign = IDisplayInterstitialCampaign> extends Campaign<T> {
+    public static Schema: ISchema<IDisplayInterstitialCampaign> = {
+        ... Campaign.Schema,
+        clickThroughUrl: ['string', 'undefined'],
+        tracking: ['object', 'undefined']
+    };
+
+    constructor(classname: string, schema: ISchema<T>, session: Session, gamerId: string, abGroup: number, cacheTTL: number | undefined, tracking?: { [eventName: string]: string[] }, adType?: string, creativeId?: string, seatId?: number, correlationId?: string,  useWebViewUserAgentForTracking?: boolean) {
+        super(classname, schema);
         if(cacheTTL) {
             this.set('willExpireAt', Date.now() + cacheTTL * 1000);
         }
-        this.set('dynamicMarkup', markup || undefined);
-        this.set('markupUrl', markupUrl || undefined);
-        this.set('markupBaseUrl', markupBaseUrl || undefined);
-        this.set('clickThroughUrl', clickThroughUrl || undefined);
         this.set('gamerId', gamerId);
         this.set('abGroup', abGroup);
         this.set('adType', adType || undefined);
@@ -35,22 +28,15 @@ export class DisplayInterstitialCampaign extends Campaign<IDisplayInterstitialCa
         this.set('seatId', seatId || undefined);
         this.set('tracking', tracking || undefined);
         this.set('session', session);
-    }
-
-    public getDynamicMarkup(): string | undefined {
-        return this.get('dynamicMarkup');
-    }
-
-    public getMarkupUrl(): string | undefined {
-        return this.get('markupUrl');
-    }
-
-    public getMarkupBaseUrl(): string | undefined {
-        return this.get('markupBaseUrl');
+        this.set('useWebViewUserAgentForTracking', useWebViewUserAgentForTracking);
     }
 
     public getClickThroughUrl(): string | undefined {
         return this.get('clickThroughUrl');
+    }
+
+    public setClickThroughUrl(clickThroughUrl: string) {
+        this.set('clickThroughUrl', clickThroughUrl);
     }
 
     public getTrackingUrlsForEvent(eventName: string): string[] {
