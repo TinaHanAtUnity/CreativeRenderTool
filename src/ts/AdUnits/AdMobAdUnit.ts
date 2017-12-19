@@ -54,7 +54,7 @@ export class AdMobAdUnit extends AbstractAdUnit {
 
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
 
-        return this._container.open(this, false, true, this._forceOrientation, true, false, true, false, this._options).then(() => {
+        return this._container.open(this, ['webview'], true, this._forceOrientation, true, false, true, false, this._options).then(() => {
             this.showView();
         });
     }

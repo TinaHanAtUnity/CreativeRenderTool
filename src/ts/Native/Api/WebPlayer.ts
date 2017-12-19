@@ -2,7 +2,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { NativeApi } from 'Native/NativeApi';
 import { Observable1 } from "Utilities/Observable";
 
-// TODO: platform specifc
+// Platform specific, first three are available on both Android & iOS. The rest are Android only.
 export enum WebplayerEvent {
     PAGE_STARTED,
     PAGE_FINISHED,
