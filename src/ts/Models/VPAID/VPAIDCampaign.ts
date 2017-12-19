@@ -10,7 +10,7 @@ interface IVPAIDCampaign extends ICampaign {
 
 export class VPAIDCampaign extends Campaign<IVPAIDCampaign> {
 
-    constructor(vpaid: VPAID, session: Session, campaignId: string, gamerId: string, abGroup: number, cacheTTL?: number, tracking?: any, adType?: string, creativeId?: string, seatId?: number, correlationId?: string, appCategory?: string, appSubCategory?: string) {
+    constructor(vpaid: VPAID, session: Session, campaignId: string, gamerId: string, abGroup: number, cacheTTL?: number, tracking?: any, adType?: string, creativeId?: string, seatId?: number, correlationId?: string, appCategory?: string, appSubCategory?: string, useWebViewUserAgentForTracking?: boolean) {
         super('VPAIDCampaign', {
             ... Campaign.Schema,
             vpaid: ['object']
@@ -21,6 +21,7 @@ export class VPAIDCampaign extends Campaign<IVPAIDCampaign> {
         this.set('id', campaignId);
         this.set('gamerId', gamerId);
         this.set('abGroup', abGroup);
+        this.set('useWebViewUserAgentForTracking', useWebViewUserAgentForTracking);
         const timeout = cacheTTL || 3600;
         this.set('willExpireAt', Date.now() + timeout * 1000);
         this.set('adType', adType || undefined);

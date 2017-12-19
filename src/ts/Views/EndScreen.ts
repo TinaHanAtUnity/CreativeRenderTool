@@ -1,5 +1,5 @@
 import EndScreenTemplate from 'html/EndScreen.html';
-import DarkEndScreenTemplate from 'html/DarkEndScreen.html';
+import XmasEndScreenTemplate from 'html/XmasEndScreen.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -17,7 +17,7 @@ export interface IEndScreenHandler {
     onKeyEvent(keyCode: number): void;
 }
 
-const darkEndScreenId = "dark-end-screen";
+const xMasEndScreenId = "xmas-end-screen";
 
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
 
@@ -37,8 +37,8 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
         this._template = new Template(EndScreenTemplate, this._localization);
 
-        if (this.getEndscreenAlt() === darkEndScreenId) {
-            this._template = new Template(DarkEndScreenTemplate, this._localization);
+        if (this.getEndscreenAlt() === xMasEndScreenId) {
+            this._template = new Template(XmasEndScreenTemplate, this._localization);
         } else {
             this._template = new Template(EndScreenTemplate, this._localization);
         }
@@ -102,19 +102,6 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
                 this._handlers.forEach(handler => handler.onEndScreenClose());
             }, AbstractAdUnit.getAutoCloseDelay());
         }
-
-        if (this.getEndscreenAlt() === darkEndScreenId) {
-            const el = <HTMLElement>this._container.querySelector(".underlay");
-            const style: CSSStyleDeclaration = window.getComputedStyle(el);
-
-            const isFilterSupported = ["filter", "webkitFilter", "-webkit-filter"].filter((cssProp: string) => {
-                return style.hasOwnProperty(cssProp) && style.getPropertyValue(cssProp) && style.getPropertyValue(cssProp) !== "none";
-            }) || [];
-
-            if(!isFilterSupported.length) {
-                this._container.classList.add("filter-fallback");
-            }
-        }
     }
 
     public hide(): void {
@@ -141,11 +128,11 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     protected getEndscreenAlt(campaign?: Campaign) {
-        if (this._abGroup === 8 || this._abGroup === 9) {
-            return darkEndScreenId;
+        if (this._abGroup === 10 || this._abGroup === 11) {
+            return undefined;
         }
 
-        return undefined;
+        return xMasEndScreenId;
     }
 
     protected abstract onDownloadEvent(event: Event): void;

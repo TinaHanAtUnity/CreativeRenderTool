@@ -89,4 +89,20 @@ describe('ThirdPartyEventManagerTest', () => {
             assert.equal(url, requestSpy.getCall(0).args[0], 'Click attribution event url does not match');
         });
     });
+
+    it('should send headers for event', () => {
+        const url: string = 'https://www.example.net/third_party_event';
+        const requestSpy = sinon.spy(request, 'get');
+
+        return thirdPartyEventManager.sendEvent('click', 'abcde-12345', url, true).then(() => {
+            assert(requestSpy.calledOnce, 'Click attribution event did not try sending GET request');
+            let userAgentHeaderExists = false;
+            for(const header of requestSpy.getCall(0).args[1]) {
+                if(header[0] === 'User-Agent') {
+                    userAgentHeaderExists = true;
+                }
+            }
+            assert.isTrue(userAgentHeaderExists, 'User-Agent header should exist in headers');
+        });
+    });
 });

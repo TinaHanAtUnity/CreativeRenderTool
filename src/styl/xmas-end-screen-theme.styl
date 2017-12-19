@@ -1,0 +1,77 @@
+@import "vars.styl";
+@import "mixins.styl";
+
+body.landscape #end-screen.xmas-end-screen .btn-close-region {
+  color: $white;
+}
+
+#end-screen.xmas-end-screen {
+
+  .btn-close-region {
+    z-index: 100;
+  }
+
+  .border-line {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    border-bottom: 1px solid $end-screen-info-gray;
+  }
+
+  .game-icon {
+
+    position: relative;
+    width: $default-size * $default-scale-size * 6;
+    height: $default-size * $default-scale-size * 6;
+    border-radius: 50%;
+
+    &:after {
+      $set-image(100%, 100%, 0, "../img/xmas-end-screen-theme/crystal.png", contain);
+      position: absolute;
+      top: $default-size * $default-scale-size * -3.5;
+      left: $default-size * $default-scale-size * -1.75;
+      width: $default-size * $default-scale-size * 9.5;
+      height: $default-size * $default-scale-size * 9.5;
+      content: "";
+    }
+  }
+
+  .privacy-button {
+    color: lighten($gray, 70%);
+  }
+
+  .game-background-portrait {
+    position: relative;
+    z-index: 20;
+    border-bottom: 1px solid $end-screen-info-gray;
+  }
+}
+
+body {
+  &.portrait #end-screen.xmas-end-screen {
+    .column-container {
+      margin-left: $default-size * $default-scale-size;
+    }
+
+    .end-screen-info-background {
+      $set-image("", "", 0, "../img/xmas-end-screen-theme/wallpaper-portrait.jpg", cover);
+    }
+  }
+
+  &.landscape #end-screen.xmas-end-screen {
+
+    .row-container {
+      bottom: $default-size * $default-scale-size * .5;
+    }
+
+    .column-container {
+      margin: $default-size * $default-scale-size * .5 0 0 0;
+    }
+
+    .end-screen-info-background {
+      $set-image("", "", 0, "../img/xmas-end-screen-theme/wallpaper-landscape.jpg", cover);
+    }
+  }
+}

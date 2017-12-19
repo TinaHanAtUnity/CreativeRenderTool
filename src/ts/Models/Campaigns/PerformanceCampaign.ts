@@ -63,22 +63,22 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
 
         this.set('gameId', campaign.gameId);
         this.set('gameName', campaign.gameName);
-        this.set('gameIcon', new Image(campaign.gameIcon));
+        this.set('gameIcon', new Image(campaign.gameIcon, session));
 
         this.set('rating', campaign.rating);
         this.set('ratingCount', campaign.ratingCount);
 
-        this.set('landscapeImage', new Image(campaign.endScreenLandscape));
-        this.set('portraitImage', new Image(campaign.endScreenPortrait));
+        this.set('landscapeImage', new Image(campaign.endScreenLandscape, session));
+        this.set('portraitImage', new Image(campaign.endScreenPortrait, session));
 
         if(campaign.trailerDownloadable && campaign.trailerDownloadableSize && campaign.trailerStreaming) {
-            this.set('video', new Video(campaign.trailerDownloadable, campaign.trailerDownloadableSize));
-            this.set('streamingVideo', new Video(campaign.trailerStreaming));
+            this.set('video', new Video(campaign.trailerDownloadable, session, campaign.trailerDownloadableSize));
+            this.set('streamingVideo', new Video(campaign.trailerStreaming, session));
         }
 
         if(campaign.trailerPortraitDownloadable && campaign.trailerPortraitDownloadableSize && campaign.trailerPortraitStreaming) {
-            this.set('videoPortrait', new Video(campaign.trailerPortraitDownloadable, campaign.trailerPortraitDownloadableSize));
-            this.set('streamingPortraitVideo', new Video(campaign.trailerPortraitStreaming));
+            this.set('videoPortrait', new Video(campaign.trailerPortraitDownloadable, session, campaign.trailerPortraitDownloadableSize));
+            this.set('streamingPortraitVideo', new Video(campaign.trailerPortraitStreaming, session));
         }
 
         this.set('clickUrl', campaign.clickUrl);

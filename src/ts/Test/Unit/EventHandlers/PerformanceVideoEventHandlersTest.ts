@@ -38,7 +38,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
         });
 
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
-        video = new Video('');
+        video = new Video('', TestFixtures.getSession());
 
         const focusManager = new FocusManager(nativeBridge);
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);

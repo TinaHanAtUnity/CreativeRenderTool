@@ -25,8 +25,12 @@ import { ProgrammaticVastParser } from 'Parsers/ProgrammaticVastParser';
 import { ProgrammaticMraidUrlParser } from 'Parsers/ProgrammaticMraidUrlParser';
 import { ProgrammaticMraidParser } from 'Parsers/ProgrammaticMraidParser';
 import { ProgrammaticStaticInterstitialParser } from 'Parsers/ProgrammaticStaticInterstitialParser';
+import { ProgrammaticStaticInterstitialUrlParser } from 'Parsers/ProgrammaticStaticInterstitialUrlParser';
+import { ProgrammaticAdMobParser } from 'Parsers/ProgrammaticAdMobParser';
 import { CampaignParser } from 'Parsers/CampaignParser';
 import { ProgrammaticVPAIDParser } from 'Parsers/ProgrammaticVPAIDParser';
+import { AdMobSignalFactory} from 'AdMob/AdMobSignalFactory';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class CampaignManager {
 
@@ -69,6 +73,7 @@ export class CampaignManager {
     protected _assetManager: AssetManager;
     protected _configuration: Configuration;
     protected _clientInfo: ClientInfo;
+    private _adMobSignalFactory: AdMobSignalFactory;
     private _sessionManager: SessionManager;
     private _metaDataManager: MetaDataManager;
     private _request: Request;
@@ -76,7 +81,7 @@ export class CampaignManager {
     private _previousPlacementId: string | undefined;
     private _rawResponse: string | undefined;
 
-    constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager) {
+    constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager) {
         this._nativeBridge = nativeBridge;
         this._configuration = configuration;
         this._assetManager = assetManager;
@@ -85,6 +90,7 @@ export class CampaignManager {
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._metaDataManager = metaDataManager;
+        this._adMobSignalFactory = adMobSignalFactory;
         this._requesting = false;
     }
 
@@ -250,6 +256,13 @@ export class CampaignManager {
             case 'programmatic/static-interstitial':
                 parser = new ProgrammaticStaticInterstitialParser();
                 break;
+            case 'programmatic/static-interstitial-url':
+                parser = new ProgrammaticStaticInterstitialUrlParser();
+                break;
+            case 'programmatic/admob-video':
+                parser = new ProgrammaticAdMobParser();
+                Diagnostics.trigger('admob_ad_received', {}, session);
+                break;
             case 'programmatic/vast-vpaid':
                 // vast-vpaid can be both VPAID or VAST, so in this case we use the VAST parser
                 // which can parse both.
@@ -387,6 +400,9 @@ export class CampaignManager {
         promises.push(this._deviceInfo.getDeviceVolume());
         promises.push(this.getFullyCachedCampaigns());
         promises.push(this.getVersionCode());
+        promises.push(this._adMobSignalFactory.getAdRequestSignal().then(signal => {
+            return signal.getBase64ProtoBufNonEncoded();
+        }));
 
         const body: any = {
             bundleVersion: this._clientInfo.getApplicationVersion(),
@@ -410,12 +426,13 @@ export class CampaignManager {
             body.nofillRetry = true;
         }
 
-        return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName, headset, volume, fullyCachedCampaignIds, versionCode]) => {
+        return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName, headset, volume, fullyCachedCampaignIds, versionCode, requestSignal]) => {
             body.deviceFreeSpace = freeSpace;
             body.networkOperator = networkOperator;
             body.networkOperatorName = networkOperatorName;
             body.wiredHeadset = headset;
             body.volume = volume;
+            body.requestSignal = requestSignal;
 
             if(fullyCachedCampaignIds && fullyCachedCampaignIds.length > 0) {
                 body.cachedCampaigns = fullyCachedCampaignIds;
