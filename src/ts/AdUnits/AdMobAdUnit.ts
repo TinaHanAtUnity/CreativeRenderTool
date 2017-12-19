@@ -95,6 +95,11 @@ export class AdMobAdUnit extends AbstractAdUnit {
         this.sendTrackingEvent('complete');
     }
 
+    public sendRewardEvent() {
+        this._operativeEventManager.sendThirdQuartile(this._campaign.getSession(), this._placement, this._campaign);
+        this._operativeEventManager.sendView(this._campaign.getSession(), this._placement, this._campaign);
+    }
+
     private showView() {
         this._view.show();
         document.body.appendChild(this._view.container());
@@ -132,8 +137,6 @@ export class AdMobAdUnit extends AbstractAdUnit {
         if (this.getFinishState() === FinishState.SKIPPED) {
             this.sendSkipEvent();
         } else if (this.getFinishState() === FinishState.COMPLETED) {
-            this._operativeEventManager.sendThirdQuartile(this._campaign.getSession(), this._placement, this._campaign);
-            this._operativeEventManager.sendView(this._campaign.getSession(), this._placement, this._campaign);
             this.sendCompleteEvent();
         }
     }
