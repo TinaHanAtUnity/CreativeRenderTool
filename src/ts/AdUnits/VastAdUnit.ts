@@ -179,6 +179,8 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     }
 
     public sendVideoClickTrackingEvent(sessionId: string, sdkVersion: number): void {
+        this.sendTrackingEvent('click', sessionId, sdkVersion);
+
         const clickTrackingEventUrls = this._vastCampaign.getVast().getVideoClickTrackingURLs();
 
         if (clickTrackingEventUrls) {
