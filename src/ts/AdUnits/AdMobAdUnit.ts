@@ -42,7 +42,6 @@ export class AdMobAdUnit extends AbstractAdUnit {
     public show(): Promise<void> {
         this.setShowing(true);
         this.onStart.trigger();
-        this._operativeEventManager.sendStart(this._campaign.getSession(), this._placement, this._campaign);
 
         Diagnostics.trigger('admob_ad_show', {
             placement: this._placement.getId()
@@ -84,6 +83,7 @@ export class AdMobAdUnit extends AbstractAdUnit {
 
     public sendStartEvent() {
         this.sendTrackingEvent('start');
+        this._operativeEventManager.sendStart(this._campaign.getSession(), this._placement, this._campaign);
     }
 
     public sendSkipEvent() {
