@@ -119,8 +119,6 @@ export class AdMobAdUnit extends AbstractAdUnit {
         this.setShowing(false);
         this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
         this.onClose.trigger();
-        this._operativeEventManager.sendThirdQuartile(this._campaign.getSession(), this._placement, this._campaign);
-        this._operativeEventManager.sendView(this._campaign.getSession(), this._placement, this._campaign);
 
         if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
             this._nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(this._keyDownListener);
@@ -134,6 +132,8 @@ export class AdMobAdUnit extends AbstractAdUnit {
         if (this.getFinishState() === FinishState.SKIPPED) {
             this.sendSkipEvent();
         } else if (this.getFinishState() === FinishState.COMPLETED) {
+            this._operativeEventManager.sendThirdQuartile(this._campaign.getSession(), this._placement, this._campaign);
+            this._operativeEventManager.sendView(this._campaign.getSession(), this._placement, this._campaign);
             this.sendCompleteEvent();
         }
     }
