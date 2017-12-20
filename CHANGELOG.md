@@ -1,3 +1,8 @@
+# Wed Dec 20 00:04:26 UTC 2017
+
+* Add PTS click tracking for VAST
+* Change AdMob start diagnostic firing to reflect TPS.
+
 # Mon Dec 18 21:47:30 UTC 2017
 
 * Fix failing hybrid test
