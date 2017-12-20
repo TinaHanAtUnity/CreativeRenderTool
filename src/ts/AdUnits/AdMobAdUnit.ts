@@ -42,7 +42,6 @@ export class AdMobAdUnit extends AbstractAdUnit {
     public show(): Promise<void> {
         this.setShowing(true);
         this.onStart.trigger();
-        this._operativeEventManager.sendStart(this._campaign.getSession(), this._placement, this._campaign);
 
         Diagnostics.trigger('admob_ad_show', {
             placement: this._placement.getId()
@@ -84,6 +83,7 @@ export class AdMobAdUnit extends AbstractAdUnit {
 
     public sendStartEvent() {
         this.sendTrackingEvent('start');
+        this._operativeEventManager.sendStart(this._campaign.getSession(), this._placement, this._campaign);
     }
 
     public sendSkipEvent() {
@@ -93,6 +93,11 @@ export class AdMobAdUnit extends AbstractAdUnit {
 
     public sendCompleteEvent() {
         this.sendTrackingEvent('complete');
+    }
+
+    public sendRewardEvent() {
+        this._operativeEventManager.sendThirdQuartile(this._campaign.getSession(), this._placement, this._campaign);
+        this._operativeEventManager.sendView(this._campaign.getSession(), this._placement, this._campaign);
     }
 
     private showView() {
@@ -119,8 +124,6 @@ export class AdMobAdUnit extends AbstractAdUnit {
         this.setShowing(false);
         this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
         this.onClose.trigger();
-        this._operativeEventManager.sendThirdQuartile(this._campaign.getSession(), this._placement, this._campaign);
-        this._operativeEventManager.sendView(this._campaign.getSession(), this._placement, this._campaign);
 
         if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
             this._nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(this._keyDownListener);
