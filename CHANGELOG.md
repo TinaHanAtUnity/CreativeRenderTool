@@ -1,3 +1,7 @@
+# Wed Dec 20 20:51:09 UTC 2017
+
+* Changed xmas theme to prevent overlaying game icon
+
 # Wed Dec 20 00:04:26 UTC 2017
 
 * Add PTS click tracking for VAST
