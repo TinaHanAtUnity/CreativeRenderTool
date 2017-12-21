@@ -32,6 +32,35 @@ export enum WebplayerEvent {
     GEOLOCATION_PERMISSIONS_SHOW
 }
 
+export interface IWebPlayerEventSettings {
+    onPageStarted?: { sendEvent: boolean };
+    onPageFinished?: { sendEvent: boolean };
+    onReceivedError?: { sendEvent: boolean };
+    onLoadResource?: { sendEvent: boolean };
+    onReceivedSslError?: { sendEvent: boolean };
+    onReceivedClientCertRequest?: { sendEvent: boolean };
+    onReceivedHttpAuthRequest?: { sendEvent: boolean };
+    onScaleChanged?: { sendEvent: boolean };
+    onReceivedLoginRequest?: { sendEvent: boolean };
+    onReceivedHttpError?: { sendEvent: boolean };
+    onGeolocationPermissionsShowPrompt?: { sendEvent: boolean };
+    onPermissionRequest?: { sendEvent: boolean };
+    onProgressChanged?: { sendEvent: boolean };
+    onReceivedTitle?: { sendEvent: boolean };
+    onReceivedIcon?: { sendEvent: boolean };
+    onReceivedTouchIconUrl?: { sendEvent: boolean };
+    onShowCustomView?: { sendEvent: boolean };
+    onHideCustomView?: { sendEvent: boolean };
+    onCreateWindow?: { sendEvent: boolean };
+    onRequestFocus?: { sendEvent: boolean };
+    onCloseWindow?: { sendEvent: boolean };
+    onJsAlert?: { sendEvent: boolean };
+    onJsConfirm?: { sendEvent: boolean };
+    onJsPrompt?: { sendEvent: boolean };
+    onConsoleMessage?: { sendEvent: boolean };
+    onShowFileChooser?: { sendEvent: boolean };
+}
+
 export class WebPlayerApi extends NativeApi {
 
     public readonly onPageStarted = new Observable1<string>();
@@ -61,7 +90,7 @@ export class WebPlayerApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._apiClass, 'clearSettings');
     }
 
-    public setEventSettings(eventSettings: { [key: string]: {[key: string]: boolean} }): Promise<void> {
+    public setEventSettings(eventSettings: IWebPlayerEventSettings): Promise<void> {
         return this._nativeBridge.invoke<void>(this._apiClass, 'setEventSettings', [eventSettings]);
     }
 
