@@ -53,7 +53,7 @@ export class WebPlayerApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._apiClass, 'setDataWithUrl', [baseUrl, data, mimeType, encoding]);
     }
 
-    public setSettings<T>(webSettings: T, webPlayerSettings: T): Promise<void>  {
+    public setSettings(webSettings: {[key: string]: any}, webPlayerSettings: {[key: string]: any}): Promise<void>  {
         return this._nativeBridge.invoke<void>(this._apiClass, 'setSettings', [webSettings, webPlayerSettings]);
     }
 
@@ -61,8 +61,7 @@ export class WebPlayerApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._apiClass, 'clearSettings');
     }
 
-    public setEventSettings<T>(eventSettings: T): Promise<void> {
-        this._nativeBridge.Sdk.logDebug("WebPlayerApi: setEventSettings()");
+    public setEventSettings(eventSettings: { [key: string]: {[key: string]: boolean} }): Promise<void> {
         return this._nativeBridge.invoke<void>(this._apiClass, 'setEventSettings', [eventSettings]);
     }
 
