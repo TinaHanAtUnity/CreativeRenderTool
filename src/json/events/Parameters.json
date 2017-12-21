@@ -420,6 +420,13 @@
     "platforms": "ios"
   },
   {
+    "key": "requestSignal",
+    "type": "string",
+    "description": "Base64 encoded string from AdMob protobuf signals",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
     "key": "realtimeRequest",
     "type": "boolean",
     "description": "If ad request is done at show time for immediate streaming",

@@ -71,6 +71,7 @@
 | volume | number | On iOS, this is a float between 0 (silent) and 1 (max volume), on Android, this is integer from 0 (silent) to max volume index | SDK | all |
 | versionCode | number | Application internal version code for Android apps, available only for SDK 2.1.1 and later | SDK | android |
 | simulator | boolean | If device is a simulator, not a real device | SDK | ios |
+| requestSignal | string | Base64 encoded string from AdMob protobuf signals | SDK | all |
 | realtimeRequest | boolean | If ad request is done at show time for immediate streaming | SDK | all |
 
 
@@ -148,6 +149,7 @@
 | volume | all | False | True | number | On iOS, this is a float between 0 (silent) and 1 (max volume), on Android, this is integer from 0 (silent) to max volume index | SDK | all |
 | versionCode | no | False | True | number | Application internal version code for Android apps, available only for SDK 2.1.1 and later | SDK | android |
 | simulator | ios | False | True | boolean | If device is a simulator, not a real device | SDK | ios |
+| requestSignal | all | False | True | string | Base64 encoded string from AdMob protobuf signals | SDK | all |
 | realtimeRequest | all | True | False | boolean | If ad request is done at show time for immediate streaming | SDK | all |
 
 

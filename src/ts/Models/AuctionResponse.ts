@@ -1,3 +1,4 @@
+import { JsonParser } from 'Utilities/JsonParser';
 import { Model } from 'Models/Model';
 
 export interface IAuctionResponse {
@@ -15,6 +16,8 @@ export interface IAuctionResponse {
     advertiserCampaignId: string | undefined;
     advertiserDomain: string | undefined;
     advertiserBundleId: string | undefined;
+    useWebViewUserAgentForTracking: boolean | undefined;
+    buyerId: string | undefined;
     mediaId: string;
 }
 
@@ -35,6 +38,8 @@ export class AuctionResponse extends Model<IAuctionResponse> {
             advertiserCampaignId: ['string', 'undefined'],
             advertiserDomain: ['string', 'undefined'],
             advertiserBundleId: ['string', 'undefined'],
+            useWebViewUserAgentForTracking: ['boolean', 'undefined'],
+            buyerId: ['string', 'undefined'],
             mediaId: ['string']
         });
 
@@ -52,6 +57,8 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         this.set('advertiserCampaignId', data.campaignId);
         this.set('advertiserDomain', data.advDomain);
         this.set('advertiserBundleId', data.bundleId);
+        this.set('useWebViewUserAgentForTracking', data.useWebViewUserAgentForTracking || false);
+        this.set('buyerId', data.buyerId);
         this.set('mediaId', mediaId);
     }
 
@@ -65,6 +72,10 @@ export class AuctionResponse extends Model<IAuctionResponse> {
 
     public getContent(): string {
         return this.get('content');
+    }
+
+    public getJsonContent(): any {
+        return JsonParser.parse(this.getContent());
     }
 
     public getCacheTTL(): number | undefined {
@@ -111,6 +122,14 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         return this.get('advertiserBundleId');
     }
 
+    public getUseWebViewUserAgentForTracking(): boolean | undefined {
+        return this.get('useWebViewUserAgentForTracking');
+    }
+
+    public getBuyerId(): string | undefined {
+        return this.get('buyerId');
+    }
+
     public getMediaId(): string {
         return this.get('mediaId');
     }
@@ -128,6 +147,8 @@ export class AuctionResponse extends Model<IAuctionResponse> {
             'correlationId': this.getCorrelationId(),
             'appCategory': this.getCategory(),
             'appSubCategory': this.getSubCategory(),
+            'useWebViewUserAgentForTracking': this.getUseWebViewUserAgentForTracking(),
+            'buyerId': this.getBuyerId(),
             'mediaId': this.getMediaId()
         };
     }

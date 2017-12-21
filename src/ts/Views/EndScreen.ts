@@ -1,4 +1,5 @@
 import EndScreenTemplate from 'html/EndScreen.html';
+import XmasEndScreenTemplate from 'html/XmasEndScreen.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -15,6 +16,8 @@ export interface IEndScreenHandler {
     onEndScreenClose(): void;
     onKeyEvent(keyCode: number): void;
 }
+
+const xMasEndScreenId = "xmas-end-screen";
 
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
 
@@ -33,6 +36,12 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._gameName = gameName;
 
         this._template = new Template(EndScreenTemplate, this._localization);
+
+        if (this.getEndscreenAlt() === xMasEndScreenId) {
+            this._template = new Template(XmasEndScreenTemplate, this._localization);
+        } else {
+            this._template = new Template(EndScreenTemplate, this._localization);
+        }
 
         this._bindings = [
             {
@@ -68,6 +77,11 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
         if (this._isSwipeToCloseEnabled) {
             (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';
+        }
+
+        const endScreenAlt = this.getEndscreenAlt();
+        if (typeof endScreenAlt === "string") {
+            this._container.classList.add(endScreenAlt);
         }
     }
 
@@ -114,7 +128,11 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     protected getEndscreenAlt(campaign?: Campaign) {
-        return undefined;
+        if (this._abGroup === 10 || this._abGroup === 11) {
+            return undefined;
+        }
+
+        return xMasEndScreenId;
     }
 
     protected abstract onDownloadEvent(event: Event): void;

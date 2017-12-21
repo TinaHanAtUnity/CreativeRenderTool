@@ -11,13 +11,14 @@ import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { EventType } from 'Models/Session';
+import { Placement } from 'Models/Placement';
 
 export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign> {
     mraid: MRAIDView<IMRAIDViewHandler>;
     endScreen?: EndScreen;
 }
 
-export class MRAIDAdUnit extends AbstractAdUnit<MRAIDCampaign> {
+export class MRAIDAdUnit extends AbstractAdUnit {
 
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
@@ -27,6 +28,8 @@ export class MRAIDAdUnit extends AbstractAdUnit<MRAIDCampaign> {
     private _endScreen?: EndScreen;
     private _showingMRAID: boolean;
     private _clientInfo: ClientInfo;
+    private _placement: Placement;
+    private _campaign: MRAIDCampaign;
 
     private _onShowObserver: IObserver0;
     private _onSystemKillObserver: IObserver0;
@@ -43,6 +46,8 @@ export class MRAIDAdUnit extends AbstractAdUnit<MRAIDCampaign> {
         this._additionalTrackingEvents = parameters.campaign.getTrackingEventUrls();
         this._endScreen = parameters.endScreen;
         this._clientInfo = parameters.clientInfo;
+        this._placement = parameters.placement;
+        this._campaign = parameters.campaign;
 
         this._mraid.render();
         document.body.appendChild(this._mraid.container());
@@ -68,7 +73,9 @@ export class MRAIDAdUnit extends AbstractAdUnit<MRAIDCampaign> {
         this._mraid.show();
         this.onStart.trigger();
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
-        this._operativeEventManager.sendStart(this);
+        this._operativeEventManager.sendStart(this._campaign.getSession(), this._placement, this._campaign).then(() => {
+            this.onStartProcessed.trigger();
+        });
         this.sendTrackingEvent('impression');
 
         this._onShowObserver = this._container.onShow.subscribe(() => this.onShow());
@@ -94,19 +101,20 @@ export class MRAIDAdUnit extends AbstractAdUnit<MRAIDCampaign> {
         this._mraid.hide();
         if(this._endScreen) {
             this._endScreen.hide();
+            this._endScreen.container().parentElement!.removeChild(this._endScreen.container());
         }
 
         const finishState = this.getFinishState();
         if(finishState === FinishState.COMPLETED) {
-            if(!this.getCampaign().getSession().getEventSent(EventType.THIRD_QUARTILE)) {
-                this._operativeEventManager.sendThirdQuartile(this);
+            if(!this._campaign.getSession().getEventSent(EventType.THIRD_QUARTILE)) {
+                this._operativeEventManager.sendThirdQuartile(this._campaign.getSession(), this._placement, this._campaign);
             }
-            if(!this.getCampaign().getSession().getEventSent(EventType.VIEW)) {
-                this._operativeEventManager.sendView(this);
+            if(!this._campaign.getSession().getEventSent(EventType.VIEW)) {
+                this._operativeEventManager.sendView(this._campaign.getSession(), this._placement, this._campaign);
             }
             this.sendTrackingEvent('complete');
         } else if(finishState === FinishState.SKIPPED) {
-            this._operativeEventManager.sendSkip(this);
+            this._operativeEventManager.sendSkip(this._campaign.getSession(), this._placement, this._campaign);
         }
 
         this.onFinish.trigger();
@@ -125,7 +133,7 @@ export class MRAIDAdUnit extends AbstractAdUnit<MRAIDCampaign> {
     }
 
     public isCached(): boolean {
-        const asset: HTML | undefined = (<MRAIDCampaign>this.getCampaign()).getResourceUrl();
+        const asset: HTML | undefined = this._campaign.getResourceUrl();
         if(asset) {
             return asset.isCached();
         }
@@ -198,15 +206,15 @@ export class MRAIDAdUnit extends AbstractAdUnit<MRAIDCampaign> {
 
     private sendTrackingEvent(eventName: string): void {
         const sdkVersion = this._clientInfo.getSdkVersion();
-        const placementId = this.getPlacement().getId();
-        const sessionId = this.getCampaign().getSession().getId();
+        const placementId = this._placement.getId();
+        const sessionId = this._campaign.getSession().getId();
         const trackingEventUrls = this._additionalTrackingEvents[eventName];
 
         if(trackingEventUrls) {
             for (let url of trackingEventUrls) {
                 url = url.replace(/%ZONE%/, placementId);
                 url = url.replace(/%SDK_VERSION%/, sdkVersion.toString());
-                this._thirdPartyEventManager.sendEvent(`mraid ${eventName}`, sessionId, url);
+                this._thirdPartyEventManager.sendEvent(`mraid ${eventName}`, sessionId, url, this._campaign.getUseWebViewUserAgentForTracking());
             }
         }
     }

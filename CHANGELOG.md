@@ -1,3 +1,66 @@
+# Wed Dec 20 20:51:09 UTC 2017
+
+* Changed xmas theme to prevent overlaying game icon
+
+# Wed Dec 20 00:04:26 UTC 2017
+
+* Add PTS click tracking for VAST
+* Change AdMob start diagnostic firing to reflect TPS.
+
+# Mon Dec 18 21:47:30 UTC 2017
+
+* Fix failing hybrid test
+* Remove ComScore AB groups, enable on whole network
+* Fix display unit tests
+* Set xmas end screen by default except groups 10 & 11 
+* Remove dark end screen
+
+# Fri Dec 15 11:12:36 UTC 2017
+
+* Fix for iOS AdMob spam signals
+
+# Fri Dec 15 05:53:39 UTC 2017
+
+* Fixes various issues reported by AdMob
+
+# Thu Dec 14 20:09:09 UTC 2017
+
+* Redeployment of previous deployment with fixed Video model handling for portrait videos
+
+# Thu Dec 14 19:04:21 UTC 2017
+
+* Fix VAST end screen layout
+* Xmas endscreen theme on groups 18 and 19
+* Rearrange MOAT parameters
+* Add session to every asset for better diagnostics
+* Send webview user agent for tracking events based on auction response
+* Clickthrough parse on Display Interstitial Campaign and Display Interstitial Url Campaign
+
+# Thu Dec 14 12:03:50 UTC 2017
+
+* Redeployment of previous deployment with fixed placement ID handling
+
+# Wed Dec 13 21:24:50 UTC 2017
+
+* Refactor/cleanup ad unit model abuse
+* No fill retrying for production
+* Show build info in privacy pop up on end screen
+* Show playable end screen on Roll the Ball campaign
+* Add URL parser & parse APK redirect location correctly
+* Adjust video overlay safety margins in landscape mode
+* Sample SdkStats with game session ID
+
+# Tue Dec 12 19:04:39 UTC 2017
+
+* Initial support for AdMob ad units
+
+# Tue Dec 12 11:07:50 UTC 2017
+
+* Do not use video duration reported in vast xml and use the REAL video duration
+* New dark end screen AB test in groups 8 & 9
+* Add info button and privacy pop-up to MRAID overlay
+* Add isAppForeground to FocusManager
+
 # Thu Dec  7 10:05:11 UTC 2017
 
 * Change comscore ABGroup to check campaign ABGroup
@@ -133,7 +196,7 @@
 
 # Mon Oct 16 20:19:29 UTC 2017
 
-* Adds ad response to all diagnostic messages
+* Adds ad response to all diagnostic messages.
 
 # Thu Oct 12 20:04:06 UTC 2017
 

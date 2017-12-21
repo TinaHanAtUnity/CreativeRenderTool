@@ -25,8 +25,12 @@ import { ProgrammaticVastParser } from 'Parsers/ProgrammaticVastParser';
 import { ProgrammaticMraidUrlParser } from 'Parsers/ProgrammaticMraidUrlParser';
 import { ProgrammaticMraidParser } from 'Parsers/ProgrammaticMraidParser';
 import { ProgrammaticStaticInterstitialParser } from 'Parsers/ProgrammaticStaticInterstitialParser';
+import { ProgrammaticStaticInterstitialUrlParser } from 'Parsers/ProgrammaticStaticInterstitialUrlParser';
+import { ProgrammaticAdMobParser } from 'Parsers/ProgrammaticAdMobParser';
 import { CampaignParser } from 'Parsers/CampaignParser';
 import { ProgrammaticVPAIDParser } from 'Parsers/ProgrammaticVPAIDParser';
+import { AdMobSignalFactory} from 'AdMob/AdMobSignalFactory';
+import { Diagnostics } from 'Utilities/Diagnostics';
 import { Placement } from 'Models/Placement';
 import { RealtimeCampaign } from 'Models/Campaigns/RealtimeCampaign';
 
@@ -71,13 +75,14 @@ export class CampaignManager {
     protected _assetManager: AssetManager;
     protected _configuration: Configuration;
     protected _clientInfo: ClientInfo;
+    private _adMobSignalFactory: AdMobSignalFactory;
     private _sessionManager: SessionManager;
     private _metaDataManager: MetaDataManager;
     private _request: Request;
     private _deviceInfo: DeviceInfo;
     private _previousPlacementId: string | undefined;
 
-    constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager) {
+    constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager) {
         this._nativeBridge = nativeBridge;
         this._configuration = configuration;
         this._assetManager = assetManager;
@@ -86,6 +91,7 @@ export class CampaignManager {
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._metaDataManager = metaDataManager;
+        this._adMobSignalFactory = adMobSignalFactory;
         this._requesting = false;
     }
 
@@ -276,7 +282,7 @@ export class CampaignManager {
 
     private handleCampaign(response: AuctionResponse, session: Session): Promise<void> {
         this._nativeBridge.Sdk.logDebug('Parsing campaign ' + response.getContentType() + ': ' + response.getContent());
-        const parser: CampaignParser = this.getCampaignParser(response.getContentType());
+        const parser: CampaignParser = this.getCampaignParser(response.getContentType(), session);
 
         const parseTimestamp = Date.now();
         return parser.parse(this._nativeBridge, this._request, response, session, this._configuration.getGamerId(), this.getAbGroup()).then((campaign) => {
@@ -302,7 +308,7 @@ export class CampaignManager {
     private handleRealtimeCampaign(response: AuctionResponse, session: Session): Promise<Campaign> {
         this._nativeBridge.Sdk.logDebug('Parsing campaign ' + response.getContentType() + ': ' + response.getContent());
 
-        const parser: CampaignParser = this.getCampaignParser(response.getContentType());
+        const parser: CampaignParser = this.getCampaignParser(response.getContentType(), session);
 
         return parser.parse(this._nativeBridge, this._request, response, session, this._configuration.getGamerId(), this.getAbGroup()).then((campaign) => {
             campaign.setMediaId(response.getMediaId());
@@ -311,7 +317,7 @@ export class CampaignManager {
         });
     }
 
-    private getCampaignParser(contentType: string): CampaignParser {
+    private getCampaignParser(contentType: string, session: Session): CampaignParser {
         switch(contentType) {
             case 'comet/campaign':
                 return new CometCampaignParser();
@@ -323,6 +329,11 @@ export class CampaignManager {
                 return new ProgrammaticMraidParser();
             case 'programmatic/static-interstitial':
                 return new ProgrammaticStaticInterstitialParser();
+            case 'programmatic/static-interstitial-url':
+                return new ProgrammaticStaticInterstitialUrlParser();
+            case 'programmatic/admob-video':
+                Diagnostics.trigger('admob_ad_received', {}, session);
+                return new ProgrammaticAdMobParser();
             case 'programmatic/vast-vpaid':
                 // vast-vpaid can be both VPAID or VAST, so in this case we use the VAST parser
                 // which can parse both.
@@ -443,6 +454,9 @@ export class CampaignManager {
         promises.push(this._deviceInfo.getDeviceVolume());
         promises.push(this.getFullyCachedCampaigns());
         promises.push(this.getVersionCode());
+        promises.push(this._adMobSignalFactory.getAdRequestSignal().then(signal => {
+            return signal.getBase64ProtoBufNonEncoded();
+        }));
 
         const body: any = {
             bundleVersion: this._clientInfo.getApplicationVersion(),
@@ -466,12 +480,13 @@ export class CampaignManager {
             body.nofillRetry = true;
         }
 
-        return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName, headset, volume, fullyCachedCampaignIds, versionCode]) => {
+        return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName, headset, volume, fullyCachedCampaignIds, versionCode, requestSignal]) => {
             body.deviceFreeSpace = freeSpace;
             body.networkOperator = networkOperator;
             body.networkOperatorName = networkOperatorName;
             body.wiredHeadset = headset;
             body.volume = volume;
+            body.requestSignal = requestSignal;
 
             if(fullyCachedCampaignIds && fullyCachedCampaignIds.length > 0) {
                 body.cachedCampaigns = fullyCachedCampaignIds;
