@@ -391,6 +391,18 @@ export class Cache {
         this._sendDiagnosticEvents = value;
     }
 
+    public getFreeSpace(): Promise<number> {
+        return this._nativeBridge.Cache.getFreeSpace().then(freeSpace => {
+            if(freeSpace > 0) {
+                return freeSpace;
+            } else {
+                return 0;
+            }
+        }).catch(() => {
+            return 0;
+        });
+    }
+
     private deleteCacheBookKeepingData(): Promise<void> {
         return this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache').then(() => {
             return this._nativeBridge.Storage.write(StorageType.PRIVATE);

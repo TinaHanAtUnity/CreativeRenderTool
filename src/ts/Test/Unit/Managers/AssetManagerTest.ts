@@ -25,6 +25,7 @@ class TestCacheApi extends CacheApi {
     private _files: { [key: string]: IFileInfo } = {};
     private _currentFile: string;
     private _downloadDelay: number = 1;
+    private _freeSpace = 123456789;
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge);
@@ -85,6 +86,10 @@ class TestCacheApi extends CacheApi {
         return Promise.resolve(this.getHashDirect(value));
     }
 
+    public getFreeSpace(): Promise<number> {
+        return Promise.resolve(this._freeSpace);
+    }
+
     public getHashDirect(value: string): string {
         let hash = 0;
         if(!value.length) {
@@ -113,6 +118,10 @@ class TestCacheApi extends CacheApi {
 
     public setDownloadDelay(delay: number) {
         this._downloadDelay = delay;
+    }
+
+    public setFreeSpace(freeSpace: number) {
+        this._freeSpace = freeSpace;
     }
 }
 
@@ -279,6 +288,36 @@ describe('AssetManagerTest', () => {
             throw new Error('Should not resolve');
         }).catch(error => {
             assert.isFalse(asset.isCached(), 'Asset was cached when caching was stopped');
+        });
+    });
+
+    it('should act like cache mode disabled when there is less than 20 MB of free space', () => {
+        const cache = new Cache(nativeBridge, wakeUpManager, request);
+        const assetManager = new AssetManager(cache, CacheMode.FORCED, deviceInfo);
+        const asset = new HTML('https://www.google.fi', TestFixtures.getSession());
+        const campaign = new TestCampaign([asset], []);
+        const spy = sinon.spy(cache, 'cache');
+        cacheApi.setFreeSpace(0);
+        return assetManager.checkFreeSpace().then(() => {
+            return assetManager.setup(campaign);
+        }).then(() => {
+            assert(!spy.called, 'Cache was called when there is less than 20 MB of free space');
+            assert(!asset.isCached(), 'Asset was cached when there is less than 20 MB of free space');
+        });
+    });
+
+    it('should cache in a normal way when there is more than 20 MB of free space', () => {
+        const cache = new Cache(nativeBridge, wakeUpManager, request);
+        const assetManager = new AssetManager(cache, CacheMode.FORCED, deviceInfo);
+        const asset = new HTML('https://www.google.fi', TestFixtures.getSession());
+        const campaign = new TestCampaign([asset], []);
+        const spy = sinon.spy(cache, 'cache');
+        cacheApi.setFreeSpace(123456789);
+        return assetManager.checkFreeSpace().then(() => {
+            return assetManager.setup(campaign);
+        }).then(() => {
+            assert(spy.called, 'Cache was not called with forced caching and more than 20 MB of free space');
+            assert(asset.isCached(), 'Asset was not cached with forced caching and more than 20 MB of free space');
         });
     });
 
