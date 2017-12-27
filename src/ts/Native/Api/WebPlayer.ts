@@ -33,32 +33,122 @@ export enum WebplayerEvent {
 }
 
 export interface IWebPlayerEventSettings {
-    onPageStarted?: { sendEvent: boolean };
-    onPageFinished?: { sendEvent: boolean };
-    onReceivedError?: { sendEvent: boolean };
-    onLoadResource?: { sendEvent: boolean };
-    onReceivedSslError?: { sendEvent: boolean };
-    onReceivedClientCertRequest?: { sendEvent: boolean };
-    onReceivedHttpAuthRequest?: { sendEvent: boolean };
-    onScaleChanged?: { sendEvent: boolean };
-    onReceivedLoginRequest?: { sendEvent: boolean };
-    onReceivedHttpError?: { sendEvent: boolean };
-    onGeolocationPermissionsShowPrompt?: { sendEvent: boolean };
-    onPermissionRequest?: { sendEvent: boolean };
-    onProgressChanged?: { sendEvent: boolean };
-    onReceivedTitle?: { sendEvent: boolean };
-    onReceivedIcon?: { sendEvent: boolean };
-    onReceivedTouchIconUrl?: { sendEvent: boolean };
-    onShowCustomView?: { sendEvent: boolean };
-    onHideCustomView?: { sendEvent: boolean };
-    onCreateWindow?: { sendEvent: boolean };
-    onRequestFocus?: { sendEvent: boolean };
-    onCloseWindow?: { sendEvent: boolean };
-    onJsAlert?: { sendEvent: boolean };
-    onJsConfirm?: { sendEvent: boolean };
-    onJsPrompt?: { sendEvent: boolean };
-    onConsoleMessage?: { sendEvent: boolean };
-    onShowFileChooser?: { sendEvent: boolean };
+    onPageStarted?: { sendEvent?: boolean, shouldCallSuper?: boolean };
+    onPageFinished?: { sendEvent?: boolean, shouldCallSuper?: boolean };
+    onReceivedError?: { sendEvent?: boolean, shouldCallSuper?: boolean };
+    onLoadResource?: { sendEvent?: boolean, shouldCallSuper?: boolean };
+    onReceivedSslError?: { sendEvent?: boolean, shouldCallSuper?: boolean };
+    onReceivedClientCertRequest?: { sendEvent?: boolean, shouldCallSuper?: boolean };
+    onReceivedHttpAuthRequest?: { sendEvent?: boolean, shouldCallSuper?: boolean };
+    onScaleChanged?: { sendEvent?: boolean, shouldCallSuper?: boolean };
+    onReceivedLoginRequest?: { sendEvent?: boolean, shouldCallSuper?: boolean };
+    onReceivedHttpError?: { sendEvent?: boolean, shouldCallSuper?: boolean };
+    onGeolocationPermissionsShowPrompt?: { sendEvent?: boolean, shouldCallSuper?: boolean };
+    onPermissionRequest?: { sendEvent?: boolean, shouldCallSuper?: boolean };
+    onProgressChanged?: { sendEvent?: boolean, shouldCallSuper?: boolean };
+    onReceivedTitle?: { sendEvent?: boolean, shouldCallSuper?: boolean };
+    onReceivedIcon?: { sendEvent?: boolean, shouldCallSuper?: boolean };
+    onReceivedTouchIconUrl?: { sendEvent?: boolean, shouldCallSuper?: boolean };
+    onShowCustomView?: { sendEvent?: boolean, shouldCallSuper?: boolean };
+    onHideCustomView?: { sendEvent?: boolean, shouldCallSuper?: boolean };
+    onCreateWindow?: { sendEvent?: boolean, shouldCallSuper?: boolean, getReturnValue?: boolean };
+    onRequestFocus?: { sendEvent?: boolean, shouldCallSuper?: boolean };
+    onCloseWindow?: { sendEvent?: boolean, shouldCallSuper?: boolean };
+    onJsAlert?: { sendEvent?: boolean, shouldCallSuper?: boolean, getReturnValue?: boolean };
+    onJsConfirm?: { sendEvent?: boolean, shouldCallSuper?: boolean, getReturnValue?: boolean };
+    onJsPrompt?: { sendEvent?: boolean, shouldCallSuper?: boolean, getReturnValue?: boolean };
+    onConsoleMessage?: { sendEvent?: boolean, shouldCallSuper?: boolean, getReturnValue?: boolean };
+    onShowFileChooser?: { sendEvent?: boolean, shouldCallSuper?: boolean, getReturnValue?: boolean };
+}
+
+export interface IWebPlayerWebSettingsAndroid {
+    setAllowContentAccess?: [ boolean ];
+    setAllowFileAccess?: [ boolean ];
+    setAllowFileAccessFromFileURLs?: [ boolean ];
+    setAllowUniversalAccessFromFileURLs?: [ boolean ];
+    setAppCacheEnabled?: [ boolean ];
+    setAppCacheMaxSize?: [ number ];
+    setAppCachePath?: [ string ];
+    setBlockNetworkImage?: [ boolean ];
+    setBlockNetworkLoads?: [ boolean ];
+    setBuiltInZoomControls?: [ boolean ];
+    setCacheMode?: [ number ];
+    setCursiveFontFamily?: [ string ];
+    setDatabaseEnabled?: [ boolean ];
+    setDatabasePath?: [ string ];
+    setDefaultFixedFontSize?: [ number ];
+    setDefaultFontSize?: [ number ];
+    setDefaultTextEncodingName?: [ string ];
+    setDisabledActionModeMenuItems?: [ number ];
+    setDisplayZoomControls?: [ boolean ];
+    setDomStorageEnabled?: [ boolean ];
+    setEnableSmoothTransition?: [ boolean ];
+    setFantasyFontFamily?: [ string ];
+    setFixedFontFamily?: [ string ];
+    setGeolocationDatabasePath?: [ string ];
+    setGeolocationEnabled?: [ boolean ];
+    setJavaScriptCanOpenWindowsAutomatically?: [ boolean ];
+    setJavaScriptEnabled?: [ boolean ];
+    setLightTouchEnabled?: [ boolean ];
+    setLoadWithOverviewMode?: [ boolean ];
+    setLoadsImagesAutomatically?: [ boolean ];
+    setMediaPlaybackRequiresUserGesture?: [ boolean ];
+    setMinimumFontSize?: [ number ];
+    setMinimumLogicalFontSize?: [ number ];
+    setMixedContentMode?: [ number ];
+    setNeedInitialFocus?: [ boolean ];
+    setOffscreenPreRaster?: [ boolean ];
+    setSafeBrowsingEnabled?: [ boolean ];
+    setSansSerifFontFamily?: [ string ];
+    setSaveFormData?: [ boolean ];
+    setSavePassword?: [ boolean ];
+    setSerifFontFamily?: [ string ];
+    setStandardFontFamily?: [ string ];
+    setSupportMultipleWindows?: [ boolean ];
+    setSupportZoom?: [ boolean ];
+    setTextZoom?: [ number ];
+    setUseWideViewPort?: [ boolean ];
+    setLayoutAlgorithm?: [ { type: "Enum", className: "android.webkit.WebSettings.LayoutAlgorithm",
+        value: "NARROW_COLUMNS" | "NORMAL" | "SINGLE_COLUMN" | "TEXT_AUTOSIZING" } ];
+}
+
+export interface IWebPlayerPlayerSettingsAndroid {
+    setBackgroundColor?: [ number ];
+    setInitialScale?: [ number ];
+    setHorizontalScrollbarOverlay?: [ boolean ];
+    setMapTrackballToArrowKeys?: [ boolean ];
+    setNetworkAvailable?: [ boolean ];
+    setOverScrollMode?: [ number ];
+    setScrollBarStyle?: [ number ];
+    setVerticalScrollbarOverlay?: [ boolean ];
+    setHttpAuthUsernamePassword?: [string, string, string, string];
+    setRendererPriorityPolicy?: [number, boolean];
+
+    /* TODO: These need native changes to function:
+    setLayerType?: number, layerType, Paint;
+    setLayoutParams?: ViewGroup.LayoutParams;
+    setPictureListener?: WebView.PictureListener;
+    setTextClassifier?: TextClassifier;
+    setWebChromeClient?: WebChromeClient;
+    setWebViewClient?: WebViewClient;
+    setCertificate?: SslCertificate;
+    setDownloadListener?: DownloadListener;
+    setFindListener?: WebView.FindListener;
+    */
+}
+
+export interface IWebPlayerWebSettingsIos {
+    allowsPlayback?: boolean;
+    playbackRequiresAction?: boolean;
+    typesRequiringAction?: number;
+    scalesPagesToFit?: boolean; // UIWebView only
+    javaScriptCanOpenWindowsAutomatically?: boolean; // WKWebView only
+    javaScriptEnabled?: boolean; // WKWebView only
+    mediaPlaybackAllowsAirPlay?: boolean;
+    suppressesIncrementalRendering?: boolean;
+    keyboardDisplayRequiresUserAction?: boolean; // UIWebView only
+    ignoresViewportScaleLimits?: boolean; // WKWebView iOS10+ only
+    dataDetectorTypes?: number; // WKWebView iOS10+ only (bitfield) & UIWebView (enum)
 }
 
 export class WebPlayerApi extends NativeApi {
@@ -82,7 +172,7 @@ export class WebPlayerApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._apiClass, 'setDataWithUrl', [baseUrl, data, mimeType, encoding]);
     }
 
-    public setSettings(webSettings: {[key: string]: any}, webPlayerSettings: {[key: string]: any}): Promise<void>  {
+    public setSettings(webSettings: IWebPlayerWebSettingsAndroid | IWebPlayerWebSettingsIos, webPlayerSettings: IWebPlayerPlayerSettingsAndroid): Promise<void>  {
         return this._nativeBridge.invoke<void>(this._apiClass, 'setSettings', [webSettings, webPlayerSettings]);
     }
 
