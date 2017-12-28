@@ -108,7 +108,7 @@ export interface IWebPlayerWebSettingsAndroid {
     setSupportZoom?: [ boolean ];
     setTextZoom?: [ number ];
     setUseWideViewPort?: [ boolean ];
-    setLayoutAlgorithm?: [ { type: "Enum", className: "android.webkit.WebSettings.LayoutAlgorithm",
+    setLayoutAlgorithm?: [ { type: "Enum", className: "android.webkit.WebSettings$LayoutAlgorithm",
         value: "NARROW_COLUMNS" | "NORMAL" | "SINGLE_COLUMN" | "TEXT_AUTOSIZING" } ];
 }
 
@@ -123,18 +123,6 @@ export interface IWebPlayerPlayerSettingsAndroid {
     setVerticalScrollbarOverlay?: [ boolean ];
     setHttpAuthUsernamePassword?: [string, string, string, string];
     setRendererPriorityPolicy?: [number, boolean];
-
-    /* TODO: These need native changes to function:
-    setLayerType?: number, layerType, Paint;
-    setLayoutParams?: ViewGroup.LayoutParams;
-    setPictureListener?: WebView.PictureListener;
-    setTextClassifier?: TextClassifier;
-    setWebChromeClient?: WebChromeClient;
-    setWebViewClient?: WebViewClient;
-    setCertificate?: SslCertificate;
-    setDownloadListener?: DownloadListener;
-    setFindListener?: WebView.FindListener;
-    */
 }
 
 export interface IWebPlayerWebSettingsIos {
