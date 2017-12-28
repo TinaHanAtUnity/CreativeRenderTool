@@ -1,11 +1,9 @@
 @import "vars.styl";
 
 $dark-end-screen-size = $default-scale-size * $default-size;
+$dark-end-font-size = $dark-end-screen-size * 1.25;
 
 body.landscape #end-screen.dark-end-screen {
-  .btn-close-region {
-    color: $white;
-  }
   .underlay {
     width: 50%;
   }
@@ -32,11 +30,11 @@ body.portrait #end-screen.dark-end-screen {
 
   .icon-star {
     color: $blue;
-    font-size: $dark-end-screen-size * 1.25;
+    font-size: $dark-end-font-size;
   }
 
   .name-container {
-    font-size: $dark-end-screen-size * 1.25;
+    font-size: $dark-end-font-size;
   }
 
   /* iOS 8 fix */
@@ -63,9 +61,10 @@ body.portrait #end-screen.dark-end-screen {
       /* iOS 8 fix: position and z-index */
       position: relative;
       z-index: 20;
+      margin: 0 auto;
       border-radius: $dark-end-screen-size * 5;
       background-color: darken($blue, 10%);
-      font-size: $dark-end-screen-size * 1;
+      font-size: $dark-end-font-size * .75;
     }
 
     .game-background-landscape,
@@ -123,6 +122,10 @@ body.portrait #end-screen.dark-end-screen {
       bottom: 0;
       height: $dark-end-screen-size * 1.5;
       background-image: url("../img/unityads-white.png");
+    }
+
+    .store-container {
+      margin-top: $dark-end-screen-size * .25;
     }
 
     .store-icon {
