@@ -64,6 +64,7 @@ export class AdMobEventHandler implements IAdMobEventHandler {
    }
 
     public onGrantReward(): void {
+        this._adUnit.sendRewardEvent();
         this._adUnit.setFinishState(FinishState.COMPLETED);
     }
 
