@@ -29,7 +29,8 @@ export enum WebplayerEvent {
     JS_PROMPT,
     CONSOLE_MESSAGE,
     SHOW_FILE_CHOOSER,
-    GEOLOCATION_PERMISSIONS_SHOW
+    GEOLOCATION_PERMISSIONS_SHOW,
+    DOWNLOAD_START
 }
 
 export interface IWebPlayerEventSettings {
@@ -59,6 +60,7 @@ export interface IWebPlayerEventSettings {
     onJsPrompt?: { sendEvent?: boolean, shouldCallSuper?: boolean, getReturnValue?: boolean };
     onConsoleMessage?: { sendEvent?: boolean, shouldCallSuper?: boolean, getReturnValue?: boolean };
     onShowFileChooser?: { sendEvent?: boolean, shouldCallSuper?: boolean, getReturnValue?: boolean };
+    onDownloadStart?: { sendEvent?: boolean, shouldCallSuper?: boolean, getReturnValue?: boolean };
 }
 
 export interface IWebPlayerWebSettingsAndroid {
