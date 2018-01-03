@@ -9,7 +9,7 @@ export enum StoreName {
     XIAOMI
 }
 
-interface IPerformanceCampaign extends ICampaign {
+export interface IPerformanceCampaign extends ICampaign {
     appStoreId: string;
     gameId: number;
     gameName: string;
@@ -31,7 +31,7 @@ interface IPerformanceCampaign extends ICampaign {
 }
 
 export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
-    constructor(campaign: any, session: Session, gamerId: string, abGroup: number) {
+    constructor(campaign: IPerformanceCampaign) {
         super('PerformanceCampaign', {
             ... Campaign.Schema,
             appStoreId: ['string'],
@@ -55,30 +55,30 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
         });
 
         this.set('id', campaign.id);
-        this.set('session', session);
-        this.set('gamerId', gamerId);
-        this.set('abGroup', abGroup);
+        this.set('session', campaign.session);
+        this.set('gamerId', campaign.gamerId);
+        this.set('abGroup', campaign.abGroup);
 
         this.set('appStoreId', campaign.appStoreId);
 
         this.set('gameId', campaign.gameId);
         this.set('gameName', campaign.gameName);
-        this.set('gameIcon', new Image(campaign.gameIcon, session));
+        this.set('gameIcon', campaign.gameIcon);
 
         this.set('rating', campaign.rating);
         this.set('ratingCount', campaign.ratingCount);
 
-        this.set('landscapeImage', new Image(campaign.endScreenLandscape, session));
-        this.set('portraitImage', new Image(campaign.endScreenPortrait, session));
+        this.set('landscapeImage', campaign.landscapeImage);
+        this.set('portraitImage', campaign.portraitImage);
 
-        if(campaign.trailerDownloadable && campaign.trailerDownloadableSize && campaign.trailerStreaming) {
-            this.set('video', new Video(campaign.trailerDownloadable, session, campaign.trailerDownloadableSize));
-            this.set('streamingVideo', new Video(campaign.trailerStreaming, session));
+        if(campaign.video && campaign.streamingVideo) {
+            this.set('video', campaign.video);
+            this.set('streamingVideo', campaign.streamingVideo);
         }
 
-        if(campaign.trailerPortraitDownloadable && campaign.trailerPortraitDownloadableSize && campaign.trailerPortraitStreaming) {
-            this.set('videoPortrait', new Video(campaign.trailerPortraitDownloadable, session, campaign.trailerPortraitDownloadableSize));
-            this.set('streamingPortraitVideo', new Video(campaign.trailerPortraitStreaming, session));
+        if(campaign.videoPortrait && campaign.streamingPortraitVideo) {
+            this.set('videoPortrait', campaign.videoPortrait);
+            this.set('streamingPortraitVideo', campaign.streamingPortraitVideo);
         }
 
         this.set('clickUrl', campaign.clickUrl);
@@ -87,21 +87,7 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
         this.set('clickAttributionUrlFollowsRedirects', campaign.clickAttributionUrlFollowsRedirects);
 
         this.set('bypassAppSheet', campaign.bypassAppSheet);
-
-        const campaignStore = typeof campaign.store !== 'undefined' ? campaign.store : '';
-        switch(campaignStore) {
-            case 'apple':
-                this.set('store', StoreName.APPLE);
-                break;
-            case 'google':
-                this.set('store', StoreName.GOOGLE);
-                break;
-            case 'xiaomi':
-                this.set('store', StoreName.XIAOMI);
-                break;
-            default:
-                throw new Error('Unknown store value "' + campaign.store + '"');
-        }
+        this.set('store', campaign.store);
 
         this.set('meta', campaign.meta);
     }

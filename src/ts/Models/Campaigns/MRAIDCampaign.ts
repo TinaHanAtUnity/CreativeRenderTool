@@ -10,7 +10,7 @@ export interface IMRAIDCampaign extends ICampaign {
     resourceAsset: HTML | undefined;
     resource: string | undefined;
     dynamicMarkup: string | undefined;
-    additionalTrackingEvents: { [eventName: string]: string[] };
+    additionalTrackingEvents: { [eventName: string]: string[] } | undefined;
 
     clickAttributionUrl?: string;
     clickAttributionUrlFollowsRedirects?: boolean;
@@ -29,7 +29,7 @@ export interface IMRAIDCampaign extends ICampaign {
 }
 
 export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
-    constructor(campaign: any, session: Session, gamerId: string, abGroup: number, cacheTTL: number | undefined, resourceUrl?: string, resource?: string, additionalTrackingEvents?: { [eventName: string]: string[] }, adType?: string, creativeId?: string, seatId?: number, correlationId?: string, useWebViewUserAgentForTracking?: boolean) {
+    constructor(campaign: IMRAIDCampaign) {
         super('MRAIDCampaign', {
             ... Campaign.Schema,
             resourceAsset: ['object', 'undefined'],
@@ -52,19 +52,19 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         });
 
         this.set('id', campaign.id);
-        this.set('session', session);
-        this.set('gamerId', gamerId);
-        this.set('abGroup', abGroup);
-        this.set('useWebViewUserAgentForTracking', useWebViewUserAgentForTracking);
+        this.set('session', campaign.session);
+        this.set('gamerId', campaign.gamerId);
+        this.set('abGroup', campaign.abGroup);
+        this.set('useWebViewUserAgentForTracking', campaign.useWebViewUserAgentForTracking);
 
-        this.set('resourceAsset', resourceUrl ? new HTML(resourceUrl, session) : undefined);
-        this.set('resource', resource);
+        this.set('resourceAsset', campaign.resourceAsset);
+        this.set('resource', campaign.resource);
         this.set('dynamicMarkup', campaign.dynamicMarkup);
-        this.set('additionalTrackingEvents', additionalTrackingEvents || {});
-        this.set('adType', adType || undefined);
-        this.set('correlationId', correlationId || undefined);
-        this.set('creativeId', creativeId || undefined);
-        this.set('seatId', seatId || undefined);
+        this.set('additionalTrackingEvents', campaign.additionalTrackingEvents || {});
+        this.set('adType', campaign.adType || undefined);
+        this.set('correlationId', campaign.correlationId || undefined);
+        this.set('creativeId', campaign.creativeId || undefined);
+        this.set('seatId', campaign.seatId || undefined);
 
         this.set('clickAttributionUrl', campaign.clickAttributionUrl);
         this.set('clickAttributionUrlFollowsRedirects', campaign.clickAttributionUrlFollowsRedirects);
@@ -79,43 +79,31 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         this.set('meta', campaign.meta);
         this.set('gameName', campaign.gameName);
 
-        if(cacheTTL) {
-            this.set('willExpireAt', Date.now() + cacheTTL * 1000);
+        if(campaign.willExpireAt) {
+            this.set('willExpireAt', campaign.willExpireAt);
         }
 
         if(campaign.gameIcon) {
-            this.set('gameIcon', new Image(campaign.gameIcon, session));
+            this.set('gameIcon', campaign.gameIcon);
         }
+
         this.set('rating', campaign.rating);
         this.set('ratingCount', campaign.ratingCount);
 
-        if(campaign.endScreenLandscape) {
-            this.set('landscapeImage', new Image(campaign.endScreenLandscape, session));
+        if(campaign.landscapeImage) {
+            this.set('landscapeImage', campaign.landscapeImage);
         }
-        if(campaign.endScreenPortrait) {
-            this.set('portraitImage', new Image(campaign.endScreenPortrait, session));
+        if(campaign.portraitImage) {
+            this.set('portraitImage', campaign.portraitImage);
         }
-        this.set('bypassAppSheet', campaign.bypassAppSheet);
 
-        const campaignStore = typeof campaign.store !== 'undefined' ? campaign.store : '';
-        switch(campaignStore) {
-            case 'apple':
-                this.set('store', StoreName.APPLE);
-                break;
-            case 'google':
-                this.set('store', StoreName.GOOGLE);
-                break;
-            case 'xiaomi':
-                this.set('store', StoreName.XIAOMI);
-                break;
-            default:
-                break;
-        }
+        this.set('bypassAppSheet', campaign.bypassAppSheet);
+        this.set('store', campaign.store);
         this.set('appStoreId', campaign.appStoreId);
 
-        if(resourceUrl && CustomFeatures.isPlayableEndScreenTest(abGroup, resourceUrl)) {
-            this.set('landscapeImage', new Image('https://cdn.unityads.unity3d.com/impact/images/130393/4729d640d83d4a18/unityads600x800-b.jpg', session));
-            this.set('portraitImage', new Image('https://cdn.unityads.unity3d.com/impact/images/130393/98c14b54d4c51801/unityads800x600-b.jpg', session));
+        if(campaign.resourceAsset && CustomFeatures.isPlayableEndScreenTest(campaign.abGroup, campaign.resourceAsset.getOriginalUrl())) {
+            this.set('landscapeImage', new Image('https://cdn.unityads.unity3d.com/impact/images/130393/4729d640d83d4a18/unityads600x800-b.jpg', campaign.session));
+            this.set('portraitImage', new Image('https://cdn.unityads.unity3d.com/impact/images/130393/98c14b54d4c51801/unityads800x600-b.jpg', campaign.session));
         }
     }
 
@@ -186,7 +174,7 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         return this.get('dynamicMarkup');
     }
 
-    public getTrackingEventUrls(): { [eventName: string]: string[] } {
+    public getTrackingEventUrls(): { [eventName: string]: string[] } | undefined {
         return this.get('additionalTrackingEvents');
     }
 
