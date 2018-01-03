@@ -35,6 +35,8 @@ import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { Campaign } from 'Models/Campaign';
 
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
+import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 
 describe('AdUnitFactoryTest', () => {
 
@@ -51,6 +53,7 @@ describe('AdUnitFactoryTest', () => {
     let thirdPartyEventManager: ThirdPartyEventManager;
     let request: Request;
     let adUnitParameters: IAdUnitParameters<Campaign>;
+    let comScoreService: ComScoreTrackingService;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -64,12 +67,15 @@ describe('AdUnitFactoryTest', () => {
         request = new Request(nativeBridge, wakeUpManager);
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         sandbox.stub(container, 'close').returns(Promise.resolve());
+        sandbox.stub(container, 'open').returns(Promise.resolve());
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         config = new Configuration(JSON.parse(ConfigurationJson));
         deviceInfo = <DeviceInfo>{getLanguage: () => 'en', getAdvertisingIdentifier: () => '000', getLimitAdTracking: () => false};
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         sessionManager = new SessionManager(nativeBridge);
         operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
+
         adUnitParameters = {
             forceOrientation: ForceOrientation.LANDSCAPE,
             focusManager: focusManager,
@@ -78,6 +84,7 @@ describe('AdUnitFactoryTest', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
+            comScoreTrackingService: comScoreService,
             placement: TestFixtures.getPlacement(),
             campaign: TestFixtures.getCampaign(),
             configuration: config,
@@ -218,22 +225,48 @@ describe('AdUnitFactoryTest', () => {
         });
     });
 
-    describe('DisplayInterstitialAdUnit', () => {
+    const displayUnitTests = (isStaticInterstitialUrlCampaign: boolean): void => {
         let adUnit: DisplayInterstitialAdUnit;
         let campaign: DisplayInterstitialCampaign;
+        let server: sinon.SinonFakeServer;
 
         beforeEach(() => {
-            campaign = TestFixtures.getDisplayInterstitialCampaign();
+            campaign = TestFixtures.getDisplayInterstitialCampaign(isStaticInterstitialUrlCampaign);
             adUnitParameters.campaign = campaign;
             adUnit = <DisplayInterstitialAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+
+            if (isStaticInterstitialUrlCampaign) {
+                server = sinon.fakeServer.create();
+                server.respondImmediately = true;
+                server.respondWith('<a href="http://unity3d.com"></a>');
+            }
+        });
+
+        afterEach(() => {
+            if (server) {
+                server.restore();
+            }
         });
 
         describe('on show', () => {
             it('should send tracking events', () => {
-                adUnit.show();
-                sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendEvent, 'display impression', campaign.getSession().getId(), 'https://unity3d.com/impression');
-                adUnit.hide();
+                return adUnit.show().then(() => {
+                    sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendEvent, 'display impression', campaign.getSession().getId(), 'https://unity3d.com/impression');
+                    return adUnit.hide();
+                });
             });
+        });
+    };
+
+    describe('DisplayInterstitialAdUnit', () => {
+        const isStaticInterstitialUrlCampaign = true;
+
+        describe('On static-interstial campaign', () => {
+            displayUnitTests(!isStaticInterstitialUrlCampaign);
+        });
+
+        describe('On static-interstial-url campaign', () => {
+            displayUnitTests(isStaticInterstitialUrlCampaign);
         });
     });
 });

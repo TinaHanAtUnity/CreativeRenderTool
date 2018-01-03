@@ -18,6 +18,7 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { SessionManager } from 'Managers/SessionManager';
 
 import EventTestVast from 'xml/EventTestVast.xml';
@@ -29,6 +30,7 @@ describe('VastEndScreenEventHandlersTest', () => {
     let container: AdUnitContainer;
     let request: Request;
     let vastAdUnitParameters: IVastAdUnitParameters;
+    let comScoreService: ComScoreTrackingService;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -51,8 +53,9 @@ describe('VastEndScreenEventHandlersTest', () => {
         const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         const sessionManager = new SessionManager(nativeBridge);
         const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
-        const video = new Video('');
+        const video = new Video('', TestFixtures.getSession());
         const overlay = new Overlay(nativeBridge, true, 'en', 'testGameId');
+        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         vastAdUnitParameters = {
             forceOrientation: ForceOrientation.LANDSCAPE,
@@ -62,6 +65,7 @@ describe('VastEndScreenEventHandlersTest', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
+            comScoreTrackingService: comScoreService,
             placement: TestFixtures.getPlacement(),
             campaign: campaign,
             configuration: TestFixtures.getConfiguration(),
@@ -75,7 +79,7 @@ describe('VastEndScreenEventHandlersTest', () => {
 
     describe('when calling onClose', () => {
         it('should hide endcard', () => {
-            const vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
+            const vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.configuration.isCoppaCompliant(), vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
             vastAdUnitParameters.endScreen = vastEndScreen;
             const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
             sinon.stub(vastAdUnit, 'hide').returns(sinon.spy());
@@ -97,13 +101,13 @@ describe('VastEndScreenEventHandlersTest', () => {
 
         beforeEach(() => {
 
-            video = new Video('');
+            video = new Video('', TestFixtures.getSession());
             campaign = new VastCampaign(vast, '12345', TestFixtures.getSession(), 'gamerId', 1);
 
             vastAdUnitParameters.video = video;
             vastAdUnitParameters.campaign = campaign;
             vastAdUnitParameters.placement = TestFixtures.getPlacement();
-            const vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
+            const vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.configuration.isCoppaCompliant(), vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
             vastAdUnitParameters.endScreen = vastEndScreen;
             vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
             vastEndScreenEventHandler = new VastEndScreenEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);

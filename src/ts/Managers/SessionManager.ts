@@ -4,6 +4,7 @@ import { StorageType } from 'Native/Api/Storage';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { SdkStats } from 'Utilities/SdkStats';
 
 export class SessionManager {
     public static getSessionKey(sessionId: string): string {
@@ -38,7 +39,8 @@ export class SessionManager {
         ]).catch(error => {
             Diagnostics.trigger('session_start_failed', new DiagnosticError(error, {
                 key: sessionTimestampKey,
-                timestamp: timestamp
+                timestamp: timestamp,
+                adRequestOrdinal: SdkStats.getAdRequestOrdinal()
             }));
             return Promise.resolve([]);
         });

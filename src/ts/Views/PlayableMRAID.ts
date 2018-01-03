@@ -9,6 +9,7 @@ import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
 
 export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -36,8 +37,8 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _backgroundTime: number = 0;
     private _backgroundTimestamp: number;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string) {
-        super(nativeBridge, 'playable-mraid');
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string, coppaCompliant: boolean) {
+        super(nativeBridge, 'playable-mraid', placement, campaign, coppaCompliant);
 
         this._placement = placement;
         this._campaign = campaign;
@@ -69,11 +70,16 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 event: 'click',
                 listener: (event: Event) => this.onCloseEvent(event),
                 selector: '.close-region'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onPrivacyEvent(event),
+                selector: '.privacy-button'
             }
         ];
     }
 
-    public render() {
+    public render(): void {
         super.render();
 
         this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
@@ -230,8 +236,8 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 this._closeElement.style.display = 'block';
 
                 this._playableStartTimestamp = Date.now();
-                const timeFromShow = this.checkIsNegative((this._playableStartTimestamp - this._showTimestamp) / 1000);
-                const backgroundTime = this.checkIsNegative(this._backgroundTime / 1000);
+                const timeFromShow = this.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
+                const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
                 this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_start', undefined));
                 this._iframe.contentWindow.postMessage({
                     type: 'viewable',
@@ -308,9 +314,9 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 }));
                 break;
             case 'analyticsEvent':
-                const timeFromShow = this.checkIsNegative((Date.now() - this._showTimestamp) / 1000);
-                const timeFromPlayableStart = this.checkIsNegative((Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000);
-                const backgroundTime = this.checkIsNegative(this._backgroundTime / 1000);
+                const timeFromShow = this.checkIsValid((Date.now() - this._showTimestamp) / 1000);
+                const timeFromPlayableStart = this.checkIsValid((Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000);
+                const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
                 this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, event.data.event, event.data.eventData));
                 break;
             case 'customMraidState':
@@ -321,7 +327,10 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                         }
                         break;
                     case 'showEndScreen':
-                        this._handlers.forEach(handler => handler.onMraidShowEndScreen());
+                        const resourceUrl = this._campaign.getResourceUrl();
+                        if(resourceUrl && CustomFeatures.isPlayableEndScreenTest(this._campaign.getAbGroup(), resourceUrl.getOriginalUrl())) {
+                            this._handlers.forEach(handler => handler.onMraidShowEndScreen());
+                        }
                         break;
                     default:
                         break;
@@ -331,10 +340,10 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
     }
 
-    private checkIsNegative(time: number): number | undefined {
-        if (time < 0) {
+    private checkIsValid(timeInSeconds: number): number | undefined {
+        if (timeInSeconds < 0 || timeInSeconds > 600) {
             return undefined;
         }
-        return time;
+        return timeInSeconds;
     }
 }

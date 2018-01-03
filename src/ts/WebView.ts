@@ -38,10 +38,13 @@ import { StorageType } from 'Native/Api/Storage';
 import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { SdkStats } from 'Utilities/SdkStats';
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
+import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
+import { Campaign } from 'Models/Campaign';
 
 export class WebView {
 
@@ -65,9 +68,11 @@ export class WebView {
     private _sessionManager: SessionManager;
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
+    private _comScoreTrackingService: ComScoreTrackingService;
     private _wakeUpManager: WakeUpManager;
     private _focusManager: FocusManager;
     private _analyticsManager: AnalyticsManager;
+    private _adMobSignalFactory: AdMobSignalFactory;
 
     private _showing: boolean = false;
     private _initialized: boolean = false;
@@ -98,18 +103,13 @@ export class WebView {
             this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
             this._thirdPartyEventManager = new ThirdPartyEventManager(this._nativeBridge, this._request);
             this._metadataManager = new MetaDataManager(this._nativeBridge);
+            this._adMobSignalFactory = new AdMobSignalFactory(this._nativeBridge, this._clientInfo, this._deviceInfo, this._focusManager);
 
             HttpKafka.setRequest(this._request);
             HttpKafka.setClientInfo(this._clientInfo);
             SdkStats.setInitTimestamp();
 
-            return this._deviceInfo.fetch();
-        }).then(() => {
-            return this._cache.cleanCache().catch(error => {
-                // don't fail init due to cache cleaning issues, instead just log and report diagnostics
-                this._nativeBridge.Sdk.logError('Unity Ads cleaning cache failed: ' + error);
-                Diagnostics.trigger('cleaning_cache_failed', error);
-            });
+            return Promise.all([this._deviceInfo.fetch(), this.setupTestEnvironment()]);
         }).then(() => {
             if(this._clientInfo.getPlatform() === Platform.ANDROID) {
                 document.body.classList.add('android');
@@ -140,14 +140,21 @@ export class WebView {
                 this._focusManager.setListenAndroidLifecycle(true);
             }
 
-            return this.setupTestEnvironment();
-        }).then(() => {
+            let configPromise;
             if(this._creativeUrl) {
-                return new Configuration(JsonParser.parse(CreativeUrlConfiguration));
+                configPromise = Promise.resolve(new Configuration(JsonParser.parse(CreativeUrlConfiguration)));
             } else {
-                return ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, this._metadataManager);
+                configPromise = ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, this._metadataManager);
             }
-        }).then((configuration) => {
+
+            const cachePromise = this._cache.cleanCache().catch(error => {
+                // don't fail init due to cache cleaning issues, instead just log and report diagnostics
+                this._nativeBridge.Sdk.logError('Unity Ads cleaning cache failed: ' + error);
+                Diagnostics.trigger('cleaning_cache_failed', error);
+            });
+
+            return Promise.all([configPromise, cachePromise]);
+        }).then(([configuration]) => {
             this._configuration = configuration;
             HttpKafka.setConfiguration(this._configuration);
 
@@ -180,10 +187,10 @@ export class WebView {
             this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
 
             this._assetManager = new AssetManager(this._cache, this._configuration.getCacheMode(), this._deviceInfo);
-            this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._request, this._clientInfo, this._deviceInfo, this._metadataManager);
+            this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._adMobSignalFactory, this._request, this._clientInfo, this._deviceInfo, this._metadataManager);
             this._campaignRefreshManager = new CampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration, this._focusManager);
 
-            SdkStats.initialize(this._nativeBridge, this._request, this._configuration, this._sessionManager, this._campaignManager, this._metadataManager);
+            SdkStats.initialize(this._nativeBridge, this._request, this._configuration, this._sessionManager, this._campaignManager, this._metadataManager, this._clientInfo);
 
             return this._campaignRefreshManager.refresh();
         }).then(() => {
@@ -278,6 +285,7 @@ export class WebView {
             }
 
             const orientation = screenWidth >= screenHeight ? ForceOrientation.LANDSCAPE : ForceOrientation.PORTRAIT;
+            this._comScoreTrackingService = new ComScoreTrackingService(this._thirdPartyEventManager, this._nativeBridge, this._deviceInfo);
             this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, {
                 forceOrientation: orientation,
                 focusManager: this._focusManager,
@@ -286,11 +294,13 @@ export class WebView {
                 clientInfo: this._clientInfo,
                 thirdPartyEventManager: this._thirdPartyEventManager,
                 operativeEventManager: this._operativeEventManager,
+                comScoreTrackingService: this._comScoreTrackingService,
                 placement: placement,
                 campaign: campaign,
                 configuration: this._configuration,
                 request: this._request,
-                options: options
+                options: options,
+                adMobSignalFactory: this._adMobSignalFactory
             });
             this._campaignRefreshManager.setCurrentAdUnit(this._currentAdUnit);
             this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());

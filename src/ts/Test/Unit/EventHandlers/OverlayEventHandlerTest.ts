@@ -24,6 +24,8 @@ import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
+import { Placement } from 'Models/Placement';
 
 describe('OverlayEventHandlerTest', () => {
 
@@ -44,6 +46,9 @@ describe('OverlayEventHandlerTest', () => {
     let overlay: Overlay;
     let performanceAdUnitParameters: IPerformanceAdUnitParameters;
     let overlayEventHandler: OverlayEventHandler<PerformanceCampaign>;
+    let comScoreService: ComScoreTrackingService;
+    let campaign: PerformanceCampaign;
+    let placement: Placement;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -58,13 +63,16 @@ describe('OverlayEventHandlerTest', () => {
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
 
+        campaign = TestFixtures.getCampaign();
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         sessionManager = new SessionManager(nativeBridge);
         operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
         container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
-        video = new Video('');
-        endScreen = new PerformanceEndScreen(nativeBridge, TestFixtures.getCampaign(), TestFixtures.getConfiguration().isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
+        video = new Video('', TestFixtures.getSession());
+        endScreen = new PerformanceEndScreen(nativeBridge, campaign, TestFixtures.getConfiguration().isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
+        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
+        placement = TestFixtures.getPlacement();
 
         performanceAdUnitParameters = {
             forceOrientation: ForceOrientation.LANDSCAPE,
@@ -74,8 +82,9 @@ describe('OverlayEventHandlerTest', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
-            placement: TestFixtures.getPlacement(),
-            campaign: TestFixtures.getCampaign(),
+            comScoreTrackingService: comScoreService,
+            placement: placement,
+            campaign: campaign,
             configuration: TestFixtures.getConfiguration(),
             request: request,
             options: {},
@@ -83,6 +92,7 @@ describe('OverlayEventHandlerTest', () => {
             overlay: overlay,
             video: video
         };
+        sinon.stub(performanceAdUnitParameters.campaign, 'getAbGroup').returns(5);
 
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
         overlayEventHandler = new OverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
@@ -95,6 +105,7 @@ describe('OverlayEventHandlerTest', () => {
             sinon.spy(nativeBridge.AndroidAdUnit, 'setViews');
             sinon.spy(container, 'reconfigure');
             sinon.spy(overlay, 'hide');
+            sinon.spy(comScoreService, 'sendEvent');
 
             overlayEventHandler.onOverlaySkip(1);
         });
@@ -112,7 +123,7 @@ describe('OverlayEventHandlerTest', () => {
         });
 
         it('should send skip', () => {
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendSkip, performanceAdUnit, performanceAdUnit.getVideo().getPosition());
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendSkip, campaign.getSession(), placement, campaign, performanceAdUnit.getVideo().getPosition());
         });
 
         it('should call reconfigure', () => {
@@ -123,6 +134,15 @@ describe('OverlayEventHandlerTest', () => {
             sinon.assert.called(<sinon.SinonSpy>overlay.hide);
         });
 
+        it('should send comscore end event', () => {
+            const positionAtSkip = performanceAdUnit.getVideo().getPosition();
+            const comScoreDuration = (performanceAdUnit.getVideo().getDuration()).toString(10);
+            const sessionId = campaign.getSession().getId();
+            const creativeId = campaign.getCreativeId();
+            const category =  campaign.getCategory();
+            const subCategory = campaign.getSubCategory();
+            sinon.assert.calledWith(<sinon.SinonSpy>comScoreService.sendEvent, 'end', sessionId, comScoreDuration, positionAtSkip, creativeId, category, subCategory);
+        });
     });
 
     describe('When calling onMute', () => {

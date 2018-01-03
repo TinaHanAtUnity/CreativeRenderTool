@@ -1,7 +1,7 @@
-import { Vast } from "Models/Vast/Vast";
-import { VastMediaFile } from "Models/Vast/VastMediaFile";
-import { VastCreativeLinear } from "Models/Vast/VastCreativeLinear";
-import { VastCreativeCompanionAd } from "Models/Vast/VastCreativeCompanionAd";
+import { Vast } from 'Models/Vast/Vast';
+import { VastMediaFile } from 'Models/Vast/VastMediaFile';
+import { VastCreativeLinear } from 'Models/Vast/VastCreativeLinear';
+import { VastCreativeCompanionAd } from 'Models/Vast/VastCreativeCompanionAd';
 
 export class VPAID {
     private vast: Vast;

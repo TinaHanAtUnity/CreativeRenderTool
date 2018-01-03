@@ -22,6 +22,7 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { FocusManager } from 'Managers/FocusManager';
 import { Request } from 'Utilities/Request';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 
 describe('VastOverlayEventHandlersTest', () => {
     let campaign: VastCampaign;
@@ -42,6 +43,7 @@ describe('VastOverlayEventHandlersTest', () => {
     let request: Request;
     let vastAdUnitParameters: IVastAdUnitParameters;
     let vastOverlayEventHandler: VastOverlayEventHandler;
+    let comScoreService: ComScoreTrackingService;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -79,6 +81,7 @@ describe('VastOverlayEventHandlersTest', () => {
         });
 
         const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         vastAdUnitParameters = {
             forceOrientation: ForceOrientation.LANDSCAPE,
@@ -88,6 +91,7 @@ describe('VastOverlayEventHandlersTest', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
+            comScoreTrackingService: comScoreService,
             placement: TestFixtures.getPlacement(),
             campaign: campaign,
             configuration: TestFixtures.getConfiguration(),
@@ -115,7 +119,7 @@ describe('VastOverlayEventHandlersTest', () => {
 
         describe('When ad unit has an endscreen', () => {
             it('should hide endcard', () => {
-                const vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
+                const vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.configuration.isCoppaCompliant(), vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
                 sinon.spy(vastEndScreen, 'show');
                 vastAdUnitParameters.endScreen = vastEndScreen;
                 vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);

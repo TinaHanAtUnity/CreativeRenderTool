@@ -1,5 +1,5 @@
 import EndScreenTemplate from 'html/EndScreen.html';
-import NewEndScreenTemplate from 'html/NewEndScreen.html';
+import XmasEndScreenTemplate from 'html/XmasEndScreen.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -17,7 +17,7 @@ export interface IEndScreenHandler {
     onKeyEvent(keyCode: number): void;
 }
 
-const newEndScreenId = "new-end-screen";
+const xMasEndScreenId = "xmas-end-screen";
 
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
 
@@ -35,23 +35,19 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._abGroup = abGroup;
         this._gameName = gameName;
 
-        if (this.getEndscreenAlt() === newEndScreenId) {
-            this._template = new Template(NewEndScreenTemplate, this._localization);
+        this._template = new Template(EndScreenTemplate, this._localization);
+
+        if (this.getEndscreenAlt() === xMasEndScreenId) {
+            this._template = new Template(XmasEndScreenTemplate, this._localization);
         } else {
             this._template = new Template(EndScreenTemplate, this._localization);
-        }
-
-        let downloadSelectors = '.game-background, .btn-download, .game-icon';
-
-        if (this.getEndscreenAlt() === newEndScreenId) {
-            downloadSelectors = '.game-background, .download-container, .game-icon';
         }
 
         this._bindings = [
             {
                 event: 'click',
                 listener: (event: Event) => this.onDownloadEvent(event),
-                selector: downloadSelectors
+                selector: '.game-background, .download-container, .game-icon'
             },
             {
                 event: 'click',
@@ -83,10 +79,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';
         }
 
-        if (this.getEndscreenAlt() === newEndScreenId) {
-            this._container.id = newEndScreenId;
+        const endScreenAlt = this.getEndscreenAlt();
+        if (typeof endScreenAlt === "string") {
+            this._container.classList.add(endScreenAlt);
         }
-
     }
 
     public show(): void {
@@ -132,7 +128,11 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     protected getEndscreenAlt(campaign?: Campaign) {
-        return undefined;
+        if (this._abGroup === 10 || this._abGroup === 11) {
+            return undefined;
+        }
+
+        return xMasEndScreenId;
     }
 
     protected abstract onDownloadEvent(event: Event): void;

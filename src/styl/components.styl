@@ -11,6 +11,8 @@ $game-rating-default($scale-size, $with-styles = true) {
     color: $end-screen-info-gray;
     vertical-align: middle;
     letter-spacing: 5px;
+    /* Required for all androids <= 4.3 */
+    text-align: center;
   }
 }
 
@@ -36,7 +38,7 @@ $game-icon-default($scale-size, $with-styles = true) {
   $set-image($scale-size * $default-size * 4.5, $scale-size * $default-size * 4.5, $scale-size * $default-size * .75);
 }
 
-$unityads-logo-default($scale-size, $unity-logo-width = 5, $with-styles = true) {
+$unityads-logo-default($scale-size, $with-styles = true) {
   $set-image(100%, $scale-size * $default-size, 0, "../img/unityads.png", contain);
   bottom: $scale-size * $default-size * .25;
 
@@ -60,12 +62,20 @@ $name-container-default($scale-size, $with-styles = true) {
   }
 }
 
+$close-button-width = 1.25;
 $close-button-default($scale-size, $with-styles = true) {
-  font-size: $scale-size * $default-font-size * 1.25;
+  /*
+    width is not necessarily, but requires for Android <= 4.3
+    due to pseudo elements partial support, also width must be bigger than font-size
+  */
+  width: $scale-size * $default-font-size * $close-button-width * 1.75;
+  font-size: $scale-size * $default-font-size * $close-button-width;
+  line-height: @width;
   if($with-styles) {
     position: absolute;
     right: 0;
     color: $white;
+    text-align: center;
     text-shadow: 2px 2px 20px $gray;
   }
 }
@@ -89,6 +99,31 @@ $privacy-button-default($scale-size, $with-styles = true) {
     bottom: 0;
     z-index: 10;
     color: $end-screen-info-gray;
+  }
+}
+
+/* MRAID iframe */
+
+$iframe-default($with-styles = true) {
+  if($with-styles) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    border: none;
+  }
+}
+
+$iframe-close-region-default($with-styles = true) {
+  if($with-styles) {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 9999;
+    width: 50px;
+    height: 50px;
+    opacity: .4;
   }
 }
 

@@ -42,7 +42,7 @@ describe('ResolveTest', () => {
         const testHost: string = 'www.example.net';
         const testIp: string = '1.2.3.4';
 
-        return resolve.resolve(testHost).then(([host, ip]) => {
+        return resolve.resolve(testHost).then(([id, host, ip]) => {
             assert.equal(testHost, host, 'Hostname does not match the request');
             assert.equal(testIp, ip, 'IP address was not successfully resolved');
         });

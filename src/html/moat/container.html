@@ -160,9 +160,17 @@
             }
             h[e] = d;
             g.type = "text/javascript";
+            g.onerror = loadError;
             c && c.insertBefore(g, c.childNodes[0] || null);
             g.src = "https://z.moatads.com/" + k + "/moatvideo.js#" + e;
             return d
+        }
+
+        function loadError(e) {
+            window.parent.postMessage({
+                type: 'MOATVideoError',
+                error: e.target.src + ' failed to download'
+            }, '*');
         }
     </script>
 </head>

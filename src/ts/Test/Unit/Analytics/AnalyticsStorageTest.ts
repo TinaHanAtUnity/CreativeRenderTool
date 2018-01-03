@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import { assert } from 'chai';
 
 import { NativeBridge } from 'Native/NativeBridge';
-import { TestFixtures } from "../TestHelpers/TestFixtures";
+import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { AnalyticsStorage, IIAPInstrumentation } from 'Analytics/AnalyticsStorage';
 import { StorageType } from 'Native/Api/Storage';
 
@@ -18,29 +18,31 @@ describe('AnalyticsStorageTest', () => {
 
     describe('should get analytics user id', () => {
         it('with empty storage', () => {
-            const nativeId: string = '6c7fa2c0-4333-47be-8de2-2f24e33e710c';
+            const nativeId: string = '6C7FA2C0-4333-47BE-8DE2-2F24E33E710C';
+            const finalId: string = '6c7fa2c0433347be8de22f24e33e710c';
 
             sinon.stub(nativeBridge.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve(nativeId));
             sinon.stub(nativeBridge.Storage, 'get').withArgs(StorageType.PRIVATE, 'analytics.userid').returns(Promise.reject(['COULDNT_GET_VALUE', 'analytics.userid']));
 
             return analyticsStorage.getUserId().then(id => {
-                assert.equal(id, nativeId, 'created analytics user id does not match');
+                assert.equal(id, finalId, 'created analytics user id does not match');
             });
         });
 
         it('with no storage', () => {
             const nativeId: string = '6c7fa2c0-4333-47be-8de2-2f24e33e710c';
+            const finalId: string = '6c7fa2c0433347be8de22f24e33e710c';
 
             sinon.stub(nativeBridge.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve(nativeId));
             sinon.stub(nativeBridge.Storage, 'get').withArgs(StorageType.PRIVATE, 'analytics.userid').returns(Promise.reject(['COULDNT_GET_STORAGE', StorageType.PRIVATE, 'analytics.userid']));
 
             return analyticsStorage.getUserId().then(id => {
-                assert.equal(id, nativeId, 'created analytics user id does not match');
+                assert.equal(id, finalId, 'created analytics user id does not match');
             });
         });
 
         it('with existing id in storage', () => {
-            const storedId: string = '9b67056f-1aa4-4680-be30-df179f244211';
+            const storedId: string = '9b67056f1aa44680be30df179f244211';
 
             sinon.stub(nativeBridge.Storage, 'get').withArgs(StorageType.PRIVATE, 'analytics.userid').returns(Promise.resolve(storedId));
 

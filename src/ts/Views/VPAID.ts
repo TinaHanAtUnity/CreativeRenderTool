@@ -5,7 +5,7 @@ import LoadingTemplate from 'html/loading.html';
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
-import { VPAIDCampaign } from "Models/VPAID/VPAIDCampaign";
+import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
 import { Timer } from 'Utilities/Timer';
 import { Placement } from 'Models/Placement';
 
@@ -62,7 +62,7 @@ export class VPAID extends View<IVPAIDHandler> {
         }];
     }
 
-    public render() {
+    public render(): void {
         super.render();
 
         const iframeSrcDoc = VPAIDContainerTemplate.replace(this.vpaidSrcTag, this._campaign.getVPAID().getScriptUrl());

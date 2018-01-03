@@ -25,9 +25,13 @@ import { ProgrammaticVastParser } from 'Parsers/ProgrammaticVastParser';
 import { ProgrammaticMraidUrlParser } from 'Parsers/ProgrammaticMraidUrlParser';
 import { ProgrammaticMraidParser } from 'Parsers/ProgrammaticMraidParser';
 import { ProgrammaticStaticInterstitialParser } from 'Parsers/ProgrammaticStaticInterstitialParser';
+import { ProgrammaticStaticInterstitialUrlParser } from 'Parsers/ProgrammaticStaticInterstitialUrlParser';
+import { ProgrammaticAdMobParser } from 'Parsers/ProgrammaticAdMobParser';
 import { CampaignParser } from 'Parsers/CampaignParser';
 import { ProgrammaticVPAIDParser } from 'Parsers/ProgrammaticVPAIDParser';
 import { XPromoCampaignParser } from "Parsers/XPromoCampaignParser";
+import { AdMobSignalFactory} from 'AdMob/AdMobSignalFactory';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class CampaignManager {
 
@@ -63,13 +67,14 @@ export class CampaignManager {
     public readonly onCampaign = new Observable2<string, Campaign>();
     public readonly onNoFill = new Observable1<string>();
     public readonly onError = new Observable3<WebViewError, string[], Session | undefined>();
-    public readonly onAdPlanReceived = new Observable1<number>();
+    public readonly onAdPlanReceived = new Observable2<number, number>();
 
     protected _nativeBridge: NativeBridge;
     protected _requesting: boolean;
     protected _assetManager: AssetManager;
     protected _configuration: Configuration;
     protected _clientInfo: ClientInfo;
+    private _adMobSignalFactory: AdMobSignalFactory;
     private _sessionManager: SessionManager;
     private _metaDataManager: MetaDataManager;
     private _request: Request;
@@ -77,7 +82,7 @@ export class CampaignManager {
     private _previousPlacementId: string | undefined;
     private _rawResponse: string | undefined;
 
-    constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager) {
+    constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager) {
         this._nativeBridge = nativeBridge;
         this._configuration = configuration;
         this._assetManager = assetManager;
@@ -86,16 +91,18 @@ export class CampaignManager {
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._metaDataManager = metaDataManager;
+        this._adMobSignalFactory = adMobSignalFactory;
         this._requesting = false;
     }
 
-    public request(): Promise<INativeResponse | void> {
+    public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
         // prevent having more then one ad request in flight
         if(this._requesting) {
             return Promise.resolve();
         }
 
         this._assetManager.enableCaching();
+        this._assetManager.checkFreeSpace();
 
         this._requesting = true;
 
@@ -104,7 +111,7 @@ export class CampaignManager {
         }
 
         return this._sessionManager.create().then((session) => {
-            return Promise.all([this.createRequestUrl(session), this.createRequestBody()]).then(([requestUrl, requestBody]) => {
+            return Promise.all([this.createRequestUrl(session), this.createRequestBody(nofillRetry)]).then(([requestUrl, requestBody]) => {
                 this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
                 const body = JSON.stringify(requestBody);
                 SdkStats.setAdRequestTimestamp();
@@ -190,8 +197,11 @@ export class CampaignManager {
                 refreshDelay = CampaignRefreshManager.NoFillDelay;
             }
 
+            let campaigns: number = 0;
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
+                    campaigns++;
+
                     const contentType = json.media[mediaId].contentType;
                     const cacheTTL = json.media[mediaId].cacheTTL ? json.media[mediaId].cacheTTL : 3600;
                     if(contentType && contentType !== 'comet/campaign' && cacheTTL > 0 && (cacheTTL < refreshDelay || refreshDelay === 0)) {
@@ -200,7 +210,7 @@ export class CampaignManager {
                 }
             }
 
-            this.onAdPlanReceived.trigger(refreshDelay);
+            this.onAdPlanReceived.trigger(refreshDelay, campaigns);
 
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
@@ -250,6 +260,13 @@ export class CampaignManager {
                 break;
             case 'programmatic/static-interstitial':
                 parser = new ProgrammaticStaticInterstitialParser();
+                break;
+            case 'programmatic/static-interstitial-url':
+                parser = new ProgrammaticStaticInterstitialUrlParser();
+                break;
+            case 'programmatic/admob-video':
+                parser = new ProgrammaticAdMobParser();
+                Diagnostics.trigger('admob_ad_received', {}, session);
                 break;
             case 'programmatic/vast-vpaid':
                 // vast-vpaid can be both VPAID or VAST, so in this case we use the VAST parser
@@ -379,7 +396,7 @@ export class CampaignManager {
         });
     }
 
-    private createRequestBody(): Promise<any> {
+    private createRequestBody(nofillRetry?: boolean): Promise<any> {
         const promises: Array<Promise<any>> = [];
         promises.push(this._deviceInfo.getFreeSpace());
         promises.push(this._deviceInfo.getNetworkOperator());
@@ -388,6 +405,9 @@ export class CampaignManager {
         promises.push(this._deviceInfo.getDeviceVolume());
         promises.push(this.getFullyCachedCampaigns());
         promises.push(this.getVersionCode());
+        promises.push(this._adMobSignalFactory.getAdRequestSignal().then(signal => {
+            return signal.getBase64ProtoBufNonEncoded();
+        }));
 
         const body: any = {
             bundleVersion: this._clientInfo.getApplicationVersion(),
@@ -407,12 +427,17 @@ export class CampaignManager {
             body.webviewUa = navigator.userAgent;
         }
 
-        return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName, headset, volume, fullyCachedCampaignIds, versionCode]) => {
+        if(nofillRetry) {
+            body.nofillRetry = true;
+        }
+
+        return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName, headset, volume, fullyCachedCampaignIds, versionCode, requestSignal]) => {
             body.deviceFreeSpace = freeSpace;
             body.networkOperator = networkOperator;
             body.networkOperatorName = networkOperatorName;
             body.wiredHeadset = headset;
             body.volume = volume;
+            body.requestSignal = requestSignal;
 
             if(fullyCachedCampaignIds && fullyCachedCampaignIds.length > 0) {
                 body.cachedCampaigns = fullyCachedCampaignIds;

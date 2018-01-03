@@ -16,6 +16,10 @@ import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 import { Platform } from 'Constants/Platform';
 import { SessionManager } from 'Managers/SessionManager';
 import { MetaDataManager } from 'Managers/MetaDataManager';
+import { Session } from 'Models/Session';
+import { Placement } from 'Models/Placement';
+import { Campaign } from 'Models/Campaign';
+import { DeviceInfoApi } from 'Native/Api/DeviceInfo';
 
 class TestStorageApi extends StorageApi {
 
@@ -55,7 +59,7 @@ class TestStorageApi extends StorageApi {
         return this._dirty;
     }
 
-    private setInMemoryValue(storage: {}, key: string, value: any): {} {
+    private setInMemoryValue(storage: { [key: string]: any }, key: string, value: any): {} {
         const keyArray: string[] = key.split('.');
 
         if(keyArray.length > 1) {
@@ -71,7 +75,7 @@ class TestStorageApi extends StorageApi {
         }
     }
 
-    private getInMemoryValue(storage: {}, key: string): any {
+    private getInMemoryValue(storage: { [key: string]: any }, key: string): any {
         const keyArray: string[] = key.split('.');
 
         if(keyArray.length > 1) {
@@ -85,7 +89,7 @@ class TestStorageApi extends StorageApi {
         }
     }
 
-    private getInMemoryKeys(storage: {}, key: string): string[] {
+    private getInMemoryKeys(storage: { [key: string]: any }, key: string): string[] {
         const keyArray: string[] = key.split('.');
 
         if(keyArray.length > 1) {
@@ -110,7 +114,7 @@ class TestStorageApi extends StorageApi {
         }
     }
 
-    private deleteInMemoryValue(storage: {}, key: string): {} {
+    private deleteInMemoryValue(storage: { [key: string]: any }, key: string): {} {
         const keyArray: string[] = key.split('.');
 
         if(keyArray.length > 1) {
@@ -265,6 +269,65 @@ describe('OperativeEventManagerTest', () => {
         return thirdPartyEventManager.clickAttributionEvent(url, false).then(() => {
             assert(requestSpy.calledOnce, 'Click attribution event did not try sending GET request');
             assert.equal(url, requestSpy.getCall(0).args[0], 'Click attribution event url does not match');
+        });
+    });
+
+    describe('sending clicks', () => {
+        let placement: Placement;
+        let session: Session;
+        let campaign: Campaign;
+
+        beforeEach(() => {
+            placement = TestFixtures.getPlacement();
+            session = TestFixtures.getSession();
+            campaign = TestFixtures.getCampaign();
+            nativeBridge.DeviceInfo = sinon.createStubInstance(DeviceInfoApi);
+        });
+
+        it('should send the proper data', () => {
+            const requestSpy = sinon.spy(request, 'post');
+            const uniqueEventID = '42';
+            const gamerSid = 'foobar';
+            const previousPlacementId = 'foobar1';
+
+            operativeEventManager.setGamerServerId('foobar');
+            operativeEventManager.setPreviousPlacementId(previousPlacementId);
+
+            (<sinon.SinonStub>nativeBridge.DeviceInfo.getUniqueEventId).returns(Promise.resolve('42'));
+            (<sinon.SinonStub>nativeBridge.DeviceInfo.getNetworkType).returns(Promise.resolve(13));
+            (<sinon.SinonStub>nativeBridge.DeviceInfo.getConnectionType).returns(Promise.resolve('wifi'));
+            (<sinon.SinonStub>nativeBridge.DeviceInfo.getScreenWidth).returns(Promise.resolve(1280));
+            (<sinon.SinonStub>nativeBridge.DeviceInfo.getScreenHeight).returns(Promise.resolve(768));
+
+            return operativeEventManager.sendClick(session, placement, campaign).then(() => {
+                assert(requestSpy.calledOnce, 'Operative event did not send POST request');
+                const data = JSON.parse(requestSpy.getCall(0).args[1]);
+
+                assert.equal(data.auctionId, session.getId());
+                assert.equal(data.gameSessionId, sessionManager.getGameSessionId());
+                assert.equal(data.gamerId, campaign.getGamerId());
+                assert.equal(data.campaignId, campaign.getId());
+                assert.equal(data.adType, campaign.getAdType());
+                assert.equal(data.correlationId, campaign.getCorrelationId());
+                assert.equal(data.creativeId, campaign.getCreativeId());
+                assert.equal(data.seatId, campaign.getSeatId());
+                assert.equal(data.placementId, placement.getId());
+                assert.equal(data.apiLevel, deviceInfo.getApiLevel());
+                assert.equal(data.advertisingTrackingId, deviceInfo.getAdvertisingIdentifier());
+                assert.equal(data.limitAdTracking, deviceInfo.getLimitAdTracking());
+                assert.equal(data.osVersion, deviceInfo.getOsVersion());
+                assert.equal(data.sid, gamerSid);
+                assert.equal(data.deviceMake, deviceInfo.getManufacturer());
+                assert.equal(data.deviceModel, deviceInfo.getModel());
+                assert.equal(data.sdkVersion, clientInfo.getSdkVersion());
+                assert.equal(data.previousPlacementId, previousPlacementId);
+                assert.equal(data.bundleId, clientInfo.getApplicationName());
+                assert.equal(data.meta, campaign.getMeta());
+                assert.equal(data.screenDensity, deviceInfo.getScreenDensity());
+                assert.equal(data.screenSize, deviceInfo.getScreenLayout());
+                assert.equal(data.platform, Platform[clientInfo.getPlatform()].toLowerCase());
+                assert.equal(data.language, deviceInfo.getLanguage());
+            });
         });
     });
 });

@@ -9,6 +9,8 @@ ISTANBUL = $(BIN)/istanbul
 REMAP_ISTANBUL = $(BIN)/remap-istanbul
 COVERALLS = $(BIN)/coveralls
 STYLINT = $(BIN)/stylint
+PBJS = $(BIN)/pbjs
+PBTS = $(BIN)/pbts
 CC = java -jar node_modules/google-closure-compiler/compiler.jar
 ES6_PROMISE = node_modules/es6-promise/dist/es6-promise.auto.js
 SYSTEM_JS = node_modules/systemjs/dist/system.src.js
@@ -33,19 +35,22 @@ endif
 # Targets
 BUILD_DIR = build
 
+# For platform specific operations
+OS := $(shell uname)
+
 .PHONY: build-browser build-dev build-release build-test build-dir build-ts build-js build-css build-static clean lint test test-unit test-integration test-coverage test-coveralls watch setup deploy
 
 build-browser: BUILD_DIR = build/browser
 build-browser: MODULE = system
 build-browser: TARGET = es5
-build-browser: build-dir build-static build-css build-ts
+build-browser: build-dir build-static build-css build-proto build-ts
 	cp src/browser-index.html $(BUILD_DIR)/index.html
 	cp src/browser-iframe.html $(BUILD_DIR)/iframe.html
 
 build-dev: BUILD_DIR = build/dev
 build-dev: MODULE = system
 build-dev: TARGET = es5
-build-dev: build-dir build-static build-css build-ts
+build-dev: build-dir build-static build-css build-proto build-ts
 	echo "{\"url\":\"http://$(shell ifconfig |grep "inet" |fgrep -v "127.0.0.1"|grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}" |grep -v -E "^0|^127" -m 1):8000/build/dev/index.html\",\"hash\":null}" > $(BUILD_DIR)/config.json
 	cp src/dev-index.html $(BUILD_DIR)/index.html
 	node -e "\
@@ -59,7 +64,7 @@ build-dev: build-dir build-static build-css build-ts
 build-release: BUILD_DIR = build/release
 build-release: MODULE = es2015
 build-release: TARGET = es5
-build-release: clean build-dir build-static build-css build-ts build-js
+build-release: clean build-dir build-static build-css build-proto build-ts build-js
 	@echo
 	@echo Copying release index.html to build
 	@echo
@@ -76,7 +81,8 @@ build-release: clean build-dir build-static build-css build-ts build-js
 		var s=fs.readFileSync('$(BUILD_DIR)/css/main.css', o);\
 		var j=fs.readFileSync('$(BUILD_DIR)/bundle.min.js', o);\
 		var i=fs.readFileSync('$(BUILD_DIR)/index.html', o);\
-		fs.writeFileSync('$(BUILD_DIR)/index.html', i.replace('{COMPILED_CSS}', s).replace('{COMPILED_JS}', j), o);"
+		var b=fs.readFileSync('node_modules/protobufjs/dist/minimal/protobuf.js', o);\
+		fs.writeFileSync('$(BUILD_DIR)/index.html', i.replace('{COMPILED_CSS}', s).replace('{COMPILED_JS}', j).replace('{PROTOBUF_JS}', b), o);"
 
 	@echo
 	@echo Cleaning release build
@@ -107,7 +113,7 @@ build-release: clean build-dir build-static build-css build-ts build-js
 build-test: BUILD_DIR = build/test
 build-test: MODULE = system
 build-test: TARGET = es5
-build-test: clean build-dir build-css build-static build-ts
+build-test: clean build-dir build-css build-static build-proto build-ts
 	@echo
 	@echo Generating test runner
 	@echo
@@ -140,6 +146,8 @@ build-test: clean build-dir build-css build-static build-ts
 		node_modules/chai/chai.js \
 		node_modules/sinon/pkg/sinon.js \
 		node_modules/systemjs-plugin-text/text.js \
+		node_modules/long/dist/long.js \
+		node_modules/protobufjs/dist/minimal/protobuf.js \
 		test-utils/reporter.js \
 		$(BUILD_DIR)/vendor
 
@@ -169,6 +177,16 @@ build-dir:
 	@echo
 
 	mkdir -p $(BUILD_DIR)
+
+build-proto:
+	@echo
+	@echo Compiling .proto to .js and .d.ts
+	@echo
+
+	mkdir -p $(BUILD_DIR)/proto
+	$(PBJS) -t static-module -w $$(if [ $(MODULE) = es2015 ]; then echo es6; else echo commonjs; fi) -o src/proto/unity_proto.js src/proto/unity_proto.proto
+	$(PBTS) -o src/proto/unity_proto.d.ts src/proto/unity_proto.js
+	cp src/proto/unity_proto.js $(BUILD_DIR)/proto/unity_proto.js
 
 build-ts:
 	@echo
@@ -215,7 +233,6 @@ clean:
 
 	rm -rf $(BUILD_DIR)
 	find $(TS_SRC) -type f -name "*.js" -or -name "*.map" | xargs rm -rf
-
 lint:
 	@echo
 	@echo Running linter
@@ -227,7 +244,7 @@ test: test-unit test-integration
 
 test-unit: MODULE = system
 test-unit: TARGET = es5
-test-unit:
+test-unit: build-proto
 	@echo
 	@echo Transpiling .ts to .js for local tests
 	@echo
@@ -238,11 +255,11 @@ test-unit:
 	@echo Running unit tests
 	@echo
 
-	TEST_FILTER=Unit node --trace-warnings test-utils/node_runner.js
+	TEST_FILTER=Test/Unit node --trace-warnings test-utils/node_runner.js
 
 test-integration: MODULE = system
 test-integration: TARGET = es5
-test-integration:
+test-integration: build-proto
 	@echo
 	@echo Transpiling .ts to .js for local tests
 	@echo
@@ -253,12 +270,12 @@ test-integration:
 	@echo Running integration tests
 	@echo
 
-	TEST_FILTER=Integration node test-utils/node_runner.js
+	ISOLATED=true TEST_FILTER=Test/Integration node test-utils/node_runner.js
 
 test-coverage: BUILD_DIR = build/coverage
 test-coverage: MODULE = system
 test-coverage: TARGET = es5
-test-coverage: build-dir
+test-coverage: build-dir build-proto
 	@echo
 	@echo Transpiling .ts to .js for local tests
 	@echo
@@ -269,7 +286,7 @@ test-coverage: build-dir
 	@echo Running unit tests with coverage
 	@echo
 
-	COVERAGE_DIR=$(BUILD_DIR) TEST_FILTER=Unit node test-utils/node_runner.js
+	COVERAGE_DIR=$(BUILD_DIR) TEST_FILTER=Test/Unit node test-utils/node_runner.js
 	@$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage.json -o $(BUILD_DIR)/summary -t text-summary
 	@cat $(BUILD_DIR)/summary && echo \n
 	@$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage.json -o $(BUILD_DIR)/report -t html
@@ -278,6 +295,22 @@ test-coveralls: BUILD_DIR = build/coverage
 test-coveralls: test-coverage
 	$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage.json -o $(BUILD_DIR)/lcov.info -t lcovonly
 	cat $(BUILD_DIR)/lcov.info | $(COVERALLS) --verbose
+
+test-browser: build-browser
+	@echo
+	@echo Running browser build tests
+	@echo
+	node test-utils/headless.js
+
+ifeq ($(TRAVIS_PULL_REQUEST), false)
+travis-browser-test:
+	@echo "Skipping travis browser tests, this is not a PR"
+else ifneq ($(BRANCH), master)
+travis-browser-test:
+	@echo "Skipping travis browser tests, the PR is not to master-branch it is for $(BRANCH)"
+else
+travis-browser-test: build-browser start-nginx test-browser stop-nginx
+endif
 
 watch:
 	watchman-make -p 'src/index.html' 'src/ts/**/*.ts' 'src/styl/*.styl' 'src/html/*.html' -t build-dev -p 'src/ts/Test/**/*.ts' -t test
@@ -296,8 +329,17 @@ else
 endif
 
 start-nginx:
+ifeq ($(OS),Darwin)
 	sed -e "s#DEVELOPMENT_DIR#$(shell pwd)#g" nginx/nginx.conf.template > nginx/nginx.conf
 	nginx -c $(shell pwd)/nginx/nginx.conf
+else
+	python3 -m http.server 8000 & echo $$! > nginx/server.PID
+	@echo "Started Python static webserver"
+endif
 
 stop-nginx:
+ifeq ($(OS),Darwin)
 	nginx -s stop
+else
+	kill $$(cat nginx/server.PID)
+endif

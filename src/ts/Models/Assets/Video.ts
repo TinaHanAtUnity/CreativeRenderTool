@@ -1,4 +1,5 @@
 import { Asset, IAsset } from 'Models/Assets/Asset';
+import { Session } from 'Models/Session';
 
 export interface IVideo extends IAsset {
     size: number | undefined;
@@ -11,8 +12,8 @@ export interface IVideo extends IAsset {
 }
 
 export class Video extends Asset<IVideo> {
-    constructor(url: string, size?: number) {
-        super('Video', {
+    constructor(url: string, session: Session, size?: number) {
+        super('Video', session, {
             ... Asset.Schema,
             size: ['number', 'undefined'],
             started: ['boolean'],

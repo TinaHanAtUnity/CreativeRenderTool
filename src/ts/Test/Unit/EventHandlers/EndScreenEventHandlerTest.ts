@@ -8,6 +8,7 @@ import { SessionManager } from 'Managers/SessionManager';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { Request, INativeResponse } from 'Utilities/Request';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
@@ -15,7 +16,7 @@ import { Platform } from 'Constants/Platform';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { ViewController } from 'AdUnits/Containers/ViewController';
-import { PerformanceCampaign, StoreName } from "Models/Campaigns/PerformanceCampaign";
+import { PerformanceCampaign, StoreName } from 'Models/Campaigns/PerformanceCampaign';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { Video } from 'Models/Assets/Video';
 import { FocusManager } from 'Managers/FocusManager';
@@ -23,6 +24,7 @@ import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { PerformanceEndScreenEventHandler } from 'EventHandlers/PerformanceEndScreenEventHandler';
 import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
+import { Placement } from 'Models/Placement';
 
 describe('EndScreenEventHandlerTest', () => {
 
@@ -39,6 +41,9 @@ describe('EndScreenEventHandlerTest', () => {
     let thirdPartyEventManager: ThirdPartyEventManager;
     let performanceAdUnitParameters: IPerformanceAdUnitParameters;
     let endScreenEventHandler: PerformanceEndScreenEventHandler;
+    let comScoreService: ComScoreTrackingService;
+    let campaign: PerformanceCampaign;
+    let placement: Placement;
 
     describe('with onDownloadAndroid', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -49,6 +54,7 @@ describe('EndScreenEventHandlerTest', () => {
                 handleCallback
             }, Platform.ANDROID);
 
+            campaign = TestFixtures.getCampaign();
             focusManager = new FocusManager(nativeBridge);
             container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
             metaDataManager = new MetaDataManager(nativeBridge);
@@ -60,13 +66,15 @@ describe('EndScreenEventHandlerTest', () => {
             sessionManager = new SessionManager(nativeBridge);
             operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
+            comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
             sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
             sinon.spy(nativeBridge.Intent, 'launch');
 
-            const video = new Video('');
+            const video = new Video('', TestFixtures.getSession());
             endScreen = new PerformanceEndScreen(nativeBridge, TestFixtures.getCampaign(), TestFixtures.getConfiguration().isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
+            placement = TestFixtures.getPlacement();
 
             performanceAdUnitParameters = {
                 forceOrientation: ForceOrientation.LANDSCAPE,
@@ -76,8 +84,9 @@ describe('EndScreenEventHandlerTest', () => {
                 clientInfo: clientInfo,
                 thirdPartyEventManager: thirdPartyEventManager,
                 operativeEventManager: operativeEventManager,
-                placement: TestFixtures.getPlacement(),
-                campaign: TestFixtures.getCampaign(),
+                comScoreTrackingService: comScoreService,
+                placement: placement,
+                campaign: campaign,
                 configuration: TestFixtures.getConfiguration(),
                 request: request,
                 options: {},
@@ -100,7 +109,7 @@ describe('EndScreenEventHandlerTest', () => {
                 clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
             });
 
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, performanceAdUnit);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, campaign.getSession(), placement, campaign);
         });
 
         describe('with follow redirects', () => {
@@ -160,8 +169,8 @@ describe('EndScreenEventHandlerTest', () => {
 
         describe('with no follow redirects', () => {
             beforeEach(() => {
-                sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getClickAttributionUrlFollowsRedirects').returns(false);
-                sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getStore').returns(StoreName.GOOGLE);
+                sinon.stub(campaign, 'getClickAttributionUrlFollowsRedirects').returns(false);
+                sinon.stub(campaign, 'getStore').returns(StoreName.GOOGLE);
                 endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                     appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
                     bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
@@ -174,7 +183,7 @@ describe('EndScreenEventHandlerTest', () => {
             });
 
             it('should send a click with session manager', () => {
-                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, performanceAdUnit);
+                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, campaign.getSession(), placement, campaign);
             });
 
             it('should launch market view', () => {
@@ -210,8 +219,8 @@ describe('EndScreenEventHandlerTest', () => {
             sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
             sinon.spy(nativeBridge.UrlScheme, 'open');
 
-            const video = new Video('');
-            const campaign = TestFixtures.getCampaign();
+            const video = new Video('', TestFixtures.getSession());
+            campaign = TestFixtures.getCampaign();
             campaign.set('store', StoreName.APPLE);
             campaign.set('appStoreId', '11111');
 
@@ -226,6 +235,7 @@ describe('EndScreenEventHandlerTest', () => {
                 clientInfo: clientInfo,
                 thirdPartyEventManager: thirdPartyEventManager,
                 operativeEventManager: operativeEventManager,
+                comScoreTrackingService: comScoreService,
                 placement: TestFixtures.getPlacement(),
                 campaign: campaign,
                 configuration: TestFixtures.getConfiguration(),
@@ -255,7 +265,7 @@ describe('EndScreenEventHandlerTest', () => {
                 clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
             });
 
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, performanceAdUnit);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, campaign.getSession(), placement, campaign);
         });
 
         describe('with follow redirects', () => {
@@ -265,7 +275,7 @@ describe('EndScreenEventHandlerTest', () => {
                 performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
                 endScreenEventHandler = new PerformanceEndScreenEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
 
-                const campaign = TestFixtures.getCampaignFollowsRedirects();
+                campaign = TestFixtures.getCampaignFollowsRedirects();
                 campaign.set('store', StoreName.APPLE);
                 performanceAdUnitParameters.campaign = TestFixtures.getCampaignFollowsRedirects();
 
@@ -316,7 +326,7 @@ describe('EndScreenEventHandlerTest', () => {
         describe('with no follow redirects and OS version 8.1', () => {
             beforeEach(() => {
                 sinon.stub(deviceInfo, 'getOsVersion').returns('8.1');
-                const campaign = TestFixtures.getCampaign();
+                campaign = TestFixtures.getCampaign();
                 campaign.set('store', StoreName.APPLE);
                 campaign.set('appStoreId', '11111');
                 sinon.stub(campaign, 'getClickAttributionUrlFollowsRedirects').returns(false);
@@ -349,7 +359,7 @@ describe('EndScreenEventHandlerTest', () => {
             beforeEach(() => {
                 sinon.stub(deviceInfo, 'getOsVersion').returns('9.0');
 
-                const campaign = TestFixtures.getCampaign();
+                campaign = TestFixtures.getCampaign();
                 campaign.set('store', StoreName.APPLE);
                 campaign.set('appStoreId', '11111');
                 sinon.stub(campaign, 'getClickAttributionUrlFollowsRedirects').returns(false);
@@ -384,8 +394,8 @@ describe('EndScreenEventHandlerTest', () => {
                 performanceAdUnitParameters.deviceInfo = deviceInfo;
                 performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
                 endScreenEventHandler = new PerformanceEndScreenEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
-                sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getClickAttributionUrlFollowsRedirects').returns(false);
-                sinon.stub(<PerformanceCampaign> performanceAdUnit.getCampaign(), 'getBypassAppSheet').returns(false);
+                sinon.stub(campaign, 'getClickAttributionUrlFollowsRedirects').returns(false);
+                sinon.stub(campaign, 'getBypassAppSheet').returns(false);
                 sinon.stub(nativeBridge.AppSheet, 'canOpen').returns(Promise.resolve(true));
 
                 endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
@@ -410,7 +420,7 @@ describe('EndScreenEventHandlerTest', () => {
             });
 
             it('should send a click with session manager', () => {
-                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, performanceAdUnit);
+                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, campaign.getSession(), placement, campaign);
             });
         });
     });

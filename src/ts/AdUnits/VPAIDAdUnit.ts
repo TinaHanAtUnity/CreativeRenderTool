@@ -12,15 +12,16 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { FocusManager } from 'Managers/FocusManager';
 import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
-import { Overlay } from 'Views/Overlay';
+import { AbstractOverlay } from 'Views/AbstractOverlay';
+import { Placement } from 'Models/Placement';
 
 export interface IVPAIDAdUnitParameters extends IAdUnitParameters<VPAIDCampaign> {
     vpaid: VPAID;
     endScreen?: VPAIDEndScreen;
-    overlay: Overlay;
+    overlay: AbstractOverlay;
 }
 
-export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
+export class VPAIDAdUnit extends AbstractAdUnit {
 
     public static setAdLoadTimeout(timeout: number) {
         VPAIDAdUnit._adLoadTimeout = timeout;
@@ -34,6 +35,8 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
     private _vpaidCampaign: VPAIDCampaign;
     private _timer: Timer;
     private _options: any;
+    private _overlay: AbstractOverlay;
+    private _placement: Placement;
 
     private _onAppForegroundHandler: any;
     private _onAppBackgroundHandler: any;
@@ -47,12 +50,14 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._options = parameters.options;
         this._view = parameters.vpaid;
+        this._overlay = parameters.overlay;
+        this._placement = parameters.placement;
 
-        parameters.overlay.render();
-        parameters.overlay.setFadeEnabled(true);
-        parameters.overlay.setSkipEnabled(false);
-        parameters.overlay.setMuteEnabled(false);
-        const overlayContainer = parameters.overlay.container();
+        this._overlay.render();
+        this._overlay.setFadeEnabled(true);
+        this._overlay.setSkipEnabled(false);
+        this._overlay.setMuteEnabled(false);
+        const overlayContainer = this._overlay.container();
         overlayContainer.style.position = 'absolute';
         overlayContainer.style.top = '0px';
         overlayContainer.style.left = '0px';
@@ -136,7 +141,7 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
         const sdkVersion = this._operativeEventManager.getClientInfo().getSdkVersion();
         url = url.replace(/%ZONE%/, this._placement.getId());
         url = url.replace(/%SDK_VERSION%/, sdkVersion.toString());
-        this._thirdPartyEventManager.sendEvent(eventType, sessionId, url);
+        this._thirdPartyEventManager.sendEvent(eventType, sessionId, url, this._vpaidCampaign.getUseWebViewUserAgentForTracking());
     }
 
     private onAdUnitNotLoaded() {
@@ -162,6 +167,8 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
     }
 
     private onHide() {
+        this._overlay.container().parentElement!.removeChild(this._overlay.container());
+
         this._timer.stop();
         this.setShowing(false);
         this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());

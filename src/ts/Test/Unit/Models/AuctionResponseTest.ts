@@ -27,7 +27,10 @@ describe('AuctionResponse', () => {
             assert.equal(auctionResponse.getAdType(), campaignObject.adType, 'AdType not what was expected');
             assert.equal(auctionResponse.getCreativeId(), campaignObject.creativeId, 'CreativeId not what was expected');
             assert.equal(auctionResponse.getSeatId(), campaignObject.seatId, 'SeatId not what was expected');
+            assert.equal(auctionResponse.getCategory(), campaignObject.appCategory, 'AppCategory not what was expected');
+            assert.equal(auctionResponse.getSubCategory(), campaignObject.appSubCategory, 'AppSubCategory not what was expected');
             assert.equal(auctionResponse.getCorrelationId(), correlationId, 'CorrelationId not what was expected');
+            assert.equal(auctionResponse.getUseWebViewUserAgentForTracking(), campaignObject.useWebViewUserAgentForTracking, 'UseWebViewUserAgentForTracking not what was expected');
         });
     });
 });
