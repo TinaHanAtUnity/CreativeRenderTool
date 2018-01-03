@@ -39,7 +39,7 @@ export class CometCampaignParser extends CampaignParser {
             correlationId: undefined,
             creativeId: undefined,
             seatId: undefined,
-            meta: undefined,
+            meta: json.meta,
             appCategory: undefined,
             appSubCategory: undefined,
             advertiserDomain: undefined,
@@ -72,11 +72,7 @@ export class CometCampaignParser extends CampaignParser {
                 store: storeName,
                 appStoreId: json.appStoreId
             };
-/*
-            if(json.cacheTTL) {
-                parameters.willExpireAt = Date.now() + json.cacheTTL * 1000;
-            }
-*/
+
             return Promise.resolve(new MRAIDCampaign(parameters));
         } else {
             const parameters: IPerformanceCampaign = {
