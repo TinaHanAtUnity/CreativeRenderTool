@@ -3,6 +3,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { AndroidDeviceInfoApi } from 'Native/Api/AndroidDeviceInfo';
 import { IosDeviceInfoApi } from 'Native/Api/IosDeviceInfo';
 import { Platform } from 'Constants/Platform';
+import { RNGTest } from 'Utilities/RNGTest';
 
 export enum DeviceInfoEvent {
     VOLUME_CHANGED
@@ -93,7 +94,10 @@ export class DeviceInfoApi extends NativeApi {
     }
 
     public getUniqueEventId(): Promise<string> {
-        return this._nativeBridge.invoke<string>(this._apiClass, 'getUniqueEventId');
+        return this._nativeBridge.invoke<string>(this._apiClass, 'getUniqueEventId').then(id => {
+            RNGTest.testId(id);
+            return id;
+        });
     }
 
     public getHeadset(): Promise<boolean> {
