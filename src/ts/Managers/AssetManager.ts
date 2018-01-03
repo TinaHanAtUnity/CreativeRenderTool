@@ -172,6 +172,25 @@ export class AssetManager {
         }
     }
 
+    public checkFreeSpace(): Promise<void> {
+        if(this._cacheMode === CacheMode.DISABLED) {
+            return Promise.resolve();
+        }
+
+        return this._cache.getFreeSpace().then(freeSpace => {
+            // disable caching if there is less than 20 megabytes free space in cache directory
+            if(freeSpace < 20480) {
+                this._cacheMode = CacheMode.DISABLED;
+
+                Diagnostics.trigger('caching_disabled', {
+                    freeCacheSpace: freeSpace
+                });
+            }
+
+            return;
+        });
+    }
+
     private cache(assets: Asset[], campaign: Campaign, cacheType: CacheType): Promise<void> {
         let chain = Promise.resolve();
         for(const asset of assets) {
