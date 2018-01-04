@@ -115,23 +115,17 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         }
 
         if(this._loaded) {
-            this._iframe.contentWindow.postMessage('viewable', '*');
+            this.setViewableState(true);
         } else {
             const observer = this.onLoaded.subscribe(() => {
-                this._iframe.contentWindow.postMessage({
-                    type: 'viewable',
-                    value: true
-                }, '*');
+                this.setViewableState(true);
                 this.onLoaded.unsubscribe(observer);
             });
         }
     }
 
     public hide() {
-        this._iframe.contentWindow.postMessage({
-            type: 'viewable',
-            value: false
-        }, '*');
+        this.setViewableState(false);
         if(this._messageListener) {
             window.removeEventListener('message', this._messageListener, false);
             this._messageListener = undefined;
