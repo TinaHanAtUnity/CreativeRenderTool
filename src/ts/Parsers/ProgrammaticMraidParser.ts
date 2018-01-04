@@ -6,7 +6,6 @@ import { IMRAIDCampaign, MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { AuctionResponse } from 'Models/AuctionResponse';
 import { Session } from 'Models/Session';
-import { HTML } from 'Models/Assets/HTML';
 import { Image } from 'Models/Assets/Image';
 import { StoreName } from 'Models/Campaigns/PerformanceCampaign';
 
@@ -25,7 +24,6 @@ export class ProgrammaticMraidParser extends CampaignParser {
             throw MRAIDError;
         }
 
-        jsonMraid.id = this.getProgrammaticCampaignId(nativeBridge);
         const markup = decodeURIComponent(jsonMraid.markup);
 
         const campaignStore = typeof jsonMraid.store !== 'undefined' ? jsonMraid.store : '';
@@ -45,7 +43,7 @@ export class ProgrammaticMraidParser extends CampaignParser {
         }
 
         const baseCampaignParams: ICampaign = {
-            id: jsonMraid.id,
+            id: this.getProgrammaticCampaignId(nativeBridge),
             gamerId: gamerId,
             abGroup: abGroup,
             willExpireAt: jsonMraid.cacheTTL ? Date.now() + jsonMraid.cacheTTL * 1000 : undefined,
