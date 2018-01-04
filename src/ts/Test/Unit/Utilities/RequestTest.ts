@@ -8,6 +8,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { RequestError } from 'Errors/RequestError';
 import { FocusManager } from 'Managers/FocusManager';
+import { UrlSchemeApi } from 'Native/Api/UrlScheme';
 
 class TestRequestApi extends RequestApi {
     private _retryCount: number = 0;
@@ -82,6 +83,21 @@ class TestRequestApi extends RequestApi {
             this._retryCount++;
         }
 
+        return Promise.resolve(id);
+    }
+
+    public head(id: string, url: string, headers: Array<[string, string]>): Promise<string> {
+        if (url.indexOf('/responsecode') !== -1) {
+            const responseCodes = url.match(/3[0-9]{2}/);
+            if (responseCodes && responseCodes.length > 0) {
+                const responseCode = responseCodes[0];
+                this.sendSuccessResponse(id, url, 'Redirect response', parseInt(responseCode, 10),[['location', 'http://www.example.org/endurl/']]);
+            }
+        } else if (url.indexOf('/recursiveResponseCode') !== -1) {
+            this.sendSuccessResponse(id, url, 'Recursive redirect response', 301, [['location', 'http://www.example.org/recursiveResponseCode/']]);
+        } else {
+            this.sendSuccessResponse(id, url, 'Success response', 200, []);
+        }
         return Promise.resolve(id);
     }
 
@@ -342,6 +358,30 @@ describe('RequestTest', () => {
                 assert.equal(error.message, reason);
                 assert.equal(error.nativeResponse.responseCode, 600);
                 assert.equal(error.nativeResponse.response, failureResponse);
+            });
+        });
+    });
+
+    describe('Request followRedirectChain should redirect for all status codes in the 3xx range', () => {
+        for (let i = 300; i <= 308; i++) {
+            it('should redirect for response ' + i.toString(), () => {
+                const redirectUrl: string = 'http://www.example.org/responsecode/' + i.toString();
+                return request.followRedirectChain(redirectUrl).then((url) => {
+                    assert.equal('http://www.example.org/endurl/', url);
+                }).catch(error => {
+                    error = <RequestError>error;
+                    throw new Error('Head without headers failed: ' + error.message);
+                });
+
+            });
+        }
+
+        it('should reject when redirect limit has been reached', () => {
+            const redirectUrl: string = 'http://www.example.org/recursiveResponseCode/';
+            return request.followRedirectChain(redirectUrl).then((url) => {
+                assert.fail('Should not resolve');
+            }).catch(error => {
+                assert.equal(error.message, 'redirect limit reached');
             });
         });
     });
