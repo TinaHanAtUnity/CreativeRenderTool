@@ -1,3 +1,8 @@
+# Wed Jan  3 13:18:38 UTC 2018
+
+* Disable caching if there is less than 20 megabytes of free space on device
+* Add debugging diagnostics for native random UUID generator
+
 # Wed Dec 20 20:51:09 UTC 2017
 
 * Changed xmas theme to prevent overlaying game icon
