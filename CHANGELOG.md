@@ -1,4 +1,4 @@
-# Staged
+# Thu Jan  4 10:59:50 UTC 2018
 
 * MRAID fixes for iOS XInstall blackscreen issue
 * MRAID fixes for Beeswax event listening problems
