@@ -1,3 +1,10 @@
+# Pending
+
+* Remove xmas theme
+* Follow all 3xx redirect HTTP status codes and set max limit of redirections to 10
+* Remove game ID from endscreen privacy popup
+* Pass raw free cache space value from native SDK in caching_disabled diagnostic message
+
 # Thu Jan  4 10:59:50 UTC 2018
 
 * MRAID fixes for iOS XInstall blackscreen issue
