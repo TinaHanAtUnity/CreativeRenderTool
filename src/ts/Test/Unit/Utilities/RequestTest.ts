@@ -8,7 +8,6 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { RequestError } from 'Errors/RequestError';
 import { FocusManager } from 'Managers/FocusManager';
-import { UrlSchemeApi } from 'Native/Api/UrlScheme';
 
 class TestRequestApi extends RequestApi {
     private _retryCount: number = 0;
