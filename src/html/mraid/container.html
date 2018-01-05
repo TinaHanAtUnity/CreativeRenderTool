@@ -34,9 +34,20 @@
                         parameters = [];
                     }
                     if(event in listeners) {
-                        listeners[event].forEach(function(listener) {
-                            listener.apply(window, parameters);
-                        });
+                        for (var len = listeners[event].length, i = len - 1; i >= 0; i--) {
+                            var listener = listeners[event][i];
+                            try {
+                                listener.apply(window, parameters);
+                            } catch (e) {
+                                console.log('Got error ', e);
+                                window.parent.postMessage({
+                                    type: 'diagnosticError',
+                                    error: {
+                                        message: e.message
+                                    }
+                                }, '*');
+                            }
+                        }
                     }
                 };
 
