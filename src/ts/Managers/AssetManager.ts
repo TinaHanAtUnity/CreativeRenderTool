@@ -188,6 +188,8 @@ export class AssetManager {
             }
 
             return;
+        }).catch(error => {
+            Diagnostics.trigger('cache_space_check_failed', {});
         });
     }
 
