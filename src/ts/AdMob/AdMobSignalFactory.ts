@@ -101,6 +101,8 @@ export class AdMobSignalFactory {
             promises.push(nativeBridge.DeviceInfo.Android.getPackageInfo(this._clientInfo.getApplicationName()).then(packageInfo => {
                 if(packageInfo.installer) {
                     signal.setAppInstaller(packageInfo.installer);
+                } else {
+                    signal.setAppInstaller('unknown');
                 }
 
                 if(packageInfo.versionCode) {
