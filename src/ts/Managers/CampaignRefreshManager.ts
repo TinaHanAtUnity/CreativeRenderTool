@@ -1,6 +1,6 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';
-import { CampaignManager } from 'Managers/CampaignManager';
+import { CampaignManager, CampaignParseError } from 'Managers/CampaignManager';
 import { Campaign } from 'Models/Campaign';
 import { WebViewError } from 'Errors/WebViewError';
 import { PlacementState } from 'Models/Placement';
@@ -187,8 +187,12 @@ export class CampaignRefreshManager {
         if(error instanceof Error) {
             error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
         }
+        let diagnostic = 'auction_request_failed';
+        if (error instanceof CampaignParseError) {
+            diagnostic = 'auction_parse_failed';
+        }
 
-        Diagnostics.trigger('auction_request_failed', {
+        Diagnostics.trigger(diagnostic, {
             error: error,
         }, session);
         this._nativeBridge.Sdk.logError(JSON.stringify(error));
