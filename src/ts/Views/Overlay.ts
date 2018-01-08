@@ -33,6 +33,7 @@ export class Overlay extends AbstractOverlay {
     private _muteButtonElement: HTMLElement;
     private _debugMessageElement: HTMLElement;
     private _callButtonElement: HTMLElement;
+    private _overlayFooter: HTMLElement;
 
     private _progressElement: HTMLElement;
 
@@ -113,6 +114,9 @@ export class Overlay extends AbstractOverlay {
         const endScreenAlt = this.getAltOverlay();
         if (typeof endScreenAlt === "string") {
             this._container.classList.add(endScreenAlt);
+            if (endScreenAlt === richOverlayId) {
+                this._overlayFooter = <HTMLElement>this._container.querySelector('.overlay-footer');
+            }
         }
 
     }
@@ -306,6 +310,9 @@ export class Overlay extends AbstractOverlay {
                 this._muteButtonElement.classList.add('slide-down');
             }
 
+            this._overlayFooter.classList.remove('slide-back-in-place');
+            this._overlayFooter.classList.add('slide-down');
+
             this._container.style.pointerEvents = 'auto';
             this._fadeStatus = false;
         } else {
@@ -320,6 +327,9 @@ export class Overlay extends AbstractOverlay {
             } else {
                 this._muteButtonElement.classList.remove('slide-down');
             }
+
+            this._overlayFooter.classList.remove('slide-down');
+            this._overlayFooter.classList.add('slide-back-in-place');
 
             this._muteButtonElement.classList.add('slide-back-in-place');
 
