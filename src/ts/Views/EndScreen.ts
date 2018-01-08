@@ -35,7 +35,6 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._abGroup = abGroup;
         this._gameName = gameName;
 
-
         if (this.getEndscreenAlt() === combineEndScreenId) {
             this._template = new Template(CombineEndScreen, this._localization);
         } else {
