@@ -61,6 +61,7 @@ $default-rich-overlay-size = $default-size * $default-rich-overlay-scale;
 
     .name-container {
       $name-container-default($default-rich-overlay-scale);
+      font-size: $default-rich-overlay-size * 1.25;
     }
 
     .game-icon {
@@ -107,7 +108,7 @@ body {
   &.portrait #overlay.rich-overlay {
     .overlay-footer {
       .download-container {
-        width: $default-rich-overlay-size * 7.75;
+        width: $default-rich-overlay-size * 7.95;
         font-size: $default-rich-overlay-size;
       }
 
@@ -117,7 +118,10 @@ body {
 
       .name-container {
         max-width: $default-rich-overlay-size * 10;
-        font-size: $default-rich-overlay-size * 1.25;
+      }
+
+      .store-container {
+        margin-top: $default-rich-overlay-size * .25 * -1;
       }
     }
   }
