@@ -83,7 +83,6 @@ export class ProgrammaticMraidUrlParser extends CampaignParser {
             appStoreId: jsonMraidUrl.appStoreId
         };
 
-        // jsonMraidUrl.id = this.getProgrammaticCampaignId(nativeBridge);
         return Promise.resolve(new MRAIDCampaign(parameters));
     }
 }
