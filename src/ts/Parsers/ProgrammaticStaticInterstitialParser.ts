@@ -1,12 +1,12 @@
 import { CampaignParser } from 'Parsers/CampaignParser';
 import { Request } from 'Utilities/Request';
-import { Campaign } from 'Models/Campaign';
+import { Campaign, ICampaign } from 'Models/Campaign';
 import { NativeBridge } from 'Native/NativeBridge';
-import { JsonParser } from 'Utilities/JsonParser';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { AuctionResponse } from 'Models/AuctionResponse';
 import { Session } from 'Models/Session';
-import { DisplayInterstitialMarkupCampaign } from 'Models/Campaigns/DisplayInterstitialMarkupCampaign';
+import { DisplayInterstitialMarkupCampaign, IDisplayInterstitialMarkupCampaign } from 'Models/Campaigns/DisplayInterstitialMarkupCampaign';
+import { IDisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 
 export class ProgrammaticStaticInterstitialParser extends CampaignParser {
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
@@ -33,8 +33,38 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
             }
         }
 
-        const clickThroughUrl = jsonDisplay.clickThroughURL;
-        return Promise.resolve(new DisplayInterstitialMarkupCampaign(displayMarkup, session, gamerId, abGroup, response.getCacheTTL(), response.getTrackingUrls(), clickThroughUrl, response.getAdType(), response.getCreativeId(), response.getSeatId(), response.getCorrelationId()));
+        const baseCampaignParams: ICampaign = {
+            id: this.getProgrammaticCampaignId(nativeBridge),
+            gamerId: gamerId,
+            abGroup: abGroup,
+            willExpireAt: jsonDisplay.cacheTTL ? Date.now() + jsonDisplay.cacheTTL * 1000 : undefined,
+            adType: response.getAdType() || undefined,
+            correlationId: response.getCorrelationId() || undefined,
+            creativeId: response.getCreativeId() || undefined,
+            seatId: response.getSeatId() || undefined,
+            meta: jsonDisplay.meta,
+            appCategory: undefined,
+            appSubCategory: undefined,
+            advertiserDomain: undefined,
+            advertiserCampaignId: undefined,
+            advertiserBundleId: undefined,
+            useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking(),
+            buyerId: undefined,
+            session: session
+        };
+
+        const displayInterstitialParams: IDisplayInterstitialCampaign = {
+            ... baseCampaignParams,
+            clickThroughUrl: jsonDisplay.clickThroughURL,
+            tracking: response.getTrackingUrls() || undefined
+        };
+
+        const displayInterstitialMarkupParams: IDisplayInterstitialMarkupCampaign = {
+            ... displayInterstitialParams,
+            markup: displayMarkup
+        };
+
+        return Promise.resolve(new DisplayInterstitialMarkupCampaign(displayInterstitialMarkupParams));
     }
 
     private getClickThroughUrlFromMarkup(markup: string): string | null {
