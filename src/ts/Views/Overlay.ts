@@ -312,7 +312,6 @@ export class Overlay extends AbstractOverlay {
                 this._muteButtonElement.classList.add('slide-down');
             }
 
-
             this._container.style.pointerEvents = 'auto';
             this._fadeStatus = false;
         } else {
