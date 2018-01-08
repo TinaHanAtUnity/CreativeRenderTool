@@ -81,7 +81,7 @@ describe('VideoEventHandlersTest', () => {
         vastCampaign = TestFixtures.getEventVastCampaign();
         performanceCampaign = TestFixtures.getCampaign();
         placement = TestFixtures.getPlacement();
-        overlay = new Overlay(nativeBridge, false, 'en', configuration.getGamerId(), configuration.getAbGroup());
+        overlay = new Overlay(nativeBridge, false, 'en', configuration.getGamerId(), performanceCampaign, configuration.getAbGroup());
         endScreen = new PerformanceEndScreen(nativeBridge, performanceCampaign, true, 'en', '12345');
 
         vastAdUnitParameters = {

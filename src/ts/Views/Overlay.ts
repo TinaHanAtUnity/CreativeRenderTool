@@ -1,10 +1,14 @@
 import OverlayTemplate from 'html/Overlay.html';
+import RichOverlayTemplate from 'html/RichOverlay.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
 import { Platform } from 'Constants/Platform';
 import { AbstractOverlay } from 'Views/AbstractOverlay';
+import {PerformanceCampaign} from "../Models/Campaigns/PerformanceCampaign";
+
+const richOverlayId = "rich-overlay";
 
 export class Overlay extends AbstractOverlay {
 
@@ -35,15 +39,32 @@ export class Overlay extends AbstractOverlay {
     private _fadeTimer: any;
     private _fadeStatus: boolean = true;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, abGroup: number = 0) {
+    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, campaign?: PerformanceCampaign, abGroup: number = 0) {
         super(nativeBridge, 'overlay', muted, abGroup);
 
         this._localization = new Localization(language, 'overlay');
-        this._template = new Template(OverlayTemplate, this._localization);
 
-        this._templateData = {
-            muted: muted
-        };
+        this._templateData = {};
+
+        if (this.getAltOverlay() === richOverlayId && typeof campaign !== "undefined") {
+            this._template = new Template(RichOverlayTemplate, this._localization);
+
+            const adjustedRating: number = campaign.getRating() * 20;
+            this._templateData = {
+                muted: true,
+                'gameName': campaign.getGameName(),
+                'gameIcon': campaign.getGameIcon().getUrl(),
+                // NOTE! Landscape orientation should use a portrait image and portrait orientation should use a landscape image
+                'endScreenLandscape': campaign.getPortrait().getUrl(),
+                'endScreenPortrait': campaign.getLandscape().getUrl(),
+                'rating': adjustedRating.toString(),
+                'ratingCount': this._localization.abbreviate(campaign.getRatingCount())
+            };
+        } else {
+            this._template = new Template(OverlayTemplate, this._localization);
+        }
+
+        this._templateData.muted = muted;
 
         this._bindings = [
             {
@@ -88,19 +109,29 @@ export class Overlay extends AbstractOverlay {
         this._debugMessageElement = <HTMLElement>this._container.querySelector('.debug-message-text');
         this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
         this._progressElement = <HTMLElement>this._container.querySelector('.progress');
+
+        const endScreenAlt = this.getAltOverlay();
+        if (typeof endScreenAlt === "string") {
+            this._container.classList.add(endScreenAlt);
+        }
+
     }
 
     public setSpinnerEnabled(value: boolean): void {
         if(this._spinnerEnabled !== value) {
             this._spinnerEnabled = value;
-            this._spinnerElement.style.display = value ? 'block' : 'none';
+            // this._spinnerElement.style.display = value ? 'block' : 'none';
         }
     }
 
     public setSkipEnabled(value: boolean): void {
         if(this._skipEnabled !== value) {
             this._skipEnabled = value;
-            this._skipElement.style.display = value ? 'block' : 'none';
+            if (this.getAltOverlay() === richOverlayId) {
+                this._skipElement.style.display = value ? 'inline-block' : 'none';
+            } else {
+                this._skipElement.style.display = value ? 'block' : 'none';
+            }
         }
     }
 
@@ -138,9 +169,13 @@ export class Overlay extends AbstractOverlay {
     }
 
     public setMuteEnabled(value: boolean) {
-        if(this._muteEnabled !== value) {
+        if (this._muteEnabled !== value) {
             this._muteEnabled = value;
-            this._muteButtonElement.style.display = value ? 'block' : 'none';
+            if (this.getAltOverlay() === richOverlayId) {
+                this._muteButtonElement.style.display = value ? 'inline-block' : 'none';
+            } else {
+                this._muteButtonElement.style.display = value ? 'block' : 'none';
+            }
         }
     }
 
@@ -255,13 +290,22 @@ export class Overlay extends AbstractOverlay {
     }
 
     private fade(value: boolean) {
+        const muteButtonOnTop = this.getAltOverlay() === richOverlayId;
+
         if (value) {
             this._skipElement.classList.remove('slide-back-in-place');
             this._skipElement.classList.add('slide-up');
             this._progressElement.classList.remove('slide-back-in-place');
             this._progressElement.classList.add('slide-up');
+
             this._muteButtonElement.classList.remove('slide-back-in-place');
-            this._muteButtonElement.classList.add('slide-down');
+
+            if (muteButtonOnTop) {
+                this._muteButtonElement.classList.add('slide-up');
+            } else {
+                this._muteButtonElement.classList.add('slide-down');
+            }
+
             this._container.style.pointerEvents = 'auto';
             this._fadeStatus = false;
         } else {
@@ -270,9 +314,24 @@ export class Overlay extends AbstractOverlay {
             this._skipElement.classList.add('slide-back-in-place');
             this._progressElement.classList.remove('slide-up');
             this._progressElement.classList.add('slide-back-in-place');
-            this._muteButtonElement.classList.remove('slide-down');
+
+            if (muteButtonOnTop) {
+                this._muteButtonElement.classList.remove('slide-up');
+            } else {
+                this._muteButtonElement.classList.remove('slide-down');
+            }
+
             this._muteButtonElement.classList.add('slide-back-in-place');
+
             this._fadeStatus = true;
         }
+    }
+
+    private getAltOverlay(): string | undefined {
+        if(this._abGroup === 9 || this._abGroup === 10) {
+            return richOverlayId;
+        }
+
+        return undefined;
     }
 }

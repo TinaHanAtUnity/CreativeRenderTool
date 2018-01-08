@@ -1,6 +1,5 @@
 import EndScreenTemplate from 'html/EndScreen.html';
-import DarkEndScreenTemplate from 'html/DarkEndScreen.html';
-import XmasEndScreenTemplate from 'html/XmasEndScreen.html';
+import CombineEndScreen from 'html/CombineEndScreen.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -18,8 +17,7 @@ export interface IEndScreenHandler {
     onKeyEvent(keyCode: number): void;
 }
 
-const xMasEndScreenId = "xmas-end-screen";
-const darkEndScreenId = "dark-end-screen";
+const combineEndScreenId = "combine-end-screen";
 
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
 
@@ -37,10 +35,9 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._abGroup = abGroup;
         this._gameName = gameName;
 
-        if (this.getEndscreenAlt() === xMasEndScreenId) {
-            this._template = new Template(XmasEndScreenTemplate, this._localization);
-        } else if (this.getEndscreenAlt() === darkEndScreenId) {
-            this._template = new Template(DarkEndScreenTemplate, this._localization);
+
+        if (this.getEndscreenAlt() === combineEndScreenId) {
+            this._template = new Template(CombineEndScreen, this._localization);
         } else {
             this._template = new Template(EndScreenTemplate, this._localization);
         }
@@ -105,7 +102,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             }, AbstractAdUnit.getAutoCloseDelay());
         }
 
-        if (this.getEndscreenAlt() === darkEndScreenId) {
+        if (this.getEndscreenAlt() === combineEndScreenId) {
             const el = <HTMLElement>this._container.querySelector(".underlay");
             const style: CSSStyleDeclaration = window.getComputedStyle(el);
 
@@ -143,7 +140,11 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     protected getEndscreenAlt(campaign?: Campaign) {
-        return darkEndScreenId;
+        if(this._abGroup === 9 || this._abGroup === 10) {
+            return combineEndScreenId;
+        }
+
+        return undefined;
     }
 
     protected abstract onDownloadEvent(event: Event): void;
