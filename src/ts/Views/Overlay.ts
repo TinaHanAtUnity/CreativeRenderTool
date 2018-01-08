@@ -6,7 +6,7 @@ import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
 import { Platform } from 'Constants/Platform';
 import { AbstractOverlay } from 'Views/AbstractOverlay';
-import {PerformanceCampaign} from "../Models/Campaigns/PerformanceCampaign";
+import { PerformanceCampaign } from "../Models/Campaigns/PerformanceCampaign";
 
 const richOverlayId = "rich-overlay";
 
@@ -294,7 +294,7 @@ export class Overlay extends AbstractOverlay {
     }
 
     private fade(value: boolean) {
-        const muteButtonOnTop = this.getAltOverlay() === richOverlayId;
+        const isRichOverlayAlt = this.getAltOverlay() === richOverlayId;
 
         if (value) {
             this._skipElement.classList.remove('slide-back-in-place');
@@ -304,14 +304,14 @@ export class Overlay extends AbstractOverlay {
 
             this._muteButtonElement.classList.remove('slide-back-in-place');
 
-            if (muteButtonOnTop) {
+            if (isRichOverlayAlt) {
                 this._muteButtonElement.classList.add('slide-up');
+                this._overlayFooter.classList.remove('slide-back-in-place');
+                this._overlayFooter.classList.add('slide-down');
             } else {
                 this._muteButtonElement.classList.add('slide-down');
             }
 
-            this._overlayFooter.classList.remove('slide-back-in-place');
-            this._overlayFooter.classList.add('slide-down');
 
             this._container.style.pointerEvents = 'auto';
             this._fadeStatus = false;
@@ -322,14 +322,13 @@ export class Overlay extends AbstractOverlay {
             this._progressElement.classList.remove('slide-up');
             this._progressElement.classList.add('slide-back-in-place');
 
-            if (muteButtonOnTop) {
+            if (isRichOverlayAlt) {
                 this._muteButtonElement.classList.remove('slide-up');
+                this._overlayFooter.classList.remove('slide-down');
+                this._overlayFooter.classList.add('slide-back-in-place');
             } else {
                 this._muteButtonElement.classList.remove('slide-down');
             }
-
-            this._overlayFooter.classList.remove('slide-down');
-            this._overlayFooter.classList.add('slide-back-in-place');
 
             this._muteButtonElement.classList.add('slide-back-in-place');
 
