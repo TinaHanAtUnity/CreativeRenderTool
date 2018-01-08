@@ -1,19 +1,18 @@
-import { Session } from 'Models/Session';
 import { DisplayInterstitialCampaign, IDisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 
-interface IDisplayInterstitialMarkupCampaign extends IDisplayInterstitialCampaign {
+export interface IDisplayInterstitialMarkupCampaign extends IDisplayInterstitialCampaign {
     markup: string;
 }
 
 export class DisplayInterstitialMarkupCampaign extends DisplayInterstitialCampaign<IDisplayInterstitialMarkupCampaign> {
-    constructor(markup: string, session: Session, gamerId: string, abGroup: number, cacheTTL: number | undefined, tracking?: { [eventName: string]: string[] }, clickThroughUrl?: string, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
+    constructor(campaign: IDisplayInterstitialMarkupCampaign) {
         super('DisplayInterstitialMarkupUrlCampaign', {
             ... DisplayInterstitialCampaign.Schema,
             markup: ['string']
-        }, session, gamerId, abGroup, cacheTTL, tracking, adType, creativeId, seatId, correlationId);
+        }, campaign);
 
-        this.set('markup', markup);
-        this.set('clickThroughUrl', clickThroughUrl);
+        this.set('markup', campaign.markup);
+        this.set('clickThroughUrl', campaign.clickThroughUrl);
     }
 
     public getDynamicMarkup() {

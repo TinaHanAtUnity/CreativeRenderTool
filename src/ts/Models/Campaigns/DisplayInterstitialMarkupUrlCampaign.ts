@@ -1,18 +1,17 @@
-import { Session } from 'Models/Session';
 import {DisplayInterstitialCampaign, IDisplayInterstitialCampaign} from 'Models/Campaigns/DisplayInterstitialCampaign';
 
-interface IDisplayInterstitialMarkupUrlCampaign extends IDisplayInterstitialCampaign {
+export interface IDisplayInterstitialMarkupUrlCampaign extends IDisplayInterstitialCampaign {
     markupUrl: string;
 }
 
 export class DisplayInterstitialMarkupUrlCampaign extends DisplayInterstitialCampaign<IDisplayInterstitialMarkupUrlCampaign> {
-    constructor(markupUrl: string, session: Session, gamerId: string, abGroup: number, cacheTTL: number | undefined, tracking?: { [eventName: string]: string[] }, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
+    constructor(campaign: IDisplayInterstitialMarkupUrlCampaign) {
         super('DisplayInterstitialMarkupUrlCampaign', {
             ... DisplayInterstitialCampaign.Schema,
             markupUrl: ['string']
-        }, session, gamerId, abGroup, cacheTTL, tracking, adType, creativeId, seatId, correlationId);
+        }, campaign);
 
-        this.set('markupUrl', markupUrl);
+        this.set('markupUrl', campaign.markupUrl);
     }
 
     public getMarkupUrl(): string {
