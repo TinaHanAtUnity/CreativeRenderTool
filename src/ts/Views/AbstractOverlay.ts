@@ -53,6 +53,14 @@ export abstract class AbstractOverlay extends View<IOverlayHandler> {
         }
     }
 
+    public getABGroup(): number {
+        return this._abGroup;
+    }
+
+    public getClickedState(): boolean {
+        return false;
+    }
+
     public abstract setSpinnerEnabled(value: boolean): void;
 
     public abstract setSkipEnabled(value: boolean): void;

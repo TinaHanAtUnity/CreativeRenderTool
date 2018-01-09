@@ -40,6 +40,8 @@ export class Overlay extends AbstractOverlay {
     private _fadeTimer: any;
     private _fadeStatus: boolean = true;
 
+    private _appStoreVisited: boolean = false;
+
     constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, campaign?: PerformanceCampaign, abGroup: number = 0) {
         super(nativeBridge, 'overlay', muted, abGroup);
 
@@ -110,6 +112,8 @@ export class Overlay extends AbstractOverlay {
                                 store: campaign.getStore(),
                                 gamerId: campaign.getGamerId()
                             });
+
+                            this._appStoreVisited = true;
                         }
                     });
 
@@ -226,6 +230,18 @@ export class Overlay extends AbstractOverlay {
 
     public isMuted(): boolean {
         return this._muted;
+    }
+
+    public getClickedState(): boolean {
+        return this._appStoreVisited;
+    }
+
+    protected getAltOverlay(): string | undefined {
+        if (this._abGroup === 9 || this._abGroup === 10) {
+            return richOverlayId;
+        }
+
+        return undefined;
     }
 
     private onSkipEvent(event: Event): void {
@@ -358,13 +374,5 @@ export class Overlay extends AbstractOverlay {
 
             this._fadeStatus = true;
         }
-    }
-
-    private getAltOverlay(): string | undefined {
-        if(this._abGroup === 9 || this._abGroup === 10) {
-            return richOverlayId;
-        }
-
-        return undefined;
     }
 }
