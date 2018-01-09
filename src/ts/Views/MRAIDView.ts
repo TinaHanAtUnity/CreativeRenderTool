@@ -8,6 +8,8 @@ import { WebViewError } from 'Errors/WebViewError';
 import { Platform } from 'Constants/Platform';
 import { NativeBridge } from 'Native/NativeBridge';
 import { IPrivacyHandler, Privacy } from 'Views/Privacy';
+import { platform } from 'os';
+import { DOMUtils } from 'Utilities/DOMUtils';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
@@ -93,15 +95,27 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     }
 
     private replaceMraidSources(mraid: string): string {
-        const dom = new DOMParser().parseFromString(mraid, "text/html");
+        // Workaround for https://jira.hq.unity3d.com/browse/ABT-333
+        // On certain versions of the webview on iOS (2.0.2 - 2.0.8) there seems
+        // to be some sort of race where the parsed document returns a null
+        // documentElement which throws an exception.
+
+        let dom: Document;
+        if (this._nativeBridge.getPlatform() === Platform.IOS) {
+            dom = DOMUtils.parseFromString(mraid, 'text/html');
+        } else {
+            dom = new DOMParser().parseFromString(mraid, 'text/html');
+        }
         if(!dom) {
             this._nativeBridge.Sdk.logWarning(`Could not parse markup for campaign ${this._campaign.getId()}`);
             return mraid;
         }
+
         const src = dom.documentElement.querySelector('script[src^="mraid.js"]');
         if(src && src.parentNode) {
             src.parentNode.removeChild(src);
         }
+
         return dom.documentElement.outerHTML;
     }
 
@@ -126,7 +140,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
             xhr.addEventListener('load', () => {
-                if((this._nativeBridge.getPlatform() === Platform.ANDROID && xhr.status === 0) || (xhr.status >= 200 && xhr.status <= 299)) {
+                if((xhr.status === 0 && url.indexOf('file://') === 0) || (xhr.status >= 200 && xhr.status <= 299)) {
                     resolve(xhr.responseText);
                 } else {
                     reject(new Error(`XHR returned with unknown status code ${xhr.status}`));

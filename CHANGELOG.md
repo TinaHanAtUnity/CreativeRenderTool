@@ -1,3 +1,20 @@
+# Mon Jan  8 08:56:05 UTC 2018
+
+* Remove xmas theme
+* Follow all 3xx redirect HTTP status codes and set max limit of redirections to 10
+* Remove game ID from endscreen privacy popup
+* Pass raw free cache space value from native SDK in caching_disabled diagnostic message
+
+# Thu Jan  4 10:59:50 UTC 2018
+
+* MRAID fixes for iOS XInstall blackscreen issue
+* MRAID fixes for Beeswax event listening problems
+
+# Wed Jan  3 13:18:38 UTC 2018
+
+* Disable caching if there is less than 20 megabytes of free space on device
+* Add debugging diagnostics for native random UUID generator
+
 # Wed Dec 20 20:51:09 UTC 2017
 
 * Changed xmas theme to prevent overlaying game icon
