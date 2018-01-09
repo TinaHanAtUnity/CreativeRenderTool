@@ -1,37 +1,37 @@
 import { ICampaign, Campaign } from 'Models/Campaign';
 import { VPAID } from 'Models/VPAID/VPAID';
 import { IAsset, Asset } from 'Models/Assets/Asset';
-import { Session } from 'Models/Session';
 import { VastCreativeCompanionAd } from 'Models/Vast/VastCreativeCompanionAd';
 
-interface IVPAIDCampaign extends ICampaign {
+export interface IVPAIDCampaign extends ICampaign {
     vpaid: VPAID;
+    tracking: any | undefined;
 }
 
 export class VPAIDCampaign extends Campaign<IVPAIDCampaign> {
 
-    constructor(vpaid: VPAID, session: Session, campaignId: string, gamerId: string, abGroup: number, cacheTTL?: number, tracking?: any, adType?: string, creativeId?: string, seatId?: number, correlationId?: string, appCategory?: string, appSubCategory?: string, useWebViewUserAgentForTracking?: boolean) {
+    constructor(campaign: IVPAIDCampaign) {
         super('VPAIDCampaign', {
             ... Campaign.Schema,
-            vpaid: ['object']
+            vpaid: ['object'],
+            tracking: ['object', 'undefined']
         });
-        this.set('vpaid', vpaid);
-        this.set('session', session);
+        this.set('vpaid', campaign.vpaid);
+        this.set('session', campaign.session);
 
-        this.set('id', campaignId);
-        this.set('gamerId', gamerId);
-        this.set('abGroup', abGroup);
-        this.set('useWebViewUserAgentForTracking', useWebViewUserAgentForTracking);
-        const timeout = cacheTTL || 3600;
-        this.set('willExpireAt', Date.now() + timeout * 1000);
-        this.set('adType', adType || undefined);
-        this.set('correlationId', correlationId || undefined);
-        this.set('creativeId', creativeId || undefined);
-        this.set('appCategory', appCategory || undefined);
-        this.set('appSubCategory', appSubCategory || undefined);
-        this.set('seatId', seatId || undefined);
+        this.set('id', campaign.id);
+        this.set('gamerId', campaign.gamerId);
+        this.set('abGroup', campaign.abGroup);
+        this.set('useWebViewUserAgentForTracking', campaign.useWebViewUserAgentForTracking);
+        this.set('willExpireAt', campaign.willExpireAt);
+        this.set('adType', campaign.adType || undefined);
+        this.set('correlationId', campaign.correlationId || undefined);
+        this.set('creativeId', campaign.creativeId || undefined);
+        this.set('appCategory', campaign.appCategory || undefined);
+        this.set('appSubCategory', campaign.appSubCategory || undefined);
+        this.set('seatId', campaign.seatId || undefined);
 
-        this.addTrackingToVAST(tracking);
+        this.addTrackingToVAST(campaign.tracking);
     }
 
     public hasEndScreen(): boolean {
