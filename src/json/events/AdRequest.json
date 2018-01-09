@@ -20,12 +20,6 @@
       "body": false
     },
     {
-      "parameter": "auctionId",
-      "required": "all",
-      "queryString": true,
-      "body": false
-    },
-    {
       "parameter": "deviceMake",
       "required": "android",
       "queryString": true,
