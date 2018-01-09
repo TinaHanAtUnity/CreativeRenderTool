@@ -1,4 +1,4 @@
-# PENDING
+# Tue Jan  9 12:32:29 UTC 2018
 
 * Switch to server-side auction ID
 * Stop refreshing ads when Unity ad unit activity resumes
