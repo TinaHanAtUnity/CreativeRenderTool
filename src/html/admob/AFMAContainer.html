@@ -15,6 +15,7 @@
 
         // This string will be replaced prior to the source being inserted into the iframe
         var clickSignals = '{{AFMA_CLICK_SIGNALS_PLACEHOLDER}}';
+        var rdvt = '{{AFMA_RDVT_PLACEHOLDER}}';
 
         function getQueryParams(url) {
             var a = document.createElement('a');
@@ -67,15 +68,14 @@
             this.appendClickSignals = function(url, spamSignals) {
                 spamSignals = spamSignals || clickSignals;
                 var query = getQueryParams(url);
-                if (query.ms) {
-                    return url;
-                } else {
+                if (!query.ms) {
                     if (isObjectEmpty(query)) {
                         url = url + '?ms=' + spamSignals;
                     } else {
                         url = url + '&ms=' + spamSignals;
                     }
                 }
+                url = url + '&rdvt=' + rdvt;
                 return url;
             };
 

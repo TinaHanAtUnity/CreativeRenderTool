@@ -13,6 +13,7 @@ import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
 import { MRAIDBridge } from 'Views/MRAIDBridge';
+import { SdkStats } from 'Utilities/SdkStats';
 
 export interface IAdMobEventHandler {
     onClose(): void;
@@ -25,6 +26,7 @@ export interface IAdMobEventHandler {
 }
 
 const AFMAClickStringMacro = '{{AFMA_CLICK_SIGNALS_PLACEHOLDER}}';
+const AFMADelayMacro = '{{AFMA_RDVT_PLACEHOLDER}}';
 
 export class AdMobView extends View<IAdMobEventHandler> {
     private _placement: Placement;
@@ -123,8 +125,9 @@ export class AdMobView extends View<IAdMobEventHandler> {
             this.injectScript(e, MRAIDContainer);
 
             const signalProto = signal.getBase64ProtoBufNonEncoded();
-            this.injectScript(e, AFMAContainer.replace(AFMAClickStringMacro, signalProto));
- //           this.injectScript(e, `<script>AFMA_ReceiveMessage('onshow');</script>`);
+            let containerHTML = AFMAContainer.replace(AFMAClickStringMacro, signalProto);
+            containerHTML = containerHTML.replace(AFMADelayMacro, (Date.now() - SdkStats.getAdRequestTimestamp()).toString());
+            this.injectScript(e, containerHTML);
         });
     }
 
