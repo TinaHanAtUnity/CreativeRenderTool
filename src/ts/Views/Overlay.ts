@@ -94,6 +94,31 @@ export class Overlay extends AbstractOverlay {
             }
         ];
 
+        if (this.getAltOverlay() === richOverlayId && typeof campaign !== "undefined") {
+            this._bindings.push({
+                event: 'click',
+                listener: (event: Event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    this._handlers.forEach((handler) => {
+                        if (typeof handler.onEndScreenDownload === "function") {
+                            handler.onEndScreenDownload({
+                                clickAttributionUrl: campaign.getClickAttributionUrl(),
+                                clickAttributionUrlFollowsRedirects: campaign.getClickAttributionUrlFollowsRedirects(),
+                                bypassAppSheet: campaign.getBypassAppSheet(),
+                                appStoreId: campaign.getAppStoreId(),
+                                store: campaign.getStore(),
+                                gamerId: campaign.getGamerId()
+                            });
+                        }
+                    });
+
+                    // this._handlers.forEach(handler => handler.onEndScreenDownload());
+                },
+                selector: '.download-container'
+            });
+        }
+
         if(gameId === '1300023' || gameId === '1300024') {
             this._bindings.push({
                 event: 'swipe',
