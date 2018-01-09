@@ -2,31 +2,33 @@ import { Campaign, ICampaign } from 'Models/Campaign';
 import { Asset } from 'Models/Assets/Asset';
 import { Session } from 'Models/Session';
 
-interface IAdMobCampaign extends ICampaign {
+export interface IAdMobCampaign extends ICampaign {
     dynamicMarkup: string;
     tracking: { [eventName: string]: string[] } | undefined;
 }
 
 export class AdMobCampaign extends Campaign<IAdMobCampaign> {
-    constructor(markup: string, session: Session, campaignId: string, gamerId: string, abGroup: number, cacheTTL: number | undefined, tracking?: { [eventName: string]: string[] }, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
+    constructor(campaign: IAdMobCampaign) {
         super('AdMobCampaign', {
             ... Campaign.Schema,
             dynamicMarkup: ['string'],
             tracking: ['object', 'undefined']
         });
-        if(cacheTTL) {
-            this.set('willExpireAt', Date.now() + cacheTTL * 1000);
+
+        if(campaign.willExpireAt) {
+            this.set('willExpireAt', campaign.willExpireAt);
         }
-        this.set('id', campaignId);
-        this.set('dynamicMarkup', markup);
-        this.set('gamerId', gamerId);
-        this.set('abGroup', abGroup);
-        this.set('adType', adType || undefined);
-        this.set('correlationId', correlationId || undefined);
-        this.set('creativeId', creativeId || undefined);
-        this.set('seatId', seatId || undefined);
-        this.set('tracking', tracking || undefined);
-        this.set('session', session);
+
+        this.set('id', campaign.id);
+        this.set('dynamicMarkup', campaign.dynamicMarkup);
+        this.set('gamerId', campaign.gamerId);
+        this.set('abGroup', campaign.abGroup);
+        this.set('adType', campaign.adType);
+        this.set('correlationId', campaign.correlationId);
+        this.set('creativeId', campaign.creativeId);
+        this.set('seatId', campaign.seatId);
+        this.set('tracking', campaign.tracking);
+        this.set('session', campaign.session);
     }
 
     public getDynamicMarkup(): string {
