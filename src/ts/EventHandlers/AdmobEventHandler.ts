@@ -60,7 +60,7 @@ export class AdMobEventHandler implements IAdMobEventHandler {
     }
 
     public onAttribution(url: string): void {
-        this._thirdPartyEventManager.sendEvent('admob click', this._session.getId(), url);
+        this._thirdPartyEventManager.sendEvent('admob click', this._session.getId(), url, true);
    }
 
     public onGrantReward(): void {
