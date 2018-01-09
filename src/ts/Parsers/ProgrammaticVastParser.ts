@@ -1,14 +1,16 @@
 import { CampaignParser } from 'Parsers/CampaignParser';
-import { Campaign } from 'Models/Campaign';
+import { Campaign, ICampaign } from 'Models/Campaign';
 import { VastParser } from 'Utilities/VastParser';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Request } from 'Utilities/Request';
-import { VastCampaign } from 'Models/Vast/VastCampaign';
+import { IVastCampaign, VastCampaign } from 'Models/Vast/VastCampaign';
 import { Platform } from 'Constants/Platform';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { AuctionResponse } from 'Models/AuctionResponse';
 import { Session } from 'Models/Session';
 import { Vast } from 'Models/Vast/Vast';
+import { Video } from 'Models/Assets/Video';
+import { Image } from 'Models/Assets/Image';
 
 export class ProgrammaticVastParser extends CampaignParser {
     public static setVastParserMaxDepth(depth: number): void {
@@ -33,7 +35,51 @@ export class ProgrammaticVastParser extends CampaignParser {
     }
 
     protected parseVastToCampaign(vast: Vast, nativeBridge: NativeBridge, campaignId: string, session: Session, gamerId: string, abGroup: number, response: AuctionResponse): Promise<Campaign> {
-        const campaign = new VastCampaign(vast, campaignId, session, gamerId, abGroup, response.getCacheTTL(), response.getTrackingUrls(), response.getAdType(), response.getCreativeId(), response.getSeatId(), response.getCorrelationId(), response.getAdvertiserCampaignId(), response.getAdvertiserBundleId(), response.getAdvertiserDomain(), response.getCategory(), response.getSubCategory(), response.getUseWebViewUserAgentForTracking(), response.getBuyerId());
+        const cacheTTL = response.getCacheTTL();
+
+        const baseCampaignParams: ICampaign = {
+            id: this.getProgrammaticCampaignId(nativeBridge),
+            gamerId: gamerId,
+            abGroup: abGroup,
+            willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
+            adType: response.getAdType() || undefined,
+            correlationId: response.getCorrelationId() || undefined,
+            creativeId: response.getCreativeId() || undefined,
+            seatId: response.getSeatId() || undefined,
+            meta: undefined,
+            appCategory: response.getCategory() || undefined,
+            appSubCategory: response.getSubCategory() || undefined,
+            advertiserDomain: response.getAdvertiserDomain() || undefined,
+            advertiserCampaignId: response.getAdvertiserCampaignId() || undefined,
+            advertiserBundleId: response.getAdvertiserBundleId() || undefined,
+            useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking(),
+            buyerId: response.getBuyerId() || undefined,
+            session: session
+        };
+
+        const portraitUrl = vast.getCompanionPortraitUrl();
+        let portraitAsset;
+        if(portraitUrl) {
+            portraitAsset = new Image(portraitUrl, session);
+        }
+
+        const landscapeUrl = vast.getCompanionLandscapeUrl();
+        let landscapeAsset;
+        if(landscapeUrl) {
+            landscapeAsset = new Image(landscapeUrl, session);
+        }
+
+        const vastCampaignParms: IVastCampaign = {
+            ... baseCampaignParams,
+            vast: vast,
+            video: new Video(vast.getVideoUrl(), session),
+            hasEndscreen: !!vast.getCompanionPortraitUrl() || !!vast.getCompanionLandscapeUrl(),
+            portrait: portraitAsset,
+            landscape: landscapeAsset,
+            tracking: response.getTrackingUrls()
+        };
+
+        const campaign = new VastCampaign(vastCampaignParms);
         if(campaign.getVast().getImpressionUrls().length === 0) {
             throw new Error('Campaign does not have an impression url');
         }

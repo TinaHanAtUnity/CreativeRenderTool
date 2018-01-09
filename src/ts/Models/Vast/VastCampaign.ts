@@ -3,63 +3,52 @@ import { Video } from 'Models/Assets/Video';
 import { Asset } from 'Models/Assets/Asset';
 import { Campaign, ICampaign } from 'Models/Campaign';
 import { Image } from 'Models/Assets/Image';
-import { Session } from 'Models/Session';
 
-interface IVastCampaign extends ICampaign {
+export interface IVastCampaign extends ICampaign {
     vast: Vast;
     video: Video;
     hasEndscreen: boolean;
     portrait: Image | undefined;
     landscape: Image | undefined;
+    tracking: any | undefined;
 }
 
 export class VastCampaign extends Campaign<IVastCampaign> {
-    constructor(vast: Vast, campaignId: string, session: Session, gamerId: string, abGroup: number, cacheTTL?: number, tracking?: any, adType?: string, creativeId?: string, seatId?: number, correlationId?: string, advertiserCampaignId?: string, advertiserBundleId?: string, advertiserDomain?: string, appCategory?: string, appSubCategory?: string, useWebViewUserAgentForTracking?: boolean, buyerId?: string) {
+    constructor(campaign: IVastCampaign) {
         super('VastCampaign', {
             ... Campaign.Schema,
             vast: ['object'],
             video: ['object'],
             hasEndscreen: ['boolean'],
             portrait: ['object', 'undefined'],
-            landscape: ['object', 'undefined']
+            landscape: ['object', 'undefined'],
+            tracking: ['object', 'undefined']
         });
 
-        const portraitUrl = vast.getCompanionPortraitUrl();
-        let portraitAsset;
-        if(portraitUrl) {
-            portraitAsset = new Image(portraitUrl, session);
-        }
+        this.set('vast', campaign.vast);
+        this.set('video', campaign.video);
+        this.set('hasEndscreen', campaign.hasEndscreen);
+        this.set('portrait', campaign.portrait);
+        this.set('landscape', campaign.landscape);
 
-        const landscapeUrl = vast.getCompanionLandscapeUrl();
-        let landscapeAsset;
-        if(landscapeUrl) {
-            landscapeAsset = new Image(landscapeUrl, session);
-        }
-        this.set('vast', vast);
-        this.set('video', new Video(vast.getVideoUrl(), session));
-        this.set('hasEndscreen', !!vast.getCompanionPortraitUrl() || !!vast.getCompanionLandscapeUrl());
-        this.set('portrait', portraitAsset);
-        this.set('landscape', landscapeAsset);
+        this.set('id', campaign.id);
+        this.set('session', campaign.session);
+        this.set('gamerId', campaign.gamerId);
+        this.set('abGroup', campaign.abGroup);
+        this.set('useWebViewUserAgentForTracking', campaign.useWebViewUserAgentForTracking);
+        this.set('willExpireAt', campaign.willExpireAt);
+        this.set('adType', campaign.adType);
+        this.set('correlationId', campaign.correlationId || undefined);
+        this.set('creativeId', campaign.creativeId || undefined);
+        this.set('appCategory', campaign.appCategory || undefined);
+        this.set('appSubCategory', campaign.appSubCategory || undefined);
+        this.set('seatId', campaign.seatId || undefined);
+        this.set('advertiserDomain', campaign.advertiserDomain || undefined);
+        this.set('advertiserCampaignId', campaign.advertiserCampaignId || undefined);
+        this.set('advertiserBundleId', campaign.advertiserBundleId || undefined);
+        this.set('buyerId', campaign.buyerId || undefined);
 
-        this.set('id', campaignId);
-        this.set('session', session);
-        this.set('gamerId', gamerId);
-        this.set('abGroup', abGroup);
-        this.set('useWebViewUserAgentForTracking', useWebViewUserAgentForTracking);
-        const timeout = cacheTTL || 3600;
-        this.set('willExpireAt', Date.now() + timeout * 1000);
-        this.set('adType', adType || undefined);
-        this.set('correlationId', correlationId || undefined);
-        this.set('creativeId', creativeId || undefined);
-        this.set('appCategory', appCategory || undefined);
-        this.set('appSubCategory', appSubCategory || undefined);
-        this.set('seatId', seatId || undefined);
-        this.set('advertiserDomain', advertiserDomain || undefined);
-        this.set('advertiserCampaignId', advertiserCampaignId || undefined);
-        this.set('advertiserBundleId', advertiserBundleId || undefined);
-        this.set('buyerId', buyerId || undefined);
-
-        this.processCustomTracking(tracking);
+        this.processCustomTracking(campaign.tracking);
     }
 
     public getVast(): Vast {
