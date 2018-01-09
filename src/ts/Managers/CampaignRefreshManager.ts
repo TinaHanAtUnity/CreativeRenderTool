@@ -291,7 +291,12 @@ export class CampaignRefreshManager {
     }
 
     private onActivityResumed(activity: string): void {
-        this.refresh();
+        if(activity !== 'com.unity3d.ads.adunit.AdUnitActivity' &&
+            activity !== 'com.unity3d.ads.adunit.AdUnitTransparentActivity' &&
+            activity !== 'com.unity3d.ads.adunit.AdUnitTransparentSoftwareActivity' &&
+            activity !== 'com.unity3d.ads.adunit.AdUnitSoftwareActivity') {
+            this.refresh();
+        }
     }
 
     private onAppForeground(): void {
