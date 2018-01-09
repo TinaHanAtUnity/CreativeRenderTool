@@ -18,7 +18,7 @@ import { SdkStats } from 'Utilities/SdkStats';
 export interface IAdMobEventHandler {
     onClose(): void;
     onOpenURL(url: string): void;
-    onAttribution(url: string): void;
+    onAttribution(url: string): Promise<void>;
     onGrantReward(): void;
     onShow(): void;
     onVideoStart(): void;
@@ -121,14 +121,9 @@ export class AdMobView extends View<IAdMobEventHandler> {
 
     private injectScripts(dom: Document): Promise<void> {
         const e = dom.head || document.body;
-        return this._adMobSignalFactory.getClickSignal().then((signal) => {
-            this.injectScript(e, MRAIDContainer);
-
-            const signalProto = signal.getBase64ProtoBufNonEncoded();
-            let containerHTML = AFMAContainer.replace(AFMAClickStringMacro, signalProto);
-            containerHTML = containerHTML.replace(AFMADelayMacro, (Date.now() - SdkStats.getAdRequestTimestamp()).toString());
-            this.injectScript(e, containerHTML);
-        });
+        this.injectScript(e, MRAIDContainer);
+        this.injectScript(e, AFMAContainer);
+        return Promise.resolve();
     }
 
     private injectScript(e: HTMLElement, script: string) {

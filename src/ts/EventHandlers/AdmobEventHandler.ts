@@ -8,6 +8,8 @@ import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Request } from 'Utilities/Request';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { Session } from 'Models/Session';
+import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
+import { Url } from 'Utilities/Url';
 
 export interface IAdMobEventHandlerParameters {
     adUnit: AdMobAdUnit;
@@ -15,6 +17,7 @@ export interface IAdMobEventHandlerParameters {
     nativeBridge: NativeBridge;
     session: Session;
     thirdPartyEventManager: ThirdPartyEventManager;
+    adMobSignalFactory: AdMobSignalFactory;
 }
 
 export class AdMobEventHandler implements IAdMobEventHandler {
@@ -29,6 +32,7 @@ export class AdMobEventHandler implements IAdMobEventHandler {
     private _request: Request;
     private _session: Session;
     private _thirdPartyEventManager: ThirdPartyEventManager;
+    private _adMobSignalFactory: AdMobSignalFactory;
 
     constructor(parameters: IAdMobEventHandlerParameters) {
         this._adUnit = parameters.adUnit;
@@ -36,6 +40,7 @@ export class AdMobEventHandler implements IAdMobEventHandler {
         this._request = parameters.request;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._session = parameters.session;
+        this._adMobSignalFactory = parameters.adMobSignalFactory;
         this._timeoutTimer = new Timer(() => this.onFailureToLoad(), AdMobEventHandler._loadTimeout);
     }
 
@@ -59,8 +64,12 @@ export class AdMobEventHandler implements IAdMobEventHandler {
         }
     }
 
-    public onAttribution(url: string): void {
-        this._thirdPartyEventManager.sendEvent('admob click', this._session.getId(), url, true);
+    public onAttribution(url: string): Promise<void> {
+        return this.createClickUrl(url).then((clickUrl) => {
+            return new Promise<void>((resolve, reject) => {
+                this._thirdPartyEventManager.sendEvent('admob click', this._session.getId(), clickUrl, true).then(() => resolve()).catch(reject);
+            });
+        });
    }
 
     public onGrantReward(): void {
@@ -89,5 +98,15 @@ export class AdMobEventHandler implements IAdMobEventHandler {
     private onFailureToLoad(): void {
         this._adUnit.setFinishState(FinishState.ERROR);
         this._adUnit.hide();
+    }
+
+    private createClickUrl(url: string): Promise<string> {
+        return this._adMobSignalFactory.getClickSignal().then((signal) => {
+            signal.setTimeOnScreen(this._adUnit.getTimeOnScreen());
+            return Url.addParameters(url, {
+                ms: signal.getBase64ProtoBufNonEncoded(),
+                rdvt: Date.now() - this._adUnit.getStartTime()
+            });
+        });
     }
 }

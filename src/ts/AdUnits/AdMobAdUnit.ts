@@ -9,19 +9,32 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { Platform } from 'Constants/Platform';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { Placement } from 'Models/Placement';
+import { FocusManager } from 'Managers/FocusManager';
 
 export interface IAdMobAdUnitParameters extends IAdUnitParameters<AdMobCampaign> {
     view: AdMobView;
 }
+
+const AdUnitActivities = ['com.unity3d.ads.adunit.AdUnitActivity', 'com.unity3d.ads.adunit.AdUnitTransparentActivity', 'com.unity3d.ads.adunit.AdUnitTransparentSoftwareActivity', 'com.unity3d.ads.adunit.AdUnitSoftwareActivity'];
+
 export class AdMobAdUnit extends AbstractAdUnit {
     private _operativeEventManager: OperativeEventManager;
     private _view: AdMobView;
     private _thirdPartyEventManager: ThirdPartyEventManager;
+    private _focusManager: FocusManager;
     private _options: any;
     private _onSystemKillObserver: any;
     private _keyDownListener: (kc: number) => void;
     private _campaign: AdMobCampaign;
     private _placement: Placement;
+    private _timeOnScreen: number;
+    private _foregroundTime: number;
+    private _startTime: number;
+
+    private _onAppForeground: () => void;
+    private _onAppBackground: () => void;
+    private _onActivityResumed: (activity: string) => void;
+    private _onActivityPaused: (activity: string) => void;
 
     constructor(nativeBridge: NativeBridge, parameters: IAdMobAdUnitParameters) {
         super(nativeBridge, parameters);
@@ -33,6 +46,7 @@ export class AdMobAdUnit extends AbstractAdUnit {
         this._keyDownListener = (kc: number) => this.onKeyDown(kc);
         this._campaign = parameters.campaign;
         this._placement = parameters.placement;
+        this._focusManager = parameters.focusManager;
 
         // TODO, we skip initial because the AFMA grantReward event tells us the video
         // has been completed. Is there a better way to do this with AFMA right now?
@@ -52,8 +66,13 @@ export class AdMobAdUnit extends AbstractAdUnit {
         }
 
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
+        this.subscribeToLifecycle();
 
         return this._container.open(this, false, true, this._forceOrientation, true, false, true, false, this._options).then(() => {
+            if (this._startTime === 0) {
+                this._startTime = Date.now();
+            }
+            this._foregroundTime = Date.now();
             this.showView();
         });
     }
@@ -61,6 +80,7 @@ export class AdMobAdUnit extends AbstractAdUnit {
     public hide(): Promise<void> {
         this.onHide();
         this.hideView();
+        this.unsubscribeFromLifecycle();
         return this._container.close();
     }
 
@@ -98,6 +118,14 @@ export class AdMobAdUnit extends AbstractAdUnit {
     public sendRewardEvent() {
         this._operativeEventManager.sendThirdQuartile(this._campaign.getSession(), this._placement, this._campaign);
         this._operativeEventManager.sendView(this._campaign.getSession(), this._placement, this._campaign);
+    }
+
+    public getTimeOnScreen(): number {
+        return (Date.now() - this._foregroundTime) + this._timeOnScreen;
+    }
+
+    public getStartTime(): number {
+        return this._startTime;
     }
 
     private showView() {
@@ -156,6 +184,40 @@ export class AdMobAdUnit extends AbstractAdUnit {
     private onKeyDown(key: number) {
         if (key === KeyCode.BACK) {
             this._view.onBackPressed();
+        }
+    }
+
+    private subscribeToLifecycle() {
+        this._onAppForeground = this._focusManager.onAppForeground.subscribe(() => this.onAppForeground());
+        this._onAppBackground = this._focusManager.onAppBackground.subscribe(() => this.onAppBackground());
+        this._onActivityResumed = this._focusManager.onActivityResumed.subscribe((activity) => this.onActivityResumed(activity));
+        this._onActivityPaused = this._focusManager.onActivityPaused.subscribe((activity) => this.onActivityPaused(activity));
+    }
+
+    private unsubscribeFromLifecycle() {
+        this._focusManager.onAppForeground.unsubscribe(this._onAppForeground);
+        this._focusManager.onAppBackground.unsubscribe(this._onAppBackground);
+        this._focusManager.onActivityResumed.unsubscribe(this._onActivityResumed);
+        this._focusManager.onActivityPaused.unsubscribe(this._onActivityPaused);
+    }
+
+    private onAppForeground() {
+        this._foregroundTime = Date.now();
+    }
+
+    private onAppBackground() {
+        this._timeOnScreen = (Date.now() - this._foregroundTime) + this._timeOnScreen;
+    }
+
+    private onActivityResumed(activity: string) {
+        if (AdUnitActivities.indexOf(activity) !== -1) {
+            this.onAppForeground();
+        }
+    }
+
+    private onActivityPaused(activity: string) {
+        if (AdUnitActivities.indexOf(activity) !== -1) {
+            this.onAppBackground();
         }
     }
 }

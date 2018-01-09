@@ -13,39 +13,6 @@
             }
         });
 
-        // This string will be replaced prior to the source being inserted into the iframe
-        var clickSignals = '{{AFMA_CLICK_SIGNALS_PLACEHOLDER}}';
-        var rdvt = '{{AFMA_RDVT_PLACEHOLDER}}';
-
-        function getQueryParams(url) {
-            var a = document.createElement('a');
-            a.href = url;
-            var params = {};
-            if (a.search) {
-                var tuples = a.search.substring(1).split(/&/);
-                for (var i = 0; i < tuples.length; i++) {
-                    var parts = tuples[i].split(/=/);
-                    var key = parts[0];
-                    var value = parts[1];
-                    if (params[key]) {
-                        params[key].push(value);
-                    } else {
-                        params[key] = [value];
-                    }
-                }
-            }
-            return params;
-        }
-
-        function isObjectEmpty(obj) {
-            for (var prop in obj) {
-                if (obj.hasOwnProperty(prop)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
         var AFMA = function() {
             this.forceOrientation = function(orientation, override, animationDuration) {
                 this.postMessage('forceOrientation', {
@@ -62,20 +29,10 @@
             };
 
             this.getClickSignals = function(clickString) {
-                return clickSignals;
+                return null;
             };
 
             this.appendClickSignals = function(url, spamSignals) {
-                spamSignals = spamSignals || clickSignals;
-                var query = getQueryParams(url);
-                if (!query.ms) {
-                    if (isObjectEmpty(query)) {
-                        url = url + '?ms=' + spamSignals;
-                    } else {
-                        url = url + '&ms=' + spamSignals;
-                    }
-                }
-                url = url + '&rdvt=' + rdvt;
                 return url;
             };
 
