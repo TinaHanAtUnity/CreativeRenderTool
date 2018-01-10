@@ -1,3 +1,8 @@
+# PENDING
+
+* Recreate ad request parameters when retrying with connectivity events
+* Fixes for AdMob spam signals for screen width, screen height and app installer
+
 # Tue Jan  9 12:32:29 UTC 2018
 
 * Switch to server-side auction ID
