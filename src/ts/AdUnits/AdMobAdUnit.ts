@@ -213,16 +213,4 @@ export class AdMobAdUnit extends AbstractAdUnit {
     private onAppBackground() {
         this._timeOnScreen = (Date.now() - this._foregroundTime) + this._timeOnScreen;
     }
-
-    private onActivityResumed(activity: string) {
-        if (AdUnitActivities.indexOf(activity) !== -1) {
-            this.onAppForeground();
-        }
-    }
-
-    private onActivityPaused(activity: string) {
-        if (AdUnitActivities.indexOf(activity) !== -1) {
-            this.onAppBackground();
-        }
-    }
 }
