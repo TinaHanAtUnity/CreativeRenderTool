@@ -178,6 +178,9 @@ export class CampaignManager {
         try {
             json = JsonParser.parse(response.response);
         } catch (e) {
+            Diagnostics.trigger('auction_invalid_json', new DiagnosticError(e, {
+                response: response.response
+            }));
             return Promise.reject(new Error('Could not parse campaign JSON: ' + e.message));
         }
 
