@@ -10,6 +10,7 @@ import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { Session } from 'Models/Session';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { Url } from 'Utilities/Url';
+import { SdkStats } from 'Utilities/SdkStats';
 
 export interface IAdMobEventHandlerParameters {
     adUnit: AdMobAdUnit;
@@ -105,7 +106,7 @@ export class AdMobEventHandler implements IAdMobEventHandler {
             signal.setTimeOnScreen(this._adUnit.getTimeOnScreen());
             return Url.addParameters(url, {
                 ms: signal.getBase64ProtoBufNonEncoded(),
-                rdvt: Date.now() - this._adUnit.getStartTime()
+                rdvt: this._adUnit.getStartTime() - SdkStats.getAdRequestTimestamp()
             });
         });
     }
