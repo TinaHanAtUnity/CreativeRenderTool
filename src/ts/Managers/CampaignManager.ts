@@ -31,7 +31,6 @@ import { CampaignParser } from 'Parsers/CampaignParser';
 import { ProgrammaticVPAIDParser } from 'Parsers/ProgrammaticVPAIDParser';
 import { AdMobSignalFactory} from 'AdMob/AdMobSignalFactory';
 import { Diagnostics } from 'Utilities/Diagnostics';
-import { DiagnosticError } from 'Errors/DiagnosticError';
 import { RequestError } from 'Errors/RequestError';
 
 export class CampaignManager {
@@ -178,9 +177,9 @@ export class CampaignManager {
         try {
             json = JsonParser.parse(response.response);
         } catch (e) {
-            Diagnostics.trigger('auction_invalid_json', new DiagnosticError(e, {
+            Diagnostics.trigger('auction_invalid_json', {
                 response: response.response
-            }));
+            });
             return Promise.reject(new Error('Could not parse campaign JSON: ' + e.message));
         }
 
