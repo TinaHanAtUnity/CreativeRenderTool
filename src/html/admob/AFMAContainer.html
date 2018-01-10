@@ -21,7 +21,7 @@
         });
         document.addEventListener('touchend', function(e) {
             var duration = Date.now() - touchStartTime;
-            endTouch = e.touches[0];
+            endTouch = e.changedTouches[0];
             upCounts++;
         });
         document.addEventListener('touchmove', function(e) {
@@ -54,15 +54,15 @@
                     url: url,
                     touch: {
                         start: {
-                            x: startTouch.clientX,
-                            y: startTouch.clientY
+                            x: startTouch ? startTouch.clientX : 0,
+                            y: startTouch ? startTouch.clientY : 0
                         },
                         end: {
-                            x: endTouch.clientX,
-                            y: endTouch.clientY
+                            x: endTouch ? endTouch.clientX : 0,
+                            y: endTouch ? endTouch.clientY : 0,
                         },
-                        diameter: endTouch.radiusX * 2,
-                        pressure: endTouch.force || 0.0,
+                        diameter: endTouch ? endTouch.radiusX * 2 : 0.0,
+                        pressure: endTouch ? endTouch.force || 0.0 : 0.0,
                         counts: {
                             up: upCounts,
                             down: downCounts,
