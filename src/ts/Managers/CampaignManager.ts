@@ -31,6 +31,7 @@ import { CampaignParser } from 'Parsers/CampaignParser';
 import { ProgrammaticVPAIDParser } from 'Parsers/ProgrammaticVPAIDParser';
 import { AdMobSignalFactory} from 'AdMob/AdMobSignalFactory';
 import { Diagnostics } from 'Utilities/Diagnostics';
+import { RequestError } from 'Errors/RequestError';
 
 export class CampaignManager {
 
@@ -66,6 +67,7 @@ export class CampaignManager {
     public readonly onCampaign = new Observable2<string, Campaign>();
     public readonly onNoFill = new Observable1<string>();
     public readonly onError = new Observable3<WebViewError, string[], Session | undefined>();
+    public readonly onConnectivityError = new Observable1<string[]>();
     public readonly onAdPlanReceived = new Observable2<number, number>();
 
     protected _nativeBridge: NativeBridge;
@@ -127,7 +129,7 @@ export class CampaignManager {
                     retries: 2,
                     retryDelay: 10000,
                     followRedirects: false,
-                    retryWithConnectionEvents: true
+                    retryWithConnectionEvents: false
                 });
             }).then(response => {
                 if (response) {
@@ -140,6 +142,12 @@ export class CampaignManager {
                 this._requesting = false;
             }).catch((error) => {
                 this._requesting = false;
+                if(error instanceof RequestError) {
+                    if(!(<RequestError>error).nativeResponse) {
+                        this.onConnectivityError.trigger(this._configuration.getPlacementIds());
+                        return Promise.resolve();
+                    }
+                }
                 return this.handleError(error, this._configuration.getPlacementIds());
             });
         });
