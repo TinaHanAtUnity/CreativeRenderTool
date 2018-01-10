@@ -51,6 +51,7 @@ export class CampaignRefreshManager {
         this._campaignManager.onCampaign.subscribe((placementId, campaign) => this.onCampaign(placementId, campaign));
         this._campaignManager.onNoFill.subscribe(placementId => this.onNoFill(placementId));
         this._campaignManager.onError.subscribe((error, placementIds, session) => this.onError(error, placementIds, session));
+        this._campaignManager.onConnectivityError.subscribe((placementIds) => this.onConnectivityError(placementIds));
         this._campaignManager.onAdPlanReceived.subscribe((refreshDelay, campaignCount) => this.onAdPlanReceived(refreshDelay, campaignCount));
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
             this._focusManager.onAppForeground.subscribe(() => this.onAppForeground());
@@ -222,6 +223,22 @@ export class CampaignRefreshManager {
                     this.refresh();
                 }, retryDelaySeconds * 1000);
             }
+        }
+    }
+
+    private onConnectivityError(placementIds: string[]) {
+        this.invalidateCampaigns(this._needsRefill, placementIds);
+        this._refillTimestamp = Date.now();
+
+        this._nativeBridge.Sdk.logInfo('Unity Ads failed to contact server, retrying after next system event');
+
+        if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
+            const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
+                this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
+                this.setPlacementStates(PlacementState.NO_FILL, placementIds);
+            });
+        } else {
+            this.setPlacementStates(PlacementState.NO_FILL, placementIds);
         }
     }
 
