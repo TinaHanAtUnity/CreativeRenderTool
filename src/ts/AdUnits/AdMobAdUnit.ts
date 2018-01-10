@@ -21,6 +21,7 @@ export class AdMobAdUnit extends AbstractAdUnit {
     private _operativeEventManager: OperativeEventManager;
     private _view: AdMobView;
     private _thirdPartyEventManager: ThirdPartyEventManager;
+    private _focusManager: FocusManager;
     private _options: any;
     private _keyDownListener: (kc: number) => void;
     private _campaign: AdMobCampaign;
@@ -30,7 +31,6 @@ export class AdMobAdUnit extends AbstractAdUnit {
     private _startTime: number;
 
     private _onSystemKillObserver: () => void;
-    private _onSystemInterruptObserver: (isBackground: boolean) => void;
     private _onPauseObserver: () => void;
     private _onResumeObserver: () => void;
 
@@ -41,6 +41,7 @@ export class AdMobAdUnit extends AbstractAdUnit {
         this._options = parameters.options;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._operativeEventManager = parameters.operativeEventManager;
+        this._focusManager = parameters.focusManager;
         this._keyDownListener = (kc: number) => this.onKeyDown(kc);
         this._campaign = parameters.campaign;
         this._placement = parameters.placement;
@@ -184,17 +185,25 @@ export class AdMobAdUnit extends AbstractAdUnit {
     }
 
     private subscribeToLifecycle() {
-        this._onSystemInterruptObserver = this._container.onSystemInterrupt.subscribe((isBackground) => isBackground ? this.onAppBackground() : this.onAppForeground());
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
-        this._onResumeObserver = this._container.onShow.subscribe(() => this.onAppForeground());
-        this._onPauseObserver = this._container.onAndroidPause.subscribe(() => this.onAppBackground());
+        if (this._nativeBridge.getPlatform() === Platform.IOS) {
+            this._onPauseObserver = this._focusManager.onAppBackground.subscribe(() => this.onAppBackground());
+            this._onResumeObserver = this._focusManager.onAppForeground.subscribe(() => this.onAppForeground());
+        } else {
+            this._onResumeObserver = this._container.onShow.subscribe(() => this.onAppForeground());
+            this._onPauseObserver = this._container.onAndroidPause.subscribe(() => this.onAppBackground());
+        }
     }
 
     private unsubscribeFromLifecycle() {
-        this._container.onSystemInterrupt.unsubscribe(this._onSystemInterruptObserver);
         this._container.onSystemKill.unsubscribe(this._onSystemKillObserver);
-        this._container.onShow.unsubscribe(this._onResumeObserver);
-        this._container.onAndroidPause.unsubscribe(this._onPauseObserver);
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            this._focusManager.onAppBackground.unsubscribe(this._onPauseObserver);
+            this._focusManager.onAppForeground.unsubscribe(this._onResumeObserver);
+        } else {
+            this._container.onShow.unsubscribe(this._onResumeObserver);
+            this._container.onAndroidPause.unsubscribe(this._onPauseObserver);
+        }
     }
 
     private onAppForeground() {
