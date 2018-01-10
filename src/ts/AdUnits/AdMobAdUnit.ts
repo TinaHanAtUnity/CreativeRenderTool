@@ -21,9 +21,7 @@ export class AdMobAdUnit extends AbstractAdUnit {
     private _operativeEventManager: OperativeEventManager;
     private _view: AdMobView;
     private _thirdPartyEventManager: ThirdPartyEventManager;
-    private _focusManager: FocusManager;
     private _options: any;
-    private _onSystemKillObserver: any;
     private _keyDownListener: (kc: number) => void;
     private _campaign: AdMobCampaign;
     private _placement: Placement;
@@ -31,10 +29,10 @@ export class AdMobAdUnit extends AbstractAdUnit {
     private _foregroundTime: number;
     private _startTime: number;
 
-    private _onAppForeground: () => void;
-    private _onAppBackground: () => void;
-    private _onActivityResumed: (activity: string) => void;
-    private _onActivityPaused: (activity: string) => void;
+    private _onSystemKillObserver: () => void;
+    private _onSystemInterruptObserver: (isBackground: boolean) => void;
+    private _onPauseObserver: () => void;
+    private _onResumeObserver: () => void;
 
     constructor(nativeBridge: NativeBridge, parameters: IAdMobAdUnitParameters) {
         super(nativeBridge, parameters);
@@ -46,7 +44,6 @@ export class AdMobAdUnit extends AbstractAdUnit {
         this._keyDownListener = (kc: number) => this.onKeyDown(kc);
         this._campaign = parameters.campaign;
         this._placement = parameters.placement;
-        this._focusManager = parameters.focusManager;
 
         // TODO, we skip initial because the AFMA grantReward event tells us the video
         // has been completed. Is there a better way to do this with AFMA right now?
@@ -65,7 +62,6 @@ export class AdMobAdUnit extends AbstractAdUnit {
             this._nativeBridge.AndroidAdUnit.onKeyDown.subscribe(this._keyDownListener);
         }
 
-        this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
         this.subscribeToLifecycle();
 
         return this._container.open(this, false, true, this._forceOrientation, true, false, true, false, this._options).then(() => {
@@ -188,17 +184,17 @@ export class AdMobAdUnit extends AbstractAdUnit {
     }
 
     private subscribeToLifecycle() {
-        this._onAppForeground = this._focusManager.onAppForeground.subscribe(() => this.onAppForeground());
-        this._onAppBackground = this._focusManager.onAppBackground.subscribe(() => this.onAppBackground());
-        this._onActivityResumed = this._focusManager.onActivityResumed.subscribe((activity) => this.onActivityResumed(activity));
-        this._onActivityPaused = this._focusManager.onActivityPaused.subscribe((activity) => this.onActivityPaused(activity));
+        this._onSystemInterruptObserver = this._container.onSystemInterrupt.subscribe((isBackground) => isBackground ? this.onAppBackground() : this.onAppForeground());
+        this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
+        this._onResumeObserver = this._container.onShow.subscribe(() => this.onAppForeground());
+        this._onPauseObserver = this._container.onAndroidPause.subscribe(() => this.onAppBackground());
     }
 
     private unsubscribeFromLifecycle() {
-        this._focusManager.onAppForeground.unsubscribe(this._onAppForeground);
-        this._focusManager.onAppBackground.unsubscribe(this._onAppBackground);
-        this._focusManager.onActivityResumed.unsubscribe(this._onActivityResumed);
-        this._focusManager.onActivityPaused.unsubscribe(this._onActivityPaused);
+        this._container.onSystemInterrupt.unsubscribe(this._onSystemInterruptObserver);
+        this._container.onSystemKill.unsubscribe(this._onSystemKillObserver);
+        this._container.onShow.unsubscribe(this._onResumeObserver);
+        this._container.onAndroidPause.unsubscribe(this._onPauseObserver);
     }
 
     private onAppForeground() {
