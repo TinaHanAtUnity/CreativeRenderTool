@@ -19,6 +19,7 @@ import { Url } from 'Utilities/Url';
 
 import { unity_proto } from '../../../../proto/unity_proto.js';
 import * as protobuf from 'protobufjs/minimal';
+import { SdkStats } from 'Utilities/SdkStats';
 
 const resolveAfter = (timeout: number): Promise<void> => {
     return new Promise((resolve, reject) => setTimeout(resolve, timeout));
@@ -105,12 +106,13 @@ describe('AdMobEventHandler', () => {
     });
 
     describe('on click', () => {
-        const stubTime = Date.now();
-        const startTime = stubTime - 1000;
+        const startTime = Date.now();
+        const requestTime = startTime - 1000;
         let clock: sinon.SinonFakeTimers;
 
         beforeEach(() => {
-            clock = sinon.useFakeTimers(stubTime);
+            clock = sinon.useFakeTimers(requestTime);
+            SdkStats.setAdRequestTimestamp();
         });
 
         afterEach(() => {
@@ -155,7 +157,7 @@ describe('AdMobEventHandler', () => {
                 if (!param) {
                     throw new Error('Expected param not to be null');
                 }
-                assert.equal(param, (stubTime - startTime).toString());
+                assert.equal(param, (startTime - requestTime).toString());
             });
         });
     });
