@@ -1,7 +1,34 @@
 <script>
     (function() {
+        var touches = [];
+
         window.addEventListener('pageshow', function() {
             AFMA_ReceiveMessage('onshow');
+        });
+
+        var startTouch;
+        var endTouch;
+        var touchStartTime;
+        var upCounts = 0;
+        var downCounts = 0;
+        var moveCounts = 0;
+        var cancelCounts = 0;
+
+        document.addEventListener('touchstart', function(e) {
+            touchStartTime = Date.now();
+            startTouch = e.touches[0];
+            downCounts++;
+        });
+        document.addEventListener('touchend', function(e) {
+            var duration = Date.now() - touchStartTime;
+            endTouch = e.touches[0];
+            upCounts++;
+        });
+        document.addEventListener('touchmove', function(e) {
+            moveCounts++;
+        });
+        document.addEventListener('touchcancel', function(e) {
+            cancelCounts++;
         });
 
         window.addEventListener('message', function(e) {
@@ -25,6 +52,24 @@
             this.click = function(url) {
                 this.postMessage('click', {
                     url: url,
+                    touch: {
+                        start: {
+                            x: startTouch.clientX,
+                            y: startTouch.clientY
+                        },
+                        end: {
+                            x: endTouch.clientX,
+                            y: endTouch.clientY
+                        },
+                        diameter: endTouch.radiusX * 2,
+                        pressure: endTouch.force || 0.0,
+                        counts: {
+                            up: upCounts,
+                            down: downCounts,
+                            move: moveCounts,
+                            cancel: cancelCounts
+                        }
+                    }
                 });
             };
 

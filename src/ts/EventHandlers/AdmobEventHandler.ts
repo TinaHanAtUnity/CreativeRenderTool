@@ -11,6 +11,7 @@ import { Session } from 'Models/Session';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { Url } from 'Utilities/Url';
 import { SdkStats } from 'Utilities/SdkStats';
+import { ITouchInfo } from 'Views/AFMABridge';
 
 export interface IAdMobEventHandlerParameters {
     adUnit: AdMobAdUnit;
@@ -65,8 +66,8 @@ export class AdMobEventHandler implements IAdMobEventHandler {
         }
     }
 
-    public onAttribution(url: string): Promise<void> {
-        return this.createClickUrl(url).then((clickUrl) => {
+    public onAttribution(url: string, touchInfo: ITouchInfo): Promise<void> {
+        return this.createClickUrl(url, touchInfo).then((clickUrl) => {
             return new Promise<void>((resolve, reject) => {
                 this._thirdPartyEventManager.sendEvent('admob click', this._session.getId(), clickUrl, true).then(() => resolve()).catch(reject);
             });
@@ -101,9 +102,19 @@ export class AdMobEventHandler implements IAdMobEventHandler {
         this._adUnit.hide();
     }
 
-    private createClickUrl(url: string): Promise<string> {
+    private createClickUrl(url: string, touchInfo: ITouchInfo): Promise<string> {
         return this._adMobSignalFactory.getClickSignal().then((signal) => {
             signal.setTimeOnScreen(this._adUnit.getTimeOnScreen());
+            signal.setTouchDiameter(touchInfo.diameter);
+            signal.setTouchPressure(touchInfo.pressure);
+            signal.setTouchXDown(touchInfo.start.x);
+            signal.setTouchYDown(touchInfo.start.y);
+            signal.setTouchXUp(touchInfo.end.x);
+            signal.setTouchYUp(touchInfo.end.y);
+            signal.setTouchDownTotal(touchInfo.counts.down);
+            signal.setTouchUpTotal(touchInfo.counts.up);
+            signal.setTouchMoveTotal(touchInfo.counts.move);
+            signal.setTouchCancelTotal(touchInfo.counts.cancel);
             return Url.addParameters(url, {
                 ms: signal.getBase64ProtoBufNonEncoded(),
                 rdvt: this._adUnit.getStartTime() - SdkStats.getAdRequestTimestamp()

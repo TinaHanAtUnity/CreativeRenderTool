@@ -20,6 +20,7 @@ import { Url } from 'Utilities/Url';
 import { unity_proto } from '../../../../proto/unity_proto.js';
 import * as protobuf from 'protobufjs/minimal';
 import { SdkStats } from 'Utilities/SdkStats';
+import { ITouchInfo } from 'Views/AFMABridge';
 
 const resolveAfter = (timeout: number): Promise<void> => {
     return new Promise((resolve, reject) => setTimeout(resolve, timeout));
@@ -109,6 +110,24 @@ describe('AdMobEventHandler', () => {
         const startTime = Date.now();
         const requestTime = startTime - 1000;
         let clock: sinon.SinonFakeTimers;
+        const touch = <ITouchInfo>{
+            start: {
+                x: 0.0,
+                y: 0.0
+            },
+            end: {
+                x: 1.0,
+                y: 1.0
+            },
+            diameter: 1.0,
+            pressure: 0.5,
+            counts: {
+                up: 1,
+                down: 1,
+                cancel: 2,
+                move: 5
+            }
+        };
 
         beforeEach(() => {
             clock = sinon.useFakeTimers(requestTime);
@@ -126,7 +145,7 @@ describe('AdMobEventHandler', () => {
             (<sinon.SinonStub>thirdPartyEventManager.sendEvent).returns(Promise.resolve());
             const url = 'http://unityads.unity3d.com';
 
-            return admobEventHandler.onAttribution(url).then(() => {
+            return admobEventHandler.onAttribution(url, touch).then(() => {
                 const call = (<sinon.SinonStub>thirdPartyEventManager.sendEvent).getCall(0);
                 const calledUrl = call.args[2];
                 const param = Url.getQueryParameter(calledUrl, 'ms');
@@ -150,7 +169,7 @@ describe('AdMobEventHandler', () => {
             (<sinon.SinonStub>thirdPartyEventManager.sendEvent).returns(Promise.resolve());
             const url = 'http://unityads.unity3d.com';
 
-            return admobEventHandler.onAttribution(url).then(() => {
+            return admobEventHandler.onAttribution(url, touch).then(() => {
                 const call = (<sinon.SinonStub>thirdPartyEventManager.sendEvent).getCall(0);
                 const calledUrl = call.args[2];
                 const param = Url.getQueryParameter(calledUrl, 'rdvt');
