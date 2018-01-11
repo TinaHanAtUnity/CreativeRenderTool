@@ -1,3 +1,8 @@
+# PENDING
+
+* Send auction_invalid_json diagnostic message when auction response JSON parsing fails
+* Handle Cache.getFilePath FILE_NOT_FOUND error in auction_request_failed diagnostic message
+
 # Wed Jan 10 18:52:53 UTC 2018
 
 * Recreate ad request parameters when retrying with connectivity events
