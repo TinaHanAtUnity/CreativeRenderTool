@@ -132,10 +132,13 @@ export class CampaignManager {
                     retryWithConnectionEvents: false
                 });
             }).then(response => {
-                if (response) {
+                if(response) {
                     SdkStats.setAdRequestDuration(Date.now() - requestTimestamp);
                     SdkStats.increaseAdRequestOrdinal();
-                    return this.parseCampaigns(response);
+                    this._rawResponse = response.response;
+                    return this.parseCampaigns(response).catch((e) => {
+                        this.handleError(e, this._configuration.getPlacementIds());
+                    });
                 }
                 throw new WebViewError('Empty campaign response', 'CampaignRequestError');
             }).then(() => {
@@ -170,7 +173,15 @@ export class CampaignManager {
     }
 
     private parseCampaigns(response: INativeResponse): Promise<void[]> {
-        const json = JsonParser.parse(response.response);
+        let json;
+        try {
+            json = JsonParser.parse(response.response);
+        } catch (e) {
+            Diagnostics.trigger('auction_invalid_json', {
+                response: response.response
+            });
+            return Promise.reject(new Error('Could not parse campaign JSON: ' + e.message));
+        }
 
         if(!json.auctionId) {
             throw new Error('No auction ID found');
