@@ -16,7 +16,16 @@ body.portrait #end-screen.combined-end-screen {
   }
 
   .underlay {
-    height: 50%;
+    height: 45%;
+  }
+
+  .download-container {
+    top: $combined-end-screen-size * .5;
+  }
+
+  .row-container {
+    bottom: $combined-end-screen-size * 1.5;
+
   }
 }
 
@@ -39,7 +48,6 @@ body.portrait #end-screen.combined-end-screen {
 
   /* iOS 8 fix */
   .row-container {
-    bottom: $combined-end-screen-size * .25 * -1;
     z-index: 20;
   }
 
@@ -113,6 +121,7 @@ body.portrait #end-screen.combined-end-screen {
         right: 0;
         bottom: 0;
         left: 0;
+        height: 105%;
         background-image: linear-gradient(rgba(255, 255, 255, 0), $black 80%);
         content: "";
       }
@@ -126,12 +135,6 @@ body.portrait #end-screen.combined-end-screen {
 
     .store-container {
       margin-top: $combined-end-screen-size * .25;
-    }
-
-    .store-icon {
-      $set-image($combined-end-screen-size * 5, $combined-end-screen-size * 3.5, 0, "../img/apple-store-logo.png", contain);
-      position: relative;
-      margin: 0 auto;
     }
   }
 }
