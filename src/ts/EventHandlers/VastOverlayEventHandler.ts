@@ -11,8 +11,8 @@ import { ViewController } from 'AdUnits/Containers/ViewController';
 
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _vastAdUnit: VastAdUnit;
-    private _request: Request;
     private _clientInfo: ClientInfo;
+    private _request: Request;
     private _vastCampaign: VastCampaign;
     private _paused: boolean = false;
 

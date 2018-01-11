@@ -1,6 +1,5 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
-import { IEndScreenDownloadParameters } from "EventHandlers/EndScreenEventHandler";
 
 export interface IOverlayHandler {
     onOverlaySkip(position: number): void;
@@ -8,7 +7,6 @@ export interface IOverlayHandler {
     onOverlayPauseForTesting(paused: boolean): void;
     onOverlayCallButton(): void;
     onOverlayClose(): void;
-    onEndScreenDownload?(parameters: IEndScreenDownloadParameters): void;
 }
 
 export abstract class AbstractOverlay extends View<IOverlayHandler> {
