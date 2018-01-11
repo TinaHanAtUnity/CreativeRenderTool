@@ -1,4 +1,4 @@
-# PENDING
+# Wed Jan 10 18:52:53 UTC 2018
 
 * Recreate ad request parameters when retrying with connectivity events
 * Fixes for AdMob spam signals for screen width, screen height and app installer
