@@ -1,3 +1,15 @@
+# Wed Jan 10 18:52:53 UTC 2018
+
+* Recreate ad request parameters when retrying with connectivity events
+* Fixes for AdMob spam signals for screen width, screen height and app installer
+
+# Tue Jan  9 12:32:29 UTC 2018
+
+* Switch to server-side auction ID
+* Stop refreshing ads when Unity ad unit activity resumes
+* Fix overlay width and height on iPhone X
+* Use env() css function for layout safety margins in iOS 11.2
+
 # Mon Jan  8 08:56:05 UTC 2018
 
 * Remove xmas theme

@@ -31,6 +31,7 @@ import { CampaignParser } from 'Parsers/CampaignParser';
 import { ProgrammaticVPAIDParser } from 'Parsers/ProgrammaticVPAIDParser';
 import { AdMobSignalFactory} from 'AdMob/AdMobSignalFactory';
 import { Diagnostics } from 'Utilities/Diagnostics';
+import { RequestError } from 'Errors/RequestError';
 
 export class CampaignManager {
 
@@ -66,6 +67,7 @@ export class CampaignManager {
     public readonly onCampaign = new Observable2<string, Campaign>();
     public readonly onNoFill = new Observable1<string>();
     public readonly onError = new Observable3<WebViewError, string[], Session | undefined>();
+    public readonly onConnectivityError = new Observable1<string[]>();
     public readonly onAdPlanReceived = new Observable2<number, number>();
 
     protected _nativeBridge: NativeBridge;
@@ -109,42 +111,47 @@ export class CampaignManager {
             delete this._rawResponse;
         }
 
-        return this._sessionManager.create().then((session) => {
-            return Promise.all([this.createRequestUrl(session), this.createRequestBody(nofillRetry)]).then(([requestUrl, requestBody]) => {
-                this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
-                const body = JSON.stringify(requestBody);
-                SdkStats.setAdRequestTimestamp();
-                const requestTimestamp: number = Date.now();
-                return Promise.resolve().then((): Promise<INativeResponse> => {
-                    if(CampaignManager.CampaignResponse) {
-                        return Promise.resolve({
-                            url: requestUrl,
-                            response: CampaignManager.CampaignResponse,
-                            responseCode: 200,
-                            headers: []
-                        });
-                    }
-                    return this._request.post(requestUrl, body, [], {
-                        retries: 2,
-                        retryDelay: 10000,
-                        followRedirects: false,
-                        retryWithConnectionEvents: true
+        return Promise.all([this.createRequestUrl(), this.createRequestBody(nofillRetry)]).then(([requestUrl, requestBody]) => {
+            this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
+            const body = JSON.stringify(requestBody);
+            SdkStats.setAdRequestTimestamp();
+            const requestTimestamp: number = Date.now();
+            return Promise.resolve().then((): Promise<INativeResponse> => {
+                if(CampaignManager.CampaignResponse) {
+                    return Promise.resolve({
+                        url: requestUrl,
+                        response: CampaignManager.CampaignResponse,
+                        responseCode: 200,
+                        headers: []
                     });
-                }).then(response => {
-                    if(response) {
-                        SdkStats.setAdRequestDuration(Date.now() - requestTimestamp);
-                        SdkStats.increaseAdRequestOrdinal();
-                        this._rawResponse = response.response;
-                        session.setAdPlan(this._rawResponse);
-                        return this.parseCampaigns(response, session);
-                    }
-                    throw new WebViewError('Empty campaign response', 'CampaignRequestError');
-                }).then(() => {
-                    this._requesting = false;
-                }).catch((error) => {
-                    this._requesting = false;
-                    return this.handleError(error, this._configuration.getPlacementIds(), session);
+                }
+                return this._request.post(requestUrl, body, [], {
+                    retries: 2,
+                    retryDelay: 10000,
+                    followRedirects: false,
+                    retryWithConnectionEvents: false
                 });
+            }).then(response => {
+                if(response) {
+                    SdkStats.setAdRequestDuration(Date.now() - requestTimestamp);
+                    SdkStats.increaseAdRequestOrdinal();
+                    this._rawResponse = response.response;
+                    return this.parseCampaigns(response).catch((e) => {
+                        this.handleError(e, this._configuration.getPlacementIds());
+                    });
+                }
+                throw new WebViewError('Empty campaign response', 'CampaignRequestError');
+            }).then(() => {
+                this._requesting = false;
+            }).catch((error) => {
+                this._requesting = false;
+                if(error instanceof RequestError) {
+                    if(!(<RequestError>error).nativeResponse) {
+                        this.onConnectivityError.trigger(this._configuration.getPlacementIds());
+                        return Promise.resolve();
+                    }
+                }
+                return this.handleError(error, this._configuration.getPlacementIds());
             });
         });
     }
@@ -165,8 +172,24 @@ export class CampaignManager {
         });
     }
 
-    private parseCampaigns(response: INativeResponse, session: Session): Promise<void[]> {
-        const json = JsonParser.parse(response.response);
+    private parseCampaigns(response: INativeResponse): Promise<void[]> {
+        let json;
+        try {
+            json = JsonParser.parse(response.response);
+        } catch (e) {
+            Diagnostics.trigger('auction_invalid_json', {
+                response: response.response
+            });
+            return Promise.reject(new Error('Could not parse campaign JSON: ' + e.message));
+        }
+
+        if(!json.auctionId) {
+            throw new Error('No auction ID found');
+        }
+
+        const session: Session = this._sessionManager.create(json.auctionId);
+        session.setAdPlan(response.response);
+
         if('placements' in json) {
             const fill: { [mediaId: string]: string[] } = {};
             const noFill: string[] = [];
@@ -297,7 +320,7 @@ export class CampaignManager {
         return Promise.resolve();
     }
 
-    private handleError(error: any, placementIds: string[], session: Session): Promise<void> {
+    private handleError(error: any, placementIds: string[], session?: Session): Promise<void> {
         this._nativeBridge.Sdk.logDebug('PLC error ' + error);
         this.onError.trigger(error, placementIds, session);
 
@@ -316,7 +339,7 @@ export class CampaignManager {
         return CampaignManager.AbGroup ? CampaignManager.AbGroup : this._configuration.getAbGroup();
     }
 
-    private createRequestUrl(session: Session): Promise<string> {
+    private createRequestUrl(): Promise<string> {
         let url: string = this.getBaseUrl();
 
         if(this._deviceInfo.getAdvertisingIdentifier()) {
@@ -331,7 +354,6 @@ export class CampaignManager {
         }
 
         url = Url.addParameters(url, {
-            auctionId: session.getId(),
             deviceMake: this._deviceInfo.getManufacturer(),
             deviceModel: this._deviceInfo.getModel(),
             platform: Platform[this._clientInfo.getPlatform()].toLowerCase(),
