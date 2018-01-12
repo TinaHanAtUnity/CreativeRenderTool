@@ -107,7 +107,6 @@
 | advertisingTrackingId | no | True | False | string | Advertising identifier in raw format | SDK | all |
 | limitAdTracking | no | True | False | boolean | boolean if user has limited tracking or not | SDK | all |
 | androidId | no | True | False | string | Android ID | SDK | android |
-| auctionId | all | True | False | string | Unique identifier for joining ad requests and operative events. This identifies one ad unit lifecycle so e.g. ad request, start and end events share same auctionId. | SDK | all |
 | deviceMake | android | True | False | string | Android device manufacturer | SDK | android |
 | deviceModel | all | True | False | string | Android or iOS device model, example 'iPhone7,1' | SDK | all |
 | platform | all | True | False | string | "android" or "ios" | SDK | all |

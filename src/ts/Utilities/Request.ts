@@ -60,8 +60,13 @@ export class Request {
         return sc >= 200 && sc < 300;
     }
 
+    public static is3xxRedirect(sc: number): boolean {
+        return sc >= 300 && sc < 400;
+    }
+
     private static _connectTimeout = 30000;
     private static _readTimeout = 30000;
+    private static _redirectLimit = 10;
 
     private static _callbackId: number = 1;
     private static _callbacks: { [key: number]: CallbackContainer<INativeResponse> } = {};
@@ -149,20 +154,24 @@ export class Request {
 
     // Follows the redirects of a URL, returning the final location.
     public followRedirectChain(url: string, resolveOnHttpError = false): Promise<string> {
+        let redirectCount = 0;
         return new Promise((resolve, reject) => {
             const makeRequest = (requestUrl: string) => {
+                redirectCount++;
                 requestUrl = requestUrl.trim();
-                if (requestUrl.indexOf('http') === -1) {
+                if (redirectCount >= Request._redirectLimit) {
+                    reject(new Error('redirect limit reached'));
+                } else if (requestUrl.indexOf('http') === -1) {
                     // market:// or itunes:// urls can be opened directly
                     resolve(requestUrl);
                 } else {
                     this.head(requestUrl).then((response: INativeResponse) => {
-                        if (response.responseCode === 302) {
+                        if (Request.is3xxRedirect(response.responseCode)) {
                             const location = Request.getHeader(response.headers, 'location');
                             if (location) {
                                 makeRequest(location);
                             } else {
-                                reject(new Error('302 Found did not have a "Location" header'));
+                                reject(new Error(`${response.responseCode} response did not have a "Location" header`));
                             }
                         } else if (Request.is2xxSuccessful(response.responseCode)) {
                             resolve(requestUrl);
