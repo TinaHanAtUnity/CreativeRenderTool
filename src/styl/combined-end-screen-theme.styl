@@ -7,6 +7,21 @@ body.landscape #end-screen.combined-end-screen {
   .underlay {
     width: 50%;
   }
+
+  /* ios8 fix */
+  .end-screen-info-background {
+    position: absolute;
+    left: 50%;
+  }
+
+  .unityads-logo {
+    width: 100%;
+  }
+
+  .privacy-button {
+    left: 0;
+  }
+  /* end ios8 fix */
 }
 
 body.portrait #end-screen.combined-end-screen {
@@ -122,12 +137,6 @@ body.portrait #end-screen.combined-end-screen {
         background-image: linear-gradient(rgba(255, 255, 255, 0), $black 80%);
         content: "";
       }
-    }
-
-    .unityads-logo {
-      bottom: 0;
-      height: $combined-end-screen-size * 1.5;
-      background-image: url("../img/unityads-white.png");
     }
 
     .store-container {
