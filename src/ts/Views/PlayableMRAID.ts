@@ -9,7 +9,6 @@ import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
-import { CustomFeatures } from 'Utilities/CustomFeatures';
 
 export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -327,10 +326,6 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                         }
                         break;
                     case 'showEndScreen':
-                        const resourceUrl = this._campaign.getResourceUrl();
-                        if(resourceUrl && CustomFeatures.isPlayableEndScreenTest(this._campaign.getAbGroup(), resourceUrl.getOriginalUrl())) {
-                            this._handlers.forEach(handler => handler.onMraidShowEndScreen());
-                        }
                         break;
                     default:
                         break;
