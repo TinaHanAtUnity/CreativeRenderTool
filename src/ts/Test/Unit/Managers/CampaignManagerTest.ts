@@ -67,6 +67,7 @@ import OnStaticInterstitialDisplayCampaignNoClickMarkupUrl from 'json/OnStaticIn
 import { ProgrammaticVastParser } from 'Parsers/ProgrammaticVastParser';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { AdMobSignal } from 'Models/AdMobSignal';
+import {XPromoCampaign} from "../../../Models/Campaigns/XPromoCampaign";
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -1039,7 +1040,7 @@ describe('CampaignManager', () => {
                     }
 
                     mockRequest.verify();
-                    assert.isTrue(triggeredCampaign instanceof PerformanceCampaign);
+                    assert.isTrue(triggeredCampaign instanceof XPromoCampaign);
                     assert.equal(triggeredPlacement, 'video');
                     assert.equal(triggeredCampaign.getGamerId(), '57a35671bb58271e002d93c9');
                     assert.equal(triggeredCampaign.getAbGroup(), 99);
