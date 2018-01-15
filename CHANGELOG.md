@@ -1,3 +1,9 @@
+# Thu Jan 11 17:49:27 UTC 2018
+
+* Send auction_invalid_json diagnostic message when auction response JSON parsing fails
+* Handle Cache.getFilePath FILE_NOT_FOUND error in auction_request_failed diagnostic message
+* Fix creative test app to work with latest auction ID changes
+
 # Wed Jan 10 18:52:53 UTC 2018
 
 * Recreate ad request parameters when retrying with connectivity events

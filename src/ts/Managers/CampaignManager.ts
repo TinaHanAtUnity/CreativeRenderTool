@@ -32,6 +32,7 @@ import { ProgrammaticVPAIDParser } from 'Parsers/ProgrammaticVPAIDParser';
 import { AdMobSignalFactory} from 'AdMob/AdMobSignalFactory';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { RequestError } from 'Errors/RequestError';
+import { CacheError } from 'Native/Api/Cache';
 
 export class CampaignManager {
 
@@ -244,6 +245,9 @@ export class CampaignManager {
                                 return Promise.resolve();
                             } else if(error === CacheStatus.FAILED) {
                                 return this.handleError(new WebViewError('Caching failed', 'CacheStatusFailed'), fill[mediaId], session);
+                            } else if(error === CacheError[CacheError.FILE_NOT_FOUND]) {
+                                // handle native API Cache.getFilePath failure (related to Android cache directory problems?)
+                                return this.handleError(new WebViewError('Getting file path failed', 'GetFilePathFailed'), fill[mediaId], session);
                             }
 
                             return this.handleError(error, fill[mediaId], session);
