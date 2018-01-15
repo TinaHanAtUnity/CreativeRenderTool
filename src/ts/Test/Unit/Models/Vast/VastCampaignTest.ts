@@ -12,7 +12,7 @@ describe('VastCampaign', () => {
     it('should return default cache TTL of 1 hour represented in seconds', () => {
         const vast = new Vast([], []);
         sinon.stub(vast, 'getVideoUrl').returns('https://video.url');
-        const campaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 1);
+        const campaign = TestFixtures.getEventVastCampaign();
         const willExpireAt = campaign.getWillExpireAt();
         assert.isDefined(willExpireAt, 'Will expire at should be defined');
         if(willExpireAt) {
@@ -24,7 +24,7 @@ describe('VastCampaign', () => {
     it('should return default cache TTL represented in seconds if server provides TTL of 0', () => {
         const vast = new Vast([], []);
         sinon.stub(vast, 'getVideoUrl').returns('https://video.url');
-        const campaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 1, 0);
+        const campaign = TestFixtures.getEventVastCampaign();
         const willExpireAt = campaign.getWillExpireAt();
         assert.isDefined(willExpireAt, 'Will expire at should be defined');
         if(willExpireAt) {
@@ -52,7 +52,7 @@ describe('VastCampaign', () => {
         };
         const vast = new Vast([], []);
         sinon.stub(vast, 'getVideoUrl').returns('https://video.url');
-        const campaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), json.gamerId, json.abGroup, json.cacheTTL);
+        const campaign = TestFixtures.getEventVastCampaign();
         const willExpireAt = campaign.getWillExpireAt();
         assert.isDefined(willExpireAt, 'Will expire at should be defined');
         if(willExpireAt) {
@@ -65,14 +65,14 @@ describe('VastCampaign', () => {
         it('should have an endscreen when VAST has portrait or landscape url', () => {
             const vastParser = TestFixtures.getVastParser();
             const vast = vastParser.parseVast(VastCompanionXml);
-            const vastCampaign = new VastCampaign(vast, '12345', TestFixtures.getSession(), 'gamerId', 1);
+            const vastCampaign = TestFixtures.getEventVastCampaign();
             assert.equal(vastCampaign.hasEndscreen(), true);
         });
 
         it('should not have an endscreen when both portrait and landscape urls missing', () => {
             const vastParser = TestFixtures.getVastParser();
             const vast = vastParser.parseVast(VastCompanionAdWithoutImagesXml);
-            const vastCampaign = new VastCampaign(vast, '12345', TestFixtures.getSession(), 'gamerId', 1);
+            const vastCampaign = TestFixtures.getEventVastCampaign();
             assert.equal(vastCampaign.hasEndscreen(), false);
         });
     });

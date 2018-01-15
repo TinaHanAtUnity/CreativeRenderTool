@@ -72,7 +72,8 @@ describe('VPAIDEventHandlerTest', () => {
             muteVideo: false
         });
 
-        campaign = new VPAIDCampaign(vpaid, TestFixtures.getSession(), vpaidCampaignJson.campaignId, vpaidCampaignJson.gamerId, vpaidCampaignJson.abGroup);
+        campaign = TestFixtures.getVPAIDCampaign();
+        // campaign = new VPAIDCampaign(vpaid, TestFixtures.getSession(), vpaidCampaignJson.campaignId, vpaidCampaignJson.gamerId, vpaidCampaignJson.abGroup);
         vpaidView = new VPAID(nativeBridge, campaign, placement, 'en', 'TestGameId');
 
         const sessionManager = new SessionManager(nativeBridge);

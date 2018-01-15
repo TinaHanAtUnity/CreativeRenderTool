@@ -83,7 +83,7 @@ export class TestFixtures {
 
     public static getPerformanceCampaignParams(json: any, storeName: StoreName): IPerformanceCampaign {
         const session = this.getSession();
-        return {
+        const parameters: IPerformanceCampaign = {
             ... this.getCometCampaignBaseParams(session, json.id, this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup(), undefined),
             appStoreId: json.appStoreId,
             gameId: json.gameId,
@@ -100,6 +100,18 @@ export class TestFixtures {
             bypassAppSheet: json.bypassAppSheet,
             store: storeName
         };
+
+        if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
+            parameters.video = new Video(json.trailerDownloadable, session, json.trailerDownloadableSize);
+            parameters.streamingVideo = new Video(json.trailerStreaming, session);
+        }
+
+        if(json.trailerPortraitDownloadable && json.trailerPortraitDownloadableSize && json.trailerPortraitStreaming) {
+            parameters.videoPortrait = new Video(json.trailerPortraitDownloadable, session, json.trailerPortraitDownloadableSize);
+            parameters.streamingPortraitVideo = new Video(json.trailerPortraitStreaming, session);
+        }
+
+        return parameters;
     }
 
     public static getPlayableMRAIDCampaignParams(json: any, storeName: StoreName): IMRAIDCampaign {
@@ -150,29 +162,30 @@ export class TestFixtures {
     }
 
     public static getProgrammaticMRAIDCampaignParams(json: any, storeName: StoreName, cacheTTL: number, campaignId: string): IMRAIDCampaign {
-        const mraidJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
+        const mraidContentJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
+        const mraidJson = json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'];
         const session = this.getSession();
 
         return {
             ... this.getProgrammaticMRAIDCampaignBaseParams(this.getSession(), campaignId, this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup(), json),
             willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
-            resourceAsset: mraidJson.inlinedUrl ? new HTML(mraidJson.inlinedUrl, session) : undefined,
+            resourceAsset: mraidContentJson.inlinedUrl ? new HTML(mraidContentJson.inlinedUrl, session) : undefined,
             resource: '<div>resource</div>',
-            dynamicMarkup: mraidJson.dynamicMarkup,
-            additionalTrackingEvents: json.trackingUrls,
-            clickAttributionUrl: mraidJson.clickAttributionUrl,
-            clickAttributionUrlFollowsRedirects: mraidJson.clickAttributionUrlFollowsRedirects,
-            clickUrl: mraidJson.clickUrl ? mraidJson.clickAttributionUrl : undefined,
-            videoEventUrls: mraidJson.videoEventUrls ? mraidJson.videoEventUrls : undefined,
-            gameName: mraidJson.gameName,
-            gameIcon: mraidJson.gameIcon ? new Image(mraidJson.gameIcon, session) : undefined,
-            rating: mraidJson.rating,
-            ratingCount: mraidJson.ratingCount,
-            landscapeImage: mraidJson.endScreenLandscape ? new Image(mraidJson.endScreenLandscape, session) : undefined,
-            portraitImage: mraidJson.endScreenPortrait ? new Image(mraidJson.endScreenPortrait, session) : undefined,
-            bypassAppSheet: mraidJson.bypassAppSheet,
+            dynamicMarkup: mraidContentJson.dynamicMarkup,
+            additionalTrackingEvents: mraidJson.trackingUrls,
+            clickAttributionUrl: mraidContentJson.clickAttributionUrl,
+            clickAttributionUrlFollowsRedirects: mraidContentJson.clickAttributionUrlFollowsRedirects,
+            clickUrl: mraidContentJson.clickUrl ? mraidContentJson.clickAttributionUrl : undefined,
+            videoEventUrls: mraidContentJson.videoEventUrls ? mraidContentJson.videoEventUrls : undefined,
+            gameName: mraidContentJson.gameName,
+            gameIcon: mraidContentJson.gameIcon ? new Image(mraidContentJson.gameIcon, session) : undefined,
+            rating: mraidContentJson.rating,
+            ratingCount: mraidContentJson.ratingCount,
+            landscapeImage: mraidContentJson.endScreenLandscape ? new Image(mraidContentJson.endScreenLandscape, session) : undefined,
+            portraitImage: mraidContentJson.endScreenPortrait ? new Image(mraidContentJson.endScreenPortrait, session) : undefined,
+            bypassAppSheet: mraidContentJson.bypassAppSheet,
             store: storeName,
-            appStoreId: mraidJson.appStoreId
+            appStoreId: mraidContentJson.appStoreId
         };
     }
 
@@ -249,8 +262,8 @@ export class TestFixtures {
 
         return {
             ... baseCampaignParams,
-            clickThroughUrl: json.clickThroughURL,
-            tracking: json.trackingUrls || undefined
+            clickThroughUrl: json.display.clickThroughURL,
+            tracking: json.display.tracking || undefined
         };
     }
 

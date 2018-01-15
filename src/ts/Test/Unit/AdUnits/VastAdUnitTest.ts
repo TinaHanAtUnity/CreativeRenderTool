@@ -70,7 +70,7 @@ describe('VastAdUnit', () => {
         const request = new Request(nativeBridge, wakeUpManager);
         const activity = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        vastCampaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 12);
+        vastCampaign = TestFixtures.getEventVastCampaign();
         const video = vastCampaign.getVideo();
 
         let duration = vastCampaign.getVast().getDuration();
@@ -184,7 +184,7 @@ describe('VastAdUnit', () => {
             vast = new Vast([], []);
             const video = new Video('', TestFixtures.getSession());
             sinon.stub(vast, 'getVideoUrl').returns(video.getUrl());
-            vastCampaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 12);
+            vastCampaign = TestFixtures.getEventVastCampaign();
             sinon.stub(vastCampaign, 'getVideo').returns(video);
             const nativeBridge = TestFixtures.getNativeBridge();
             const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
@@ -283,7 +283,7 @@ describe('VastAdUnit', () => {
             vast = new Vast([], []);
             const video = new Video('', TestFixtures.getSession());
             sinon.stub(vast, 'getVideoUrl').returns(video.getUrl());
-            vastCampaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 12);
+            vastCampaign = TestFixtures.getCompanionVastCampaign();
             sinon.stub(vastCampaign, 'getVideo').returns(video);
             const nativeBridge = TestFixtures.getNativeBridge();
             const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
