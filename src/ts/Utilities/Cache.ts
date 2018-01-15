@@ -393,13 +393,7 @@ export class Cache {
 
     public getFreeSpace(): Promise<number> {
         return this._nativeBridge.Cache.getFreeSpace().then(freeSpace => {
-            if(freeSpace > 0) {
-                return freeSpace;
-            } else {
-                return 0;
-            }
-        }).catch(() => {
-            return 0;
+            return freeSpace;
         });
     }
 

@@ -94,6 +94,8 @@
     }
   }
 
+
+// @stylint off
 /* iPhone X */
 @media only screen and (device-width : 375px) and (device-height : 812px) and (-webkit-device-pixel-ratio : 3) {
   html {
@@ -106,16 +108,29 @@
         padding-left: constant(safe-area-inset-left);
         width: calc(100vw - constant(safe-area-inset-left) - constant(safe-area-inset-right));
         height: calc(100vh - constant(safe-area-inset-top) - constant(safe-area-inset-bottom));
+
+        padding-top: env(safe-area-inset-top);
+        padding-right: env(safe-area-inset-right);
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-left: env(safe-area-inset-left);
+        width: calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right));
+        height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
       }
 
       .close-region {
         top: constant(safe-area-inset-top);
         right: constant(safe-area-inset-right);
+
+        top: env(safe-area-inset-top);
+        right: env(safe-area-inset-right);
       }
 
       .privacy-button {
         bottom: constant(safe-area-inset-bottom);
         left: constant(safe-area-inset-left);
+
+        bottom: env(safe-area-inset-bottom);
+        left: env(safe-area-inset-left);
       }
     }
 
@@ -128,20 +143,34 @@
       width: calc(100% - constant(safe-area-inset-left) - constant(safe-area-inset-right));
       height: calc(100% - constant(safe-area-inset-top) - constant(safe-area-inset-bottom));
 
+      padding-top: env(safe-area-inset-top);
+      padding-right: env(safe-area-inset-right);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+      width: calc(100% - env(safe-area-inset-left) - env(safe-area-inset-right));
+      height: calc(100% - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+
       .btn-close-region {
         top: constant(safe-area-inset-top);
         right: constant(safe-area-inset-right);
+
+        top: env(safe-area-inset-top);
+        right: env(safe-area-inset-right);
       }
 
       .privacy-button {
         bottom: constant(safe-area-inset-bottom);
         left: constant(safe-area-inset-left);
+
+        bottom: env(safe-area-inset-bottom);
+        left: env(safe-area-inset-left);
       }
     }
 
     #end-screen {
       .unityads-logo {
         bottom: constant(safe-area-inset-bottom);
+        bottom: env(safe-area-inset-bottom);
       }
     }
 
@@ -152,6 +181,13 @@
       padding-left: constant(safe-area-inset-left);
       width: calc(100% - constant(safe-area-inset-left) - constant(safe-area-inset-right));
       height: calc(100% - constant(safe-area-inset-top) - constant(safe-area-inset-bottom));
+
+      padding-top: env(safe-area-inset-top);
+      padding-right: env(safe-area-inset-right);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+      width: calc(100% - env(safe-area-inset-left) - env(safe-area-inset-right));
+      height: calc(100% - env(safe-area-inset-top) - env(safe-area-inset-bottom));
     }
 
     #display-interstitial,
@@ -159,33 +195,55 @@
       .close-region {
         top: constant(safe-area-inset-top);
         right: constant(safe-area-inset-right);
+
+        top: env(safe-area-inset-top);
+        right: env(safe-area-inset-right);
       }
     }
 
-    #overlay {
-      .skip-hit-area {
-        padding-top: constant(safe-area-inset-top);
-        padding-left: constant(safe-area-inset-top);
-      }
+    #overlay,
+    #interstitial-overlay {
+      position: absolute;
+      top: constant(safe-area-inset-top);
+      left: constant(safe-area-inset-left);
+      width: calc(100% - constant(safe-area-inset-left) - constant(safe-area-inset-right));
+      height: calc(100% - constant(safe-area-inset-top) - constant(safe-area-inset-bottom));
 
-      .skip {
+      top: env(safe-area-inset-top);
+      left: env(safe-area-inset-left);
+      width: calc(100% - env(safe-area-inset-left) - env(safe-area-inset-right));
+      height: calc(100% - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+
+      .skip-hit-area {
         top: constant(safe-area-inset-top);
         left: constant(safe-area-inset-left);
+
+        top: env(safe-area-inset-top);
+        left: env(safe-area-inset-left);
       }
 
       .progress {
         top: constant(safe-area-inset-top);
         right: constant(safe-area-inset-right);
+
+        top: env(safe-area-inset-top);
+        right: env(safe-area-inset-right);
       }
 
       .mute-button {
         bottom: constant(safe-area-inset-bottom);
         left: constant(safe-area-inset-left);
+
+        bottom: env(safe-area-inset-bottom);
+        left: env(safe-area-inset-left);
       }
 
       .call-button {
         right: constant(safe-area-inset-right);
         bottom: constant(safe-area-inset-bottom);
+
+        right: env(safe-area-inset-right);
+        bottom: env(safe-area-inset-bottom);
       }
     }
   }
@@ -197,5 +255,6 @@
     slide-animation(.4s, ease-in, 250%);
   }
 }
+// @stylint on
 
 
