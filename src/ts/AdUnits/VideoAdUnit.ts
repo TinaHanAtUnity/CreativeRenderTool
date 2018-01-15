@@ -239,6 +239,14 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
             if(this.getVideo().isCached() && this.getVideo().getFileId()) {
                 return this._nativeBridge.Cache.getFileInfo(<string>this.getVideo().getFileId()).then(result => {
                     if(result.found) {
+                        const remoteVideoSize: number | undefined = this.getVideo().getSize();
+                        if(remoteVideoSize && remoteVideoSize !== result.size) {
+                            Diagnostics.trigger('video_size_mismatch', {
+                                remoteVideoSize: remoteVideoSize,
+                                localVideoSize: result.size
+                            }, this._campaign.getSession());
+                        }
+
                         return this.getVideo().getUrl();
                     } else {
                         Diagnostics.trigger('cached_file_not_found', new DiagnosticError(new Error('File not found'), {
