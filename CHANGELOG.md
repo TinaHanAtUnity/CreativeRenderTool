@@ -1,3 +1,9 @@
+# PENDING
+
+* Test combined endscreen on A/B groups 8 and 9
+* Remove Roll the Ball endscreen A/B test
+* Remove random number generator test
+
 # Thu Jan 11 17:49:27 UTC 2018
 
 * Send auction_invalid_json diagnostic message when auction response JSON parsing fails
