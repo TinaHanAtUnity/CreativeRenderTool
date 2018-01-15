@@ -53,7 +53,7 @@ export class ProgrammaticStaticInterstitialUrlParser extends CampaignParser {
 
         const displayInterstitialMarkupUrlParams: IDisplayInterstitialMarkupUrlCampaign = {
             ... displayInterstitialParams,
-            markupUrl: jsonDisplayUrl
+            markupUrl: jsonDisplayUrl.markupUrl
         };
 
         return Promise.resolve(new DisplayInterstitialMarkupUrlCampaign(displayInterstitialMarkupUrlParams));
