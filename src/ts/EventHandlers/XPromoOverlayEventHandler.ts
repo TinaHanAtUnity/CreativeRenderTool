@@ -1,7 +1,7 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { IXPromoAdUnitParameters, XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
 import { OverlayEventHandler } from 'EventHandlers/OverlayEventHandler';
-import { XPromoCampaign } from 'Models/Campaigns/XpromoCampaign';
+import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 
 export class XPromoOverlayEventHandler extends OverlayEventHandler<XPromoCampaign> {
     private _xPromoAdUnit: XPromoAdUnit;
