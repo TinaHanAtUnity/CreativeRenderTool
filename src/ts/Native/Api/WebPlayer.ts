@@ -30,7 +30,13 @@ export enum WebplayerEvent {
     CONSOLE_MESSAGE,
     SHOW_FILE_CHOOSER,
     GEOLOCATION_PERMISSIONS_SHOW,
-    DOWNLOAD_START
+    DOWNLOAD_START,
+    SHOULD_OVERRIDE_URL_LOADING,
+    SHOULD_OVERRIDE_KEY_EVENT,
+    PAGE_COMMIT_VISIBLE,
+    FORM_RESUBMISSION,
+    UNHANDLED_KEY_EVENT,
+    SHOULD_INTERCEPT_REQUEST
 }
 
 export interface IWebPlayerEventSettings {
@@ -61,6 +67,12 @@ export interface IWebPlayerEventSettings {
     onConsoleMessage?: { sendEvent?: boolean, shouldCallSuper?: boolean, getReturnValue?: boolean };
     onShowFileChooser?: { sendEvent?: boolean, shouldCallSuper?: boolean, getReturnValue?: boolean };
     onDownloadStart?: { sendEvent?: boolean, shouldCallSuper?: boolean, getReturnValue?: boolean };
+    shouldOverrideUrlLoading?: { sendEvent?: boolean, shouldCallSuper?: boolean, getReturnValue?: boolean };
+    onPageCommitVisible?: { sendEvent?: boolean, shouldCallSuper?: boolean };
+    shouldInterceptRequest?: { sendEvent?: boolean, shouldCallSuper?: boolean };
+    onFormResubmission?: { sendEvent?: boolean, shouldCallSuper?: boolean };
+    shouldOverrideKeyEvent?: { sendEvent?: boolean, shouldCallSuper?: boolean, getReturnValue?: boolean };
+    onUnhandledKeyEvent?: { sendEvent?: boolean, shouldCallSuper?: boolean };
 }
 
 export interface IWebPlayerWebSettingsAndroid {
