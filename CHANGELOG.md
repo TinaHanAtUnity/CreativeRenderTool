@@ -1,4 +1,4 @@
-# PENDING
+# Tue Jan 16 10:23:28 UTC 2018
 
 * Test combined endscreen on A/B groups 8 and 9
 * Remove Roll the Ball endscreen A/B test
