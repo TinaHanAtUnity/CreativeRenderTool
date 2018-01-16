@@ -1,4 +1,29 @@
-# Pending
+# Tue Jan 16 10:23:28 UTC 2018
+
+* Test combined endscreen on A/B groups 8 and 9
+* Remove Roll the Ball endscreen A/B test
+* Remove random number generator test
+* Send video_size_mismatch diagnostic if comet video size and cached video size are different
+
+# Thu Jan 11 17:49:27 UTC 2018
+
+* Send auction_invalid_json diagnostic message when auction response JSON parsing fails
+* Handle Cache.getFilePath FILE_NOT_FOUND error in auction_request_failed diagnostic message
+* Fix creative test app to work with latest auction ID changes
+
+# Wed Jan 10 18:52:53 UTC 2018
+
+* Recreate ad request parameters when retrying with connectivity events
+* Fixes for AdMob spam signals for screen width, screen height and app installer
+
+# Tue Jan  9 12:32:29 UTC 2018
+
+* Switch to server-side auction ID
+* Stop refreshing ads when Unity ad unit activity resumes
+* Fix overlay width and height on iPhone X
+* Use env() css function for layout safety margins in iOS 11.2
+
+# Mon Jan  8 08:56:05 UTC 2018
 
 * Remove xmas theme
 * Follow all 3xx redirect HTTP status codes and set max limit of redirections to 10

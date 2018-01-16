@@ -22,11 +22,9 @@ export class SessionManager {
         this._nativeBridge = nativeBridge;
     }
 
-    public create(): Promise<Session> {
-        return this._nativeBridge.DeviceInfo.getUniqueEventId().then(id => {
-            this.startNewSession(id);
-            return Promise.resolve(new Session(id));
-        });
+    public create(id: string): Session {
+        this.startNewSession(id);
+        return new Session(id);
     }
 
     public startNewSession(sessionId: string): Promise<any[]> {
