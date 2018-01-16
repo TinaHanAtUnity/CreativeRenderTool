@@ -246,16 +246,6 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         return true;
     }
 
-    public getConfigurationUrl(): string | undefined {
-        const resourceUrl = this.getResourceUrl();
-        if(resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) {
-            return resourceUrl.getOriginalUrl().replace(/index\.html/, 'config.json');
-        } else {
-            return undefined;
-        }
-
-    }
-
     public getDTO(): { [key: string]: any } {
         let resourceUrlDTO: any;
         const resourceUrlAsset = this.getResourceUrl();
