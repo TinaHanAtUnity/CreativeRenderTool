@@ -5,6 +5,7 @@ import { Asset } from 'Models/Assets/Asset';
 import { StoreName } from 'Models/Campaigns/PerformanceCampaign';
 import { Session } from 'Models/Session';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { JSONAsset } from 'Models/Assets/JSONAsset';
 
 export interface IMRAIDCampaign extends ICampaign {
     resourceAsset: HTML | undefined;
@@ -26,6 +27,7 @@ export interface IMRAIDCampaign extends ICampaign {
     bypassAppSheet: boolean | undefined;
     store: StoreName | undefined;
     appStoreId: string | undefined;
+    configurationAsset: JSONAsset | undefined;
 }
 
 export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
@@ -49,6 +51,7 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
             bypassAppSheet: ['boolean', 'undefined'],
             store: ['number', 'undefined'],
             appStoreId: ['string', 'undefined'],
+            configurationAsset: ['object', 'undefined']
         });
 
         this.set('id', campaign.id);
@@ -117,6 +120,10 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
             this.set('landscapeImage', new Image('https://cdn.unityads.unity3d.com/impact/images/130393/4729d640d83d4a18/unityads600x800-b.jpg', session));
             this.set('portraitImage', new Image('https://cdn.unityads.unity3d.com/impact/images/130393/98c14b54d4c51801/unityads800x600-b.jpg', session));
         }
+
+        if(resourceUrl && CustomFeatures.isPlayableConfigurationEnabled(resourceUrl)) {
+            this.set('configurationAsset', new JSONAsset(resourceUrl.replace(/index\.html/, 'config.json'), session));
+        }
     }
 
     public getResourceUrl(): HTML | undefined {
@@ -157,6 +164,10 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
 
     public getLandscape(): Image | undefined {
         return this.get('landscapeImage');
+    }
+
+    public getConfiguration(): JSONAsset | undefined {
+        return this.get('configurationAsset');
     }
 
     public getRequiredAssets() {
@@ -233,6 +244,16 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
             return false;
         }
         return true;
+    }
+
+    public getConfigurationUrl(): string | undefined {
+        const resourceUrl = this.getResourceUrl();
+        if(resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) {
+            return resourceUrl.getOriginalUrl().replace(/index\.html/, 'config.json');
+        } else {
+            return undefined;
+        }
+
     }
 
     public getDTO(): { [key: string]: any } {
