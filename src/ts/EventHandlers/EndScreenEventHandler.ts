@@ -8,13 +8,14 @@ import { Platform } from 'Constants/Platform';
 import { StoreName } from 'Models/Campaigns/PerformanceCampaign';
 import { IosUtils } from 'Utilities/IosUtils';
 import { DeviceInfo } from 'Models/DeviceInfo';
-import { EventType } from 'Models/Session';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { RequestError } from 'Errors/RequestError';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Request } from 'Utilities/Request';
 import { Campaign } from 'Models/Campaign';
 import { Placement } from 'Models/Placement';
+import { Url } from 'Utilities/Url';
+import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 
 export interface IEndScreenDownloadParameters {
     clickAttributionUrl: string | undefined;
@@ -25,7 +26,7 @@ export interface IEndScreenDownloadParameters {
     gamerId: string;
 }
 
-export abstract class EndScreenEventHandler<T extends Campaign, T2 extends AbstractAdUnit<T>> implements IEndScreenHandler {
+export abstract class EndScreenEventHandler<T extends Campaign, T2 extends AbstractAdUnit> implements IEndScreenHandler {
     protected _adUnit: T2;
     private _nativeBridge: NativeBridge;
     private _operativeEventManager: OperativeEventManager;
@@ -74,7 +75,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     private onDownloadAndroid(parameters: IEndScreenDownloadParameters): void {
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
 
-        this._operativeEventManager.sendClick(this._adUnit);
+        this._operativeEventManager.sendClick(this._campaign.getSession(), this._placement, this._campaign, this.getVideoOrientation());
         if(parameters.clickAttributionUrl) {
             this.handleClickAttribution(parameters);
 
@@ -89,7 +90,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     private onDownloadIos(parameters: IEndScreenDownloadParameters): void {
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
 
-        this._operativeEventManager.sendClick(this._adUnit);
+        this._operativeEventManager.sendClick(this._campaign.getSession(), this._placement, this._campaign, this.getVideoOrientation());
         if(parameters.clickAttributionUrl) {
             this.handleClickAttribution(parameters);
 
@@ -103,13 +104,6 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
 
     private handleClickAttribution(parameters: IEndScreenDownloadParameters) {
         const currentSession = this._campaign.getSession();
-        if(currentSession) {
-            if(currentSession.getEventSent(EventType.CLICK_ATTRIBUTION)) {
-                return;
-            }
-            currentSession.setEventSent(EventType.CLICK_ATTRIBUTION);
-        }
-
         const platform = this._nativeBridge.getPlatform();
 
         if(parameters.clickAttributionUrlFollowsRedirects && parameters.clickAttributionUrl) {
@@ -117,10 +111,24 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
                 const location = Request.getHeader(response.headers, 'location');
                 if(location) {
                     if(platform === Platform.ANDROID) {
-                        this._nativeBridge.Intent.launch({
-                            'action': 'android.intent.action.VIEW',
-                            'uri': location
-                        });
+                        const parsedLocation = Url.parse(location);
+                        if(parsedLocation.pathname.match(/\.apk$/i) && this._nativeBridge.getApiLevel() >= 21) {
+                            // Using WEB_SEARCH bypasses some security check for directly downloading .apk files
+                            this._nativeBridge.Intent.launch({
+                                'action': 'android.intent.action.WEB_SEARCH',
+                                'extras': [
+                                    {
+                                        'key': 'query',
+                                        'value': location
+                                    }
+                                ]
+                            });
+                        } else {
+                            this._nativeBridge.Intent.launch({
+                                'action': 'android.intent.action.VIEW',
+                                'uri': location
+                            });
+                        }
                     } else if(platform === Platform.IOS) {
                         this._nativeBridge.UrlScheme.open(location);
                     }
@@ -198,6 +206,14 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
                 });
             }
         }
+    }
+
+    private getVideoOrientation(): string | undefined {
+        if(this._adUnit instanceof PerformanceAdUnit) {
+            return (<PerformanceAdUnit>this._adUnit).getVideoOrientation();
+        }
+
+        return undefined;
     }
 
     private getAppStoreUrl(parameters: IEndScreenDownloadParameters, packageName?: string): string | undefined {

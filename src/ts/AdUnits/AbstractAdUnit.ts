@@ -11,6 +11,8 @@ import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { Configuration } from 'Models/Configuration';
 import { Request } from 'Utilities/Request';
 import { FocusManager } from 'Managers/FocusManager';
+import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 
 export interface IAdUnitParameters<T extends Campaign> {
     forceOrientation: ForceOrientation;
@@ -20,14 +22,16 @@ export interface IAdUnitParameters<T extends Campaign> {
     clientInfo: ClientInfo;
     thirdPartyEventManager: ThirdPartyEventManager;
     operativeEventManager: OperativeEventManager;
+    comScoreTrackingService: ComScoreTrackingService;
     placement: Placement;
     campaign: T;
     configuration: Configuration;
     request: Request;
     options: any;
+    adMobSignalFactory?: AdMobSignalFactory;
 }
 
-export abstract class AbstractAdUnit<T extends Campaign = Campaign> {
+export abstract class AbstractAdUnit {
 
     public static setAutoClose(value: boolean) {
         AbstractAdUnit._autoClose = value;
@@ -57,19 +61,14 @@ export abstract class AbstractAdUnit<T extends Campaign = Campaign> {
     protected readonly _nativeBridge: NativeBridge;
     protected readonly _forceOrientation: ForceOrientation;
     protected readonly _container: AdUnitContainer;
-    protected readonly _placement: Placement;
-    protected readonly _campaign: T;
 
     private _showing: boolean;
     private _finishState: FinishState;
 
-    constructor(nativeBridge: NativeBridge, parameters: IAdUnitParameters<T>) {
+    constructor(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>) {
         this._nativeBridge = nativeBridge;
         this._forceOrientation = parameters.forceOrientation;
         this._container = parameters.container;
-        this._placement = parameters.placement;
-        this._campaign = parameters.campaign;
-
         this._showing = false;
         this._finishState = FinishState.ERROR;
     }
@@ -96,14 +95,6 @@ export abstract class AbstractAdUnit<T extends Campaign = Campaign> {
 
     public getForceOrientation(): ForceOrientation {
         return this._forceOrientation;
-    }
-
-    public getPlacement(): Placement {
-        return this._placement;
-    }
-
-    public getCampaign(): Campaign {
-        return this._campaign;
     }
 
     public getFinishState() {

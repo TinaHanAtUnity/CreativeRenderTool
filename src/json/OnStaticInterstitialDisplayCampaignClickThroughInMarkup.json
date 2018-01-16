@@ -1,0 +1,25 @@
+{
+  "auctionId": "a15a4fb6-f9ce-4b09-a0cc-0672f1de4d20",
+  "correlationId": "4hOSkSWVyCg8K0AxjxlJTx",
+  "placements": {
+    "video": "B0JMQwI7mlsbtAeTSrUjC4"
+  },
+  "media": {
+    "B0JMQwI7mlsbtAeTSrUjC4": {
+      "contentType": "programmatic/static-interstitial",
+      "content": "{\"markup\":\"%3Cstyle%3Ebody%7Bmargin%3A0%7D.cr%7Bdisplay%3Ablock%3Bmin-width%3A320px%3Bmin-height%3A480px%3Bwidth%3A100%25%3Bheight%3A100%25%3Bbackground%3Aurl('http%3A%2F%2Fz.tpbid.com%2Fssb%2F1%2Fimages%2Ffcd44b6631d5c3c2c7576b6463af50b4.jpg')%20center%20no-repeat%3Bbackground-size%3Acontain%7D%3C%2Fstyle%3E%3Ca%20href%3D%22https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.triapodi.apprec%22%3E%3C%2Fa%3E%3Ca%20class%3Dcr%20id%3Dz%20href%3D'http%3A%2F%2Flocalhost.tpbid.com%2Fclick%3Fbid_id%3D3992480bfea3c39d6395ff8f3e8815411dd5328bbc1632605992ded7%26ep0%3DyB1%26ep1%3DuxaUqs29OM%26cid%3D1_f7e7c50d874690515cebae47f2d6fb2c%26redirect_to%3Dhttps%253a%252f%252fplay.google.com%252fstore%252fapps%252fdetails%253fid%253dcom.triapodi.apprec%2526bid_id%253dus-3992480bfea3c39d6395ff8f3e8815411dd5328bbc1632605992ded7'%3E%3C%2Fa%3E%3Cnoscript%3E%3Cstyle%20scoped%3Espan%7Bbackground-image%3Aurl('http%3A%2F%2Flocalhost.tpbid.com%2Fshow%2F38%3Fbid_id%3D3992480bfea3c39d6395ff8f3e8815411dd5328bbc1632605992ded7%26g%3Dp%26src%3D0')%7D%3C%2Fstyle%3E%3Cspan%3E%3C%2Fspan%3E%3C%2Fnoscript%3E\"}",
+      "trackingUrls": {
+        "impression": [
+          "https:///brands/2000/%ZONE%/impression/common?data=EEO66QOuIMbY72oCkCmub22mbr5wsMm948nEg62CXgdjjhqigdIj-TGV3MfPH9YJ3H6sMKnkA3DgDHmSR4pzey6FozbXAtM6mKYvFV1bLwwM9bdmTMxi1OlLVP9fTbSqirW-fDcc191pRnb23fgsD-m0PbS-n9QLRb_GzjiVXHq7vVxhKleG6-hH3PYF2UM0d-2e7NVrUj-vKUdJVI_8a0ho6orT0PiiuCeP7X2gxk7kcfu9lHvzDmKYeuZCCs1hJTXfL-kdWJSZCbhvlxmtzdDB_wFdCF3jbpIO8IPa6qWWxSZW_u615k39pB5orV2UaMPPcCsrbbOep3m0cJgL7ozlxgmC-KCxuosSVN2RMAfjnauWc1cuZqmmYPjfEIBArJJdct2-9_fvEGSwSq17QslsRSZk7Ng2WM-aNHzqT4r3jpwIGszygj__N5qsGEPxXPWvxA2uvvQz3SqKW8QOhSJ5mlBq51y3niRytPrnCJZ5_3xx_v2fAYv0nywWT-8zBvSzXUVuhgyDE9GMnXH9Sf1fpXvj0pgL_SxkRcuDydZtBA3vjCSzINR4Ig2swgRTtuq_VvUaTRkOygKTDFKZOPtdTgLFRQYAukaHPli8ZzXWKKJ6HZvfpnR1Q8sTHm7MwErTy7cyrQ%3D%3D&key=11",
+          "http://localhost.tpbid.com/win/100091f1?bid_id=3992480bfea3c3a9d6395ff8f3e8815411dd5328bbc1632605992ded7&price=0.09&eaid=${AUCTION_ID}&g=l&as=1&exp_uuid=3755962a976d83b56561212f828f8427&i=1&c=f08"
+        ]
+      },
+      "creativeId": "1_f08d00227a80868cc869a11b40bebdd2",
+      "campaignId": "1_f7e7c50d874690515cebae47f2d6fb2c",
+      "seatId": 9029,
+      "advDomain": "triapodi.com",
+      "adType": "DISPLAY",
+      "cacheTTL": 300
+    }
+  }
+}

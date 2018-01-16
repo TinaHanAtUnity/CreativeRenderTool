@@ -20,7 +20,7 @@ export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
             const campaignId = this.getProgrammaticCampaignId(nativeBridge);
             if (vpaidMediaFile) {
                 const vpaid = this._vpaidParser.parseFromVast(vast, vpaidMediaFile);
-                return Promise.resolve(new VPAIDCampaign(vpaid, session, campaignId, gamerId, abGroup, response.getCacheTTL(), response.getTrackingUrls(), response.getAdType(), response.getCreativeId(), response.getSeatId(), response.getCorrelationId()));
+                return Promise.resolve(new VPAIDCampaign(vpaid, session, campaignId, gamerId, abGroup, response.getCacheTTL(), response.getTrackingUrls(), response.getAdType(), response.getCreativeId(), response.getSeatId(), response.getCorrelationId(), response.getCategory(), response.getSubCategory(), response.getUseWebViewUserAgentForTracking()));
             } else {
                 return this.parseVastToCampaign(vast, nativeBridge, campaignId, session, gamerId, abGroup, response);
             }

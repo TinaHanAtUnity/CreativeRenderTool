@@ -4,6 +4,19 @@ import { assert } from 'chai';
 import { Url } from 'Utilities/Url';
 
 describe('UrlTest', () => {
+
+    it('should parse URL correctly', () => {
+        const url = 'http://www.google.fi:8000/path/to/file.txt?search=true#hash123';
+        const parsedUrl = Url.parse(url);
+        assert.equal(parsedUrl.pathname, '/path/to/file.txt', 'Path was parsed incorrectly');
+        assert.equal(parsedUrl.hash, '#hash123', 'Hash was parsed incorrectly');
+        assert.equal(parsedUrl.host, 'www.google.fi:8000', 'Host was parsed incorrectly');
+        assert.equal(parsedUrl.hostname, 'www.google.fi', 'Hostname was parsed incorrectly');
+        assert.equal(parsedUrl.port, 8000, 'Port was parsed incorrectly');
+        assert.equal(parsedUrl.protocol, 'http:', 'Protocol was parsed incorrectly');
+        assert.equal(parsedUrl.search, '?search=true', 'Query string was parsed incorrectly');
+    });
+
     it('should add URL parameters correctly', () => {
         const url: string = Url.addParameters('http://www.google.fi', {test: true});
         assert.equal(url, 'http://www.google.fi?test=true');

@@ -15,6 +15,7 @@ import { Platform } from 'Constants/Platform';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { FocusManager } from 'Managers/FocusManager';
 import { Request } from 'Utilities/Request';
 import { WakeUpManager } from 'Managers/WakeUpManager';
@@ -42,6 +43,7 @@ describe('VPAIDEventHandlerTest', () => {
     let vpaidEventHandler: VPAIDEventHandler;
     let request: Request;
     let overlay: Overlay;
+    let comScoreService: ComScoreTrackingService;
 
     beforeEach(() => {
         sandbox = sinon.sandbox.create();
@@ -80,6 +82,7 @@ describe('VPAIDEventHandlerTest', () => {
         sinon.spy(thirdPartyEventManager, 'sendEvent');
 
         operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
 
         vpaidAdUnitParameters = {
@@ -90,6 +93,7 @@ describe('VPAIDEventHandlerTest', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
+            comScoreTrackingService: comScoreService,
             placement: placement,
             campaign: campaign,
             configuration: TestFixtures.getConfiguration(),
@@ -98,6 +102,8 @@ describe('VPAIDEventHandlerTest', () => {
             vpaid: vpaidView,
             overlay: overlay
         };
+
+        sinon.stub(vpaidAdUnitParameters.campaign, 'getAbGroup').returns(5);
 
         adUnit = new VPAIDAdUnit(nativeBridge, vpaidAdUnitParameters);
         vpaidEventHandler = new VPAIDEventHandler(nativeBridge, adUnit, vpaidAdUnitParameters);
@@ -163,11 +169,12 @@ describe('VPAIDEventHandlerTest', () => {
             sinon.spy(operativeEventManager, 'sendMidpoint');
             sinon.spy(operativeEventManager, 'sendThirdQuartile');
             sinon.spy(operativeEventManager, 'sendView');
+            sinon.spy(comScoreService, 'sendEvent');
         });
 
         // Generic events that translate to VAST tracking with
         // no additional processing on our end.
-        const vpaidToVASTTracking = {
+        const vpaidToVASTTracking: { [key: string]: string } = {
             AdImpression: 'impression',
             AdVideoStart: 'start',
             AdPaused: 'paused',
@@ -218,6 +225,9 @@ describe('VPAIDEventHandlerTest', () => {
             it('should trigger complete tracking', verifyTrackingEvent('complete'));
             it('should send the view operative event', () => {
                 sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendView);
+            });
+            it('should send the comscore end event', () => {
+                sinon.assert.called(<sinon.SinonSpy>comScoreService.sendEvent);
             });
             it('should set the finish state to COMPLETE', () => {
                 assert.isTrue(adUnit.getFinishState() === FinishState.COMPLETED);

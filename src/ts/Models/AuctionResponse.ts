@@ -1,3 +1,4 @@
+import { JsonParser } from 'Utilities/JsonParser';
 import { Model } from 'Models/Model';
 
 export interface IAuctionResponse {
@@ -10,9 +11,13 @@ export interface IAuctionResponse {
     creativeId: string | undefined;
     seatId: number | undefined;
     correlationId: string;
+    appCategory: string | undefined;
+    appSubCategory: string | undefined;
     advertiserCampaignId: string | undefined;
     advertiserDomain: string | undefined;
     advertiserBundleId: string | undefined;
+    useWebViewUserAgentForTracking: boolean | undefined;
+    buyerId: string | undefined;
 }
 
 export class AuctionResponse extends Model<IAuctionResponse> {
@@ -26,10 +31,14 @@ export class AuctionResponse extends Model<IAuctionResponse> {
             adType: ['string'],
             creativeId: ['string', 'undefined'],
             seatId: ['integer', 'undefined'],
+            appCategory: ['string', 'undefined'],
+            appSubCategory: ['string', 'undefined'],
             correlationId: ['string'],
             advertiserCampaignId: ['string', 'undefined'],
             advertiserDomain: ['string', 'undefined'],
-            advertiserBundleId: ['string', 'undefined']
+            advertiserBundleId: ['string', 'undefined'],
+            useWebViewUserAgentForTracking: ['boolean', 'undefined'],
+            buyerId: ['string', 'undefined']
         });
 
         this.set('placements', placements);
@@ -41,9 +50,13 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         this.set('creativeId', data.creativeId);
         this.set('seatId', data.seatId);
         this.set('correlationId', correlationId);
+        this.set('appCategory', data.appCategory);
+        this.set('appSubCategory', data.appSubCategory);
         this.set('advertiserCampaignId', data.campaignId);
         this.set('advertiserDomain', data.advDomain);
         this.set('advertiserBundleId', data.bundleId);
+        this.set('useWebViewUserAgentForTracking', data.useWebViewUserAgentForTracking || false);
+        this.set('buyerId', data.buyerId);
     }
 
     public getPlacements(): string[] {
@@ -56,6 +69,10 @@ export class AuctionResponse extends Model<IAuctionResponse> {
 
     public getContent(): string {
         return this.get('content');
+    }
+
+    public getJsonContent(): any {
+        return JsonParser.parse(this.getContent());
     }
 
     public getCacheTTL(): number | undefined {
@@ -82,6 +99,14 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         return this.get('correlationId');
     }
 
+    public getCategory(): string | undefined {
+        return this.get('appCategory');
+    }
+
+    public getSubCategory(): string | undefined {
+        return this.get('appSubCategory');
+    }
+
     public getAdvertiserDomain(): string | undefined {
         return this.get('advertiserDomain');
     }
@@ -94,6 +119,14 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         return this.get('advertiserBundleId');
     }
 
+    public getUseWebViewUserAgentForTracking(): boolean | undefined {
+        return this.get('useWebViewUserAgentForTracking');
+    }
+
+    public getBuyerId(): string | undefined {
+        return this.get('buyerId');
+    }
+
     public getDTO(): {[key: string]: any } {
         return {
             'placements': this.getPlacements(),
@@ -104,7 +137,11 @@ export class AuctionResponse extends Model<IAuctionResponse> {
             'adType': this.getAdType(),
             'creativeId': this.getCreativeId(),
             'seatId': this.getSeatId(),
-            'correlationId': this.getCorrelationId()
+            'correlationId': this.getCorrelationId(),
+            'appCategory': this.getCategory(),
+            'appSubCategory': this.getSubCategory(),
+            'useWebViewUserAgentForTracking': this.getUseWebViewUserAgentForTracking(),
+            'buyerId': this.getBuyerId()
         };
     }
 }

@@ -5,48 +5,57 @@
 
 [data-icon]:before {
   content: attr(data-icon);
-  font-family: "unityicons";
+  font-family: "unityicons" !important; // @stylint ignore
 }
 
 [class^="icon-"]:before,
 [class*=" icon-"]:before {
-  font-family: "unityicons";
+  font-family: "unityicons" !important; // @stylint ignore
 }
 
-.icon-info:before {
-  content: "\61";
-}
-
-.icon-reload:before {
-  content: "\62";
+/*
+    Dummy icon that won't be rendered on android 4.2 and 4.3,
+    thus always make sure that your font is packed so that first icon will
+    no be visible on those old androids.
+*/
+.icon-android:before {
+  content: "\e000";
 }
 
 .icon-star:before {
   display: inline-block;
   width: 1em;
-  content: "\65";
+  content: "\e001";
+}
+
+.icon-info:before {
+  content: "\e002";
 }
 
 .icon-volume:before {
-  content: "\66";
+  content: "\e003";
 }
 
 .icon-volume-mute:before {
-  content: "\67";
+  content: "\e004";
 }
 
-.icon-skip:before {
-  content: "\69";
+.icon-reload:before {
+  content: "\e005";
 }
 
 .icon-person:before {
-  content: "\6a";
+  content: "\e006";
+}
+
+.icon-skip:before {
+  content: "\e007";
 }
 
 .icon-close:before {
-  content: "\6c";
+  content: "\e008";
 }
 
 .icon-screen-full:before {
-  content: "\63";
+  content: "\e009";
 }

@@ -7,7 +7,7 @@ export class Template {
 
     private static _matcher: RegExp = /<%=([\s\S]+?)%>|<%([\s\S]+?)%>|$/g;
 
-    private static _escapes = {
+    private static _escapes: { [key: string]: string } = {
         "'": "'",
         '\\': '\\',
         '\r': 'r',

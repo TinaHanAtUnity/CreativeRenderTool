@@ -7,17 +7,20 @@ import { DisplayInterstitial } from 'Views/DisplayInterstitial';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { Platform } from 'Constants/Platform';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { Placement } from 'Models/Placement';
 
 export interface IDisplayInterstitialAdUnitParameters extends IAdUnitParameters<DisplayInterstitialCampaign> {
     view: DisplayInterstitial;
 }
 
-export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitialCampaign> {
+export class DisplayInterstitialAdUnit extends AbstractAdUnit {
 
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _view: DisplayInterstitial;
     private _options: any;
+    private _campaign: DisplayInterstitialCampaign;
+    private _placement: Placement;
 
     private _onShowObserver: IObserver0;
     private _onSystemKillObserver: IObserver0;
@@ -27,9 +30,8 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
         this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._view = parameters.view;
-
-        this._view.render();
-        document.body.appendChild(this._view.container());
+        this._campaign = parameters.campaign;
+        this._placement = parameters.placement;
 
         this._options = parameters.options;
         this.setShowing(false);
@@ -37,18 +39,24 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
 
     public show(): Promise<void> {
         this.setShowing(true);
-        this._view.show();
         this.onStart.trigger();
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
         this.sendStartEvents();
 
-        this._onShowObserver = this._container.onShow.subscribe(() => this.onShow());
-        this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
+        return this._view.render().then(() => {
+            document.body.appendChild(this._view.container());
+            this._view.show();
 
-        // Display ads are always completed.
-        this.setFinishState(FinishState.COMPLETED);
+            this._onShowObserver = this._container.onShow.subscribe(() => this.onShow());
+            this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
 
-        return this._container.open(this, false, false, this._forceOrientation, true, false, true, false, this._options);
+            // Display ads are always completed.
+            this.setFinishState(FinishState.COMPLETED);
+            return this._container.open(this, false, false, this._forceOrientation, true, false, true, false, this._options);
+        }).catch((e) => {
+            this.hide();
+            // TODO: Trigger Diagnostic error for above
+        });
     }
 
     public hide(): Promise<void> {
@@ -80,12 +88,12 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
     }
 
     public openLink(href: string): void {
-        this._operativeEventManager.sendClick(this);
+        this._operativeEventManager.sendClick(this._campaign.getSession(), this._placement, this._campaign);
 
         for (let url of this._campaign.getTrackingUrlsForEvent('click')) {
-            url = url.replace(/%ZONE%/, this.getPlacement().getId());
+            url = url.replace(/%ZONE%/, this._placement.getId());
             url = url.replace(/%SDK_VERSION%/, this._operativeEventManager.getClientInfo().getSdkVersion().toString());
-            this._thirdPartyEventManager.sendEvent('display click', this._campaign.getSession().getId(), url);
+            this._thirdPartyEventManager.sendEvent('display click', this._campaign.getSession().getId(), url, this._campaign.getUseWebViewUserAgentForTracking());
         }
 
         if (this.isWhiteListedLinkType(href)) {
@@ -131,10 +139,12 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
 
     private sendStartEvents(): void {
         for (let url of (this._campaign).getTrackingUrlsForEvent('impression')) {
-            url = url.replace(/%ZONE%/, (this.getCampaign()).getId());
+            url = url.replace(/%ZONE%/, this._campaign.getId());
             url = url.replace(/%SDK_VERSION%/, this._operativeEventManager.getClientInfo().getSdkVersion().toString());
-            this._thirdPartyEventManager.sendEvent('display impression', (this.getCampaign()).getSession().getId(), url);
+            this._thirdPartyEventManager.sendEvent('display impression', this._campaign.getSession().getId(), url);
         }
-        this._operativeEventManager.sendStart(this);
+        this._operativeEventManager.sendStart(this._campaign.getSession(), this._placement, this._campaign).then(() => {
+            this.onStartProcessed.trigger();
+        });
     }
 }

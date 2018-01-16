@@ -23,6 +23,7 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 
 import VPAIDTestXML from 'xml/VPAID.xml';
 import VPAIDCampaignJson from 'json/OnProgrammaticVPAIDCampaign.json';
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 
 describe('VPAIDAdUnit', () => {
     let campaign: VPAIDCampaign;
@@ -38,6 +39,7 @@ describe('VPAIDAdUnit', () => {
     let vpaidAdUnitParameters: IVPAIDAdUnitParameters;
     let request: Request;
     let overlay: Overlay;
+    let comScoreService: ComScoreTrackingService;
 
     beforeEach(() => {
         sandbox = sinon.sandbox.create();
@@ -79,6 +81,7 @@ describe('VPAIDAdUnit', () => {
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
+        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         vpaidAdUnitParameters = {
             forceOrientation: ForceOrientation.LANDSCAPE,
@@ -88,6 +91,7 @@ describe('VPAIDAdUnit', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
+            comScoreTrackingService: comScoreService,
             placement: placement,
             campaign: campaign,
             configuration: TestFixtures.getConfiguration(),

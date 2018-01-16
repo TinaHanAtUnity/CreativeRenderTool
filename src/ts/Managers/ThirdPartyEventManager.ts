@@ -23,9 +23,14 @@ export class ThirdPartyEventManager {
         });
     }
 
-    public sendEvent(event: string, sessionId: string, url: string): Promise<INativeResponse> {
-        this._nativeBridge.Sdk.logInfo('Unity Ads third party event: sending ' + event + ' event to ' + url + ' (session ' + sessionId + ')');
-        return this._request.get(url, [], {
+    public sendEvent(event: string, sessionId: string, url: string, useWebViewUserAgentForTracking?: boolean): Promise<INativeResponse> {
+        const headers: Array<[string, string]> = [];
+        if (typeof navigator !== 'undefined' && navigator.userAgent && useWebViewUserAgentForTracking === true) {
+            headers.push(['User-Agent', navigator.userAgent]);
+        }
+
+        this._nativeBridge.Sdk.logInfo('Unity Ads third party event: sending ' + event + ' event to ' + url + ' with headers ' + headers + ' (session ' + sessionId + ')');
+        return this._request.get(url, headers, {
             retries: 0,
             retryDelay: 0,
             followRedirects: true,

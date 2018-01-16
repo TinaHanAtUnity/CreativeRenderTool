@@ -20,6 +20,7 @@ import { Cache } from 'Utilities/Cache';
 import { Placement, PlacementState } from 'Models/Placement';
 import { SessionManager } from 'Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { AdUnitContainer, ForceOrientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
@@ -35,6 +36,8 @@ import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
 import OnCometMraidPlcCampaign from 'json/OnCometMraidPlcCampaign.json';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
+import { AdMobSignal } from 'Models/AdMobSignal';
 
 describe('CampaignRefreshManager', () => {
     let deviceInfo: DeviceInfo;
@@ -54,6 +57,8 @@ describe('CampaignRefreshManager', () => {
     let focusManager: FocusManager;
     let adUnitParams: IAdUnitParameters<Campaign>;
     let operativeEventManager: OperativeEventManager;
+    let adMobSignalFactory: AdMobSignalFactory;
+    let comScoreService: ComScoreTrackingService;
 
     beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo();
@@ -136,6 +141,9 @@ describe('CampaignRefreshManager', () => {
         assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
         container = new TestContainer();
         operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+        adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);
+        (<sinon.SinonStub>adMobSignalFactory.getAdRequestSignal).returns(Promise.resolve(new AdMobSignal()));
+        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         adUnitParams = {
             forceOrientation: ForceOrientation.NONE,
@@ -145,18 +153,21 @@ describe('CampaignRefreshManager', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
+            comScoreTrackingService: comScoreService,
             placement: TestFixtures.getPlacement(),
             campaign: TestFixtures.getCampaign(),
             configuration: configuration,
             request: request,
             options: {}
         };
+
+        CampaignRefreshManager.ParsingErrorRefillDelay = 0; // prevent tests from hanging due to long retry timeouts
     });
 
     describe('PLC campaigns', () => {
         beforeEach(() => {
             configuration = new Configuration(JSON.parse(ConfigurationAuctionPlc));
-            campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, request, clientInfo, deviceInfo, metaDataManager);
+            campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager);
             campaignRefreshManager = new CampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration, focusManager);
         });
 
@@ -561,6 +572,9 @@ export class TestContainer extends AdUnitContainer {
     }
     public isPaused(): boolean {
         return false;
+    }
+    public setViewFrame(view: string, x: number, y: number, width: number, height: number): Promise<void> {
+        return Promise.resolve();
     }
 }
 

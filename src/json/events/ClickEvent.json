@@ -192,6 +192,12 @@
       "required": "all",
       "queryString": false,
       "body": true
+    },
+    {
+      "parameter": "language",
+      "required": "all",
+      "queryString": false,
+      "body": true
     }
   ]
 }

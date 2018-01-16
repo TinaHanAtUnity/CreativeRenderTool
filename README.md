@@ -70,6 +70,11 @@ To build and test continuously (on file changes), use:
 - `make build-test`
 - Run hybrid test suite from the SDK
 
+### Browser build tests
+
+- `make clean build-browser start-nginx`
+- `make test-browser`
+
 #### Hybrid tests triggered with github webhook
 http://qa-jenkins.us-east-1.applifier.info:8080/job/unity-ads-sdk2-ios-hybrid-tests-webview-webhook/
 

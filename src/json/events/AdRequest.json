@@ -20,12 +20,6 @@
       "body": false
     },
     {
-      "parameter": "auctionId",
-      "required": "all",
-      "queryString": true,
-      "body": false
-    },
-    {
       "parameter": "deviceMake",
       "required": "android",
       "queryString": true,
@@ -268,6 +262,12 @@
     {
       "parameter": "simulator",
       "required": "ios",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "requestSignal",
+      "required": "all",
       "queryString": false,
       "body": true
     }

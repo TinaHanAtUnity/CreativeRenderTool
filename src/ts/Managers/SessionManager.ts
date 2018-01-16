@@ -4,6 +4,7 @@ import { StorageType } from 'Native/Api/Storage';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { SdkStats } from 'Utilities/SdkStats';
 
 export class SessionManager {
     public static getSessionKey(sessionId: string): string {
@@ -21,11 +22,9 @@ export class SessionManager {
         this._nativeBridge = nativeBridge;
     }
 
-    public create(): Promise<Session> {
-        return this._nativeBridge.DeviceInfo.getUniqueEventId().then(id => {
-            this.startNewSession(id);
-            return Promise.resolve(new Session(id));
-        });
+    public create(id: string): Session {
+        this.startNewSession(id);
+        return new Session(id);
     }
 
     public startNewSession(sessionId: string): Promise<any[]> {
@@ -38,7 +37,8 @@ export class SessionManager {
         ]).catch(error => {
             Diagnostics.trigger('session_start_failed', new DiagnosticError(error, {
                 key: sessionTimestampKey,
-                timestamp: timestamp
+                timestamp: timestamp,
+                adRequestOrdinal: SdkStats.getAdRequestOrdinal()
             }));
             return Promise.resolve([]);
         });

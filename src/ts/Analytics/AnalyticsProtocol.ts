@@ -60,6 +60,7 @@ interface IAnalyticsUpdateEvent {
 interface IAnalyticsAppRunningEvent {
     ts: number;
     duration: number;
+    local_time_offset: number;
 }
 
 interface IAnalyticsTransactionEvent {
@@ -85,7 +86,7 @@ export class AnalyticsProtocol {
             platform: platform === Platform.IOS ? 'IPhonePlayer' : 'AndroidPlayer',
             platformid: platform === Platform.IOS ? 8 : 11,
             sdk_ver: clientInfo.getSdkVersionName(),
-            adsid: deviceInfo.getAdvertisingIdentifier(),
+            adsid: AnalyticsProtocol.getAdvertisingIdentifier(deviceInfo),
             ads_tracking: deviceInfo.getLimitAdTracking() ? false : true, // intentionally inverted value
             ads_coppa: configuration.isCoppaCompliant(),
             ads_gamerid: configuration.getGamerId(),
@@ -166,7 +167,8 @@ export class AnalyticsProtocol {
     public static getRunningObject(durationInSeconds: number): IAnalyticsObject {
         const appRunningEvent: IAnalyticsAppRunningEvent = {
             ts: Date.now(),
-            duration: durationInSeconds
+            duration: durationInSeconds,
+            local_time_offset: new Date().getTimezoneOffset() * -1 * 60 * 1000
         };
         return {
             type: 'analytics.appRunning.v1',
@@ -194,5 +196,15 @@ export class AnalyticsProtocol {
             type: 'analytics.transaction.v1',
             msg: transactionEvent
         };
+    }
+
+    private static getAdvertisingIdentifier(deviceInfo: DeviceInfo): string | undefined {
+        const adsid: string | undefined | null = deviceInfo.getAdvertisingIdentifier();
+
+        if(adsid) {
+            return adsid.toLowerCase();
+        } else {
+            return undefined;
+        }
     }
 }

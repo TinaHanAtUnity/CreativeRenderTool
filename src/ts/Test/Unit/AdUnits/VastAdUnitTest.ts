@@ -21,6 +21,7 @@ import { FocusManager } from 'Managers/FocusManager';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { SessionManager } from 'Managers/SessionManager';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 
@@ -31,11 +32,13 @@ describe('VastAdUnit', () => {
     let sandbox: sinon.SinonSandbox;
     let thirdPartyEventManager: ThirdPartyEventManager;
     let vastAdUnit: VastAdUnit;
-    let campaign: VastCampaign;
     let focusManager: FocusManager;
     let vastAdUnitParameters: IVastAdUnitParameters;
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
+    let comScoreService: ComScoreTrackingService;
+    let placement: Placement;
+    let vastCampaign: VastCampaign;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -47,9 +50,8 @@ describe('VastAdUnit', () => {
         const vastXml = EventTestVast;
 
         const vast = vastParser.parseVast(vastXml);
-        campaign = new VastCampaign(vast, '12345', TestFixtures.getSession(), 'gamerId', 1);
 
-        const placement = new Placement({
+        placement = new Placement({
             id: '123',
             name: 'test',
             default: true,
@@ -68,12 +70,20 @@ describe('VastAdUnit', () => {
         const request = new Request(nativeBridge, wakeUpManager);
         const activity = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        const vastCampaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 12);
+        vastCampaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 12);
         const video = vastCampaign.getVideo();
+
+        let duration = vastCampaign.getVast().getDuration();
+        if(duration) {
+            duration = duration * 1000;
+            video.setDuration(duration);
+        }
+
         const sessionManager = new SessionManager(nativeBridge);
         const metaDataManager = new MetaDataManager(nativeBridge);
         const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
         const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
+        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         vastAdUnitParameters = {
             forceOrientation: ForceOrientation.LANDSCAPE,
@@ -83,6 +93,7 @@ describe('VastAdUnit', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
+            comScoreTrackingService: comScoreService,
             placement: placement,
             campaign: vastCampaign,
             configuration: TestFixtures.getConfiguration(),
@@ -100,8 +111,7 @@ describe('VastAdUnit', () => {
 
     describe('sendTrackingEvent', () => {
         it('should replace "%ZONE%" in the url with the placement id', () => {
-            const placement = vastAdUnit.getPlacement();
-            const vast = (<VastCampaign> vastAdUnit.getCampaign()).getVast();
+            const vast = vastCampaign.getVast();
             const urlTemplate = 'http://foo.biz/%ZONE%/123';
             sandbox.stub(vast, 'getTrackingEventUrls').returns([ urlTemplate ]);
             sandbox.stub(thirdPartyEventManager, 'sendEvent').returns(null);
@@ -112,9 +122,8 @@ describe('VastAdUnit', () => {
         });
 
         it('should replace "%SDK_VERSION%" in the url with the SDK version as a query parameter', () => {
-            const placement = vastAdUnit.getPlacement();
             const urlTemplate = 'http://ads-brand-postback.unityads.unity3d.com/brands/2002/defaultVideoAndPictureZone/%ZONE%/impression/common?adSourceId=2&advertiserDomain=appnexus.com&advertisingTrackingId=49f7acaa-81f2-4887-9f3b-cd124854879c&cc=USD&creativeId=54411305&dealCode=&demandSeatId=1&fillSource=appnexus&floor=0&gamerId=5834bc21b54e3b0100f44c92&gross=0&networkId=&precomputedFloor=0&seatId=958&value=1.01&sdkVersion=%SDK_VERSION%';
-            const vast = (<VastCampaign> vastAdUnit.getCampaign()).getVast();
+            const vast = vastCampaign.getVast();
             sandbox.stub(vast, 'getTrackingEventUrls').returns([ urlTemplate ]);
             sandbox.stub(thirdPartyEventManager, 'sendEvent').returns(null);
             vastAdUnit.sendTrackingEvent('start', 'sessionId', 1234);
@@ -125,12 +134,10 @@ describe('VastAdUnit', () => {
     });
 
     describe('sendImpressionEvent', () => {
-        let placement: Placement;
         let vast: Vast;
 
         beforeEach(() => {
-            placement = vastAdUnit.getPlacement();
-            vast = (<VastCampaign> vastAdUnit.getCampaign()).getVast();
+            vast = vastCampaign.getVast();
             sandbox.stub(thirdPartyEventManager, 'sendEvent').returns(null);
         });
 
@@ -175,14 +182,14 @@ describe('VastAdUnit', () => {
 
         beforeEach(() => {
             vast = new Vast([], []);
-            const video = new Video('');
+            const video = new Video('', TestFixtures.getSession());
             sinon.stub(vast, 'getVideoUrl').returns(video.getUrl());
-            campaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 12);
-            sinon.stub(campaign, 'getVideo').returns(video);
+            vastCampaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 12);
+            sinon.stub(vastCampaign, 'getVideo').returns(video);
             const nativeBridge = TestFixtures.getNativeBridge();
             const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
             vastAdUnitParameters.overlay = overlay;
-            vastAdUnitParameters.campaign = campaign;
+            vastAdUnitParameters.campaign = vastCampaign;
             vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
         });
 
@@ -232,14 +239,10 @@ describe('VastAdUnit', () => {
             const mockEventManager = sinon.mock(thirdPartyEventManager);
             mockEventManager.expects('sendEvent').withArgs(`vast ${quartileEventName}`, '123', `http://localhost:3500/brands/14851/${quartileEventName}?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123`);
 
-            const duration = campaign.getVast().getDuration();
-            if(!duration) {
-                assert.fail('Missing duration in VAST ad');
-            } else {
-                const quartilePosition = duration * 0.25 * quartile * 1000;
-                vastAdUnit.sendProgressEvents('123', 2000, quartilePosition + 100, quartilePosition - 100);
-                mockEventManager.verify();
-            }
+            const duration = vastCampaign.getVideo().getDuration();
+            const quartilePosition = duration * 0.25 * quartile;
+            vastAdUnit.sendProgressEvents('123', 2000, quartilePosition + 100, quartilePosition - 100);
+            mockEventManager.verify();
         };
 
         it('sends first quartile events from VAST', () => {
@@ -278,15 +281,15 @@ describe('VastAdUnit', () => {
 
         beforeEach(() => {
             vast = new Vast([], []);
-            const video = new Video('');
+            const video = new Video('', TestFixtures.getSession());
             sinon.stub(vast, 'getVideoUrl').returns(video.getUrl());
-            campaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 12);
-            sinon.stub(campaign, 'getVideo').returns(video);
+            vastCampaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 12);
+            sinon.stub(vastCampaign, 'getVideo').returns(video);
             const nativeBridge = TestFixtures.getNativeBridge();
             const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
-            vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
+            vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.configuration.isCoppaCompliant(), vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
             vastAdUnitParameters.overlay = overlay;
-            vastAdUnitParameters.campaign = campaign;
+            vastAdUnitParameters.campaign = vastCampaign;
             vastAdUnitParameters.endScreen = vastEndScreen;
             vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
         });

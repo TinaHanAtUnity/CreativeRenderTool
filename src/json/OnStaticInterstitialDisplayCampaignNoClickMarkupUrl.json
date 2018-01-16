@@ -1,0 +1,27 @@
+{
+  "auctionId": "a15a4fb6-f9ce-4b09-a0cc-0672f1de4d20",
+  "correlationId": "4hOSkSWVyCg8K0AxjxlJTx",
+  "placements": {
+    "video": "B0JMQwI7mlsbtAeTSrUjC4"
+  },
+  "abGroup": 0,
+  "gamerId": "B0JMQwI7mlsbtAeTSrUjC4",
+  "media": {
+    "B0JMQwI7mlsbtAeTSrUjC4": {
+      "contentType": "programmatic/static-interstitial-url",
+      "content": "{\"markupUrl\":\"http://example.com/sweaters\"}",
+      "trackingUrls": {
+        "impression": [
+          "https:///brands/2000/%ZONE%/impression/common?data=EEO66QOuIMbY72oCkCmub22mbr5wsMm948nEg62CXgdjjhqigdIj-TGV3MfPH9YJ3H6sMKnkA3DgDHmSR4pzey6FozbXAtM6mKYvFV1bLwwM9bdmTMxi1OlLVP9fTbSqirW-fDcc191pRnb23fgsD-m0PbS-n9QLRb_GzjiVXHq7vVxhKleG6-hH3PYF2UM0d-2e7NVrUj-vKUdJVI_8a0ho6orT0PiiuCeP7X2gxk7kcfu9lHvzDmKYeuZCCs1hJTXfL-kdWJSZCbhvlxmtzdDB_wFdCF3jbpIO8IPa6qWWxSZW_u615k39pB5orV2UaMPPcCsrbbOep3m0cJgL7ozlxgmC-KCxuosSVN2RMAfjnauWc1cuZqmmYPjfEIBArJJdct2-9_fvEGSwSq17QslsRSZk7Ng2WM-aNHzqT4r3jpwIGszygj__N5qsGEPxXPWvxA2uvvQz3SqKW8QOhSJ5mlBq51y3niRytPrnCJZ5_3xx_v2fAYv0nywWT-8zBvSzXUVuhgyDE9GMnXH9Sf1fpXvj0pgL_SxkRcuDydZtBA3vjCSzINR4Ig2swgRTtuq_VvUaTRkOygKTDFKZOPtdTgLFRQYAukaHPli8ZzXWKKJ6HZvfpnR1Q8sTHm7MwErTy7cyrQ%3D%3D&key=11",
+          "http://localhost.tpbid.com/win/100091f1?bid_id=3992480bfea3c3a9d6395ff8f3e8815411dd5328bbc1632605992ded7&price=0.09&eaid=${AUCTION_ID}&g=l&as=1&exp_uuid=3755962a976d83b56561212f828f8427&i=1&c=f08"
+        ]
+      },
+      "creativeId": "1_f08d00227a80868cc869a11b40bebdd2",
+      "campaignId": "1_f7e7c50d874690515cebae47f2d6fb2c",
+      "seatId": 9029,
+      "advDomain": "triapodi.com",
+      "adType": "DISPLAY",
+      "cacheTTL": 300
+    }
+  }
+}

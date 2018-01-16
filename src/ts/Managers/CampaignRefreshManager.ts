@@ -16,6 +16,7 @@ import { Platform } from 'Constants/Platform';
 export class CampaignRefreshManager {
     public static NoFillDelay = 3600;
     public static ErrorRefillDelay = 3600;
+    public static ParsingErrorRefillDelay = 60;
 
     private _nativeBridge: NativeBridge;
     private _wakeUpManager: WakeUpManager;
@@ -26,6 +27,9 @@ export class CampaignRefreshManager {
     private _refillTimestamp: number;
     private _needsRefill = true;
     private _refreshAllowed = true;
+    private _campaignCount: number;
+    private _parsingErrorCount: number;
+    private _noFills: number;
 
     // constant value that determines the delay for refreshing ads after backend has processed a start event
     // set to five seconds because backend should usually process start event in less than one second but
@@ -40,11 +44,15 @@ export class CampaignRefreshManager {
         this._configuration = configuration;
         this._focusManager = focusManager;
         this._refillTimestamp = 0;
+        this._campaignCount = 0;
+        this._parsingErrorCount = 0;
+        this._noFills = 0;
 
         this._campaignManager.onCampaign.subscribe((placementId, campaign) => this.onCampaign(placementId, campaign));
         this._campaignManager.onNoFill.subscribe(placementId => this.onNoFill(placementId));
-        this._campaignManager.onError.subscribe((error, placementIds, rawAdPlan) => this.onError(error, placementIds, rawAdPlan));
-        this._campaignManager.onAdPlanReceived.subscribe((refreshDelay) => this.onAdPlanReceived(refreshDelay));
+        this._campaignManager.onError.subscribe((error, placementIds, session) => this.onError(error, placementIds, session));
+        this._campaignManager.onConnectivityError.subscribe((placementIds) => this.onConnectivityError(placementIds));
+        this._campaignManager.onAdPlanReceived.subscribe((refreshDelay, campaignCount) => this.onAdPlanReceived(refreshDelay, campaignCount));
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
             this._focusManager.onAppForeground.subscribe(() => this.onAppForeground());
         } else {
@@ -78,7 +86,7 @@ export class CampaignRefreshManager {
         this._refreshAllowed = bool;
     }
 
-    public refresh(): Promise<INativeResponse | void> {
+    public refresh(nofillRetry?: boolean): Promise<INativeResponse | void> {
         if(!this._refreshAllowed) {
             return Promise.resolve();
         }
@@ -86,7 +94,8 @@ export class CampaignRefreshManager {
             this.setPlacementStates(PlacementState.WAITING, this._configuration.getPlacementIds());
             this._refillTimestamp = 0;
             this.invalidateCampaigns(false, this._configuration.getPlacementIds());
-            return this._campaignManager.request();
+            this._campaignCount = 0;
+            return this._campaignManager.request(nofillRetry);
         } else if(this.checkForExpiredCampaigns()) {
             return this.onCampaignExpired();
         }
@@ -159,11 +168,15 @@ export class CampaignRefreshManager {
     }
 
     private onCampaign(placementId: string, campaign: Campaign) {
+        this._parsingErrorCount = 0;
+
         this.setCampaignForPlacement(placementId, campaign);
         this.handlePlacementState(placementId, PlacementState.READY);
     }
 
     private onNoFill(placementId: string) {
+        this._parsingErrorCount = 0;
+
         this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill, no ads to show, for placement: ' + placementId);
         this.setCampaignForPlacement(placementId, undefined);
         this.handlePlacementState(placementId, PlacementState.NO_FILL);
@@ -195,9 +208,69 @@ export class CampaignRefreshManager {
         } else {
             this.setPlacementStates(PlacementState.NO_FILL, placementIds);
         }
+
+        // for now, parsing errors are retried only if there is only one campaign in ad plan
+        // therefore all parsing error retry logic is written with the assumption that there is only one campaign
+        if(this._campaignCount === 1) {
+            this._parsingErrorCount++;
+
+            if(this._parsingErrorCount === 1 && CampaignRefreshManager.ParsingErrorRefillDelay > 0) {
+                const retryDelaySeconds: number = CampaignRefreshManager.ParsingErrorRefillDelay + Math.random() * CampaignRefreshManager.ParsingErrorRefillDelay;
+                this._nativeBridge.Sdk.logDebug('Unity Ads retrying failed campaign in ' + retryDelaySeconds + ' seconds');
+                this._refillTimestamp = Date.now() + CampaignRefreshManager.ParsingErrorRefillDelay * 1000;
+                setTimeout(() => {
+                    this._nativeBridge.Sdk.logDebug('Unity Ads retrying failed campaign now');
+                    this.refresh();
+                }, retryDelaySeconds * 1000);
+            }
+        }
     }
 
-    private onAdPlanReceived(refreshDelay: number) {
+    private onConnectivityError(placementIds: string[]) {
+        this.invalidateCampaigns(this._needsRefill, placementIds);
+        this._refillTimestamp = Date.now();
+
+        this._nativeBridge.Sdk.logInfo('Unity Ads failed to contact server, retrying after next system event');
+
+        if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
+            const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
+                this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
+                this.setPlacementStates(PlacementState.NO_FILL, placementIds);
+            });
+        } else {
+            this.setPlacementStates(PlacementState.NO_FILL, placementIds);
+        }
+    }
+
+    private onAdPlanReceived(refreshDelay: number, campaignCount: number) {
+        this._campaignCount = campaignCount;
+
+        if(campaignCount === 0) {
+            this._noFills++;
+
+            let delay: number = 0;
+
+            // delay starts from 20 secs, then increased 50% for each additional no fill (20 secs, 30 secs, 45 secs etc.)
+            if(this._noFills > 0 && this._noFills < 15) {
+                delay = 20;
+                for(let i: number = 1; i < this._noFills; i++) {
+                    delay = delay * 1.5;
+                }
+            }
+
+            if(delay > 0) {
+                this._refillTimestamp = Date.now() + delay * 1000;
+                delay = delay + Math.random() * 10; // add 0-10 second random delay
+                this._nativeBridge.Sdk.logDebug('Unity Ads ad plan will be refreshed in ' + delay + ' seconds');
+                setTimeout(() => {
+                    this.refresh(true);
+                }, delay * 1000);
+                return;
+            }
+        } else {
+            this._noFills = 0;
+        }
+
         if(refreshDelay > 0) {
             this._refillTimestamp = Date.now() + refreshDelay * 1000;
             this._nativeBridge.Sdk.logDebug('Unity Ads ad plan will expire in ' + refreshDelay + ' seconds');
@@ -235,7 +308,12 @@ export class CampaignRefreshManager {
     }
 
     private onActivityResumed(activity: string): void {
-        this.refresh();
+        if(activity !== 'com.unity3d.ads.adunit.AdUnitActivity' &&
+            activity !== 'com.unity3d.ads.adunit.AdUnitTransparentActivity' &&
+            activity !== 'com.unity3d.ads.adunit.AdUnitTransparentSoftwareActivity' &&
+            activity !== 'com.unity3d.ads.adunit.AdUnitSoftwareActivity') {
+            this.refresh();
+        }
     }
 
     private onAppForeground(): void {

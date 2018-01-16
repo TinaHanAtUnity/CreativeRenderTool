@@ -1,20 +1,12 @@
+@import "components.styl";
+@import "vars.styl";
+
 #mraid {
   #mraid-iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    border: none;
+    $iframe-default();
   }
   .close-region {
-    position: absolute;
-    top: 2px;
-    right: 2px;
-    z-index: 9999;
-    width: 50px;
-    height: 50px;
-    opacity: .4;
+    $iframe-close-region-default();
   }
   .icon-close {
     position: absolute;
@@ -76,5 +68,11 @@
     -webkit-animation-fill-mode: forwards;
     -webkit-animation-timing-function: linear;
     -webkit-animation-duration: .01s;
+  }
+
+  .privacy-button {
+    $privacy-button-default($default-scale-size);
+    left: 0;
+    margin: 0 0 0 $default-size * $default-scale-size * .25;
   }
 }

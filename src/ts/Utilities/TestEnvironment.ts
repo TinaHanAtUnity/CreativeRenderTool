@@ -2,24 +2,23 @@ import { MetaData } from 'Utilities/MetaData';
 
 export class TestEnvironment {
     public static setup(metaData: MetaData): Promise<string[]> {
-        return metaData.get("test.clearTestMetaData", false).then(([found, value]) => {
+        const clearMetaDataPromise = metaData.get("test.clearTestMetaData", false);
+        const getKeysPromise = metaData.getKeys('test');
+        return Promise.all([clearMetaDataPromise, getKeysPromise]).then(([[clearKeyFound, clearKeyValue], keys]) => {
             let deleteValue = false;
-            if(found && typeof value === 'boolean') {
-                deleteValue = value;
+            if(clearKeyFound && typeof clearKeyValue === 'boolean') {
+                deleteValue = clearKeyValue;
             }
-            return deleteValue;
-        }).then(deleteValue => {
-            return metaData.getKeys('test').then(keys => {
-                const promises: any[] = [];
-                keys.forEach((key) => {
-                    promises.push(metaData.get('test.' + key, deleteValue).then(([found, value]) => {
-                        if(found) {
-                            this._testEnvironment[key] = value;
-                        }
-                    }));
-                });
-                return Promise.all(promises);
+
+            const promises: any[] = [];
+            keys.forEach((key) => {
+                promises.push(metaData.get('test.' + key, deleteValue).then(([found, value]) => {
+                    if(found) {
+                        this._testEnvironment[key] = value;
+                    }
+                }));
             });
+            return Promise.all(promises);
         });
     }
 
