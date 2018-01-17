@@ -171,7 +171,6 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
             configuration: this._configuration
         }, '*');
 
-
         if(!this._loadingScreenTimeout) {
             clearTimeout(this._prepareTimeout);
             this._prepareTimeout = undefined;
