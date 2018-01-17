@@ -189,6 +189,10 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         if(landscape) {
             assets.push(landscape);
         }
+        const configuration = this.getConfiguration();
+        if(configuration) {
+            assets.push(configuration);
+        }
 
         return assets;
     }
