@@ -1,3 +1,7 @@
+# Wed Jan 17 12:26:52 UTC 2018
+
+* Use streaming fallback if comet video size and cached video size are different
+
 # Tue Jan 16 10:23:28 UTC 2018
 
 * Test combined endscreen on A/B groups 8 and 9
