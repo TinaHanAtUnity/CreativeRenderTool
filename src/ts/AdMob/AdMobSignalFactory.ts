@@ -90,8 +90,13 @@ export class AdMobSignalFactory {
         }));
 
         promises.push(Promise.all([this._deviceInfo.getScreenWidth(),this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
-            signal.setScreenWidth(width);
-            signal.setScreenHeight(height);
+            if (this._nativeBridge.getPlatform() === Platform.IOS) {
+                signal.setScreenWidth(width * this._deviceInfo.getScreenScale());
+                signal.setScreenHeight(height * this._deviceInfo.getScreenScale());
+            } else {
+                signal.setScreenWidth(width);
+                signal.setScreenHeight(height);
+            }
             signal.setDeviceOrientation(this.getDeviceScreenOrientation(width, height));
         }).catch(() => {
             this.logFailure(nativeBridge, 'screenWidth');
@@ -101,6 +106,8 @@ export class AdMobSignalFactory {
             promises.push(nativeBridge.DeviceInfo.Android.getPackageInfo(this._clientInfo.getApplicationName()).then(packageInfo => {
                 if(packageInfo.installer) {
                     signal.setAppInstaller(packageInfo.installer);
+                } else {
+                    signal.setAppInstaller('unknown');
                 }
 
                 if(packageInfo.versionCode) {

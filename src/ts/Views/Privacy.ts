@@ -24,7 +24,6 @@ export interface IBuildInformation {
     webviewHash: string | null;
     app: string;
     appVersion: string;
-    game: string;
 }
 
 export class Privacy extends View<IPrivacyHandler> {
@@ -39,8 +38,7 @@ export class Privacy extends View<IPrivacyHandler> {
             webview: clientInfo.getWebviewVersion(),
             webviewHash: clientInfo.getWebviewHash(),
             app: clientInfo.getApplicationName(),
-            appVersion: clientInfo.getApplicationVersion(),
-            game: clientInfo.getGameId()
+            appVersion: clientInfo.getApplicationVersion()
         };
     }
 
