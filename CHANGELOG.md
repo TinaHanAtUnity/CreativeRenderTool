@@ -1,3 +1,14 @@
+# Wed Jan 17 12:26:52 UTC 2018
+
+* Use streaming fallback if comet video size and cached video size are different
+
+# Tue Jan 16 10:23:28 UTC 2018
+
+* Test combined endscreen on A/B groups 8 and 9
+* Remove Roll the Ball endscreen A/B test
+* Remove random number generator test
+* Send video_size_mismatch diagnostic if comet video size and cached video size are different
+
 # Thu Jan 11 17:49:27 UTC 2018
 
 * Send auction_invalid_json diagnostic message when auction response JSON parsing fails
