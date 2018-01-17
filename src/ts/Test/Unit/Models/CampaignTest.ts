@@ -15,8 +15,7 @@ describe('PerformanceCampaign', () => {
 
     describe('when created with campaign json', () => {
         it('should have correct data from the json', () => {
-            const configurationJson = JSON.parse(ConfigurationAuctionPlc);
-            const configuration = new Configuration(configurationJson);
+            const configuration = TestFixtures.getConfiguration();
             const json: any = JSON.parse(OnCometVideoPlcCampaign);
             const campaignObject: any = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
 
@@ -47,8 +46,8 @@ describe('VastCampaign', () => {
             const parsedVast = vastParser.parseVast(vastXml);
             const params = TestFixtures.getVastCampaignParams(parsedVast, 3600, '12345');
             const campaign = new VastCampaign(params);
-            assert.equal(campaign.getAbGroup(), 1);
-            assert.equal(campaign.getGamerId(), 'gamerId');
+            assert.equal(campaign.getAbGroup(), 99);
+            assert.equal(campaign.getGamerId(), '57a35671bb58271e002d93c9');
             assert.equal(campaign.getId(), '12345');
             const vast = campaign.getVast();
             assert.equal(1, vast.getAds().length);

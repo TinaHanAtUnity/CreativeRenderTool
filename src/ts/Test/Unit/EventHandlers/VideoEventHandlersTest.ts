@@ -361,7 +361,6 @@ describe('VideoEventHandlersTest', () => {
             const vast = new Vast([], []);
             sinon.stub(vast, 'getVideoUrl').returns(video.getUrl());
             vastCampaign = TestFixtures.getEventVastCampaign();
-            // vastCampaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 12);
             sinon.stub(vastCampaign, 'getVideo').returns(video);
             const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
             sinon.stub(vastAdUnit, 'isPrepareCalled').returns(true);

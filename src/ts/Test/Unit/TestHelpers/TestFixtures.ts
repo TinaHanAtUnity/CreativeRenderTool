@@ -37,6 +37,7 @@ import VastCompanionXml from 'xml/VastCompanionAd.xml';
 import EventTestVast from 'xml/EventTestVast.xml';
 import VPAIDTestXML from 'xml/VPAID.xml';
 import VPAIDCampaignJson from 'json/OnProgrammaticVPAIDCampaign.json';
+import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xml';
 
 export class TestFixtures {
     public static getDisplayInterstitialCampaign(isStaticInterstitialUrlCampaign: boolean): DisplayInterstitialCampaign {
@@ -140,28 +141,29 @@ export class TestFixtures {
     }
 
     public static getProgrammaticMRAIDCampaignBaseParams(session: Session, campaignId: string, gamerId: string, abGroup: number, json: any): ICampaign {
+        const mraidJson = json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'];
         return {
             id: campaignId,
             gamerId: gamerId,
             abGroup: abGroup,
             willExpireAt: undefined,
-            adType: json.adType || undefined,
+            adType: mraidJson.adType || undefined,
             correlationId: json.correlationId || undefined,
-            creativeId: json.creativeId || undefined,
-            seatId: json.seatId || undefined,
-            meta: json.meta || undefined,
+            creativeId: mraidJson.creativeId || undefined,
+            seatId: mraidJson.seatId || undefined,
+            meta: mraidJson.meta || undefined,
             appCategory: undefined,
             appSubCategory: undefined,
             advertiserDomain: undefined,
             advertiserCampaignId: undefined,
             advertiserBundleId: undefined,
-            useWebViewUserAgentForTracking: json.useWebViewUserAgentForTracking,
+            useWebViewUserAgentForTracking: mraidJson.useWebViewUserAgentForTracking,
             buyerId: undefined,
             session: session
         };
     }
 
-    public static getProgrammaticMRAIDCampaignParams(json: any, storeName: StoreName, cacheTTL: number, campaignId: string): IMRAIDCampaign {
+    public static getProgrammaticMRAIDCampaignParams(json: any, cacheTTL: number, campaignId: string): IMRAIDCampaign {
         const mraidContentJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
         const mraidJson = json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'];
         const session = this.getSession();
@@ -184,7 +186,7 @@ export class TestFixtures {
             landscapeImage: mraidContentJson.endScreenLandscape ? new Image(mraidContentJson.endScreenLandscape, session) : undefined,
             portraitImage: mraidContentJson.endScreenPortrait ? new Image(mraidContentJson.endScreenPortrait, session) : undefined,
             bypassAppSheet: mraidContentJson.bypassAppSheet,
-            store: storeName,
+            store: undefined,
             appStoreId: mraidContentJson.appStoreId
         };
     }
@@ -331,7 +333,7 @@ export class TestFixtures {
 
     public static getProgrammaticMRAIDCampaign(): MRAIDCampaign {
         const json = JSON.parse(OnProgrammaticMraidUrlPlcCampaign);
-        return new MRAIDCampaign(this.getProgrammaticMRAIDCampaignParams(json, StoreName.GOOGLE, 3600, 'testId'));
+        return new MRAIDCampaign(this.getProgrammaticMRAIDCampaignParams(json, 3600, 'testId'));
     }
 
     public static getCompanionVastCampaign(): VastCampaign {
@@ -343,6 +345,13 @@ export class TestFixtures {
     public static getEventVastCampaign(): VastCampaign {
         const vastParser = TestFixtures.getVastParser();
         const vastXml = EventTestVast;
+        const vast = vastParser.parseVast(vastXml);
+        return new VastCampaign(this.getVastCampaignParams(vast, 3600, '12345'));
+    }
+
+    public static getCompanionVastCampaignWihoutImages(): VastCampaign {
+        const vastParser = TestFixtures.getVastParser();
+        const vastXml = VastCompanionAdWithoutImagesXml;
         const vast = vastParser.parseVast(vastXml);
         return new VastCampaign(this.getVastCampaignParams(vast, 3600, '12345'));
     }

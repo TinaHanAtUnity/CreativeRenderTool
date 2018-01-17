@@ -132,7 +132,6 @@ describe('VastVideoEventHandlers tests', () => {
         };
         const campaignWithTrackers = TestFixtures.getEventVastCampaign();
         campaignWithTrackers.getVast().set('additionalTrackingEvents', customTracking);
-        // const campaignWithTrackers = new VastCampaign(vast, '12345', TestFixtures.getSession(), 'gamerId', 1, 10, customTracking);
         vastAdUnitParameters.campaign = campaignWithTrackers;
         const adUnitWithTrackers = new VastAdUnit(nativeBridge, vastAdUnitParameters);
 

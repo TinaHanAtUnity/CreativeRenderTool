@@ -2,12 +2,9 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
 
-import VPAIDTestXML from 'xml/VPAIDWithAdParameters.xml';
-import VPAIDCampaignJson from 'json/OnProgrammaticVPAIDCampaign.json';
 import { VPAID } from 'Views/VPAID';
 import { NativeBridge } from 'Native/NativeBridge';
 import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
-import { VPAIDParser } from 'Utilities/VPAIDParser';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 
 describe.skip('VPAID View', () => {
@@ -17,12 +14,7 @@ describe.skip('VPAID View', () => {
 
     beforeEach(() => {
         nativeBridge = sinon.createStubInstance(NativeBridge);
-
-        const vpaidModel = new VPAIDParser().parse(VPAIDTestXML);
-        const vpaidCampaignJson = JSON.parse(VPAIDCampaignJson);
         campaign = TestFixtures.getVPAIDCampaign();
-        // campaign = new VPAIDCampaign(vpaidModel, TestFixtures.getSession(), vpaidCampaignJson.campaignId, vpaidCampaignJson.gamerId, vpaidCampaignJson.abGroup);
-
         vpaid = new VPAID(nativeBridge, campaign, TestFixtures.getPlacement(), 'en_US', '11111');
     });
 
