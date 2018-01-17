@@ -54,6 +54,8 @@
                 var width = window.innerWidth;
                 var height = window.innerHeight;
 
+                var configuration = undefined;
+
                 var setState = function(newState) {
                     state = newState;
                     trigger('stateChange', [newState]);
@@ -72,6 +74,8 @@
                             trigger('sizeChange', [width, height]);
                             break;
 
+                        case 'configurationAvailable':
+                            configuration = event.data.configuration;
                         default:
                             break;
                     }
@@ -218,6 +222,10 @@
                         state: state
                     }, '*');
                 };
+
+                this.getConfiguration = function() {
+                    return configuration;
+                }
             };
             window.mraid = new MRAID();
         })();
