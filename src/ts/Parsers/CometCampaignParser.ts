@@ -54,7 +54,7 @@ export class CometCampaignParser extends CampaignParser {
             const parameters: IMRAIDCampaign = {
                 ... baseCampaignParams,
                 useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking(),
-                resourceAsset: json.resourceUrl ? new HTML(json.resourceUrl, session) : undefined,
+                resourceAsset: json.mraidUrl ? new HTML(json.mraidUrl, session) : undefined,
                 resource: undefined,
                 dynamicMarkup: json.dynamicMarkup,
                 additionalTrackingEvents: undefined,

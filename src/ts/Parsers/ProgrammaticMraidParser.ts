@@ -7,7 +7,6 @@ import { DiagnosticError } from 'Errors/DiagnosticError';
 import { AuctionResponse } from 'Models/AuctionResponse';
 import { Session } from 'Models/Session';
 import { Image } from 'Models/Assets/Image';
-import { StoreName } from 'Models/Campaigns/PerformanceCampaign';
 
 export class ProgrammaticMraidParser extends CampaignParser {
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
@@ -25,28 +24,13 @@ export class ProgrammaticMraidParser extends CampaignParser {
         }
 
         const markup = decodeURIComponent(jsonMraid.markup);
-
-        const campaignStore = typeof jsonMraid.store !== 'undefined' ? jsonMraid.store : '';
-        let storeName: StoreName;
-        switch(campaignStore) {
-            case 'apple':
-                storeName = StoreName.APPLE;
-                break;
-            case 'google':
-                storeName = StoreName.GOOGLE;
-                break;
-            case 'xiaomi':
-                storeName = StoreName.XIAOMI;
-                break;
-            default:
-                throw new Error('Unknown store value "' + jsonMraid.store + '"');
-        }
+        const cacheTTL = response.getCacheTTL();
 
         const baseCampaignParams: ICampaign = {
             id: this.getProgrammaticCampaignId(nativeBridge),
             gamerId: gamerId,
             abGroup: abGroup,
-            willExpireAt: jsonMraid.cacheTTL ? Date.now() + jsonMraid.cacheTTL * 1000 : undefined,
+            willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
             adType: response.getAdType() || undefined,
             correlationId: response.getCorrelationId() || undefined,
             creativeId: response.getCreativeId() || undefined,
@@ -64,7 +48,6 @@ export class ProgrammaticMraidParser extends CampaignParser {
 
         const parameters: IMRAIDCampaign = {
             ... baseCampaignParams,
-            useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking(),
             resourceAsset: undefined,
             resource: markup,
             dynamicMarkup: jsonMraid.dynamicMarkup,
@@ -80,7 +63,7 @@ export class ProgrammaticMraidParser extends CampaignParser {
             landscapeImage: jsonMraid.endScreenLandscape ? new Image(jsonMraid.endScreenLandscape, session) : undefined,
             portraitImage: jsonMraid.endScreenPortrait ? new Image(jsonMraid.endScreenPortrait, session) : undefined,
             bypassAppSheet: jsonMraid.bypassAppSheet,
-            store: storeName,
+            store: undefined,
             appStoreId: jsonMraid.appStoreId
         };
 

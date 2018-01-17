@@ -33,11 +33,13 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
             }
         }
 
+        const cacheTTL = response.getCacheTTL();
+
         const baseCampaignParams: ICampaign = {
             id: this.getProgrammaticCampaignId(nativeBridge),
             gamerId: gamerId,
             abGroup: abGroup,
-            willExpireAt: jsonDisplay.cacheTTL ? Date.now() + jsonDisplay.cacheTTL * 1000 : undefined,
+            willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
             adType: response.getAdType() || undefined,
             correlationId: response.getCorrelationId() || undefined,
             creativeId: response.getCreativeId() || undefined,
