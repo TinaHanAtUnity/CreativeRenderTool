@@ -15,6 +15,7 @@ export interface IntentData {
     categories?: string[];
     flags?: number;
     extras?: IntentExtra[];
+    id?: string;
 }
 
 export class IntentApi extends NativeApi {
@@ -27,4 +28,11 @@ export class IntentApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._apiClass, 'launch', [intentData]);
     }
 
+    public canOpenIntent(intentData: IntentData): Promise<{ [id: string]: boolean }> {
+        return this._nativeBridge.invoke<{ [id: string]: boolean }>(this._apiClass, 'canOpenIntent', [intentData]);
+    }
+
+    public canOpenIntents(intentData: IntentData[]): Promise<{ [id: string]: boolean }> {
+        return this._nativeBridge.invoke<{ [id: string]: boolean }>(this._apiClass, 'canOpenIntents', [intentData]);
+    }
 }

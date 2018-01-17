@@ -8,6 +8,7 @@ import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Request } from 'Utilities/Request';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { Session } from 'Models/Session';
+import { IOpenableIntentsRequest } from 'Views/AFMABridge';
 
 export interface IAdMobEventHandlerParameters {
     adUnit: AdMobAdUnit;
@@ -84,6 +85,15 @@ export class AdMobEventHandler implements IAdMobEventHandler {
         } else {
             this._adUnit.getContainer().reorient(allowOrientation, forceOrientation);
         }
+    }
+
+    public onOpenableIntentsRequest(request: IOpenableIntentsRequest): void {
+        this._nativeBridge.Intent.canOpenIntents(request.intents).then((results) => {
+            this._adUnit.sendOpenableIntentsResponse({
+                id: request.id,
+                results: results
+            });
+        });
     }
 
     private onFailureToLoad(): void {

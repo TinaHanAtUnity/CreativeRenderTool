@@ -8,7 +8,7 @@ import { Placement } from 'Models/Placement';
 import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
 import { Template } from 'Utilities/Template';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
-import { AFMABridge } from 'Views/AFMABridge';
+import { AFMABridge, IOpenableIntentsResponse, IOpenableIntentsRequest } from 'Views/AFMABridge';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
@@ -22,6 +22,7 @@ export interface IAdMobEventHandler {
     onShow(): void;
     onVideoStart(): void;
     onSetOrientationProperties(allowOrientation: boolean, forceOrientation: ForceOrientation): void;
+    onOpenableIntentsRequest(request: IOpenableIntentsRequest): void;
 }
 
 const AFMAClickStringMacro = '{{AFMA_CLICK_SIGNALS_PLACEHOLDER}}';
@@ -53,7 +54,8 @@ export class AdMobView extends View<IAdMobEventHandler> {
             onAFMAGrantReward: () => this.onGrantReward(),
             onAFMAOpenInAppStore: () => { /**/ },
             onAFMAOpenStoreOverlay: () => { /**/ },
-            onAFMARewardedVideoStart: () => this.onVideoStart()
+            onAFMARewardedVideoStart: () => this.onVideoStart(),
+            onAFMAResolveOpenableIntents: (request) => this.onResolveOpenableIntents(request)
         });
         this._mraidBridge = new MRAIDBridge(nativeBridge, {
             onSetOrientationProperties: (allowOrientation: boolean, forceOrientation: ForceOrientation) => this.onSetOrientationProperties(allowOrientation, forceOrientation)
@@ -82,6 +84,10 @@ export class AdMobView extends View<IAdMobEventHandler> {
 
     public onBackPressed() {
         this._afmaBridge.onBackPressed();
+    }
+
+    public sendOpenableIntentsResponse(response: IOpenableIntentsResponse) {
+        this._afmaBridge.sendOpenableIntentsResult(response);
     }
 
     private setupIFrame() {
@@ -154,5 +160,9 @@ export class AdMobView extends View<IAdMobEventHandler> {
 
     private onSetOrientationProperties(allowOrientation: boolean, forceOrientation: ForceOrientation) {
         this._handlers.forEach((h) => h.onSetOrientationProperties(allowOrientation, forceOrientation));
+    }
+
+    private onResolveOpenableIntents(request: IOpenableIntentsRequest) {
+        this._handlers.forEach((h) => h.onOpenableIntentsRequest(request));
     }
 }
