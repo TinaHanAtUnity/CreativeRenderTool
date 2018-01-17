@@ -10,7 +10,7 @@ import { Localization } from 'Utilities/Localization';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
-import { JsonParser } from "../Utilities/JsonParser";
+import { JsonParser } from 'Utilities/JsonParser';
 
 export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 

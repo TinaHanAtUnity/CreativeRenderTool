@@ -103,4 +103,8 @@ export class CustomFeatures {
     public static isPlayableEndScreenTest(abGroup: number, url: string) {
         return url.match(/playables\/production\/unity\/roll-the-ball-v3\.1/) && (abGroup === 10 || abGroup === 11);
     }
+
+    public static isPlayableConfigurationEnabled(originalResourceUrl: string) {
+        return originalResourceUrl.match(/playables\/production\/unity/);
+    }
 }
