@@ -1,4 +1,21 @@
-# PENDING
+# Wed Jan 17 12:26:52 UTC 2018
+
+* Use streaming fallback if comet video size and cached video size are different
+
+# Tue Jan 16 10:23:28 UTC 2018
+
+* Test combined endscreen on A/B groups 8 and 9
+* Remove Roll the Ball endscreen A/B test
+* Remove random number generator test
+* Send video_size_mismatch diagnostic if comet video size and cached video size are different
+
+# Thu Jan 11 17:49:27 UTC 2018
+
+* Send auction_invalid_json diagnostic message when auction response JSON parsing fails
+* Handle Cache.getFilePath FILE_NOT_FOUND error in auction_request_failed diagnostic message
+* Fix creative test app to work with latest auction ID changes
+
+# Wed Jan 10 18:52:53 UTC 2018
 
 * Recreate ad request parameters when retrying with connectivity events
 * Fixes for AdMob spam signals for screen width, screen height and app installer
