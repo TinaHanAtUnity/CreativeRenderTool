@@ -1,3 +1,7 @@
+# Staged
+
+* `admob_ad_impression` diagnostic added.
+
 # Wed Jan 17 12:26:52 UTC 2018
 
 * Use streaming fallback if comet video size and cached video size are different
