@@ -10,6 +10,7 @@ import { Localization } from 'Utilities/Localization';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { JsonParser } from "../Utilities/JsonParser";
 
 export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -36,6 +37,8 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _playableStartTimestamp: number;
     private _backgroundTime: number = 0;
     private _backgroundTimestamp: number;
+
+    private _configuration: any;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string, coppaCompliant: boolean) {
         super(nativeBridge, 'playable-mraid', placement, campaign, coppaCompliant);
@@ -90,6 +93,19 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         this.createMRAID().then(mraid => {
             iframe.onload = () => this.onIframeLoaded();
             iframe.srcdoc = mraid;
+        });
+
+        this.fetchConfiguration().then(configuration => {
+            if(configuration) {
+                const configurationJson = JsonParser.parse(configuration);
+                // check configuration based on the ab group
+                const groupKey = "group" + this._campaign.getAbGroup();
+                if(configurationJson[groupKey]) {
+                    this._configuration = configurationJson[groupKey];
+                } else if (configurationJson.defaultConfiguration) {
+                    this._configuration = configurationJson.defaultConfiguration;
+                }
+            }
         });
 
         this._messageListener = (event: MessageEvent) => this.onMessage(event);
@@ -149,6 +165,12 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private onIframeLoaded() {
         this._iframeLoaded = true;
+
+        this._iframe.contentWindow.postMessage({
+            type: 'configurationAvailable',
+            configuration: this._configuration
+        }, '*');
+
 
         if(!this._loadingScreenTimeout) {
             clearTimeout(this._prepareTimeout);
@@ -345,5 +367,16 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
             return undefined;
         }
         return timeInSeconds;
+    }
+
+    private fetchConfiguration(): Promise<string | undefined> {
+        const configuration = this._campaign.getConfiguration();
+        if(configuration) {
+            const fileId = configuration.getFileId();
+            if(fileId) {
+                return this._nativeBridge.Cache.getFileContent(fileId, 'UTF-8');
+            }
+        }
+        return Promise.resolve(undefined);
     }
 }
