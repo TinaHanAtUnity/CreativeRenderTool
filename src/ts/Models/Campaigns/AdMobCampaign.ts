@@ -1,6 +1,5 @@
 import { Campaign, ICampaign } from 'Models/Campaign';
 import { Asset } from 'Models/Assets/Asset';
-import { Session } from 'Models/Session';
 
 export interface IAdMobCampaign extends ICampaign {
     dynamicMarkup: string;

@@ -3,7 +3,6 @@ import { HTML } from 'Models/Assets/HTML';
 import { Image } from 'Models/Assets/Image';
 import { Asset } from 'Models/Assets/Asset';
 import { StoreName } from 'Models/Campaigns/PerformanceCampaign';
-import { Session } from 'Models/Session';
 
 export interface IMRAIDCampaign extends ICampaign {
     resourceAsset: HTML | undefined;
