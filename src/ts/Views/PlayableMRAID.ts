@@ -348,10 +348,6 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                         }
                         break;
                     case 'showEndScreen':
-                        const resourceUrl = this._campaign.getResourceUrl();
-                        if(resourceUrl && CustomFeatures.isPlayableEndScreenTest(this._campaign.getAbGroup(), resourceUrl.getOriginalUrl())) {
-                            this._handlers.forEach(handler => handler.onMraidShowEndScreen());
-                        }
                         break;
                     default:
                         break;

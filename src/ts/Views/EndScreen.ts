@@ -1,4 +1,5 @@
 import EndScreenTemplate from 'html/EndScreen.html';
+import CombinedEndScreenTemplate from 'html/CombinedEndScreen.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -16,6 +17,8 @@ export interface IEndScreenHandler {
     onKeyEvent(keyCode: number): void;
 }
 
+const combinedEndScreenId = "combined-end-screen";
+
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
 
     protected _localization: Localization;
@@ -32,7 +35,11 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._abGroup = abGroup;
         this._gameName = gameName;
 
-        this._template = new Template(EndScreenTemplate, this._localization);
+        if (this.getEndscreenAlt() === combinedEndScreenId) {
+            this._template = new Template(CombinedEndScreenTemplate, this._localization);
+        } else {
+            this._template = new Template(EndScreenTemplate, this._localization);
+        }
 
         this._bindings = [
             {
@@ -93,6 +100,19 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
                 this._handlers.forEach(handler => handler.onEndScreenClose());
             }, AbstractAdUnit.getAutoCloseDelay());
         }
+
+        if (this.getEndscreenAlt() === combinedEndScreenId) {
+            const el = <HTMLElement>this._container.querySelector(".underlay");
+            const style: CSSStyleDeclaration = window.getComputedStyle(el);
+
+            const isFilterSupported = ["filter", "webkitFilter", "-webkit-filter"].filter((cssProp: string) => {
+                return style.hasOwnProperty(cssProp) && style.getPropertyValue(cssProp) && style.getPropertyValue(cssProp) !== "none";
+            }) || [];
+
+            if (!isFilterSupported.length) {
+                this._container.classList.add("filter-fallback");
+            }
+        }
     }
 
     public hide(): void {
@@ -119,6 +139,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     protected getEndscreenAlt(campaign?: Campaign) {
+        if(this._abGroup === 8 || this._abGroup === 9) {
+            return combinedEndScreenId;
+        }
+
         return undefined;
     }
 

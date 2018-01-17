@@ -1,5 +1,6 @@
 @import "vars.styl";
 @import "components.styl";
+@import "combined-end-screen-theme.styl";
 
 $end-screen-mixin($scale-size = $default-scale-size) {
 
@@ -63,12 +64,14 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       }
     }
 
-    .store-container {
-      margin-top: $default-size * $scale-size * .4;
-    }
+    #end-screen {
+      .store-container {
+        margin-top: $default-size * $scale-size * .4;
+      }
 
-    .row-container {
-      bottom: $default-size * $scale-size;
+      .row-container {
+        bottom: $default-size * $scale-size;
+      }
     }
   }
 }
