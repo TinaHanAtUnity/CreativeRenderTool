@@ -119,6 +119,10 @@ export class SdkStats {
         SdkStats._parseDuration = {};
     }
 
+    public static getAdRequestTimestamp(): number {
+        return SdkStats._latestAdRequestTimestamp;
+    }
+
     public static setAdRequestDuration(duration: number): void {
         SdkStats._latestAdRequestDuration = duration;
     }

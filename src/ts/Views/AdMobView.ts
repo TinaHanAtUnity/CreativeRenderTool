@@ -8,16 +8,17 @@ import { Placement } from 'Models/Placement';
 import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
 import { Template } from 'Utilities/Template';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
-import { AFMABridge } from 'Views/AFMABridge';
+import { AFMABridge, ITouchInfo } from 'Views/AFMABridge';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
 import { MRAIDBridge } from 'Views/MRAIDBridge';
+import { SdkStats } from 'Utilities/SdkStats';
 
 export interface IAdMobEventHandler {
     onClose(): void;
     onOpenURL(url: string): void;
-    onAttribution(url: string): void;
+    onAttribution(url: string, touchInfo: ITouchInfo): Promise<void>;
     onGrantReward(): void;
     onShow(): void;
     onVideoStart(): void;
@@ -25,6 +26,7 @@ export interface IAdMobEventHandler {
 }
 
 const AFMAClickStringMacro = '{{AFMA_CLICK_SIGNALS_PLACEHOLDER}}';
+const AFMADelayMacro = '{{AFMA_RDVT_PLACEHOLDER}}';
 
 export class AdMobView extends View<IAdMobEventHandler> {
     private _placement: Placement;
@@ -47,7 +49,7 @@ export class AdMobView extends View<IAdMobEventHandler> {
             onAFMAClose: () => this.onClose(),
             onAFMAOpenURL: (url: string) => this.onOpenURL(url),
             onAFMADisableBackButton: () => { /**/ },
-            onAFMAClick: (url) => this.onAttribution(url),
+            onAFMAClick: (url, touchInfo) => this.onAttribution(url, touchInfo),
             onAFMAFetchAppStoreOverlay: () => { /**/ },
             onAFMAForceOrientation: () => { /**/ },
             onAFMAGrantReward: () => this.onGrantReward(),
@@ -119,13 +121,9 @@ export class AdMobView extends View<IAdMobEventHandler> {
 
     private injectScripts(dom: Document): Promise<void> {
         const e = dom.head || document.body;
-        return this._adMobSignalFactory.getClickSignal().then((signal) => {
-            this.injectScript(e, MRAIDContainer);
-
-            const signalProto = signal.getBase64ProtoBufNonEncoded();
-            this.injectScript(e, AFMAContainer.replace(AFMAClickStringMacro, signalProto));
- //           this.injectScript(e, `<script>AFMA_ReceiveMessage('onshow');</script>`);
-        });
+        this.injectScript(e, MRAIDContainer);
+        this.injectScript(e, AFMAContainer);
+        return Promise.resolve();
     }
 
     private injectScript(e: HTMLElement, script: string) {
@@ -136,8 +134,8 @@ export class AdMobView extends View<IAdMobEventHandler> {
         this._handlers.forEach((h) => h.onClose());
     }
 
-    private onAttribution(url: string) {
-        this._handlers.forEach((h) => h.onAttribution(url));
+    private onAttribution(url: string, touchInfo: ITouchInfo) {
+        this._handlers.forEach((h) => h.onAttribution(url, touchInfo));
     }
 
     private onOpenURL(url: string) {
