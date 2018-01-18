@@ -10,7 +10,7 @@ import { MRAID } from 'Views/MRAID';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Configuration } from 'Models/Configuration';
 
-import OnProgrammaticMraidUrlPlcCampaign from "json/OnProgrammaticMraidUrlPlcCampaign.json";
+import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCampaign.json';
 
 describe('MRAID', () => {
     let handleInvocation: sinon.SinonSpy;
