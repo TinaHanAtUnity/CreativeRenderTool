@@ -55,16 +55,16 @@ export class ProgrammaticMraidUrlParser extends CampaignParser {
             clickAttributionUrl: jsonMraidUrl.clickAttributionUrl,
             clickAttributionUrlFollowsRedirects: jsonMraidUrl.clickAttributionUrlFollowsRedirects,
             clickUrl: jsonMraidUrl.clickUrl ? jsonMraidUrl.clickUrl : undefined,
-            videoEventUrls: jsonMraidUrl.videoEventUrls ? jsonMraidUrl.videoEventUrls : undefined,
-            gameName: jsonMraidUrl.gameName,
-            gameIcon: jsonMraidUrl.gameIcon ? new Image(jsonMraidUrl.gameIcon, session) : undefined,
-            rating: jsonMraidUrl.rating,
-            ratingCount: jsonMraidUrl.ratingCount,
-            landscapeImage: jsonMraidUrl.endScreenLandscape ? new Image(jsonMraidUrl.endScreenLandscape, session) : undefined,
-            portraitImage: jsonMraidUrl.endScreenPortrait ? new Image(jsonMraidUrl.endScreenPortrait, session) : undefined,
-            bypassAppSheet: jsonMraidUrl.bypassAppSheet,
+            videoEventUrls: undefined,
+            gameName: undefined,
+            gameIcon: undefined,
+            rating: undefined,
+            ratingCount: undefined,
+            landscapeImage: undefined,
+            portraitImage: undefined,
+            bypassAppSheet: undefined,
             store: undefined,
-            appStoreId: jsonMraidUrl.appStoreId
+            appStoreId: undefined
         };
 
         return Promise.resolve(new MRAIDCampaign(parameters));
