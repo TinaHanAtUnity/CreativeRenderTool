@@ -245,6 +245,10 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
                                 remoteVideoSize: remoteVideoSize,
                                 localVideoSize: result.size
                             }, this._campaign.getSession());
+
+                            // this condition is most commonly triggered on Android that probably has some unknown issue with resuming downloads
+                            // if comet has given video size that does not match local file size, use streaming fallback
+                            return streamingUrl;
                         }
 
                         return this.getVideo().getUrl();
