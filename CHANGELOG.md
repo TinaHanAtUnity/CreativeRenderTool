@@ -1,6 +1,7 @@
 # PENDING
 
 * Initial support for AdMob click signals
+* Send analytics events to CDP production endpoint
 
 # Wed Jan 17 23:33:54 UTC 2018
 
