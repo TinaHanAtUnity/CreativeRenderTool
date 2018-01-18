@@ -14,6 +14,26 @@ export enum AFMAEvents {
     FETCH_APP_STORE_OVERLAY = 'fetchAppStoreOverlay'
 }
 
+export interface IPoint {
+    x: number;
+    y: number;
+}
+
+export interface ITouchCounts {
+    up: number;
+    down: number;
+    move: number;
+    cancel: number;
+}
+
+export interface ITouchInfo {
+    start: IPoint;
+    end: IPoint;
+    diameter: number;
+    pressure: number;
+    counts: ITouchCounts;
+}
+
 export interface IAFMAMessage {
     type: string;
     event: string;
@@ -24,7 +44,7 @@ export interface IAFMAHandler {
     onAFMAOpenURL(url: string): void;
     onAFMAClose(): void;
     onAFMAForceOrientation(orientation: ForceOrientation): void;
-    onAFMAClick(url: string): void;
+    onAFMAClick(url: string, touchInfo: ITouchInfo): void;
     onAFMARewardedVideoStart(): void;
     onAFMAGrantReward(): void;
     onAFMADisableBackButton(disabled: boolean): void;
@@ -48,7 +68,7 @@ export class AFMABridge {
         this._afmaHandlers[AFMAEvents.OPEN_URL] = (msg) => this._handler.onAFMAOpenURL(msg.data.url);
         this._afmaHandlers[AFMAEvents.CLOSE] = () => this._handler.onAFMAClose();
         this._afmaHandlers[AFMAEvents.FORCE_ORIENTATION] = (msg) => this._handler.onAFMAForceOrientation(msg.data.orientation === 'portrait' ? ForceOrientation.PORTRAIT : ForceOrientation.LANDSCAPE);
-        this._afmaHandlers[AFMAEvents.CLICK] = (msg) => this._handler.onAFMAClick(msg.data.url);
+        this._afmaHandlers[AFMAEvents.CLICK] = (msg) => this._handler.onAFMAClick(msg.data.url, msg.data.touch);
         this._afmaHandlers[AFMAEvents.REWARDED_VIDEO_START] = () => this._handler.onAFMARewardedVideoStart();
         this._afmaHandlers[AFMAEvents.GRANT_REWARD] = () => this._handler.onAFMAGrantReward();
         this._afmaHandlers[AFMAEvents.DISABLE_BACK_BUTTON] = (msg) => this._handler.onAFMADisableBackButton(msg.data.disabled);
