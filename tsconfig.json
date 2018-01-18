@@ -10,7 +10,8 @@
     "moduleResolution": "node",
     "rootDir": "src/ts",
     "baseUrl": "src/ts",
-    "strict": true
+    "strict": true,
+    "strictPropertyInitialization": false
   },
   "include": [
     "src/ts/**/*.ts",
