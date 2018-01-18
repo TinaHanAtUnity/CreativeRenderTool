@@ -48,64 +48,6 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
             store: ['number', 'undefined'],
             appStoreId: ['string', 'undefined'],
         }, campaign);
-
-        // this.setModelValues(campaign);
-        /*
-        for(const key in campaign) {
-            if(campaign[<keyof IMRAIDCampaign>key] !== undefined) {
-                this.set(<keyof IMRAIDCampaign>key, campaign[<keyof IMRAIDCampaign>key]);
-            }
-        }*/
-/*
-        this.set('id', campaign.id);
-        this.set('session', campaign.session);
-        this.set('gamerId', campaign.gamerId);
-        this.set('abGroup', campaign.abGroup);
-        this.set('useWebViewUserAgentForTracking', campaign.useWebViewUserAgentForTracking);
-
-        this.set('resourceAsset', campaign.resourceAsset);
-        this.set('resource', campaign.resource);
-        this.set('dynamicMarkup', campaign.dynamicMarkup);
-        this.set('additionalTrackingEvents', campaign.additionalTrackingEvents || {});
-        this.set('adType', campaign.adType || undefined);
-        this.set('correlationId', campaign.correlationId || undefined);
-        this.set('creativeId', campaign.creativeId || undefined);
-        this.set('seatId', campaign.seatId || undefined);
-
-        this.set('clickAttributionUrl', campaign.clickAttributionUrl);
-        this.set('clickAttributionUrlFollowsRedirects', campaign.clickAttributionUrlFollowsRedirects);
-
-        if(campaign.clickUrl) {
-            this.set('clickUrl', campaign.clickUrl);
-        }
-        if (campaign.videoEventUrls) {
-            this.set('videoEventUrls', campaign.videoEventUrls);
-        }
-
-        this.set('meta', campaign.meta);
-        this.set('gameName', campaign.gameName);
-
-        if(campaign.willExpireAt) {
-            this.set('willExpireAt', campaign.willExpireAt);
-        }
-
-        if(campaign.gameIcon) {
-            this.set('gameIcon', campaign.gameIcon);
-        }
-
-        this.set('rating', campaign.rating);
-        this.set('ratingCount', campaign.ratingCount);
-
-        if(campaign.landscapeImage) {
-            this.set('landscapeImage', campaign.landscapeImage);
-        }
-        if(campaign.portraitImage) {
-            this.set('portraitImage', campaign.portraitImage);
-        }
-
-        this.set('bypassAppSheet', campaign.bypassAppSheet);
-        this.set('store', campaign.store);
-        this.set('appStoreId', campaign.appStoreId);*/
     }
 
     public getResourceUrl(): HTML | undefined {
