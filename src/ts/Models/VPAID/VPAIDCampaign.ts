@@ -15,21 +15,7 @@ export class VPAIDCampaign extends Campaign<IVPAIDCampaign> {
             ... Campaign.Schema,
             vpaid: ['object'],
             tracking: ['object', 'undefined']
-        });
-        this.set('vpaid', campaign.vpaid);
-        this.set('session', campaign.session);
-
-        this.set('id', campaign.id);
-        this.set('gamerId', campaign.gamerId);
-        this.set('abGroup', campaign.abGroup);
-        this.set('useWebViewUserAgentForTracking', campaign.useWebViewUserAgentForTracking);
-        this.set('willExpireAt', campaign.willExpireAt);
-        this.set('adType', campaign.adType || undefined);
-        this.set('correlationId', campaign.correlationId || undefined);
-        this.set('creativeId', campaign.creativeId || undefined);
-        this.set('appCategory', campaign.appCategory || undefined);
-        this.set('appSubCategory', campaign.appSubCategory || undefined);
-        this.set('seatId', campaign.seatId || undefined);
+        }, campaign);
 
         this.addTrackingToVAST(campaign.tracking);
     }

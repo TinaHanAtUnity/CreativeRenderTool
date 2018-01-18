@@ -14,19 +14,8 @@ export abstract class DisplayInterstitialCampaign<T extends IDisplayInterstitial
         tracking: ['object', 'undefined']
     };
 
-    constructor(classname: string, schema: ISchema<T>, campaign: IDisplayInterstitialCampaign) {
-        super(classname, schema);
-
-        this.set('willExpireAt', campaign.willExpireAt);
-        this.set('gamerId', campaign.gamerId);
-        this.set('abGroup', campaign.abGroup);
-        this.set('adType', campaign.adType);
-        this.set('correlationId', campaign.correlationId);
-        this.set('creativeId', campaign.creativeId);
-        this.set('seatId', campaign.seatId);
-        this.set('tracking', campaign.tracking);
-        this.set('session', campaign.session);
-        this.set('useWebViewUserAgentForTracking', campaign.useWebViewUserAgentForTracking);
+    constructor(classname: string, schema: ISchema<T>, campaign: T) {
+        super(classname, schema, campaign);
     }
 
     public getClickThroughUrl(): string | undefined {

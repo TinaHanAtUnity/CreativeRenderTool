@@ -47,8 +47,16 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
             bypassAppSheet: ['boolean', 'undefined'],
             store: ['number', 'undefined'],
             appStoreId: ['string', 'undefined'],
-        });
+        }, campaign);
 
+        // this.setModelValues(campaign);
+        /*
+        for(const key in campaign) {
+            if(campaign[<keyof IMRAIDCampaign>key] !== undefined) {
+                this.set(<keyof IMRAIDCampaign>key, campaign[<keyof IMRAIDCampaign>key]);
+            }
+        }*/
+/*
         this.set('id', campaign.id);
         this.set('session', campaign.session);
         this.set('gamerId', campaign.gamerId);
@@ -97,7 +105,7 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
 
         this.set('bypassAppSheet', campaign.bypassAppSheet);
         this.set('store', campaign.store);
-        this.set('appStoreId', campaign.appStoreId);
+        this.set('appStoreId', campaign.appStoreId);*/
     }
 
     public getResourceUrl(): HTML | undefined {

@@ -23,30 +23,7 @@ export class VastCampaign extends Campaign<IVastCampaign> {
             portrait: ['object', 'undefined'],
             landscape: ['object', 'undefined'],
             tracking: ['object', 'undefined']
-        });
-
-        this.set('vast', campaign.vast);
-        this.set('video', campaign.video);
-        this.set('hasEndscreen', campaign.hasEndscreen);
-        this.set('portrait', campaign.portrait);
-        this.set('landscape', campaign.landscape);
-
-        this.set('id', campaign.id);
-        this.set('session', campaign.session);
-        this.set('gamerId', campaign.gamerId);
-        this.set('abGroup', campaign.abGroup);
-        this.set('useWebViewUserAgentForTracking', campaign.useWebViewUserAgentForTracking);
-        this.set('willExpireAt', campaign.willExpireAt);
-        this.set('adType', campaign.adType);
-        this.set('correlationId', campaign.correlationId || undefined);
-        this.set('creativeId', campaign.creativeId || undefined);
-        this.set('appCategory', campaign.appCategory || undefined);
-        this.set('appSubCategory', campaign.appSubCategory || undefined);
-        this.set('seatId', campaign.seatId || undefined);
-        this.set('advertiserDomain', campaign.advertiserDomain || undefined);
-        this.set('advertiserCampaignId', campaign.advertiserCampaignId || undefined);
-        this.set('advertiserBundleId', campaign.advertiserBundleId || undefined);
-        this.set('buyerId', campaign.buyerId || undefined);
+        }, campaign);
 
         this.processCustomTracking(campaign.tracking);
     }

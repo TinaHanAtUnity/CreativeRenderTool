@@ -51,44 +51,7 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             videoEventUrls: ['object'],
             bypassAppSheet: ['boolean'],
             store: ['number']
-        });
-
-        this.set('id', campaign.id);
-        this.set('session', campaign.session);
-        this.set('gamerId', campaign.gamerId);
-        this.set('abGroup', campaign.abGroup);
-
-        this.set('appStoreId', campaign.appStoreId);
-
-        this.set('gameId', campaign.gameId);
-        this.set('gameName', campaign.gameName);
-        this.set('gameIcon', campaign.gameIcon);
-
-        this.set('rating', campaign.rating);
-        this.set('ratingCount', campaign.ratingCount);
-
-        this.set('landscapeImage', campaign.landscapeImage);
-        this.set('portraitImage', campaign.portraitImage);
-
-        if(campaign.video && campaign.streamingVideo) {
-            this.set('video', campaign.video);
-            this.set('streamingVideo', campaign.streamingVideo);
-        }
-
-        if(campaign.videoPortrait && campaign.streamingPortraitVideo) {
-            this.set('videoPortrait', campaign.videoPortrait);
-            this.set('streamingPortraitVideo', campaign.streamingPortraitVideo);
-        }
-
-        this.set('clickUrl', campaign.clickUrl);
-        this.set('videoEventUrls', campaign.videoEventUrls);
-        this.set('clickAttributionUrl', campaign.clickAttributionUrl);
-        this.set('clickAttributionUrlFollowsRedirects', campaign.clickAttributionUrlFollowsRedirects);
-
-        this.set('bypassAppSheet', campaign.bypassAppSheet);
-        this.set('store', campaign.store);
-
-        this.set('meta', campaign.meta);
+        }, campaign);
     }
 
     public getStore(): StoreName {

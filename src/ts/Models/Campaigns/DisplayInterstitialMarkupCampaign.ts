@@ -10,9 +10,6 @@ export class DisplayInterstitialMarkupCampaign extends DisplayInterstitialCampai
             ... DisplayInterstitialCampaign.Schema,
             markup: ['string']
         }, campaign);
-
-        this.set('markup', campaign.markup);
-        this.set('clickThroughUrl', campaign.clickThroughUrl);
     }
 
     public getDynamicMarkup() {

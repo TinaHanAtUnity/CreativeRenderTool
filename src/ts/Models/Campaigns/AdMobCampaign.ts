@@ -12,22 +12,7 @@ export class AdMobCampaign extends Campaign<IAdMobCampaign> {
             ... Campaign.Schema,
             dynamicMarkup: ['string'],
             tracking: ['object', 'undefined']
-        });
-
-        if(campaign.willExpireAt) {
-            this.set('willExpireAt', campaign.willExpireAt);
-        }
-
-        this.set('id', campaign.id);
-        this.set('dynamicMarkup', campaign.dynamicMarkup);
-        this.set('gamerId', campaign.gamerId);
-        this.set('abGroup', campaign.abGroup);
-        this.set('adType', campaign.adType);
-        this.set('correlationId', campaign.correlationId);
-        this.set('creativeId', campaign.creativeId);
-        this.set('seatId', campaign.seatId);
-        this.set('tracking', campaign.tracking);
-        this.set('session', campaign.session);
+        }, campaign);
     }
 
     public getDynamicMarkup(): string {
