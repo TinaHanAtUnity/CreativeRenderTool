@@ -54,7 +54,7 @@ export class ProgrammaticMraidUrlParser extends CampaignParser {
             additionalTrackingEvents: response.getTrackingUrls(),
             clickAttributionUrl: jsonMraidUrl.clickAttributionUrl,
             clickAttributionUrlFollowsRedirects: jsonMraidUrl.clickAttributionUrlFollowsRedirects,
-            clickUrl: jsonMraidUrl.clickUrl ? jsonMraidUrl.clickAttributionUrl : undefined,
+            clickUrl: jsonMraidUrl.clickUrl ? jsonMraidUrl.clickUrl : undefined,
             videoEventUrls: jsonMraidUrl.videoEventUrls ? jsonMraidUrl.videoEventUrls : undefined,
             gameName: jsonMraidUrl.gameName,
             gameIcon: jsonMraidUrl.gameIcon ? new Image(jsonMraidUrl.gameIcon, session) : undefined,

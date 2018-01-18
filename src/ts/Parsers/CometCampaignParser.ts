@@ -60,7 +60,7 @@ export class CometCampaignParser extends CampaignParser {
                 additionalTrackingEvents: undefined,
                 clickAttributionUrl: json.clickAttributionUrl,
                 clickAttributionUrlFollowsRedirects: json.clickAttributionUrlFollowsRedirects,
-                clickUrl: json.clickUrl ? json.clickAttributionUrl : undefined,
+                clickUrl: json.clickUrl ? json.clickUrl : undefined,
                 videoEventUrls: json.videoEventUrls ? json.videoEventUrls : undefined,
                 gameName: json.gameName,
                 gameIcon: json.gameIcon ? new Image(json.gameIcon, session) : undefined,
