@@ -91,6 +91,9 @@ export class AdMobAdUnit extends AbstractAdUnit {
 
     public sendImpressionEvent() {
         this.sendTrackingEvent('impression');
+        Diagnostics.trigger('admob_ad_impression', {
+            placement: this._placement.getId()
+        }, this._campaign.getSession());
     }
 
     public sendClickEvent() {
