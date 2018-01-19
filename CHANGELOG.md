@@ -1,3 +1,12 @@
+# Thu Jan 18 08:36:17 UTC 2018
+
+* Initial support for AdMob click signals
+* Send analytics events to CDP production endpoint
+
+# Wed Jan 17 23:33:54 UTC 2018
+
+* `admob_ad_impression` diagnostic added.
+
 # Wed Jan 17 12:26:52 UTC 2018
 
 * Use streaming fallback if comet video size and cached video size are different

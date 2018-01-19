@@ -47,8 +47,8 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         mediaId: ['string']
     };
 
-    constructor(name: string, schema: ISchema<T>) {
-        super(name, schema);
+    constructor(name: string, schema: ISchema<T>, data: T) {
+        super(name, schema, data);
     }
 
     public getId(): string {

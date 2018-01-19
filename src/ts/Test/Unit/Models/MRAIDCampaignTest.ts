@@ -1,25 +1,25 @@
 import 'mocha';
 import { assert } from 'chai';
 
-import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
+import { IMRAIDCampaign, MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { HTML } from 'Models/Assets/HTML';
-import { Configuration } from 'Models/Configuration';
-import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
-import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCampaign.json';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
+
+import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCampaign.json';
 
 describe('MRAIDCampaign', () => {
 
     describe('when created with campaign json', () => {
         it('should have correct data from the json', () => {
-            const configurationJson = JSON.parse(ConfigurationAuctionPlc);
-            const configuration = new Configuration(configurationJson);
+            const configuration = TestFixtures.getConfiguration();
             const json = JSON.parse(OnProgrammaticMraidUrlPlcCampaign);
             const media = json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'];
             const mraidJson = JSON.parse(media.content);
             const asset = new HTML(mraidJson.inlinedUrl, TestFixtures.getSession());
             mraidJson.id = 'testId';
-            const campaign = new MRAIDCampaign(mraidJson, TestFixtures.getSession(), configuration.getGamerId(), configuration.getAbGroup(), media.cacheTTL, mraidJson.inlinedUrl, '<div>resource</div>', undefined, undefined, undefined, undefined, undefined, media.useWebViewUserAgentForTracking);
+
+            const params: IMRAIDCampaign = TestFixtures.getProgrammaticMRAIDCampaignParams(json, media.cacheTTL, mraidJson.id);
+            const campaign = new MRAIDCampaign(params);
 
             assert.equal(campaign.getId(), mraidJson.id);
             assert.equal(campaign.getAbGroup(), configuration.getAbGroup());
@@ -39,24 +39,25 @@ describe('MRAIDCampaign', () => {
         });
 
         it('should have correct additional tracking from the json', () => {
-            const configurationJson = JSON.parse(ConfigurationAuctionPlc);
-            const configuration = new Configuration(configurationJson);
             const json = JSON.parse(OnProgrammaticMraidUrlPlcCampaign);
             const media = json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'];
             const mraidJson = JSON.parse(media.content);
             mraidJson.id = 'testId';
-            const campaign = new MRAIDCampaign(mraidJson, TestFixtures.getSession(), configuration.getGamerId(), configuration.getAbGroup(), media.cacheTTL, mraidJson.inlinedUrl, '<div>resource</div>', media.trackingUrls);
+
+            const params: IMRAIDCampaign = TestFixtures.getProgrammaticMRAIDCampaignParams(json, media.cacheTTL, mraidJson.id);
+            const campaign = new MRAIDCampaign(params);
 
             assert.deepEqual(campaign.getTrackingEventUrls(), media.trackingUrls);
         });
 
         it('should set resourceUrl', () => {
-            const configurationJson = JSON.parse(ConfigurationAuctionPlc);
-            const configuration = new Configuration(configurationJson);
             const json = JSON.parse(OnProgrammaticMraidUrlPlcCampaign);
+            const media = json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'];
             const mraidJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
             mraidJson.id = 'testId';
-            const campaign = new MRAIDCampaign(mraidJson, TestFixtures.getSession(), configuration.getGamerId(), configuration.getAbGroup(), 12345);
+
+            const params: IMRAIDCampaign = TestFixtures.getProgrammaticMRAIDCampaignParams(json, media.cacheTTL, mraidJson.id);
+            const campaign = new MRAIDCampaign(params);
             const asset = new HTML('https://resource-url.com', TestFixtures.getSession());
 
             campaign.setResourceUrl('https://resource-url.com');
@@ -65,12 +66,13 @@ describe('MRAIDCampaign', () => {
         });
 
         it('should set resource', () => {
-            const configurationJson = JSON.parse(ConfigurationAuctionPlc);
-            const configuration = new Configuration(configurationJson);
             const json = JSON.parse(OnProgrammaticMraidUrlPlcCampaign);
+            const media = json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'];
             const mraidJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
             mraidJson.id = 'testId';
-            const campaign = new MRAIDCampaign(mraidJson, TestFixtures.getSession(), configuration.getGamerId(), configuration.getAbGroup(), 12345);
+
+            const params: IMRAIDCampaign = TestFixtures.getProgrammaticMRAIDCampaignParams(json, media.cacheTTL, mraidJson.id);
+            const campaign = new MRAIDCampaign(params);
 
             campaign.setResource('some resource');
 
