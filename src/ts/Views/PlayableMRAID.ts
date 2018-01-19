@@ -1,4 +1,5 @@
 import PlayableMRAIDTemplate from 'html/PlayableMRAID.html';
+import MRAIDContainer from 'html/mraid/container.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { Placement } from 'Models/Placement';
@@ -9,7 +10,6 @@ import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
-import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { JsonParser } from 'Utilities/JsonParser';
 
 export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
@@ -90,12 +90,8 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
 
-        this.createMRAID().then(mraid => {
-            iframe.onload = () => this.onIframeLoaded();
-            iframe.srcdoc = mraid;
-        });
-
         this.fetchConfiguration().then(configuration => {
+            let container = MRAIDContainer;
             if(configuration) {
                 const configurationJson = JsonParser.parse(configuration);
                 // check configuration based on the ab group
@@ -105,7 +101,14 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 } else if (configurationJson.defaultConfiguration) {
                     this._configuration = configurationJson.defaultConfiguration;
                 }
+                if(this._configuration) {
+                    container = container.replace('var configuration = undefined;', 'var configuration = ' + JSON.stringify(this._configuration) + ';');
+                }
             }
+            this.createMRAID(container).then(mraid => {
+                iframe.onload = () => this.onIframeLoaded();
+                iframe.srcdoc = mraid;
+            });
         });
 
         this._messageListener = (event: MessageEvent) => this.onMessage(event);
@@ -165,11 +168,6 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private onIframeLoaded() {
         this._iframeLoaded = true;
-
-        this._iframe.contentWindow.postMessage({
-            type: 'configurationAvailable',
-            configuration: this._configuration
-        }, '*');
 
         if(!this._loadingScreenTimeout) {
             clearTimeout(this._prepareTimeout);
