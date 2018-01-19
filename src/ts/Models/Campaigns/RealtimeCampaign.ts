@@ -6,9 +6,26 @@ export class RealtimeCampaign extends Campaign<ICampaign> {
     constructor(session: Session) {
         super('RealtimeCampaign', {
             ... Campaign.Schema,
+        }, {
+            id: '',
+            gamerId: '',
+            abGroup: 0,
+            willExpireAt: undefined,
+            adType: undefined,
+            correlationId: undefined,
+            creativeId: undefined,
+            seatId: undefined,
+            meta: undefined,
+            appCategory: undefined,
+            appSubCategory: undefined,
+            advertiserDomain: undefined,
+            advertiserCampaignId: undefined,
+            advertiserBundleId: undefined,
+            useWebViewUserAgentForTracking: undefined,
+            buyerId: undefined,
+            session: session,
+            mediaId: ''
         });
-
-        this.set('session', session);
     }
 
     public getRequiredAssets(): Array<Asset<IAsset>> {

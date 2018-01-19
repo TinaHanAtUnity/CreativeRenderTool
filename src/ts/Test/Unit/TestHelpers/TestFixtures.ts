@@ -78,7 +78,8 @@ export class TestFixtures {
             advertiserBundleId: undefined,
             useWebViewUserAgentForTracking: undefined,
             buyerId: undefined,
-            session: session
+            session: session,
+            mediaId: 'UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'
         };
     }
 
@@ -159,7 +160,8 @@ export class TestFixtures {
             advertiserBundleId: undefined,
             useWebViewUserAgentForTracking: mraidJson.useWebViewUserAgentForTracking,
             buyerId: undefined,
-            session: session
+            session: session,
+            mediaId: 'UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'
         };
     }
 
@@ -209,7 +211,8 @@ export class TestFixtures {
             advertiserBundleId: 'advertiserBundleId',
             useWebViewUserAgentForTracking: false,
             buyerId: 'buyerId',
-            session: session
+            session: session,
+            mediaId: 'UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'
         };
     }
 
@@ -259,7 +262,8 @@ export class TestFixtures {
             advertiserBundleId: undefined,
             useWebViewUserAgentForTracking: json.useWebViewUserAgentForTracking,
             buyerId: undefined,
-            session: session
+            session: session,
+            mediaId: 'UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'
         };
 
         return {
@@ -288,7 +292,8 @@ export class TestFixtures {
             advertiserBundleId: json.advertiserBundleId || undefined,
             useWebViewUserAgentForTracking: json.useWebViewUserAgentForTracking,
             buyerId: json.buyerId || undefined,
-            session: session
+            session: session,
+            mediaId: 'UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'
         };
     }
 

@@ -44,7 +44,8 @@ export class ProgrammaticStaticInterstitialUrlParser extends CampaignParser {
             advertiserBundleId: undefined,
             useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking(),
             buyerId: undefined,
-            session: session
+            session: session,
+            mediaId: response.getMediaId()
         };
 
         const displayInterstitialParams: IDisplayInterstitialCampaign = {

@@ -40,7 +40,8 @@ export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
                     advertiserBundleId: response.getAdvertiserBundleId() || undefined,
                     useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking(),
                     buyerId: response.getBuyerId() || undefined,
-                    session: session
+                    session: session,
+                    mediaId: response.getMediaId()
                 };
 
                 const vpaidCampaignParams: IVPAIDCampaign = {

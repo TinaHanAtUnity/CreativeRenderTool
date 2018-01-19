@@ -47,7 +47,8 @@ export class CometCampaignParser extends CampaignParser {
             advertiserBundleId: undefined,
             useWebViewUserAgentForTracking: undefined,
             buyerId: undefined,
-            session: session
+            session: session,
+            mediaId: response.getMediaId()
         };
 
         if(json && json.mraidUrl) {
