@@ -154,7 +154,7 @@ export class CampaignManager {
     }
 
     public requestRealtime(placement: Placement, session: Session): Promise<Campaign | void> {
-        return Promise.all([this.createRequestUrl(true), this.createRequestBody(false, placement)]).then(([requestUrl, requestBody]) => {
+        return Promise.all([this.createRequestUrl(true, session), this.createRequestBody(false, placement)]).then(([requestUrl, requestBody]) => {
             this._nativeBridge.Sdk.logInfo('Requesting realtime ad plan from ' + requestUrl);
             const body = JSON.stringify(requestBody);
             return this._request.post(requestUrl, body, [], {
@@ -396,7 +396,7 @@ export class CampaignManager {
         return CampaignManager.AbGroup ? CampaignManager.AbGroup : this._configuration.getAbGroup();
     }
 
-    private createRequestUrl(realtime: boolean): Promise<string> {
+    private createRequestUrl(realtime: boolean, session?: Session): Promise<string> {
         let url: string = this.getBaseUrl();
 
         if(this._deviceInfo.getAdvertisingIdentifier()) {
@@ -421,6 +421,11 @@ export class CampaignManager {
             realtimeRequest: realtime
         });
 
+        if(realtime && session) {
+            url = Url.addParameters(url, {
+                auctionId: session.getId()
+            });
+        }
         if(this._clientInfo.getPlatform() === Platform.IOS) {
             url = Url.addParameters(url, {
                 osVersion: this._deviceInfo.getOsVersion()
