@@ -355,9 +355,13 @@ export class Cache {
     public isVideoValid(video: Video, campaign: Campaign): Promise<boolean> {
         return this.getFileId(video.getOriginalUrl()).then(fileId => {
             return VideoInfo.getVideoInfo(this._nativeBridge, fileId).then(([width, height, duration]) => {
-                const isValid = (width > 0 && height > 0 && duration > 0);
+                const isValid = (width > 0 && height > 0 && duration > 0 && duration <= 40000);
+                let errorType = 'video_validation_failed';
+                if(duration > 40000) {
+                    errorType = 'video_validation_failed_video_too_long';
+                }
                 if(!isValid) {
-                    Diagnostics.trigger('video_validation_failed', {
+                    Diagnostics.trigger(errorType, {
                         url: video.getOriginalUrl(),
                         width: width,
                         height: height,
