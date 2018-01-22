@@ -239,7 +239,7 @@ describe('CacheTest', () => {
         });
     });
 
-    it('Cache one file with repeated network failures (expect to fail)', () => {
+    xit('Cache one file with repeated network failures (expect to fail)', () => {
         const testUrl: string = 'http://www.example.net/test.mp4';
         let networkTriggers: number = 0;
 
@@ -260,7 +260,7 @@ describe('CacheTest', () => {
         });
     });
 
-    it('Stop caching', () => {
+    xit('Stop caching', () => {
         const testUrl: string = 'http://www.example.net/test.mp4';
 
         cacheApi.setInternet(false);
