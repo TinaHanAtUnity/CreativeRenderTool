@@ -1,3 +1,29 @@
+# PENDING
+
+* Refactor campaign model constructors
+* Reject and never show videos longer than 40 seconds
+* Combined end screen with golden stars and platform specific download button on groups 10 and 11
+
+# Thu Jan 18 08:36:17 UTC 2018
+
+* Initial support for AdMob click signals
+* Send analytics events to CDP production endpoint
+
+# Wed Jan 17 23:33:54 UTC 2018
+
+* `admob_ad_impression` diagnostic added.
+
+# Wed Jan 17 12:26:52 UTC 2018
+
+* Use streaming fallback if comet video size and cached video size are different
+
+# Tue Jan 16 10:23:28 UTC 2018
+
+* Test combined endscreen on A/B groups 8 and 9
+* Remove Roll the Ball endscreen A/B test
+* Remove random number generator test
+* Send video_size_mismatch diagnostic if comet video size and cached video size are different
+
 # Thu Jan 11 17:49:27 UTC 2018
 
 * Send auction_invalid_json diagnostic message when auction response JSON parsing fails

@@ -459,7 +459,8 @@ export class AdUnitFactory {
             adUnit: adUnit,
             request: parameters.request,
             thirdPartyEventManager: parameters.thirdPartyEventManager,
-            session: parameters.campaign.getSession()
+            session: parameters.campaign.getSession(),
+            adMobSignalFactory: parameters.adMobSignalFactory
         });
         view.addEventHandler(eventHandler);
 

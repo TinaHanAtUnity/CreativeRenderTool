@@ -1,0 +1,166 @@
+@import "vars.styl";
+
+$combined-end-screen-size = $default-scale-size * $default-size;
+$combined-end-font-size = $combined-end-screen-size * 1.25;
+
+body.landscape #end-screen.combined-end-screen {
+  .underlay {
+    width: 50%;
+  }
+
+  /* ios8 fix */
+  .end-screen-info-background {
+    position: absolute;
+    left: 50%;
+  }
+
+  .unityads-logo {
+    width: 100%;
+  }
+
+  .privacy-button {
+    left: 0;
+  }
+  /* end ios8 fix */
+}
+
+body.portrait #end-screen.combined-end-screen {
+  .end-screen-info {
+    position: relative;
+    top: $combined-end-screen-size * 1.5;
+  }
+
+  .underlay {
+    height: 45%;
+  }
+
+  .download-container {
+    top: $combined-end-screen-size * .5;
+  }
+
+  .row-container {
+    bottom: $combined-end-screen-size * 1.5;
+
+  }
+}
+
+#end-screen.combined-end-screen {
+
+  overflow: hidden;
+
+  .btn-close-region {
+    z-index: 100;
+  }
+
+  .game-rating-mask {
+    color: $blue;
+  }
+
+  .icon-star {
+    font-size: $combined-end-font-size;
+  }
+
+  .name-container {
+    font-size: $combined-end-font-size;
+  }
+
+  /* iOS 8 fix */
+  .row-container {
+    z-index: 20;
+  }
+
+  .campaign-container {
+
+    .end-screen-info-background,
+    .game-background {
+      z-index: 10;
+    }
+
+    .end-screen-info-background {
+      background-color: $white;
+    }
+
+    .download-container {
+      width: $combined-end-screen-size * 12;
+      /* iOS 8 fix: position and z-index */
+      position: relative;
+      z-index: 20;
+      margin: 0 auto;
+      border-radius: $combined-end-screen-size * 5;
+      background-color: darken($blue, 10%);
+      font-size: $combined-end-font-size * .75;
+    }
+
+    .game-background-landscape,
+    .game-background-portrait {
+      position: relative;
+      border-radius: .2rem;
+      box-shadow: 0 0 100px 5px rgba(0, 0, 0, .75);
+    }
+
+    .game-background-landscape {
+      /* iOS8 fix: right and margin */
+      top: 5%;
+      right: 2.5%;
+      margin-left: 5%;
+      width: 45%;
+      height: 90%;
+    }
+
+    .game-background-portrait {
+      top: $combined-end-screen-size * 2.75;
+      margin: 0 auto;
+      width: 90%;
+    }
+
+    .end-screen-info {
+      z-index: 20;
+    }
+
+    .underlay {
+      position: absolute;
+      z-index: 5;
+      width: 100%;
+      height: 100%;
+      filter: brightness(100%) blur(20px);
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+      /* Help android to render blur faster */
+      transform: scale(1.5) translateZ(0);
+      perspective: 1000;
+      backface-visibility: hidden;
+
+      &:before {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background-image: linear-gradient(rgba(255, 255, 255, 0), $black 80%);
+        content: "";
+      }
+    }
+
+    .store-container {
+      margin-top: $combined-end-screen-size * .25;
+    }
+  }
+}
+
+#end-screen.combined-end-screen.gold {
+  .game-rating-mask {
+    color: $rating-orange;
+  }
+}
+
+body.android #end-screen.combined-end-screen.gold .campaign-container .download-container {
+  border-radius: $combined-end-screen-size * .75;
+}
+
+#end-screen.combined-end-screen.filter-fallback {
+  .underlay {
+    display: none;
+  }
+}
+

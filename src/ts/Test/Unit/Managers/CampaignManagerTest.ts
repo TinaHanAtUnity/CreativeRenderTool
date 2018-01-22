@@ -6,6 +6,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Campaign } from 'Models/Campaign';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
+import { XPromoCampaign } from "Models/Campaigns/XPromoCampaign";
 import { DisplayInterstitialMarkupCampaign } from 'Models/Campaigns/DisplayInterstitialMarkupCampaign';
 import { DisplayInterstitialMarkupUrlCampaign } from 'Models/Campaigns/DisplayInterstitialMarkupUrlCampaign';
 import { ClientInfo } from 'Models/ClientInfo';
@@ -28,6 +29,9 @@ import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { StorageType } from 'Native/Api/AndroidDeviceInfo';
 import { CampaignManager } from 'Managers/CampaignManager';
 import { FocusManager } from 'Managers/FocusManager';
+import { ProgrammaticVastParser } from 'Parsers/ProgrammaticVastParser';
+import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
+import { AdMobSignal } from 'Models/AdMobSignal';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import OnProgrammaticMraidPlcCampaignEmpty from 'json/OnProgrammaticMraidPlcCampaignEmpty.json';
@@ -64,10 +68,6 @@ import OnProgrammaticVastPlcCampaignCustomTracking from 'json/OnProgrammaticVast
 import OnStaticInterstitialDisplayCampaign from 'json/OnStaticInterstitialDisplayCampaign.json';
 import OnStaticInterstitialDisplayCampaignNoClick from 'json/OnStaticInterstitialDisplayCampaignNoClick.json';
 import OnStaticInterstitialDisplayCampaignNoClickMarkupUrl from 'json/OnStaticInterstitialDisplayCampaignNoClickMarkupUrl.json';
-import { ProgrammaticVastParser } from 'Parsers/ProgrammaticVastParser';
-import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
-import { AdMobSignal } from 'Models/AdMobSignal';
-import {XPromoCampaign} from "../../../Models/Campaigns/XPromoCampaign";
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
