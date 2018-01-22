@@ -1,3 +1,9 @@
+# PENDING
+
+* Refactor campaign model constructors
+* Reject and never show videos longer than 40 seconds
+* Combined end screen with golden stars and platform specific download button on groups 10 and 11
+
 # Thu Jan 18 08:36:17 UTC 2018
 
 * Initial support for AdMob click signals
