@@ -7,7 +7,7 @@ import { Cache, CacheStatus } from 'Utilities/Cache';
 import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { CacheMode } from 'Models/Configuration';
-import { Campaign } from 'Models/Campaign';
+import { Campaign, ICampaign } from 'Models/Campaign';
 import { Asset } from 'Models/Assets/Asset';
 import { StorageType, StorageApi } from 'Native/Api/Storage';
 import { CacheError, IFileInfo, CacheEvent, CacheApi } from 'Native/Api/Cache';
@@ -149,7 +149,7 @@ class TestCampaign extends Campaign {
     private _optional: Asset[];
 
     constructor(required: Asset[], optional: Asset[]) {
-        super('TestCampaign', Campaign.Schema);
+        super('TestCampaign', Campaign.Schema, <ICampaign>{});
         this._required = required;
         this._optional = optional;
     }
