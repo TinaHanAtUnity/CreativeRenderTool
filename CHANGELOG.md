@@ -1,3 +1,7 @@
+# PENDING
+
+* Fix AdMob time on screen click signal
+
 # Tue Jan 23 09:19:04 UTC 2018
 
 * Refactor campaign model constructors
