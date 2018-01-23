@@ -16,6 +16,7 @@ import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { Campaign } from 'Models/Campaign';
 import { Placement } from 'Models/Placement';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
+import { XPromoAdUnit } from "../AdUnits/XPromoAdUnit";
 
 export class VideoEventHandlers {
 
@@ -65,6 +66,8 @@ export class VideoEventHandlers {
             let debugMessage = '';
             if(adUnit instanceof VastAdUnit) {
                 debugMessage = 'Programmatic Ad';
+            } else if(adUnit instanceof XPromoAdUnit) {
+                debugMessage = 'XPromo';
             } else {
                 debugMessage = 'Performance Ad';
             }
