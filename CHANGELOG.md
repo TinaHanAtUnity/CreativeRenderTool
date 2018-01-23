@@ -1,4 +1,4 @@
-# PENDING
+# Tue Jan 23 09:19:04 UTC 2018
 
 * Refactor campaign model constructors
 * Reject and never show videos longer than 40 seconds
