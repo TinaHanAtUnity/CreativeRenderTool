@@ -1,4 +1,4 @@
-import { EndScreenEventHandler } from 'EventHandlers/EndScreenEventHandler';
+import { EndScreenEventHandler, IEndScreenDownloadParameters } from 'EventHandlers/EndScreenEventHandler';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { IXPromoAdUnitParameters, XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
@@ -13,5 +13,10 @@ export class XPromoEndScreenEventHandler extends EndScreenEventHandler<XPromoCam
         if (keyCode === KeyCode.BACK && this._adUnit.isShowing() && !this._adUnit.isActive()) {
             this._adUnit.hide();
         }
+    }
+
+    public onEndScreenDownload(parameters: IEndScreenDownloadParameters): void {
+        super.onEndScreenDownload(parameters);
+        // todo: send click event to HttpKafka
     }
 }

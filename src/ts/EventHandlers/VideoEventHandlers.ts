@@ -97,19 +97,21 @@ export class VideoEventHandlers {
             adUnit.getContainer().addDiagnosticsEvent({type: 'videoStarted'});
             adUnit.getVideo().setStarted(true);
 
-            operativeEventManager.sendStart(campaign.getSession(), placement, campaign, this.getVideoOrientation(adUnit)).then(() => {
-                adUnit.onStartProcessed.trigger();
-            });
-
-            const comScoreDuration = (adUnit.getVideo().getDuration()).toString(10);
-            const sessionId = campaign.getSession().getId();
-            const creativeId = campaign.getCreativeId();
-            const category = campaign.getCategory();
-            const subCategory = campaign.getSubCategory();
-            comScoreTrackingService.sendEvent('play', sessionId, comScoreDuration, position, creativeId, category, subCategory);
-
             if(overlay) {
                 overlay.setSpinnerEnabled(false);
+            }
+
+            if(!(adUnit instanceof XPromoAdUnit)) {
+                operativeEventManager.sendStart(campaign.getSession(), placement, campaign, this.getVideoOrientation(adUnit)).then(() => {
+                    adUnit.onStartProcessed.trigger();
+                });
+
+                const comScoreDuration = (adUnit.getVideo().getDuration()).toString(10);
+                const sessionId = campaign.getSession().getId();
+                const creativeId = campaign.getCreativeId();
+                const category = campaign.getCategory();
+                const subCategory = campaign.getSubCategory();
+                comScoreTrackingService.sendEvent('play', sessionId, comScoreDuration, position, creativeId, category, subCategory);
             }
 
             nativeBridge.Listener.sendStartEvent(placement.getId());
@@ -233,15 +235,18 @@ export class VideoEventHandlers {
         adUnit.getContainer().addDiagnosticsEvent({type: 'onVideoCompleted'});
         adUnit.setActive(false);
         adUnit.setFinishState(FinishState.COMPLETED);
-        operativeEventManager.sendView(campaign.getSession(), placement, campaign, this.getVideoOrientation(adUnit));
 
-        const comScorePlayedTime = adUnit.getVideo().getPosition();
-        const comScoreDuration = (adUnit.getVideo().getDuration()).toString(10);
-        const sessionId = campaign.getSession().getId();
-        const creativeId = campaign.getCreativeId();
-        const category = campaign.getCategory();
-        const subCategory = campaign.getSubCategory();
-        comScoreTrackingService.sendEvent('end', sessionId, comScoreDuration, comScorePlayedTime, creativeId, category, subCategory);
+        if(!(adUnit instanceof XPromoAdUnit)) {
+            operativeEventManager.sendView(campaign.getSession(), placement, campaign, this.getVideoOrientation(adUnit));
+
+            const comScorePlayedTime = adUnit.getVideo().getPosition();
+            const comScoreDuration = (adUnit.getVideo().getDuration()).toString(10);
+            const sessionId = campaign.getSession().getId();
+            const creativeId = campaign.getCreativeId();
+            const category = campaign.getCategory();
+            const subCategory = campaign.getSubCategory();
+            comScoreTrackingService.sendEvent('end', sessionId, comScoreDuration, comScorePlayedTime, creativeId, category, subCategory);
+        }
 
         this.afterVideoCompleted(adUnit);
     }
