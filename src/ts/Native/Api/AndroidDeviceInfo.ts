@@ -117,6 +117,10 @@ export class AndroidDeviceInfoApi extends NativeApi {
         return this._nativeBridge.invoke<string>(this._apiClass, 'getProduct');
     }
 
+    public getFingerprint(): Promise<string> {
+        return this._nativeBridge.invoke<string>(this._apiClass, 'getFingerprint');
+    }
+
     public getSupportedAbis(): Promise<string[]> {
         return this._nativeBridge.invoke<string[]>(this._apiClass, 'getSupportedAbis');
     }
@@ -127,6 +131,10 @@ export class AndroidDeviceInfoApi extends NativeApi {
 
     public getElapsedRealtime(): Promise<number> {
         return this._nativeBridge.invoke<number>(this._apiClass, 'getElapsedRealtime');
+    }
+
+    public isUSBConnected(): Promise<boolean> {
+        return this._nativeBridge.invoke<boolean>(this._apiClass, 'isUSBConnected');
     }
 
     public handleEvent(event: string, parameters: any[]): void {
