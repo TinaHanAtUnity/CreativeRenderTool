@@ -6,8 +6,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Campaign } from 'Models/Campaign';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
-import { DisplayInterstitialMarkupCampaign } from 'Models/Campaigns/DisplayInterstitialMarkupCampaign';
-import { DisplayInterstitialMarkupUrlCampaign } from 'Models/Campaigns/DisplayInterstitialMarkupUrlCampaign';
+import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { ClientInfo } from 'Models/ClientInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Request } from 'Utilities/Request';
@@ -887,10 +886,10 @@ describe('CampaignManager', () => {
             const content = JSON.parse(json.media.B0JMQwI7mlsbtAeTSrUjC4.content);
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager);
-            let triggeredCampaign: DisplayInterstitialMarkupCampaign;
+            let triggeredCampaign: DisplayInterstitialCampaign;
             let triggeredError: any;
             campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
-                triggeredCampaign = <DisplayInterstitialMarkupCampaign>campaign;
+                triggeredCampaign = <DisplayInterstitialCampaign>campaign;
             });
             campaignManager.onError.subscribe(error => {
                 triggeredError = error;
@@ -907,39 +906,6 @@ describe('CampaignManager', () => {
                 assert.equal(triggeredCampaign.getGamerId(), configuration.getGamerId());
                 assert.deepEqual(triggeredCampaign.getOptionalAssets(), []);
                 assert.equal(triggeredCampaign.getDynamicMarkup(), decodeURIComponent(content.markup));
-            });
-        });
-
-        it('should process the programmatic/static-interstitial-url content-type', () => {
-            const mockRequest = sinon.mock(request);
-            mockRequest.expects('post').returns(Promise.resolve({
-                response: OnStaticInterstitialDisplayCampaignNoClickMarkupUrl
-            }));
-
-            const json = JSON.parse(OnStaticInterstitialDisplayCampaignNoClickMarkupUrl);
-            const content = JSON.parse(json.media.B0JMQwI7mlsbtAeTSrUjC4.content);
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager);
-            let triggeredCampaign: DisplayInterstitialMarkupUrlCampaign;
-            let triggeredError: any;
-            campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
-                triggeredCampaign = <DisplayInterstitialMarkupUrlCampaign>campaign;
-            });
-            campaignManager.onError.subscribe(error => {
-                triggeredError = error;
-            });
-
-            return campaignManager.request().then(() => {
-                if(triggeredError) {
-                    throw triggeredError;
-                }
-
-                mockRequest.verify();
-
-                assert.equal(triggeredCampaign.getAbGroup(), configuration.getAbGroup());
-                assert.equal(triggeredCampaign.getGamerId(), configuration.getGamerId());
-                assert.deepEqual(triggeredCampaign.getOptionalAssets(), []);
-                assert.equal(triggeredCampaign.getMarkupUrl(), decodeURIComponent(content.markupUrl));
             });
         });
 

@@ -1,6 +1,7 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { NativeApi } from 'Native/NativeApi';
 import { Observable1 } from "Utilities/Observable";
+import { Observable2 } from "Utilities/Observable";
 
 // Platform specific, first three are available on both Android & iOS. The rest are Android only.
 export enum WebplayerEvent {
@@ -157,6 +158,8 @@ export class WebPlayerApi extends NativeApi {
 
     public readonly onPageStarted = new Observable1<string>();
     public readonly onPageFinished = new Observable1<string>();
+    public readonly onCreateWindow = new Observable1<string>();
+    public readonly shouldOverrideUrlLoading = new Observable2<string, string>();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'WebPlayer');
@@ -198,6 +201,14 @@ export class WebPlayerApi extends NativeApi {
 
             case WebplayerEvent[WebplayerEvent.ERROR]:
                 this.onPageFinished.trigger(parameters[0]);
+                break;
+
+            case WebplayerEvent[WebplayerEvent.SHOULD_OVERRIDE_URL_LOADING]:
+                let method = "";
+                if (parameters.length > 1) {
+                    method = parameters[1];
+                }
+                this.shouldOverrideUrlLoading.trigger(parameters[0], method);
                 break;
 
             default:

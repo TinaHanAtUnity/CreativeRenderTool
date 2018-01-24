@@ -1,25 +1,23 @@
 import { Campaign, ICampaign } from 'Models/Campaign';
 import { Asset } from 'Models/Assets/Asset';
-import { ISchema } from 'Models/Model';
 import { Session } from 'Models/Session';
 
-export interface IDisplayInterstitialCampaign extends ICampaign {
-    clickThroughUrl: string | undefined;
+interface IDisplayInterstitialCampaign extends ICampaign {
+    dynamicMarkup: string;
     tracking: object | undefined;
 }
 
-export abstract class DisplayInterstitialCampaign<T extends IDisplayInterstitialCampaign = IDisplayInterstitialCampaign> extends Campaign<T> {
-    public static Schema: ISchema<IDisplayInterstitialCampaign> = {
-        ... Campaign.Schema,
-        clickThroughUrl: ['string', 'undefined'],
-        tracking: ['object', 'undefined']
-    };
-
-    constructor(classname: string, schema: ISchema<T>, session: Session, gamerId: string, abGroup: number, cacheTTL: number | undefined, tracking?: { [eventName: string]: string[] }, adType?: string, creativeId?: string, seatId?: number, correlationId?: string,  useWebViewUserAgentForTracking?: boolean) {
-        super(classname, schema);
+export class DisplayInterstitialCampaign extends Campaign<IDisplayInterstitialCampaign> {
+    constructor(markup: string, session: Session, gamerId: string, abGroup: number, cacheTTL: number | undefined, tracking?: { [eventName: string]: string[] }, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
+        super('DisplayInterstitialCampaign', {
+            ... Campaign.Schema,
+            dynamicMarkup: ['string', 'undefined'],
+            tracking: ['object', 'undefined']
+        });
         if(cacheTTL) {
             this.set('willExpireAt', Date.now() + cacheTTL * 1000);
         }
+        this.set('dynamicMarkup', markup);
         this.set('gamerId', gamerId);
         this.set('abGroup', abGroup);
         this.set('adType', adType || undefined);
@@ -28,15 +26,10 @@ export abstract class DisplayInterstitialCampaign<T extends IDisplayInterstitial
         this.set('seatId', seatId || undefined);
         this.set('tracking', tracking || undefined);
         this.set('session', session);
-        this.set('useWebViewUserAgentForTracking', useWebViewUserAgentForTracking);
     }
 
-    public getClickThroughUrl(): string | undefined {
-        return this.get('clickThroughUrl');
-    }
-
-    public setClickThroughUrl(clickThroughUrl: string) {
-        this.set('clickThroughUrl', clickThroughUrl);
+    public getDynamicMarkup(): string {
+        return this.get('dynamicMarkup');
     }
 
     public getTrackingUrlsForEvent(eventName: string): string[] {

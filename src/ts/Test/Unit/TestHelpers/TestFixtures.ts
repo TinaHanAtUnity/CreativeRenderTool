@@ -11,8 +11,6 @@ import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Configuration } from 'Models/Configuration';
 import { ICacheDiagnostics } from 'Utilities/Cache';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
-import { DisplayInterstitialMarkupCampaign } from 'Models/Campaigns/DisplayInterstitialMarkupCampaign';
-import { DisplayInterstitialMarkupUrlCampaign } from 'Models/Campaigns/DisplayInterstitialMarkupUrlCampaign';
 import { Session } from 'Models/Session';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { IPackageInfo } from 'Native/Api/AndroidDeviceInfo';
@@ -28,13 +26,6 @@ import VastCompanionXml from 'xml/VastCompanionAd.xml';
 import EventTestVast from 'xml/EventTestVast.xml';
 
 export class TestFixtures {
-    public static getDisplayInterstitialCampaign(isStaticInterstitialUrlCampaign: boolean): DisplayInterstitialCampaign {
-        if (isStaticInterstitialUrlCampaign) {
-            return this.getDisplayInterstitialMarkupUrlCampaign();
-        }
-        return this.getDisplayInterstitialMarkupCampaign();
-    }
-
     public static getPlacement(): Placement {
         return new Placement({
             id: 'fooId',
@@ -90,6 +81,11 @@ export class TestFixtures {
         const vastXml = EventTestVast;
         const vast = vastParser.parseVast(vastXml);
         return new VastCampaign(vast, '12345', TestFixtures.getSession(), 'gamerId', 1);
+    }
+
+    public static getDisplayInterstitialCampaign(): DisplayInterstitialCampaign {
+        const json = JSON.parse(DummyDisplayInterstitialCampaign);
+        return new DisplayInterstitialCampaign(json.display.markup, this.getSession(), json.gamerId, json.abGroup, undefined, json.display.tracking);
     }
 
     public static getClientInfo(platform?: Platform): ClientInfo {
@@ -185,15 +181,5 @@ export class TestFixtures {
     public static getDisplayMarkup(): string {
         const json = JSON.parse(DummyDisplayInterstitialCampaign);
         return decodeURIComponent(json.display.markup);
-    }
-
-    private static getDisplayInterstitialMarkupCampaign(): DisplayInterstitialMarkupCampaign {
-        const json = JSON.parse(DummyDisplayInterstitialCampaign);
-        return new DisplayInterstitialMarkupCampaign(json.display.markup, this.getSession(), json.gamerId, json.abGroup, undefined, json.display.tracking, json.display.clickThroughURL);
-    }
-
-    private static getDisplayInterstitialMarkupUrlCampaign(): DisplayInterstitialMarkupUrlCampaign {
-        const json = JSON.parse(DummyDisplayInterstitialUrlCampaign);
-        return new DisplayInterstitialMarkupUrlCampaign(json.display.markupUrl, this.getSession(), json.gamerId, json.abGroup, undefined, json.display.tracking);
     }
 }

@@ -225,27 +225,14 @@ describe('AdUnitFactoryTest', () => {
         });
     });
 
-    const displayUnitTests = (isStaticInterstitialUrlCampaign: boolean): void => {
+    const displayUnitTests = (): void => {
         let adUnit: DisplayInterstitialAdUnit;
         let campaign: DisplayInterstitialCampaign;
-        let server: sinon.SinonFakeServer;
 
         beforeEach(() => {
-            campaign = TestFixtures.getDisplayInterstitialCampaign(isStaticInterstitialUrlCampaign);
+            campaign = TestFixtures.getDisplayInterstitialCampaign();
             adUnitParameters.campaign = campaign;
             adUnit = <DisplayInterstitialAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
-
-            if (isStaticInterstitialUrlCampaign) {
-                server = sinon.fakeServer.create();
-                server.respondImmediately = true;
-                server.respondWith('<a href="http://unity3d.com"></a>');
-            }
-        });
-
-        afterEach(() => {
-            if (server) {
-                server.restore();
-            }
         });
 
         describe('on show', () => {
@@ -259,14 +246,8 @@ describe('AdUnitFactoryTest', () => {
     };
 
     describe('DisplayInterstitialAdUnit', () => {
-        const isStaticInterstitialUrlCampaign = true;
-
         describe('On static-interstial campaign', () => {
-            displayUnitTests(!isStaticInterstitialUrlCampaign);
-        });
-
-        describe('On static-interstial-url campaign', () => {
-            displayUnitTests(isStaticInterstitialUrlCampaign);
+            displayUnitTests();
         });
     });
 });
