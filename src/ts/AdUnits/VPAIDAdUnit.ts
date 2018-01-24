@@ -81,9 +81,8 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
     }
 
     public show(): Promise<void> {
-        return this._container.open(this, ['webplayer'], false, this._forceOrientation, false, false, true, false, this._options).then(() => {
-            window.setTimeout(() => this._view.show(), 250);
-       });
+        this.onShow();
+        return this._container.open(this, ['webplayer'], false, this._forceOrientation, false, false, true, false, this._options);
     }
 
     public hide(): Promise<void> {
@@ -191,7 +190,11 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
     }
 
     private onAppForeground() {
-        this._view.resumeAd();
+        if (this._view.isLoaded()) {
+            this._view.resumeAd();
+        } else {
+            this._view.loadWebPlayer();
+        }
     }
 
     private onAppBackground() {

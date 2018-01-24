@@ -41,6 +41,7 @@ export class VPAID extends View<IVPAIDHandler> {
     private _loadingScreen: HTMLElement;
     private _stuckTimer: Timer;
     private _isPaused = false;
+    private _isLoaded = false;
     private _webplayerEventObserver: IObserver1<any[]>;
 
     constructor(nativeBridge: NativeBridge, campaign: VPAIDCampaign, placement: Placement, language: string, gameId: string) {
@@ -63,22 +64,22 @@ export class VPAID extends View<IVPAIDHandler> {
         }];
     }
 
-    public render() {
-        super.render();
-
-    }
-
-    public show() {
-        super.show();
+    public loadWebPlayer() {
+        this._isLoaded = true;
         const iframeSrcDoc = VPAIDContainerTemplate.replace(this.vpaidSrcTag, this._campaign.getVPAID().getScriptUrl());
         this._nativeBridge.WebPlayer.setData(encodeURIComponent(iframeSrcDoc), 'text/html', 'UTF-8');
         this._webplayerEventObserver = this._nativeBridge.WebPlayer.onWebPlayerEvent.subscribe((args: any[]) => this.onWebPlayerEvent(args));
+    }
+
+    public isLoaded(): boolean {
+        return this._isLoaded;
     }
 
     public hide() {
         this.sendEvent('destroy');
         super.hide();
         this._stuckTimer.stop();
+        this._nativeBridge.WebPlayer.onWebPlayerEvent.unsubscribe(this._webplayerEventObserver);
     }
 
     public showAd() {
