@@ -26,9 +26,9 @@ export class AdMobAdUnit extends AbstractAdUnit {
     private _keyDownListener: (kc: number) => void;
     private _campaign: AdMobCampaign;
     private _placement: Placement;
-    private _timeOnScreen: number;
-    private _foregroundTime: number;
-    private _startTime: number;
+    private _timeOnScreen: number = 0;
+    private _foregroundTime: number = 0;
+    private _startTime: number = 0;
 
     private _onSystemKillObserver: () => void;
     private _onPauseObserver: () => void;

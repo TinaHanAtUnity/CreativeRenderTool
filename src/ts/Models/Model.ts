@@ -12,10 +12,11 @@ export abstract class Model<T extends object> {
     private readonly _schema: ISchema<T>;
     private _name: string;
 
-    constructor(name: string, schema: ISchema<T>) {
+    constructor(name: string, schema: ISchema<T>, data: T = <T>{}) {
         this._data = <T>{};
         this._schema = schema;
         this._name = name;
+        this.setModelValues(data);
     }
 
     public abstract getDTO(): { [key: string]: any };
@@ -28,6 +29,14 @@ export abstract class Model<T extends object> {
             this._data[key] = value;
         } else {
             this.handleError(new WebViewError('model: ' + this._name + ' key: ' + key + ' with value: ' + value + ': ' + this.getTypeOf(value) + ' is not in: ' + this._schema[key], 'CheckValueError'));
+        }
+    }
+
+    public setModelValues(values: T) {
+        for(const key in values) {
+            if(values.hasOwnProperty(key)) {
+                this.set(key, values[key]);
+            }
         }
     }
 

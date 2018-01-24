@@ -102,7 +102,7 @@ describe('VastEndScreenEventHandlersTest', () => {
         beforeEach(() => {
 
             video = new Video('', TestFixtures.getSession());
-            campaign = new VastCampaign(vast, '12345', TestFixtures.getSession(), 'gamerId', 1);
+            campaign = TestFixtures.getEventVastCampaign();
 
             vastAdUnitParameters.video = video;
             vastAdUnitParameters.campaign = campaign;

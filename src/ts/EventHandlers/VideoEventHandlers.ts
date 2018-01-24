@@ -39,6 +39,7 @@ export class VideoEventHandlers {
                 originalUrl: originalUrl
             });
             Diagnostics.trigger('video_too_long', error, campaign.getSession());
+            this.handleVideoError(nativeBridge, adUnit, campaign);
         }
 
         const overlay = adUnit.getOverlay();
