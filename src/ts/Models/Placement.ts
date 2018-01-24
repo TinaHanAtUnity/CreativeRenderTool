@@ -96,12 +96,7 @@ export class Placement extends Model<IPlacement> {
     }
 
     public getAdTypes(): string[] | undefined {
-        // TODO: Hack for internal testing
-        const adTypes: string[] = []; // this.get('adTypes');
-        if(adTypes) {
-            adTypes.push('XPROMO');
-        }
-        return adTypes;
+        return this.get('adTypes');
     }
 
     public getState(): PlacementState {
