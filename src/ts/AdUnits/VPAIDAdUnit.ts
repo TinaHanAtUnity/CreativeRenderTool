@@ -13,6 +13,7 @@ import { DiagnosticError } from 'Errors/DiagnosticError';
 import { FocusManager } from 'Managers/FocusManager';
 import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
 import { AbstractOverlay } from 'Views/AbstractOverlay';
+import { setTimeout } from 'timers';
 
 export interface IVPAIDAdUnitParameters extends IAdUnitParameters<VPAIDCampaign> {
     vpaid: VPAID;
@@ -80,9 +81,9 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
     }
 
     public show(): Promise<void> {
-        this.onShow();
-        this.showView();
-        return this._container.open(this, ['webview'], false, this._forceOrientation, false, false, true, false, this._options);
+        return this._container.open(this, ['webplayer'], false, this._forceOrientation, false, false, true, false, this._options).then(() => {
+            window.setTimeout(() => this._view.show(), 250);
+       });
     }
 
     public hide(): Promise<void> {
@@ -187,7 +188,6 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
 
     private hideView() {
         this._view.hide();
-        document.body.removeChild(this._view.container());
     }
 
     private onAppForeground() {

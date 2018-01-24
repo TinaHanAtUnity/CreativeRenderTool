@@ -29,13 +29,15 @@ export enum WebplayerEvent {
     JS_PROMPT,
     CONSOLE_MESSAGE,
     SHOW_FILE_CHOOSER,
-    GEOLOCATION_PERMISSIONS_SHOW
+    GEOLOCATION_PERMISSIONS_SHOW,
+    WEBPLAYER_EVENT
 }
 
 export class WebPlayerApi extends NativeApi {
 
     public readonly onPageStarted = new Observable1<string>();
     public readonly onPageFinished = new Observable1<string>();
+    public readonly onWebPlayerEvent = new Observable1<any[]>();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'WebPlayer');
@@ -66,6 +68,10 @@ export class WebPlayerApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._apiClass, 'setEventSettings', [eventSettings]);
     }
 
+    public sendEventToWebPlayer(args: any[]): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'sendEventToWebPlayer', [args]   );
+    }
+
     public handleEvent(event: string, parameters: any[]): void {
         switch(event) {
             case WebplayerEvent[WebplayerEvent.PAGE_STARTED]:
@@ -79,7 +85,9 @@ export class WebPlayerApi extends NativeApi {
             case WebplayerEvent[WebplayerEvent.ERROR]:
                 this.onPageFinished.trigger(parameters[0]);
                 break;
-
+            case WebplayerEvent[WebplayerEvent.WEBPLAYER_EVENT]:
+                this.onWebPlayerEvent.trigger(parameters[0]);
+                break;
             default:
                 super.handleEvent(event, parameters);
         }
