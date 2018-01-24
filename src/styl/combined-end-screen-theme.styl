@@ -1,48 +1,8 @@
 @import "vars.styl";
+@import "mixins.styl";
 
 $combined-end-screen-size = $default-scale-size * $default-size;
 $combined-end-font-size = $combined-end-screen-size * 1.25;
-
-body.landscape #end-screen.combined-end-screen {
-  .underlay {
-    width: 50%;
-  }
-
-  /* ios8 fix */
-  .end-screen-info-background {
-    position: absolute;
-    left: 50%;
-  }
-
-  .unityads-logo {
-    width: 100%;
-  }
-
-  .privacy-button {
-    left: 0;
-  }
-  /* end ios8 fix */
-}
-
-body.portrait #end-screen.combined-end-screen {
-  .end-screen-info {
-    position: relative;
-    top: $combined-end-screen-size * 1.5;
-  }
-
-  .underlay {
-    height: 45%;
-  }
-
-  .download-container {
-    top: $combined-end-screen-size * .5;
-  }
-
-  .row-container {
-    bottom: $combined-end-screen-size * 1.5;
-
-  }
-}
 
 #end-screen.combined-end-screen {
 
@@ -50,10 +10,6 @@ body.portrait #end-screen.combined-end-screen {
 
   .btn-close-region {
     z-index: 100;
-  }
-
-  .game-rating-mask {
-    color: $blue;
   }
 
   .icon-star {
@@ -146,16 +102,82 @@ body.portrait #end-screen.combined-end-screen {
       margin-top: $combined-end-screen-size * .25;
     }
   }
-}
 
-#end-screen.combined-end-screen.gold {
-  .game-rating-mask {
-    color: $rating-orange;
+  &.with-store-logos {
+    .store-logo {
+      $set-image(100%, $combined-end-screen-size * 3, 0, "", contain);
+    }
   }
 }
 
-body.android #end-screen.combined-end-screen.gold .campaign-container .download-container {
-  border-radius: $combined-end-screen-size * .75;
+/* Orientation specific */
+body.landscape #end-screen.combined-end-screen {
+  .underlay {
+    width: 50%;
+  }
+
+  /* ios8 fix */
+  .end-screen-info-background {
+    position: absolute;
+    left: 50%;
+  }
+
+  .unityads-logo {
+    width: 100%;
+  }
+
+  .privacy-button {
+    left: 0;
+  }
+  /* end ios8 fix */
+}
+
+body.portrait #end-screen.combined-end-screen {
+  .end-screen-info {
+    position: relative;
+    top: $combined-end-screen-size * 1.5;
+  }
+
+  .underlay {
+    height: 45%;
+  }
+
+  .download-container {
+    top: $combined-end-screen-size * .5;
+  }
+
+  .row-container {
+    bottom: $combined-end-screen-size * 1.5;
+  }
+
+  &.with-store-logos {
+    .download-container {
+      top: 0;
+    }
+  }
+}
+
+/* Device os specific */
+body.android #end-screen {
+  &.combined-end-screen {
+
+    &.with-store-logos .store-logo {
+      margin-top: $combined-end-screen-size * -1.25;
+      background-image: url("../img/play-store.png");
+    }
+
+    .campaign-container .download-container {
+      border-radius: $combined-end-screen-size * .75;
+    }
+  }
+}
+
+body.iphone #end-screen.combined-end-screen.with-store-logos .store-logo,
+body.ipad #end-screen.combined-end-screen.with-store-logos .store-logo {
+  position: relative;
+  bottom: $combined-end-screen-size * .5;
+  height: $combined-end-screen-size * 2;
+  background-image: url("../img/app-store.png");
 }
 
 #end-screen.combined-end-screen.filter-fallback {
