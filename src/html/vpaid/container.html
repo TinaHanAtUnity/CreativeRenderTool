@@ -1,30 +1,15 @@
 <html>
 <head>
-    <style>
-        /* just a shadow iframe for loading the VPAID src */
-        iframe {
-            display: none;
-        }
-
-        body {
-            width: 100vw;
-            height: 100vh;
-            margin: 0;
-            padding: 0;
-        }
-
-        .video-player-slot {
-            width: 100%;
-            height: 100%;
-        }
-
-        .video-player-slot video {
-            width: 100%;
-            height: 100%;
-        }
-    </style>
+    <style>{COMPILED_CSS}</style>
 </head>
 <body>
+    <div class="progress">
+        <div class="circle-base"></div>
+        <div class="progress-wrapper">
+            <div class="circle-left"></div>
+            <div class="circle-right"></div>
+        </div>
+    </div>
     <div class="video-player-slot">
         <video
             poster="data:image/svg+xml;base64,"
@@ -90,6 +75,11 @@
                 this._creative = null;
                 this._slot = document.querySelector('.video-player-slot');
                 this._videoSlot = this._slot.querySelector('video');
+                this._progressElement = document.querySelector('.progress');
+                this._leftCircleElement = document.querySelector('.circle-left');
+                this._rightCircleElement = document.querySelector('.circle-right');
+                this._wrapperElement = document.querySelector('.progress-wrapper');
+
                 var _this = this;
 
                 var eventHandlers = {
@@ -116,7 +106,25 @@
 
                 this._videoSlot.addEventListener('timeupdate', function(e) {
                     _this._sendProgressEvent();
+                    _this._updateProgress();
                 });
+
+                this._updateProgress = function() {
+                    var progress = _this._videoSlot.currentTime;
+                    var duration = _this._videoSlot.duration;
+                    var time = Math.floor(duration - progress);
+                    var delta = progress / duration;
+
+                    _this._progressElement.setAttribute('data-seconds', time);
+
+                    var degrees = delta * 360;
+                    _this._leftCircleElement.style.webkitTransform = 'rotate(' + degrees + 'deg)';
+
+                    if (delta >= 0.5) {
+                        _this._wrapperElement.style.webkitAnimationName = 'close-progress-wrapper';
+                        _this._rightCircleElement.style.webkitAnimationName = 'right-spin';
+                    }
+                };
 
                 this.init = function() {
                     var getVPAID = this._getVPAIDFunction();
@@ -176,10 +184,8 @@
                 };
 
                 this._handleEvent = function() {
-                    debugger;
                     var eventType = arguments[0];
                     var args = arguments.length > 1 ? Array.prototype.slice.call(arguments, 1) : [];
-
                     window.nativebridge.sendEvent('VPAID', [eventType, args]);
                 };
 

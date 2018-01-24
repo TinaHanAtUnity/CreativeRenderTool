@@ -1,4 +1,5 @@
 import VPAIDContainerTemplate from 'html/vpaid/container.html';
+import VPAIDCss from 'css/vpaid-container.css';
 import VPAIDTemplate from 'html/vpaid/VPAID.html';
 import LoadingTemplate from 'html/loading.html';
 
@@ -42,7 +43,7 @@ export class VPAID extends View<IVPAIDHandler> {
     private _stuckTimer: Timer;
     private _isPaused = false;
     private _isLoaded = false;
-    private _webplayerEventObserver: IObserver1<any[]>;
+    private _webplayerEventObserver: IObserver1<string>;
 
     constructor(nativeBridge: NativeBridge, campaign: VPAIDCampaign, placement: Placement, language: string, gameId: string) {
         super(nativeBridge, 'vpaid');
@@ -66,9 +67,9 @@ export class VPAID extends View<IVPAIDHandler> {
 
     public loadWebPlayer() {
         this._isLoaded = true;
-        const iframeSrcDoc = VPAIDContainerTemplate.replace(this.vpaidSrcTag, this._campaign.getVPAID().getScriptUrl());
+        const iframeSrcDoc = VPAIDContainerTemplate.replace(this.vpaidSrcTag, this._campaign.getVPAID().getScriptUrl()).replace('{COMPILED_CSS}', VPAIDCss);
         this._nativeBridge.WebPlayer.setData(encodeURIComponent(iframeSrcDoc), 'text/html', 'UTF-8');
-        this._webplayerEventObserver = this._nativeBridge.WebPlayer.onWebPlayerEvent.subscribe((args: any[]) => this.onWebPlayerEvent(args));
+        this._webplayerEventObserver = this._nativeBridge.WebPlayer.onWebPlayerEvent.subscribe((args: string) => this.onWebPlayerEvent(JSON.parse(args)));
     }
 
     public isLoaded(): boolean {

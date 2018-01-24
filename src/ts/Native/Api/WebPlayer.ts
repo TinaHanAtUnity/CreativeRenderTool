@@ -37,7 +37,7 @@ export class WebPlayerApi extends NativeApi {
 
     public readonly onPageStarted = new Observable1<string>();
     public readonly onPageFinished = new Observable1<string>();
-    public readonly onWebPlayerEvent = new Observable1<any[]>();
+    public readonly onWebPlayerEvent = new Observable1<string>();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'WebPlayer');
@@ -69,7 +69,7 @@ export class WebPlayerApi extends NativeApi {
     }
 
     public sendEventToWebPlayer(args: any[]): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'sendEventToWebPlayer', [args]   );
+        return this._nativeBridge.invoke<void>(this._apiClass, 'sendEventToWebPlayer', [args]);
     }
 
     public handleEvent(event: string, parameters: any[]): void {

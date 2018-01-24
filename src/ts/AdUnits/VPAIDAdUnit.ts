@@ -182,7 +182,6 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
 
     private showView() {
         this._view.show();
-        document.body.appendChild(this._view.container());
     }
 
     private hideView() {
