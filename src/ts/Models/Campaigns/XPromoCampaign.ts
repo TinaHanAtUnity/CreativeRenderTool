@@ -117,6 +117,14 @@ export class XPromoCampaign extends Campaign<IXPromoCampaign> {
         return this.get('bypassAppSheet');
     }
 
+    public getTrackingUrlsForEvent(eventName: string): string[] {
+        const trackingUrls = this.get('trackingUrls');
+        if (trackingUrls) {
+            return (<any>trackingUrls)[eventName] || [];
+        }
+        return [];
+    }
+
     public getTimeoutInSeconds(): number {
         return 0;
     }
