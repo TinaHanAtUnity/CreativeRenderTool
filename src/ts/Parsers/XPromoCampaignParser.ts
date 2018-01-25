@@ -1,7 +1,7 @@
 import { Campaign, ICampaign } from 'Models/Campaign';
 import { CampaignParser } from 'Parsers/CampaignParser';
 import { StoreName } from 'Models/Campaigns/PerformanceCampaign';
-import { IXPromoCampaign, XPromoCampaign } from "Models/Campaigns/XPromoCampaign";
+import { IXPromoCampaign, XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Request } from 'Utilities/Request';
 import { AuctionResponse } from 'Models/AuctionResponse';

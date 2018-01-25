@@ -25,7 +25,7 @@ import { AdUnitContainer, ForceOrientation, ViewConfiguration } from 'AdUnits/Co
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
-import { XPromoCampaign } from "Models/Campaigns/XPromoCampaign";
+import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { FocusManager } from 'Managers/FocusManager';
 import { Campaign } from 'Models/Campaign';

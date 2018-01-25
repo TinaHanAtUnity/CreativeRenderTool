@@ -6,7 +6,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Campaign } from 'Models/Campaign';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
-import { XPromoCampaign } from "Models/Campaigns/XPromoCampaign";
+import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { DisplayInterstitialMarkupCampaign } from 'Models/Campaigns/DisplayInterstitialMarkupCampaign';
 import { DisplayInterstitialMarkupUrlCampaign } from 'Models/Campaigns/DisplayInterstitialMarkupUrlCampaign';
 import { ClientInfo } from 'Models/ClientInfo';
