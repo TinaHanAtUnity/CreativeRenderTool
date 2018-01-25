@@ -41,7 +41,7 @@ import OnProgrammaticMraidUrlPlcCampaignJson from 'json/OnProgrammaticMraidUrlPl
 import OnProgrammaticMraidPlcCampaignJson from 'json/OnProgrammaticMraidPlcCampaign.json';
 import OnCometMraidPlcCampaignJson from 'json/OnCometMraidPlcCampaign.json';
 import OnCometVideoPlcCampaignJson from 'json/OnCometVideoPlcCampaign.json';
-import OnCometXPromoPlcCampaignJson from 'json/OnCometXPromoPlcCampaign.json';
+import OnXPromoPlcCampaignJson from 'json/OnXPromoPlcCampaign.json';
 import VastInlineLinear from 'xml/VastInlineLinear.xml';
 import WrappedVast1 from 'xml/WrappedVast1.xml';
 import WrappedVast2 from 'xml/WrappedVast2.xml';
@@ -1031,7 +1031,7 @@ describe('CampaignManager', () => {
         describe('XPromo campaign', () => {
             it('should process correct Auction xpromo/video Campaign content type', () => {
                 mockRequest.expects('post').returns(Promise.resolve({
-                    response: OnCometXPromoPlcCampaignJson
+                    response: OnXPromoPlcCampaignJson
                 }));
 
                 return campaignManager.request().then(() => {

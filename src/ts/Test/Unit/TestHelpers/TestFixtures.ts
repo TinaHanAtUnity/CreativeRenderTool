@@ -30,7 +30,7 @@ import OnCometMraidPlcCampaignFollowsRedirects from 'json/OnCometMraidPlcCampaig
 import OnCometMraidPlcCampaign from 'json/OnCometMraidPlcCampaign.json';
 import OnCometVideoPlcCampaignFollowsRedirects from 'json/OnCometVideoPlcCampaignFollowsRedirects.json';
 import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
-import OnCometXpromoPlcCampaign from 'json/OnCometXPromoPlcCampaign.json';
+import OnXPromoPlcCampaign from 'json/OnXPromoPlcCampaign.json';
 import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCampaign.json';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
@@ -354,7 +354,7 @@ export class TestFixtures {
     }
 
     public static getXPromoCampaign(): XPromoCampaign {
-        const json = JSON.parse(OnCometXpromoPlcCampaign);
+        const json = JSON.parse(OnXPromoPlcCampaign);
         const xPromoJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
         return new XPromoCampaign(this.getXPromoCampaignParams(xPromoJson, StoreName.GOOGLE));
     }
