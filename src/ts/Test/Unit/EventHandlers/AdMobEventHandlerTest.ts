@@ -162,7 +162,7 @@ describe('AdMobEventHandler', () => {
             });
         });
 
-        it('should append the rdvt parameter', () => {
+        it('should append the rvdt parameter', () => {
             (<sinon.SinonStub>adMobSignalFactory.getClickSignal).returns(Promise.resolve(new AdMobSignal()));
             (<sinon.SinonStub>adUnit.getTimeOnScreen).returns(42);
             (<sinon.SinonStub>adUnit.getStartTime).returns(startTime);
@@ -172,7 +172,7 @@ describe('AdMobEventHandler', () => {
             return admobEventHandler.onAttribution(url, touch).then(() => {
                 const call = (<sinon.SinonStub>thirdPartyEventManager.sendEvent).getCall(0);
                 const calledUrl = call.args[2];
-                const param = Url.getQueryParameter(calledUrl, 'rdvt');
+                const param = Url.getQueryParameter(calledUrl, 'rvdt');
                 if (!param) {
                     throw new Error('Expected param not to be null');
                 }
