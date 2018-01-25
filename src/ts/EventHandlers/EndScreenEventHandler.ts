@@ -17,6 +17,7 @@ import { Placement } from 'Models/Placement';
 import { Url } from 'Utilities/Url';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
+import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 
 export interface IEndScreenDownloadParameters {
     clickAttributionUrl: string | undefined;
@@ -80,6 +81,12 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
             this._operativeEventManager.sendClick(this._campaign.getSession(), this._placement, this._campaign, this.getVideoOrientation());
         } else {
             this._operativeEventManager.sendHttpKafkaEvent('ads.xpromo.operative.videoclick.v1.json', this._campaign.getSession(), this._placement, this._campaign, this.getVideoOrientation());
+            if(this._campaign instanceof XPromoCampaign) {
+                const clickTrackingUrls = this._campaign.getTrackingUrlsForEvent('click');
+                for (const url of clickTrackingUrls) {
+                    this._thirdPartyEventManager.sendEvent('xpromo click', this._campaign.getSession().getId(), url);
+                }
+            }
         }
         if(parameters.clickAttributionUrl) {
             this.handleClickAttribution(parameters);
@@ -99,6 +106,12 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
             this._operativeEventManager.sendClick(this._campaign.getSession(), this._placement, this._campaign, this.getVideoOrientation());
         } else {
             this._operativeEventManager.sendHttpKafkaEvent('ads.xpromo.operative.videoclick.v1.json', this._campaign.getSession(), this._placement, this._campaign, this.getVideoOrientation());
+            if(this._campaign instanceof XPromoCampaign) {
+                const clickTrackingUrls = this._campaign.getTrackingUrlsForEvent('click');
+                for (const url of clickTrackingUrls) {
+                    this._thirdPartyEventManager.sendEvent('xpromo click', this._campaign.getSession().getId(), url);
+                }
+            }
         }
         if(parameters.clickAttributionUrl) {
             this.handleClickAttribution(parameters);
