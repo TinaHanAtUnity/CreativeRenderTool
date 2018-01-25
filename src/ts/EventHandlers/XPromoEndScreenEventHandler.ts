@@ -14,9 +14,4 @@ export class XPromoEndScreenEventHandler extends EndScreenEventHandler<XPromoCam
             this._adUnit.hide();
         }
     }
-
-    public onEndScreenDownload(parameters: IEndScreenDownloadParameters): void {
-        super.onEndScreenDownload(parameters);
-        // todo: send click event to HttpKafka
-    }
 }

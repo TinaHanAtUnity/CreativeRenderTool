@@ -112,6 +112,9 @@ export class VideoEventHandlers {
                 const category = campaign.getCategory();
                 const subCategory = campaign.getSubCategory();
                 comScoreTrackingService.sendEvent('play', sessionId, comScoreDuration, position, creativeId, category, subCategory);
+            } else {
+                operativeEventManager.sendHttpKafkaEvent('ads.xpromo.operative.videostart.v1.json', campaign.getSession(), placement, campaign, this.getVideoOrientation(adUnit));
+
             }
 
             nativeBridge.Listener.sendStartEvent(placement.getId());
@@ -246,6 +249,8 @@ export class VideoEventHandlers {
             const category = campaign.getCategory();
             const subCategory = campaign.getSubCategory();
             comScoreTrackingService.sendEvent('end', sessionId, comScoreDuration, comScorePlayedTime, creativeId, category, subCategory);
+        } else {
+            operativeEventManager.sendHttpKafkaEvent('ads.xpromo.operative.videoview.v1.json', campaign.getSession(), placement, campaign, this.getVideoOrientation(adUnit));
         }
 
         this.afterVideoCompleted(adUnit);

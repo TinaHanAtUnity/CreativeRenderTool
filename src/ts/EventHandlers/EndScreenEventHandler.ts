@@ -78,6 +78,8 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
 
         if(!(this._adUnit instanceof XPromoAdUnit)) {
             this._operativeEventManager.sendClick(this._campaign.getSession(), this._placement, this._campaign, this.getVideoOrientation());
+        } else {
+            this._operativeEventManager.sendHttpKafkaEvent('ads.xpromo.operative.videoclick.v1.json', this._campaign.getSession(), this._placement, this._campaign, this.getVideoOrientation());
         }
         if(parameters.clickAttributionUrl) {
             this.handleClickAttribution(parameters);
@@ -95,6 +97,8 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
 
         if(!(this._adUnit instanceof XPromoAdUnit)) {
             this._operativeEventManager.sendClick(this._campaign.getSession(), this._placement, this._campaign, this.getVideoOrientation());
+        } else {
+            this._operativeEventManager.sendHttpKafkaEvent('ads.xpromo.operative.videoclick.v1.json', this._campaign.getSession(), this._placement, this._campaign, this.getVideoOrientation());
         }
         if(parameters.clickAttributionUrl) {
             this.handleClickAttribution(parameters);
