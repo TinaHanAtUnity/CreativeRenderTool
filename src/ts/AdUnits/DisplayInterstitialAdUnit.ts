@@ -159,6 +159,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
 
     private shouldOverrideUrlLoading(url: string, method: string): void {
         this._nativeBridge.Sdk.logDebug("DisplayInterstitialAdUnit: shouldOverrideUrlLoading triggered for url: " + url);
+        this._nativeBridge.WebPlayer.setUrl(url);
     }
 
     private unsetReferences(): void {
@@ -180,7 +181,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
     private setWebPlayerViews(): Promise<void> {
         // TODO: support also iOS!
         const webPlayerSettingsAndroid: IWebPlayerWebSettingsAndroid = {"setJavaScriptCanOpenWindowsAutomatically": [true],
-            "setSupportMultipleWindows": [true]};
+            "setSupportMultipleWindows": [false]};
         return this._nativeBridge.WebPlayer.setSettings(webPlayerSettingsAndroid,{}).then( () => {
             this._nativeBridge.Sdk.logDebug("DisplayInterstitalAdUnit: WebPlayer settings have been set");
             return this._container.open(this, ['webplayer', 'webview'], false, this._forceOrientation, true, false, true, false, this._options).catch((e) => {
@@ -206,8 +207,9 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
     }
 
     private setWebplayerSettings(): Promise<void> {
-        const eventSettings = { 'onPageStarted': {'sendEvent':true},
-            'shouldOverrideUrlLoading': {'sendEvent':true, 'returnValue': true}};
+        const eventSettings = { 'onPageStarted': {'sendEvent': true},
+            'shouldOverrideUrlLoading': {'sendEvent': true, 'returnValue': true}
+        };
         this._nativeBridge.WebPlayer.onPageStarted.subscribe( (url) => this.onPageStarted(url));
         this._nativeBridge.WebPlayer.shouldOverrideUrlLoading.subscribe( (url: string, method: string) => this.shouldOverrideUrlLoading(url, method));
         return this._nativeBridge.WebPlayer.setEventSettings(eventSettings);
