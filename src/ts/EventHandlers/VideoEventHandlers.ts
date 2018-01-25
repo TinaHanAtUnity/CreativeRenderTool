@@ -16,7 +16,8 @@ import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { Campaign } from 'Models/Campaign';
 import { Placement } from 'Models/Placement';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
-import { XPromoAdUnit } from "../AdUnits/XPromoAdUnit";
+import { XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
+import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 
 export class VideoEventHandlers {
 
@@ -114,6 +115,12 @@ export class VideoEventHandlers {
                 comScoreTrackingService.sendEvent('play', sessionId, comScoreDuration, position, creativeId, category, subCategory);
             } else {
                 operativeEventManager.sendHttpKafkaEvent('ads.xpromo.operative.videostart.v1.json', campaign.getSession(), placement, campaign, this.getVideoOrientation(adUnit));
+                if(campaign instanceof XPromoCampaign) {
+                    const clickTrackingUrls = campaign.getTrackingUrlsForEvent('start');
+                    for (const url of clickTrackingUrls) {
+                        thirdPartyEventManager.sendEvent('xpromo start', campaign.getSession().getId(), url);
+                    }
+                }
 
             }
 
@@ -234,7 +241,7 @@ export class VideoEventHandlers {
         nativeBridge.VideoPlayer.setProgressEventInterval(adUnit.getProgressInterval());
     }
 
-    public static onVideoCompleted(operativeEventManager: OperativeEventManager, comScoreTrackingService: ComScoreTrackingService, adUnit: VideoAdUnit, campaign: Campaign, placement: Placement): void {
+    public static onVideoCompleted(operativeEventManager: OperativeEventManager, thirdPartyEventManager: ThirdPartyEventManager, comScoreTrackingService: ComScoreTrackingService, adUnit: VideoAdUnit, campaign: Campaign, placement: Placement): void {
         adUnit.getContainer().addDiagnosticsEvent({type: 'onVideoCompleted'});
         adUnit.setActive(false);
         adUnit.setFinishState(FinishState.COMPLETED);
@@ -251,6 +258,12 @@ export class VideoEventHandlers {
             comScoreTrackingService.sendEvent('end', sessionId, comScoreDuration, comScorePlayedTime, creativeId, category, subCategory);
         } else {
             operativeEventManager.sendHttpKafkaEvent('ads.xpromo.operative.videoview.v1.json', campaign.getSession(), placement, campaign, this.getVideoOrientation(adUnit));
+            if(campaign instanceof XPromoCampaign) {
+                const clickTrackingUrls = campaign.getTrackingUrlsForEvent('view');
+                for (const url of clickTrackingUrls) {
+                    thirdPartyEventManager.sendEvent('xpromo view', campaign.getSession().getId(), url);
+                }
+            }
         }
 
         this.afterVideoCompleted(adUnit);
