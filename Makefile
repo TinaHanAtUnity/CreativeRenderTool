@@ -7,7 +7,6 @@ BABEL = $(BIN)/babel
 ROLLUP = $(BIN)/rollup
 ISTANBUL = $(BIN)/istanbul
 REMAP_ISTANBUL = $(BIN)/remap-istanbul
-COVERALLS = $(BIN)/coveralls
 STYLINT = $(BIN)/stylint
 PBJS = $(BIN)/pbjs
 PBTS = $(BIN)/pbts
@@ -38,7 +37,7 @@ BUILD_DIR = build
 # For platform specific operations
 OS := $(shell uname)
 
-.PHONY: build-browser build-dev build-release build-test build-dir build-ts build-js build-css build-static clean lint test test-unit test-integration test-coverage test-coveralls watch setup deploy
+.PHONY: build-browser build-dev build-release build-test build-dir build-ts build-js build-css build-static clean lint test test-unit test-integration test-coverage watch setup deploy
 
 build-browser: BUILD_DIR = build/browser
 build-browser: MODULE = system
@@ -290,11 +289,6 @@ test-coverage: build-dir build-proto
 	@$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage.json -o $(BUILD_DIR)/summary -t text-summary
 	@cat $(BUILD_DIR)/summary && echo \n
 	@$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage.json -o $(BUILD_DIR)/report -t html
-
-test-coveralls: BUILD_DIR = build/coverage
-test-coveralls: test-coverage
-	$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage.json -o $(BUILD_DIR)/lcov.info -t lcovonly
-	cat $(BUILD_DIR)/lcov.info | $(COVERALLS) --verbose
 
 test-browser: build-browser
 	@echo

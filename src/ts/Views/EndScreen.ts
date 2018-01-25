@@ -80,6 +80,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         const endScreenAlt = this.getEndscreenAlt();
         if (typeof endScreenAlt === "string") {
             this._container.classList.add(endScreenAlt);
+
+            if (this._abGroup === 10 || this._abGroup === 11) {
+                this._container.classList.add("gold");
+            }
         }
     }
 
@@ -139,7 +143,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     protected getEndscreenAlt(campaign?: Campaign) {
-        if(this._abGroup === 8 || this._abGroup === 9) {
+        if(this._abGroup === 8 || this._abGroup === 9 || this._abGroup === 10 || this._abGroup === 11) {
             return combinedEndScreenId;
         }
 
