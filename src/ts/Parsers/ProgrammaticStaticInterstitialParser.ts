@@ -10,16 +10,7 @@ import { Session } from 'Models/Session';
 
 export class ProgrammaticStaticInterstitialParser extends CampaignParser {
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
-        const jsonDisplay = JsonParser.parse(response.getContent());
-
-        if(!jsonDisplay.markup && !jsonDisplay.markupUrl) {
-            throw new DiagnosticError(
-                new Error('No markup or markupUrl for programmatic/static-interstitial'),
-                {json: jsonDisplay}
-            );
-        }
-        const displayMarkup = jsonDisplay.markup;
-
+        const displayMarkup = response.getContent();
         return Promise.resolve(new DisplayInterstitialCampaign(displayMarkup, session, gamerId, abGroup, response.getCacheTTL(), response.getTrackingUrls(), response.getAdType(), response.getCreativeId(), response.getSeatId(), response.getCorrelationId()));
     }
 }
