@@ -512,6 +512,10 @@ export class WebView {
                     CampaignManager.setCampaignResponse(CreativeUrlResponseIos.replace('{CREATIVE_URL_PLACEHOLDER}', creativeUrl));
                 }
             }
+
+            if(TestEnvironment.get('realtimePlacement')) {
+                ConfigManager.setTestRealtimePlacement(TestEnvironment.get('realtimePlacement'));
+            }
         });
     }
 }

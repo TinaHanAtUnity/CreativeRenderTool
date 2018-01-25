@@ -110,6 +110,10 @@ export class Placement extends Model<IPlacement> {
         return this.get('realtime');
     }
 
+    public setRealtime(state: boolean): void {
+        this.set('realtime', state);
+    }
+
     public getState(): PlacementState {
         return this.get('state');
     }
