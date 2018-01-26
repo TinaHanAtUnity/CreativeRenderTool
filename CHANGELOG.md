@@ -1,3 +1,8 @@
+# Thu Jan 25 11:38:27 UTC 2018
+
+* Fix RVDT typo
+* Fix persistent gamer SID
+
 # Tue Jan 23 12:08:45 UTC 2018
 
 * Fix AdMob time on screen click signal
