@@ -137,6 +137,18 @@ export class AndroidDeviceInfoApi extends NativeApi {
         return this._nativeBridge.invoke<boolean>(this._apiClass, 'isUSBConnected');
     }
 
+    public isAdbEnabled(): Promise<boolean> {
+        return this._nativeBridge.invoke<boolean>(this._apiClass, 'isAdbEnabled');
+    }
+
+    public getApkDigest(): Promise<string> {
+        return this._nativeBridge.invoke<string>(this._apiClass, 'getApkDigest');
+    }
+
+    public getCertificateFingerprint(): Promise<string> {
+        return this._nativeBridge.invoke<string>(this._apiClass, 'getCertificateFingerprint');
+    }
+
     public handleEvent(event: string, parameters: any[]): void {
         switch (event) {
             case DeviceInfoEvent[DeviceInfoEvent.VOLUME_CHANGED]:
