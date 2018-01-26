@@ -22,6 +22,7 @@ import { NotificationApi } from 'Native/Api/Notification';
 import { UrlSchemeApi } from 'Native/Api/UrlScheme';
 import { LifecycleApi } from 'Native/Api/Lifecycle';
 import { AndroidPreferencesApi } from 'Native/Api/AndroidPreferences';
+import { IosPreferencesApi } from 'Native/Api/IosPreferences';
 
 export enum CallbackStatus {
     OK,
@@ -54,6 +55,7 @@ export class NativeBridge implements INativeBridge {
     public DeviceInfo: DeviceInfoApi;
     public Intent: IntentApi;
     public IosAdUnit: IosAdUnitApi;
+    public IosPreferences: IosPreferencesApi;
     public Listener: ListenerApi;
     public Lifecycle: LifecycleApi;
     public Notification: NotificationApi;
