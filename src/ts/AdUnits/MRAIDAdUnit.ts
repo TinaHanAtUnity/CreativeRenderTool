@@ -35,7 +35,7 @@ export class MRAIDAdUnit extends AbstractAdUnit {
     private _onSystemKillObserver: IObserver0;
     private _onSystemInterruptObserver: any;
     private _onPauseObserver: any;
-    private _additionalTrackingEvents: { [eventName: string]: string[] };
+    private _additionalTrackingEvents: { [eventName: string]: string[] } | undefined;
 
     constructor(nativeBridge: NativeBridge, parameters: IMRAIDAdUnitParameters) {
         super(nativeBridge, parameters);
@@ -208,13 +208,16 @@ export class MRAIDAdUnit extends AbstractAdUnit {
         const sdkVersion = this._clientInfo.getSdkVersion();
         const placementId = this._placement.getId();
         const sessionId = this._campaign.getSession().getId();
-        const trackingEventUrls = this._additionalTrackingEvents[eventName];
 
-        if(trackingEventUrls) {
-            for (let url of trackingEventUrls) {
-                url = url.replace(/%ZONE%/, placementId);
-                url = url.replace(/%SDK_VERSION%/, sdkVersion.toString());
-                this._thirdPartyEventManager.sendEvent(`mraid ${eventName}`, sessionId, url, this._campaign.getUseWebViewUserAgentForTracking());
+        if(this._additionalTrackingEvents && this._additionalTrackingEvents[eventName]) {
+            const trackingEventUrls = this._additionalTrackingEvents[eventName];
+
+            if(trackingEventUrls) {
+                for (let url of trackingEventUrls) {
+                    url = url.replace(/%ZONE%/, placementId);
+                    url = url.replace(/%SDK_VERSION%/, sdkVersion.toString());
+                    this._thirdPartyEventManager.sendEvent(`mraid ${eventName}`, sessionId, url, this._campaign.getUseWebViewUserAgentForTracking());
+                }
             }
         }
     }
