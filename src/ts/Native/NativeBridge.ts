@@ -21,6 +21,7 @@ import { IosAdUnitApi } from 'Native/Api/IosAdUnit';
 import { NotificationApi } from 'Native/Api/Notification';
 import { UrlSchemeApi } from 'Native/Api/UrlScheme';
 import { LifecycleApi } from 'Native/Api/Lifecycle';
+import { AndroidPreferencesApi } from 'Native/Api/AndroidPreferences';
 
 export enum CallbackStatus {
     OK,
@@ -46,6 +47,7 @@ export class NativeBridge implements INativeBridge {
 
     public AppSheet: AppSheetApi;
     public AndroidAdUnit: AndroidAdUnitApi;
+    public AndroidPreferences: AndroidPreferencesApi;
     public Broadcast: BroadcastApi;
     public Cache: CacheApi;
     public Connectivity: ConnectivityApi;
@@ -86,6 +88,7 @@ export class NativeBridge implements INativeBridge {
             this.IosAdUnit = new IosAdUnitApi(this);
         } else {
             this.AndroidAdUnit = new AndroidAdUnitApi(this);
+            this.AndroidPreferences = new AndroidPreferencesApi(this);
         }
 
         this.Broadcast = new BroadcastApi(this);
