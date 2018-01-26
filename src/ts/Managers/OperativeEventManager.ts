@@ -41,7 +41,7 @@ export class OperativeEventManager {
         return OperativeEventManager.getEventKey(sessionId, eventId) + '.data';
     }
 
-    private _gamerServerId: string;
+    private _gamerServerId: string | undefined;
     private _nativeBridge: NativeBridge;
     private _metaDataManager: MetaDataManager;
     private _sessionManager: SessionManager;
@@ -66,9 +66,11 @@ export class OperativeEventManager {
 
         session.setEventSent(EventType.START);
 
-        return this._metaDataManager.fetch(PlayerMetaData).then(player => {
+        return this._metaDataManager.fetch(PlayerMetaData, false).then(player => {
             if(player) {
                 this.setGamerServerId(player.getServerId());
+            } else {
+                this.setGamerServerId(undefined);
             }
 
             return this._metaDataManager.fetch(MediationMetaData, true, ['ordinal']);
@@ -151,7 +153,7 @@ export class OperativeEventManager {
             infoJson.id = id;
             infoJson.ts = (new Date()).toISOString();
 
-            HttpKafka.sendEvent('events.skip.json', infoJson);
+            HttpKafka.sendEvent('ads.sdk2.events.skip.json', infoJson);
         };
 
         return this.createUniqueEventMetadata(session, placement, campaign, this._sessionManager.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId(), videoOrientation).then(fulfilled);
@@ -191,7 +193,7 @@ export class OperativeEventManager {
         });
     }
 
-    public setGamerServerId(serverId: string): void {
+    public setGamerServerId(serverId: string | undefined): void {
         this._gamerServerId = serverId;
     }
 
@@ -222,7 +224,33 @@ export class OperativeEventManager {
         });
     }
 
-    private createUniqueEventMetadata(session: Session, placement: Placement, campaign: Campaign, gameSession: number, gamerSid: string, previousPlacementId?: string, videoOrientation?: string): Promise<[string, any]> {
+    public sendHttpKafkaEvent(kafkaType: string, session: Session, placement: Placement, campaign: Campaign, videoOrientation?: string) {
+        const fulfilled = ([id, infoJson]: [string, any]) => {
+
+            // todo: clears duplicate data for httpkafka, should be cleaned up
+            delete infoJson.eventId;
+            delete infoJson.apiLevel;
+            delete infoJson.advertisingTrackingId;
+            delete infoJson.limitAdTracking;
+            delete infoJson.osVersion;
+            delete infoJson.sid;
+            delete infoJson.deviceMake;
+            delete infoJson.deviceModel;
+            delete infoJson.sdkVersion;
+            delete infoJson.webviewUa;
+            delete infoJson.networkType;
+            delete infoJson.connectionType;
+
+            infoJson.id = id;
+            infoJson.ts = (new Date()).toISOString();
+
+            HttpKafka.sendEvent(kafkaType, infoJson);
+        };
+
+        return this.createUniqueEventMetadata(session, placement, campaign, this._sessionManager.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId(), videoOrientation).then(fulfilled);
+    }
+
+    private createUniqueEventMetadata(session: Session, placement: Placement, campaign: Campaign, gameSession: number, gamerSid?: string, previousPlacementId?: string, videoOrientation?: string): Promise<[string, any]> {
         return this._nativeBridge.DeviceInfo.getUniqueEventId().then(id => {
             return this.getInfoJson(session, placement, campaign, id, gameSession, gamerSid, previousPlacementId, videoOrientation);
         });
@@ -253,7 +281,7 @@ export class OperativeEventManager {
         ]);
     }
 
-    private getInfoJson(session: Session, placement: Placement, campaign: Campaign, id: string, gameSession: number, gamerSid: string, previousPlacementId?: string, videoOrientation?: string): Promise<[string, any]> {
+    private getInfoJson(session: Session, placement: Placement, campaign: Campaign, id: string, gameSession: number, gamerSid?: string, previousPlacementId?: string, videoOrientation?: string): Promise<[string, any]> {
         const infoJson: any = {
             'eventId': id,
             'auctionId': session.getId(),

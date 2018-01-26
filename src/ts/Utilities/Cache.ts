@@ -841,7 +841,7 @@ export class Cache {
                 targetGameId: callback.diagnostics.targetGameId,
                 targetCampaignId: callback.diagnostics.targetCampaignId
             };
-            HttpKafka.sendEvent('events.creativedownload.json', msg);
+            HttpKafka.sendEvent('ads.sdk2.events.creativedownload.json', msg);
         }
     }
 }

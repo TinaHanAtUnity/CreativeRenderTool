@@ -22,6 +22,7 @@ export class PlayerMetaData extends BaseMetaData<IPlayerMetaData> {
         return super.fetch(nativeBridge, keys).then((exists) => {
             if (exists) {
                 return nativeBridge.Storage.delete(StorageType.PUBLIC, this.getCategory()).then(() => {
+                    nativeBridge.Storage.write(StorageType.PUBLIC);
                     return true;
                 });
             } else {

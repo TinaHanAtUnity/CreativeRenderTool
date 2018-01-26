@@ -107,7 +107,7 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
         if(resourceUrl) {
             kafkaObject.url = resourceUrl.getOriginalUrl();
         }
-        HttpKafka.sendEvent('events.playable.json', kafkaObject);
+        HttpKafka.sendEvent('ads.sdk2.events.playable.json', kafkaObject);
     }
 
     public onMraidShowEndScreen(): void {
