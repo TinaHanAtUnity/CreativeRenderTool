@@ -22,7 +22,7 @@ describe.skip('VPAID View', () => {
         const vpaidCampaignJson = JSON.parse(VPAIDCampaignJson);
         campaign = new VPAIDCampaign(vpaidModel, TestFixtures.getSession(), vpaidCampaignJson.campaignId, vpaidCampaignJson.gamerId, vpaidCampaignJson.abGroup);
 
-        vpaid = new VPAID(nativeBridge, campaign, TestFixtures.getPlacement(), 'en_US', '11111');
+        vpaid = new VPAID(nativeBridge, campaign, TestFixtures.getPlacement(), 'en_US', '11111', true);
     });
 
     describe('rendering', () => {

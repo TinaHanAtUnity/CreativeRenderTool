@@ -2,6 +2,7 @@ import VPAIDContainerTemplate from 'html/vpaid/container.html';
 import VPAIDCss from 'css/vpaid-container.css';
 import VPAIDTemplate from 'html/vpaid/VPAID.html';
 import LoadingTemplate from 'html/loading.html';
+import PrivacyTemplate from 'html/Privacy.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -36,6 +37,7 @@ interface IVPAIDAdParameters {
 
 interface IVPAIDTemplateData {
     adParameters: string;
+    isCoppaCompliant: boolean;
 }
 
 export class VPAID extends View<IVPAIDHandler> {
@@ -52,14 +54,16 @@ export class VPAID extends View<IVPAIDHandler> {
     private _isPaused = false;
     private _isLoaded = false;
     private _webplayerEventObserver: IObserver1<string>;
+    private _isCoppaCompliant: boolean;
 
-    constructor(nativeBridge: NativeBridge, campaign: VPAIDCampaign, placement: Placement, language: string, gameId: string) {
+    constructor(nativeBridge: NativeBridge, campaign: VPAIDCampaign, placement: Placement, language: string, gameId: string, isCoppaCompliant: boolean) {
         super(nativeBridge, 'vpaid');
 
         this._template = new Template(VPAIDTemplate);
         this._campaign = campaign;
         this._placement = placement;
         this._stuckTimer = new Timer(() => this._handlers.forEach(handler => handler.onVPAIDStuck()), VPAID.stuckDelay);
+        this._isCoppaCompliant = isCoppaCompliant;
 
         this._bindings = [{
             selector: '.companion',
@@ -77,11 +81,12 @@ export class VPAID extends View<IVPAIDHandler> {
 
         const templateData = <IVPAIDTemplateData>{
             adParameters: JSON.stringify(adParameters),
-            vpaidSrcUrl: this._campaign.getVPAID().getScriptUrl()
+            vpaidSrcUrl: this._campaign.getVPAID().getScriptUrl(),
+            isCoppaCompliant: this._isCoppaCompliant
         };
 
-        let iframeSrcDoc = new Template(VPAIDContainerTemplate).render(templateData);
-        iframeSrcDoc = iframeSrcDoc.replace('{COMPILED_CSS}', VPAIDCss);
+        let iframeSrcDoc = VPAIDContainerTemplate.replace('{COMPILED_CSS}', VPAIDCss).replace('{PRIVACY}', PrivacyTemplate);
+        iframeSrcDoc = new Template(iframeSrcDoc).render(templateData);
 
         this._nativeBridge.WebPlayer.setData(encodeURIComponent(iframeSrcDoc), 'text/html', 'UTF-8');
         this._webplayerEventObserver = this._nativeBridge.WebPlayer.onWebPlayerEvent.subscribe((args: string) => this.onWebPlayerEvent(JSON.parse(args)));

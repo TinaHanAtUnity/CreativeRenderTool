@@ -71,7 +71,7 @@ describe('VPAIDAdUnit', () => {
 
         campaign = new VPAIDCampaign(vpaid, TestFixtures.getSession(), vpaidCampaignJson.campaignId, vpaidCampaignJson.gamerId, vpaidCampaignJson.abGroup);
 
-        vpaidView = new VPAID(nativeBridge, campaign, placement, 'en', 'TestGameId');
+        vpaidView = new VPAID(nativeBridge, campaign, placement, 'en', 'TestGameId', true);
         sinon.stub(vpaidView, 'container').returns(document.createElement('div'));
         sinon.stub(vpaidView, 'show').returns(Promise.resolve());
         sinon.stub(vpaidView, 'hide').returns(Promise.resolve());

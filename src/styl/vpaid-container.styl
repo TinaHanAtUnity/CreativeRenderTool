@@ -1,5 +1,7 @@
 @import "vars.styl";
 @import "icons.styl";
+@import "components.styl";
+@import "privacy.styl";
 
 body {
     margin: 0;
@@ -274,4 +276,10 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
   to {
     clip: rect(auto, auto, auto, auto);
   }
+}
+
+.privacy-button {
+  right: 0;
+  $privacy-button-default($default-scale-size);
+  margin: 0 0 0 $default-scale-size * $default-scale-size * .25;
 }

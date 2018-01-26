@@ -40,6 +40,10 @@
         <div class="call-button"><%= data.t("Learn More") %></div>
         <div class="debug-message-text"></div>
     </div>
+    <div id="privacy" class="hide">
+        {PRIVACY}
+    </div>
+    <div class="privacy-button"><span class="icon-info"></span></div>
     <script src="<%= data.vpaidSrcUrl %>"></script>
     <script>
         (function(global) {
@@ -179,6 +183,32 @@
                 return this._element.className.match(/\s?enabled\s?/);
             };
 
+            var PrivacyControl = function(e) {
+                var _this = this;
+                this._element = e;
+                this._ok = e.querySelector('.ok-button');
+                this._privacy = e.querySelector('a');
+
+                this._ok.addEventListener('click', function() {
+                    _this._onOKClick();
+                });
+                this._privacy.addEventListener('click', function(e) {
+                    _this._onPrivacyClick(e);
+                });
+            };
+
+            PrivacyControl.prototype._onOKClick = function() {
+                this._element.classList.add('hide');
+            };
+
+            PrivacyControl.prototype._onPrivacyClick = function(e) {
+                window.open(e.target.href, '_blank');
+            };
+
+            PrivacyControl.prototype.show = function() {
+                this._element.classList.remove('hide');
+            };
+
             var Container = function() {
                 var _this = this;
                 this._iframe = document.querySelector('iframe');
@@ -188,7 +218,9 @@
                 this._progress = new ProgressControl(document.querySelector('.progress'));
                 this._skip = new SkipControl(document.querySelector('.skip'));
                 this._skipContainer = document.querySelector('.skip-hit-area');
-                this._muteButton = document.querySelector('.mute-button')
+                this._muteButton = document.querySelector('.mute-button');
+                this._privacyButton = document.querySelector('.privacy-button');
+                this._privacy = new PrivacyControl(document.querySelector('#privacy'));
 
                 this._skipHandler = function() {
                     if (_this._creative.getAdSkippableState()) {
@@ -208,6 +240,10 @@
                         _this._muteButton.classList.add('muted');
                     }
                     _this._videoSlot.muted = !isMuted;
+                });
+
+                this._privacyButton.addEventListener('click', function() {
+                    _this._privacy.show();
                 });
 
                 if (adParameters.skipEnabled) {
