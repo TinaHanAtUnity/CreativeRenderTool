@@ -1,3 +1,8 @@
+# Staged
+
+* Combined endscreen with store buttons AB test (groups 8 & 9)
+* Initial XPromo support
+
 # Thu Jan 25 11:38:27 UTC 2018
 
 * Fix RVDT typo
