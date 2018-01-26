@@ -23,6 +23,7 @@ import { UrlSchemeApi } from 'Native/Api/UrlScheme';
 import { LifecycleApi } from 'Native/Api/Lifecycle';
 import { AndroidPreferencesApi } from 'Native/Api/AndroidPreferences';
 import { IosPreferencesApi } from 'Native/Api/IosPreferences';
+import { SensorInfoApi } from 'Native/Api/SensorInfo';
 
 export enum CallbackStatus {
     OK,
@@ -63,6 +64,7 @@ export class NativeBridge implements INativeBridge {
     public Request: RequestApi;
     public Resolve: ResolveApi;
     public Sdk: SdkApi;
+    public SensorInfo: SensorInfoApi;
     public Storage: StorageApi;
     public VideoPlayer: VideoPlayerApi;
     public UrlScheme: UrlSchemeApi;
@@ -88,6 +90,7 @@ export class NativeBridge implements INativeBridge {
 
         if(platform === Platform.IOS) {
             this.IosAdUnit = new IosAdUnitApi(this);
+            this.IosPreferences = new IosPreferencesApi(this);
         } else {
             this.AndroidAdUnit = new AndroidAdUnitApi(this);
             this.AndroidPreferences = new AndroidPreferencesApi(this);
@@ -105,6 +108,7 @@ export class NativeBridge implements INativeBridge {
         this.Request = new RequestApi(this);
         this.Resolve = new ResolveApi(this);
         this.Sdk = new SdkApi(this);
+        this.SensorInfo = new SensorInfoApi(this);
         this.Storage = new StorageApi(this);
         this.VideoPlayer = new VideoPlayerApi(this);
         this.UrlScheme = new UrlSchemeApi(this);
