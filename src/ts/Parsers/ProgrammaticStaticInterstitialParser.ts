@@ -10,7 +10,7 @@ import { Session } from 'Models/Session';
 
 export class ProgrammaticStaticInterstitialParser extends CampaignParser {
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
-        const displayMarkup = response.getContent();
+        const displayMarkup = decodeURIComponent(response.getContent());
         return Promise.resolve(new DisplayInterstitialCampaign(displayMarkup, session, gamerId, abGroup, response.getCacheTTL(), response.getTrackingUrls(), response.getAdType(), response.getCreativeId(), response.getSeatId(), response.getCorrelationId()));
     }
 }

@@ -47,6 +47,8 @@ describe('DisplayInterstitialAdUnit', () => {
 
             sandbox = sinon.sandbox.create();
             nativeBridge = TestFixtures.getNativeBridge(Platform.ANDROID);
+            sandbox.stub(nativeBridge.WebPlayer, 'setSettings').returns(Promise.resolve());
+            sandbox.stub(nativeBridge.WebPlayer, 'clearSettings').returns(Promise.resolve());
             placement = TestFixtures.getPlacement();
 
             const metaDataManager = new MetaDataManager(nativeBridge);

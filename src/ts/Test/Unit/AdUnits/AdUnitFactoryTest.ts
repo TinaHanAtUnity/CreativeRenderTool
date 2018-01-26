@@ -75,7 +75,6 @@ describe('AdUnitFactoryTest', () => {
         sessionManager = new SessionManager(nativeBridge);
         operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
         comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
-
         adUnitParameters = {
             forceOrientation: ForceOrientation.LANDSCAPE,
             focusManager: focusManager,
@@ -96,6 +95,8 @@ describe('AdUnitFactoryTest', () => {
         sandbox.stub(operativeEventManager, 'sendThirdQuartile').returns(Promise.resolve());
         sandbox.stub(operativeEventManager, 'sendSkip').returns(Promise.resolve());
         sandbox.spy(thirdPartyEventManager, 'sendEvent');
+        sandbox.stub(nativeBridge.WebPlayer, 'setSettings').returns(Promise.resolve());
+        sandbox.stub(nativeBridge.WebPlayer, 'clearSettings').returns(Promise.resolve());
     });
 
     afterEach(() => {
@@ -225,29 +226,26 @@ describe('AdUnitFactoryTest', () => {
         });
     });
 
-    const displayUnitTests = (): void => {
-        let adUnit: DisplayInterstitialAdUnit;
-        let campaign: DisplayInterstitialCampaign;
-
-        beforeEach(() => {
-            campaign = TestFixtures.getDisplayInterstitialCampaign();
-            adUnitParameters.campaign = campaign;
-            adUnit = <DisplayInterstitialAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
-        });
-
-        describe('on show', () => {
-            it('should send tracking events', () => {
-                return adUnit.show().then(() => {
-                    sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendEvent, 'display impression', campaign.getSession().getId(), 'https://unity3d.com/impression');
-                    return adUnit.hide();
-                });
-            });
-        });
-    };
-
     describe('DisplayInterstitialAdUnit', () => {
         describe('On static-interstial campaign', () => {
-            displayUnitTests();
+            let adUnit: DisplayInterstitialAdUnit;
+            let campaign: DisplayInterstitialCampaign;
+
+            beforeEach(() => {
+                campaign = TestFixtures.getDisplayInterstitialCampaign();
+                adUnitParameters.campaign = campaign;
+                adUnit = <DisplayInterstitialAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+            });
+
+            describe('on show', () => {
+                it('should send tracking events', () => {
+                    return adUnit.show().then(() => {
+                        sinon.assert.calledOnce(<sinon.SinonSpy>thirdPartyEventManager.sendEvent);
+                        sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendEvent, 'display impression', campaign.getSession().getId(), 'https://unity3d.com/impression');
+                        return adUnit.hide();
+                    });
+                });
+            });
         });
     });
 });

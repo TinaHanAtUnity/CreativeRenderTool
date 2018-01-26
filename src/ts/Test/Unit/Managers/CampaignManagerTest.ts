@@ -60,8 +60,6 @@ import OnProgrammaticVastPlcCampaignMissingErrorUrls from 'json/OnProgrammaticVa
 import OnProgrammaticVastPlcCampaignAdLevelErrorUrls from 'json/OnProgrammaticVastPlcCampaignAdLevelErrorUrls.json';
 import OnProgrammaticVastPlcCampaignCustomTracking from 'json/OnProgrammaticVastPlcCampaignCustomTracking.json';
 import OnStaticInterstitialDisplayCampaign from 'json/OnStaticInterstitialDisplayCampaign.json';
-import OnStaticInterstitialDisplayCampaignNoClick from 'json/OnStaticInterstitialDisplayCampaignNoClick.json';
-import OnStaticInterstitialDisplayCampaignNoClickMarkupUrl from 'json/OnStaticInterstitialDisplayCampaignNoClickMarkupUrl.json';
 import { ProgrammaticVastParser } from 'Parsers/ProgrammaticVastParser';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { AdMobSignal } from 'Models/AdMobSignal';
@@ -883,7 +881,7 @@ describe('CampaignManager', () => {
             }));
 
             const json = JSON.parse(OnStaticInterstitialDisplayCampaign);
-            const content = JSON.parse(json.media.B0JMQwI7mlsbtAeTSrUjC4.content);
+            const content = json.media.B0JMQwI7mlsbtAeTSrUjC4.content;
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager);
             let triggeredCampaign: DisplayInterstitialCampaign;
@@ -905,27 +903,7 @@ describe('CampaignManager', () => {
                 assert.equal(triggeredCampaign.getAbGroup(), configuration.getAbGroup());
                 assert.equal(triggeredCampaign.getGamerId(), configuration.getGamerId());
                 assert.deepEqual(triggeredCampaign.getOptionalAssets(), []);
-                assert.equal(triggeredCampaign.getDynamicMarkup(), decodeURIComponent(content.markup));
-            });
-        });
-
-        it('should trigger onError when there is no clickThroughURL in programmatic/static-interstitial markup or auction json', () => {
-            const mockRequest = sinon.mock(request);
-            mockRequest.expects('post').returns(Promise.resolve({
-                response: OnStaticInterstitialDisplayCampaignNoClick
-            }));
-
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
-            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager);
-            let triggeredError: any;
-
-            campaignManager.onError.subscribe(error => {
-                triggeredError = error;
-            });
-
-            return campaignManager.request().then(() => {
-                mockRequest.verify();
-                assert.equal(triggeredError.message, 'No clickThroughURL for programmatic/static-interstitial');
+                assert.equal(triggeredCampaign.getDynamicMarkup(), decodeURIComponent(content));
             });
         });
     });
