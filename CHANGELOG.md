@@ -1,4 +1,4 @@
-# Staged
+# Thu Jan 25 11:38:27 UTC 2018
 
 * Fix RVDT typo
 * Fix persistent gamer SID
