@@ -82,11 +82,18 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
 
     public show(): Promise<void> {
         this.onShow();
-        return this._nativeBridge.WebPlayer.setSettings({
+
+        const promises = [];
+        promises.push(this._nativeBridge.WebPlayer.setSettings({
             setSupportMultipleWindows: true
-        }, {
-            setSupportMultipleWindows: true
-        }).then(() => {
+        }, {}));
+        promises.push(this._nativeBridge.WebPlayer.setEventSettings({
+            onCreateWindow: {
+                sendEvent: true
+            }
+        }));
+
+        return Promise.all(promises).then(() => {
             return this._container.open(this, ['webplayer'], false, this._forceOrientation, false, false, true, false, this._options);
         });
     }

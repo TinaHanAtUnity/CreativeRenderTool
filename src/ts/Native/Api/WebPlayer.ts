@@ -55,7 +55,7 @@ export class WebPlayerApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._apiClass, 'setDataWithUrl', [baseUrl, data, mimeType, encoding]);
     }
 
-    public setSettings<T>(webSettings: T, webPlayerSettings: T): Promise<void>  {
+    public setSettings<T, V>(webSettings: T, webPlayerSettings: V): Promise<void>  {
         return this._nativeBridge.invoke<void>(this._apiClass, 'setSettings', [webSettings, webPlayerSettings]);
     }
 
