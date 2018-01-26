@@ -105,7 +105,9 @@ $combined-end-font-size = $combined-end-screen-size * 1.25;
 
   &.with-store-logos {
     .store-logo {
-      $set-image(100%, $combined-end-screen-size * 2.25, 0, "", contain);
+      $set-image(100%, $combined-end-screen-size * 2, 0, "", contain);
+      position: relative;
+      bottom: $combined-end-screen-size * .5;
     }
   }
 }
@@ -164,7 +166,6 @@ body.android #end-screen {
     &.with-store-logos {
       .campaign-container {
         .store-logo {
-          margin-top: $combined-end-screen-size * -1.25;
           background-image: url("../img/play-store.png");
         }
 
@@ -182,9 +183,6 @@ body.android #end-screen {
 
 body.iphone #end-screen.combined-end-screen.with-store-logos .store-logo,
 body.ipad #end-screen.combined-end-screen.with-store-logos .store-logo {
-  position: relative;
-  bottom: $combined-end-screen-size * .5;
-  height: $combined-end-screen-size * 2;
   background-image: url("../img/app-store.png");
 }
 
