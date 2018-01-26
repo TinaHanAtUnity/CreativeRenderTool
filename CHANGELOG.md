@@ -1,3 +1,18 @@
+# Thu Jan 25 11:38:27 UTC 2018
+
+* Fix RVDT typo
+* Fix persistent gamer SID
+
+# Tue Jan 23 12:08:45 UTC 2018
+
+* Fix AdMob time on screen click signal
+
+# Tue Jan 23 09:19:04 UTC 2018
+
+* Refactor campaign model constructors
+* Reject and never show videos longer than 40 seconds
+* Combined end screen with golden stars and platform specific download button on groups 10 and 11
+
 # Thu Jan 18 08:36:17 UTC 2018
 
 * Initial support for AdMob click signals

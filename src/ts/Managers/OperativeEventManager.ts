@@ -41,7 +41,7 @@ export class OperativeEventManager {
         return OperativeEventManager.getEventKey(sessionId, eventId) + '.data';
     }
 
-    private _gamerServerId: string;
+    private _gamerServerId: string | undefined;
     private _nativeBridge: NativeBridge;
     private _metaDataManager: MetaDataManager;
     private _sessionManager: SessionManager;
@@ -66,9 +66,11 @@ export class OperativeEventManager {
 
         session.setEventSent(EventType.START);
 
-        return this._metaDataManager.fetch(PlayerMetaData).then(player => {
+        return this._metaDataManager.fetch(PlayerMetaData, false).then(player => {
             if(player) {
                 this.setGamerServerId(player.getServerId());
+            } else {
+                this.setGamerServerId(undefined);
             }
 
             return this._metaDataManager.fetch(MediationMetaData, true, ['ordinal']);
@@ -191,7 +193,7 @@ export class OperativeEventManager {
         });
     }
 
-    public setGamerServerId(serverId: string): void {
+    public setGamerServerId(serverId: string | undefined): void {
         this._gamerServerId = serverId;
     }
 
@@ -222,7 +224,7 @@ export class OperativeEventManager {
         });
     }
 
-    private createUniqueEventMetadata(session: Session, placement: Placement, campaign: Campaign, gameSession: number, gamerSid: string, previousPlacementId?: string, videoOrientation?: string): Promise<[string, any]> {
+    private createUniqueEventMetadata(session: Session, placement: Placement, campaign: Campaign, gameSession: number, gamerSid?: string, previousPlacementId?: string, videoOrientation?: string): Promise<[string, any]> {
         return this._nativeBridge.DeviceInfo.getUniqueEventId().then(id => {
             return this.getInfoJson(session, placement, campaign, id, gameSession, gamerSid, previousPlacementId, videoOrientation);
         });
@@ -253,7 +255,7 @@ export class OperativeEventManager {
         ]);
     }
 
-    private getInfoJson(session: Session, placement: Placement, campaign: Campaign, id: string, gameSession: number, gamerSid: string, previousPlacementId?: string, videoOrientation?: string): Promise<[string, any]> {
+    private getInfoJson(session: Session, placement: Placement, campaign: Campaign, id: string, gameSession: number, gamerSid?: string, previousPlacementId?: string, videoOrientation?: string): Promise<[string, any]> {
         const infoJson: any = {
             'eventId': id,
             'auctionId': session.getId(),

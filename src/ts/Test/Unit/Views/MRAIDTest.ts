@@ -10,6 +10,8 @@ import { MRAID } from 'Views/MRAID';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Configuration } from 'Models/Configuration';
 
+import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCampaign.json';
+
 describe('MRAID', () => {
     let handleInvocation: sinon.SinonSpy;
     let handleCallback: sinon.SinonSpy;
@@ -40,7 +42,7 @@ describe('MRAID', () => {
     });
 
     it('should render', (done) => {
-        const campaign = new MRAIDCampaign({id: '123abc'}, TestFixtures.getSession(), '123456', 1, undefined, undefined, `<script src="mraid.js"></script><div>Hello</div>`);
+        const campaign = TestFixtures.getProgrammaticMRAIDCampaign();
         const mraid = new MRAID(nativeBridge, placement, campaign, configuration.isCoppaCompliant());
 
         mraid.render();
@@ -62,7 +64,13 @@ describe('MRAID', () => {
     });
 
     it('should replace placeholder with dynamic markup injected', () => {
-        const campaign = new MRAIDCampaign({id: '123abc', dynamicMarkup: 'InjectMe'}, TestFixtures.getSession(), '123456', 1, undefined, undefined, `<script src="mraid.js"></script><script>{UNITY_DYNAMIC_MARKUP}</script><div>Hello</div>`);
+        const json = JSON.parse(OnProgrammaticMraidUrlPlcCampaign);
+        const params = TestFixtures.getProgrammaticMRAIDCampaignParams(json, 3600, '123abc');
+        params.resourceAsset = undefined;
+        params.resource = `<script src="mraid.js"></script><script>{UNITY_DYNAMIC_MARKUP}</script><div>Hello</div>`;
+        params.dynamicMarkup = 'InjectMe';
+        const campaign = new MRAIDCampaign(params);
+
         const mraid = new MRAID(nativeBridge, placement, campaign, configuration.isCoppaCompliant());
         return mraid.createMRAID().then((mraidSrc) => {
             assert.notEqual(mraidSrc.indexOf('InjectMe'), -1);
@@ -71,7 +79,12 @@ describe('MRAID', () => {
 
     it('should remove the mraid.js placeholder when it has a query parameter', () => {
         const markup = '<script src="mraid.js?foo=bar&baz=blah><div>Hello, world!</div>';
-        const campaign = new MRAIDCampaign({id: '123abc', dynamicMarkup: 'InjectMe'}, TestFixtures.getSession(), '123456', 1, undefined, undefined, markup);
+        const json = JSON.parse(OnProgrammaticMraidUrlPlcCampaign);
+        const params = TestFixtures.getProgrammaticMRAIDCampaignParams(json, 3600, '123abc');
+        params.resourceAsset = undefined;
+        params.resource = markup;
+        params.dynamicMarkup = 'InjectMe';
+        const campaign = new MRAIDCampaign(params);
         const mraid = new MRAID(nativeBridge, placement, campaign, configuration.isCoppaCompliant());
         return mraid.createMRAID().then((src) => {
             const dom = new DOMParser().parseFromString(src, 'text/html');
@@ -81,11 +94,16 @@ describe('MRAID', () => {
     });
 
     it('should not remove string replacement patterns', () => {
-        const campaign = new MRAIDCampaign({id: '123abc', dynamicMarkup: 'InjectMe'}, TestFixtures.getSession(), '123456', 1, undefined, undefined, `<script src="mraid.js"></script><script>{UNITY_DYNAMIC_MARKUP}</script><script>var test = "Hello $&"</script><div>Hello World</div>`);
+        const json = JSON.parse(OnProgrammaticMraidUrlPlcCampaign);
+        const params = TestFixtures.getProgrammaticMRAIDCampaignParams(json, 3600, '123abc');
+        params.resourceAsset = undefined;
+        params.resource = `<script src="mraid.js"></script><script>{UNITY_DYNAMIC_MARKUP}</script><script>var test = "Hello $&"</script><div>Hello World</div>`;
+        params.dynamicMarkup = 'InjectMe';
+        const campaign = new MRAIDCampaign(params);
         const mraid = new MRAID(nativeBridge, placement, campaign, configuration.isCoppaCompliant());
         return mraid.createMRAID().then((mraidSrc) => {
             assert.notEqual(mraidSrc.indexOf('InjectMe'), -1);
-            assert.notEqual(mraidSrc.indexOf('<script>var test = "Hello $&"</script>'), -1);
+            assert.notEqual(mraidSrc.indexOf(`<script>var test = "Hello $&"</script>`), -1);
         });
     });
 });

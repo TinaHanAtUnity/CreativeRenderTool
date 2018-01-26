@@ -117,7 +117,7 @@ export class AdMobEventHandler implements IAdMobEventHandler {
             signal.setTouchCancelTotal(touchInfo.counts.cancel);
             return Url.addParameters(url, {
                 ms: signal.getBase64ProtoBufNonEncoded(),
-                rdvt: this._adUnit.getStartTime() - SdkStats.getAdRequestTimestamp()
+                rvdt: this._adUnit.getStartTime() - SdkStats.getAdRequestTimestamp()
             });
         });
     }

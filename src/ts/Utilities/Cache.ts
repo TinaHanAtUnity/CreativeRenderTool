@@ -85,7 +85,9 @@ export class Cache {
 
     private _maxRetries: number = 5;
     private _retryDelay: number = 10000;
-    private _maxFileSize: number = 20971520;
+
+    private readonly _maxFileSize = 20971520;
+    private readonly _maxVideoDuration = 40000;
 
     private _currentDownloadPosition: number = -1;
     private _lastProgressEvent: number;
@@ -355,9 +357,13 @@ export class Cache {
     public isVideoValid(video: Video, campaign: Campaign): Promise<boolean> {
         return this.getFileId(video.getOriginalUrl()).then(fileId => {
             return VideoInfo.getVideoInfo(this._nativeBridge, fileId).then(([width, height, duration]) => {
-                const isValid = (width > 0 && height > 0 && duration > 0);
+                const isValid = (width > 0 && height > 0 && duration > 0 && duration <= this._maxVideoDuration);
+                let errorType = 'video_validation_failed';
+                if(duration > this._maxVideoDuration) {
+                    errorType = 'video_validation_failed_video_too_long';
+                }
                 if(!isValid) {
-                    Diagnostics.trigger('video_validation_failed', {
+                    Diagnostics.trigger(errorType, {
                         url: video.getOriginalUrl(),
                         width: width,
                         height: height,

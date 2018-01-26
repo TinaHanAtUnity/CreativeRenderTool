@@ -24,8 +24,6 @@ import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { AdUnitContainer, ForceOrientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
-import { Vast } from 'Models/Vast/Vast';
-import { VastAd } from 'Models/Vast/VastAd';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { FocusManager } from 'Managers/FocusManager';
@@ -33,7 +31,6 @@ import { Campaign } from 'Models/Campaign';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
-import OnCometMraidPlcCampaign from 'json/OnCometMraidPlcCampaign.json';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
@@ -135,7 +132,6 @@ describe('CampaignRefreshManager', () => {
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        // deviceInfo = new DeviceInfo(nativeBridge);
         sessionManager = new SessionManager(nativeBridge);
         deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
         assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
@@ -176,11 +172,8 @@ describe('CampaignRefreshManager', () => {
         });
 
         it('get campaign should return a campaign (Performance)', () => {
-            const json: any = JSON.parse(OnCometVideoPlcCampaign);
-            const campaignObject: any = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
-
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onCampaign.trigger('premium', new PerformanceCampaign(campaignObject, TestFixtures.getSession(), 'TestGamerId', 12345));
+                campaignManager.onCampaign.trigger('premium', TestFixtures.getCampaign());
                 return Promise.resolve();
             });
 
@@ -197,7 +190,7 @@ describe('CampaignRefreshManager', () => {
                 assert.equal(configuration.getPlacement('premium').getState(), PlacementState.READY);
                 assert.equal(configuration.getPlacement('video').getState(), PlacementState.WAITING);
 
-                campaignManager.onCampaign.trigger('video', new PerformanceCampaign(campaignObject, TestFixtures.getSession(), 'TestGamerId', 12345));
+                campaignManager.onCampaign.trigger('video', TestFixtures.getCampaign());
                 assert.notEqual(campaignRefreshManager.getCampaign('video'), undefined);
                 assert.isTrue(campaignRefreshManager.getCampaign('video') instanceof PerformanceCampaign);
                 assert.equal(configuration.getPlacement('premium').getState(), PlacementState.READY);
@@ -206,11 +199,8 @@ describe('CampaignRefreshManager', () => {
         });
 
         it('get campaign should return a campaign (Vast)', () => {
-            const vast = new Vast([new VastAd()], ['ErrorUrl']);
-            sinon.stub(vast, 'getVideoUrl').returns('https://video.url');
-
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onCampaign.trigger('premium', new VastCampaign(vast, 'TestCampaignId', TestFixtures.getSession(), 'TestGamerId', 12345));
+                campaignManager.onCampaign.trigger('premium', TestFixtures.getCompanionVastCampaign());
                 return Promise.resolve();
             });
 
@@ -221,13 +211,13 @@ describe('CampaignRefreshManager', () => {
                 const tmpCampaign = campaignRefreshManager.getCampaign('premium');
                 assert.notEqual(undefined, tmpCampaign);
                 if (tmpCampaign) {
-                    assert.equal(tmpCampaign.getId(), 'TestCampaignId');
+                    assert.equal(tmpCampaign.getId(), '12345');
                 }
 
                 assert.equal(configuration.getPlacement('premium').getState(), PlacementState.READY);
                 assert.equal(configuration.getPlacement('video').getState(), PlacementState.WAITING);
 
-                campaignManager.onCampaign.trigger('video', new VastCampaign(vast, 'TestCampaignId', TestFixtures.getSession(), 'TestGamerId', 12345));
+                campaignManager.onCampaign.trigger('video', TestFixtures.getCompanionVastCampaign());
 
                 assert.notEqual(campaignRefreshManager.getCampaign('video'), undefined);
                 assert.isTrue(campaignRefreshManager.getCampaign('video') instanceof VastCampaign);
@@ -237,9 +227,7 @@ describe('CampaignRefreshManager', () => {
         });
 
         it('get campaign should return a campaign (MRAID)', () => {
-            const json: any = JSON.parse(OnCometVideoPlcCampaign);
-            const campaignObject: any = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
-            const mraid = new MRAIDCampaign(campaignObject, TestFixtures.getSession(), 'TestGamerId', 12345, undefined);
+            const mraid = TestFixtures.getPlayableMRAIDCampaign();
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('premium', mraid);
@@ -253,7 +241,7 @@ describe('CampaignRefreshManager', () => {
                 const tmpCampaign = campaignRefreshManager.getCampaign('premium');
                 assert.notEqual(undefined, tmpCampaign);
                 if (tmpCampaign) {
-                    assert.equal(tmpCampaign.getId(), '582bb5e352e4c4abd7fab850');
+                    assert.equal(tmpCampaign.getId(), '58dec182f01b1c0cdef54f0f');
                 }
 
                 assert.equal(configuration.getPlacement('premium').getState(), PlacementState.READY);
@@ -268,15 +256,11 @@ describe('CampaignRefreshManager', () => {
         });
 
         it('should not refresh', () => {
-            const json: any = JSON.parse(OnCometVideoPlcCampaign);
-            const campaignObject: any = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
-            const json2: any = JSON.parse(OnCometMraidPlcCampaign);
-            const campaignObject2: any = JSON.parse(json2.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
-            let campaign: Campaign = new PerformanceCampaign(campaignObject, TestFixtures.getSession(), 'TestGamerId', 12345);
+            let campaign: Campaign = TestFixtures.getCampaign();
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('premium', campaign);
-                campaign = new MRAIDCampaign(campaignObject2, TestFixtures.getSession(), 'TestGamerId', 12345, undefined);
+                campaign = TestFixtures.getPlayableMRAIDCampaign();
                 return Promise.resolve();
             });
 
@@ -310,11 +294,8 @@ describe('CampaignRefreshManager', () => {
         });
 
         it('placement states should end up with NO_FILL', () => {
-            const json: any = JSON.parse(OnCometVideoPlcCampaign);
-            const campaignObject: any = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
-
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onCampaign.trigger('premium', new PerformanceCampaign(campaignObject, TestFixtures.getSession(), 'TestGamerId', 12345));
+                campaignManager.onCampaign.trigger('premium', TestFixtures.getCampaign());
                 campaignManager.onNoFill.trigger('premium');
                 return Promise.resolve();
             });
@@ -334,16 +315,14 @@ describe('CampaignRefreshManager', () => {
         });
 
         it('should invalidate campaigns', () => {
-            const json: any = JSON.parse(OnCometVideoPlcCampaign);
-            const campaignObject: any = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
-            const campaign = new PerformanceCampaign(campaignObject, TestFixtures.getSession(), 'TestGamerId', 12345);
+            const campaign = TestFixtures.getCampaign();
             const placement: Placement = configuration.getPlacement('premium');
             adUnitParams.campaign = campaign;
             adUnitParams.placement = placement;
             const currentAdUnit = new TestAdUnit(nativeBridge, adUnitParams);
 
             sinon.stub(campaignManager, 'request').callsFake(() => {
-                campaignManager.onCampaign.trigger('premium', new PerformanceCampaign(campaignObject, TestFixtures.getSession(), 'TestGamerId', 12345));
+                campaignManager.onCampaign.trigger('premium', TestFixtures.getCampaign());
                 return Promise.resolve();
             });
 
@@ -357,7 +336,7 @@ describe('CampaignRefreshManager', () => {
                 assert.equal(configuration.getPlacement('premium').getState(), PlacementState.READY);
                 assert.equal(configuration.getPlacement('video').getState(), PlacementState.WAITING);
 
-                campaignManager.onCampaign.trigger('video', new PerformanceCampaign(campaignObject, TestFixtures.getSession(), 'TestGamerId', 12345));
+                campaignManager.onCampaign.trigger('video', TestFixtures.getCampaign());
 
                 assert.equal(configuration.getPlacement('premium').getState(), PlacementState.READY);
                 assert.equal(configuration.getPlacement('video').getState(), PlacementState.READY);
@@ -371,12 +350,8 @@ describe('CampaignRefreshManager', () => {
         });
 
         it ('should set campaign status to ready after close', () => {
-            const json: any = JSON.parse(OnCometVideoPlcCampaign);
-            const campaignObject: any = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
-            const json2: any = JSON.parse(OnCometMraidPlcCampaign);
-            const campaignObject2: any = JSON.parse(json2.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
-            let campaign: Campaign = new PerformanceCampaign(campaignObject, TestFixtures.getSession(), 'TestGamerId', 12345);
-            const campaign2 = new MRAIDCampaign(campaignObject2, TestFixtures.getSession(), 'TestGamerId', 12345, undefined);
+            let campaign: Campaign = TestFixtures.getCampaign();
+            const campaign2 = TestFixtures.getPlayableMRAIDCampaign();
             const placement: Placement = configuration.getPlacement('premium');
             adUnitParams.campaign = campaign;
             adUnitParams.placement = placement;
