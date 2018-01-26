@@ -153,7 +153,7 @@ export class OperativeEventManager {
             infoJson.id = id;
             infoJson.ts = (new Date()).toISOString();
 
-            HttpKafka.sendEvent('events.skip.json', infoJson);
+            HttpKafka.sendEvent('ads.sdk2.events.skip.json', infoJson);
         };
 
         return this.createUniqueEventMetadata(session, placement, campaign, this._sessionManager.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId(), videoOrientation).then(fulfilled);
@@ -222,6 +222,32 @@ export class OperativeEventManager {
             this._nativeBridge.Storage.set(StorageType.PRIVATE, OperativeEventManager.getDataKey(sessionId, eventId), data);
             this._nativeBridge.Storage.write(StorageType.PRIVATE);
         });
+    }
+
+    public sendHttpKafkaEvent(kafkaType: string, session: Session, placement: Placement, campaign: Campaign, videoOrientation?: string) {
+        const fulfilled = ([id, infoJson]: [string, any]) => {
+
+            // todo: clears duplicate data for httpkafka, should be cleaned up
+            delete infoJson.eventId;
+            delete infoJson.apiLevel;
+            delete infoJson.advertisingTrackingId;
+            delete infoJson.limitAdTracking;
+            delete infoJson.osVersion;
+            delete infoJson.sid;
+            delete infoJson.deviceMake;
+            delete infoJson.deviceModel;
+            delete infoJson.sdkVersion;
+            delete infoJson.webviewUa;
+            delete infoJson.networkType;
+            delete infoJson.connectionType;
+
+            infoJson.id = id;
+            infoJson.ts = (new Date()).toISOString();
+
+            HttpKafka.sendEvent(kafkaType, infoJson);
+        };
+
+        return this.createUniqueEventMetadata(session, placement, campaign, this._sessionManager.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId(), videoOrientation).then(fulfilled);
     }
 
     private createUniqueEventMetadata(session: Session, placement: Placement, campaign: Campaign, gameSession: number, gamerSid?: string, previousPlacementId?: string, videoOrientation?: string): Promise<[string, any]> {
