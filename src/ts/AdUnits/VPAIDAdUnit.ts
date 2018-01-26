@@ -82,13 +82,20 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
 
     public show(): Promise<void> {
         this.onShow();
-        return this._container.open(this, ['webplayer'], false, this._forceOrientation, false, false, true, false, this._options);
+        return this._nativeBridge.WebPlayer.setSettings({
+            setSupportMultipleWindows: true
+        }, {
+            setSupportMultipleWindows: true
+        }).then(() => {
+            return this._container.open(this, ['webplayer'], false, this._forceOrientation, false, false, true, false, this._options);
+        });
     }
 
     public hide(): Promise<void> {
         this.onHide();
         this.hideView();
         return this._container.close();
+        // return Promise.resolve();
     }
 
     public description(): string {

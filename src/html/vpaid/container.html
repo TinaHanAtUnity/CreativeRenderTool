@@ -1,39 +1,93 @@
 <html>
 <head>
-    <style>{COMPILED_CSS}</style>
+    <style>
+        {COMPILED_CSS}
+    </style>
 </head>
 <body>
-    <div class="progress">
-        <div class="circle-base"></div>
-        <div class="progress-wrapper">
-            <div class="circle-left"></div>
-            <div class="circle-right"></div>
-        </div>
-    </div>
     <div class="video-player-slot">
         <video
             poster="data:image/svg+xml;base64,"
-            playsinline>
+            playsinline
+            muted>
         </video>
     </div>
-    <script src="{{VPAID_SRC_URL}}"></script>
+    <div id="overlay">
+        <div class="skip-hit-area hide">
+            <div class="skip">
+                <div class="skip-icon"><span class="icon-skip"></span></div>
+                <div class="circle-base"></div>
+                <div class="progress-wrapper">
+                    <div class="circle-left"></div>
+                    <div class="circle-right"></div>
+                </div>
+            </div>
+        </div>
+        <div class="progress">
+            <div class="circle-base"></div>
+            <div class="progress-wrapper">
+                <div class="circle-left"></div>
+                <div class="circle-right"></div>
+            </div>
+        </div>
+        <div class="buffering-spinner">
+            <div class="spinner-animation"></div>
+            <div class="spinner-text"><%= data.t("Buffering") %></div>
+        </div>
+        <div class="mute-button muted">
+            <div class="mute-icon"><span class="icon-volume"></span></div>
+            <div class="unmute-icon"><span class="icon-volume-mute"></span></div>
+        </div>
+        <div class="call-button"><%= data.t("Learn More") %></div>
+        <div class="debug-message-text"></div>
+    </div>
+    <script src="<%= data.vpaidSrcUrl %>"></script>
     <script>
         (function(global) {
+            var EventTarget = function() {
+                this.listeners = {};
+            };
+
+            EventTarget.prototype.listeners = null;
+            EventTarget.prototype.addEventListener = function(type, callback) {
+                if (!(type in this.listeners)) {
+                    this.listeners[type] = [];
+                }
+                this.listeners[type].push(callback);
+            };
+
+            EventTarget.prototype.removeEventListener = function(type, callback) {
+                if (!(type in this.listeners)) {
+                    return;
+                }
+                var stack = this.listeners[type];
+                for (var i = 0, l = stack.length; i < l; i++) {
+                    if (stack[i] === callback){
+                        stack.splice(i, 1);
+                        return;
+                    }
+                }
+            };
+
+            EventTarget.prototype.dispatchEvent = function(event) {
+                if (!(event.type in this.listeners)) {
+                    return true;
+                }
+                var stack = this.listeners[event.type];
+
+                for (var i = 0, l = stack.length; i < l; i++) {
+                    stack[i].call(this, event);
+                }
+                return !event.defaultPrevented;
+            };
+
             var NativeBridge = function() {
                 var _this = this;
-
-                this.eventHandlers = {};
 
                 this.receiveEvent = function(args) {
                     var event = args.shift();
                     var parameters = args.shift();
-                    _this.trigger(event, parameters);
-                };
-
-                this.addEventListener = function(event, listener) {
-                    var listeners = _this.eventHandlers[event] || [];
-                    listeners.push(listener);
-                    _this.eventHandlers[event] = listeners;
+                    _this.dispatchEvent(new CustomEvent(event, { detail: parameters }));
                 };
 
                 this.sendEvent = function(event, parameters) {
@@ -50,12 +104,15 @@
                     }
                 };
             };
+            NativeBridge.prototype = new EventTarget();
 
             global.nativebridge = new NativeBridge();
         })(window);
     </script>
     <script>
         (function() {
+            var adParameters = <%= data.adParameters %>;
+
             var nativebridge = window.nativebridge;
 
             // List of all ad events
@@ -69,34 +126,100 @@
                 'log', 'error'
             ];
 
+            var FillCircle = function(e) {
+                var _this = this;
+                this._element = e;
+                this._leftCircle = e.querySelector('.circle-left');
+                this._rightCircle = e.querySelector('.circle-right');
+                this._wrapper = e.querySelector('.progress-wrapper');
+            };
+
+            FillCircle.prototype.update = function(progress, duration) {
+                var time = Math.floor(duration - progress);
+                var delta = progress / duration;
+                if (delta >= 1.0) {
+                    return;
+                }
+
+                var degrees = delta * 360;
+                this._leftCircle.style.webkitTransform = 'rotate(' + degrees + 'deg)';
+
+                if (delta >= 0.5) {
+                    this._wrapper.style.webkitAnimationName = 'close-progress-wrapper';
+                    this._rightCircle.style.webkitAnimationName = 'right-spin';
+                }
+            };
+
+            var ProgressControl = function(e) {
+                FillCircle.call(this, e);
+            };
+
+            ProgressControl.prototype = Object.create(FillCircle.prototype);
+            ProgressControl.prototype.constructor = ProgressControl;
+            ProgressControl.prototype.update = function(progress, duration) {
+                var time = Math.floor(duration - progress);
+                this._element.setAttribute('data-seconds', String(time));
+                FillCircle.prototype.update.call(this, progress, duration);
+            };
+
+            var SkipControl = function(e) {
+                FillCircle.call(this, e);
+            };
+
+            SkipControl.prototype = Object.create(FillCircle.prototype);
+            SkipControl.prototype.constructor = ProgressControl;
+            SkipControl.prototype.setEnabled = function() {
+                this._element.classList.add('enabled');
+            };
+
+            SkipControl.prototype.setDisabled = function() {
+                this._element.classList.remove('enabled');
+            };
+
+            SkipControl.prototype.isEnabled = function() {
+                return this._element.className.match(/\s?enabled\s?/);
+            };
 
             var Container = function() {
                 this._iframe = document.querySelector('iframe');
                 this._creative = null;
                 this._slot = document.querySelector('.video-player-slot');
                 this._videoSlot = this._slot.querySelector('video');
-                this._progressElement = document.querySelector('.progress');
-                this._leftCircleElement = document.querySelector('.circle-left');
-                this._rightCircleElement = document.querySelector('.circle-right');
-                this._wrapperElement = document.querySelector('.progress-wrapper');
+                this._progress = new ProgressControl(document.querySelector('.progress'));
+                this._skip = new SkipControl(document.querySelector('.skip'));
+                this._skipContainer = document.querySelector('.skip-hit-area');
+
+                this._skipHandler = function() {
+                    if (_this._creative.getAdSkippableState()) {
+                        _this._creative.skipAd();
+                    } else {
+                        // manually trigger the AdSkipped event
+                        _this._handleEvent('AdSkipped');
+                        _this._creative.stopAd();
+                    }
+                };
+
+                if (adParameters.skipEnabled) {
+                    this._skipContainer.classList.remove('hide');
+                }
 
                 var _this = this;
 
                 var eventHandlers = {
-                    init: function() {
-                        _this._initAd.apply(_this, arguments);
+                    init: function(e) {
+                        _this._initAd.apply(_this, e.detail);
                     },
-                    show: function() {
-                        _this._showAd.apply(_this, arguments);
+                    show: function(e) {
+                        _this._showAd.apply(_this, e.detail);
                     },
-                    destroy: function() {
-                        _this._stopAd.apply(_this, arguments);
+                    destroy: function(e) {
+                        _this._stopAd.apply(_this, e.detail);
                     },
-                    pause: function() {
-                        _this._pauseAd.apply(_this, arguments);
+                    pause: function(e) {
+                        _this._pauseAd.apply(_this, e.detail);
                     },
-                    resume: function() {
-                        _this._resumeAd.apply(_this, arguments);
+                    resume: function(e) {
+                        _this._resumeAd.apply(_this, e.detail);
                     }
                 };
 
@@ -112,17 +235,13 @@
                 this._updateProgress = function() {
                     var progress = _this._videoSlot.currentTime;
                     var duration = _this._videoSlot.duration;
-                    var time = Math.floor(duration - progress);
-                    var delta = progress / duration;
+                    _this._progress.update(progress, duration);
 
-                    _this._progressElement.setAttribute('data-seconds', time);
-
-                    var degrees = delta * 360;
-                    _this._leftCircleElement.style.webkitTransform = 'rotate(' + degrees + 'deg)';
-
-                    if (delta >= 0.5) {
-                        _this._wrapperElement.style.webkitAnimationName = 'close-progress-wrapper';
-                        _this._rightCircleElement.style.webkitAnimationName = 'right-spin';
+                    if (adParameters.skipEnabled) {
+                        this._skip.update(progress, adParameters.skipDuration);
+                        if (progress > adParameters.skipDuration) {
+                            _this._updateSkipControls(true);
+                        }
                     }
                 };
 
@@ -132,6 +251,14 @@
                         _this._creative = getVPAID();
 
                         _this._subscribeToAllEvents();
+
+                        _this._creative.subscribe(function() {
+                            _this._onSkippableStateChange();
+                        }, 'AdSkippableStateChange', _this);
+
+                        if (!adParameters.startMuted) {
+                            _this._videoSlot.removeAttribute('muted');
+                        }
 
                         nativebridge.sendEvent('ready');
                     } else {
@@ -191,7 +318,7 @@
 
                 this._initAd = function(initOpts) {
                     this._version = this._creative.handshakeVersion('2.0');
-                    this._creative.initAd(initOpts.width, initOpts.height, initOpts.viewMode, initOpts.bitrate, initOpts.creativeData, {
+                    this._creative.initAd(initOpts.width / window.devicePixelRatio, initOpts.height / window.devicePixelRatio, initOpts.viewMode, initOpts.bitrate, initOpts.creativeData, {
                         slot: _this._slot,
                         videoSlot: _this._videoSlot
                     });
@@ -215,6 +342,27 @@
 
                 this._sendProgressEvent = function() {
                     window.nativebridge.sendEvent('progress', [_this._videoSlot.duration, _this._videoSlot.duration - _this._videoSlot.currentTime]);
+                };
+
+                this._onSkippableStateChange = function() {
+                    // Our skip element takes priority.
+                    var canSkip = _this._creative.getAdSkippableState() || (adParameters.skipEnabled && _this._videoSlot.currentTime >= adParameters.skipDuration);
+                    this._updateSkipControls(canSkip);
+                };
+
+                this._updateSkipControls = function(canSkip) {
+                    if (canSkip && _this._skip.isEnabled()) {
+                        return;
+                    } else if (canSkip) {
+                        this._skipContainer.classList.remove('hide');
+                        // Fill the skip controls completely
+                        _this._skip.update(1, 1);
+                        _this._skip.setEnabled();
+                        this._skipContainer.addEventListener('click', _this._skipHandler);
+                    } else {
+                        _this._skip.setDisabled();
+                        this._skipContainer.removeEventListener('click', _this._skipHandler);
+                    }
                 };
             };
 

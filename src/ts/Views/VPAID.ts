@@ -29,6 +29,15 @@ export interface IVPAIDHandler {
     onVPAIDProgress(duration: number, remainingTime: number): void;
 }
 
+interface IVPAIDAdParameters {
+    skipEnabled: boolean;
+    skipDuration: number;
+}
+
+interface IVPAIDTemplateData {
+    adParameters: string;
+}
+
 export class VPAID extends View<IVPAIDHandler> {
     private static stuckDelay = 5 * 1000;
 
@@ -39,7 +48,6 @@ export class VPAID extends View<IVPAIDHandler> {
     private _iframe: HTMLIFrameElement;
     private _messageListener: (e: MessageEvent) => void;
 
-    private _loadingScreen: HTMLElement;
     private _stuckTimer: Timer;
     private _isPaused = false;
     private _isLoaded = false;
@@ -50,11 +58,6 @@ export class VPAID extends View<IVPAIDHandler> {
 
         this._template = new Template(VPAIDTemplate);
         this._campaign = campaign;
-
-        this._loadingScreen = document.createElement('div');
-        this._loadingScreen.classList.add('loading-container');
-        this._loadingScreen.innerHTML = new Template(LoadingTemplate).render({});
-
         this._placement = placement;
         this._stuckTimer = new Timer(() => this._handlers.forEach(handler => handler.onVPAIDStuck()), VPAID.stuckDelay);
 
@@ -67,7 +70,19 @@ export class VPAID extends View<IVPAIDHandler> {
 
     public loadWebPlayer() {
         this._isLoaded = true;
-        const iframeSrcDoc = VPAIDContainerTemplate.replace(this.vpaidSrcTag, this._campaign.getVPAID().getScriptUrl()).replace('{COMPILED_CSS}', VPAIDCss);
+        const adParameters = <IVPAIDAdParameters>{
+            skipEnabled: this._placement.allowSkip(),
+            skipDuration: this._placement.allowSkipInSeconds(),
+        };
+
+        const templateData = <IVPAIDTemplateData>{
+            adParameters: JSON.stringify(adParameters),
+            vpaidSrcUrl: this._campaign.getVPAID().getScriptUrl()
+        };
+
+        let iframeSrcDoc = new Template(VPAIDContainerTemplate).render(templateData);
+        iframeSrcDoc = iframeSrcDoc.replace('{COMPILED_CSS}', VPAIDCss);
+
         this._nativeBridge.WebPlayer.setData(encodeURIComponent(iframeSrcDoc), 'text/html', 'UTF-8');
         this._webplayerEventObserver = this._nativeBridge.WebPlayer.onWebPlayerEvent.subscribe((args: string) => this.onWebPlayerEvent(JSON.parse(args)));
     }
