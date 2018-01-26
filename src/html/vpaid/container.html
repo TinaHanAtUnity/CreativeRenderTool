@@ -8,8 +8,7 @@
     <div class="video-player-slot">
         <video
             poster="data:image/svg+xml;base64,"
-            playsinline
-            muted>
+            playsinline>
         </video>
     </div>
     <div id="overlay">
@@ -34,7 +33,7 @@
             <div class="spinner-animation"></div>
             <div class="spinner-text"><%= data.t("Buffering") %></div>
         </div>
-        <div class="mute-button muted">
+        <div class="mute-button">
             <div class="mute-icon"><span class="icon-volume"></span></div>
             <div class="unmute-icon"><span class="icon-volume-mute"></span></div>
         </div>
@@ -181,6 +180,7 @@
             };
 
             var Container = function() {
+                var _this = this;
                 this._iframe = document.querySelector('iframe');
                 this._creative = null;
                 this._slot = document.querySelector('.video-player-slot');
@@ -188,6 +188,7 @@
                 this._progress = new ProgressControl(document.querySelector('.progress'));
                 this._skip = new SkipControl(document.querySelector('.skip'));
                 this._skipContainer = document.querySelector('.skip-hit-area');
+                this._muteButton = document.querySelector('.mute-button')
 
                 this._skipHandler = function() {
                     if (_this._creative.getAdSkippableState()) {
@@ -199,11 +200,24 @@
                     }
                 };
 
+                this._muteButton.addEventListener('click', function() {
+                    var isMuted = _this._videoSlot.muted;
+                    if (isMuted) {
+                        _this._muteButton.classList.remove('muted');
+                    } else {
+                        _this._muteButton.classList.add('muted');
+                    }
+                    _this._videoSlot.muted = !isMuted;
+                });
+
                 if (adParameters.skipEnabled) {
                     this._skipContainer.classList.remove('hide');
                 }
 
-                var _this = this;
+                if (adParameters.startMuted) {
+                    this._videoSlot.muted = true;
+                    this._muteButton.classList.add('muted');
+                }
 
                 var eventHandlers = {
                     init: function(e) {
@@ -255,10 +269,6 @@
                         _this._creative.subscribe(function() {
                             _this._onSkippableStateChange();
                         }, 'AdSkippableStateChange', _this);
-
-                        if (!adParameters.startMuted) {
-                            _this._videoSlot.removeAttribute('muted');
-                        }
 
                         nativebridge.sendEvent('ready');
                     } else {
