@@ -7,6 +7,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { FakeDeviceInfo } from './FakeDeviceInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { IPerformanceCampaign, PerformanceCampaign, StoreName } from 'Models/Campaigns/PerformanceCampaign';
+import { IXPromoCampaign, XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { IMRAIDCampaign, MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Configuration } from 'Models/Configuration';
 import { ICacheDiagnostics } from 'Utilities/Cache';
@@ -29,6 +30,7 @@ import OnCometMraidPlcCampaignFollowsRedirects from 'json/OnCometMraidPlcCampaig
 import OnCometMraidPlcCampaign from 'json/OnCometMraidPlcCampaign.json';
 import OnCometVideoPlcCampaignFollowsRedirects from 'json/OnCometVideoPlcCampaignFollowsRedirects.json';
 import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
+import OnXPromoPlcCampaign from 'json/OnXPromoPlcCampaign.json';
 import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCampaign.json';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
@@ -100,6 +102,38 @@ export class TestFixtures {
             videoEventUrls: json.videoEventUrls,
             bypassAppSheet: json.bypassAppSheet,
             store: storeName
+        };
+
+        if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
+            parameters.video = new Video(json.trailerDownloadable, session, json.trailerDownloadableSize);
+            parameters.streamingVideo = new Video(json.trailerStreaming, session);
+        }
+
+        if(json.trailerPortraitDownloadable && json.trailerPortraitDownloadableSize && json.trailerPortraitStreaming) {
+            parameters.videoPortrait = new Video(json.trailerPortraitDownloadable, session, json.trailerPortraitDownloadableSize);
+            parameters.streamingPortraitVideo = new Video(json.trailerPortraitStreaming, session);
+        }
+
+        return parameters;
+    }
+
+    public static getXPromoCampaignParams(json: any, storeName: StoreName): IXPromoCampaign {
+        const session = this.getSession();
+        const parameters: IXPromoCampaign = {
+            ... this.getCometCampaignBaseParams(session, json.id, this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup(), undefined),
+            appStoreId: json.appStoreId,
+            gameId: json.gameId,
+            gameName: json.gameName,
+            gameIcon: new Image(json.gameIcon, session),
+            rating: json.rating,
+            ratingCount: json.ratingCount,
+            landscapeImage: new Image(json.endScreenLandscape, session),
+            portraitImage: new Image(json.endScreenPortrait, session),
+            clickAttributionUrl: json.clickAttributionUrl,
+            clickAttributionUrlFollowsRedirects: json.clickAttributionUrlFollowsRedirects,
+            bypassAppSheet: json.bypassAppSheet,
+            store: storeName,
+            trackingUrls: json.trackingUrls
         };
 
         if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
@@ -317,6 +351,12 @@ export class TestFixtures {
         const json = JSON.parse(OnCometVideoPlcCampaign);
         const performanceJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
         return new PerformanceCampaign(this.getPerformanceCampaignParams(performanceJson, StoreName.GOOGLE));
+    }
+
+    public static getXPromoCampaign(): XPromoCampaign {
+        const json = JSON.parse(OnXPromoPlcCampaign);
+        const xPromoJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
+        return new XPromoCampaign(this.getXPromoCampaignParams(xPromoJson, StoreName.GOOGLE));
     }
 
     public static getPlayableMRAIDCampaignFollowsRedirects(): MRAIDCampaign {

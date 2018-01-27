@@ -1,0 +1,15 @@
+{
+  "auctionId": "a15a4fb6-f9ce-4b09-a0cc-0672f1de4d20",
+  "correlationId": "zGg2TfRsBNbqlc7AVdhLAw",
+  "placements": {
+    "video": "UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85"
+  },
+  "media": {
+  "UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85": {
+      "contentType": "xpromo/video",
+      "content": "{\"clickUrl\": \"https://test.click.url?gameId=12345\",\"videoEventUrls\":{\"video_start\": \"https://video.event.url/start\",\"first_quartile\": \"https://video.event.url/first_quartile\",\"midpoint\": \"https://video.event.url/midpoint\",\"third_quartile\": \"https://video.event.url/third_quartile\",\"video_end\": \"https://video.event.url/video_end\"},\"id\":\"582bb5e352e4c4abd7fab850\",\"store\":\"google\",\"appStoreId\":\"com.glu.stardomkim\",\"gameId\":1000,\"gameName\":\"\",\"gameIcon\":\"store-icons/1fb528bd-41f0-4de7-b879-c69749aa0082.png\",\"rating\":0,\"ratingCount\":0,\"clickAttributionUrl\":\"https://www.test.com\",\"endScreenLandscape\":\"https://unityads-cdn-origin-staging.s3.amazonaws.com/assets/74ed141a-e9ab-46c6-a0cf-d5ed31c395cd/qa_endcard_landscape_800x600.png\",\"endScreenPortrait\":\"https://unityads-cdn-origin-staging.s3.amazonaws.com/assets/74ed141a-e9ab-46c6-a0cf-d5ed31c395cd/qa_endcard_portrait_600x800.png\",\"trailerDownloadable\":\"http://unityads-cdn-origin-staging.s3.amazonaws.com/assets/59f8442d8f5a7b0011838615/m31-1000.mp4\",\"trailerDownloadableSize\":1112835,\"trailerPortraitDownloadable\":\"http://unityads-cdn-origin-staging.s3.amazonaws.com/assets/59f843bcd955480011346d80/m31-1000.mp4\",\"trailerPortraitDownloadableSize\":1104109,\"trailerStreaming\":\"http://unityads-cdn-origin-staging.s3.amazonaws.com/assets/59f8442d8f5a7b0011838615/b30-400.mp4\",\"trailerPortraitStreaming\":\"http://unityads-cdn-origin-staging.s3.amazonaws.com/assets/59f843bcd955480011346d80/b30-400.mp4\",\"bypassAppSheet\":false}",
+      "trackingUrls": {},
+      "adType": "VIDEO"
+    }
+  }
+}
