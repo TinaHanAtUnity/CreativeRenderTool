@@ -7,6 +7,7 @@ import { IVideoAdUnitParameters, VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { VastEndScreen } from 'Views/VastEndScreen';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { MOAT } from 'Views/MOAT';
+import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 import { StreamType } from 'Constants/Android/StreamType';
 import { Platform } from 'Constants/Platform';
 import { Placement } from 'Models/Placement';
@@ -85,6 +86,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
                 endScreen.remove();
             }
 
+            this._moat = MoatViewabilityService.getMoat();
             if(this._moat) {
                 this._moat.removeMessageListener();
                 this._moat.container().parentElement!.removeChild(this._moat.container());
@@ -96,10 +98,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
 
     public description(): string {
         return 'VAST';
-    }
-
-    public getMoat(): MOAT | undefined {
-        return this._moat;
     }
 
     public getEvents() {
@@ -171,13 +169,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         }
     }
 
-    public initMoat() {
-        this._moat = new MOAT(this._nativeBridge);
-        this._moat.render();
-        this._moat.addMessageListener();
-        document.body.appendChild(this._moat.container());
-    }
-
     public sendVideoClickTrackingEvent(sessionId: string, sdkVersion: number): void {
         this.sendTrackingEvent('click', sessionId, sdkVersion);
 
@@ -206,6 +197,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
 
     protected onSystemInterrupt(interruptStarted: boolean): void {
         super.onSystemInterrupt(interruptStarted);
+        this._moat = MoatViewabilityService.getMoat();
         if (this._moat) {
             if (!interruptStarted) {
                 this._moat.resume(this.getVolume());
@@ -214,6 +206,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     }
 
     protected onSystemPause(): void {
+        this._moat = MoatViewabilityService.getMoat();
         if (this._moat && !this._container.isPaused()) {
             this._moat.pause(this.getVolume());
         }

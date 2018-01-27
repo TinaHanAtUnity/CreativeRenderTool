@@ -8,6 +8,7 @@ import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { OverlayEventHandler } from 'EventHandlers/OverlayEventHandler';
 import { Placement } from 'Models/Placement';
 import { ViewController } from 'AdUnits/Containers/ViewController';
+import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _vastAdUnit: VastAdUnit;
@@ -40,20 +41,9 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
 
     public onOverlayMute(isMuted: boolean): void {
         super.onOverlayMute(isMuted);
-
         if (isMuted) {
-            const moat = this._vastAdUnit.getMoat();
-            if(moat) {
-                moat.triggerVideoEvent('AdVolumeChange', 0);
-                moat.triggerViewabilityEvent('volume', 0.0);
-            }
             this._vastAdUnit.sendTrackingEvent('mute', this._vastCampaign.getSession().getId(), this._clientInfo.getSdkVersion());
         } else {
-            const moat = this._vastAdUnit.getMoat();
-            if(moat) {
-                moat.triggerVideoEvent('AdVolumeChange', this._vastAdUnit.getVolume());
-                moat.triggerViewabilityEvent('volume', this._vastAdUnit.getVolume() * 100);
-            }
             this._vastAdUnit.sendTrackingEvent('unmute', this._vastCampaign.getSession().getId(), this._clientInfo.getSdkVersion());
         }
 
@@ -93,7 +83,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
                 (this._vastAdUnit.getContainer() as ViewController).unPause();
             }
             this._nativeBridge.VideoPlayer.play();
-            const moat = this._vastAdUnit.getMoat();
+            const moat = MoatViewabilityService.getMoat();
             if(moat) {
                 moat.triggerViewabilityEvent('exposure', true);
                 moat.triggerVideoEvent('AdPlaying', this._vastAdUnit.getVolume());
