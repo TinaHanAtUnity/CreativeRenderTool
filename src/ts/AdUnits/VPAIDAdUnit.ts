@@ -50,26 +50,10 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
         this._options = parameters.options;
         this._view = parameters.vpaid;
         this._overlay = parameters.overlay;
-
         this._overlay.render();
-        this._overlay.setFadeEnabled(true);
-        this._overlay.setSkipEnabled(false);
-        this._overlay.setMuteEnabled(false);
-        const overlayContainer = this._overlay.container();
-        overlayContainer.style.position = 'absolute';
-        overlayContainer.style.top = '0px';
-        overlayContainer.style.left = '0px';
-        document.body.appendChild(overlayContainer);
-
         if (this._placement.allowSkip()) {
-            parameters.overlay.setSkipEnabled(true);
-            parameters.overlay.setSkipDuration(this._placement.allowSkipInSeconds());
-        }
-
-        if(this._vpaidCampaign.hasEndScreen() && parameters.endScreen) {
-            parameters.endScreen.render();
-            parameters.endScreen.hide();
-            document.body.appendChild(parameters.endScreen.container());
+            this._overlay.setSkipEnabled(true);
+            this._overlay.setSkipDuration(this._placement.allowSkipInSeconds());
         }
 
         this._timer = new Timer(() => this.onAdUnitNotLoaded(), VPAIDAdUnit._adLoadTimeout);
@@ -83,18 +67,10 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
     public show(): Promise<void> {
         this.onShow();
 
-        const promises = [];
-        promises.push(this._nativeBridge.WebPlayer.setSettings({
-            setSupportMultipleWindows: true
-        }, {}));
-        promises.push(this._nativeBridge.WebPlayer.setEventSettings({
-            onCreateWindow: {
-                sendEvent: true
-            }
-        }));
-
-        return Promise.all(promises).then(() => {
-            return this._container.open(this, ['webplayer'], false, this._forceOrientation, false, false, true, false, this._options);
+        return this.setupWebPlayer().then(() => {
+            return this._container.open(this, ['webplayer', 'webview'], false, this._forceOrientation, false, false, true, false, this._options).then(() => {
+                this.showOverlay();
+            });
         });
     }
 
@@ -102,7 +78,6 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
         this.onHide();
         this.hideView();
         return this._container.close();
-        // return Promise.resolve();
     }
 
     public description(): string {
@@ -153,6 +128,32 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
         url = url.replace(/%ZONE%/, this._placement.getId());
         url = url.replace(/%SDK_VERSION%/, sdkVersion.toString());
         this._thirdPartyEventManager.sendEvent(eventType, sessionId, url);
+    }
+
+    public mute() {
+        this._view.mute();
+    }
+
+    public unmute() {
+        this._view.unmute();
+    }
+
+    private setupWebPlayer(): Promise<{}> {
+        const promises = [];
+        promises.push(this._nativeBridge.WebPlayer.setSettings({
+            setSupportMultipleWindows: true
+        }, {}));
+        promises.push(this._nativeBridge.WebPlayer.setEventSettings({
+            onCreateWindow: {
+                sendEvent: true
+            }
+        }));
+        return Promise.all(promises);
+    }
+
+    private showOverlay() {
+        document.body.appendChild(this._overlay.container());
+        this._overlay.show();
     }
 
     private onAdUnitNotLoaded() {

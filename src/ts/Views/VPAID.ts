@@ -37,7 +37,6 @@ interface IVPAIDAdParameters {
 
 interface IVPAIDTemplateData {
     adParameters: string;
-    isCoppaCompliant: boolean;
 }
 
 export class VPAID extends View<IVPAIDHandler> {
@@ -47,29 +46,20 @@ export class VPAID extends View<IVPAIDHandler> {
     private _campaign: VPAIDCampaign;
     private _placement: Placement;
 
-    private _iframe: HTMLIFrameElement;
-    private _messageListener: (e: MessageEvent) => void;
-
     private _stuckTimer: Timer;
     private _isPaused = false;
     private _isLoaded = false;
     private _webplayerEventObserver: IObserver1<string>;
     private _isCoppaCompliant: boolean;
 
-    constructor(nativeBridge: NativeBridge, campaign: VPAIDCampaign, placement: Placement, language: string, gameId: string, isCoppaCompliant: boolean) {
+    constructor(nativeBridge: NativeBridge, campaign: VPAIDCampaign, placement: Placement) {
         super(nativeBridge, 'vpaid');
 
         this._template = new Template(VPAIDTemplate);
         this._campaign = campaign;
         this._placement = placement;
         this._stuckTimer = new Timer(() => this._handlers.forEach(handler => handler.onVPAIDStuck()), VPAID.stuckDelay);
-        this._isCoppaCompliant = isCoppaCompliant;
-
-        this._bindings = [{
-            selector: '.companion',
-            event: 'click',
-            listener: (e: Event) => this._handlers.forEach(handler => handler.onVPAIDCompanionClick())
-        }];
+        this._bindings = [];
     }
 
     public loadWebPlayer() {
@@ -118,6 +108,14 @@ export class VPAID extends View<IVPAIDHandler> {
         this._isPaused = false;
         this.sendEvent('resume');
         this._stuckTimer.start();
+    }
+
+    public mute() {
+        this.sendEvent('mute');
+    }
+
+    public unmute() {
+        this.sendEvent('unmute');
     }
 
     private onVPAIDContainerReady() {

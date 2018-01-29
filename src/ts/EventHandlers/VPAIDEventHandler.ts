@@ -18,7 +18,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _comScoreTrackingService: ComScoreTrackingService;
     private _adUnit: VPAIDAdUnit;
-    private _vpaidEventHandlers: { [eventName: string]: () => void; } = {};
+    private _vpaidEventHandlers: { [key: string]: () => void; } = {};
     private _vpaidCampaign: VPAIDCampaign;
     private _placement: Placement;
     private _vpaidView: VPAID;

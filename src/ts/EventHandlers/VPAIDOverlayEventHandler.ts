@@ -30,6 +30,11 @@ export class VPAIDOverlayEventHandler implements IOverlayHandler {
 
     public onOverlayMute(isMuted: boolean): void {
         // EMPTY
+        if (isMuted) {
+            this._adUnit.mute();
+        } else {
+            this._adUnit.unmute();
+        }
     }
 
     public onOverlayCallButton(): void {
@@ -41,9 +46,6 @@ export class VPAIDOverlayEventHandler implements IOverlayHandler {
     }
 
     public onOverlayClose(): void {
-        this._adUnit.sendTrackingEvent('skip');
-        this._operativeEventManager.sendSkip(this._adUnit);
-        this._adUnit.setFinishState(FinishState.SKIPPED);
         this._adUnit.hide();
     }
 
