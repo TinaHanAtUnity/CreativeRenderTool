@@ -231,7 +231,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     }
 
     private getVideoOrientation(): string | undefined {
-        if(this._adUnit instanceof PerformanceAdUnit) {
+        if(this._adUnit instanceof PerformanceAdUnit || this._adUnit instanceof XPromoAdUnit) {
             return (<PerformanceAdUnit>this._adUnit).getVideoOrientation();
         }
 
