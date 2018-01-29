@@ -11,7 +11,7 @@ import { Placement } from 'Models/Placement';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Diagnostics } from 'Utilities/Diagnostics';
-import { IWebPlayerWebSettingsAndroid } from "../Native/Api/WebPlayer";
+import { IWebPlayerWebSettingsAndroid, IWebPlayerWebSettingsIos } from "Native/Api/WebPlayer";
 
 export interface IDisplayInterstitialAdUnitParameters extends IAdUnitParameters<DisplayInterstitialCampaign> {
     view: DisplayInterstitial;
@@ -179,10 +179,17 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
     }
 
     private setWebPlayerViews(): Promise<void> {
-        // TODO: support also iOS!
-        const webPlayerSettingsAndroid: IWebPlayerWebSettingsAndroid = {"setJavaScriptCanOpenWindowsAutomatically": [true],
-            "setSupportMultipleWindows": [false]};
-        return this._nativeBridge.WebPlayer.setSettings(webPlayerSettingsAndroid,{}).then( () => {
+        const platform = this._nativeBridge.getPlatform();
+        let webPlayerSettings: IWebPlayerWebSettingsAndroid | IWebPlayerWebSettingsIos;
+        if (platform === Platform.ANDROID) {
+            webPlayerSettings = {
+                'setJavaScriptCanOpenWindowsAutomatically': [true],
+                'setSupportMultipleWindows': [false]
+            };
+        } else {
+            webPlayerSettings = {};
+        }
+        return this._nativeBridge.WebPlayer.setSettings(webPlayerSettings,{}).then( () => {
             this._nativeBridge.Sdk.logDebug("DisplayInterstitalAdUnit: WebPlayer settings have been set");
             return this._container.open(this, ['webplayer', 'webview'], false, this._forceOrientation, true, false, true, false, this._options).catch((e) => {
                 this.hide();
@@ -207,8 +214,9 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
     }
 
     private setWebplayerSettings(): Promise<void> {
-        const eventSettings = { 'onPageStarted': {'sendEvent': true},
-            'shouldOverrideUrlLoading': {'sendEvent': true, 'returnValue': true}
+        const eventSettings = {
+            'onPageStarted': { 'sendEvent': true },
+            'shouldOverrideUrlLoading': { 'sendEvent': true, 'returnValue': true }
         };
         this._nativeBridge.WebPlayer.onPageStarted.subscribe( (url) => this.onPageStarted(url));
         this._nativeBridge.WebPlayer.shouldOverrideUrlLoading.subscribe( (url: string, method: string) => this.shouldOverrideUrlLoading(url, method));

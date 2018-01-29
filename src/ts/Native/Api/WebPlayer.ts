@@ -161,7 +161,6 @@ export class WebPlayerApi extends NativeApi {
     public readonly onCreateWindow = new Observable1<string>();
     public readonly shouldOverrideUrlLoading = new Observable2<string, string>();
 
-
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'WebPlayer');
     }
