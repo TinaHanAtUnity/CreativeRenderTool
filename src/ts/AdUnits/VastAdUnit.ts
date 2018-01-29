@@ -54,6 +54,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._vastCampaign = parameters.campaign;
         this._vastPlacement = parameters.placement;
+        this._moat = MoatViewabilityService.getMoat();
 
         if(this._endScreen) {
             this._endScreen.render();
@@ -86,7 +87,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
                 endScreen.remove();
             }
 
-            this._moat = MoatViewabilityService.getMoat();
             if(this._moat) {
                 this._moat.removeMessageListener();
                 this._moat.container().parentElement!.removeChild(this._moat.container());
@@ -197,7 +197,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
 
     protected onSystemInterrupt(interruptStarted: boolean): void {
         super.onSystemInterrupt(interruptStarted);
-        this._moat = MoatViewabilityService.getMoat();
         if (this._moat) {
             if (!interruptStarted) {
                 this._moat.resume(this.getVolume());
@@ -206,7 +205,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     }
 
     protected onSystemPause(): void {
-        this._moat = MoatViewabilityService.getMoat();
         if (this._moat && !this._container.isPaused()) {
             this._moat.pause(this.getVolume());
         }

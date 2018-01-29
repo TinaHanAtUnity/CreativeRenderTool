@@ -4,6 +4,7 @@ import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
+import { MOAT } from 'Views/MOAT';
 
 export class VastVideoEventHandlers {
 
@@ -94,5 +95,4 @@ export class VastVideoEventHandlers {
             adUnit.hide();
         }
     }
-
 }

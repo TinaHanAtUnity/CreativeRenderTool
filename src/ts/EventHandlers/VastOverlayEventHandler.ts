@@ -9,6 +9,7 @@ import { OverlayEventHandler } from 'EventHandlers/OverlayEventHandler';
 import { Placement } from 'Models/Placement';
 import { ViewController } from 'AdUnits/Containers/ViewController';
 import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
+import { MOAT } from 'Views/MOAT';
 
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _vastAdUnit: VastAdUnit;
@@ -16,6 +17,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _request: Request;
     private _vastCampaign: VastCampaign;
     private _paused: boolean = false;
+    private _moat?: MOAT;
 
     constructor(nativeBridge: NativeBridge, adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
         super(nativeBridge, adUnit, parameters);
@@ -25,6 +27,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         this._clientInfo = parameters.clientInfo;
         this._vastCampaign = parameters.campaign;
         this._placement = parameters.placement;
+        this._moat = MoatViewabilityService.getMoat();
     }
 
     public onOverlaySkip(position: number): void {
@@ -83,10 +86,9 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
                 (this._vastAdUnit.getContainer() as ViewController).unPause();
             }
             this._nativeBridge.VideoPlayer.play();
-            const moat = MoatViewabilityService.getMoat();
-            if(moat) {
-                moat.triggerViewabilityEvent('exposure', true);
-                moat.triggerVideoEvent('AdPlaying', this._vastAdUnit.getVolume());
+            if(this._moat) {
+                this._moat.triggerViewabilityEvent('exposure', true);
+                this._moat.triggerVideoEvent('AdPlaying', this._vastAdUnit.getVolume());
             }
             this._paused = false;
         }

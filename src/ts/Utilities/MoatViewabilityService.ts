@@ -25,7 +25,6 @@ export interface IMoatData {
     LimitAdTracking: boolean | undefined;
     COPPA: boolean;
     bundle: string;
-
 }
 
 export class MoatViewabilityService {
