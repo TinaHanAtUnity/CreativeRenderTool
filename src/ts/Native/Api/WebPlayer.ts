@@ -204,11 +204,7 @@ export class WebPlayerApi extends NativeApi {
                 break;
 
             case WebplayerEvent[WebplayerEvent.SHOULD_OVERRIDE_URL_LOADING]:
-                let method = "";
-                if (parameters.length > 1) {
-                    method = parameters[1];
-                }
-                this.shouldOverrideUrlLoading.trigger(parameters[0], method);
+                this.shouldOverrideUrlLoading.trigger(parameters[0], parameters[1]);
                 break;
 
             default:
