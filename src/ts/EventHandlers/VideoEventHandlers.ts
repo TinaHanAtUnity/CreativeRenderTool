@@ -395,7 +395,7 @@ export class VideoEventHandlers {
     }
 
     private static getVideoOrientation(adUnit: VideoAdUnit): string | undefined {
-        if(adUnit instanceof PerformanceAdUnit) {
+        if(adUnit instanceof PerformanceAdUnit || adUnit instanceof XPromoAdUnit) {
             return adUnit.getVideoOrientation();
         }
 
