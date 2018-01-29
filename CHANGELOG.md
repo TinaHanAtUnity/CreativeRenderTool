@@ -1,4 +1,4 @@
-# Staged
+# Mon Jan 29 10:22:43 UTC 2018
 
 * Combined endscreen with store buttons AB test (groups 8 & 9)
 * Initial XPromo support
