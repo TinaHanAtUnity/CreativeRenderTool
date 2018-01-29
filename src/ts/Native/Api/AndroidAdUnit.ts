@@ -117,12 +117,13 @@ export class AndroidAdUnitApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._apiClass, 'clearMotionEventCapture');
     }
 
-    // todo: check exact inbound and outbound types (native bug?)
     public getMotionEventCount(actions: MotionEventAction[]): Promise<{ [action: string]: number}> {
         return this._nativeBridge.invoke<{ [action: string]: number}>(this._apiClass, 'getMotionEventCount', [actions]);
     }
 
-    // todo: implement getMotionEventData
+    public getMotionEventData(data: { [action: number ]: number[] }): Promise<{ [action: string]: { [index: string]: IMotionEvent } }> {
+        return this._nativeBridge.invoke<{ [action: string]: { [index: string]: IMotionEvent } }>(this._apiClass, 'getMotionEventData', [data]);
+    }
 
     public handleEvent(event: string, parameters: any[]): void {
         switch(event) {
