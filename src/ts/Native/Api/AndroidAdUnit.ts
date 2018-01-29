@@ -121,7 +121,7 @@ export class AndroidAdUnitApi extends NativeApi {
         return this._nativeBridge.invoke<{ [action: string]: number}>(this._apiClass, 'getMotionEventCount', [actions]);
     }
 
-    public getMotionEventData(data: { [action: number ]: number[] }): Promise<{ [action: string]: { [index: string]: IMotionEvent } }> {
+    public getMotionEventData(data: { [action: string]: number[] }): Promise<{ [action: string]: { [index: string]: IMotionEvent } }> {
         return this._nativeBridge.invoke<{ [action: string]: { [index: string]: IMotionEvent } }>(this._apiClass, 'getMotionEventData', [data]);
     }
 
