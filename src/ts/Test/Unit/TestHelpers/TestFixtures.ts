@@ -24,6 +24,9 @@ import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
 import VastCompanionXml from 'xml/VastCompanionAd.xml';
 import EventTestVast from 'xml/EventTestVast.xml';
+import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
+import { Campaign } from 'Models/Campaign';
+import { FocusManager } from 'Managers/FocusManager';
 
 export class TestFixtures {
     public static getDisplayInterstitialCampaign(): DisplayInterstitialCampaign {
