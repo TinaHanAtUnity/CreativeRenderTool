@@ -73,9 +73,14 @@ $default-rich-overlay-size = $default-size * $default-rich-overlay-scale;
 
     .download-container {
       $download-container-default($default-rich-overlay-scale);
-      margin: 0 $default-rich-overlay-size 0 auto;
+      position: absolute;
+      right: $default-rich-overlay-size;
       width: $default-rich-overlay-size * 7.95;
       pointer-events: auto;
+
+      /* iOS8 fix */
+      align-self: start;
+      transform: translate(0, 50%);
     }
 
     .row-container {
@@ -83,7 +88,7 @@ $default-rich-overlay-size = $default-size * $default-rich-overlay-scale;
       @extend body.portrait #end-screen .row-container;  // @stylint ignore
       align-items: center;
       height: 100%;
-      justify-content: left;
+      justify-content: start;
     }
 
     .icon-star {
