@@ -50,4 +50,8 @@ export class AndroidPreferencesApi extends NativeApi {
     public setFloat(name: string, key: string, value: number): Promise<void> {
         return this._nativeBridge.invoke<void>(this._apiClass, 'setFloat', [name, key, new Double(value)]);
     }
+
+    public removeKey(name: string, key: string): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'removeKey', [name, key]);
+    }
 }

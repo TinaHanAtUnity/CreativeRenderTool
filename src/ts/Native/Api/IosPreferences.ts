@@ -15,39 +15,43 @@ export class IosPreferencesApi extends NativeApi {
         return this._nativeBridge.invoke<string>(this._apiClass, 'getString', [key]);
     }
 
-    public setString(key: string, value: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setString', [key, value]);
+    public setString(value: string, key: string): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'setString', [value, key]);
     }
 
-    public getInt(key: string): Promise<number> {
-        return this._nativeBridge.invoke<number>(this._apiClass, 'getInt', [key]);
+    public getInt(key: string): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'getInt', [key]);
     }
 
-    public setInt(key: string, value: number): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setInt', [key, value]);
+    public setInt(value: number, key: string): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'setInt', [value, key]);
     }
 
     public getLong(key: string): Promise<number> {
         return this._nativeBridge.invoke<number>(this._apiClass, 'getLong', [key]);
     }
 
-    public setLong(key: string, value: number): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setLong', [key, value]);
+    public setLong(value: number, key: string): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'setLong', [value, key]);
     }
 
     public getBoolean(key: string): Promise<boolean> {
         return this._nativeBridge.invoke<boolean>(this._apiClass, 'getBoolean', [key]);
     }
 
-    public setBoolean(key: string, value: boolean): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setBoolean', [key, value]);
+    public setBoolean(value: boolean, key: string): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'setBoolean', [value, key]);
     }
 
     public getFloat(key: string): Promise<number> {
         return this._nativeBridge.invoke<number>(this._apiClass, 'getFloat', [key]);
     }
 
-    public setFloat(key: string, value: number): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setFloat', [key, new Double(value)]);
+    public setFloat(value: number, key: string): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'setFloat', [new Double(value), key]);
+    }
+
+    public removeKey(key: string): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'removeKey', [key]);
     }
 }
