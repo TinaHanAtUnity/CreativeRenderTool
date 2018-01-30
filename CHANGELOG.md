@@ -1,5 +1,9 @@
 # Staged
 
+* Add xpromo event type to Kafka info json
+
+# Tue Jan 30 12:20:25 UTC 2018
+
 * Fix video caching on XPromos
 
 # Mon Jan 29 10:22:43 UTC 2018
