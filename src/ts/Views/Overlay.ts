@@ -1,10 +1,14 @@
 import OverlayTemplate from 'html/Overlay.html';
+import RichOverlayTemplate from 'html/RichOverlay.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
 import { Platform } from 'Constants/Platform';
 import { AbstractOverlay } from 'Views/AbstractOverlay';
+import { PerformanceCampaign } from "../Models/Campaigns/PerformanceCampaign";
+
+const richOverlayId = "rich-overlay";
 
 export class Overlay extends AbstractOverlay {
 
@@ -29,21 +33,39 @@ export class Overlay extends AbstractOverlay {
     private _muteButtonElement: HTMLElement;
     private _debugMessageElement: HTMLElement;
     private _callButtonElement: HTMLElement;
+    private _overlayFooter: HTMLElement;
 
     private _progressElement: HTMLElement;
 
     private _fadeTimer: any;
     private _fadeStatus: boolean = true;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, abGroup: number = 0) {
+    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, campaign?: PerformanceCampaign, abGroup: number = 0) {
         super(nativeBridge, 'overlay', muted, abGroup);
 
         this._localization = new Localization(language, 'overlay');
-        this._template = new Template(OverlayTemplate, this._localization);
 
-        this._templateData = {
-            muted: muted
-        };
+        this._templateData = {};
+
+        if (this.getAltOverlay() === richOverlayId && typeof campaign !== "undefined") {
+            this._template = new Template(RichOverlayTemplate, this._localization);
+
+            const adjustedRating: number = campaign.getRating() * 20;
+            this._templateData = {
+                muted: true,
+                'gameName': campaign.getGameName(),
+                'gameIcon': campaign.getGameIcon().getUrl(),
+                // NOTE! Landscape orientation should use a portrait image and portrait orientation should use a landscape image
+                'endScreenLandscape': campaign.getPortrait().getUrl(),
+                'endScreenPortrait': campaign.getLandscape().getUrl(),
+                'rating': adjustedRating.toString(),
+                'ratingCount': this._localization.abbreviate(campaign.getRatingCount())
+            };
+        } else {
+            this._template = new Template(OverlayTemplate, this._localization);
+        }
+
+        this._templateData.muted = muted;
 
         this._bindings = [
             {
@@ -72,6 +94,31 @@ export class Overlay extends AbstractOverlay {
             }
         ];
 
+        if (this.getAltOverlay() === richOverlayId && typeof campaign !== "undefined") {
+            this._bindings.push({
+                event: 'click',
+                listener: (event: Event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    this._handlers.forEach((handler) => {
+                        if (typeof handler.onEndScreenDownload === "function") {
+                            handler.onEndScreenDownload({
+                                clickAttributionUrl: campaign.getClickAttributionUrl(),
+                                clickAttributionUrlFollowsRedirects: campaign.getClickAttributionUrlFollowsRedirects(),
+                                bypassAppSheet: campaign.getBypassAppSheet(),
+                                appStoreId: campaign.getAppStoreId(),
+                                store: campaign.getStore(),
+                                gamerId: campaign.getGamerId()
+                            });
+
+                            this._appStoreVisited = true;
+                        }
+                    });
+                },
+                selector: '.download-container'
+            });
+        }
+
         if(gameId === '1300023' || gameId === '1300024') {
             this._bindings.push({
                 event: 'swipe',
@@ -88,6 +135,15 @@ export class Overlay extends AbstractOverlay {
         this._debugMessageElement = <HTMLElement>this._container.querySelector('.debug-message-text');
         this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
         this._progressElement = <HTMLElement>this._container.querySelector('.progress');
+
+        const endScreenAlt = this.getAltOverlay();
+        if (typeof endScreenAlt === "string") {
+            this._container.classList.add(endScreenAlt);
+            if (endScreenAlt === richOverlayId) {
+                this._overlayFooter = <HTMLElement>this._container.querySelector('.overlay-footer');
+            }
+        }
+
     }
 
     public setSpinnerEnabled(value: boolean): void {
@@ -100,7 +156,11 @@ export class Overlay extends AbstractOverlay {
     public setSkipEnabled(value: boolean): void {
         if(this._skipEnabled !== value) {
             this._skipEnabled = value;
-            this._skipElement.style.display = value ? 'block' : 'none';
+            if (this.getAltOverlay() === richOverlayId) {
+                this._skipElement.style.display = value ? 'inline-block' : 'none';
+            } else {
+                this._skipElement.style.display = value ? 'block' : 'none';
+            }
         }
     }
 
@@ -138,9 +198,13 @@ export class Overlay extends AbstractOverlay {
     }
 
     public setMuteEnabled(value: boolean) {
-        if(this._muteEnabled !== value) {
+        if (this._muteEnabled !== value) {
             this._muteEnabled = value;
-            this._muteButtonElement.style.display = value ? 'block' : 'none';
+            if (this.getAltOverlay() === richOverlayId) {
+                this._muteButtonElement.style.display = value ? 'inline-block' : 'none';
+            } else {
+                this._muteButtonElement.style.display = value ? 'block' : 'none';
+            }
         }
     }
 
@@ -162,6 +226,18 @@ export class Overlay extends AbstractOverlay {
 
     public isMuted(): boolean {
         return this._muted;
+    }
+
+    public getClickedState(): boolean {
+        return this._appStoreVisited;
+    }
+
+    protected getAltOverlay(): string | undefined {
+        if (this._abGroup === 9 || this._abGroup === 10) {
+            return richOverlayId;
+        }
+
+        return undefined;
     }
 
     private onSkipEvent(event: Event): void {
@@ -255,13 +331,24 @@ export class Overlay extends AbstractOverlay {
     }
 
     private fade(value: boolean) {
+        const isRichOverlayAlt = this.getAltOverlay() === richOverlayId;
+
         if (value) {
             this._skipElement.classList.remove('slide-back-in-place');
             this._skipElement.classList.add('slide-up');
             this._progressElement.classList.remove('slide-back-in-place');
             this._progressElement.classList.add('slide-up');
+
             this._muteButtonElement.classList.remove('slide-back-in-place');
-            this._muteButtonElement.classList.add('slide-down');
+
+            if (isRichOverlayAlt) {
+                this._muteButtonElement.classList.add('slide-up');
+                this._overlayFooter.classList.remove('slide-back-in-place');
+                this._overlayFooter.classList.add('slide-down');
+            } else {
+                this._muteButtonElement.classList.add('slide-down');
+            }
+
             this._container.style.pointerEvents = 'auto';
             this._fadeStatus = false;
         } else {
@@ -270,8 +357,17 @@ export class Overlay extends AbstractOverlay {
             this._skipElement.classList.add('slide-back-in-place');
             this._progressElement.classList.remove('slide-up');
             this._progressElement.classList.add('slide-back-in-place');
-            this._muteButtonElement.classList.remove('slide-down');
+
+            if (isRichOverlayAlt) {
+                this._muteButtonElement.classList.remove('slide-up');
+                this._overlayFooter.classList.remove('slide-down');
+                this._overlayFooter.classList.add('slide-back-in-place');
+            } else {
+                this._muteButtonElement.classList.remove('slide-down');
+            }
+
             this._muteButtonElement.classList.add('slide-back-in-place');
+
             this._fadeStatus = true;
         }
     }

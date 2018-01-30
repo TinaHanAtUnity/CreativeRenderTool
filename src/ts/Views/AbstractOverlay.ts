@@ -1,5 +1,6 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
+import { IEndScreenDownloadParameters } from "../EventHandlers/EndScreenEventHandler";
 
 export interface IOverlayHandler {
     onOverlaySkip(position: number): void;
@@ -7,6 +8,7 @@ export interface IOverlayHandler {
     onOverlayPauseForTesting(paused: boolean): void;
     onOverlayCallButton(): void;
     onOverlayClose(): void;
+    onEndScreenDownload?(parameters: IEndScreenDownloadParameters): void;
 }
 
 export abstract class AbstractOverlay extends View<IOverlayHandler> {
@@ -26,6 +28,7 @@ export abstract class AbstractOverlay extends View<IOverlayHandler> {
     protected _muted: boolean;
 
     protected _fadeEnabled: boolean = true;
+    protected _appStoreVisited: boolean = false;
 
     constructor(nativeBridge: NativeBridge, containerId: string, muted: boolean, abGroup: number = 0) {
         super(nativeBridge, containerId);
@@ -49,6 +52,14 @@ export abstract class AbstractOverlay extends View<IOverlayHandler> {
         if(this._fadeEnabled !== value) {
             this._fadeEnabled = value;
         }
+    }
+
+    public getABGroup(): number {
+        return this._abGroup;
+    }
+
+    public getClickedState(): boolean {
+        return this._appStoreVisited;
     }
 
     public abstract setSpinnerEnabled(value: boolean): void;
