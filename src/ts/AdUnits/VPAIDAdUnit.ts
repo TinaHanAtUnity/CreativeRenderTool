@@ -88,10 +88,6 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
         return false;
     }
 
-    public getAdUnitNotLoadedTimer(): Timer {
-        return this._timer;
-    }
-
     public openUrl(url: string | null) {
         if (url && Url.isProtocolWhitelisted(url)) {
             if (this._nativeBridge.getPlatform() === Platform.IOS) {
@@ -136,6 +132,11 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
 
     public unmute() {
         this._view.unmute();
+    }
+
+    public onAdLoaded() {
+        this._timer.stop();
+        this._view.showAd();
     }
 
     private setupWebPlayer(): Promise<{}> {

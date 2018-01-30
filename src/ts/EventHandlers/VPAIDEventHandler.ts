@@ -21,7 +21,6 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     private _vpaidEventHandlers: { [key: string]: () => void; } = {};
     private _vpaidCampaign: VPAIDCampaign;
     private _placement: Placement;
-    private _vpaidView: VPAID;
     private _vpaidEndScreen: VPAIDEndScreen | undefined;
     private _overlay: AbstractOverlay;
     private _adDuration: number = -2;
@@ -36,7 +35,6 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         this._adUnit = adUnit;
         this._vpaidCampaign = parameters.campaign;
         this._placement = parameters.placement;
-        this._vpaidView = parameters.vpaid;
         this._overlay = parameters.overlay;
         this._vpaidEndScreen = parameters.endScreen;
         this._abGroup = parameters.campaign.getAbGroup();
@@ -115,9 +113,8 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     }
 
     private onAdLoaded() {
-        this._adUnit.getAdUnitNotLoadedTimer().stop();
+        this._adUnit.onAdLoaded();
         this.onVPAIDProgress(this._adDuration, this._adRemainingTime);
-        this._vpaidView.showAd();
     }
 
     private onAdError() {
@@ -226,10 +223,10 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     }
 
     private sendComscoreEvent(eventName: string, position: number) {
-        const sessionId = this._adUnit.getCampaign().getSession().getId();
-        const creativeId = this._adUnit.getCampaign().getCreativeId();
-        const category = this._adUnit.getCampaign().getCategory();
-        const subCategory = this._adUnit.getCampaign().getSubCategory();
+        const sessionId = this._vpaidCampaign.getSession().getId();
+        const creativeId = this._vpaidCampaign.getCreativeId();
+        const category = this._vpaidCampaign.getCategory();
+        const subCategory = this._vpaidCampaign.getSubCategory();
         let adDuration = (this._adDuration * 1000);
 
         if (adDuration < 0 || typeof adDuration === 'undefined') {
