@@ -1,8 +1,6 @@
 import VPAIDContainerTemplate from 'html/vpaid/container.html';
 import VPAIDCss from 'css/vpaid-container.css';
 import VPAIDTemplate from 'html/vpaid/VPAID.html';
-import LoadingTemplate from 'html/loading.html';
-import PrivacyTemplate from 'html/Privacy.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -62,7 +60,7 @@ export class VPAID extends View<IVPAIDHandler> {
         this._bindings = [];
     }
 
-    public loadWebPlayer() {
+    public loadWebPlayer(): Promise<void> {
         this._isLoaded = true;
         const adParameters = <IVPAIDAdParameters>{
             skipEnabled: this._placement.allowSkip(),
@@ -75,11 +73,11 @@ export class VPAID extends View<IVPAIDHandler> {
             isCoppaCompliant: this._isCoppaCompliant
         };
 
-        let iframeSrcDoc = VPAIDContainerTemplate.replace('{COMPILED_CSS}', VPAIDCss).replace('{PRIVACY}', PrivacyTemplate);
+        let iframeSrcDoc = VPAIDContainerTemplate.replace('{COMPILED_CSS}', VPAIDCss);
         iframeSrcDoc = new Template(iframeSrcDoc).render(templateData);
 
-        this._nativeBridge.WebPlayer.setData(encodeURIComponent(iframeSrcDoc), 'text/html', 'UTF-8');
         this._webplayerEventObserver = this._nativeBridge.WebPlayer.onWebPlayerEvent.subscribe((args: string) => this.onWebPlayerEvent(JSON.parse(args)));
+        return this._nativeBridge.WebPlayer.setData(encodeURIComponent(iframeSrcDoc), 'text/html', 'UTF-8');
     }
 
     public isLoaded(): boolean {
@@ -88,7 +86,6 @@ export class VPAID extends View<IVPAIDHandler> {
 
     public hide() {
         this.sendEvent('destroy');
-        super.hide();
         this._stuckTimer.stop();
         this._nativeBridge.WebPlayer.onWebPlayerEvent.unsubscribe(this._webplayerEventObserver);
     }
@@ -140,7 +137,11 @@ export class VPAID extends View<IVPAIDHandler> {
     }
 
     private sendEvent(event: string, parameters?: any[]): Promise<void> {
-        return this._nativeBridge.WebPlayer.sendEventToWebPlayer([event, parameters]);
+        const webPlayerParams: any[] = [event];
+        if (parameters) {
+            webPlayerParams.push(parameters);
+        }
+        return this._nativeBridge.WebPlayer.sendEventToWebPlayer(webPlayerParams);
     }
 
     private onWebPlayerEvent(args: any[]) {
