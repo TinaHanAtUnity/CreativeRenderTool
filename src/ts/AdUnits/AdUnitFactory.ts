@@ -56,6 +56,7 @@ import { AbstractOverlay } from 'Views/AbstractOverlay';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { Privacy } from 'Views/Privacy';
 import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
+import { IObserver2, IObserver3 } from 'Utilities/IObserver';
 
 export class AdUnitFactory {
 
@@ -208,6 +209,16 @@ export class AdUnitFactory {
         const onPlayObserver = nativeBridge.VideoPlayer.onPlay.subscribe(() => VastVideoEventHandlers.onVideoStart(parameters.thirdPartyEventManager, vastAdUnit, parameters.clientInfo, parameters.campaign.getSession()));
         const onVideoErrorObserver = vastAdUnit.onError.subscribe(() => VastVideoEventHandlers.onVideoError(vastAdUnit));
 
+        let onVolumeChangeObserverAndroid: IObserver3<number, number, number>;
+        let onVolumeChangeObserverIOS: IObserver2<number, number>;
+        if(nativeBridge.getPlatform() === Platform.ANDROID) {
+            nativeBridge.DeviceInfo.Android.registerVolumeChangeListener(StreamType.STREAM_MUSIC);
+            onVolumeChangeObserverAndroid = nativeBridge.DeviceInfo.Android.onVolumeChanged.subscribe((streamType, volume, maxVolume) => VastVideoEventHandlers.onVolumeChange(vastAdUnit, volume, maxVolume));
+        } else if(nativeBridge.getPlatform() === Platform.IOS) {
+            nativeBridge.DeviceInfo.Ios.registerVolumeChangeListener();
+            onVolumeChangeObserverIOS = nativeBridge.DeviceInfo.Ios.onVolumeChanged.subscribe((volume, maxVolume) => VastVideoEventHandlers.onVolumeChange(vastAdUnit, volume, maxVolume));
+        }
+
         vastAdUnit.onClose.subscribe(() => {
             nativeBridge.VideoPlayer.onPrepared.unsubscribe(onPreparedObserver);
             nativeBridge.VideoPlayer.onCompleted.unsubscribe(onCompletedObserver);
@@ -215,6 +226,16 @@ export class AdUnitFactory {
             nativeBridge.VideoPlayer.onPause.unsubscribe(onPauseObserver);
             nativeBridge.VideoPlayer.onStop.unsubscribe(onStopObserver);
             nativeBridge.VideoPlayer.onProgress.unsubscribe(onProgressObserver);
+
+            if(onVolumeChangeObserverAndroid) {
+                nativeBridge.DeviceInfo.Android.unregisterVolumeChangeListener(StreamType.STREAM_MUSIC);
+                nativeBridge.DeviceInfo.Android.onVolumeChanged.unsubscribe(onVolumeChangeObserverAndroid);
+            }
+
+            if(onVolumeChangeObserverIOS) {
+                nativeBridge.DeviceInfo.Ios.unregisterVolumeChangeListener();
+                nativeBridge.DeviceInfo.Ios.onVolumeChanged.unsubscribe(onVolumeChangeObserverIOS);
+            }
 
             vastAdUnit.onError.unsubscribe(onVideoErrorObserver);
         });

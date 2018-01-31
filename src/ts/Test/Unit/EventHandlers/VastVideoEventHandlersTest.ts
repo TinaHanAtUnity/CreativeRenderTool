@@ -236,6 +236,20 @@ describe('VastVideoEventHandlers tests', () => {
         });
     });
 
+    describe('onVolumeChange', () => {
+        beforeEach(() => {
+            VastVideoEventHandlers.onVolumeChange(testAdUnit, 1, 10);
+        });
+
+        it ('should send moat video event', () => {
+            sinon.assert.called(<sinon.SinonStub>moat.triggerVideoEvent);
+        });
+
+        it ('should trigger moat viewability event', () => {
+            sinon.assert.called(<sinon.SinonStub>moat.triggerViewabilityEvent);
+        });
+    });
+
     describe('onVideoError', ()=> {
         it('should hide ad unit', () => {
             VastVideoEventHandlers.onVideoError(testAdUnit);

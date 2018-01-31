@@ -87,6 +87,15 @@ export class VastVideoEventHandlers {
         }
     }
 
+    public static onVolumeChange(adUnit: VastAdUnit, volume: number, maxVolume: number) {
+        const moat = MoatViewabilityService.getMoat();
+        if(moat) {
+            adUnit.setVolume(volume / maxVolume);
+            moat.triggerVideoEvent('AdVolumeChange', adUnit.getVolume());
+            moat.triggerViewabilityEvent('volume', adUnit.getVolume() * 100);
+        }
+    }
+
     public static onVideoError(adUnit: VastAdUnit) {
         const endScreen = adUnit.getEndScreen();
         if(endScreen) {
