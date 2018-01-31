@@ -160,7 +160,10 @@ export class Overlay extends AbstractOverlay {
         if(this._skipEnabled !== value) {
             this._skipEnabled = value;
             if (this.getAltOverlay() === richOverlayId) {
+                /* All kinds of cases like this should be handle via css classes */
                 this._skipElement.style.display = value ? 'inline-block' : 'none';
+                this._muteButtonElement.style.left = value ? 'initial' : '10px';
+                this._muteButtonElement.style.top = value ? 'initial' : '-5px';
             } else {
                 this._skipElement.style.display = value ? 'block' : 'none';
             }
