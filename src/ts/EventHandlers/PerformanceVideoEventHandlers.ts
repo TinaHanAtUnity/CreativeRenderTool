@@ -4,8 +4,9 @@ export class PerformanceVideoEventHandlers {
 
     public static onVideoCompleted(adUnit: PerformanceAdUnit) {
         const overlay = adUnit.getOverlay();
+        const abGroup = overlay && overlay.getABGroup();
 
-        if (typeof overlay !== "undefined" && (overlay.getABGroup() === 9 || overlay.getABGroup() === 10) && overlay.getClickedState()) {
+        if (overlay && (abGroup === 8 || abGroup === 9 || abGroup === 10 || abGroup === 11) && overlay.getClickedState()) {
             /* Add .then() to comfort test not sure why...
             * “before each” hook for “should include all operational events on Android”:
             * Error: Timeout of 2000ms exceeded. For async tests and hooks, ensure “done()” is called; if returning a Promise, ensure it resolves.
