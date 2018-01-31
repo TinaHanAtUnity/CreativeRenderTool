@@ -7,7 +7,7 @@ export class IosPreferencesApi extends NativeApi {
         super(nativeBridge, 'Preferences');
     }
 
-    public hasKey(key: string) {
+    public hasKey(key: string): Promise<boolean> {
         return this._nativeBridge.invoke<boolean>(this._apiClass, 'hasKey', [key]);
     }
 

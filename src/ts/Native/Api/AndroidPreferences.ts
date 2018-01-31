@@ -7,7 +7,7 @@ export class AndroidPreferencesApi extends NativeApi {
         super(nativeBridge, 'Preferences');
     }
 
-    public hasKey(name: string, key: string) {
+    public hasKey(name: string, key: string): Promise<boolean> {
         return this._nativeBridge.invoke<boolean>(this._apiClass, 'hasKey', [name, key]);
     }
 
