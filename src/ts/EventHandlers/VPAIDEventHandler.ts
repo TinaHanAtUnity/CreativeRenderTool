@@ -11,6 +11,7 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { FinishState } from 'Constants/FinishState';
 import { Placement } from 'Models/Placement';
+import { Closer } from 'Views/Closer';
 
 export class VPAIDEventHandler implements IVPAIDHandler {
     private _nativeBridge: NativeBridge;
@@ -22,7 +23,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     private _vpaidCampaign: VPAIDCampaign;
     private _placement: Placement;
     private _vpaidEndScreen: VPAIDEndScreen | undefined;
-    private _overlay: AbstractOverlay;
+    private _closer: Closer;
     private _adDuration: number = -2;
     private _adRemainingTime: number = -2;
     private _abGroup: number;
@@ -35,7 +36,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         this._adUnit = adUnit;
         this._vpaidCampaign = parameters.campaign;
         this._placement = parameters.placement;
-        this._overlay = parameters.overlay;
+        this._closer = parameters.closer;
         this._vpaidEndScreen = parameters.endScreen;
         this._abGroup = parameters.campaign.getAbGroup();
 
@@ -94,13 +95,8 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     public onVPAIDProgress(duration: number, remainingTime: number) {
         this._adDuration = duration;
         this._adRemainingTime = remainingTime;
-
         if ((duration && duration !== -2) && (remainingTime && remainingTime !== -2)) {
-            this._overlay.setVideoDurationEnabled(true);
-            this._overlay.setVideoDuration(duration * 1000);
-            this._overlay.setVideoProgress((duration - remainingTime) * 1000);
-        } else {
-            this._overlay.setVideoDurationEnabled(false);
+            this._closer.update(duration - remainingTime, duration);
         }
     }
 

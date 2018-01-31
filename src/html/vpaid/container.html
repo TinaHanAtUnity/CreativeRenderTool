@@ -133,21 +133,11 @@
 
                 this._videoSlot.addEventListener('timeupdate', function(e) {
                     _this._sendProgressEvent();
-                    _this._updateProgress();
                 });
 
-                this._updateProgress = function() {
-                    var progress = _this._videoSlot.currentTime;
-                    var duration = _this._videoSlot.duration;
-                    _this._progress.update(progress, duration);
-
-                    if (adParameters.skipEnabled) {
-                        this._skip.update(progress, adParameters.skipDuration);
-                        if (progress > adParameters.skipDuration) {
-                            _this._updateSkipControls(true);
-                        }
-                    }
-                };
+                this._videoSlot.addEventListener('click', function() {
+                    console.log('clicked!!');
+                });
 
                 this.init = function() {
                     var getVPAID = this._getVPAIDFunction();

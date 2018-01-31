@@ -34,6 +34,7 @@ import { Configuration } from 'Models/Configuration';
 import { UrlSchemeApi } from 'Native/Api/UrlScheme';
 import { IntentApi } from 'Native/Api/Intent';
 import { SdkApi } from 'Native/Api/Sdk';
+import { Closer } from 'Views/Closer';
 
 describe('VPAIDEventHandlerTest', () => {
     let eventHandler: VPAIDEventHandler;
@@ -44,7 +45,7 @@ describe('VPAIDEventHandlerTest', () => {
     beforeEach(() => {
         parameters = {
             campaign: sinon.createStubInstance(VPAIDCampaign),
-            overlay: sinon.createStubInstance(Overlay),
+            closer: sinon.createStubInstance(Closer),
             vpaid: sinon.createStubInstance(VPAID),
             endScreen: sinon.createStubInstance(VPAIDEndScreen),
             focusManager: sinon.createStubInstance(FocusManager),

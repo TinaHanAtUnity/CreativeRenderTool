@@ -48,6 +48,7 @@ import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { InterstitialOverlay } from 'Views/InterstitialOverlay';
 import { AbstractOverlay } from 'Views/AbstractOverlay';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { Closer } from 'Views/Closer';
 
 export class AdUnitFactory {
 
@@ -238,14 +239,14 @@ export class AdUnitFactory {
     }
 
     private static createVPAIDAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<VPAIDCampaign>): AbstractAdUnit<VPAIDCampaign> {
-        const overlay = this.createOverlay(nativeBridge, parameters);
+        const closer = new Closer(nativeBridge, parameters.placement);
         const vpaid = new VPAID(nativeBridge, <VPAIDCampaign>parameters.campaign, parameters.placement);
         let endScreen: VPAIDEndScreen | undefined;
 
         const vpaidAdUnitParameters: IVPAIDAdUnitParameters = {
             ... parameters,
             vpaid: vpaid,
-            overlay: overlay,
+            closer: closer,
         };
 
         if(parameters.campaign.hasEndScreen()) {
@@ -258,7 +259,7 @@ export class AdUnitFactory {
         const vpaidEventHandler = new VPAIDEventHandler(nativeBridge, vpaidAdUnit, vpaidAdUnitParameters);
         vpaid.addEventHandler(vpaidEventHandler);
         const overlayEventHandler = new VPAIDOverlayEventHandler(nativeBridge, vpaidAdUnit, vpaidAdUnitParameters);
-        overlay.addEventHandler(overlayEventHandler);
+        closer.addEventHandler(overlayEventHandler);
 
         if(parameters.campaign.hasEndScreen() && endScreen) {
             const endScreenEventHandler = new VPAIDEndScreenEventHandler(nativeBridge, vpaidAdUnit, vpaidAdUnitParameters);

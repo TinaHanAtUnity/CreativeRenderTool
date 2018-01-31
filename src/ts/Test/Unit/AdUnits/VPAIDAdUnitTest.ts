@@ -26,6 +26,7 @@ import { Activity } from 'AdUnits/Containers/Activity';
 import { ListenerApi } from 'Native/Api/Listener';
 import { FinishState } from 'Constants/FinishState';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
+import { Closer } from 'Views/Closer';
 
 describe('VPAIDAdUnit', () => {
     let nativeBridge: NativeBridge;
@@ -37,7 +38,7 @@ describe('VPAIDAdUnit', () => {
 
         parameters = {
             campaign: sinon.createStubInstance(VPAIDCampaign),
-            overlay: sinon.createStubInstance(AbstractOverlay),
+            closer: sinon.createStubInstance(Closer),
             vpaid: sinon.createStubInstance(VPAID),
             endScreen: sinon.createStubInstance(VPAIDEndScreen),
             focusManager: sinon.createStubInstance(FocusManager),
@@ -67,10 +68,14 @@ describe('VPAIDAdUnit', () => {
         (<any>parameters.container).onAndroidPause = new Observable0();
         (<sinon.SinonStub>parameters.container.open).returns(Promise.resolve());
         (<sinon.SinonStub>parameters.container.close).returns(Promise.resolve());
+        (<sinon.SinonStub>parameters.container.setViewFrame).returns(Promise.resolve());
+
+        (<sinon.SinonStub>parameters.deviceInfo.getScreenWidth).returns(Promise.resolve(320));
+        (<sinon.SinonStub>parameters.deviceInfo.getScreenHeight).returns(Promise.resolve(480));
 
         const overlayEl = document.createElement('div');
-        overlayEl.setAttribute('id', 'overlay');
-        (<sinon.SinonStub>parameters.overlay.container).returns(overlayEl);
+        overlayEl.setAttribute('id', 'closer');
+        (<sinon.SinonStub>parameters.closer.container).returns(overlayEl);
 
         adUnit = new VPAIDAdUnit(nativeBridge, parameters);
     });
@@ -97,8 +102,8 @@ describe('VPAIDAdUnit', () => {
             sinon.assert.calledOnce(<sinon.SinonSpy>parameters.container.open);
         });
 
-        it('should show the overlay', () => {
-            assert.isNotNull(document.querySelector('#overlay'));
+        it('should show the closer', () => {
+            assert.isNotNull(document.querySelector('#closer'));
         });
 
         afterEach(() => {
@@ -114,7 +119,7 @@ describe('VPAIDAdUnit', () => {
             onCloseObserver = sinon.spy();
             adUnit.onClose.subscribe(onCloseObserver);
             adUnit.setFinishState(finishState);
-            const elements = document.querySelectorAll('#overlay');
+            const elements = document.querySelectorAll('#closer');
             // tslint:disable-next-line:prefer-for-of
             for (let i = 0; i < elements.length; i++) {
                 elements[i].parentNode!.removeChild(elements[i]);
@@ -130,8 +135,8 @@ describe('VPAIDAdUnit', () => {
             sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Listener.sendFinishEvent, parameters.placement.getId(), finishState);
         });
 
-        it('should remove the overlay from the document', () => {
-            assert.isNull(document.querySelector('#overlay'));
+        it('should remove the closer from the document', () => {
+            assert.isNull(document.querySelector('#closer'));
         });
     });
 });

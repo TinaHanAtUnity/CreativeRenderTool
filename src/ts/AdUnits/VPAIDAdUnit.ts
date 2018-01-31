@@ -14,11 +14,13 @@ import { FocusManager } from 'Managers/FocusManager';
 import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
 import { AbstractOverlay } from 'Views/AbstractOverlay';
 import { setTimeout } from 'timers';
+import { Closer } from 'Views/Closer';
+import { DeviceInfo } from 'Models/DeviceInfo';
 
 export interface IVPAIDAdUnitParameters extends IAdUnitParameters<VPAIDCampaign> {
     vpaid: VPAID;
+    closer: Closer;
     endScreen?: VPAIDEndScreen;
-    overlay: AbstractOverlay;
 }
 
 export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
@@ -28,6 +30,7 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
     }
 
     private static _adLoadTimeout: number = 10 * 1000;
+    private _closer: Closer;
     private _focusManager: FocusManager;
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
@@ -35,7 +38,7 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
     private _vpaidCampaign: VPAIDCampaign;
     private _timer: Timer;
     private _options: any;
-    private _overlay: AbstractOverlay;
+    private _deviceInfo: DeviceInfo;
 
     private _onAppForegroundHandler: any;
     private _onAppBackgroundHandler: any;
@@ -49,19 +52,14 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._options = parameters.options;
         this._view = parameters.vpaid;
-        this._overlay = parameters.overlay;
-        this._overlay.render();
-        if (this._placement.allowSkip()) {
-            this._overlay.setSkipEnabled(true);
-            this._overlay.setSkipDuration(this._placement.allowSkipInSeconds());
-        }
-
+        this._closer = parameters.closer;
+        this._deviceInfo = parameters.deviceInfo;
         this._timer = new Timer(() => this.onAdUnitNotLoaded(), VPAIDAdUnit._adLoadTimeout);
 
         this._onAppBackgroundHandler = () => this.onAppBackground();
         this._onAppForegroundHandler = () => this.onAppForeground();
 
-        this._view.render();
+        this._closer.render();
     }
 
     public show(): Promise<void> {
@@ -69,7 +67,7 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
 
         return this.setupWebPlayer().then(() => {
             return this._container.open(this, ['webplayer', 'webview'], false, this._forceOrientation, false, false, true, false, this._options).then(() => {
-                this.showOverlay();
+                return this.showCloser();
             });
         });
     }
@@ -152,11 +150,6 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
         return Promise.all(promises);
     }
 
-    private showOverlay() {
-        document.body.appendChild(this._overlay.container());
-        this._overlay.show();
-    }
-
     private onAdUnitNotLoaded() {
         this.setFinishState(FinishState.ERROR);
         Diagnostics.trigger('vpaid_load_timeout', new DiagnosticError(new Error('VPAID failed to load within timeout'), {
@@ -180,7 +173,7 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
     }
 
     private onHide() {
-        this._overlay.container().parentElement!.removeChild(this._overlay.container());
+        this._closer.container().parentElement!.removeChild(this._closer.container());
 
         this._timer.stop();
         this.setShowing(false);
@@ -214,5 +207,17 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
 
     private onAppBackground() {
         this._view.pauseAd();
+    }
+
+    private showCloser() {
+        return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
+            const left = Math.floor(width * 0.90);
+            const top = 0;
+            const viewWidth = Math.floor(width * 0.10);
+            const viewHeight = viewWidth;
+            return this._container.setViewFrame('webview', left, top, viewWidth, viewHeight).then(() => {
+                document.body.appendChild(this._closer.container());
+            });
+        });
     }
 }
