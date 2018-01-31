@@ -81,24 +81,4 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         }
         return Promise.reject(new Error('No clickThroughURL was defined'));
     }
-
-    public onOverlayPauseForTesting(paused: boolean): void {
-        if(!this._paused) {
-            if(this._nativeBridge.getPlatform() === Platform.IOS) {
-                (this._vastAdUnit.getContainer() as ViewController).pause();
-            }
-            this._nativeBridge.VideoPlayer.pause();
-            this._paused = true;
-        } else {
-            if(this._nativeBridge.getPlatform() === Platform.IOS) {
-                (this._vastAdUnit.getContainer() as ViewController).unPause();
-            }
-            this._nativeBridge.VideoPlayer.play();
-            if(this._moat) {
-                this._moat.triggerViewabilityEvent('exposure', true);
-                this._moat.triggerVideoEvent('AdPlaying', this._vastAdUnit.getVolume());
-            }
-            this._paused = false;
-        }
-    }
 }

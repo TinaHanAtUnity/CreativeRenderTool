@@ -176,7 +176,7 @@ describe('VastVideoEventHandlers tests', () => {
             mockEventManager.verify();
         });
 
-        it('tiggers moat viewability events', () => {
+        it('tiggers moat viewability and video events', () => {
             VastVideoEventHandlers.onVideoStart(thirdPartyEventManager, testAdUnit, clientInfo, campaign.getSession());
             sinon.assert.called(<sinon.SinonStub>moat.triggerViewabilityEvent);
             sinon.assert.called(<sinon.SinonStub>moat.triggerVideoEvent);
@@ -224,11 +224,12 @@ describe('VastVideoEventHandlers tests', () => {
 
     describe('onVideoPaused', () => {
         beforeEach(() => {
+            testAdUnit.setVolume(4);
             VastVideoEventHandlers.onVideoPaused(testAdUnit);
         });
 
         it ('should send moat video event', () => {
-            sinon.assert.called(<sinon.SinonStub>moat.triggerVideoEvent);
+            sinon.assert.calledWith(<sinon.SinonStub>moat.triggerVideoEvent, 'AdPaused', 4);
         });
 
         it ('should trigger moat viewability event', () => {
@@ -242,11 +243,11 @@ describe('VastVideoEventHandlers tests', () => {
         });
 
         it ('should send moat video event', () => {
-            sinon.assert.called(<sinon.SinonStub>moat.triggerVideoEvent);
+            sinon.assert.calledWith(<sinon.SinonStub>moat.triggerVideoEvent, 'AdVolumeChange', 0.1);
         });
 
         it ('should trigger moat viewability event', () => {
-            sinon.assert.called(<sinon.SinonStub>moat.triggerViewabilityEvent);
+            sinon.assert.calledWith(<sinon.SinonStub>moat.triggerViewabilityEvent, 'volume', 10);
         });
     });
 
