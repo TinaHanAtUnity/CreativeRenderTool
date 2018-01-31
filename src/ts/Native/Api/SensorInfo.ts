@@ -1,5 +1,8 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { NativeApi } from 'Native/NativeApi';
+import { Platform } from 'Constants/Platform';
+import { AndroidSensorInfoApi } from 'Native/Api/AndroidSensorInfo';
+import { IosSensorInfoApi } from 'Native/Api/IosSensorInfo';
 
 export interface IAccelerometerData {
     x: number;
@@ -8,12 +11,17 @@ export interface IAccelerometerData {
 }
 
 export class SensorInfoApi extends NativeApi {
+    public Android: AndroidSensorInfoApi;
+    public Ios: IosSensorInfoApi;
+
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'SensorInfo');
-    }
 
-    public startAccelerometerUpdates(updateInterval: number): Promise<boolean> {
-        return this._nativeBridge.invoke<boolean>(this._apiClass, 'startAccelerometerUpdates', [updateInterval]);
+        if(nativeBridge.getPlatform() === Platform.IOS) {
+            this.Ios = new IosSensorInfoApi(nativeBridge);
+        } else {
+            this.Android = new AndroidSensorInfoApi(nativeBridge);
+        }
     }
 
     public stopAccelerometerUpdates(): Promise<void> {
