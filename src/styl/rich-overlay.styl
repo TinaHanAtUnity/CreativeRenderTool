@@ -40,6 +40,16 @@ $default-rich-overlay-size = $default-size * $default-rich-overlay-scale;
     width: 100%;
     height: $default-rich-overlay-size * 5.75;
 
+    &.dark {
+      .background-container {
+        background-color: $black;
+      }
+
+      .name-container {
+        color: $white;
+      }
+    }
+
     .background-container {
       position: absolute;
       width: 100%;
@@ -48,9 +58,14 @@ $default-rich-overlay-size = $default-size * $default-rich-overlay-scale;
       opacity: .9;
     }
 
+    &:not(.dark) {
+      .game-rating {
+        color: darken($end-screen-info-gray, 20%);
+      }
+    }
+
     .game-rating {
       $game-rating-default($default-rich-overlay-scale);
-      color: darken($end-screen-info-gray, 20%);
     }
 
     .game-rating-mask {
