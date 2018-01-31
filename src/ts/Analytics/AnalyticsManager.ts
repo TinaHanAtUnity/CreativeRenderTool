@@ -36,8 +36,7 @@ export class AnalyticsManager {
         this._configuration = configuration;
         this._storage = new AnalyticsStorage(nativeBridge);
 
-        // staging endpoint
-        this._endpoint = 'https://stg-lender.cdp.internal.unity3d.com/v1/events';
+        this._endpoint = 'https://prd-lender.cdp.internal.unity3d.com/v1/events';
     }
 
     public init(): Promise<void> {

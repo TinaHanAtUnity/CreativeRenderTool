@@ -1,40 +1,44 @@
 <script>
     (function() {
+        var touches = [];
+
         window.addEventListener('pageshow', function() {
             AFMA_ReceiveMessage('onshow');
         });
 
-        // This string will be replaced prior to the source being inserted into the iframe
-        var clickSignals = '{{AFMA_CLICK_SIGNALS_PLACEHOLDER}}';
+        var startTouch;
+        var endTouch;
+        var touchStartTime;
+        var upCounts = 0;
+        var downCounts = 0;
+        var moveCounts = 0;
+        var cancelCounts = 0;
 
-        function getQueryParams(url) {
-            var a = document.createElement('a');
-            a.href = url;
-            var params = {};
-            if (a.search) {
-                var tuples = a.search.substring(1).split(/&/);
-                for (var i = 0; i < tuples.length; i++) {
-                    var parts = tuples[i].split(/=/);
-                    var key = parts[0];
-                    var value = parts[1];
-                    if (params[key]) {
-                        params[key].push(value);
-                    } else {
-                        params[key] = [value];
-                    }
+        document.addEventListener('touchstart', function(e) {
+            touchStartTime = Date.now();
+            startTouch = e.touches[0];
+            downCounts++;
+        });
+        document.addEventListener('touchend', function(e) {
+            var duration = Date.now() - touchStartTime;
+            endTouch = e.changedTouches[0];
+            upCounts++;
+        });
+        document.addEventListener('touchmove', function(e) {
+            moveCounts++;
+        });
+        document.addEventListener('touchcancel', function(e) {
+            cancelCounts++;
+        });
+
+        window.addEventListener('message', function(e) {
+            if (e.data.type === 'afma') {
+                if (e.data.event === 'back') {
+                    console.log('calling AFMA back function', e);
+                    AFMA_ReceiveMessage('onbackblocked');
                 }
             }
-            return params;
-        }
-
-        function isObjectEmpty(obj) {
-            for (var prop in obj) {
-                if (obj.hasOwnProperty(prop)) {
-                    return false;
-                }
-            }
-            return true;
-        }
+        });
 
         var AFMA = function() {
             var self = this;
@@ -52,25 +56,32 @@
             this.click = function(url) {
                 this.postMessage('click', {
                     url: url,
+                    touch: {
+                        start: {
+                            x: startTouch ? startTouch.clientX : 0,
+                            y: startTouch ? startTouch.clientY : 0
+                        },
+                        end: {
+                            x: endTouch ? endTouch.clientX : 0,
+                            y: endTouch ? endTouch.clientY : 0,
+                        },
+                        diameter: endTouch ? endTouch.radiusX * 2 : 0.0,
+                        pressure: endTouch ? endTouch.force || 0.0 : 0.0,
+                        counts: {
+                            up: upCounts,
+                            down: downCounts,
+                            move: moveCounts,
+                            cancel: cancelCounts
+                        }
+                    }
                 });
             };
 
             this.getClickSignals = function(clickString) {
-                return clickSignals;
+                return null;
             };
 
             this.appendClickSignals = function(url, spamSignals) {
-                spamSignals = spamSignals || clickSignals;
-                var query = getQueryParams(url);
-                if (query.ms) {
-                    return url;
-                } else {
-                    if (isObjectEmpty(query)) {
-                        url = url + '?ms=' + spamSignals;
-                    } else {
-                        url = url + '&ms=' + spamSignals;
-                    }
-                }
                 return url;
             };
 

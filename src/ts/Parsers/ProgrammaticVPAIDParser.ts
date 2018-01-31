@@ -5,8 +5,8 @@ import { Session } from 'Models/Session';
 import { VPAIDParser } from 'Utilities/VPAIDParser';
 import { ProgrammaticVastParser } from 'Parsers/ProgrammaticVastParser';
 import { Vast } from 'Models/Vast/Vast';
-import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
-import { Campaign } from 'Models/Campaign';
+import { IVPAIDCampaign, VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
+import { Campaign, ICampaign } from 'Models/Campaign';
 import { VastMediaFile } from 'Models/Vast/VastMediaFile';
 
 export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
@@ -20,7 +20,36 @@ export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
             const campaignId = this.getProgrammaticCampaignId(nativeBridge);
             if (vpaidMediaFile) {
                 const vpaid = this._vpaidParser.parseFromVast(vast, vpaidMediaFile);
-                return Promise.resolve(new VPAIDCampaign(vpaid, session, campaignId, gamerId, abGroup, response.getCacheTTL(), response.getTrackingUrls(), response.getAdType(), response.getCreativeId(), response.getSeatId(), response.getCorrelationId(), response.getCategory(), response.getSubCategory(), response.getUseWebViewUserAgentForTracking()));
+
+                const cacheTTL = response.getCacheTTL();
+
+                const baseCampaignParams: ICampaign = {
+                    id: this.getProgrammaticCampaignId(nativeBridge),
+                    gamerId: gamerId,
+                    abGroup: abGroup,
+                    willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
+                    adType: response.getAdType() || undefined,
+                    correlationId: response.getCorrelationId() || undefined,
+                    creativeId: response.getCreativeId() || undefined,
+                    seatId: response.getSeatId() || undefined,
+                    meta: undefined,
+                    appCategory: response.getCategory() || undefined,
+                    appSubCategory: response.getSubCategory() || undefined,
+                    advertiserDomain: response.getAdvertiserDomain() || undefined,
+                    advertiserCampaignId: response.getAdvertiserCampaignId() || undefined,
+                    advertiserBundleId: response.getAdvertiserBundleId() || undefined,
+                    useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking(),
+                    buyerId: response.getBuyerId() || undefined,
+                    session: session
+                };
+
+                const vpaidCampaignParams: IVPAIDCampaign = {
+                    ... baseCampaignParams,
+                    vpaid: vpaid,
+                    tracking: response.getTrackingUrls()
+                };
+
+                return Promise.resolve(new VPAIDCampaign(vpaidCampaignParams));
             } else {
                 return this.parseVastToCampaign(vast, nativeBridge, campaignId, session, gamerId, abGroup, response);
             }

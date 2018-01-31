@@ -1,7 +1,6 @@
 import { Campaign, ICampaign } from 'Models/Campaign';
 import { Asset } from 'Models/Assets/Asset';
 import { ISchema } from 'Models/Model';
-import { Session } from 'Models/Session';
 
 export interface IDisplayInterstitialCampaign extends ICampaign {
     clickThroughUrl: string | undefined;
@@ -15,20 +14,8 @@ export abstract class DisplayInterstitialCampaign<T extends IDisplayInterstitial
         tracking: ['object', 'undefined']
     };
 
-    constructor(classname: string, schema: ISchema<T>, session: Session, gamerId: string, abGroup: number, cacheTTL: number | undefined, tracking?: { [eventName: string]: string[] }, adType?: string, creativeId?: string, seatId?: number, correlationId?: string,  useWebViewUserAgentForTracking?: boolean) {
-        super(classname, schema);
-        if(cacheTTL) {
-            this.set('willExpireAt', Date.now() + cacheTTL * 1000);
-        }
-        this.set('gamerId', gamerId);
-        this.set('abGroup', abGroup);
-        this.set('adType', adType || undefined);
-        this.set('correlationId', correlationId || undefined);
-        this.set('creativeId', creativeId || undefined);
-        this.set('seatId', seatId || undefined);
-        this.set('tracking', tracking || undefined);
-        this.set('session', session);
-        this.set('useWebViewUserAgentForTracking', useWebViewUserAgentForTracking);
+    constructor(classname: string, schema: ISchema<T>, campaign: T) {
+        super(classname, schema, campaign);
     }
 
     public getClickThroughUrl(): string | undefined {
