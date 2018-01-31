@@ -1,5 +1,10 @@
 # Staged
 
+* Add support for upcoming overlay placement parameters
+* Merge 2.2.0 APIs
+
+# Wed Jan 31 10:34:49 UTC 2018
+
 * Add xpromo event type to Kafka info json
 
 # Tue Jan 30 12:20:25 UTC 2018

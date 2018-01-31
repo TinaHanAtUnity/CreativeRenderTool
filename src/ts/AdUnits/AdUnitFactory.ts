@@ -476,13 +476,13 @@ export class AdUnitFactory {
                 '1307777',
                 '1495013'];
 
-            if(enabledGameIds.indexOf(parameters.clientInfo.getGameId()) !== -1) {
+            if(parameters.placement.skipEndCardOnClose() || enabledGameIds.indexOf(parameters.clientInfo.getGameId()) !== -1) {
                 overlay = new InterstitialOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
             } else {
                 overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
             }
 
-            if(CustomFeatures.isFadeDisabled(parameters.clientInfo.getGameId())) {
+            if(parameters.placement.disableVideoControlsFade() || CustomFeatures.isFadeDisabled(parameters.clientInfo.getGameId())) {
                 overlay.setFadeEnabled(false);
             }
             return overlay;
