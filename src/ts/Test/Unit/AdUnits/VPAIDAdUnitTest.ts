@@ -114,6 +114,11 @@ describe('VPAIDAdUnit', () => {
             onCloseObserver = sinon.spy();
             adUnit.onClose.subscribe(onCloseObserver);
             adUnit.setFinishState(finishState);
+            const elements = document.querySelectorAll('#overlay');
+            // tslint:disable-next-line:prefer-for-of
+            for (let i = 0; i < elements.length; i++) {
+                elements[i].parentNode!.removeChild(elements[i]);
+            }
             return adUnit.show().then(() => adUnit.hide());
         });
 
