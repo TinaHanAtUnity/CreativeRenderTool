@@ -50,6 +50,10 @@ export class DeviceInfoApi extends NativeApi {
         return this._nativeBridge.invoke<string>(this._apiClass, 'getTimeZone', [dst]);
     }
 
+    public getTimeZoneOffset(): Promise<number> {
+        return this._nativeBridge.invoke<number>(this._apiClass, 'getTimeZoneOffset');
+    }
+
     public getConnectionType(): Promise<string> {
         return this._nativeBridge.invoke<string>(this._apiClass, 'getConnectionType');
     }
@@ -126,5 +130,9 @@ export class DeviceInfoApi extends NativeApi {
 
     public getGLVersion(): Promise<string> {
         return this._nativeBridge.invoke<string>(this._apiClass, 'getGLVersion');
+    }
+
+    public getCPUCount(): Promise<number> {
+        return this._nativeBridge.invoke<number>(this._apiClass, 'getCPUCount');
     }
 }

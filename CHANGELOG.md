@@ -1,4 +1,4 @@
-# Staged
+# Wed Jan 31 10:34:49 UTC 2018
 
 * Add xpromo event type to Kafka info json
 
