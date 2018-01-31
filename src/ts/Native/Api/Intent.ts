@@ -15,6 +15,7 @@ export interface IntentData {
     categories?: string[];
     flags?: number;
     extras?: IntentExtra[];
+    id?: string;
 }
 
 export class IntentApi extends NativeApi {
