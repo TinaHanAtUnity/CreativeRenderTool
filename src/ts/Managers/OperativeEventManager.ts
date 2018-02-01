@@ -18,6 +18,7 @@ import { SessionManager } from 'Managers/SessionManager';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { Campaign } from 'Models/Campaign';
 import { Placement } from 'Models/Placement';
+import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 
 export class OperativeEventManager {
 
@@ -224,7 +225,7 @@ export class OperativeEventManager {
         });
     }
 
-    public sendHttpKafkaEvent(kafkaType: string, session: Session, placement: Placement, campaign: Campaign, videoOrientation?: string) {
+    public sendHttpKafkaEvent(kafkaType: string, eventType: string, session: Session, placement: Placement, campaign: Campaign, videoOrientation?: string) {
         const fulfilled = ([id, infoJson]: [string, any]) => {
 
             // todo: clears duplicate data for httpkafka, should be cleaned up
@@ -243,6 +244,7 @@ export class OperativeEventManager {
 
             infoJson.id = id;
             infoJson.ts = (new Date()).toISOString();
+            infoJson.event_type = eventType;
 
             HttpKafka.sendEvent(kafkaType, infoJson);
         };
@@ -310,7 +312,7 @@ export class OperativeEventManager {
             'language': this._deviceInfo.getLanguage()
         };
 
-        if(campaign instanceof PerformanceCampaign) {
+        if(campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign) {
             const landscapeVideo = campaign.getVideo();
             const portraitVideo = campaign.getPortraitVideo();
             if(landscapeVideo && landscapeVideo.isCached()) {
