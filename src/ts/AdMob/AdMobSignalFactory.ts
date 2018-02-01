@@ -7,6 +7,8 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { FocusManager } from 'Managers/FocusManager';
 import { ITouchInfo } from 'Views/AFMABridge';
 import { AdMobAdUnit } from 'AdUnits/AdMobAdUnit';
+import { MotionEventAction } from 'Constants/Android/MotionEventAction';
+import { IMotionEvent } from 'Native/Api/AndroidAdUnit';
 
 export class AdMobSignalFactory {
     private _nativeBridge: NativeBridge;
@@ -28,8 +30,8 @@ export class AdMobSignalFactory {
     public getClickSignal(touchInfo: ITouchInfo, adUnit: AdMobAdUnit): Promise<AdMobSignal> {
         return this.getCommonSignal().then(signal => {
             // todo: touch duration
+            // todo: touch distance
 
-            signal.setTimeOnScreen(adUnit.getTimeOnScreen());
             signal.setTouchDiameter(touchInfo.diameter);
             signal.setTouchPressure(touchInfo.pressure);
             signal.setTouchXDown(touchInfo.start.x);
@@ -40,6 +42,7 @@ export class AdMobSignalFactory {
             signal.setTouchUpTotal(touchInfo.counts.up);
             signal.setTouchMoveTotal(touchInfo.counts.move);
             signal.setTouchCancelTotal(touchInfo.counts.cancel);
+            signal.setTimeOnScreen(adUnit.getTimeOnScreen());
 
             if(signal.getScreenWidth() && signal.getScreenHeight()) {
                 if(this._clientInfo.getPlatform() === Platform.IOS && this._deviceInfo.getScreenScale()) {
@@ -53,6 +56,7 @@ export class AdMobSignalFactory {
 
             signal.setAdViewX(0);
             signal.setAdViewY(0);
+            signal.setMinimumAlpha(100); // our views are never transparent
 
             const promises = [];
 
@@ -71,7 +75,30 @@ export class AdMobSignalFactory {
                 this.logFailure(this._nativeBridge, 'accelerometer');
             }));
 
-            return signal;
+            if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                promises.push(this._nativeBridge.AndroidAdUnit.getMotionEventCount([MotionEventAction.ACTION_DOWN, MotionEventAction.ACTION_UP, MotionEventAction.ACTION_MOVE, MotionEventAction.ACTION_CANCEL]).then(results => {
+                    if(results[MotionEventAction[MotionEventAction.ACTION_DOWN]]) {
+                        const downIndex: number = results[MotionEventAction[MotionEventAction.ACTION_DOWN]];
+
+                        return this._nativeBridge.AndroidAdUnit.getMotionEventData({ "0": [downIndex] }).then(motionData => {
+                            if(motionData["0"] && motionData["0"][downIndex.toString()]) {
+                                const motionEvent: IMotionEvent = motionData["0"][downIndex.toString()];
+                                signal.setAndroidTouchObscured(motionEvent.isObscured);
+                                signal.setTouchToolType(motionEvent.toolType);
+                                signal.setTouchSource(motionEvent.source);
+                                signal.setTouchDeviceId(motionEvent.deviceId);
+                            }
+                        }).catch(() => {
+                            this.logFailure(this._nativeBridge, 'motionEventData');
+                        });
+                    }
+                }).catch(() => {
+                    this.logFailure(this._nativeBridge,'motionEventCount');
+                }));
+            }
+            return Promise.all(promises).then(() => {
+                return signal;
+            });
         });
     }
 
@@ -159,6 +186,25 @@ export class AdMobSignalFactory {
                 signal.setApkDeveloperSigningCertificateHash(certificate);
             }).catch(() => {
                 this.logFailure(nativeBridge, 'apkDeveloperSigningCertificateHash');
+            }));
+
+            promises.push(this._nativeBridge.DeviceInfo.Android.getUptime().then(uptime => {
+                signal.setDeviceUptime(uptime);
+            }).catch(() => {
+                this.logFailure(nativeBridge, 'deviceUptime');
+            }));
+
+            promises.push(this._nativeBridge.DeviceInfo.Android.getElapsedRealtime().then(elapsedRealtime => {
+                signal.setDeviceElapsedRealtime(elapsedRealtime);
+            }).catch(() => {
+                this.logFailure(nativeBridge, 'elapsedRealtime');
+            }));
+
+            promises.push(this._nativeBridge.DeviceInfo.Android.isAdbEnabled().then(adb => {
+                signal.setAdbEnabled(adb ? 1 : 0);
+            }).catch(() => {
+                signal.setAdbEnabled(2);
+                this.logFailure(nativeBridge, 'adbEnabled');
             }));
         }
 
