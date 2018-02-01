@@ -25,12 +25,14 @@ import { AdUnitContainer, ForceOrientation, ViewConfiguration } from 'AdUnits/Co
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
+import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { FocusManager } from 'Managers/FocusManager';
 import { Campaign } from 'Models/Campaign';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
+
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
@@ -198,6 +200,33 @@ describe('CampaignRefreshManager', () => {
             });
         });
 
+        it('get campaign should return a campaign (XPromo)', () => {
+            sinon.stub(campaignManager, 'request').callsFake(() => {
+                campaignManager.onCampaign.trigger('premium', TestFixtures.getXPromoCampaign());
+                return Promise.resolve();
+            });
+
+            return campaignRefreshManager.refresh().then(() => {
+                assert.notEqual(campaignRefreshManager.getCampaign('premium'), undefined);
+                assert.isTrue(campaignRefreshManager.getCampaign('premium') instanceof XPromoCampaign);
+
+                const tmpCampaign = campaignRefreshManager.getCampaign('premium');
+                assert.notEqual(undefined, tmpCampaign);
+                if (tmpCampaign) {
+                    assert.equal(tmpCampaign.getId(), '582bb5e352e4c4abd7fab850');
+                }
+
+                assert.equal(configuration.getPlacement('premium').getState(), PlacementState.READY);
+                assert.equal(configuration.getPlacement('video').getState(), PlacementState.WAITING);
+
+                campaignManager.onCampaign.trigger('video', TestFixtures.getXPromoCampaign());
+                assert.notEqual(campaignRefreshManager.getCampaign('video'), undefined);
+                assert.isTrue(campaignRefreshManager.getCampaign('video') instanceof XPromoCampaign);
+                assert.equal(configuration.getPlacement('premium').getState(), PlacementState.READY);
+                assert.equal(configuration.getPlacement('video').getState(), PlacementState.READY);
+            });
+        });
+
         it('get campaign should return a campaign (Vast)', () => {
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('premium', TestFixtures.getCompanionVastCampaign());
@@ -205,11 +234,11 @@ describe('CampaignRefreshManager', () => {
             });
 
             return campaignRefreshManager.refresh().then(() => {
-                assert.notEqual(campaignRefreshManager.getCampaign('premium'), undefined);
+                assert.isDefined(campaignRefreshManager.getCampaign('premium'));
                 assert.isTrue(campaignRefreshManager.getCampaign('premium') instanceof VastCampaign);
 
                 const tmpCampaign = campaignRefreshManager.getCampaign('premium');
-                assert.notEqual(undefined, tmpCampaign);
+                assert.isDefined(tmpCampaign);
                 if (tmpCampaign) {
                     assert.equal(tmpCampaign.getId(), '12345');
                 }
@@ -219,7 +248,7 @@ describe('CampaignRefreshManager', () => {
 
                 campaignManager.onCampaign.trigger('video', TestFixtures.getCompanionVastCampaign());
 
-                assert.notEqual(campaignRefreshManager.getCampaign('video'), undefined);
+                assert.isDefined(campaignRefreshManager.getCampaign('video'));
                 assert.isTrue(campaignRefreshManager.getCampaign('video') instanceof VastCampaign);
                 assert.equal(configuration.getPlacement('premium').getState(), PlacementState.READY);
                 assert.equal(configuration.getPlacement('video').getState(), PlacementState.READY);
@@ -235,11 +264,11 @@ describe('CampaignRefreshManager', () => {
             });
 
             return campaignRefreshManager.refresh().then(() => {
-                assert.notEqual(campaignRefreshManager.getCampaign('premium'), undefined);
+                assert.isDefined(campaignRefreshManager.getCampaign('premium'));
                 assert.isTrue(campaignRefreshManager.getCampaign('premium') instanceof MRAIDCampaign);
 
                 const tmpCampaign = campaignRefreshManager.getCampaign('premium');
-                assert.notEqual(undefined, tmpCampaign);
+                assert.isDefined(tmpCampaign);
                 if (tmpCampaign) {
                     assert.equal(tmpCampaign.getId(), '58dec182f01b1c0cdef54f0f');
                 }
@@ -248,7 +277,7 @@ describe('CampaignRefreshManager', () => {
                 assert.equal(configuration.getPlacement('video').getState(), PlacementState.WAITING);
 
                 campaignManager.onCampaign.trigger('video', mraid);
-                assert.notEqual(campaignRefreshManager.getCampaign('video'), undefined);
+                assert.isDefined(campaignRefreshManager.getCampaign('video'));
                 assert.isTrue(campaignRefreshManager.getCampaign('video') instanceof MRAIDCampaign);
                 assert.equal(configuration.getPlacement('premium').getState(), PlacementState.READY);
                 assert.equal(configuration.getPlacement('video').getState(), PlacementState.READY);
@@ -266,7 +295,7 @@ describe('CampaignRefreshManager', () => {
 
             return campaignRefreshManager.refresh().then(() => {
                 const tmpCampaign = campaignRefreshManager.getCampaign('premium');
-                assert.notEqual(undefined, tmpCampaign);
+                assert.isDefined(tmpCampaign);
                 if (tmpCampaign) {
                     assert.equal(tmpCampaign.getId(), '582bb5e352e4c4abd7fab850');
                 }
@@ -276,13 +305,13 @@ describe('CampaignRefreshManager', () => {
 
                 return campaignRefreshManager.refresh().then(() => {
                     const tmpCampaign2 = campaignRefreshManager.getCampaign('premium');
-                    assert.notEqual(undefined, tmpCampaign2);
+                    assert.isDefined(tmpCampaign2);
                     if (tmpCampaign2) {
                         assert.notEqual(tmpCampaign2.getId(), '58dec182f01b1c0cdef54f0f');
                     }
 
                     const tmpCampaign3 = campaignRefreshManager.getCampaign('premium');
-                    assert.notEqual(undefined, tmpCampaign3);
+                    assert.isDefined(tmpCampaign3);
                     if (tmpCampaign3) {
                         assert.equal(tmpCampaign3.getId(), '582bb5e352e4c4abd7fab850');
                     }
@@ -328,7 +357,7 @@ describe('CampaignRefreshManager', () => {
 
             return campaignRefreshManager.refresh().then(() => {
                 const tmpCampaign = campaignRefreshManager.getCampaign('premium');
-                assert.notEqual(undefined, tmpCampaign);
+                assert.isDefined(tmpCampaign);
                 if (tmpCampaign) {
                     assert.equal(tmpCampaign.getId(), '582bb5e352e4c4abd7fab850');
                 }
@@ -365,7 +394,7 @@ describe('CampaignRefreshManager', () => {
 
             return campaignRefreshManager.refresh().then(() => {
                 const tmpCampaign = campaignRefreshManager.getCampaign('premium');
-                assert.notEqual(undefined, tmpCampaign);
+                assert.isDefined(tmpCampaign);
                 if (tmpCampaign) {
                     assert.equal(tmpCampaign.getId(), '582bb5e352e4c4abd7fab850');
                 }
@@ -386,7 +415,7 @@ describe('CampaignRefreshManager', () => {
 
                 return campaignRefreshManager.refresh().then(() => {
                     const tmpCampaign2 = campaignRefreshManager.getCampaign('premium');
-                    assert.notEqual(undefined, tmpCampaign2);
+                    assert.isDefined(tmpCampaign2);
                     if (tmpCampaign2) {
                         assert.equal(tmpCampaign2.getId(), '58dec182f01b1c0cdef54f0f');
                     }

@@ -19,6 +19,6 @@ export class Diagnostics {
             kafkaObject.adPlan = session.getAdPlan();
         }
 
-        return HttpKafka.sendEvent('diagnostics', kafkaObject);
+        return HttpKafka.sendEvent('ads.sdk2.diagnostics', kafkaObject);
     }
 }

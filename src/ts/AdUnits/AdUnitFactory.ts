@@ -43,6 +43,13 @@ import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 import { MRAIDEndScreen } from 'Views/MRAIDEndScreen';
 import { MRAIDEndScreenEventHandler } from 'EventHandlers/MRAIDEndScreenEventHandler';
 import { PerformanceEndScreenEventHandler } from 'EventHandlers/PerformanceEndScreenEventHandler';
+import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
+import { XPromoEndScreen } from 'Views/XPromoEndScreen';
+import { IXPromoAdUnitParameters } from 'AdUnits/XPromoAdUnit';
+import { XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
+import { XPromoOverlayEventHandler } from 'EventHandlers/XPromoOverlayEventHandler';
+import { XPromoEndScreenEventHandler } from 'EventHandlers/XPromoEndScreenEventHandler';
+import { XPromoVideoEventHandlers } from 'EventHandlers/XPromoVideoEventHandlers';
 import { AdMobEventHandler } from 'EventHandlers/AdmobEventHandler';
 import { InterstitialOverlay } from 'Views/InterstitialOverlay';
 import { AbstractOverlay } from 'Views/AbstractOverlay';
@@ -66,6 +73,8 @@ export class AdUnitFactory {
             return this.createDisplayInterstitialAdUnit(nativeBridge, <IAdUnitParameters<DisplayInterstitialCampaign>>parameters);
         } else if (parameters.campaign instanceof VPAIDCampaign) {
             return this.createVPAIDAdUnit(nativeBridge, <IAdUnitParameters<VPAIDCampaign>>parameters);
+        } else if (parameters.campaign instanceof XPromoCampaign) {
+            return this.createXPromoAdUnit(nativeBridge, <IAdUnitParameters<XPromoCampaign>>parameters);
         } else if (parameters.campaign instanceof AdMobCampaign) {
             return this.createAdMobAdUnit(nativeBridge, <IAdUnitParameters<AdMobCampaign>>parameters);
         } else {
@@ -110,6 +119,45 @@ export class AdUnitFactory {
         });
 
         return performanceAdUnit;
+    }
+
+    private static createXPromoAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<XPromoCampaign>): XPromoAdUnit {
+        const overlay = this.createOverlay(nativeBridge, parameters);
+        const endScreen = new XPromoEndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+        const video = this.getOrientedVideo(<XPromoCampaign>parameters.campaign, parameters.forceOrientation);
+
+        const xPromoAdUnitParameters: IXPromoAdUnitParameters = {
+            ... parameters,
+            video: video,
+            overlay: overlay,
+            endScreen: endScreen
+        };
+
+        const xPromoAdUnit = new XPromoAdUnit(nativeBridge, xPromoAdUnitParameters);
+        const xPromoOverlayEventHandler = new XPromoOverlayEventHandler(nativeBridge, xPromoAdUnit, xPromoAdUnitParameters);
+        overlay.addEventHandler(xPromoOverlayEventHandler);
+        const endScreenEventHandler = new XPromoEndScreenEventHandler(nativeBridge, xPromoAdUnit, xPromoAdUnitParameters);
+        endScreen.addEventHandler(endScreenEventHandler);
+
+        this.prepareVideoPlayer(nativeBridge, xPromoAdUnit, parameters);
+
+        if (nativeBridge.getPlatform() === Platform.ANDROID) {
+            const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => endScreenEventHandler.onKeyEvent(keyCode));
+            xPromoAdUnit.onClose.subscribe(() => {
+                if(onBackKeyObserver) {
+                    nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(onBackKeyObserver);
+                }
+            });
+        }
+
+        const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => XPromoVideoEventHandlers.onVideoCompleted(xPromoAdUnit));
+        const onVideoErrorObserver = xPromoAdUnit.onError.subscribe(() => XPromoVideoEventHandlers.onVideoError(xPromoAdUnit));
+        xPromoAdUnit.onClose.subscribe(() => {
+            nativeBridge.VideoPlayer.onCompleted.unsubscribe(onCompletedObserver);
+            xPromoAdUnit.onError.unsubscribe(onVideoErrorObserver);
+        });
+
+        return xPromoAdUnit;
     }
 
     private static createVastAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<VastCampaign>): VastAdUnit {
@@ -295,7 +343,7 @@ export class AdUnitFactory {
         const onPrepareTimeoutObserver = nativeBridge.VideoPlayer.onPrepareTimeout.subscribe((url) => VideoEventHandlers.onVideoPrepareTimeout(nativeBridge, adUnit, parameters.campaign, url));
         const onProgressObserver = nativeBridge.VideoPlayer.onProgress.subscribe((position) => VideoEventHandlers.onVideoProgress(nativeBridge, parameters.operativeEventManager, parameters.thirdPartyEventManager, parameters.comScoreTrackingService, adUnit, position, parameters.configuration, parameters.campaign, parameters.placement));
         const onPlayObserver = nativeBridge.VideoPlayer.onPlay.subscribe(() => VideoEventHandlers.onVideoPlay(nativeBridge, adUnit));
-        const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VideoEventHandlers.onVideoCompleted(parameters.operativeEventManager, parameters.comScoreTrackingService, adUnit, parameters.campaign, parameters.placement));
+        const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VideoEventHandlers.onVideoCompleted(parameters.operativeEventManager, parameters.thirdPartyEventManager, parameters.comScoreTrackingService, adUnit, parameters.campaign, parameters.placement));
 
         adUnit.onClose.subscribe(() => {
             nativeBridge.VideoPlayer.onPrepared.unsubscribe(onPreparedObserver);
@@ -340,7 +388,7 @@ export class AdUnitFactory {
         });
     }
 
-    private static getOrientedVideo(campaign: PerformanceCampaign, forceOrientation: ForceOrientation): Video {
+    private static getOrientedVideo(campaign: PerformanceCampaign | XPromoCampaign, forceOrientation: ForceOrientation): Video {
         const landscapeVideo = AdUnitFactory.getLandscapeVideo(campaign);
         const portraitVideo = AdUnitFactory.getPortraitVideo(campaign);
 
@@ -365,7 +413,7 @@ export class AdUnitFactory {
         throw new WebViewError('Unable to select an oriented video');
     }
 
-    private static getLandscapeVideo(campaign: PerformanceCampaign): Video | undefined {
+    private static getLandscapeVideo(campaign: PerformanceCampaign | XPromoCampaign): Video | undefined {
         const video = campaign.getVideo();
         const streaming = campaign.getStreamingVideo();
         if(video) {
@@ -379,7 +427,7 @@ export class AdUnitFactory {
         return undefined;
     }
 
-    private static getPortraitVideo(campaign: PerformanceCampaign): Video | undefined {
+    private static getPortraitVideo(campaign: PerformanceCampaign | XPromoCampaign): Video | undefined {
         const video = campaign.getPortraitVideo();
         const streaming = campaign.getStreamingPortraitVideo();
         if(video) {

@@ -28,6 +28,7 @@ import { ProgrammaticStaticInterstitialParser } from 'Parsers/ProgrammaticStatic
 import { ProgrammaticAdMobParser } from 'Parsers/ProgrammaticAdMobParser';
 import { CampaignParser } from 'Parsers/CampaignParser';
 import { ProgrammaticVPAIDParser } from 'Parsers/ProgrammaticVPAIDParser';
+import { XPromoCampaignParser } from "Parsers/XPromoCampaignParser";
 import { AdMobSignalFactory} from 'AdMob/AdMobSignalFactory';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { RequestError } from 'Errors/RequestError';
@@ -270,6 +271,9 @@ export class CampaignManager {
         switch (response.getContentType()) {
             case 'comet/campaign':
                 parser = new CometCampaignParser();
+                break;
+            case 'xpromo/video':
+                parser = new XPromoCampaignParser();
                 break;
             case 'programmatic/vast':
                 parser = new ProgrammaticVastParser();
