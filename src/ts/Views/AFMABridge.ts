@@ -11,7 +11,8 @@ export enum AFMAEvents {
     DISABLE_BACK_BUTTON     = 'disableBackButton',
     OPEN_STORE_OVERLAY      = 'openStoreOverlay',
     OPEN_IN_APP_STORE       = 'openInAppStore',
-    FETCH_APP_STORE_OVERLAY = 'fetchAppStoreOverlay'
+    FETCH_APP_STORE_OVERLAY = 'fetchAppStoreOverlay',
+    TRACKING                = 'tracking'
 }
 
 export interface IPoint {
@@ -51,6 +52,7 @@ export interface IAFMAHandler {
     onAFMAOpenStoreOverlay(url: string): void;
     onAFMAOpenInAppStore(productId: string, url: string): void;
     onAFMAFetchAppStoreOverlay(productId: string): void;
+    onAFMATrackingEvent(event: string, data?: any): void;
 }
 
 export class AFMABridge {
@@ -75,6 +77,7 @@ export class AFMABridge {
         this._afmaHandlers[AFMAEvents.OPEN_STORE_OVERLAY] = (msg) => this._handler.onAFMAOpenStoreOverlay(msg.data.url);
         this._afmaHandlers[AFMAEvents.OPEN_IN_APP_STORE] = (msg) => this._handler.onAFMAOpenInAppStore(msg.data.productId, msg.data.url);
         this._afmaHandlers[AFMAEvents.FETCH_APP_STORE_OVERLAY] = (msg) => this._handler.onAFMAFetchAppStoreOverlay(msg.data.productId);
+        this._afmaHandlers[AFMAEvents.TRACKING] = (msg) => this._handler.onAFMATrackingEvent(msg.data.event, msg.data.data);
     }
 
     public connect(iframe: HTMLIFrameElement) {
@@ -93,7 +96,7 @@ export class AFMABridge {
     private onMessage(e: MessageEvent) {
         const message = <IAFMAMessage>e.data;
         if (message.type === 'afma') {
-            this._nativeBridge.Sdk.logInfo(`afma: event=${message.event}, data=${message.data}`);
+            this._nativeBridge.Sdk.logInfo(`afma: event=${message.event}, data=${JSON.stringify(message.data)}`);
             if (message.event in this._afmaHandlers) {
                 const handler = this._afmaHandlers[message.event];
                 handler(message);

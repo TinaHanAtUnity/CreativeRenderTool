@@ -12,6 +12,8 @@ import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { Url } from 'Utilities/Url';
 import { SdkStats } from 'Utilities/SdkStats';
 import { ITouchInfo } from 'Views/AFMABridge';
+import { Diagnostics } from 'Utilities/Diagnostics';
+import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
 
 export interface IAdMobEventHandlerParameters {
     adUnit: AdMobAdUnit;
@@ -20,6 +22,7 @@ export interface IAdMobEventHandlerParameters {
     session: Session;
     thirdPartyEventManager: ThirdPartyEventManager;
     adMobSignalFactory: AdMobSignalFactory;
+    campaign: AdMobCampaign;
 }
 
 export class AdMobEventHandler implements IAdMobEventHandler {
@@ -35,6 +38,7 @@ export class AdMobEventHandler implements IAdMobEventHandler {
     private _session: Session;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _adMobSignalFactory: AdMobSignalFactory;
+    private _campaign: AdMobCampaign;
 
     constructor(parameters: IAdMobEventHandlerParameters) {
         this._adUnit = parameters.adUnit;
@@ -43,6 +47,7 @@ export class AdMobEventHandler implements IAdMobEventHandler {
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._session = parameters.session;
         this._adMobSignalFactory = parameters.adMobSignalFactory;
+        this._campaign = parameters.campaign;
         this._timeoutTimer = new Timer(() => this.onFailureToLoad(), AdMobEventHandler._loadTimeout);
     }
 
@@ -94,6 +99,13 @@ export class AdMobEventHandler implements IAdMobEventHandler {
             this._adUnit.getContainer().reorient(true, forceOrientation);
         } else {
             this._adUnit.getContainer().reorient(allowOrientation, forceOrientation);
+        }
+    }
+
+    public onTrackingEvent(event: string, data?: any) {
+        this._adUnit.sendTrackingEvent(event);
+        if (event === 'error') {
+            Diagnostics.trigger('admob_ad_error', data, this._campaign.getSession());
         }
     }
 

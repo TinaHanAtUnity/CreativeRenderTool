@@ -444,7 +444,8 @@ export class AdUnitFactory {
             request: parameters.request,
             thirdPartyEventManager: parameters.thirdPartyEventManager,
             session: parameters.campaign.getSession(),
-            adMobSignalFactory: parameters.adMobSignalFactory
+            adMobSignalFactory: parameters.adMobSignalFactory,
+            campaign: parameters.campaign
         });
         view.addEventHandler(eventHandler);
 
