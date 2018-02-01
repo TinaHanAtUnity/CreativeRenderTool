@@ -67,7 +67,6 @@ interface ICallbackObject {
 
 export class Cache {
     public onFastConnectionDetected: Observable0 = new Observable0();
-    // public Bookkeeping: CacheBookkeeping;
 
     private _nativeBridge: NativeBridge;
     private _wakeUpManager: WakeUpManager;
