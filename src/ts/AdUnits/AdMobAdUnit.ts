@@ -11,6 +11,8 @@ import { KeyCode } from 'Constants/Android/KeyCode';
 import { Placement } from 'Models/Placement';
 import { IOpenableIntentsResponse } from 'Views/AFMABridge';
 import { FocusManager } from 'Managers/FocusManager';
+import { Double } from 'Utilities/Double';
+import { SensorDelay } from 'Constants/Android/SensorDelay';
 
 export interface IAdMobAdUnitParameters extends IAdUnitParameters<AdMobCampaign> {
     view: AdMobView;
@@ -162,6 +164,13 @@ export class AdMobAdUnit extends AbstractAdUnit {
             this._nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(this._keyDownListener);
         }
 
+        this._nativeBridge.SensorInfo.stopAccelerometerUpdates();
+
+        if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            this._nativeBridge.AndroidAdUnit.endMotionEventCapture();
+            this._nativeBridge.AndroidAdUnit.clearMotionEventCapture();
+        }
+
         Diagnostics.trigger('admob_ad_close', {
             placement: this._placement.getId(),
             finishState: this.getFinishState()
@@ -216,9 +225,18 @@ export class AdMobAdUnit extends AbstractAdUnit {
 
     private onAppForeground() {
         this._foregroundTime = Date.now();
+
+        if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            this._nativeBridge.SensorInfo.Android.startAccelerometerUpdates(SensorDelay.SENSOR_DELAY_FASTEST);
+            this._nativeBridge.AndroidAdUnit.startMotionEventCapture(10000);
+        } else {
+            this._nativeBridge.SensorInfo.Ios.startAccelerometerUpdates(new Double(0.01));
+        }
     }
 
     private onAppBackground() {
         this._timeOnScreen = (Date.now() - this._foregroundTime) + this._timeOnScreen;
+
+        this._nativeBridge.SensorInfo.stopAccelerometerUpdates();
     }
 }
