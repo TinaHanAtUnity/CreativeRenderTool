@@ -28,11 +28,11 @@ export class IntentApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._apiClass, 'launch', [intentData]);
     }
 
-    public canOpenIntent(intentData: IntentData): Promise<{ [id: string]: boolean }> {
-        return this._nativeBridge.invoke<{ [id: string]: boolean }>(this._apiClass, 'canOpenIntent', [intentData]);
+    public canOpenIntent(intentData: IntentData): Promise<boolean> {
+        return this._nativeBridge.invoke<boolean>(this._apiClass, 'canOpenIntent', [intentData]);
     }
 
-    public canOpenIntents(intentData: IntentData[]): Promise<{ [id: string]: boolean }> {
-        return this._nativeBridge.invoke<{ [id: string]: boolean }>(this._apiClass, 'canOpenIntents', [intentData]);
+    public canOpenIntents(intents: IntentData[]): Promise<{ [id: string]: boolean }> {
+        return this._nativeBridge.invoke<{ [id: string]: boolean }>(this._apiClass, 'canOpenIntents', [intents]);
     }
 }
