@@ -3,7 +3,6 @@ import * as sinon from 'sinon';
 import { assert } from 'chai';
 
 import { AdUnitFactory } from 'AdUnits/AdUnitFactory';
-import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { Vast } from 'Models/Vast/Vast';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
@@ -35,8 +34,9 @@ import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { Campaign } from 'Models/Campaign';
 
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
-import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
+import { XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
+import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 
 describe('AdUnitFactoryTest', () => {
 
@@ -245,6 +245,42 @@ describe('AdUnitFactoryTest', () => {
                         return adUnit.hide();
                     });
                 });
+            });
+        });
+    });
+
+    describe('XPromo AdUnit', () => {
+        let adUnit: XPromoAdUnit;
+        let campaign: XPromoCampaign;
+
+        beforeEach(() => {
+
+            campaign = TestFixtures.getXPromoCampaign();
+
+            adUnitParameters.campaign = campaign;
+            adUnit = <XPromoAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+        });
+
+        describe('on hide', () => {
+            it('should trigger onClose when hide is called', (done) => {
+                adUnit.setShowing(true);
+                adUnit.onClose.subscribe(() => {
+                    assert.equal(adUnit.isShowing(), false);
+                    done();
+                });
+
+                adUnit.hide();
+            });
+        });
+
+        describe('on show', () => {
+            it('should trigger onStart', (done) => {
+                adUnit.onStart.subscribe(() => {
+                    adUnit.hide();
+                    done();
+                });
+
+                adUnit.show();
             });
         });
     });
