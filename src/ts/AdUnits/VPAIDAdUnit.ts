@@ -140,7 +140,8 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
     private setupWebPlayer(): Promise<{}> {
         const promises = [];
         promises.push(this._nativeBridge.WebPlayer.setSettings({
-            setSupportMultipleWindows: true
+            setSupportMultipleWindows: [true],
+            setMediaPlaybackRequiresUserGesture: [false]
         }, {}));
         promises.push(this._nativeBridge.WebPlayer.setEventSettings({
             onCreateWindow: {

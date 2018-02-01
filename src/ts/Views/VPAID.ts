@@ -141,7 +141,7 @@ export class VPAID extends View<IVPAIDHandler> {
         if (parameters) {
             webPlayerParams.push(parameters);
         }
-        return this._nativeBridge.WebPlayer.sendEventToWebPlayer(webPlayerParams);
+        return this._nativeBridge.WebPlayer.sendEvent(webPlayerParams);
     }
 
     private onWebPlayerEvent(args: any[]) {

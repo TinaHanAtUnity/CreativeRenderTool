@@ -51,8 +51,38 @@
                 return !event.defaultPrevented;
             };
 
+            var UIWebViewBridge = function() {
+                this.handleEvent = function(event, parameters) {
+                    var iframe = document.createElement('iframe');
+                    iframe.setAttribute('src', 'js:' + JSON.stringify([event, parameters]));
+                    document.documentElement.appendChild(iframe);
+                    iframe.parentNode.removeChild(iframe);
+                };
+            };
+
+            var WKWebViewBridge = function() {
+                this.handleEvent = function(event, parameters) {
+                    window.webkit.webplayerbridge.handleEvent(JSON.stringify([event, parameters]));
+                }
+            };
+
+            var WebViewBridge = function() {
+                this.handleEvent = function(event, parameters) {
+                    window.webplayerbridge.handleEvent(JSON.stringify([event, parameters]));
+                }
+            };
+
             var NativeBridge = function() {
                 var _this = this;
+                var bridge;
+                if (window.webplayerbridge) {
+                    bridge = new WebViewBridge();
+                } else if (window.webkit && window.webkit.webplayerbridge) {
+                    bridge = new WKWebViewBridge();
+                } else {
+                    bridge = new UIWebViewBridge();
+                }
+                this._bridge = bridge;
 
                 this.receiveEvent = function(args) {
                     var event = args.shift();
@@ -61,7 +91,7 @@
                 };
 
                 this.sendEvent = function(event, parameters) {
-                    window.webplayerbridge.sendEvent(JSON.stringify([event, parameters]));
+                    _this._bridge.handleEvent(event, parameters);
                 };
 
                 this.trigger = function(event, parameters) {

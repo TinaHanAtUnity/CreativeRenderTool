@@ -68,8 +68,8 @@ export class WebPlayerApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._apiClass, 'setEventSettings', [eventSettings]);
     }
 
-    public sendEventToWebPlayer(args: any[]): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'sendEventToWebPlayer', [args]);
+    public sendEvent(args: any[]): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'sendEvent', [args]);
     }
 
     public handleEvent(event: string, parameters: any[]): void {

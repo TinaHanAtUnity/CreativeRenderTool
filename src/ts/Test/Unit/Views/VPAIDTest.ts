@@ -69,7 +69,7 @@ describe('VPAID View', () => {
             if (parameters) {
                 webPlayerParams.push(parameters);
             }
-            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.WebPlayer.sendEventToWebPlayer, webPlayerParams);
+            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.WebPlayer.sendEvent, webPlayerParams);
         };
     };
 
