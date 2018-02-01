@@ -21,6 +21,7 @@ import { unity_proto } from '../../../../proto/unity_proto.js';
 import * as protobuf from 'protobufjs/minimal';
 import { SdkStats } from 'Utilities/SdkStats';
 import { ITouchInfo } from 'Views/AFMABridge';
+import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
 
 const resolveAfter = (timeout: number): Promise<void> => {
     return new Promise((resolve, reject) => setTimeout(resolve, timeout));
@@ -34,6 +35,7 @@ describe('AdMobEventHandler', () => {
     let thirdPartyEventManager: ThirdPartyEventManager;
     let session: Session;
     let adMobSignalFactory: AdMobSignalFactory;
+    let campaign: AdMobCampaign;
     const testTimeout = 250;
 
     beforeEach(() => {
@@ -45,6 +47,9 @@ describe('AdMobEventHandler', () => {
         nativeBridge = sinon.createStubInstance(NativeBridge);
         nativeBridge.Intent = sinon.createStubInstance(IntentApi);
         nativeBridge.UrlScheme = sinon.createStubInstance(UrlSchemeApi);
+        campaign = sinon.createStubInstance(AdMobCampaign);
+        (<sinon.SinonStub>campaign.getSession).returns(TestFixtures.getSession());
+
         AdMobEventHandler.setLoadTimeout(testTimeout);
         admobEventHandler = new AdMobEventHandler({
             adUnit: adUnit,
@@ -52,7 +57,8 @@ describe('AdMobEventHandler', () => {
             request: request,
             thirdPartyEventManager: thirdPartyEventManager,
             session: session,
-            adMobSignalFactory: adMobSignalFactory
+            adMobSignalFactory: adMobSignalFactory,
+            campaign: campaign
         });
     });
 
@@ -96,15 +102,16 @@ describe('AdMobEventHandler', () => {
         });
     });
 
-    describe('detecting a timeout', () => {
-        xit('should hide and error the AdUnit if the video does not load', () => {
-            admobEventHandler.onShow();
-            return resolveAfter(testTimeout).then(() => {
-                sinon.assert.calledWith(<sinon.SinonSpy>adUnit.setFinishState, FinishState.ERROR);
-                sinon.assert.called(<sinon.SinonSpy>adUnit.hide);
-            });
-        });
-    });
+    // Note, since AdMob does timeout detection on their end, this isn't explicitly necessary.
+    // describe('detecting a timeout', () => {
+    //     xit('should hide and error the AdUnit if the video does not load', () => {
+    //         admobEventHandler.onShow();
+    //         return resolveAfter(testTimeout).then(() => {
+    //             sinon.assert.calledWith(<sinon.SinonSpy>adUnit.setFinishState, FinishState.ERROR);
+    //             sinon.assert.called(<sinon.SinonSpy>adUnit.hide);
+    //         });
+    //     });
+    // });
 
     describe('on click', () => {
         const startTime = Date.now();
@@ -178,6 +185,13 @@ describe('AdMobEventHandler', () => {
                 }
                 assert.equal(param, (startTime - requestTime).toString());
             });
+        });
+    });
+
+    describe('tracking event', () => {
+        it('should forward the event to the ad unit', () => {
+            admobEventHandler.onTrackingEvent('foo');
+            (<sinon.SinonStub>adUnit.sendTrackingEvent).calledWith('foo');
         });
     });
 });

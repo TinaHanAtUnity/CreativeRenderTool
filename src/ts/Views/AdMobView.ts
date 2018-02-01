@@ -24,6 +24,7 @@ export interface IAdMobEventHandler {
     onVideoStart(): void;
     onSetOrientationProperties(allowOrientation: boolean, forceOrientation: ForceOrientation): void;
     onOpenableIntentsRequest(request: IOpenableIntentsRequest): void;
+    onTrackingEvent(event: string, data?: any): void;
 }
 
 const AFMAClickStringMacro = '{{AFMA_CLICK_SIGNALS_PLACEHOLDER}}';
@@ -57,7 +58,8 @@ export class AdMobView extends View<IAdMobEventHandler> {
             onAFMAOpenInAppStore: () => { /**/ },
             onAFMAOpenStoreOverlay: () => { /**/ },
             onAFMARewardedVideoStart: () => this.onVideoStart(),
-            onAFMAResolveOpenableIntents: (request) => this.onResolveOpenableIntents(request)
+            onAFMAResolveOpenableIntents: (request) => this.onResolveOpenableIntents(request),
+            onAFMATrackingEvent: (event, data?) => this.onTrackingEvent(event, data)
         });
         this._mraidBridge = new MRAIDBridge(nativeBridge, {
             onSetOrientationProperties: (allowOrientation: boolean, forceOrientation: ForceOrientation) => this.onSetOrientationProperties(allowOrientation, forceOrientation)
@@ -162,5 +164,9 @@ export class AdMobView extends View<IAdMobEventHandler> {
 
     private onResolveOpenableIntents(request: IOpenableIntentsRequest) {
         this._handlers.forEach((h) => h.onOpenableIntentsRequest(request));
+    }
+
+    private onTrackingEvent(event: string, data?: any) {
+        this._handlers.forEach((h) => h.onTrackingEvent(event, data));
     }
 }

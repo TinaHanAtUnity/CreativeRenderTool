@@ -12,6 +12,8 @@ import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { Url } from 'Utilities/Url';
 import { SdkStats } from 'Utilities/SdkStats';
 import { ITouchInfo, IOpenableIntentsRequest } from 'Views/AFMABridge';
+import { Diagnostics } from 'Utilities/Diagnostics';
+import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
 
 export interface IAdMobEventHandlerParameters {
     adUnit: AdMobAdUnit;
@@ -20,6 +22,7 @@ export interface IAdMobEventHandlerParameters {
     session: Session;
     thirdPartyEventManager: ThirdPartyEventManager;
     adMobSignalFactory: AdMobSignalFactory;
+    campaign: AdMobCampaign;
 }
 
 export class AdMobEventHandler implements IAdMobEventHandler {
@@ -35,6 +38,7 @@ export class AdMobEventHandler implements IAdMobEventHandler {
     private _session: Session;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _adMobSignalFactory: AdMobSignalFactory;
+    private _campaign: AdMobCampaign;
 
     constructor(parameters: IAdMobEventHandlerParameters) {
         this._adUnit = parameters.adUnit;
@@ -43,6 +47,7 @@ export class AdMobEventHandler implements IAdMobEventHandler {
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._session = parameters.session;
         this._adMobSignalFactory = parameters.adMobSignalFactory;
+        this._campaign = parameters.campaign;
         this._timeoutTimer = new Timer(() => this.onFailureToLoad(), AdMobEventHandler._loadTimeout);
     }
 
@@ -106,6 +111,13 @@ export class AdMobEventHandler implements IAdMobEventHandler {
         });
     }
 
+    public onTrackingEvent(event: string, data?: any) {
+        this._adUnit.sendTrackingEvent(event);
+        if (event === 'error') {
+            Diagnostics.trigger('admob_ad_error', data, this._campaign.getSession());
+        }
+    }
+
     private onFailureToLoad(): void {
         this._adUnit.setFinishState(FinishState.ERROR);
         this._adUnit.hide();
@@ -113,6 +125,17 @@ export class AdMobEventHandler implements IAdMobEventHandler {
 
     private createClickUrl(url: string, touchInfo: ITouchInfo): Promise<string> {
         return this._adMobSignalFactory.getClickSignal(touchInfo, this._adUnit).then((signal) => {
+            signal.setTimeOnScreen(this._adUnit.getTimeOnScreen());
+            signal.setTouchDiameter(touchInfo.diameter);
+            signal.setTouchPressure(touchInfo.pressure);
+            signal.setTouchXDown(touchInfo.start.x);
+            signal.setTouchYDown(touchInfo.start.y);
+            signal.setTouchXUp(touchInfo.end.x);
+            signal.setTouchYUp(touchInfo.end.y);
+            signal.setTouchDownTotal(touchInfo.counts.down);
+            signal.setTouchUpTotal(touchInfo.counts.up);
+            signal.setTouchMoveTotal(touchInfo.counts.move);
+            signal.setTouchCancelTotal(touchInfo.counts.cancel);
             return Url.addParameters(url, {
                 ms: signal.getBase64ProtoBufNonEncoded(),
                 rvdt: this._adUnit.getStartTime() - SdkStats.getAdRequestTimestamp()
