@@ -10,6 +10,8 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Request } from 'Utilities/Request';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { FocusManager } from 'Managers/FocusManager';
+import { FileId } from 'Utilities/FileId';
+import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
 
 class TestCacheApi extends CacheApi {
 
@@ -153,6 +155,7 @@ describe('CacheTest', () => {
     let cacheApi: TestCacheApi;
     let storageApi: TestStorageApi;
     let request: Request;
+    let cacheBookkeeping: CacheBookkeeping;
     let cacheManager: Cache;
     let wakeUpManager: WakeUpManager;
 
@@ -167,7 +170,8 @@ describe('CacheTest', () => {
         const focusManager = new FocusManager(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
-        cacheManager = new Cache(nativeBridge, wakeUpManager, request, {retries: 3, retryDelay: 1000});
+        cacheBookkeeping = new CacheBookkeeping(nativeBridge);
+        cacheManager = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, {retries: 3, retryDelay: 1000});
         sinon.stub(cacheManager, 'isCached').returns(Promise.resolve(false));
     });
 
@@ -177,7 +181,7 @@ describe('CacheTest', () => {
 
         cacheApi.addPreviouslyDownloadedFile(testUrl);
 
-        return cacheManager.getFileId(testUrl).then(fileId => cacheManager.getFileUrl(fileId)).then(fileUrl => {
+        return FileId.getFileId(testUrl, nativeBridge).then(fileId => FileId.getFileUrl(fileId, nativeBridge)).then(fileUrl => {
             assert.equal(testFileUrl, fileUrl, 'Local file url does not match');
         });
     });

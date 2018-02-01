@@ -12,6 +12,7 @@ import { VideoMetadata } from 'Constants/Android/VideoMetadata';
 import { CacheError } from 'Native/Api/Cache';
 import { Request } from 'Utilities/Request';
 import { FocusManager } from 'Managers/FocusManager';
+import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
 
 describe('VideoMetadataTest', () => {
     const validVideo: string = 'https://www.example.net/valid.mp4';
@@ -27,6 +28,7 @@ describe('VideoMetadataTest', () => {
     let request: Request;
     let cache: Cache;
     let focusManager: FocusManager;
+    let cacheBookkeeping: CacheBookkeeping;
 
     describe('on Android', () => {
         const metadataKeys = [VideoMetadata.METADATA_KEY_VIDEO_WIDTH, VideoMetadata.METADATA_KEY_VIDEO_HEIGHT, VideoMetadata.METADATA_KEY_DURATION];
@@ -36,7 +38,8 @@ describe('VideoMetadataTest', () => {
             focusManager = new FocusManager(nativeBridge);
             wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             request = new Request(nativeBridge, wakeUpManager);
-            cache = new Cache(nativeBridge, wakeUpManager, request);
+            cacheBookkeeping = new CacheBookkeeping(nativeBridge);
+            cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping);
         });
 
         it('should validate valid video', () => {
@@ -70,7 +73,8 @@ describe('VideoMetadataTest', () => {
             focusManager = new FocusManager(nativeBridge);
             wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             request = new Request(nativeBridge, wakeUpManager);
-            cache = new Cache(nativeBridge, wakeUpManager, request);
+            cacheBookkeeping = new CacheBookkeeping(nativeBridge);
+            cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping);
         });
 
         it('should validate valid video', () => {
