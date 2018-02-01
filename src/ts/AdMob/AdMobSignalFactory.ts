@@ -85,7 +85,6 @@ export class AdMobSignalFactory {
         signal.setAppActive(this._focusManager.isAppForeground());
         signal.setAppUptime(this.getAppUptime(this._clientInfo));
         signal.setAppStartTime(this.getAppStartTime(this._clientInfo));
-        signal.setRooted(this.getRooted(this._deviceInfo));
         signal.setAppVersionName(this._clientInfo.getApplicationVersion());
         signal.setAppIdName(this._clientInfo.getApplicationName());
 
@@ -149,6 +148,28 @@ export class AdMobSignalFactory {
                 signal.setUsbConnected(2); // failed to get usb connection status
                 this.logFailure(nativeBridge, 'usbConnected');
             }));
+
+            promises.push(this._nativeBridge.DeviceInfo.Android.getApkDigest().then(apkdigest => {
+                signal.setApkHash(apkdigest);
+            }).catch(() => {
+                this.logFailure(nativeBridge, 'apkHash');
+            }));
+
+            promises.push(this._nativeBridge.DeviceInfo.Android.getCertificateFingerprint().then(certificate => {
+                signal.setApkDeveloperSigningCertificateHash(certificate);
+            }).catch(() => {
+                this.logFailure(nativeBridge, 'apkDeveloperSigningCertificateHash');
+            }));
+        }
+
+        if(nativeBridge.getPlatform() === Platform.ANDROID) {
+            promises.push(this.getAndroidRooted(this._deviceInfo).then(rooted => {
+                signal.setRooted(rooted);
+            }).catch(() => {
+                this.logFailure(nativeBridge, 'rooted');
+            }));
+        } else {
+            signal.setRooted(this.getIosRooted(this._deviceInfo));
         }
 
         return Promise.all(promises).then(() => {
@@ -214,7 +235,7 @@ export class AdMobSignalFactory {
         return Math.round(clientInfo.getInitTimestamp() / 1000);
     }
 
-    private getRooted(deviceInfo: DeviceInfo): number {
+    private getIosRooted(deviceInfo: DeviceInfo): number {
         if(deviceInfo.isSimulator()) { // not available on Android
             return 2;
         } else if(deviceInfo.isRooted()) {
@@ -222,6 +243,18 @@ export class AdMobSignalFactory {
         } else {
             return 0;
         }
+    }
+
+    private getAndroidRooted(deviceInfo: DeviceInfo): Promise<number> {
+        return this._nativeBridge.DeviceInfo.Android.getFingerprint().then(fingerprint => {
+            if(fingerprint.indexOf('generic') >= 0) {
+                return 2; // simulator
+            } else if(deviceInfo.isRooted()) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
     }
 
     private getIosViewWidth(width: number, scale: number): number {
