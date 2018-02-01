@@ -11,7 +11,7 @@ import { Session } from 'Models/Session';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { Url } from 'Utilities/Url';
 import { SdkStats } from 'Utilities/SdkStats';
-import { ITouchInfo } from 'Views/AFMABridge';
+import { ITouchInfo, IOpenableIntentsRequest } from 'Views/AFMABridge';
 
 export interface IAdMobEventHandlerParameters {
     adUnit: AdMobAdUnit;
@@ -95,6 +95,15 @@ export class AdMobEventHandler implements IAdMobEventHandler {
         } else {
             this._adUnit.getContainer().reorient(allowOrientation, forceOrientation);
         }
+    }
+
+    public onOpenableIntentsRequest(request: IOpenableIntentsRequest): void {
+        this._nativeBridge.Intent.canOpenIntents(request.intents).then((results) => {
+            this._adUnit.sendOpenableIntentsResponse({
+                id: request.id,
+                results: results
+            });
+        });
     }
 
     private onFailureToLoad(): void {

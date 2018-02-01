@@ -9,6 +9,7 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { Platform } from 'Constants/Platform';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { Placement } from 'Models/Placement';
+import { IOpenableIntentsResponse } from 'Views/AFMABridge';
 import { FocusManager } from 'Managers/FocusManager';
 
 export interface IAdMobAdUnitParameters extends IAdUnitParameters<AdMobCampaign> {
@@ -118,6 +119,10 @@ export class AdMobAdUnit extends AbstractAdUnit {
     public sendRewardEvent() {
         this._operativeEventManager.sendThirdQuartile(this._campaign.getSession(), this._placement, this._campaign);
         this._operativeEventManager.sendView(this._campaign.getSession(), this._placement, this._campaign);
+    }
+
+    public sendOpenableIntentsResponse(response: IOpenableIntentsResponse) {
+        this._view.sendOpenableIntentsResponse(response);
     }
 
     public getTimeOnScreen(): number {

@@ -41,6 +41,10 @@
         });
 
         var AFMA = function() {
+            var self = this;
+            this.intentCallbacks = {};
+            this.intentCallbackId = 0;
+
             this.forceOrientation = function(orientation, override, animationDuration) {
                 this.postMessage('forceOrientation', {
                     orientation: orientation,
@@ -175,11 +179,18 @@
             };
 
             this.canOpenIntents = function(intents, callback, timeoutCallback, timeoutMillis) {
-                var canDo = {};
-                for (var i = 0; i < intents.length; i++) {
-                    canDo[intents[i].id] = true;
-                }
-                callback('openableIntents', canDo);
+                var id = self.intentCallbackId++;
+                self.intentCallbacks[id] = {
+                    callback: callback,
+                    timer: setTimeout(function() {
+                        timeoutCallback();
+                        delete self.intentCallbacks[id];
+                    }, timeoutMillis)
+                };
+                this.postMessage('openableIntents', {
+                    id: id,
+                    intents: intents
+                });
             };
 
             this.postMessage = function(event, data) {
@@ -190,6 +201,17 @@
                 }, '*');
             };
 
+            this.handleOpenableIntentResponse = function(response) {
+                var callbackId = response.id;
+                var resolutions = response.results;
+                if (callbackId in self.intentCallbacks) {
+                    var callback = self.intentCallbacks[callbackId].callback;
+                    callback('openableIntents', resolutions);
+                    clearTimeout(self.intentCallbacks[callbackId].timer);
+                    delete self.intentCallbacks[callbackId];
+                }
+            }
+
             // MRAID proxy functions
             this.setOrienationProperties = function(properties) {
                 window.mraid.setOrienationProperties(properties);
@@ -197,6 +219,17 @@
 
             this.useCustomClose = function(uses) {
             };
+
+            window.addEventListener('message', function(e) {
+                if (e.data.type === 'afma') {
+                    if (e.data.event === 'back') {
+                        console.log('calling AFMA back function', e);
+                        AFMA_ReceiveMessage('onbackblocked');
+                    } else if (e.data.event === 'openableIntentsResponse') {
+                        self.handleOpenableIntentResponse(e.data.data);
+                    }
+                }
+            });
         };
 
         window.unity = window.unity || {};
