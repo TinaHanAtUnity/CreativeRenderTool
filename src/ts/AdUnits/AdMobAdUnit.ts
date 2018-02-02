@@ -58,6 +58,7 @@ export class AdMobAdUnit extends AbstractAdUnit {
         this.setShowing(true);
         this.onStart.trigger();
 
+        this.sendTrackingEvent('show');
         Diagnostics.trigger('admob_ad_show', {
             placement: this._placement.getId()
         }, this._campaign.getSession());
@@ -135,16 +136,16 @@ export class AdMobAdUnit extends AbstractAdUnit {
         return this._startTime;
     }
 
-    private showView() {
-        this._view.show();
-        document.body.appendChild(this._view.container());
-    }
-
-    private sendTrackingEvent(event: string) {
+    public sendTrackingEvent(event: string) {
         const urls = this._campaign.getTrackingUrlsForEvent(event);
         for (const url of urls) {
             this.sendThirdPartyEvent(`admob ${event}`, url);
         }
+    }
+
+    private showView() {
+        this._view.show();
+        document.body.appendChild(this._view.container());
     }
 
     private sendThirdPartyEvent(eventType: string, url: string) {

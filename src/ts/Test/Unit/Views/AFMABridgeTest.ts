@@ -25,7 +25,8 @@ describe('AFMABridge', () => {
             onAFMAOpenInAppStore: sinon.spy(),
             onAFMAOpenStoreOverlay: sinon.spy(),
             onAFMARewardedVideoStart: sinon.spy(),
-            onAFMAResolveOpenableIntents: sinon.spy()
+            onAFMAResolveOpenableIntents: sinon.spy(),
+            onAFMATrackingEvent: sinon.spy()
         };
         afmaBridge = new AFMABridge(nativeBridge, handler);
         iframe = document.createElement('iframe');
@@ -120,6 +121,12 @@ describe('AFMABridge', () => {
                 }]
             },
             verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAResolveOpenableIntents, data)
+        }, {
+            event: AFMAEvents.TRACKING,
+            data: {
+                event: 'foo'
+            },
+            verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMATrackingEvent, data.event)
         }];
 
         for (const test of tests) {

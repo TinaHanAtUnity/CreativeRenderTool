@@ -45,6 +45,60 @@
             this.intentCallbacks = {};
             this.intentCallbackId = 0;
 
+            this.sentQuartiles = {};
+
+            document.addEventListener('DOMContentLoaded', function() {
+                var videoEl = document.querySelector('video');
+                if (videoEl === null) {
+                    // TODO, warn?
+                    return;
+                }
+
+                videoEl.addEventListener('error', function() {
+                    var error = videoEl.error;
+                    self.postMessage('tracking', {
+                        event: 'error',
+                        data: JSON.stringify(error)
+                    });
+                });
+
+                videoEl.addEventListener('timeupdate', function() {
+                    var quartile = Math.floor((videoEl.currentTime / videoEl.duration) * 4);
+                    if (quartile !== 0 && !(quartile in self.sentQuartiles)) {
+                        self.sentQuartiles[quartile] = true;
+                        var adQuartile;
+                        switch (quartile) {
+                            case 1:
+                                adQuartile = 'firstQuartile';
+                                break;
+                            case 2:
+                                adQuartile = 'secondQuartile';
+                                break;
+                            case 3:
+                                adQuartile = 'thirdQuartile';
+                                break;
+                        }
+                        if (adQuartile) {
+                            self.postMessage('tracking', {
+                                event: adQuartile
+                            });
+                        }
+                    }
+                });
+
+                videoEl.addEventListener('stalled', function() {
+                    self.postMessage('tracking', {
+                        event: 'stalled'
+                    });
+                });
+
+                videoEl.addEventListener('canplay', function() {
+                    self.postMessage('tracking', {
+                        event: 'loaded'
+                    });
+                });
+            });
+
             this.forceOrientation = function(orientation, override, animationDuration) {
                 this.postMessage('forceOrientation', {
                     orientation: orientation,
