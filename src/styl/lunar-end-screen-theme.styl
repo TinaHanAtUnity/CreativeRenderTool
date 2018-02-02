@@ -1,0 +1,61 @@
+@import "vars.styl";
+@import "mixins.styl";
+
+$lunar-end-screen-size = $default-scale-size * $default-size;
+$lunar-end-font-size = $lunar-end-screen-size;
+$lunar-dog-scale = 3.5;
+
+#end-screen.lunar-end-screen {
+
+  #the-dog {
+    $set-image(100%, $lunar-end-screen-size * $lunar-dog-scale, 0, "../img/dog_body.png", contain);
+    position: absolute;
+    bottom: 0;
+    transform: translateZ(0);
+
+    #head {
+      $set-image(100%, $lunar-end-screen-size * $lunar-dog-scale, 0, "../img/dog_head.png", contain);
+      position: relative;
+      bottom: $lunar-end-screen-size * ($lunar-dog-scale / 2) * .75;
+      left: $lunar-end-screen-size * $lunar-dog-scale * .125 * -1;
+      transform: translateZ(0);
+
+      will-change: transform, top;
+      backface-visibility: hidden;
+    }
+  }
+
+  &.run-animation #the-dog {
+    #head {
+      transition: bottom .125s linear;
+      animation-name: head-spin;
+      animation-duration: 8s;
+      animation-delay: 1s;
+      animation-iteration-count: infinite;
+      animation-fill-mode: forwards;
+
+      &.nod {
+        bottom: $lunar-end-screen-size * ($lunar-dog-scale / 2) * .6;
+      }
+    }
+  }
+}
+
+@keyframes head-spin {
+  0%, 50% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-45deg);
+  }
+}
+
+@keyframes head-nod {
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY($lunar-end-screen-size * $lunar-dog-scale / 4);
+  }
+}
