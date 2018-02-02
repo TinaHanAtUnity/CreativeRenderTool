@@ -6,6 +6,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Campaign } from 'Models/Campaign';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
+import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { DisplayInterstitialMarkupCampaign } from 'Models/Campaigns/DisplayInterstitialMarkupCampaign';
 import { DisplayInterstitialMarkupUrlCampaign } from 'Models/Campaigns/DisplayInterstitialMarkupUrlCampaign';
 import { ClientInfo } from 'Models/ClientInfo';
@@ -28,6 +29,9 @@ import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { StorageType } from 'Native/Api/AndroidDeviceInfo';
 import { CampaignManager } from 'Managers/CampaignManager';
 import { FocusManager } from 'Managers/FocusManager';
+import { ProgrammaticVastParser } from 'Parsers/ProgrammaticVastParser';
+import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
+import { AdMobSignal } from 'Models/AdMobSignal';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import OnProgrammaticMraidPlcCampaignEmpty from 'json/OnProgrammaticMraidPlcCampaignEmpty.json';
@@ -37,6 +41,7 @@ import OnProgrammaticMraidUrlPlcCampaignJson from 'json/OnProgrammaticMraidUrlPl
 import OnProgrammaticMraidPlcCampaignJson from 'json/OnProgrammaticMraidPlcCampaign.json';
 import OnCometMraidPlcCampaignJson from 'json/OnCometMraidPlcCampaign.json';
 import OnCometVideoPlcCampaignJson from 'json/OnCometVideoPlcCampaign.json';
+import OnXPromoPlcCampaignJson from 'json/OnXPromoPlcCampaign.json';
 import VastInlineLinear from 'xml/VastInlineLinear.xml';
 import WrappedVast1 from 'xml/WrappedVast1.xml';
 import WrappedVast2 from 'xml/WrappedVast2.xml';
@@ -63,9 +68,6 @@ import OnProgrammaticVastPlcCampaignCustomTracking from 'json/OnProgrammaticVast
 import OnStaticInterstitialDisplayCampaign from 'json/OnStaticInterstitialDisplayCampaign.json';
 import OnStaticInterstitialDisplayCampaignNoClick from 'json/OnStaticInterstitialDisplayCampaignNoClick.json';
 import OnStaticInterstitialDisplayCampaignNoClickMarkupUrl from 'json/OnStaticInterstitialDisplayCampaignNoClickMarkupUrl.json';
-import { ProgrammaticVastParser } from 'Parsers/ProgrammaticVastParser';
-import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
-import { AdMobSignal } from 'Models/AdMobSignal';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -1022,6 +1024,26 @@ describe('CampaignManager', () => {
                     assert.equal(triggeredCampaign.getGamerId(), '57a35671bb58271e002d93c9');
                     assert.equal(triggeredCampaign.getAbGroup(), 99);
                     assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getResourceUrl(), new HTML('https://cdn.unityads.unity3d.com/playables/sma_re2.0.0_ios/index.html', triggeredCampaign.getSession()));
+                });
+            });
+        });
+
+        describe('XPromo campaign', () => {
+            it('should process correct Auction xpromo/video Campaign content type', () => {
+                mockRequest.expects('post').returns(Promise.resolve({
+                    response: OnXPromoPlcCampaignJson
+                }));
+
+                return campaignManager.request().then(() => {
+                    if(triggeredError) {
+                        throw triggeredError;
+                    }
+
+                    mockRequest.verify();
+                    assert.isTrue(triggeredCampaign instanceof XPromoCampaign);
+                    assert.equal(triggeredPlacement, 'video');
+                    assert.equal(triggeredCampaign.getGamerId(), '57a35671bb58271e002d93c9');
+                    assert.equal(triggeredCampaign.getAbGroup(), 99);
                 });
             });
         });

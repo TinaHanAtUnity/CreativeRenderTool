@@ -23,7 +23,7 @@ export class HttpKafka {
     public static sendEvent(type: string, data: any): Promise<INativeResponse> {
         const messages: any[] = [];
         messages.push({
-            'type': 'ads.sdk2.' + type,
+            'type': type,
             'msg': data
         });
 

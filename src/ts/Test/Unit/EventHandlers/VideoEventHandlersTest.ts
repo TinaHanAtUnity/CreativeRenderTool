@@ -31,6 +31,9 @@ import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { Placement } from 'Models/Placement';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
+import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
+import { IXPromoAdUnitParameters, XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
+import { XPromoEndScreen } from 'Views/XPromoEndScreen';
 
 describe('VideoEventHandlersTest', () => {
 
@@ -55,6 +58,9 @@ describe('VideoEventHandlersTest', () => {
     let placement: Placement;
     let performanceCampaign: PerformanceCampaign;
     let vastCampaign: VastCampaign;
+    let xPromoCampaign: XPromoCampaign;
+    let xPromoAdUnitParameters: IXPromoAdUnitParameters;
+    let xPromoEndScreen: XPromoEndScreen;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -118,6 +124,27 @@ describe('VideoEventHandlersTest', () => {
             request: request,
             options: {},
             endScreen: endScreen,
+            overlay: overlay,
+            video: video
+        };
+
+        xPromoCampaign = TestFixtures.getXPromoCampaign();
+        xPromoEndScreen = new XPromoEndScreen(nativeBridge, xPromoCampaign, true, 'en', '12345');
+        xPromoAdUnitParameters = {
+            forceOrientation: ForceOrientation.LANDSCAPE,
+            focusManager: focusManager,
+            container: container,
+            deviceInfo: deviceInfo,
+            clientInfo: clientInfo,
+            thirdPartyEventManager: thirdPartyEventManager,
+            operativeEventManager: operativeEventManager,
+            comScoreTrackingService: comScoreService,
+            placement: TestFixtures.getPlacement(),
+            campaign: xPromoCampaign,
+            configuration: configuration,
+            request: request,
+            options: {},
+            endScreen: xPromoEndScreen,
             overlay: overlay,
             video: video
         };
@@ -244,25 +271,25 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('should set video to inactive', () => {
-            VideoEventHandlers.onVideoCompleted(operativeEventManager, comScoreService, performanceAdUnit, performanceCampaign, placement);
+            VideoEventHandlers.onVideoCompleted(operativeEventManager, thirdPartyEventManager, comScoreService, performanceAdUnit, performanceCampaign, placement);
 
             assert.isFalse(performanceAdUnit.isActive());
         });
 
         it('should set finnish state to COMPLETED', () => {
-            VideoEventHandlers.onVideoCompleted(operativeEventManager, comScoreService, performanceAdUnit, performanceCampaign, placement);
+            VideoEventHandlers.onVideoCompleted(operativeEventManager, thirdPartyEventManager, comScoreService, performanceAdUnit, performanceCampaign, placement);
 
             assert.equal(performanceAdUnit.getFinishState(), FinishState.COMPLETED);
         });
 
         it('should send view to session manager', () => {
-            VideoEventHandlers.onVideoCompleted(operativeEventManager, comScoreService, performanceAdUnit, performanceCampaign, placement);
+            VideoEventHandlers.onVideoCompleted(operativeEventManager, thirdPartyEventManager, comScoreService, performanceAdUnit, performanceCampaign, placement);
 
             sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendView, performanceCampaign.getSession(), placement, performanceCampaign);
         });
 
         it('should hide overlay', () => {
-            VideoEventHandlers.onVideoCompleted(operativeEventManager, comScoreService, performanceAdUnit, performanceCampaign, placement);
+            VideoEventHandlers.onVideoCompleted(operativeEventManager, thirdPartyEventManager, comScoreService, performanceAdUnit, performanceCampaign, placement);
 
             const adUnitOverlay = performanceAdUnit.getOverlay();
             if(adUnitOverlay) {
@@ -271,7 +298,7 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('should send comscore end event', () => {
-            VideoEventHandlers.onVideoCompleted(operativeEventManager, comScoreService, performanceAdUnit, performanceCampaign, placement);
+            VideoEventHandlers.onVideoCompleted(operativeEventManager, thirdPartyEventManager, comScoreService, performanceAdUnit, performanceCampaign, placement);
             const positionAtSkip = performanceAdUnit.getVideo().getPosition();
             const comScoreDuration = (performanceAdUnit.getVideo().getDuration()).toString(10);
             const sessionId = performanceCampaign.getSession().getId();
@@ -279,6 +306,18 @@ describe('VideoEventHandlersTest', () => {
             const category = performanceCampaign.getCategory();
             const subCategory = performanceCampaign.getSubCategory();
             sinon.assert.calledWith(<sinon.SinonSpy>comScoreService.sendEvent, 'end', sessionId, comScoreDuration, positionAtSkip, creativeId, category, subCategory);
+        });
+
+        it('should send view event to HttpKafka on XPromos', () => {
+            sinon.spy(operativeEventManager, 'sendHttpKafkaEvent');
+
+            const xPromoAdUnit = new XPromoAdUnit(nativeBridge, xPromoAdUnitParameters);
+
+            VideoEventHandlers.onVideoCompleted(operativeEventManager, thirdPartyEventManager, comScoreService, xPromoAdUnit, xPromoAdUnitParameters.campaign, placement);
+
+            sinon.assert.notCalled(<sinon.SinonSpy>comScoreService.sendEvent);
+            sinon.assert.notCalled(<sinon.SinonSpy>operativeEventManager.sendView);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendHttpKafkaEvent, 'ads.xpromo.operative.videoview.v1.json', 'view', xPromoAdUnitParameters.campaign.getSession(), placement, xPromoAdUnitParameters.campaign, xPromoAdUnit.getVideoOrientation());
         });
     });
 
@@ -360,7 +399,7 @@ describe('VideoEventHandlersTest', () => {
             const stub = sinon.stub(TestEnvironment, 'get').returns(true);
             const vast = new Vast([], []);
             sinon.stub(vast, 'getVideoUrl').returns(video.getUrl());
-            vastCampaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 12);
+            vastCampaign = TestFixtures.getEventVastCampaign();
             sinon.stub(vastCampaign, 'getVideo').returns(video);
             const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
             sinon.stub(vastAdUnit, 'isPrepareCalled').returns(true);
@@ -456,6 +495,19 @@ describe('VideoEventHandlersTest', () => {
 
             sinon.assert.notCalled(<sinon.SinonSpy>overlay.setFadeEnabled);
         });
+
+        it('should set debug message to xpromo ad if the ad unit is XPromoAdUnit', () => {
+            sinon.stub(overlay, 'setDebugMessage');
+            const stub = sinon.stub(TestEnvironment, 'get').returns(true);
+
+            const xPromoAdUnit = new XPromoAdUnit(nativeBridge, xPromoAdUnitParameters);
+            xPromoAdUnit.setPrepareCalled(true);
+            VideoEventHandlers.onVideoPrepared(nativeBridge, xPromoAdUnit, 10, xPromoCampaign);
+
+            sinon.assert.calledWith(<sinon.SinonSpy>overlay.setDebugMessage, 'XPromo');
+
+            stub.restore();
+        });
     });
 
     describe('with onPrepareError', () => {
@@ -534,6 +586,24 @@ describe('VideoEventHandlersTest', () => {
 
             sinon.assert.calledWith(<sinon.SinonSpy>container.reconfigure, ViewConfiguration.ENDSCREEN);
             sinon.assert.called(<sinon.SinonSpy>performanceAdUnit.hide);
+        });
+    });
+
+    describe('with video start on XPromos', () => {
+        beforeEach(() => {
+            video = new Video('', TestFixtures.getSession());
+        });
+
+        it('should send start event to HttpKafka on XPromos', () => {
+            sinon.spy(operativeEventManager, 'sendHttpKafkaEvent');
+            sinon.spy(operativeEventManager, 'sendEvent');
+
+            const xPromoAdUnit = new XPromoAdUnit(nativeBridge, xPromoAdUnitParameters);
+
+            VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, comScoreService, xPromoAdUnit, 1, TestFixtures.getConfiguration(), xPromoCampaign, placement);
+
+            sinon.assert.notCalled(<sinon.SinonSpy>operativeEventManager.sendEvent);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendHttpKafkaEvent, 'ads.xpromo.operative.videostart.v1.json', 'start', xPromoAdUnitParameters.campaign.getSession(), placement, xPromoAdUnitParameters.campaign, xPromoAdUnit.getVideoOrientation());
         });
     });
 });

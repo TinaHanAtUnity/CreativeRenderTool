@@ -8,6 +8,7 @@ import { Video } from 'Models/Assets/Video';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { WebViewError } from 'Errors/WebViewError';
+import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 
 enum CacheType {
     REQUIRED,
@@ -136,7 +137,7 @@ export class AssetManager {
         const requiredAssets = campaign.getRequiredAssets();
         const optionalAssets = campaign.getOptionalAssets();
 
-        if(campaign instanceof PerformanceCampaign) {
+        if(campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign) {
             return this.getOrientedVideo(campaign).then(video => {
                 return [[video], optionalAssets];
             });
@@ -303,7 +304,7 @@ export class AssetManager {
         }, campaign.getSession());
     }
 
-    private getOrientedVideo(campaign: PerformanceCampaign): Promise<Video> {
+    private getOrientedVideo(campaign: PerformanceCampaign | XPromoCampaign): Promise<Video> {
         return Promise.all([
             this._deviceInfo.getScreenWidth(),
             this._deviceInfo.getScreenHeight()

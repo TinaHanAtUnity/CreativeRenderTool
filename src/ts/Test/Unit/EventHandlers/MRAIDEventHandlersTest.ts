@@ -219,7 +219,7 @@ describe('MRAIDEventHandlersTest', () => {
                 if(resourceUrl) {
                     kafkaObject.url = resourceUrl.getOriginalUrl();
                 }
-                sinon.assert.calledWith(<sinon.SinonStub>HttpKafka.sendEvent, 'events.playable.json', kafkaObject);
+                sinon.assert.calledWith(<sinon.SinonStub>HttpKafka.sendEvent, 'ads.sdk2.events.playable.json', kafkaObject);
             });
 
             it('should send a analytics event without extra event data', () => {
@@ -240,7 +240,7 @@ describe('MRAIDEventHandlersTest', () => {
                 if(resourceUrl) {
                     kafkaObject.url = resourceUrl.getOriginalUrl();
                 }
-                sinon.assert.calledWith(<sinon.SinonStub>HttpKafka.sendEvent, 'events.playable.json', kafkaObject);
+                sinon.assert.calledWith(<sinon.SinonStub>HttpKafka.sendEvent, 'ads.sdk2.events.playable.json', kafkaObject);
             });
         });
     });
