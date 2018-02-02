@@ -11,7 +11,7 @@ import { unity_proto } from '../../../../proto/unity_proto.js';
 import * as protobuf from 'protobufjs/minimal';
 
 describe('AdMobSignalFactoryTest', () => {
-    it('basic test', () => {
+    xit('basic test', () => {
         const nativeBridge: NativeBridge = TestFixtures.getNativeBridge();
         const clientInfo: ClientInfo = TestFixtures.getClientInfo();
         const deviceInfo: DeviceInfo = TestFixtures.getDeviceInfo();

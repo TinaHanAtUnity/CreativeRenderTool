@@ -85,11 +85,43 @@ class TestDeviceInfoApi extends DeviceInfoApi {
     public getUniqueEventId(): Promise<string> {
         return Promise.resolve('1234-ABCD');
     }
+
+    public getCPUCount(): Promise<number> {
+        return Promise.resolve(2);
+    }
 }
 
 class TestAndroidDeviceInfoApi extends AndroidDeviceInfoApi {
     public getPackageInfo(packageName: string): Promise<IPackageInfo> {
         return Promise.resolve(TestFixtures.getPackageInfo());
+    }
+
+    public isUSBConnected(): Promise<boolean> {
+        return Promise.resolve(false);
+    }
+
+    public getApkDigest(): Promise<string> {
+        return Promise.resolve('abcd-1234');
+    }
+
+    public getCertificateFingerprint(): Promise<string> {
+        return Promise.resolve('efgh-5678');
+    }
+
+    public getUptime(): Promise<number> {
+        return Promise.resolve(123456);
+    }
+
+    public getElapsedRealtime(): Promise<number> {
+        return Promise.resolve(12345);
+    }
+
+    public isAdbEnabled(): Promise<boolean> {
+        return Promise.resolve(false);
+    }
+
+    public getFingerprint(): Promise<string> {
+        return Promise.resolve('test/fingerprint');
     }
 }
 

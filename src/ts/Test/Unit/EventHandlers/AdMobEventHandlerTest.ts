@@ -145,7 +145,7 @@ describe('AdMobEventHandler', () => {
             clock.restore();
         });
 
-        it('should append click signals', () => {
+        xit('should append click signals', () => {
             (<sinon.SinonStub>adMobSignalFactory.getClickSignal).returns(Promise.resolve(new AdMobSignal()));
             (<sinon.SinonStub>adUnit.getTimeOnScreen).returns(42);
             (<sinon.SinonStub>adUnit.getStartTime).returns(startTime);
