@@ -114,7 +114,7 @@ export class VideoEventHandlers {
                 const subCategory = campaign.getSubCategory();
                 comScoreTrackingService.sendEvent('play', sessionId, comScoreDuration, position, creativeId, category, subCategory);
             } else {
-                operativeEventManager.sendHttpKafkaEvent('ads.xpromo.operative.videostart.v1.json', campaign.getSession(), placement, campaign, this.getVideoOrientation(adUnit));
+                operativeEventManager.sendHttpKafkaEvent('ads.xpromo.operative.videostart.v1.json', 'start', campaign.getSession(), placement, campaign, this.getVideoOrientation(adUnit));
                 if(campaign instanceof XPromoCampaign) {
                     const clickTrackingUrls = campaign.getTrackingUrlsForEvent('start');
                     for (const url of clickTrackingUrls) {
@@ -257,7 +257,7 @@ export class VideoEventHandlers {
             const subCategory = campaign.getSubCategory();
             comScoreTrackingService.sendEvent('end', sessionId, comScoreDuration, comScorePlayedTime, creativeId, category, subCategory);
         } else {
-            operativeEventManager.sendHttpKafkaEvent('ads.xpromo.operative.videoview.v1.json', campaign.getSession(), placement, campaign, this.getVideoOrientation(adUnit));
+            operativeEventManager.sendHttpKafkaEvent('ads.xpromo.operative.videoview.v1.json', 'view', campaign.getSession(), placement, campaign, this.getVideoOrientation(adUnit));
             if(campaign instanceof XPromoCampaign) {
                 const clickTrackingUrls = campaign.getTrackingUrlsForEvent('view');
                 for (const url of clickTrackingUrls) {
@@ -395,7 +395,7 @@ export class VideoEventHandlers {
     }
 
     private static getVideoOrientation(adUnit: VideoAdUnit): string | undefined {
-        if(adUnit instanceof PerformanceAdUnit) {
+        if(adUnit instanceof PerformanceAdUnit || adUnit instanceof XPromoAdUnit) {
             return adUnit.getVideoOrientation();
         }
 
