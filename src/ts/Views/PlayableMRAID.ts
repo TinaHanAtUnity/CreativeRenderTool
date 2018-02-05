@@ -330,6 +330,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                     default:
                         break;
                 }
+                break;
             default:
                 break;
         }
