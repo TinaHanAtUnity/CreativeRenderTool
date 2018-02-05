@@ -77,7 +77,7 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
         // EMPTY
     }
 
-    public onEndScreenDownload(parameters: IEndScreenDownloadParameters): void {
+    public onOverlayDownload(parameters: IEndScreenDownloadParameters): void {
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
             this.onDownloadIos(parameters);
         } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {

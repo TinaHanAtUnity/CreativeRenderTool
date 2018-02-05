@@ -6,7 +6,7 @@ import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
 import { Platform } from 'Constants/Platform';
 import { AbstractOverlay } from 'Views/AbstractOverlay';
-import { PerformanceCampaign } from "../Models/Campaigns/PerformanceCampaign";
+import { PerformanceCampaign } from "Models/Campaigns/PerformanceCampaign";
 
 const richOverlayId = "rich-overlay";
 
@@ -101,8 +101,8 @@ export class Overlay extends AbstractOverlay {
                     event.preventDefault();
                     event.stopPropagation();
                     this._handlers.forEach((handler) => {
-                        if (typeof handler.onEndScreenDownload === "function") {
-                            handler.onEndScreenDownload({
+                        if (typeof handler.onOverlayDownload === "function") {
+                            handler.onOverlayDownload({
                                 clickAttributionUrl: campaign.getClickAttributionUrl(),
                                 clickAttributionUrlFollowsRedirects: campaign.getClickAttributionUrlFollowsRedirects(),
                                 bypassAppSheet: campaign.getBypassAppSheet(),
