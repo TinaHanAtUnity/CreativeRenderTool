@@ -30,9 +30,10 @@ export class MetaDataManager {
         });
     }
 
-    public clearCache(category?: string) {
+    public clearCache(category?: string): void {
         if(category && this._metaDataCache[category]) {
             this._metaDataCache[category] = undefined;
+            return;
         }
         this._metaDataCache = {};
     }
