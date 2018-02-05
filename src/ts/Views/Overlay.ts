@@ -52,7 +52,6 @@ export class Overlay extends AbstractOverlay {
 
             const adjustedRating: number = campaign.getRating() * 20;
             this._templateData = {
-                muted: true,
                 'gameName': campaign.getGameName(),
                 'gameIcon': campaign.getGameIcon().getUrl(),
                 // NOTE! Landscape orientation should use a portrait image and portrait orientation should use a landscape image
