@@ -1,3 +1,9 @@
+# PENDING
+
+* Enable custom MRAID fast forward feature for all the playables
+* Refactor cache bookkeeping
+* Fix metadata caching
+
 # Thu Feb  1 12:47:26 UTC 2018
 
 * Add support for upcoming overlay placement parameters
