@@ -106,6 +106,7 @@ export class AdMobAdUnit extends AbstractAdUnit {
     }
 
     public sendStartEvent() {
+        this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
         this.sendTrackingEvent('start');
         this._operativeEventManager.sendStart(this._campaign.getSession(), this._placement, this._campaign);
     }
