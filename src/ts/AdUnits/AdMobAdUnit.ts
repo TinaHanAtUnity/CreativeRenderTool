@@ -9,19 +9,30 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { Platform } from 'Constants/Platform';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { Placement } from 'Models/Placement';
+import { FocusManager } from 'Managers/FocusManager';
 
 export interface IAdMobAdUnitParameters extends IAdUnitParameters<AdMobCampaign> {
     view: AdMobView;
 }
+
+const AdUnitActivities = ['com.unity3d.ads.adunit.AdUnitActivity', 'com.unity3d.ads.adunit.AdUnitTransparentActivity', 'com.unity3d.ads.adunit.AdUnitTransparentSoftwareActivity', 'com.unity3d.ads.adunit.AdUnitSoftwareActivity'];
+
 export class AdMobAdUnit extends AbstractAdUnit {
     private _operativeEventManager: OperativeEventManager;
     private _view: AdMobView;
     private _thirdPartyEventManager: ThirdPartyEventManager;
+    private _focusManager: FocusManager;
     private _options: any;
-    private _onSystemKillObserver: any;
     private _keyDownListener: (kc: number) => void;
     private _campaign: AdMobCampaign;
     private _placement: Placement;
+    private _timeOnScreen: number = 0;
+    private _foregroundTime: number = 0;
+    private _startTime: number = 0;
+
+    private _onSystemKillObserver: () => void;
+    private _onPauseObserver: () => void;
+    private _onResumeObserver: () => void;
 
     constructor(nativeBridge: NativeBridge, parameters: IAdMobAdUnitParameters) {
         super(nativeBridge, parameters);
@@ -30,6 +41,7 @@ export class AdMobAdUnit extends AbstractAdUnit {
         this._options = parameters.options;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._operativeEventManager = parameters.operativeEventManager;
+        this._focusManager = parameters.focusManager;
         this._keyDownListener = (kc: number) => this.onKeyDown(kc);
         this._campaign = parameters.campaign;
         this._placement = parameters.placement;
@@ -51,9 +63,13 @@ export class AdMobAdUnit extends AbstractAdUnit {
             this._nativeBridge.AndroidAdUnit.onKeyDown.subscribe(this._keyDownListener);
         }
 
-        this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
+        this.subscribeToLifecycle();
 
         return this._container.open(this, false, true, this._forceOrientation, true, false, true, false, this._options).then(() => {
+            if (this._startTime === 0) {
+                this._startTime = Date.now();
+            }
+            this._foregroundTime = Date.now();
             this.showView();
         });
     }
@@ -61,6 +77,7 @@ export class AdMobAdUnit extends AbstractAdUnit {
     public hide(): Promise<void> {
         this.onHide();
         this.hideView();
+        this.unsubscribeFromLifecycle();
         return this._container.close();
     }
 
@@ -74,6 +91,9 @@ export class AdMobAdUnit extends AbstractAdUnit {
 
     public sendImpressionEvent() {
         this.sendTrackingEvent('impression');
+        Diagnostics.trigger('admob_ad_impression', {
+            placement: this._placement.getId()
+        }, this._campaign.getSession());
     }
 
     public sendClickEvent() {
@@ -98,6 +118,14 @@ export class AdMobAdUnit extends AbstractAdUnit {
     public sendRewardEvent() {
         this._operativeEventManager.sendThirdQuartile(this._campaign.getSession(), this._placement, this._campaign);
         this._operativeEventManager.sendView(this._campaign.getSession(), this._placement, this._campaign);
+    }
+
+    public getTimeOnScreen(): number {
+        return (Date.now() - this._foregroundTime) + this._timeOnScreen;
+    }
+
+    public getStartTime(): number {
+        return this._startTime;
     }
 
     private showView() {
@@ -157,5 +185,35 @@ export class AdMobAdUnit extends AbstractAdUnit {
         if (key === KeyCode.BACK) {
             this._view.onBackPressed();
         }
+    }
+
+    private subscribeToLifecycle() {
+        this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
+        if (this._nativeBridge.getPlatform() === Platform.IOS) {
+            this._onPauseObserver = this._focusManager.onAppBackground.subscribe(() => this.onAppBackground());
+            this._onResumeObserver = this._focusManager.onAppForeground.subscribe(() => this.onAppForeground());
+        } else {
+            this._onResumeObserver = this._container.onShow.subscribe(() => this.onAppForeground());
+            this._onPauseObserver = this._container.onAndroidPause.subscribe(() => this.onAppBackground());
+        }
+    }
+
+    private unsubscribeFromLifecycle() {
+        this._container.onSystemKill.unsubscribe(this._onSystemKillObserver);
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            this._focusManager.onAppBackground.unsubscribe(this._onPauseObserver);
+            this._focusManager.onAppForeground.unsubscribe(this._onResumeObserver);
+        } else {
+            this._container.onShow.unsubscribe(this._onResumeObserver);
+            this._container.onAndroidPause.unsubscribe(this._onPauseObserver);
+        }
+    }
+
+    private onAppForeground() {
+        this._foregroundTime = Date.now();
+    }
+
+    private onAppBackground() {
+        this._timeOnScreen = (Date.now() - this._foregroundTime) + this._timeOnScreen;
     }
 }

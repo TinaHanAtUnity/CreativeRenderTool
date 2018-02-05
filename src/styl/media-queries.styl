@@ -254,6 +254,15 @@
   .slide-down {
     slide-animation(.4s, ease-in, 250%);
   }
+
+  body.landscape {
+    #end-screen.combined-end-screen.with-store-logos {
+      .unityads-logo {
+        bottom: calc(constant(safe-area-inset-bottom) - 10px);
+        bottom: calc(env(safe-area-inset-bottom) - 10px);
+      }
+    }
+  }
 }
 // @stylint on
 

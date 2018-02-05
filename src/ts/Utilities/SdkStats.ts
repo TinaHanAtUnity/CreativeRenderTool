@@ -119,6 +119,10 @@ export class SdkStats {
         SdkStats._parseDuration = {};
     }
 
+    public static getAdRequestTimestamp(): number {
+        return SdkStats._latestAdRequestTimestamp;
+    }
+
     public static setAdRequestDuration(duration: number): void {
         SdkStats._latestAdRequestDuration = duration;
     }
@@ -146,7 +150,7 @@ export class SdkStats {
     private static _campaignManager: CampaignManager;
     private static _metaDataManager: MetaDataManager;
     private static _clientInfo: ClientInfo;
-    private static _topic: string = 'events.sdktimeline.json';
+    private static _topic: string = 'ads.sdk2.events.sdktimeline.json';
 
     private static _initialized: boolean = false;
     private static _adRequestOrdinal: number = 0;

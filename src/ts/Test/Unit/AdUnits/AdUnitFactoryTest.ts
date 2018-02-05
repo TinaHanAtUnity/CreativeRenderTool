@@ -3,7 +3,6 @@ import * as sinon from 'sinon';
 import { assert } from 'chai';
 
 import { AdUnitFactory } from 'AdUnits/AdUnitFactory';
-import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { Vast } from 'Models/Vast/Vast';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
@@ -35,8 +34,9 @@ import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { Campaign } from 'Models/Campaign';
 
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
-import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
+import { XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
+import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 
 describe('AdUnitFactoryTest', () => {
 
@@ -118,7 +118,7 @@ describe('AdUnitFactoryTest', () => {
             sandbox.stub(VastVideoEventHandlers, 'onVideoError').returns(null);
             const vast = new Vast([], []);
             sandbox.stub(vast, 'getVideoUrl').returns('http://www.google.fi');
-            const vastCampaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 1);
+            const vastCampaign = TestFixtures.getEventVastCampaign();
             adUnitParameters.campaign = vastCampaign;
             adUnitParameters.forceOrientation = ForceOrientation.NONE;
             const videoAdUnit = <VastAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
@@ -267,6 +267,42 @@ describe('AdUnitFactoryTest', () => {
 
         describe('On static-interstial-url campaign', () => {
             displayUnitTests(isStaticInterstitialUrlCampaign);
+        });
+    });
+
+    describe('XPromo AdUnit', () => {
+        let adUnit: XPromoAdUnit;
+        let campaign: XPromoCampaign;
+
+        beforeEach(() => {
+
+            campaign = TestFixtures.getXPromoCampaign();
+
+            adUnitParameters.campaign = campaign;
+            adUnit = <XPromoAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+        });
+
+        describe('on hide', () => {
+            it('should trigger onClose when hide is called', (done) => {
+                adUnit.setShowing(true);
+                adUnit.onClose.subscribe(() => {
+                    assert.equal(adUnit.isShowing(), false);
+                    done();
+                });
+
+                adUnit.hide();
+            });
+        });
+
+        describe('on show', () => {
+            it('should trigger onStart', (done) => {
+                adUnit.onStart.subscribe(() => {
+                    adUnit.hide();
+                    done();
+                });
+
+                adUnit.show();
+            });
         });
     });
 });

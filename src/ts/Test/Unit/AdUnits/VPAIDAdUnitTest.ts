@@ -20,9 +20,6 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Overlay } from 'Views/Overlay';
 import { SessionManager } from 'Managers/SessionManager';
 import { MetaDataManager } from 'Managers/MetaDataManager';
-
-import VPAIDTestXML from 'xml/VPAID.xml';
-import VPAIDCampaignJson from 'json/OnProgrammaticVPAIDCampaign.json';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 
 describe('VPAIDAdUnit', () => {
@@ -35,7 +32,6 @@ describe('VPAIDAdUnit', () => {
     let thirdPartyEventManager: ThirdPartyEventManager;
     let container: AdUnitContainer;
     let focusManager: FocusManager;
-    let vpaid: VPAIDModel;
     let vpaidAdUnitParameters: IVPAIDAdUnitParameters;
     let request: Request;
     let overlay: Overlay;
@@ -56,8 +52,7 @@ describe('VPAIDAdUnit', () => {
         sinon.stub(container, 'close').returns(Promise.resolve());
 
         request = new Request(nativeBridge, wakeUpManager);
-        vpaid = new VPAIDParser().parse(VPAIDTestXML);
-        const vpaidCampaignJson = JSON.parse(VPAIDCampaignJson);
+
         const placement = new Placement({
             id: '123',
             name: 'test',
@@ -69,7 +64,7 @@ describe('VPAIDAdUnit', () => {
             muteVideo: false
         });
 
-        campaign = new VPAIDCampaign(vpaid, TestFixtures.getSession(), vpaidCampaignJson.campaignId, vpaidCampaignJson.gamerId, vpaidCampaignJson.abGroup);
+        campaign = TestFixtures.getVPAIDCampaign();
 
         vpaidView = new VPAID(nativeBridge, campaign, placement, 'en', 'TestGameId');
         sinon.stub(vpaidView, 'container').returns(document.createElement('div'));

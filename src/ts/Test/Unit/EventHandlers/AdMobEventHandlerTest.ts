@@ -1,4 +1,5 @@
 import * as sinon from 'sinon';
+import { assert } from 'chai';
 
 import { AdMobEventHandler } from 'EventHandlers/AdmobEventHandler';
 import { AdMobAdUnit } from 'AdUnits/AdMobAdUnit';
@@ -11,6 +12,15 @@ import { Request } from 'Utilities/Request';
 import { Session } from 'Models/Session';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
+import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
+import { AdMobSignal } from 'Models/AdMobSignal';
+import { SinonSandbox } from 'sinon';
+import { Url } from 'Utilities/Url';
+
+import { unity_proto } from '../../../../proto/unity_proto.js';
+import * as protobuf from 'protobufjs/minimal';
+import { SdkStats } from 'Utilities/SdkStats';
+import { ITouchInfo } from 'Views/AFMABridge';
 
 const resolveAfter = (timeout: number): Promise<void> => {
     return new Promise((resolve, reject) => setTimeout(resolve, timeout));
@@ -23,6 +33,7 @@ describe('AdMobEventHandler', () => {
     let request: Request;
     let thirdPartyEventManager: ThirdPartyEventManager;
     let session: Session;
+    let adMobSignalFactory: AdMobSignalFactory;
     const testTimeout = 250;
 
     beforeEach(() => {
@@ -30,6 +41,7 @@ describe('AdMobEventHandler', () => {
         request = sinon.createStubInstance(Request);
         thirdPartyEventManager = sinon.createStubInstance(ThirdPartyEventManager);
         session = TestFixtures.getSession();
+        adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);
         nativeBridge = sinon.createStubInstance(NativeBridge);
         nativeBridge.Intent = sinon.createStubInstance(IntentApi);
         nativeBridge.UrlScheme = sinon.createStubInstance(UrlSchemeApi);
@@ -39,7 +51,8 @@ describe('AdMobEventHandler', () => {
             nativeBridge: nativeBridge,
             request: request,
             thirdPartyEventManager: thirdPartyEventManager,
-            session: session
+            session: session,
+            adMobSignalFactory: adMobSignalFactory
         });
     });
 
@@ -89,6 +102,81 @@ describe('AdMobEventHandler', () => {
             return resolveAfter(testTimeout).then(() => {
                 sinon.assert.calledWith(<sinon.SinonSpy>adUnit.setFinishState, FinishState.ERROR);
                 sinon.assert.called(<sinon.SinonSpy>adUnit.hide);
+            });
+        });
+    });
+
+    describe('on click', () => {
+        const startTime = Date.now();
+        const requestTime = startTime - 1000;
+        let clock: sinon.SinonFakeTimers;
+        const touch = <ITouchInfo>{
+            start: {
+                x: 0.0,
+                y: 0.0
+            },
+            end: {
+                x: 1.0,
+                y: 1.0
+            },
+            diameter: 1.0,
+            pressure: 0.5,
+            counts: {
+                up: 1,
+                down: 1,
+                cancel: 2,
+                move: 5
+            }
+        };
+
+        beforeEach(() => {
+            clock = sinon.useFakeTimers(requestTime);
+            SdkStats.setAdRequestTimestamp();
+        });
+
+        afterEach(() => {
+            clock.restore();
+        });
+
+        it('should append click signals', () => {
+            (<sinon.SinonStub>adMobSignalFactory.getClickSignal).returns(Promise.resolve(new AdMobSignal()));
+            (<sinon.SinonStub>adUnit.getTimeOnScreen).returns(42);
+            (<sinon.SinonStub>adUnit.getStartTime).returns(startTime);
+            (<sinon.SinonStub>thirdPartyEventManager.sendEvent).returns(Promise.resolve());
+            const url = 'http://unityads.unity3d.com';
+
+            return admobEventHandler.onAttribution(url, touch).then(() => {
+                const call = (<sinon.SinonStub>thirdPartyEventManager.sendEvent).getCall(0);
+                const calledUrl = call.args[2];
+                const param = Url.getQueryParameter(calledUrl, 'ms');
+                if (!param) {
+                    throw new Error('Expected param not to be null');
+                }
+
+                const buffer = new Uint8Array(protobuf.util.base64.length(param));
+                protobuf.util.base64.decode(param, buffer, 0);
+                const decodedProtoBuf = unity_proto.UnityProto.decode(buffer);
+
+                const decodedSignal = unity_proto.UnityInfo.decode(decodedProtoBuf.encryptedBlobs[0]);
+                assert.equal(decodedSignal.field_36, adUnit.getTimeOnScreen());
+            });
+        });
+
+        it('should append the rvdt parameter', () => {
+            (<sinon.SinonStub>adMobSignalFactory.getClickSignal).returns(Promise.resolve(new AdMobSignal()));
+            (<sinon.SinonStub>adUnit.getTimeOnScreen).returns(42);
+            (<sinon.SinonStub>adUnit.getStartTime).returns(startTime);
+            (<sinon.SinonStub>thirdPartyEventManager.sendEvent).returns(Promise.resolve());
+            const url = 'http://unityads.unity3d.com';
+
+            return admobEventHandler.onAttribution(url, touch).then(() => {
+                const call = (<sinon.SinonStub>thirdPartyEventManager.sendEvent).getCall(0);
+                const calledUrl = call.args[2];
+                const param = Url.getQueryParameter(calledUrl, 'rvdt');
+                if (!param) {
+                    throw new Error('Expected param not to be null');
+                }
+                assert.equal(param, (startTime - requestTime).toString());
             });
         });
     });

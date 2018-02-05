@@ -9,6 +9,6 @@ export class Analytics {
                 value: data
             };
         }
-        return HttpKafka.sendEvent('analytics', data);
+        return HttpKafka.sendEvent('ads.sdk2.analytics', data);
     }
 }
