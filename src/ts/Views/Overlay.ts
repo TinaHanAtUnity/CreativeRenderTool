@@ -7,6 +7,7 @@ import { Localization } from 'Utilities/Localization';
 import { Platform } from 'Constants/Platform';
 import { AbstractOverlay } from 'Views/AbstractOverlay';
 import { PerformanceCampaign } from "Models/Campaigns/PerformanceCampaign";
+import { Campaign } from "Models/Campaign";
 
 const richOverlayId = "rich-overlay";
 
@@ -39,11 +40,13 @@ export class Overlay extends AbstractOverlay {
 
     private _fadeTimer: any;
     private _fadeStatus: boolean = true;
+    private _campaign: Campaign | undefined;
 
     constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, campaign?: PerformanceCampaign, abGroup: number = 0) {
         super(nativeBridge, 'overlay', muted, abGroup);
 
         this._localization = new Localization(language, 'overlay');
+        this._campaign = campaign;
 
         this._templateData = {};
 
@@ -238,7 +241,7 @@ export class Overlay extends AbstractOverlay {
     }
 
     protected getAltOverlay(): string | undefined {
-        if (this._abGroup === 8 || this._abGroup === 9 || this._abGroup === 10 || this._abGroup === 11) {
+        if (this._campaign instanceof PerformanceCampaign && (this._abGroup === 8 || this._abGroup === 9 || this._abGroup === 10 || this._abGroup === 11)) {
             return richOverlayId;
         }
 
