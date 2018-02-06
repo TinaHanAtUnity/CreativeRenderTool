@@ -136,7 +136,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     protected getEndscreenAlt(campaign?: Campaign) {
-        if(this._abGroup === 8 || this._abGroup === 9) {
+        if(this._abGroup === 5 || this._abGroup === 6) {
             return lunarEndScreenId;
         }
 
