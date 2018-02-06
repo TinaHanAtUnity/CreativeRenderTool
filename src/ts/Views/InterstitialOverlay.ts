@@ -72,7 +72,6 @@ export class InterstitialOverlay extends AbstractOverlay {
         this._muteButtonElement = <HTMLElement>this._container.querySelector('.mute-button');
         this._debugMessageElement = <HTMLElement>this._container.querySelector('.debug-message-text');
         this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
-
     }
 
     public setSpinnerEnabled(value: boolean): void {

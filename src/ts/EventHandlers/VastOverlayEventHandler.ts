@@ -13,8 +13,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _vastAdUnit: VastAdUnit;
     private _clientInfo: ClientInfo;
     private _request: Request;
-    private _campaign: VastCampaign;
-    private _placement: Placement;
+    private _vastCampaign: VastCampaign;
     private _paused: boolean = false;
 
     constructor(nativeBridge: NativeBridge, adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
@@ -23,7 +22,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         this._vastAdUnit = adUnit;
         this._request = parameters.request;
         this._clientInfo = parameters.clientInfo;
-        this._campaign = parameters.campaign;
+        this._vastCampaign = parameters.campaign;
         this._placement = parameters.placement;
     }
 
@@ -48,14 +47,14 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
                 moat.triggerVideoEvent('AdVolumeChange', 0);
                 moat.triggerViewabilityEvent('volume', 0.0);
             }
-            this._vastAdUnit.sendTrackingEvent('mute', this._campaign.getSession().getId(), this._clientInfo.getSdkVersion());
+            this._vastAdUnit.sendTrackingEvent('mute', this._vastCampaign.getSession().getId(), this._clientInfo.getSdkVersion());
         } else {
             const moat = this._vastAdUnit.getMoat();
             if(moat) {
                 moat.triggerVideoEvent('AdVolumeChange', this._vastAdUnit.getVolume());
                 moat.triggerViewabilityEvent('volume', this._vastAdUnit.getVolume() * 100);
             }
-            this._vastAdUnit.sendTrackingEvent('unmute', this._campaign.getSession().getId(), this._clientInfo.getSdkVersion());
+            this._vastAdUnit.sendTrackingEvent('unmute', this._vastCampaign.getSession().getId(), this._clientInfo.getSdkVersion());
         }
 
     }
@@ -64,7 +63,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         super.onOverlayCallButton();
 
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
-        this._vastAdUnit.sendVideoClickTrackingEvent(this._campaign.getSession().getId(), this._clientInfo.getSdkVersion());
+        this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId(), this._clientInfo.getSdkVersion());
 
         const clickThroughURL = this._vastAdUnit.getVideoClickThroughURL();
         if(clickThroughURL) {

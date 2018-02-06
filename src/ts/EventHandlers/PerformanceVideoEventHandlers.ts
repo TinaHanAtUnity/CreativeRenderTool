@@ -15,5 +15,4 @@ export class PerformanceVideoEventHandlers {
             endScreen.show();
         }
     }
-
 }

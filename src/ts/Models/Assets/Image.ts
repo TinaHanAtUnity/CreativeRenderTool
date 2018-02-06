@@ -1,8 +1,9 @@
 import { Asset, IAsset } from 'Models/Assets/Asset';
+import { Session } from 'Models/Session';
 
 export class Image extends Asset<IAsset> {
-    constructor(url: string) {
-        super('Image', Asset.Schema);
+    constructor(url: string, session: Session) {
+        super('Image', session, Asset.Schema);
 
         this.set('url', url);
     }

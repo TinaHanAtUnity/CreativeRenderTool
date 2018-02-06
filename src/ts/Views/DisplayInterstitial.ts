@@ -9,7 +9,6 @@ import { Platform } from 'Constants/Platform';
 import { Template } from 'Utilities/Template';
 
 export interface IDisplayInterstitialHandler {
-    onDisplayInterstitialClick(url: string): void;
     onDisplayInterstitialReward(): void;
     onDisplayInterstitialSkip(): void;
     onDisplayInterstitialClose(): void;
@@ -50,14 +49,6 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
 
     public render() {
         super.render();
-
-        if (this._campaign.getClickThroughUrl()) {
-            const clickCatcher = document.createElement('div');
-            clickCatcher.classList.add('iframe-click-catcher');
-            this._container.appendChild(clickCatcher);
-
-            clickCatcher.addEventListener('click', (e: Event) => this.onIFrameClicked(e));
-        }
 
         this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
     }
@@ -133,16 +124,6 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
         window.clearInterval(handle);
     }
 
-    private onIFrameClicked(e: Event) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        const clickThroughUrl = this._campaign.getClickThroughUrl();
-        if (clickThroughUrl) {
-            this._handlers.forEach(handler => handler.onDisplayInterstitialClick(clickThroughUrl));
-        }
-    }
-
     private updateProgressCircle(container: HTMLElement, value: number) {
         const wrapperElement = <HTMLElement>container.querySelector('.progress-wrapper');
 
@@ -181,7 +162,8 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
     private onMessage(e: MessageEvent) {
         switch (e.data.type) {
             case 'redirect':
-                this._handlers.forEach(handler => handler.onDisplayInterstitialClick(e.data.href));
+                // TODO: should we do something here?
+                // this._handlers.forEach(handler => handler.onDisplayInterstitialClick(e.data.href));
                 break;
             default:
                 this._nativeBridge.Sdk.logWarning(`Unknown message: ${e.data.type}`);

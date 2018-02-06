@@ -53,7 +53,7 @@ describe('VastEndScreenEventHandlersTest', () => {
         const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         const sessionManager = new SessionManager(nativeBridge);
         const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
-        const video = new Video('');
+        const video = new Video('', TestFixtures.getSession());
         const overlay = new Overlay(nativeBridge, true, 'en', 'testGameId');
         comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
@@ -79,7 +79,7 @@ describe('VastEndScreenEventHandlersTest', () => {
 
     describe('when calling onClose', () => {
         it('should hide endcard', () => {
-            const vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
+            const vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.configuration.isCoppaCompliant(), vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
             vastAdUnitParameters.endScreen = vastEndScreen;
             const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
             sinon.stub(vastAdUnit, 'hide').returns(sinon.spy());
@@ -101,13 +101,13 @@ describe('VastEndScreenEventHandlersTest', () => {
 
         beforeEach(() => {
 
-            video = new Video('');
-            campaign = new VastCampaign(vast, '12345', TestFixtures.getSession(), 'gamerId', 1);
+            video = new Video('', TestFixtures.getSession());
+            campaign = TestFixtures.getEventVastCampaign();
 
             vastAdUnitParameters.video = video;
             vastAdUnitParameters.campaign = campaign;
             vastAdUnitParameters.placement = TestFixtures.getPlacement();
-            const vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
+            const vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.configuration.isCoppaCompliant(), vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
             vastAdUnitParameters.endScreen = vastEndScreen;
             vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
             vastEndScreenEventHandler = new VastEndScreenEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);

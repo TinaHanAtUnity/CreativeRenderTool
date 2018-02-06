@@ -78,7 +78,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         ];
     }
 
-    public render() {
+    public render(): void {
         super.render();
 
         this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
@@ -326,7 +326,6 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                         }
                         break;
                     case 'showEndScreen':
-                        this._handlers.forEach(handler => handler.onMraidShowEndScreen());
                         break;
                     default:
                         break;

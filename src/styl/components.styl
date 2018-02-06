@@ -34,8 +34,8 @@ $game-rating-count-default($scale-size, $with-styles = true) {
   }
 }
 
-$game-icon-default($scale-size, $with-styles = true) {
-  $set-image($scale-size * $default-size * 4.5, $scale-size * $default-size * 4.5, $scale-size * $default-size * .75);
+$game-icon-default($scale-size, $radius-size = .75, $with-styles = true) {
+  $set-image($scale-size * $default-size * 4.5, $scale-size * $default-size * 4.5, $scale-size * $default-size * $radius-size);
 }
 
 $unityads-logo-default($scale-size, $with-styles = true) {

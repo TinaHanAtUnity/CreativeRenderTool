@@ -8,7 +8,6 @@ import { VPAID as VPAIDModel } from 'Models/VPAID/VPAID';
 import { VPAID, IVPAIDHandler } from 'Views/VPAID';
 import { NativeBridge } from 'Native/NativeBridge';
 import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
-import { VPAIDParser } from 'Utilities/VPAIDParser';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 import { WebPlayerApi } from 'Native/Api/WebPlayer';
 import { Observable1 } from 'Utilities/Observable';
@@ -33,7 +32,7 @@ describe('VPAID View', () => {
         const webPlayer = sinon.createStubInstance(WebPlayerApi);
         (<any>webPlayer).onWebPlayerEvent = new Observable1<string>();
         (<sinon.SinonStub>webPlayer.setData).returns(Promise.resolve());
-        (<sinon.SinonStub>webPlayer.sendEventToWebPlayer).returns(Promise.resolve());
+        (<sinon.SinonStub>webPlayer.sendEvent).returns(Promise.resolve());
         (<any>nativeBridge).WebPlayer = webPlayer;
 
         const model = sinon.createStubInstance(VPAIDModel);

@@ -1,5 +1,149 @@
 # Staged
 
+* Add support for upcoming overlay placement parameters
+* Merge 2.2.0 APIs
+
+# Wed Jan 31 10:34:49 UTC 2018
+
+* Add xpromo event type to Kafka info json
+
+# Tue Jan 30 12:20:25 UTC 2018
+
+* Fix video caching on XPromos
+
+# Mon Jan 29 10:22:43 UTC 2018
+
+* Combined endscreen with store buttons AB test (groups 8 & 9)
+* Initial XPromo support
+
+# Thu Jan 25 11:38:27 UTC 2018
+
+* Fix RVDT typo
+* Fix persistent gamer SID
+
+# Tue Jan 23 12:08:45 UTC 2018
+
+* Fix AdMob time on screen click signal
+
+# Tue Jan 23 09:19:04 UTC 2018
+
+* Refactor campaign model constructors
+* Reject and never show videos longer than 40 seconds
+* Combined end screen with golden stars and platform specific download button on groups 10 and 11
+
+# Thu Jan 18 08:36:17 UTC 2018
+
+* Initial support for AdMob click signals
+* Send analytics events to CDP production endpoint
+
+# Wed Jan 17 23:33:54 UTC 2018
+
+* `admob_ad_impression` diagnostic added.
+
+# Wed Jan 17 12:26:52 UTC 2018
+
+* Use streaming fallback if comet video size and cached video size are different
+
+# Tue Jan 16 10:23:28 UTC 2018
+
+* Test combined endscreen on A/B groups 8 and 9
+* Remove Roll the Ball endscreen A/B test
+* Remove random number generator test
+* Send video_size_mismatch diagnostic if comet video size and cached video size are different
+
+# Thu Jan 11 17:49:27 UTC 2018
+
+* Send auction_invalid_json diagnostic message when auction response JSON parsing fails
+* Handle Cache.getFilePath FILE_NOT_FOUND error in auction_request_failed diagnostic message
+* Fix creative test app to work with latest auction ID changes
+
+# Wed Jan 10 18:52:53 UTC 2018
+
+* Recreate ad request parameters when retrying with connectivity events
+* Fixes for AdMob spam signals for screen width, screen height and app installer
+
+# Tue Jan  9 12:32:29 UTC 2018
+
+* Switch to server-side auction ID
+* Stop refreshing ads when Unity ad unit activity resumes
+* Fix overlay width and height on iPhone X
+* Use env() css function for layout safety margins in iOS 11.2
+
+# Mon Jan  8 08:56:05 UTC 2018
+
+* Remove xmas theme
+* Follow all 3xx redirect HTTP status codes and set max limit of redirections to 10
+* Remove game ID from endscreen privacy popup
+* Pass raw free cache space value from native SDK in caching_disabled diagnostic message
+
+# Thu Jan  4 10:59:50 UTC 2018
+
+* MRAID fixes for iOS XInstall blackscreen issue
+* MRAID fixes for Beeswax event listening problems
+
+# Wed Jan  3 13:18:38 UTC 2018
+
+* Disable caching if there is less than 20 megabytes of free space on device
+* Add debugging diagnostics for native random UUID generator
+
+# Wed Dec 20 20:51:09 UTC 2017
+
+* Changed xmas theme to prevent overlaying game icon
+
+# Wed Dec 20 00:04:26 UTC 2017
+
+* Add PTS click tracking for VAST
+* Change AdMob start diagnostic firing to reflect TPS.
+
+# Mon Dec 18 21:47:30 UTC 2017
+
+* Fix failing hybrid test
+* Remove ComScore AB groups, enable on whole network
+* Fix display unit tests
+* Set xmas end screen by default except groups 10 & 11 
+* Remove dark end screen
+
+# Fri Dec 15 11:12:36 UTC 2017
+
+* Fix for iOS AdMob spam signals
+
+# Fri Dec 15 05:53:39 UTC 2017
+
+* Fixes various issues reported by AdMob
+
+# Thu Dec 14 20:09:09 UTC 2017
+
+* Redeployment of previous deployment with fixed Video model handling for portrait videos
+
+# Thu Dec 14 19:04:21 UTC 2017
+
+* Fix VAST end screen layout
+* Xmas endscreen theme on groups 18 and 19
+* Rearrange MOAT parameters
+* Add session to every asset for better diagnostics
+* Send webview user agent for tracking events based on auction response
+* Clickthrough parse on Display Interstitial Campaign and Display Interstitial Url Campaign
+
+# Thu Dec 14 12:03:50 UTC 2017
+
+* Redeployment of previous deployment with fixed placement ID handling
+
+# Wed Dec 13 21:24:50 UTC 2017
+
+* Refactor/cleanup ad unit model abuse
+* No fill retrying for production
+* Show build info in privacy pop up on end screen
+* Show playable end screen on Roll the Ball campaign
+* Add URL parser & parse APK redirect location correctly
+* Adjust video overlay safety margins in landscape mode
+* Sample SdkStats with game session ID
+
+# Tue Dec 12 19:04:39 UTC 2017
+
+* Initial support for AdMob ad units
+
+# Tue Dec 12 11:07:50 UTC 2017
+
 * Do not use video duration reported in vast xml and use the REAL video duration
 * New dark end screen AB test in groups 8 & 9
 * Add info button and privacy pop-up to MRAID overlay
@@ -140,7 +284,7 @@
 
 # Mon Oct 16 20:19:29 UTC 2017
 
-* Adds ad response to all diagnostic messages
+* Adds ad response to all diagnostic messages.
 
 # Thu Oct 12 20:04:06 UTC 2017
 

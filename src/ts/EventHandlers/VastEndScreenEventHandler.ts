@@ -13,18 +13,20 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     private _adUnit: VastAdUnit;
     private _clientInfo: ClientInfo;
     private _request: Request;
+    private _campaign: VastCampaign;
 
     constructor(nativeBridge: NativeBridge, adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
         this._nativeBridge = nativeBridge;
         this._adUnit = adUnit;
         this._clientInfo = parameters.clientInfo;
         this._request = parameters.request;
+        this._campaign = parameters.campaign;
     }
 
     public onVastEndScreenClick(): Promise<void> {
         const platform = this._nativeBridge.getPlatform();
         const clickThroughURL = this._adUnit.getCompanionClickThroughUrl() || this._adUnit.getVideoClickThroughURL();
-        this._adUnit.sendTrackingEvent('videoEndCardClick', this._adUnit.getCampaign().getSession().getId(), this._clientInfo.getSdkVersion());
+        this._adUnit.sendTrackingEvent('videoEndCardClick', this._campaign.getSession().getId(), this._clientInfo.getSdkVersion());
 
         if (clickThroughURL) {
             return this._request.followRedirectChain(clickThroughURL).then((url: string) => {
@@ -52,6 +54,17 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     }
 
     public onVastEndScreenShow(): void {
-        this._adUnit.sendCompanionTrackingEvent(this._adUnit.getCampaign().getSession().getId(), this._clientInfo.getSdkVersion());
+        this._adUnit.sendCompanionTrackingEvent(this._campaign.getSession().getId(), this._clientInfo.getSdkVersion());
+    }
+
+    public onEndScreenPrivacy(url: string): void {
+            if (this._nativeBridge.getPlatform() === Platform.IOS) {
+            this._nativeBridge.UrlScheme.open(url);
+        } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            this._nativeBridge.Intent.launch({
+                'action': 'android.intent.action.VIEW',
+                'uri': url
+            });
+        }
     }
 }

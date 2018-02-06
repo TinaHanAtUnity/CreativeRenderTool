@@ -1,0 +1,75 @@
+syntax = "proto2";
+
+package unity_proto;
+
+
+message UnityProto {
+
+  repeated bytes encrypted_blobs = 1;
+
+  enum EncryptionMethod {
+    UNENCRYPTED = 3;
+  }
+
+  optional EncryptionMethod encryption_method = 4;
+
+  enum ProtoName {
+    UNITY_INFO = 2;
+  }
+
+  // Should always be set to UNITY_INFO
+  optional ProtoName proto_name = 3;
+}
+
+message UnityInfo {
+  optional string field_1 = 1;
+  optional int64 field_2 = 2;
+  optional int64 field_3 = 3;
+  optional int64 field_4 = 4;
+  optional int64 field_5 = 5;
+  optional int64 field_6 = 6;
+  optional int64 field_7 = 7;
+  optional int64 field_8 = 8;
+  optional int64 field_9 = 9;
+  optional int64 field_10 = 10;
+  optional int64 field_11 = 11;
+  optional int64 field_12 = 12;
+  optional int64 field_13 = 13;
+  optional bool field_14 = 14;
+  optional int64 field_15 = 15;
+  optional int64 field_16 = 16;
+  optional int64 field_17 = 17;
+  optional int64 field_18 = 18;
+  optional int64 field_19 = 19;
+  optional int64 field_20 = 20;
+  optional int64 field_21 = 21;
+  optional int64 field_22 = 22;
+  optional string field_23 = 23;
+  optional int64 field_24 = 24;
+  optional int64 field_25 = 25;
+  optional int64 field_26 = 26;
+  optional int64 field_27 = 27;
+  optional int64 field_28 = 28;
+  optional int64 field_29 = 29;
+  optional int64 field_30 = 30;
+  optional int64 field_31 = 31;
+  optional bool field_32 = 32;
+  optional int64 field_33 = 33;
+  optional int64 field_34 = 34;
+  optional int64 field_35 = 35;
+  optional int64 field_36 = 36;
+  optional string field_37 = 37;
+  optional string field_38 = 38;
+  optional string field_39 = 39;
+  optional int64 field_40 = 40;
+  optional string field_41 = 41;
+  optional string field_42 = 42;
+  optional int64 field_43 = 43;
+  optional int64 field_44 = 44;
+  optional int64 field_45 = 45;
+  optional int64 field_46 = 46;
+  optional int64 field_47 = 47;
+  optional int64 field_48 = 48;
+  optional int64 field_49 = 49;
+  optional int64 field_50 = 50;
+}

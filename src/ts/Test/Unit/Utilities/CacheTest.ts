@@ -167,7 +167,7 @@ describe('CacheTest', () => {
         const focusManager = new FocusManager(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
-        cacheManager = new Cache(nativeBridge, wakeUpManager, request, {retries: 3, retryDelay: 1});
+        cacheManager = new Cache(nativeBridge, wakeUpManager, request, {retries: 3, retryDelay: 1000});
         sinon.stub(cacheManager, 'isCached').returns(Promise.resolve(false));
     });
 

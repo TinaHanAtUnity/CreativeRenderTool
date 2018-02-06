@@ -71,6 +71,7 @@
 | volume | number | On iOS, this is a float between 0 (silent) and 1 (max volume), on Android, this is integer from 0 (silent) to max volume index | SDK | all |
 | versionCode | number | Application internal version code for Android apps, available only for SDK 2.1.1 and later | SDK | android |
 | simulator | boolean | If device is a simulator, not a real device | SDK | ios |
+| requestSignal | string | Base64 encoded string from AdMob protobuf signals | SDK | all |
 
 
 
@@ -105,7 +106,6 @@
 | advertisingTrackingId | no | True | False | string | Advertising identifier in raw format | SDK | all |
 | limitAdTracking | no | True | False | boolean | boolean if user has limited tracking or not | SDK | all |
 | androidId | no | True | False | string | Android ID | SDK | android |
-| auctionId | all | True | False | string | Unique identifier for joining ad requests and operative events. This identifies one ad unit lifecycle so e.g. ad request, start and end events share same auctionId. | SDK | all |
 | deviceMake | android | True | False | string | Android device manufacturer | SDK | android |
 | deviceModel | all | True | False | string | Android or iOS device model, example 'iPhone7,1' | SDK | all |
 | platform | all | True | False | string | "android" or "ios" | SDK | all |
@@ -147,6 +147,7 @@
 | volume | all | False | True | number | On iOS, this is a float between 0 (silent) and 1 (max volume), on Android, this is integer from 0 (silent) to max volume index | SDK | all |
 | versionCode | no | False | True | number | Application internal version code for Android apps, available only for SDK 2.1.1 and later | SDK | android |
 | simulator | ios | False | True | boolean | If device is a simulator, not a real device | SDK | ios |
+| requestSignal | all | False | True | string | Base64 encoded string from AdMob protobuf signals | SDK | all |
 
 
 

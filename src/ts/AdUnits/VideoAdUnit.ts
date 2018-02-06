@@ -13,13 +13,14 @@ import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { WebViewError } from 'Errors/WebViewError';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Campaign } from 'Models/Campaign';
+import { Placement } from 'Models/Placement';
 
 export interface IVideoAdUnitParameters<T extends Campaign> extends IAdUnitParameters<T> {
     video: Video;
     overlay: AbstractOverlay;
 }
 
-export abstract class VideoAdUnit<T extends Campaign = Campaign> extends AbstractAdUnit<T> {
+export abstract class VideoAdUnit<T extends Campaign = Campaign> extends AbstractAdUnit {
 
     private static _progressInterval: number = 250;
 
@@ -37,6 +38,8 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     private _lowMemory: boolean;
     private _prepareCalled: boolean;
     private _videoReady: boolean;
+    private _placement: Placement;
+    private _campaign: T;
 
     constructor(nativeBridge: NativeBridge, parameters: IVideoAdUnitParameters<T>) {
         super(nativeBridge, parameters);
@@ -49,6 +52,8 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         this._options = parameters.options;
         this._prepareCalled = false;
         this._lowMemory = false;
+        this._placement = parameters.placement;
+        this._campaign = parameters.campaign;
 
         this.prepareOverlay();
     }
@@ -141,11 +146,11 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
             overlay.render();
             document.body.appendChild(overlay.container());
 
-            if(!this.getPlacement().allowSkip()) {
+            if(!this._placement.allowSkip()) {
                 overlay.setSkipEnabled(false);
             } else {
                 overlay.setSkipEnabled(true);
-                overlay.setSkipDuration(this.getPlacement().allowSkipInSeconds());
+                overlay.setSkipDuration(this._placement.allowSkipInSeconds());
             }
         }
     }
@@ -234,6 +239,18 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
             if(this.getVideo().isCached() && this.getVideo().getFileId()) {
                 return this._nativeBridge.Cache.getFileInfo(<string>this.getVideo().getFileId()).then(result => {
                     if(result.found) {
+                        const remoteVideoSize: number | undefined = this.getVideo().getSize();
+                        if(remoteVideoSize && remoteVideoSize !== result.size) {
+                            Diagnostics.trigger('video_size_mismatch', {
+                                remoteVideoSize: remoteVideoSize,
+                                localVideoSize: result.size
+                            }, this._campaign.getSession());
+
+                            // this condition is most commonly triggered on Android that probably has some unknown issue with resuming downloads
+                            // if comet has given video size that does not match local file size, use streaming fallback
+                            return streamingUrl;
+                        }
+
                         return this.getVideo().getUrl();
                     } else {
                         Diagnostics.trigger('cached_file_not_found', new DiagnosticError(new Error('File not found'), {

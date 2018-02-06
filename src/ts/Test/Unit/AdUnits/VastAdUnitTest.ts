@@ -37,6 +37,7 @@ describe('VastAdUnit', () => {
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
     let comScoreService: ComScoreTrackingService;
+    let placement: Placement;
     let vastCampaign: VastCampaign;
 
     before(() => {
@@ -50,7 +51,7 @@ describe('VastAdUnit', () => {
 
         const vast = vastParser.parseVast(vastXml);
 
-        const placement = new Placement({
+        placement = new Placement({
             id: '123',
             name: 'test',
             default: true,
@@ -69,7 +70,7 @@ describe('VastAdUnit', () => {
         const request = new Request(nativeBridge, wakeUpManager);
         const activity = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        vastCampaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 12);
+        vastCampaign = TestFixtures.getEventVastCampaign();
         const video = vastCampaign.getVideo();
 
         let duration = vastCampaign.getVast().getDuration();
@@ -110,8 +111,7 @@ describe('VastAdUnit', () => {
 
     describe('sendTrackingEvent', () => {
         it('should replace "%ZONE%" in the url with the placement id', () => {
-            const placement = vastAdUnit.getPlacement();
-            const vast = (<VastCampaign> vastAdUnit.getCampaign()).getVast();
+            const vast = vastCampaign.getVast();
             const urlTemplate = 'http://foo.biz/%ZONE%/123';
             sandbox.stub(vast, 'getTrackingEventUrls').returns([ urlTemplate ]);
             sandbox.stub(thirdPartyEventManager, 'sendEvent').returns(null);
@@ -122,9 +122,8 @@ describe('VastAdUnit', () => {
         });
 
         it('should replace "%SDK_VERSION%" in the url with the SDK version as a query parameter', () => {
-            const placement = vastAdUnit.getPlacement();
             const urlTemplate = 'http://ads-brand-postback.unityads.unity3d.com/brands/2002/defaultVideoAndPictureZone/%ZONE%/impression/common?adSourceId=2&advertiserDomain=appnexus.com&advertisingTrackingId=49f7acaa-81f2-4887-9f3b-cd124854879c&cc=USD&creativeId=54411305&dealCode=&demandSeatId=1&fillSource=appnexus&floor=0&gamerId=5834bc21b54e3b0100f44c92&gross=0&networkId=&precomputedFloor=0&seatId=958&value=1.01&sdkVersion=%SDK_VERSION%';
-            const vast = (<VastCampaign> vastAdUnit.getCampaign()).getVast();
+            const vast = vastCampaign.getVast();
             sandbox.stub(vast, 'getTrackingEventUrls').returns([ urlTemplate ]);
             sandbox.stub(thirdPartyEventManager, 'sendEvent').returns(null);
             vastAdUnit.sendTrackingEvent('start', 'sessionId', 1234);
@@ -135,12 +134,10 @@ describe('VastAdUnit', () => {
     });
 
     describe('sendImpressionEvent', () => {
-        let placement: Placement;
         let vast: Vast;
 
         beforeEach(() => {
-            placement = vastAdUnit.getPlacement();
-            vast = (<VastCampaign> vastAdUnit.getCampaign()).getVast();
+            vast = vastCampaign.getVast();
             sandbox.stub(thirdPartyEventManager, 'sendEvent').returns(null);
         });
 
@@ -181,13 +178,9 @@ describe('VastAdUnit', () => {
     });
 
     describe('with click through url', () => {
-        let vast: Vast;
-
         beforeEach(() => {
-            vast = new Vast([], []);
-            const video = new Video('');
-            sinon.stub(vast, 'getVideoUrl').returns(video.getUrl());
-            vastCampaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 12);
+            const video = new Video('', TestFixtures.getSession());
+            vastCampaign = TestFixtures.getEventVastCampaign();
             sinon.stub(vastCampaign, 'getVideo').returns(video);
             const nativeBridge = TestFixtures.getNativeBridge();
             const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
@@ -197,39 +190,39 @@ describe('VastAdUnit', () => {
         });
 
         it('should return correct http:// url', () => {
-            sandbox.stub(vast, 'getVideoClickThroughURL').returns('http://www.example.com/wpstyle/?p=364');
+            sandbox.stub(vastCampaign.getVast(), 'getVideoClickThroughURL').returns('http://www.example.com/wpstyle/?p=364');
 
             const clickThroughURL = vastAdUnit.getVideoClickThroughURL();
             assert.equal(clickThroughURL, 'http://www.example.com/wpstyle/?p=364');
         });
 
         it('should return correct https:// url', () => {
-            sandbox.stub(vast, 'getVideoClickThroughURL').returns('https://www.example.com/foo/?bar=baz&inga=42&quux');
+            sandbox.stub(vastCampaign.getVast(), 'getVideoClickThroughURL').returns('https://www.example.com/foo/?bar=baz&inga=42&quux');
             const clickThroughURL = vastAdUnit.getVideoClickThroughURL();
             assert.equal(clickThroughURL, 'https://www.example.com/foo/?bar=baz&inga=42&quux');
         });
 
         it('should return null for malformed url', () => {
-            sandbox.stub(vast, 'getVideoClickThroughURL').returns('www.foo.com');
+            sandbox.stub(vastCampaign.getVast(), 'getVideoClickThroughURL').returns('www.foo.com');
             const clickThroughURL = vastAdUnit.getVideoClickThroughURL();
             assert.equal(clickThroughURL, null);
         });
 
         it('should return null for a deeplink to an app', () => {
-            sandbox.stub(vast, 'getVideoClickThroughURL').returns('myapp://details?id=foo');
+            sandbox.stub(vastCampaign.getVast(), 'getVideoClickThroughURL').returns('myapp://details?id=foo');
             const clickThroughURL = vastAdUnit.getVideoClickThroughURL();
             assert.equal(clickThroughURL, null);
         });
 
         it('should call video click tracking url', () => {
-            sandbox.stub(vast, 'getVideoClickTrackingURLs').returns(['https://www.example.com/foo/?bar=baz&inga=42&quux', 'http://wwww.tremor.com/click']);
+            sandbox.stub(vastCampaign.getVast(), 'getVideoClickTrackingURLs').returns(['https://www.example.com/foo/?bar=baz&inga=42&quux', 'http://wwww.tremor.com/click']);
             sandbox.stub(thirdPartyEventManager, 'sendEvent').returns(null);
             vastAdUnit.sendVideoClickTrackingEvent('foo', 1234);
             sinon.assert.calledTwice(<sinon.SinonSpy>thirdPartyEventManager.sendEvent);
         });
 
         it('should not call thirdPartyEvent if there are no tracking urls', () => {
-            sandbox.stub(vast, 'getVideoClickTrackingURLs').returns([]);
+            sandbox.stub(vastCampaign.getVast(), 'getVideoClickTrackingURLs').returns([]);
             sandbox.stub(thirdPartyEventManager, 'sendEvent').returns(null);
             vastAdUnit.sendVideoClickTrackingEvent('foo', 1234);
             sinon.assert.notCalled(<sinon.SinonSpy>thirdPartyEventManager.sendEvent);
@@ -279,18 +272,15 @@ describe('VastAdUnit', () => {
     });
 
     describe('with companion ad', () => {
-        let vast: Vast;
         let vastEndScreen: VastEndScreen;
 
         beforeEach(() => {
-            vast = new Vast([], []);
-            const video = new Video('');
-            sinon.stub(vast, 'getVideoUrl').returns(video.getUrl());
-            vastCampaign = new VastCampaign(vast, 'campaignId', TestFixtures.getSession(), 'gamerId', 12);
+            const video = new Video('', TestFixtures.getSession());
+            vastCampaign = TestFixtures.getCompanionVastCampaign();
             sinon.stub(vastCampaign, 'getVideo').returns(video);
             const nativeBridge = TestFixtures.getNativeBridge();
             const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
-            vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
+            vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.configuration.isCoppaCompliant(), vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
             vastAdUnitParameters.overlay = overlay;
             vastAdUnitParameters.campaign = vastCampaign;
             vastAdUnitParameters.endScreen = vastEndScreen;
@@ -298,14 +288,14 @@ describe('VastAdUnit', () => {
         });
 
         it('should return correct companion click through url', () => {
-            sandbox.stub(vast, 'getCompanionClickThroughUrl').returns('http://www.example.com/wpstyle/?p=364');
+            sandbox.stub(vastCampaign.getVast(), 'getCompanionClickThroughUrl').returns('http://www.example.com/wpstyle/?p=364');
 
             const clickThroughURL = vastAdUnit.getCompanionClickThroughUrl();
             assert.equal(clickThroughURL, 'http://www.example.com/wpstyle/?p=364');
         });
 
         it('should return null when companion click through url is invalid', () => {
-            sandbox.stub(vast, 'getCompanionClickThroughUrl').returns('blah');
+            sandbox.stub(vastCampaign.getVast(), 'getCompanionClickThroughUrl').returns('blah');
 
             const clickThroughURL = vastAdUnit.getCompanionClickThroughUrl();
             assert.equal(clickThroughURL, null);
@@ -323,8 +313,8 @@ describe('VastAdUnit', () => {
             const companion = new VastCreativeCompanionAd('foobarCompanion', 'Creative', height, width, 'http://example.com/img.png', 'http://example.com/clickme', {
                 'creativeView': [url]
             });
-            sandbox.stub(vast, 'getLandscapeOrientedCompanionAd').returns(companion);
-            sandbox.stub(vast, 'getPortraitOrientedCompanionAd').returns(companion);
+            sandbox.stub(vastCampaign.getVast(), 'getLandscapeOrientedCompanionAd').returns(companion);
+            sandbox.stub(vastCampaign.getVast(), 'getPortraitOrientedCompanionAd').returns(companion);
 
             const mockEventManager = sinon.mock(thirdPartyEventManager);
             mockEventManager.expects('sendEvent').withArgs('companion', '123', companion.getEventTrackingUrls('creativeView')[0]);

@@ -1,36 +1,23 @@
 import { ICampaign, Campaign } from 'Models/Campaign';
 import { VPAID } from 'Models/VPAID/VPAID';
 import { IAsset, Asset } from 'Models/Assets/Asset';
-import { Session } from 'Models/Session';
 import { VastCreativeCompanionAd } from 'Models/Vast/VastCreativeCompanionAd';
 
-interface IVPAIDCampaign extends ICampaign {
+export interface IVPAIDCampaign extends ICampaign {
     vpaid: VPAID;
+    tracking: any | undefined;
 }
 
 export class VPAIDCampaign extends Campaign<IVPAIDCampaign> {
 
-    constructor(vpaid: VPAID, session: Session, campaignId: string, gamerId: string, abGroup: number, cacheTTL?: number, tracking?: any, adType?: string, creativeId?: string, seatId?: number, correlationId?: string, appCategory?: string, appSubCategory?: string) {
+    constructor(campaign: IVPAIDCampaign) {
         super('VPAIDCampaign', {
             ... Campaign.Schema,
-            vpaid: ['object']
-        });
-        this.set('vpaid', vpaid);
-        this.set('session', session);
+            vpaid: ['object'],
+            tracking: ['object', 'undefined']
+        }, campaign);
 
-        this.set('id', campaignId);
-        this.set('gamerId', gamerId);
-        this.set('abGroup', abGroup);
-        const timeout = cacheTTL || 3600;
-        this.set('willExpireAt', Date.now() + timeout * 1000);
-        this.set('adType', adType || undefined);
-        this.set('correlationId', correlationId || undefined);
-        this.set('creativeId', creativeId || undefined);
-        this.set('appCategory', appCategory || undefined);
-        this.set('appSubCategory', appSubCategory || undefined);
-        this.set('seatId', seatId || undefined);
-
-        this.addTrackingToVAST(tracking);
+        this.addTrackingToVAST(campaign.tracking);
     }
 
     public hasEndScreen(): boolean {

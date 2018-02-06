@@ -69,6 +69,7 @@
 <tr><td>volume</td><td>number</td><td>On iOS, this is a float between 0 (silent) and 1 (max volume), on Android, this is integer from 0 (silent) to max volume index</td><td>SDK</td><td>all</td></tr>
 <tr><td>versionCode</td><td>number</td><td>Application internal version code for Android apps, available only for SDK 2.1.1 and later</td><td>SDK</td><td>android</td></tr>
 <tr><td>simulator</td><td>boolean</td><td>If device is a simulator, not a real device</td><td>SDK</td><td>ios</td></tr>
+<tr><td>requestSignal</td><td>string</td><td>Base64 encoded string from AdMob protobuf signals</td><td>SDK</td><td>all</td></tr>
  </table><br><br></h3> <a name="configuration-request"></a> <h3> Configuration request </h3> 
  <table> <tr><th>key</th><th>required</th><th>queryString</th><th>body</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
 <tr><td>bundleId</td><td>all</td><td>True</td><td>False</td><td>string</td><td>Bundle identifier for the app</td><td>SDK</td><td>all</td></tr>
@@ -95,7 +96,6 @@
 <tr><td>advertisingTrackingId</td><td>no</td><td>True</td><td>False</td><td>string</td><td>Advertising identifier in raw format</td><td>SDK</td><td>all</td></tr>
 <tr><td>limitAdTracking</td><td>no</td><td>True</td><td>False</td><td>boolean</td><td>boolean if user has limited tracking or not</td><td>SDK</td><td>all</td></tr>
 <tr><td>androidId</td><td>no</td><td>True</td><td>False</td><td>string</td><td>Android ID</td><td>SDK</td><td>android</td></tr>
-<tr><td>auctionId</td><td>all</td><td>True</td><td>False</td><td>string</td><td>Unique identifier for joining ad requests and operative events. This identifies one ad unit lifecycle so e.g. ad request, start and end events share same auctionId.</td><td>SDK</td><td>all</td></tr>
 <tr><td>deviceMake</td><td>android</td><td>True</td><td>False</td><td>string</td><td>Android device manufacturer</td><td>SDK</td><td>android</td></tr>
 <tr><td>deviceModel</td><td>all</td><td>True</td><td>False</td><td>string</td><td>Android or iOS device model, example 'iPhone7,1'</td><td>SDK</td><td>all</td></tr>
 <tr><td>platform</td><td>all</td><td>True</td><td>False</td><td>string</td><td>"android" or "ios"</td><td>SDK</td><td>all</td></tr>
@@ -137,6 +137,7 @@
 <tr><td>volume</td><td>all</td><td>False</td><td>True</td><td>number</td><td>On iOS, this is a float between 0 (silent) and 1 (max volume), on Android, this is integer from 0 (silent) to max volume index</td><td>SDK</td><td>all</td></tr>
 <tr><td>versionCode</td><td>no</td><td>False</td><td>True</td><td>number</td><td>Application internal version code for Android apps, available only for SDK 2.1.1 and later</td><td>SDK</td><td>android</td></tr>
 <tr><td>simulator</td><td>ios</td><td>False</td><td>True</td><td>boolean</td><td>If device is a simulator, not a real device</td><td>SDK</td><td>ios</td></tr>
+<tr><td>requestSignal</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Base64 encoded string from AdMob protobuf signals</td><td>SDK</td><td>all</td></tr>
  </table><br><br></h3> <a name="video-events"></a> <h3> Video events </h3> 
  <table> <tr><th>key</th><th>required</th><th>queryString</th><th>body</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
 <tr><td>eventId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Unique event identifier</td><td>SDK</td><td>all</td></tr>

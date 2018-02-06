@@ -51,7 +51,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         ];
     }
 
-    public render() {
+    public render(): void {
         super.render();
 
         this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
@@ -59,8 +59,9 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
 
         this.createMRAID().then(mraid => {
+            this._nativeBridge.Sdk.logError('setting iframe srcdoc (' + mraid.length + ')');
             iframe.srcdoc = mraid;
-        });
+        }).catch(e => this._nativeBridge.Sdk.logError('failed to create mraid: ' + e));
 
         this._messageListener = (event: MessageEvent) => this.onMessage(event);
         window.addEventListener('message', this._messageListener, false);
@@ -114,23 +115,17 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         }
 
         if(this._loaded) {
-            this._iframe.contentWindow.postMessage('viewable', '*');
+            this.setViewableState(true);
         } else {
             const observer = this.onLoaded.subscribe(() => {
-                this._iframe.contentWindow.postMessage({
-                    type: 'viewable',
-                    value: true
-                }, '*');
+                this.setViewableState(true);
                 this.onLoaded.unsubscribe(observer);
             });
         }
     }
 
     public hide() {
-        this._iframe.contentWindow.postMessage({
-            type: 'viewable',
-            value: false
-        }, '*');
+        this.setViewableState(false);
         if(this._messageListener) {
             window.removeEventListener('message', this._messageListener, false);
             this._messageListener = undefined;

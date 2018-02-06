@@ -5,18 +5,24 @@ import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'AdUnits/VPAIDAdUnit';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { ICloseHandler } from 'Views/Closer';
+import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
+import { Placement } from 'Models/Placement';
 
 export class VPAIDOverlayEventHandler implements ICloseHandler {
     private _adUnit: VPAIDAdUnit;
     private _operativeEventManager: OperativeEventManager;
     private _comScoreTrackingService: ComScoreTrackingService;
     private _abGroup: number;
+    private _campaign: VPAIDCampaign;
+    private _placement: Placement;
 
     constructor(nativeBridge: NativeBridge, adUnit: VPAIDAdUnit, parameters: IVPAIDAdUnitParameters) {
         this._adUnit = adUnit;
         this._operativeEventManager = parameters.operativeEventManager;
         this._comScoreTrackingService = parameters.comScoreTrackingService;
         this._abGroup = parameters.campaign.getAbGroup();
+        this._campaign = parameters.campaign;
+        this._placement = parameters.placement;
     }
 
     public onClose(skipped: boolean) {

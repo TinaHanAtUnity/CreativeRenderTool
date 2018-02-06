@@ -3,13 +3,12 @@ import { HTML } from 'Models/Assets/HTML';
 import { Image } from 'Models/Assets/Image';
 import { Asset } from 'Models/Assets/Asset';
 import { StoreName } from 'Models/Campaigns/PerformanceCampaign';
-import { Session } from 'Models/Session';
 
 export interface IMRAIDCampaign extends ICampaign {
     resourceAsset: HTML | undefined;
     resource: string | undefined;
     dynamicMarkup: string | undefined;
-    additionalTrackingEvents: { [eventName: string]: string[] };
+    additionalTrackingEvents: { [eventName: string]: string[] } | undefined;
 
     clickAttributionUrl?: string;
     clickAttributionUrlFollowsRedirects?: boolean;
@@ -28,7 +27,7 @@ export interface IMRAIDCampaign extends ICampaign {
 }
 
 export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
-    constructor(campaign: any, session: Session, gamerId: string, abGroup: number, cacheTTL: number | undefined, resourceUrl?: string, resource?: string, additionalTrackingEvents?: { [eventName: string]: string[] }, adType?: string, creativeId?: string, seatId?: number, correlationId?: string) {
+    constructor(campaign: IMRAIDCampaign) {
         super('MRAIDCampaign', {
             ... Campaign.Schema,
             resourceAsset: ['object', 'undefined'],
@@ -48,77 +47,15 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
             bypassAppSheet: ['boolean', 'undefined'],
             store: ['number', 'undefined'],
             appStoreId: ['string', 'undefined'],
-        });
-
-        this.set('id', campaign.id);
-        this.set('session', session);
-        this.set('gamerId', gamerId);
-        this.set('abGroup', abGroup);
-
-        this.set('resourceAsset', resourceUrl ? new HTML(resourceUrl) : undefined);
-        this.set('resource', resource);
-        this.set('dynamicMarkup', campaign.dynamicMarkup);
-        this.set('additionalTrackingEvents', additionalTrackingEvents || {});
-        this.set('adType', adType || undefined);
-        this.set('correlationId', correlationId || undefined);
-        this.set('creativeId', creativeId || undefined);
-        this.set('seatId', seatId || undefined);
-
-        this.set('clickAttributionUrl', campaign.clickAttributionUrl);
-        this.set('clickAttributionUrlFollowsRedirects', campaign.clickAttributionUrlFollowsRedirects);
-
-        if(campaign.clickUrl) {
-            this.set('clickUrl', campaign.clickUrl);
-        }
-        if (campaign.videoEventUrls) {
-            this.set('videoEventUrls', campaign.videoEventUrls);
-        }
-
-        this.set('meta', campaign.meta);
-        this.set('gameName', campaign.gameName);
-
-        if(cacheTTL) {
-            this.set('willExpireAt', Date.now() + cacheTTL * 1000);
-        }
-
-        if(campaign.gameIcon) {
-            this.set('gameIcon', new Image(campaign.gameIcon));
-        }
-        this.set('rating', campaign.rating);
-        this.set('ratingCount', campaign.ratingCount);
-
-        if(campaign.endScreenLandscape) {
-            this.set('landscapeImage', new Image(campaign.endScreenLandscape));
-        }
-        if(campaign.endScreenPortrait) {
-            this.set('portraitImage', new Image(campaign.endScreenPortrait));
-        }
-        this.set('bypassAppSheet', campaign.bypassAppSheet);
-
-        const campaignStore = typeof campaign.store !== 'undefined' ? campaign.store : '';
-        switch(campaignStore) {
-            case 'apple':
-                this.set('store', StoreName.APPLE);
-                break;
-            case 'google':
-                this.set('store', StoreName.GOOGLE);
-                break;
-            case 'xiaomi':
-                this.set('store', StoreName.XIAOMI);
-                break;
-            default:
-                break;
-        }
-        this.set('appStoreId', campaign.appStoreId);
-
+        }, campaign);
     }
 
     public getResourceUrl(): HTML | undefined {
         return this.get('resourceAsset');
     }
 
-    public setResourceUrl(url: string): void {
-        this.set('resourceAsset', new HTML(url));
+    public setResourceUrl(url: string,): void {
+        this.set('resourceAsset', new HTML(url, this.getSession()));
     }
 
     public setResource(resource: string): void {
@@ -180,7 +117,7 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         return this.get('dynamicMarkup');
     }
 
-    public getTrackingEventUrls(): { [eventName: string]: string[] } {
+    public getTrackingEventUrls(): { [eventName: string]: string[] } | undefined {
         return this.get('additionalTrackingEvents');
     }
 

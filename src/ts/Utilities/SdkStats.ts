@@ -119,6 +119,10 @@ export class SdkStats {
         SdkStats._parseDuration = {};
     }
 
+    public static getAdRequestTimestamp(): number {
+        return SdkStats._latestAdRequestTimestamp;
+    }
+
     public static setAdRequestDuration(duration: number): void {
         SdkStats._latestAdRequestDuration = duration;
     }
@@ -146,7 +150,7 @@ export class SdkStats {
     private static _campaignManager: CampaignManager;
     private static _metaDataManager: MetaDataManager;
     private static _clientInfo: ClientInfo;
-    private static _topic: string = 'events.sdktimeline.json';
+    private static _topic: string = 'ads.sdk2.events.sdktimeline.json';
 
     private static _initialized: boolean = false;
     private static _adRequestOrdinal: number = 0;
@@ -159,9 +163,9 @@ export class SdkStats {
     private static _cachingFinished: { [id: string]: number } = {};
 
     private static isTestActive(): boolean {
-        const abGroup: number = SdkStats._configuration.getAbGroup();
+        const gameSessionId: number = SdkStats._sessionManager.getGameSessionId();
 
-        if(abGroup === 1 || abGroup === 2 || abGroup === 12 || abGroup === 13) {
+        if(gameSessionId % 1000 === 0) {
             return true;
         }
 

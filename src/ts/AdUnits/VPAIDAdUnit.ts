@@ -13,9 +13,9 @@ import { DiagnosticError } from 'Errors/DiagnosticError';
 import { FocusManager } from 'Managers/FocusManager';
 import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
 import { AbstractOverlay } from 'Views/AbstractOverlay';
-import { setTimeout } from 'timers';
 import { Closer } from 'Views/Closer';
 import { DeviceInfo } from 'Models/DeviceInfo';
+import { Placement } from 'Models/Placement';
 
 export interface IVPAIDAdUnitParameters extends IAdUnitParameters<VPAIDCampaign> {
     vpaid: VPAID;
@@ -23,7 +23,7 @@ export interface IVPAIDAdUnitParameters extends IAdUnitParameters<VPAIDCampaign>
     endScreen?: VPAIDEndScreen;
 }
 
-export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
+export class VPAIDAdUnit extends AbstractAdUnit {
 
     public static setAdLoadTimeout(timeout: number) {
         VPAIDAdUnit._adLoadTimeout = timeout;
@@ -31,6 +31,7 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
 
     private static _adLoadTimeout: number = 10 * 1000;
     private _closer: Closer;
+    private _placement: Placement;
     private _focusManager: FocusManager;
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
@@ -54,6 +55,7 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
         this._view = parameters.vpaid;
         this._closer = parameters.closer;
         this._deviceInfo = parameters.deviceInfo;
+        this._placement = parameters.placement;
         this._timer = new Timer(() => this.onAdUnitNotLoaded(), VPAIDAdUnit._adLoadTimeout);
 
         this._onAppBackgroundHandler = () => this.onAppBackground();
@@ -121,7 +123,7 @@ export class VPAIDAdUnit extends AbstractAdUnit<VPAIDCampaign> {
         const sdkVersion = this._operativeEventManager.getClientInfo().getSdkVersion();
         url = url.replace(/%ZONE%/, this._placement.getId());
         url = url.replace(/%SDK_VERSION%/, sdkVersion.toString());
-        this._thirdPartyEventManager.sendEvent(eventType, sessionId, url);
+        this._thirdPartyEventManager.sendEvent(eventType, sessionId, url, this._vpaidCampaign.getUseWebViewUserAgentForTracking());
     }
 
     public mute() {

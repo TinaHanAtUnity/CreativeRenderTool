@@ -7,24 +7,24 @@ import { DisplayInterstitial } from 'Views/DisplayInterstitial';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { Platform } from 'Constants/Platform';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { Placement } from 'Models/Placement';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Diagnostics } from 'Utilities/Diagnostics';
+import { IWebPlayerWebSettingsAndroid, IWebPlayerWebSettingsIos } from "Native/Api/WebPlayer";
 
 export interface IDisplayInterstitialAdUnitParameters extends IAdUnitParameters<DisplayInterstitialCampaign> {
     view: DisplayInterstitial;
 }
 
-// TODO: Open questions:
-// - Do we want to use the clickThroughUrl? How should it be used?
-// - What will the campaign content look like? (for parser)
-
-export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitialCampaign> {
+export class DisplayInterstitialAdUnit extends AbstractAdUnit {
 
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _view: DisplayInterstitial;
     private _options: any;
+    private _campaign: DisplayInterstitialCampaign;
+    private _placement: Placement;
     private _deviceInfo: DeviceInfo;
     private _receivedOnPageStart: boolean = false;
     private _clickEventHasBeenSent: boolean = false;
@@ -37,6 +37,8 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
         this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._view = parameters.view;
+        this._campaign = parameters.campaign;
+        this._placement = parameters.placement;
         this._deviceInfo = parameters.deviceInfo;
 
         this._view.render();
@@ -96,32 +98,10 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
         return 'programmaticImage';
     }
 
-    // TODO: do we need this?
-    public openLink(href: string): void {
-        this._operativeEventManager.sendClick(this);
-
-        for (let url of this._campaign.getTrackingUrlsForEvent('click')) {
-            url = url.replace(/%ZONE%/, this.getPlacement().getId());
-            url = url.replace(/%SDK_VERSION%/, this._operativeEventManager.getClientInfo().getSdkVersion().toString());
-            this._thirdPartyEventManager.sendEvent('display click', this._campaign.getSession().getId(), url);
-        }
-
-        if(this.isWhiteListedLinkType(href)) {
-            if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                this._nativeBridge.Intent.launch({
-                    'action': 'android.intent.action.VIEW',
-                    'uri': href
-                });
-            } else {
-                this._nativeBridge.UrlScheme.open(href);
-            }
-        }
-    }
-
     private isWhiteListedLinkType(href: string): boolean {
         const whiteListedProtocols = ['http', 'market', 'itunes'];
         for (const protocol of whiteListedProtocols) {
-            if(href.indexOf(protocol) === 0) {
+            if (href.indexOf(protocol) === 0) {
                 return true;
             }
         }
@@ -146,7 +126,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
             // TODO: leave the webplayer running in background, don't reopen on return
             this._container.setViewFrame('webview', Math.floor(webviewXPos), Math.floor(webviewYPos), Math.floor(webviewAreaSize), Math.floor(webviewAreaSize)).then(() => {
                 return this._container.setViewFrame('webplayer', Math.floor(screenWidth), Math.floor(screenHeight), Math.floor(screenWidth), Math.floor(screenHeight)).then(() => {
-                    this.setWebPlayerContent();
+                    return this.setWebPlayerContent();
                 });
             });
         });
@@ -167,14 +147,19 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
         if(this._clickEventHasBeenSent) {
             return;
         }
-        this._operativeEventManager.sendClick(this);
+        this._operativeEventManager.sendClick(this._campaign.getSession(), this._placement, this._campaign);
         this._clickEventHasBeenSent = true;
 
         for (let trackingUrl of this._campaign.getTrackingUrlsForEvent('click')) {
-            trackingUrl = trackingUrl.replace(/%ZONE%/, this.getPlacement().getId());
+            trackingUrl = trackingUrl.replace(/%ZONE%/, this._placement.getId());
             trackingUrl = trackingUrl.replace(/%SDK_VERSION%/, this._operativeEventManager.getClientInfo().getSdkVersion().toString());
             this._thirdPartyEventManager.sendEvent('display click', this._campaign.getSession().getId(), trackingUrl);
         }
+    }
+
+    private shouldOverrideUrlLoading(url: string, method: string): void {
+        this._nativeBridge.Sdk.logDebug("DisplayInterstitialAdUnit: shouldOverrideUrlLoading triggered for url: " + url);
+        this._nativeBridge.WebPlayer.setUrl(url);
     }
 
     private unsetReferences(): void {
@@ -183,27 +168,32 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
 
     private sendStartEvents(): void {
         for (let url of (this._campaign).getTrackingUrlsForEvent('impression')) {
-            url = url.replace(/ /, (this.getCampaign()).getId());
+            url = url.replace(/%ZONE%/, this._campaign.getId());
             url = url.replace(/%SDK_VERSION%/, this._operativeEventManager.getClientInfo().getSdkVersion().toString());
             this._nativeBridge.Sdk.logDebug("todo: remove - sendStartEvents - sending " + url);
-            this._thirdPartyEventManager.sendEvent('display impression', (this.getCampaign()).getSession().getId(), url);
+            this._thirdPartyEventManager.sendEvent('display impression', this._campaign.getSession().getId(), url);
         }
-        this._operativeEventManager.sendStart(this);
-    }
-
-    private setWebPlayerViews(): Promise<void> {
-        return this._nativeBridge.WebPlayer.setSettings({}, {}).then( () => {
-            this._nativeBridge.Sdk.logDebug("DisplayInterstitalAdUnit: WebPlayer settings have been set");
-            return this._container.open(this, ['webplayer', 'webview'], false, this._forceOrientation, true, false, true, false, this._options);
+        this._operativeEventManager.sendStart(this._campaign.getSession(), this._placement, this._campaign).then(() => {
+            this.onStartProcessed.trigger();
         });
     }
 
-    private setWebPlayerUrl(url: string): Promise<void> {
-        return this._nativeBridge.WebPlayer.setUrl(url).catch( (error) => {
-            this._nativeBridge.Sdk.logError(JSON.stringify(error));
-            Diagnostics.trigger('webplayer_set_url_error', new DiagnosticError(error, { url: url}));
-            this.setFinishState(FinishState.ERROR);
-            this.hide();
+    private setWebPlayerViews(): Promise<void> {
+        const platform = this._nativeBridge.getPlatform();
+        let webPlayerSettings: IWebPlayerWebSettingsAndroid | IWebPlayerWebSettingsIos;
+        if (platform === Platform.ANDROID) {
+            webPlayerSettings = {
+                'setJavaScriptCanOpenWindowsAutomatically': [true],
+                'setSupportMultipleWindows': [false]
+            };
+        } else {
+            webPlayerSettings = {};
+        }
+        return this._nativeBridge.WebPlayer.setSettings(webPlayerSettings,{}).then( () => {
+            this._nativeBridge.Sdk.logDebug("DisplayInterstitalAdUnit: WebPlayer settings have been set");
+            return this._container.open(this, ['webplayer', 'webview'], false, this._forceOrientation, true, false, true, false, this._options).catch((e) => {
+                this.hide();
+            });
         });
     }
 
@@ -224,31 +214,20 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit<DisplayInterstitia
     }
 
     private setWebplayerSettings(): Promise<void> {
-        const eventSettings = { 'onPageStarted': {'sendEvent':true} };
+        const eventSettings = {
+            'onPageStarted': { 'sendEvent': true },
+            'shouldOverrideUrlLoading': { 'sendEvent': true, 'returnValue': true }
+        };
         this._nativeBridge.WebPlayer.onPageStarted.subscribe( (url) => this.onPageStarted(url));
+        this._nativeBridge.WebPlayer.shouldOverrideUrlLoading.subscribe( (url: string, method: string) => this.shouldOverrideUrlLoading(url, method));
         return this._nativeBridge.WebPlayer.setEventSettings(eventSettings);
     }
 
+    // TODO: we only have content in current auction response, dump the url stuff
     private setWebPlayerContent(): Promise<void> {
-        const markupUrl = this._campaign.getMarkupUrl();
-        const markupBaseUrl = this._campaign.getMarkupBaseUrl();
-
         return this.setWebplayerSettings().then( () => {
-            if(markupUrl) {
-                return this.setWebPlayerUrl(markupUrl);
-            }
             const markup = this._campaign.getDynamicMarkup();
-            if(markup) {
-                if(markupBaseUrl) {
-                    return this.setWebPlayerData(markup, 'text/html', 'UTF-8', markupBaseUrl);
-                }
-                return this.setWebPlayerData(markup, 'text/html', 'UTF-8');
-            }
-            this._nativeBridge.Sdk.logError("Display Interstitial: Neither markupUrl or Markup was defined in campaign");
-            Diagnostics.trigger('display_interstitial_campaign_error', {markupUrl: markupUrl, markup: markup});
-            this.setFinishState(FinishState.ERROR);
-            this.hide();
-            return Promise.reject(new Error("Display Interstitial: Neither markupUrl or Markup was defined in campaign"));
+            return this.setWebPlayerData(markup, 'text/html', 'UTF-8');
         });
     }
 }
