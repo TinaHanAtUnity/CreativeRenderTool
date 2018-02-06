@@ -55,12 +55,12 @@ export class XPromoCampaignParser extends CampaignParser {
             appStoreId: json.appStoreId,
             gameId: json.gameId,
             gameName: json.gameName,
-            gameIcon: new Image(json.gameIcon, session),
+            gameIcon: new Image(this.validateAndEncodeUrl(json.gameIcon), session),
             rating: json.rating,
             ratingCount: json.ratingCount,
-            landscapeImage: new Image(json.endScreenLandscape, session),
-            portraitImage: new Image(json.endScreenPortrait, session),
-            clickAttributionUrl: json.clickAttributionUrl,
+            landscapeImage: new Image(this.validateAndEncodeUrl(json.endScreenLandscape), session),
+            portraitImage: new Image(this.validateAndEncodeUrl(json.endScreenPortrait), session),
+            clickAttributionUrl: json.clickAttributionUrl ? this.validateAndEncodeUrl(json.clickAttributionUrl) : undefined,
             clickAttributionUrlFollowsRedirects: json.clickAttributionUrlFollowsRedirects,
             bypassAppSheet: json.bypassAppSheet,
             trackingUrls: response.getTrackingUrls(),
@@ -68,13 +68,13 @@ export class XPromoCampaignParser extends CampaignParser {
         };
 
         if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
-            parameters.video = new Video(json.trailerDownloadable, session, json.trailerDownloadableSize);
-            parameters.streamingVideo = new Video(json.trailerStreaming, session);
+            parameters.video = new Video(this.validateAndEncodeUrl(json.trailerDownloadable), session, json.trailerDownloadableSize);
+            parameters.streamingVideo = new Video(this.validateAndEncodeUrl(json.trailerStreaming), session);
         }
 
         if(json.trailerPortraitDownloadable && json.trailerPortraitDownloadableSize && json.trailerPortraitStreaming) {
-            parameters.videoPortrait = new Video(json.trailerPortraitDownloadable, session, json.trailerPortraitDownloadableSize);
-            parameters.streamingPortraitVideo = new Video(json.trailerPortraitStreaming, session);
+            parameters.videoPortrait = new Video(this.validateAndEncodeUrl(json.trailerPortraitDownloadable), session, json.trailerPortraitDownloadableSize);
+            parameters.streamingPortraitVideo = new Video(this.validateAndEncodeUrl(json.trailerPortraitStreaming), session);
         }
 
         return Promise.resolve(new XPromoCampaign(parameters));
