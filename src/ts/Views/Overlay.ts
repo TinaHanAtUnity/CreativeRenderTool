@@ -41,8 +41,9 @@ export class Overlay extends AbstractOverlay {
     private _fadeTimer: any;
     private _fadeStatus: boolean = true;
     private _campaign: Campaign | undefined;
+    private _appStoreVisited: boolean = false;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, campaign?: PerformanceCampaign, abGroup: number = 0) {
+    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, campaign?: Campaign, abGroup: number = 0) {
         super(nativeBridge, 'overlay', muted, abGroup);
 
         this._localization = new Localization(language, 'overlay');
@@ -50,7 +51,7 @@ export class Overlay extends AbstractOverlay {
 
         this._templateData = {};
 
-        if (this.getAltOverlay() === richOverlayId && typeof campaign !== "undefined") {
+        if (this.getAltOverlay() === richOverlayId && typeof campaign !== "undefined" && campaign instanceof PerformanceCampaign) {
             this._template = new Template(RichOverlayTemplate, this._localization);
 
             const adjustedRating: number = campaign.getRating() * 20;
@@ -96,7 +97,7 @@ export class Overlay extends AbstractOverlay {
             }
         ];
 
-        if (this.getAltOverlay() === richOverlayId && typeof campaign !== "undefined") {
+        if (this.getAltOverlay() === richOverlayId && typeof campaign !== "undefined" && campaign instanceof  PerformanceCampaign) {
             this._bindings.push({
                 event: 'click',
                 listener: (event: Event) => {
@@ -238,6 +239,10 @@ export class Overlay extends AbstractOverlay {
 
     public getClickedState(): boolean {
         return this._appStoreVisited;
+    }
+
+    public getAbGroup(): number {
+        return this._abGroup;
     }
 
     protected getAltOverlay(): string | undefined {
