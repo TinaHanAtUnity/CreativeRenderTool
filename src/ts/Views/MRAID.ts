@@ -215,6 +215,13 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
                     forceOrientation: forceOrientation
                 }));
                 break;
+            case 'customMraidState':
+                if(event.data.state === 'completed') {
+                    if(!this._placement.allowSkip() && this._closeRemaining > 5) {
+                        this._closeRemaining = 5;
+                    }
+                }
+                break;
             default:
                 break;
         }

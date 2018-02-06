@@ -29,6 +29,7 @@ import { ProgrammaticStaticInterstitialUrlParser } from 'Parsers/ProgrammaticSta
 import { ProgrammaticAdMobParser } from 'Parsers/ProgrammaticAdMobParser';
 import { CampaignParser } from 'Parsers/CampaignParser';
 import { ProgrammaticVPAIDParser } from 'Parsers/ProgrammaticVPAIDParser';
+import { XPromoCampaignParser } from "Parsers/XPromoCampaignParser";
 import { AdMobSignalFactory} from 'AdMob/AdMobSignalFactory';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { Placement } from 'Models/Placement';
@@ -349,6 +350,8 @@ export class CampaignManager {
         switch(contentType) {
             case 'comet/campaign':
                 return new CometCampaignParser();
+            case 'xpromo/video':
+                return new XPromoCampaignParser();
             case 'programmatic/vast':
                 return new ProgrammaticVastParser();
             case 'programmatic/mraid-url':

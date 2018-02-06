@@ -22,6 +22,9 @@ interface IPlacement {
 
     muteVideo: boolean;
 
+    skipEndCardOnClose: boolean | undefined;
+    disableVideoControlsFade: boolean | undefined;
+
     adTypes: string[] | undefined;
     realtime: boolean;
     realtimeData: string | undefined;
@@ -43,6 +46,8 @@ export class Placement extends Model<IPlacement> {
             skipInSeconds: ['number'],
             disableBackButton: ['boolean'],
             muteVideo: ['boolean'],
+            skipEndCardOnClose: ['boolean', 'undefined'],
+            disableVideoControlsFade: ['boolean', 'undefined'],
             adTypes: ['array', 'undefined'],
             realtime: ['boolean'],
             realtimeData: ['string', 'undefined'],
@@ -66,6 +71,10 @@ export class Placement extends Model<IPlacement> {
         this.set('disableBackButton', data.disableBackButton);
 
         this.set('muteVideo', data.muteVideo);
+
+        this.set('skipEndCardOnClose', data.skipEndCardOnClose);
+
+        this.set('disableVideoControlsFade', data.disableVideoControlsFade);
 
         this.set('adTypes', data.adTypes);
 
@@ -100,6 +109,14 @@ export class Placement extends Model<IPlacement> {
 
     public muteVideo(): boolean {
         return this.get('muteVideo');
+    }
+
+    public skipEndCardOnClose(): boolean | undefined {
+        return this.get('skipEndCardOnClose');
+    }
+
+    public disableVideoControlsFade(): boolean | undefined {
+        return this.get('disableVideoControlsFade');
     }
 
     public getAdTypes(): string[] | undefined {
@@ -163,6 +180,8 @@ export class Placement extends Model<IPlacement> {
             'skipInSeconds': this.allowSkipInSeconds(),
             'disableBackButton': this.disableBackButton(),
             'muteVideo': this.muteVideo(),
+            'skipEndCardOnClose': this.skipEndCardOnClose(),
+            'disableVideoControlsFade': this.disableVideoControlsFade(),
             'adTypes': this.getAdTypes(),
             'state': PlacementState[this.getState()].toLowerCase()
         };

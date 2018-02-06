@@ -8,6 +8,8 @@ import { Video } from 'Models/Assets/Video';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { WebViewError } from 'Errors/WebViewError';
+import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
+import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
 
 enum CacheType {
     REQUIRED,
@@ -32,6 +34,7 @@ export class AssetManager {
 
     private _cache: Cache;
     private _cacheMode: CacheMode;
+    private _cacheBookkeeping: CacheBookkeeping;
     private _deviceInfo: DeviceInfo;
     private _stopped: boolean;
     private _caching: boolean;
@@ -41,9 +44,10 @@ export class AssetManager {
     private _campaignQueue: { [id: number]: ICampaignQueueObject };
     private _queueId: number;
 
-    constructor(cache: Cache, cacheMode: CacheMode, deviceInfo: DeviceInfo) {
+    constructor(cache: Cache, cacheMode: CacheMode, deviceInfo: DeviceInfo, cacheBookkeeping: CacheBookkeeping) {
         this._cache = cache;
         this._cacheMode = cacheMode;
+        this._cacheBookkeeping = cacheBookkeeping;
         this._deviceInfo = deviceInfo;
         this._stopped = false;
         this._caching = false;
@@ -136,7 +140,7 @@ export class AssetManager {
         const requiredAssets = campaign.getRequiredAssets();
         const optionalAssets = campaign.getOptionalAssets();
 
-        if(campaign instanceof PerformanceCampaign) {
+        if(campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign) {
             return this.getOrientedVideo(campaign).then(video => {
                 return [[video], optionalAssets];
             });
@@ -207,7 +211,7 @@ export class AssetManager {
                     return fileId;
                 }).then((fileId) => {
                     if (cacheType === CacheType.REQUIRED) {
-                        return this._cache.writeCachedFileForCampaign(campaign.getId(), fileId);
+                        return this._cacheBookkeeping.writeFileForCampaign(campaign.getId(), fileId);
                     }
 
                     return Promise.resolve();
@@ -303,7 +307,7 @@ export class AssetManager {
         }, campaign.getSession());
     }
 
-    private getOrientedVideo(campaign: PerformanceCampaign): Promise<Video> {
+    private getOrientedVideo(campaign: PerformanceCampaign | XPromoCampaign): Promise<Video> {
         return Promise.all([
             this._deviceInfo.getScreenWidth(),
             this._deviceInfo.getScreenHeight()

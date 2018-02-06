@@ -45,7 +45,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             {
                 event: 'click',
                 listener: (event: Event) => this.onDownloadEvent(event),
-                selector: '.game-background, .download-container, .game-icon'
+                selector: '.game-background, .download-container, .game-icon, .store-logo'
             },
             {
                 event: 'click',
@@ -81,8 +81,8 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         if (typeof endScreenAlt === "string") {
             this._container.classList.add(endScreenAlt);
 
-            if (this._abGroup === 10 || this._abGroup === 11) {
-                this._container.classList.add("gold");
+            if (this._abGroup === 8 || this._abGroup === 9) {
+                this._container.classList.add("with-store-logos");
             }
         }
     }

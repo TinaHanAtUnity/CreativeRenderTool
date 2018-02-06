@@ -1,3 +1,32 @@
+# Tue Feb  6 08:17:32 UTC 2018
+
+* Enable custom MRAID fast forward feature for all the playables
+* Refactor cache bookkeeping
+* Fix metadata caching
+
+# Thu Feb  1 12:47:26 UTC 2018
+
+* Add support for upcoming overlay placement parameters
+* Merge 2.2.0 APIs
+
+# Wed Jan 31 10:34:49 UTC 2018
+
+* Add xpromo event type to Kafka info json
+
+# Tue Jan 30 12:20:25 UTC 2018
+
+* Fix video caching on XPromos
+
+# Mon Jan 29 10:22:43 UTC 2018
+
+* Combined endscreen with store buttons AB test (groups 8 & 9)
+* Initial XPromo support
+
+# Thu Jan 25 11:38:27 UTC 2018
+
+* Fix RVDT typo
+* Fix persistent gamer SID
+
 # Tue Jan 23 12:08:45 UTC 2018
 
 * Fix AdMob time on screen click signal
