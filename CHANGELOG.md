@@ -1,3 +1,8 @@
+# PENDING
+
+* Start test with new video overlay on groups 8 and 10
+* Add call to VAST impression tracking event
+
 # Tue Feb  6 08:17:32 UTC 2018
 
 * Enable custom MRAID fast forward feature for all the playables
