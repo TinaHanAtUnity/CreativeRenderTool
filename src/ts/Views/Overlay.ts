@@ -144,7 +144,7 @@ export class Overlay extends AbstractOverlay {
             this._container.classList.add(endScreenAlt);
             if (endScreenAlt === richOverlayId) {
                 this._overlayFooter = <HTMLElement>this._container.querySelector('.overlay-footer');
-                if (this._abGroup === 10 || this._abGroup === 11) {
+                if (this._abGroup === 10) {
                     this._overlayFooter.classList.add("dark");
                 }
             }
@@ -246,7 +246,7 @@ export class Overlay extends AbstractOverlay {
     }
 
     protected getAltOverlay(): string | undefined {
-        if (this._campaign instanceof PerformanceCampaign && (this._abGroup === 8 || this._abGroup === 9 || this._abGroup === 10 || this._abGroup === 11)) {
+        if (this._campaign instanceof PerformanceCampaign && (this._abGroup === 8 || this._abGroup === 10)) {
             return richOverlayId;
         }
 
