@@ -4,6 +4,7 @@ import { Campaign } from 'Models/Campaign';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Request } from 'Utilities/Request';
 import { Platform } from 'Constants/Platform';
+import { Url } from 'Utilities/Url';
 
 export abstract class CampaignParser {
     public abstract parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign>;
@@ -17,5 +18,13 @@ export abstract class CampaignParser {
             default:
                 return 'UNKNOWN';
         }
+    }
+
+    protected validateAndEncodeUrl(url: string): string {
+        if(Url.isValid(url)) {
+            return encodeURI(url);
+        }
+
+        throw new Error('Invalid url: ' + url);
     }
 }
