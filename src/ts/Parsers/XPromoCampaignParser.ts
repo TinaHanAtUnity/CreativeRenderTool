@@ -46,7 +46,8 @@ export class XPromoCampaignParser extends CampaignParser {
             advertiserBundleId: undefined,
             useWebViewUserAgentForTracking: undefined,
             buyerId: undefined,
-            session: session
+            session: session,
+            mediaId: response.getMediaId()
         };
 
         const parameters: IXPromoCampaign = {

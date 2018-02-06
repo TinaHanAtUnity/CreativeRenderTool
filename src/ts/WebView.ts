@@ -38,7 +38,6 @@ import { StorageType } from 'Native/Api/Storage';
 import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { SdkStats } from 'Utilities/SdkStats';
-import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { Campaign } from 'Models/Campaign';
 import { RealtimeCampaign } from 'Models/Campaigns/RealtimeCampaign';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
