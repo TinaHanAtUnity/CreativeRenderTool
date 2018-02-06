@@ -6,8 +6,8 @@ import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
 import { Platform } from 'Constants/Platform';
 import { AbstractOverlay } from 'Views/AbstractOverlay';
-import { PerformanceCampaign } from "Models/Campaigns/PerformanceCampaign";
-import { Campaign } from "Models/Campaign";
+import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
+import { Campaign } from 'Models/Campaign';
 
 const richOverlayId = "rich-overlay";
 
@@ -139,17 +139,16 @@ export class Overlay extends AbstractOverlay {
         this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
         this._progressElement = <HTMLElement>this._container.querySelector('.progress');
 
-        const endScreenAlt = this.getAltOverlay();
-        if (typeof endScreenAlt === "string") {
-            this._container.classList.add(endScreenAlt);
-            if (endScreenAlt === richOverlayId) {
+        const overlayAlt = this.getAltOverlay();
+        if (typeof overlayAlt === "string") {
+            this._container.classList.add(overlayAlt);
+            if (overlayAlt === richOverlayId) {
                 this._overlayFooter = <HTMLElement>this._container.querySelector('.overlay-footer');
                 if (this._abGroup === 10) {
                     this._overlayFooter.classList.add("dark");
                 }
             }
         }
-
     }
 
     public setSpinnerEnabled(value: boolean): void {
