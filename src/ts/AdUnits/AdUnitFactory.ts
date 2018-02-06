@@ -469,7 +469,7 @@ export class AdUnitFactory {
 
     private static createOverlay(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractOverlay {
         if(!parameters.placement.allowSkip()) {
-            return new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+            return new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign, parameters.campaign.getAbGroup());
         } else {
             let overlay: AbstractOverlay;
 
@@ -495,7 +495,7 @@ export class AdUnitFactory {
             if(parameters.placement.skipEndCardOnClose() || enabledGameIds.indexOf(parameters.clientInfo.getGameId()) !== -1) {
                 overlay = new InterstitialOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
             } else {
-                overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+                overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign, parameters.campaign.getAbGroup());
             }
 
             if(parameters.placement.disableVideoControlsFade() || CustomFeatures.isFadeDisabled(parameters.clientInfo.getGameId())) {
