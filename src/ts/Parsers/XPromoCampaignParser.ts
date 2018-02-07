@@ -63,7 +63,7 @@ export class XPromoCampaignParser extends CampaignParser {
             clickAttributionUrl: json.clickAttributionUrl ? this.validateAndEncodeUrl(json.clickAttributionUrl) : undefined,
             clickAttributionUrlFollowsRedirects: json.clickAttributionUrlFollowsRedirects,
             bypassAppSheet: json.bypassAppSheet,
-            trackingUrls: response.getTrackingUrls(),
+            trackingUrls: response.getTrackingUrls() ? this.validateAndEncodeTrackingUrls(response.getTrackingUrls()) : undefined,
             store: storeName
         };
 
