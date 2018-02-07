@@ -26,7 +26,7 @@ export interface IXPromoCampaign extends ICampaign {
     clickAttributionUrlFollowsRedirects?: boolean;
     bypassAppSheet: boolean;
     store: StoreName;
-    trackingUrls: { [eventName: string]: string[] };
+    trackingUrls: { [eventName: string]: string[] } | undefined;
 }
 
 export class XPromoCampaign extends Campaign<IXPromoCampaign> {
