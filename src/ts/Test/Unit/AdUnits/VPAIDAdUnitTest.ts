@@ -18,7 +18,7 @@ import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { Configuration } from 'Models/Configuration';
-import { Observable0 } from 'Utilities/Observable';
+import { Observable0, Observable2 } from 'Utilities/Observable';
 import { IObserver0 } from 'Utilities/IObserver';
 import { WebPlayerApi } from 'Native/Api/WebPlayer';
 import { Request } from 'Utilities/Request';
@@ -27,6 +27,7 @@ import { ListenerApi } from 'Native/Api/Listener';
 import { FinishState } from 'Constants/FinishState';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 import { Closer } from 'Views/Closer';
+import { Platform } from 'Constants/Platform';
 
 describe('VPAIDAdUnit', () => {
     let nativeBridge: NativeBridge;
@@ -58,6 +59,7 @@ describe('VPAIDAdUnit', () => {
         const webPlayer = sinon.createStubInstance(WebPlayerApi);
         (<sinon.SinonStub>webPlayer.setSettings).returns(Promise.resolve());
         (<sinon.SinonStub>webPlayer.setEventSettings).returns(Promise.resolve());
+        (<any>webPlayer).shouldOverrideUrlLoading = new Observable2<string, string>();
         (<any>nativeBridge).WebPlayer = webPlayer;
 
         (<any>nativeBridge).Listener = sinon.createStubInstance(ListenerApi);
@@ -81,33 +83,50 @@ describe('VPAIDAdUnit', () => {
     });
 
     describe('on show', () => {
-        let onStartObserver: IObserver0;
 
-        beforeEach(() => {
-            onStartObserver = sinon.spy();
-            adUnit.onStart.subscribe(onStartObserver);
-            return adUnit.show();
+        const onShowTests = () => {
+            let onStartObserver: IObserver0;
+
+            beforeEach(() => {
+                onStartObserver = sinon.spy();
+                adUnit.onStart.subscribe(onStartObserver);
+                return adUnit.show();
+            });
+
+            it('should trigger onStart', () => {
+                sinon.assert.calledOnce(<sinon.SinonSpy>onStartObserver);
+            });
+
+            it('should set up the web player', () => {
+                sinon.assert.calledOnce(<sinon.SinonSpy>nativeBridge.WebPlayer.setSettings);
+                sinon.assert.calledOnce(<sinon.SinonSpy>nativeBridge.WebPlayer.setEventSettings);
+            });
+
+            it('should open the container', () => {
+                sinon.assert.calledOnce(<sinon.SinonSpy>parameters.container.open);
+            });
+
+            it('should show the closer', () => {
+                assert.isNotNull(document.querySelector('#closer'));
+            });
+
+            afterEach(() => {
+                return adUnit.hide();
+            });
+        };
+
+        describe('on android', () => {
+            beforeEach(() => {
+                (<sinon.SinonStub>nativeBridge.getPlatform).returns(Platform.ANDROID);
+            });
+            onShowTests();
         });
 
-        it('should trigger onStart', () => {
-            sinon.assert.calledOnce(<sinon.SinonSpy>onStartObserver);
-        });
-
-        it('should set up the web player', () => {
-            sinon.assert.calledOnce(<sinon.SinonSpy>nativeBridge.WebPlayer.setSettings);
-            sinon.assert.calledOnce(<sinon.SinonSpy>nativeBridge.WebPlayer.setEventSettings);
-        });
-
-        it('should open the container', () => {
-            sinon.assert.calledOnce(<sinon.SinonSpy>parameters.container.open);
-        });
-
-        it('should show the closer', () => {
-            assert.isNotNull(document.querySelector('#closer'));
-        });
-
-        afterEach(() => {
-            return adUnit.hide();
+        xdescribe('on ios', () => {
+            beforeEach(() => {
+                (<sinon.SinonStub>nativeBridge.getPlatform).returns(Platform.IOS);
+            });
+            onShowTests();
         });
     });
 
