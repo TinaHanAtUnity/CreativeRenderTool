@@ -16,6 +16,7 @@ import { AbstractOverlay } from 'Views/AbstractOverlay';
 import { Closer } from 'Views/Closer';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Placement } from 'Models/Placement';
+import { IObserver2 } from 'Utilities/IObserver';
 
 export interface IVPAIDAdUnitParameters extends IAdUnitParameters<VPAIDCampaign> {
     vpaid: VPAID;
@@ -43,6 +44,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
 
     private _onAppForegroundHandler: any;
     private _onAppBackgroundHandler: any;
+    private _urlLoadingObserver: IObserver2<string, string>;
 
     constructor(nativeBridge: NativeBridge, parameters: IVPAIDAdUnitParameters) {
         super(nativeBridge, parameters);
@@ -68,6 +70,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         this.onShow();
 
         return this.setupWebPlayer().then(() => {
+            this._urlLoadingObserver = this._nativeBridge.WebPlayer.shouldOverrideUrlLoading.subscribe((url, method) => this.onUrlLoad(url));
             return this._container.open(this, ['webplayer', 'webview'], false, this._forceOrientation, false, false, true, false, this._options).then(() => {
                 return this.showCloser();
             });
@@ -139,18 +142,31 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         this._view.showAd();
     }
 
-    private setupWebPlayer(): Promise<{}> {
+    private setupWebPlayer(): Promise<any> {
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            return this.setupAndroidWebPlayer();
+        } else {
+            return this.setupIosWebPlayer();
+        }
+    }
+
+    private setupAndroidWebPlayer(): Promise<{}> {
         const promises = [];
         promises.push(this._nativeBridge.WebPlayer.setSettings({
-            setSupportMultipleWindows: [true],
-            setMediaPlaybackRequiresUserGesture: [false]
+            setSupportMultipleWindows: [false],
+            setJavaScriptCanOpenWindowsAutomatically: [true],
+            setMediaPlaybackRequiresUserGesture: [false],
         }, {}));
-        promises.push(this._nativeBridge.WebPlayer.setEventSettings({
-            onCreateWindow: {
-                sendEvent: true
-            }
-        }));
+        const eventSettings = {
+            'onPageStarted': { 'sendEvent': true },
+            'shouldOverrideUrlLoading': { 'sendEvent': true, 'returnValue': true }
+        };
+        promises.push(this._nativeBridge.WebPlayer.setEventSettings(eventSettings));
         return Promise.all(promises);
+    }
+
+    private setupIosWebPlayer(): Promise<any> {
+        return Promise.resolve();
     }
 
     private onAdUnitNotLoaded() {
@@ -182,6 +198,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         this.setShowing(false);
         this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
         this.onClose.trigger();
+        this._nativeBridge.WebPlayer.shouldOverrideUrlLoading.unsubscribe(this._urlLoadingObserver);
 
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
             this._focusManager.onAppForeground.unsubscribe(this._onAppForegroundHandler);
@@ -222,5 +239,9 @@ export class VPAIDAdUnit extends AbstractAdUnit {
                 document.body.appendChild(this._closer.container());
             });
         });
+    }
+
+    private onUrlLoad(url: string) {
+        this.openUrl(url);
     }
 }
