@@ -27,4 +27,23 @@ export abstract class CampaignParser {
 
         throw new Error('Invalid url: ' + url);
     }
+
+    protected validateAndEncodeTrackingUrls(urls: { [eventName: string]: string[] }): { [eventName: string]: string[] } {
+        if(urls && urls !== null) {
+            for(const urlKey in urls) {
+                if(urls.hasOwnProperty(urlKey)) {
+                    const urlArray = urls[urlKey];
+                    const newUrlArray: string[] = [];
+
+                    for(const url of urlArray) {
+                        newUrlArray.push(this.validateAndEncodeUrl(url));
+                    }
+
+                    urls[urlKey] = newUrlArray;
+                }
+            }
+        }
+
+        return urls;
+    }
 }
