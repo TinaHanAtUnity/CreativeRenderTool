@@ -1,4 +1,4 @@
-# PENDING
+# Wed Feb  7 10:16:29 UTC 2018
 
 * Start test with new video overlay on groups 8 and 10
 * Add call to VAST impression tracking event
