@@ -469,7 +469,11 @@ export class AdUnitFactory {
 
     private static createOverlay(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractOverlay {
         if(!parameters.placement.allowSkip()) {
-            return new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign, parameters.campaign.getAbGroup());
+            const overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign, parameters.campaign.getAbGroup());
+            if(parameters.placement.disableVideoControlsFade()) {
+                overlay.setFadeEnabled(false);
+            }
+            return overlay;
         } else {
             let overlay: AbstractOverlay;
 
