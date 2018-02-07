@@ -61,7 +61,7 @@ export class CometCampaignParser extends CampaignParser {
                 clickAttributionUrl: json.clickAttributionUrl ? this.validateAndEncodeUrl(json.clickAttributionUrl) : undefined,
                 clickAttributionUrlFollowsRedirects: json.clickAttributionUrlFollowsRedirects,
                 clickUrl: json.clickUrl ? this.validateAndEncodeUrl(json.clickUrl) : undefined,
-                videoEventUrls: json.videoEventUrls ? json.videoEventUrls : undefined,
+                videoEventUrls: json.videoEventUrls ? this.validateAndEncodeVideoEventUrls(json.videoEventUrls) : undefined,
                 gameName: json.gameName,
                 gameIcon: json.gameIcon ? new Image(this.validateAndEncodeUrl(json.gameIcon), session) : undefined,
                 rating: json.rating,
@@ -89,7 +89,7 @@ export class CometCampaignParser extends CampaignParser {
                 clickAttributionUrl: json.clickAttributionUrl ? this.validateAndEncodeUrl(json.clickAttributionUrl) : undefined,
                 clickAttributionUrlFollowsRedirects: json.clickAttributionUrlFollowsRedirects,
                 clickUrl: this.validateAndEncodeUrl(json.clickUrl),
-                videoEventUrls: json.videoEventUrls,
+                videoEventUrls: this.validateAndEncodeVideoEventUrls(json.videoEventUrls),
                 bypassAppSheet: json.bypassAppSheet,
                 store: storeName
             };
@@ -106,5 +106,17 @@ export class CometCampaignParser extends CampaignParser {
 
             return Promise.resolve(new PerformanceCampaign(parameters));
         }
+    }
+
+    private validateAndEncodeVideoEventUrls(urls: { [eventType: string]: string }): { [eventType: string]: string } {
+        if(urls && urls !== null) {
+            for(const urlKey in urls) {
+                if(urls.hasOwnProperty(urlKey)) {
+                    urls[urlKey] = this.validateAndEncodeUrl(urls[urlKey]);
+                }
+            }
+        }
+
+        return urls;
     }
 }
