@@ -160,6 +160,11 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
     private onPetEvent(event: Event): void {
         event.preventDefault();
+
+        if (!this._container.classList.contains("active")) {
+            this._container.classList.add("active");
+        }
+
         const headEl: HTMLElement = <HTMLElement>this._container.querySelector('#head');
         headEl.style.animationPlayState = "paused";
         headEl.classList.add("nod");

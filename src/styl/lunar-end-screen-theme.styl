@@ -4,14 +4,21 @@
 $lunar-end-screen-size = $default-scale-size * $default-size;
 $lunar-end-font-size = $lunar-end-screen-size;
 $lunar-dog-scale = 2.15;
+$lunar-red = #c1272d;
+
+/* Most of z-index rules related to old devices support */
 
 #end-screen.lunar-end-screen {
+  .btn-close-region {
+    z-index: 100;
+  }
 
   #the-dog {
     $set-image($lunar-end-screen-size * $lunar-dog-scale * 1.75, $lunar-end-screen-size * $lunar-dog-scale, 0, "../img/lunar/dog_body.png", contain);
     position: absolute;
     bottom: 0;
     transform: translateZ(0);
+    z-index: 20;
 
     #head {
       $set-image($lunar-end-screen-size * $lunar-dog-scale * 1.75, $lunar-end-screen-size * $lunar-dog-scale * 1.4, 0, "../img/lunar/dog_head.png", contain);
@@ -25,14 +32,37 @@ $lunar-dog-scale = 2.15;
     }
   }
 
-  .lunar-logo {
-    $set-image($lunar-end-screen-size * 4.5, $lunar-end-screen-size * 2.25, 0, "../img/lunar/lunar_logo.png", contain);
+  .row-container {
+    z-index: 12;
+  }
+
+  .download-container {
+    position: relative;
+    z-index: 15;
+    transition: background ease-in 500ms;
+  }
+
+  .background-underlay {
     position: absolute;
     z-index: 1;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity ease-in 500ms;
   }
 
   .end-screen-info {
-    z-index: 5;
+    z-index: 10;
+  }
+
+  &.active {
+    .download-container {
+      background: $lunar-red;
+    }
+
+    .background-underlay {
+      opacity: 1;
+    }
   }
 
   &.run-animation #the-dog {
@@ -57,30 +87,25 @@ body {
       right: 0;
     }
 
-    .lunar-logo {
-      bottom: $lunar-end-screen-size * 1.25;
-    }
-
-    .end-screen-info-background {
-      $set-image("", "", 0, "../img/lunar/wallpaper_portrait.jpg", cover);
+    .background-underlay {
+      $set-image("", "", 0, "../img/lunar/wallpaper_portrait.jpg", 100% 100%);
+      height: 50%;
     }
   }
 
   &.landscape #end-screen.lunar-end-screen {
     #the-dog {
-      margin-left: 50%;
-    }
-
-    .lunar-logo {
-      top: 0;
+      margin-left: 45%;
     }
 
     .privacy-button {
       left: 95%;
     }
 
-    .end-screen-info-background {
-      $set-image("", "", 0, "../img/lunar/wallpaper_landscape.jpg", cover);
+    .background-underlay {
+      $set-image("", "", 0, "../img/lunar/wallpaper_landscape.jpg", 100% 100%);
+      left: 50%;
+      width: 50%;
     }
   }
 }
