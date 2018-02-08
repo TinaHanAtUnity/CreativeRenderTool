@@ -24,6 +24,7 @@ export class VastVideoEventHandlers {
         adUnit.sendImpressionEvent(session.getId(), clientInfo.getSdkVersion());
         adUnit.sendTrackingEvent('creativeView', session.getId(), clientInfo.getSdkVersion());
         adUnit.sendTrackingEvent('start', session.getId(), clientInfo.getSdkVersion());
+        adUnit.sendTrackingEvent('impression', session.getId(), clientInfo.getSdkVersion());
 
         const moat = adUnit.getMoat();
         if(moat) {

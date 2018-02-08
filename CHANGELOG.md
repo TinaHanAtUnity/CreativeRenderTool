@@ -1,3 +1,12 @@
+# Wed Feb  7 11:08:36 UTC 2018
+
+* Disable cache cleaning on all iOS SDK 2.0.x versions to revert accidental problem caused by deployment on Tue Feb 6 08:17 UTC
+
+# Wed Feb  7 10:16:29 UTC 2018
+
+* Start test with new video overlay on groups 8 and 10
+* Add call to VAST impression tracking event
+
 # Tue Feb  6 08:17:32 UTC 2018
 
 * Enable custom MRAID fast forward feature for all the playables
