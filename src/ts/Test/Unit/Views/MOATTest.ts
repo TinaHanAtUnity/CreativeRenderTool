@@ -47,9 +47,7 @@ describe('MOAT View', () => {
             messageListener = sinon.spy();
             iframe = <HTMLIFrameElement>moat.container().querySelector('iframe');
             document.body.appendChild(moat.container());
-
             iframe.contentWindow.addEventListener('message', messageListener);
-
 
             fakeMoatIds = {
                 level1: 1,
