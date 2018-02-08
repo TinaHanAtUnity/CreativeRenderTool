@@ -40,11 +40,16 @@ describe('MOAT View', () => {
         let iframe: HTMLIFrameElement;
         let fakeMoatIds: IMoatIds;
         let fakeMoatData: IMoatData;
+        let messageListener: sinon.SinonSpy;
 
         beforeEach(() => {
             moat.render();
+            messageListener = sinon.spy();
             iframe = <HTMLIFrameElement>moat.container().querySelector('iframe');
             document.body.appendChild(moat.container());
+
+            iframe.contentWindow.addEventListener('message', messageListener);
+
 
             fakeMoatIds = {
                 level1: 1,
@@ -73,13 +78,15 @@ describe('MOAT View', () => {
             moat.hide();
         });
 
-        it ('should send the init message', () => {
+        it('should send the init message', () => {
             const promise = new Promise((resolve, reject) => {
-                iframe.contentWindow.addEventListener('message', (e: MessageEvent) => {
+                setTimeout(() => {
                     try {
-                        assert.isTrue(e.data.type === 'init');
+                        sinon.assert.called(messageListener);
+                        const e = messageListener.getCall(0).args[0];
+                        assert.equal(e.data.type, 'init', 'Passed in event was not "init"');
                         resolve();
-                    } catch(e) {
+                    } catch (e) {
                         reject(e);
                     }
                 });
@@ -90,50 +97,60 @@ describe('MOAT View', () => {
 
     describe('triggering video event', () => {
         let iframe: HTMLIFrameElement;
+        let messageListener: sinon.SinonSpy;
 
         beforeEach(() => {
             moat.render();
+            messageListener = sinon.spy();
             iframe = <HTMLIFrameElement>moat.container().querySelector('iframe');
             document.body.appendChild(moat.container());
+            iframe.contentWindow.addEventListener('message', messageListener);
+            moat.triggerVideoEvent('test', 1);
         });
 
         it ('should fire the video message', () => {
             const promise = new Promise((resolve, reject) => {
-                iframe.contentWindow.addEventListener('message', (e: MessageEvent) => {
+                setTimeout(() => {
                     try {
-                        assert.isTrue(e.data.type === 'videoEvent');
+                        sinon.assert.called(messageListener);
+                        const e = messageListener.getCall(0).args[0];
+                        assert.equal(e.data.type, 'videoEvent', 'Passed in event was not "videoEvent"');
                         resolve();
-                    } catch(e) {
+                    } catch (e) {
                         reject(e);
                     }
                 });
             });
-            moat.triggerVideoEvent('test', 1);
             return promise;
         });
     });
 
     describe('triggering viewability event', () => {
         let iframe: HTMLIFrameElement;
+        let messageListener: sinon.SinonSpy;
 
         beforeEach(() => {
             moat.render();
+            messageListener = sinon.spy();
             iframe = <HTMLIFrameElement>moat.container().querySelector('iframe');
             document.body.appendChild(moat.container());
+            iframe.contentWindow.addEventListener('message', messageListener);
+            moat.triggerViewabilityEvent('testViewabilityEvent', 'test');
         });
 
         it ('should fire the viewability message of the specified type', () => {
             const promise = new Promise((resolve, reject) => {
-                iframe.contentWindow.addEventListener('message', (e: MessageEvent) => {
+                setTimeout(() => {
                     try {
-                        assert.isTrue(e.data.type === 'testViewabilityEvent');
+                        sinon.assert.called(messageListener);
+                        const e = messageListener.getCall(0).args[0];
+                        assert.equal(e.data.type, 'testViewabilityEvent', 'Passed in event was not "testViewabilityEvent"');
                         resolve();
-                    } catch(e) {
+                    } catch (e) {
                         reject(e);
                     }
                 });
             });
-            moat.triggerViewabilityEvent('testViewabilityEvent', 'test');
             return promise;
         });
     });
