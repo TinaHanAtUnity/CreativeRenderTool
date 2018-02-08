@@ -84,7 +84,7 @@ export class ConfigManager {
         ConfigManager.AbGroup = abGroup;
     }
 
-    private static ConfigBaseUrl: string = 'https://adserver.unityads.unity3d.com/games';
+    private static ConfigBaseUrl: string = 'https://publisher-config.unityads.unity3d.com/games';
     private static AbGroup: number | undefined;
 
     private static createConfigUrl(clientInfo: ClientInfo, deviceInfo: DeviceInfo, framework?: FrameworkMetaData, adapter?: AdapterMetaData, gamerId?: string): string {
