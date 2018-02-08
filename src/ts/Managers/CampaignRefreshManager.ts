@@ -177,7 +177,7 @@ export class CampaignRefreshManager {
     private onNoFill(placementId: string) {
         this._parsingErrorCount = 0;
 
-        this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill, no ads to show, for placement: ' + placementId);
+        this._nativeBridge.Sdk.logDebug('Unity Ads server returned no fill, no ads to show, for placement: ' + placementId);
         this.setCampaignForPlacement(placementId, undefined);
         this.handlePlacementState(placementId, PlacementState.NO_FILL);
     }
