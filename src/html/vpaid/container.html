@@ -7,8 +7,9 @@
 <body>
     <div class="video-player-slot">
         <video
-            poster="data:image/svg+xml;base64,"
-            playsinline>
+            playsinline="true"
+            webkit-playsinline="true"
+            poster="data:image/svg+xml;base64,">
         </video>
     </div>
     <script src="<%= data.vpaidSrcUrl %>"></script>
@@ -224,8 +225,11 @@
                     return window.getVPAIDAd;
                 };
 
-                this._handleEvent = function(eventType, ...args) {
-                    args.unshift(eventType);
+                this._handleEvent = function(eventType) {
+                    var args = [eventType];
+                    if (arguments.length > 1) {
+                        args.push(arguments[1]);
+                    }
                     window.nativebridge.sendEvent('VPAID', args);
                     console.log('unity', 'Got VPAID event', eventType);
                 };

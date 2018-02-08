@@ -167,7 +167,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     private setupIosWebPlayer(): Promise<any> {
         const eventSettings = {
             'allowsPlayback': true,
-            'mediaPlaybackRequiresUserAction': true,
+            'playbackRequiresAction': false,
             'typesRequiringAction': WKAudiovisualMediaTypes.NONE
         };
         return this._nativeBridge.WebPlayer.setSettings(eventSettings, {});
@@ -188,7 +188,6 @@ export class VPAIDAdUnit extends AbstractAdUnit {
 
         this._container.onShow.subscribe(this._onAppForegroundHandler);
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            this._focusManager.onAppForeground.subscribe(this._onAppForegroundHandler);
             this._focusManager.onAppBackground.subscribe(this._onAppBackgroundHandler);
         } else {
             this._container.onAndroidPause.subscribe(this._onAppBackgroundHandler);
@@ -208,7 +207,6 @@ export class VPAIDAdUnit extends AbstractAdUnit {
 
         this._container.onShow.unsubscribe(this._onAppForegroundHandler);
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            this._focusManager.onAppForeground.unsubscribe(this._onAppForegroundHandler);
             this._focusManager.onAppBackground.unsubscribe(this._onAppBackgroundHandler);
         } else {
             this._container.onAndroidPause.unsubscribe(this._onAppBackgroundHandler);
