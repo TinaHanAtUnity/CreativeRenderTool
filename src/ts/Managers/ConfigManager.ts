@@ -93,7 +93,7 @@ export class ConfigManager {
         ConfigManager.AbGroup = abGroup;
     }
 
-    private static ConfigBaseUrl: string = 'https://adserver.unityads.unity3d.com/games';
+    private static ConfigBaseUrl: string = 'https://publisher-config.unityads.unity3d.com/games';
     private static AbGroup: number | undefined;
     private static TestRealtimePlacement: string | undefined;
 
