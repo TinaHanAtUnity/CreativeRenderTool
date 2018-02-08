@@ -29,7 +29,7 @@ export class ThirdPartyEventManager {
             headers.push(['User-Agent', navigator.userAgent]);
         }
 
-        this._nativeBridge.Sdk.logInfo('Unity Ads third party event: sending ' + event + ' event to ' + url + ' with headers ' + headers + ' (session ' + sessionId + ')');
+        this._nativeBridge.Sdk.logDebug('Unity Ads third party event: sending ' + event + ' event to ' + url + ' with headers ' + headers + ' (session ' + sessionId + ')');
         return this._request.get(url, headers, {
             retries: 0,
             retryDelay: 0,

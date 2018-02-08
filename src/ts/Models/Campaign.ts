@@ -10,17 +10,17 @@ export interface ICampaign {
     abGroup: number;
     willExpireAt: number | undefined;
     adType: string | undefined;
+    meta: string | undefined;
     correlationId: string | undefined;
     creativeId: string | undefined;
     seatId: number | undefined;
-    meta: string | undefined;
     appCategory: string | undefined;
     appSubCategory: string | undefined;
     advertiserDomain: string | undefined;
     advertiserCampaignId: string | undefined;
     advertiserBundleId: string | undefined;
-    useWebViewUserAgentForTracking: boolean | undefined;
     buyerId: string | undefined;
+    useWebViewUserAgentForTracking: boolean | undefined;
     session: Session;
 }
 

@@ -211,7 +211,7 @@ export class OperativeEventManager {
     }
 
     public sendEvent(event: string, eventId: string, sessionId: string, url: string, data: string): Promise<INativeResponse | void> {
-        this._nativeBridge.Sdk.logInfo('Unity Ads event: sending ' + event + ' event to ' + url);
+        this._nativeBridge.Sdk.logDebug('Unity Ads event: sending ' + event + ' event to ' + url);
 
         return this._request.post(url, data, [], {
             retries: 2,
@@ -264,7 +264,7 @@ export class OperativeEventManager {
 
     private resendEvent(sessionId: string, eventId: string): Promise<void | void[]> {
         return this.getStoredEvent(sessionId, eventId).then(([url, data]) => {
-            this._nativeBridge.Sdk.logInfo('Unity Ads operative event: resending operative event to ' + url + ' (session ' + sessionId + ', event ' + eventId + ')');
+            this._nativeBridge.Sdk.logDebug('Unity Ads operative event: resending operative event to ' + url + ' (session ' + sessionId + ', event ' + eventId + ')');
             return this._request.post(url, data);
         }).then(() => {
             return Promise.all([
