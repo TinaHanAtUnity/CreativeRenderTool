@@ -12,7 +12,6 @@ import { Session } from 'Models/Session';
 import { FocusManager } from 'Managers/FocusManager';
 import { SdkStats } from 'Utilities/SdkStats';
 import { Platform } from 'Constants/Platform';
-import { RealtimeCampaign } from 'Models/Campaigns/RealtimeCampaign';
 
 export class CampaignRefreshManager {
     public static NoFillDelay = 3600;
@@ -181,15 +180,9 @@ export class CampaignRefreshManager {
 
         const placement: Placement = this._configuration.getPlacement(placementId);
 
-        if(placement.isRealtime()) {
-            this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill, waiting realtime auction, for placement: ' + placementId);
-            this.setCampaignForPlacement(placementId, new RealtimeCampaign(session));
-            this.handlePlacementState(placementId, PlacementState.READY);
-        } else {
-            this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill, no ads to show, for placement: ' + placementId);
-            this.setCampaignForPlacement(placementId, undefined);
-            this.handlePlacementState(placementId, PlacementState.NO_FILL);
-        }
+        this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill, no ads to show, for placement: ' + placementId);
+        this.setCampaignForPlacement(placementId, undefined);
+        this.handlePlacementState(placementId, PlacementState.NO_FILL);
     }
 
     private onError(error: WebViewError | Error, placementIds: string[], session?: Session) {

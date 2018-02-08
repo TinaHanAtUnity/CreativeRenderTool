@@ -33,7 +33,6 @@ import { XPromoCampaignParser } from "Parsers/XPromoCampaignParser";
 import { AdMobSignalFactory} from 'AdMob/AdMobSignalFactory';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { Placement } from 'Models/Placement';
-import { RealtimeCampaign } from 'Models/Campaigns/RealtimeCampaign';
 import { RequestError } from 'Errors/RequestError';
 import { CacheError } from 'Native/Api/Cache';
 
