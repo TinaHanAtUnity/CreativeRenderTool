@@ -5,6 +5,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Request } from 'Utilities/Request';
 import { Platform } from 'Constants/Platform';
 import { Url } from 'Utilities/Url';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export abstract class CampaignParser {
     public abstract parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign>;
@@ -20,15 +21,19 @@ export abstract class CampaignParser {
         }
     }
 
-    protected validateAndEncodeUrl(url: string): string {
+    protected validateAndEncodeUrl(url: string, session: Session): string {
         if(Url.isValid(url)) {
             return encodeURI(url);
         }
 
+        Diagnostics.trigger('invalid_url', {
+            url: url,
+        }, session);
+
         throw new Error('Invalid url: ' + url);
     }
 
-    protected validateAndEncodeTrackingUrls(urls: { [eventName: string]: string[] }): { [eventName: string]: string[] } {
+    protected validateAndEncodeTrackingUrls(urls: { [eventName: string]: string[] }, session: Session): { [eventName: string]: string[] } {
         if(urls && urls !== null) {
             for(const urlKey in urls) {
                 if(urls.hasOwnProperty(urlKey)) {
@@ -36,7 +41,7 @@ export abstract class CampaignParser {
                     const newUrlArray: string[] = [];
 
                     for(const url of urlArray) {
-                        newUrlArray.push(this.validateAndEncodeUrl(url));
+                        newUrlArray.push(this.validateAndEncodeUrl(url, session));
                     }
 
                     urls[urlKey] = newUrlArray;
