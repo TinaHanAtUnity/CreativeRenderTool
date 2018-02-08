@@ -245,10 +245,6 @@ export class Overlay extends AbstractOverlay {
     }
 
     protected getAltOverlay(): string | undefined {
-        if (this._campaign instanceof PerformanceCampaign && (this._abGroup === 8 || this._abGroup === 10)) {
-            return richOverlayId;
-        }
-
         return undefined;
     }
 
