@@ -7,11 +7,7 @@ export class PerformanceVideoEventHandlers {
         const overlay = adUnit.getOverlay();
 
         if (overlay && overlay instanceof Overlay && overlay.getClickedState() && (overlay.getAbGroup() === 8 || overlay.getAbGroup() === 10)) {
-            /* Add .then() to comfort test not sure why...
-            * “before each” hook for “should include all operational events on Android”:
-            * Error: Timeout of 2000ms exceeded. For async tests and hooks, ensure “done()” is called; if returning a Promise, ensure it resolves.
-            * */
-            adUnit.hide().then();
+            adUnit.hide();
         } else {
             const endScreen = adUnit.getEndScreen();
 
