@@ -48,13 +48,13 @@ export class ProgrammaticMraidUrlParser extends CampaignParser {
 
         const parameters: IMRAIDCampaign = {
             ... baseCampaignParams,
-            resourceAsset: jsonMraidUrl.inlinedUrl ? new HTML(this.validateAndEncodeUrl(jsonMraidUrl.inlinedUrl), session) : undefined,
+            resourceAsset: jsonMraidUrl.inlinedUrl ? new HTML(this.validateAndEncodeUrl(jsonMraidUrl.inlinedUrl, session), session) : undefined,
             resource: undefined,
             dynamicMarkup: jsonMraidUrl.dynamicMarkup,
             additionalTrackingEvents: response.getTrackingUrls(),
-            clickAttributionUrl: jsonMraidUrl.clickAttributionUrl ? this.validateAndEncodeUrl(jsonMraidUrl.clickAttributionUrl) : undefined,
+            clickAttributionUrl: jsonMraidUrl.clickAttributionUrl ? this.validateAndEncodeUrl(jsonMraidUrl.clickAttributionUrl, session) : undefined,
             clickAttributionUrlFollowsRedirects: jsonMraidUrl.clickAttributionUrlFollowsRedirects,
-            clickUrl: jsonMraidUrl.clickUrl ? this.validateAndEncodeUrl(jsonMraidUrl.clickUrl) : undefined,
+            clickUrl: jsonMraidUrl.clickUrl ? this.validateAndEncodeUrl(jsonMraidUrl.clickUrl, session) : undefined,
             videoEventUrls: undefined,
             gameName: undefined,
             gameIcon: undefined,
