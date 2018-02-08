@@ -9,6 +9,7 @@ import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
 import { Timer } from 'Utilities/Timer';
 import { Placement } from 'Models/Placement';
 import { IObserver1 } from 'Utilities/IObserver';
+import { Platform } from 'Constants/Platform';
 
 interface InitAdOptions {
     width: number;
@@ -77,7 +78,8 @@ export class VPAID extends View<IVPAIDHandler> {
         iframeSrcDoc = new Template(iframeSrcDoc).render(templateData);
 
         this._webplayerEventObserver = this._nativeBridge.WebPlayer.onWebPlayerEvent.subscribe((args: string) => this.onWebPlayerEvent(JSON.parse(args)));
-        return this._nativeBridge.WebPlayer.setData(encodeURIComponent(iframeSrcDoc), 'text/html', 'UTF-8');
+        iframeSrcDoc = this._nativeBridge.getPlatform() === Platform.ANDROID ? encodeURIComponent(iframeSrcDoc) : iframeSrcDoc;
+        return this._nativeBridge.WebPlayer.setData(iframeSrcDoc, 'text/html', 'UTF-8');
     }
 
     public isLoaded(): boolean {

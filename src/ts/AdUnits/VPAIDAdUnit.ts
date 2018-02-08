@@ -17,6 +17,7 @@ import { Closer } from 'Views/Closer';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Placement } from 'Models/Placement';
 import { IObserver2 } from 'Utilities/IObserver';
+import { WKAudiovisualMediaTypes } from 'Native/Api/WebPlayer';
 
 export interface IVPAIDAdUnitParameters extends IAdUnitParameters<VPAIDCampaign> {
     vpaid: VPAID;
@@ -71,9 +72,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
 
         return this.setupWebPlayer().then(() => {
             this._urlLoadingObserver = this._nativeBridge.WebPlayer.shouldOverrideUrlLoading.subscribe((url, method) => this.onUrlLoad(url));
-            return this._container.open(this, ['webplayer', 'webview'], false, this._forceOrientation, false, false, true, false, this._options).then(() => {
-                return this.showCloser();
-            });
+            return this._container.open(this, ['webplayer', 'webview'], false, this._forceOrientation, false, false, true, false, this._options);
         });
     }
 
@@ -166,7 +165,12 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     }
 
     private setupIosWebPlayer(): Promise<any> {
-        return Promise.resolve();
+        const eventSettings = {
+            'allowsPlayback': true,
+            'mediaPlaybackRequiresUserAction': true,
+            'typesRequiringAction': WKAudiovisualMediaTypes.NONE
+        };
+        return this._nativeBridge.WebPlayer.setSettings(eventSettings, {});
     }
 
     private onAdUnitNotLoaded() {
@@ -180,19 +184,21 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     private onShow() {
         this.setShowing(true);
         this.onStart.trigger();
-        this._timer.start();
+        // this._timer.start();
 
+        this._container.onShow.subscribe(this._onAppForegroundHandler);
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
             this._focusManager.onAppForeground.subscribe(this._onAppForegroundHandler);
             this._focusManager.onAppBackground.subscribe(this._onAppBackgroundHandler);
         } else {
-            this._container.onShow.subscribe(this._onAppForegroundHandler);
             this._container.onAndroidPause.subscribe(this._onAppBackgroundHandler);
         }
     }
 
     private onHide() {
-        this._closer.container().parentElement!.removeChild(this._closer.container());
+        if (this._closer.container().parentElement) {
+            this._closer.container().parentElement!.removeChild(this._closer.container());
+        }
 
         this._timer.stop();
         this.setShowing(false);
@@ -200,11 +206,11 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         this.onClose.trigger();
         this._nativeBridge.WebPlayer.shouldOverrideUrlLoading.unsubscribe(this._urlLoadingObserver);
 
+        this._container.onShow.unsubscribe(this._onAppForegroundHandler);
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
             this._focusManager.onAppForeground.unsubscribe(this._onAppForegroundHandler);
             this._focusManager.onAppBackground.unsubscribe(this._onAppBackgroundHandler);
         } else {
-            this._container.onShow.unsubscribe(this._onAppForegroundHandler);
             this._container.onAndroidPause.unsubscribe(this._onAppBackgroundHandler);
         }
     }
@@ -218,6 +224,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     }
 
     private onAppForeground() {
+        this.showCloser();
         if (this._view.isLoaded()) {
             this._view.resumeAd();
         } else {
@@ -231,12 +238,14 @@ export class VPAIDAdUnit extends AbstractAdUnit {
 
     private showCloser() {
         return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
-            const left = Math.floor(width * 0.90);
+            const left = Math.floor(width * 0.85);
             const top = 0;
-            const viewWidth = Math.floor(width * 0.10);
+            const viewWidth = Math.floor(width * 0.15);
             const viewHeight = viewWidth;
             return this._container.setViewFrame('webview', left, top, viewWidth, viewHeight).then(() => {
-                document.body.appendChild(this._closer.container());
+                if (!this._closer.container().parentNode) {
+                    document.body.appendChild(this._closer.container());
+                }
             });
         });
     }

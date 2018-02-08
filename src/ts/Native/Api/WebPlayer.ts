@@ -143,7 +143,7 @@ export interface IWebPlayerPlayerSettingsAndroid {
 export interface IWebPlayerWebSettingsIos {
     allowsPlayback?: boolean;
     playbackRequiresAction?: boolean;
-    typesRequiringAction?: number;
+    typesRequiringAction?: WKAudiovisualMediaTypes;
     scalesPagesToFit?: boolean; // UIWebView only
     javaScriptCanOpenWindowsAutomatically?: boolean; // WKWebView only
     javaScriptEnabled?: boolean; // WKWebView only
@@ -152,6 +152,13 @@ export interface IWebPlayerWebSettingsIos {
     keyboardDisplayRequiresUserAction?: boolean; // UIWebView only
     ignoresViewportScaleLimits?: boolean; // WKWebView iOS10+ only
     dataDetectorTypes?: number; // WKWebView iOS10+ only (bitfield) & UIWebView (enum)
+}
+
+export enum WKAudiovisualMediaTypes {
+    NONE    = 0,
+    AUDIO   = 1 << 0,
+    VIDEO   = 1 << 1,
+    ALL     = WKAudiovisualMediaTypes.AUDIO | WKAudiovisualMediaTypes.VIDEO,
 }
 
 export class WebPlayerApi extends NativeApi {

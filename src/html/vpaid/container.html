@@ -54,7 +54,7 @@
             var UIWebViewBridge = function() {
                 this.handleEvent = function(event, parameters) {
                     var iframe = document.createElement('iframe');
-                    iframe.setAttribute('src', 'js:' + JSON.stringify([event, parameters]));
+                    iframe.setAttribute('src', 'umsg:' + JSON.stringify([event, parameters]));
                     document.documentElement.appendChild(iframe);
                     iframe.parentNode.removeChild(iframe);
                 };
@@ -62,7 +62,7 @@
 
             var WKWebViewBridge = function() {
                 this.handleEvent = function(event, parameters) {
-                    window.webkit.webplayerbridge.handleEvent(JSON.stringify([event, parameters]));
+                    window.webkit.messageHandlers.sendEvent.postMessage(JSON.stringify([event, parameters]));
                 }
             };
 
@@ -77,7 +77,7 @@
                 var bridge;
                 if (window.webplayerbridge) {
                     bridge = new WebViewBridge();
-                } else if (window.webkit && window.webkit.webplayerbridge) {
+                } else if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.sendEvent) {
                     bridge = new WKWebViewBridge();
                 } else {
                     bridge = new UIWebViewBridge();
@@ -85,6 +85,7 @@
                 this._bridge = bridge;
 
                 this.receiveEvent = function(args) {
+                    console.log('unity', 'Received event: ', args);
                     var event = args.shift();
                     var parameters = args.shift();
                     _this.dispatchEvent(new CustomEvent(event, { detail: parameters }));
@@ -173,6 +174,7 @@
                         _this._subscribeToAllEvents();
 
                         nativebridge.sendEvent('ready');
+                        console.log('unity', 'Sent ready event');
                     } else {
                         _this._triggerError('getVPAIDAd is not defined');
                     }
@@ -225,6 +227,7 @@
                 this._handleEvent = function(eventType, ...args) {
                     args.unshift(eventType);
                     window.nativebridge.sendEvent('VPAID', args);
+                    console.log('unity', 'Got VPAID event', eventType);
                 };
 
                 this._initAd = function(initOpts) {
@@ -233,6 +236,7 @@
                         slot: _this._slot,
                         videoSlot: _this._videoSlot
                     });
+                    console.log('unity', 'Ad initialized');
                 }
 
                 this._showAd = function() {
