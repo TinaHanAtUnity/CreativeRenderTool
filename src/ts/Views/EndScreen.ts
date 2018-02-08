@@ -1,5 +1,5 @@
 import EndScreenTemplate from 'html/EndScreen.html';
-import CombinedEndScreenTemplate from 'html/CombinedEndScreen.html';
+import LunarEndScreen from 'html/LunarEndScreen.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -17,7 +17,7 @@ export interface IEndScreenHandler {
     onKeyEvent(keyCode: number): void;
 }
 
-const combinedEndScreenId = "combined-end-screen";
+const lunarEndScreenId = "lunar-end-screen";
 
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
 
@@ -35,8 +35,8 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._abGroup = abGroup;
         this._gameName = gameName;
 
-        if (this.getEndscreenAlt() === combinedEndScreenId) {
-            this._template = new Template(CombinedEndScreenTemplate, this._localization);
+        if (this.getEndscreenAlt() === lunarEndScreenId) {
+            this._template = new Template(LunarEndScreen, this._localization);
         } else {
             this._template = new Template(EndScreenTemplate, this._localization);
         }
@@ -45,7 +45,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             {
                 event: 'click',
                 listener: (event: Event) => this.onDownloadEvent(event),
-                selector: '.game-background, .download-container, .game-icon, .store-logo'
+                selector: '.game-background, .download-container, .game-icon'
             },
             {
                 event: 'click',
@@ -56,6 +56,11 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
                 event: 'click',
                 listener: (event: Event) => this.onPrivacyEvent(event),
                 selector: '.privacy-button'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onPetEvent(event),
+                selector: '#head'
             }
         ];
 
@@ -80,10 +85,6 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         const endScreenAlt = this.getEndscreenAlt();
         if (typeof endScreenAlt === "string") {
             this._container.classList.add(endScreenAlt);
-
-            if (this._abGroup === 8 || this._abGroup === 9) {
-                this._container.classList.add("with-store-logos");
-            }
         }
     }
 
@@ -105,17 +106,9 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             }, AbstractAdUnit.getAutoCloseDelay());
         }
 
-        if (this.getEndscreenAlt() === combinedEndScreenId) {
-            const el = <HTMLElement>this._container.querySelector(".underlay");
-            const style: CSSStyleDeclaration = window.getComputedStyle(el);
-
-            const isFilterSupported = ["filter", "webkitFilter", "-webkit-filter"].filter((cssProp: string) => {
-                return style.hasOwnProperty(cssProp) && style.getPropertyValue(cssProp) && style.getPropertyValue(cssProp) !== "none";
-            }) || [];
-
-            if (!isFilterSupported.length) {
-                this._container.classList.add("filter-fallback");
-            }
+        if (this.getEndscreenAlt() === lunarEndScreenId) {
+            /* Run animation when end screen is shown */
+            this._container.classList.add("run-animation");
         }
     }
 
@@ -143,8 +136,8 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     protected getEndscreenAlt(campaign?: Campaign) {
-        if(this._abGroup === 8 || this._abGroup === 9 || this._abGroup === 10 || this._abGroup === 11) {
-            return combinedEndScreenId;
+        if(this._abGroup === 5 || this._abGroup === 6) {
+            return lunarEndScreenId;
         }
 
         return undefined;
@@ -163,5 +156,25 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._privacy.render();
         document.body.appendChild(this._privacy.container());
         this._privacy.addEventHandler(this);
+    }
+
+    private onPetEvent(event: Event): void {
+        event.preventDefault();
+
+        if (!this._container.classList.contains("active")) {
+            this._container.classList.add("active");
+        }
+
+        const headEl: HTMLElement = <HTMLElement>this._container.querySelector('#head');
+        headEl.style.animationPlayState = "paused";
+        headEl.classList.add("nod");
+        setTimeout(() => {
+            if (typeof headEl !== "undefined" && headEl.classList && headEl.classList.contains("nod")) {
+                headEl.classList.remove("nod");
+                setTimeout(() => {
+                    headEl.style.animationPlayState = "running";
+                }, 150);
+            }
+        }, 150);
     }
 }

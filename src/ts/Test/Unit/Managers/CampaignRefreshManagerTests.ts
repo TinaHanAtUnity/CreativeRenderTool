@@ -37,6 +37,7 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { AdMobSignal } from 'Models/AdMobSignal';
+import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
 
 describe('CampaignRefreshManager', () => {
     let deviceInfo: DeviceInfo;
@@ -58,6 +59,7 @@ describe('CampaignRefreshManager', () => {
     let operativeEventManager: OperativeEventManager;
     let adMobSignalFactory: AdMobSignalFactory;
     let comScoreService: ComScoreTrackingService;
+    let cacheBookkeeping: CacheBookkeeping;
 
     beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo();
@@ -136,7 +138,8 @@ describe('CampaignRefreshManager', () => {
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         sessionManager = new SessionManager(nativeBridge);
         deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
-        assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
+        cacheBookkeeping = new CacheBookkeeping(nativeBridge);
+        assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
         container = new TestContainer();
         operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
         adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);

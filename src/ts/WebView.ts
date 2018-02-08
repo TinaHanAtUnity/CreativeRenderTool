@@ -39,12 +39,13 @@ import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { SdkStats } from 'Utilities/SdkStats';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
+import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
+import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
+import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
 
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
-import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
-import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 
 export class WebView {
 
@@ -61,6 +62,7 @@ export class WebView {
     private _campaignRefreshManager: CampaignRefreshManager;
     private _assetManager: AssetManager;
     private _cache: Cache;
+    private _cacheBookkeeping: CacheBookkeeping;
     private _container: AdUnitContainer;
 
     private _currentAdUnit: AbstractAdUnit;
@@ -98,7 +100,8 @@ export class WebView {
             this._focusManager = new FocusManager(this._nativeBridge);
             this._wakeUpManager = new WakeUpManager(this._nativeBridge, this._focusManager);
             this._request = new Request(this._nativeBridge, this._wakeUpManager);
-            this._cache = new Cache(this._nativeBridge, this._wakeUpManager, this._request);
+            this._cacheBookkeeping = new CacheBookkeeping(this._nativeBridge);
+            this._cache = new Cache(this._nativeBridge, this._wakeUpManager, this._request, this._cacheBookkeeping);
             this._resolve = new Resolve(this._nativeBridge);
             this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
             this._thirdPartyEventManager = new ThirdPartyEventManager(this._nativeBridge, this._request);
@@ -147,7 +150,7 @@ export class WebView {
                 configPromise = ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, this._metadataManager);
             }
 
-            const cachePromise = this._cache.cleanCache().catch(error => {
+            const cachePromise = this._cacheBookkeeping.cleanCache().catch(error => {
                 // don't fail init due to cache cleaning issues, instead just log and report diagnostics
                 this._nativeBridge.Sdk.logError('Unity Ads cleaning cache failed: ' + error);
                 Diagnostics.trigger('cleaning_cache_failed', error);
@@ -186,7 +189,7 @@ export class WebView {
             const defaultPlacement = this._configuration.getDefaultPlacement();
             this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
 
-            this._assetManager = new AssetManager(this._cache, this._configuration.getCacheMode(), this._deviceInfo);
+            this._assetManager = new AssetManager(this._cache, this._configuration.getCacheMode(), this._deviceInfo, this._cacheBookkeeping);
             this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._adMobSignalFactory, this._request, this._clientInfo, this._deviceInfo, this._metadataManager);
             this._campaignRefreshManager = new CampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration, this._focusManager);
 
