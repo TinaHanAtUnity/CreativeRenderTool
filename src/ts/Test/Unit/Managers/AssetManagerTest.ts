@@ -219,7 +219,7 @@ describe('AssetManagerTest', () => {
         });
     });
 
-    xit('should cache optional assets', () => {
+    it('should cache optional assets', () => {
         const cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping);
         const assetManager = new AssetManager(cache, CacheMode.FORCED, deviceInfo, cacheBookkeeping);
         const asset = new HTML('https://www.google.fi', TestFixtures.getSession());
