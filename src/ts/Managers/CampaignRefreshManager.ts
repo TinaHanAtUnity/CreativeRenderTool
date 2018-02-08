@@ -50,7 +50,7 @@ export class CampaignRefreshManager {
 
         this._campaignManager.onCampaign.subscribe((placementId, campaign) => this.onCampaign(placementId, campaign));
 
-        this._campaignManager.onNoFill.subscribe((placementId, session) => this.onNoFill(placementId, session));
+        this._campaignManager.onNoFill.subscribe((placementId) => this.onNoFill(placementId));
         this._campaignManager.onError.subscribe((error, placementIds, session) => this.onError(error, placementIds, session));
         this._campaignManager.onConnectivityError.subscribe((placementIds) => this.onConnectivityError(placementIds));
         this._campaignManager.onAdPlanReceived.subscribe((refreshDelay, campaignCount) => this.onAdPlanReceived(refreshDelay, campaignCount));
@@ -175,7 +175,7 @@ export class CampaignRefreshManager {
         this.handlePlacementState(placementId, PlacementState.READY);
     }
 
-    private onNoFill(placementId: string, session: Session) {
+    private onNoFill(placementId: string) {
         this._parsingErrorCount = 0;
 
         const placement: Placement = this._configuration.getPlacement(placementId);

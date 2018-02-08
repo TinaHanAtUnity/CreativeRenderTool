@@ -328,7 +328,7 @@ describe('CampaignRefreshManager', () => {
         it('placement states should end up with NO_FILL', () => {
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('premium', TestFixtures.getCampaign());
-                campaignManager.onNoFill.trigger('premium', TestFixtures.getSession());
+                campaignManager.onNoFill.trigger('premium');
                 return Promise.resolve();
             });
 
@@ -340,7 +340,7 @@ describe('CampaignRefreshManager', () => {
                 assert.equal(configuration.getPlacement('premium').getState(), PlacementState.NO_FILL);
                 assert.equal(configuration.getPlacement('video').getState(), PlacementState.WAITING);
 
-                campaignManager.onNoFill.trigger('video', TestFixtures.getSession());
+                campaignManager.onNoFill.trigger('video');
 
                 assert.equal(configuration.getPlacement('video').getState(), PlacementState.NO_FILL);
             });

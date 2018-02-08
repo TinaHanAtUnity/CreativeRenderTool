@@ -68,7 +68,7 @@ export class CampaignManager {
     private static Country: string | undefined;
 
     public readonly onCampaign = new Observable2<string, Campaign>();
-    public readonly onNoFill = new Observable2<string, Session>();
+    public readonly onNoFill = new Observable1<string>();
     public readonly onError = new Observable3<WebViewError, string[], Session | undefined>();
     public readonly onConnectivityError = new Observable1<string[]>();
     public readonly onAdPlanReceived = new Observable2<number, number>();
@@ -235,7 +235,7 @@ export class CampaignManager {
             const promises: Array<Promise<void>> = [];
 
             for(const placement of noFill) {
-                promises.push(this.handleNoFill(placement, session));
+                promises.push(this.handleNoFill(placement));
                 refreshDelay = CampaignRefreshManager.NoFillDelay;
             }
 
@@ -373,9 +373,9 @@ export class CampaignManager {
         }
     }
 
-    private handleNoFill(placement: string, session: Session): Promise<void> {
+    private handleNoFill(placement: string): Promise<void> {
         this._nativeBridge.Sdk.logDebug('PLC no fill for placement ' + placement);
-        this.onNoFill.trigger(placement, session);
+        this.onNoFill.trigger(placement);
         return Promise.resolve();
     }
 
