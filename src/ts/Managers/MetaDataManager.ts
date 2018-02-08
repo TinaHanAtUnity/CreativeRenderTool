@@ -14,6 +14,9 @@ export class MetaDataManager {
 
         if (this._metaDataCache[metaData.getCategory()]) {
             metaData = this._metaDataCache[metaData.getCategory()];
+            if(!keys) {
+                return Promise.resolve(metaData);
+            }
         }
 
         return metaData.fetch(this._nativeBridge, keys).then((success) => {
@@ -27,7 +30,13 @@ export class MetaDataManager {
         });
     }
 
-    public clearCache() {
+    public clearCache(category?: string): void {
+        if(category) {
+            if(this._metaDataCache[category]) {
+                this._metaDataCache[category] = undefined;
+            }
+            return;
+        }
         this._metaDataCache = {};
     }
 }
