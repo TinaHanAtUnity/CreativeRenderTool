@@ -220,33 +220,8 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
                 'action': 'android.intent.action.VIEW',
                 'uri': appStoreUrl
             });
-        } else if(platform === Platform.IOS) {
-            if(isAppSheetBroken || parameters.bypassAppSheet) {
-                this._nativeBridge.UrlScheme.open(appStoreUrl);
-            } else {
-                this._nativeBridge.AppSheet.canOpen().then(canOpenAppSheet => {
-                    if(canOpenAppSheet) {
-                        if(!parameters.appStoreId) {
-                            Diagnostics.trigger('no_appstore_id', {
-                                message: 'trying to open ios appstore without appstore id'
-                            });
-                            return;
-                        }
-                        const options = {
-                            id: parseInt(parameters.appStoreId, 10)
-                        };
-                        this._nativeBridge.AppSheet.present(options).then(() => {
-                            this._nativeBridge.AppSheet.destroy(options);
-                        }).catch(([error]) => {
-                            if(error === 'APPSHEET_NOT_FOUND') {
-                                this._nativeBridge.UrlScheme.open(appStoreUrl);
-                            }
-                        });
-                    } else {
-                        this._nativeBridge.UrlScheme.open(appStoreUrl);
-                    }
-                });
-            }
+        } else if (platform === Platform.IOS) {
+            this._nativeBridge.UrlScheme.open(appStoreUrl);
         }
     }
 
