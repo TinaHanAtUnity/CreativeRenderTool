@@ -318,13 +318,12 @@ export class Cache {
             Diagnostics.trigger('cache_callback_error', {
                 url: url,
                 currentUrl: this._currentUrl,
-                callbacks: this._callbacks,
+                callbacks: JSON.stringify(this._callbacks),
                 size: size,
                 totalSize: totalSize,
                 responseCode: responseCode,
                 headers: headers
             });
-            this.stop();
         }
     }
 
