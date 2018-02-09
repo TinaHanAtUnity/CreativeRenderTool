@@ -98,12 +98,12 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 const groupKey = "group" + this._campaign.getAbGroup();
                 if(configurationJson[groupKey]) {
                     this._configuration = configurationJson[groupKey];
-                } else if (configurationJson.defaultConfiguration) {
-                    this._configuration = configurationJson.defaultConfiguration;
+                } else if (configurationJson.default) {
+                    this._configuration = configurationJson.default;
+                } else {
+                    this._configuration = {};
                 }
-                if(this._configuration) {
-                    container = container.replace('var configuration = {};', 'var configuration = ' + JSON.stringify(this._configuration) + ';');
-                }
+                container = container.replace('var configuration = {};', 'var configuration = ' + JSON.stringify(this._configuration) + ';');
             }
             this.createMRAID(container).then(mraid => {
                 iframe.onload = () => this.onIframeLoaded();
