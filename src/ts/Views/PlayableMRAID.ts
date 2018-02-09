@@ -103,7 +103,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 } else {
                     this._configuration = {};
                 }
-                container = container.replace('var configuration = {};', 'var configuration = ' + JSON.stringify(this._configuration) + ';');
+                container = container.replace('var playableConfiguration = {};', 'var playableConfiguration = ' + JSON.stringify(this._configuration) + ';');
             }
             this.createMRAID(container).then(mraid => {
                 iframe.onload = () => this.onIframeLoaded();
