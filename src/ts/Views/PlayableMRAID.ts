@@ -102,7 +102,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                     this._configuration = configurationJson.defaultConfiguration;
                 }
                 if(this._configuration) {
-                    container = container.replace('var configuration = undefined;', 'var configuration = ' + JSON.stringify(this._configuration) + ';');
+                    container = container.replace('var configuration = {};', 'var configuration = ' + JSON.stringify(this._configuration) + ';');
                 }
             }
             this.createMRAID(container).then(mraid => {
