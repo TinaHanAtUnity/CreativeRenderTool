@@ -6,12 +6,10 @@ import { Platform } from 'Constants/Platform';
 import { Request } from 'Utilities/Request';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { OverlayEventHandler } from 'EventHandlers/OverlayEventHandler';
-import { Placement } from 'Models/Placement';
 import { ViewController } from 'AdUnits/Containers/ViewController';
 
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _vastAdUnit: VastAdUnit;
-    private _clientInfo: ClientInfo;
     private _request: Request;
     private _vastCampaign: VastCampaign;
     private _paused: boolean = false;
@@ -21,7 +19,6 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
 
         this._vastAdUnit = adUnit;
         this._request = parameters.request;
-        this._clientInfo = parameters.clientInfo;
         this._vastCampaign = parameters.campaign;
         this._placement = parameters.placement;
     }

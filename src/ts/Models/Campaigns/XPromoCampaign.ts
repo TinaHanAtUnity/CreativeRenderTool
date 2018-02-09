@@ -1,7 +1,6 @@
 import { Campaign, ICampaign } from 'Models/Campaign';
 import { Video } from 'Models/Assets/Video';
 import { Image } from 'Models/Assets/Image';
-import { Session } from 'Models/Session';
 
 export enum StoreName {
     APPLE,
@@ -26,7 +25,7 @@ export interface IXPromoCampaign extends ICampaign {
     clickAttributionUrlFollowsRedirects?: boolean;
     bypassAppSheet: boolean;
     store: StoreName;
-    trackingUrls: { [eventName: string]: string[] };
+    trackingUrls?: { [eventName: string]: string[] };
 }
 
 export class XPromoCampaign extends Campaign<IXPromoCampaign> {
