@@ -47,7 +47,7 @@ describe('ComScoreTrackingServiceTest', () => {
     });
 
     afterEach(() => {
-        spy.reset();
+        spy.resetHistory();
     });
 
     describe('when calling sendEvent', () => {

@@ -55,6 +55,8 @@ import { InterstitialOverlay } from 'Views/InterstitialOverlay';
 import { AbstractOverlay } from 'Views/AbstractOverlay';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { Privacy } from 'Views/Privacy';
+import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
+import { IObserver2, IObserver3 } from 'Utilities/IObserver';
 
 export class AdUnitFactory {
 
@@ -175,6 +177,11 @@ export class AdUnitFactory {
             vastAdUnitParameters.endScreen = vastEndScreen;
         }
 
+        const hasAdvertiserDomain = parameters.campaign.getAdvertiserDomain() !== undefined;
+        if (hasAdvertiserDomain) {
+            MoatViewabilityService.initMoat(nativeBridge, parameters.campaign, parameters.clientInfo, parameters.placement, parameters.deviceInfo, parameters.configuration);
+        }
+
         const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
 
         if(parameters.campaign.hasEndscreen() && vastEndScreen) {
@@ -189,52 +196,27 @@ export class AdUnitFactory {
             }
         }
 
-        const campaign = parameters.campaign;
-        const hasAdvertiserDomain = campaign.getAdvertiserDomain() !== undefined;
-        if (hasAdvertiserDomain) {
-            vastAdUnit.initMoat();
-        }
-
-        const moatIds = {
-            level1: campaign.getSeatId(),
-            level2: campaign.getBuyerId(),
-            level3: campaign.getAdvertiserBundleId() ? campaign.getAdvertiserBundleId() : campaign.getAdvertiserDomain(),
-            level4: campaign.getCreativeId(),
-            slicer1: parameters.clientInfo.getSdkVersionName(),
-            slicer2: parameters.clientInfo.getApplicationName(),
-            slicer3: parameters.placement.getName()
-        };
-
-        const moatData = {
-            SDK: 'UnityAds',
-            Version: '1.0',
-            SDKVersion: parameters.clientInfo.getSdkVersionName(),
-            IFA: parameters.deviceInfo.getAdvertisingIdentifier(),
-            LimitAdTracking: parameters.deviceInfo.getLimitAdTracking(),
-            COPPA: parameters.configuration.isCoppaCompliant(),
-            bundle: parameters.clientInfo.getApplicationName()
-        };
-
         const vastOverlayHandler = new VastOverlayEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
         overlay.addEventHandler(vastOverlayHandler);
 
         this.prepareVideoPlayer(nativeBridge, vastAdUnit, parameters);
 
-        const onPreparedObserver = nativeBridge.VideoPlayer.onPrepared.subscribe((url, duration, width, height) => VastVideoEventHandlers.onVideoPrepared(vastAdUnit, url, duration, moatData, moatIds));
+        const onPreparedObserver = nativeBridge.VideoPlayer.onPrepared.subscribe((url, duration, width, height) => VastVideoEventHandlers.onVideoPrepared(vastAdUnit, url, duration));
         const onPauseObserver = nativeBridge.VideoPlayer.onPause.subscribe(() => VastVideoEventHandlers.onVideoPaused(vastAdUnit));
         const onStopObserver = nativeBridge.VideoPlayer.onStop.subscribe(() => VastVideoEventHandlers.onVideoStopped(vastAdUnit));
-        const onProgressObserver = nativeBridge.VideoPlayer.onProgress.subscribe((position) => VastVideoEventHandlers.onVideoProgress(vastAdUnit, campaign, position));
+        const onProgressObserver = nativeBridge.VideoPlayer.onProgress.subscribe((position) => VastVideoEventHandlers.onVideoProgress(vastAdUnit, parameters.campaign, position));
         const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VastVideoEventHandlers.onVideoCompleted(parameters.thirdPartyEventManager, vastAdUnit, parameters.clientInfo, parameters.campaign.getSession()));
         const onPlayObserver = nativeBridge.VideoPlayer.onPlay.subscribe(() => VastVideoEventHandlers.onVideoStart(parameters.thirdPartyEventManager, vastAdUnit, parameters.clientInfo, parameters.campaign.getSession()));
         const onVideoErrorObserver = vastAdUnit.onError.subscribe(() => VastVideoEventHandlers.onVideoError(vastAdUnit));
 
-        let onVolumeChangeObserver: any;
+        let onVolumeChangeObserverAndroid: IObserver3<number, number, number>;
+        let onVolumeChangeObserverIOS: IObserver2<number, number>;
         if(nativeBridge.getPlatform() === Platform.ANDROID) {
             nativeBridge.DeviceInfo.Android.registerVolumeChangeListener(StreamType.STREAM_MUSIC);
-            onVolumeChangeObserver = nativeBridge.DeviceInfo.Android.onVolumeChanged.subscribe((streamType, volume, maxVolume) => VastVideoEventHandlers.onVolumeChange(vastAdUnit, volume, maxVolume));
+            onVolumeChangeObserverAndroid = nativeBridge.DeviceInfo.Android.onVolumeChanged.subscribe((streamType, volume, maxVolume) => VastVideoEventHandlers.onVolumeChange(vastAdUnit, volume, maxVolume));
         } else if(nativeBridge.getPlatform() === Platform.IOS) {
             nativeBridge.DeviceInfo.Ios.registerVolumeChangeListener();
-            onVolumeChangeObserver = nativeBridge.DeviceInfo.Ios.onVolumeChanged.subscribe((volume, maxVolume) => VastVideoEventHandlers.onVolumeChange(vastAdUnit, volume, maxVolume));
+            onVolumeChangeObserverIOS = nativeBridge.DeviceInfo.Ios.onVolumeChanged.subscribe((volume, maxVolume) => VastVideoEventHandlers.onVolumeChange(vastAdUnit, volume, maxVolume));
         }
 
         vastAdUnit.onClose.subscribe(() => {
@@ -244,15 +226,17 @@ export class AdUnitFactory {
             nativeBridge.VideoPlayer.onPause.unsubscribe(onPauseObserver);
             nativeBridge.VideoPlayer.onStop.unsubscribe(onStopObserver);
             nativeBridge.VideoPlayer.onProgress.unsubscribe(onProgressObserver);
-            if(onVolumeChangeObserver) {
-                if(nativeBridge.getPlatform() === Platform.ANDROID) {
-                    nativeBridge.DeviceInfo.Android.unregisterVolumeChangeListener(StreamType.STREAM_MUSIC);
-                    nativeBridge.DeviceInfo.Android.onVolumeChanged.unsubscribe(onVolumeChangeObserver);
-                } else if(nativeBridge.getPlatform() === Platform.IOS) {
-                    nativeBridge.DeviceInfo.Ios.unregisterVolumeChangeListener();
-                    nativeBridge.DeviceInfo.Ios.onVolumeChanged.unsubscribe(onVolumeChangeObserver);
-                }
+
+            if(onVolumeChangeObserverAndroid) {
+                nativeBridge.DeviceInfo.Android.unregisterVolumeChangeListener(StreamType.STREAM_MUSIC);
+                nativeBridge.DeviceInfo.Android.onVolumeChanged.unsubscribe(onVolumeChangeObserverAndroid);
             }
+
+            if(onVolumeChangeObserverIOS) {
+                nativeBridge.DeviceInfo.Ios.unregisterVolumeChangeListener();
+                nativeBridge.DeviceInfo.Ios.onVolumeChanged.unsubscribe(onVolumeChangeObserverIOS);
+            }
+
             vastAdUnit.onError.unsubscribe(onVideoErrorObserver);
         });
 
