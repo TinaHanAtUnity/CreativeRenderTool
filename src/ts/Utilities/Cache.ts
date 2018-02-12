@@ -356,17 +356,19 @@ export class Cache {
                 return;
             }
 
-            this.sendDiagnostic(CacheDiagnosticEvent.ERROR, callback);
+            if(!url.match(/playables\/production\/unity.*configuration\.json/)) {
+                this.sendDiagnostic(CacheDiagnosticEvent.ERROR, callback);
 
-            const error: DiagnosticError = new DiagnosticError(new Error('HTTP ' + responseCode), {
-                url: url,
-                size: size,
-                totalSize: totalSize,
-                duration: duration,
-                responseCode: responseCode,
-                headers: JSON.stringify(headers)
-            });
-            Diagnostics.trigger('cache_error', error, callback.session);
+                const error: DiagnosticError = new DiagnosticError(new Error('HTTP ' + responseCode), {
+                    url: url,
+                    size: size,
+                    totalSize: totalSize,
+                    duration: duration,
+                    responseCode: responseCode,
+                    headers: JSON.stringify(headers)
+                });
+                Diagnostics.trigger('cache_error', error, callback.session);
+            }
 
             this._cacheBookkeeping.removeFileEntry(callback.fileId);
             if(size > 0) {

@@ -73,7 +73,7 @@ export class CometCampaignParser extends CampaignParser {
                 bypassAppSheet: json.bypassAppSheet,
                 store: storeName,
                 appStoreId: json.appStoreId,
-                configurationAsset: CustomFeatures.isPlayableConfigurationEnabled(json.mraidUrl) ? new JSONAsset(json.mraidUrl.replace(/index\.html/, 'config.json'), session) : undefined
+                configurationAsset: CustomFeatures.isPlayableConfigurationEnabled(json.mraidUrl) ? new JSONAsset(json.mraidUrl.replace(/index\.html/, 'configuration.json'), session) : undefined
             };
 
             return Promise.resolve(new MRAIDCampaign(parameters));
