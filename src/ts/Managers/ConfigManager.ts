@@ -60,6 +60,10 @@ export class ConfigManager {
                     }
                     return config;
                 } catch(error) {
+                    Diagnostics.trigger('config_parsing_failed', {
+                        configUrl: url,
+                        configResponse: response.response
+                    });
                     nativeBridge.Sdk.logError('Config request failed ' + error);
                     throw new Error(error);
                 }

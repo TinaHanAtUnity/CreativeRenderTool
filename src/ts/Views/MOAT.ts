@@ -7,6 +7,7 @@ import { Template } from 'Utilities/Template';
 import { Platform } from 'Constants/Platform';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { Diagnostics } from 'Utilities/Diagnostics';
+import { MoatViewabilityService, IMoatIds, IMoatData } from 'Utilities/MoatViewabilityService';
 
 export class MOAT extends View<VastCampaign> {
     private _iframe: HTMLIFrameElement;
@@ -42,7 +43,7 @@ export class MOAT extends View<VastCampaign> {
         }
     }
 
-    public init(ids: { [key: string]: string }, duration: number, url: string, moatData: any, volume: number) {
+    public init(ids: IMoatIds, duration: number, url: string, moatData: IMoatData, volume: number) {
         if (!this._didInitMoat) {
             this._didInitMoat = true;
             this._resizeDelayer = (event: Event) => {

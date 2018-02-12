@@ -291,27 +291,39 @@ export class Cache {
 
         const callback = this._callbacks[url];
 
-        callback.startTimestamp = Date.now();
-        callback.contentLength = totalSize;
+        if(callback) {
+            callback.startTimestamp = Date.now();
+            callback.contentLength = totalSize;
 
-        if(size === 0) {
-            this._cacheBookkeeping.writeFileEntry(callback.fileId, this._cacheBookkeeping.createFileInfo(false, size, totalSize, FileId.getFileIdExtension(callback.fileId)));
-            this.sendDiagnostic(CacheDiagnosticEvent.STARTED, callback);
-            SdkStats.setCachingStartTimestamp(callback.fileId);
+            if(size === 0) {
+                this._cacheBookkeeping.writeFileEntry(callback.fileId, this._cacheBookkeeping.createFileInfo(false, size, totalSize, FileId.getFileIdExtension(callback.fileId)));
+                this.sendDiagnostic(CacheDiagnosticEvent.STARTED, callback);
+                SdkStats.setCachingStartTimestamp(callback.fileId);
+            } else {
+                this.sendDiagnostic(CacheDiagnosticEvent.RESUMED, callback);
+            }
+
+            // reject all files larger than 20 megabytes
+            if(totalSize > this._maxFileSize) {
+                this._nativeBridge.Cache.stop();
+                Diagnostics.trigger('too_large_file', {
+                    url: url,
+                    size: size,
+                    totalSize: totalSize,
+                    responseCode: responseCode,
+                    headers: headers
+                }, callback.session);
+            }
         } else {
-            this.sendDiagnostic(CacheDiagnosticEvent.RESUMED, callback);
-        }
-
-        // reject all files larger than 20 megabytes
-        if(totalSize > this._maxFileSize) {
-            this._nativeBridge.Cache.stop();
-            Diagnostics.trigger('too_large_file', {
+            Diagnostics.trigger('cache_callback_error', {
                 url: url,
+                currentUrl: this._currentUrl,
+                callbacks: JSON.stringify(this._callbacks),
                 size: size,
                 totalSize: totalSize,
                 responseCode: responseCode,
                 headers: headers
-            }, callback.session);
+            });
         }
     }
 
