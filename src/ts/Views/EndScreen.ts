@@ -167,14 +167,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         }
 
         const headEl: HTMLElement = <HTMLElement>this._container.querySelector('#head');
-        headEl.style.animationPlayState = "paused";
         headEl.classList.add("nod");
         setTimeout(() => {
             if (typeof headEl !== "undefined" && headEl.classList && headEl.classList.contains("nod")) {
                 headEl.classList.remove("nod");
-                setTimeout(() => {
-                    headEl.style.animationPlayState = "running";
-                }, 150);
             }
         }, 150);
     }
