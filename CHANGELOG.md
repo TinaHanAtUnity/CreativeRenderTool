@@ -1,3 +1,11 @@
+# Staged
+
+* Remove the hidden margin from the admob iframe
+* Enable MOAT on all SDK 2 versions without volume change listeners
+* New overlay AB test on groups 8 & 10
+* Send diagnostics if callback cannot be found when onDownloadStart event is received
+* Cleanup protobuf build & use minified release
+
 # Fri Feb  9 11:00:06 UTC 2018
 
 * Add config_parsing_failed diagnostic event
