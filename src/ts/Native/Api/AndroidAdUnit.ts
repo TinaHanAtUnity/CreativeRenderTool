@@ -4,6 +4,7 @@ import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { NativeApi } from 'Native/NativeApi';
+import { MotionEventAction } from 'Constants/Android/MotionEventAction';
 
 enum AdUnitEvent {
     ON_START,
@@ -28,6 +29,19 @@ export enum AndroidAdUnitError {
     CORRUPTED_KEYEVENTLIST,
     SYSTEM_UI_VISIBILITY,
     UNKNOWN_VIEW
+}
+
+export interface IMotionEvent {
+    action: MotionEventAction;
+    isObscured: boolean;
+    toolType: number;
+    source: number;
+    deviceId: number;
+    x: number;
+    y: number;
+    eventTime: number;
+    pressure: number;
+    size: number;
 }
 
 export class AndroidAdUnitApi extends NativeApi {
@@ -89,6 +103,30 @@ export class AndroidAdUnitApi extends NativeApi {
 
     public getViewFrame(view: string): Promise<number[]> {
         return this._nativeBridge.invoke<number[]>(this._apiClass, 'getViewFrame', [view]);
+    }
+
+    public startMotionEventCapture(maxEvents: number): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'startMotionEventCapture', [maxEvents]);
+    }
+
+    public endMotionEventCapture(): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'endMotionEventCapture');
+    }
+
+    public clearMotionEventCapture(): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'clearMotionEventCapture');
+    }
+
+    public getMotionEventCount(actions: MotionEventAction[]): Promise<{ [action: string]: number}> {
+        return this._nativeBridge.invoke<{ [action: string]: number}>(this._apiClass, 'getMotionEventCount', [actions]);
+    }
+
+    public getMotionEventData(data: { [action: string]: number[] }): Promise<{ [action: string]: { [index: string]: IMotionEvent } }> {
+        return this._nativeBridge.invoke<{ [action: string]: { [index: string]: IMotionEvent } }>(this._apiClass, 'getMotionEventData', [data]);
+    }
+
+    public getCurrentMotionEventCount(): Promise<number> {
+        return this._nativeBridge.invoke<number>(this._apiClass, 'getCurrentMotionEventCount');
     }
 
     public handleEvent(event: string, parameters: any[]): void {

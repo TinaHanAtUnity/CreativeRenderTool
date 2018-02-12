@@ -1,0 +1,120 @@
+@import "vars.styl";
+@import "mixins.styl";
+
+$lunar-end-screen-size = $default-scale-size * $default-size;
+$lunar-end-font-size = $lunar-end-screen-size;
+$lunar-dog-scale = 2.15;
+$lunar-red = #c1272d;
+
+/* Most of z-index rules related to old devices support */
+
+#end-screen.lunar-end-screen {
+  .btn-close-region {
+    z-index: 100;
+  }
+
+  #the-dog {
+    $set-image($lunar-end-screen-size * $lunar-dog-scale * 1.75, $lunar-end-screen-size * $lunar-dog-scale, 0, "../img/lunar/dog_body.png", contain);
+    position: absolute;
+    bottom: 0;
+    transform: translateZ(0);
+    z-index: 20;
+
+    #head {
+      $set-image($lunar-end-screen-size * $lunar-dog-scale * 1.75, $lunar-end-screen-size * $lunar-dog-scale * 1.4, 0, "../img/lunar/dog_head.png", contain);
+      position: relative;
+      bottom: $lunar-end-screen-size * $lunar-dog-scale;
+      left: $lunar-end-screen-size * $lunar-dog-scale * .125 * -1;
+      transform: translateZ(0);
+
+      will-change: transform, top;
+      backface-visibility: hidden;
+    }
+  }
+
+  .row-container {
+    z-index: 12;
+  }
+
+  .download-container {
+    position: relative;
+    z-index: 15;
+    transition: background ease-in 500ms;
+  }
+
+  .background-underlay {
+    position: absolute;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity ease-in 500ms;
+  }
+
+  .end-screen-info {
+    z-index: 10;
+  }
+
+  &.active {
+    .download-container {
+      background: $lunar-red;
+    }
+
+    .background-underlay {
+      opacity: 1;
+    }
+  }
+
+  &.run-animation #the-dog {
+    #head {
+      transition: bottom .125s linear;
+      animation-name: head-spin;
+      animation-duration: 8s;
+      animation-delay: 1s;
+      animation-iteration-count: infinite;
+      animation-fill-mode: forwards;
+
+      &.nod {
+        bottom: $lunar-end-screen-size * $lunar-dog-scale * .85;
+      }
+    }
+  }
+}
+
+body {
+  &.portrait #end-screen.lunar-end-screen {
+    #the-dog {
+      right: 0;
+    }
+
+    .background-underlay {
+      $set-image("", "", 0, "../img/lunar/wallpaper_portrait.jpg", 100% 100%);
+      height: 50%;
+    }
+  }
+
+  &.landscape #end-screen.lunar-end-screen {
+    #the-dog {
+      margin-left: 45%;
+    }
+
+    .privacy-button {
+      left: 95%;
+    }
+
+    .background-underlay {
+      $set-image("", "", 0, "../img/lunar/wallpaper_landscape.jpg", 100% 100%);
+      left: 50%;
+      width: 50%;
+    }
+  }
+}
+
+@keyframes head-spin {
+  0%, 70% {
+    transform: rotate(0deg);
+  }
+  35% {
+    transform: rotate(-45deg);
+  }
+}

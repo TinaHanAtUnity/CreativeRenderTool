@@ -117,8 +117,36 @@ export class AndroidDeviceInfoApi extends NativeApi {
         return this._nativeBridge.invoke<string>(this._apiClass, 'getProduct');
     }
 
+    public getFingerprint(): Promise<string> {
+        return this._nativeBridge.invoke<string>(this._apiClass, 'getFingerprint');
+    }
+
     public getSupportedAbis(): Promise<string[]> {
         return this._nativeBridge.invoke<string[]>(this._apiClass, 'getSupportedAbis');
+    }
+
+    public getUptime(): Promise<number> {
+        return this._nativeBridge.invoke<number>(this._apiClass, 'getUptime');
+    }
+
+    public getElapsedRealtime(): Promise<number> {
+        return this._nativeBridge.invoke<number>(this._apiClass, 'getElapsedRealtime');
+    }
+
+    public isUSBConnected(): Promise<boolean> {
+        return this._nativeBridge.invoke<boolean>(this._apiClass, 'isUSBConnected');
+    }
+
+    public isAdbEnabled(): Promise<boolean> {
+        return this._nativeBridge.invoke<boolean>(this._apiClass, 'isAdbEnabled');
+    }
+
+    public getApkDigest(): Promise<string> {
+        return this._nativeBridge.invoke<string>(this._apiClass, 'getApkDigest');
+    }
+
+    public getCertificateFingerprint(): Promise<string> {
+        return this._nativeBridge.invoke<string>(this._apiClass, 'getCertificateFingerprint');
     }
 
     public handleEvent(event: string, parameters: any[]): void {

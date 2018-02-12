@@ -1,0 +1,151 @@
+@import "vars.styl";
+@import "end-screen.styl";
+
+$default-rich-overlay-scale = $default-scale-size * .75;
+$default-rich-overlay-size = $default-size * $default-rich-overlay-scale;
+
+#overlay.rich-overlay {
+
+  .mute-button {
+    position: absolute;
+    bottom: initial;
+    left: initial;
+    display: inline-block;
+
+    .mute-icon,
+    .unmute-icon {
+      top: 8px;
+      bottom: 0;
+      left: 0;
+      height: auto;
+      font-size: 35px;
+    }
+  }
+
+  .skip-hit-area {
+    position: initial;
+    display: inline-block;
+    pointer-events: auto;
+  }
+
+  .skip-icon {
+    top: 50%;
+    left: 15%;
+    transform: translate(0, -50%);
+  }
+
+  .overlay-footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: $default-rich-overlay-size * 5.75;
+
+    &.dark {
+      .background-container {
+        background-color: $black;
+      }
+
+      .name-container {
+        color: $white;
+      }
+    }
+
+    .background-container {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-color: $white;
+      opacity: .9;
+    }
+
+    &:not(.dark) {
+      .game-rating {
+        color: darken($end-screen-info-gray, 20%);
+      }
+    }
+
+    .game-rating {
+      $game-rating-default($default-rich-overlay-scale);
+    }
+
+    .game-rating-mask {
+      $game-rating-mask-default($default-rich-overlay-scale);
+    }
+
+    .game-rating-count {
+      $game-rating-count-default($default-rich-overlay-scale);
+    }
+
+    .name-container {
+      $name-container-default($default-rich-overlay-scale);
+      font-size: $default-rich-overlay-size * 1.25;
+    }
+
+    .game-icon {
+      $game-icon-default($default-rich-overlay-scale, $default-scale-size * .95);
+      margin-left: $default-rich-overlay-size;
+    }
+
+    .download-container {
+      $download-container-default($default-rich-overlay-scale);
+      position: absolute;
+      right: $default-rich-overlay-size;
+      width: $default-rich-overlay-size * 7.95;
+      pointer-events: auto;
+
+      /* iOS8 fix */
+      align-self: start;
+      transform: translate(0, 50%);
+    }
+
+    .row-container {
+      /* Use items positioning the same for both orientations in this case  */
+      @extend body.portrait #end-screen .row-container;  // @stylint ignore
+      align-items: center;
+      height: 100%;
+      justify-content: flex-start;
+    }
+
+    .icon-star {
+      font-size: $default-rich-overlay-size * 1.25;
+    }
+
+    .column-container {
+      @extend body.portrait #end-screen .column-container;  // @stylint ignore
+    }
+
+    .store-container {
+      @extend body #end-screen .store-container;  // @stylint ignore
+      margin-top: $default-rich-overlay-size * .2;
+    }
+  }
+}
+
+body {
+
+  &.portrait #overlay.rich-overlay {
+    .overlay-footer {
+      .icon-star {
+        font-size: $default-rich-overlay-size * .85;
+      }
+
+      .name-container {
+        max-width: $default-rich-overlay-size * 10;
+        font-size: $default-rich-overlay-size * 1.1;
+      }
+
+      .store-container {
+        margin-top: $default-rich-overlay-size * .25 * -1;
+      }
+    }
+  }
+
+  &.landscape #overlay.rich-overlay {
+    .overlay-footer {
+      .name-container {
+        max-width: $default-rich-overlay-size * 25;
+      }
+    }
+  }
+
+}
