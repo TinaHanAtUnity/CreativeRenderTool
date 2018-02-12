@@ -7,17 +7,17 @@ export namespace unity_proto {
     interface IUnityProto {
 
         /** UnityProto encryptedBlobs */
-        encryptedBlobs?: (Uint8Array[]|null);
+        encryptedBlobs?: Uint8Array[];
 
         /** UnityProto encryptionMethod */
-        encryptionMethod?: (unity_proto.UnityProto.EncryptionMethod|null);
+        encryptionMethod?: unity_proto.UnityProto.EncryptionMethod;
 
         /** UnityProto protoName */
-        protoName?: (unity_proto.UnityProto.ProtoName|null);
+        protoName?: unity_proto.UnityProto.ProtoName;
     }
 
     /** Represents an UnityProto. */
-    class UnityProto implements IUnityProto {
+    class UnityProto {
 
         /**
          * Constructs a new UnityProto.
@@ -70,158 +70,158 @@ export namespace unity_proto {
     interface IUnityInfo {
 
         /** UnityInfo field_1 */
-        field_1?: (string|null);
+        field_1?: string;
 
         /** UnityInfo field_2 */
-        field_2?: (number|Long|null);
+        field_2?: (number|Long);
 
         /** UnityInfo field_3 */
-        field_3?: (number|Long|null);
+        field_3?: (number|Long);
 
         /** UnityInfo field_4 */
-        field_4?: (number|Long|null);
+        field_4?: (number|Long);
 
         /** UnityInfo field_5 */
-        field_5?: (number|Long|null);
+        field_5?: (number|Long);
 
         /** UnityInfo field_6 */
-        field_6?: (number|Long|null);
+        field_6?: (number|Long);
 
         /** UnityInfo field_7 */
-        field_7?: (number|Long|null);
+        field_7?: (number|Long);
 
         /** UnityInfo field_8 */
-        field_8?: (number|Long|null);
+        field_8?: (number|Long);
 
         /** UnityInfo field_9 */
-        field_9?: (number|Long|null);
+        field_9?: (number|Long);
 
         /** UnityInfo field_10 */
-        field_10?: (number|Long|null);
+        field_10?: (number|Long);
 
         /** UnityInfo field_11 */
-        field_11?: (number|Long|null);
+        field_11?: (number|Long);
 
         /** UnityInfo field_12 */
-        field_12?: (number|Long|null);
+        field_12?: (number|Long);
 
         /** UnityInfo field_13 */
-        field_13?: (number|Long|null);
+        field_13?: (number|Long);
 
         /** UnityInfo field_14 */
-        field_14?: (boolean|null);
+        field_14?: boolean;
 
         /** UnityInfo field_15 */
-        field_15?: (number|Long|null);
+        field_15?: (number|Long);
 
         /** UnityInfo field_16 */
-        field_16?: (number|Long|null);
+        field_16?: (number|Long);
 
         /** UnityInfo field_17 */
-        field_17?: (number|Long|null);
+        field_17?: (number|Long);
 
         /** UnityInfo field_18 */
-        field_18?: (number|Long|null);
+        field_18?: (number|Long);
 
         /** UnityInfo field_19 */
-        field_19?: (number|Long|null);
+        field_19?: (number|Long);
 
         /** UnityInfo field_20 */
-        field_20?: (number|Long|null);
+        field_20?: (number|Long);
 
         /** UnityInfo field_21 */
-        field_21?: (number|Long|null);
+        field_21?: (number|Long);
 
         /** UnityInfo field_22 */
-        field_22?: (number|Long|null);
+        field_22?: (number|Long);
 
         /** UnityInfo field_23 */
-        field_23?: (string|null);
+        field_23?: string;
 
         /** UnityInfo field_24 */
-        field_24?: (number|Long|null);
+        field_24?: (number|Long);
 
         /** UnityInfo field_25 */
-        field_25?: (number|Long|null);
+        field_25?: (number|Long);
 
         /** UnityInfo field_26 */
-        field_26?: (number|Long|null);
+        field_26?: (number|Long);
 
         /** UnityInfo field_27 */
-        field_27?: (number|Long|null);
+        field_27?: (number|Long);
 
         /** UnityInfo field_28 */
-        field_28?: (number|Long|null);
+        field_28?: (number|Long);
 
         /** UnityInfo field_29 */
-        field_29?: (number|Long|null);
+        field_29?: (number|Long);
 
         /** UnityInfo field_30 */
-        field_30?: (number|Long|null);
+        field_30?: (number|Long);
 
         /** UnityInfo field_31 */
-        field_31?: (number|Long|null);
+        field_31?: (number|Long);
 
         /** UnityInfo field_32 */
-        field_32?: (boolean|null);
+        field_32?: boolean;
 
         /** UnityInfo field_33 */
-        field_33?: (number|Long|null);
+        field_33?: (number|Long);
 
         /** UnityInfo field_34 */
-        field_34?: (number|Long|null);
+        field_34?: (number|Long);
 
         /** UnityInfo field_35 */
-        field_35?: (number|Long|null);
+        field_35?: (number|Long);
 
         /** UnityInfo field_36 */
-        field_36?: (number|Long|null);
+        field_36?: (number|Long);
 
         /** UnityInfo field_37 */
-        field_37?: (string|null);
+        field_37?: string;
 
         /** UnityInfo field_38 */
-        field_38?: (string|null);
+        field_38?: string;
 
         /** UnityInfo field_39 */
-        field_39?: (string|null);
+        field_39?: string;
 
         /** UnityInfo field_40 */
-        field_40?: (number|Long|null);
+        field_40?: (number|Long);
 
         /** UnityInfo field_41 */
-        field_41?: (string|null);
+        field_41?: string;
 
         /** UnityInfo field_42 */
-        field_42?: (string|null);
+        field_42?: string;
 
         /** UnityInfo field_43 */
-        field_43?: (number|Long|null);
+        field_43?: (number|Long);
 
         /** UnityInfo field_44 */
-        field_44?: (number|Long|null);
+        field_44?: (number|Long);
 
         /** UnityInfo field_45 */
-        field_45?: (number|Long|null);
+        field_45?: (number|Long);
 
         /** UnityInfo field_46 */
-        field_46?: (number|Long|null);
+        field_46?: (number|Long);
 
         /** UnityInfo field_47 */
-        field_47?: (number|Long|null);
+        field_47?: (number|Long);
 
         /** UnityInfo field_48 */
-        field_48?: (number|Long|null);
+        field_48?: (number|Long);
 
         /** UnityInfo field_49 */
-        field_49?: (number|Long|null);
+        field_49?: (number|Long);
 
         /** UnityInfo field_50 */
-        field_50?: (number|Long|null);
+        field_50?: (number|Long);
     }
 
     /** Represents an UnityInfo. */
-    class UnityInfo implements IUnityInfo {
+    class UnityInfo {
 
         /**
          * Constructs a new UnityInfo.
