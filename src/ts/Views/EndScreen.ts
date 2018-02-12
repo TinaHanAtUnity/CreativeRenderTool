@@ -58,9 +58,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
                 selector: '.privacy-button'
             },
             {
-                event: 'click',
+                event: 'swipe',
                 listener: (event: Event) => this.onPetEvent(event),
-                selector: '#head'
+                selector: '#the-dog',
+                ignoreLength: true
             }
         ];
 
