@@ -22,6 +22,7 @@ import * as protobuf from 'protobufjs/minimal';
 import { SdkStats } from 'Utilities/SdkStats';
 import { ITouchInfo } from 'Views/AFMABridge';
 import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
+import { ClientInfo } from 'Models/ClientInfo';
 
 const resolveAfter = (timeout: number): Promise<void> => {
     return new Promise((resolve, reject) => setTimeout(resolve, timeout));
@@ -36,6 +37,7 @@ describe('AdMobEventHandler', () => {
     let session: Session;
     let adMobSignalFactory: AdMobSignalFactory;
     let campaign: AdMobCampaign;
+    let clientInfo: ClientInfo;
     const testTimeout = 250;
 
     beforeEach(() => {
@@ -50,6 +52,8 @@ describe('AdMobEventHandler', () => {
         campaign = sinon.createStubInstance(AdMobCampaign);
         (<sinon.SinonStub>campaign.getSession).returns(TestFixtures.getSession());
 
+        clientInfo = sinon.createStubInstance(ClientInfo);
+
         AdMobEventHandler.setLoadTimeout(testTimeout);
         admobEventHandler = new AdMobEventHandler({
             adUnit: adUnit,
@@ -58,7 +62,8 @@ describe('AdMobEventHandler', () => {
             thirdPartyEventManager: thirdPartyEventManager,
             session: session,
             adMobSignalFactory: adMobSignalFactory,
-            campaign: campaign
+            campaign: campaign,
+            clientInfo: clientInfo
         });
     });
 

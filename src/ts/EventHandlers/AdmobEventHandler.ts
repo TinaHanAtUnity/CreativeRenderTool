@@ -14,6 +14,7 @@ import { SdkStats } from 'Utilities/SdkStats';
 import { ITouchInfo } from 'Views/AFMABridge';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
+import { ClientInfo } from 'Models/ClientInfo';
 
 export interface IAdMobEventHandlerParameters {
     adUnit: AdMobAdUnit;
@@ -22,6 +23,7 @@ export interface IAdMobEventHandlerParameters {
     session: Session;
     thirdPartyEventManager: ThirdPartyEventManager;
     adMobSignalFactory: AdMobSignalFactory;
+    clientInfo: ClientInfo;
     campaign: AdMobCampaign;
 }
 
@@ -39,6 +41,7 @@ export class AdMobEventHandler implements IAdMobEventHandler {
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _adMobSignalFactory: AdMobSignalFactory;
     private _campaign: AdMobCampaign;
+    private _clientInfo: ClientInfo;
 
     constructor(parameters: IAdMobEventHandlerParameters) {
         this._adUnit = parameters.adUnit;
@@ -48,6 +51,7 @@ export class AdMobEventHandler implements IAdMobEventHandler {
         this._session = parameters.session;
         this._adMobSignalFactory = parameters.adMobSignalFactory;
         this._campaign = parameters.campaign;
+        this._clientInfo = parameters.clientInfo;
         this._timeoutTimer = new Timer(() => this.onFailureToLoad(), AdMobEventHandler._loadTimeout);
     }
 
@@ -72,9 +76,13 @@ export class AdMobEventHandler implements IAdMobEventHandler {
     }
 
     public onAttribution(url: string, touchInfo: ITouchInfo): Promise<void> {
+        const userAgent = this.getUserAgentHeader();
+        const headers: Array<[string, string]> = [
+            ['User-Agent', userAgent]
+        ];
         return this.createClickUrl(url, touchInfo).then((clickUrl) => {
             return new Promise<void>((resolve, reject) => {
-                this._thirdPartyEventManager.sendEvent('admob click', this._session.getId(), clickUrl, true).then(() => resolve()).catch(reject);
+                this._thirdPartyEventManager.sendEvent('admob click', this._session.getId(), clickUrl, true, headers).then(() => resolve()).catch(reject);
             });
         });
    }
@@ -107,6 +115,11 @@ export class AdMobEventHandler implements IAdMobEventHandler {
         if (event === 'error') {
             Diagnostics.trigger('admob_ad_error', data, this._campaign.getSession());
         }
+    }
+
+    private getUserAgentHeader(): string {
+        const userAgent = navigator.userAgent || 'Unknown ';
+        return `${userAgent} (Unity ${this._clientInfo.getSdkVersion()})`;
     }
 
     private onFailureToLoad(): void {
