@@ -35,6 +35,7 @@ import { Campaign } from 'Models/Campaign';
 
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
+import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 import { XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 
@@ -75,6 +76,8 @@ describe('AdUnitFactoryTest', () => {
         sessionManager = new SessionManager(nativeBridge);
         operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
         comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
+
+        sandbox.stub(MoatViewabilityService, 'initMoat');
 
         adUnitParameters = {
             forceOrientation: ForceOrientation.LANDSCAPE,
