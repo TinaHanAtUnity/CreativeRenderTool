@@ -18,7 +18,7 @@ export class AndroidCacheApi extends NativeApi {
         return this._nativeBridge.invoke<boolean>(this._apiClass, 'getCacheDirectoryExists');
     }
 
-    public reCreateCacheDirectory(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'reCreateCacheDirectory');
+    public recreateCacheDirectory(): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'recreateCacheDirectory');
     }
 }
