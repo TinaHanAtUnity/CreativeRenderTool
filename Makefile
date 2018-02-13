@@ -80,14 +80,14 @@ build-release: clean build-dir build-static build-css build-proto build-ts build
 		var s=fs.readFileSync('$(BUILD_DIR)/css/main.css', o);\
 		var j=fs.readFileSync('$(BUILD_DIR)/bundle.min.js', o);\
 		var i=fs.readFileSync('$(BUILD_DIR)/index.html', o);\
-		var b=fs.readFileSync('node_modules/protobufjs/dist/minimal/protobuf.js', o);\
+		var b=fs.readFileSync('node_modules/protobufjs/dist/minimal/protobuf.min.js', o);\
 		fs.writeFileSync('$(BUILD_DIR)/index.html', i.replace('{COMPILED_CSS}', s).replace('{COMPILED_JS}', j).replace('{PROTOBUF_JS}', b), o);"
 
 	@echo
 	@echo Cleaning release build
 	@echo
 
-	rm -rf $(BUILD_DIR)/img $(BUILD_DIR)/css $(BUILD_DIR)/js $(BUILD_DIR)/html $(BUILD_DIR)/xml $(BUILD_DIR)/json $(BUILD_DIR)/bundle.js $(BUILD_DIR)/bundle.min.js
+	rm -rf $(BUILD_DIR)/img $(BUILD_DIR)/css $(BUILD_DIR)/js $(BUILD_DIR)/html $(BUILD_DIR)/xml $(BUILD_DIR)/json $(BUILD_DIR)/proto $(BUILD_DIR)/bundle.js $(BUILD_DIR)/bundle.min.js
 
 	@echo
 	@echo Copying release config.json to build
@@ -183,7 +183,7 @@ build-proto:
 	@echo
 
 	mkdir -p $(BUILD_DIR)/proto
-	$(PBJS) -t static-module -w $$(if [ $(MODULE) = es2015 ]; then echo es6; else echo commonjs; fi) -o src/proto/unity_proto.js src/proto/unity_proto.proto
+	$(PBJS) -t static-module -w $$(if [ $(MODULE) = es2015 ]; then echo es6; else echo commonjs; fi) --no-create --no-verify --no-convert --no-delimited --no-beautify -o src/proto/unity_proto.js src/proto/unity_proto.proto
 	$(PBTS) -o src/proto/unity_proto.d.ts src/proto/unity_proto.js
 	cp src/proto/unity_proto.js $(BUILD_DIR)/proto/unity_proto.js
 
