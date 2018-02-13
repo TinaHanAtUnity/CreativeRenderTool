@@ -1,3 +1,8 @@
+# Pending
+
+* Validate and encode all incoming URLs to handle unsafe characters
+* Enable lunar theme on all groups except 5
+
 # Tue Feb 13 09:49:36 UTC 2018
 
 * Remove the hidden margin from the admob iframe
