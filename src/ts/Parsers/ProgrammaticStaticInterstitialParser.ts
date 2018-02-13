@@ -57,7 +57,7 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
 
         const displayInterstitialParams: IDisplayInterstitialCampaign = {
             ... baseCampaignParams,
-            clickThroughUrl: jsonDisplay.clickThroughURL,
+            clickThroughUrl: jsonDisplay.clickThroughURL ? this.validateAndEncodeUrl(jsonDisplay.clickThroughURL, session) : undefined,
             tracking: response.getTrackingUrls() || undefined
         };
 
