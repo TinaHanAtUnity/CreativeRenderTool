@@ -1,4 +1,16 @@
-# Staged
+# Tue Feb 13 09:49:36 UTC 2018
+
+* Remove the hidden margin from the admob iframe
+* Enable MOAT on all SDK 2 versions without volume change listeners
+* New overlay AB test on groups 8 & 10
+* Send diagnostics if callback cannot be found when onDownloadStart event is received
+* Cleanup protobuf build & use minified release
+
+# Fri Feb  9 11:00:06 UTC 2018
+
+* Add config_parsing_failed diagnostic event
+
+# Thu Feb  8 12:36:42 UTC 2018
 
 * Lunar new year theme (groups  5 & 6)
 * Fade animation can be disabled on rewarded placements
