@@ -137,11 +137,11 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     protected getEndscreenAlt(campaign?: Campaign) {
-        if(this._abGroup === 5 || this._abGroup === 6) {
-            return lunarEndScreenId;
+        if(this._abGroup === 5) {
+            return undefined;
         }
 
-        return undefined;
+        return lunarEndScreenId;
     }
 
     protected abstract onDownloadEvent(event: Event): void;
