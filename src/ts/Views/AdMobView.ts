@@ -8,7 +8,7 @@ import { Placement } from 'Models/Placement';
 import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
 import { Template } from 'Utilities/Template';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
-import { AFMABridge, ITouchInfo } from 'Views/AFMABridge';
+import { AFMABridge, ITouchInfo, IClickSignalResponse } from 'Views/AFMABridge';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
@@ -24,6 +24,7 @@ export interface IAdMobEventHandler {
     onVideoStart(): void;
     onSetOrientationProperties(allowOrientation: boolean, forceOrientation: ForceOrientation): void;
     onTrackingEvent(event: string, data?: any): void;
+    onClickSignalRequest(touchInfo: ITouchInfo): void;
 }
 
 const AFMAClickStringMacro = '{{AFMA_CLICK_SIGNALS_PLACEHOLDER}}';
@@ -57,7 +58,8 @@ export class AdMobView extends View<IAdMobEventHandler> {
             onAFMAOpenInAppStore: () => { /**/ },
             onAFMAOpenStoreOverlay: () => { /**/ },
             onAFMARewardedVideoStart: () => this.onVideoStart(),
-            onAFMATrackingEvent: (event, data?) => this.onTrackingEvent(event, data)
+            onAFMATrackingEvent: (event, data?) => this.onTrackingEvent(event, data),
+            onAFMAClickSignalRequest: (touchInfo) => this.onClickSignalRequest(touchInfo)
         });
         this._mraidBridge = new MRAIDBridge(nativeBridge, {
             onSetOrientationProperties: (allowOrientation: boolean, forceOrientation: ForceOrientation) => this.onSetOrientationProperties(allowOrientation, forceOrientation)
@@ -86,6 +88,10 @@ export class AdMobView extends View<IAdMobEventHandler> {
 
     public onBackPressed() {
         this._afmaBridge.onBackPressed();
+    }
+
+    public sendClickSignalResponse(response: IClickSignalResponse) {
+        this._afmaBridge.sendClickSignalResponse(response);
     }
 
     private setupIFrame() {
@@ -157,5 +163,8 @@ export class AdMobView extends View<IAdMobEventHandler> {
     }
     private onTrackingEvent(event: string, data?: any) {
         this._handlers.forEach((h) => h.onTrackingEvent(event, data));
+    }
+    private onClickSignalRequest(touchInfo: ITouchInfo) {
+        this._handlers.forEach((h) => h.onClickSignalRequest(touchInfo));
     }
 }

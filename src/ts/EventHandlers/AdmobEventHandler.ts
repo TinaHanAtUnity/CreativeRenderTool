@@ -15,6 +15,7 @@ import { ITouchInfo } from 'Views/AFMABridge';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
 import { ClientInfo } from 'Models/ClientInfo';
+import { AdMobSignal } from 'Models/AdMobSignal';
 
 export interface IAdMobEventHandlerParameters {
     adUnit: AdMobAdUnit;
@@ -80,7 +81,14 @@ export class AdMobEventHandler implements IAdMobEventHandler {
         const headers: Array<[string, string]> = [
             ['User-Agent', userAgent]
         ];
-        return this.createClickUrl(url, touchInfo).then((clickUrl) => {
+        const isMsPresent = Url.getQueryParameter(url, 'ms');
+        let urlPromise;
+        if (isMsPresent) {
+            urlPromise = Promise.resolve(url);
+        } else {
+            urlPromise = this.createClickUrl(url, touchInfo);
+        }
+        return urlPromise.then((clickUrl) => {
             return new Promise<void>((resolve, reject) => {
                 this._thirdPartyEventManager.sendEvent('admob click', this._session.getId(), clickUrl, true, headers).then(() => resolve()).catch(reject);
             });
@@ -117,17 +125,17 @@ export class AdMobEventHandler implements IAdMobEventHandler {
         }
     }
 
-    private getUserAgentHeader(): string {
-        const userAgent = navigator.userAgent || 'Unknown ';
-        return `${userAgent} (Unity ${this._clientInfo.getSdkVersion()})`;
+    public onClickSignalRequest(touchInfo: ITouchInfo) {
+        return this.getClickSignal(touchInfo).then((signal) => {
+            const response = {
+                encodedClickSignal: signal.getBase64ProtoBufNonEncoded(),
+                rvdt: this._adUnit.getRequestToViewTime()
+            };
+            this._adUnit.sendClickSignalResponse(response);
+        });
     }
 
-    private onFailureToLoad(): void {
-        this._adUnit.setFinishState(FinishState.ERROR);
-        this._adUnit.hide();
-    }
-
-    private createClickUrl(url: string, touchInfo: ITouchInfo): Promise<string> {
+    private getClickSignal(touchInfo: ITouchInfo): Promise<AdMobSignal> {
         return this._adMobSignalFactory.getClickSignal().then((signal) => {
             signal.setTimeOnScreen(this._adUnit.getTimeOnScreen());
             signal.setTouchDiameter(touchInfo.diameter);
@@ -140,9 +148,26 @@ export class AdMobEventHandler implements IAdMobEventHandler {
             signal.setTouchUpTotal(touchInfo.counts.up);
             signal.setTouchMoveTotal(touchInfo.counts.move);
             signal.setTouchCancelTotal(touchInfo.counts.cancel);
+            signal.setTouchDuration(touchInfo.duration);
+            return signal;
+        });
+    }
+
+    private getUserAgentHeader(): string {
+        const userAgent = navigator.userAgent || 'Unknown ';
+        return `${userAgent} (Unity ${this._clientInfo.getSdkVersion()})`;
+    }
+
+    private onFailureToLoad(): void {
+        this._adUnit.setFinishState(FinishState.ERROR);
+        this._adUnit.hide();
+    }
+
+    private createClickUrl(url: string, touchInfo: ITouchInfo): Promise<string> {
+        return this.getClickSignal(touchInfo).then((signal) => {
             return Url.addParameters(url, {
                 ms: signal.getBase64ProtoBufNonEncoded(),
-                rvdt: this._adUnit.getStartTime() - SdkStats.getAdRequestTimestamp()
+                rvdt: this._adUnit.getRequestToViewTime()
             });
         });
     }

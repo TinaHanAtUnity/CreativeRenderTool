@@ -12,7 +12,8 @@ export enum AFMAEvents {
     OPEN_STORE_OVERLAY      = 'openStoreOverlay',
     OPEN_IN_APP_STORE       = 'openInAppStore',
     FETCH_APP_STORE_OVERLAY = 'fetchAppStoreOverlay',
-    TRACKING                = 'tracking'
+    TRACKING                = 'tracking',
+    GET_CLICK_SIGNAL        = 'getClickSignal'
 }
 
 export interface IPoint {
@@ -32,6 +33,7 @@ export interface ITouchInfo {
     end: IPoint;
     diameter: number;
     pressure: number;
+    duration: number;
     counts: ITouchCounts;
 }
 
@@ -39,6 +41,11 @@ export interface IAFMAMessage {
     type: string;
     event: string;
     data?: any;
+}
+
+export interface IClickSignalResponse {
+    encodedClickSignal: string;
+    rvdt: number;
 }
 
 export interface IAFMAHandler {
@@ -53,6 +60,7 @@ export interface IAFMAHandler {
     onAFMAOpenInAppStore(productId: string, url: string): void;
     onAFMAFetchAppStoreOverlay(productId: string): void;
     onAFMATrackingEvent(event: string, data?: any): void;
+    onAFMAClickSignalRequest(touchInfo: ITouchInfo): void;
 }
 
 export class AFMABridge {
@@ -78,6 +86,7 @@ export class AFMABridge {
         this._afmaHandlers[AFMAEvents.OPEN_IN_APP_STORE] = (msg) => this._handler.onAFMAOpenInAppStore(msg.data.productId, msg.data.url);
         this._afmaHandlers[AFMAEvents.FETCH_APP_STORE_OVERLAY] = (msg) => this._handler.onAFMAFetchAppStoreOverlay(msg.data.productId);
         this._afmaHandlers[AFMAEvents.TRACKING] = (msg) => this._handler.onAFMATrackingEvent(msg.data.event, msg.data.data);
+        this._afmaHandlers[AFMAEvents.GET_CLICK_SIGNAL] = (msg) => this._handler.onAFMAClickSignalRequest(msg.data.data);
     }
 
     public connect(iframe: HTMLIFrameElement) {
@@ -93,6 +102,10 @@ export class AFMABridge {
         this.postMessage('back');
     }
 
+    public sendClickSignalResponse(response: IClickSignalResponse) {
+        this.postMessage('clickSignal', response);
+    }
+
     private onMessage(e: MessageEvent) {
         const message = <IAFMAMessage>e.data;
         if (message.type === 'afma') {
@@ -104,10 +117,11 @@ export class AFMABridge {
         }
     }
 
-    private postMessage(event: string) {
+    private postMessage(event: string, data?: any) {
         this._iframe.contentWindow.postMessage({
             type: 'afma',
-            event: event
+            event: event,
+            data: data
         }, '*');
     }
 }

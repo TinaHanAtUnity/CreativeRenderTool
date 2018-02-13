@@ -10,6 +10,8 @@ import { Platform } from 'Constants/Platform';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { Placement } from 'Models/Placement';
 import { FocusManager } from 'Managers/FocusManager';
+import { IClickSignalResponse } from 'Views/AFMABridge';
+import { SdkStats } from 'Utilities/SdkStats';
 
 export interface IAdMobAdUnitParameters extends IAdUnitParameters<AdMobCampaign> {
     view: AdMobView;
@@ -29,6 +31,7 @@ export class AdMobAdUnit extends AbstractAdUnit {
     private _timeOnScreen: number = 0;
     private _foregroundTime: number = 0;
     private _startTime: number = 0;
+    private _requestToViewTime: number = 0;
 
     private _onSystemKillObserver: () => void;
     private _onPauseObserver: () => void;
@@ -52,6 +55,7 @@ export class AdMobAdUnit extends AbstractAdUnit {
     }
 
     public show(): Promise<void> {
+        this._requestToViewTime = Date.now() - SdkStats.getAdRequestTimestamp();
         this.setShowing(true);
         this.onStart.trigger();
 
@@ -63,9 +67,7 @@ export class AdMobAdUnit extends AbstractAdUnit {
         if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
             this._nativeBridge.AndroidAdUnit.onKeyDown.subscribe(this._keyDownListener);
         }
-
         this.subscribeToLifecycle();
-
         return this._container.open(this, false, true, this._forceOrientation, true, false, true, false, this._options).then(() => {
             if (this._startTime === 0) {
                 this._startTime = Date.now();
@@ -134,6 +136,14 @@ export class AdMobAdUnit extends AbstractAdUnit {
         for (const url of urls) {
             this.sendThirdPartyEvent(`admob ${event}`, url);
         }
+    }
+
+    public sendClickSignalResponse(response: IClickSignalResponse) {
+        this._view.sendClickSignalResponse(response);
+    }
+
+    public getRequestToViewTime(): number {
+        return this._requestToViewTime;
     }
 
     private showView() {
