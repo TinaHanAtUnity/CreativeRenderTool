@@ -28,7 +28,6 @@ export class AdMobAdUnit extends AbstractAdUnit {
     private _keyDownListener: (kc: number) => void;
     private _campaign: AdMobCampaign;
     private _placement: Placement;
-    private _timeOnScreen: number = 0;
     private _foregroundTime: number = 0;
     private _startTime: number = 0;
     private _requestToViewTime: number = 0;
@@ -124,7 +123,7 @@ export class AdMobAdUnit extends AbstractAdUnit {
     }
 
     public getTimeOnScreen(): number {
-        return (Date.now() - this._foregroundTime) + this._timeOnScreen;
+        return Date.now() - this._foregroundTime;
     }
 
     public getStartTime(): number {
@@ -201,30 +200,22 @@ export class AdMobAdUnit extends AbstractAdUnit {
     private subscribeToLifecycle() {
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            this._onPauseObserver = this._focusManager.onAppBackground.subscribe(() => this.onAppBackground());
             this._onResumeObserver = this._focusManager.onAppForeground.subscribe(() => this.onAppForeground());
         } else {
             this._onResumeObserver = this._container.onShow.subscribe(() => this.onAppForeground());
-            this._onPauseObserver = this._container.onAndroidPause.subscribe(() => this.onAppBackground());
         }
     }
 
     private unsubscribeFromLifecycle() {
         this._container.onSystemKill.unsubscribe(this._onSystemKillObserver);
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+        if (this._nativeBridge.getPlatform() === Platform.IOS) {
             this._focusManager.onAppBackground.unsubscribe(this._onPauseObserver);
-            this._focusManager.onAppForeground.unsubscribe(this._onResumeObserver);
         } else {
             this._container.onShow.unsubscribe(this._onResumeObserver);
-            this._container.onAndroidPause.unsubscribe(this._onPauseObserver);
         }
     }
 
     private onAppForeground() {
         this._foregroundTime = Date.now();
-    }
-
-    private onAppBackground() {
-        this._timeOnScreen = (Date.now() - this._foregroundTime) + this._timeOnScreen;
     }
 }
