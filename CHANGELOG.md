@@ -1,4 +1,4 @@
-# Staged
+# Tue Feb 13 09:49:36 UTC 2018
 
 * Remove the hidden margin from the admob iframe
 * Enable MOAT on all SDK 2 versions without volume change listeners
