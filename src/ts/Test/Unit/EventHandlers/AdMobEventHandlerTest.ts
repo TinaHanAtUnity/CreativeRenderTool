@@ -133,6 +133,7 @@ describe('AdMobEventHandler', () => {
             },
             diameter: 1.0,
             pressure: 0.5,
+            duration: 5,
             counts: {
                 up: 1,
                 down: 1,
@@ -144,6 +145,11 @@ describe('AdMobEventHandler', () => {
         beforeEach(() => {
             clock = sinon.useFakeTimers(requestTime);
             SdkStats.setAdRequestTimestamp();
+            (<sinon.SinonStub>adMobSignalFactory.getClickSignal).returns(Promise.resolve(new AdMobSignal()));
+            (<sinon.SinonStub>adUnit.getTimeOnScreen).returns(42);
+            (<sinon.SinonStub>adUnit.getStartTime).returns(startTime);
+            (<sinon.SinonStub>adUnit.getRequestToViewTime).returns(42);
+            (<sinon.SinonStub>thirdPartyEventManager.sendEvent).returns(Promise.resolve());
         });
 
         afterEach(() => {
@@ -151,10 +157,6 @@ describe('AdMobEventHandler', () => {
         });
 
         it('should append click signals', () => {
-            (<sinon.SinonStub>adMobSignalFactory.getClickSignal).returns(Promise.resolve(new AdMobSignal()));
-            (<sinon.SinonStub>adUnit.getTimeOnScreen).returns(42);
-            (<sinon.SinonStub>adUnit.getStartTime).returns(startTime);
-            (<sinon.SinonStub>thirdPartyEventManager.sendEvent).returns(Promise.resolve());
             const url = 'http://unityads.unity3d.com';
 
             return admobEventHandler.onAttribution(url, touch).then(() => {
@@ -175,10 +177,6 @@ describe('AdMobEventHandler', () => {
         });
 
         it('should append the rvdt parameter', () => {
-            (<sinon.SinonStub>adMobSignalFactory.getClickSignal).returns(Promise.resolve(new AdMobSignal()));
-            (<sinon.SinonStub>adUnit.getTimeOnScreen).returns(42);
-            (<sinon.SinonStub>adUnit.getStartTime).returns(startTime);
-            (<sinon.SinonStub>thirdPartyEventManager.sendEvent).returns(Promise.resolve());
             const url = 'http://unityads.unity3d.com';
 
             return admobEventHandler.onAttribution(url, touch).then(() => {
@@ -188,7 +186,7 @@ describe('AdMobEventHandler', () => {
                 if (!param) {
                     throw new Error('Expected param not to be null');
                 }
-                assert.equal(param, (startTime - requestTime).toString());
+                assert.equal(param, adUnit.getRequestToViewTime().toString());
             });
         });
     });
