@@ -1,6 +1,6 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { NativeApi } from 'Native/NativeApi';
-import { Observable1, Observable2 } from "Utilities/Observable";
+import { Observable1, Observable0, Observable2 } from "Utilities/Observable";
 
 // Platform specific, first three are available on both Android & iOS. The rest are Android only.
 export enum WebplayerEvent {
@@ -30,6 +30,7 @@ export enum WebplayerEvent {
     CONSOLE_MESSAGE,
     SHOW_FILE_CHOOSER,
     GEOLOCATION_PERMISSIONS_SHOW,
+    WEBPLAYER_EVENT,
     DOWNLOAD_START,
     SHOULD_OVERRIDE_URL_LOADING,
     SHOULD_OVERRIDE_KEY_EVENT,
@@ -142,7 +143,7 @@ export interface IWebPlayerPlayerSettingsAndroid {
 export interface IWebPlayerWebSettingsIos {
     allowsPlayback?: boolean;
     playbackRequiresAction?: boolean;
-    typesRequiringAction?: number;
+    typesRequiringAction?: WKAudiovisualMediaTypes;
     scalesPagesToFit?: boolean; // UIWebView only
     javaScriptCanOpenWindowsAutomatically?: boolean; // WKWebView only
     javaScriptEnabled?: boolean; // WKWebView only
@@ -153,10 +154,18 @@ export interface IWebPlayerWebSettingsIos {
     dataDetectorTypes?: number; // WKWebView iOS10+ only (bitfield) & UIWebView (enum)
 }
 
+export enum WKAudiovisualMediaTypes {
+    NONE    = 0,
+    AUDIO   = 1 << 0,
+    VIDEO   = 1 << 1,
+    ALL     = WKAudiovisualMediaTypes.AUDIO | WKAudiovisualMediaTypes.VIDEO,
+}
+
 export class WebPlayerApi extends NativeApi {
 
     public readonly onPageStarted = new Observable1<string>();
     public readonly onPageFinished = new Observable1<string>();
+    public readonly onWebPlayerEvent = new Observable1<string>();
     public readonly onCreateWindow = new Observable1<string>();
     public readonly shouldOverrideUrlLoading = new Observable2<string, string>();
 
@@ -188,6 +197,10 @@ export class WebPlayerApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._apiClass, 'setEventSettings', [eventSettings]);
     }
 
+    public sendEvent(args: any[]): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'sendEvent', [args]);
+    }
+
     public handleEvent(event: string, parameters: any[]): void {
         switch(event) {
             case WebplayerEvent[WebplayerEvent.PAGE_STARTED]:
@@ -200,6 +213,9 @@ export class WebPlayerApi extends NativeApi {
 
             case WebplayerEvent[WebplayerEvent.ERROR]:
                 this.onPageFinished.trigger(parameters[0]);
+                break;
+            case WebplayerEvent[WebplayerEvent.WEBPLAYER_EVENT]:
+                this.onWebPlayerEvent.trigger(parameters[0]);
                 break;
 
             case WebplayerEvent[WebplayerEvent.SHOULD_OVERRIDE_URL_LOADING]:

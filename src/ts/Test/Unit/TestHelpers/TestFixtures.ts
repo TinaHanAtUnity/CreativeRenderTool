@@ -35,8 +35,9 @@ import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampa
 import DummyDisplayInterstitialUrlCampaign from 'json/DummyDisplayInterstitialUrlCampaign.json';
 import VastCompanionXml from 'xml/VastCompanionAd.xml';
 import EventTestVast from 'xml/EventTestVast.xml';
-import VPAIDTestXML from 'xml/VPAID.xml';
-import VPAIDCampaignJson from 'json/OnProgrammaticVPAIDCampaign.json';
+import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
+import { Campaign } from 'Models/Campaign';
+import { FocusManager } from 'Managers/FocusManager';
 import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xml';
 
 export class TestFixtures {
@@ -323,13 +324,6 @@ export class TestFixtures {
             vpaid: vpaid,
             tracking: json.trackingUrls
         };
-    }
-
-    public static getVPAIDCampaign(): VPAIDCampaign {
-        const vpaid = new VPAIDParser().parse(VPAIDTestXML);
-        const vpaidCampaignJson = JSON.parse(VPAIDCampaignJson);
-
-        return new VPAIDCampaign(this.getVPAIDCampaignParams(vpaidCampaignJson, vpaid));
     }
 
     public static getCampaignFollowsRedirects(): PerformanceCampaign {

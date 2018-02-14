@@ -1,6 +1,6 @@
 import VPAIDContainerTemplate from 'html/vpaid/container.html';
+import VPAIDCss from 'css/vpaid-container.css';
 import VPAIDTemplate from 'html/vpaid/VPAID.html';
-import LoadingTemplate from 'html/loading.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -8,6 +8,8 @@ import { Template } from 'Utilities/Template';
 import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
 import { Timer } from 'Utilities/Timer';
 import { Placement } from 'Models/Placement';
+import { IObserver1 } from 'Utilities/IObserver';
+import { Platform } from 'Constants/Platform';
 
 interface InitAdOptions {
     width: number;
@@ -27,6 +29,15 @@ export interface IVPAIDHandler {
     onVPAIDProgress(duration: number, remainingTime: number): void;
 }
 
+interface IVPAIDAdParameters {
+    skipEnabled: boolean;
+    skipDuration: number;
+}
+
+interface IVPAIDTemplateData {
+    adParameters: string;
+}
+
 export class VPAID extends View<IVPAIDHandler> {
     private static stuckDelay = 5 * 1000;
 
@@ -34,137 +45,127 @@ export class VPAID extends View<IVPAIDHandler> {
     private _campaign: VPAIDCampaign;
     private _placement: Placement;
 
-    private _iframe: HTMLIFrameElement;
-    private _messageListener: (e: MessageEvent) => void;
-
-    private _loadingScreen: HTMLElement;
     private _stuckTimer: Timer;
     private _isPaused = false;
+    private _isLoaded = false;
+    private _webplayerEventObserver: IObserver1<string>;
+    private _isCoppaCompliant: boolean;
 
-    constructor(nativeBridge: NativeBridge, campaign: VPAIDCampaign, placement: Placement, language: string, gameId: string) {
+    constructor(nativeBridge: NativeBridge, campaign: VPAIDCampaign, placement: Placement) {
         super(nativeBridge, 'vpaid');
 
         this._template = new Template(VPAIDTemplate);
         this._campaign = campaign;
-        this._messageListener = (e: MessageEvent) => this.onMessage(e);
-
-        this._loadingScreen = document.createElement('div');
-        this._loadingScreen.classList.add('loading-container');
-        this._loadingScreen.innerHTML = new Template(LoadingTemplate).render({});
-
         this._placement = placement;
         this._stuckTimer = new Timer(() => this._handlers.forEach(handler => handler.onVPAIDStuck()), VPAID.stuckDelay);
-
-        this._bindings = [{
-            selector: '.companion',
-            event: 'click',
-            listener: (e: Event) => this._handlers.forEach(handler => handler.onVPAIDCompanionClick())
-        }];
+        this._bindings = [];
     }
 
-    public render(): void {
-        super.render();
+    public loadWebPlayer(): Promise<void> {
+        this._isLoaded = true;
+        const adParameters = <IVPAIDAdParameters>{
+            skipEnabled: this._placement.allowSkip(),
+            skipDuration: this._placement.allowSkipInSeconds(),
+        };
 
-        const iframeSrcDoc = VPAIDContainerTemplate.replace(this.vpaidSrcTag, this._campaign.getVPAID().getScriptUrl());
-        this._iframe = <HTMLIFrameElement>this._container.querySelector('iframe');
-        this._iframe.setAttribute('srcdoc', iframeSrcDoc);
-        this._container.insertBefore(this._loadingScreen, this._container.firstChild);
+        const templateData = <IVPAIDTemplateData>{
+            adParameters: JSON.stringify(adParameters),
+            vpaidSrcUrl: this._campaign.getVPAID().getScriptUrl(),
+            isCoppaCompliant: this._isCoppaCompliant
+        };
 
-        if (this._campaign.hasCompanionAd()) {
-            const companionContainer = <HTMLDivElement>this._container.querySelector('.companion-container');
-            companionContainer.style.display = 'block';
+        let iframeSrcDoc = VPAIDContainerTemplate.replace('{COMPILED_CSS}', VPAIDCss);
+        iframeSrcDoc = new Template(iframeSrcDoc).render(templateData);
 
-            const companionElement = <HTMLImageElement>this._container.querySelector('.companion');
-            const companionAd = this._campaign.getCompanionAd();
-            if (companionAd) {
-                const companionUrl = companionAd.getStaticResourceURL();
-                companionElement.style.width = companionAd.getWidth() + 'px';
-                companionElement.style.height = companionAd.getHeight() + 'px';
-
-                if (companionUrl) {
-                    companionElement.src = companionUrl;
-                }
-            }
-        }
+        this._webplayerEventObserver = this._nativeBridge.WebPlayer.onWebPlayerEvent.subscribe((args: string) => this.onWebPlayerEvent(JSON.parse(args)));
+        iframeSrcDoc = this._nativeBridge.getPlatform() === Platform.ANDROID ? encodeURIComponent(iframeSrcDoc) : iframeSrcDoc;
+        return this._nativeBridge.WebPlayer.setData(iframeSrcDoc, 'text/html', 'UTF-8');
     }
 
-    public show() {
-        super.show();
-
-        window.addEventListener('message', this._messageListener);
-        if (this._campaign.hasCompanionAd()) {
-            this._handlers.forEach(handler => handler.onVPAIDCompanionView());
-        }
+    public isLoaded(): boolean {
+        return this._isLoaded;
     }
 
     public hide() {
-        this._iframe.contentWindow.postMessage({ type: 'destroy' }, '*');
-        window.removeEventListener('message', this._messageListener);
-        super.hide();
+        this.sendEvent('destroy');
         this._stuckTimer.stop();
+        this._nativeBridge.WebPlayer.onWebPlayerEvent.unsubscribe(this._webplayerEventObserver);
     }
 
     public showAd() {
-        this._container.removeChild(this._loadingScreen);
-        this._iframe.contentWindow.postMessage({
-            type: 'show'
-        }, '*');
+        this.sendEvent('show');
         this._stuckTimer.start();
     }
 
     public pauseAd() {
         this._isPaused = true;
-        this._iframe.contentWindow.postMessage({
-            type: 'pause'
-        }, '*');
+        this.sendEvent('pause');
         this._stuckTimer.stop();
     }
 
     public resumeAd() {
         this._isPaused = false;
-        this._iframe.contentWindow.postMessage({
-            type: 'resume'
-        }, '*');
+        this.sendEvent('resume');
         this._stuckTimer.start();
     }
 
-    private onMessage(e: MessageEvent) {
-        switch (e.data.type) {
+    public mute() {
+        this.sendEvent('mute');
+    }
+
+    public unmute() {
+        this.sendEvent('unmute');
+    }
+
+    private onVPAIDContainerReady() {
+        this.getInitAdOptions().then(initOptions => {
+            this.sendEvent('init', [initOptions]);
+        });
+    }
+
+    private getInitAdOptions(): Promise<InitAdOptions> {
+        return Promise.all([this._nativeBridge.DeviceInfo.getScreenWidth(),
+            this._nativeBridge.DeviceInfo.getScreenHeight()]).then(([width, height]) => {
+                return <InitAdOptions>{
+                    width: width,
+                    height: height,
+                    bitrate: 500,
+                    viewMode: 'normal',
+                    creativeData: {
+                        AdParameters: this._campaign.getVPAID().getCreativeParameters()
+                    }
+                };
+            });
+    }
+
+    private sendEvent(event: string, parameters?: any[]): Promise<void> {
+        const webPlayerParams: any[] = [event];
+        if (parameters) {
+            webPlayerParams.push(parameters);
+        }
+        return this._nativeBridge.WebPlayer.sendEvent(webPlayerParams);
+    }
+
+    private onWebPlayerEvent(args: any[]) {
+        const eventType = args.shift();
+        const params = args.shift();
+
+        switch (eventType) {
             case 'progress':
-                this._handlers.forEach(handler => handler.onVPAIDProgress(e.data.adDuration, e.data.adRemainingTime));
+                this._handlers.forEach(handler => handler.onVPAIDProgress(params[0], params[1]));
                 if (!this._isPaused) {
                     this._stuckTimer.reset();
                 }
                 break;
             case 'VPAID':
-                this._handlers.forEach(handler => handler.onVPAIDEvent(e.data.eventType, e.data.args));
+                this._handlers.forEach(handler => handler.onVPAIDEvent(params.shift(), params.shift()));
                 break;
             case 'ready':
                 this.onVPAIDContainerReady();
                 break;
             default:
-                this._nativeBridge.Sdk.logWarning(`VPAID Unknown message type ${e.data.type}`);
+                this._nativeBridge.Sdk.logWarning(`VPAID Unknown message type ${eventType}`);
                 break;
         }
-    }
-
-    private onVPAIDContainerReady() {
-        const initOptions = this.getInitAdOptions();
-        this._iframe.contentWindow.postMessage({
-            ... initOptions,
-            type: 'init'
-        }, '*');
-    }
-
-    private getInitAdOptions(): InitAdOptions {
-        return <InitAdOptions>{
-            width: this._container.clientWidth,
-            height: this._container.clientHeight,
-            bitrate: 500,
-            viewMode: 'normal',
-            creativeData: {
-                AdParameters: this._campaign.getVPAID().getCreativeParameters()
-            }
-        };
     }
 }
