@@ -105,7 +105,7 @@ export class AdUnitFactory {
         const endScreenEventHandler = new PerformanceEndScreenEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
         endScreen.addEventHandler(endScreenEventHandler);
 
-        this.prepareVideoPlayer(nativeBridge, performanceAdUnit, parameters);
+        this.prepareVideoPlayer(nativeBridge, performanceAdUnit, parameters, performanceAdUnitParameters.adUnitStyle);
 
         if (nativeBridge.getPlatform() === Platform.ANDROID) {
             const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => endScreenEventHandler.onKeyEvent(keyCode));
