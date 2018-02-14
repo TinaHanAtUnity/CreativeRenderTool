@@ -243,7 +243,7 @@ test: test-unit test-integration
 
 test-unit: MODULE = system
 test-unit: TARGET = es5
-test-unit: build-proto
+test-unit: build-proto build-css
 	@echo
 	@echo Transpiling .ts to .js for local tests
 	@echo
@@ -258,7 +258,7 @@ test-unit: build-proto
 
 test-integration: MODULE = system
 test-integration: TARGET = es5
-test-integration: build-proto
+test-integration: build-proto build-css
 	@echo
 	@echo Transpiling .ts to .js for local tests
 	@echo
@@ -274,7 +274,7 @@ test-integration: build-proto
 test-coverage: BUILD_DIR = build/coverage
 test-coverage: MODULE = system
 test-coverage: TARGET = es5
-test-coverage: build-dir build-proto
+test-coverage: build-dir build-proto build-css
 	@echo
 	@echo Transpiling .ts to .js for local tests
 	@echo
