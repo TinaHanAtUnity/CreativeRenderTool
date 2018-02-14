@@ -2,6 +2,7 @@ import { Cache, ICacheDiagnostics, CacheStatus } from 'Utilities/Cache';
 import { Campaign } from 'Models/Campaign';
 import { CacheMode } from 'Models/Configuration';
 import { Asset } from 'Models/Assets/Asset';
+import { Url } from 'Utilities/Url';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { Video } from 'Models/Assets/Video';
 import { DeviceInfo } from 'Models/DeviceInfo';
@@ -62,6 +63,10 @@ export class AssetManager {
     }
 
     public setup(campaign: Campaign): Promise<Campaign> {
+        if(!this.validateAssets(campaign)) {
+            throw new Error('Invalid required assets in campaign ' + campaign.getId());
+        }
+
         if(this._cacheMode === CacheMode.DISABLED) {
             return Promise.resolve(campaign);
         }
@@ -257,6 +262,25 @@ export class AssetManager {
         }
     }
 
+    private validateAssets(campaign: Campaign): boolean {
+        const optionalAssets = campaign.getOptionalAssets();
+        for(const optionalAsset of optionalAssets) {
+            if(!Url.isValid(optionalAsset.getUrl())) {
+                this.reportInvalidUrl(campaign, optionalAsset, false);
+            }
+        }
+
+        const requiredAssets = campaign.getRequiredAssets();
+        for(const requiredAsset of requiredAssets) {
+            if(!Url.isValid(requiredAsset.getUrl())) {
+                this.reportInvalidUrl(campaign, requiredAsset, true);
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private validateVideos(assets: Asset[], campaign: Campaign): Promise<void[]> {
         const promises = [];
         for(const asset of assets) {
@@ -270,6 +294,17 @@ export class AssetManager {
         }
 
         return Promise.all(promises);
+    }
+
+    private reportInvalidUrl(campaign: Campaign, asset: Asset, required: boolean): void {
+        Diagnostics.trigger('invalid_asset_url', {
+            url: asset.getUrl(),
+            assetType: asset.getDescription(),
+            assetDTO: asset.getDTO(),
+            required: required,
+            id: campaign.getId(),
+            campaignDTO: campaign.getDTO()
+        }, campaign.getSession());
     }
 
     private getOrientedVideo(campaign: PerformanceCampaign | XPromoCampaign): Promise<Video> {

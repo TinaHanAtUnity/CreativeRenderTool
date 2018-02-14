@@ -1,4 +1,4 @@
-# Pending
+# Wed Feb 14 10:24:20 UTC 2018
 
 * Validate and encode all incoming URLs to handle unsafe characters
 * Enable lunar theme on all groups except 5
