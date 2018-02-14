@@ -10,6 +10,8 @@ import { Platform } from 'Constants/Platform';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { Placement } from 'Models/Placement';
 import { FocusManager } from 'Managers/FocusManager';
+import { IClickSignalResponse } from 'Views/AFMABridge';
+import { SdkStats } from 'Utilities/SdkStats';
 
 export interface IAdMobAdUnitParameters extends IAdUnitParameters<AdMobCampaign> {
     view: AdMobView;
@@ -26,9 +28,9 @@ export class AdMobAdUnit extends AbstractAdUnit {
     private _keyDownListener: (kc: number) => void;
     private _campaign: AdMobCampaign;
     private _placement: Placement;
-    private _timeOnScreen: number = 0;
     private _foregroundTime: number = 0;
     private _startTime: number = 0;
+    private _requestToViewTime: number = 0;
 
     private _onSystemKillObserver: () => void;
     private _onPauseObserver: () => void;
@@ -52,9 +54,11 @@ export class AdMobAdUnit extends AbstractAdUnit {
     }
 
     public show(): Promise<void> {
+        this._requestToViewTime = Date.now() - SdkStats.getAdRequestTimestamp();
         this.setShowing(true);
         this.onStart.trigger();
 
+        this.sendTrackingEvent('show');
         Diagnostics.trigger('admob_ad_show', {
             placement: this._placement.getId()
         }, this._campaign.getSession());
@@ -62,7 +66,6 @@ export class AdMobAdUnit extends AbstractAdUnit {
         if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
             this._nativeBridge.AndroidAdUnit.onKeyDown.subscribe(this._keyDownListener);
         }
-
         this.subscribeToLifecycle();
 
         return this._container.open(this, ['webview'], true, this._forceOrientation, true, false, true, false, this._options).then(() => {
@@ -121,23 +124,31 @@ export class AdMobAdUnit extends AbstractAdUnit {
     }
 
     public getTimeOnScreen(): number {
-        return (Date.now() - this._foregroundTime) + this._timeOnScreen;
+        return Date.now() - this._foregroundTime;
     }
 
     public getStartTime(): number {
         return this._startTime;
     }
 
-    private showView() {
-        this._view.show();
-        document.body.appendChild(this._view.container());
-    }
-
-    private sendTrackingEvent(event: string) {
+    public sendTrackingEvent(event: string) {
         const urls = this._campaign.getTrackingUrlsForEvent(event);
         for (const url of urls) {
             this.sendThirdPartyEvent(`admob ${event}`, url);
         }
+    }
+
+    public sendClickSignalResponse(response: IClickSignalResponse) {
+        this._view.sendClickSignalResponse(response);
+    }
+
+    public getRequestToViewTime(): number {
+        return this._requestToViewTime;
+    }
+
+    private showView() {
+        this._view.show();
+        document.body.appendChild(this._view.container());
     }
 
     private sendThirdPartyEvent(eventType: string, url: string) {
@@ -190,30 +201,22 @@ export class AdMobAdUnit extends AbstractAdUnit {
     private subscribeToLifecycle() {
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            this._onPauseObserver = this._focusManager.onAppBackground.subscribe(() => this.onAppBackground());
             this._onResumeObserver = this._focusManager.onAppForeground.subscribe(() => this.onAppForeground());
         } else {
             this._onResumeObserver = this._container.onShow.subscribe(() => this.onAppForeground());
-            this._onPauseObserver = this._container.onAndroidPause.subscribe(() => this.onAppBackground());
         }
     }
 
     private unsubscribeFromLifecycle() {
         this._container.onSystemKill.unsubscribe(this._onSystemKillObserver);
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+        if (this._nativeBridge.getPlatform() === Platform.IOS) {
             this._focusManager.onAppBackground.unsubscribe(this._onPauseObserver);
-            this._focusManager.onAppForeground.unsubscribe(this._onResumeObserver);
         } else {
             this._container.onShow.unsubscribe(this._onResumeObserver);
-            this._container.onAndroidPause.unsubscribe(this._onPauseObserver);
         }
     }
 
     private onAppForeground() {
         this._foregroundTime = Date.now();
-    }
-
-    private onAppBackground() {
-        this._timeOnScreen = (Date.now() - this._foregroundTime) + this._timeOnScreen;
     }
 }
