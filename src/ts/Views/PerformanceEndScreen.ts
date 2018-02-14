@@ -27,7 +27,6 @@ export class PerformanceEndScreen extends EndScreen {
         this._campaign = campaign;
     }
 
-
     public render(): void {
         super.render();
 
