@@ -101,7 +101,8 @@ System.config({
     paths: {
         '*.html': './src/*.html',
         '*.xml': './src/*.xml',
-        '*.json': './src/*.json'
+        '*.json': './src/*.json',
+        '*.css': './src/*.css'
     }
 });
 
