@@ -156,7 +156,7 @@ describe('AdMobEventHandler', () => {
             clock.restore();
         });
 
-        it('should append click signals', () => {
+        xit('should append click signals', () => {
             const url = 'http://unityads.unity3d.com';
 
             return admobEventHandler.onAttribution(url, touch).then(() => {
