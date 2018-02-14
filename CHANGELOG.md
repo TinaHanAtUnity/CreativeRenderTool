@@ -1,3 +1,12 @@
+# Pending
+
+* Enable lunar theme on all groups except 5
+* Miscellaneous AdMob fixes
+
+# Wed Feb 14 10:24:20 UTC 2018
+
+* Revert previous deployment
+
 # Wed Feb 14 10:24:20 UTC 2018
 
 * Validate and encode all incoming URLs to handle unsafe characters
