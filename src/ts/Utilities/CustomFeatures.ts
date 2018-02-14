@@ -104,6 +104,6 @@ export class CustomFeatures {
 
     public static getAdUnitStyle(abGroup: number): AdUnitStyle {
         // todo: test different download button colors in two ab groups
-        return new AdUnitStyle({ctaButtonColor: "#99FF99"});
+        return new AdUnitStyle({ctaButtonColor: "#167dfb"});
     }
 }
