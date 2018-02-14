@@ -60,19 +60,19 @@ export class ProgrammaticVastParser extends CampaignParser {
         const portraitUrl = vast.getCompanionPortraitUrl();
         let portraitAsset;
         if(portraitUrl) {
-            portraitAsset = new Image(this.validateAndEncodeUrl(portraitUrl, session), session);
+            portraitAsset = new Image(portraitUrl, session);
         }
 
         const landscapeUrl = vast.getCompanionLandscapeUrl();
         let landscapeAsset;
         if(landscapeUrl) {
-            landscapeAsset = new Image(this.validateAndEncodeUrl(landscapeUrl, session), session);
+            landscapeAsset = new Image(landscapeUrl, session);
         }
 
         const vastCampaignParms: IVastCampaign = {
             ... baseCampaignParams,
             vast: vast,
-            video: new Video(this.validateAndEncodeUrl(vast.getVideoUrl(), session), session),
+            video: new Video(vast.getVideoUrl(), session),
             hasEndscreen: !!vast.getCompanionPortraitUrl() || !!vast.getCompanionLandscapeUrl(),
             portrait: portraitAsset,
             landscape: landscapeAsset,

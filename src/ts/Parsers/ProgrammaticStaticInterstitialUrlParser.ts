@@ -49,13 +49,13 @@ export class ProgrammaticStaticInterstitialUrlParser extends CampaignParser {
 
         const displayInterstitialParams: IDisplayInterstitialCampaign = {
             ... baseCampaignParams,
-            clickThroughUrl: jsonDisplayUrl.clickThroughURL ? this.validateAndEncodeUrl(jsonDisplayUrl.clickThroughURL, session) : undefined,
+            clickThroughUrl: jsonDisplayUrl.clickThroughURL,
             tracking: response.getTrackingUrls() || undefined
         };
 
         const displayInterstitialMarkupUrlParams: IDisplayInterstitialMarkupUrlCampaign = {
             ... displayInterstitialParams,
-            markupUrl: this.validateAndEncodeUrl(jsonDisplayUrl.markupUrl, session)
+            markupUrl: jsonDisplayUrl.markupUrl
         };
 
         return Promise.resolve(new DisplayInterstitialMarkupUrlCampaign(displayInterstitialMarkupUrlParams));
