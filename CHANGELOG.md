@@ -1,3 +1,17 @@
+# Wed Feb 14 14:59:14 UTC 2018
+
+* Enable lunar theme on all groups except 5
+* Miscellaneous AdMob fixes
+
+# Wed Feb 14 10:24:20 UTC 2018
+
+* Revert previous deployment
+
+# Wed Feb 14 10:24:20 UTC 2018
+
+* Validate and encode all incoming URLs to handle unsafe characters
+* Enable lunar theme on all groups except 5
+
 # Tue Feb 13 09:49:36 UTC 2018
 
 * Remove the hidden margin from the admob iframe

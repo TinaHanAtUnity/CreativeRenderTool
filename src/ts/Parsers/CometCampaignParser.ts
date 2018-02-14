@@ -54,20 +54,20 @@ export class CometCampaignParser extends CampaignParser {
             const parameters: IMRAIDCampaign = {
                 ... baseCampaignParams,
                 useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking(),
-                resourceAsset: json.mraidUrl ? new HTML(this.validateAndEncodeUrl(json.mraidUrl, session), session) : undefined,
+                resourceAsset: json.mraidUrl ? new HTML(json.mraidUrl, session) : undefined,
                 resource: undefined,
                 dynamicMarkup: json.dynamicMarkup,
                 additionalTrackingEvents: undefined,
-                clickAttributionUrl: json.clickAttributionUrl ? this.validateAndEncodeUrl(json.clickAttributionUrl, session) : undefined,
+                clickAttributionUrl: json.clickAttributionUrl,
                 clickAttributionUrlFollowsRedirects: json.clickAttributionUrlFollowsRedirects,
-                clickUrl: json.clickUrl ? this.validateAndEncodeUrl(json.clickUrl, session) : undefined,
-                videoEventUrls: json.videoEventUrls ? this.validateAndEncodeVideoEventUrls(json.videoEventUrls, session) : undefined,
+                clickUrl: json.clickUrl ? json.clickUrl : undefined,
+                videoEventUrls: json.videoEventUrls ? json.videoEventUrls : undefined,
                 gameName: json.gameName,
-                gameIcon: json.gameIcon ? new Image(this.validateAndEncodeUrl(json.gameIcon, session), session) : undefined,
+                gameIcon: json.gameIcon ? new Image(json.gameIcon, session) : undefined,
                 rating: json.rating,
                 ratingCount: json.ratingCount,
-                landscapeImage: json.endScreenLandscape ? new Image(this.validateAndEncodeUrl(json.endScreenLandscape, session), session) : undefined,
-                portraitImage: json.endScreenPortrait ? new Image(this.validateAndEncodeUrl(json.endScreenPortrait, session), session) : undefined,
+                landscapeImage: json.endScreenLandscape ? new Image(json.endScreenLandscape, session) : undefined,
+                portraitImage: json.endScreenPortrait ? new Image(json.endScreenPortrait, session) : undefined,
                 bypassAppSheet: json.bypassAppSheet,
                 store: storeName,
                 appStoreId: json.appStoreId
@@ -81,42 +81,30 @@ export class CometCampaignParser extends CampaignParser {
                 appStoreId: json.appStoreId,
                 gameId: json.gameId,
                 gameName: json.gameName,
-                gameIcon: new Image(this.validateAndEncodeUrl(json.gameIcon, session), session),
+                gameIcon: new Image(json.gameIcon, session),
                 rating: json.rating,
                 ratingCount: json.ratingCount,
-                landscapeImage: new Image(this.validateAndEncodeUrl(json.endScreenLandscape, session), session),
-                portraitImage: new Image(this.validateAndEncodeUrl(json.endScreenPortrait, session), session),
-                clickAttributionUrl: json.clickAttributionUrl ? this.validateAndEncodeUrl(json.clickAttributionUrl, session) : undefined,
+                landscapeImage: new Image(json.endScreenLandscape, session),
+                portraitImage: new Image(json.endScreenPortrait, session),
+                clickAttributionUrl: json.clickAttributionUrl,
                 clickAttributionUrlFollowsRedirects: json.clickAttributionUrlFollowsRedirects,
-                clickUrl: this.validateAndEncodeUrl(json.clickUrl, session),
-                videoEventUrls: this.validateAndEncodeVideoEventUrls(json.videoEventUrls, session),
+                clickUrl: json.clickUrl,
+                videoEventUrls: json.videoEventUrls,
                 bypassAppSheet: json.bypassAppSheet,
                 store: storeName
             };
 
             if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
-                parameters.video = new Video(this.validateAndEncodeUrl(json.trailerDownloadable, session), session, json.trailerDownloadableSize);
-                parameters.streamingVideo = new Video(this.validateAndEncodeUrl(json.trailerStreaming, session), session);
+                parameters.video = new Video(json.trailerDownloadable, session, json.trailerDownloadableSize);
+                parameters.streamingVideo = new Video(json.trailerStreaming, session);
             }
 
             if(json.trailerPortraitDownloadable && json.trailerPortraitDownloadableSize && json.trailerPortraitStreaming) {
-                parameters.videoPortrait = new Video(this.validateAndEncodeUrl(json.trailerPortraitDownloadable, session), session, json.trailerPortraitDownloadableSize);
-                parameters.streamingPortraitVideo = new Video(this.validateAndEncodeUrl(json.trailerPortraitStreaming, session), session);
+                parameters.videoPortrait = new Video(json.trailerPortraitDownloadable, session, json.trailerPortraitDownloadableSize);
+                parameters.streamingPortraitVideo = new Video(json.trailerPortraitStreaming, session);
             }
 
             return Promise.resolve(new PerformanceCampaign(parameters));
         }
-    }
-
-    private validateAndEncodeVideoEventUrls(urls: { [eventType: string]: string }, session: Session): { [eventType: string]: string } {
-        if(urls && urls !== null) {
-            for(const urlKey in urls) {
-                if(urls.hasOwnProperty(urlKey)) {
-                    urls[urlKey] = this.validateAndEncodeUrl(urls[urlKey], session);
-                }
-            }
-        }
-
-        return urls;
     }
 }
