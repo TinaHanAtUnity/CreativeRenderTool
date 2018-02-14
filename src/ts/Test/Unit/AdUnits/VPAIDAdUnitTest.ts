@@ -106,10 +106,6 @@ describe('VPAIDAdUnit', () => {
                 sinon.assert.calledOnce(<sinon.SinonSpy>parameters.container.open);
             });
 
-            it('should show the closer', () => {
-                assert.isNotNull(document.querySelector('#closer'));
-            });
-
             afterEach(() => {
                 return adUnit.hide();
             });
