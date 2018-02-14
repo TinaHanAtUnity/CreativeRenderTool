@@ -1,5 +1,5 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { CacheError } from 'Native/Api/Cache';
+import { CacheError, IFileInfo } from 'Native/Api/Cache';
 import { StorageType } from 'Native/Api/Storage';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Diagnostics } from 'Utilities/Diagnostics';
@@ -149,15 +149,14 @@ export class Cache {
 
     public isCached(url: string): Promise<boolean> {
         return FileId.getFileId(url, this._nativeBridge).then(fileId => {
-            return this._nativeBridge.Cache.getFileInfo(fileId).then(fileInfo => {
+            return this.getFileInfo(fileId).then(fileInfo => {
                 if(fileInfo && fileInfo.found && fileInfo.size > 0) {
                     return this._cacheBookkeeping.getFileInfo(fileId).then(cacheResponse => {
                         return cacheResponse.fullyDownloaded;
+                    }).catch(() => {
+                        return false;
                     });
                 }
-                return false;
-            }).catch(error => {
-                // todo: should we do something more intelligent here?
                 return false;
             });
         });
@@ -223,26 +222,43 @@ export class Cache {
         });
     }
 
+    private getFileInfo(fileId: string): Promise<IFileInfo | undefined> {
+        return this._nativeBridge.Cache.getFileInfo(fileId).catch(() => {
+            return Promise.resolve(undefined);
+        });
+    }
+
     private downloadFile(url: string, fileId: string): void {
         this._currentUrl = url;
-        this._nativeBridge.Cache.download(url, fileId, []).catch(error => {
-            const callback = this._callbacks[url];
-            if(callback) {
-                switch(error) {
-                    case CacheError[CacheError.FILE_ALREADY_CACHING]:
-                        this._nativeBridge.Sdk.logError('Unity Ads cache error: attempted to add second download from ' + url + ' to ' + fileId);
-                        this.fulfillCallback(url, CacheStatus.FAILED);
-                        return;
 
-                    case CacheError[CacheError.NO_INTERNET]:
-                        this.handleRetry(callback, url, CacheError[CacheError.NO_INTERNET]);
-                        return;
+        this.getFileInfo(fileId).then(fileInfo => {
+            let append = false;
+            let headers: Array<[string, string]> = [];
 
-                    default:
-                        this.fulfillCallback(url, CacheStatus.FAILED);
-                        return;
-                }
+            if(fileInfo && fileInfo.found && fileInfo.size > 0) {
+                append = true;
+                headers = [['Range', 'bytes=' + fileInfo.size + '-']];
             }
+
+            this._nativeBridge.Cache.download(url, fileId, headers, append).catch(error => {
+                const callback = this._callbacks[url];
+                if(callback) {
+                    switch(error) {
+                        case CacheError[CacheError.FILE_ALREADY_CACHING]:
+                            this._nativeBridge.Sdk.logError('Unity Ads cache error: attempted to add second download from ' + url + ' to ' + fileId);
+                            this.fulfillCallback(url, CacheStatus.FAILED);
+                            return;
+
+                        case CacheError[CacheError.NO_INTERNET]:
+                            this.handleRetry(callback, url, CacheError[CacheError.NO_INTERNET]);
+                            return;
+
+                        default:
+                            this.fulfillCallback(url, CacheStatus.FAILED);
+                            return;
+                    }
+                }
+            });
         });
     }
 
