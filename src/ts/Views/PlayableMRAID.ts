@@ -93,16 +93,22 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         this.fetchConfiguration().then(configuration => {
             let container = MRAIDContainer;
             if(configuration) {
-                const configurationJson = JsonParser.parse(configuration);
-                // check configuration based on the ab group
-                const groupKey = "group" + this._campaign.getAbGroup();
-                if(configurationJson[groupKey]) {
-                    this._configuration = configurationJson[groupKey];
-                } else if (configurationJson.default) {
-                    this._configuration = configurationJson.default;
-                } else {
-                    this._configuration = {};
+                this._configuration = {};
+                try {
+                    const configurationJson = JsonParser.parse(configuration);
+                    // check configuration based on the ab group
+                    const groupKey = "group" + this._campaign.getAbGroup();
+                    if(configurationJson[groupKey]) {
+                        this._configuration = configurationJson[groupKey];
+                    } else if (configurationJson.default) {
+                        this._configuration = configurationJson.default;
+                    }
+                } catch (e) {
+                    Diagnostics.trigger('playable_configuration_invalid_json', {
+                        configuration: configuration
+                    });
                 }
+
                 container = container.replace('var playableConfiguration = {};', 'var playableConfiguration = ' + JSON.stringify(this._configuration) + ';');
             }
             this.createMRAID(container).then(mraid => {
