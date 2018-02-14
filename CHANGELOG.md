@@ -1,3 +1,41 @@
+# Wed Feb 14 10:24:20 UTC 2018
+
+* Validate and encode all incoming URLs to handle unsafe characters
+* Enable lunar theme on all groups except 5
+
+# Tue Feb 13 09:49:36 UTC 2018
+
+* Remove the hidden margin from the admob iframe
+* Enable MOAT on all SDK 2 versions without volume change listeners
+* New overlay AB test on groups 8 & 10
+* Send diagnostics if callback cannot be found when onDownloadStart event is received
+* Cleanup protobuf build & use minified release
+
+# Fri Feb  9 11:00:06 UTC 2018
+
+* Add config_parsing_failed diagnostic event
+
+# Thu Feb  8 12:36:42 UTC 2018
+
+* Lunar new year theme (groups  5 & 6)
+* Fade animation can be disabled on rewarded placements
+* Change config request base url for new config service
+
+# Wed Feb  7 11:08:36 UTC 2018
+
+* Disable cache cleaning on all iOS SDK 2.0.x versions to revert accidental problem caused by deployment on Tue Feb 6 08:17 UTC
+
+# Wed Feb  7 10:16:29 UTC 2018
+
+* Start test with new video overlay on groups 8 and 10
+* Add call to VAST impression tracking event
+
+# Tue Feb  6 08:17:32 UTC 2018
+
+* Enable custom MRAID fast forward feature for all the playables
+* Refactor cache bookkeeping
+* Fix metadata caching
+
 # Thu Feb  1 12:47:26 UTC 2018
 
 * Add support for upcoming overlay placement parameters

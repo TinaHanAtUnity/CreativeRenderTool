@@ -13,11 +13,7 @@ import { RequestApi } from 'Native/Api/Request';
 import { ParamsTestData, IEventSpec } from './ParamsTestData';
 import { ConfigManager } from 'Managers/ConfigManager';
 import { SessionManager } from 'Managers/SessionManager';
-import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
-import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { Configuration, CacheMode } from 'Models/Configuration';
-import { AdUnitFactory } from 'AdUnits/AdUnitFactory';
 import { IosAdUnitApi } from 'Native/Api/IosAdUnit';
 import { DeviceInfoApi } from 'Native/Api/DeviceInfo';
 import { AndroidAdUnitApi } from 'Native/Api/AndroidAdUnit';
@@ -25,9 +21,6 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Cache } from 'Utilities/Cache';
 import { AssetManager } from 'Managers/AssetManager';
-import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
-import { ViewController } from 'AdUnits/Containers/ViewController';
-import { Activity } from 'AdUnits/Containers/Activity';
 import { ClientInfo } from 'Models/ClientInfo';
 import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
@@ -37,6 +30,7 @@ import { AndroidDeviceInfoApi, IPackageInfo } from 'Native/Api/AndroidDeviceInfo
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
+import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
 
 class TestStorageApi extends StorageApi {
     public get<T>(storageType: StorageType, key: string): Promise<T> {
@@ -283,7 +277,8 @@ describe('Event parameters should match specifications', () => {
             const requestSpy: any = sinon.spy(request, 'post');
             const clientInfo: ClientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
             const deviceInfo: DeviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
+            const cacheBookkeeping: CacheBookkeeping = new CacheBookkeeping(nativeBridge);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
             const sessionManager = new SessionManager(nativeBridge);
             const adMobSignalFactory = new AdMobSignalFactory(nativeBridge, clientInfo, deviceInfo, focusManager);
             sinon.stub(nativeBridge.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));
@@ -308,7 +303,8 @@ describe('Event parameters should match specifications', () => {
             const requestSpy: any = sinon.spy(request, 'post');
             const clientInfo: ClientInfo = TestFixtures.getClientInfo(Platform.IOS);
             const deviceInfo: DeviceInfo = TestFixtures.getDeviceInfo(Platform.IOS);
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request), CacheMode.DISABLED, deviceInfo);
+            const cacheBookkeeping: CacheBookkeeping = new CacheBookkeeping(nativeBridge);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
             const sessionManager = new SessionManager(nativeBridge);
             const adMobSignalFactory = new AdMobSignalFactory(nativeBridge, clientInfo, deviceInfo, focusManager);
             sinon.stub(nativeBridge.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));

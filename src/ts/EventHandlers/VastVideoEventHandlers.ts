@@ -3,13 +3,15 @@ import { EventType, Session } from 'Models/Session';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
+import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
+import { MOAT } from 'Views/MOAT';
 
 export class VastVideoEventHandlers {
 
-    public static onVideoPrepared(adUnit: VastAdUnit, url: string, duration: number, moatData: any, moatIds: any) {
-        const moat = adUnit.getMoat();
+    public static onVideoPrepared(adUnit: VastAdUnit, url: string, duration: number) {
+        const moat = MoatViewabilityService.getMoat();
         if(moat) {
-            moat.init(moatIds, duration / 1000, url, moatData, adUnit.getVolume());
+            moat.init(MoatViewabilityService.getMoatIds(), duration / 1000, url, MoatViewabilityService.getMoatData(), adUnit.getVolume());
         }
     }
 
@@ -24,8 +26,9 @@ export class VastVideoEventHandlers {
         adUnit.sendImpressionEvent(session.getId(), clientInfo.getSdkVersion());
         adUnit.sendTrackingEvent('creativeView', session.getId(), clientInfo.getSdkVersion());
         adUnit.sendTrackingEvent('start', session.getId(), clientInfo.getSdkVersion());
+        adUnit.sendTrackingEvent('impression', session.getId(), clientInfo.getSdkVersion());
 
-        const moat = adUnit.getMoat();
+        const moat = MoatViewabilityService.getMoat();
         if(moat) {
             moat.triggerViewabilityEvent('exposure', true);
             moat.triggerVideoEvent('AdPlaying', adUnit.getVolume());
@@ -33,7 +36,7 @@ export class VastVideoEventHandlers {
     }
 
     public static onVideoProgress(adUnit: VastAdUnit, campaign: VastCampaign, position: number) {
-        const moat = adUnit.getMoat();
+        const moat = MoatViewabilityService.getMoat();
         if(moat) {
             const events = adUnit.getEvents();
             const event = events.shift();
@@ -57,7 +60,7 @@ export class VastVideoEventHandlers {
         }
         adUnit.sendTrackingEvent('complete', session.getId(), clientInfo.getSdkVersion());
 
-        const moat = adUnit.getMoat();
+        const moat = MoatViewabilityService.getMoat();
         if(moat) {
             moat.triggerVideoEvent('AdVideoComplete', adUnit.getVolume());
         }
@@ -71,14 +74,14 @@ export class VastVideoEventHandlers {
     }
 
     public static onVideoStopped(adUnit: VastAdUnit) {
-        const moat = adUnit.getMoat();
+        const moat = MoatViewabilityService.getMoat();
         if(moat) {
             moat.triggerVideoEvent('AdStopped', adUnit.getVolume());
         }
     }
 
     public static onVideoPaused(adUnit: VastAdUnit) {
-        const moat = adUnit.getMoat();
+        const moat = MoatViewabilityService.getMoat();
         if(moat) {
             moat.triggerVideoEvent('AdPaused', adUnit.getVolume());
             moat.triggerViewabilityEvent('exposure', false);
@@ -86,7 +89,7 @@ export class VastVideoEventHandlers {
     }
 
     public static onVolumeChange(adUnit: VastAdUnit, volume: number, maxVolume: number) {
-        const moat = adUnit.getMoat();
+        const moat = MoatViewabilityService.getMoat();
         if(moat) {
             adUnit.setVolume(volume / maxVolume);
             moat.triggerVideoEvent('AdVolumeChange', adUnit.getVolume());
@@ -102,5 +105,4 @@ export class VastVideoEventHandlers {
             adUnit.hide();
         }
     }
-
 }

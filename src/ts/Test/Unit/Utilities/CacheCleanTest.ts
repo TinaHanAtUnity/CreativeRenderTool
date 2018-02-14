@@ -11,6 +11,7 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Request } from 'Utilities/Request';
 import { FakeSdkApi } from '../TestHelpers/FakeSdkApi';
 import { FocusManager } from 'Managers/FocusManager';
+import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
 
 class TestCacheApi extends CacheApi {
     private _files: IFileInfo[];
@@ -202,6 +203,7 @@ class TestHelper {
 
 describe('CacheCleanTest', () => {
     let cache: Cache;
+    let cacheBookkeeping: CacheBookkeeping;
     let helper: TestHelper;
     let cacheApi: TestCacheApi;
     let storageApi: TestStorageApi;
@@ -211,7 +213,8 @@ describe('CacheCleanTest', () => {
         const focusManager = new FocusManager(nativeBridge);
         const wakeUpManager: WakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         const request: Request = new Request(nativeBridge, wakeUpManager);
-        cache = new Cache(nativeBridge, wakeUpManager, request);
+        cacheBookkeeping = new CacheBookkeeping(nativeBridge);
+        cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping);
         cacheApi = new TestCacheApi(nativeBridge);
         storageApi = new TestStorageApi(nativeBridge);
         nativeBridge.Cache = cacheApi;
@@ -240,7 +243,7 @@ describe('CacheCleanTest', () => {
             }
         });
 
-        return cache.cleanCache().then(() => {
+        return cacheBookkeeping.cleanCache().then(() => {
             assert.equal(cacheSpy.callCount, 0, 'Cache cleanup tried to delete files when none should have been deleted');
             assert.isTrue(storageApi.hasFileEntry(fileId), 'Cache cleanup removed entry for kept file');
             assert.isFalse(storageApi.isDirty(), 'Cache cleanup left storage dirty');
@@ -266,7 +269,7 @@ describe('CacheCleanTest', () => {
             }
         });
 
-        return cache.cleanCache().then(() => {
+        return cacheBookkeeping.cleanCache().then(() => {
             assert.equal(cacheSpy.callCount, 1, 'Cache cleanup should have deleted one file');
             assert.equal(cacheSpy.getCall(0).args[0], fileId, 'Cache cleanup deleted the wrong file');
             assert.isFalse(storageApi.hasFileEntry(fileId), 'Cache cleanup did not remove storage entry for deleted file');
@@ -317,7 +320,7 @@ describe('CacheCleanTest', () => {
             }
         });
 
-        return cache.cleanCache().then(() => {
+        return cacheBookkeeping.cleanCache().then(() => {
             assert.equal(cacheSpy.callCount, 2, 'Cache cleanup should have deleted two files');
             assert.equal(cacheSpy.getCall(0).args[0], oldFileId, 'Cache cleanup deleted the wrong file (should have deleted first)');
             assert.equal(cacheSpy.getCall(1).args[0], oldFileId2, 'Cache cleanup deleted the wrong file (should have deleted second)');
@@ -356,7 +359,7 @@ describe('CacheCleanTest', () => {
             }
         });
 
-        return cache.cleanCache().then(() => {
+        return cacheBookkeeping.cleanCache().then(() => {
             assert.equal(cacheSpy.callCount, 1, 'Cache cleanup should have deleted one file');
             assert.equal(cacheSpy.getCall(0).args[0], largeFileId, 'Cache cleanup deleted the wrong file');
             assert.isTrue(storageApi.hasFileEntry(smallFileId), 'Cache cleanup removed storage entry for kept file');
@@ -368,7 +371,7 @@ describe('CacheCleanTest', () => {
     it('should not clean empty cache', () => {
         const cacheSpy = sinon.spy(cacheApi, 'deleteFile');
 
-        return cache.cleanCache().then(() => {
+        return cacheBookkeeping.cleanCache().then(() => {
             assert.equal(cacheSpy.callCount, 0, 'Cache cleanup should have deleted nothing when cache is empty');
             assert.isFalse(storageApi.isDirty(), 'Cache cleanup left storage dirty');
         });
@@ -380,7 +383,7 @@ describe('CacheCleanTest', () => {
 
         cacheApi.addFile(fileId, 12345, new Date().getTime());
 
-        return cache.cleanCache().then(() => {
+        return cacheBookkeeping.cleanCache().then(() => {
             assert.equal(cacheSpy.callCount, 1, 'Cache cleanup should have deleted one file');
             assert.equal(cacheSpy.getCall(0).args[0], fileId, 'Cache cleanup deleted the wrong file');
             assert.isFalse(storageApi.isDirty(), 'Cache cleanup left storage dirty');
@@ -404,7 +407,7 @@ describe('CacheCleanTest', () => {
             }
         });
 
-        return cache.cleanCache().then(() => {
+        return cacheBookkeeping.cleanCache().then(() => {
             assert.equal(storageSpy.callCount, 1, 'Cache cleanup did not invoke storage delete once');
             assert.equal(storageSpy.getCall(0).args[0], StorageType.PRIVATE, 'Cache cleanup invoked wrong storage type');
             assert.equal(storageSpy.getCall(0).args[1], 'cache', 'Cache cleanup invoked wrong storage hierarchy');
@@ -432,7 +435,7 @@ describe('CacheCleanTest', () => {
             }
         });
 
-        return cache.cleanCache().then(() => {
+        return cacheBookkeeping.cleanCache().then(() => {
             assert.equal(cacheSpy.callCount, 1, 'Cache cleanup should have deleted one file');
             assert.equal(cacheSpy.getCall(0).args[0], fileId, 'Cache cleanup deleted the wrong file');
             assert.isFalse(storageApi.hasFileEntry(fileId), 'Cache cleanup did not remove storage entry for deleted file');
@@ -463,7 +466,7 @@ describe('CacheCleanTest', () => {
         });
 
         assert.isTrue(storageApi.hasCampaignEntry(campaignId), 'Should have a campaign entry');
-        return cache.cleanCache().then(() => {
+        return cacheBookkeeping.cleanCache().then(() => {
             assert.equal(storageSpy.callCount, 1, 'Cache cleanup should have deleted one campaign');
             assert.equal(storageSpy.getCall(0).args[1], 'cache.campaigns.' + campaignId, 'Cache cleanup deleted a wrong campaign');
             assert.isFalse(storageApi.hasCampaignEntry(campaignId), 'Cache cleanup did not remove storage entry for deleted campaign');
@@ -491,7 +494,7 @@ describe('CacheCleanTest', () => {
             }
         });
         assert.isTrue(storageApi.hasCampaignEntry(campaignId), 'Should have a campaign entry');
-        return cache.cleanCache().then(() => {
+        return cacheBookkeeping.cleanCache().then(() => {
             assert.equal(storageSpy.callCount, 1, 'Cache cleanup should have deleted one campaign');
             assert.equal(storageSpy.getCall(0).args[1], 'cache', 'Cache cleanup should have deleted the whole cache entry');
             assert.isFalse(storageApi.hasCampaignEntry(campaignId), 'Cache cleanup did not remove storage entry for deleted campaign');
@@ -535,7 +538,7 @@ describe('CacheCleanTest', () => {
         });
 
         assert.isTrue(storageApi.hasCampaignEntry(campaignId), 'Should have a campaign entry');
-        return cache.cleanCache().then(() => {
+        return cacheBookkeeping.cleanCache().then(() => {
             assert.equal(storageSpy.callCount, 0, 'Cache cleanup shouldn\'t have deleted campaign');
             assert.isTrue(storageApi.hasCampaignEntry(campaignId), 'Cache cleanup did remove storage entry for campaign');
             assert.isFalse(storageApi.isDirty(), 'Cache cleanup left storage dirty');
@@ -560,7 +563,7 @@ describe('CacheCleanTest', () => {
             }
         });
 
-        return cache.cleanCache().then(() => {
+        return cacheBookkeeping.cleanCache().then(() => {
             assert.equal(storageSpy.callCount, 1, 'Should have called storage delete once');
             assert.equal(storageSpy.getCall(0).args[1], 'cache', 'Cache cleanup should have deleted the whole cache entry');
             assert.equal(cacheSpy.callCount, 2, 'Should have deleted two files from cache');
@@ -584,7 +587,7 @@ describe('CacheCleanTest', () => {
             }
         });
 
-        return cache.cleanCache().then(() => {
+        return cacheBookkeeping.cleanCache().then(() => {
             assert.equal(storageSpy.callCount, 1, 'Should have called storage delete once');
             assert.equal(storageSpy.getCall(0).args[1], 'cache', 'Cache cleanup should have deleted the whole cache entry');
             assert.isFalse(storageApi.isDirty(), 'Cache cleanup left storage dirty');
