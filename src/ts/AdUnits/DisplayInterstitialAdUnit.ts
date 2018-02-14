@@ -12,6 +12,7 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { IWebPlayerWebSettingsAndroid, IWebPlayerWebSettingsIos } from "Native/Api/WebPlayer";
+import { Url } from 'Utilities/Url';
 
 export interface IDisplayInterstitialAdUnitParameters extends IAdUnitParameters<DisplayInterstitialCampaign> {
     view: DisplayInterstitial;
@@ -159,7 +160,17 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
 
     private shouldOverrideUrlLoading(url: string, method: string): void {
         this._nativeBridge.Sdk.logDebug("DisplayInterstitialAdUnit: shouldOverrideUrlLoading triggered for url: " + url);
-        this._nativeBridge.WebPlayer.setUrl(url);
+        // this._nativeBridge.WebPlayer.setUrl(url);
+        if (url && Url.isProtocolWhitelisted(url)) {
+            if (this._nativeBridge.getPlatform() === Platform.IOS) {
+                this._nativeBridge.UrlScheme.open(url);
+            } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                this._nativeBridge.Intent.launch({
+                    'action': 'android.intent.action.VIEW',
+                    'uri': url
+                });
+            }
+        }
     }
 
     private unsetReferences(): void {
