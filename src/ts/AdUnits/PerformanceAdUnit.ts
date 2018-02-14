@@ -2,9 +2,11 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { IVideoAdUnitParameters, VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
+import { AdUnitStyle } from 'Models/AdUnitStyle';
 
 export interface IPerformanceAdUnitParameters extends IVideoAdUnitParameters<PerformanceCampaign> {
     endScreen: PerformanceEndScreen;
+    adUnitStyle?: AdUnitStyle;
 }
 
 export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
