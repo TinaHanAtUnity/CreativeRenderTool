@@ -160,11 +160,8 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
 
     private shouldOverrideUrlLoading(url: string, method: string): void {
         this._nativeBridge.Sdk.logDebug("DisplayInterstitialAdUnit: shouldOverrideUrlLoading triggered for url: " + url);
-        // this._nativeBridge.WebPlayer.setUrl(url);
         if (url && Url.isProtocolWhitelisted(url)) {
-            if (this._nativeBridge.getPlatform() === Platform.IOS) {
-                this._nativeBridge.UrlScheme.open(url);
-            } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
                 this._nativeBridge.Intent.launch({
                     'action': 'android.intent.action.VIEW',
                     'uri': url
