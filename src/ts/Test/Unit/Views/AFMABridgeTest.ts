@@ -25,6 +25,8 @@ describe('AFMABridge', () => {
             onAFMAOpenInAppStore: sinon.spy(),
             onAFMAOpenStoreOverlay: sinon.spy(),
             onAFMARewardedVideoStart: sinon.spy(),
+            onAFMATrackingEvent: sinon.spy(),
+            onAFMAClickSignalRequest: sinon.spy()
         };
         afmaBridge = new AFMABridge(nativeBridge, handler);
         iframe = document.createElement('iframe');
@@ -109,6 +111,19 @@ describe('AFMABridge', () => {
                 productId: 'com.unity3d.ads',
             },
             verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAFetchAppStoreOverlay, data.productId)
+        }, {
+            event: AFMAEvents.TRACKING,
+            data: {
+                event: 'foo'
+            },
+            verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMATrackingEvent, data.event)
+        }, {
+            event: AFMAEvents.GET_CLICK_SIGNAL,
+            data: {
+                start: { x: 1, y: 1 },
+                end: { x: 2, y: 2}
+            },
+            verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAClickSignalRequest, data.data)
         }];
 
         for (const test of tests) {

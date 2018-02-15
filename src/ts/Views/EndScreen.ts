@@ -61,6 +61,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
                 event: 'click',
                 listener: (event: Event) => this.onPetEvent(event),
                 selector: '#head'
+
             }
         ];
 
@@ -136,11 +137,19 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     protected getEndscreenAlt(campaign?: Campaign) {
+<<<<<<< Updated upstream
         if(this._abGroup === 5 || this._abGroup === 6) {
             return lunarEndScreenId;
         }
 
         return undefined;
+=======
+        if(this._abGroup === 5) {
+            return undefined;
+        }
+
+        return lunarEndScreenId;
+>>>>>>> Stashed changes
     }
 
     protected abstract onDownloadEvent(event: Event): void;
@@ -166,14 +175,20 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         }
 
         const headEl: HTMLElement = <HTMLElement>this._container.querySelector('#head');
+<<<<<<< Updated upstream
         headEl.style.animationPlayState = "paused";
+=======
+>>>>>>> Stashed changes
         headEl.classList.add("nod");
         setTimeout(() => {
             if (typeof headEl !== "undefined" && headEl.classList && headEl.classList.contains("nod")) {
                 headEl.classList.remove("nod");
+<<<<<<< Updated upstream
                 setTimeout(() => {
                     headEl.style.animationPlayState = "running";
                 }, 150);
+=======
+>>>>>>> Stashed changes
             }
         }, 150);
     }

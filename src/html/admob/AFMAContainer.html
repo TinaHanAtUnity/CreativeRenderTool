@@ -1,4 +1,32 @@
 <script>
+    function getQueryParams(url) {
+        var a = document.createElement('a');
+        a.href = url;
+        var params = {};
+        if (a.search) {
+            var tuples = a.search.substring(1).split(/&/);
+            for (var i = 0; i < tuples.length; i++) {
+                var parts = tuples[i].split(/=/);
+                var key = parts[0];
+                var value = parts[1];
+                if (params[key]) {
+                    params[key].push(value);
+                } else {
+                    params[key] = [value];
+                }
+            }
+        }
+        return params;
+    }
+    function isObjectEmpty(obj) {
+        for (var prop in obj) {
+            if (obj.hasOwnProperty(prop)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     (function() {
         var touches = [];
 
@@ -13,6 +41,7 @@
         var downCounts = 0;
         var moveCounts = 0;
         var cancelCounts = 0;
+        var touchDuration;
 
         document.addEventListener('touchstart', function(e) {
             touchStartTime = Date.now();
@@ -20,7 +49,7 @@
             downCounts++;
         });
         document.addEventListener('touchend', function(e) {
-            var duration = Date.now() - touchStartTime;
+            touchDuration = Date.now() - touchStartTime;
             endTouch = e.changedTouches[0];
             upCounts++;
         });
@@ -31,16 +60,65 @@
             cancelCounts++;
         });
 
-        window.addEventListener('message', function(e) {
-            if (e.data.type === 'afma') {
-                if (e.data.event === 'back') {
-                    console.log('calling AFMA back function', e);
-                    AFMA_ReceiveMessage('onbackblocked');
-                }
-            }
-        });
-
         var AFMA = function() {
+            var self = this;
+            this.intentCallbacks = {};
+            this.intentCallbackId = 0;
+            this.sentQuartiles = {};
+            var clickSignalListeners = [];
+
+            document.addEventListener('DOMContentLoaded', function() {
+                var videoEl = document.querySelector('video');
+                if (videoEl === null) {
+                    // TODO, warn?
+                    return;
+                }
+
+                videoEl.addEventListener('error', function() {
+                    var error = videoEl.error;
+                    self.postMessage('tracking', {
+                        event: 'error',
+                        data: JSON.stringify(error)
+                    });
+                });
+
+                videoEl.addEventListener('timeupdate', function() {
+                    var quartile = Math.floor((videoEl.currentTime / videoEl.duration) * 4);
+                    if (quartile !== 0 && !(quartile in self.sentQuartiles)) {
+                        self.sentQuartiles[quartile] = true;
+                        var adQuartile;
+                        switch (quartile) {
+                            case 1:
+                                adQuartile = 'firstQuartile';
+                                break;
+                            case 2:
+                                adQuartile = 'secondQuartile';
+                                break;
+                            case 3:
+                                adQuartile = 'thirdQuartile';
+                                break;
+                        }
+                        if (adQuartile) {
+                            self.postMessage('tracking', {
+                                event: adQuartile
+                            });
+                        }
+                    }
+                });
+
+                videoEl.addEventListener('stalled', function() {
+                    self.postMessage('tracking', {
+                        event: 'stalled'
+                    });
+                });
+
+                videoEl.addEventListener('canplay', function() {
+                    self.postMessage('tracking', {
+                        event: 'loaded'
+                    });
+                });
+            });
+
             this.forceOrientation = function(orientation, override, animationDuration) {
                 this.postMessage('forceOrientation', {
                     orientation: orientation,
@@ -50,26 +128,10 @@
             };
 
             this.click = function(url) {
+                var touchInfo = self.getTouchInfo();
                 this.postMessage('click', {
                     url: url,
-                    touch: {
-                        start: {
-                            x: startTouch ? startTouch.clientX : 0,
-                            y: startTouch ? startTouch.clientY : 0
-                        },
-                        end: {
-                            x: endTouch ? endTouch.clientX : 0,
-                            y: endTouch ? endTouch.clientY : 0,
-                        },
-                        diameter: endTouch ? endTouch.radiusX * 2 : 0.0,
-                        pressure: endTouch ? endTouch.force || 0.0 : 0.0,
-                        counts: {
-                            up: upCounts,
-                            down: downCounts,
-                            move: moveCounts,
-                            cancel: cancelCounts
-                        }
-                    }
+                    touch: touchInfo
                 });
             };
 
@@ -79,6 +141,64 @@
 
             this.appendClickSignals = function(url, spamSignals) {
                 return url;
+            };
+
+            this.getClickSignalsAsync = function(cs) {
+                return new Promise(function(resolve, reject) {
+                    self.requestClickSignal(resolve);
+                });
+            }
+
+            this.appendClickSignalsAsync = function(url, spamSignals) {
+                var signalPromise = spamSignals ? Promise.resolve(spamSignals) : this.getClickSignalsAsync(url);
+                return signalPromise.then(function(signalObject) {
+                    var clickSignals = signalObject.encodedClickSignal;
+                    var query = getQueryParams(url);
+                    if (!query.ms) {
+                        if (isObjectEmpty(query)) {
+                            url = url + '?ms=' + clickSignals;
+                        } else {
+                            url = url + '&ms=' + clickSignals;
+                        }
+                    }
+                    var rvdt = signalObject.rvdt;
+                    url = url + '&rvdt=' + rvdt;
+                    return url;
+                });
+            };
+
+            this.requestClickSignal = function(resolve) {
+                clickSignalListeners.push(resolve);
+                var touchInfo = this.getTouchInfo();
+                this.postMessage('getClickSignal', touchInfo);
+            };
+            this.getTouchInfo = function() {
+                return {
+                    start: {
+                        x: startTouch ? startTouch.clientX : 0,
+                        y: startTouch ? startTouch.clientY : 0
+                    },
+                    end: {
+                        x: endTouch ? endTouch.clientX : 0,
+                        y: endTouch ? endTouch.clientY : 0,
+                    },
+                    diameter: endTouch ? endTouch.radiusX * 2 : 0.0,
+                    pressure: endTouch ? endTouch.force || 0.0 : 0.0,
+                    duration: touchDuration,
+                    counts: {
+                        up: upCounts,
+                        down: downCounts,
+                        move: moveCounts,
+                        cancel: cancelCounts
+                    }
+                };
+            };
+
+            this.onReceiveClickSignal = function(signal) {
+                for (var i = 0, len = clickSignalListeners.length; i < len; i++) {
+                    clickSignalListeners[i](signal);
+                }
+                clickSignalListeners = [];
             };
 
             this.notifyRewardedVideoStart = function() {
@@ -197,6 +317,18 @@
 
             this.useCustomClose = function(uses) {
             };
+
+            window.addEventListener('message', function(e) {
+                if (e.data.type === 'afma') {
+                    if (e.data.event === 'back') {
+                        console.log('calling AFMA back function', e);
+                        AFMA_ReceiveMessage('onbackblocked');
+                    } else if (e.data.event === 'clickSignal') {
+                        console.log('recieved click signal', e);
+                        self.onReceiveClickSignal(e.data.data);
+                    }
+                }
+            });
         };
 
         window.unity = window.unity || {};
