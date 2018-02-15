@@ -9,8 +9,8 @@ import { Session } from 'Models/Session';
 import { Video } from 'Models/Assets/Video';
 import { Image } from 'Models/Assets/Image';
 import { HTML } from 'Models/Assets/HTML';
-import { CustomFeatures } from "../Utilities/CustomFeatures";
-import { JSONAsset } from "../Models/Assets/JSONAsset";
+import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { JSONAsset } from 'Models/Assets/JSONAsset';
 
 export class CometCampaignParser extends CampaignParser {
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
