@@ -310,7 +310,7 @@ export class OperativeEventManager {
             'screenDensity': this._deviceInfo.getScreenDensity(),
             'screenSize': this._deviceInfo.getScreenLayout(),
             'platform': Platform[this._clientInfo.getPlatform()].toLowerCase(),
-            'language': this._deviceInfo.getLanguage(),
+            'language': this._deviceInfo.getLanguage()
         };
 
         if(campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign) {
