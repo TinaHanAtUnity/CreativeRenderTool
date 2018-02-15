@@ -183,7 +183,7 @@ export class AdMobSignalFactory {
         return Math.round(clientInfo.getInitTimestamp() / 1000);
     }
 
-    private getRooted(deviceInfo: DeviceInfo<IDeviceInfo>): number {
+    private getRooted(deviceInfo: DeviceInfo): number {
         if(deviceInfo instanceof IosDeviceInfo && deviceInfo.isSimulator()) { // not available on Android
             return 2;
         } else if(deviceInfo.isRooted()) {
