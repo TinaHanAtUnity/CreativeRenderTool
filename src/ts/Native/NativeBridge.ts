@@ -24,6 +24,7 @@ import { LifecycleApi } from 'Native/Api/Lifecycle';
 import { AndroidPreferencesApi } from 'Native/Api/AndroidPreferences';
 import { IosPreferencesApi } from 'Native/Api/IosPreferences';
 import { SensorInfoApi } from 'Native/Api/SensorInfo';
+import { PurchasingApi } from 'Native/Api/Purchasing';
 
 export enum CallbackStatus {
     OK,
@@ -61,6 +62,7 @@ export class NativeBridge implements INativeBridge {
     public Lifecycle: LifecycleApi;
     public Notification: NotificationApi;
     public Placement: PlacementApi;
+    public Purchasing: PurchasingApi;
     public Request: RequestApi;
     public Resolve: ResolveApi;
     public Sdk: SdkApi;
@@ -105,6 +107,7 @@ export class NativeBridge implements INativeBridge {
         this.Lifecycle = new LifecycleApi(this);
         this.Notification = new NotificationApi(this);
         this.Placement = new PlacementApi(this);
+        this.Purchasing = new PurchasingApi(this);
         this.Request = new RequestApi(this);
         this.Resolve = new ResolveApi(this);
         this.Sdk = new SdkApi(this);
@@ -218,6 +221,10 @@ export class NativeBridge implements INativeBridge {
 
             case EventCategory[EventCategory.STORAGE]:
                 this.Storage.handleEvent(event, parameters);
+                break;
+
+            case EventCategory[EventCategory.PURCHASING]:
+                this.Purchasing.handleEvent(event, parameters);
                 break;
 
             case EventCategory[EventCategory.DEVICEINFO]:
