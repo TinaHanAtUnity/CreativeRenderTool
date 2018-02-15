@@ -3,6 +3,7 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { Platform } from 'Constants/Platform';
 import { IIAPInstrumentation } from 'Analytics/AnalyticsStorage';
 import { Configuration } from 'Models/Configuration';
+import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 
 export interface IAnalyticsObject {
     type: string;
@@ -117,7 +118,7 @@ export class AnalyticsProtocol {
                 ads_tracking: deviceInfo.getLimitAdTracking() ? false : true, // intentionally inverted value
                 os_ver: deviceInfo.getOsVersion(),
                 model: deviceInfo.getModel(),
-                make: deviceInfo.getManufacturer(), // empty for iOS
+                make: deviceInfo instanceof AndroidDeviceInfo ? deviceInfo.getManufacturer() : undefined, // empty for iOS
                 app_name: clientInfo.getApplicationName(),
                 ram: Math.round(deviceInfo.getTotalMemory() / 1024), // convert DeviceInfo kilobytes to analytics megabytes
                 screen: screenWidth + ' x ' + screenHeight,

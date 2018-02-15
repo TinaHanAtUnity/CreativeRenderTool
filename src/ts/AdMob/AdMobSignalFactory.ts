@@ -1,18 +1,20 @@
 import { AdMobSignal } from 'Models/AdMobSignal';
 import { ClientInfo } from 'Models/ClientInfo';
-import { DeviceInfo } from 'Models/DeviceInfo';
+import { DeviceInfo, IDeviceInfo } from 'Models/DeviceInfo';
 import { Platform } from 'Constants/Platform';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { FocusManager } from 'Managers/FocusManager';
+import { IosDeviceInfo } from 'Models/IosDeviceInfo';
+import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 
 export class AdMobSignalFactory {
     private _nativeBridge: NativeBridge;
     private _clientInfo: ClientInfo;
-    private _deviceInfo: DeviceInfo;
+    private _deviceInfo: DeviceInfo<IDeviceInfo>;
     private _focusManager: FocusManager;
 
-    constructor(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo, focusManager: FocusManager) {
+    constructor(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo<IDeviceInfo>, focusManager: FocusManager) {
         this._nativeBridge = nativeBridge;
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
@@ -39,10 +41,10 @@ export class AdMobSignalFactory {
             // todo: time on screen
 
             if(signal.getScreenWidth() && signal.getScreenHeight()) {
-                if(this._clientInfo.getPlatform() === Platform.IOS && this._deviceInfo.getScreenScale()) {
+                if(this._clientInfo.getPlatform() === Platform.IOS && this._deviceInfo instanceof IosDeviceInfo && this._deviceInfo.getScreenScale()) {
                     signal.setAdViewWidth(this.getIosViewWidth(signal.getScreenWidth(), this._deviceInfo.getScreenScale()));
                     signal.setAdViewHeight(this.getIosViewHeight(signal.getScreenHeight(), this._deviceInfo.getScreenScale()));
-                } else if(this._deviceInfo.getScreenDensity()) {
+                } else if(this._deviceInfo instanceof AndroidDeviceInfo && this._deviceInfo.getScreenDensity()) {
                     signal.setAdViewWidth(this.getAndroidViewWidth(signal.getScreenWidth(), this._deviceInfo.getScreenDensity()));
                     signal.setAdViewHeight(this.getAndroidViewHeight(signal.getScreenHeight(), this._deviceInfo.getScreenDensity()));
                 }
@@ -90,7 +92,7 @@ export class AdMobSignalFactory {
         }));
 
         promises.push(Promise.all([this._deviceInfo.getScreenWidth(),this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
-            if (this._nativeBridge.getPlatform() === Platform.IOS) {
+            if (this._nativeBridge.getPlatform() === Platform.IOS && this._deviceInfo instanceof IosDeviceInfo) {
                 signal.setScreenWidth(width * this._deviceInfo.getScreenScale());
                 signal.setScreenHeight(height * this._deviceInfo.getScreenScale());
             } else {
@@ -181,8 +183,8 @@ export class AdMobSignalFactory {
         return Math.round(clientInfo.getInitTimestamp() / 1000);
     }
 
-    private getRooted(deviceInfo: DeviceInfo): number {
-        if(deviceInfo.isSimulator()) { // not available on Android
+    private getRooted(deviceInfo: DeviceInfo<IDeviceInfo>): number {
+        if(deviceInfo instanceof IosDeviceInfo && deviceInfo.isSimulator()) { // not available on Android
             return 2;
         } else if(deviceInfo.isRooted()) {
             return 1;

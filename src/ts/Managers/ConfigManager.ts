@@ -13,6 +13,7 @@ import { RequestError } from 'Errors/RequestError';
 import { StorageType } from 'Native/Api/Storage';
 import { Platform } from 'Constants/Platform';
 import { Diagnostics } from 'Utilities/Diagnostics';
+import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 
 export class ConfigManager {
 
@@ -114,7 +115,7 @@ export class ConfigManager {
 
         if(clientInfo.getPlatform() === Platform.ANDROID) {
             url = Url.addParameters(url, {
-                deviceMake: deviceInfo.getManufacturer()
+                deviceMake: deviceInfo instanceof AndroidDeviceInfo ? deviceInfo.getManufacturer() : undefined
             });
         }
 
@@ -125,7 +126,7 @@ export class ConfigManager {
             });
         } else if(clientInfo.getPlatform() === Platform.ANDROID) {
             url = Url.addParameters(url, {
-                androidId: deviceInfo.getAndroidId()
+                androidId: deviceInfo instanceof AndroidDeviceInfo ? deviceInfo.getAndroidId() : undefined
             });
         }
 
