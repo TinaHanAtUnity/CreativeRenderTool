@@ -49,6 +49,7 @@ export class PurchasingUtilities {
                     if (isCommandSuccessful === 'false') {
                         nativeBridge.Sdk.logError("PurchasingUtilities: Purchase command unsuccessful");
                         Diagnostics.trigger("purchase_command_unsuccessful", { message: "Purchase command unsuccessful" });
+                        reject(new Error('Unsuccessful purchase command'));
                     } else if (isCommandSuccessful === 'true') {
                         resolve();
                     }
