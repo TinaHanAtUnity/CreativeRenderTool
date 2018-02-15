@@ -94,19 +94,19 @@ export class VPAID extends View<IVPAIDHandler> {
 
     public showAd() {
         this.sendEvent('show');
-        this._stuckTimer.start();
+        // this._stuckTimer.start();
     }
 
     public pauseAd() {
         this._isPaused = true;
         this.sendEvent('pause');
-        this._stuckTimer.stop();
+        // this._stuckTimer.stop();
     }
 
     public resumeAd() {
         this._isPaused = false;
         this.sendEvent('resume');
-        this._stuckTimer.start();
+        // this._stuckTimer.start();
     }
 
     public mute() {
@@ -154,7 +154,7 @@ export class VPAID extends View<IVPAIDHandler> {
             case 'progress':
                 this._handlers.forEach(handler => handler.onVPAIDProgress(params[0], params[1]));
                 if (!this._isPaused) {
-                    this._stuckTimer.reset();
+                    // this._stuckTimer.reset();
                 }
                 break;
             case 'VPAID':

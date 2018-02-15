@@ -5,12 +5,13 @@
     </style>
 </head>
 <body>
-    <div class="video-player-slot">
-        <video
-            playsinline="true"
-            webkit-playsinline="true"
-            poster="data:image/svg+xml;base64,">
-        </video>
+    <video
+        playsinline="true"
+        webkit-playsinline="true"
+        poster="data:image/svg+xml;base64,">
+    </video>
+    <div class="video-player-slot"></div>
+
     </div>
     <script src="<%= data.vpaidSrcUrl %>"></script>
     <script>
@@ -133,7 +134,7 @@
                 this._iframe = document.querySelector('iframe');
                 this._creative = null;
                 this._slot = document.querySelector('.video-player-slot');
-                this._videoSlot = this._slot.querySelector('video');
+                this._videoSlot = document.querySelector('video');
 
                 var eventHandlers = {
                     init: function(e) {
