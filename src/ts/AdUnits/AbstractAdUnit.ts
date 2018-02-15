@@ -4,7 +4,7 @@ import { Observable0 } from 'Utilities/Observable';
 import { NativeBridge } from 'Native/NativeBridge';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { FinishState } from 'Constants/FinishState';
-import { DeviceInfo, IDeviceInfo } from 'Models/DeviceInfo';
+import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
