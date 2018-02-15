@@ -1,4 +1,6 @@
 
+import { AdUnitStyle } from 'Models/AdUnitStyle';
+
 export class CustomFeatures {
 
     public static isFadeDisabled(gameId: string) {
@@ -98,6 +100,11 @@ export class CustomFeatures {
         } else {
             return false;
         }
+    }
+
+    public static getAdUnitStyle(abGroup: number): AdUnitStyle {
+        // todo: test different download button colors in two ab groups
+        return new AdUnitStyle({ctaButtonColor: "#167dfb"});
     }
 
     public static isPlayableConfigurationEnabled(originalResourceUrl: string) {

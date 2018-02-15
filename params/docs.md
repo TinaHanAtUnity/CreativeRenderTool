@@ -72,6 +72,7 @@
 | versionCode | number | Application internal version code for Android apps, available only for SDK 2.1.1 and later | SDK | android |
 | simulator | boolean | If device is a simulator, not a real device | SDK | ios |
 | requestSignal | string | Base64 encoded string from AdMob protobuf signals | SDK | all |
+| adUnitStyle | object | Style of the ad unit | SDK | all |
 
 
 
@@ -188,6 +189,7 @@
 | screenSize | android | False | True | number | Android raw screen layout value | SDK | android |
 | platform | all | False | True | string | "android" or "ios" | SDK | all |
 | language | all | False | True | string | Device language code (e.g. en_US or fr_CA) | SDK | all |
+| adUnitStyle | no | False | True | object | Style of the ad unit | SDK | all |
 
 
 
@@ -227,4 +229,5 @@
 | screenSize | android | False | True | number | Android raw screen layout value | SDK | android |
 | platform | all | False | True | string | "android" or "ios" | SDK | all |
 | language | all | False | True | string | Device language code (e.g. en_US or fr_CA) | SDK | all |
+| adUnitStyle | no | False | True | object | Style of the ad unit | SDK | all |
 
