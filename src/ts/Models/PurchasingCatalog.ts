@@ -1,12 +1,12 @@
 import { Model } from 'Models/Model';
-import { Product } from 'Models/Product';
+import { Product, IProductData } from 'Models/Product';
 
 interface IPurchasingCatalog {
     products: { [productId: string]: Product };
 }
 
 export class PurchasingCatalog extends Model<IPurchasingCatalog> {
-    constructor(data: any[]) {
+    constructor(data: IProductData[]) {
         super('PurchasingCatalog', {
             products: ['object']
         });
