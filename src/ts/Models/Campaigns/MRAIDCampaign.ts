@@ -3,7 +3,6 @@ import { HTML } from 'Models/Assets/HTML';
 import { Image } from 'Models/Assets/Image';
 import { Asset } from 'Models/Assets/Asset';
 import { StoreName } from 'Models/Campaigns/PerformanceCampaign';
-import { JSONAsset } from 'Models/Assets/JSONAsset';
 
 export interface IMRAIDCampaign extends ICampaign {
     resourceAsset: HTML | undefined;
