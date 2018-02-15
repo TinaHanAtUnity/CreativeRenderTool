@@ -22,6 +22,7 @@ import { DiagnosticError } from 'Errors/DiagnosticError';
 import { ClientInfo } from 'Models/ClientInfo';
 import { StoreName } from 'Models/Campaigns/PerformanceCampaign';
 import { Request } from 'Utilities/Request';
+import { AdUnitStyle } from 'Models/AdUnitStyle';
 
 export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler {
     protected _placement: Placement;
@@ -34,8 +35,9 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
     private _campaign: T;
     private _deviceInfo: DeviceInfo;
     private _thirdPartyEventManager: ThirdPartyEventManager;
+    private _adUnitStyle?: AdUnitStyle;
 
-    constructor(nativeBridge: NativeBridge, adUnit: VideoAdUnit<T>, parameters: IAdUnitParameters<T>) {
+    constructor(nativeBridge: NativeBridge, adUnit: VideoAdUnit<T>, parameters: IAdUnitParameters<T>, adUnitStyle?: AdUnitStyle) {
         this._nativeBridge = nativeBridge;
         this._operativeEventManager = parameters.operativeEventManager;
         this._comScoreTrackingService = parameters.comScoreTrackingService;
@@ -46,13 +48,14 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
         this._deviceInfo = parameters.deviceInfo;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._clientInfo = parameters.clientInfo;
+        this._adUnitStyle = adUnitStyle;
     }
 
     public onOverlaySkip(position: number): void {
         this._nativeBridge.VideoPlayer.pause();
         this._adUnit.setActive(false);
         this._adUnit.setFinishState(FinishState.SKIPPED);
-        this._operativeEventManager.sendSkip(this._campaign.getSession(), this._placement, this._campaign, this._adUnit.getVideo().getPosition(), this.getVideoOrientation());
+        this._operativeEventManager.sendSkip(this._campaign.getSession(), this._placement, this._campaign, this._adUnit.getVideo().getPosition(), this.getVideoOrientation(), this._adUnitStyle);
         this.sendComscoreEvent();
 
         this._adUnit.getContainer().reconfigure(ViewConfiguration.ENDSCREEN);

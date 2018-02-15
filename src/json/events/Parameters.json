@@ -425,5 +425,12 @@
     "description": "Base64 encoded string from AdMob protobuf signals",
     "provider": "SDK",
     "platforms": "all"
+  },
+  {
+    "key": "adUnitStyle",
+    "type": "object",
+    "description": "Style of the ad unit",
+    "provider": "SDK",
+    "platforms": "all"
   }
 ]
