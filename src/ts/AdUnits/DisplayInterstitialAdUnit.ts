@@ -166,6 +166,8 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
                     'action': 'android.intent.action.VIEW',
                     'uri': url
                 });
+            } else if (this._nativeBridge.getPlatform() === Platform.IOS) {
+                this._nativeBridge.UrlScheme.open(url);
             }
         }
     }
