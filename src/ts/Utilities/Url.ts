@@ -12,19 +12,19 @@ export class Url {
 
     public static encode(url: string): string {
         if(url) {
-            url = url.replace('"', '%22');
-            url = url.replace('<', '%3C');
-            url = url.replace('>', '%3E');
-            url = url.replace('#', '%23');
-            url = url.replace('{', '%7B');
-            url = url.replace('}', '%7D');
-            url = url.replace('|', '%7C');
-            url = url.replace('\\', '%5C');
-            url = url.replace('^', '%5E');
-            url = url.replace('~', '%7E');
-            url = url.replace('[', '%5B');
-            url = url.replace(']', '%5D');
-            url = url.replace('`', '%60');
+            url = url.replace(/"/g, '%22');
+            url = url.replace(/</g, '%3C');
+            url = url.replace(/>/g, '%3E');
+            url = url.replace(/#/g, '%23');
+            url = url.replace(/{/g, '%7B');
+            url = url.replace(/}/g, '%7D');
+            url = url.replace(/\|/g, '%7C');
+            url = url.replace(/\\/g, '%5C');
+            url = url.replace(/\^/g, '%5E');
+            url = url.replace(/~/g, '%7E');
+            url = url.replace(/\[/g, '%5B');
+            url = url.replace(/]/g, '%5D');
+            url = url.replace(/`/g, '%60');
         }
 
         return url;
