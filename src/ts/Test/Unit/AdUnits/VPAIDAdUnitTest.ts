@@ -41,13 +41,13 @@ describe('VPAIDAdUnit', () => {
         sandbox = sinon.sandbox.create();
 
         const clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-        const deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
+        const deviceInfo = TestFixtures.getAndroidDeviceInfo();
         nativeBridge = TestFixtures.getNativeBridge();
         sinon.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
         focusManager = new FocusManager(nativeBridge);
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
 
-        container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
         sinon.stub(container, 'open').returns(Promise.resolve());
         sinon.stub(container, 'close').returns(Promise.resolve());
 

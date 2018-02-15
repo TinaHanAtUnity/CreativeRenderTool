@@ -56,12 +56,12 @@ describe('XPromoEndScreenEventHandlerTest', () => {
 
             campaign = TestFixtures.getXPromoCampaign();
             focusManager = new FocusManager(nativeBridge);
-            container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+            container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
             metaDataManager = new MetaDataManager(nativeBridge);
             const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request = new Request(nativeBridge, wakeUpManager);
             clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-            deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
+            deviceInfo = TestFixtures.getAndroidDeviceInfo();
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
             sessionManager = new SessionManager(nativeBridge);
             operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
@@ -126,11 +126,11 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 handleCallback
             }, Platform.IOS);
 
-            container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS), focusManager);
+            container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager);
             const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request = new Request(nativeBridge, wakeUpManager);
             clientInfo = TestFixtures.getClientInfo(Platform.IOS);
-            deviceInfo = TestFixtures.getDeviceInfo(Platform.IOS);
+            deviceInfo = TestFixtures.getIosDeviceInfo();
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
             sessionManager = new SessionManager(nativeBridge);
             operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);

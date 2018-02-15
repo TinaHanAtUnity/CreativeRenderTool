@@ -65,11 +65,11 @@ describe('DisplayInterstitialAdUnit', () => {
             const focusManager = new FocusManager(nativeBridge);
             const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request = new Request(nativeBridge, wakeUpManager);
-            container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+            container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
             sandbox.stub(container, 'open').returns(Promise.resolve());
             sandbox.stub(container, 'close').returns(Promise.resolve());
             clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-            deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
+            deviceInfo = TestFixtures.getAndroidDeviceInfo();
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
             sessionManager = new SessionManager(nativeBridge);
             operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);

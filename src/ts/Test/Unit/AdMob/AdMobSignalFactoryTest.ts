@@ -4,17 +4,17 @@ import { assert } from 'chai';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { ClientInfo } from 'Models/ClientInfo';
-import { DeviceInfo } from 'Models/DeviceInfo';
 import { FocusManager } from 'Managers/FocusManager';
 import { NativeBridge } from 'Native/NativeBridge';
 import { unity_proto } from '../../../../proto/unity_proto.js';
 import * as protobuf from 'protobufjs/minimal';
+import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 
 describe('AdMobSignalFactoryTest', () => {
     it('basic test', () => {
         const nativeBridge: NativeBridge = TestFixtures.getNativeBridge();
         const clientInfo: ClientInfo = TestFixtures.getClientInfo();
-        const deviceInfo: DeviceInfo = TestFixtures.getDeviceInfo();
+        const deviceInfo: AndroidDeviceInfo = TestFixtures.getAndroidDeviceInfo();
         const focusManager: FocusManager = new FocusManager(nativeBridge);
 
         return new AdMobSignalFactory(nativeBridge, clientInfo, deviceInfo, focusManager).getAdRequestSignal().then(signal => {

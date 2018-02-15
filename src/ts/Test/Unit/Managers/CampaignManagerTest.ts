@@ -69,6 +69,7 @@ import OnProgrammaticVastPlcCampaignCustomTracking from 'json/OnProgrammaticVast
 import OnStaticInterstitialDisplayCampaign from 'json/OnStaticInterstitialDisplayCampaign.json';
 import OnStaticInterstitialDisplayCampaignNoClick from 'json/OnStaticInterstitialDisplayCampaignNoClick.json';
 import OnStaticInterstitialDisplayCampaignNoClickMarkupUrl from 'json/OnStaticInterstitialDisplayCampaignNoClickMarkupUrl.json';
+import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -197,7 +198,7 @@ describe('CampaignManager', () => {
         focusManager = new FocusManager(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
-        deviceInfo = new DeviceInfo(nativeBridge);
+        deviceInfo = new AndroidDeviceInfo(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         sessionManager = new SessionManager(nativeBridge);

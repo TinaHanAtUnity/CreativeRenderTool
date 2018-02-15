@@ -43,8 +43,8 @@ describe('AndroidAdUnitTest', () => {
         const request = new Request(nativeBridge, wakeUpManager);
         const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         const sessionManager = new SessionManager(nativeBridge);
-        const deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
-        container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+        const deviceInfo = TestFixtures.getAndroidDeviceInfo();
+        container = new Activity(nativeBridge, deviceInfo);
         const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
         const comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
@@ -92,7 +92,7 @@ describe('AndroidAdUnitTest', () => {
 
     it('should close ad unit', () => {
         nativeBridge = TestFixtures.getNativeBridge(Platform.ANDROID);
-        container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
         const stub = sinon.stub(nativeBridge.AndroidAdUnit, 'close').returns(Promise.resolve());
 
         return container.close().then(() => {
@@ -104,7 +104,7 @@ describe('AndroidAdUnitTest', () => {
     // note: when reconfigure method is enhanced with some actual parameters, this test needs to be refactored
     it('should reconfigure ad unit', () => {
         nativeBridge = TestFixtures.getNativeBridge(Platform.ANDROID);
-        container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
 
         const stubViews = sinon.stub(nativeBridge.AndroidAdUnit, 'setViews').returns(Promise.resolve());
         const stubOrientation = sinon.stub(nativeBridge.AndroidAdUnit, 'setOrientation').returns(Promise.resolve());

@@ -59,7 +59,7 @@ describe('MRAIDEventHandlersTest', () => {
             sinon.spy(nativeBridge.Listener, 'sendClickEvent');
 
             focusManager = new FocusManager(nativeBridge);
-            container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+            container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
             request = sinon.createStubInstance(Request);
             metaDataManager = new MetaDataManager(nativeBridge);
             placement = TestFixtures.getPlacement();
@@ -68,7 +68,7 @@ describe('MRAIDEventHandlersTest', () => {
 
             request = new Request(nativeBridge, wakeUpManager);
             clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-            deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
+            deviceInfo = TestFixtures.getAndroidDeviceInfo();
 
             thirdPartyEventManager = sinon.createStubInstance(ThirdPartyEventManager);
             sessionManager = sinon.createStubInstance(SessionManager);

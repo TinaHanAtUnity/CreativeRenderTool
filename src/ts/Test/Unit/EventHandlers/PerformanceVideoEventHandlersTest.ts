@@ -37,7 +37,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
             handleCallback
         });
 
-        container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
         video = new Video('', TestFixtures.getSession());
 
         const focusManager = new FocusManager(nativeBridge);
@@ -45,7 +45,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
         const request = new Request(nativeBridge, wakeUpManager);
         const metaDataManager = new MetaDataManager(nativeBridge);
         const clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-        const deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
+        const deviceInfo = TestFixtures.getAndroidDeviceInfo();
         const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         const sessionManager = new SessionManager(nativeBridge);
         const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
