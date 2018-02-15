@@ -1,3 +1,29 @@
+# Thu Feb 15 09:07:01 UTC 2018
+
+* Preparations for new cache APIs in 2.2.0 release
+
+# Wed Feb 14 14:59:14 UTC 2018
+
+* Enable lunar theme on all groups except 5
+* Miscellaneous AdMob fixes
+
+# Wed Feb 14 10:24:20 UTC 2018
+
+* Revert previous deployment
+
+# Wed Feb 14 10:24:20 UTC 2018
+
+* Validate and encode all incoming URLs to handle unsafe characters
+* Enable lunar theme on all groups except 5
+
+# Tue Feb 13 09:49:36 UTC 2018
+
+* Remove the hidden margin from the admob iframe
+* Enable MOAT on all SDK 2 versions without volume change listeners
+* New overlay AB test on groups 8 & 10
+* Send diagnostics if callback cannot be found when onDownloadStart event is received
+* Cleanup protobuf build & use minified release
+
 # Fri Feb  9 11:00:06 UTC 2018
 
 * Add config_parsing_failed diagnostic event
