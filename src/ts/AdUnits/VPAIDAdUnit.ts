@@ -165,12 +165,19 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     }
 
     private setupIosWebPlayer(): Promise<any> {
-        const eventSettings = {
+        const settings = {
             'allowsPlayback': true,
             'playbackRequiresAction': false,
             'typesRequiringAction': WKAudiovisualMediaTypes.NONE
         };
-        return this._nativeBridge.WebPlayer.setSettings(eventSettings, {});
+        const events = {
+            'onPageStarted': { 'sendEvent': true },
+            'shouldOverrideUrlLoading': { 'sendEvent': true, 'returnValue': true }
+        };
+        return Promise.all([
+            this._nativeBridge.WebPlayer.setSettings(settings, {}),
+            this._nativeBridge.WebPlayer.setEventSettings(events)
+        ]);
     }
 
     private onAdUnitNotLoaded() {
