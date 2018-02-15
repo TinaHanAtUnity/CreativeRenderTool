@@ -23,7 +23,7 @@ export abstract class CampaignParser {
 
     protected validateAndEncodeUrl(url: string, session: Session): string {
         if(Url.isValid(url)) {
-            return encodeURI(url);
+            return Url.encode(url);
         }
 
         Diagnostics.trigger('invalid_url', {
