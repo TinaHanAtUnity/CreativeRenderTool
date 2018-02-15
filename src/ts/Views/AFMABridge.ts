@@ -109,7 +109,7 @@ export class AFMABridge {
     private onMessage(e: MessageEvent) {
         const message = <IAFMAMessage>e.data;
         if (message.type === 'afma') {
-            this._nativeBridge.Sdk.logInfo(`afma: event=${message.event}, data=${message.data}`);
+            this._nativeBridge.Sdk.logInfo(`afma: event=${message.event}, data=${JSON.stringify(message.data)}`);
             if (message.event in this._afmaHandlers) {
                 const handler = this._afmaHandlers[message.event];
                 handler(message);
