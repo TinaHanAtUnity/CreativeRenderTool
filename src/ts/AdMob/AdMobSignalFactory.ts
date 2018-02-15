@@ -1,6 +1,6 @@
 import { AdMobSignal } from 'Models/AdMobSignal';
 import { ClientInfo } from 'Models/ClientInfo';
-import { DeviceInfo, IDeviceInfo } from 'Models/DeviceInfo';
+import { DeviceInfo } from 'Models/DeviceInfo';
 import { Platform } from 'Constants/Platform';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Diagnostics } from 'Utilities/Diagnostics';
@@ -11,10 +11,10 @@ import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 export class AdMobSignalFactory {
     private _nativeBridge: NativeBridge;
     private _clientInfo: ClientInfo;
-    private _deviceInfo: DeviceInfo<IDeviceInfo>;
+    private _deviceInfo: DeviceInfo;
     private _focusManager: FocusManager;
 
-    constructor(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo<IDeviceInfo>, focusManager: FocusManager) {
+    constructor(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo, focusManager: FocusManager) {
         this._nativeBridge = nativeBridge;
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
