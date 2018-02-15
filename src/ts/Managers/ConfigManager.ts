@@ -113,9 +113,9 @@ export class ConfigManager {
             forceAbGroup: ConfigManager.AbGroup
         });
 
-        if(clientInfo.getPlatform() === Platform.ANDROID) {
+        if(clientInfo.getPlatform() === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
             url = Url.addParameters(url, {
-                deviceMake: deviceInfo instanceof AndroidDeviceInfo ? deviceInfo.getManufacturer() : undefined
+                deviceMake: deviceInfo.getManufacturer()
             });
         }
 
@@ -124,9 +124,9 @@ export class ConfigManager {
                 advertisingTrackingId: deviceInfo.getAdvertisingIdentifier(),
                 limitAdTracking: deviceInfo.getLimitAdTracking()
             });
-        } else if(clientInfo.getPlatform() === Platform.ANDROID) {
+        } else if(clientInfo.getPlatform() === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
             url = Url.addParameters(url, {
-                androidId: deviceInfo instanceof AndroidDeviceInfo ? deviceInfo.getAndroidId() : undefined
+                androidId: deviceInfo.getAndroidId()
             });
         }
 
