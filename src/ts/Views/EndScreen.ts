@@ -137,27 +137,11 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     protected getEndscreenAlt(campaign?: Campaign) {
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-        if(this._abGroup === 5 || this._abGroup === 6) {
-            return lunarEndScreenId;
-        }
-
-        return undefined;
-=======
         if(this._abGroup === 5) {
             return undefined;
         }
 
         return lunarEndScreenId;
->>>>>>> Stashed changes
-=======
-        if(this._abGroup === 5) {
-            return undefined;
-        }
-
-        return lunarEndScreenId;
->>>>>>> 1ab2fa07478ea68c1a7dfd824bda1ec7bd44a4da
     }
 
     protected abstract onDownloadEvent(event: Event): void;
@@ -183,26 +167,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         }
 
         const headEl: HTMLElement = <HTMLElement>this._container.querySelector('#head');
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-        headEl.style.animationPlayState = "paused";
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> 1ab2fa07478ea68c1a7dfd824bda1ec7bd44a4da
         headEl.classList.add("nod");
         setTimeout(() => {
             if (typeof headEl !== "undefined" && headEl.classList && headEl.classList.contains("nod")) {
                 headEl.classList.remove("nod");
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-                setTimeout(() => {
-                    headEl.style.animationPlayState = "running";
-                }, 150);
-=======
->>>>>>> Stashed changes
-=======
->>>>>>> 1ab2fa07478ea68c1a7dfd824bda1ec7bd44a4da
             }
         }, 150);
     }
