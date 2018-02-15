@@ -90,31 +90,23 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
 
-        this.fetchConfiguration().then(configuration => {
-            let container = MRAIDContainer;
-            if(configuration) {
+        let container = MRAIDContainer;
+        const playableConfiguration = this._campaign.getPlayableConfiguration();
+        if(playableConfiguration) {
+            // check configuration based on the ab group
+            const groupKey = "group" + this._campaign.getAbGroup();
+            if(playableConfiguration[groupKey]) {
+                this._configuration = playableConfiguration[groupKey];
+            } else if (playableConfiguration.default) {
+                this._configuration = playableConfiguration.default;
+            } else {
                 this._configuration = {};
-                try {
-                    const configurationJson = JsonParser.parse(configuration);
-                    // check configuration based on the ab group
-                    const groupKey = "group" + this._campaign.getAbGroup();
-                    if(configurationJson[groupKey]) {
-                        this._configuration = configurationJson[groupKey];
-                    } else if (configurationJson.default) {
-                        this._configuration = configurationJson.default;
-                    }
-                } catch (e) {
-                    Diagnostics.trigger('playable_configuration_invalid_json', {
-                        configuration: configuration
-                    });
-                }
-
-                container = container.replace('var playableConfiguration = {};', 'var playableConfiguration = ' + JSON.stringify(this._configuration) + ';');
             }
-            this.createMRAID(container).then(mraid => {
-                iframe.onload = () => this.onIframeLoaded();
-                iframe.srcdoc = mraid;
-            });
+            container = container.replace('var playableConfiguration = {};', 'var playableConfiguration = ' + JSON.stringify(this._configuration) + ';');
+        }
+        this.createMRAID(container).then(mraid => {
+            iframe.onload = () => this.onIframeLoaded();
+            iframe.srcdoc = mraid;
         });
 
         this._messageListener = (event: MessageEvent) => this.onMessage(event);
@@ -367,16 +359,5 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
             return undefined;
         }
         return timeInSeconds;
-    }
-
-    private fetchConfiguration(): Promise<string | undefined> {
-        const configuration = this._campaign.getConfiguration();
-        if(configuration) {
-            const fileId = configuration.getFileId();
-            if(fileId) {
-                return this._nativeBridge.Cache.getFileContent(fileId, 'UTF-8');
-            }
-        }
-        return Promise.resolve(undefined);
     }
 }

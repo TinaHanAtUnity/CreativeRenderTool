@@ -65,7 +65,7 @@ export class ProgrammaticMraidUrlParser extends CampaignParser {
             bypassAppSheet: undefined,
             store: undefined,
             appStoreId: undefined,
-            configurationAsset: undefined
+            playableConfiguration: undefined
         };
 
         return Promise.resolve(new MRAIDCampaign(parameters));

@@ -25,7 +25,12 @@ export interface IMRAIDCampaign extends ICampaign {
     bypassAppSheet: boolean | undefined;
     store: StoreName | undefined;
     appStoreId: string | undefined;
-    configurationAsset: JSONAsset | undefined;
+    playableConfiguration: IPlayableConfiguration | undefined;
+}
+
+export interface IPlayableConfiguration {
+    default?: any;
+    [key: string]: any;
 }
 
 export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
@@ -49,7 +54,7 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
             bypassAppSheet: ['boolean', 'undefined'],
             store: ['number', 'undefined'],
             appStoreId: ['string', 'undefined'],
-            configurationAsset: ['object', 'undefined'],
+            playableConfiguration: ['object', 'undefined'],
         }, campaign);
     }
 
@@ -93,8 +98,8 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         return this.get('landscapeImage');
     }
 
-    public getConfiguration(): JSONAsset | undefined {
-        return this.get('configurationAsset');
+    public getPlayableConfiguration(): IPlayableConfiguration | undefined {
+        return this.get('playableConfiguration');
     }
 
     public getRequiredAssets() {
@@ -115,10 +120,6 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         const landscape = this.getLandscape();
         if(landscape) {
             assets.push(landscape);
-        }
-        const configuration = this.getConfiguration();
-        if(configuration) {
-            assets.push(configuration);
         }
 
         return assets;
@@ -167,6 +168,10 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
 
     public getAppStoreId(): string | undefined {
         return this.get('appStoreId');
+    }
+
+    public setPlayableConfiguration(configuration: IPlayableConfiguration) {
+        this.set('playableConfiguration', configuration);
     }
 
     public isConnectionNeeded(): boolean {

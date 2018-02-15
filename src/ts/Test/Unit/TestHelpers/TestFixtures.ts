@@ -171,7 +171,7 @@ export class TestFixtures {
             bypassAppSheet: json.bypassAppSheet,
             store: storeName,
             appStoreId: json.appStoreId,
-            configurationAsset: undefined
+            playableConfiguration: undefined
         };
     }
 
@@ -223,7 +223,7 @@ export class TestFixtures {
             bypassAppSheet: mraidContentJson.bypassAppSheet,
             store: undefined,
             appStoreId: mraidContentJson.appStoreId,
-            configurationAsset: undefined
+            playableConfiguration: undefined
         };
     }
 
