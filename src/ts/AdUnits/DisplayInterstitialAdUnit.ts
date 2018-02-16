@@ -165,7 +165,8 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
     }
 
     private shouldOverrideUrlLoading(url: string, method: string): void {
-        this._nativeBridge.Sdk.logDebug("DisplayInterstitialAdUnit: shouldOverrideUrlLoading triggered for url: " + url);
+        this._nativeBridge.WebPlayer.shouldOverrideUrlLoading.unsubscribe(this._shouldOverrideUrlLoadingObserver);
+        this._nativeBridge.Sdk.logDebug("DisplayInterstitialAdUnit: shouldOverrideUrlLoading triggered for url: " + url + "methods " + method);
         if (!url) {
             return;
         }
