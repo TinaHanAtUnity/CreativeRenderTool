@@ -35,11 +35,13 @@ export class PromoAdUnit extends AbstractAdUnit {
         this._placement = parameters.placement;
         this._campaign = parameters.campaign;
     }
+
     public show(): Promise<void> {
         // Always set to complete to avoid errors.
         this.setFinishState(FinishState.COMPLETED);
         this.setShowing(true);
         this.onStart.trigger();
+        this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
         this._promoView.show();
         this.sendTrackingEvent('impression');
 
@@ -69,6 +71,7 @@ export class PromoAdUnit extends AbstractAdUnit {
     }
 
     public sendClick(): void {
+        this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
         this.sendTrackingEvent('click');
     }
 
