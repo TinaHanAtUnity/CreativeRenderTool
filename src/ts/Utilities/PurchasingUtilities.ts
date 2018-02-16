@@ -8,7 +8,11 @@ export class PurchasingUtilities {
         return new Promise((resolve, reject) => {
             const observer = nativeBridge.Purchasing.onGetPromoCatalog.subscribe((promoCatalogJSON) => {
                 nativeBridge.Purchasing.onGetPromoCatalog.unsubscribe(observer);
-                this._catalog = new PurchasingCatalog(JSON.parse(promoCatalogJSON));
+                try {
+                    this._catalog = new PurchasingCatalog(JSON.parse(promoCatalogJSON));
+                } catch(err) {
+                    reject();
+                }
                 resolve();
             });
             nativeBridge.Purchasing.getPromoCatalog().catch(reject);
