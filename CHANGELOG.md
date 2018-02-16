@@ -1,4 +1,4 @@
-# Pending
+# Fri Feb 16 10:18:25 UTC 2018
 
 * Add ad unit style object to operative events
 * Modify analytics event formats to better match Unity Analytics event formats
