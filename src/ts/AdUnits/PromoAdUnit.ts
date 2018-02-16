@@ -76,7 +76,7 @@ export class PromoAdUnit extends AbstractAdUnit {
     }
 
     public isCached(): boolean {
-        return true;
+        return this._campaign.getCreativeResource().isCached();
     }
 
     public description(): string {
