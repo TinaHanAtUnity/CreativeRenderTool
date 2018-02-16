@@ -53,6 +53,8 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
 
     public show(): Promise<void> {
         this.setShowing(true);
+        this._onPageStartedObserver = this._nativeBridge.WebPlayer.onPageStarted.subscribe( (url) => this.onPageStarted(url));
+        this._shouldOverrideUrlLoadingObserver = this._nativeBridge.WebPlayer.shouldOverrideUrlLoading.subscribe((url: string, method: string) => this.shouldOverrideUrlLoading(url, method));
 
         return this.setWebPlayerViews().then( () => {
             this._view.show();
@@ -237,8 +239,6 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
             'onPageStarted': { 'sendEvent': true },
             'shouldOverrideUrlLoading': { 'sendEvent': true, 'returnValue': false, 'callSuper': false }
         };
-        this._onPageStartedObserver = this._nativeBridge.WebPlayer.onPageStarted.subscribe( (url) => this.onPageStarted(url));
-        this._shouldOverrideUrlLoadingObserver = this._nativeBridge.WebPlayer.shouldOverrideUrlLoading.subscribe((url: string, method: string) => this.shouldOverrideUrlLoading(url, method));
         return this._nativeBridge.WebPlayer.setEventSettings(eventSettings);
     }
 
