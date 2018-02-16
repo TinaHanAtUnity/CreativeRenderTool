@@ -61,6 +61,7 @@ import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 import { Promo } from 'Views/Promo';
 import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
 import { PromoEventHandler } from 'EventHandlers/PromoEventHandler';
+import { AdUnitStyle } from 'Models/AdUnitStyle';
 
 export class AdUnitFactory {
 
@@ -92,7 +93,8 @@ export class AdUnitFactory {
 
     private static createPerformanceAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PerformanceCampaign>): PerformanceAdUnit {
         const overlay = this.createOverlay(nativeBridge, parameters);
-        const endScreen = new PerformanceEndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+        const adUnitStyle = CustomFeatures.getAdUnitStyle(parameters.campaign.getAbGroup());
+        const endScreen = new PerformanceEndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), adUnitStyle);
         const video = this.getOrientedVideo(<PerformanceCampaign>parameters.campaign, parameters.forceOrientation);
 
         const performanceAdUnitParameters: IPerformanceAdUnitParameters = {
@@ -100,6 +102,7 @@ export class AdUnitFactory {
             video: video,
             overlay: overlay,
             endScreen: endScreen,
+            adUnitStyle: adUnitStyle
         };
 
         const performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
@@ -108,7 +111,7 @@ export class AdUnitFactory {
         const endScreenEventHandler = new PerformanceEndScreenEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
         endScreen.addEventHandler(endScreenEventHandler);
 
-        this.prepareVideoPlayer(nativeBridge, performanceAdUnit, parameters);
+        this.prepareVideoPlayer(nativeBridge, performanceAdUnit, parameters, performanceAdUnitParameters.adUnitStyle);
 
         if (nativeBridge.getPlatform() === Platform.ANDROID) {
             const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => endScreenEventHandler.onKeyEvent(keyCode));
@@ -344,12 +347,12 @@ export class AdUnitFactory {
         return displayInterstitialAdUnit;
     }
 
-    private static prepareVideoPlayer(nativeBridge: NativeBridge, adUnit: VideoAdUnit, parameters: IAdUnitParameters<Campaign>) {
+    private static prepareVideoPlayer(nativeBridge: NativeBridge, adUnit: VideoAdUnit, parameters: IAdUnitParameters<Campaign>, adUnitStyle?: AdUnitStyle) {
         const onPreparedObserver = nativeBridge.VideoPlayer.onPrepared.subscribe((url, duration, width, height) => VideoEventHandlers.onVideoPrepared(nativeBridge, adUnit, duration, parameters.campaign));
         const onPrepareTimeoutObserver = nativeBridge.VideoPlayer.onPrepareTimeout.subscribe((url) => VideoEventHandlers.onVideoPrepareTimeout(nativeBridge, adUnit, parameters.campaign, url));
-        const onProgressObserver = nativeBridge.VideoPlayer.onProgress.subscribe((position) => VideoEventHandlers.onVideoProgress(nativeBridge, parameters.operativeEventManager, parameters.thirdPartyEventManager, parameters.comScoreTrackingService, adUnit, position, parameters.configuration, parameters.campaign, parameters.placement));
+        const onProgressObserver = nativeBridge.VideoPlayer.onProgress.subscribe((position) => VideoEventHandlers.onVideoProgress(nativeBridge, parameters.operativeEventManager, parameters.thirdPartyEventManager, parameters.comScoreTrackingService, adUnit, position, parameters.configuration, parameters.campaign, parameters.placement, adUnitStyle));
         const onPlayObserver = nativeBridge.VideoPlayer.onPlay.subscribe(() => VideoEventHandlers.onVideoPlay(nativeBridge, adUnit));
-        const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VideoEventHandlers.onVideoCompleted(parameters.operativeEventManager, parameters.thirdPartyEventManager, parameters.comScoreTrackingService, adUnit, parameters.campaign, parameters.placement));
+        const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VideoEventHandlers.onVideoCompleted(parameters.operativeEventManager, parameters.thirdPartyEventManager, parameters.comScoreTrackingService, adUnit, parameters.campaign, parameters.placement, adUnitStyle));
 
         adUnit.onClose.subscribe(() => {
             nativeBridge.VideoPlayer.onPrepared.unsubscribe(onPreparedObserver);
