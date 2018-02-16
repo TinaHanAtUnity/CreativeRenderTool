@@ -10,7 +10,7 @@ export class PerformanceOverlayEventHandler extends OverlayEventHandler<Performa
     private _performanceCampaign: PerformanceCampaign;
 
     constructor(nativeBridge: NativeBridge, adUnit: PerformanceAdUnit, parameters: IPerformanceAdUnitParameters) {
-        super(nativeBridge, adUnit, parameters);
+        super(nativeBridge, adUnit, parameters, parameters.adUnitStyle);
         this._performanceAdUnit = adUnit;
         this._performanceOperativeEventManger = parameters.operativeEventManager;
         this._performanceCampaign = parameters.campaign;
