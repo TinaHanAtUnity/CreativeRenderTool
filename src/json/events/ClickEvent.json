@@ -198,6 +198,12 @@
       "required": "all",
       "queryString": false,
       "body": true
+    },
+    {
+      "parameter": "adUnitStyle",
+      "required": "no",
+      "queryString": false,
+      "body": true
     }
   ]
 }
