@@ -7,6 +7,7 @@ import { Request, INativeResponse } from 'Utilities/Request';
 import { AnalyticsProtocol, IAnalyticsObject, IAnalyticsCommonObject } from 'Analytics/AnalyticsProtocol';
 import { FocusManager } from 'Managers/FocusManager';
 import { Configuration } from 'Models/Configuration';
+import { StorageType } from 'Native/Api/Storage';
 
 export class AnalyticsManager {
     private _nativeBridge: NativeBridge;
@@ -176,8 +177,12 @@ export class AnalyticsManager {
         }
     }
 
-    private onStorageSet(eventType: string, data: any) {
-        // todo: handle IAP purchase data with new 2.1.1 storage format
+    private onStorageSet(eventType: string, data: object) {
+        if (data && Array.isArray(data)) {
+            this.sendIAPTransactions(data);
+            this._nativeBridge.Storage.delete(StorageType.PUBLIC, 'iap.purchases');
+            this._nativeBridge.Storage.write(StorageType.PUBLIC);
+        }
     }
 
     private send(event: IAnalyticsObject): Promise<INativeResponse> {

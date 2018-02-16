@@ -38,6 +38,9 @@ import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 import { XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
+import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
+import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
+import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 
 describe('AdUnitFactoryTest', () => {
 
@@ -270,6 +273,40 @@ describe('AdUnitFactoryTest', () => {
 
         describe('On static-interstial-url campaign', () => {
             displayUnitTests(isStaticInterstitialUrlCampaign);
+        });
+    });
+
+    describe('Promo AdUnit', () => {
+        let promoAdUnit: PromoAdUnit;
+        let campaign: PromoCampaign;
+        beforeEach(() => {
+            campaign = TestFixtures.getPromoCampaign();
+            sandbox.stub(PurchasingUtilities, 'productPrice').returns("3 €");
+            sandbox.stub(campaign, 'getSession').returns({
+                getId: sinon.stub().returns('1111')
+            });
+            adUnitParameters.campaign = campaign;
+
+            promoAdUnit = <PromoAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+        });
+        describe('on show', () => {
+            it('should trigger onStart', (done) => {
+                promoAdUnit.onStart.subscribe(() => {
+                    done();
+                });
+                promoAdUnit.show();
+            });
+        });
+        describe('on hide', () => {
+            it('should trigger onClose when hide is called', (done) => {
+                promoAdUnit.setShowing(true);
+                promoAdUnit.onClose.subscribe(() => {
+                    assert.equal(promoAdUnit.isShowing(), false);
+                    done();
+                });
+
+                promoAdUnit.hide();
+            });
         });
     });
 

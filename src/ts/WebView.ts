@@ -46,6 +46,7 @@ import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
+import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 
 export class WebView {
 
@@ -160,6 +161,16 @@ export class WebView {
         }).then(([configuration]) => {
             this._configuration = configuration;
             HttpKafka.setConfiguration(this._configuration);
+
+            const iapPayload = {
+                gamerId: this._configuration.getGamerId(),
+                iapPromo: true,
+                abGroup: this._configuration.getAbGroup(),
+                gameId: this._clientInfo.getGameId(),
+                request: "setids"
+            };
+
+            PurchasingUtilities.initiatePurchaseRequest(this._nativeBridge, JSON.stringify(iapPayload));
 
             if (!this._configuration.isEnabled()) {
                 const error = new Error('Game with ID ' + this._clientInfo.getGameId() +  ' is not enabled');
