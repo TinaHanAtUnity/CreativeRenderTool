@@ -9,7 +9,7 @@ export class PurchasingUtilities {
             if(ready) {
                 const promoVersionObserver = nativeBridge.Purchasing.onGetPromoVersion.subscribe((promoVersion) => {
                     nativeBridge.Purchasing.onGetPromoVersion.unsubscribe(promoVersionObserver);
-                    const promoVersionSplit: string[] = promoVersion.split(',', 2);
+                    const promoVersionSplit: string[] = promoVersion.split('.', 2);
                     // Checks if the version is AT LEAST 1.16.0
                     if(parseInt(promoVersionSplit[0], 10) >= 1 && parseInt(promoVersionSplit[1], 10) >= 16) {
                         return true;
