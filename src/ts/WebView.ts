@@ -42,11 +42,11 @@ import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
+import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
-import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 
 export class WebView {
 
@@ -162,15 +162,20 @@ export class WebView {
             this._configuration = configuration;
             HttpKafka.setConfiguration(this._configuration);
 
-            const iapPayload = {
-                gamerId: this._configuration.getGamerId(),
-                iapPromo: true,
-                abGroup: this._configuration.getAbGroup(),
-                gameId: this._clientInfo.getGameId(),
-                request: "setids"
-            };
-
-            PurchasingUtilities.initiatePurchaseRequest(this._nativeBridge, JSON.stringify(iapPayload));
+            const promoVersionObserver = this._nativeBridge.Purchasing.onGetPromoVersion.subscribe((promoVersion) => {
+                this._nativeBridge.Purchasing.onGetPromoVersion.unsubscribe(promoVersionObserver);
+                if(promoVersion === '1.16.0') {
+                    const iapPayload = {
+                        gamerId: this._configuration.getGamerId(),
+                        iapPromo: true,
+                        abGroup: this._configuration.getAbGroup(),
+                        gameId: this._clientInfo.getGameId(),
+                        request: "setids"
+                    };
+                    PurchasingUtilities.initiatePurchaseRequest(this._nativeBridge, JSON.stringify(iapPayload));
+                }
+            });
+            this._nativeBridge.Purchasing.getPromoVersion();
 
             if (!this._configuration.isEnabled()) {
                 const error = new Error('Game with ID ' + this._clientInfo.getGameId() +  ' is not enabled');
