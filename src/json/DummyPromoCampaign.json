@@ -1,0 +1,25 @@
+{
+    "abGroup": 0,
+    "promo": {
+        "id": "000000000000000000000123",
+        "appStoreId": "fooAppId",
+        "iapProductId": "com.example.iap.product1",
+        "creativeUrl": "http://foobar.com",
+        "dynamicMarkup": "<script>console.log('Dynamic!');</script>",
+        "tracking": {
+            "impression": [
+                "http://test.impression.com/blah1",
+                "http://test.impression.com/blah2",
+                "http://test.impression.com/%ZONE%/blah?sdkVersion=%SDK_VERSION%"
+            ],
+            "complete": [
+                "http://test.complete.com/complete1"
+            ],
+            "click": [
+                "http://test.complete.com/click1"
+            ]
+        }
+    },
+    "gamerId": "583dfda0d933a3630a53249c",
+    "cacheTTL": 7200
+}

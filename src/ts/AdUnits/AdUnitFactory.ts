@@ -57,6 +57,10 @@ import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { Privacy } from 'Views/Privacy';
 import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 import { IObserver2, IObserver3 } from 'Utilities/IObserver';
+import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
+import { Promo } from 'Views/Promo';
+import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
+import { PromoEventHandler } from 'EventHandlers/PromoEventHandler';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 
 export class AdUnitFactory {
@@ -80,6 +84,8 @@ export class AdUnitFactory {
             return this.createXPromoAdUnit(nativeBridge, <IAdUnitParameters<XPromoCampaign>>parameters);
         } else if (parameters.campaign instanceof AdMobCampaign) {
             return this.createAdMobAdUnit(nativeBridge, <IAdUnitParameters<AdMobCampaign>>parameters);
+        } else if (parameters.campaign instanceof PromoCampaign) {
+            return this.createPromoAdUnit(nativeBridge, <IAdUnitParameters<PromoCampaign>>parameters);
         } else {
             throw new Error('Unknown campaign instance type');
         }
@@ -308,6 +314,22 @@ export class AdUnitFactory {
         }
 
         return vpaidAdUnit;
+    }
+
+    private static createPromoAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PromoCampaign>): AbstractAdUnit {
+        const promoView = new Promo(nativeBridge, parameters.campaign, parameters.deviceInfo.getLanguage());
+        const promoAdUnit = new PromoAdUnit(nativeBridge, {
+            ...parameters,
+            view: promoView
+        });
+
+        promoView.render();
+        document.body.appendChild(promoView.container());
+
+        promoView.onClose.subscribe(() => PromoEventHandler.onClose(nativeBridge, promoAdUnit, parameters.campaign.getGamerId(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup(), parameters.campaign.getTrackingUrlsForEvent('purchase'), "purchase"));
+        promoView.onPromo.subscribe((productId) => PromoEventHandler.onPromo(nativeBridge, promoAdUnit, productId, parameters.campaign.getTrackingUrlsForEvent('purchase'), "purchase"));
+
+        return promoAdUnit;
     }
 
     private static createDisplayInterstitialAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<DisplayInterstitialCampaign>): DisplayInterstitialAdUnit {

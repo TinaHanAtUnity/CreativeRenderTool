@@ -1,18 +1,35 @@
-import { MetaData } from 'Utilities/MetaData';
 import { PurchasingCatalog } from 'Models/PurchasingCatalog';
-import { JsonParser } from 'Utilities/JsonParser';
-import { PurchasingApi } from 'Native/Api/Purchasing';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Diagnostics } from './Diagnostics';
-import { DiagnosticError } from 'Errors/DiagnosticError';
 
 export class PurchasingUtilities {
+
+    public static checkPromoVersion(nativeBridge: NativeBridge): Promise<boolean> {
+        return this.isPromoReady(nativeBridge).then(ready =>  {
+            if(ready) {
+                const promoVersionObserver = nativeBridge.Purchasing.onGetPromoVersion.subscribe((promoVersion) => {
+                    nativeBridge.Purchasing.onGetPromoVersion.unsubscribe(promoVersionObserver);
+                    if(promoVersion === '1.16.0') {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                });
+                nativeBridge.Purchasing.getPromoVersion();
+            }
+            return false;
+        });
+    }
 
     public static refreshCatalog(nativeBridge: NativeBridge): Promise<void | {}> {
         return new Promise((resolve, reject) => {
             const observer = nativeBridge.Purchasing.onGetPromoCatalog.subscribe((promoCatalogJSON) => {
                 nativeBridge.Purchasing.onGetPromoCatalog.unsubscribe(observer);
-                this._catalog = new PurchasingCatalog(JSON.parse(promoCatalogJSON));
+                try {
+                    this._catalog = new PurchasingCatalog(JSON.parse(promoCatalogJSON));
+                } catch(err) {
+                    reject();
+                }
                 resolve();
             });
             nativeBridge.Purchasing.getPromoCatalog().catch(reject);
@@ -26,11 +43,11 @@ export class PurchasingUtilities {
         return new Promise<boolean>((resolve, reject) => {
             const observer = nativeBridge.Purchasing.onInitialize.subscribe((isReady) => {
                 nativeBridge.Purchasing.onInitialize.unsubscribe(observer);
-                if (isReady === 'false') {
+                if (isReady !== 'True') {
                     nativeBridge.Sdk.logError("PurchasingUtilities: Promo was not ready.");
                     Diagnostics.trigger("promo_not_ready", { message: "Promo was not ready" });
                 }
-                resolve(isReady === 'true');
+                resolve(isReady === 'True');
             });
             nativeBridge.Purchasing.initialize().catch(() => {
                 nativeBridge.Purchasing.onInitialize.unsubscribe(observer);
@@ -46,11 +63,11 @@ export class PurchasingUtilities {
             }
             return new Promise<void>((resolve, reject) => {
                 const observer = nativeBridge.Purchasing.onCommandResult.subscribe((isCommandSuccessful) => {
-                    if (isCommandSuccessful === 'false') {
+                    if (isCommandSuccessful === 'False') {
                         nativeBridge.Sdk.logError("PurchasingUtilities: Purchase command unsuccessful");
                         Diagnostics.trigger("purchase_command_unsuccessful", { message: "Purchase command unsuccessful" });
                         reject(new Error('Unsuccessful purchase command'));
-                    } else if (isCommandSuccessful === 'true') {
+                    } else if (isCommandSuccessful === 'True') {
                         resolve();
                     }
                 });

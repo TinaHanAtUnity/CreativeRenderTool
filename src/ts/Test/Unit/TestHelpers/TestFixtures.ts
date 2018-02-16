@@ -25,7 +25,9 @@ import { Vast } from 'Models/Vast/Vast';
 import { IVPAIDCampaign, VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
 import { VPAIDParser } from 'Utilities/VPAIDParser';
 import { VPAID } from 'Models/VPAID/VPAID';
+import { IPromoCampaign, PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 
+import DummyPromoCampaign from 'json/DummyPromoCampaign.json';
 import OnCometMraidPlcCampaignFollowsRedirects from 'json/OnCometMraidPlcCampaignFollowsRedirects.json';
 import OnCometMraidPlcCampaign from 'json/OnCometMraidPlcCampaign.json';
 import OnCometVideoPlcCampaignFollowsRedirects from 'json/OnCometVideoPlcCampaignFollowsRedirects.json';
@@ -334,11 +336,27 @@ export class TestFixtures {
         };
     }
 
+    public static getPromoCampaignParams(json: any): IPromoCampaign {
+        const session = this.getSession();
+        return {
+            ... this.getCometCampaignBaseParams(session, json.promo.id, json.gamerId, json.abGroup, json.meta),
+            iapProductId: json.promo.iapProductId,
+            additionalTrackingEvents: json.promo.tracking ? json.promo.tracking : undefined,
+            dynamicMarkup: json.promo.dynamicMarkup,
+            creativeAsset: new HTML(json.promo.creativeUrl, session)
+        };
+    }
+
     public static getVPAIDCampaign(): VPAIDCampaign {
         const vpaid = new VPAIDParser().parse(VPAIDTestXML);
         const vpaidCampaignJson = JSON.parse(VPAIDCampaignJson);
 
         return new VPAIDCampaign(this.getVPAIDCampaignParams(vpaidCampaignJson, vpaid));
+    }
+
+    public static getPromoCampaign(): PromoCampaign {
+        const json = JSON.parse(DummyPromoCampaign);
+        return new PromoCampaign(this.getPromoCampaignParams(json));
     }
 
     public static getCampaignFollowsRedirects(): PerformanceCampaign {
