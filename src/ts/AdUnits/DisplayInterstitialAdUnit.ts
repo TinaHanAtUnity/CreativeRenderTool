@@ -160,13 +160,16 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
 
     private shouldOverrideUrlLoading(url: string, method: string): void {
         this._nativeBridge.Sdk.logDebug("DisplayInterstitialAdUnit: shouldOverrideUrlLoading triggered for url: " + url);
-        if (url && Url.isProtocolWhitelisted(url)) {
-            if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                this._nativeBridge.Intent.launch({
-                    'action': 'android.intent.action.VIEW',
-                    'uri': url
-                });
-            } else if (this._nativeBridge.getPlatform() === Platform.IOS) {
+        if (!url) {
+            return;
+        }
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            this._nativeBridge.Intent.launch({
+                'action': 'android.intent.action.VIEW',
+                'uri': url
+            });
+        } else if (this._nativeBridge.getPlatform() === Platform.IOS) {
+            if( Url.isProtocolWhitelisted(url) ) {
                 this._nativeBridge.UrlScheme.open(url);
             }
         }
@@ -197,7 +200,9 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
                 'setSupportMultipleWindows': [false]
             };
         } else {
-            webPlayerSettings = {};
+            webPlayerSettings = {
+                'javaScriptCanOpenWindowsAutomatically': true
+            };
         }
         return this._nativeBridge.WebPlayer.setSettings(webPlayerSettings,{}).then( () => {
             this._nativeBridge.Sdk.logDebug("DisplayInterstitalAdUnit: WebPlayer settings have been set");
