@@ -68,7 +68,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         this._onSystemInterruptObserver = this._container.onSystemInterrupt.subscribe((interruptStarted) => this.onSystemInterrupt(interruptStarted));
         this._onLowMemoryWarningObserver = this._container.onLowMemoryWarning.subscribe(() => this.onLowMemoryWarning());
 
-        return this._container.open(this, true, true, this.getForceOrientation(), this._placement.disableBackButton(), false, true, false, this._options);
+        return this._container.open(this, ['videoplayer', 'webview'], true, this.getForceOrientation(), this._placement.disableBackButton(), false, true, false, this._options);
     }
 
     public hide(): Promise<void> {

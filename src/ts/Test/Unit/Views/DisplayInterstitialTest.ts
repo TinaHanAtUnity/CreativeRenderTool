@@ -12,52 +12,17 @@ import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 const json = JSON.parse(DummyDisplayInterstitialCampaign);
 
 describe('DisplayInterstitial View', () => {
-    const isDisplayInterstitialUrlCampaign = true;
     let view: DisplayInterstitial;
     let nativeBridge: NativeBridge;
     let placement: Placement;
     let campaign: DisplayInterstitialCampaign;
     let sandbox: sinon.SinonSandbox;
-    let server: sinon.SinonFakeServer;
 
     describe('on Display Interstitial Markup Campaign',() => {
-        viewUnitTests(!isDisplayInterstitialUrlCampaign);
+        viewUnitTests();
     });
 
-    describe('on Display Interstitial MarkupUrl Campaign', () => {
-        viewUnitTests(isDisplayInterstitialUrlCampaign);
-
-        it('should throw error when no clickthroughurl is in the markupurl', () => {
-            sandbox = sinon.sandbox.create();
-            nativeBridge = TestFixtures.getNativeBridge();
-            placement = new Placement({
-                id: '123',
-                name: 'test',
-                default: true,
-                allowSkip: true,
-                skipInSeconds: 5,
-                disableBackButton: true,
-                useDeviceOrientationForVideo: false,
-                muteVideo: false
-            });
-            campaign = TestFixtures.getDisplayInterstitialCampaign(isDisplayInterstitialUrlCampaign);
-
-            server = sinon.fakeServer.create();
-            server.respondImmediately = true;
-            server.respondWith('<div>cool beans</div>');
-
-            view = new DisplayInterstitial(nativeBridge, placement, campaign);
-
-            sandbox.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
-            sandbox.stub(nativeBridge, 'getApiLevel').returns(16);
-
-            return new Promise((resolve, reject) => {
-                return view.render().then(reject).catch(resolve);
-            });
-        });
-    });
-
-    function viewUnitTests(isUrlCampaign: boolean) {
+    function viewUnitTests() {
         beforeEach(() => {
             sandbox = sinon.sandbox.create();
             nativeBridge = TestFixtures.getNativeBridge();
@@ -71,7 +36,7 @@ describe('DisplayInterstitial View', () => {
                 useDeviceOrientationForVideo: false,
                 muteVideo: false
             });
-            campaign = TestFixtures.getDisplayInterstitialCampaign(isUrlCampaign);
+            campaign = TestFixtures.getDisplayInterstitialCampaign();
 
             view = new DisplayInterstitial(nativeBridge, placement, campaign);
 
@@ -81,10 +46,6 @@ describe('DisplayInterstitial View', () => {
 
         afterEach(() => {
             sandbox.restore();
-
-            if (server) {
-                server.restore();
-            }
         });
 
         // Disabled because of missing srcdoc support on Android < 4.4

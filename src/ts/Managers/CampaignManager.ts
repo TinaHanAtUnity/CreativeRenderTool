@@ -25,7 +25,6 @@ import { ProgrammaticVastParser } from 'Parsers/ProgrammaticVastParser';
 import { ProgrammaticMraidUrlParser } from 'Parsers/ProgrammaticMraidUrlParser';
 import { ProgrammaticMraidParser } from 'Parsers/ProgrammaticMraidParser';
 import { ProgrammaticStaticInterstitialParser } from 'Parsers/ProgrammaticStaticInterstitialParser';
-import { ProgrammaticStaticInterstitialUrlParser } from 'Parsers/ProgrammaticStaticInterstitialUrlParser';
 import { ProgrammaticAdMobParser } from 'Parsers/ProgrammaticAdMobParser';
 import { CampaignParser } from 'Parsers/CampaignParser';
 import { PromoCampaignParser } from 'Parsers/PromoCampaignParser';
@@ -288,9 +287,6 @@ export class CampaignManager {
                 break;
             case 'programmatic/static-interstitial':
                 parser = new ProgrammaticStaticInterstitialParser();
-                break;
-            case 'programmatic/static-interstitial-url':
-                parser = new ProgrammaticStaticInterstitialUrlParser();
                 break;
             case 'programmatic/admob-video':
                 parser = new ProgrammaticAdMobParser();

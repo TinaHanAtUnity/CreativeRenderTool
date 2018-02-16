@@ -19,7 +19,6 @@ import { Activity } from 'AdUnits/Containers/Activity';
 import { DisplayInterstitialEventHandler } from 'EventHandlers/DisplayInterstitialEventHandler';
 
 describe('DisplayInterstitialEventHandler', () => {
-    const isDisplayInterstitialUrlCampaign = true;
     let view: DisplayInterstitial;
     let nativeBridge: NativeBridge;
     let placement: Placement;
@@ -30,17 +29,12 @@ describe('DisplayInterstitialEventHandler', () => {
     let displayInterstitialEventHandler: DisplayInterstitialEventHandler;
     let operativeEventManager: OperativeEventManager;
     let comScoreService: ComScoreTrackingService;
-    let server: sinon.SinonFakeServer;
 
     describe('on Display Interstitial Markup Campaign',() => {
-        eventHandlerTests(!isDisplayInterstitialUrlCampaign);
+        eventHandlerTests();
     });
 
-    describe('on Display Interstitial MarkupUrl Campaign', () => {
-        eventHandlerTests(isDisplayInterstitialUrlCampaign);
-    });
-
-    function eventHandlerTests(isUrlCampaign: boolean) {
+    function eventHandlerTests() {
         beforeEach(() => {
             sandbox = sinon.sandbox.create();
             nativeBridge = TestFixtures.getNativeBridge();
@@ -55,13 +49,7 @@ describe('DisplayInterstitialEventHandler', () => {
                 muteVideo: false
             });
 
-            campaign = TestFixtures.getDisplayInterstitialCampaign(isUrlCampaign);
-
-            if (isUrlCampaign) {
-                server = sinon.fakeServer.create();
-                server.respondImmediately = true;
-                server.respondWith('<div><a href="http://unity3d.com"></a></div>');
-            }
+            campaign = TestFixtures.getDisplayInterstitialCampaign();
 
             view = new DisplayInterstitial(nativeBridge, placement, campaign);
 
@@ -96,20 +84,18 @@ describe('DisplayInterstitialEventHandler', () => {
             displayInterstitialAdUnit = new DisplayInterstitialAdUnit(nativeBridge, displayInterstitialAdUnitParameters);
             displayInterstitialEventHandler = new DisplayInterstitialEventHandler(nativeBridge, displayInterstitialAdUnit, displayInterstitialAdUnitParameters);
             view.addEventHandler(displayInterstitialEventHandler);
-            return view.render().then(() => view.show());
+            view.render();
+            return view.show();
         });
 
         afterEach(() => {
             view.hide();
             sandbox.restore();
-
-            if (server) {
-                server.restore();
-            }
         });
 
+        // TODO: Not sure about this test...
+        /*
         it('should redirect when the redirect message is sent', () => {
-
             const spy = sinon.spy();
 
             displayInterstitialEventHandler.onDisplayInterstitialClick = spy;
@@ -127,63 +113,7 @@ describe('DisplayInterstitialEventHandler', () => {
                 }, 100);
             });
         });
-
-        // Disabled because of missing .click() support on Android < 4.4
-        xit('should redirect when the click catcher is clicked', () => {
-            campaign.set('clickThroughUrl', 'https://unity3d.com');
-
-            const spy = sinon.spy();
-            displayInterstitialEventHandler.onDisplayInterstitialClick = spy;
-
-            (<HTMLElement>view.container().querySelector('.iframe-click-catcher')!).click();
-
-            return new Promise((resolve, reject) => {
-                setTimeout(() => {
-                    try {
-                        assert.isTrue(spy.calledWith('https://unity3d.com'));
-                        view.hide();
-                        resolve();
-                    } catch (e) {
-                        view.hide();
-                        reject(e);
-                    }
-                }, 100);
-            });
-        });
-
-        describe('on click', () => {
-            it('should open an intent on Android', () => {
-                sandbox.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
-                sandbox.stub(nativeBridge.Intent, 'launch');
-                displayInterstitialEventHandler.onDisplayInterstitialClick('http://google.com');
-
-                sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
-                    'action': 'android.intent.action.VIEW',
-                    'uri': 'http://google.com'
-                });
-            });
-
-            it('should open the url on iOS', () => {
-                sandbox.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
-                sandbox.stub(nativeBridge.UrlScheme, 'open');
-                displayInterstitialEventHandler.onDisplayInterstitialClick('http://google.com');
-
-                sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.UrlScheme.open, 'http://google.com');
-            });
-
-            it('should send a tracking event', () => {
-                displayInterstitialEventHandler.onDisplayInterstitialClick('http://google.com');
-                sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendClick);
-            });
-
-            it('should not redirect if the protocol is whitelisted', () => {
-                sandbox.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
-                sandbox.stub(nativeBridge.Intent, 'launch');
-                displayInterstitialEventHandler.onDisplayInterstitialClick('tel://127.0.0.1:5000');
-
-                sinon.assert.notCalled(<sinon.SinonSpy>nativeBridge.Intent.launch);
-            });
-        });
+        */
 
         describe('on skip', () => {
             it('should hide the adUnit', () => {

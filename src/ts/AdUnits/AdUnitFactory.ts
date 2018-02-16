@@ -54,6 +54,7 @@ import { AdMobEventHandler } from 'EventHandlers/AdmobEventHandler';
 import { InterstitialOverlay } from 'Views/InterstitialOverlay';
 import { AbstractOverlay } from 'Views/AbstractOverlay';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { Closer } from 'Views/Closer';
 import { Privacy } from 'Views/Privacy';
 import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 import { IObserver2, IObserver3 } from 'Utilities/IObserver';
@@ -285,15 +286,15 @@ export class AdUnitFactory {
         return mraidAdUnit;
     }
 
-    private static createVPAIDAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<VPAIDCampaign>): VPAIDAdUnit {
-        const overlay = this.createOverlay(nativeBridge, parameters);
-        const vpaid = new VPAID(nativeBridge, <VPAIDCampaign>parameters.campaign, parameters.placement, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+    private static createVPAIDAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<VPAIDCampaign>): AbstractAdUnit {
+        const closer = new Closer(nativeBridge, parameters.placement);
+        const vpaid = new VPAID(nativeBridge, <VPAIDCampaign>parameters.campaign, parameters.placement);
         let endScreen: VPAIDEndScreen | undefined;
 
         const vpaidAdUnitParameters: IVPAIDAdUnitParameters = {
             ... parameters,
             vpaid: vpaid,
-            overlay: overlay,
+            closer: closer,
         };
 
         if(parameters.campaign.hasEndScreen()) {
@@ -306,7 +307,7 @@ export class AdUnitFactory {
         const vpaidEventHandler = new VPAIDEventHandler(nativeBridge, vpaidAdUnit, vpaidAdUnitParameters);
         vpaid.addEventHandler(vpaidEventHandler);
         const overlayEventHandler = new VPAIDOverlayEventHandler(nativeBridge, vpaidAdUnit, vpaidAdUnitParameters);
-        overlay.addEventHandler(overlayEventHandler);
+        closer.addEventHandler(overlayEventHandler);
 
         if(parameters.campaign.hasEndScreen() && endScreen) {
             const endScreenEventHandler = new VPAIDEndScreenEventHandler(nativeBridge, vpaidAdUnit, vpaidAdUnitParameters);
