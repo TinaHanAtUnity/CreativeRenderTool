@@ -1,3 +1,12 @@
+# Fri Feb 16 10:18:25 UTC 2018
+
+* Add ad unit style object to operative events
+* Modify analytics event formats to better match Unity Analytics event formats
+
+# Thu Feb 15 09:07:01 UTC 2018
+
+* Preparations for new cache APIs in 2.2.0 release
+
 # Wed Feb 14 14:59:14 UTC 2018
 
 * Enable lunar theme on all groups except 5
