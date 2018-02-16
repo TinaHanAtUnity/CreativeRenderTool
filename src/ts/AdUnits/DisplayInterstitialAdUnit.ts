@@ -1,7 +1,7 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { FinishState } from 'Constants/FinishState';
-import { IObserver0 } from 'Utilities/IObserver';
+import { IObserver0, IObserver2, IObserver1 } from 'Utilities/IObserver';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { DisplayInterstitial } from 'Views/DisplayInterstitial';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
@@ -32,6 +32,8 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
 
     private _onShowObserver: IObserver0;
     private _onSystemKillObserver: IObserver0;
+    private _shouldOverrideUrlLoadingObserver: IObserver2<string, string>;
+    private _onPageStartedObserver: IObserver1<string>;
 
     constructor(nativeBridge: NativeBridge, parameters: IDisplayInterstitialAdUnitParameters) {
         super(nativeBridge, parameters);
@@ -51,7 +53,6 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
 
     public show(): Promise<void> {
         this.setShowing(true);
-        this._container.onShow.subscribe(() => this.onShow);
 
         return this.setWebPlayerViews().then( () => {
             this._view.show();
@@ -76,6 +77,9 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
 
         this._container.onShow.unsubscribe(this._onShowObserver);
         this._container.onSystemKill.unsubscribe(this._onSystemKillObserver);
+
+        this._nativeBridge.WebPlayer.onPageStarted.unsubscribe(this._onPageStartedObserver);
+        this._nativeBridge.WebPlayer.shouldOverrideUrlLoading.unsubscribe(this._shouldOverrideUrlLoadingObserver);
 
         this._view.hide();
         this.onFinish.trigger();
@@ -231,10 +235,10 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
     private setWebplayerSettings(): Promise<void> {
         const eventSettings = {
             'onPageStarted': { 'sendEvent': true },
-            'shouldOverrideUrlLoading': { 'sendEvent': true, 'returnValue': true }
+            'shouldOverrideUrlLoading': { 'sendEvent': true, 'returnValue': false, 'callSuper': false }
         };
-        this._nativeBridge.WebPlayer.onPageStarted.subscribe( (url) => this.onPageStarted(url));
-        this._nativeBridge.WebPlayer.shouldOverrideUrlLoading.subscribe( (url: string, method: string) => this.shouldOverrideUrlLoading(url, method));
+        this._onPageStartedObserver = this._nativeBridge.WebPlayer.onPageStarted.subscribe( (url) => this.onPageStarted(url));
+        this._shouldOverrideUrlLoadingObserver = this._nativeBridge.WebPlayer.shouldOverrideUrlLoading.subscribe((url: string, method: string) => this.shouldOverrideUrlLoading(url, method));
         return this._nativeBridge.WebPlayer.setEventSettings(eventSettings);
     }
 
