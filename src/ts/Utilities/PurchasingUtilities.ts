@@ -4,6 +4,23 @@ import { Diagnostics } from './Diagnostics';
 
 export class PurchasingUtilities {
 
+    public static checkPromoVersion(nativeBridge: NativeBridge): Promise<boolean> {
+        return this.isPromoReady(nativeBridge).then(ready =>  {
+            if(ready) {
+                const promoVersionObserver = nativeBridge.Purchasing.onGetPromoVersion.subscribe((promoVersion) => {
+                    nativeBridge.Purchasing.onGetPromoVersion.unsubscribe(promoVersionObserver);
+                    if(promoVersion === '1.16.0') {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                });
+                nativeBridge.Purchasing.getPromoVersion();
+            }
+            return false;
+        });
+    }
+
     public static refreshCatalog(nativeBridge: NativeBridge): Promise<void | {}> {
         return new Promise((resolve, reject) => {
             const observer = nativeBridge.Purchasing.onGetPromoCatalog.subscribe((promoCatalogJSON) => {

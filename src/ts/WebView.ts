@@ -162,9 +162,8 @@ export class WebView {
             this._configuration = configuration;
             HttpKafka.setConfiguration(this._configuration);
 
-            const promoVersionObserver = this._nativeBridge.Purchasing.onGetPromoVersion.subscribe((promoVersion) => {
-                this._nativeBridge.Purchasing.onGetPromoVersion.unsubscribe(promoVersionObserver);
-                if(promoVersion === '1.16.0') {
+            PurchasingUtilities.checkPromoVersion(this._nativeBridge).then(valid => {
+                if(valid) {
                     const iapPayload = {
                         gamerId: this._configuration.getGamerId(),
                         iapPromo: true,
@@ -175,7 +174,6 @@ export class WebView {
                     PurchasingUtilities.initiatePurchaseRequest(this._nativeBridge, JSON.stringify(iapPayload));
                 }
             });
-            this._nativeBridge.Purchasing.getPromoVersion();
 
             if (!this._configuration.isEnabled()) {
                 const error = new Error('Game with ID ' + this._clientInfo.getGameId() +  ' is not enabled');
