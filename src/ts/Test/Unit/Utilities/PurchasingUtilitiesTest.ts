@@ -89,11 +89,11 @@ describe('PurchasingUtilitiesTest', () => {
 
                     it('should resolve', () => {
                         (<sinon.SinonStub>purchasing.initialize).callsFake(() => {
-                            purchasing.onInitialize.trigger('true');
+                            purchasing.onInitialize.trigger('True');
                             return Promise.resolve(true);
                         });
                         (<sinon.SinonStub>purchasing.initiatePurchasingCommand).callsFake(() => {
-                            purchasing.onCommandResult.trigger('true');
+                            purchasing.onCommandResult.trigger('True');
                             return Promise.resolve();
                         });
                         const promise = PurchasingUtilities.initiatePurchaseRequest(nativeBridge, JSON.stringify(iapPayload));
@@ -104,12 +104,12 @@ describe('PurchasingUtilitiesTest', () => {
                 describe('With a bad command request', () => {
                     it('should fail', () => {
                         (<sinon.SinonStub>purchasing.initialize).callsFake(() => {
-                            purchasing.onInitialize.trigger('true');
+                            purchasing.onInitialize.trigger('True');
                             return Promise.resolve(true);
                         });
                         (<sinon.SinonStub>purchasing.initiatePurchasingCommand).callsFake(() => {
-                            purchasing.onCommandResult.trigger('false');
-                            return Promise.reject('false');
+                            purchasing.onCommandResult.trigger('False');
+                            return Promise.reject('False');
                         });
                         const promise = PurchasingUtilities.initiatePurchaseRequest(nativeBridge, JSON.stringify(iapPayload));
                         return new Promise((resolve, reject) => {
@@ -122,11 +122,11 @@ describe('PurchasingUtilitiesTest', () => {
             describe('And promo is not ready', () => {
                 it('should fail', () => {
                     (<sinon.SinonStub>purchasing.initialize).callsFake(() => {
-                        purchasing.onInitialize.trigger('false');
+                        purchasing.onInitialize.trigger('False');
                         return Promise.resolve();
                     });
                     const promise = PurchasingUtilities.initiatePurchaseRequest(nativeBridge, JSON.stringify(iapPayload));
-                    purchasing.onCommandResult.trigger('true');
+                    purchasing.onCommandResult.trigger('True');
                     return new Promise((resolve, reject) => {
                         return promise.then(reject).catch(resolve);
                     });

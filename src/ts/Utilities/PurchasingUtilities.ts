@@ -1,10 +1,6 @@
-import { MetaData } from 'Utilities/MetaData';
 import { PurchasingCatalog } from 'Models/PurchasingCatalog';
-import { JsonParser } from 'Utilities/JsonParser';
-import { PurchasingApi } from 'Native/Api/Purchasing';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Diagnostics } from './Diagnostics';
-import { DiagnosticError } from 'Errors/DiagnosticError';
 
 export class PurchasingUtilities {
 
@@ -46,11 +42,11 @@ export class PurchasingUtilities {
             }
             return new Promise<void>((resolve, reject) => {
                 const observer = nativeBridge.Purchasing.onCommandResult.subscribe((isCommandSuccessful) => {
-                    if (isCommandSuccessful === 'false') {
+                    if (isCommandSuccessful === 'False') {
                         nativeBridge.Sdk.logError("PurchasingUtilities: Purchase command unsuccessful");
                         Diagnostics.trigger("purchase_command_unsuccessful", { message: "Purchase command unsuccessful" });
                         reject(new Error('Unsuccessful purchase command'));
-                    } else if (isCommandSuccessful === 'true') {
+                    } else if (isCommandSuccessful === 'True') {
                         resolve();
                     }
                 });
