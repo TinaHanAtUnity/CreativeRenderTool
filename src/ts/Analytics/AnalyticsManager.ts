@@ -125,7 +125,7 @@ export class AnalyticsManager {
     }
 
     private sendDeviceInfo(): void {
-        AnalyticsProtocol.getDeviceInfoObject(this._clientInfo, this._deviceInfo).then(deviceInfoObject => {
+        AnalyticsProtocol.getDeviceInfoObject(this._nativeBridge, this._clientInfo, this._deviceInfo).then(deviceInfoObject => {
             this.send(deviceInfoObject);
         });
     }
