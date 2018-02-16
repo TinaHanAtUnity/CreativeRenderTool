@@ -5,6 +5,7 @@ import { IIAPInstrumentation } from 'Analytics/AnalyticsStorage';
 import { Configuration } from 'Models/Configuration';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { NativeBridge } from 'Native/NativeBridge';
+import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 
 export interface IAnalyticsObject {
     type: string;
@@ -213,7 +214,7 @@ export class AnalyticsProtocol {
                 screenHeight = width;
             }
 
-            if(nativeBridge.getPlatform() === Platform.IOS) {
+            if(nativeBridge.getPlatform() === Platform.IOS && deviceInfo instanceof IosDeviceInfo) {
                 screenWidth = screenWidth / deviceInfo.getScreenScale();
                 screenHeight = screenHeight / deviceInfo.getScreenScale();
             }
@@ -225,18 +226,22 @@ export class AnalyticsProtocol {
     private static getDeviceModel(nativeBridge: NativeBridge, deviceInfo: DeviceInfo): Promise<string> {
         if(nativeBridge.getPlatform() === Platform.IOS) {
             return Promise.resolve(deviceInfo.getModel());
-        } else {
+        } else if (nativeBridge.getPlatform() === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
             return nativeBridge.DeviceInfo.Android.getDevice().then(device => {
                 return deviceInfo.getManufacturer() + '/' + deviceInfo.getModel() + '/' + device;
             });
+        } else {
+            return Promise.resolve('');
         }
     }
 
     private static getOsVersion(nativeBridge: NativeBridge, deviceInfo: DeviceInfo): string {
         if(nativeBridge.getPlatform() === Platform.IOS) {
             return 'iOS ' + deviceInfo.getOsVersion();
-        } else {
+        } else if (nativeBridge.getPlatform() === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
             return 'Android OS ' + deviceInfo.getOsVersion() + ' / API-' + deviceInfo.getApiLevel();
+        } else {
+            return '';
         }
     }
 }
