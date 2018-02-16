@@ -27,6 +27,7 @@ import { ProgrammaticMraidParser } from 'Parsers/ProgrammaticMraidParser';
 import { ProgrammaticStaticInterstitialParser } from 'Parsers/ProgrammaticStaticInterstitialParser';
 import { ProgrammaticAdMobParser } from 'Parsers/ProgrammaticAdMobParser';
 import { CampaignParser } from 'Parsers/CampaignParser';
+import { PromoCampaignParser } from 'Parsers/PromoCampaignParser';
 import { ProgrammaticVPAIDParser } from 'Parsers/ProgrammaticVPAIDParser';
 import { XPromoCampaignParser } from "Parsers/XPromoCampaignParser";
 import { AdMobSignalFactory} from 'AdMob/AdMobSignalFactory';
@@ -295,6 +296,9 @@ export class CampaignManager {
                 // vast-vpaid can be both VPAID or VAST, so in this case we use the VAST parser
                 // which can parse both.
                 parser = new ProgrammaticVPAIDParser();
+                break;
+            case 'purchasing/iap':
+                parser = new PromoCampaignParser();
                 break;
             default:
                 throw new Error('Unsupported content-type: ' + response.getContentType());
