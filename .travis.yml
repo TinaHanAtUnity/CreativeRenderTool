@@ -6,7 +6,7 @@ python: "3.6"
 addons:
   apt:
     packages:
-    - libimage-exiftool-perl
+      - libimage-exiftool-perl
 
 install:
   - . $HOME/.nvm/nvm.sh
@@ -16,6 +16,7 @@ install:
   - npm install
 
 cache:
+  pip: true
   directories:
     - node_modules
 
