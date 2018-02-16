@@ -47,7 +47,7 @@ export class PromoAdUnit extends AbstractAdUnit {
 
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
 
-        return this._container.open(this, false, false, ForceOrientation.NONE, true, true, false, true, this._options);
+        return this._container.open(this, ['webview'], false, ForceOrientation.NONE, true, true, false, true, this._options);
     }
 
     public hide(): Promise<void> {

@@ -339,13 +339,6 @@ export class TestFixtures {
         };
     }
 
-    public static getVPAIDCampaign(): VPAIDCampaign {
-        const vpaid = new VPAIDParser().parse(VPAIDTestXML);
-        const vpaidCampaignJson = JSON.parse(VPAIDCampaignJson);
-
-        return new VPAIDCampaign(this.getVPAIDCampaignParams(vpaidCampaignJson, vpaid));
-    }
-
     public static getPromoCampaign(): PromoCampaign {
         const json = JSON.parse(DummyPromoCampaign);
         return new PromoCampaign(this.getPromoCampaignParams(json));
