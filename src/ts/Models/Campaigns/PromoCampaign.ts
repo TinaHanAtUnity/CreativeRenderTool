@@ -1,5 +1,5 @@
-import { Campaign, ICampaign} from "Models/Campaign";
-import { HTML } from "Models/Assets/HTML";
+import { Campaign, ICampaign} from 'Models/Campaign';
+import { HTML } from 'Models/Assets/HTML';
 
 export interface IPromoCampaign extends ICampaign {
     iapProductId: string;

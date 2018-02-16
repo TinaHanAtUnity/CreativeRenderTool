@@ -1,13 +1,13 @@
-import { AbstractAdUnit, IAdUnitParameters } from "AdUnits/AbstractAdUnit";
-import { NativeBridge } from "Native/NativeBridge";
+import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
+import { NativeBridge } from 'Native/NativeBridge';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
-import { Placement } from "Models/Placement";
-import { PromoCampaign } from "Models/Campaigns/PromoCampaign";
+import { Placement } from 'Models/Placement';
+import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 import { Promo } from 'Views/Promo';
 import { IObserver0 } from 'Utilities/IObserver';
 import { FinishState } from 'Constants/FinishState';
 import { SessionManager } from 'Managers/SessionManager';
-import { ThirdPartyEventManager } from "Managers/ThirdPartyEventManager";
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { PurchasingApi } from 'Native/Api/Purchasing';
 
 export interface IPromoAdUnitParameters extends IAdUnitParameters<PromoCampaign> {

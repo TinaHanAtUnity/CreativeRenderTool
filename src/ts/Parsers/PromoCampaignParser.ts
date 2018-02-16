@@ -1,12 +1,12 @@
-import { CampaignParser } from "Parsers/CampaignParser";
-import { NativeBridge } from "Native/NativeBridge";
-import { Campaign, ICampaign } from "Models/Campaign";
+import { CampaignParser } from 'Parsers/CampaignParser';
+import { NativeBridge } from 'Native/NativeBridge';
+import { Campaign, ICampaign } from 'Models/Campaign';
 import { Request } from 'Utilities/Request';
-import { JsonParser } from "Utilities/JsonParser";
-import { PurchasingUtilities } from "Utilities/PurchasingUtilities";
-import { IPromoCampaign, PromoCampaign } from "Models/Campaigns/PromoCampaign";
-import { AuctionResponse } from "Models/AuctionResponse";
-import { Session } from "Models/Session";
+import { JsonParser } from 'Utilities/JsonParser';
+import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
+import { IPromoCampaign, PromoCampaign } from 'Models/Campaigns/PromoCampaign';
+import { AuctionResponse } from 'Models/AuctionResponse';
+import { Session } from 'Models/Session';
 import { HTML } from 'Models/Assets/HTML';
 
 export class PromoCampaignParser extends CampaignParser {
