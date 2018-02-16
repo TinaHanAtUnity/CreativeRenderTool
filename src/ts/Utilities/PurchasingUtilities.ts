@@ -26,11 +26,11 @@ export class PurchasingUtilities {
         return new Promise<boolean>((resolve, reject) => {
             const observer = nativeBridge.Purchasing.onInitialize.subscribe((isReady) => {
                 nativeBridge.Purchasing.onInitialize.unsubscribe(observer);
-                if (isReady === 'false') {
+                if (isReady !== 'True') {
                     nativeBridge.Sdk.logError("PurchasingUtilities: Promo was not ready.");
                     Diagnostics.trigger("promo_not_ready", { message: "Promo was not ready" });
                 }
-                resolve(isReady === 'true');
+                resolve(isReady === 'True');
             });
             nativeBridge.Purchasing.initialize().catch(() => {
                 nativeBridge.Purchasing.onInitialize.unsubscribe(observer);
