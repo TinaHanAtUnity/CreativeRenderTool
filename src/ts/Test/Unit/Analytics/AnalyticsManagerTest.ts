@@ -61,12 +61,6 @@ class TestHelper {
         const analyticsObject: IAnalyticsObject = JSON.parse(rawJson);
         return analyticsObject.type;
     }
-
-    public static getEventJson(data: string): IAnalyticsObject {
-        const rawJson: string = data.split('\n')[1];
-        const analyticsObject: IAnalyticsObject = JSON.parse(rawJson);
-        return analyticsObject;
-    }
 }
 
 describe('AnalyticsManagerTest', () => {
@@ -140,30 +134,7 @@ describe('AnalyticsManagerTest', () => {
                 ++count;
             });
 
-            nativeBridge.Storage.onSet.trigger(StorageEvent[StorageEvent.SET], [{price: 1, currency: 'USD'}]);
-        });
-    });
-
-    it('storage event', (done) => {
-        analyticsManager.init().then(() => {
-            let eventNumber = 0;
-            nativeBridge.Request = new FakeRequestApi(nativeBridge, (url: string, body: string) => {
-                eventNumber++;
-                if (eventNumber === 2) {
-                    try {
-                        assert.equal(TestHelper.getEventType(body), 'analytics.transaction.v1');
-                        const eventJson = TestHelper.getEventJson(body);
-                        const msgJson: any = eventJson.msg;
-                        assert.equal(msgJson.amount, 1);
-                        assert.equal(msgJson.currency, 'USD');
-                        done();
-                    } catch (e) {
-                        done(e);
-                    }
-                }
-            });
-
-            nativeBridge.Storage.onSet.trigger(StorageEvent[StorageEvent.SET], [{price: 1, currency: 'USD'}]);
+            nativeBridge.Storage.onSet.trigger(StorageEvent[StorageEvent.SET], {});
         });
     });
 });
