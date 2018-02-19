@@ -6,12 +6,12 @@ import { Platform } from 'Constants/Platform';
 import { Request } from 'Utilities/Request';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { OverlayEventHandler } from 'EventHandlers/OverlayEventHandler';
-import { ViewController } from 'AdUnits/Containers/ViewController';
 import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 import { MOAT } from 'Views/MOAT';
 
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _vastAdUnit: VastAdUnit;
+    private _clientInfo: ClientInfo;
     private _request: Request;
     private _vastCampaign: VastCampaign;
     private _paused: boolean = false;
