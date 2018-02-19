@@ -5,6 +5,7 @@ import { IObserver0, IObserver2, IObserver1 } from 'Utilities/IObserver';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { DisplayInterstitial } from 'Views/DisplayInterstitial';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { FocusManager } from 'Managers/FocusManager';
 import { Platform } from 'Constants/Platform';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { Placement } from 'Models/Placement';
@@ -22,6 +23,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
 
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
+    private _focusManager: FocusManager;
     private _view: DisplayInterstitial;
     private _options: any;
     private _campaign: DisplayInterstitialCampaign;
@@ -29,16 +31,19 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
     private _deviceInfo: DeviceInfo;
     private _receivedOnPageStart: boolean = false;
     private _clickEventHasBeenSent: boolean = false;
+    private _handlingShouldOverrideUrlLoading: boolean = false;
 
     private _onShowObserver: IObserver0;
     private _onSystemKillObserver: IObserver0;
     private _shouldOverrideUrlLoadingObserver: IObserver2<string, string>;
     private _onPageStartedObserver: IObserver1<string>;
+    private _onActivityResumed: IObserver1<string>;
 
     constructor(nativeBridge: NativeBridge, parameters: IDisplayInterstitialAdUnitParameters) {
         super(nativeBridge, parameters);
         this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
+        this._focusManager = parameters.focusManager;
         this._view = parameters.view;
         this._campaign = parameters.campaign;
         this._placement = parameters.placement;
@@ -55,6 +60,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
         this.setShowing(true);
         this._onPageStartedObserver = this._nativeBridge.WebPlayer.onPageStarted.subscribe( (url) => this.onPageStarted(url));
         this._shouldOverrideUrlLoadingObserver = this._nativeBridge.WebPlayer.shouldOverrideUrlLoading.subscribe((url: string, method: string) => this.shouldOverrideUrlLoading(url, method));
+        this._onActivityResumed = this._focusManager.onActivityResumed.subscribe((activity: string) => this.onActivityResumed(activity));
 
         return this.setWebPlayerViews().then( () => {
             this._view.show();
@@ -105,14 +111,8 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
         return 'programmaticImage';
     }
 
-    private isWhiteListedLinkType(href: string): boolean {
-        const whiteListedProtocols = ['http', 'market', 'itunes'];
-        for (const protocol of whiteListedProtocols) {
-            if (href.indexOf(protocol) === 0) {
-                return true;
-            }
-        }
-        return false;
+    private onActivityResumed(activity: string): void {
+        this.makeReadyForNextUrl();
     }
 
     private onShow(): void {
@@ -165,21 +165,47 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
     }
 
     private shouldOverrideUrlLoading(url: string, method: string): void {
-        this._nativeBridge.WebPlayer.shouldOverrideUrlLoading.unsubscribe(this._shouldOverrideUrlLoadingObserver);
-        this._nativeBridge.Sdk.logDebug("DisplayInterstitialAdUnit: shouldOverrideUrlLoading triggered for url: " + url + "methods " + method);
+        if (this._handlingShouldOverrideUrlLoading) {
+            this._nativeBridge.Sdk.logDebug("DisplayInterstitialAdUnit: shouldOverrideUrlLoading triggered for url: '" + url + "'. Already handling a url, skipping");
+            return;
+        }
+        this._handlingShouldOverrideUrlLoading = true;
+        this._nativeBridge.Sdk.logDebug("DisplayInterstitialAdUnit: shouldOverrideUrlLoading triggered for url: '" + url + "' method: " + method);
         if (!url) {
+            this.makeReadyForNextUrl();
             return;
         }
         if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            this._nativeBridge.Intent.launch({
-                'action': 'android.intent.action.VIEW',
-                'uri': url
+            this._nativeBridge.WebPlayer.shouldOverrideUrlLoading.unsubscribe(this._shouldOverrideUrlLoadingObserver);
+            const eventSettings = {
+                'onPageStarted': {'sendEvent': true},
+                'shouldOverrideUrlLoading': {'sendEvent': false, 'returnValue': true, 'callSuper': false}
+            };
+            this._nativeBridge.WebPlayer.setEventSettings(eventSettings).then( () => {
+                this._nativeBridge.Intent.launch({
+                    'action': 'android.intent.action.VIEW',
+                    'uri': url
+                }).then( () => {
+                    this.makeReadyForNextUrl();
+                }).catch( (e) => {
+                    this._nativeBridge.Sdk.logInfo("DisplayInterstitialAdUnit: Cannot open url: '" + url + "': " + e);
+                    this.makeReadyForNextUrl();
+                });
             });
         } else if (this._nativeBridge.getPlatform() === Platform.IOS) {
             if( Url.isProtocolWhitelisted(url) ) {
                 this._nativeBridge.UrlScheme.open(url);
             }
+            this.makeReadyForNextUrl();
         }
+    }
+
+    private makeReadyForNextUrl(): Promise<void> {
+        return this.setWebplayerSettings().then( () => {
+            this._shouldOverrideUrlLoadingObserver = this._nativeBridge.WebPlayer.shouldOverrideUrlLoading.subscribe((url: string, method: string) => this.shouldOverrideUrlLoading(url, method));
+            this._handlingShouldOverrideUrlLoading = false;
+            return Promise.resolve();
+        });
     }
 
     private unsetReferences(): void {
@@ -212,7 +238,6 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
             };
         }
         return this._nativeBridge.WebPlayer.setSettings(webPlayerSettings,{}).then( () => {
-            this._nativeBridge.Sdk.logDebug("DisplayInterstitalAdUnit: WebPlayer settings have been set");
             return this._container.open(this, ['webplayer', 'webview'], false, this._forceOrientation, true, false, true, false, this._options).catch((e) => {
                 this.hide();
             });
@@ -237,8 +262,8 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
 
     private setWebplayerSettings(): Promise<void> {
         const eventSettings = {
-            'onPageStarted': { 'sendEvent': true },
-            'shouldOverrideUrlLoading': { 'sendEvent': true, 'returnValue': false, 'callSuper': false }
+            'onPageStarted': {'sendEvent': true},
+            'shouldOverrideUrlLoading': {'sendEvent': true, 'returnValue': true, 'callSuper': false}
         };
         return this._nativeBridge.WebPlayer.setEventSettings(eventSettings);
     }
