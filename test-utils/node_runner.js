@@ -72,6 +72,7 @@ System.config({
         'chai': './node_modules/chai/chai.js',
         'text': './node_modules/systemjs-plugin-text/text.js',
         'es6-promise': './node_modules/es6-promise/dist/es6-promise.auto.js',
+        'null': './test-utils/null-plugin.js',
         'long': './node_modules/long/dist/long.js',
         'protobufjs/minimal': './node_modules/protobufjs/dist/minimal/protobuf.js'
     },
@@ -87,6 +88,9 @@ System.config({
         },
         '*.json': {
             loader: 'text'
+        },
+        '*.css': {
+            loader: 'null'
         }
     },
     packages: {
@@ -97,7 +101,8 @@ System.config({
     paths: {
         '*.html': './src/*.html',
         '*.xml': './src/*.xml',
-        '*.json': './src/*.json'
+        '*.json': './src/*.json',
+        '*.css': './src/*.css'
     }
 });
 

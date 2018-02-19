@@ -14,6 +14,8 @@ import { SdkStats } from 'Utilities/SdkStats';
 import { ITouchInfo, IOpenableIntentsRequest } from 'Views/AFMABridge';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
+import { ClientInfo } from 'Models/ClientInfo';
+import { AdMobSignal } from 'Models/AdMobSignal';
 
 export interface IAdMobEventHandlerParameters {
     adUnit: AdMobAdUnit;
@@ -22,6 +24,7 @@ export interface IAdMobEventHandlerParameters {
     session: Session;
     thirdPartyEventManager: ThirdPartyEventManager;
     adMobSignalFactory: AdMobSignalFactory;
+    clientInfo: ClientInfo;
     campaign: AdMobCampaign;
 }
 
@@ -39,6 +42,7 @@ export class AdMobEventHandler implements IAdMobEventHandler {
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _adMobSignalFactory: AdMobSignalFactory;
     private _campaign: AdMobCampaign;
+    private _clientInfo: ClientInfo;
 
     constructor(parameters: IAdMobEventHandlerParameters) {
         this._adUnit = parameters.adUnit;
@@ -48,6 +52,7 @@ export class AdMobEventHandler implements IAdMobEventHandler {
         this._session = parameters.session;
         this._adMobSignalFactory = parameters.adMobSignalFactory;
         this._campaign = parameters.campaign;
+        this._clientInfo = parameters.clientInfo;
         this._timeoutTimer = new Timer(() => this.onFailureToLoad(), AdMobEventHandler._loadTimeout);
     }
 
@@ -72,9 +77,20 @@ export class AdMobEventHandler implements IAdMobEventHandler {
     }
 
     public onAttribution(url: string, touchInfo: ITouchInfo): Promise<void> {
-        return this.createClickUrl(url, touchInfo).then((clickUrl) => {
+        const userAgent = this.getUserAgentHeader();
+        const headers: Array<[string, string]> = [
+            ['User-Agent', userAgent]
+        ];
+        const isMsPresent = Url.getQueryParameter(url, 'ms');
+        let urlPromise;
+        if (isMsPresent) {
+            urlPromise = Promise.resolve(url);
+        } else {
+            urlPromise = this.createClickUrl(url, touchInfo);
+        }
+        return urlPromise.then((clickUrl) => {
             return new Promise<void>((resolve, reject) => {
-                this._thirdPartyEventManager.sendEvent('admob click', this._session.getId(), clickUrl, true).then(() => resolve()).catch(reject);
+                this._thirdPartyEventManager.sendEvent('admob click', this._session.getId(), clickUrl, true, headers).then(() => resolve()).catch(reject);
             });
         });
    }
@@ -118,16 +134,49 @@ export class AdMobEventHandler implements IAdMobEventHandler {
         }
     }
 
+    public onClickSignalRequest(touchInfo: ITouchInfo) {
+        return this.getClickSignal(touchInfo).then((signal) => {
+            const response = {
+                encodedClickSignal: signal.getBase64ProtoBufNonEncoded(),
+                rvdt: this._adUnit.getRequestToViewTime()
+            };
+            this._adUnit.sendClickSignalResponse(response);
+        });
+    }
+
+    private getClickSignal(touchInfo: ITouchInfo): Promise<AdMobSignal> {
+        return this._adMobSignalFactory.getClickSignal(touchInfo, this._adUnit).then((signal) => {
+            signal.setTimeOnScreen(this._adUnit.getTimeOnScreen());
+            signal.setTouchDiameter(touchInfo.diameter);
+            signal.setTouchPressure(touchInfo.pressure);
+            signal.setTouchXDown(touchInfo.start.x);
+            signal.setTouchYDown(touchInfo.start.y);
+            signal.setTouchXUp(touchInfo.end.x);
+            signal.setTouchYUp(touchInfo.end.y);
+            signal.setTouchDownTotal(touchInfo.counts.down);
+            signal.setTouchUpTotal(touchInfo.counts.up);
+            signal.setTouchMoveTotal(touchInfo.counts.move);
+            signal.setTouchCancelTotal(touchInfo.counts.cancel);
+            signal.setTouchDuration(touchInfo.duration);
+            return signal;
+        });
+    }
+
+    private getUserAgentHeader(): string {
+        const userAgent = navigator.userAgent || 'Unknown ';
+        return `${userAgent} (Unity ${this._clientInfo.getSdkVersion()})`;
+    }
+
     private onFailureToLoad(): void {
         this._adUnit.setFinishState(FinishState.ERROR);
         this._adUnit.hide();
     }
 
     private createClickUrl(url: string, touchInfo: ITouchInfo): Promise<string> {
-        return this._adMobSignalFactory.getClickSignal(touchInfo, this._adUnit).then((signal) => {
+        return this.getClickSignal(touchInfo).then((signal) => {
             return Url.addParameters(url, {
                 ms: signal.getBase64ProtoBufNonEncoded(),
-                rvdt: this._adUnit.getStartTime() - SdkStats.getAdRequestTimestamp()
+                rvdt: this._adUnit.getRequestToViewTime()
             });
         });
     }

@@ -47,6 +47,9 @@ export class Url {
     }
 
     public static getQueryParameter(locationString: string, parameter: string): string | null {
+        if (locationString.indexOf('?') === -1) {
+            return null;
+        }
         const queryString: string[] = locationString.split('?')[1].split('&');
 
         for(const entryPair of queryString) {
@@ -78,5 +81,5 @@ export class Url {
         return false;
     }
 
-    private static whitelistedProtocols = ['http', 'https', 'market', 'itunes'];
+    private static whitelistedProtocols = ['market', 'itunes', 'itms', 'itmss'];
 }

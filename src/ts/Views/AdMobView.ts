@@ -8,7 +8,7 @@ import { Placement } from 'Models/Placement';
 import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
 import { Template } from 'Utilities/Template';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
-import { AFMABridge, IOpenableIntentsResponse, IOpenableIntentsRequest, ITouchInfo  } from 'Views/AFMABridge';
+import { AFMABridge, IOpenableIntentsResponse, IOpenableIntentsRequest, ITouchInfo, IClickSignalResponse } from 'Views/AFMABridge';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
@@ -25,6 +25,7 @@ export interface IAdMobEventHandler {
     onSetOrientationProperties(allowOrientation: boolean, forceOrientation: ForceOrientation): void;
     onOpenableIntentsRequest(request: IOpenableIntentsRequest): void;
     onTrackingEvent(event: string, data?: any): void;
+    onClickSignalRequest(touchInfo: ITouchInfo): void;
 }
 
 const AFMAClickStringMacro = '{{AFMA_CLICK_SIGNALS_PLACEHOLDER}}';
@@ -59,7 +60,8 @@ export class AdMobView extends View<IAdMobEventHandler> {
             onAFMAOpenStoreOverlay: () => { /**/ },
             onAFMARewardedVideoStart: () => this.onVideoStart(),
             onAFMAResolveOpenableIntents: (request) => this.onResolveOpenableIntents(request),
-            onAFMATrackingEvent: (event, data?) => this.onTrackingEvent(event, data)
+            onAFMATrackingEvent: (event, data?) => this.onTrackingEvent(event, data),
+            onAFMAClickSignalRequest: (touchInfo) => this.onClickSignalRequest(touchInfo)
         });
         this._mraidBridge = new MRAIDBridge(nativeBridge, {
             onSetOrientationProperties: (allowOrientation: boolean, forceOrientation: ForceOrientation) => this.onSetOrientationProperties(allowOrientation, forceOrientation)
@@ -92,6 +94,10 @@ export class AdMobView extends View<IAdMobEventHandler> {
 
     public sendOpenableIntentsResponse(response: IOpenableIntentsResponse) {
         this._afmaBridge.sendOpenableIntentsResult(response);
+    }
+
+    public sendClickSignalResponse(response: IClickSignalResponse) {
+        this._afmaBridge.sendClickSignalResponse(response);
     }
 
     private setupIFrame() {
@@ -164,6 +170,10 @@ export class AdMobView extends View<IAdMobEventHandler> {
 
     private onResolveOpenableIntents(request: IOpenableIntentsRequest) {
         this._handlers.forEach((h) => h.onOpenableIntentsRequest(request));
+    }
+
+    private onClickSignalRequest(touchInfo: ITouchInfo) {
+        this._handlers.forEach((h) => h.onClickSignalRequest(touchInfo));
     }
 
     private onTrackingEvent(event: string, data?: any) {

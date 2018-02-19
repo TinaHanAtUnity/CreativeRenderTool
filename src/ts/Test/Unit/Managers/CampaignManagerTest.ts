@@ -6,9 +6,8 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Campaign } from 'Models/Campaign';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
+import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
-import { DisplayInterstitialMarkupCampaign } from 'Models/Campaigns/DisplayInterstitialMarkupCampaign';
-import { DisplayInterstitialMarkupUrlCampaign } from 'Models/Campaigns/DisplayInterstitialMarkupUrlCampaign';
 import { ClientInfo } from 'Models/ClientInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Request } from 'Utilities/Request';
@@ -67,8 +66,6 @@ import OnProgrammaticVastPlcCampaignMissingErrorUrls from 'json/OnProgrammaticVa
 import OnProgrammaticVastPlcCampaignAdLevelErrorUrls from 'json/OnProgrammaticVastPlcCampaignAdLevelErrorUrls.json';
 import OnProgrammaticVastPlcCampaignCustomTracking from 'json/OnProgrammaticVastPlcCampaignCustomTracking.json';
 import OnStaticInterstitialDisplayCampaign from 'json/OnStaticInterstitialDisplayCampaign.json';
-import OnStaticInterstitialDisplayCampaignNoClick from 'json/OnStaticInterstitialDisplayCampaignNoClick.json';
-import OnStaticInterstitialDisplayCampaignNoClickMarkupUrl from 'json/OnStaticInterstitialDisplayCampaignNoClickMarkupUrl.json';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -889,14 +886,12 @@ describe('CampaignManager', () => {
                 response: OnStaticInterstitialDisplayCampaign
             }));
 
-            const json = JSON.parse(OnStaticInterstitialDisplayCampaign);
-            const content = JSON.parse(json.media.B0JMQwI7mlsbtAeTSrUjC4.content);
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager);
-            let triggeredCampaign: DisplayInterstitialMarkupCampaign;
+            let triggeredCampaign: DisplayInterstitialCampaign;
             let triggeredError: any;
             campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
-                triggeredCampaign = <DisplayInterstitialMarkupCampaign>campaign;
+                triggeredCampaign = <DisplayInterstitialCampaign>campaign;
             });
             campaignManager.onError.subscribe(error => {
                 triggeredError = error;
@@ -912,60 +907,6 @@ describe('CampaignManager', () => {
                 assert.equal(triggeredCampaign.getAbGroup(), configuration.getAbGroup());
                 assert.equal(triggeredCampaign.getGamerId(), configuration.getGamerId());
                 assert.deepEqual(triggeredCampaign.getOptionalAssets(), []);
-                assert.equal(triggeredCampaign.getDynamicMarkup(), decodeURIComponent(content.markup));
-            });
-        });
-
-        it('should process the programmatic/static-interstitial-url content-type', () => {
-            const mockRequest = sinon.mock(request);
-            mockRequest.expects('post').returns(Promise.resolve({
-                response: OnStaticInterstitialDisplayCampaignNoClickMarkupUrl
-            }));
-
-            const json = JSON.parse(OnStaticInterstitialDisplayCampaignNoClickMarkupUrl);
-            const content = JSON.parse(json.media.B0JMQwI7mlsbtAeTSrUjC4.content);
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
-            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager);
-            let triggeredCampaign: DisplayInterstitialMarkupUrlCampaign;
-            let triggeredError: any;
-            campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
-                triggeredCampaign = <DisplayInterstitialMarkupUrlCampaign>campaign;
-            });
-            campaignManager.onError.subscribe(error => {
-                triggeredError = error;
-            });
-
-            return campaignManager.request().then(() => {
-                if(triggeredError) {
-                    throw triggeredError;
-                }
-
-                mockRequest.verify();
-
-                assert.equal(triggeredCampaign.getAbGroup(), configuration.getAbGroup());
-                assert.equal(triggeredCampaign.getGamerId(), configuration.getGamerId());
-                assert.deepEqual(triggeredCampaign.getOptionalAssets(), []);
-                assert.equal(triggeredCampaign.getMarkupUrl(), decodeURIComponent(content.markupUrl));
-            });
-        });
-
-        it('should trigger onError when there is no clickThroughURL in programmatic/static-interstitial markup or auction json', () => {
-            const mockRequest = sinon.mock(request);
-            mockRequest.expects('post').returns(Promise.resolve({
-                response: OnStaticInterstitialDisplayCampaignNoClick
-            }));
-
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
-            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager);
-            let triggeredError: any;
-
-            campaignManager.onError.subscribe(error => {
-                triggeredError = error;
-            });
-
-            return campaignManager.request().then(() => {
-                mockRequest.verify();
-                assert.equal(triggeredError.message, 'No clickThroughURL for programmatic/static-interstitial');
             });
         });
     });

@@ -13,6 +13,8 @@ import { IOpenableIntentsResponse } from 'Views/AFMABridge';
 import { FocusManager } from 'Managers/FocusManager';
 import { Double } from 'Utilities/Double';
 import { SensorDelay } from 'Constants/Android/SensorDelay';
+import { IClickSignalResponse } from 'Views/AFMABridge';
+import { SdkStats } from 'Utilities/SdkStats';
 
 export interface IAdMobAdUnitParameters extends IAdUnitParameters<AdMobCampaign> {
     view: AdMobView;
@@ -29,9 +31,9 @@ export class AdMobAdUnit extends AbstractAdUnit {
     private _keyDownListener: (kc: number) => void;
     private _campaign: AdMobCampaign;
     private _placement: Placement;
-    private _timeOnScreen: number = 0;
     private _foregroundTime: number = 0;
     private _startTime: number = 0;
+    private _requestToViewTime: number = 0;
 
     private _onSystemKillObserver: () => void;
     private _onPauseObserver: () => void;
@@ -55,6 +57,7 @@ export class AdMobAdUnit extends AbstractAdUnit {
     }
 
     public show(): Promise<void> {
+        this._requestToViewTime = Date.now() - SdkStats.getAdRequestTimestamp();
         this.setShowing(true);
         this.onStart.trigger();
 
@@ -66,10 +69,9 @@ export class AdMobAdUnit extends AbstractAdUnit {
         if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
             this._nativeBridge.AndroidAdUnit.onKeyDown.subscribe(this._keyDownListener);
         }
-
         this.subscribeToLifecycle();
 
-        return this._container.open(this, false, true, this._forceOrientation, true, false, true, false, this._options).then(() => {
+        return this._container.open(this, ['webview'], true, this._forceOrientation, true, false, true, false, this._options).then(() => {
             if (this._startTime === 0) {
                 this._startTime = Date.now();
             }
@@ -130,7 +132,7 @@ export class AdMobAdUnit extends AbstractAdUnit {
     }
 
     public getTimeOnScreen(): number {
-        return (Date.now() - this._foregroundTime) + this._timeOnScreen;
+        return Date.now() - this._foregroundTime;
     }
 
     public getStartTime(): number {
@@ -142,6 +144,14 @@ export class AdMobAdUnit extends AbstractAdUnit {
         for (const url of urls) {
             this.sendThirdPartyEvent(`admob ${event}`, url);
         }
+    }
+
+    public sendClickSignalResponse(response: IClickSignalResponse) {
+        this._view.sendClickSignalResponse(response);
+    }
+
+    public getRequestToViewTime(): number {
+        return this._requestToViewTime;
     }
 
     private showView() {
@@ -206,8 +216,8 @@ export class AdMobAdUnit extends AbstractAdUnit {
     private subscribeToLifecycle() {
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            this._onPauseObserver = this._focusManager.onAppBackground.subscribe(() => this.onAppBackground());
             this._onResumeObserver = this._focusManager.onAppForeground.subscribe(() => this.onAppForeground());
+            this._onPauseObserver = this._focusManager.onAppBackground.subscribe(() => this.onAppBackground());
         } else {
             this._onResumeObserver = this._container.onShow.subscribe(() => this.onAppForeground());
             this._onPauseObserver = this._container.onAndroidPause.subscribe(() => this.onAppBackground());
@@ -216,12 +226,10 @@ export class AdMobAdUnit extends AbstractAdUnit {
 
     private unsubscribeFromLifecycle() {
         this._container.onSystemKill.unsubscribe(this._onSystemKillObserver);
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+        if (this._nativeBridge.getPlatform() === Platform.IOS) {
             this._focusManager.onAppBackground.unsubscribe(this._onPauseObserver);
-            this._focusManager.onAppForeground.unsubscribe(this._onResumeObserver);
         } else {
             this._container.onShow.unsubscribe(this._onResumeObserver);
-            this._container.onAndroidPause.unsubscribe(this._onPauseObserver);
         }
     }
 
@@ -237,8 +245,6 @@ export class AdMobAdUnit extends AbstractAdUnit {
     }
 
     private onAppBackground() {
-        this._timeOnScreen = (Date.now() - this._foregroundTime) + this._timeOnScreen;
-
         this._nativeBridge.SensorInfo.stopAccelerometerUpdates();
     }
 }

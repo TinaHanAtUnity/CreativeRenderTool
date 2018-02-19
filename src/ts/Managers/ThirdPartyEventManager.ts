@@ -23,10 +23,12 @@ export class ThirdPartyEventManager {
         });
     }
 
-    public sendEvent(event: string, sessionId: string, url: string, useWebViewUserAgentForTracking?: boolean): Promise<INativeResponse> {
-        const headers: Array<[string, string]> = [];
-        if (typeof navigator !== 'undefined' && navigator.userAgent && useWebViewUserAgentForTracking === true) {
-            headers.push(['User-Agent', navigator.userAgent]);
+    public sendEvent(event: string, sessionId: string, url: string, useWebViewUserAgentForTracking?: boolean, headers?: Array<[string, string]>): Promise<INativeResponse> {
+        headers = headers || [];
+        if (!Request.getHeader(headers, 'User-Agent')) {
+            if (typeof navigator !== 'undefined' && navigator.userAgent && useWebViewUserAgentForTracking === true) {
+                headers.push(['User-Agent', navigator.userAgent]);
+            }
         }
 
         this._nativeBridge.Sdk.logInfo('Unity Ads third party event: sending ' + event + ' event to ' + url + ' with headers ' + headers + ' (session ' + sessionId + ')');

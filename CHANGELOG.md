@@ -1,3 +1,21 @@
+# Fri Feb 16 10:18:25 UTC 2018
+
+* Add ad unit style object to operative events
+* Modify analytics event formats to better match Unity Analytics event formats
+
+# Thu Feb 15 09:07:01 UTC 2018
+
+* Preparations for new cache APIs in 2.2.0 release
+
+# Wed Feb 14 14:59:14 UTC 2018
+
+* Enable lunar theme on all groups except 5
+* Miscellaneous AdMob fixes
+
+# Wed Feb 14 10:24:20 UTC 2018
+
+* Revert previous deployment
+
 # Wed Feb 14 10:24:20 UTC 2018
 
 * Validate and encode all incoming URLs to handle unsafe characters
