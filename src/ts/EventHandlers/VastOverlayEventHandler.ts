@@ -22,6 +22,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
 
         this._vastAdUnit = adUnit;
         this._request = parameters.request;
+        this._clientInfo = parameters.clientInfo;
         this._vastCampaign = parameters.campaign;
         this._placement = parameters.placement;
         this._moat = MoatViewabilityService.getMoat();
