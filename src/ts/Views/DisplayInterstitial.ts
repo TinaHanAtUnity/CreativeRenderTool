@@ -1,16 +1,14 @@
 import DisplayInterstitialTemplate from 'html/display/DisplayInterstitial.html';
+import DisplayContainer from 'html/display/DisplayContainer.html';
+
 import { View } from 'Views/View';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Placement } from 'Models/Placement';
-import { IDisplayInterstitialCampaign, DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
-import { DisplayInterstitialMarkupCampaign } from 'Models/Campaigns/DisplayInterstitialMarkupCampaign';
-import { DisplayInterstitialMarkupUrlCampaign } from 'Models/Campaigns/DisplayInterstitialMarkupUrlCampaign';
-
+import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { Platform } from 'Constants/Platform';
 import { Template } from 'Utilities/Template';
 
 export interface IDisplayInterstitialHandler {
-    onDisplayInterstitialClick(url: string): void;
     onDisplayInterstitialReward(): void;
     onDisplayInterstitialSkip(): void;
     onDisplayInterstitialClose(): void;
@@ -22,11 +20,11 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
     private _campaign: DisplayInterstitialCampaign;
 
     private _closeElement: HTMLElement;
-    private _iframe: HTMLIFrameElement;
 
     private _canClose = false;
     private _canSkip = false;
     private _didReward = false;
+    private _webPlayerPrepared = false;
 
     private _messageListener: EventListener;
     private _timers: number[] = [];
@@ -49,16 +47,10 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
         ];
     }
 
-    public render(): Promise<void> {
+    public render() {
         super.render();
-        return Promise.resolve().then(() => {
-            this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
-            this.enableClickThroughCatcher();
-            const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#display-iframe');
-            return this.getIFrameSrcDoc().then((srcdoc) => {
-                iframe.srcdoc = srcdoc;
-            });
-        });
+
+        this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
     }
 
     public show(): void {
@@ -66,7 +58,7 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
 
         window.addEventListener('message', this._messageListener);
 
-        const closeLength = 30;
+        const closeLength = 5;
 
         if(this._placement.allowSkip()) {
             const skipLength = this._placement.allowSkipInSeconds();
@@ -132,16 +124,6 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
         window.clearInterval(handle);
     }
 
-    private onIFrameClicked(e: Event) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        const clickThroughUrl = this._campaign.getClickThroughUrl();
-        if (clickThroughUrl) {
-            this._handlers.forEach(handler => handler.onDisplayInterstitialClick(clickThroughUrl));
-        }
-    }
-
     private updateProgressCircle(container: HTMLElement, value: number) {
         const wrapperElement = <HTMLElement>container.querySelector('.progress-wrapper');
 
@@ -180,68 +162,11 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
     private onMessage(e: MessageEvent) {
         switch (e.data.type) {
             case 'redirect':
-                this._handlers.forEach(handler => handler.onDisplayInterstitialClick(e.data.href));
+                // TODO: should we do something here?
+                // this._handlers.forEach(handler => handler.onDisplayInterstitialClick(e.data.href));
                 break;
             default:
                 this._nativeBridge.Sdk.logWarning(`Unknown message: ${e.data.type}`);
         }
-    }
-
-    private requestMarkupFromURL(url: string): Promise<string> {
-        return new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.addEventListener('load', () => {
-                if ((this._nativeBridge.getPlatform() === Platform.ANDROID && xhr.status === 0) || (xhr.status >= 200 && xhr.status <= 299)) {
-                    resolve(xhr.responseText);
-                } else {
-                    reject(new Error(`XHR returned with unknown status code ${xhr.status}`));
-                }
-            }, false);
-            xhr.open('GET', decodeURIComponent(url));
-            xhr.send();
-        });
-    }
-
-    private getClickThroughUrlFromMarkup(markup: string): string {
-        const doc = new DOMParser().parseFromString(markup, 'text/html');
-        const a = doc.querySelector('a');
-        if (a) {
-            const href = a.getAttribute('href');
-            if (href) {
-                return href;
-            }
-        }
-
-        throw new Error('No clickthrough URL was found');
-    }
-
-    private fetchMarkupAndParseClickThroughURL(): Promise<string> {
-        const markupUrlCampaign = <DisplayInterstitialMarkupUrlCampaign>this._campaign;
-        return this.requestMarkupFromURL(markupUrlCampaign.getMarkupUrl()).then(displayMarkup => {
-            const clickThroughURL = this.getClickThroughUrlFromMarkup(displayMarkup);
-            markupUrlCampaign.setClickThroughUrl(clickThroughURL);
-            return displayMarkup;
-        });
-    }
-
-    private enableClickThroughCatcher() {
-        const clickCatcher = document.createElement('div');
-        clickCatcher.classList.add('iframe-click-catcher');
-        this._container.appendChild(clickCatcher);
-
-        clickCatcher.addEventListener('click', (e: Event) => this.onIFrameClicked(e));
-    }
-
-    private getIFrameSrcDoc(): Promise<string> {
-        if (this._campaign instanceof DisplayInterstitialMarkupCampaign) {
-            if (this._campaign.getClickThroughUrl()) {
-                return Promise.resolve(this._campaign.getDynamicMarkup());
-            }
-        }
-
-        if (this._campaign instanceof DisplayInterstitialMarkupUrlCampaign) {
-            return this.fetchMarkupAndParseClickThroughURL();
-        }
-        return Promise.reject('Unknown campaign type');
     }
 }

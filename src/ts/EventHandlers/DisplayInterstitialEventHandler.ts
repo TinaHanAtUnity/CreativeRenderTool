@@ -20,10 +20,6 @@ export class DisplayInterstitialEventHandler implements IDisplayInterstitialHand
         this._placement = parameters.placement;
     }
 
-    public onDisplayInterstitialClick(url: string): void {
-        this._adUnit.openLink(url);
-    }
-
     public onDisplayInterstitialReward(): void {
         // EMPTY?
     }

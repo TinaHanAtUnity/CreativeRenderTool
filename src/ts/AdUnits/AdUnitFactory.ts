@@ -54,9 +54,14 @@ import { AdMobEventHandler } from 'EventHandlers/AdmobEventHandler';
 import { InterstitialOverlay } from 'Views/InterstitialOverlay';
 import { AbstractOverlay } from 'Views/AbstractOverlay';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { Closer } from 'Views/Closer';
 import { Privacy } from 'Views/Privacy';
 import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 import { IObserver2, IObserver3 } from 'Utilities/IObserver';
+import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
+import { Promo } from 'Views/Promo';
+import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
+import { PromoEventHandler } from 'EventHandlers/PromoEventHandler';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 
 export class AdUnitFactory {
@@ -80,6 +85,8 @@ export class AdUnitFactory {
             return this.createXPromoAdUnit(nativeBridge, <IAdUnitParameters<XPromoCampaign>>parameters);
         } else if (parameters.campaign instanceof AdMobCampaign) {
             return this.createAdMobAdUnit(nativeBridge, <IAdUnitParameters<AdMobCampaign>>parameters);
+        } else if (parameters.campaign instanceof PromoCampaign) {
+            return this.createPromoAdUnit(nativeBridge, <IAdUnitParameters<PromoCampaign>>parameters);
         } else {
             throw new Error('Unknown campaign instance type');
         }
@@ -279,15 +286,15 @@ export class AdUnitFactory {
         return mraidAdUnit;
     }
 
-    private static createVPAIDAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<VPAIDCampaign>): VPAIDAdUnit {
-        const overlay = this.createOverlay(nativeBridge, parameters);
-        const vpaid = new VPAID(nativeBridge, <VPAIDCampaign>parameters.campaign, parameters.placement, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+    private static createVPAIDAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<VPAIDCampaign>): AbstractAdUnit {
+        const closer = new Closer(nativeBridge, parameters.placement);
+        const vpaid = new VPAID(nativeBridge, <VPAIDCampaign>parameters.campaign, parameters.placement);
         let endScreen: VPAIDEndScreen | undefined;
 
         const vpaidAdUnitParameters: IVPAIDAdUnitParameters = {
             ... parameters,
             vpaid: vpaid,
-            overlay: overlay,
+            closer: closer,
         };
 
         if(parameters.campaign.hasEndScreen()) {
@@ -300,7 +307,7 @@ export class AdUnitFactory {
         const vpaidEventHandler = new VPAIDEventHandler(nativeBridge, vpaidAdUnit, vpaidAdUnitParameters);
         vpaid.addEventHandler(vpaidEventHandler);
         const overlayEventHandler = new VPAIDOverlayEventHandler(nativeBridge, vpaidAdUnit, vpaidAdUnitParameters);
-        overlay.addEventHandler(overlayEventHandler);
+        closer.addEventHandler(overlayEventHandler);
 
         if(parameters.campaign.hasEndScreen() && endScreen) {
             const endScreenEventHandler = new VPAIDEndScreenEventHandler(nativeBridge, vpaidAdUnit, vpaidAdUnitParameters);
@@ -308,6 +315,22 @@ export class AdUnitFactory {
         }
 
         return vpaidAdUnit;
+    }
+
+    private static createPromoAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PromoCampaign>): AbstractAdUnit {
+        const promoView = new Promo(nativeBridge, parameters.campaign, parameters.deviceInfo.getLanguage());
+        const promoAdUnit = new PromoAdUnit(nativeBridge, {
+            ...parameters,
+            view: promoView
+        });
+
+        promoView.render();
+        document.body.appendChild(promoView.container());
+
+        promoView.onClose.subscribe(() => PromoEventHandler.onClose(nativeBridge, promoAdUnit, parameters.campaign.getGamerId(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup(), parameters.campaign.getTrackingUrlsForEvent('purchase'), "purchase"));
+        promoView.onPromo.subscribe((productId) => PromoEventHandler.onPromo(nativeBridge, promoAdUnit, productId, parameters.campaign.getTrackingUrlsForEvent('purchase'), "purchase"));
+
+        return promoAdUnit;
     }
 
     private static createDisplayInterstitialAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<DisplayInterstitialCampaign>): DisplayInterstitialAdUnit {

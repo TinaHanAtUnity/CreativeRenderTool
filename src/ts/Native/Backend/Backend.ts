@@ -16,6 +16,7 @@ import { Platform } from 'Constants/Platform';
 import { Intent } from 'Native/Backend/Api/Intent';
 import { UrlScheme } from 'Native/Backend/Api/UrlScheme';
 import { Lifecycle } from 'Native/Backend/Api/Lifecycle';
+import { Purchasing } from 'Native/Backend/Api/Purchasing';
 
 interface IInvocation {
     className: string;
@@ -56,6 +57,7 @@ export class Backend implements IWebViewBridge {
         '.*Listener': Listener,
         '.*Notification': Notification,
         '.*Placement': Placement,
+        '.*Purchasing': Purchasing,
         '.*Request': Request,
         '.*Sdk': Sdk,
         '.*Storage': Storage,

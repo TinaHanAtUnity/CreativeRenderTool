@@ -22,7 +22,6 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 
 describe('DisplayInterstitialAdUnit', () => {
-    const isStaticInterstitialUrlCampaign = true;
     let adUnit: DisplayInterstitialAdUnit;
     let nativeBridge: NativeBridge;
     let container: AdUnitContainer;
@@ -37,28 +36,19 @@ describe('DisplayInterstitialAdUnit', () => {
     let clientInfo: ClientInfo;
     let displayInterstitialAdUnitParameters: IDisplayInterstitialAdUnitParameters;
     let comScoreService: ComScoreTrackingService;
-    let server: sinon.SinonFakeServer;
 
     describe('On static-interstial campaign', () => {
-        adUnitTests(!isStaticInterstitialUrlCampaign);
+        adUnitTests();
     });
 
-    describe('On static-interstial-url campaign', () => {
-        adUnitTests(isStaticInterstitialUrlCampaign);
-    });
-
-    function adUnitTests(isUrlCampaign: boolean): void {
+    function adUnitTests(): void {
         beforeEach(() => {
-            campaign = TestFixtures.getDisplayInterstitialCampaign(isUrlCampaign);
-
-            if (isUrlCampaign) {
-                server = sinon.fakeServer.create();
-                server.respondImmediately = true;
-                server.respondWith('<div><a href="http://unity3d.com"></a></div>');
-            }
+            campaign = TestFixtures.getDisplayInterstitialCampaign();
 
             sandbox = sinon.sandbox.create();
             nativeBridge = TestFixtures.getNativeBridge(Platform.ANDROID);
+            sandbox.stub(nativeBridge.WebPlayer, 'setSettings').returns(Promise.resolve());
+            sandbox.stub(nativeBridge.WebPlayer, 'clearSettings').returns(Promise.resolve());
             placement = TestFixtures.getPlacement();
 
             const metaDataManager = new MetaDataManager(nativeBridge);
@@ -106,10 +96,6 @@ describe('DisplayInterstitialAdUnit', () => {
                 adUnit.hide();
             }
             sandbox.restore();
-
-            if (server) {
-                server.restore();
-            }
         });
 
         describe('showing', () => {

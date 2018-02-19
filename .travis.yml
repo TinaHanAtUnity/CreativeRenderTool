@@ -1,18 +1,22 @@
 sudo: false
 
-language: node_js
-node_js: 8
+language: python
+python: "3.6"
 
 addons:
   apt:
     packages:
-    - libimage-exiftool-perl
+      - libimage-exiftool-perl
 
 install:
-  - pip install --user awscli
+  - . $HOME/.nvm/nvm.sh
+  - nvm install stable
+  - nvm use stable
+  - pip install awscli
   - npm install
 
 cache:
+  pip: true
   directories:
     - node_modules
 
