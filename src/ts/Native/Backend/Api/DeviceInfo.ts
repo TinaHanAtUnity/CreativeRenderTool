@@ -282,8 +282,8 @@ export class DeviceInfo {
         return DeviceInfo._statusBarHeight;
     }
 
-    public static getDevice(): Promise<string> {
-        return Promise.resolve(DeviceInfo._device);
+    public static getDevice(): string {
+        return DeviceInfo._device;
     }
 
     private static _advertisingTrackingId: string = 'DA276DED-8DFE-4C57-A75E-9D7F7BBF2D21';
