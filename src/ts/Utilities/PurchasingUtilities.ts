@@ -5,19 +5,20 @@ import { Diagnostics } from './Diagnostics';
 export class PurchasingUtilities {
 
     public static checkPromoVersion(nativeBridge: NativeBridge): Promise<boolean> {
-        return this.isPromoReady(nativeBridge).then(ready =>  {
-            if(ready) {
+        return this.isPromoReady(nativeBridge).then((ready) => {
+            if (!ready) {
+                return Promise.reject(new Error('Promo was not ready'));
+            }
+            return new Promise<boolean>((resolve, reject) => {
                 const promoVersionObserver = nativeBridge.Purchasing.onGetPromoVersion.subscribe((promoVersion) => {
                     nativeBridge.Purchasing.onGetPromoVersion.unsubscribe(promoVersionObserver);
-                    if(promoVersion === '1.16.0') {
-                        return true;
-                    } else {
-                        return false;
-                    }
+                    resolve(promoVersion === '1.16.0');
                 });
-                nativeBridge.Purchasing.getPromoVersion();
-            }
-            return false;
+                nativeBridge.Purchasing.getPromoVersion().catch(() => {
+                    nativeBridge.Purchasing.onGetPromoVersion.unsubscribe(promoVersionObserver);
+                    reject(new Error('Unsuccessful purchasing version check'));
+                });
+            });
         });
     }
 
