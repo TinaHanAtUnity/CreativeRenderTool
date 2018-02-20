@@ -67,7 +67,8 @@ export class AdMobAdUnit extends AbstractAdUnit {
             this._nativeBridge.AndroidAdUnit.onKeyDown.subscribe(this._keyDownListener);
         }
         this.subscribeToLifecycle();
-        return this._container.open(this, false, true, this._forceOrientation, true, false, true, false, this._options).then(() => {
+
+        return this._container.open(this, ['webview'], true, this._forceOrientation, true, false, true, false, this._options).then(() => {
             if (this._startTime === 0) {
                 this._startTime = Date.now();
             }

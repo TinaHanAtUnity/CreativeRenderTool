@@ -42,6 +42,7 @@ import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
+import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
@@ -160,6 +161,10 @@ export class WebView {
         }).then(([configuration]) => {
             this._configuration = configuration;
             HttpKafka.setConfiguration(this._configuration);
+
+            PurchasingUtilities.setConfiguration(this._configuration);
+            PurchasingUtilities.setClientInfo(this._clientInfo);
+            PurchasingUtilities.sendInitializationCommand(this._nativeBridge);
 
             if (!this._configuration.isEnabled()) {
                 const error = new Error('Game with ID ' + this._clientInfo.getGameId() +  ' is not enabled');

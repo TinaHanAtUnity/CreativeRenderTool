@@ -81,5 +81,5 @@ export class Url {
         return false;
     }
 
-    private static whitelistedProtocols = ['http', 'https', 'market', 'itunes'];
+    private static whitelistedProtocols = ['market', 'itunes', 'itms', 'itmss'];
 }
