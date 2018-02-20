@@ -21,7 +21,7 @@ export class PurchasingUtilities {
             return new Promise<boolean>((resolve, reject) => {
                 const promoVersionObserver = nativeBridge.Purchasing.onGetPromoVersion.subscribe((promoVersion) => {
                     nativeBridge.Purchasing.onGetPromoVersion.unsubscribe(promoVersionObserver);
-                    resolve(promoVersion === '1.16.0');
+                    resolve(PurchasingUtilities.supportsVersion(promoVersion));
                 });
                 nativeBridge.Purchasing.getPromoVersion().catch(() => {
                     nativeBridge.Purchasing.onGetPromoVersion.unsubscribe(promoVersionObserver);
@@ -174,4 +174,14 @@ export class PurchasingUtilities {
     private static _clientInfo: ClientInfo | undefined;
     private static _configuration: Configuration | undefined;
     private static _didSuccessfullySendInitializationCommand: boolean = false;
+
+    private static supportsVersion(version: string): boolean {
+        const promoVersionSplit: string[] = version.split('.', 2);
+        // Checks if the version is AT LEAST 1.16.0
+        if (parseInt(promoVersionSplit[0], 10) >= 2 || (parseInt(promoVersionSplit[0], 10) >= 1 && parseInt(promoVersionSplit[1], 10) >= 16)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

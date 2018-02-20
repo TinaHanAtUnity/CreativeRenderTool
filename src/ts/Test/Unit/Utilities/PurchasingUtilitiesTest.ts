@@ -82,6 +82,64 @@ describe('PurchasingUtilitiesTest', () => {
 
     });
 
+    describe('Checking version', () => {
+        describe('with a correctly formatted string', () =>  {
+            it('should pass', () => {
+                (<sinon.SinonStub>purchasing.initialize).callsFake(() => {
+                    purchasing.onInitialize.trigger('True');
+                    return Promise.resolve(true);
+                });
+                (<sinon.SinonStub>purchasing.getPromoVersion).callsFake(() => {
+                    purchasing.onGetPromoVersion.trigger('1.17.0-foo');
+                    return Promise.resolve();
+                });
+                const promise = PurchasingUtilities.checkPromoVersion(nativeBridge);
+                return promise;
+            });
+
+            it('should fail', () => {
+                (<sinon.SinonStub>purchasing.initialize).callsFake(() => {
+                    purchasing.onInitialize.trigger('True');
+                    return Promise.resolve(true);
+                });
+                (<sinon.SinonStub>purchasing.getPromoVersion).callsFake(() => {
+                    purchasing.onGetPromoVersion.trigger('1.15.0-foo');
+                    return Promise.resolve(false);
+                });
+                const promise = PurchasingUtilities.checkPromoVersion(nativeBridge);
+                return promise;
+            });
+        });
+
+        describe('with an incorrectly formatted/empty string', () =>  {
+            it('should fail', () => {
+                (<sinon.SinonStub>purchasing.initialize).callsFake(() => {
+                    purchasing.onInitialize.trigger('True');
+                    return Promise.resolve(true);
+                });
+                (<sinon.SinonStub>purchasing.getPromoVersion).callsFake(() => {
+                    purchasing.onGetPromoVersion.trigger('a.a.a');
+                    return Promise.resolve(false);
+                });
+                const promise = PurchasingUtilities.checkPromoVersion(nativeBridge);
+                return promise;
+            });
+
+            it('should fail', () => {
+                (<sinon.SinonStub>purchasing.initialize).callsFake(() => {
+                    purchasing.onInitialize.trigger('True');
+                    return Promise.resolve(true);
+                });
+                (<sinon.SinonStub>purchasing.getPromoVersion).callsFake(() => {
+                    purchasing.onGetPromoVersion.trigger('');
+                    return Promise.resolve(false);
+                });
+                const promise = PurchasingUtilities.checkPromoVersion(nativeBridge);
+                return promise;
+            });
+        });
+    });
+
     describe('Checking initiate purchase', () => {
         describe('Initiating a purchase', () => {
             describe('And promo is ready', () => {
