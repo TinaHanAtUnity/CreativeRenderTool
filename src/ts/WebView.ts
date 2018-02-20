@@ -162,18 +162,9 @@ export class WebView {
             this._configuration = configuration;
             HttpKafka.setConfiguration(this._configuration);
 
-            PurchasingUtilities.checkPromoVersion(this._nativeBridge).then(valid => {
-                if(valid) {
-                    const iapPayload = {
-                        gamerId: this._configuration.getGamerId(),
-                        iapPromo: true,
-                        abGroup: this._configuration.getAbGroup(),
-                        gameId: this._clientInfo.getGameId(),
-                        request: "setids"
-                    };
-                    PurchasingUtilities.initiatePurchaseRequest(this._nativeBridge, JSON.stringify(iapPayload));
-                }
-            });
+            PurchasingUtilities.setConfiguration(this._configuration);
+            PurchasingUtilities.setClientInfo(this._clientInfo);
+            PurchasingUtilities.sendInitializationCommand(this._nativeBridge);
 
             if (!this._configuration.isEnabled()) {
                 const error = new Error('Game with ID ' + this._clientInfo.getGameId() +  ' is not enabled');
