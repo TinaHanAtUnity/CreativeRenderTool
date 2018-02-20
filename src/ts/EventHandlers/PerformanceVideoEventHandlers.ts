@@ -4,16 +4,10 @@ import { Overlay } from 'Views/Overlay';
 export class PerformanceVideoEventHandlers {
 
     public static onVideoCompleted(adUnit: PerformanceAdUnit) {
-        const overlay = adUnit.getOverlay();
+        const endScreen = adUnit.getEndScreen();
 
-        if (overlay && overlay instanceof Overlay && overlay.getClickedState() && (overlay.getAbGroup() === 8 || overlay.getAbGroup() === 10)) {
-            adUnit.hide();
-        } else {
-            const endScreen = adUnit.getEndScreen();
-
-            if (endScreen) {
-                endScreen.show();
-            }
+        if (endScreen) {
+            endScreen.show();
         }
     }
 

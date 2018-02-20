@@ -5,12 +5,9 @@ import { AdUnitStyle } from 'Models/AdUnitStyle';
 
 export class PerformanceEndScreen extends EndScreen {
     private _campaign: PerformanceCampaign;
-    private _adUnitStyle?: AdUnitStyle;
 
     constructor(nativeBridge: NativeBridge, campaign: PerformanceCampaign, coppaCompliant: boolean, language: string, gameId: string, adUnitStyle?: AdUnitStyle) {
-        super(nativeBridge, coppaCompliant, language, gameId, campaign.getGameName(), campaign.getAbGroup());
-
-        this._adUnitStyle = adUnitStyle;
+        super(nativeBridge, coppaCompliant, language, gameId, campaign.getGameName(), campaign.getAbGroup(), adUnitStyle);
 
         const adjustedRating: number = campaign.getRating() * 20;
         this._templateData = {
@@ -25,15 +22,6 @@ export class PerformanceEndScreen extends EndScreen {
         };
 
         this._campaign = campaign;
-    }
-
-    public render(): void {
-        super.render();
-
-        const ctaButtonColor = this._adUnitStyle && this._adUnitStyle.getCTAButtonColor() ? this._adUnitStyle.getCTAButtonColor() : undefined;
-        if (ctaButtonColor) {
-            (<HTMLElement>this._container.querySelector('.download-container')).style.background = ctaButtonColor;
-        }
     }
 
     protected onDownloadEvent(event: Event): void {
