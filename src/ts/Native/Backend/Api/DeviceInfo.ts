@@ -281,6 +281,11 @@ export class DeviceInfo {
     public static getStatusBarHeight() {
         return DeviceInfo._statusBarHeight;
     }
+
+    public static getDevice(): Promise<string> {
+        return Promise.resolve(DeviceInfo._device);
+    }
+
     private static _advertisingTrackingId: string = 'DA276DED-8DFE-4C57-A75E-9D7F7BBF2D21';
     private static _limitAdTrackingFlag: boolean = true;
     private static _osVersion: string = '10.1.1';
@@ -314,6 +319,7 @@ export class DeviceInfo {
     private static _simulator: boolean = false;
     private static _statusBarHeight: number = 0;
     private static _maxVolume: number = 1;
+    private static _device: string = 'GT-I9000';
 
     private static getGuid() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (char) => {
