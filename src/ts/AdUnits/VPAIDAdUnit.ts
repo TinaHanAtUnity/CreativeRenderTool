@@ -193,11 +193,16 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         this.onStart.trigger();
         // this._timer.start();
 
-        this._container.onShow.subscribe(this._onAppForegroundHandler);
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
+            const onShowHandler = this._container.onShow.subscribe(() => {
+                this.showCloser();
+                this._view.loadWebPlayer().then(() => this._container.onShow.unsubscribe(onShowHandler));
+            });
             this._focusManager.onAppBackground.subscribe(this._onAppBackgroundHandler);
+            this._focusManager.onAppForeground.subscribe(this._onAppForegroundHandler);
         } else {
             this._container.onAndroidPause.subscribe(this._onAppBackgroundHandler);
+            this._container.onShow.subscribe(this._onAppForegroundHandler);
         }
     }
 
@@ -212,11 +217,12 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         this.onClose.trigger();
         this._nativeBridge.WebPlayer.shouldOverrideUrlLoading.unsubscribe(this._urlLoadingObserver);
 
-        this._container.onShow.unsubscribe(this._onAppForegroundHandler);
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
             this._focusManager.onAppBackground.unsubscribe(this._onAppBackgroundHandler);
+            this._focusManager.onAppForeground.unsubscribe(this._onAppForegroundHandler);
         } else {
             this._container.onAndroidPause.unsubscribe(this._onAppBackgroundHandler);
+            this._container.onShow.unsubscribe(this._onAppForegroundHandler);
         }
     }
 
@@ -230,10 +236,14 @@ export class VPAIDAdUnit extends AbstractAdUnit {
 
     private onAppForeground() {
         this.showCloser();
-        if (this._view.isLoaded()) {
-            this._view.resumeAd();
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            if (this._view.isLoaded()) {
+                this._view.resumeAd();
+            } else {
+                this._view.loadWebPlayer();
+            }
         } else {
-            this._view.loadWebPlayer();
+            this._view.resumeAd();
         }
     }
 
