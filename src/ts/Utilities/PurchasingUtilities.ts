@@ -112,7 +112,7 @@ export class PurchasingUtilities {
             }
         }
         if (!configurationIncludesPromoPlacement) {
-            return Promise.reject(new Error('No Promo placements, skipping init'));
+            return Promise.resolve();
         }
         return this.checkPromoVersion(nativeBridge).then((isValid) => {
             if (!isValid) {
