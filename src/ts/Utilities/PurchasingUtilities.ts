@@ -25,7 +25,7 @@ export class PurchasingUtilities {
                 });
                 nativeBridge.Purchasing.getPromoVersion().catch(() => {
                     nativeBridge.Purchasing.onGetPromoVersion.unsubscribe(promoVersionObserver);
-                    reject(new Error('Unsuccessful purchasing version check'));
+                    reject(new Error('Unsuccessful promo version check'));
                 });
             });
         });
@@ -66,17 +66,17 @@ export class PurchasingUtilities {
         });
     }
 
-    public static initiatePurchaseRequest(nativeBridge: NativeBridge, iapPayload: string): Promise<void> {
+    public static requestPurchase(nativeBridge: NativeBridge, iapPayload: string): Promise<void> {
         if (!PurchasingUtilities._didSuccessfullySendInitializationCommand) {
             return PurchasingUtilities.sendInitializationCommand(nativeBridge).then(() => {
-                return this.initiateCommand(nativeBridge, iapPayload);
+                return this.sendPurchaseAttempt(nativeBridge, iapPayload);
             });
         } else {
-            return this.initiateCommand(nativeBridge, iapPayload);
+            return this.sendPurchaseAttempt(nativeBridge, iapPayload);
         }
     }
 
-    public static initiateCommand(nativeBridge: NativeBridge, iapPayload: string): Promise<void> {
+    public static sendPurchaseAttempt(nativeBridge: NativeBridge, iapPayload: string): Promise<void> {
         return this.isPromoReady(nativeBridge).then((ready) => {
             if (!ready) {
                 return Promise.reject(new Error('Promo was not ready'));
@@ -84,16 +84,16 @@ export class PurchasingUtilities {
             return new Promise<void>((resolve, reject) => {
                 const observer = nativeBridge.Purchasing.onCommandResult.subscribe((isCommandSuccessful) => {
                     if (isCommandSuccessful === 'False') {
-                        nativeBridge.Sdk.logError("PurchasingUtilities: Purchase command unsuccessful");
-                        Diagnostics.trigger("purchase_command_unsuccessful", { message: "Purchase command unsuccessful" });
-                        reject(new Error('Unsuccessful purchase command'));
+                        nativeBridge.Sdk.logError("PurchasingUtilities: Purchase attempt unsuccessful");
+                        Diagnostics.trigger("purchase_attempt_unsuccessful", { message: "Purchase attempt unsuccessful" });
+                        reject(new Error('Unsuccessful purchase attempt'));
                     } else if (isCommandSuccessful === 'True') {
                         resolve();
                     }
                 });
                 nativeBridge.Purchasing.initiatePurchasingCommand(iapPayload).catch(() => {
                     nativeBridge.Purchasing.onCommandResult.unsubscribe(observer);
-                    reject(new Error('Unsuccessful purchase command'));
+                    reject(new Error('Unsuccessful purchase attempt'));
                 });
             });
         });
@@ -122,8 +122,8 @@ export class PurchasingUtilities {
                 const observer = nativeBridge.Purchasing.onCommandResult.subscribe((isCommandSuccessful) => {
                     if (isCommandSuccessful === 'False') {
                         nativeBridge.Sdk.logError("PurchasingUtilities: Purchase command unsuccessful");
-                        Diagnostics.trigger("purchase_command_unsuccessful", { message: "Purchase command unsuccessful" });
-                        reject(new Error('Unsuccessful purchase command'));
+                        Diagnostics.trigger("initilization_command_unsuccessful", { message: "Purchase initialization command unsuccessful" });
+                        reject(new Error('Unsuccessful purchase initialization command'));
                     } else if (isCommandSuccessful === 'True') {
                         PurchasingUtilities._didSuccessfullySendInitializationCommand = true;
                         resolve();
@@ -139,7 +139,7 @@ export class PurchasingUtilities {
                 }
                 nativeBridge.Purchasing.initiatePurchasingCommand(JSON.stringify(iapPayload)).catch(() => {
                     nativeBridge.Purchasing.onCommandResult.unsubscribe(observer);
-                    reject(new Error('Unsuccessful purchase command'));
+                    reject(new Error('Unsuccessful initialization command'));
                 });
             });
         });
@@ -175,13 +175,9 @@ export class PurchasingUtilities {
     private static _configuration: Configuration | undefined;
     private static _didSuccessfullySendInitializationCommand: boolean = false;
 
+    // Returns true if version is 1.16.0 or newer
     private static supportsVersion(version: string): boolean {
         const promoVersionSplit: string[] = version.split('.', 2);
-        // Checks if the version is AT LEAST 1.16.0
-        if (parseInt(promoVersionSplit[0], 10) >= 2 || (parseInt(promoVersionSplit[0], 10) >= 1 && parseInt(promoVersionSplit[1], 10) >= 16)) {
-            return true;
-        } else {
-            return false;
-        }
+        return (parseInt(promoVersionSplit[0], 10) >= 2 || (parseInt(promoVersionSplit[0], 10) >= 1 && parseInt(promoVersionSplit[1], 10) >= 16));
     }
 }

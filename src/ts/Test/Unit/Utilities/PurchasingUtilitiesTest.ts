@@ -154,7 +154,7 @@ describe('PurchasingUtilitiesTest', () => {
                             purchasing.onCommandResult.trigger('True');
                             return Promise.resolve();
                         });
-                        const promise = PurchasingUtilities.initiatePurchaseRequest(nativeBridge, JSON.stringify(iapPayload));
+                        const promise = PurchasingUtilities.requestPurchase(nativeBridge, JSON.stringify(iapPayload));
                         return promise;
                     });
                 });
@@ -169,7 +169,7 @@ describe('PurchasingUtilitiesTest', () => {
                             purchasing.onCommandResult.trigger('False');
                             return Promise.reject('False');
                         });
-                        const promise = PurchasingUtilities.initiatePurchaseRequest(nativeBridge, JSON.stringify(iapPayload));
+                        const promise = PurchasingUtilities.requestPurchase(nativeBridge, JSON.stringify(iapPayload));
                         return new Promise((resolve, reject) => {
                             return promise.then(reject).catch(resolve);
                         });
@@ -183,7 +183,7 @@ describe('PurchasingUtilitiesTest', () => {
                         purchasing.onInitialize.trigger('False');
                         return Promise.resolve();
                     });
-                    const promise = PurchasingUtilities.initiatePurchaseRequest(nativeBridge, JSON.stringify(iapPayload));
+                    const promise = PurchasingUtilities.requestPurchase(nativeBridge, JSON.stringify(iapPayload));
                     purchasing.onCommandResult.trigger('True');
                     return new Promise((resolve, reject) => {
                         return promise.then(reject).catch(resolve);
