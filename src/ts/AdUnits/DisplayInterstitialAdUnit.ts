@@ -112,7 +112,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
     }
 
     private onActivityResumed(activity: string): void {
-        this.makeReadyForNextUrl();
+        this._handlingShouldOverrideUrlLoading = false;
     }
 
     private onShow(): void {
@@ -172,40 +172,27 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
         this._handlingShouldOverrideUrlLoading = true;
         this._nativeBridge.Sdk.logDebug("DisplayInterstitialAdUnit: shouldOverrideUrlLoading triggered for url: '" + url + "' method: " + method);
         if (!url) {
-            this.makeReadyForNextUrl();
+            this._handlingShouldOverrideUrlLoading = false;
             return;
         }
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            this._nativeBridge.WebPlayer.shouldOverrideUrlLoading.unsubscribe(this._shouldOverrideUrlLoadingObserver);
-            const eventSettings = {
-                'onPageStarted': {'sendEvent': true},
-                'shouldOverrideUrlLoading': {'sendEvent': false, 'returnValue': true, 'callSuper': false}
-            };
-            this._nativeBridge.WebPlayer.setEventSettings(eventSettings).then( () => {
-                this._nativeBridge.Intent.launch({
-                    'action': 'android.intent.action.VIEW',
-                    'uri': url
-                }).then( () => {
-                    this.makeReadyForNextUrl();
-                }).catch( (e) => {
-                    this._nativeBridge.Sdk.logInfo("DisplayInterstitialAdUnit: Cannot open url: '" + url + "': " + e);
-                    this.makeReadyForNextUrl();
-                });
-            });
-        } else if (this._nativeBridge.getPlatform() === Platform.IOS) {
+        if (this._nativeBridge.getPlatform() === Platform.IOS) {
             if( Url.isProtocolWhitelisted(url) ) {
                 this._nativeBridge.UrlScheme.open(url);
             }
-            this.makeReadyForNextUrl();
-        }
-    }
-
-    private makeReadyForNextUrl(): Promise<void> {
-        return this.setWebplayerSettings().then( () => {
-            this._shouldOverrideUrlLoadingObserver = this._nativeBridge.WebPlayer.shouldOverrideUrlLoading.subscribe((url: string, method: string) => this.shouldOverrideUrlLoading(url, method));
             this._handlingShouldOverrideUrlLoading = false;
-            return Promise.resolve();
-        });
+            return;
+        }
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            this._nativeBridge.Intent.launch({
+                'action': 'android.intent.action.VIEW',
+                'uri': url
+            }).then( () => {
+                this._handlingShouldOverrideUrlLoading = false;
+            }).catch( (e) => {
+                this._nativeBridge.Sdk.logInfo("DisplayInterstitialAdUnit: Cannot open url: '" + url + "': " + e);
+                this._handlingShouldOverrideUrlLoading = false;
+            });
+        }
     }
 
     private unsetReferences(): void {
