@@ -1,8 +1,17 @@
 import { PurchasingCatalog } from 'Models/PurchasingCatalog';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Diagnostics } from './Diagnostics';
+import { Configuration } from 'Models/Configuration';
+import { ClientInfo } from 'Models/ClientInfo';
 
 export class PurchasingUtilities {
+    public static setClientInfo(clientInfo?: ClientInfo) {
+        PurchasingUtilities._clientInfo = clientInfo;
+    }
+
+    public static setConfiguration(configuration?: Configuration) {
+        PurchasingUtilities._configuration = configuration;
+    }
 
     public static checkPromoVersion(nativeBridge: NativeBridge): Promise<boolean> {
         return this.isPromoReady(nativeBridge).then((ready) => {
@@ -58,6 +67,16 @@ export class PurchasingUtilities {
     }
 
     public static initiatePurchaseRequest(nativeBridge: NativeBridge, iapPayload: string): Promise<void> {
+        if (!PurchasingUtilities._didSuccessfullySendInitializationCommand) {
+            return PurchasingUtilities.sendInitializationCommand(nativeBridge).then(() => {
+                return this.initiateCommand(nativeBridge, iapPayload);
+            });
+        } else {
+            return this.initiateCommand(nativeBridge, iapPayload);
+        }
+    }
+
+    public static initiateCommand(nativeBridge: NativeBridge, iapPayload: string): Promise<void> {
         return this.isPromoReady(nativeBridge).then((ready) => {
             if (!ready) {
                 return Promise.reject(new Error('Promo was not ready'));
@@ -73,6 +92,52 @@ export class PurchasingUtilities {
                     }
                 });
                 nativeBridge.Purchasing.initiatePurchasingCommand(iapPayload).catch(() => {
+                    nativeBridge.Purchasing.onCommandResult.unsubscribe(observer);
+                    reject(new Error('Unsuccessful purchase command'));
+                });
+            });
+        });
+    }
+
+    public static sendInitializationCommand(nativeBridge: NativeBridge): Promise<void> {
+        let configurationIncludesPromoPlacement = false;
+        if (PurchasingUtilities._configuration) {
+            const placements = PurchasingUtilities._configuration.getPlacements();
+            const placementIds = PurchasingUtilities._configuration.getPlacementIds();
+            for (const placementId of placementIds) {
+                const adTypes = placements[placementId].getAdTypes();
+                if (adTypes && adTypes.indexOf('IAP') > -1) {
+                    configurationIncludesPromoPlacement = true;
+                }
+            }
+        }
+        if (!configurationIncludesPromoPlacement) {
+            return Promise.reject(new Error('No Promo placements, skipping init'));
+        }
+        return this.checkPromoVersion(nativeBridge).then((isValid) => {
+            if (!isValid) {
+                return Promise.reject(new Error('Purchasing version is not valid'));
+            }
+            return new Promise<void>((resolve, reject) => {
+                const observer = nativeBridge.Purchasing.onCommandResult.subscribe((isCommandSuccessful) => {
+                    if (isCommandSuccessful === 'False') {
+                        nativeBridge.Sdk.logError("PurchasingUtilities: Purchase command unsuccessful");
+                        Diagnostics.trigger("purchase_command_unsuccessful", { message: "Purchase command unsuccessful" });
+                        reject(new Error('Unsuccessful purchase command'));
+                    } else if (isCommandSuccessful === 'True') {
+                        PurchasingUtilities._didSuccessfullySendInitializationCommand = true;
+                        resolve();
+                    }
+                });
+                const iapPayload = <any>{};
+                if (PurchasingUtilities._configuration && PurchasingUtilities._clientInfo) {
+                    iapPayload.gamerId = PurchasingUtilities._configuration.getGamerId();
+                    iapPayload.iapPromo = true;
+                    iapPayload.abGroup = PurchasingUtilities._configuration.getAbGroup();
+                    iapPayload.gameId = PurchasingUtilities._clientInfo.getGameId();
+                    iapPayload.request = "setids";
+                }
+                nativeBridge.Purchasing.initiatePurchasingCommand(JSON.stringify(iapPayload)).catch(() => {
                     nativeBridge.Purchasing.onCommandResult.unsubscribe(observer);
                     reject(new Error('Unsuccessful purchase command'));
                 });
@@ -106,4 +171,7 @@ export class PurchasingUtilities {
     }
 
     private static _catalog: PurchasingCatalog = new PurchasingCatalog([]);
+    private static _clientInfo: ClientInfo | undefined;
+    private static _configuration: Configuration | undefined;
+    private static _didSuccessfullySendInitializationCommand: boolean = false;
 }
