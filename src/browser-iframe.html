@@ -29,6 +29,9 @@
                 },
                 '*.json': {
                     loader: 'text'
+                },
+                '*.css': {
+                    loader: 'text'
                 }
             },
             packages: {
@@ -39,7 +42,8 @@
             paths: {
                 '*.html': './*.html',
                 '*.xml': './*.xml',
-                '*.json': './*.json'
+                '*.json': './*.json',
+                '*.css': './*.css'
             }
         });
         System.import('Browser').then(() => {
