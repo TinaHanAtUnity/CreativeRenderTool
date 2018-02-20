@@ -39,6 +39,9 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
     private _onPageStartedObserver: IObserver1<string>;
     private _onActivityResumed: IObserver1<string>;
 
+    private readonly _closeAreaMinRatio = 0.05;
+    private readonly _closeAreaMinPixels = 50;
+
     constructor(nativeBridge: NativeBridge, parameters: IDisplayInterstitialAdUnitParameters) {
         super(nativeBridge, parameters);
         this._operativeEventManager = parameters.operativeEventManager;
@@ -116,6 +119,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
     }
 
     private onShow(): void {
+        this._nativeBridge.Sdk.logDebug("DisplayInterstitialAdUnit: onShow");
         if(AbstractAdUnit.getAutoClose()) {
             setTimeout(() => {
                 this.setFinishState(FinishState.COMPLETED);
@@ -126,11 +130,9 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
             this._deviceInfo.getScreenWidth(),
             this._deviceInfo.getScreenHeight()
         ]).then(([screenWidth, screenHeight]) => {
-            const closeAreaSizePercent = 0.1;
-            const webviewAreaSize = Math.min(screenWidth, screenHeight) * closeAreaSizePercent;
+            const webviewAreaSize = Math.max( Math.min(screenWidth, screenHeight) * this._closeAreaMinRatio, this._closeAreaMinPixels );
             const webviewXPos = screenWidth - webviewAreaSize;
             const webviewYPos = 0;
-            // TODO: leave the webplayer running in background, don't reopen on return
             this._container.setViewFrame('webview', Math.floor(webviewXPos), Math.floor(webviewYPos), Math.floor(webviewAreaSize), Math.floor(webviewAreaSize)).then(() => {
                 return this._container.setViewFrame('webplayer', Math.floor(screenWidth), Math.floor(screenHeight), Math.floor(screenWidth), Math.floor(screenHeight)).then(() => {
                     return this.setWebPlayerContent();
