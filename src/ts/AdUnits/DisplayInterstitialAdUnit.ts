@@ -119,7 +119,6 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
     }
 
     private onShow(): void {
-        this._nativeBridge.Sdk.logDebug("DisplayInterstitialAdUnit: onShow");
         if(AbstractAdUnit.getAutoClose()) {
             setTimeout(() => {
                 this.setFinishState(FinishState.COMPLETED);
@@ -128,11 +127,16 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
         }
         Promise.all([
             this._deviceInfo.getScreenWidth(),
-            this._deviceInfo.getScreenHeight()
-        ]).then(([screenWidth, screenHeight]) => {
-            const webviewAreaSize = Math.max( Math.min(screenWidth, screenHeight) * this._closeAreaMinRatio, this._closeAreaMinPixels );
-            const webviewXPos = screenWidth - webviewAreaSize;
-            const webviewYPos = 0;
+            this._deviceInfo.getScreenHeight(),
+            this._deviceInfo.getScreenDensity()
+        ]).then(([screenWidth, screenHeight, screenDensity]) => {
+            let webviewAreaSize = Math.max( Math.min(screenWidth, screenHeight) * this._closeAreaMinRatio, this._closeAreaMinPixels );
+            if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                webviewAreaSize = this.getAndroidViewSize(webviewAreaSize, screenDensity);
+                screenWidth = this.getAndroidViewSize(screenWidth, screenDensity);
+            }
+            let webviewXPos = screenWidth - webviewAreaSize;
+            let webviewYPos = 0;
             this._container.setViewFrame('webview', Math.floor(webviewXPos), Math.floor(webviewYPos), Math.floor(webviewAreaSize), Math.floor(webviewAreaSize)).then(() => {
                 return this._container.setViewFrame('webplayer', Math.floor(screenWidth), Math.floor(screenHeight), Math.floor(screenWidth), Math.floor(screenHeight)).then(() => {
                     return this.setWebPlayerContent();
@@ -247,6 +251,10 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
             this.setFinishState(FinishState.ERROR);
             this.hide();
         });
+    }
+
+    private getAndroidViewSize(size: number, density: number): number {
+        return size * (density / 160);
     }
 
     private setWebplayerSettings(): Promise<void> {
