@@ -133,10 +133,9 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
             let webviewAreaSize = Math.max( Math.min(screenWidth, screenHeight) * this._closeAreaMinRatio, this._closeAreaMinPixels );
             if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
                 webviewAreaSize = this.getAndroidViewSize(webviewAreaSize, screenDensity);
-                screenWidth = this.getAndroidViewSize(screenWidth, screenDensity);
             }
-            let webviewXPos = screenWidth - webviewAreaSize;
-            let webviewYPos = 0;
+            const webviewXPos = screenWidth - webviewAreaSize;
+            const webviewYPos = 0;
             this._container.setViewFrame('webview', Math.floor(webviewXPos), Math.floor(webviewYPos), Math.floor(webviewAreaSize), Math.floor(webviewAreaSize)).then(() => {
                 return this._container.setViewFrame('webplayer', Math.floor(screenWidth), Math.floor(screenHeight), Math.floor(screenWidth), Math.floor(screenHeight)).then(() => {
                     return this.setWebPlayerContent();
