@@ -164,7 +164,7 @@ export class WebView {
 
             PurchasingUtilities.setConfiguration(this._configuration);
             PurchasingUtilities.setClientInfo(this._clientInfo);
-            PurchasingUtilities.sendInitializationCommand(this._nativeBridge);
+            PurchasingUtilities.sendPurchaseInitializationEvent(this._nativeBridge);
 
             if (!this._configuration.isEnabled()) {
                 const error = new Error('Game with ID ' + this._clientInfo.getGameId() +  ' is not enabled');
