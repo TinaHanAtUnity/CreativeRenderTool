@@ -56,13 +56,17 @@
                 },
                 '*.json': {
                     loader: 'text'
+                },
+                '*.css': {
+                    loader: 'text'
                 }
             },
             packages: {},
             paths: {
                 '*.html': origin + '*.html',
                 '*.xml': origin + '*.xml',
-                '*.json': origin + '*.json'
+                '*.json': origin + '*.json',
+                '*.css': './*.css'
             }
         };
         config.packages[origin] = {
