@@ -366,6 +366,7 @@ export class CampaignManager {
             deviceModel: this._deviceInfo.getModel(),
             platform: Platform[this._clientInfo.getPlatform()].toLowerCase(),
             screenDensity: this._deviceInfo.getScreenDensity(),
+            screenScale: this._deviceInfo.getScreenScale(),
             sdkVersion: this._clientInfo.getSdkVersion(),
             screenSize: this._deviceInfo.getScreenLayout(),
             stores: this._deviceInfo.getStores()
