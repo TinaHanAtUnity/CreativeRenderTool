@@ -196,7 +196,7 @@ export class PurchasingUtilities {
                         resolve();
                     }
                 });
-                nativeBridge.Purchasing.sendPurchaseEvent(iapPayload).catch(() => {
+                nativeBridge.Purchasing.sendPurchasingCommand(iapPayload).catch(() => {
                     nativeBridge.Purchasing.onCommandResult.unsubscribe(observer);
                     reject(this.logIssue(nativeBridge, 'send_purchase_event_failed', 'Purchase event failed to send'));
                 });

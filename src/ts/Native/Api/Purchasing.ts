@@ -36,7 +36,7 @@ export class PurchasingApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._apiClass, 'initiatePurchasingCommand', [event]);
     }
 
-    public sendPurchaseEvent(event: string): Promise<void> {
+    public sendPurchasingCommand(event: string): Promise<void> {
         return this._nativeBridge.invoke<void>(this._apiClass, 'initiatePurchasingCommand', [event]);
     }
 

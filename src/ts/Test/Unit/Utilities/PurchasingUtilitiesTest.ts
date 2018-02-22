@@ -150,7 +150,7 @@ describe('PurchasingUtilitiesTest', () => {
                             purchasing.onInitialize.trigger('True');
                             return Promise.resolve(true);
                         });
-                        (<sinon.SinonStub>purchasing.sendPurchaseEvent).callsFake(() => {
+                        (<sinon.SinonStub>purchasing.sendPurchasingCommand).callsFake(() => {
                             purchasing.onCommandResult.trigger('True');
                             return Promise.resolve();
                         });
@@ -165,7 +165,7 @@ describe('PurchasingUtilitiesTest', () => {
                             purchasing.onInitialize.trigger('True');
                             return Promise.resolve(true);
                         });
-                        (<sinon.SinonStub>purchasing.sendPurchaseEvent).callsFake(() => {
+                        (<sinon.SinonStub>purchasing.sendPurchasingCommand).callsFake(() => {
                             purchasing.onCommandResult.trigger('False');
                             return Promise.reject('False');
                         });
