@@ -6,7 +6,8 @@ export enum PurchasingEvent {
     COMMAND,
     VERSION,
     CATALOG,
-    INITIALIZATION
+    INITIALIZATION,
+    EVENT
 }
 
 export class PurchasingApi extends NativeApi {
@@ -15,6 +16,7 @@ export class PurchasingApi extends NativeApi {
     public readonly onCommandResult = new Observable1<string>();
     public readonly onGetPromoVersion = new Observable1<string>();
     public readonly onGetPromoCatalog = new Observable1<string>();
+    public readonly onIAPSendEvent = new Observable1<string>();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'Purchasing');
@@ -52,6 +54,10 @@ export class PurchasingApi extends NativeApi {
 
             case PurchasingEvent[PurchasingEvent.INITIALIZATION]:
                 this.onInitialize.trigger(parameters[0]);
+                break;
+
+            case PurchasingEvent[PurchasingEvent.EVENT]:
+                this.onIAPSendEvent.trigger(parameters[0]);
                 break;
 
             default:
