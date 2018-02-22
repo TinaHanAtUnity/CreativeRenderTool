@@ -11,6 +11,7 @@ import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { Placement } from 'Models/Placement';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
+import { VastCampaign } from 'Models/Vast/VastCampaign';
 
 export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler {
     protected _placement: Placement;
@@ -86,8 +87,12 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
         const positionAtSkip = this._adUnit.getVideo().getPosition();
         const comScoreDuration = (this._adUnit.getVideo().getDuration()).toString(10);
         const creativeId = this._campaign.getCreativeId();
-        const category = this._campaign.getCategory();
-        const subCategory = this._campaign.getSubCategory();
+        let category;
+        let subCategory;
+        if (this._campaign instanceof VastCampaign) {
+            category = this._campaign.getCategory();
+            subCategory = this._campaign.getSubcategory();
+        }
         this._comScoreTrackingService.sendEvent('end', sessionId, comScoreDuration, positionAtSkip, creativeId, category, subCategory);
     }
 }

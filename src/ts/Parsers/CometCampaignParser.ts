@@ -40,13 +40,6 @@ export class CometCampaignParser extends CampaignParser {
             creativeId: undefined,
             seatId: undefined,
             meta: json.meta,
-            appCategory: undefined,
-            appSubCategory: undefined,
-            advertiserDomain: undefined,
-            advertiserCampaignId: undefined,
-            advertiserBundleId: undefined,
-            useWebViewUserAgentForTracking: undefined,
-            buyerId: undefined,
             session: session
         };
 
@@ -57,7 +50,6 @@ export class CometCampaignParser extends CampaignParser {
                 resourceAsset: json.mraidUrl ? new HTML(json.mraidUrl, session) : undefined,
                 resource: undefined,
                 dynamicMarkup: json.dynamicMarkup,
-                additionalTrackingEvents: undefined,
                 clickAttributionUrl: json.clickAttributionUrl,
                 clickAttributionUrlFollowsRedirects: json.clickAttributionUrlFollowsRedirects,
                 clickUrl: json.clickUrl ? json.clickUrl : undefined,
@@ -70,7 +62,8 @@ export class CometCampaignParser extends CampaignParser {
                 portraitImage: json.endScreenPortrait ? new Image(json.endScreenPortrait, session) : undefined,
                 bypassAppSheet: json.bypassAppSheet,
                 store: storeName,
-                appStoreId: json.appStoreId
+                appStoreId: json.appStoreId,
+                trackingUrls: {}
             };
 
             return Promise.resolve(new MRAIDCampaign(parameters));

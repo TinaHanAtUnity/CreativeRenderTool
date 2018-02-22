@@ -1042,7 +1042,7 @@ describe('CampaignManager', () => {
                     assert.equal(triggeredCampaign.getCorrelationId(), '0zGg2TfRsBNbqlc7AVdhLAw');
                     assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getResourceUrl(), new HTML('https://img.serveroute.com/mini_8ball_fast/inlined.html', triggeredCampaign.getSession()));
                     assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getDynamicMarkup(), 'var markup = \'dynamic\';');
-                    assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getTrackingEventUrls(), {
+                    assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getTrackingUrls(), {
                         "impression": [
                             "http://test.impression.com/blah1",
                             "http://test.impression.com/blah2",
@@ -1078,7 +1078,7 @@ describe('CampaignManager', () => {
                     assert.equal(triggeredCampaign.getSeatId(), 902);
                     assert.equal(triggeredCampaign.getCorrelationId(), 'zGg2TfRsBNbqlc7AVdhLAw');
                     assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getResource(), '<div>markup</div>');
-                    assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getTrackingEventUrls(), {impression: ['https://ads-brand-postback.unityads.unity3d.com/brands/2000/%ZONE%/impression/common?data=Kz2J']});
+                    assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getTrackingUrls(), {impression: ['https://ads-brand-postback.unityads.unity3d.com/brands/2000/%ZONE%/impression/common?data=Kz2J']});
                 });
             });
 

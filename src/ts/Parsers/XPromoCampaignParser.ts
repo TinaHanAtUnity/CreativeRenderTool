@@ -38,14 +38,7 @@ export class XPromoCampaignParser extends CampaignParser {
             correlationId: undefined,
             creativeId: undefined,
             seatId: undefined,
-            meta: json.meta,
-            appCategory: undefined,
-            appSubCategory: undefined,
-            advertiserDomain: undefined,
-            advertiserCampaignId: undefined,
-            advertiserBundleId: undefined,
-            useWebViewUserAgentForTracking: undefined,
-            buyerId: undefined,
+            meta: undefined,
             session: session
         };
 

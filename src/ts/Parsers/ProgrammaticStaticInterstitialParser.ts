@@ -21,20 +21,14 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
             creativeId: response.getCreativeId() || undefined,
             seatId: response.getSeatId() || undefined,
             meta: undefined,
-            appCategory: undefined,
-            appSubCategory: undefined,
-            advertiserDomain: undefined,
-            advertiserCampaignId: undefined,
-            advertiserBundleId: undefined,
-            useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking(),
-            buyerId: undefined,
             session: session
         };
 
         const displayInterstitialParams: IDisplayInterstitialCampaign = {
             ... baseCampaignParams,
             dynamicMarkup: dynamicMarkup,
-            tracking: response.getTrackingUrls() || undefined
+            trackingUrls: response.getTrackingUrls(),
+            useWebViewUserAgentForTracking: false
         };
 
         return Promise.resolve(new DisplayInterstitialCampaign(displayInterstitialParams));

@@ -104,7 +104,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     }
 
     public sendTrackingEvent(eventType: string) {
-        const urls = this._vpaidCampaign.getTrackingEventUrls(eventType);
+        const urls = this._vpaidCampaign.getTrackingUrlsForEvent(eventType);
 
         for (const url of urls) {
             this.sendThirdPartyEvent(`vpaid ${eventType}`, url);
