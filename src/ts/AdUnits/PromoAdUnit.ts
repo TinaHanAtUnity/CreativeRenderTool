@@ -14,17 +14,6 @@ export interface IPromoAdUnitParameters extends IAdUnitParameters<PromoCampaign>
     view: Promo;
 }
 
-class DeviceOrientation {
-    public static getDeviceOrientation(): ForceOrientation {
-        let height = window.innerHeight;
-        if (height <= 0) {
-            height = 1;
-        }
-        const aspectRatio = window.innerWidth / height;
-        return aspectRatio >= 1.0 ? ForceOrientation.LANDSCAPE : ForceOrientation.PORTRAIT;
-    }
-}
-
 export class PromoAdUnit extends AbstractAdUnit {
     private _sessionManager: SessionManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
@@ -58,7 +47,7 @@ export class PromoAdUnit extends AbstractAdUnit {
 
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
 
-        return this._container.open(this, ['webview'], false, DeviceOrientation.getDeviceOrientation(), true, true, false, true, this._options);
+        return this._container.open(this, ['webview'], false, ForceOrientation.NONE, true, true, false, true, this._options);
     }
 
     public hide(): Promise<void> {
