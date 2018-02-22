@@ -83,32 +83,11 @@ export class PurchasingUtilities {
     public static beginPurchaseEvent(nativeBridge: NativeBridge, iapPayload: string): Promise<void> {
         if (!PurchasingUtilities._didSuccessfullyInitiatePurchaseEvent) {
             return PurchasingUtilities.sendPurchaseInitializationEvent(nativeBridge).then(() => {
-                return this.isPurchasingCommandReady(nativeBridge, iapPayload);
+                return this.sendPurchasingCommandIfReady(nativeBridge, iapPayload);
             });
         } else {
-            return this.isPurchasingCommandReady(nativeBridge, iapPayload);
+            return this.sendPurchasingCommandIfReady(nativeBridge, iapPayload);
         }
-    }
-
-    public static isPurchasingCommandReady(nativeBridge: NativeBridge, iapPayload: string): Promise<void> {
-        return this.isPromoReady(nativeBridge).then((ready) => {
-            if (!ready) {
-                return Promise.reject(this.logIssue(nativeBridge, 'purchasing_command_not_ready', 'Purchasing command was not ready'));
-            }
-            return new Promise<void>((resolve, reject) => {
-                const observer = nativeBridge.Purchasing.onCommandResult.subscribe((isCommandSuccessful) => {
-                    if (isCommandSuccessful === 'False') {
-                        reject(this.logIssue(nativeBridge, 'purchase_command_attempt_failed', 'Purchase command attempt failed'));
-                    } else if (isCommandSuccessful === 'True') {
-                        resolve();
-                    }
-                });
-                nativeBridge.Purchasing.sendPurchaseEvent(iapPayload).catch(() => {
-                    nativeBridge.Purchasing.onCommandResult.unsubscribe(observer);
-                    reject(this.logIssue(nativeBridge, 'send_purchase_event_failed', 'Purchase event failed to send'));
-                });
-            });
-        });
     }
 
     public static sendPurchaseInitializationEvent(nativeBridge: NativeBridge): Promise<void> {
@@ -202,5 +181,26 @@ export class PurchasingUtilities {
             iapPayload.request = IPromoRequest.SETIDS;
         }
         return iapPayload;
+    }
+
+    private static sendPurchasingCommandIfReady(nativeBridge: NativeBridge, iapPayload: string): Promise<void> {
+        return this.isPromoReady(nativeBridge).then((ready) => {
+            if (!ready) {
+                return Promise.reject(this.logIssue(nativeBridge, 'purchasing_command_not_ready', 'Purchasing command was not ready'));
+            }
+            return new Promise<void>((resolve, reject) => {
+                const observer = nativeBridge.Purchasing.onCommandResult.subscribe((isCommandSuccessful) => {
+                    if (isCommandSuccessful === 'False') {
+                        reject(this.logIssue(nativeBridge, 'purchase_command_attempt_failed', 'Purchase command attempt failed'));
+                    } else if (isCommandSuccessful === 'True') {
+                        resolve();
+                    }
+                });
+                nativeBridge.Purchasing.sendPurchaseEvent(iapPayload).catch(() => {
+                    nativeBridge.Purchasing.onCommandResult.unsubscribe(observer);
+                    reject(this.logIssue(nativeBridge, 'send_purchase_event_failed', 'Purchase event failed to send'));
+                });
+            });
+        });
     }
 }
