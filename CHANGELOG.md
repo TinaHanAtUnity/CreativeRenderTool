@@ -1,4 +1,4 @@
-# Pending
+# Thu Feb 22 08:57:26 UTC 2018
 
 * Preparations for new double webview APIs in 2.2.0 release
 * Preparations for new IAP promo APIs in 2.2.0 release
