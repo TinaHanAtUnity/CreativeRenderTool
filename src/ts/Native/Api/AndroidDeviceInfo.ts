@@ -149,6 +149,14 @@ export class AndroidDeviceInfoApi extends NativeApi {
         return this._nativeBridge.invoke<string>(this._apiClass, 'getCertificateFingerprint');
     }
 
+    public getBuildId(): Promise<string> {
+        return this._nativeBridge.invoke<string>(this._apiClass, 'getBuildId');
+    }
+
+    public getBuildVersionIncremental(): Promise<string> {
+        return this._nativeBridge.invoke<string>(this._apiClass, 'getBuildVersionIncremental');
+    }
+
     public handleEvent(event: string, parameters: any[]): void {
         switch (event) {
             case DeviceInfoEvent[DeviceInfoEvent.VOLUME_CHANGED]:
