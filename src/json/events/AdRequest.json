@@ -44,6 +44,12 @@
       "body": false
     },
     {
+      "parameter": "screenScale",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
       "parameter": "screenWidth",
       "required": "all",
       "queryString": true,
