@@ -1,3 +1,11 @@
+# Thu Feb 22 08:57:26 UTC 2018
+
+* Preparations for new double webview APIs in 2.2.0 release
+* Preparations for new IAP promo APIs in 2.2.0 release
+* Removal of VPAID and display ad support from all pre-2.2.0 releases
+* Remove video overlay test from groups 8 and 10
+* Start random download button color test on groups 8 and 10
+
 # Fri Feb 16 10:18:25 UTC 2018
 
 * Add ad unit style object to operative events
