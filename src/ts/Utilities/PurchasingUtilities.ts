@@ -80,7 +80,7 @@ export class PurchasingUtilities {
         });
     }
 
-    public static startPurchaseEvent(nativeBridge: NativeBridge, iapPayload: string): Promise<void> {
+    public static beginPurchaseEvent(nativeBridge: NativeBridge, iapPayload: string): Promise<void> {
         if (!PurchasingUtilities._didSuccessfullyInitiatePurchaseEvent) {
             return PurchasingUtilities.sendPurchaseInitializationEvent(nativeBridge).then(() => {
                 return this.isPurchasingCommandReady(nativeBridge, iapPayload);

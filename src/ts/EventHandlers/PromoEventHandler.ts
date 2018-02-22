@@ -14,7 +14,7 @@ export class PromoEventHandler {
             request: IPromoRequest.CLOSE,
             purchaseTrackingUrls: purchaseTrackingUrls,
         };
-        PurchasingUtilities.startPurchaseEvent(nativeBridge, JSON.stringify(iapPayload));
+        PurchasingUtilities.beginPurchaseEvent(nativeBridge, JSON.stringify(iapPayload));
     }
 
     public static onPromo(nativeBridge: NativeBridge, adUnit: PromoAdUnit, iapProductId: string, purchaseTrackingUrls: string[]): void {
@@ -26,6 +26,6 @@ export class PromoEventHandler {
             request: IPromoRequest.PURCHASE,
             purchaseTrackingUrls: purchaseTrackingUrls,
         };
-        PurchasingUtilities.startPurchaseEvent(nativeBridge, JSON.stringify(iapPayload));
+        PurchasingUtilities.beginPurchaseEvent(nativeBridge, JSON.stringify(iapPayload));
     }
 }
