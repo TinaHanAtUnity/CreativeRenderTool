@@ -164,7 +164,7 @@ export class WebView {
 
             PurchasingUtilities.setConfiguration(this._configuration);
             PurchasingUtilities.setClientInfo(this._clientInfo);
-            PurchasingUtilities.sendInitializationCommand(this._nativeBridge);
+            PurchasingUtilities.sendPurchaseInitializationEvent(this._nativeBridge);
 
             if (!this._configuration.isEnabled()) {
                 const error = new Error('Game with ID ' + this._clientInfo.getGameId() +  ' is not enabled');
@@ -314,7 +314,7 @@ export class WebView {
             this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());
 
             if(this._nativeBridge.getPlatform() === Platform.IOS && (campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign)) {
-                if(!IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion()) && !campaign.getBypassAppSheet()) {
+                if(!IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion(), this._deviceInfo.getModel()) && !campaign.getBypassAppSheet()) {
                     const appSheetOptions = {
                         id: parseInt(campaign.getAppStoreId(), 10)
                     };

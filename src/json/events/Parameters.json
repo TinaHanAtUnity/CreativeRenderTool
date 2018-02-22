@@ -287,6 +287,13 @@
     "platforms": "all"
   },
   {
+    "key": "screenScale",
+    "type": "number",
+    "description": "Screen scale factor",
+    "provider": "SDK",
+    "platforms": "ios"
+  },
+  {
     "key": "screenSize",
     "type": "number",
     "description": "Android raw screen layout value",

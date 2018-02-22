@@ -119,10 +119,10 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
             this.handleClickAttribution(parameters);
 
             if(!parameters.clickAttributionUrlFollowsRedirects) {
-                this.openAppStore(parameters, IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion()));
+                this.openAppStore(parameters, IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion(), this._deviceInfo.getModel()));
             }
         } else {
-            this.openAppStore(parameters, IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion()));
+            this.openAppStore(parameters, IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion(), this._deviceInfo.getModel()));
         }
     }
 

@@ -226,12 +226,13 @@
                     return window.getVPAIDAd;
                 };
 
-                this._handleEvent = function(eventType) {
-                    var args = [eventType];
-                    if (arguments.length > 1) {
-                        args.push(arguments[1]);
-                    }
-                    window.nativebridge.sendEvent('VPAID', args);
+                this._handleEvent = function() {
+                    var args = Array.prototype.slice.call(arguments);
+                    var eventType = args.shift();
+                    var eventData = [eventType];
+                    eventData.push(args);
+
+                    window.nativebridge.sendEvent('VPAID', eventData);
                     console.log('unity', 'Got VPAID event', eventType);
                 };
 

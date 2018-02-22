@@ -42,7 +42,7 @@ describe('PromoEventHandlersTest', () => {
         it('should hide adunit', () => {
             promoAdUnit = sinon.createStubInstance(PromoAdUnit);
 
-            PromoEventHandler.onClose(nativeBridge, promoAdUnit, '111', '111', 1, [purchaseTrackingUrls], 'close');
+            PromoEventHandler.onClose(nativeBridge, promoAdUnit, '111', '111', 1, [purchaseTrackingUrls]);
             sinon.assert.called(<sinon.SinonSpy>promoAdUnit.hide);
         });
     });
@@ -51,19 +51,19 @@ describe('PromoEventHandlersTest', () => {
         it('should hide adunit', () => {
             promoAdUnit = sinon.createStubInstance(PromoAdUnit);
 
-            PromoEventHandler.onClose(nativeBridge, promoAdUnit, '111', '111', 1, [purchaseTrackingUrls], 'close');
+            PromoEventHandler.onClose(nativeBridge, promoAdUnit, '111', '111', 1, [purchaseTrackingUrls]);
             sinon.assert.called(<sinon.SinonSpy>promoAdUnit.hide);
         });
 
-        it('should call initiatePurchaseRequest', () => {
+        it('should call startPurchaseEvent', () => {
             const promoView = <Promo><any> {
                 hide: sinon.spy()
             };
             promoAdUnit = sinon.createStubInstance(PromoAdUnit);
-            sinon.stub(PurchasingUtilities, 'initiatePurchaseRequest');
+            sinon.stub(PurchasingUtilities, 'beginPurchaseEvent');
 
-            PromoEventHandler.onPromo(nativeBridge, promoAdUnit, 'com.unit.test.iapproductid', [purchaseTrackingUrls], 'purchase');
-            sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.initiatePurchaseRequest);
+            PromoEventHandler.onPromo(nativeBridge, promoAdUnit, 'com.unit.test.iapproductid', [purchaseTrackingUrls]);
+            sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.beginPurchaseEvent);
         });
     });
 });
