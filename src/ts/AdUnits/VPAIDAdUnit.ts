@@ -88,7 +88,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     }
 
     public openUrl(url: string | null) {
-        if (url && Url.isProtocolWhitelisted(url)) {
+        if (url) {
             if (this._nativeBridge.getPlatform() === Platform.IOS) {
                 this._nativeBridge.UrlScheme.open(url);
             } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
