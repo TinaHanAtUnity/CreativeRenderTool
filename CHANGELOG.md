@@ -1,3 +1,15 @@
+# Staged
+
+* Purchasing utilities cleanup
+* Disable app sheet on iPhone iOS 11
+* Fix orientation issues for Promo Android
+* Display ads: fixed ABT-373 and ABT-374 Cleanups, simplification of adunit.
+* Fix the view rendering and add system interrupt observer for iOS foreground and background events to VPAIDAdUnit
+* VPAID container fixes
+* Fix hybrid tests & disable 2 broken PurchasingUtilities tests
+* Add iOS screenScale to ad request query parameters
+* Fix missing MOAT stylesheet 
+
 # Thu Feb 22 08:57:26 UTC 2018
 
 * Preparations for new double webview APIs in 2.2.0 release
