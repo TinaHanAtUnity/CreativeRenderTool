@@ -85,7 +85,7 @@ describe('PurchasingUtilitiesTest', () => {
     describe('Checking version', () => {
         describe('with a correctly formatted string', () =>  {
             it('should pass', () => {
-                (<sinon.SinonStub>purchasing.initializePromo).callsFake(() => {
+                (<sinon.SinonStub>purchasing.initializePurchasing).callsFake(() => {
                     purchasing.onInitialize.trigger('True');
                     return Promise.resolve(true);
                 });
@@ -98,7 +98,7 @@ describe('PurchasingUtilitiesTest', () => {
             });
 
             it('should fail', () => {
-                (<sinon.SinonStub>purchasing.initializePromo).callsFake(() => {
+                (<sinon.SinonStub>purchasing.initializePurchasing).callsFake(() => {
                     purchasing.onInitialize.trigger('True');
                     return Promise.resolve(true);
                 });
@@ -113,7 +113,7 @@ describe('PurchasingUtilitiesTest', () => {
 
         describe('with an incorrectly formatted/empty string', () =>  {
             it('should fail', () => {
-                (<sinon.SinonStub>purchasing.initializePromo).callsFake(() => {
+                (<sinon.SinonStub>purchasing.initializePurchasing).callsFake(() => {
                     purchasing.onInitialize.trigger('True');
                     return Promise.resolve(true);
                 });
@@ -126,7 +126,7 @@ describe('PurchasingUtilitiesTest', () => {
             });
 
             it('should fail', () => {
-                (<sinon.SinonStub>purchasing.initializePromo).callsFake(() => {
+                (<sinon.SinonStub>purchasing.initializePurchasing).callsFake(() => {
                     purchasing.onInitialize.trigger('True');
                     return Promise.resolve(true);
                 });
@@ -146,11 +146,11 @@ describe('PurchasingUtilitiesTest', () => {
                 describe('With a good command request', () => {
 
                     it('should resolve', () => {
-                        (<sinon.SinonStub>purchasing.initializePromo).callsFake(() => {
+                        (<sinon.SinonStub>purchasing.initializePurchasing).callsFake(() => {
                             purchasing.onInitialize.trigger('True');
                             return Promise.resolve(true);
                         });
-                        (<sinon.SinonStub>purchasing.sendPurchasingCommand).callsFake(() => {
+                        (<sinon.SinonStub>purchasing.initiatePurchasingCommand).callsFake(() => {
                             purchasing.onCommandResult.trigger('True');
                             return Promise.resolve();
                         });
@@ -161,11 +161,11 @@ describe('PurchasingUtilitiesTest', () => {
 
                 describe('With a bad command request', () => {
                     it('should fail', () => {
-                        (<sinon.SinonStub>purchasing.initializePromo).callsFake(() => {
+                        (<sinon.SinonStub>purchasing.initializePurchasing).callsFake(() => {
                             purchasing.onInitialize.trigger('True');
                             return Promise.resolve(true);
                         });
-                        (<sinon.SinonStub>purchasing.sendPurchasingCommand).callsFake(() => {
+                        (<sinon.SinonStub>purchasing.initiatePurchasingCommand).callsFake(() => {
                             purchasing.onCommandResult.trigger('False');
                             return Promise.reject('False');
                         });
@@ -179,7 +179,7 @@ describe('PurchasingUtilitiesTest', () => {
 
             describe('And promo is not ready', () => {
                 it('should fail', () => {
-                    (<sinon.SinonStub>purchasing.initializePromo).callsFake(() => {
+                    (<sinon.SinonStub>purchasing.initializePurchasing).callsFake(() => {
                         purchasing.onInitialize.trigger('False');
                         return Promise.resolve();
                     });

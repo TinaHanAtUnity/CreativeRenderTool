@@ -20,7 +20,7 @@ export class PurchasingApi extends NativeApi {
         super(nativeBridge, 'Purchasing');
     }
 
-    public initializePromo(): Promise<void> {
+    public initializePurchasing(): Promise<void> {
         return this._nativeBridge.invoke<void>(this._apiClass, 'initializePurchasing');
     }
 
@@ -32,11 +32,7 @@ export class PurchasingApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._apiClass, 'getPromoCatalog');
     }
 
-    public initializePurchasingParameters(event: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'initiatePurchasingCommand', [event]);
-    }
-
-    public sendPurchasingCommand(event: string): Promise<void> {
+    public initiatePurchasingCommand(event: string): Promise<void> {
         return this._nativeBridge.invoke<void>(this._apiClass, 'initiatePurchasingCommand', [event]);
     }
 

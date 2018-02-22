@@ -73,7 +73,7 @@ export class PurchasingUtilities {
                 }
                 resolve(isReady === 'True');
             });
-            nativeBridge.Purchasing.initializePromo().catch(() => {
+            nativeBridge.Purchasing.initializePurchasing().catch(() => {
                 nativeBridge.Purchasing.onInitialize.unsubscribe(observer);
                 reject(this.logIssue(nativeBridge, 'purchase_initilization_failed', 'Purchase initialization failed'));
             });
@@ -107,7 +107,7 @@ export class PurchasingUtilities {
                         resolve();
                     }
                 });
-                nativeBridge.Purchasing.initializePurchasingParameters(JSON.stringify(this.loadInitializationPayloads())).catch(() => {
+                nativeBridge.Purchasing.initiatePurchasingCommand(JSON.stringify(this.loadInitializationPayloads())).catch(() => {
                     nativeBridge.Purchasing.onCommandResult.unsubscribe(observer);
                     reject(this.logIssue(nativeBridge, 'send_purchase_event_failed', 'Purchase event failed to send'));
                 });
@@ -196,7 +196,7 @@ export class PurchasingUtilities {
                         resolve();
                     }
                 });
-                nativeBridge.Purchasing.sendPurchasingCommand(iapPayload).catch(() => {
+                nativeBridge.Purchasing.initiatePurchasingCommand(iapPayload).catch(() => {
                     nativeBridge.Purchasing.onCommandResult.unsubscribe(observer);
                     reject(this.logIssue(nativeBridge, 'send_purchase_event_failed', 'Purchase event failed to send'));
                 });
