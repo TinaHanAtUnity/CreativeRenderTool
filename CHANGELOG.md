@@ -1,3 +1,7 @@
+# Staged
+
+* Fix MOAT init & closing due to bad merge
+
 # Fri Feb 23 10:27:13 UTC 2018
 
 * Purchasing utilities cleanup
