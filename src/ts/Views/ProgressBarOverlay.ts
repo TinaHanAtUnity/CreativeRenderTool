@@ -304,7 +304,7 @@ export class ProgressBarOverlay extends AbstractOverlay {
 
     private setCssTransition(): void {
         const transitionRule = `width ${(this._videoDuration - this._videoProgress) / 1000}s linear`;
-        console.warn('SETTING NEW TRANSITION', transitionRule);
+        // console.warn('SETTING NEW TRANSITION', transitionRule);
         this._progressElement.style.transition = transitionRule;
         this._progressElement.style.webkitTransition = transitionRule;
     }
