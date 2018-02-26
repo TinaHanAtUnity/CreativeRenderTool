@@ -265,6 +265,21 @@
       height: calc(100% - constant(safe-area-inset-bottom));
       height: calc(100% - env(safe-area-inset-bottom));
     }
+
+    #progress-bar-overlay {
+      bottom: constant(safe-area-inset-bottom);
+      bottom: env(safe-area-inset-bottom);
+
+      .progress {
+        bottom: constant(safe-area-inset-bottom);
+        bottom: env(safe-area-inset-bottom);
+      }
+
+      .timer {
+        bottom: calc(constant(safe-area-inset-bottom) + .25rem);
+        bottom: calc(env(safe-area-inset-bottom) + .25rem);
+      }
+    }
   }
 
   body.portrait {
