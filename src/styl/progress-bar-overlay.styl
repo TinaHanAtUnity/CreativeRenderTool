@@ -26,7 +26,7 @@ $progress-bar-color = #05bbd3;
 
   .mute-button {
     position: absolute;
-    top: $progress-bar-overlay-size * .5;
+    top: 0;
     left: 0;
     width: 70px;
     height: 55px;
@@ -34,6 +34,7 @@ $progress-bar-color = #05bbd3;
     .mute-icon,
     .unmute-icon {
       position: absolute;
+      top: $progress-bar-overlay-size * .5;
       padding: $progress-bar-overlay-size * .25 $progress-bar-overlay-size * .5;
       height: 27px;
       font-size: $progress-bar-overlay-font-size;
@@ -52,6 +53,11 @@ $progress-bar-color = #05bbd3;
         display: block;
       }
     }
+  }
+
+  .icon-volume-mute,
+  .icon-volume {
+    vertical-align: sub;
   }
 
   .call-button {
@@ -122,11 +128,10 @@ $progress-bar-color = #05bbd3;
     will-change: width;
   }
 
-    //left: 0;
   .timer {
     position: absolute;
-    right: 0;
     bottom: $progress-bar-overlay-size * .25;
+    left: 0;
     padding: $progress-bar-overlay-size * .25 $progress-bar-overlay-size * .5;
     text-align: center;
     font-size: $progress-bar-overlay-font-size * .75;
@@ -154,11 +159,22 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
   transition: transform $duration $function;
 }
 
-.slide-up {
+slide-animation($duration = .4s, $function = ease-in, $translation = 0, $right = false) {
+
+  transform: translateX($translation);
+
+  if($right) {
+    transform: translateX($translation * -1);
+  }
+
+  transition: transform $duration $function;
+}
+
+.slide-left {
   slide-animation(.4s, ease-in, -150%);
 }
 
-.slide-down {
+.slide-right {
   slide-animation(.4s, ease-in, 150%);
 }
 
