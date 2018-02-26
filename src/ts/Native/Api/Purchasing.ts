@@ -20,7 +20,7 @@ export class PurchasingApi extends NativeApi {
         super(nativeBridge, 'Purchasing');
     }
 
-    public initialize(): Promise<void> {
+    public initializePurchasing(): Promise<void> {
         return this._nativeBridge.invoke<void>(this._apiClass, 'initializePurchasing');
     }
 

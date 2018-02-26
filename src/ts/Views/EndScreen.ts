@@ -9,6 +9,7 @@ import { Localization } from 'Utilities/Localization';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { Campaign } from 'Models/Campaign';
 import { IEndScreenDownloadParameters } from 'EventHandlers/EndScreenEventHandler';
+import { AdUnitStyle } from 'Models/AdUnitStyle';
 
 export interface IEndScreenHandler {
     onEndScreenDownload(parameters: IEndScreenDownloadParameters): void;
@@ -22,18 +23,20 @@ const lunarEndScreenId = "lunar-end-screen";
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
 
     protected _localization: Localization;
+    protected _adUnitStyle?: AdUnitStyle;
     private _coppaCompliant: boolean;
     private _gameName: string | undefined;
     private _privacy: Privacy;
     private _isSwipeToCloseEnabled: boolean = false;
     private _abGroup: number;
 
-    constructor(nativeBridge: NativeBridge, coppaCompliant: boolean, language: string, gameId: string, gameName: string | undefined, abGroup: number) {
+    constructor(nativeBridge: NativeBridge, coppaCompliant: boolean, language: string, gameId: string, gameName: string | undefined, abGroup: number, adUnitStyle?: AdUnitStyle) {
         super(nativeBridge, 'end-screen');
         this._coppaCompliant = coppaCompliant;
         this._localization = new Localization(language, 'endscreen');
         this._abGroup = abGroup;
         this._gameName = gameName;
+        this._adUnitStyle = adUnitStyle;
 
         if (this.getEndscreenAlt() === lunarEndScreenId) {
             this._template = new Template(LunarEndScreen, this._localization);
@@ -81,6 +84,11 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
         if (this._isSwipeToCloseEnabled) {
             (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';
+        }
+
+        const ctaButtonColor = this._adUnitStyle && this._adUnitStyle.getCTAButtonColor() ? this._adUnitStyle.getCTAButtonColor() : undefined;
+        if (ctaButtonColor && !this.getEndscreenAlt()) {
+            (<HTMLElement>this._container.querySelector('.download-container')).style.background = ctaButtonColor;
         }
 
         const endScreenAlt = this.getEndscreenAlt();
@@ -137,7 +145,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     protected getEndscreenAlt(campaign?: Campaign) {
-        if(this._abGroup === 5) {
+        if(this._abGroup === 5 || this._abGroup === 8 || this._abGroup === 10) {
             return undefined;
         }
 

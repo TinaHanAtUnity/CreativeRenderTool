@@ -162,18 +162,9 @@ export class WebView {
             this._configuration = configuration;
             HttpKafka.setConfiguration(this._configuration);
 
-            PurchasingUtilities.checkPromoVersion(this._nativeBridge).then(valid => {
-                if(valid) {
-                    const iapPayload = {
-                        gamerId: this._configuration.getGamerId(),
-                        iapPromo: true,
-                        abGroup: this._configuration.getAbGroup(),
-                        gameId: this._clientInfo.getGameId(),
-                        request: "setids"
-                    };
-                    PurchasingUtilities.initiatePurchaseRequest(this._nativeBridge, JSON.stringify(iapPayload));
-                }
-            });
+            PurchasingUtilities.setConfiguration(this._configuration);
+            PurchasingUtilities.setClientInfo(this._clientInfo);
+            PurchasingUtilities.sendPurchaseInitializationEvent(this._nativeBridge);
 
             if (!this._configuration.isEnabled()) {
                 const error = new Error('Game with ID ' + this._clientInfo.getGameId() +  ' is not enabled');
@@ -323,7 +314,7 @@ export class WebView {
             this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());
 
             if(this._nativeBridge.getPlatform() === Platform.IOS && (campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign)) {
-                if(!IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion()) && !campaign.getBypassAppSheet()) {
+                if(!IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion(), this._deviceInfo.getModel()) && !campaign.getBypassAppSheet()) {
                     const appSheetOptions = {
                         id: parseInt(campaign.getAppStoreId(), 10)
                     };
