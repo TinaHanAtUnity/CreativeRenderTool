@@ -246,6 +246,18 @@
         bottom: env(safe-area-inset-bottom);
       }
     }
+
+    #progress-bar-overlay {
+      .progress {
+        bottom: constant(safe-area-inset-bottom);
+        bottom: env(safe-area-inset-bottom);
+      }
+
+      .timer {
+        bottom: calc(constant(safe-area-inset-bottom) + .25rem);
+        bottom: calc(env(safe-area-inset-bottom) + .25rem);
+      }
+    }
   }
   .slide-up {
     slide-animation(.4s, ease-in, -250%);
@@ -260,32 +272,22 @@
     bottom: calc(env(safe-area-inset-bottom));
   }
 
-  body.landscape {
-    #end-screen.lunar-end-screen .background-underlay {
-      height: calc(100% - constant(safe-area-inset-bottom));
-      height: calc(100% - env(safe-area-inset-bottom));
-    }
-
-    #progress-bar-overlay {
-      bottom: constant(safe-area-inset-bottom);
-      bottom: env(safe-area-inset-bottom);
-
-      .progress {
-        bottom: constant(safe-area-inset-bottom);
-        bottom: env(safe-area-inset-bottom);
-      }
-
-      .timer {
-        bottom: calc(constant(safe-area-inset-bottom) + .25rem);
-        bottom: calc(env(safe-area-inset-bottom) + .25rem);
-      }
-    }
-  }
-
   body.portrait {
     #end-screen.lunar-end-screen .background-underlay {
       height: calc(49.4% - constant(safe-area-inset-bottom));
       height: calc(49.4% - env(safe-area-inset-bottom));
+    }
+
+    #progress-bar-overlay {
+      .mute-button {
+        top: constant(safe-area-inset-top);
+        top: env(safe-area-inset-top);
+      }
+
+      .skip-hit-area {
+        top: calc(constant(safe-area-inset-top) + .5rem);
+        top: calc(env(safe-area-inset-top) + .5rem);
+      }
     }
   }
 }
