@@ -1,19 +1,19 @@
 export class Purchasing {
 
     public static initializePurchasing() {
-        // not implemented
+        return;
     }
 
     public static getPromoVersion() {
-        // not implemented
+        return;
     }
 
     public static getPromoCatalog() {
-        // not implemented
+        return;
     }
 
     public static initiatePurchasingCommand(event: string) {
-        // not implemented
+        return;
     }
 
 }
