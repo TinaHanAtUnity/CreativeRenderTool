@@ -81,12 +81,6 @@ export class ProgressBarOverlay extends AbstractOverlay {
             });
         }
 
-        // /* DO MUTE */
-        setTimeout(() => {
-            this._muted = true;
-            this._handlers.forEach(handler => handler.onOverlayMute(this._muted));
-        }, 200);
-
     }
 
     public render(): void {
