@@ -7,5 +7,4 @@ export interface IViewBinding {
     listener: (event: Event) => void;
     tap?: Tap;
     swipe?: Swipe;
-    ignoreLength?: boolean;
 }
