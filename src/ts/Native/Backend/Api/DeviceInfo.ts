@@ -434,6 +434,10 @@ export class DeviceInfo {
         return DeviceInfo._statusBarHidden;
     }
 
+    public static isAdbEnabled() {
+        return DeviceInfo._adbEnabled;
+    }
+
     private static _advertisingTrackingId: string = 'DA276DED-8DFE-4C57-A75E-9D7F7BBF2D21';
     private static _limitAdTrackingFlag: boolean = true;
     private static _osVersion: string = '10.1.1';
@@ -486,6 +490,7 @@ export class DeviceInfo {
     private static _elapsedRealtime: number = 10000;
     private static _statusBarWidth: number = 0;
     private static _statusBarHidden: boolean = true;
+    private static _adbEnabled = false;
 
     private static getGuid() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (char) => {
