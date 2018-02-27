@@ -374,8 +374,10 @@ export class Cache {
                         fileId = this._callbacks[callback.originalUrl].fileId;
                         originalUrl = callback.originalUrl;
                     }
-                    this.registerCallback(location, fileId, false, callback.diagnostics, callback.session, originalUrl);
-                    this.downloadFile(location, fileId);
+                    this._nativeBridge.Cache.deleteFile(fileId).then( () => {
+                        this.downloadFile(location, fileId);
+                        this.registerCallback(location, fileId, false, callback.diagnostics, callback.session, originalUrl);
+                    });
                     return;
                 }
             } else if(responseCode === 416) {
@@ -400,7 +402,6 @@ export class Cache {
             if(size > 0) {
                 this._nativeBridge.Cache.deleteFile(callback.fileId);
             }
-
             this.fulfillCallback(url, CacheStatus.FAILED);
         }
     }
