@@ -1,28 +1,26 @@
 import { BatteryStatus } from 'Constants/Android/BatteryStatus';
 import { RingerMode } from 'Constants/Android/RingerMode';
 import { Platform } from 'Constants/Platform';
-import { UIUserInterfaceIdiom } from 'Constants/iOS/UIUserInterfaceIdiom';
-import { DeviceInfo } from 'Models/DeviceInfo';
 import { NativeBridge } from 'Native/NativeBridge';
-import AndroidDefaults from 'json/FakeAndroidDeviceInfo.json';
-import IosDefaults from 'json/FakeIosDeviceInfo.json';
+import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 
-export class FakeDeviceInfo extends DeviceInfo {
+import AndroidDefaults from 'json/FakeAndroidDeviceInfo.json';
+
+export class FakeAndroidDeviceInfo extends AndroidDeviceInfo {
     private _platform: Platform;
     private _fakeDevice: any;
 
-    constructor(nativeBridge: NativeBridge, platform: Platform) {
+    constructor(nativeBridge: NativeBridge) {
         super(nativeBridge);
-        this._platform = platform;
-        if(platform === Platform.IOS) {
-            this._fakeDevice = JSON.parse(IosDefaults);
-        } else {
-            this._fakeDevice = JSON.parse(AndroidDefaults);
-        }
+        this._fakeDevice = JSON.parse(AndroidDefaults);
     }
 
     public fetch(): Promise<any[]> {
         return Promise.resolve(<any>void(0));
+    }
+
+    public getStores(): string {
+        return 'xiaomi,google';
     }
 
     public getAndroidId(): string {
@@ -81,14 +79,6 @@ export class FakeDeviceInfo extends DeviceInfo {
         return Promise.resolve(this._fakeDevice.screenHeight);
     }
 
-    public getScreenScale(): number {
-        return this._fakeDevice.screenScale;
-    }
-
-    public getUserInterfaceIdiom(): UIUserInterfaceIdiom {
-        return this._fakeDevice.userInterfaceIdiom;
-    }
-
     public isRooted(): boolean {
         return this._fakeDevice.rooted;
     }
@@ -119,10 +109,6 @@ export class FakeDeviceInfo extends DeviceInfo {
 
     public getLanguage(): string {
         return this._fakeDevice.language;
-    }
-
-    public isSimulator(): boolean {
-        return this._fakeDevice.simulator;
     }
 
     public getHeadset(): Promise<boolean> {

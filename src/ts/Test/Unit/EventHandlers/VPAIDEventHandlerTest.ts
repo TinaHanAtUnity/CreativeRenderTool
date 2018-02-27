@@ -1,15 +1,11 @@
 import 'mocha';
 import * as sinon from 'sinon';
-import { assert } from 'chai';
 
 import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'AdUnits/VPAIDAdUnit';
 import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
-import { VPAIDParser } from 'Utilities/VPAIDParser';
 import { VPAID } from 'Views/VPAID';
-import { VPAID as VPAIDModel } from 'Models/VPAID/VPAID';
 import { NativeBridge } from 'Native/NativeBridge';
-import { ForceOrientation, AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
-import { Placement } from 'Models/Placement';
+import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { Platform } from 'Constants/Platform';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
@@ -18,15 +14,8 @@ import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { FocusManager } from 'Managers/FocusManager';
 import { Request } from 'Utilities/Request';
-import { WakeUpManager } from 'Managers/WakeUpManager';
-import { Overlay } from 'Views/Overlay';
 import { VPAIDEventHandler } from 'EventHandlers/VPAIDEventHandler';
 import { FinishState } from 'Constants/FinishState';
-import { SessionManager } from 'Managers/SessionManager';
-import { MetaDataManager } from 'Managers/MetaDataManager';
-
-import VPAIDTestXML from 'xml/VPAID.xml';
-import VPAIDCampaignJson from 'json/OnProgrammaticVPAIDCampaign.json';
 import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';

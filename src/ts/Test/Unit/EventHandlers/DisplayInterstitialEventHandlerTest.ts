@@ -55,11 +55,11 @@ describe('DisplayInterstitialEventHandler', () => {
 
             sandbox.stub(nativeBridge, 'getApiLevel').returns(16);
 
-            const container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+            const container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
             const focusManager = sinon.createStubInstance(FocusManager);
             const request = sinon.createStubInstance(Request);
             const clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-            const deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
+            const deviceInfo = TestFixtures.getAndroidDeviceInfo();
             const thirdPartyEventManager = sinon.createStubInstance(ThirdPartyEventManager);
             operativeEventManager = sinon.createStubInstance(OperativeEventManager);
             comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);

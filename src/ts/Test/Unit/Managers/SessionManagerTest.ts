@@ -10,12 +10,12 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 import { Platform } from 'Constants/Platform';
 import { SessionManager } from 'Managers/SessionManager';
 import { MetaDataManager } from 'Managers/MetaDataManager';
+import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 
 class TestStorageApi extends StorageApi {
 
@@ -166,7 +166,7 @@ describe('SessionManagerTest', () => {
     let requestApi: TestRequestApi;
     let focusManager: FocusManager;
     let operativeEventManager: OperativeEventManager;
-    let deviceInfo: DeviceInfo;
+    let deviceInfo: AndroidDeviceInfo;
     let clientInfo: ClientInfo;
     let thirdPartyEventManager: ThirdPartyEventManager;
     let request: Request;
@@ -188,7 +188,7 @@ describe('SessionManagerTest', () => {
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-        deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
+        deviceInfo = TestFixtures.getAndroidDeviceInfo();
 
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         sessionManager = new SessionManager(nativeBridge);

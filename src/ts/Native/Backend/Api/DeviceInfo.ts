@@ -1,4 +1,4 @@
-import { DeviceInfo as RealDeviceInfo } from 'Models/DeviceInfo';
+import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 
 export class DeviceInfo {
 
@@ -128,6 +128,82 @@ export class DeviceInfo {
 
     public static setStatusBarHeight(value: number) {
         DeviceInfo._statusBarHeight = value;
+    }
+
+    public static setCPUCount(count: number) {
+        DeviceInfo._cpuCount = count;
+    }
+
+    public static setGLVersion(version: string) {
+        DeviceInfo._glVersion = version;
+    }
+
+    public static setApkDigest(digest: string) {
+        DeviceInfo._apkDigest = digest;
+    }
+
+    public static setCertificateFingerprint(fingerPrint: string) {
+        DeviceInfo._certificateFingerprint = fingerPrint;
+    }
+
+    public static setBoard(board: string) {
+        DeviceInfo._board = board;
+    }
+
+    public static setBootloader(bootLoader: string) {
+        DeviceInfo._bootLoader = bootLoader;
+    }
+
+    public static setBrand(brand: string) {
+        DeviceInfo._brand = brand;
+    }
+
+    public static setDevice(device: string) {
+        DeviceInfo._device = device;
+    }
+
+    public static setHardware(hardware: string) {
+        DeviceInfo._hardware = hardware;
+    }
+
+    public static setHost(host: string) {
+        DeviceInfo._host = host;
+    }
+
+    public static setProduct(product: string) {
+        DeviceInfo._product = product;
+    }
+
+    public static setFingerprint(fingerPrint: string) {
+        DeviceInfo._fingerPrint = fingerPrint;
+    }
+
+    public static setSupportedAbis(supportedAbis: string[]) {
+        DeviceInfo._supportedAbis = supportedAbis;
+    }
+
+    public static setSensorList(sensorList: object[]) {
+        DeviceInfo._sensorList = sensorList;
+    }
+
+    public static setIsUSBConnected(connected: boolean) {
+        DeviceInfo._usbConnected = connected;
+    }
+
+    public static setUptime(upTime: number) {
+        DeviceInfo._upTime = upTime;
+    }
+
+    public static setElapsedRealtime(realtime: number) {
+        DeviceInfo._elapsedRealtime = realtime;
+    }
+
+    public static setStatusBarWidth(width: number) {
+        DeviceInfo._statusBarWidth = width;
+    }
+
+    public static setIsStatusBarHidden(hidden: boolean) {
+        DeviceInfo._statusBarHidden = hidden;
     }
 
     public static getAdvertisingTrackingId() {
@@ -275,15 +351,87 @@ export class DeviceInfo {
     }
 
     public static isAppInstalled(packageName: string) {
-        return packageName === RealDeviceInfo.GooglePlayPackageName;
+        return packageName === AndroidDeviceInfo.GooglePlayPackageName;
     }
 
     public static getStatusBarHeight() {
         return DeviceInfo._statusBarHeight;
     }
 
-    public static getDevice(): string {
+    public static getCPUCount() {
+        return DeviceInfo._cpuCount;
+    }
+
+    public static getGLVersion() {
+        return DeviceInfo._glVersion;
+    }
+
+    public static getApkDigest() {
+        return DeviceInfo._apkDigest;
+    }
+
+    public static getCertificateFingerprint() {
+        return DeviceInfo._certificateFingerprint;
+    }
+
+    public static getBoard() {
+        return DeviceInfo._board;
+    }
+
+    public static getBootloader() {
+        return DeviceInfo._bootLoader;
+    }
+
+    public static getBrand() {
+        return DeviceInfo._brand;
+    }
+
+    public static getDevice() {
         return DeviceInfo._device;
+    }
+
+    public static getHardware() {
+        return DeviceInfo._hardware;
+    }
+
+    public static getHost() {
+        return DeviceInfo._host;
+    }
+
+    public static getProduct() {
+        return DeviceInfo._product;
+    }
+
+    public static getFingerprint() {
+        return DeviceInfo._fingerPrint;
+    }
+
+    public static getSupportedAbis() {
+        return DeviceInfo._supportedAbis;
+    }
+
+    public static getSensorList() {
+        return DeviceInfo._sensorList;
+    }
+
+    public static isUSBConnected() {
+        return DeviceInfo._usbConnected;
+    }
+
+    public static getUptime() {
+        return DeviceInfo._upTime;
+    }
+
+    public static getElapsedRealtime() {
+        return DeviceInfo._elapsedRealtime;
+    }
+
+    public static getStatusBarWidth() {
+        return DeviceInfo._statusBarWidth;
+    }
+
+    public static isStatusBarHidden() {
+        return DeviceInfo._statusBarHidden;
     }
 
     private static _advertisingTrackingId: string = 'DA276DED-8DFE-4C57-A75E-9D7F7BBF2D21';
@@ -319,7 +467,25 @@ export class DeviceInfo {
     private static _simulator: boolean = false;
     private static _statusBarHeight: number = 0;
     private static _maxVolume: number = 1;
-    private static _device: string = 'GT-I9000';
+    private static _cpuCount: number = 1;
+    private static _glVersion: string = '2.0';
+    private static _apkDigest: string = 'apkDigest';
+    private static _certificateFingerprint: string = 'certificateFingerprint';
+    private static _board: string = 'board';
+    private static _bootLoader: string = 'bootLoader';
+    private static _brand: string = 'brand';
+    private static _device: string = 'device';
+    private static _hardware: string = 'hardware';
+    private static _host: string = 'host';
+    private static _product: string = 'product';
+    private static _fingerPrint: string = 'fingerPrint';
+    private static _supportedAbis: string[] = ['supported_abi_1', 'supported_abi_2'];
+    private static _sensorList: object[] = [];
+    private static _usbConnected: boolean = false;
+    private static _upTime: number = 10000;
+    private static _elapsedRealtime: number = 10000;
+    private static _statusBarWidth: number = 0;
+    private static _statusBarHidden: boolean = true;
 
     private static getGuid() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (char) => {
