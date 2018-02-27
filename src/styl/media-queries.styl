@@ -266,6 +266,10 @@
         right: env(safe-area-inset-right);
       }
 
+      .call-button {
+        right: constant(safe-area-inset-right);
+        right: env(safe-area-inset-right);
+      }
     }
   }
   .slide-up {
@@ -294,6 +298,11 @@
       .timer {
         bottom: calc(constant(safe-area-inset-bottom) + .25rem);
         bottom: calc(env(safe-area-inset-bottom) + .25rem);
+      }
+
+      .call-button {
+        bottom: calc(constant(safe-area-inset-bottom) * 2);
+        bottom: calc(env(safe-area-inset-bottom) * 2);
       }
     }
   }
