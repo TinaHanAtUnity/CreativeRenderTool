@@ -13,6 +13,7 @@ import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { IWebPlayerWebSettingsAndroid, IWebPlayerWebSettingsIos } from "Native/Api/WebPlayer";
 import { Url } from 'Utilities/Url';
+import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 
 export interface IDisplayInterstitialAdUnitParameters extends IAdUnitParameters<DisplayInterstitialCampaign> {
     view: DisplayInterstitial;
@@ -120,11 +121,14 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
                 this.hide();
             }, AbstractAdUnit.getAutoCloseDelay());
         }
-        Promise.all([
+        const promises = [
             this._deviceInfo.getScreenWidth(),
-            this._deviceInfo.getScreenHeight(),
-            this._deviceInfo.getScreenDensity()
-        ]).then(([screenWidth, screenHeight, screenDensity]) => {
+            this._deviceInfo.getScreenHeight()
+        ];
+        if(this._deviceInfo instanceof AndroidDeviceInfo) {
+            promises.push(Promise.resolve(this._deviceInfo.getScreenDensity()));
+        }
+        Promise.all(promises).then(([screenWidth, screenHeight, screenDensity]) => {
             let webviewAreaSize = Math.max( Math.min(screenWidth, screenHeight) * this._closeAreaMinRatio, this._closeAreaMinPixels );
             if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
                 webviewAreaSize = this.getAndroidViewSize(webviewAreaSize, screenDensity);

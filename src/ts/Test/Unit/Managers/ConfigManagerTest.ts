@@ -81,7 +81,7 @@ describe('ConfigManagerTest', () => {
         });
 
         it('calling fetch should return configuration', () => {
-            ConfigManager.fetch(nativeBridge, requestMock, TestFixtures.getClientInfo(), TestFixtures.getDeviceInfo(), metaDataManager);
+            ConfigManager.fetch(nativeBridge, requestMock, TestFixtures.getClientInfo(), TestFixtures.getAndroidDeviceInfo(), metaDataManager);
 
             return configPromise.then((configuration) => {
                 assert.isNotNull(configuration);
@@ -106,7 +106,7 @@ describe('ConfigManagerTest', () => {
         });
 
         it('calling fetch should return error', () => {
-            return ConfigManager.fetch(nativeBridge, requestMock, TestFixtures.getClientInfo(), TestFixtures.getDeviceInfo(), metaDataManager).then(() => {
+            return ConfigManager.fetch(nativeBridge, requestMock, TestFixtures.getClientInfo(), TestFixtures.getAndroidDeviceInfo(), metaDataManager).then(() => {
                 assert.fail('should not resolve');
             }).catch(error => {
                 assert.instanceOf(error, Error);
@@ -130,7 +130,7 @@ describe('ConfigManagerTest', () => {
         });
 
         it('calling fetch should throw ConfigError', () => {
-            return ConfigManager.fetch(nativeBridge, requestMock, TestFixtures.getClientInfo(), TestFixtures.getDeviceInfo(), metaDataManager).then(() => {
+            return ConfigManager.fetch(nativeBridge, requestMock, TestFixtures.getClientInfo(), TestFixtures.getAndroidDeviceInfo(), metaDataManager).then(() => {
                 assert.fail('should not resolve');
             }).catch(error => {
                 assert.instanceOf(error, ConfigError);
@@ -154,7 +154,7 @@ describe('ConfigManagerTest', () => {
         });
 
         it('calling fetch should throw ConfigError', () => {
-            return ConfigManager.fetch(nativeBridge, requestMock, TestFixtures.getClientInfo(), TestFixtures.getDeviceInfo(), metaDataManager).then(() => {
+            return ConfigManager.fetch(nativeBridge, requestMock, TestFixtures.getClientInfo(), TestFixtures.getAndroidDeviceInfo(), metaDataManager).then(() => {
                 assert.fail('should not resolve');
             }).catch(error => {
                 assert.instanceOf(error, DiagnosticError);

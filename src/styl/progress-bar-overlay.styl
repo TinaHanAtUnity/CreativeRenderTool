@@ -1,0 +1,210 @@
+@import "vars.styl";
+
+$progress-bar-overlay-size = $default-scale-size * $default-size;
+$progress-bar-overlay-font-size = $progress-bar-overlay-size;
+
+$progress-bar-color = #05bbd3;
+
+#progress-bar-overlay {
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+  color: $white;
+
+  .skip-hit-area {
+    position: absolute;
+    top: $progress-bar-overlay-size * .5;
+    right: 0;
+    padding: $progress-bar-overlay-size * .25 $progress-bar-overlay-size * .5;
+    font-size: $progress-bar-overlay-font-size;
+
+    .icon-skip {
+      position: relative;
+      top: $progress-bar-overlay-font-size * .2;
+    }
+  }
+
+  .mute-button {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: $progress-bar-overlay-size * 3;
+    height: $progress-bar-overlay-size * 3;
+
+    .mute-icon,
+    .unmute-icon {
+      position: absolute;
+      top: $progress-bar-overlay-size * .5;
+      padding: $progress-bar-overlay-size * .25 $progress-bar-overlay-size * .5;
+      height: $progress-bar-overlay-size * 1.125;
+      font-size: $progress-bar-overlay-font-size;
+    }
+
+    .unmute-icon {
+      display: none;
+    }
+
+    &.muted {
+      .mute-icon {
+        display: none;
+      }
+
+      .unmute-icon {
+        display: block;
+      }
+    }
+  }
+
+  .icon-volume-mute,
+  .icon-volume {
+    vertical-align: sub;
+  }
+
+  .call-button {
+    position: absolute;
+    right: 0;
+    bottom: $progress-bar-overlay-size * 2;
+    padding: $progress-bar-overlay-size * .5;
+    text-align: center;
+    font-size: $progress-bar-overlay-font-size * .75;
+  }
+
+  .buffering-spinner {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: none;
+    margin: auto;
+    width: 100px;
+    height: 65px;
+  }
+
+  .spinner-animation {
+    margin: 0 auto;
+    width: 24px;
+    height: 24px;
+    border: 4px solid $white;
+    border-right-color: transparent;
+    border-left-color: transparent;
+    border-radius: 200px;
+    animation: spinner 1s linear infinite;
+  }
+
+  .debug-message-text {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    display: none;
+  }
+
+  @keyframes spinner {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .spinner-text {
+    margin-top: 10px;
+    color: $white;
+    text-align: center;
+    text-shadow: 1px 1px $black;
+    font-weight: bold;
+  }
+
+  /* PROGRESS BAR */
+
+  .progress {
+    position: absolute;
+    bottom: 0;
+    width: 0;
+    height: $progress-bar-overlay-size * .25;
+    background-color: $progress-bar-color;
+
+    will-change: width;
+  }
+
+  .timer {
+    position: absolute;
+    bottom: $progress-bar-overlay-size * .25;
+    left: 0;
+    padding: $progress-bar-overlay-size * .25 $progress-bar-overlay-size * .5;
+    text-align: center;
+    font-size: $progress-bar-overlay-font-size * .75;
+  }
+
+  .timer,
+  .mute-icon,
+  .unmute-icon,
+  .skip-hit-area,
+  .call-button {
+    background-color: rgba(0, 0, 0, .3);
+    text-align: center;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, .8), 0 0 2px rgba(0, 0, 0, 1);
+  }
+
+}
+
+.fade {
+  opacity: 0;
+  transition: opacity .45s ease-in-out;
+}
+
+progress-slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
+  transform: translateY($translation);
+  transition: transform $duration $function;
+}
+
+progress-slide-animation($duration = .4s, $function = ease-in, $translation = 0, $right = false) {
+
+  transform: translateX($translation);
+
+  if($right) {
+    transform: translateX($translation * -1);
+  }
+
+  transition: transform $duration $function;
+}
+
+.slide-left {
+  progress-slide-animation(.4s, ease-in, -150%);
+}
+
+.slide-right {
+  progress-slide-animation(.4s, ease-in, 150%);
+}
+
+.slide-back-in-place {
+  progress-slide-animation(.2s, ease-in-out, 0);
+}
+
+@keyframes right-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(180deg);
+  }
+}
+
+@keyframes left-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes close-progress-wrapper {
+  to {
+    clip: rect(auto, auto, auto, auto);
+  }
+}
+

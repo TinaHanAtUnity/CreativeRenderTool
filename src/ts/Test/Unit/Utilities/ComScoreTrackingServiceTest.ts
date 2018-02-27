@@ -39,7 +39,7 @@ describe('ComScoreTrackingServiceTest', () => {
         focusManager = new FocusManager(nativeBridge);
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
-        deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
+        deviceInfo = TestFixtures.getAndroidDeviceInfo();
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         comscoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
         spy = sinon.spy(thirdPartyEventManager, 'sendEvent');
@@ -165,8 +165,8 @@ describe('ComScoreTrackingServiceTest', () => {
 
         it('the query parameters should return the device model', () => {
             fillComscoreParams();
-            assert.equal(queryParamsDictPlay.ns_ap_device, TestFixtures.getDeviceInfo().getModel());
-            assert.equal(queryParamsDictEnd.ns_ap_device, TestFixtures.getDeviceInfo().getModel());
+            assert.equal(queryParamsDictPlay.ns_ap_device, TestFixtures.getAndroidDeviceInfo().getModel());
+            assert.equal(queryParamsDictEnd.ns_ap_device, TestFixtures.getAndroidDeviceInfo().getModel());
         });
 
         it('the query parameters should return the video eventName', () => {

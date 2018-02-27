@@ -4,13 +4,10 @@ import * as sinon from 'sinon';
 
 import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'AdUnits/VPAIDAdUnit';
 import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
-import { VPAIDParser } from 'Utilities/VPAIDParser';
 import { VPAID } from 'Views/VPAID';
 import { NativeBridge } from 'Native/NativeBridge';
-import { ForceOrientation, AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
-import { Placement } from 'Models/Placement';
+import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
-import { AbstractOverlay } from 'Views/AbstractOverlay';
 import { FocusManager } from 'Managers/FocusManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';

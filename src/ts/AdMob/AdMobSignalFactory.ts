@@ -9,6 +9,8 @@ import { ITouchInfo } from 'Views/AFMABridge';
 import { AdMobAdUnit } from 'AdUnits/AdMobAdUnit';
 import { MotionEventAction } from 'Constants/Android/MotionEventAction';
 import { IMotionEvent } from 'Native/Api/AndroidAdUnit';
+import { IosDeviceInfo } from 'Models/IosDeviceInfo';
+import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 
 export class AdMobSignalFactory {
     private _nativeBridge: NativeBridge;
@@ -45,10 +47,10 @@ export class AdMobSignalFactory {
             signal.setTimeOnScreen(adUnit.getTimeOnScreen());
 
             if(signal.getScreenWidth() && signal.getScreenHeight()) {
-                if(this._clientInfo.getPlatform() === Platform.IOS && this._deviceInfo.getScreenScale()) {
+                if(this._clientInfo.getPlatform() === Platform.IOS && this._deviceInfo instanceof IosDeviceInfo && this._deviceInfo.getScreenScale()) {
                     signal.setAdViewWidth(this.getIosViewWidth(signal.getScreenWidth(), this._deviceInfo.getScreenScale()));
                     signal.setAdViewHeight(this.getIosViewHeight(signal.getScreenHeight(), this._deviceInfo.getScreenScale()));
-                } else if(this._deviceInfo.getScreenDensity()) {
+                } else if(this._deviceInfo instanceof AndroidDeviceInfo && this._deviceInfo.getScreenDensity()) {
                     signal.setAdViewWidth(this.getAndroidViewWidth(signal.getScreenWidth(), this._deviceInfo.getScreenDensity()));
                     signal.setAdViewHeight(this.getAndroidViewHeight(signal.getScreenHeight(), this._deviceInfo.getScreenDensity()));
                 }
@@ -136,7 +138,7 @@ export class AdMobSignalFactory {
         }));
 
         promises.push(Promise.all([this._deviceInfo.getScreenWidth(),this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
-            if (this._nativeBridge.getPlatform() === Platform.IOS) {
+            if (this._nativeBridge.getPlatform() === Platform.IOS && this._deviceInfo instanceof IosDeviceInfo) {
                 signal.setScreenWidth(width * this._deviceInfo.getScreenScale());
                 signal.setScreenHeight(height * this._deviceInfo.getScreenScale());
             } else {
@@ -282,7 +284,7 @@ export class AdMobSignalFactory {
     }
 
     private getIosRooted(deviceInfo: DeviceInfo): number {
-        if(deviceInfo.isSimulator()) { // not available on Android
+        if(deviceInfo instanceof IosDeviceInfo && deviceInfo.isSimulator()) { // not available on Android
             return 2;
         } else if(deviceInfo.isRooted()) {
             return 1;
