@@ -43,6 +43,14 @@ export class IosDeviceInfoApi extends NativeApi {
         return this._nativeBridge.invoke<number>(this._apiClass, 'getStatusBarHeight');
     }
 
+    public getStatusBarWidth(): Promise<number> {
+        return this._nativeBridge.invoke<number>(this._apiClass, 'getStatusBarWidth');
+    }
+
+    public isStatusBarHidden(): Promise<boolean> {
+        return this._nativeBridge.invoke<boolean>(this._apiClass, 'isStatusBarHidden');
+    }
+
     public getDeviceMaxVolume(): Promise<number> {
         return this._nativeBridge.invoke<number>(this._apiClass, 'getDeviceMaxVolume');
     }

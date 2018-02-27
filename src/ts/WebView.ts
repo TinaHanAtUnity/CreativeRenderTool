@@ -42,6 +42,8 @@ import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
+import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
+import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
@@ -97,14 +99,20 @@ export class WebView {
 
     public initialize(): Promise<void | any[]> {
         return this._nativeBridge.Sdk.loadComplete().then((data) => {
-            this._deviceInfo = new DeviceInfo(this._nativeBridge);
+            this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
+
+            if(this._clientInfo.getPlatform() === Platform.ANDROID) {
+                this._deviceInfo = new AndroidDeviceInfo(this._nativeBridge);
+            } else if(this._clientInfo.getPlatform() === Platform.IOS) {
+                this._deviceInfo = new IosDeviceInfo(this._nativeBridge);
+            }
+
             this._focusManager = new FocusManager(this._nativeBridge);
             this._wakeUpManager = new WakeUpManager(this._nativeBridge, this._focusManager);
             this._request = new Request(this._nativeBridge, this._wakeUpManager);
             this._cacheBookkeeping = new CacheBookkeeping(this._nativeBridge);
             this._cache = new Cache(this._nativeBridge, this._wakeUpManager, this._request, this._cacheBookkeeping);
             this._resolve = new Resolve(this._nativeBridge);
-            this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
             this._thirdPartyEventManager = new ThirdPartyEventManager(this._nativeBridge, this._request);
             this._metadataManager = new MetaDataManager(this._nativeBridge);
             this._adMobSignalFactory = new AdMobSignalFactory(this._nativeBridge, this._clientInfo, this._deviceInfo, this._focusManager);
@@ -115,11 +123,11 @@ export class WebView {
 
             return Promise.all([this._deviceInfo.fetch(), this.setupTestEnvironment()]);
         }).then(() => {
-            if(this._clientInfo.getPlatform() === Platform.ANDROID) {
+            if(this._clientInfo.getPlatform() === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
                 document.body.classList.add('android');
                 this._nativeBridge.setApiLevel(this._deviceInfo.getApiLevel());
                 this._container = new Activity(this._nativeBridge, this._deviceInfo);
-            } else if(this._clientInfo.getPlatform() === Platform.IOS) {
+            } else if(this._clientInfo.getPlatform() === Platform.IOS && this._deviceInfo instanceof IosDeviceInfo) {
                 const model = this._deviceInfo.getModel();
                 if(model.match(/iphone/i) || model.match(/ipod/i)) {
                     document.body.classList.add('iphone');

@@ -8,7 +8,7 @@ import { Placement } from 'Models/Placement';
 import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
 import { Template } from 'Utilities/Template';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
-import { AFMABridge, ITouchInfo, IClickSignalResponse } from 'Views/AFMABridge';
+import { AFMABridge, IOpenableIntentsResponse, IOpenableIntentsRequest, ITouchInfo, IClickSignalResponse } from 'Views/AFMABridge';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
@@ -23,6 +23,7 @@ export interface IAdMobEventHandler {
     onShow(): void;
     onVideoStart(): void;
     onSetOrientationProperties(allowOrientation: boolean, forceOrientation: ForceOrientation): void;
+    onOpenableIntentsRequest(request: IOpenableIntentsRequest): void;
     onTrackingEvent(event: string, data?: any): void;
     onClickSignalRequest(touchInfo: ITouchInfo): void;
 }
@@ -58,6 +59,7 @@ export class AdMobView extends View<IAdMobEventHandler> {
             onAFMAOpenInAppStore: () => { /**/ },
             onAFMAOpenStoreOverlay: () => { /**/ },
             onAFMARewardedVideoStart: () => this.onVideoStart(),
+            onAFMAResolveOpenableIntents: (request) => this.onResolveOpenableIntents(request),
             onAFMATrackingEvent: (event, data?) => this.onTrackingEvent(event, data),
             onAFMAClickSignalRequest: (touchInfo) => this.onClickSignalRequest(touchInfo)
         });
@@ -88,6 +90,10 @@ export class AdMobView extends View<IAdMobEventHandler> {
 
     public onBackPressed() {
         this._afmaBridge.onBackPressed();
+    }
+
+    public sendOpenableIntentsResponse(response: IOpenableIntentsResponse) {
+        this._afmaBridge.sendOpenableIntentsResult(response);
     }
 
     public sendClickSignalResponse(response: IClickSignalResponse) {
@@ -161,10 +167,16 @@ export class AdMobView extends View<IAdMobEventHandler> {
     private onSetOrientationProperties(allowOrientation: boolean, forceOrientation: ForceOrientation) {
         this._handlers.forEach((h) => h.onSetOrientationProperties(allowOrientation, forceOrientation));
     }
-    private onTrackingEvent(event: string, data?: any) {
-        this._handlers.forEach((h) => h.onTrackingEvent(event, data));
+
+    private onResolveOpenableIntents(request: IOpenableIntentsRequest) {
+        this._handlers.forEach((h) => h.onOpenableIntentsRequest(request));
     }
+
     private onClickSignalRequest(touchInfo: ITouchInfo) {
         this._handlers.forEach((h) => h.onClickSignalRequest(touchInfo));
+    }
+
+    private onTrackingEvent(event: string, data?: any) {
+        this._handlers.forEach((h) => h.onTrackingEvent(event, data));
     }
 }

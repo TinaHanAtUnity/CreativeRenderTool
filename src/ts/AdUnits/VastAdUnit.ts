@@ -1,5 +1,4 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { Vast } from 'Models/Vast/Vast';
 import { VastCreativeCompanionAd } from 'Models/Vast/VastCreativeCompanionAd';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';

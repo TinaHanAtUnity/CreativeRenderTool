@@ -18,6 +18,17 @@ export interface IPackageInfo {
     packageName: string;
 }
 
+export interface ISensorInfo {
+    name: string;
+    type: number;
+    vendor: string;
+    maximumRange: number;
+    power: number;
+    version: number;
+    resolution: number;
+    minDelay: number;
+}
+
 export class AndroidDeviceInfoApi extends NativeApi {
     public readonly onVolumeChanged = new Observable3<number, number, number>();
 
@@ -89,8 +100,8 @@ export class AndroidDeviceInfoApi extends NativeApi {
         return this._nativeBridge.invoke<number>(this._apiClass, 'getTotalSpace', [StorageType[storageType]]);
     }
 
-    public getSensorList(): Promise<any[]> {
-        return this._nativeBridge.invoke<any[]>(this._apiClass, 'getSensorList');
+    public getSensorList(): Promise<ISensorInfo[]> {
+        return this._nativeBridge.invoke<ISensorInfo[]>(this._apiClass, 'getSensorList');
     }
 
     public getBoard(): Promise<string> {
@@ -99,6 +110,10 @@ export class AndroidDeviceInfoApi extends NativeApi {
 
     public getBootloader(): Promise<string> {
         return this._nativeBridge.invoke<string>(this._apiClass, 'getBootloader');
+    }
+
+    public getBrand(): Promise<string> {
+        return this._nativeBridge.invoke<string>(this._apiClass, 'getBrand');
     }
 
     public getDevice(): Promise<string> {
