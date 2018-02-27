@@ -181,8 +181,4 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
             'additionalTrackingEvents': this.getTrackingEventUrls()
         };
     }
-
-    public getAbGroup(): number {
-        return this.get('abGroup');
-    }
 }
