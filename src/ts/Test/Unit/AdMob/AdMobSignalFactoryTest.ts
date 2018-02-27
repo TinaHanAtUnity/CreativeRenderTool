@@ -11,7 +11,7 @@ import * as protobuf from 'protobufjs/minimal';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 
 describe('AdMobSignalFactoryTest', () => {
-    it('basic test', () => {
+    xit('basic test', () => {
         const nativeBridge: NativeBridge = TestFixtures.getNativeBridge();
         const clientInfo: ClientInfo = TestFixtures.getClientInfo();
         const deviceInfo: AndroidDeviceInfo = TestFixtures.getAndroidDeviceInfo();

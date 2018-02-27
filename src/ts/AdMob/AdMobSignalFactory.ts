@@ -5,6 +5,10 @@ import { Platform } from 'Constants/Platform';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { FocusManager } from 'Managers/FocusManager';
+import { ITouchInfo } from 'Views/AFMABridge';
+import { AdMobAdUnit } from 'AdUnits/AdMobAdUnit';
+import { MotionEventAction } from 'Constants/Android/MotionEventAction';
+import { IMotionEvent } from 'Native/Api/AndroidAdUnit';
 import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 
@@ -25,20 +29,22 @@ export class AdMobSignalFactory {
         return this.getCommonSignal();
     }
 
-    public getClickSignal(): Promise<AdMobSignal> {
+    public getClickSignal(touchInfo: ITouchInfo, adUnit: AdMobAdUnit): Promise<AdMobSignal> {
         return this.getCommonSignal().then(signal => {
-            // todo: touchXUp
-            // todo: touchYUp
-            // todo: touchXDown
-            // todo: touchYDown
             // todo: touch duration
-            // todo: touch pressure
-            // todo: touch diameter
-            // todo: up count
-            // todo: down count
-            // todo: move count
-            // todo: cancel count
-            // todo: time on screen
+            // todo: touch distance
+
+            signal.setTouchDiameter(touchInfo.diameter);
+            signal.setTouchPressure(touchInfo.pressure);
+            signal.setTouchXDown(touchInfo.start.x);
+            signal.setTouchYDown(touchInfo.start.y);
+            signal.setTouchXUp(touchInfo.end.x);
+            signal.setTouchYUp(touchInfo.end.y);
+            signal.setTouchDownTotal(touchInfo.counts.down);
+            signal.setTouchUpTotal(touchInfo.counts.up);
+            signal.setTouchMoveTotal(touchInfo.counts.move);
+            signal.setTouchCancelTotal(touchInfo.counts.cancel);
+            signal.setTimeOnScreen(adUnit.getTimeOnScreen());
 
             if(signal.getScreenWidth() && signal.getScreenHeight()) {
                 if(this._clientInfo.getPlatform() === Platform.IOS && this._deviceInfo instanceof IosDeviceInfo && this._deviceInfo.getScreenScale()) {
@@ -52,8 +58,49 @@ export class AdMobSignalFactory {
 
             signal.setAdViewX(0);
             signal.setAdViewY(0);
+            signal.setMinimumAlpha(100); // our views are never transparent
 
-            return signal;
+            const promises = [];
+
+            promises.push(this._nativeBridge.SensorInfo.getAccelerometerData().then(data => {
+                if(this._nativeBridge.getPlatform() === Platform.IOS) {
+                    signal.setAccelerometerX(data.x);
+                    signal.setAccelerometerY(data.y);
+                    signal.setAccelerometerZ(data.z);
+                } else {
+                    const androidGravityConstant: number = 9.80665; // Android system constant SensorManager.GRAVITY_EARTH
+                    signal.setAccelerometerX(data.x / androidGravityConstant * -100);
+                    signal.setAccelerometerX(data.y / androidGravityConstant * -100);
+                    signal.setAccelerometerX(data.z / androidGravityConstant * -100);
+                }
+            }).catch(() => {
+                this.logFailure(this._nativeBridge, 'accelerometer');
+            }));
+
+            if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                promises.push(this._nativeBridge.AndroidAdUnit.getMotionEventCount([MotionEventAction.ACTION_DOWN, MotionEventAction.ACTION_UP, MotionEventAction.ACTION_MOVE, MotionEventAction.ACTION_CANCEL]).then(results => {
+                    if(results[MotionEventAction[MotionEventAction.ACTION_DOWN]]) {
+                        const downIndex: number = results[MotionEventAction[MotionEventAction.ACTION_DOWN]];
+
+                        return this._nativeBridge.AndroidAdUnit.getMotionEventData({ "0": [downIndex] }).then(motionData => {
+                            if(motionData["0"] && motionData["0"][downIndex.toString()]) {
+                                const motionEvent: IMotionEvent = motionData["0"][downIndex.toString()];
+                                signal.setAndroidTouchObscured(motionEvent.isObscured);
+                                signal.setTouchToolType(motionEvent.toolType);
+                                signal.setTouchSource(motionEvent.source);
+                                signal.setTouchDeviceId(motionEvent.deviceId);
+                            }
+                        }).catch(() => {
+                            this.logFailure(this._nativeBridge, 'motionEventData');
+                        });
+                    }
+                }).catch(() => {
+                    this.logFailure(this._nativeBridge,'motionEventCount');
+                }));
+            }
+            return Promise.all(promises).then(() => {
+                return signal;
+            });
         });
     }
 
@@ -67,7 +114,6 @@ export class AdMobSignalFactory {
         signal.setAppActive(this._focusManager.isAppForeground());
         signal.setAppUptime(this.getAppUptime(this._clientInfo));
         signal.setAppStartTime(this.getAppStartTime(this._clientInfo));
-        signal.setRooted(this.getRooted(this._deviceInfo));
         signal.setAppVersionName(this._clientInfo.getApplicationVersion());
         signal.setAppIdName(this._clientInfo.getApplicationName());
 
@@ -104,6 +150,12 @@ export class AdMobSignalFactory {
             this.logFailure(nativeBridge, 'screenWidth');
         }));
 
+        promises.push(this._nativeBridge.DeviceInfo.getCPUCount().then(cpucount => {
+            signal.setCpuCount(cpucount);
+        }).catch(() => {
+            this.logFailure(nativeBridge, 'cpucount');
+        }));
+
         if(nativeBridge.getPlatform() === Platform.ANDROID) {
             promises.push(nativeBridge.DeviceInfo.Android.getPackageInfo(this._clientInfo.getApplicationName()).then(packageInfo => {
                 if(packageInfo.installer) {
@@ -118,6 +170,54 @@ export class AdMobSignalFactory {
             }).catch(() => {
                 this.logFailure(nativeBridge, 'packageInfo');
             }));
+
+            promises.push(this._nativeBridge.DeviceInfo.Android.isUSBConnected().then(usb => {
+                signal.setUsbConnected(usb ? 1 : 0);
+            }).catch(() => {
+                signal.setUsbConnected(2); // failed to get usb connection status
+                this.logFailure(nativeBridge, 'usbConnected');
+            }));
+
+            promises.push(this._nativeBridge.DeviceInfo.Android.getApkDigest().then(apkdigest => {
+                signal.setApkHash(apkdigest);
+            }).catch(() => {
+                this.logFailure(nativeBridge, 'apkHash');
+            }));
+
+            promises.push(this._nativeBridge.DeviceInfo.Android.getCertificateFingerprint().then(certificate => {
+                signal.setApkDeveloperSigningCertificateHash(certificate);
+            }).catch(() => {
+                this.logFailure(nativeBridge, 'apkDeveloperSigningCertificateHash');
+            }));
+
+            promises.push(this._nativeBridge.DeviceInfo.Android.getUptime().then(uptime => {
+                signal.setDeviceUptime(uptime);
+            }).catch(() => {
+                this.logFailure(nativeBridge, 'deviceUptime');
+            }));
+
+            promises.push(this._nativeBridge.DeviceInfo.Android.getElapsedRealtime().then(elapsedRealtime => {
+                signal.setDeviceElapsedRealtime(elapsedRealtime);
+            }).catch(() => {
+                this.logFailure(nativeBridge, 'elapsedRealtime');
+            }));
+
+            promises.push(this._nativeBridge.DeviceInfo.Android.isAdbEnabled().then(adb => {
+                signal.setAdbEnabled(adb ? 1 : 0);
+            }).catch(() => {
+                signal.setAdbEnabled(2);
+                this.logFailure(nativeBridge, 'adbEnabled');
+            }));
+        }
+
+        if(nativeBridge.getPlatform() === Platform.ANDROID) {
+            promises.push(this.getAndroidRooted(this._deviceInfo).then(rooted => {
+                signal.setRooted(rooted);
+            }).catch(() => {
+                this.logFailure(nativeBridge, 'rooted');
+            }));
+        } else {
+            signal.setRooted(this.getIosRooted(this._deviceInfo));
         }
 
         return Promise.all(promises).then(() => {
@@ -183,7 +283,7 @@ export class AdMobSignalFactory {
         return Math.round(clientInfo.getInitTimestamp() / 1000);
     }
 
-    private getRooted(deviceInfo: DeviceInfo): number {
+    private getIosRooted(deviceInfo: DeviceInfo): number {
         if(deviceInfo instanceof IosDeviceInfo && deviceInfo.isSimulator()) { // not available on Android
             return 2;
         } else if(deviceInfo.isRooted()) {
@@ -191,6 +291,18 @@ export class AdMobSignalFactory {
         } else {
             return 0;
         }
+    }
+
+    private getAndroidRooted(deviceInfo: DeviceInfo): Promise<number> {
+        return this._nativeBridge.DeviceInfo.Android.getFingerprint().then(fingerprint => {
+            if(fingerprint.indexOf('generic') >= 0) {
+                return 2; // simulator
+            } else if(deviceInfo.isRooted()) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
     }
 
     private getIosViewWidth(width: number, scale: number): number {

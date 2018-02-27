@@ -9,7 +9,10 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { Platform } from 'Constants/Platform';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { Placement } from 'Models/Placement';
+import { IOpenableIntentsResponse } from 'Views/AFMABridge';
 import { FocusManager } from 'Managers/FocusManager';
+import { Double } from 'Utilities/Double';
+import { SensorDelay } from 'Constants/Android/SensorDelay';
 import { IClickSignalResponse } from 'Views/AFMABridge';
 import { SdkStats } from 'Utilities/SdkStats';
 
@@ -105,6 +108,7 @@ export class AdMobAdUnit extends AbstractAdUnit {
     }
 
     public sendStartEvent() {
+        this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
         this.sendTrackingEvent('start');
         this._operativeEventManager.sendStart(this._campaign.getSession(), this._placement, this._campaign);
     }
@@ -121,6 +125,10 @@ export class AdMobAdUnit extends AbstractAdUnit {
     public sendRewardEvent() {
         this._operativeEventManager.sendThirdQuartile(this._campaign.getSession(), this._placement, this._campaign);
         this._operativeEventManager.sendView(this._campaign.getSession(), this._placement, this._campaign);
+    }
+
+    public sendOpenableIntentsResponse(response: IOpenableIntentsResponse) {
+        this._view.sendOpenableIntentsResponse(response);
     }
 
     public getTimeOnScreen(): number {
@@ -168,6 +176,13 @@ export class AdMobAdUnit extends AbstractAdUnit {
             this._nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(this._keyDownListener);
         }
 
+        this._nativeBridge.SensorInfo.stopAccelerometerUpdates();
+
+        if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            this._nativeBridge.AndroidAdUnit.endMotionEventCapture();
+            this._nativeBridge.AndroidAdUnit.clearMotionEventCapture();
+        }
+
         Diagnostics.trigger('admob_ad_close', {
             placement: this._placement.getId(),
             finishState: this.getFinishState()
@@ -202,8 +217,10 @@ export class AdMobAdUnit extends AbstractAdUnit {
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
             this._onResumeObserver = this._focusManager.onAppForeground.subscribe(() => this.onAppForeground());
+            this._onPauseObserver = this._focusManager.onAppBackground.subscribe(() => this.onAppBackground());
         } else {
             this._onResumeObserver = this._container.onShow.subscribe(() => this.onAppForeground());
+            this._onPauseObserver = this._container.onAndroidPause.subscribe(() => this.onAppBackground());
         }
     }
 
@@ -218,5 +235,16 @@ export class AdMobAdUnit extends AbstractAdUnit {
 
     private onAppForeground() {
         this._foregroundTime = Date.now();
+
+        if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            this._nativeBridge.SensorInfo.Android.startAccelerometerUpdates(SensorDelay.SENSOR_DELAY_FASTEST);
+            this._nativeBridge.AndroidAdUnit.startMotionEventCapture(10000);
+        } else {
+            this._nativeBridge.SensorInfo.Ios.startAccelerometerUpdates(new Double(0.01));
+        }
+    }
+
+    private onAppBackground() {
+        this._nativeBridge.SensorInfo.stopAccelerometerUpdates();
     }
 }
