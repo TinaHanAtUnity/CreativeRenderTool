@@ -375,8 +375,8 @@ export class Cache {
                         originalUrl = callback.originalUrl;
                     }
                     this._nativeBridge.Cache.deleteFile(fileId).then( () => {
-                        this.downloadFile(location, fileId);
                         this.registerCallback(location, fileId, false, callback.diagnostics, callback.session, originalUrl);
+                        this.downloadFile(location, fileId);
                     });
                     return;
                 }
