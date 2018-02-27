@@ -9,7 +9,8 @@ export enum ForceOrientation {
 
 export const enum ViewConfiguration {
     ENDSCREEN,
-    LANDSCAPE_VIDEO
+    LANDSCAPE_VIDEO,
+    WEB_PLAYER
 }
 
 export abstract class AdUnitContainer {
@@ -34,11 +35,13 @@ export abstract class AdUnitContainer {
 
     private _diagnosticsEvents: any[] = [];
 
-    public abstract open(adUnit: AbstractAdUnit, videoplayer: boolean, allowRotation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: any): Promise<void>;
+    public abstract open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: any): Promise<void>;
     public abstract close(): Promise<void>;
     public abstract reconfigure(configuration: ViewConfiguration): Promise<any[]>;
     public abstract reorient(allowRotation: boolean, forceOrientation: ForceOrientation): Promise<any[]>;
     public abstract isPaused(): boolean;
+    public abstract setViewFrame(view: string, x: number, y: number, width: number, height: number): Promise<void>;
+    public abstract getViews(): Promise<string[]>;
 
     public getLockedOrientation() {
         return this._lockedOrientation;

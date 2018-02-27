@@ -3,27 +3,27 @@ import { Asset } from 'Models/Assets/Asset';
 import { ISchema } from 'Models/Model';
 
 export interface IDisplayInterstitialCampaign extends ICampaign {
-    clickThroughUrl: string | undefined;
+    dynamicMarkup: string;
     tracking: object | undefined;
 }
 
-export abstract class DisplayInterstitialCampaign<T extends IDisplayInterstitialCampaign = IDisplayInterstitialCampaign> extends Campaign<T> {
+export class DisplayInterstitialCampaign extends Campaign<IDisplayInterstitialCampaign> {
     public static Schema: ISchema<IDisplayInterstitialCampaign> = {
         ... Campaign.Schema,
-        clickThroughUrl: ['string', 'undefined'],
+        dynamicMarkup: ['string'],
         tracking: ['object', 'undefined']
     };
 
-    constructor(classname: string, schema: ISchema<T>, campaign: T) {
-        super(classname, schema, campaign);
+    constructor(campaign: IDisplayInterstitialCampaign) {
+        super('DisplayInterstitialCampaign', {
+            ... Campaign.Schema,
+            dynamicMarkup: ['string', 'undefined'],
+            tracking: ['object', 'undefined']
+        }, campaign);
     }
 
-    public getClickThroughUrl(): string | undefined {
-        return this.get('clickThroughUrl');
-    }
-
-    public setClickThroughUrl(clickThroughUrl: string) {
-        this.set('clickThroughUrl', clickThroughUrl);
+    public getDynamicMarkup(): string {
+        return this.get('dynamicMarkup');
     }
 
     public getTrackingUrlsForEvent(eventName: string): string[] {

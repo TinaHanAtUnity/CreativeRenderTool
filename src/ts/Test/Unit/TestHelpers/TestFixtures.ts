@@ -10,8 +10,6 @@ import { IMRAIDCampaign, MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Configuration } from 'Models/Configuration';
 import { ICacheDiagnostics } from 'Utilities/Cache';
 import { DisplayInterstitialCampaign, IDisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
-import { DisplayInterstitialMarkupCampaign, IDisplayInterstitialMarkupCampaign } from 'Models/Campaigns/DisplayInterstitialMarkupCampaign';
-import { DisplayInterstitialMarkupUrlCampaign, IDisplayInterstitialMarkupUrlCampaign } from 'Models/Campaigns/DisplayInterstitialMarkupUrlCampaign';
 import { Session } from 'Models/Session';
 import { IVastCampaign, VastCampaign } from 'Models/Vast/VastCampaign';
 import { IPackageInfo } from 'Native/Api/AndroidDeviceInfo';
@@ -20,10 +18,17 @@ import { Image } from 'Models/Assets/Image';
 import { HTML } from 'Models/Assets/HTML';
 import { Video } from 'Models/Assets/Video';
 import { Vast } from 'Models/Vast/Vast';
-import { IVPAIDCampaign, VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
-import { VPAIDParser } from 'Utilities/VPAIDParser';
+import { IVPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
 import { VPAID } from 'Models/VPAID/VPAID';
+import { IPromoCampaign, PromoCampaign } from 'Models/Campaigns/PromoCampaign';
+import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
+import { IosDeviceInfo } from 'Models/IosDeviceInfo';
+import { FakeAndroidDeviceInfo } from 'Test/Unit/TestHelpers/FakeAndroidDeviceInfo';
+import { RingerMode } from 'Constants/Android/RingerMode';
+import { UIUserInterfaceIdiom } from 'Constants/iOS/UIUserInterfaceIdiom';
+import { FakeIosDeviceInfo } from 'Test/Unit/TestHelpers/FakeIosDeviceInfo';
 
+import DummyPromoCampaign from 'json/DummyPromoCampaign.json';
 import OnCometMraidPlcCampaignFollowsRedirects from 'json/OnCometMraidPlcCampaignFollowsRedirects.json';
 import OnCometMraidPlcCampaign from 'json/OnCometMraidPlcCampaign.json';
 import OnCometVideoPlcCampaignFollowsRedirects from 'json/OnCometVideoPlcCampaignFollowsRedirects.json';
@@ -32,28 +37,13 @@ import OnXPromoPlcCampaign from 'json/OnXPromoPlcCampaign.json';
 import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCampaign.json';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
-import DummyDisplayInterstitialUrlCampaign from 'json/DummyDisplayInterstitialUrlCampaign.json';
 import VastCompanionXml from 'xml/VastCompanionAd.xml';
 import EventTestVast from 'xml/EventTestVast.xml';
-import VPAIDTestXML from 'xml/VPAID.xml';
-import VPAIDCampaignJson from 'json/OnProgrammaticVPAIDCampaign.json';
 import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xml';
-import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
-import { IosDeviceInfo } from 'Models/IosDeviceInfo';
-import { FakeAndroidDeviceInfo } from 'Test/Unit/TestHelpers/FakeAndroidDeviceInfo';
+
 import * as sinon from 'sinon';
-import { RingerMode } from 'Constants/Android/RingerMode';
-import { UIUserInterfaceIdiom } from 'Constants/iOS/UIUserInterfaceIdiom';
-import { FakeIosDeviceInfo } from 'Test/Unit/TestHelpers/FakeIosDeviceInfo';
 
 export class TestFixtures {
-    public static getDisplayInterstitialCampaign(isStaticInterstitialUrlCampaign: boolean): DisplayInterstitialCampaign {
-        if (isStaticInterstitialUrlCampaign) {
-            return this.getDisplayInterstitialMarkupUrlCampaign();
-        }
-        return this.getDisplayInterstitialMarkupCampaign();
-    }
-
     public static getPlacement(): Placement {
         return new Placement({
             id: 'fooId',
@@ -303,7 +293,7 @@ export class TestFixtures {
 
         return {
             ... baseCampaignParams,
-            clickThroughUrl: json.display.clickThroughURL,
+            dynamicMarkup: json.content,
             tracking: json.display.tracking || undefined
         };
     }
@@ -339,11 +329,20 @@ export class TestFixtures {
         };
     }
 
-    public static getVPAIDCampaign(): VPAIDCampaign {
-        const vpaid = new VPAIDParser().parse(VPAIDTestXML);
-        const vpaidCampaignJson = JSON.parse(VPAIDCampaignJson);
+    public static getPromoCampaignParams(json: any): IPromoCampaign {
+        const session = this.getSession();
+        return {
+            ... this.getCometCampaignBaseParams(session, json.promo.id, json.gamerId, json.abGroup, json.meta),
+            iapProductId: json.promo.iapProductId,
+            additionalTrackingEvents: json.promo.tracking ? json.promo.tracking : undefined,
+            dynamicMarkup: json.promo.dynamicMarkup,
+            creativeAsset: new HTML(json.promo.creativeUrl, session)
+        };
+    }
 
-        return new VPAIDCampaign(this.getVPAIDCampaignParams(vpaidCampaignJson, vpaid));
+    public static getPromoCampaign(): PromoCampaign {
+        const json = JSON.parse(DummyPromoCampaign);
+        return new PromoCampaign(this.getPromoCampaignParams(json));
     }
 
     public static getCampaignFollowsRedirects(): PerformanceCampaign {
@@ -399,6 +398,15 @@ export class TestFixtures {
         const vastXml = VastCompanionAdWithoutImagesXml;
         const vast = vastParser.parseVast(vastXml);
         return new VastCampaign(this.getVastCampaignParams(vast, 3600, '12345'));
+    }
+
+    public static getDisplayInterstitialCampaign(): DisplayInterstitialCampaign {
+        const json = JSON.parse(DummyDisplayInterstitialCampaign);
+        const displayInterstitialParams: IDisplayInterstitialCampaign = {
+            ... this.getDisplayInterstitialCampaignBaseParams(json, StoreName.GOOGLE, '12345'),
+            dynamicMarkup: json.content
+        };
+        return new DisplayInterstitialCampaign(displayInterstitialParams);
     }
 
     public static getClientInfo(platform?: Platform): ClientInfo {
@@ -568,23 +576,4 @@ export class TestFixtures {
         };
     }
 
-    private static getDisplayInterstitialMarkupCampaign(): DisplayInterstitialMarkupCampaign {
-        const json = JSON.parse(DummyDisplayInterstitialCampaign);
-        const displayInterstitialMarkupParams: IDisplayInterstitialMarkupCampaign = {
-            ... this.getDisplayInterstitialCampaignBaseParams(json, StoreName.GOOGLE, '12345'),
-            markup: json.display.markup
-        };
-
-        return new DisplayInterstitialMarkupCampaign(displayInterstitialMarkupParams);
-    }
-
-    private static getDisplayInterstitialMarkupUrlCampaign(): DisplayInterstitialMarkupUrlCampaign {
-        const json = JSON.parse(DummyDisplayInterstitialUrlCampaign);
-        const displayInterstitialMarkupUrlParams: IDisplayInterstitialMarkupUrlCampaign = {
-            ... this.getDisplayInterstitialCampaignBaseParams(json, StoreName.GOOGLE, '12345'),
-            markupUrl: json.display.markupUrl
-        };
-
-        return new DisplayInterstitialMarkupUrlCampaign(displayInterstitialMarkupUrlParams);
-    }
 }

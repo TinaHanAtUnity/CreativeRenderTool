@@ -45,15 +45,15 @@ export class ViewController extends AdUnitContainer {
         this._onNotificationObserver = this._nativeBridge.Notification.onNotification.subscribe((event, parameters) => this.onNotification(event, parameters));
     }
 
-    public open(adUnit: AbstractAdUnit, videoplayer: boolean, allowRotation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: IIosOptions): Promise<void> {
+    public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: IIosOptions): Promise<void> {
         this.resetDiagnosticsEvents();
         this.addDiagnosticsEvent({type: 'open'});
         this._options = options;
         this._showing = true;
 
-        let views: string[] = ['webview'];
-        if(videoplayer) {
-            views = ['videoplayer', 'webview'];
+        let nativeViews: string[] = views;
+        if(nativeViews.length === 0) {
+            nativeViews = ['webview'];
         }
 
         const forcedOrientation = AdUnitContainer.getForcedOrientation();
@@ -76,7 +76,7 @@ export class ViewController extends AdUnitContainer {
             hideStatusBar = options.statusBarHidden;
         }
 
-        return this._nativeBridge.IosAdUnit.open(views, this.getOrientation(options, allowRotation, this._lockedOrientation), hideStatusBar, allowRotation, isTransparent, withAnimation);
+        return this._nativeBridge.IosAdUnit.open(nativeViews, this.getOrientation(options, allowRotation, this._lockedOrientation), hideStatusBar, allowRotation, isTransparent, withAnimation);
     }
 
     public close(): Promise<void> {
@@ -111,7 +111,10 @@ export class ViewController extends AdUnitContainer {
                     promises.push(this._nativeBridge.IosAdUnit.setTransform(new Double(1.57079632679)));
                     promises.push(this._nativeBridge.IosAdUnit.setViewFrame('adunit', new Double(0), new Double(0), new Double(width), new Double(height)));
                     break;
-
+                case ViewConfiguration.WEB_PLAYER:
+                    promises.push(this._nativeBridge.IosAdUnit.setViews(['webplayer', 'webview']));
+                    promises.push(this._nativeBridge.IosAdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL));
+                    break;
                 default:
                     break;
             }
@@ -136,6 +139,14 @@ export class ViewController extends AdUnitContainer {
 
     public unPause() {
         this._paused = false;
+    }
+
+    public setViewFrame(view: string, x: number, y: number, width: number, height: number): Promise<void> {
+        return this._nativeBridge.IosAdUnit.setViewFrame(view, new Double(x), new Double(y), new Double(width), new Double(height));
+    }
+
+    public getViews(): Promise<string[]> {
+        return this._nativeBridge.IosAdUnit.getViews();
     }
 
     private getOrientation(options: IIosOptions, allowRotation: boolean, forceOrientation: ForceOrientation) {

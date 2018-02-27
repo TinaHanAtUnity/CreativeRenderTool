@@ -25,9 +25,9 @@ import { ProgrammaticVastParser } from 'Parsers/ProgrammaticVastParser';
 import { ProgrammaticMraidUrlParser } from 'Parsers/ProgrammaticMraidUrlParser';
 import { ProgrammaticMraidParser } from 'Parsers/ProgrammaticMraidParser';
 import { ProgrammaticStaticInterstitialParser } from 'Parsers/ProgrammaticStaticInterstitialParser';
-import { ProgrammaticStaticInterstitialUrlParser } from 'Parsers/ProgrammaticStaticInterstitialUrlParser';
 import { ProgrammaticAdMobParser } from 'Parsers/ProgrammaticAdMobParser';
 import { CampaignParser } from 'Parsers/CampaignParser';
+import { PromoCampaignParser } from 'Parsers/PromoCampaignParser';
 import { ProgrammaticVPAIDParser } from 'Parsers/ProgrammaticVPAIDParser';
 import { XPromoCampaignParser } from "Parsers/XPromoCampaignParser";
 import { AdMobSignalFactory} from 'AdMob/AdMobSignalFactory';
@@ -290,9 +290,6 @@ export class CampaignManager {
             case 'programmatic/static-interstitial':
                 parser = new ProgrammaticStaticInterstitialParser();
                 break;
-            case 'programmatic/static-interstitial-url':
-                parser = new ProgrammaticStaticInterstitialUrlParser();
-                break;
             case 'programmatic/admob-video':
                 parser = new ProgrammaticAdMobParser();
                 Diagnostics.trigger('admob_ad_received', {}, session);
@@ -301,6 +298,9 @@ export class CampaignManager {
                 // vast-vpaid can be both VPAID or VAST, so in this case we use the VAST parser
                 // which can parse both.
                 parser = new ProgrammaticVPAIDParser();
+                break;
+            case 'purchasing/iap':
+                parser = new PromoCampaignParser();
                 break;
             default:
                 throw new Error('Unsupported content-type: ' + response.getContentType());
@@ -370,9 +370,11 @@ export class CampaignManager {
             stores: this._deviceInfo.getStores()
         });
 
-        if(this._clientInfo.getPlatform() === Platform.IOS) {
+        if(this._clientInfo.getPlatform() === Platform.IOS && this._deviceInfo instanceof IosDeviceInfo) {
             url = Url.addParameters(url, {
-                osVersion: this._deviceInfo.getOsVersion()
+                osVersion: this._deviceInfo.getOsVersion(),
+                screenScale: this._deviceInfo.getScreenScale(),
+                screenDensity: this._deviceInfo.getScreenScale()
             });
         } else if(this._clientInfo.getPlatform() === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
             url = Url.addParameters(url, {

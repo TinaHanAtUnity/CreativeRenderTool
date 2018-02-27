@@ -83,7 +83,7 @@ export class MRAIDAdUnit extends AbstractAdUnit {
         this._onSystemInterruptObserver = this._container.onSystemInterrupt.subscribe((interruptStarted) => this.onSystemInterrupt(interruptStarted));
         this._onPauseObserver = this._container.onAndroidPause.subscribe(() => this.onSystemPause());
 
-        return this._container.open(this, false, this._orientationProperties.allowOrientationChange, this._orientationProperties.forceOrientation, true, false, true, false, this._options);
+        return this._container.open(this, ['webview'], this._orientationProperties.allowOrientationChange, this._orientationProperties.forceOrientation, true, false, true, false, this._options);
     }
 
     public hide(): Promise<void> {

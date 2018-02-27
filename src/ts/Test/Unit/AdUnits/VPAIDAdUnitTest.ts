@@ -1,156 +1,154 @@
 import 'mocha';
+import { assert } from 'chai';
 import * as sinon from 'sinon';
 
 import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'AdUnits/VPAIDAdUnit';
 import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
-import { VPAIDParser } from 'Utilities/VPAIDParser';
 import { VPAID } from 'Views/VPAID';
-import { VPAID as VPAIDModel } from 'Models/VPAID/VPAID';
 import { NativeBridge } from 'Native/NativeBridge';
-import { ForceOrientation, AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
-import { Placement } from 'Models/Placement';
-import { Activity } from 'AdUnits/Containers/Activity';
-import { Platform } from 'Constants/Platform';
-import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
 import { FocusManager } from 'Managers/FocusManager';
-import { Request } from 'Utilities/Request';
-import { WakeUpManager } from 'Managers/WakeUpManager';
-import { Overlay } from 'Views/Overlay';
-import { SessionManager } from 'Managers/SessionManager';
-import { MetaDataManager } from 'Managers/MetaDataManager';
+import { ClientInfo } from 'Models/ClientInfo';
+import { DeviceInfo } from 'Models/DeviceInfo';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
+import { Configuration } from 'Models/Configuration';
+import { Observable0, Observable2 } from 'Utilities/Observable';
+import { IObserver0 } from 'Utilities/IObserver';
+import { WebPlayerApi } from 'Native/Api/WebPlayer';
+import { Request } from 'Utilities/Request';
+import { Activity } from 'AdUnits/Containers/Activity';
+import { ListenerApi } from 'Native/Api/Listener';
+import { FinishState } from 'Constants/FinishState';
+import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
+import { Closer } from 'Views/Closer';
+import { Platform } from 'Constants/Platform';
 
 describe('VPAIDAdUnit', () => {
-    let campaign: VPAIDCampaign;
-    let adUnit: VPAIDAdUnit;
-    let vpaidView: VPAID;
-    let sandbox: sinon.SinonSandbox;
     let nativeBridge: NativeBridge;
-    let operativeEventManager: OperativeEventManager;
-    let thirdPartyEventManager: ThirdPartyEventManager;
-    let container: AdUnitContainer;
-    let focusManager: FocusManager;
-    let vpaidAdUnitParameters: IVPAIDAdUnitParameters;
-    let request: Request;
-    let overlay: Overlay;
-    let comScoreService: ComScoreTrackingService;
+    let parameters: IVPAIDAdUnitParameters;
+    let adUnit: VPAIDAdUnit;
 
     beforeEach(() => {
-        sandbox = sinon.sandbox.create();
+        nativeBridge = sinon.createStubInstance(NativeBridge);
 
-        const clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-        const deviceInfo = TestFixtures.getAndroidDeviceInfo();
-        nativeBridge = TestFixtures.getNativeBridge();
-        sinon.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
-        focusManager = new FocusManager(nativeBridge);
-        const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
-
-        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
-        sinon.stub(container, 'open').returns(Promise.resolve());
-        sinon.stub(container, 'close').returns(Promise.resolve());
-
-        request = new Request(nativeBridge, wakeUpManager);
-
-        const placement = new Placement({
-            id: '123',
-            name: 'test',
-            default: true,
-            allowSkip: true,
-            skipInSeconds: 5,
-            disableBackButton: true,
-            useDeviceOrientationForVideo: false,
-            muteVideo: false
-        });
-
-        campaign = TestFixtures.getVPAIDCampaign();
-
-        vpaidView = new VPAID(nativeBridge, campaign, placement, 'en', 'TestGameId');
-        sinon.stub(vpaidView, 'container').returns(document.createElement('div'));
-        sinon.stub(vpaidView, 'show').returns(Promise.resolve());
-        sinon.stub(vpaidView, 'hide').returns(Promise.resolve());
-
-        const sessionManager = new SessionManager(nativeBridge);
-        const metaDataManager = new MetaDataManager(nativeBridge);
-        thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
-        overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
-        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
-
-        vpaidAdUnitParameters = {
-            forceOrientation: ForceOrientation.LANDSCAPE,
-            focusManager: focusManager,
-            container: container,
-            deviceInfo: deviceInfo,
-            clientInfo: clientInfo,
-            thirdPartyEventManager: thirdPartyEventManager,
-            operativeEventManager: operativeEventManager,
-            comScoreTrackingService: comScoreService,
-            placement: placement,
-            campaign: campaign,
-            configuration: TestFixtures.getConfiguration(),
-            request: request,
-            options: {},
-            vpaid: vpaidView,
-            overlay: overlay
+        parameters = {
+            campaign: sinon.createStubInstance(VPAIDCampaign),
+            closer: sinon.createStubInstance(Closer),
+            vpaid: sinon.createStubInstance(VPAID),
+            endScreen: sinon.createStubInstance(VPAIDEndScreen),
+            focusManager: sinon.createStubInstance(FocusManager),
+            deviceInfo: sinon.createStubInstance(DeviceInfo),
+            clientInfo: sinon.createStubInstance(ClientInfo),
+            thirdPartyEventManager: sinon.createStubInstance(ThirdPartyEventManager),
+            operativeEventManager: sinon.createStubInstance(OperativeEventManager),
+            comScoreTrackingService: sinon.createStubInstance(ComScoreTrackingService),
+            placement: TestFixtures.getPlacement(),
+            container: sinon.createStubInstance(Activity),
+            configuration: sinon.createStubInstance(Configuration),
+            request: sinon.createStubInstance(Request),
+            forceOrientation: ForceOrientation.NONE,
+            options: {}
         };
 
-        adUnit = new VPAIDAdUnit(nativeBridge, vpaidAdUnitParameters);
+        const webPlayer = sinon.createStubInstance(WebPlayerApi);
+        (<sinon.SinonStub>webPlayer.setSettings).returns(Promise.resolve());
+        (<sinon.SinonStub>webPlayer.setEventSettings).returns(Promise.resolve());
+        (<any>webPlayer).shouldOverrideUrlLoading = new Observable2<string, string>();
+        (<any>nativeBridge).WebPlayer = webPlayer;
+
+        (<any>nativeBridge).Listener = sinon.createStubInstance(ListenerApi);
+
+        (<any>parameters.focusManager).onAppForeground = new Observable0();
+        (<any>parameters.focusManager).onAppBackground = new Observable0();
+        (<any>parameters.container).onShow = new Observable0();
+        (<any>parameters.container).onAndroidPause = new Observable0();
+        (<sinon.SinonStub>parameters.container.open).returns(Promise.resolve());
+        (<sinon.SinonStub>parameters.container.close).returns(Promise.resolve());
+        (<sinon.SinonStub>parameters.container.setViewFrame).returns(Promise.resolve());
+
+        (<sinon.SinonStub>parameters.deviceInfo.getScreenWidth).returns(Promise.resolve(320));
+        (<sinon.SinonStub>parameters.deviceInfo.getScreenHeight).returns(Promise.resolve(480));
+
+        const overlayEl = document.createElement('div');
+        overlayEl.setAttribute('id', 'closer');
+        (<sinon.SinonStub>parameters.closer.container).returns(overlayEl);
+
+        adUnit = new VPAIDAdUnit(nativeBridge, parameters);
     });
 
-    afterEach(() => {
-        if (adUnit.isShowing()) {
-            adUnit.hide();
-        }
-        sandbox.reset();
+    describe('on show', () => {
+
+        const onShowTests = () => {
+            let onStartObserver: IObserver0;
+
+            beforeEach(() => {
+                onStartObserver = sinon.spy();
+                adUnit.onStart.subscribe(onStartObserver);
+                return adUnit.show();
+            });
+
+            it('should trigger onStart', () => {
+                sinon.assert.calledOnce(<sinon.SinonSpy>onStartObserver);
+            });
+
+            it('should set up the web player', () => {
+                sinon.assert.calledOnce(<sinon.SinonSpy>nativeBridge.WebPlayer.setSettings);
+                sinon.assert.calledOnce(<sinon.SinonSpy>nativeBridge.WebPlayer.setEventSettings);
+            });
+
+            it('should open the container', () => {
+                sinon.assert.calledOnce(<sinon.SinonSpy>parameters.container.open);
+            });
+
+            afterEach(() => {
+                return adUnit.hide();
+            });
+        };
+
+        describe('on android', () => {
+            beforeEach(() => {
+                (<sinon.SinonStub>nativeBridge.getPlatform).returns(Platform.ANDROID);
+            });
+            onShowTests();
+        });
+
+        xdescribe('on ios', () => {
+            beforeEach(() => {
+                (<sinon.SinonStub>nativeBridge.getPlatform).returns(Platform.IOS);
+            });
+            onShowTests();
+        });
     });
 
-    describe('show', () => {
-        let spy: sinon.SinonSpy;
+    describe('on hide', () => {
+        const finishState = FinishState.COMPLETED;
+        let onCloseObserver: IObserver0;
 
         beforeEach(() => {
-            spy = sinon.spy();
-            adUnit.onStart.subscribe(spy);
-            (<sinon.SinonStub>vpaidView.container).returns(document.createElement('div'));
-            (<sinon.SinonStub>container.open).returns(Promise.resolve());
+            onCloseObserver = sinon.spy();
+            adUnit.onClose.subscribe(onCloseObserver);
+            adUnit.setFinishState(finishState);
+            const elements = document.querySelectorAll('#closer');
+            // tslint:disable-next-line:prefer-for-of
+            for (let i = 0; i < elements.length; i++) {
+                elements[i].parentNode!.removeChild(elements[i]);
+            }
+            return adUnit.show().then(() => adUnit.hide());
         });
 
-        it('should show the view', () => {
-            return adUnit.show().then(() => {
-                sinon.assert.called(<sinon.SinonSpy>vpaidView.show);
-            });
+        it('should trigger on close', () => {
+            sinon.assert.called(<sinon.SinonSpy>onCloseObserver);
         });
 
-        it('should open the container', () => {
-            return adUnit.show().then(() => {
-                sinon.assert.called(<sinon.SinonSpy>container.open);
-            });
+        it('should send the finish event', () => {
+            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Listener.sendFinishEvent, parameters.placement.getId(), finishState);
         });
 
-        it('should trigger onStart', () => {
-            return adUnit.show().then(() => {
-                sinon.assert.called(spy);
-            });
-        });
-    });
-
-    describe('hide', () => {
-
-        beforeEach(() => {
-            return adUnit.show();
-        });
-
-        it('should hide the view', () => {
-            return adUnit.hide().then(() => {
-                sinon.assert.called(<sinon.SinonSpy>vpaidView.hide);
-            });
-        });
-
-        it('should close the container', () => {
-            return adUnit.hide().then(() => {
-                sinon.assert.called(<sinon.SinonSpy>container.close);
-            });
+        it('should remove the closer from the document', () => {
+            assert.isNull(document.querySelector('#closer'));
         });
     });
 });

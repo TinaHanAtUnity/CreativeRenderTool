@@ -1,39 +1,123 @@
 <html>
 <head>
     <style>
-        /* just a shadow iframe for loading the VPAID src */
-        iframe {
-            display: none;
-        }
-
-        body {
-            width: 100vw;
-            height: 100vh;
-            margin: 0;
-            padding: 0;
-        }
-
-        .video-player-slot {
-            width: 100%;
-            height: 100%;
-        }
-
-        .video-player-slot video {
-            width: 100%;
-            height: 100%;
-        }
+        {COMPILED_CSS}
     </style>
 </head>
 <body>
-    <div class="video-player-slot">
-        <video
-            poster="data:image/svg+xml;base64,"
-            playsinline>
-        </video>
+    <video
+        playsinline="true"
+        webkit-playsinline="true"
+        poster="data:image/svg+xml;base64,">
+    </video>
+    <div class="video-player-slot"></div>
+
     </div>
-    <script src="{{VPAID_SRC_URL}}"></script>
+    <script src="<%= data.vpaidSrcUrl %>"></script>
+    <script>
+        (function(global) {
+            var EventTarget = function() {
+                this.listeners = {};
+            };
+
+            EventTarget.prototype.listeners = null;
+            EventTarget.prototype.addEventListener = function(type, callback) {
+                if (!(type in this.listeners)) {
+                    this.listeners[type] = [];
+                }
+                this.listeners[type].push(callback);
+            };
+
+            EventTarget.prototype.removeEventListener = function(type, callback) {
+                if (!(type in this.listeners)) {
+                    return;
+                }
+                var stack = this.listeners[type];
+                for (var i = 0, l = stack.length; i < l; i++) {
+                    if (stack[i] === callback){
+                        stack.splice(i, 1);
+                        return;
+                    }
+                }
+            };
+
+            EventTarget.prototype.dispatchEvent = function(event) {
+                if (!(event.type in this.listeners)) {
+                    return true;
+                }
+                var stack = this.listeners[event.type];
+
+                for (var i = 0, l = stack.length; i < l; i++) {
+                    stack[i].call(this, event);
+                }
+                return !event.defaultPrevented;
+            };
+
+            var UIWebViewBridge = function() {
+                this.handleEvent = function(event, parameters) {
+                    var iframe = document.createElement('iframe');
+                    iframe.setAttribute('src', 'umsg:' + JSON.stringify([event, parameters]));
+                    document.documentElement.appendChild(iframe);
+                    iframe.parentNode.removeChild(iframe);
+                };
+            };
+
+            var WKWebViewBridge = function() {
+                this.handleEvent = function(event, parameters) {
+                    window.webkit.messageHandlers.sendEvent.postMessage(JSON.stringify([event, parameters]));
+                }
+            };
+
+            var WebViewBridge = function() {
+                this.handleEvent = function(event, parameters) {
+                    window.webplayerbridge.handleEvent(JSON.stringify([event, parameters]));
+                }
+            };
+
+            var NativeBridge = function() {
+                var _this = this;
+                var bridge;
+                if (window.webplayerbridge) {
+                    bridge = new WebViewBridge();
+                } else if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.sendEvent) {
+                    bridge = new WKWebViewBridge();
+                } else {
+                    bridge = new UIWebViewBridge();
+                }
+                this._bridge = bridge;
+
+                this.receiveEvent = function(args) {
+                    console.log('unity', 'Received event: ', args);
+                    var event = args.shift();
+                    var parameters = args.shift();
+                    _this.dispatchEvent(new CustomEvent(event, { detail: parameters }));
+                };
+
+                this.sendEvent = function(event, parameters) {
+                    _this._bridge.handleEvent(event, parameters);
+                };
+
+                this.trigger = function(event, parameters) {
+                    if (event in _this.eventHandlers) {
+                        var listeners = _this.eventHandlers[event];
+                        for (var i = listeners.length - 1; i >= 0; i--) {
+                            var listener = listeners[i];
+                            listener.apply(global, parameters);
+                        }
+                    }
+                };
+            };
+            NativeBridge.prototype = new EventTarget();
+
+            global.nativebridge = new NativeBridge();
+        })(window);
+    </script>
     <script>
         (function() {
+            var adParameters = <%= data.adParameters %>;
+
+            var nativebridge = window.nativebridge;
+
             // List of all ad events
             var creativeEvents = [
                 'loaded', 'skipped', 'started', 'stopped',
@@ -45,150 +129,142 @@
                 'log', 'error'
             ];
 
-
             var Container = function() {
+                var _this = this;
                 this._iframe = document.querySelector('iframe');
                 this._creative = null;
                 this._slot = document.querySelector('.video-player-slot');
-                this._videoSlot = this._slot.querySelector('video');
+                this._videoSlot = document.querySelector('video');
 
-                var self = this;
-                window.addEventListener('message', function(e) {
-                    self._onMessage(e);
-                });
+                var eventHandlers = {
+                    init: function(e) {
+                        _this._initAd.apply(_this, e.detail);
+                    },
+                    show: function(e) {
+                        _this._showAd.apply(_this, e.detail);
+                    },
+                    destroy: function(e) {
+                        _this._stopAd.apply(_this, e.detail);
+                    },
+                    pause: function(e) {
+                        _this._pauseAd.apply(_this, e.detail);
+                    },
+                    resume: function(e) {
+                        _this._resumeAd.apply(_this, e.detail);
+                    },
+                    mute: function() {
+                        _this._videoSlot.muted = true;
+                    },
+                    unmute: function() {
+                        _this._videoSlot.muted = false;
+                    }
+                };
+
+                for (var event in eventHandlers) {
+                    window.nativebridge.addEventListener(event, eventHandlers[event]);
+                }
+
                 this._videoSlot.addEventListener('timeupdate', function(e) {
-                    self._sendProgressEvent();
+                    _this._sendProgressEvent();
                 });
-            };
 
-            Container.prototype.init = function() {
-                var getVPAID = this._getVPAIDFunction();
-                if (getVPAID && typeof getVPAID === 'function') {
-                    this._creative = getVPAID();
+                this.init = function() {
+                    var getVPAID = this._getVPAIDFunction();
+                    if (getVPAID && typeof getVPAID === 'function') {
+                        _this._creative = getVPAID();
 
-                    this._subscribeToAllEvents();
+                        _this._subscribeToAllEvents();
 
-                    window.parent.postMessage({
-                        type: 'ready'
-                    }, '*');
+                        nativebridge.sendEvent('ready');
+                        console.log('unity', 'Sent ready event');
+                    } else {
+                        _this._triggerError('getVPAIDAd is not defined');
+                    }
+                };
+
+                this.getHandshakeVersion = function() {
+                    return _this._creative.handshakeVersion('2.0');
+                };
+
+                this.getAdDuration = function() {
+                    if (_this._creative.getAdDuration) {
+                        return _this._creative.getAdDuration();
+                    } else {
+                        return _this._creative.adDuration || -2;
+                    }
+                };
+
+                this.getAdRemainingTime = function() {
+                    if (_this._creative.getAdRemainingTime) {
+                        return _this._creative.getAdRemainingTime();
                 } else {
-                    this._triggerError('getVPAIDAd is not defined');
+                        return _this._creative.adRemainingTime || -2;
+                    }
+                };
+
+                this._triggerError = function(e) {
+                    window.nativebridge.sendEvent('VPAID', ['AdError', [e]])
                 }
-            };
 
-            Container.prototype.getHandshakeVersion = function() {
-                return this._creative.handshakeVersion('2.0');
-            };
+                this._subscribeToAllEvents = function() {
+                    var len = creativeEvents.length;
+                    for (var i = 0; i < creativeEvents.length; i++) {
+                        var creativeEvent = creativeEvents[i];
+                        var normalizedEventName = 'Ad' + creativeEvent.charAt(0).toUpperCase() + creativeEvent.substring(1);
+                        _this._subscribeToEvent(normalizedEventName);
+                    }
+                };
 
-            Container.prototype.getAdDuration = function() {
-                if (this._creative.getAdDuration) {
-                    return this._creative.getAdDuration();
-                } else {
-                    return this._creative.adDuration || -2;
+                this._subscribeToEvent = function(eventName) {
+                    _this._creative.subscribe(function() {
+                        var args = [eventName].concat(Array.prototype.slice.call(arguments));
+                        _this._handleEvent.apply(_this, args);
+                    }, eventName, _this);
                 }
-            };
 
-            Container.prototype.getAdRemainingTime = function() {
-                if (this._creative.getAdRemainingTime) {
-                    return this._creative.getAdRemainingTime();
-            } else {
-                    return this._creative.adRemainingTime || -2;
+                this._getVPAIDFunction = function() {
+                    return window.getVPAIDAd;
+                };
+
+                this._handleEvent = function() {
+                    var args = Array.prototype.slice.call(arguments);
+                    var eventType = args.shift();
+                    var eventData = [eventType];
+                    eventData.push(args);
+
+                    window.nativebridge.sendEvent('VPAID', eventData);
+                    console.log('unity', 'Got VPAID event', eventType);
+                };
+
+                this._initAd = function(initOpts) {
+                    this._version = this._creative.handshakeVersion('2.0');
+                    this._creative.initAd(initOpts.width / window.devicePixelRatio, initOpts.height / window.devicePixelRatio, initOpts.viewMode, initOpts.bitrate, initOpts.creativeData, {
+                        slot: _this._slot,
+                        videoSlot: _this._videoSlot
+                    });
+                    console.log('unity', 'Ad initialized');
                 }
+
+                this._showAd = function() {
+                    this._creative.startAd();
+                };
+
+                this._stopAd = function() {
+                    return this._creative.stopAd();
+                };
+
+                this._pauseAd = function() {
+                    return this._creative.pauseAd();
+                };
+
+                this._resumeAd = function() {
+                    return this._creative.resumeAd();
+                };
+
+                this._sendProgressEvent = function() {
+                    window.nativebridge.sendEvent('progress', [_this._videoSlot.duration, _this._videoSlot.duration - _this._videoSlot.currentTime]);
+                };
             };
-
-            Container.prototype._triggerError = function(e) {
-                window.parent.postMessage({
-                    type: 'VPAID',
-                    eventType: 'AdError',
-                    args: [e]
-                }, '*');
-            }
-
-            Container.prototype._subscribeToAllEvents = function() {
-                var len = creativeEvents.length;
-                for (var i = 0; i < creativeEvents.length; i++) {
-                    var creativeEvent = creativeEvents[i];
-                    var normalizedEventName = 'Ad' + creativeEvent.charAt(0).toUpperCase() + creativeEvent.substring(1);
-                    this._subscribeToEvent(normalizedEventName);
-                }
-            };
-
-            Container.prototype._subscribeToEvent = function(eventName) {
-                this._creative.subscribe(function() {
-                    var args = [eventName].concat(Array.prototype.slice.call(arguments));
-                    this._handleEvent.apply(this, args);
-                }, eventName, this);
-            }
-
-            Container.prototype._getVPAIDFunction = function() {
-                return window.getVPAIDAd;
-            };
-
-            Container.prototype._handleEvent = function() {
-                var eventType = arguments[0];
-                var args = arguments.length > 1 ? Array.prototype.slice.call(arguments, 1) : [];
-
-                window.parent.postMessage({
-                    type: 'VPAID',
-                    eventType: eventType,
-                    args: args
-                }, '*');
-            };
-
-            Container.prototype._initAd = function(width, height, viewMode, bitrate, creativeData, envVars) {
-                this._version = this._creative.handshakeVersion('2.0');
-                this._creative.initAd(width, height, viewMode, bitrate, creativeData, envVars);
-            }
-
-            Container.prototype._showAd = function() {
-                this._creative.startAd();
-            };
-
-            Container.prototype._stopAd = function() {
-                return this._creative.stopAd();
-            };
-
-            Container.prototype._pauseAd = function() {
-                return this._creative.pauseAd();
-            };
-
-            Container.prototype._resumeAd = function() {
-                return this._creative.resumeAd();
-            };
-
-            Container.prototype._sendProgressEvent = function() {
-                window.parent.postMessage({
-                    type: 'progress',
-                    adDuration: this._videoSlot.duration,
-                    adRemainingTime: this._videoSlot.duration - this._videoSlot.currentTime,
-                }, '*');
-            };
-
-            Container.prototype._onMessage = function(e) {
-                switch (e.data.type) {
-                    case 'init':
-                        this._initAd(e.data.width, e.data.height, e.data.viewMode, e.data.bitrate, e.data.creativeData, {
-                            slot: this._slot,
-                            videoSlot: this._videoSlot
-                        });
-                        break;
-                    case 'show':
-                        this._showAd();
-                        break;
-                    case 'destroy':
-                        this._stopAd();
-                        break;
-                    case 'pause':
-                        this._pauseAd();
-                        break;
-                    case 'resume':
-                        this._resumeAd();
-                        break;
-                    default:
-                        // todo post back error
-                        break;
-                }
-            }
 
             var container = window.container = new Container();
             container.init();

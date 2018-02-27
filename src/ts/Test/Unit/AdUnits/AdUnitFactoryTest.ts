@@ -38,6 +38,9 @@ import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 import { XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
+import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
+import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
+import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 
 describe('AdUnitFactoryTest', () => {
 
@@ -99,6 +102,8 @@ describe('AdUnitFactoryTest', () => {
         sandbox.stub(operativeEventManager, 'sendThirdQuartile').returns(Promise.resolve());
         sandbox.stub(operativeEventManager, 'sendSkip').returns(Promise.resolve());
         sandbox.spy(thirdPartyEventManager, 'sendEvent');
+        sandbox.stub(nativeBridge.WebPlayer, 'setSettings').returns(Promise.resolve());
+        sandbox.stub(nativeBridge.WebPlayer, 'clearSettings').returns(Promise.resolve());
     });
 
     afterEach(() => {
@@ -228,48 +233,60 @@ describe('AdUnitFactoryTest', () => {
         });
     });
 
-    const displayUnitTests = (isStaticInterstitialUrlCampaign: boolean): void => {
-        let adUnit: DisplayInterstitialAdUnit;
-        let campaign: DisplayInterstitialCampaign;
-        let server: sinon.SinonFakeServer;
+    describe('DisplayInterstitialAdUnit', () => {
+        describe('On static-interstial campaign', () => {
+            let adUnit: DisplayInterstitialAdUnit;
+            let campaign: DisplayInterstitialCampaign;
 
-        beforeEach(() => {
-            campaign = TestFixtures.getDisplayInterstitialCampaign(isStaticInterstitialUrlCampaign);
-            adUnitParameters.campaign = campaign;
-            adUnit = <DisplayInterstitialAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+            beforeEach(() => {
+                campaign = TestFixtures.getDisplayInterstitialCampaign();
+                adUnitParameters.campaign = campaign;
+                adUnit = <DisplayInterstitialAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+            });
 
-            if (isStaticInterstitialUrlCampaign) {
-                server = sinon.fakeServer.create();
-                server.respondImmediately = true;
-                server.respondWith('<a href="http://unity3d.com"></a>');
-            }
-        });
-
-        afterEach(() => {
-            if (server) {
-                server.restore();
-            }
-        });
-
-        describe('on show', () => {
-            it('should send tracking events', () => {
-                return adUnit.show().then(() => {
-                    sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendEvent, 'display impression', campaign.getSession().getId(), 'https://unity3d.com/impression');
-                    return adUnit.hide();
+            describe('on show', () => {
+                it('should send tracking events', () => {
+                    return adUnit.show().then(() => {
+                        sinon.assert.calledOnce(<sinon.SinonSpy>thirdPartyEventManager.sendEvent);
+                        sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendEvent, 'display impression', campaign.getSession().getId(), 'https://unity3d.com/impression');
+                        return adUnit.hide();
+                    });
                 });
             });
         });
-    };
+    });
 
-    describe('DisplayInterstitialAdUnit', () => {
-        const isStaticInterstitialUrlCampaign = true;
+    describe('Promo AdUnit', () => {
+        let promoAdUnit: PromoAdUnit;
+        let campaign: PromoCampaign;
+        beforeEach(() => {
+            campaign = TestFixtures.getPromoCampaign();
+            sandbox.stub(PurchasingUtilities, 'productPrice').returns("3 €");
+            sandbox.stub(campaign, 'getSession').returns({
+                getId: sinon.stub().returns('1111')
+            });
+            adUnitParameters.campaign = campaign;
 
-        describe('On static-interstial campaign', () => {
-            displayUnitTests(!isStaticInterstitialUrlCampaign);
+            promoAdUnit = <PromoAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
         });
+        describe('on show', () => {
+            it('should trigger onStart', (done) => {
+                promoAdUnit.onStart.subscribe(() => {
+                    done();
+                });
+                promoAdUnit.show();
+            });
+        });
+        describe('on hide', () => {
+            it('should trigger onClose when hide is called', (done) => {
+                promoAdUnit.setShowing(true);
+                promoAdUnit.onClose.subscribe(() => {
+                    assert.equal(promoAdUnit.isShowing(), false);
+                    done();
+                });
 
-        describe('On static-interstial-url campaign', () => {
-            displayUnitTests(isStaticInterstitialUrlCampaign);
+                promoAdUnit.hide();
+            });
         });
     });
 
