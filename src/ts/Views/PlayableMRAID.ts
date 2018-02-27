@@ -287,7 +287,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         if (abGroup !== 18 && abGroup !== 19) {
             return;
         }
-        
+
         const closeIcon = <HTMLElement>this._closeElement.querySelector('.icon-close');
         if (remainingCloseSkipTime > 0) {
             closeIcon.classList.add('number');
