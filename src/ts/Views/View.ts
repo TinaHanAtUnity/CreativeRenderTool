@@ -8,9 +8,9 @@ import { IBuildInformation } from 'Views/Privacy';
 
 export abstract class View<T extends object> {
 
-    private static addEventListener(binding: IViewBinding, element: HTMLElement, attachTap: boolean, ignoreLength: boolean = false) {
+    private static addEventListener(binding: IViewBinding, element: HTMLElement, attachTap: boolean) {
         if(binding.event === 'swipe') {
-            binding.swipe = new Swipe(<HTMLElement>element, ignoreLength);
+            binding.swipe = new Swipe(<HTMLElement>element);
         }
 
         if(attachTap && binding.event === 'click') {
@@ -62,11 +62,11 @@ export abstract class View<T extends object> {
                 // tslint:disable:prefer-for-of
                 for(let i = 0; i < elements.length; ++i) {
                     const element = elements[i];
-                    View.addEventListener(binding, <HTMLElement>element, attachTap, binding.ignoreLength);
+                    View.addEventListener(binding, <HTMLElement>element, attachTap);
                 }
                 // tslint:enable:prefer-for-of
             } else {
-                View.addEventListener(binding, this._container, attachTap, binding.ignoreLength);
+                View.addEventListener(binding, this._container, attachTap);
             }
         });
     }

@@ -254,25 +254,6 @@
   .slide-down {
     slide-animation(.4s, ease-in, 250%);
   }
-
-   #end-screen.lunar-end-screen #the-dog {
-    bottom: calc(constant(safe-area-inset-bottom));
-    bottom: calc(env(safe-area-inset-bottom));
-  }
-
-  body.landscape {
-    #end-screen.lunar-end-screen .background-underlay {
-      height: calc(100% - constant(safe-area-inset-bottom));
-      height: calc(100% - env(safe-area-inset-bottom));
-    }
-  }
-
-  body.portrait {
-    #end-screen.lunar-end-screen .background-underlay {
-      height: calc(49.4% - constant(safe-area-inset-bottom));
-      height: calc(49.4% - env(safe-area-inset-bottom));
-    }
-  }
 }
 // @stylint on
 
