@@ -402,6 +402,7 @@ export class Cache {
             if(size > 0) {
                 this._nativeBridge.Cache.deleteFile(callback.fileId);
             }
+
             this.fulfillCallback(url, CacheStatus.FAILED);
         }
     }
