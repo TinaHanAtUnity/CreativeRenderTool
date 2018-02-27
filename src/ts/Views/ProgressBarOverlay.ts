@@ -3,7 +3,6 @@ import ProgressBarOverlayTemplate from 'html/ProgressBarOverlay.html';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
-import { Platform } from 'Constants/Platform';
 import { AbstractOverlay } from 'Views/AbstractOverlay';
 
 export class ProgressBarOverlay extends AbstractOverlay {

@@ -248,15 +248,24 @@
     }
 
     #progress-bar-overlay {
-      .progress {
-        bottom: constant(safe-area-inset-bottom);
-        bottom: env(safe-area-inset-bottom);
+      .timer {
+        left: constant(safe-area-inset-left);
+        left: env(safe-area-inset-left);
+      }
+      .mute-button {
+        top: constant(safe-area-inset-top);
+        top: env(safe-area-inset-top);
+        left: constant(safe-area-inset-left);
+        left: env(safe-area-inset-left);
       }
 
-      .timer {
-        bottom: calc(constant(safe-area-inset-bottom) + .25rem);
-        bottom: calc(env(safe-area-inset-bottom) + .25rem);
+      .skip-hit-area {
+        top: calc(constant(safe-area-inset-top) + .5rem);
+        top: calc(env(safe-area-inset-top) + .5rem);
+        right: constant(safe-area-inset-right);
+        right: env(safe-area-inset-right);
       }
+
     }
   }
   .slide-up {
@@ -267,16 +276,24 @@
     slide-animation(.4s, ease-in, 250%);
   }
 
+  .slide-left {
+    progress-slide-animation(.4s, ease-in, -200%);
+  }
+
+  .slide-right {
+    progress-slide-animation(.4s, ease-in, 200%);
+  }
+
   body.portrait {
     #progress-bar-overlay {
-      .mute-button {
-        top: constant(safe-area-inset-top);
-        top: env(safe-area-inset-top);
+      .progress {
+        bottom: constant(safe-area-inset-bottom);
+        bottom: env(safe-area-inset-bottom);
       }
 
-      .skip-hit-area {
-        top: calc(constant(safe-area-inset-top) + .5rem);
-        top: calc(env(safe-area-inset-top) + .5rem);
+      .timer {
+        bottom: calc(constant(safe-area-inset-bottom) + .25rem);
+        bottom: calc(env(safe-area-inset-bottom) + .25rem);
       }
     }
   }

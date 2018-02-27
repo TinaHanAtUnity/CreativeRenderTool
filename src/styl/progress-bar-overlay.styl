@@ -154,12 +154,12 @@ $progress-bar-color = #05bbd3;
   transition: opacity .45s ease-in-out;
 }
 
-slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
+progress-slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
   transform: translateY($translation);
   transition: transform $duration $function;
 }
 
-slide-animation($duration = .4s, $function = ease-in, $translation = 0, $right = false) {
+progress-slide-animation($duration = .4s, $function = ease-in, $translation = 0, $right = false) {
 
   transform: translateX($translation);
 
@@ -171,15 +171,15 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0, $right =
 }
 
 .slide-left {
-  slide-animation(.4s, ease-in, -150%);
+  progress-slide-animation(.4s, ease-in, -150%);
 }
 
 .slide-right {
-  slide-animation(.4s, ease-in, 150%);
+  progress-slide-animation(.4s, ease-in, 150%);
 }
 
 .slide-back-in-place {
-  slide-animation(.2s, ease-in-out, 0);
+  progress-slide-animation(.2s, ease-in-out, 0);
 }
 
 @keyframes right-spin {
