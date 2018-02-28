@@ -136,7 +136,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
             const webviewXPos = screenWidth - webviewAreaSize;
             const webviewYPos = 0;
             this._container.setViewFrame('webview', Math.floor(webviewXPos), Math.floor(webviewYPos), Math.floor(webviewAreaSize), Math.floor(webviewAreaSize)).then(() => {
-                return this._container.setViewFrame('webplayer', Math.floor(screenWidth), Math.floor(screenHeight), Math.floor(screenWidth), Math.floor(screenHeight)).then(() => {
+                return this._container.setViewFrame('webplayer', 0, 0, Math.floor(screenWidth), Math.floor(screenHeight)).then(() => {
                     return this.setWebPlayerContent();
                 });
             });
