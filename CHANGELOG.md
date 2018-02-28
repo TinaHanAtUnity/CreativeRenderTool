@@ -1,3 +1,11 @@
+# PENDING
+
+* Validate and encode all incoming asset URLs
+* Fix cache redirections on 2.2.0
+* Show time to close / skip for MRAID overlays on group 18 and 19
+* Fix creative slot colliding with video slot for VPAID
+* Fixed issue with how setViewFrame was being used
+
 # Wed Feb 28 13:55:33 UTC 2018
 
 * Fixes for openUrl and sendEvent for VPAID
