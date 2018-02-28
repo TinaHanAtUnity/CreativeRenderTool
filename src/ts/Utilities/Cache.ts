@@ -363,9 +363,7 @@ export class Cache {
             } else if(Request.RedirectResponseCodes.exec(responseCode.toString())) {
                 this.sendDiagnostic(CacheDiagnosticEvent.REDIRECTED, callback);
                 this._cacheBookkeeping.removeFileEntry(callback.fileId);
-                if(size > 0) {
-                    this._nativeBridge.Cache.deleteFile(callback.fileId);
-                }
+                this._nativeBridge.Cache.deleteFile(callback.fileId);
                 const location = Request.getHeader(headers, 'location');
                 if(location) {
                     let fileId = callback.fileId;
@@ -374,10 +372,8 @@ export class Cache {
                         fileId = this._callbacks[callback.originalUrl].fileId;
                         originalUrl = callback.originalUrl;
                     }
-                    this._nativeBridge.Cache.deleteFile(fileId).then( () => {
-                        this.registerCallback(location, fileId, false, callback.diagnostics, callback.session, originalUrl);
-                        this.downloadFile(location, fileId);
-                    });
+                    this.registerCallback(location, fileId, false, callback.diagnostics, callback.session, originalUrl);
+                    this.downloadFile(location, fileId);
                     return;
                 }
             } else if(responseCode === 416) {
