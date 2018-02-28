@@ -102,6 +102,10 @@ export class CustomFeatures {
         }
     }
 
+    public static isPlayableConfigurationEnabled(originalResourceUrl: string) {
+        return originalResourceUrl.match(/playables\/production\/unity/);
+    }
+
     public static getAdUnitStyle(abGroup: number): AdUnitStyle {
         if(abGroup === 8 || abGroup === 10) {
             return new AdUnitStyle({ctaButtonColor: this.getColor()});
@@ -123,9 +127,5 @@ export class CustomFeatures {
             '#c1272d'];
 
         return colors[Math.floor(Math.random() * colors.length)];
-    }
-
-    public static isPlayableConfigurationEnabled(originalResourceUrl: string) {
-        return originalResourceUrl.match(/playables\/production\/unity/);
     }
 }
