@@ -14,7 +14,22 @@ we currently need to use for some native releases.
 
 All API methods are referred with class.method notation, e.g. VideoPlayer.play
 
-## Pending
+## 2.2.0
+
+* Added home indicator hidden parameter to iOS AdUnit.open method
+* Added Android AdUnit methods: startMotionEventCapture, endMotionEventCapture, clearMotionEventCapture, getMotionEventCount, getMotionEventData and getCurrentMotionEventCount
+* Added append parameter to Android and iOS Cache.download method
+* Added Android Cache methods: getCacheDirectoryType, getCacheDirectoryExists and recreateCacheDirectory
+* Added iOS DeviceInfo methods: getTimeZoneOffset, getProcessInfo and getCPUCount
+* Added Android DeviceInfo methods: getTimeZoneOffset, isAdbEnabled, getApkDigest, getCertificateFingerprint, getFingerprint, getProcessInfo, isUSBConnected, getCPUCount, getUptime, getElapsedRealtime, getBuildId and getBuildVersionIncremental
+* Added Android Intent methods: canOpenIntent, canOpenIntents and checkIntentResolvable
+* Removed Android Listener.sendInitiatePurchaseEvent
+* Added Android and iOS Preferences API
+* Added Android and iOS Purchasing API
+* Added Android and iOS SensorInfo API
+* Added Android and iOS WebPlayer API
+
+## 2.1.2
 
 * Added Android system UI event handling to ad unit and activity
 * Added Cache.setFileContent method to Android and iOS
