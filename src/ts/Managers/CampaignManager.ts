@@ -373,8 +373,7 @@ export class CampaignManager {
         if(this._clientInfo.getPlatform() === Platform.IOS && this._deviceInfo instanceof IosDeviceInfo) {
             url = Url.addParameters(url, {
                 osVersion: this._deviceInfo.getOsVersion(),
-                screenScale: this._deviceInfo.getScreenScale(),
-                screenDensity: this._deviceInfo.getScreenScale()
+                screenScale: this._deviceInfo.getScreenScale()
             });
         } else if(this._clientInfo.getPlatform() === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
             url = Url.addParameters(url, {
