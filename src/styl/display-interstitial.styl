@@ -1,94 +1,14 @@
-// Media queries for determining final size of display iframe.
-// Note that 736px is used as the max device width as it is the
-// largest smartphone at this time.
-
-// Smartphone (portrait)
-@media only screen and (max-device-width: 736px) and (orientation: portrait) {
-  #display-interstitial {
-    #display-iframe {
-      width: 320px;
-      height: 480px;
-    }
-
-    .iframe-click-catcher {
-      width: 320px;
-      height: 480px;
-    }
-  }
-}
-
-// Smartphone (landscape)
-@media only screen and (max-device-width: 736px) and (orientation: landscape) {
-  #display-interstitial {
-    #display-iframe {
-      width: 480px;
-      height: 320px;
-    }
-
-    .iframe-click-catcher {
-      width: 480px;
-      height: 320px;
-    }
-  }
-}
-
-// Tablet (portrait)
-@media only screen and (min-device-width: 737px) and (orientation: portrait) {
-  #display-interstitial {
-    #display-iframe {
-      width: 768px;
-      height: 1024px;
-    }
-    .iframe-click-catcher {
-      width: 768px;
-      height: 1024px;
-    }
-  }
-}
-
-@media only screen and (min-device-width: 737px) and (orientation: landscape) {
-  #display-interstitial {
-    #display-iframe {
-      width: 1024px;
-      height: 768px;
-    }
-    .iframe-click-catcher {
-      width: 1024px;
-      height: 768px;
-    }
-  }
-}
-
 #display-interstitial {
-  width: 100vw;
-  height: 100vh;
-
-  .iframe-click-catcher {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    z-index: 1;
-    margin: 0 -50% 0 0;
-    padding: 0;
-    transform: translate(-50%, -50%);
-  }
-
-  #display-iframe {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    margin-right: -50%;
-    border: 1px solid white;
-    transform: translate(-50%, -50%);
-  }
+  width: 100%;
+  height: 100%;
 
   .close-region {
     position: absolute;
     top: 2px;
     right: 2px;
     z-index: 9999;
-    width: 50px;
-    height: 50px;
+    width: 100%;
+    height: 100%;
     opacity: .4;
   }
 

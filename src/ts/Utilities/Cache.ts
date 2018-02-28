@@ -374,8 +374,10 @@ export class Cache {
                         fileId = this._callbacks[callback.originalUrl].fileId;
                         originalUrl = callback.originalUrl;
                     }
-                    this.registerCallback(location, fileId, false, callback.diagnostics, callback.session, originalUrl);
-                    this.downloadFile(location, fileId);
+                    this._nativeBridge.Cache.deleteFile(fileId).then( () => {
+                        this.registerCallback(location, fileId, false, callback.diagnostics, callback.session, originalUrl);
+                        this.downloadFile(location, fileId);
+                    });
                     return;
                 }
             } else if(responseCode === 416) {

@@ -50,13 +50,17 @@
                 },
                 '*.json': {
                     loader: 'text'
+                },
+                '*.css': {
+                    loader: 'text'
                 }
             },
             packages: {},
             paths: {
                 '*.html': origin + '/build/dev/*.html',
                 '*.xml': origin + '/build/dev/*.xml',
-                '*.json': origin + '/build/dev/*.json'
+                '*.json': origin + '/build/dev/*.json',
+                '*.css': origin + '/build/dev/*.css'
             }
         };
         config.packages[origin] = {

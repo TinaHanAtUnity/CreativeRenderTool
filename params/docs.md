@@ -52,6 +52,7 @@
 | rooted | boolean | Is the device rooted or jailbroken | SDK | all |
 | screenDensity | number | Screen density in DPI | SDK | android |
 | screenHeight | number | Screen height in pixels | SDK | all |
+| screenScale | number | Screen scale factor | SDK | ios |
 | screenSize | number | Android raw screen layout value | SDK | android |
 | screenWidth | number | Screen width in pixels | SDK | all |
 | sdkVersion | number | SDK version in four digits | SDK | all |
@@ -111,6 +112,7 @@
 | deviceModel | all | True | False | string | Android or iOS device model, example 'iPhone7,1' | SDK | all |
 | platform | all | True | False | string | "android" or "ios" | SDK | all |
 | screenDensity | android | True | False | number | Screen density in DPI | SDK | android |
+| screenScale | ios | True | False | number | Screen scale factor | SDK | ios |
 | screenWidth | all | True | False | number | Screen width in pixels | SDK | all |
 | screenHeight | all | True | False | number | Screen height in pixels | SDK | all |
 | sdkVersion | all | True | False | number | SDK version in four digits | SDK | all |

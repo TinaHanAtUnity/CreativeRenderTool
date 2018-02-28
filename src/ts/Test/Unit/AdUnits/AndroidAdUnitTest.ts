@@ -43,8 +43,8 @@ describe('AndroidAdUnitTest', () => {
         const request = new Request(nativeBridge, wakeUpManager);
         const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         const sessionManager = new SessionManager(nativeBridge);
-        const deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
-        container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+        const deviceInfo = TestFixtures.getAndroidDeviceInfo();
+        container = new Activity(nativeBridge, deviceInfo);
         const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
         const comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
@@ -75,7 +75,7 @@ describe('AndroidAdUnitTest', () => {
         });
 
         it('with all options true', () => {
-            return container.open(testAdUnit, true, true, ForceOrientation.LANDSCAPE, true, true, true, true, { requestedOrientation: ScreenOrientation.SCREEN_ORIENTATION_UNSPECIFIED, display: testDisplay }).then(() => {
+            return container.open(testAdUnit, ['videoplayer', 'webview'], true, ForceOrientation.LANDSCAPE, true, true, true, true, { requestedOrientation: ScreenOrientation.SCREEN_ORIENTATION_UNSPECIFIED, display: testDisplay }).then(() => {
                 sinon.assert.calledWith(<sinon.SinonSpy>stub, 1, ['videoplayer', 'webview'], ScreenOrientation.SCREEN_ORIENTATION_LANDSCAPE, [KeyCode.BACK], SystemUiVisibility.LOW_PROFILE, true, true);
                 return;
             });
@@ -83,7 +83,7 @@ describe('AndroidAdUnitTest', () => {
 
         it('with all options false', () => {
             nativeBridge.setApiLevel(16); // act like Android 4.1, hw acceleration should be disabled
-            return container.open(testAdUnit, false, false, ForceOrientation.NONE, false, false, false, false, { requestedOrientation: ScreenOrientation.SCREEN_ORIENTATION_SENSOR_LANDSCAPE, display: testDisplay }).then(() => {
+            return container.open(testAdUnit, ['webview'], false, ForceOrientation.NONE, false, false, false, false, { requestedOrientation: ScreenOrientation.SCREEN_ORIENTATION_SENSOR_LANDSCAPE, display: testDisplay }).then(() => {
                 sinon.assert.calledWith(<sinon.SinonSpy>stub, 1, ['webview'], ScreenOrientation.SCREEN_ORIENTATION_LOCKED, [], SystemUiVisibility.LOW_PROFILE, false, false);
                 return;
             });
@@ -92,7 +92,7 @@ describe('AndroidAdUnitTest', () => {
 
     it('should close ad unit', () => {
         nativeBridge = TestFixtures.getNativeBridge(Platform.ANDROID);
-        container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
         const stub = sinon.stub(nativeBridge.AndroidAdUnit, 'close').returns(Promise.resolve());
 
         return container.close().then(() => {
@@ -104,7 +104,7 @@ describe('AndroidAdUnitTest', () => {
     // note: when reconfigure method is enhanced with some actual parameters, this test needs to be refactored
     it('should reconfigure ad unit', () => {
         nativeBridge = TestFixtures.getNativeBridge(Platform.ANDROID);
-        container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
 
         const stubViews = sinon.stub(nativeBridge.AndroidAdUnit, 'setViews').returns(Promise.resolve());
         const stubOrientation = sinon.stub(nativeBridge.AndroidAdUnit, 'setOrientation').returns(Promise.resolve());
@@ -129,7 +129,7 @@ describe('AndroidAdUnitTest', () => {
             let onShowTriggered: boolean = false;
             container.onShow.subscribe(() => { onShowTriggered = true; });
 
-            return container.open(testAdUnit, true, true, ForceOrientation.LANDSCAPE, true, false, true, false, options).then(() => {
+            return container.open(testAdUnit, ['videoplayer', 'webview'], true, ForceOrientation.LANDSCAPE, true, false, true, false, options).then(() => {
                 nativeBridge.AndroidAdUnit.onResume.trigger(1);
                 assert.isTrue(onShowTriggered, 'onShow was not triggered when invoking onResume');
                 return;
@@ -140,7 +140,7 @@ describe('AndroidAdUnitTest', () => {
             let onSystemKillTriggered: boolean = false;
             container.onSystemKill.subscribe(() => { onSystemKillTriggered = true; });
 
-            return container.open(testAdUnit, true, true, ForceOrientation.LANDSCAPE, true, false, true, false, options).then(() => {
+            return container.open(testAdUnit, ['videoplayer', 'webview'], true, ForceOrientation.LANDSCAPE, true, false, true, false, options).then(() => {
                 nativeBridge.AndroidAdUnit.onPause.trigger(true, 1);
                 assert.isTrue(onSystemKillTriggered, 'onSystemKill was not triggered when invoking onPause with finishing true');
                 return;
@@ -151,7 +151,7 @@ describe('AndroidAdUnitTest', () => {
             let onSystemKillTriggered: boolean = false;
             container.onSystemKill.subscribe(() => { onSystemKillTriggered = true; });
 
-            return container.open(testAdUnit, true, true, ForceOrientation.LANDSCAPE, true, false, true, false, options).then(() => {
+            return container.open(testAdUnit, ['videoplayer', 'webview'], true, ForceOrientation.LANDSCAPE, true, false, true, false, options).then(() => {
                 nativeBridge.AndroidAdUnit.onDestroy.trigger(true, 1);
                 assert.isTrue(onSystemKillTriggered, 'onSystemKill was not triggered when invoking onDestroy with finishing true');
                 return;
