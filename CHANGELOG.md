@@ -1,4 +1,4 @@
-# Staged
+# Wed Feb 28 13:55:33 UTC 2018
 
 * Fixes for openUrl and sendEvent for VPAID
 * New AdMob spam signals for SDK 2.2.0
