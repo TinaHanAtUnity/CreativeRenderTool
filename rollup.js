@@ -30,7 +30,8 @@ export default {
         string({
             include: [
                 '**/*.xml',
-                '**/*.json'
+                '**/*.json',
+                '**/*.css'
             ]
         }),
         alias({

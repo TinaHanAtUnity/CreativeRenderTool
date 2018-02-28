@@ -4,16 +4,12 @@ import { INativeResponse } from 'Utilities/Request';
 import { Platform } from 'Constants/Platform';
 import { VastParser } from 'Utilities/VastParser';
 import { NativeBridge } from 'Native/NativeBridge';
-import { FakeDeviceInfo } from './FakeDeviceInfo';
-import { DeviceInfo } from 'Models/DeviceInfo';
 import { IPerformanceCampaign, PerformanceCampaign, StoreName } from 'Models/Campaigns/PerformanceCampaign';
 import { IXPromoCampaign, XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { IMRAIDCampaign, MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Configuration } from 'Models/Configuration';
 import { ICacheDiagnostics } from 'Utilities/Cache';
 import { DisplayInterstitialCampaign, IDisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
-import { DisplayInterstitialMarkupCampaign, IDisplayInterstitialMarkupCampaign } from 'Models/Campaigns/DisplayInterstitialMarkupCampaign';
-import { DisplayInterstitialMarkupUrlCampaign, IDisplayInterstitialMarkupUrlCampaign } from 'Models/Campaigns/DisplayInterstitialMarkupUrlCampaign';
 import { Session } from 'Models/Session';
 import { IVastCampaign, VastCampaign } from 'Models/Vast/VastCampaign';
 import { IPackageInfo } from 'Native/Api/AndroidDeviceInfo';
@@ -22,10 +18,17 @@ import { Image } from 'Models/Assets/Image';
 import { HTML } from 'Models/Assets/HTML';
 import { Video } from 'Models/Assets/Video';
 import { Vast } from 'Models/Vast/Vast';
-import { IVPAIDCampaign, VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
-import { VPAIDParser } from 'Utilities/VPAIDParser';
+import { IVPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
 import { VPAID } from 'Models/VPAID/VPAID';
+import { IPromoCampaign, PromoCampaign } from 'Models/Campaigns/PromoCampaign';
+import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
+import { IosDeviceInfo } from 'Models/IosDeviceInfo';
+import { FakeAndroidDeviceInfo } from 'Test/Unit/TestHelpers/FakeAndroidDeviceInfo';
+import { RingerMode } from 'Constants/Android/RingerMode';
+import { UIUserInterfaceIdiom } from 'Constants/iOS/UIUserInterfaceIdiom';
+import { FakeIosDeviceInfo } from 'Test/Unit/TestHelpers/FakeIosDeviceInfo';
 
+import DummyPromoCampaign from 'json/DummyPromoCampaign.json';
 import OnCometMraidPlcCampaignFollowsRedirects from 'json/OnCometMraidPlcCampaignFollowsRedirects.json';
 import OnCometMraidPlcCampaign from 'json/OnCometMraidPlcCampaign.json';
 import OnCometVideoPlcCampaignFollowsRedirects from 'json/OnCometVideoPlcCampaignFollowsRedirects.json';
@@ -34,21 +37,13 @@ import OnXPromoPlcCampaign from 'json/OnXPromoPlcCampaign.json';
 import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCampaign.json';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
-import DummyDisplayInterstitialUrlCampaign from 'json/DummyDisplayInterstitialUrlCampaign.json';
 import VastCompanionXml from 'xml/VastCompanionAd.xml';
 import EventTestVast from 'xml/EventTestVast.xml';
-import VPAIDTestXML from 'xml/VPAID.xml';
-import VPAIDCampaignJson from 'json/OnProgrammaticVPAIDCampaign.json';
 import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xml';
 
-export class TestFixtures {
-    public static getDisplayInterstitialCampaign(isStaticInterstitialUrlCampaign: boolean): DisplayInterstitialCampaign {
-        if (isStaticInterstitialUrlCampaign) {
-            return this.getDisplayInterstitialMarkupUrlCampaign();
-        }
-        return this.getDisplayInterstitialMarkupCampaign();
-    }
+import * as sinon from 'sinon';
 
+export class TestFixtures {
     public static getPlacement(): Placement {
         return new Placement({
             id: 'fooId',
@@ -300,7 +295,7 @@ export class TestFixtures {
 
         return {
             ... baseCampaignParams,
-            clickThroughUrl: json.display.clickThroughURL,
+            dynamicMarkup: json.content,
             tracking: json.display.tracking || undefined
         };
     }
@@ -336,11 +331,20 @@ export class TestFixtures {
         };
     }
 
-    public static getVPAIDCampaign(): VPAIDCampaign {
-        const vpaid = new VPAIDParser().parse(VPAIDTestXML);
-        const vpaidCampaignJson = JSON.parse(VPAIDCampaignJson);
+    public static getPromoCampaignParams(json: any): IPromoCampaign {
+        const session = this.getSession();
+        return {
+            ... this.getCometCampaignBaseParams(session, json.promo.id, json.gamerId, json.abGroup, json.meta),
+            iapProductId: json.promo.iapProductId,
+            additionalTrackingEvents: json.promo.tracking ? json.promo.tracking : undefined,
+            dynamicMarkup: json.promo.dynamicMarkup,
+            creativeAsset: new HTML(json.promo.creativeUrl, session)
+        };
+    }
 
-        return new VPAIDCampaign(this.getVPAIDCampaignParams(vpaidCampaignJson, vpaid));
+    public static getPromoCampaign(): PromoCampaign {
+        const json = JSON.parse(DummyPromoCampaign);
+        return new PromoCampaign(this.getPromoCampaignParams(json));
     }
 
     public static getCampaignFollowsRedirects(): PerformanceCampaign {
@@ -398,6 +402,15 @@ export class TestFixtures {
         return new VastCampaign(this.getVastCampaignParams(vast, 3600, '12345'));
     }
 
+    public static getDisplayInterstitialCampaign(): DisplayInterstitialCampaign {
+        const json = JSON.parse(DummyDisplayInterstitialCampaign);
+        const displayInterstitialParams: IDisplayInterstitialCampaign = {
+            ... this.getDisplayInterstitialCampaignBaseParams(json, StoreName.GOOGLE, '12345'),
+            dynamicMarkup: json.content
+        };
+        return new DisplayInterstitialCampaign(displayInterstitialParams);
+    }
+
     public static getClientInfo(platform?: Platform): ClientInfo {
         if(typeof platform === 'undefined') {
             platform = Platform.ANDROID;
@@ -420,12 +433,12 @@ export class TestFixtures {
         ]);
     }
 
-    public static getDeviceInfo(platform?: Platform): DeviceInfo {
-        if(typeof platform === 'undefined') {
-            platform = Platform.ANDROID;
-        }
+    public static getAndroidDeviceInfo(): AndroidDeviceInfo {
+        return new FakeAndroidDeviceInfo(TestFixtures.getNativeBridge());
+    }
 
-        return new FakeDeviceInfo(TestFixtures.getNativeBridge(), platform);
+    public static getIosDeviceInfo(): IosDeviceInfo {
+        return new FakeIosDeviceInfo(TestFixtures.getNativeBridge());
     }
 
     public static getOkNativeResponse(): INativeResponse {
@@ -493,23 +506,76 @@ export class TestFixtures {
         return decodeURIComponent(json.display.markup);
     }
 
-    private static getDisplayInterstitialMarkupCampaign(): DisplayInterstitialMarkupCampaign {
-        const json = JSON.parse(DummyDisplayInterstitialCampaign);
-        const displayInterstitialMarkupParams: IDisplayInterstitialMarkupCampaign = {
-            ... this.getDisplayInterstitialCampaignBaseParams(json, StoreName.GOOGLE, '12345'),
-            markup: json.display.markup
+    public static getFakeNativeDeviceInfo(): any {
+        return {
+            getConnectionType: sinon.stub().returns(Promise.resolve('wifi')),
+            getNetworkType: sinon.stub().returns(Promise.resolve(0)),
+            getAdvertisingTrackingId: sinon.stub().returns(Promise.resolve('12345')),
+            getLimitAdTrackingFlag: sinon.stub().returns(Promise.resolve(true)),
+            getOsVersion: sinon.stub().returns(Promise.resolve('testVersion')),
+            getModel: sinon.stub().returns(Promise.resolve('testModel')),
+            getScreenHeight: sinon.stub().returns(Promise.resolve(1200)),
+            getScreenWidth: sinon.stub().returns(Promise.resolve(800)),
+            getSystemLanguage: sinon.stub().returns(Promise.resolve('fi')),
+            isRooted: sinon.stub().returns(Promise.resolve(true)),
+            getTimeZone: sinon.stub().returns(Promise.resolve('+0100')),
+            getTotalMemory: sinon.stub().returns(Promise.resolve(1024)),
+            getHeadset: sinon.stub().returns(Promise.resolve(true)),
+            getScreenBrightness: sinon.stub().returns(Promise.resolve(0.7)),
+            getBatteryLevel: sinon.stub().returns(Promise.resolve(0.3)),
+            getBatteryStatus: sinon.stub().returns(Promise.resolve(1)),
+            getFreeMemory: sinon.stub().returns(Promise.resolve(1024)),
+            getNetworkOperatorName: sinon.stub().returns(Promise.resolve('operatorName')),
+            getNetworkOperator: sinon.stub().returns(Promise.resolve('operator')),
+            getCPUCount: sinon.stub().returns(Promise.resolve(1)),
+            getGLVersion: sinon.stub().returns(Promise.resolve('2.0'))
         };
-
-        return new DisplayInterstitialMarkupCampaign(displayInterstitialMarkupParams);
     }
 
-    private static getDisplayInterstitialMarkupUrlCampaign(): DisplayInterstitialMarkupUrlCampaign {
-        const json = JSON.parse(DummyDisplayInterstitialUrlCampaign);
-        const displayInterstitialMarkupUrlParams: IDisplayInterstitialMarkupUrlCampaign = {
-            ... this.getDisplayInterstitialCampaignBaseParams(json, StoreName.GOOGLE, '12345'),
-            markupUrl: json.display.markupUrl
+    public static getFakeNativeAndroidDeviceInfo(): any {
+        return {
+            getAndroidId: sinon.stub().returns(Promise.resolve('17')),
+            getApiLevel: sinon.stub().returns(Promise.resolve(16)),
+            getManufacturer: sinon.stub().returns(Promise.resolve('N')),
+            getScreenDensity: sinon.stub().returns(Promise.resolve(2)),
+            getScreenLayout: sinon.stub().returns(Promise.resolve(1)),
+            getTotalSpace: sinon.stub().returns(Promise.resolve(2048)),
+            getRingerMode: sinon.stub().returns(Promise.resolve(RingerMode.RINGER_MODE_NORMAL)),
+            getDeviceVolume: sinon.stub().returns(Promise.resolve(0.5)),
+            getFreeSpace: sinon.stub().returns(Promise.resolve(16)),
+            isAppInstalled: sinon.stub().returns(Promise.resolve(true)),
+            getDeviceMaxVolume: sinon.stub().returns(Promise.resolve(1)),
+            getApkDigest: sinon.stub().returns(Promise.resolve('apkDigest')),
+            getCertificateFingerprint: sinon.stub().returns(Promise.resolve('certificateFingerPrint')),
+            getBoard: sinon.stub().returns(Promise.resolve('board')),
+            getBootloader: sinon.stub().returns(Promise.resolve('bootLoader')),
+            getBrand: sinon.stub().returns(Promise.resolve('brand')),
+            getDevice: sinon.stub().returns(Promise.resolve('device')),
+            getHardware: sinon.stub().returns(Promise.resolve('hardware')),
+            getHost: sinon.stub().returns(Promise.resolve('host')),
+            getProduct: sinon.stub().returns(Promise.resolve('product')),
+            getFingerprint: sinon.stub().returns(Promise.resolve('fingerPrint')),
+            getSupportedAbis: sinon.stub().returns(Promise.resolve( ['supported_abi_1', 'supported_abi_2'])),
+            getSensorList: sinon.stub().returns(Promise.resolve([])),
+            isUSBConnected: sinon.stub().returns(Promise.resolve(false)),
+            getUptime: sinon.stub().returns(Promise.resolve(10000)),
+            getElapsedRealtime: sinon.stub().returns(Promise.resolve(10000))
         };
-
-        return new DisplayInterstitialMarkupUrlCampaign(displayInterstitialMarkupUrlParams);
     }
+
+    public static getFakeNativeIosDeviceInfo(): any {
+        return {
+            getUserInterfaceIdiom: sinon.stub().returns(Promise.resolve(UIUserInterfaceIdiom.UIUserInterfaceIdiomPad)),
+            getScreenScale: sinon.stub().returns(Promise.resolve(2)),
+            isSimulator: sinon.stub().returns(Promise.resolve(true)),
+            getTotalSpace: sinon.stub().returns(Promise.resolve(1024)),
+            getDeviceVolume: sinon.stub().returns(Promise.resolve(0.5)),
+            getFreeSpace: sinon.stub().returns(Promise.resolve(16)),
+            getStatusBarHeight: sinon.stub().returns(Promise.resolve(40)),
+            getStatusBarWidth: sinon.stub().returns(Promise.resolve(768)),
+            getDeviceMaxVolume: sinon.stub().returns(Promise.resolve(1)),
+            getSensorList: sinon.stub().returns(Promise.resolve([])),
+        };
+    }
+
 }

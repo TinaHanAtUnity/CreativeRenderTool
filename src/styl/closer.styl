@@ -1,0 +1,76 @@
+#closer {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+
+  .close-region {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .icon-close {
+    position: absolute;
+    top: 55%;
+    left: 50%;
+    color: $white;
+    text-align: center;
+    text-shadow: 2px 2px 20px $gray;
+    font-size: 28px;
+    line-height: 28px;
+    transform: translate(-50%, -50%);
+  }
+  .close {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 36px;
+    height: 36px;
+    transform: translate(-50%, -50%);
+  }
+  .progress-wrapper {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    clip: rect(0px, 36px, 36px, 18px);
+    width: 36px;
+    height: 36px;
+    transform: translate(-50%, -50%);
+  }
+  .progress:after {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: block;
+    color: white;
+    font-size: 18px;
+    transform: translate(-50%, -50%);
+  }
+  .circle-base,
+  .circle-left,
+  .circle-right {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    border-radius: 100%;
+    background-color: transparent;
+    vertical-align: middle;
+  }
+  .circle-base {
+    border: 4px solid $dark-gray;
+  }
+  .circle-left,
+  .circle-right {
+    clip: rect(0, 18px, 36px, 0);
+    border: 4px solid $white;
+  }
+  .progress-wrapper,
+  .circle-left,
+  .circle-right {
+    -webkit-animation-iteration-count: 1;
+    -webkit-animation-fill-mode: forwards;
+    -webkit-animation-timing-function: linear;
+    -webkit-animation-duration: .01s;
+  }
+
+}

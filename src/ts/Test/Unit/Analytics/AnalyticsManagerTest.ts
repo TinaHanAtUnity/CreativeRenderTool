@@ -80,7 +80,7 @@ describe('AnalyticsManagerTest', () => {
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
         clientInfo = TestFixtures.getClientInfo();
-        deviceInfo = TestFixtures.getDeviceInfo();
+        deviceInfo = TestFixtures.getAndroidDeviceInfo();
         configuration = TestFixtures.getConfiguration();
 
         sinon.stub(nativeBridge.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('6c7fa2c0-4333-47be-8de2-2f24e33e710c'));

@@ -70,13 +70,13 @@ describe('VideoEventHandlersTest', () => {
 
         focusManager = new FocusManager(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
-        container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
         const configuration = TestFixtures.getConfiguration();
 
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-        deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
+        deviceInfo = TestFixtures.getAndroidDeviceInfo();
 
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         sessionManager = new SessionManager(nativeBridge);
@@ -87,7 +87,7 @@ describe('VideoEventHandlersTest', () => {
         vastCampaign = TestFixtures.getEventVastCampaign();
         performanceCampaign = TestFixtures.getCampaign();
         placement = TestFixtures.getPlacement();
-        overlay = new Overlay(nativeBridge, false, 'en', configuration.getGamerId(), performanceCampaign, configuration.getAbGroup());
+        overlay = new Overlay(nativeBridge, false, 'en', configuration.getGamerId(), configuration.getAbGroup());
         endScreen = new PerformanceEndScreen(nativeBridge, performanceCampaign, true, 'en', '12345');
 
         vastAdUnitParameters = {

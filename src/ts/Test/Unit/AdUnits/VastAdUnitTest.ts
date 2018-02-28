@@ -63,12 +63,12 @@ describe('VastAdUnit', () => {
         });
 
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-        deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
+        deviceInfo = TestFixtures.getAndroidDeviceInfo();
         const nativeBridge = TestFixtures.getNativeBridge();
         focusManager = new FocusManager(nativeBridge);
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         const request = new Request(nativeBridge, wakeUpManager);
-        const activity = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+        const activity = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         vastCampaign = TestFixtures.getEventVastCampaign();
         const video = vastCampaign.getVideo();
