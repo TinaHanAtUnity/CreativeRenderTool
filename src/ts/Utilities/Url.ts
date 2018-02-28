@@ -10,6 +10,26 @@ export interface IUrl {
 
 export class Url {
 
+    public static encode(url: string): string {
+        if(url) {
+            url = url.replace(/"/g, '%22');
+            url = url.replace(/</g, '%3C');
+            url = url.replace(/>/g, '%3E');
+            url = url.replace(/#/g, '%23');
+            url = url.replace(/{/g, '%7B');
+            url = url.replace(/}/g, '%7D');
+            url = url.replace(/\|/g, '%7C');
+            url = url.replace(/\\/g, '%5C');
+            url = url.replace(/\^/g, '%5E');
+            url = url.replace(/~/g, '%7E');
+            url = url.replace(/\[/g, '%5B');
+            url = url.replace(/]/g, '%5D');
+            url = url.replace(/`/g, '%60');
+        }
+
+        return url;
+    }
+
     public static parse(url: string): IUrl {
         const parser = document.createElement('a');
         parser.href = url;
