@@ -1,3 +1,11 @@
+# Wed Feb 28 13:55:33 UTC 2018
+
+* Fixes for openUrl and sendEvent for VPAID
+* New AdMob spam signals for SDK 2.2.0
+* Refactor and add missing device infos
+* Overlay progress bar AB test for groups 16 & 17
+* Remove lunar theme AB test
+
 # Fri Feb 23 15:10:28 UTC 2018
 
 * Fix MOAT init & closing due to bad merge
