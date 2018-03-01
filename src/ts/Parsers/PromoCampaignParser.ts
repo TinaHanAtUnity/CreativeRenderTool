@@ -26,13 +26,6 @@ export class PromoCampaignParser extends CampaignParser {
                         creativeId: undefined,
                         seatId: undefined,
                         meta: promoJson.meta,
-                        appCategory: undefined,
-                        appSubCategory: undefined,
-                        advertiserDomain: undefined,
-                        advertiserCampaignId: undefined,
-                        advertiserBundleId: undefined,
-                        useWebViewUserAgentForTracking: undefined,
-                        buyerId: undefined,
                         session: session
                     };
 

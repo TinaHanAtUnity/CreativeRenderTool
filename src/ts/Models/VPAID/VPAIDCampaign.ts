@@ -2,22 +2,33 @@ import { ICampaign, Campaign } from 'Models/Campaign';
 import { VPAID } from 'Models/VPAID/VPAID';
 import { IAsset, Asset } from 'Models/Assets/Asset';
 import { VastCreativeCompanionAd } from 'Models/Vast/VastCreativeCompanionAd';
+import { IProgrammaticCampaign, ProgrammaticCampaign } from 'Models/Campaigns/ProgrammaticCampaign';
 
-export interface IVPAIDCampaign extends ICampaign {
+export interface IVPAIDCampaign extends IProgrammaticCampaign {
     vpaid: VPAID;
-    tracking: any | undefined;
+    appCategory: string | undefined;
+    appSubcategory: string | undefined;
+    advertiserDomain: string | undefined;
+    advertiserCampaignId: string | undefined;
+    advertiserBundleId: string | undefined;
+    buyerId: string | undefined;
 }
 
-export class VPAIDCampaign extends Campaign<IVPAIDCampaign> {
+export class VPAIDCampaign extends ProgrammaticCampaign<IVPAIDCampaign> {
 
     constructor(campaign: IVPAIDCampaign) {
         super('VPAIDCampaign', {
-            ... Campaign.Schema,
+            ... ProgrammaticCampaign.Schema,
             vpaid: ['object'],
-            tracking: ['object', 'undefined']
+            appCategory: ['string', 'undefined'],
+            appSubcategory: ['string', 'undefined'],
+            advertiserDomain: ['string', 'undefined'],
+            advertiserCampaignId: ['string', 'undefined'],
+            advertiserBundleId: ['string', 'undefined'],
+            buyerId: ['string', 'undefined'],
         }, campaign);
 
-        this.addTrackingToVAST(campaign.tracking);
+        this.addTrackingToVAST(campaign.trackingUrls);
     }
 
     public hasEndScreen(): boolean {
@@ -55,7 +66,7 @@ export class VPAIDCampaign extends Campaign<IVPAIDCampaign> {
         return [];
     }
 
-    public getTrackingEventUrls(eventName: string): string[] {
+    public getTrackingUrlsForEvent(eventName: string): string[] {
         return this.getVPAID().getTrackingEventUrls(eventName);
     }
 
@@ -73,6 +84,30 @@ export class VPAIDCampaign extends Campaign<IVPAIDCampaign> {
 
     public getImpressionUrls(): string[] | null {
         return this.getVPAID().getImpressionUrls();
+    }
+
+    public getCategory(): string | undefined {
+        return this.get('appCategory');
+    }
+
+    public getSubcategory(): string | undefined {
+        return this.get('appSubcategory');
+    }
+
+    public getBuyerId(): string | undefined {
+        return this.get('buyerId');
+    }
+
+    public getAdvertiserDomain(): string | undefined {
+        return this.get('advertiserDomain');
+    }
+
+    public getAdvertiserCampaignId(): string | undefined {
+        return this.get('advertiserCampaignId');
+    }
+
+    public getAdvertiserBundleId(): string | undefined {
+        return this.get('advertiserBundleId');
     }
 
     private addTrackingToVAST(tracking: any) {

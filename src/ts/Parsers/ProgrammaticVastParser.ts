@@ -47,13 +47,6 @@ export class ProgrammaticVastParser extends CampaignParser {
             creativeId: response.getCreativeId() || undefined,
             seatId: response.getSeatId() || undefined,
             meta: undefined,
-            appCategory: response.getCategory() || undefined,
-            appSubCategory: response.getSubCategory() || undefined,
-            advertiserDomain: response.getAdvertiserDomain() || undefined,
-            advertiserCampaignId: response.getAdvertiserCampaignId() || undefined,
-            advertiserBundleId: response.getAdvertiserBundleId() || undefined,
-            useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking(),
-            buyerId: response.getBuyerId() || undefined,
             session: session
         };
 
@@ -76,7 +69,14 @@ export class ProgrammaticVastParser extends CampaignParser {
             hasEndscreen: !!vast.getCompanionPortraitUrl() || !!vast.getCompanionLandscapeUrl(),
             portrait: portraitAsset,
             landscape: landscapeAsset,
-            tracking: response.getTrackingUrls()
+            trackingUrls: response.getTrackingUrls(),
+            useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking(),
+            buyerId: response.getBuyerId() || undefined,
+            appCategory: response.getCategory() || undefined,
+            appSubcategory: response.getSubCategory() || undefined,
+            advertiserDomain: response.getAdvertiserDomain() || undefined,
+            advertiserCampaignId: response.getAdvertiserCampaignId() || undefined,
+            advertiserBundleId: response.getAdvertiserBundleId() || undefined,
         };
 
         const campaign = new VastCampaign(vastCampaignParms);

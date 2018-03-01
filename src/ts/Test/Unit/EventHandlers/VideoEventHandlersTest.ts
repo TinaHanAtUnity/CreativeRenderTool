@@ -202,8 +202,8 @@ describe('VideoEventHandlersTest', () => {
             const comScoreDuration = (performanceAdUnit.getVideo().getDuration()).toString(10);
             const sessionId = performanceCampaign.getSession().getId();
             const creativeId = performanceCampaign.getCreativeId();
-            const category = performanceCampaign.getCategory();
-            const subCategory = performanceCampaign.getSubCategory();
+            const category = undefined;
+            const subCategory = undefined;
             sinon.assert.calledWith(<sinon.SinonSpy>comScoreService.sendEvent, 'play', sessionId, comScoreDuration, positionAtSkip, creativeId, category, subCategory);
         });
     });
@@ -303,8 +303,8 @@ describe('VideoEventHandlersTest', () => {
             const comScoreDuration = (performanceAdUnit.getVideo().getDuration()).toString(10);
             const sessionId = performanceCampaign.getSession().getId();
             const creativeId = performanceCampaign.getCreativeId();
-            const category = performanceCampaign.getCategory();
-            const subCategory = performanceCampaign.getSubCategory();
+            const category = undefined;
+            const subCategory = undefined;
             sinon.assert.calledWith(<sinon.SinonSpy>comScoreService.sendEvent, 'end', sessionId, comScoreDuration, positionAtSkip, creativeId, category, subCategory);
         });
 

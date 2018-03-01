@@ -43,7 +43,7 @@ export class MRAIDAdUnit extends AbstractAdUnit {
         this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._mraid = parameters.mraid;
-        this._additionalTrackingEvents = parameters.campaign.getTrackingEventUrls();
+        this._additionalTrackingEvents = parameters.campaign.getTrackingUrls();
         this._endScreen = parameters.endScreen;
         this._clientInfo = parameters.clientInfo;
         this._placement = parameters.placement;

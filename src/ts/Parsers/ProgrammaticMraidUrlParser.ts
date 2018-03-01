@@ -36,13 +36,6 @@ export class ProgrammaticMraidUrlParser extends CampaignParser {
             creativeId: response.getCreativeId() || undefined,
             seatId: response.getSeatId() || undefined,
             meta: jsonMraidUrl.meta,
-            appCategory: undefined,
-            appSubCategory: undefined,
-            advertiserDomain: undefined,
-            advertiserCampaignId: undefined,
-            advertiserBundleId: undefined,
-            useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking(),
-            buyerId: undefined,
             session: session
         };
 
@@ -51,11 +44,12 @@ export class ProgrammaticMraidUrlParser extends CampaignParser {
             resourceAsset: jsonMraidUrl.inlinedUrl ? new HTML(this.validateAndEncodeUrl(jsonMraidUrl.inlinedUrl, session), session) : undefined,
             resource: undefined,
             dynamicMarkup: jsonMraidUrl.dynamicMarkup,
-            additionalTrackingEvents: response.getTrackingUrls(),
+            trackingUrls: response.getTrackingUrls(),
             clickAttributionUrl: jsonMraidUrl.clickAttributionUrl ? this.validateAndEncodeUrl(jsonMraidUrl.clickAttributionUrl, session) : undefined,
             clickAttributionUrlFollowsRedirects: jsonMraidUrl.clickAttributionUrlFollowsRedirects,
             clickUrl: jsonMraidUrl.clickUrl ? this.validateAndEncodeUrl(jsonMraidUrl.clickUrl, session) : undefined,
-            videoEventUrls: undefined,
+            videoEventUrls: {},
+            useWebViewUserAgentForTracking: false,
             gameName: undefined,
             gameIcon: undefined,
             rating: undefined,
