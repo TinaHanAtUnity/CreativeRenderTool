@@ -206,6 +206,12 @@ export class ProgressBarOverlay extends AbstractOverlay {
         event.preventDefault();
         event.stopPropagation();
         this.resetFadeTimer();
+
+        if(!this._fadeStatus) {
+            this.fade(false);
+            return;
+        }
+
         if(this._muted) {
             this._muteButtonElement.classList.remove('muted');
             this._muted = false;
@@ -260,21 +266,16 @@ export class ProgressBarOverlay extends AbstractOverlay {
 
     private fade(value: boolean) {
         if (value) {
-            this._skipElement.classList.remove('slide-back-in-place');
-            this._skipElement.classList.add('slide-right');
-            this._muteButtonElement.classList.remove('slide-back-in-place');
-            this._muteButtonElement.classList.add('slide-left');
-            this._timerElement.classList.remove('slide-back-in-place');
-            this._timerElement.classList.add('slide-left');
-
+            this._skipElement.classList.add('fade');
+            this._muteButtonElement.classList.add('fade');
+            this._timerElement.classList.add('fade');
+            (<HTMLElement>this._progressElement.parentElement).classList.add('fade');
             this._fadeStatus = false;
         } else {
-            this._skipElement.classList.remove('slide-right');
-            this._skipElement.classList.add('slide-back-in-place');
-            this._muteButtonElement.classList.remove('slide-left');
-            this._muteButtonElement.classList.add('slide-back-in-place');
-            this._timerElement.classList.add('slide-back-in-place');
-            this._timerElement.classList.remove('slide-left');
+            this._skipElement.classList.remove('fade');
+            this._muteButtonElement.classList.remove('fade');
+            this._timerElement.classList.remove('fade');
+            (<HTMLElement>this._progressElement.parentElement).classList.remove('fade');
             this._fadeStatus = true;
         }
     }
