@@ -1,4 +1,4 @@
-# PENDING
+# Thu Mar  1 10:39:02 UTC 2018
 
 * Validate and encode all incoming asset URLs
 * Fix cache redirections on 2.2.0
