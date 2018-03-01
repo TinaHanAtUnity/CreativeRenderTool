@@ -135,11 +135,11 @@
                 });
             };
 
-            this.getClickSignals = function(clickString) {
+            this.getClickSignals = function(cs) {
                 return null;
             };
 
-            this.appendClickSignals = function(url, spamSignals) {
+            this.appendClickSignals = function(url, ss) {
                 return url;
             };
 
@@ -149,8 +149,8 @@
                 });
             }
 
-            this.appendClickSignalsAsync = function(url, spamSignals) {
-                var signalPromise = spamSignals ? Promise.resolve(spamSignals) : this.getClickSignalsAsync(url);
+            this.appendClickSignalsAsync = function(url, ss) {
+                var signalPromise = ss ? Promise.resolve(ss) : this.getClickSignalsAsync(url);
                 return signalPromise.then(function(signalObject) {
                     var clickSignals = signalObject.encodedClickSignal;
                     var query = getQueryParams(url);
