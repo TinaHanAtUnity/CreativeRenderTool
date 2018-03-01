@@ -3,29 +3,40 @@ import { Video } from 'Models/Assets/Video';
 import { Asset } from 'Models/Assets/Asset';
 import { Campaign, ICampaign } from 'Models/Campaign';
 import { Image } from 'Models/Assets/Image';
+import { ProgrammaticCampaign, IProgrammaticCampaign } from 'Models/Campaigns/ProgrammaticCampaign';
 
-export interface IVastCampaign extends ICampaign {
+export interface IVastCampaign extends IProgrammaticCampaign {
     vast: Vast;
     video: Video;
     hasEndscreen: boolean;
     portrait: Image | undefined;
     landscape: Image | undefined;
-    tracking: any | undefined;
+    appCategory: string | undefined;
+    appSubcategory: string | undefined;
+    advertiserDomain: string | undefined;
+    advertiserCampaignId: string | undefined;
+    advertiserBundleId: string | undefined;
+    buyerId: string | undefined;
 }
 
-export class VastCampaign extends Campaign<IVastCampaign> {
+export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
     constructor(campaign: IVastCampaign) {
         super('VastCampaign', {
-            ... Campaign.Schema,
+            ... ProgrammaticCampaign.Schema,
             vast: ['object'],
             video: ['object'],
             hasEndscreen: ['boolean'],
             portrait: ['object', 'undefined'],
             landscape: ['object', 'undefined'],
-            tracking: ['object', 'undefined']
+            appCategory: ['string', 'undefined'],
+            appSubcategory: ['string', 'undefined'],
+            advertiserDomain: ['string', 'undefined'],
+            advertiserCampaignId: ['string', 'undefined'],
+            advertiserBundleId: ['string', 'undefined'],
+            buyerId: ['string', 'undefined'],
         }, campaign);
 
-        this.processCustomTracking(campaign.tracking);
+        this.processCustomTracking(campaign.trackingUrls);
     }
 
     public getVast(): Vast {
@@ -67,6 +78,30 @@ export class VastCampaign extends Campaign<IVastCampaign> {
 
     public isConnectionNeeded(): boolean {
         return false;
+    }
+
+    public getCategory(): string | undefined {
+        return this.get('appCategory');
+    }
+
+    public getSubcategory(): string | undefined {
+        return this.get('appSubcategory');
+    }
+
+    public getBuyerId(): string | undefined {
+        return this.get('buyerId');
+    }
+
+    public getAdvertiserDomain(): string | undefined {
+        return this.get('advertiserDomain');
+    }
+
+    public getAdvertiserCampaignId(): string | undefined {
+        return this.get('advertiserCampaignId');
+    }
+
+    public getAdvertiserBundleId(): string | undefined {
+        return this.get('advertiserBundleId');
     }
 
     public getDTO(): { [key: string]: any } {

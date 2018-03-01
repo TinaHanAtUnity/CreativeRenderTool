@@ -19,6 +19,7 @@ import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
+import { VastCampaign } from 'Models/Vast/VastCampaign';
 
 export class VideoEventHandlers {
 
@@ -111,8 +112,12 @@ export class VideoEventHandlers {
                 const comScoreDuration = (adUnit.getVideo().getDuration()).toString(10);
                 const sessionId = campaign.getSession().getId();
                 const creativeId = campaign.getCreativeId();
-                const category = campaign.getCategory();
-                const subCategory = campaign.getSubCategory();
+                let category;
+                let subCategory;
+                if (campaign instanceof VastCampaign) {
+                    category = campaign.getCategory();
+                    subCategory = campaign.getSubcategory();
+                }
                 comScoreTrackingService.sendEvent('play', sessionId, comScoreDuration, position, creativeId, category, subCategory);
             } else {
                 operativeEventManager.sendHttpKafkaEvent('ads.xpromo.operative.videostart.v1.json', 'start', campaign.getSession(), placement, campaign, this.getVideoOrientation(adUnit));
@@ -254,9 +259,7 @@ export class VideoEventHandlers {
             const comScoreDuration = (adUnit.getVideo().getDuration()).toString(10);
             const sessionId = campaign.getSession().getId();
             const creativeId = campaign.getCreativeId();
-            const category = campaign.getCategory();
-            const subCategory = campaign.getSubCategory();
-            comScoreTrackingService.sendEvent('end', sessionId, comScoreDuration, comScorePlayedTime, creativeId, category, subCategory);
+            comScoreTrackingService.sendEvent('end', sessionId, comScoreDuration, comScorePlayedTime, creativeId, undefined, undefined);
         } else {
             operativeEventManager.sendHttpKafkaEvent('ads.xpromo.operative.videoview.v1.json', 'view', campaign.getSession(), placement, campaign, this.getVideoOrientation(adUnit));
             if(campaign instanceof XPromoCampaign) {
