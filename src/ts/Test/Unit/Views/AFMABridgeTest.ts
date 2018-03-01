@@ -54,7 +54,7 @@ describe('AFMABridge', () => {
     };
 
     describe('receiving AFMA events', () => {
-        const tests: [{ event: AFMAEvents, data?: any, verify: any }] = [{
+        const tests = [{
             event: AFMAEvents.OPEN_URL,
             data: {
                 url: 'unityads.unity3d.com'
@@ -62,22 +62,22 @@ describe('AFMABridge', () => {
             verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAOpenURL, data.url)
         }, {
             event: AFMAEvents.CLOSE,
-            verify: () => sinon.assert.called(<sinon.SinonSpy>handler.onAFMAClose)
+            verify: (data?: any) => sinon.assert.called(<sinon.SinonSpy>handler.onAFMAClose)
         }, {
             event: AFMAEvents.FORCE_ORIENTATION,
             data: {
                 orientation: 'portrait'
             },
-            verify: () => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAForceOrientation, ForceOrientation.PORTRAIT)
+            verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAForceOrientation, ForceOrientation.PORTRAIT)
         }, {
             event: AFMAEvents.FORCE_ORIENTATION,
             data: {
                 orientation: 'landscape'
             },
-            verify: () => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAForceOrientation, ForceOrientation.LANDSCAPE)
+            verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAForceOrientation, ForceOrientation.LANDSCAPE)
         }, {
             event: AFMAEvents.REWARDED_VIDEO_START,
-            verify: () => sinon.assert.called(<sinon.SinonSpy>handler.onAFMARewardedVideoStart)
+            verify: (data?: any) => sinon.assert.called(<sinon.SinonSpy>handler.onAFMARewardedVideoStart)
         }, {
             event: AFMAEvents.CLICK,
             data: {
