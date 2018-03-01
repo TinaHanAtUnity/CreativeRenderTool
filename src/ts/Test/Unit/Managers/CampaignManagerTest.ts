@@ -32,6 +32,7 @@ import { ProgrammaticVastParser } from 'Parsers/ProgrammaticVastParser';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { AdMobSignal } from 'Models/AdMobSignal';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
+import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import OnProgrammaticMraidPlcCampaignEmpty from 'json/OnProgrammaticMraidPlcCampaignEmpty.json';
@@ -194,7 +195,7 @@ describe('CampaignManager', () => {
         focusManager = new FocusManager(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
-        deviceInfo = new DeviceInfo(nativeBridge);
+        deviceInfo = new AndroidDeviceInfo(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         sessionManager = new SessionManager(nativeBridge);

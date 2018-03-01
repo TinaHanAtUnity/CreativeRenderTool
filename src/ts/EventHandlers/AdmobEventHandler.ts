@@ -11,7 +11,7 @@ import { Session } from 'Models/Session';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { Url } from 'Utilities/Url';
 import { SdkStats } from 'Utilities/SdkStats';
-import { ITouchInfo } from 'Views/AFMABridge';
+import { ITouchInfo, IOpenableIntentsRequest } from 'Views/AFMABridge';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
 import { ClientInfo } from 'Models/ClientInfo';
@@ -118,6 +118,15 @@ export class AdMobEventHandler implements IAdMobEventHandler {
         }
     }
 
+    public onOpenableIntentsRequest(request: IOpenableIntentsRequest): void {
+        this._nativeBridge.Intent.canOpenIntents(request.intents).then((results) => {
+            this._adUnit.sendOpenableIntentsResponse({
+                id: request.id,
+                results: results
+            });
+        });
+    }
+
     public onTrackingEvent(event: string, data?: any) {
         this._adUnit.sendTrackingEvent(event);
         if (event === 'error') {
@@ -136,7 +145,7 @@ export class AdMobEventHandler implements IAdMobEventHandler {
     }
 
     private getClickSignal(touchInfo: ITouchInfo): Promise<AdMobSignal> {
-        return this._adMobSignalFactory.getClickSignal().then((signal) => {
+        return this._adMobSignalFactory.getClickSignal(touchInfo, this._adUnit).then((signal) => {
             signal.setTimeOnScreen(this._adUnit.getTimeOnScreen());
             signal.setTouchDiameter(touchInfo.diameter);
             signal.setTouchPressure(touchInfo.pressure);

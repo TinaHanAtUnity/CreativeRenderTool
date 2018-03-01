@@ -14,7 +14,6 @@ import { IVastAdUnitParameters, VastAdUnit } from 'AdUnits/VastAdUnit';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Overlay } from 'Views/Overlay';
-import { Platform } from 'Constants/Platform';
 import { VastEndScreen } from 'Views/VastEndScreen';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
@@ -26,6 +25,7 @@ import { MOAT } from 'Views/MOAT';
 import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 
 import EventTestVast from 'xml/EventTestVast.xml';
+import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 
 describe('VastVideoEventHandlers tests', () => {
     const handleInvocation = sinon.spy();
@@ -63,7 +63,7 @@ describe('VastVideoEventHandlers tests', () => {
         metaDataManager = new MetaDataManager(nativeBridge);
         campaign = TestFixtures.getEventVastCampaign();
         clientInfo = TestFixtures.getClientInfo();
-        container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
 
         placement = new Placement({
@@ -77,7 +77,7 @@ describe('VastVideoEventHandlers tests', () => {
             muteVideo: false
         });
 
-        deviceInfo = new DeviceInfo(nativeBridge);
+        deviceInfo = new AndroidDeviceInfo(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);

@@ -2,10 +2,10 @@ import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
 import { NativeBridge } from 'Native/NativeBridge';
-import { DeviceInfo } from 'Models/DeviceInfo';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { AdUnitContainer, ForceOrientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 import { Rotation } from 'Constants/Android/Rotation';
+import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 
 interface IAndroidOptions {
     requestedOrientation: ScreenOrientation;
@@ -21,7 +21,7 @@ interface IDisplay {
 export class Activity extends AdUnitContainer {
 
     private _nativeBridge: NativeBridge;
-    private _deviceInfo: DeviceInfo;
+    private _deviceInfo: AndroidDeviceInfo;
 
     private _activityId: number;
     private _currentActivityFinished: boolean;
@@ -35,7 +35,7 @@ export class Activity extends AdUnitContainer {
 
     private _androidOptions: IAndroidOptions;
 
-    constructor(nativeBridge: NativeBridge, deviceInfo: DeviceInfo) {
+    constructor(nativeBridge: NativeBridge, deviceInfo: AndroidDeviceInfo) {
         super();
 
         this._nativeBridge = nativeBridge;

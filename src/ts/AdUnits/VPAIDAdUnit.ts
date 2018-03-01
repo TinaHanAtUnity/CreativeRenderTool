@@ -262,6 +262,8 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     }
 
     private onUrlLoad(url: string) {
-        this.openUrl(url);
+        if (url.indexOf('file://') !== 0 && url.indexOf('about:blank') !== 0) {
+            this.openUrl(url);
+        }
     }
 }
