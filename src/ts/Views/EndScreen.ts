@@ -1,5 +1,4 @@
 import EndScreenTemplate from 'html/EndScreen.html';
-import LunarEndScreen from 'html/LunarEndScreen.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -17,8 +16,6 @@ export interface IEndScreenHandler {
     onEndScreenClose(): void;
     onKeyEvent(keyCode: number): void;
 }
-
-const lunarEndScreenId = "lunar-end-screen";
 
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
 
@@ -38,11 +35,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._gameName = gameName;
         this._adUnitStyle = adUnitStyle;
 
-        if (this.getEndscreenAlt() === lunarEndScreenId) {
-            this._template = new Template(LunarEndScreen, this._localization);
-        } else {
-            this._template = new Template(EndScreenTemplate, this._localization);
-        }
+        this._template = new Template(EndScreenTemplate, this._localization);
 
         this._bindings = [
             {
@@ -59,12 +52,6 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
                 event: 'click',
                 listener: (event: Event) => this.onPrivacyEvent(event),
                 selector: '.privacy-button'
-            },
-            {
-                event: 'swipe',
-                listener: (event: Event) => this.onPetEvent(event),
-                selector: '#the-dog',
-                ignoreLength: true
             }
         ];
 
@@ -114,11 +101,6 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
                 this._handlers.forEach(handler => handler.onEndScreenClose());
             }, AbstractAdUnit.getAutoCloseDelay());
         }
-
-        if (this.getEndscreenAlt() === lunarEndScreenId) {
-            /* Run animation when end screen is shown */
-            this._container.classList.add("run-animation");
-        }
     }
 
     public hide(): void {
@@ -145,11 +127,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     protected getEndscreenAlt(campaign?: Campaign) {
-        if(this._abGroup === 5 || this._abGroup === 8 || this._abGroup === 10) {
-            return undefined;
-        }
-
-        return lunarEndScreenId;
+        return undefined;
     }
 
     protected abstract onDownloadEvent(event: Event): void;
@@ -165,21 +143,5 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._privacy.render();
         document.body.appendChild(this._privacy.container());
         this._privacy.addEventHandler(this);
-    }
-
-    private onPetEvent(event: Event): void {
-        event.preventDefault();
-
-        if (!this._container.classList.contains("active")) {
-            this._container.classList.add("active");
-        }
-
-        const headEl: HTMLElement = <HTMLElement>this._container.querySelector('#head');
-        headEl.classList.add("nod");
-        setTimeout(() => {
-            if (typeof headEl !== "undefined" && headEl.classList && headEl.classList.contains("nod")) {
-                headEl.classList.remove("nod");
-            }
-        }, 150);
     }
 }

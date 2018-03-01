@@ -47,7 +47,7 @@ describe('MRAIDCampaign', () => {
             const params: IMRAIDCampaign = TestFixtures.getProgrammaticMRAIDCampaignParams(json, media.cacheTTL, mraidJson.id);
             const campaign = new MRAIDCampaign(params);
 
-            assert.deepEqual(campaign.getTrackingEventUrls(), media.trackingUrls);
+            assert.deepEqual(campaign.getTrackingUrls(), media.trackingUrls);
         });
 
         it('should set resourceUrl', () => {

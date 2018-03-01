@@ -222,7 +222,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         const sessionId = this._vpaidCampaign.getSession().getId();
         const creativeId = this._vpaidCampaign.getCreativeId();
         const category = this._vpaidCampaign.getCategory();
-        const subCategory = this._vpaidCampaign.getSubCategory();
+        const subCategory = this._vpaidCampaign.getSubcategory();
         let adDuration = (this._adDuration * 1000);
 
         if (adDuration < 0 || typeof adDuration === 'undefined') {

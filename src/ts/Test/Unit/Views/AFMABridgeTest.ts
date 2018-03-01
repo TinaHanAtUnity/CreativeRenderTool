@@ -25,6 +25,7 @@ describe('AFMABridge', () => {
             onAFMAOpenInAppStore: sinon.spy(),
             onAFMAOpenStoreOverlay: sinon.spy(),
             onAFMARewardedVideoStart: sinon.spy(),
+            onAFMAResolveOpenableIntents: sinon.spy(),
             onAFMATrackingEvent: sinon.spy(),
             onAFMAClickSignalRequest: sinon.spy()
         };
@@ -111,6 +112,16 @@ describe('AFMABridge', () => {
                 productId: 'com.unity3d.ads',
             },
             verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAFetchAppStoreOverlay, data.productId)
+        }, {
+            event: AFMAEvents.OPEN_INTENTS_REQUEST,
+            data: {
+                id: 1,
+                intents: [{
+                    id: '1',
+                    packageName: 'com.unity3d.ads.foo'
+                }]
+            },
+            verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAResolveOpenableIntents, data)
         }, {
             event: AFMAEvents.TRACKING,
             data: {

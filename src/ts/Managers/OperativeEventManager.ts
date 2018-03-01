@@ -19,6 +19,7 @@ import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitia
 import { Campaign } from 'Models/Campaign';
 import { Placement } from 'Models/Placement';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
+import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 
 export class OperativeEventManager {
@@ -285,7 +286,7 @@ export class OperativeEventManager {
     }
 
     private getInfoJson(session: Session, placement: Placement, campaign: Campaign, id: string, gameSession: number, gamerSid?: string, previousPlacementId?: string, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<[string, any]> {
-        const infoJson: any = {
+        let infoJson: any = {
             'eventId': id,
             'auctionId': session.getId(),
             'gameSessionId': gameSession,
@@ -296,22 +297,28 @@ export class OperativeEventManager {
             'creativeId': campaign.getCreativeId(),
             'seatId': campaign.getSeatId(),
             'placementId': placement.getId(),
-            'apiLevel': this._deviceInfo.getApiLevel(),
             'advertisingTrackingId': this._deviceInfo.getAdvertisingIdentifier(),
             'limitAdTracking': this._deviceInfo.getLimitAdTracking(),
             'osVersion': this._deviceInfo.getOsVersion(),
             'sid': gamerSid,
-            'deviceMake': this._deviceInfo.getManufacturer(),
             'deviceModel': this._deviceInfo.getModel(),
             'sdkVersion': this._clientInfo.getSdkVersion(),
             'previousPlacementId': previousPlacementId,
             'bundleId': this._clientInfo.getApplicationName(),
             'meta': campaign.getMeta(),
-            'screenDensity': this._deviceInfo.getScreenDensity(),
-            'screenSize': this._deviceInfo.getScreenLayout(),
             'platform': Platform[this._clientInfo.getPlatform()].toLowerCase(),
             'language': this._deviceInfo.getLanguage()
         };
+
+        if(this._clientInfo.getPlatform() === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
+            infoJson = {
+                ... infoJson,
+                'apiLevel': this._deviceInfo.getApiLevel(),
+                'deviceMake': this._deviceInfo.getManufacturer(),
+                'screenDensity': this._deviceInfo.getScreenDensity(),
+                'screenSize': this._deviceInfo.getScreenLayout()
+            };
+        }
 
         if(campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign) {
             const landscapeVideo = campaign.getVideo();

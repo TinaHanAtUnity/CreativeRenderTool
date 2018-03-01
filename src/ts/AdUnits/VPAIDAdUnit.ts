@@ -10,9 +10,7 @@ import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { Timer } from 'Utilities/Timer';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
-import { FocusManager } from 'Managers/FocusManager';
 import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
-import { AbstractOverlay } from 'Views/AbstractOverlay';
 import { Closer } from 'Views/Closer';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Placement } from 'Models/Placement';
@@ -34,7 +32,6 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     private static _adLoadTimeout: number = 10 * 1000;
     private _closer: Closer;
     private _placement: Placement;
-    private _focusManager: FocusManager;
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _view: VPAID;
@@ -45,12 +42,12 @@ export class VPAIDAdUnit extends AbstractAdUnit {
 
     private _onAppForegroundHandler: any;
     private _onAppBackgroundHandler: any;
+    private _onSystemInterruptHandler: any;
     private _urlLoadingObserver: IObserver2<string, string>;
 
     constructor(nativeBridge: NativeBridge, parameters: IVPAIDAdUnitParameters) {
         super(nativeBridge, parameters);
 
-        this._focusManager = parameters.focusManager;
         this._vpaidCampaign = parameters.campaign;
         this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
@@ -91,7 +88,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     }
 
     public openUrl(url: string | null) {
-        if (url && Url.isProtocolWhitelisted(url)) {
+        if (url) {
             if (this._nativeBridge.getPlatform() === Platform.IOS) {
                 this._nativeBridge.UrlScheme.open(url);
             } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
@@ -104,7 +101,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     }
 
     public sendTrackingEvent(eventType: string) {
-        const urls = this._vpaidCampaign.getTrackingEventUrls(eventType);
+        const urls = this._vpaidCampaign.getTrackingUrlsForEvent(eventType);
 
         for (const url of urls) {
             this.sendThirdPartyEvent(`vpaid ${eventType}`, url);
@@ -191,11 +188,12 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     private onShow() {
         this.setShowing(true);
         this.onStart.trigger();
+        // todo: is the timer needed at all?
         // this._timer.start();
 
         this._container.onShow.subscribe(this._onAppForegroundHandler);
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            this._focusManager.onAppBackground.subscribe(this._onAppBackgroundHandler);
+            this._onSystemInterruptHandler = this._container.onSystemInterrupt.subscribe((interruptStarted) => this.onSystemInterrupt(interruptStarted));
         } else {
             this._container.onAndroidPause.subscribe(this._onAppBackgroundHandler);
         }
@@ -214,7 +212,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
 
         this._container.onShow.unsubscribe(this._onAppForegroundHandler);
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            this._focusManager.onAppBackground.unsubscribe(this._onAppBackgroundHandler);
+            this._container.onSystemInterrupt.unsubscribe(this._onSystemInterruptHandler);
         } else {
             this._container.onAndroidPause.unsubscribe(this._onAppBackgroundHandler);
         }
@@ -241,6 +239,14 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         this._view.pauseAd();
     }
 
+    private onSystemInterrupt(interruptStarted: boolean) {
+        if (interruptStarted) {
+            this._view.pauseAd();
+        } else if (!interruptStarted && this._view.isLoaded()) {
+            this._view.resumeAd();
+        }
+    }
+
     private showCloser() {
         return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
             const left = Math.floor(width * 0.85);
@@ -256,6 +262,8 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     }
 
     private onUrlLoad(url: string) {
-        this.openUrl(url);
+        if (url.indexOf('file://') !== 0 && url.indexOf('about:blank') !== 0) {
+            this.openUrl(url);
+        }
     }
 }

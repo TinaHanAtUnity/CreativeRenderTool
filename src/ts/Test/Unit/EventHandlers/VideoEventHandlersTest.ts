@@ -70,13 +70,13 @@ describe('VideoEventHandlersTest', () => {
 
         focusManager = new FocusManager(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
-        container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
         const configuration = TestFixtures.getConfiguration();
 
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-        deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
+        deviceInfo = TestFixtures.getAndroidDeviceInfo();
 
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         sessionManager = new SessionManager(nativeBridge);
@@ -202,8 +202,8 @@ describe('VideoEventHandlersTest', () => {
             const comScoreDuration = (performanceAdUnit.getVideo().getDuration()).toString(10);
             const sessionId = performanceCampaign.getSession().getId();
             const creativeId = performanceCampaign.getCreativeId();
-            const category = performanceCampaign.getCategory();
-            const subCategory = performanceCampaign.getSubCategory();
+            const category = undefined;
+            const subCategory = undefined;
             sinon.assert.calledWith(<sinon.SinonSpy>comScoreService.sendEvent, 'play', sessionId, comScoreDuration, positionAtSkip, creativeId, category, subCategory);
         });
     });
@@ -303,8 +303,8 @@ describe('VideoEventHandlersTest', () => {
             const comScoreDuration = (performanceAdUnit.getVideo().getDuration()).toString(10);
             const sessionId = performanceCampaign.getSession().getId();
             const creativeId = performanceCampaign.getCreativeId();
-            const category = performanceCampaign.getCategory();
-            const subCategory = performanceCampaign.getSubCategory();
+            const category = undefined;
+            const subCategory = undefined;
             sinon.assert.calledWith(<sinon.SinonSpy>comScoreService.sendEvent, 'end', sessionId, comScoreDuration, positionAtSkip, creativeId, category, subCategory);
         });
 

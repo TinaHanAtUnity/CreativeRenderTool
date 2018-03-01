@@ -39,7 +39,7 @@ describe('ComScoreTrackingServiceTest', () => {
         focusManager = new FocusManager(nativeBridge);
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
-        deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
+        deviceInfo = TestFixtures.getAndroidDeviceInfo();
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         comscoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
         spy = sinon.spy(thirdPartyEventManager, 'sendEvent');
@@ -52,7 +52,7 @@ describe('ComScoreTrackingServiceTest', () => {
 
     describe('when calling sendEvent', () => {
         it('thirdPartyManger\'s sendEvent is called', () => {
-            comscoreService.sendEvent('play', TestFixtures.getSession().getId(), '20', 15, TestFixtures.getCampaign().getCreativeId(), TestFixtures.getCampaign().getCategory(), TestFixtures.getCampaign().getSubCategory());
+            comscoreService.sendEvent('play', TestFixtures.getSession().getId(), '20', 15, TestFixtures.getCampaign().getCreativeId(), undefined, undefined);
             sinon.assert.calledOnce(<sinon.SinonSpy>thirdPartyEventManager.sendEvent);
         });
     });
@@ -74,9 +74,9 @@ describe('ComScoreTrackingServiceTest', () => {
         let queryParamsDictEnd: any;
 
         const fillComscoreParams = () => {
-            comscoreService.sendEvent('play', TestFixtures.getSession().getId(), '20', 0, TestFixtures.getCampaign().getCreativeId(), TestFixtures.getCampaign().getCategory(), TestFixtures.getCampaign().getSubCategory());
+            comscoreService.sendEvent('play', TestFixtures.getSession().getId(), '20', 0, TestFixtures.getCampaign().getCreativeId(), undefined, undefined);
             urlPlay = spy.args[0][2];
-            comscoreService.sendEvent('end', TestFixtures.getSession().getId(), '20', 15, TestFixtures.getCampaign().getCreativeId(), TestFixtures.getCampaign().getCategory(), TestFixtures.getCampaign().getSubCategory());
+            comscoreService.sendEvent('end', TestFixtures.getSession().getId(), '20', 15, TestFixtures.getCampaign().getCreativeId(), undefined, undefined);
             urlEnd = spy.args[1][2];
             queryParamsDictPlay = getDictFromQueryString(urlPlay.split('?')[1]);
             queryParamsDictEnd = getDictFromQueryString(urlEnd.split('?')[1]);
@@ -165,8 +165,8 @@ describe('ComScoreTrackingServiceTest', () => {
 
         it('the query parameters should return the device model', () => {
             fillComscoreParams();
-            assert.equal(queryParamsDictPlay.ns_ap_device, TestFixtures.getDeviceInfo().getModel());
-            assert.equal(queryParamsDictEnd.ns_ap_device, TestFixtures.getDeviceInfo().getModel());
+            assert.equal(queryParamsDictPlay.ns_ap_device, TestFixtures.getAndroidDeviceInfo().getModel());
+            assert.equal(queryParamsDictEnd.ns_ap_device, TestFixtures.getAndroidDeviceInfo().getModel());
         });
 
         it('the query parameters should return the video eventName', () => {

@@ -5,7 +5,6 @@ import { IObserver0, IObserver2, IObserver1 } from 'Utilities/IObserver';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { DisplayInterstitial } from 'Views/DisplayInterstitial';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { FocusManager } from 'Managers/FocusManager';
 import { Platform } from 'Constants/Platform';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { Placement } from 'Models/Placement';
@@ -14,6 +13,7 @@ import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { IWebPlayerWebSettingsAndroid, IWebPlayerWebSettingsIos } from "Native/Api/WebPlayer";
 import { Url } from 'Utilities/Url';
+import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 
 export interface IDisplayInterstitialAdUnitParameters extends IAdUnitParameters<DisplayInterstitialCampaign> {
     view: DisplayInterstitial;
@@ -23,7 +23,6 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
 
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
-    private _focusManager: FocusManager;
     private _view: DisplayInterstitial;
     private _options: any;
     private _campaign: DisplayInterstitialCampaign;
@@ -32,12 +31,12 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
     private _receivedOnPageStart: boolean = false;
     private _clickEventHasBeenSent: boolean = false;
     private _handlingShouldOverrideUrlLoading: boolean = false;
+    private _contentReady: boolean = false;
 
     private _onShowObserver: IObserver0;
     private _onSystemKillObserver: IObserver0;
     private _shouldOverrideUrlLoadingObserver: IObserver2<string, string>;
     private _onPageStartedObserver: IObserver1<string>;
-    private _onActivityResumed: IObserver1<string>;
 
     private readonly _closeAreaMinRatio = 0.05;
     private readonly _closeAreaMinPixels = 50;
@@ -46,7 +45,6 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
         super(nativeBridge, parameters);
         this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
-        this._focusManager = parameters.focusManager;
         this._view = parameters.view;
         this._campaign = parameters.campaign;
         this._placement = parameters.placement;
@@ -63,7 +61,6 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
         this.setShowing(true);
         this._onPageStartedObserver = this._nativeBridge.WebPlayer.onPageStarted.subscribe( (url) => this.onPageStarted(url));
         this._shouldOverrideUrlLoadingObserver = this._nativeBridge.WebPlayer.shouldOverrideUrlLoading.subscribe((url: string, method: string) => this.shouldOverrideUrlLoading(url, method));
-        this._onActivityResumed = this._focusManager.onActivityResumed.subscribe((activity: string) => this.onActivityResumed(activity));
 
         return this.setWebPlayerViews().then( () => {
             this._view.show();
@@ -114,22 +111,24 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
         return 'programmaticImage';
     }
 
-    private onActivityResumed(activity: string): void {
-        this._handlingShouldOverrideUrlLoading = false;
-    }
-
     private onShow(): void {
+        if (this._contentReady) {
+            return;
+        }
         if(AbstractAdUnit.getAutoClose()) {
             setTimeout(() => {
                 this.setFinishState(FinishState.COMPLETED);
                 this.hide();
             }, AbstractAdUnit.getAutoCloseDelay());
         }
-        Promise.all([
+        const promises = [
             this._deviceInfo.getScreenWidth(),
-            this._deviceInfo.getScreenHeight(),
-            this._deviceInfo.getScreenDensity()
-        ]).then(([screenWidth, screenHeight, screenDensity]) => {
+            this._deviceInfo.getScreenHeight()
+        ];
+        if(this._deviceInfo instanceof AndroidDeviceInfo) {
+            promises.push(Promise.resolve(this._deviceInfo.getScreenDensity()));
+        }
+        Promise.all(promises).then(([screenWidth, screenHeight, screenDensity]) => {
             let webviewAreaSize = Math.max( Math.min(screenWidth, screenHeight) * this._closeAreaMinRatio, this._closeAreaMinPixels );
             if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
                 webviewAreaSize = this.getAndroidViewSize(webviewAreaSize, screenDensity);
@@ -137,7 +136,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
             const webviewXPos = screenWidth - webviewAreaSize;
             const webviewYPos = 0;
             this._container.setViewFrame('webview', Math.floor(webviewXPos), Math.floor(webviewYPos), Math.floor(webviewAreaSize), Math.floor(webviewAreaSize)).then(() => {
-                return this._container.setViewFrame('webplayer', Math.floor(screenWidth), Math.floor(screenHeight), Math.floor(screenWidth), Math.floor(screenHeight)).then(() => {
+                return this._container.setViewFrame('webplayer', 0, 0, Math.floor(screenWidth), Math.floor(screenHeight)).then(() => {
                     return this.setWebPlayerContent();
                 });
             });
@@ -171,11 +170,10 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
 
     private shouldOverrideUrlLoading(url: string, method: string): void {
         if (this._handlingShouldOverrideUrlLoading) {
-            this._nativeBridge.Sdk.logDebug("DisplayInterstitialAdUnit: shouldOverrideUrlLoading triggered for url: '" + url + "'. Already handling a url, skipping");
             return;
         }
         this._handlingShouldOverrideUrlLoading = true;
-        this._nativeBridge.Sdk.logDebug("DisplayInterstitialAdUnit: shouldOverrideUrlLoading triggered for url: '" + url + "' method: " + method);
+        this._nativeBridge.Sdk.logDebug("DisplayInterstitialAdUnit: shouldOverrideUrlLoading triggered for url: '" + url);
         if (!url) {
             this._handlingShouldOverrideUrlLoading = false;
             return;
@@ -208,7 +206,6 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
         for (let url of (this._campaign).getTrackingUrlsForEvent('impression')) {
             url = url.replace(/%ZONE%/, this._campaign.getId());
             url = url.replace(/%SDK_VERSION%/, this._operativeEventManager.getClientInfo().getSdkVersion().toString());
-            this._nativeBridge.Sdk.logDebug("todo: remove - sendStartEvents - sending " + url);
             this._thirdPartyEventManager.sendEvent('display impression', this._campaign.getSession().getId(), url);
         }
         this._operativeEventManager.sendStart(this._campaign.getSession(), this._placement, this._campaign).then(() => {
@@ -236,15 +233,8 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
         });
     }
 
-    private setWebPlayerData(data: string, mimeType: string, encoding: string, markupBaseUrl?: string): Promise<void> {
-        let dataPromise: Promise<void>;
-        if(markupBaseUrl) {
-            dataPromise = this._nativeBridge.WebPlayer.setDataWithUrl(markupBaseUrl, data, mimeType, encoding);
-        } else {
-            dataPromise = this._nativeBridge.WebPlayer.setData(data, mimeType, encoding);
-        }
-
-        return dataPromise.catch( (error) => {
+    private setWebPlayerData(data: string, mimeType: string, encoding: string): Promise<void> {
+        return this._nativeBridge.WebPlayer.setData(data, mimeType, encoding).catch( (error) => {
             this._nativeBridge.Sdk.logError(JSON.stringify(error));
             Diagnostics.trigger('webplayer_set_data_error', new DiagnosticError(error, {data: data, mimeType: mimeType, encoding: encoding}));
             this.setFinishState(FinishState.ERROR);
@@ -264,11 +254,12 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
         return this._nativeBridge.WebPlayer.setEventSettings(eventSettings);
     }
 
-    // TODO: we only have content in current auction response, dump the url stuff
     private setWebPlayerContent(): Promise<void> {
         return this.setWebplayerSettings().then( () => {
             const markup = this._campaign.getDynamicMarkup();
-            return this.setWebPlayerData(markup, 'text/html', 'UTF-8');
+            return this.setWebPlayerData(markup, 'text/html', 'UTF-8').then( () => {
+                this._contentReady = true;
+            });
         });
     }
 }
