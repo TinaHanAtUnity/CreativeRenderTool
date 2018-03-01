@@ -10,7 +10,6 @@ export interface ICampaign {
     abGroup: number;
     willExpireAt: number | undefined;
     adType: string | undefined;
-    meta: string | undefined;
     correlationId: string | undefined;
     creativeId: string | undefined;
     seatId: number | undefined;
