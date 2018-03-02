@@ -1,3 +1,8 @@
+# Fri Mar  2 09:31:54 UTC 2018
+
+* Refactor some programmatic properties away from base campaign model
+* Update dependencies
+
 # Thu Mar  1 10:39:02 UTC 2018
 
 * Validate and encode all incoming asset URLs
