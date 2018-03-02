@@ -21,3 +21,6 @@ nginx/server.PID
 
 # VS Code
 .vscode
+
+# MacOS
+.DS_Store
