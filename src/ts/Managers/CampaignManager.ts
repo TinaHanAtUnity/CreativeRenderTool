@@ -36,6 +36,7 @@ import { RequestError } from 'Errors/RequestError';
 import { CacheError } from 'Native/Api/Cache';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { IosDeviceInfo } from 'Models/IosDeviceInfo';
+import { CampaignParserFactory } from './CampaignParserFactory';
 
 export class CampaignManager {
 
@@ -271,40 +272,10 @@ export class CampaignManager {
     private handleCampaign(response: AuctionResponse, session: Session): Promise<void> {
         this._nativeBridge.Sdk.logDebug('Parsing campaign ' + response.getContentType() + ': ' + response.getContent());
         let parser: CampaignParser;
-
-        switch (response.getContentType()) {
-            case 'comet/campaign':
-                parser = new CometCampaignParser();
-                break;
-            case 'xpromo/video':
-                parser = new XPromoCampaignParser();
-                break;
-            case 'programmatic/vast':
-                parser = new ProgrammaticVastParser();
-                break;
-            case 'programmatic/mraid-url':
-                parser = new ProgrammaticMraidUrlParser();
-                break;
-            case 'programmatic/mraid':
-                parser = new ProgrammaticMraidParser();
-                break;
-            case 'programmatic/static-interstitial':
-                parser = new ProgrammaticStaticInterstitialParser();
-                break;
-            case 'programmatic/admob-video':
-                parser = new ProgrammaticAdMobParser();
-                Diagnostics.trigger('admob_ad_received', {}, session);
-                break;
-            case 'programmatic/vast-vpaid':
-                // vast-vpaid can be both VPAID or VAST, so in this case we use the VAST parser
-                // which can parse both.
-                parser = new ProgrammaticVPAIDParser();
-                break;
-            case 'purchasing/iap':
-                parser = new PromoCampaignParser();
-                break;
-            default:
-                throw new Error('Unsupported content-type: ' + response.getContentType());
+        try {
+            parser = CampaignParserFactory.getCampaignParser(response.getContentType());
+        } catch (e) {
+            return Promise.reject(e);
         }
 
         const parseTimestamp = Date.now();

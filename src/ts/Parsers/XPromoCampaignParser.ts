@@ -10,6 +10,7 @@ import { Video } from 'Models/Assets/Video';
 import { Image } from 'Models/Assets/Image';
 
 export class XPromoCampaignParser extends CampaignParser {
+    public static ContentType = 'xpromo/video';
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
         const json = response.getJsonContent();
 
