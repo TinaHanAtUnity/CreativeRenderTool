@@ -53,6 +53,7 @@ To build and test continuously (on file changes), use:
 ### Running development builds
 
 - Change SDK configuration URL to point to local build (`http://LOCAL_IP:LOCAL_PORT/build/dev/config.json`)
+  > On iOS you can do this by changing the return url of `getDefaultConfigUrl()` in [UADSSdkProperties.m](https://github.com/Applifier/unity-ads-ios/blob/master/UnityAds/Properties/UADSSdkProperties.m)
 - Change webview development config to point to local build (is done automagically by `make build-dev`) (`http://LOCAL_IP:LOCAL_PORT/build/dev/index.html`)
 - Start local web server in project root (`make start-nginx`)
 
