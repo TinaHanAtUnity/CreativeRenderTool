@@ -1,3 +1,8 @@
+# Pending
+
+* Test Android native bridge with 1ms autobatching on groups 12 and 13
+* Fix Android problem with close button, landscape orientation and scaled fonts
+
 # Fri Mar  2 09:31:54 UTC 2018
 
 * Refactor some programmatic properties away from base campaign model
