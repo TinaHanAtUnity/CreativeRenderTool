@@ -213,7 +213,7 @@ export class OperativeEventManager {
     }
 
     public sendEvent(event: string, eventId: string, sessionId: string, url: string, data: string): Promise<INativeResponse | void> {
-        this._nativeBridge.Sdk.logDebug('Unity Ads event: sending ' + event + ' event to ' + url);
+        this._nativeBridge.Sdk.logInfo('Unity Ads event: sending ' + event + ' event to ' + url);
 
         return this._request.post(url, data, [], {
             retries: 2,
