@@ -287,6 +287,13 @@
     "platforms": "all"
   },
   {
+    "key": "screenScale",
+    "type": "number",
+    "description": "Screen scale factor",
+    "provider": "SDK",
+    "platforms": "ios"
+  },
+  {
     "key": "screenSize",
     "type": "number",
     "description": "Android raw screen layout value",
@@ -423,6 +430,13 @@
     "key": "requestSignal",
     "type": "string",
     "description": "Base64 encoded string from AdMob protobuf signals",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
+    "key": "adUnitStyle",
+    "type": "object",
+    "description": "Style of the ad unit",
     "provider": "SDK",
     "platforms": "all"
   }

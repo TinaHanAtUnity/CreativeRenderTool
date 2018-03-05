@@ -22,7 +22,6 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 
 describe('DisplayInterstitialAdUnit', () => {
-    const isStaticInterstitialUrlCampaign = true;
     let adUnit: DisplayInterstitialAdUnit;
     let nativeBridge: NativeBridge;
     let container: AdUnitContainer;
@@ -37,39 +36,30 @@ describe('DisplayInterstitialAdUnit', () => {
     let clientInfo: ClientInfo;
     let displayInterstitialAdUnitParameters: IDisplayInterstitialAdUnitParameters;
     let comScoreService: ComScoreTrackingService;
-    let server: sinon.SinonFakeServer;
 
     describe('On static-interstial campaign', () => {
-        adUnitTests(!isStaticInterstitialUrlCampaign);
+        adUnitTests();
     });
 
-    describe('On static-interstial-url campaign', () => {
-        adUnitTests(isStaticInterstitialUrlCampaign);
-    });
-
-    function adUnitTests(isUrlCampaign: boolean): void {
+    function adUnitTests(): void {
         beforeEach(() => {
-            campaign = TestFixtures.getDisplayInterstitialCampaign(isUrlCampaign);
-
-            if (isUrlCampaign) {
-                server = sinon.fakeServer.create();
-                server.respondImmediately = true;
-                server.respondWith('<div><a href="http://unity3d.com"></a></div>');
-            }
+            campaign = TestFixtures.getDisplayInterstitialCampaign();
 
             sandbox = sinon.sandbox.create();
             nativeBridge = TestFixtures.getNativeBridge(Platform.ANDROID);
+            sandbox.stub(nativeBridge.WebPlayer, 'setSettings').returns(Promise.resolve());
+            sandbox.stub(nativeBridge.WebPlayer, 'clearSettings').returns(Promise.resolve());
             placement = TestFixtures.getPlacement();
 
             const metaDataManager = new MetaDataManager(nativeBridge);
             const focusManager = new FocusManager(nativeBridge);
             const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request = new Request(nativeBridge, wakeUpManager);
-            container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+            container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
             sandbox.stub(container, 'open').returns(Promise.resolve());
             sandbox.stub(container, 'close').returns(Promise.resolve());
             clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-            deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
+            deviceInfo = TestFixtures.getAndroidDeviceInfo();
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
             sessionManager = new SessionManager(nativeBridge);
             operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
@@ -106,10 +96,6 @@ describe('DisplayInterstitialAdUnit', () => {
                 adUnit.hide();
             }
             sandbox.restore();
-
-            if (server) {
-                server.restore();
-            }
         });
 
         describe('showing', () => {

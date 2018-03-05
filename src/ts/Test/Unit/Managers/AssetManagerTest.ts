@@ -193,7 +193,7 @@ describe('AssetManagerTest', () => {
         request = new Request(nativeBridge, wakeUpManager);
         cacheApi = nativeBridge.Cache = new TestCacheApi(nativeBridge);
         storageApi = nativeBridge.Storage = new TestStorageApi(nativeBridge);
-        deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
+        deviceInfo = TestFixtures.getAndroidDeviceInfo();
         cacheBookkeeping = new CacheBookkeeping(nativeBridge);
     });
 

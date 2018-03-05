@@ -44,8 +44,8 @@ describe('IosAdUnitTest', () => {
         const request = new Request(nativeBridge, wakeUpManager);
         const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         const sessionManager = new SessionManager(nativeBridge);
-        const deviceInfo = TestFixtures.getDeviceInfo(Platform.IOS);
-        container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS), focusManager);
+        const deviceInfo = TestFixtures.getIosDeviceInfo();
+        container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager);
         const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
         const comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
@@ -76,14 +76,14 @@ describe('IosAdUnitTest', () => {
         });
 
         it('with all options true', () => {
-            return container.open(testAdUnit, true, true, ForceOrientation.LANDSCAPE, true, true, true, true, defaultOptions).then(() => {
+            return container.open(testAdUnit, ['videoplayer', 'webview'], true, ForceOrientation.LANDSCAPE, true, true, true, true, defaultOptions).then(() => {
                 sinon.assert.calledWith(<sinon.SinonSpy>stub, ['videoplayer', 'webview'], UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT, false, true, true, true);
                 return;
             });
         });
 
         it('with all options false', () => {
-            return container.open(testAdUnit, false, false, ForceOrientation.NONE, false, false, false, false, defaultOptions).then(() => {
+            return container.open(testAdUnit, ['webview'], false, ForceOrientation.NONE, false, false, false, false, defaultOptions).then(() => {
                 sinon.assert.calledWith(<sinon.SinonSpy>stub, ['webview'], UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL, true, false, false, false);
                 return;
             });
@@ -93,7 +93,7 @@ describe('IosAdUnitTest', () => {
     it('should close ad unit', () => {
         nativeBridge = TestFixtures.getNativeBridge(Platform.IOS);
         focusManager = new FocusManager(nativeBridge);
-        container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS), focusManager);
+        container = new ViewController(nativeBridge,TestFixtures.getIosDeviceInfo(), focusManager);
         const stub = sinon.stub(nativeBridge.IosAdUnit, 'close').returns(Promise.resolve());
 
         return container.close().then(() => {
@@ -105,7 +105,7 @@ describe('IosAdUnitTest', () => {
     // note: when reconfigure method is enhanced with some actual parameters, this test needs to be refactored
     it('should reconfigure ad unit', () => {
         nativeBridge = TestFixtures.getNativeBridge(Platform.IOS);
-        container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS), focusManager);
+        container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager);
 
         const stubViews = sinon.stub(nativeBridge.IosAdUnit, 'setViews').returns(Promise.resolve());
         const stubOrientation = sinon.stub(nativeBridge.IosAdUnit, 'setSupportedOrientations').returns(Promise.resolve());
@@ -124,7 +124,7 @@ describe('IosAdUnitTest', () => {
         let onShowTriggered: boolean = false;
         container.onShow.subscribe(() => { onShowTriggered = true; });
 
-        return container.open(testAdUnit, true, true, ForceOrientation.LANDSCAPE, true, false, true, false, defaultOptions).then(() => {
+        return container.open(testAdUnit, ['videoplayer', 'webview'], true, ForceOrientation.LANDSCAPE, true, false, true, false, defaultOptions).then(() => {
             nativeBridge.IosAdUnit.onViewControllerDidAppear.trigger();
             assert.isTrue(onShowTriggered, 'onShow was not triggered with onViewControllerDidAppear');
             return;
@@ -142,7 +142,7 @@ describe('IosAdUnitTest', () => {
         });
 
         it('with application did become active', () => {
-            return container.open(testAdUnit, true, true, ForceOrientation.LANDSCAPE, true, false, true, false, defaultOptions).then(() => {
+            return container.open(testAdUnit, ['videoplayer', 'webview'], true, ForceOrientation.LANDSCAPE, true, false, true, false, defaultOptions).then(() => {
                 nativeBridge.Notification.onNotification.trigger('UIApplicationDidBecomeActiveNotification', {});
                 assert.isTrue(onSystemInterruptTriggered, 'onSystemInterrupt was not triggered with UIApplicationDidBecomeActiveNotification');
                 return;
@@ -150,7 +150,7 @@ describe('IosAdUnitTest', () => {
         });
 
         it('with audio session interrupt', () => {
-            return container.open(testAdUnit, true, true, ForceOrientation.LANDSCAPE, true, false, true, false, defaultOptions).then(() => {
+            return container.open(testAdUnit, ['videoplayer', 'webview'], true, ForceOrientation.LANDSCAPE, true, false, true, false, defaultOptions).then(() => {
                 nativeBridge.Notification.onNotification.trigger('AVAudioSessionInterruptionNotification', { AVAudioSessionInterruptionTypeKey: 0, AVAudioSessionInterruptionOptionKey: 1 });
                 assert.isTrue(onSystemInterruptTriggered, 'onSystemInterrupt was not triggered with AVAudioSessionInterruptionNotification');
                 return;
@@ -158,7 +158,7 @@ describe('IosAdUnitTest', () => {
         });
 
         it('with audio session route change', () => {
-            return container.open(testAdUnit, true, true, ForceOrientation.LANDSCAPE, true, false, true, false, defaultOptions).then(() => {
+            return container.open(testAdUnit, ['videoplayer', 'webview'], true, ForceOrientation.LANDSCAPE, true, false, true, false, defaultOptions).then(() => {
                 nativeBridge.Notification.onNotification.trigger('AVAudioSessionRouteChangeNotification', {});
                 assert.isTrue(onSystemInterruptTriggered, 'onSystemInterrupt was not triggered with AVAudioSessionRouteChangeNotification');
                 return;

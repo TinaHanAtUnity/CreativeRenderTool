@@ -52,11 +52,18 @@ import { XPromoEndScreenEventHandler } from 'EventHandlers/XPromoEndScreenEventH
 import { XPromoVideoEventHandlers } from 'EventHandlers/XPromoVideoEventHandlers';
 import { AdMobEventHandler } from 'EventHandlers/AdmobEventHandler';
 import { InterstitialOverlay } from 'Views/InterstitialOverlay';
+import { ProgressBarOverlay } from 'Views/ProgressBarOverlay';
 import { AbstractOverlay } from 'Views/AbstractOverlay';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { Closer } from 'Views/Closer';
 import { Privacy } from 'Views/Privacy';
 import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 import { IObserver2, IObserver3 } from 'Utilities/IObserver';
+import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
+import { Promo } from 'Views/Promo';
+import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
+import { PromoEventHandler } from 'EventHandlers/PromoEventHandler';
+import { AdUnitStyle } from 'Models/AdUnitStyle';
 
 export class AdUnitFactory {
 
@@ -79,6 +86,8 @@ export class AdUnitFactory {
             return this.createXPromoAdUnit(nativeBridge, <IAdUnitParameters<XPromoCampaign>>parameters);
         } else if (parameters.campaign instanceof AdMobCampaign) {
             return this.createAdMobAdUnit(nativeBridge, <IAdUnitParameters<AdMobCampaign>>parameters);
+        } else if (parameters.campaign instanceof PromoCampaign) {
+            return this.createPromoAdUnit(nativeBridge, <IAdUnitParameters<PromoCampaign>>parameters);
         } else {
             throw new Error('Unknown campaign instance type');
         }
@@ -86,7 +95,8 @@ export class AdUnitFactory {
 
     private static createPerformanceAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PerformanceCampaign>): PerformanceAdUnit {
         const overlay = this.createOverlay(nativeBridge, parameters);
-        const endScreen = new PerformanceEndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+        const adUnitStyle = CustomFeatures.getAdUnitStyle(parameters.campaign.getAbGroup());
+        const endScreen = new PerformanceEndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), adUnitStyle);
         const video = this.getOrientedVideo(<PerformanceCampaign>parameters.campaign, parameters.forceOrientation);
 
         const performanceAdUnitParameters: IPerformanceAdUnitParameters = {
@@ -94,6 +104,7 @@ export class AdUnitFactory {
             video: video,
             overlay: overlay,
             endScreen: endScreen,
+            adUnitStyle: adUnitStyle
         };
 
         const performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
@@ -102,7 +113,7 @@ export class AdUnitFactory {
         const endScreenEventHandler = new PerformanceEndScreenEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
         endScreen.addEventHandler(endScreenEventHandler);
 
-        this.prepareVideoPlayer(nativeBridge, performanceAdUnit, parameters);
+        this.prepareVideoPlayer(nativeBridge, performanceAdUnit, parameters, performanceAdUnitParameters.adUnitStyle);
 
         if (nativeBridge.getPlatform() === Platform.ANDROID) {
             const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => endScreenEventHandler.onKeyEvent(keyCode));
@@ -276,15 +287,15 @@ export class AdUnitFactory {
         return mraidAdUnit;
     }
 
-    private static createVPAIDAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<VPAIDCampaign>): VPAIDAdUnit {
-        const overlay = this.createOverlay(nativeBridge, parameters);
-        const vpaid = new VPAID(nativeBridge, <VPAIDCampaign>parameters.campaign, parameters.placement, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+    private static createVPAIDAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<VPAIDCampaign>): AbstractAdUnit {
+        const closer = new Closer(nativeBridge, parameters.placement);
+        const vpaid = new VPAID(nativeBridge, <VPAIDCampaign>parameters.campaign, parameters.placement);
         let endScreen: VPAIDEndScreen | undefined;
 
         const vpaidAdUnitParameters: IVPAIDAdUnitParameters = {
             ... parameters,
             vpaid: vpaid,
-            overlay: overlay,
+            closer: closer,
         };
 
         if(parameters.campaign.hasEndScreen()) {
@@ -297,7 +308,7 @@ export class AdUnitFactory {
         const vpaidEventHandler = new VPAIDEventHandler(nativeBridge, vpaidAdUnit, vpaidAdUnitParameters);
         vpaid.addEventHandler(vpaidEventHandler);
         const overlayEventHandler = new VPAIDOverlayEventHandler(nativeBridge, vpaidAdUnit, vpaidAdUnitParameters);
-        overlay.addEventHandler(overlayEventHandler);
+        closer.addEventHandler(overlayEventHandler);
 
         if(parameters.campaign.hasEndScreen() && endScreen) {
             const endScreenEventHandler = new VPAIDEndScreenEventHandler(nativeBridge, vpaidAdUnit, vpaidAdUnitParameters);
@@ -305,6 +316,22 @@ export class AdUnitFactory {
         }
 
         return vpaidAdUnit;
+    }
+
+    private static createPromoAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PromoCampaign>): AbstractAdUnit {
+        const promoView = new Promo(nativeBridge, parameters.campaign, parameters.deviceInfo.getLanguage());
+        const promoAdUnit = new PromoAdUnit(nativeBridge, {
+            ...parameters,
+            view: promoView
+        });
+
+        promoView.render();
+        document.body.appendChild(promoView.container());
+
+        promoView.onClose.subscribe(() => PromoEventHandler.onClose(nativeBridge, promoAdUnit, parameters.campaign.getGamerId(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup(), parameters.campaign.getTrackingUrlsForEvent('purchase')));
+        promoView.onPromo.subscribe((productId) => PromoEventHandler.onPromo(nativeBridge, promoAdUnit, productId, parameters.campaign.getTrackingUrlsForEvent('purchase')));
+
+        return promoAdUnit;
     }
 
     private static createDisplayInterstitialAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<DisplayInterstitialCampaign>): DisplayInterstitialAdUnit {
@@ -322,12 +349,12 @@ export class AdUnitFactory {
         return displayInterstitialAdUnit;
     }
 
-    private static prepareVideoPlayer(nativeBridge: NativeBridge, adUnit: VideoAdUnit, parameters: IAdUnitParameters<Campaign>) {
+    private static prepareVideoPlayer(nativeBridge: NativeBridge, adUnit: VideoAdUnit, parameters: IAdUnitParameters<Campaign>, adUnitStyle?: AdUnitStyle) {
         const onPreparedObserver = nativeBridge.VideoPlayer.onPrepared.subscribe((url, duration, width, height) => VideoEventHandlers.onVideoPrepared(nativeBridge, adUnit, duration, parameters.campaign));
         const onPrepareTimeoutObserver = nativeBridge.VideoPlayer.onPrepareTimeout.subscribe((url) => VideoEventHandlers.onVideoPrepareTimeout(nativeBridge, adUnit, parameters.campaign, url));
-        const onProgressObserver = nativeBridge.VideoPlayer.onProgress.subscribe((position) => VideoEventHandlers.onVideoProgress(nativeBridge, parameters.operativeEventManager, parameters.thirdPartyEventManager, parameters.comScoreTrackingService, adUnit, position, parameters.configuration, parameters.campaign, parameters.placement));
+        const onProgressObserver = nativeBridge.VideoPlayer.onProgress.subscribe((position) => VideoEventHandlers.onVideoProgress(nativeBridge, parameters.operativeEventManager, parameters.thirdPartyEventManager, parameters.comScoreTrackingService, adUnit, position, parameters.configuration, parameters.campaign, parameters.placement, adUnitStyle));
         const onPlayObserver = nativeBridge.VideoPlayer.onPlay.subscribe(() => VideoEventHandlers.onVideoPlay(nativeBridge, adUnit));
-        const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VideoEventHandlers.onVideoCompleted(parameters.operativeEventManager, parameters.thirdPartyEventManager, parameters.comScoreTrackingService, adUnit, parameters.campaign, parameters.placement));
+        const onCompletedObserver = nativeBridge.VideoPlayer.onCompleted.subscribe((url) => VideoEventHandlers.onVideoCompleted(parameters.operativeEventManager, parameters.thirdPartyEventManager, parameters.comScoreTrackingService, adUnit, parameters.campaign, parameters.placement, adUnitStyle));
 
         adUnit.onClose.subscribe(() => {
             nativeBridge.VideoPlayer.onPrepared.unsubscribe(onPreparedObserver);
@@ -454,13 +481,22 @@ export class AdUnitFactory {
     }
 
     private static createOverlay(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractOverlay {
-        if(!parameters.placement.allowSkip()) {
-            const overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign, parameters.campaign.getAbGroup());
-            if(parameters.placement.disableVideoControlsFade()) {
-                overlay.setFadeEnabled(false);
+        if (!parameters.placement.allowSkip()) {
+            let overlay: AbstractOverlay;
+            if (parameters.campaign.getAbGroup() === 16 || parameters.campaign.getAbGroup() === 17) {
+                overlay = new ProgressBarOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup());
+                if (parameters.placement.disableVideoControlsFade()) {
+                    overlay.setFadeEnabled(false);
+                }
+            } else {
+                overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup());
+                if (parameters.placement.disableVideoControlsFade()) {
+                    overlay.setFadeEnabled(false);
+                }
             }
             return overlay;
         } else {
+
             let overlay: AbstractOverlay;
 
             // Scopely's game IDs
@@ -482,10 +518,14 @@ export class AdUnitFactory {
                 '1307777',
                 '1495013'];
 
-            if(parameters.placement.skipEndCardOnClose() || enabledGameIds.indexOf(parameters.clientInfo.getGameId()) !== -1) {
+            if (parameters.placement.skipEndCardOnClose() || enabledGameIds.indexOf(parameters.clientInfo.getGameId()) !== -1) {
                 overlay = new InterstitialOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
             } else {
-                overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign, parameters.campaign.getAbGroup());
+                if (parameters.campaign.getAbGroup() === 16 || parameters.campaign.getAbGroup() === 17) {
+                    overlay = new ProgressBarOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup());
+                } else {
+                    overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup());
+                }
             }
 
             if(parameters.placement.disableVideoControlsFade() || CustomFeatures.isFadeDisabled(parameters.clientInfo.getGameId())) {

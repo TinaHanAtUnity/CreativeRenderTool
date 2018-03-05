@@ -21,9 +21,11 @@ import { IosAdUnitApi } from 'Native/Api/IosAdUnit';
 import { NotificationApi } from 'Native/Api/Notification';
 import { UrlSchemeApi } from 'Native/Api/UrlScheme';
 import { LifecycleApi } from 'Native/Api/Lifecycle';
+import { WebPlayerApi } from 'Native/Api/WebPlayer';
 import { AndroidPreferencesApi } from 'Native/Api/AndroidPreferences';
 import { IosPreferencesApi } from 'Native/Api/IosPreferences';
 import { SensorInfoApi } from 'Native/Api/SensorInfo';
+import { PurchasingApi } from 'Native/Api/Purchasing';
 
 export enum CallbackStatus {
     OK,
@@ -61,6 +63,7 @@ export class NativeBridge implements INativeBridge {
     public Lifecycle: LifecycleApi;
     public Notification: NotificationApi;
     public Placement: PlacementApi;
+    public Purchasing: PurchasingApi;
     public Request: RequestApi;
     public Resolve: ResolveApi;
     public Sdk: SdkApi;
@@ -68,6 +71,7 @@ export class NativeBridge implements INativeBridge {
     public Storage: StorageApi;
     public VideoPlayer: VideoPlayerApi;
     public UrlScheme: UrlSchemeApi;
+    public WebPlayer: WebPlayerApi;
 
     private _callbackId: number = 1;
     private _callbackTable: {[key: number]: CallbackContainer<any>} = {};
@@ -105,6 +109,7 @@ export class NativeBridge implements INativeBridge {
         this.Lifecycle = new LifecycleApi(this);
         this.Notification = new NotificationApi(this);
         this.Placement = new PlacementApi(this);
+        this.Purchasing = new PurchasingApi(this);
         this.Request = new RequestApi(this);
         this.Resolve = new ResolveApi(this);
         this.Sdk = new SdkApi(this);
@@ -112,6 +117,7 @@ export class NativeBridge implements INativeBridge {
         this.Storage = new StorageApi(this);
         this.VideoPlayer = new VideoPlayerApi(this);
         this.UrlScheme = new UrlSchemeApi(this);
+        this.WebPlayer = new WebPlayerApi(this);
     }
 
     public registerCallback<T>(resolve: (value?: T | PromiseLike<T>) => void, reject: (reason?: any) => void): number {
@@ -220,12 +226,20 @@ export class NativeBridge implements INativeBridge {
                 this.Storage.handleEvent(event, parameters);
                 break;
 
+            case EventCategory[EventCategory.PURCHASING]:
+                this.Purchasing.handleEvent(event, parameters);
+                break;
+
             case EventCategory[EventCategory.DEVICEINFO]:
                 if(this.getPlatform() === Platform.IOS) {
                     this.DeviceInfo.Ios.handleEvent(event, parameters);
                 } else {
                     this.DeviceInfo.Android.handleEvent(event, parameters);
                 }
+                break;
+
+            case EventCategory[EventCategory.WEBPLAYER]:
+                this.WebPlayer.handleEvent(event, parameters);
                 break;
 
             default:
@@ -253,6 +267,10 @@ export class NativeBridge implements INativeBridge {
 
     public getPlatform(): Platform {
         return this._platform;
+    }
+
+    public setAutoBatchInterval(interval: number): void {
+        this._autoBatchInterval = interval;
     }
 
     private invokeBatch(batch: BatchInvocation): void {
