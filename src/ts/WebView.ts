@@ -101,6 +101,12 @@ export class WebView {
         return this._nativeBridge.Sdk.loadComplete().then((data) => {
             this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
 
+            if(!/^\d+$/.test( this._clientInfo.getGameId())) {
+                const message = `Provided Game ID '${this._clientInfo.getGameId()}' is invalid. Game ID may contain only digits (0-9).`;
+                this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INVALID_ARGUMENT], message);
+                return Promise.reject(message);
+            }
+
             if(this._clientInfo.getPlatform() === Platform.ANDROID) {
                 this._deviceInfo = new AndroidDeviceInfo(this._nativeBridge);
             } else if(this._clientInfo.getPlatform() === Platform.IOS) {
@@ -225,11 +231,6 @@ export class WebView {
                 this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], error.message);
             } else if(error instanceof Error && error.name === 'DisabledGame') {
                 return;
-            } else if(error instanceof Error) {
-                error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
-                if(error.message === UnityAdsError[UnityAdsError.INVALID_ARGUMENT]) {
-                    this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INVALID_ARGUMENT], 'Game ID is not valid');
-                }
             }
 
             this._nativeBridge.Sdk.logError(JSON.stringify(error));

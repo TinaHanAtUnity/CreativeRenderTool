@@ -63,9 +63,9 @@ describe('ClientInfoTest', () => {
             null
         ];
 
-        assert.throw(() => {
-            const clientInfoTest = new ClientInfo(Platform.TEST, data);
-            assert.equal(clientInfoTest.getGameId(), 'abc1111');
-        }, UnityAdsError[UnityAdsError.INVALID_ARGUMENT]);
+        clientInfo = new ClientInfo(Platform.TEST, data);
+        const dto: any = clientInfo.getDTO();
+
+        assert.equal(dto.gameId, 'abc1111');
     });
 });
