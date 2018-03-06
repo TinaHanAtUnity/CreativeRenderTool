@@ -134,7 +134,7 @@ describe('AFMABridge', () => {
                 start: { x: 1, y: 1 },
                 end: { x: 2, y: 2}
             },
-            verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAClickSignalRequest, data.data)
+            verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAClickSignalRequest, data)
         }];
 
         for (const test of tests) {
