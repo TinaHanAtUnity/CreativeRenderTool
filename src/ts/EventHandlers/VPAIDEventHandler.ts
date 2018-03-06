@@ -60,7 +60,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     }
 
     public onVPAIDEvent(eventType: string, args: any[]) {
-        this._nativeBridge.Sdk.logInfo(`vpaid event ${eventType} with args ${args && args.length ? args.join(' '): 'None'}`);
+        this._nativeBridge.Sdk.logDebug(`vpaid event ${eventType} with args ${args && args.length ? args.join(' '): 'None'}`);
         const handler = this._vpaidEventHandlers[eventType];
         if (handler) {
             handler.apply(this, args);

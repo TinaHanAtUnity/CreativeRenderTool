@@ -192,7 +192,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
             }).then( () => {
                 this._handlingShouldOverrideUrlLoading = false;
             }).catch( (e) => {
-                this._nativeBridge.Sdk.logInfo("DisplayInterstitialAdUnit: Cannot open url: '" + url + "': " + e);
+                this._nativeBridge.Sdk.logDebug("DisplayInterstitialAdUnit: Cannot open url: '" + url + "': " + e);
                 this._handlingShouldOverrideUrlLoading = false;
             });
         }
