@@ -267,7 +267,7 @@ export class OperativeEventManager {
 
     private resendEvent(sessionId: string, eventId: string): Promise<void | void[]> {
         return this.getStoredEvent(sessionId, eventId).then(([url, data]) => {
-            this._nativeBridge.Sdk.logInfo('Unity Ads operative event: resending operative event to ' + url + ' (session ' + sessionId + ', event ' + eventId + ')');
+            this._nativeBridge.Sdk.logDebug('Unity Ads operative event: resending operative event to ' + url + ' (session ' + sessionId + ', event ' + eventId + ')');
             return this._request.post(url, data);
         }).then(() => {
             return Promise.all([
