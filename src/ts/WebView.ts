@@ -361,7 +361,7 @@ export class WebView {
         this._nativeBridge.Sdk.logInfo('Closing Unity Ads ad unit');
         this._showing = false;
         if(this._mustReinitialize) {
-            this._nativeBridge.Sdk.logInfo('Unity Ads webapp has been updated, reinitializing Unity Ads');
+            this._nativeBridge.Sdk.logDebug('Unity Ads webapp has been updated, reinitializing Unity Ads');
             this.reinitialize();
         }
     }
@@ -384,7 +384,7 @@ export class WebView {
                     this._mustReinitialize = true;
                     this._campaignRefreshManager.setRefreshAllowed(false);
                 } else {
-                    this._nativeBridge.Sdk.logInfo('Unity Ads webapp has been updated, reinitializing Unity Ads');
+                    this._nativeBridge.Sdk.logDebug('Unity Ads webapp has been updated, reinitializing Unity Ads');
                     this.reinitialize();
                 }
             } else {
