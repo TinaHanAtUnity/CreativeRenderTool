@@ -1,3 +1,11 @@
+# Pending
+
+* Add source game id to xpromo events
+* Allow certain range unicode characters in urls
+* Obfuscate spam idenfiers in AFMA container
+* AFMA: fix click signals
+
+
 # Tue Mar  6 06:29:39 UTC 2018
 
 * Test Android native bridge with 1ms autobatching on groups 12 and 13
