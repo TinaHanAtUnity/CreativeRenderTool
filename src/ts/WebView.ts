@@ -49,6 +49,7 @@ import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
 
 export class WebView {
 
@@ -184,7 +185,7 @@ export class WebView {
                 throw error;
             }
 
-            if(this._configuration.isAnalyticsEnabled() || this._clientInfo.getGameId() === '14850' || this._clientInfo.getGameId() === '14851') {
+            if(this._configuration.isAnalyticsEnabled() || CustomFeatures.isExampleGameId(this._clientInfo.getGameId())) {
                 this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo, this._configuration, this._focusManager);
                 return this._analyticsManager.init().then(() => {
                     this._sessionManager.setGameSessionId(this._analyticsManager.getGameSessionId());

@@ -4,6 +4,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
 import { AbstractOverlay } from 'Views/AbstractOverlay';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
 
 export class ProgressBarOverlay extends AbstractOverlay {
 
@@ -73,7 +74,7 @@ export class ProgressBarOverlay extends AbstractOverlay {
             }
         ];
 
-        if(gameId === '1300023' || gameId === '1300024') {
+        if(CustomFeatures.isTimehopApp(gameId)) {
             this._bindings.push({
                 event: 'swipe',
                 listener: (event: Event) => this.onSkipEvent(event)
