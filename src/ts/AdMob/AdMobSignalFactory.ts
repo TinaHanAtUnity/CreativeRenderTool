@@ -11,6 +11,7 @@ import { MotionEventAction } from 'Constants/Android/MotionEventAction';
 import { IMotionEvent } from 'Native/Api/AndroidAdUnit';
 import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
+import { AdMobOptionalSignal } from 'Models/AdMobOptionalSignal';
 
 export class AdMobSignalFactory {
     private _nativeBridge: NativeBridge;
@@ -23,6 +24,11 @@ export class AdMobSignalFactory {
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._focusManager = focusManager;
+    }
+
+    public getOptionalSignal(): Promise<AdMobOptionalSignal> {
+        const signal = new AdMobOptionalSignal();
+        return Promise.resolve(signal);
     }
 
     public getAdRequestSignal(): Promise<AdMobSignal> {
