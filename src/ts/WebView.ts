@@ -261,7 +261,7 @@ export class WebView {
             return;
         }
 
-        if(placement.isRealtime()) {
+        if (placement.getRealtimeData()) {
             this._nativeBridge.Sdk.logInfo('Unity Ads is requesting realtime fill for placement ' + placement.getId());
             this._campaignManager.requestRealtime(placement, campaign.getSession()).then(realtimeCampaign => {
                 if(realtimeCampaign) {

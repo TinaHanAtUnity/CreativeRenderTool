@@ -224,7 +224,7 @@ export class CampaignManager {
                     } else {
                         noFill.push(placement);
                     }
-
+                    this.resetRealtimeDataForPlacements();
                     if(json.realtimeData && json.realtimeData[placement]) {
                         this._configuration.getPlacement(placement).setRealtimeData(json.realtimeData[placement]);
                     }
@@ -281,6 +281,13 @@ export class CampaignManager {
         } else {
             throw new Error('No placements found');
         }
+    }
+
+    private resetRealtimeDataForPlacements() {
+        const placements = this._configuration.getPlacements();
+        Object.keys(placements).forEach((placementId) => {
+            placements[placementId].setRealtimeData(undefined);
+        });
     }
 
     private parseRealtimeCampaign(response: INativeResponse, session: Session, placement: Placement): Promise<Campaign | void> {
@@ -554,7 +561,6 @@ export class CampaignManager {
                     placementRequest[realtimePlacement.getId()] = {
                         adTypes: realtimePlacement.getAdTypes(),
                         allowSkip: realtimePlacement.allowSkip(),
-                        realtime: realtimePlacement.isRealtime()
                     };
 
                     if(realtimePlacement.getRealtimeData()) {
@@ -569,7 +575,6 @@ export class CampaignManager {
                             placementRequest[placement] = {
                                 adTypes: placements[placement].getAdTypes(),
                                 allowSkip: placements[placement].allowSkip(),
-                                realtime: placements[placement].isRealtime()
                             };
                         }
                     }
