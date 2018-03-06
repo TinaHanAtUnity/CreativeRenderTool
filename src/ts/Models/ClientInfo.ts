@@ -41,13 +41,7 @@ export class ClientInfo extends Model<IClientInfo> {
 
         this.set('platform', platform);
 
-        const gameIdString = data.shift();
-        if(typeof gameIdString === 'string' && /^\d+$/.test(gameIdString)) {
-            this.set('gameId', gameIdString);
-        } else {
-            throw new Error(UnityAdsError[UnityAdsError.INVALID_ARGUMENT]);
-        }
-
+        this.set('gameId', data.shift());
         this.set('testMode', data.shift());
         this.set('applicationName', data.shift());
         this.set('applicationVersion', data.shift());
