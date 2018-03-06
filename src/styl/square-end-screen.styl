@@ -1,0 +1,123 @@
+@import "vars.styl";
+
+#end-screen.square-end-screen {
+  .campaign-container {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .privacy-button {
+    left: 0;
+  }
+
+  .game-image-container {
+    position: relative;
+    z-index: 5;
+    width: 100%;
+    height: 50%;
+  }
+
+  .game-image {
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    background-image: url("http://10.35.33.235:8000/build/browser/img/square-end-screen.jpg");
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+
+  .game-background-blurred {
+    position: absolute;
+    display: block;
+    margin: 0;
+    width: 100%;
+    height: 50%;
+    filter: blur(10px) brightness(.8) opacity(.28) grayscale(1);
+    transform: scale(1.4);
+    background-color: transparent;
+    background-image: url("http://10.35.33.235:8000/build/browser/img/square-end-screen.jpg");
+    background-size: cover;
+  }
+
+  .end-screen-info {
+    width: 90%;
+  }
+
+  .end-screen-info-background {
+    position: relative;
+    z-index: 6;
+    flex-grow: 1;
+    width: auto;
+    background-color: $white;
+  }
+}
+
+&.landscape #end-screen.square-end-screen {
+  .campaign-container {
+    flex-direction: row;
+  }
+
+  .game-image-container {
+    width: 50%;
+    height: 100%;
+  }
+
+  .privacy-button {
+    left: 0;
+  }
+}
+
+
+
+@media (max-aspect-ratio: 6/9) and (orientation: portrait) {
+  body {
+    &.portrait #end-screen.square-end-screen {
+      .end-screen-info-background {
+        height: auto;
+      }
+    }
+  }
+
+  #end-screen.square-end-screen {
+    .game-image-container {
+      position: relative;
+      z-index: 5;
+      width: 100%;
+      height: 100vw;
+    }
+
+    .end-screen-info-background {
+      height: auto;
+    }
+
+    .game-background-blurred {
+      display: block;
+    }
+  }
+}
+
+@media (min-aspect-ratio: 3/2) and (orientation: landscape) {
+  &.landscape #end-screen.square-end-screen {
+    .game-image-container {
+      width: 100vh;
+      height: 100%;
+    }
+
+    .game-background-blurred {
+      display: none;
+    }
+
+    .end-screen-info-background {
+      width: auto;
+    }
+
+    .download-container {
+      width: 90%;
+    }
+
+    .download-container {
+      font-size: 1.05rem;
+    }
+  }
+}

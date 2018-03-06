@@ -1,4 +1,5 @@
 import EndScreenTemplate from 'html/EndScreen.html';
+import SquareEndScreenTemplate from 'html/SquareEndScreen.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -22,6 +23,11 @@ export interface IEndScreenHandler {
 const GDPR_OPT_OUT_BASE  = 'gdpr-pop-up-base';
 const GDPR_OPT_OUT_ALT  = 'gdpr-pop-up-alt';
 
+const SQUARE_END_SCREEN = 'square-end-screen';
+// TODO: Use actual group and campaign id
+const SQUARE_END_SCREEN_CAMPAIGN_ID = '5a84800a6ac4fd047aa50595';
+const SQUARE_END_SCREEN_AB_GROUP = 5;
+
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
 
     protected _localization: Localization;
@@ -33,8 +39,9 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     private _abGroup: number;
     private _showOptOutPopup: boolean;
     private _gdprPopupClicked = false;
+    private _campaignId: string | undefined;
 
-    constructor(nativeBridge: NativeBridge, coppaCompliant: boolean, language: string, gameId: string, gameName: string | undefined, abGroup: number, adUnitStyle?: AdUnitStyle, showOptOutPopup: boolean = false) {
+    constructor(nativeBridge: NativeBridge, coppaCompliant: boolean, language: string, gameId: string, gameName: string | undefined, abGroup: number, adUnitStyle?: AdUnitStyle, showOptOutPopup: boolean = false, campaignId?: string | undefined) {
         super(nativeBridge, 'end-screen');
         this._coppaCompliant = coppaCompliant;
         this._localization = new Localization(language, 'endscreen');
@@ -42,7 +49,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._gameName = gameName;
         this._adUnitStyle = adUnitStyle;
         this._showOptOutPopup = showOptOutPopup;
-
+        this._campaignId = campaignId;
         this._template = new Template(this.getTemplate(), this._localization);
 
         this._bindings = [
@@ -151,6 +158,11 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             }
         }
 
+        const campaignId = campaign ? campaign.getId() : this._campaignId;
+        if (campaignId === SQUARE_END_SCREEN_CAMPAIGN_ID && this._abGroup === SQUARE_END_SCREEN_AB_GROUP) {
+            return SQUARE_END_SCREEN;
+        }
+
         return undefined;
     }
 
@@ -184,6 +196,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     private getTemplate() {
+        if (this.getEndscreenAlt() === SQUARE_END_SCREEN) {
+            return SquareEndScreenTemplate;
+        }
+
         return EndScreenTemplate;
     }
 }
