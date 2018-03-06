@@ -1,4 +1,4 @@
-# Pending
+# Tue Mar  6 06:29:39 UTC 2018
 
 * Test Android native bridge with 1ms autobatching on groups 12 and 13
 * Fix Android problem with close button, landscape orientation and scaled fonts
