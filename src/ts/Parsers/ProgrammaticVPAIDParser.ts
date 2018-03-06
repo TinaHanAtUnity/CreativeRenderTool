@@ -33,13 +33,6 @@ export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
                     creativeId: response.getCreativeId() || undefined,
                     seatId: response.getSeatId() || undefined,
                     meta: undefined,
-                    appCategory: response.getCategory() || undefined,
-                    appSubCategory: response.getSubCategory() || undefined,
-                    advertiserDomain: response.getAdvertiserDomain() || undefined,
-                    advertiserCampaignId: response.getAdvertiserCampaignId() || undefined,
-                    advertiserBundleId: response.getAdvertiserBundleId() || undefined,
-                    useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking(),
-                    buyerId: response.getBuyerId() || undefined,
                     session: session,
                     mediaId: response.getMediaId()
                 };
@@ -47,7 +40,14 @@ export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
                 const vpaidCampaignParams: IVPAIDCampaign = {
                     ... baseCampaignParams,
                     vpaid: vpaid,
-                    tracking: response.getTrackingUrls()
+                    trackingUrls: response.getTrackingUrls(),
+                    appCategory: response.getCategory() || undefined,
+                    appSubcategory: response.getSubCategory() || undefined,
+                    advertiserDomain: response.getAdvertiserDomain() || undefined,
+                    advertiserCampaignId: response.getAdvertiserCampaignId() || undefined,
+                    advertiserBundleId: response.getAdvertiserBundleId() || undefined,
+                    useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking(),
+                    buyerId: response.getBuyerId() || undefined,
                 };
 
                 return Promise.resolve(new VPAIDCampaign(vpaidCampaignParams));

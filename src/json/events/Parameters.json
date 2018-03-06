@@ -287,6 +287,13 @@
     "platforms": "all"
   },
   {
+    "key": "screenScale",
+    "type": "number",
+    "description": "Screen scale factor",
+    "provider": "SDK",
+    "platforms": "ios"
+  },
+  {
     "key": "screenSize",
     "type": "number",
     "description": "Android raw screen layout value",
@@ -427,9 +434,9 @@
     "platforms": "all"
   },
   {
-    "key": "realtimeRequest",
-    "type": "boolean",
-    "description": "If ad request is done at show time for immediate streaming",
+    "key": "adUnitStyle",
+    "type": "object",
+    "description": "Style of the ad unit",
     "provider": "SDK",
     "platforms": "all"
   }

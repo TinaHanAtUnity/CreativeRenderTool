@@ -1,12 +1,13 @@
 import { EndScreen } from 'Views/EndScreen';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { NativeBridge } from 'Native/NativeBridge';
+import { AdUnitStyle } from 'Models/AdUnitStyle';
 
 export class PerformanceEndScreen extends EndScreen {
     private _campaign: PerformanceCampaign;
 
-    constructor(nativeBridge: NativeBridge, campaign: PerformanceCampaign, coppaCompliant: boolean, language: string, gameId: string) {
-        super(nativeBridge, coppaCompliant, language, gameId, campaign.getGameName(), campaign.getAbGroup());
+    constructor(nativeBridge: NativeBridge, campaign: PerformanceCampaign, coppaCompliant: boolean, language: string, gameId: string, adUnitStyle?: AdUnitStyle) {
+        super(nativeBridge, coppaCompliant, language, gameId, campaign.getGameName(), campaign.getAbGroup(), adUnitStyle);
 
         const adjustedRating: number = campaign.getRating() * 20;
         this._templateData = {
@@ -31,7 +32,8 @@ export class PerformanceEndScreen extends EndScreen {
             bypassAppSheet: this._campaign.getBypassAppSheet(),
             appStoreId: this._campaign.getAppStoreId(),
             store: this._campaign.getStore(),
-            gamerId: this._campaign.getGamerId()
+            gamerId: this._campaign.getGamerId(),
+            adUnitStyle: this._adUnitStyle
         }));
     }
 }

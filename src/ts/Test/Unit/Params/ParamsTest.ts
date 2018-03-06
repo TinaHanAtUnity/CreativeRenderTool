@@ -79,11 +79,43 @@ class TestDeviceInfoApi extends DeviceInfoApi {
     public getUniqueEventId(): Promise<string> {
         return Promise.resolve('1234-ABCD');
     }
+
+    public getCPUCount(): Promise<number> {
+        return Promise.resolve(2);
+    }
 }
 
 class TestAndroidDeviceInfoApi extends AndroidDeviceInfoApi {
     public getPackageInfo(packageName: string): Promise<IPackageInfo> {
         return Promise.resolve(TestFixtures.getPackageInfo());
+    }
+
+    public isUSBConnected(): Promise<boolean> {
+        return Promise.resolve(false);
+    }
+
+    public getApkDigest(): Promise<string> {
+        return Promise.resolve('abcd-1234');
+    }
+
+    public getCertificateFingerprint(): Promise<string> {
+        return Promise.resolve('efgh-5678');
+    }
+
+    public getUptime(): Promise<number> {
+        return Promise.resolve(123456);
+    }
+
+    public getElapsedRealtime(): Promise<number> {
+        return Promise.resolve(12345);
+    }
+
+    public isAdbEnabled(): Promise<boolean> {
+        return Promise.resolve(false);
+    }
+
+    public getFingerprint(): Promise<string> {
+        return Promise.resolve('test/fingerprint');
     }
 }
 
@@ -207,7 +239,7 @@ describe('Event parameters should match specifications', () => {
             const focusManager = new FocusManager(nativeBridge);
             const request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
             const requestSpy: any = sinon.spy(request, 'get');
-            return ConfigManager.fetch(nativeBridge, request, TestFixtures.getClientInfo(Platform.ANDROID), TestFixtures.getDeviceInfo(Platform.ANDROID), metaDataManager).then(() => {
+            return ConfigManager.fetch(nativeBridge, request, TestFixtures.getClientInfo(Platform.ANDROID), TestFixtures.getAndroidDeviceInfo(), metaDataManager).then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getConfigRequestParams(), url);
                 verifier.assert();
@@ -220,7 +252,7 @@ describe('Event parameters should match specifications', () => {
             const focusManager = new FocusManager(nativeBridge);
             const request: Request = new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
             const requestSpy: any = sinon.spy(request, 'get');
-            return ConfigManager.fetch(nativeBridge, request, TestFixtures.getClientInfo(Platform.IOS), TestFixtures.getDeviceInfo(Platform.IOS), metaDataManager).then(() => {
+            return ConfigManager.fetch(nativeBridge, request, TestFixtures.getClientInfo(Platform.IOS), TestFixtures.getIosDeviceInfo(), metaDataManager).then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
 
                 const verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getConfigRequestParams(), url);
@@ -244,7 +276,7 @@ describe('Event parameters should match specifications', () => {
             const request: Request = new Request(nativeBridge, wakeUpManager);
             const requestSpy: any = sinon.spy(request, 'post');
             const clientInfo: ClientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-            const deviceInfo: DeviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
+            const deviceInfo: DeviceInfo = TestFixtures.getAndroidDeviceInfo();
             const cacheBookkeeping: CacheBookkeeping = new CacheBookkeeping(nativeBridge);
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
             const sessionManager = new SessionManager(nativeBridge);
@@ -270,7 +302,7 @@ describe('Event parameters should match specifications', () => {
             const request: Request = new Request(nativeBridge, wakeUpManager);
             const requestSpy: any = sinon.spy(request, 'post');
             const clientInfo: ClientInfo = TestFixtures.getClientInfo(Platform.IOS);
-            const deviceInfo: DeviceInfo = TestFixtures.getDeviceInfo(Platform.IOS);
+            const deviceInfo: DeviceInfo = TestFixtures.getIosDeviceInfo();
             const cacheBookkeeping: CacheBookkeeping = new CacheBookkeeping(nativeBridge);
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
             const sessionManager = new SessionManager(nativeBridge);
@@ -298,7 +330,7 @@ describe('Event parameters should match specifications', () => {
             const metaDataManager = new MetaDataManager(nativeBridge);
             const sessionManager: SessionManager = TestHelper.getSessionManager(nativeBridge, request);
             const clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-            const deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
+            const deviceInfo = TestFixtures.getAndroidDeviceInfo();
             sessionManager.setGameSessionId(1234);
             const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
             const campaign: PerformanceCampaign = TestFixtures.getCampaign();
@@ -319,7 +351,7 @@ describe('Event parameters should match specifications', () => {
             const metaDataManager = new MetaDataManager(nativeBridge);
             const sessionManager: SessionManager = TestHelper.getSessionManager(nativeBridge, request);
             const clientInfo = TestFixtures.getClientInfo(Platform.IOS);
-            const deviceInfo = TestFixtures.getDeviceInfo(Platform.IOS);
+            const deviceInfo = TestFixtures.getIosDeviceInfo();
             sessionManager.setGameSessionId(1234);
             const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
             const campaign: PerformanceCampaign = TestFixtures.getCampaign();
@@ -350,7 +382,7 @@ describe('Event parameters should match specifications', () => {
                 const metaDataManager = new MetaDataManager(nativeBridge);
                 sessionManager = TestHelper.getSessionManager(nativeBridge, request);
                 const clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-                const deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
+                const deviceInfo = TestFixtures.getAndroidDeviceInfo();
                 sessionManager.setGameSessionId(1234);
                 operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
                 campaign = TestFixtures.getCampaign();
@@ -416,7 +448,7 @@ describe('Event parameters should match specifications', () => {
                 const metaDataManager = new MetaDataManager(nativeBridge);
                 sessionManager = TestHelper.getSessionManager(nativeBridge, request);
                 const clientInfo = TestFixtures.getClientInfo(Platform.IOS);
-                const deviceInfo = TestFixtures.getDeviceInfo(Platform.IOS);
+                const deviceInfo = TestFixtures.getIosDeviceInfo();
                 sessionManager.setGameSessionId(1234);
                 operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
                 campaign = TestFixtures.getCampaign();

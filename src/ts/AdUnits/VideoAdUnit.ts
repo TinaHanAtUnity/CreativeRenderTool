@@ -68,7 +68,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         this._onSystemInterruptObserver = this._container.onSystemInterrupt.subscribe((interruptStarted) => this.onSystemInterrupt(interruptStarted));
         this._onLowMemoryWarningObserver = this._container.onLowMemoryWarning.subscribe(() => this.onLowMemoryWarning());
 
-        return this._container.open(this, true, true, this.getForceOrientation(), this._placement.disableBackButton(), false, true, false, this._options);
+        return this._container.open(this, ['videoplayer', 'webview'], true, this.getForceOrientation(), this._placement.disableBackButton(), false, true, false, this._options);
     }
 
     public hide(): Promise<void> {
@@ -182,10 +182,10 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     protected onSystemInterrupt(interruptStarted: boolean): void {
         if(this.isShowing() && this.isActive()) {
             if(interruptStarted) {
-                this._nativeBridge.Sdk.logInfo('Pausing Unity Ads video playback due to interrupt');
+                this._nativeBridge.Sdk.logDebug('Pausing Unity Ads video playback due to interrupt');
                 this._nativeBridge.VideoPlayer.pause();
             } else if (!interruptStarted && this.isVideoReady() && !this.getContainer().isPaused()) {
-                this._nativeBridge.Sdk.logInfo('Continuing Unity Ads video playback after interrupt');
+                this._nativeBridge.Sdk.logDebug('Continuing Unity Ads video playback after interrupt');
                 this._nativeBridge.VideoPlayer.play();
             }
         }

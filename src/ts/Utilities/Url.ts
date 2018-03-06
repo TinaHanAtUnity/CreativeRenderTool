@@ -10,6 +10,26 @@ export interface IUrl {
 
 export class Url {
 
+    public static encode(url: string): string {
+        if(url) {
+            url = url.replace(/"/g, '%22');
+            url = url.replace(/</g, '%3C');
+            url = url.replace(/>/g, '%3E');
+            url = url.replace(/#/g, '%23');
+            url = url.replace(/{/g, '%7B');
+            url = url.replace(/}/g, '%7D');
+            url = url.replace(/\|/g, '%7C');
+            url = url.replace(/\\/g, '%5C');
+            url = url.replace(/\^/g, '%5E');
+            url = url.replace(/~/g, '%7E');
+            url = url.replace(/\[/g, '%5B');
+            url = url.replace(/]/g, '%5D');
+            url = url.replace(/`/g, '%60');
+        }
+
+        return url;
+    }
+
     public static parse(url: string): IUrl {
         const parser = document.createElement('a');
         parser.href = url;
@@ -47,6 +67,9 @@ export class Url {
     }
 
     public static getQueryParameter(locationString: string, parameter: string): string | null {
+        if (locationString.indexOf('?') === -1) {
+            return null;
+        }
         const queryString: string[] = locationString.split('?')[1].split('&');
 
         for(const entryPair of queryString) {
@@ -62,7 +85,7 @@ export class Url {
     public static isValid(url: string): boolean {
         // note: this is not an attempt for full URL validation, instead this just checks that protocol is http(s) and
         // all URL characters are legal following RFC3986, using ASCII character ranges &-; and ?-[ is intentional
-        if(url && (url.match(/^http:./i) || url.match(/^https:./i) && url.match(/^([\!\$\#\&-\;\=\?-\[\]_a-z~{}|\\^`]|%[0-9a-fA-F]{2})+$/i))) {
+        if(url && (url.match(/^http:./i) || url.match(/^https:./i) && url.match(/^([\!\$\#\&-\;\=\?-\[\]_a-z~{}|\\^`]|[\u00A1-\uFFFF]|%[0-9a-fA-F]{2})+$/i))) {
             return true;
         }
 
@@ -78,5 +101,5 @@ export class Url {
         return false;
     }
 
-    private static whitelistedProtocols = ['http', 'https', 'market', 'itunes'];
+    private static whitelistedProtocols = ['market', 'itunes', 'itms', 'itmss'];
 }

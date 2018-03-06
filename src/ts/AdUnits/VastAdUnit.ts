@@ -1,5 +1,4 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { Vast } from 'Models/Vast/Vast';
 import { VastCreativeCompanionAd } from 'Models/Vast/VastCreativeCompanionAd';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
@@ -7,6 +6,7 @@ import { IVideoAdUnitParameters, VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { VastEndScreen } from 'Views/VastEndScreen';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { MOAT } from 'Views/MOAT';
+import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 import { StreamType } from 'Constants/Android/StreamType';
 import { Platform } from 'Constants/Platform';
 import { Placement } from 'Models/Placement';
@@ -53,6 +53,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._vastCampaign = parameters.campaign;
         this._vastPlacement = parameters.placement;
+        this._moat = MoatViewabilityService.getMoat();
 
         if(this._endScreen) {
             this._endScreen.render();
@@ -96,10 +97,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
 
     public description(): string {
         return 'VAST';
-    }
-
-    public getMoat(): MOAT | undefined {
-        return this._moat;
     }
 
     public getEvents() {
@@ -169,13 +166,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         } else {
             return null;
         }
-    }
-
-    public initMoat() {
-        this._moat = new MOAT(this._nativeBridge);
-        this._moat.render();
-        this._moat.addMessageListener();
-        document.body.appendChild(this._moat.container());
     }
 
     public sendVideoClickTrackingEvent(sessionId: string, sdkVersion: number): void {

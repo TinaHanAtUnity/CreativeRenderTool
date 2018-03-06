@@ -1,5 +1,16 @@
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { NativeBridge } from 'Native/NativeBridge';
+import { IntentData } from 'Native/Api/Intent';
+
+export interface IOpenableIntentsRequest {
+    id: string;
+    intents: IntentData[];
+}
+
+export interface IOpenableIntentsResponse {
+    id: string;
+    results: { [id: string]: boolean };
+}
 
 export enum AFMAEvents {
     OPEN_URL                = 'openUrl',
@@ -11,7 +22,10 @@ export enum AFMAEvents {
     DISABLE_BACK_BUTTON     = 'disableBackButton',
     OPEN_STORE_OVERLAY      = 'openStoreOverlay',
     OPEN_IN_APP_STORE       = 'openInAppStore',
-    FETCH_APP_STORE_OVERLAY = 'fetchAppStoreOverlay'
+    FETCH_APP_STORE_OVERLAY = 'fetchAppStoreOverlay',
+    OPEN_INTENTS_REQUEST    = 'openableIntents',
+    TRACKING                = 'tracking',
+    GET_CLICK_SIGNAL        = 'getClickSignal'
 }
 
 export interface IPoint {
@@ -31,6 +45,7 @@ export interface ITouchInfo {
     end: IPoint;
     diameter: number;
     pressure: number;
+    duration: number;
     counts: ITouchCounts;
 }
 
@@ -38,6 +53,11 @@ export interface IAFMAMessage {
     type: string;
     event: string;
     data?: any;
+}
+
+export interface IClickSignalResponse {
+    encodedClickSignal: string;
+    rvdt: number;
 }
 
 export interface IAFMAHandler {
@@ -51,6 +71,9 @@ export interface IAFMAHandler {
     onAFMAOpenStoreOverlay(url: string): void;
     onAFMAOpenInAppStore(productId: string, url: string): void;
     onAFMAFetchAppStoreOverlay(productId: string): void;
+    onAFMAResolveOpenableIntents(productId: IOpenableIntentsRequest): void;
+    onAFMATrackingEvent(event: string, data?: any): void;
+    onAFMAClickSignalRequest(touchInfo: ITouchInfo): void;
 }
 
 export class AFMABridge {
@@ -75,6 +98,9 @@ export class AFMABridge {
         this._afmaHandlers[AFMAEvents.OPEN_STORE_OVERLAY] = (msg) => this._handler.onAFMAOpenStoreOverlay(msg.data.url);
         this._afmaHandlers[AFMAEvents.OPEN_IN_APP_STORE] = (msg) => this._handler.onAFMAOpenInAppStore(msg.data.productId, msg.data.url);
         this._afmaHandlers[AFMAEvents.FETCH_APP_STORE_OVERLAY] = (msg) => this._handler.onAFMAFetchAppStoreOverlay(msg.data.productId);
+        this._afmaHandlers[AFMAEvents.OPEN_INTENTS_REQUEST] = (msg) => this._handler.onAFMAResolveOpenableIntents(msg.data);
+        this._afmaHandlers[AFMAEvents.TRACKING] = (msg) => this._handler.onAFMATrackingEvent(msg.data.event, msg.data.data);
+        this._afmaHandlers[AFMAEvents.GET_CLICK_SIGNAL] = (msg) => this._handler.onAFMAClickSignalRequest(msg.data);
     }
 
     public connect(iframe: HTMLIFrameElement) {
@@ -90,10 +116,18 @@ export class AFMABridge {
         this.postMessage('back');
     }
 
+    public sendOpenableIntentsResult(result: IOpenableIntentsResponse) {
+        this.postMessage('openableIntentsResponse', result);
+    }
+
+    public sendClickSignalResponse(response: IClickSignalResponse) {
+        this.postMessage('clickSignal', response);
+    }
+
     private onMessage(e: MessageEvent) {
         const message = <IAFMAMessage>e.data;
         if (message.type === 'afma') {
-            this._nativeBridge.Sdk.logInfo(`afma: event=${message.event}, data=${message.data}`);
+            this._nativeBridge.Sdk.logInfo(`afma: event=${message.event}, data=${JSON.stringify(message.data)}`);
             if (message.event in this._afmaHandlers) {
                 const handler = this._afmaHandlers[message.event];
                 handler(message);
@@ -101,10 +135,11 @@ export class AFMABridge {
         }
     }
 
-    private postMessage(event: string) {
+    private postMessage(event: string, data?: any) {
         this._iframe.contentWindow.postMessage({
             type: 'afma',
-            event: event
+            event: event,
+            data: data
         }, '*');
     }
 }

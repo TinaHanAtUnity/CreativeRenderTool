@@ -18,6 +18,7 @@ import { Url } from 'Utilities/Url';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
+import { AdUnitStyle } from 'Models/AdUnitStyle';
 
 export interface IEndScreenDownloadParameters {
     clickAttributionUrl: string | undefined;
@@ -26,6 +27,7 @@ export interface IEndScreenDownloadParameters {
     appStoreId: string | undefined;
     store: StoreName | undefined;
     gamerId: string;
+    adUnitStyle?: AdUnitStyle;
 }
 
 export abstract class EndScreenEventHandler<T extends Campaign, T2 extends AbstractAdUnit> implements IEndScreenHandler {
@@ -78,7 +80,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
 
         if(!(this._adUnit instanceof XPromoAdUnit)) {
-            this._operativeEventManager.sendClick(this._campaign.getSession(), this._placement, this._campaign, this.getVideoOrientation());
+            this._operativeEventManager.sendClick(this._campaign.getSession(), this._placement, this._campaign, this.getVideoOrientation(), parameters.adUnitStyle);
         } else {
             this._operativeEventManager.sendHttpKafkaEvent('ads.xpromo.operative.videoclick.v1.json', 'click',  this._campaign.getSession(), this._placement, this._campaign, this.getVideoOrientation());
             if(this._campaign instanceof XPromoCampaign) {
@@ -103,7 +105,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
 
         if(!(this._adUnit instanceof XPromoAdUnit)) {
-            this._operativeEventManager.sendClick(this._campaign.getSession(), this._placement, this._campaign, this.getVideoOrientation());
+            this._operativeEventManager.sendClick(this._campaign.getSession(), this._placement, this._campaign, this.getVideoOrientation(), parameters.adUnitStyle);
         } else {
             this._operativeEventManager.sendHttpKafkaEvent('ads.xpromo.operative.videoclick.v1.json', 'click', this._campaign.getSession(), this._placement, this._campaign, this.getVideoOrientation());
             if(this._campaign instanceof XPromoCampaign) {
@@ -117,10 +119,10 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
             this.handleClickAttribution(parameters);
 
             if(!parameters.clickAttributionUrlFollowsRedirects) {
-                this.openAppStore(parameters, IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion()));
+                this.openAppStore(parameters, IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion(), this._deviceInfo.getModel()));
             }
         } else {
-            this.openAppStore(parameters, IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion()));
+            this.openAppStore(parameters, IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion(), this._deviceInfo.getModel()));
         }
     }
 

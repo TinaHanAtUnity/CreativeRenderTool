@@ -36,13 +36,6 @@ export class ProgrammaticMraidParser extends CampaignParser {
             creativeId: response.getCreativeId() || undefined,
             seatId: response.getSeatId() || undefined,
             meta: jsonMraid.meta,
-            appCategory: undefined,
-            appSubCategory: undefined,
-            advertiserDomain: undefined,
-            advertiserCampaignId: undefined,
-            advertiserBundleId: undefined,
-            useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking(),
-            buyerId: undefined,
             session: session,
             mediaId: response.getMediaId()
         };
@@ -52,11 +45,11 @@ export class ProgrammaticMraidParser extends CampaignParser {
             resourceAsset: undefined,
             resource: markup,
             dynamicMarkup: jsonMraid.dynamicMarkup,
-            additionalTrackingEvents: response.getTrackingUrls(),
-            clickAttributionUrl: jsonMraid.clickAttributionUrl,
+            trackingUrls: response.getTrackingUrls(),
+            clickAttributionUrl: jsonMraid.clickAttributionUrl ? this.validateAndEncodeUrl(jsonMraid.clickAttributionUrl, session) : undefined,
             clickAttributionUrlFollowsRedirects: jsonMraid.clickAttributionUrlFollowsRedirects,
-            clickUrl: jsonMraid.clickUrl ? jsonMraid.clickUrl : undefined,
-            videoEventUrls: undefined,
+            clickUrl: jsonMraid.clickUrl ? this.validateAndEncodeUrl(jsonMraid.clickUrl, session) : undefined,
+            videoEventUrls: {},
             gameName: undefined,
             gameIcon: undefined,
             rating: undefined,
@@ -65,7 +58,8 @@ export class ProgrammaticMraidParser extends CampaignParser {
             portraitImage: undefined,
             bypassAppSheet: undefined,
             store: undefined,
-            appStoreId: undefined
+            appStoreId: undefined,
+            useWebViewUserAgentForTracking: false
         };
 
         return Promise.resolve(new MRAIDCampaign(parameters));

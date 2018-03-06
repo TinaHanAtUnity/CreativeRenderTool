@@ -21,13 +21,6 @@ export class ProgrammaticAdMobParser extends CampaignParser {
             creativeId: response.getCreativeId() || undefined,
             seatId: response.getSeatId() || undefined,
             meta: undefined,
-            appCategory: undefined,
-            appSubCategory: undefined,
-            advertiserDomain: undefined,
-            advertiserCampaignId: undefined,
-            advertiserBundleId: undefined,
-            useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking(),
-            buyerId: undefined,
             session: session,
             mediaId: response.getMediaId()
         };
@@ -35,7 +28,8 @@ export class ProgrammaticAdMobParser extends CampaignParser {
         const adMobCampaignParams: IAdMobCampaign = {
             ... baseCampaignParams,
             dynamicMarkup: markup,
-            tracking: response.getTrackingUrls() || undefined
+            trackingUrls: response.getTrackingUrls(),
+            useWebViewUserAgentForTracking: true
         };
 
         return Promise.resolve(new AdMobCampaign(adMobCampaignParams));

@@ -14,13 +14,6 @@ export interface ICampaign {
     creativeId: string | undefined;
     seatId: number | undefined;
     meta: string | undefined;
-    appCategory: string | undefined;
-    appSubCategory: string | undefined;
-    advertiserDomain: string | undefined;
-    advertiserCampaignId: string | undefined;
-    advertiserBundleId: string | undefined;
-    useWebViewUserAgentForTracking: boolean | undefined;
-    buyerId: string | undefined;
     session: Session;
     mediaId: string;
 }
@@ -36,13 +29,6 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         creativeId: ['string', 'undefined'],
         seatId: ['number', 'undefined'],
         meta: ['string', 'undefined'],
-        appCategory: ['string', 'undefined'],
-        appSubCategory: ['string', 'undefined'],
-        advertiserDomain: ['string', 'undefined'],
-        advertiserCampaignId: ['string', 'undefined'],
-        advertiserBundleId: ['string', 'undefined'],
-        useWebViewUserAgentForTracking: ['boolean', 'undefined'],
-        buyerId: ['string', 'undefined'],
         session: ['object'],
         mediaId: ['string']
     };
@@ -87,36 +73,8 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         return this.get('meta');
     }
 
-    public getAdvertiserDomain(): string | undefined {
-        return this.get('advertiserDomain');
-    }
-
-    public getAdvertiserCampaignId(): string | undefined {
-        return this.get('advertiserCampaignId');
-    }
-
-    public getAdvertiserBundleId(): string | undefined {
-        return this.get('advertiserBundleId');
-    }
-
-    public getUseWebViewUserAgentForTracking(): boolean | undefined {
-        return this.get('useWebViewUserAgentForTracking');
-    }
-
     public getWillExpireAt(): number | undefined {
         return this.get('willExpireAt');
-    }
-
-    public getCategory(): string | undefined {
-        return this.get('appCategory');
-    }
-
-    public getSubCategory(): string | undefined {
-        return this.get('appSubCategory');
-    }
-
-    public getBuyerId(): string | undefined {
-        return this.get('buyerId');
     }
 
     public isExpired(): boolean {

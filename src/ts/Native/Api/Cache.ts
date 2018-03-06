@@ -53,8 +53,8 @@ export class CacheApi extends NativeApi {
         }
     }
 
-    public download(url: string, fileId: string, headers: Array<[string, string]>): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'download', [url, fileId, headers]);
+    public download(url: string, fileId: string, headers: Array<[string, string]>, append: boolean): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'download', [url, fileId, headers, append]);
     }
 
     public stop(): Promise<void> {

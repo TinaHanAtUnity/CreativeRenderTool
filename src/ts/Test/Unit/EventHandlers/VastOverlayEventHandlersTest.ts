@@ -23,6 +23,9 @@ import { FocusManager } from 'Managers/FocusManager';
 import { Request } from 'Utilities/Request';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
+import { MOAT } from 'Views/MOAT';
+import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
+import { SinonSandbox } from 'sinon';
 
 describe('VastOverlayEventHandlersTest', () => {
     let campaign: VastCampaign;
@@ -44,6 +47,12 @@ describe('VastOverlayEventHandlersTest', () => {
     let vastAdUnitParameters: IVastAdUnitParameters;
     let vastOverlayEventHandler: VastOverlayEventHandler;
     let comScoreService: ComScoreTrackingService;
+    let moat: MOAT;
+    let sandbox: sinon.SinonSandbox;
+
+    before(() => {
+        sandbox = sinon.sandbox.create();
+    });
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -56,7 +65,7 @@ describe('VastOverlayEventHandlersTest', () => {
         campaign = TestFixtures.getEventVastCampaign();
         clientInfo = TestFixtures.getClientInfo();
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
-        container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
 
         placement = new Placement({
             id: 'testPlacement',
@@ -72,7 +81,7 @@ describe('VastOverlayEventHandlersTest', () => {
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-        deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
+        deviceInfo = TestFixtures.getAndroidDeviceInfo();
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         sessionManager = new SessionManager(nativeBridge);
         request = new Request(nativeBridge, new WakeUpManager(nativeBridge, new FocusManager(nativeBridge)));
@@ -104,6 +113,13 @@ describe('VastOverlayEventHandlersTest', () => {
 
         vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
         vastOverlayEventHandler = new VastOverlayEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
+
+        moat = sinon.createStubInstance(MOAT);
+        sandbox.stub(MoatViewabilityService, 'getMoat').returns(moat);
+    });
+
+    afterEach(() => {
+        sandbox.restore();
     });
 
     describe('When calling onSkip', () => {
@@ -132,6 +148,12 @@ describe('VastOverlayEventHandlersTest', () => {
     });
 
     describe('When calling onMute', () => {
+
+        beforeEach(() => {
+            vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
+            vastOverlayEventHandler = new VastOverlayEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
+        });
+
         const testMuteEvent = function(muted: boolean) {
             const eventName = muted ? 'mute' : 'unmute';
             const mockEventManager = sinon.mock(thirdPartyEventManager);
@@ -153,6 +175,18 @@ describe('VastOverlayEventHandlersTest', () => {
             // when the session manager is told that the video has been unmuted
             // then the VAST unmute callback URL should be requested by the event manager
             testMuteEvent(false);
+        });
+
+        it('sends moat video and viewability events when mute is true', () => {
+            vastOverlayEventHandler.onOverlayMute(true);
+            sinon.assert.called(<sinon.SinonStub>moat.triggerVideoEvent);
+            sinon.assert.called(<sinon.SinonStub>moat.triggerViewabilityEvent);
+        });
+
+        it('sends moat video and viewability events when mute is false', () => {
+            vastOverlayEventHandler.onOverlayMute(false);
+            sinon.assert.called(<sinon.SinonStub>moat.triggerVideoEvent);
+            sinon.assert.called(<sinon.SinonStub>moat.triggerViewabilityEvent);
         });
     });
 

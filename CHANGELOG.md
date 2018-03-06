@@ -1,3 +1,101 @@
+# Pending
+
+* Reduce info level logging
+* Moved hard-coded game IDs to CustomFeatures
+* Improved error message for invalid game ID
+
+# Tue Mar  6 11:43:29 UTC 2018
+
+* Add source game id to xpromo events
+* Allow certain range unicode characters in urls
+* Obfuscate spam idenfiers in AFMA container
+* AFMA: fix click signals
+
+# Tue Mar  6 06:29:39 UTC 2018
+
+* Test Android native bridge with 1ms autobatching on groups 12 and 13
+* Fix Android problem with close button, landscape orientation and scaled fonts
+
+# Fri Mar  2 09:31:54 UTC 2018
+
+* Refactor some programmatic properties away from base campaign model
+* Update dependencies
+
+# Thu Mar  1 10:39:02 UTC 2018
+
+* Validate and encode all incoming asset URLs
+* Fix cache redirections on 2.2.0
+* Show time to close / skip for MRAID overlays on group 18 and 19
+* Fix creative slot colliding with video slot for VPAID
+* Fixed issue with how setViewFrame was being used
+
+# Wed Feb 28 13:55:33 UTC 2018
+
+* Fixes for openUrl and sendEvent for VPAID
+* New AdMob spam signals for SDK 2.2.0
+* Refactor and add missing device infos
+* Overlay progress bar AB test for groups 16 & 17
+* Remove lunar theme AB test
+
+# Fri Feb 23 15:10:28 UTC 2018
+
+* Fix MOAT init & closing due to bad merge
+
+# Fri Feb 23 10:27:13 UTC 2018
+
+* Purchasing utilities cleanup
+* Disable app sheet on iPhone iOS 11
+* Fix orientation issues for Promo Android
+* Display ads: fixed ABT-373 and ABT-374 Cleanups, simplification of adunit.
+* Fix the view rendering and add system interrupt observer for iOS foreground and background events to VPAIDAdUnit
+* VPAID container fixes
+* Fix hybrid tests & disable 2 broken PurchasingUtilities tests
+* Add iOS screenScale to ad request query parameters
+* Fix missing MOAT stylesheet 
+
+# Thu Feb 22 08:57:26 UTC 2018
+
+* Preparations for new double webview APIs in 2.2.0 release
+* Preparations for new IAP promo APIs in 2.2.0 release
+* Removal of VPAID and display ad support from all pre-2.2.0 releases
+* Remove video overlay test from groups 8 and 10
+* Start random download button color test on groups 8 and 10
+
+# Fri Feb 16 10:18:25 UTC 2018
+
+* Add ad unit style object to operative events
+* Modify analytics event formats to better match Unity Analytics event formats
+
+# Thu Feb 15 09:07:01 UTC 2018
+
+* Preparations for new cache APIs in 2.2.0 release
+
+# Wed Feb 14 14:59:14 UTC 2018
+
+* Enable lunar theme on all groups except 5
+* Miscellaneous AdMob fixes
+
+# Wed Feb 14 10:24:20 UTC 2018
+
+* Revert previous deployment
+
+# Wed Feb 14 10:24:20 UTC 2018
+
+* Validate and encode all incoming URLs to handle unsafe characters
+* Enable lunar theme on all groups except 5
+
+# Tue Feb 13 09:49:36 UTC 2018
+
+* Remove the hidden margin from the admob iframe
+* Enable MOAT on all SDK 2 versions without volume change listeners
+* New overlay AB test on groups 8 & 10
+* Send diagnostics if callback cannot be found when onDownloadStart event is received
+* Cleanup protobuf build & use minified release
+
+# Fri Feb  9 11:00:06 UTC 2018
+
+* Add config_parsing_failed diagnostic event
+
 # Thu Feb  8 12:36:42 UTC 2018
 
 * Lunar new year theme (groups  5 & 6)

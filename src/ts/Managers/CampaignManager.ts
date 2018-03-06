@@ -25,9 +25,9 @@ import { ProgrammaticVastParser } from 'Parsers/ProgrammaticVastParser';
 import { ProgrammaticMraidUrlParser } from 'Parsers/ProgrammaticMraidUrlParser';
 import { ProgrammaticMraidParser } from 'Parsers/ProgrammaticMraidParser';
 import { ProgrammaticStaticInterstitialParser } from 'Parsers/ProgrammaticStaticInterstitialParser';
-import { ProgrammaticStaticInterstitialUrlParser } from 'Parsers/ProgrammaticStaticInterstitialUrlParser';
 import { ProgrammaticAdMobParser } from 'Parsers/ProgrammaticAdMobParser';
 import { CampaignParser } from 'Parsers/CampaignParser';
+import { PromoCampaignParser } from 'Parsers/PromoCampaignParser';
 import { ProgrammaticVPAIDParser } from 'Parsers/ProgrammaticVPAIDParser';
 import { XPromoCampaignParser } from "Parsers/XPromoCampaignParser";
 import { AdMobSignalFactory} from 'AdMob/AdMobSignalFactory';
@@ -35,6 +35,8 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { Placement } from 'Models/Placement';
 import { RequestError } from 'Errors/RequestError';
 import { CacheError } from 'Native/Api/Cache';
+import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
+import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 
 export class CampaignManager {
 
@@ -252,6 +254,7 @@ export class CampaignManager {
                 }
             }
 
+            this._nativeBridge.Sdk.logInfo('AdPlan received with ' + campaigns + ' campaigns and refreshDelay ' + refreshDelay);
             this.onAdPlanReceived.trigger(refreshDelay, campaigns);
 
             for(const mediaId in fill) {
@@ -366,8 +369,6 @@ export class CampaignManager {
                 return new ProgrammaticMraidParser();
             case 'programmatic/static-interstitial':
                 return new ProgrammaticStaticInterstitialParser();
-            case 'programmatic/static-interstitial-url':
-                return new ProgrammaticStaticInterstitialUrlParser();
             case 'programmatic/admob-video':
                 Diagnostics.trigger('admob_ad_received', {}, session);
                 return new ProgrammaticAdMobParser();
@@ -413,21 +414,17 @@ export class CampaignManager {
                 advertisingTrackingId: this._deviceInfo.getAdvertisingIdentifier(),
                 limitAdTracking: this._deviceInfo.getLimitAdTracking()
             });
-        } else if(this._clientInfo.getPlatform() === Platform.ANDROID) {
+        } else if(this._clientInfo.getPlatform() === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
             url = Url.addParameters(url, {
                 androidId: this._deviceInfo.getAndroidId()
             });
         }
 
         url = Url.addParameters(url, {
-            deviceMake: this._deviceInfo.getManufacturer(),
             deviceModel: this._deviceInfo.getModel(),
             platform: Platform[this._clientInfo.getPlatform()].toLowerCase(),
-            screenDensity: this._deviceInfo.getScreenDensity(),
             sdkVersion: this._clientInfo.getSdkVersion(),
-            screenSize: this._deviceInfo.getScreenLayout(),
-            stores: this._deviceInfo.getStores(),
-            realtimeRequest: realtime
+            stores: this._deviceInfo.getStores()
         });
 
         if(realtime && session) {
@@ -435,12 +432,16 @@ export class CampaignManager {
                 auctionId: session.getId()
             });
         }
-        if(this._clientInfo.getPlatform() === Platform.IOS) {
+        if(this._clientInfo.getPlatform() === Platform.IOS && this._deviceInfo instanceof IosDeviceInfo) {
             url = Url.addParameters(url, {
-                osVersion: this._deviceInfo.getOsVersion()
+                osVersion: this._deviceInfo.getOsVersion(),
+                screenScale: this._deviceInfo.getScreenScale()
             });
-        } else {
+        } else if(this._clientInfo.getPlatform() === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
             url = Url.addParameters(url, {
+                deviceMake: this._deviceInfo.getManufacturer(),
+                screenSize:  this._deviceInfo.getScreenLayout(),
+                screenDensity: this._deviceInfo.getScreenDensity(),
                 apiLevel: this._deviceInfo.getApiLevel()
             });
         }
@@ -506,7 +507,7 @@ export class CampaignManager {
             language: this._deviceInfo.getLanguage(),
             gameSessionId: this._sessionManager.getGameSessionId(),
             timeZone: this._deviceInfo.getTimeZone(),
-            simulator: this._deviceInfo.isSimulator()
+            simulator: this._deviceInfo instanceof IosDeviceInfo ? this._deviceInfo.isSimulator() : undefined
         };
 
         if (this.getPreviousPlacementId()) {

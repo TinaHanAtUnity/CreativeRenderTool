@@ -6,6 +6,7 @@ import { Template } from 'Utilities/Template';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { IPrivacyHandler, Privacy } from 'Views/Privacy';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
 
 export interface IVastEndScreenHandler {
     onVastEndScreenClick(): void;
@@ -55,7 +56,7 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
             }
         ];
 
-        if(gameId === '1300023' || gameId === '1300024') {
+        if(CustomFeatures.isTimehopApp(gameId)) {
             this._isSwipeToCloseEnabled = true;
 
             this._bindings.push({

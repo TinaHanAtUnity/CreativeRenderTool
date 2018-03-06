@@ -43,10 +43,14 @@ import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
+import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
+import { IosDeviceInfo } from 'Models/IosDeviceInfo';
+import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
 
 export class WebView {
 
@@ -97,14 +101,26 @@ export class WebView {
 
     public initialize(): Promise<void | any[]> {
         return this._nativeBridge.Sdk.loadComplete().then((data) => {
-            this._deviceInfo = new DeviceInfo(this._nativeBridge);
+            this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
+
+            if(!/^\d+$/.test( this._clientInfo.getGameId())) {
+                const message = `Provided Game ID '${this._clientInfo.getGameId()}' is invalid. Game ID may contain only digits (0-9).`;
+                this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INVALID_ARGUMENT], message);
+                return Promise.reject(message);
+            }
+
+            if(this._clientInfo.getPlatform() === Platform.ANDROID) {
+                this._deviceInfo = new AndroidDeviceInfo(this._nativeBridge);
+            } else if(this._clientInfo.getPlatform() === Platform.IOS) {
+                this._deviceInfo = new IosDeviceInfo(this._nativeBridge);
+            }
+
             this._focusManager = new FocusManager(this._nativeBridge);
             this._wakeUpManager = new WakeUpManager(this._nativeBridge, this._focusManager);
             this._request = new Request(this._nativeBridge, this._wakeUpManager);
             this._cacheBookkeeping = new CacheBookkeeping(this._nativeBridge);
             this._cache = new Cache(this._nativeBridge, this._wakeUpManager, this._request, this._cacheBookkeeping);
             this._resolve = new Resolve(this._nativeBridge);
-            this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
             this._thirdPartyEventManager = new ThirdPartyEventManager(this._nativeBridge, this._request);
             this._metadataManager = new MetaDataManager(this._nativeBridge);
             this._adMobSignalFactory = new AdMobSignalFactory(this._nativeBridge, this._clientInfo, this._deviceInfo, this._focusManager);
@@ -115,11 +131,11 @@ export class WebView {
 
             return Promise.all([this._deviceInfo.fetch(), this.setupTestEnvironment()]);
         }).then(() => {
-            if(this._clientInfo.getPlatform() === Platform.ANDROID) {
+            if(this._clientInfo.getPlatform() === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
                 document.body.classList.add('android');
                 this._nativeBridge.setApiLevel(this._deviceInfo.getApiLevel());
                 this._container = new Activity(this._nativeBridge, this._deviceInfo);
-            } else if(this._clientInfo.getPlatform() === Platform.IOS) {
+            } else if(this._clientInfo.getPlatform() === Platform.IOS && this._deviceInfo instanceof IosDeviceInfo) {
                 const model = this._deviceInfo.getModel();
                 if(model.match(/iphone/i) || model.match(/ipod/i)) {
                     document.body.classList.add('iphone');
@@ -162,13 +178,21 @@ export class WebView {
             this._configuration = configuration;
             HttpKafka.setConfiguration(this._configuration);
 
+            if(this._configuration.getAbGroup() === 12 || this._configuration.getAbGroup() === 13) {
+                this._nativeBridge.setAutoBatchInterval(1);
+            }
+
+            PurchasingUtilities.setConfiguration(this._configuration);
+            PurchasingUtilities.setClientInfo(this._clientInfo);
+            PurchasingUtilities.sendPurchaseInitializationEvent(this._nativeBridge);
+
             if (!this._configuration.isEnabled()) {
                 const error = new Error('Game with ID ' + this._clientInfo.getGameId() +  ' is not enabled');
                 error.name = 'DisabledGame';
                 throw error;
             }
 
-            if(this._configuration.isAnalyticsEnabled() || this._clientInfo.getGameId() === '14850' || this._clientInfo.getGameId() === '14851') {
+            if(this._configuration.isAnalyticsEnabled() || CustomFeatures.isExampleGameId(this._clientInfo.getGameId())) {
                 this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo, this._configuration, this._focusManager);
                 return this._analyticsManager.init().then(() => {
                     this._sessionManager.setGameSessionId(this._analyticsManager.getGameSessionId());
@@ -209,11 +233,6 @@ export class WebView {
                 this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], error.message);
             } else if(error instanceof Error && error.name === 'DisabledGame') {
                 return;
-            } else if(error instanceof Error) {
-                error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
-                if(error.message === UnityAdsError[UnityAdsError.INVALID_ARGUMENT]) {
-                    this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INVALID_ARGUMENT], 'Game ID is not valid');
-                }
             }
 
             this._nativeBridge.Sdk.logError(JSON.stringify(error));
@@ -331,7 +350,7 @@ export class WebView {
             this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());
 
             if(this._nativeBridge.getPlatform() === Platform.IOS && (campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign)) {
-                if(!IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion()) && !campaign.getBypassAppSheet()) {
+                if(!IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion(), this._deviceInfo.getModel()) && !campaign.getBypassAppSheet()) {
                     const appSheetOptions = {
                         id: parseInt(campaign.getAppStoreId(), 10)
                     };
@@ -365,7 +384,7 @@ export class WebView {
         this._nativeBridge.Sdk.logInfo('Closing Unity Ads ad unit');
         this._showing = false;
         if(this._mustReinitialize) {
-            this._nativeBridge.Sdk.logInfo('Unity Ads webapp has been updated, reinitializing Unity Ads');
+            this._nativeBridge.Sdk.logDebug('Unity Ads webapp has been updated, reinitializing Unity Ads');
             this.reinitialize();
         }
     }
@@ -388,7 +407,7 @@ export class WebView {
                     this._mustReinitialize = true;
                     this._campaignRefreshManager.setRefreshAllowed(false);
                 } else {
-                    this._nativeBridge.Sdk.logInfo('Unity Ads webapp has been updated, reinitializing Unity Ads');
+                    this._nativeBridge.Sdk.logDebug('Unity Ads webapp has been updated, reinitializing Unity Ads');
                     this.reinitialize();
                 }
             } else {

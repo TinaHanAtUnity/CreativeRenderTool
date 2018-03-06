@@ -13,6 +13,7 @@ import { RequestError } from 'Errors/RequestError';
 import { StorageType } from 'Native/Api/Storage';
 import { Platform } from 'Constants/Platform';
 import { Diagnostics } from 'Utilities/Diagnostics';
+import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 
 export class ConfigManager {
 
@@ -61,6 +62,10 @@ export class ConfigManager {
                     }
                     return config;
                 } catch(error) {
+                    Diagnostics.trigger('config_parsing_failed', {
+                        configUrl: url,
+                        configResponse: response.response
+                    });
                     nativeBridge.Sdk.logError('Config request failed ' + error);
                     throw new Error(error);
                 }
@@ -114,7 +119,7 @@ export class ConfigManager {
             forceAbGroup: ConfigManager.AbGroup
         });
 
-        if(clientInfo.getPlatform() === Platform.ANDROID) {
+        if(clientInfo.getPlatform() === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
             url = Url.addParameters(url, {
                 deviceMake: deviceInfo.getManufacturer()
             });
@@ -125,7 +130,7 @@ export class ConfigManager {
                 advertisingTrackingId: deviceInfo.getAdvertisingIdentifier(),
                 limitAdTracking: deviceInfo.getLimitAdTracking()
             });
-        } else if(clientInfo.getPlatform() === Platform.ANDROID) {
+        } else if(clientInfo.getPlatform() === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
             url = Url.addParameters(url, {
                 androidId: deviceInfo.getAndroidId()
             });

@@ -43,7 +43,7 @@ export class MRAIDAdUnit extends AbstractAdUnit {
         this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._mraid = parameters.mraid;
-        this._additionalTrackingEvents = parameters.campaign.getTrackingEventUrls();
+        this._additionalTrackingEvents = parameters.campaign.getTrackingUrls();
         this._endScreen = parameters.endScreen;
         this._clientInfo = parameters.clientInfo;
         this._placement = parameters.placement;
@@ -83,7 +83,7 @@ export class MRAIDAdUnit extends AbstractAdUnit {
         this._onSystemInterruptObserver = this._container.onSystemInterrupt.subscribe((interruptStarted) => this.onSystemInterrupt(interruptStarted));
         this._onPauseObserver = this._container.onAndroidPause.subscribe(() => this.onSystemPause());
 
-        return this._container.open(this, false, this._orientationProperties.allowOrientationChange, this._orientationProperties.forceOrientation, true, false, true, false, this._options);
+        return this._container.open(this, ['webview'], this._orientationProperties.allowOrientationChange, this._orientationProperties.forceOrientation, true, false, true, false, this._options);
     }
 
     public hide(): Promise<void> {
