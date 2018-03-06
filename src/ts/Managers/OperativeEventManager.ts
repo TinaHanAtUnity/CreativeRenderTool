@@ -247,6 +247,7 @@ export class OperativeEventManager {
             infoJson.id = id;
             infoJson.ts = (new Date()).toISOString();
             infoJson.event_type = eventType;
+            infoJson.sourceGameId = this._clientInfo.getGameId();
 
             HttpKafka.sendEvent(kafkaType, infoJson);
         };
