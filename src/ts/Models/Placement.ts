@@ -26,7 +26,6 @@ interface IPlacement {
     disableVideoControlsFade: boolean | undefined;
 
     adTypes: string[] | undefined;
-    realtime: boolean;
     realtimeData: string | undefined;
 
     state: PlacementState;
@@ -49,7 +48,6 @@ export class Placement extends Model<IPlacement> {
             skipEndCardOnClose: ['boolean', 'undefined'],
             disableVideoControlsFade: ['boolean', 'undefined'],
             adTypes: ['array', 'undefined'],
-            realtime: ['boolean'],
             realtimeData: ['string', 'undefined'],
             state: ['number'],
             previousState: ['number'],
@@ -77,8 +75,6 @@ export class Placement extends Model<IPlacement> {
         this.set('disableVideoControlsFade', data.disableVideoControlsFade);
 
         this.set('adTypes', data.adTypes);
-
-        this.set('realtime', data.realtime ? true : false);
 
         this.set('state', PlacementState.NOT_AVAILABLE);
     }
@@ -121,14 +117,6 @@ export class Placement extends Model<IPlacement> {
 
     public getAdTypes(): string[] | undefined {
         return this.get('adTypes');
-    }
-
-    public isRealtime(): boolean {
-        return this.get('realtime');
-    }
-
-    public setRealtime(state: boolean): void {
-        this.set('realtime', state);
     }
 
     public getState(): PlacementState {

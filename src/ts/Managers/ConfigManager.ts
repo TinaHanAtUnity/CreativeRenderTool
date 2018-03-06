@@ -46,10 +46,6 @@ export class ConfigManager {
                     const configJson = JsonParser.parse(response.response);
                     const config: Configuration = new Configuration(configJson);
 
-                    if(ConfigManager.TestRealtimePlacement) {
-                        config.getPlacement(ConfigManager.TestRealtimePlacement).setRealtime(true);
-                    }
-
                     nativeBridge.Sdk.logInfo('Received configuration with ' + config.getPlacementCount() + ' placements for gamer ' + config.getGamerId() + ' (A/B group ' + config.getAbGroup() + ')');
                     if(config.getGamerId()) {
                         if(nativeBridge.getPlatform() === Platform.IOS && deviceInfo.getLimitAdTracking()) {

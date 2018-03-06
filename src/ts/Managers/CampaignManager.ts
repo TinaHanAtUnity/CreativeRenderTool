@@ -554,7 +554,6 @@ export class CampaignManager {
                     placementRequest[realtimePlacement.getId()] = {
                         adTypes: realtimePlacement.getAdTypes(),
                         allowSkip: realtimePlacement.allowSkip(),
-                        realtime: realtimePlacement.isRealtime()
                     };
 
                     if(realtimePlacement.getRealtimeData()) {
@@ -569,7 +568,6 @@ export class CampaignManager {
                             placementRequest[placement] = {
                                 adTypes: placements[placement].getAdTypes(),
                                 allowSkip: placements[placement].allowSkip(),
-                                realtime: placements[placement].isRealtime()
                             };
                         }
                     }
