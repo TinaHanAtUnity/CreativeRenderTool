@@ -1,3 +1,9 @@
+# Pending
+
+* Reduce info level logging
+* Moved hard-coded game IDs to CustomFeatures
+* Improved error message for invalid game ID
+
 # Tue Mar  6 11:43:29 UTC 2018
 
 * Add source game id to xpromo events
