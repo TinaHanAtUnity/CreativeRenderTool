@@ -161,7 +161,7 @@ export class CampaignRefreshManager {
     }
 
     private onCampaignExpired(): Promise<INativeResponse | void> {
-        this._nativeBridge.Sdk.logInfo('Unity Ads campaign has expired, requesting new ads');
+        this._nativeBridge.Sdk.logDebug('Unity Ads campaign has expired, requesting new ads');
         this.setPlacementStates(PlacementState.NO_FILL, this._configuration.getPlacementIds());
         this.invalidateCampaigns(false, this._configuration.getPlacementIds());
         return this._campaignManager.request();
@@ -177,7 +177,7 @@ export class CampaignRefreshManager {
     private onNoFill(placementId: string) {
         this._parsingErrorCount = 0;
 
-        this._nativeBridge.Sdk.logInfo('Unity Ads server returned no fill, no ads to show, for placement: ' + placementId);
+        this._nativeBridge.Sdk.logDebug('Unity Ads server returned no fill, no ads to show, for placement: ' + placementId);
         this.setCampaignForPlacement(placementId, undefined);
         this.handlePlacementState(placementId, PlacementState.NO_FILL);
     }
@@ -197,7 +197,7 @@ export class CampaignRefreshManager {
         const minimumRefreshTimestamp = Date.now() + CampaignRefreshManager.ErrorRefillDelay * 1000;
         if(this._refillTimestamp === 0 || this._refillTimestamp > minimumRefreshTimestamp) {
             this._refillTimestamp = minimumRefreshTimestamp;
-            this._nativeBridge.Sdk.logInfo('Unity Ads will refresh ads in ' + CampaignRefreshManager.ErrorRefillDelay + ' seconds');
+            this._nativeBridge.Sdk.logDebug('Unity Ads will refresh ads in ' + CampaignRefreshManager.ErrorRefillDelay + ' seconds');
         }
 
         if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
@@ -230,7 +230,7 @@ export class CampaignRefreshManager {
         this.invalidateCampaigns(this._needsRefill, placementIds);
         this._refillTimestamp = Date.now();
 
-        this._nativeBridge.Sdk.logInfo('Unity Ads failed to contact server, retrying after next system event');
+        this._nativeBridge.Sdk.logDebug('Unity Ads failed to contact server, retrying after next system event');
 
         if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
             const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
@@ -288,7 +288,7 @@ export class CampaignRefreshManager {
         if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
             const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
                 this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
-                this._nativeBridge.Sdk.logInfo('Unity Ads placement ' + placementId + ' status set to ' + PlacementState[placementState]);
+                this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + placementId + ' status set to ' + PlacementState[placementState]);
                 this.setPlacementState(placementId, placementState);
                 this.sendPlacementStateChanges(placementId);
                 if(placementState === PlacementState.READY) {
@@ -297,7 +297,7 @@ export class CampaignRefreshManager {
                 }
             });
         } else {
-            this._nativeBridge.Sdk.logInfo('Unity Ads placement ' + placementId + ' status set to ' + PlacementState[placementState]);
+            this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + placementId + ' status set to ' + PlacementState[placementState]);
             this.setPlacementState(placementId, placementState);
             this.sendPlacementStateChanges(placementId);
             if(placementState === PlacementState.READY) {

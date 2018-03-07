@@ -182,10 +182,10 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     protected onSystemInterrupt(interruptStarted: boolean): void {
         if(this.isShowing() && this.isActive()) {
             if(interruptStarted) {
-                this._nativeBridge.Sdk.logInfo('Pausing Unity Ads video playback due to interrupt');
+                this._nativeBridge.Sdk.logDebug('Pausing Unity Ads video playback due to interrupt');
                 this._nativeBridge.VideoPlayer.pause();
             } else if (!interruptStarted && this.isVideoReady() && !this.getContainer().isPaused()) {
-                this._nativeBridge.Sdk.logInfo('Continuing Unity Ads video playback after interrupt');
+                this._nativeBridge.Sdk.logDebug('Continuing Unity Ads video playback after interrupt');
                 this._nativeBridge.VideoPlayer.play();
             }
         }

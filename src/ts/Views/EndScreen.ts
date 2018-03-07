@@ -9,6 +9,7 @@ import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { Campaign } from 'Models/Campaign';
 import { IEndScreenDownloadParameters } from 'EventHandlers/EndScreenEventHandler';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
 
 export interface IEndScreenHandler {
     onEndScreenDownload(parameters: IEndScreenDownloadParameters): void;
@@ -55,7 +56,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             }
         ];
 
-        if (gameId === '1300023' || gameId === '1300024') {
+        if (CustomFeatures.isTimehopApp(gameId)) {
             this._isSwipeToCloseEnabled = true;
 
             this._bindings.push({

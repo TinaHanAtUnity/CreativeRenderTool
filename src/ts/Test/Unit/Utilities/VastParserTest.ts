@@ -256,7 +256,8 @@ describe('VastParser', () => {
                 }
             },
             Sdk: {
-                logInfo: sinon.spy()
+                logInfo: sinon.spy(),
+                logDebug: sinon.spy()
             },
             Connectivity: {
                 onConnected: new Observable2()
