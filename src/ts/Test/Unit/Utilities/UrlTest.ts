@@ -63,13 +63,13 @@ describe('UrlTest', () => {
 
     describe('whitelisting IOS', function() {
         it('should return true', function() {
-            ['market', 'itunes', 'itms', 'itmss'].forEach((protocol) => {
+            ['itunes', 'itms', 'itmss'].forEach((protocol) => {
                 const url = protocol + '://cdn-highwinds.unityads.unity3d.com/assets/29587943-3ee9-4490-a181-de372e9c7097/FRVideo19unity封面.png';
                 assert.isTrue(Url.isProtocolWhitelisted(url, Platform.IOS), `for protocol ${protocol}`);
           });
         });
         it('should return false', function() {
-            ['http', 'https', 'tcp', 'bla'].forEach((protocol) => {
+            ['market', 'http', 'https', 'tcp', 'bla'].forEach((protocol) => {
                 const url = protocol + '://cdn-highwinds.unityads.unity3d.com/assets/29587943-3ee9-4490-a181-de372e9c7097/FRVideo19unity封面.png';
                 assert.isFalse(Url.isProtocolWhitelisted(url, Platform.IOS), `for protocol ${protocol}`);
           });
