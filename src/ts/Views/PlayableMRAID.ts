@@ -1,4 +1,5 @@
 import PlayableMRAIDTemplate from 'html/PlayableMRAID.html';
+import MRAIDContainer from 'html/mraid/container.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { Placement } from 'Models/Placement';
@@ -9,6 +10,7 @@ import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
+import { JsonParser } from 'Utilities/JsonParser';
 
 export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -35,6 +37,8 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _playableStartTimestamp: number;
     private _backgroundTime: number = 0;
     private _backgroundTimestamp: number;
+
+    private _configuration: any;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string, coppaCompliant: boolean) {
         super(nativeBridge, 'playable-mraid', placement, campaign, coppaCompliant);
@@ -86,7 +90,21 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
 
-        this.createMRAID().then(mraid => {
+        let container = MRAIDContainer;
+        const playableConfiguration = this._campaign.getPlayableConfiguration();
+        if(playableConfiguration) {
+            // check configuration based on the ab group
+            const groupKey = "group" + this._campaign.getAbGroup();
+            if(playableConfiguration[groupKey]) {
+                this._configuration = playableConfiguration[groupKey];
+            } else if (playableConfiguration.default) {
+                this._configuration = playableConfiguration.default;
+            } else {
+                this._configuration = {};
+            }
+            container = container.replace('var playableConfiguration = {};', 'var playableConfiguration = ' + JSON.stringify(this._configuration) + ';');
+        }
+        this.createMRAID(container).then(mraid => {
             iframe.onload = () => this.onIframeLoaded();
             iframe.srcdoc = mraid;
         });
