@@ -282,16 +282,27 @@ export class WebView {
 
         if (placement.getRealtimeData()) {
             this._nativeBridge.Sdk.logInfo('Unity Ads is requesting realtime fill for placement ' + placement.getId());
+            const testGroup = this._configuration.getAbGroup();
+            const start = Date.now();
             this._campaignManager.requestRealtime(placement, campaign.getSession()).then(realtimeCampaign => {
                 if(realtimeCampaign) {
+                    if (testGroup === 7 || testGroup === 8) {
+                        Diagnostics.trigger("Realtime Testing Fill Success :: Group:" + testGroup + " Network Latency:" + (Date.now() - start), {});
+                    }
                     this._nativeBridge.Sdk.logInfo('Unity Ads received new fill for placement ' + placement.getId() + ', streaming new ad unit');
                     placement.setCurrentCampaign(realtimeCampaign);
                     this.showAd(placement, realtimeCampaign, options);
                 } else {
+                    if (testGroup === 7 || testGroup === 8) {
+                        Diagnostics.trigger("Realtime Testing No Fill :: Group:" + testGroup + " Network Latency:" + (Date.now() - start), {});
+                    }
                     this._nativeBridge.Sdk.logInfo('Unity Ads received no new fill for placement ' + placement.getId() + ', opening old ad unit');
                     this.showAd(placement, campaign, options);
                 }
             }).catch(() => {
+                if (testGroup === 7 || testGroup === 8) {
+                    Diagnostics.trigger("Realtime Testing Fill Failure :: Group:" + testGroup + " Network Latency:" + (Date.now() - start), {});
+                }
                 this._nativeBridge.Sdk.logInfo('Unity Ads realtime fill request for placement ' + placement.getId() + ' failed, opening old ad unit');
                 this.showAd(placement, campaign, options);
             });
