@@ -2,6 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 
 import { Url } from 'Utilities/Url';
+import { Platform } from 'Constants/Platform';
 
 describe('UrlTest', () => {
 
@@ -57,6 +58,45 @@ describe('UrlTest', () => {
             assert.isTrue(Url.isValid(url), 'Should allow unicode characters, test 1');
             url = 'https://cdn.unityads.unity3d.com/assets/f28676c2-5feb-4aa7-94fb-70c9c901cd57/800×600.png';
             assert.isTrue(Url.isValid(url), 'Should allow unicode characters, test 2');
+        });
+    });
+
+    describe('whitelisting IOS', function() {
+        it('should return true', function() {
+            ['market', 'itunes', 'itms', 'itmss'].forEach((protocol) => {
+                const url = protocol + '://cdn-highwinds.unityads.unity3d.com/assets/29587943-3ee9-4490-a181-de372e9c7097/FRVideo19unity封面.png';
+                assert.isTrue(Url.isProtocolWhitelisted(url, Platform.IOS), `for protocol ${protocol}`);
+          });
+        });
+        it('should return false', function() {
+            ['http', 'https', 'tcp', 'bla'].forEach((protocol) => {
+                const url = protocol + '://cdn-highwinds.unityads.unity3d.com/assets/29587943-3ee9-4490-a181-de372e9c7097/FRVideo19unity封面.png';
+                assert.isFalse(Url.isProtocolWhitelisted(url, Platform.IOS), `for protocol ${protocol}`);
+          });
+        });
+    });
+
+    describe('whitelisting ANDROID', function() {
+        it('should return true', function() {
+            ['market', 'http', 'https'].forEach((protocol) => {
+                const url = protocol + '://cdn-highwinds.unityads.unity3d.com/assets/29587943-3ee9-4490-a181-de372e9c7097/FRVideo19unity封面.png';
+                assert.isTrue(Url.isProtocolWhitelisted(url, Platform.ANDROID), `for protocol ${protocol}`);
+          });
+        });
+        it('should return false', function() {
+            ['itunes', 'itmss', 'itms', 'bla'].forEach((protocol) => {
+                const url = protocol + '://cdn-highwinds.unityads.unity3d.com/assets/29587943-3ee9-4490-a181-de372e9c7097/FRVideo19unity封面.png';
+                assert.isFalse(Url.isProtocolWhitelisted(url, Platform.ANDROID), `for protocol ${protocol}`);
+          });
+        });
+    });
+
+    describe('whitelisting TEST', function() {
+        it('should always return false', function() {
+            ['market', 'http', 'https', 'itmss', 'itunes', 'itms'].forEach((protocol) => {
+                const url = protocol + '://cdn-highwinds.unityads.unity3d.com/assets/29587943-3ee9-4490-a181-de372e9c7097/FRVideo19unity封面.png';
+                assert.isFalse(Url.isProtocolWhitelisted(url, Platform.TEST), `for protocol ${protocol}`);
+          });
         });
     });
 });
