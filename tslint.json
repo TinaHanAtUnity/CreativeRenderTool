@@ -24,8 +24,6 @@
     "max-classes-per-file": [false],
     "object-literal-key-quotes": false,
     "object-literal-shorthand": false,
-    "no-angle-bracket-type-assertion": false,
-    "no-trailing-whitespace": true,
-    "space-within-parens": false
+    "no-angle-bracket-type-assertion": false
   }
 }
