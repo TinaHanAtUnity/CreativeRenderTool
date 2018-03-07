@@ -1,5 +1,3 @@
-import MRAIDContainer from 'html/mraid/container.html';
-
 import { View } from 'Views/View';
 import { Placement } from 'Models/Placement';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
@@ -57,7 +55,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         }
     }
 
-    public createMRAID(): Promise<string> {
+    public createMRAID(container: any): Promise<string> {
         return this.fetchMRAID().then(mraid => {
             if(mraid) {
                 const markup = this._campaign.getDynamicMarkup();
@@ -67,7 +65,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
                 mraid = mraid.replace(/\$/g, '$$$');
                 mraid = this.replaceMraidSources(mraid);
-                return MRAIDContainer.replace('<body></body>', '<body>' + mraid + '</body>');
+                return container.replace('<body></body>', '<body>' + mraid + '</body>');
             }
             throw new WebViewError('Unable to fetch MRAID');
         });

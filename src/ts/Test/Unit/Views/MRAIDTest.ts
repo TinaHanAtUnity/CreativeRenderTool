@@ -9,6 +9,7 @@ import { Placement } from 'Models/Placement';
 import { MRAID } from 'Views/MRAID';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Configuration } from 'Models/Configuration';
+import MRAIDContainer from 'html/mraid/container.html';
 
 import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCampaign.json';
 
@@ -72,7 +73,7 @@ describe('MRAID', () => {
         const campaign = new MRAIDCampaign(params);
 
         const mraid = new MRAID(nativeBridge, placement, campaign, configuration.isCoppaCompliant());
-        return mraid.createMRAID().then((mraidSrc) => {
+        return mraid.createMRAID(MRAIDContainer).then((mraidSrc) => {
             assert.notEqual(mraidSrc.indexOf('InjectMe'), -1);
         });
     });
@@ -86,7 +87,7 @@ describe('MRAID', () => {
         params.dynamicMarkup = 'InjectMe';
         const campaign = new MRAIDCampaign(params);
         const mraid = new MRAID(nativeBridge, placement, campaign, configuration.isCoppaCompliant());
-        return mraid.createMRAID().then((src) => {
+        return mraid.createMRAID(MRAIDContainer).then((src) => {
             const dom = new DOMParser().parseFromString(src, 'text/html');
             assert.isNotNull(dom);
             assert.isNull(dom.querySelector('script[src^="mraid.js"]'));
@@ -101,7 +102,7 @@ describe('MRAID', () => {
         params.dynamicMarkup = 'InjectMe';
         const campaign = new MRAIDCampaign(params);
         const mraid = new MRAID(nativeBridge, placement, campaign, configuration.isCoppaCompliant());
-        return mraid.createMRAID().then((mraidSrc) => {
+        return mraid.createMRAID(MRAIDContainer).then((mraidSrc) => {
             assert.notEqual(mraidSrc.indexOf('InjectMe'), -1);
             assert.notEqual(mraidSrc.indexOf(`<script>var test = "Hello $&"</script>`), -1);
         });
