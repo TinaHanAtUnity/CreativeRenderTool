@@ -51,7 +51,7 @@ export class MRAIDBridge {
     private onMessage(e: MessageEvent) {
         const message = <IMRAIDMessage>e.data;
         if (message.type === 'mraid') {
-            this._nativeBridge.Sdk.logInfo(`mraid: event=${message.event}, data=${message.data}`);
+            this._nativeBridge.Sdk.logDebug(`mraid: event=${message.event}, data=${message.data}`);
             if (message.event in this._mraidHandlers) {
                 const handler = this._mraidHandlers[message.event];
                 handler(message);

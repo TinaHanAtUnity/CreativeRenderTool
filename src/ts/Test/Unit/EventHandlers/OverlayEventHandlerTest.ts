@@ -139,9 +139,7 @@ describe('OverlayEventHandlerTest', () => {
             const comScoreDuration = (performanceAdUnit.getVideo().getDuration()).toString(10);
             const sessionId = campaign.getSession().getId();
             const creativeId = campaign.getCreativeId();
-            const category =  campaign.getCategory();
-            const subCategory = campaign.getSubCategory();
-            sinon.assert.calledWith(<sinon.SinonSpy>comScoreService.sendEvent, 'end', sessionId, comScoreDuration, positionAtSkip, creativeId, category, subCategory);
+            sinon.assert.calledWith(<sinon.SinonSpy>comScoreService.sendEvent, 'end', sessionId, comScoreDuration, positionAtSkip, creativeId, undefined, undefined);
         });
     });
 

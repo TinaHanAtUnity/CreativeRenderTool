@@ -236,6 +236,7 @@ export class CampaignManager {
                 }
             }
 
+            this._nativeBridge.Sdk.logInfo('AdPlan received with ' + campaigns + ' campaigns and refreshDelay ' + refreshDelay);
             this.onAdPlanReceived.trigger(refreshDelay, campaigns);
 
             for(const mediaId in fill) {
@@ -373,8 +374,7 @@ export class CampaignManager {
         if(this._clientInfo.getPlatform() === Platform.IOS && this._deviceInfo instanceof IosDeviceInfo) {
             url = Url.addParameters(url, {
                 osVersion: this._deviceInfo.getOsVersion(),
-                screenScale: this._deviceInfo.getScreenScale(),
-                screenDensity: this._deviceInfo.getScreenScale()
+                screenScale: this._deviceInfo.getScreenScale()
             });
         } else if(this._clientInfo.getPlatform() === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
             url = Url.addParameters(url, {

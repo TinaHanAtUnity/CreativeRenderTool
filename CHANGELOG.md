@@ -1,10 +1,41 @@
-# Staged
+# Wed Mar  7 06:32:14 UTC 2018
+
+* Reduce info level logging
+* Moved hard-coded game IDs to CustomFeatures
+* Improved error message for invalid game ID
+
+# Tue Mar  6 11:43:29 UTC 2018
+
+* Add source game id to xpromo events
+* Allow certain range unicode characters in urls
+* Obfuscate spam idenfiers in AFMA container
+* AFMA: fix click signals
+
+# Tue Mar  6 06:29:39 UTC 2018
+
+* Test Android native bridge with 1ms autobatching on groups 12 and 13
+* Fix Android problem with close button, landscape orientation and scaled fonts
+
+# Fri Mar  2 09:31:54 UTC 2018
+
+* Refactor some programmatic properties away from base campaign model
+* Update dependencies
+
+# Thu Mar  1 10:39:02 UTC 2018
+
+* Validate and encode all incoming asset URLs
+* Fix cache redirections on 2.2.0
+* Show time to close / skip for MRAID overlays on group 18 and 19
+* Fix creative slot colliding with video slot for VPAID
+* Fixed issue with how setViewFrame was being used
+
+# Wed Feb 28 13:55:33 UTC 2018
 
 * Fixes for openUrl and sendEvent for VPAID
 * New AdMob spam signals for SDK 2.2.0
 * Refactor and add missing device infos
 * Overlay progress bar AB test for groups 16 & 17
-* Remove lunar theme AB test from groups 5, 8 and 10
+* Remove lunar theme AB test
 
 # Fri Feb 23 15:10:28 UTC 2018
 

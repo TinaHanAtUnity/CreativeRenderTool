@@ -6,6 +6,8 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { Placement } from 'Models/Placement';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Configuration } from 'Models/Configuration';
+import { VastCampaign } from 'Models/Vast/VastCampaign';
+import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
 
 export interface IMoatIds {
     level1: number | undefined;
@@ -35,25 +37,27 @@ export class MoatViewabilityService {
         this._moat.addMessageListener();
         document.body.appendChild(this._moat.container());
 
-        this._moatIds = {
-            level1: campaign.getSeatId(),
-            level2: campaign.getBuyerId(),
-            level3: campaign.getAdvertiserBundleId() ? campaign.getAdvertiserBundleId() : campaign.getAdvertiserDomain(),
-            level4: campaign.getCreativeId(),
-            slicer1: clientInfo.getSdkVersionName(),
-            slicer2: clientInfo.getApplicationName(),
-            slicer3: placement.getName()
-        };
+        if (campaign instanceof VastCampaign || campaign instanceof VPAIDCampaign) {
+            this._moatIds = {
+                level1: campaign.getSeatId(),
+                level2: campaign.getBuyerId(),
+                level3: campaign.getAdvertiserBundleId() ? campaign.getAdvertiserBundleId() : campaign.getAdvertiserDomain(),
+                level4: campaign.getCreativeId(),
+                slicer1: clientInfo.getSdkVersionName(),
+                slicer2: clientInfo.getApplicationName(),
+                slicer3: placement.getName()
+            };
 
-        this._moatData = {
-            SDK: 'UnityAds',
-            Version: '1.0',
-            SDKVersion: clientInfo.getSdkVersionName(),
-            IFA: deviceInfo.getAdvertisingIdentifier(),
-            LimitAdTracking: deviceInfo.getLimitAdTracking(),
-            COPPA: configuration.isCoppaCompliant(),
-            bundle: clientInfo.getApplicationName()
-        };
+            this._moatData = {
+                SDK: 'UnityAds',
+                Version: '1.0',
+                SDKVersion: clientInfo.getSdkVersionName(),
+                IFA: deviceInfo.getAdvertisingIdentifier(),
+                LimitAdTracking: deviceInfo.getLimitAdTracking(),
+                COPPA: configuration.isCoppaCompliant(),
+                bundle: clientInfo.getApplicationName()
+            };
+        }
     }
 
     public static getMoat(): MOAT | undefined {

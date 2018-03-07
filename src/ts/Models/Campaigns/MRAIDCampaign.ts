@@ -3,17 +3,17 @@ import { HTML } from 'Models/Assets/HTML';
 import { Image } from 'Models/Assets/Image';
 import { Asset } from 'Models/Assets/Asset';
 import { StoreName } from 'Models/Campaigns/PerformanceCampaign';
+import { ProgrammaticCampaign, IProgrammaticCampaign } from 'Models/Campaigns/ProgrammaticCampaign';
 
-export interface IMRAIDCampaign extends ICampaign {
+export interface IMRAIDCampaign extends IProgrammaticCampaign {
     resourceAsset: HTML | undefined;
     resource: string | undefined;
     dynamicMarkup: string | undefined;
-    additionalTrackingEvents: { [eventName: string]: string[] } | undefined;
 
     clickAttributionUrl?: string;
     clickAttributionUrlFollowsRedirects?: boolean;
     clickUrl: string | undefined;
-    videoEventUrls: { [eventType: string]: string } | undefined;
+    videoEventUrls: { [eventName: string]: string } | undefined;
 
     gameName: string | undefined;
     gameIcon: Image | undefined;
@@ -32,18 +32,16 @@ export interface IPlayableConfiguration {
     [key: string]: any;
 }
 
-export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
+export class MRAIDCampaign extends ProgrammaticCampaign<IMRAIDCampaign> {
     constructor(campaign: IMRAIDCampaign) {
         super('MRAIDCampaign', {
-            ... Campaign.Schema,
+            ... ProgrammaticCampaign.Schema,
             resourceAsset: ['object', 'undefined'],
             resource: ['string', 'undefined'],
             dynamicMarkup: ['string', 'undefined'],
-            additionalTrackingEvents: ['object', 'undefined'],
             clickAttributionUrl: ['string', 'undefined'],
             clickAttributionUrlFollowsRedirects: ['boolean', 'undefined'],
             clickUrl: ['string', 'undefined'],
-            videoEventUrls: ['object', 'undefined'],
             gameName: ['string', 'undefined'],
             gameIcon: ['object', 'undefined'],
             rating: ['number', 'undefined'],
@@ -53,7 +51,8 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
             bypassAppSheet: ['boolean', 'undefined'],
             store: ['number', 'undefined'],
             appStoreId: ['string', 'undefined'],
-            playableConfiguration: ['object', 'undefined'],
+            videoEventUrls: ['object', 'undefined'],
+            playableConfiguration: ['object', 'undefined']
         }, campaign);
     }
 
@@ -128,10 +127,6 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         return this.get('dynamicMarkup');
     }
 
-    public getTrackingEventUrls(): { [eventName: string]: string[] } | undefined {
-        return this.get('additionalTrackingEvents');
-    }
-
     public getClickAttributionUrl(): string | undefined {
         return this.get('clickAttributionUrl');
     }
@@ -144,19 +139,6 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
         return this.get('clickUrl');
     }
 
-    public getVideoEventUrls(): { [eventType: string]: string } | undefined {
-        return this.get('videoEventUrls');
-    }
-
-    public getVideoEventUrl(eventType: string): string | undefined {
-        const videoEventUrls = this.getVideoEventUrls();
-        if(videoEventUrls) {
-            return videoEventUrls[eventType];
-        } else {
-            return undefined;
-        }
-    }
-
     public getBypassAppSheet(): boolean | undefined {
         return this.get('bypassAppSheet');
     }
@@ -167,6 +149,15 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
 
     public getAppStoreId(): string | undefined {
         return this.get('appStoreId');
+    }
+
+    public getVideoEventUrls(): { [eventType: string]: string } | undefined {
+        return this.get('videoEventUrls');
+    }
+
+    public getVideoEventUrl(eventType: string): string | undefined {
+        const urls = this.get('videoEventUrls');
+        return urls ? urls[eventType] : undefined;
     }
 
     public setPlayableConfiguration(configuration: IPlayableConfiguration) {
@@ -192,8 +183,7 @@ export class MRAIDCampaign extends Campaign<IMRAIDCampaign> {
             'campaign': super.getDTO(),
             'resourceUrl': resourceUrlDTO,
             'resource': this.getResource(),
-            'dynamicMarkup': this.getDynamicMarkup(),
-            'additionalTrackingEvents': this.getTrackingEventUrls()
+            'dynamicMarkup': this.getDynamicMarkup()
         };
     }
 }

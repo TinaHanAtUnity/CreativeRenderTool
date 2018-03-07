@@ -136,7 +136,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
             const webviewXPos = screenWidth - webviewAreaSize;
             const webviewYPos = 0;
             this._container.setViewFrame('webview', Math.floor(webviewXPos), Math.floor(webviewYPos), Math.floor(webviewAreaSize), Math.floor(webviewAreaSize)).then(() => {
-                return this._container.setViewFrame('webplayer', Math.floor(screenWidth), Math.floor(screenHeight), Math.floor(screenWidth), Math.floor(screenHeight)).then(() => {
+                return this._container.setViewFrame('webplayer', 0, 0, Math.floor(screenWidth), Math.floor(screenHeight)).then(() => {
                     return this.setWebPlayerContent();
                 });
             });
@@ -192,7 +192,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
             }).then( () => {
                 this._handlingShouldOverrideUrlLoading = false;
             }).catch( (e) => {
-                this._nativeBridge.Sdk.logInfo("DisplayInterstitialAdUnit: Cannot open url: '" + url + "': " + e);
+                this._nativeBridge.Sdk.logDebug("DisplayInterstitialAdUnit: Cannot open url: '" + url + "': " + e);
                 this._handlingShouldOverrideUrlLoading = false;
             });
         }

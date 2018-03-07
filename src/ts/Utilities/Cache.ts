@@ -310,7 +310,6 @@ export class Cache {
         if(callback) {
             callback.startTimestamp = Date.now();
             callback.contentLength = totalSize;
-
             if(size === 0) {
                 this._cacheBookkeeping.writeFileEntry(callback.fileId, this._cacheBookkeeping.createFileInfo(false, size, totalSize, FileId.getFileIdExtension(callback.fileId)));
                 this.sendDiagnostic(CacheDiagnosticEvent.STARTED, callback);
@@ -318,7 +317,6 @@ export class Cache {
             } else {
                 this.sendDiagnostic(CacheDiagnosticEvent.RESUMED, callback);
             }
-
             // reject all files larger than 20 megabytes
             if(totalSize > this._maxFileSize) {
                 this._nativeBridge.Cache.stop();
@@ -363,9 +361,7 @@ export class Cache {
             } else if(Request.RedirectResponseCodes.exec(responseCode.toString())) {
                 this.sendDiagnostic(CacheDiagnosticEvent.REDIRECTED, callback);
                 this._cacheBookkeeping.removeFileEntry(callback.fileId);
-                if(size > 0) {
-                    this._nativeBridge.Cache.deleteFile(callback.fileId);
-                }
+                this._nativeBridge.Cache.deleteFile(callback.fileId);
                 const location = Request.getHeader(headers, 'location');
                 if(location) {
                     let fileId = callback.fileId;

@@ -94,7 +94,7 @@ export class VastParser {
             throw new Error('VAST wrapper depth exceeded');
         }
 
-        nativeBridge.Sdk.logInfo('Unity Ads is requesting VAST ad unit from ' + wrapperURL);
+        nativeBridge.Sdk.logDebug('Unity Ads is requesting VAST ad unit from ' + wrapperURL);
 
         return request.get(wrapperURL, [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).then(response => {
             return this.retrieveVast(response.response, nativeBridge, request, parsedVast, depth + 1);
