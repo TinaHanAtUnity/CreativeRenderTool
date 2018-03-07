@@ -5,7 +5,7 @@ import { Configuration, CacheMode } from 'Models/Configuration';
 import { CampaignManager } from 'Managers/CampaignManager';
 import { Cache } from 'Utilities/Cache';
 import { Placement } from 'Models/Placement';
-import { Request, INativeResponse } from 'Utilities/Request';
+import { Request } from 'Utilities/Request';
 import { SessionManager } from 'Managers/SessionManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Diagnostics } from 'Utilities/Diagnostics';
@@ -30,11 +30,10 @@ import { Activity } from 'AdUnits/Containers/Activity';
 import { ViewController } from 'AdUnits/Containers/ViewController';
 import { TestEnvironment } from 'Utilities/TestEnvironment';
 import { MetaData } from 'Utilities/MetaData';
-import { CampaignRefreshManager } from 'Managers/CampaignRefreshManager';
+import { RefreshManager } from 'Managers/RefreshManager';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { AnalyticsManager } from 'Analytics/AnalyticsManager';
 import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
-import { StorageType } from 'Native/Api/Storage';
 import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { SdkStats } from 'Utilities/SdkStats';
@@ -45,11 +44,12 @@ import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { OldCampaignRefreshManager } from 'Managers/OldCampaignRefreshManager';
 
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
-import { CustomFeatures } from 'Utilities/CustomFeatures';
 
 export class WebView {
 
@@ -63,7 +63,7 @@ export class WebView {
     private _configuration: Configuration;
 
     private _campaignManager: CampaignManager;
-    private _campaignRefreshManager: CampaignRefreshManager;
+    private _refreshManager: RefreshManager;
     private _assetManager: AssetManager;
     private _cache: Cache;
     private _cacheBookkeeping: CacheBookkeeping;
@@ -83,8 +83,6 @@ export class WebView {
     private _showing: boolean = false;
     private _initialized: boolean = false;
     private _initializedAt: number;
-    private _mustReinitialize: boolean = false;
-    private _configJsonCheckedAt: number;
 
     private _metadataManager: MetaDataManager;
 
@@ -147,7 +145,7 @@ export class WebView {
             this._sessionManager = new SessionManager(this._nativeBridge);
             this._operativeEventManager = new OperativeEventManager(this._nativeBridge, this._request, this._metadataManager, this._sessionManager, this._clientInfo, this._deviceInfo);
 
-            this._initializedAt = this._configJsonCheckedAt = Date.now();
+            this._initializedAt = Date.now();
             this._nativeBridge.Sdk.initComplete();
 
             this._wakeUpManager.setListenConnectivity(true);
@@ -215,14 +213,12 @@ export class WebView {
 
             this._assetManager = new AssetManager(this._cache, this._configuration.getCacheMode(), this._deviceInfo, this._cacheBookkeeping);
             this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._adMobSignalFactory, this._request, this._clientInfo, this._deviceInfo, this._metadataManager);
-            this._campaignRefreshManager = new CampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration, this._focusManager);
+            this._refreshManager = new OldCampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration, this._focusManager, this._sessionManager, this._clientInfo, this._request, this._cache, this._operativeEventManager);
 
             SdkStats.initialize(this._nativeBridge, this._request, this._configuration, this._sessionManager, this._campaignManager, this._metadataManager, this._clientInfo);
 
-            return this._campaignRefreshManager.refresh();
+            return this._refreshManager.refresh();
         }).then(() => {
-            this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
-
             this._initialized = true;
 
             return this._sessionManager.sendUnsentSessions(this._operativeEventManager);
@@ -258,7 +254,7 @@ export class WebView {
             return;
         }
 
-        const campaign = this._campaignRefreshManager.getCampaign(placementId);
+        const campaign = this._refreshManager.getCampaign(placementId);
 
         if(!campaign) {
             this.showError(true, placementId, 'Campaign not found');
@@ -269,7 +265,7 @@ export class WebView {
 
         if(campaign.isExpired()) {
             this.showError(true, placementId, 'Campaign has expired');
-            this._campaignRefreshManager.refresh();
+            this._refreshManager.refresh();
 
             const error = new DiagnosticError(new Error('Campaign expired'), {
                 id: campaign.getId(),
@@ -280,11 +276,6 @@ export class WebView {
         }
 
         this._showing = true;
-
-        this.shouldReinitialize().then((reinitialize) => {
-            this._mustReinitialize = reinitialize;
-            this._campaignRefreshManager.setRefreshAllowed(!reinitialize);
-        });
 
         if(this._configuration.getCacheMode() !== CacheMode.DISABLED) {
             this._assetManager.stopCaching();
@@ -324,7 +315,7 @@ export class WebView {
                 options: options,
                 adMobSignalFactory: this._adMobSignalFactory
             });
-            this._campaignRefreshManager.setCurrentAdUnit(this._currentAdUnit);
+            this._refreshManager.setCurrentAdUnit(this._currentAdUnit);
             this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());
 
             if(this._nativeBridge.getPlatform() === Platform.IOS && (campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign)) {
@@ -359,40 +350,11 @@ export class WebView {
     }
 
     private onAdUnitClose(): void {
-        this._nativeBridge.Sdk.logInfo('Closing Unity Ads ad unit');
         this._showing = false;
-        if(this._mustReinitialize) {
-            this._nativeBridge.Sdk.logDebug('Unity Ads webapp has been updated, reinitializing Unity Ads');
-            this.reinitialize();
-        }
     }
 
     private isShowing(): boolean {
         return this._showing;
-    }
-
-    /*
-     CONNECTIVITY AND USER ACTIVITY EVENT HANDLERS
-     */
-
-    private onNetworkConnected() {
-        if(this.isShowing() || !this._initialized) {
-            return;
-        }
-        this.shouldReinitialize().then((reinitialize) => {
-            if(reinitialize) {
-                if(this.isShowing()) {
-                    this._mustReinitialize = true;
-                    this._campaignRefreshManager.setRefreshAllowed(false);
-                } else {
-                    this._nativeBridge.Sdk.logDebug('Unity Ads webapp has been updated, reinitializing Unity Ads');
-                    this.reinitialize();
-                }
-            } else {
-                this._campaignRefreshManager.refresh();
-                this._sessionManager.sendUnsentSessions(this._operativeEventManager);
-            }
-        });
     }
 
     /*
@@ -407,43 +369,6 @@ export class WebView {
             'object': event.error
         });
         return true; // returning true from window.onerror will suppress the error (in theory)
-    }
-
-    /*
-     REINITIALIZE LOGIC
-     */
-
-    private reinitialize() {
-        // save caching pause state in case of reinit
-        if(this._cache.isPaused()) {
-            Promise.all([this._nativeBridge.Storage.set(StorageType.PUBLIC, 'caching.pause.value', true), this._nativeBridge.Storage.write(StorageType.PUBLIC)]).then(() => {
-                this._nativeBridge.Sdk.reinitialize();
-            }).catch(() => {
-                this._nativeBridge.Sdk.reinitialize();
-            });
-        } else {
-            this._nativeBridge.Sdk.reinitialize();
-        }
-    }
-
-    private getConfigJson(): Promise<INativeResponse> {
-        return this._request.get(this._clientInfo.getConfigUrl() + '?ts=' + Date.now() + '&sdkVersion=' + this._clientInfo.getSdkVersion());
-    }
-
-    private shouldReinitialize(): Promise<boolean> {
-        if(!this._clientInfo.getWebviewHash()) {
-            return Promise.resolve(false);
-        }
-        if(Date.now() - this._configJsonCheckedAt <= 15 * 60 * 1000) {
-            return Promise.resolve(false);
-        }
-        return this.getConfigJson().then(response => {
-            this._configJsonCheckedAt = Date.now();
-            const configJson = JsonParser.parse(response.response);
-            return configJson.hash !== this._clientInfo.getWebviewHash();
-        }).catch((error) => {
-            return false;
-        });
     }
 
     /*

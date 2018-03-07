@@ -6,7 +6,7 @@ import { CacheMode, Configuration } from 'Models/Configuration';
 import { CampaignManager } from 'Managers/CampaignManager';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { NativeBridge } from 'Native/NativeBridge';
-import { CampaignRefreshManager } from 'Managers/CampaignRefreshManager';
+import { RefreshManager } from 'Managers/RefreshManager';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { Observable0, Observable1, Observable2, Observable4 } from 'Utilities/Observable';
 import { Platform } from 'Constants/Platform';
@@ -38,6 +38,7 @@ import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { AdMobSignal } from 'Models/AdMobSignal';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
+import { OldCampaignRefreshManager } from 'Managers/OldCampaignRefreshManager';
 
 describe('CampaignRefreshManager', () => {
     let deviceInfo: DeviceInfo;
@@ -52,7 +53,7 @@ describe('CampaignRefreshManager', () => {
     let sessionManager: SessionManager;
     let thirdPartyEventManager: ThirdPartyEventManager;
     let container: AdUnitContainer;
-    let campaignRefreshManager: CampaignRefreshManager;
+    let campaignRefreshManager: RefreshManager;
     let metaDataManager: MetaDataManager;
     let focusManager: FocusManager;
     let adUnitParams: IAdUnitParameters<Campaign>;
@@ -60,6 +61,7 @@ describe('CampaignRefreshManager', () => {
     let adMobSignalFactory: AdMobSignalFactory;
     let comScoreService: ComScoreTrackingService;
     let cacheBookkeeping: CacheBookkeeping;
+    let cache: Cache;
 
     beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo();
@@ -139,7 +141,8 @@ describe('CampaignRefreshManager', () => {
         sessionManager = new SessionManager(nativeBridge);
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
         cacheBookkeeping = new CacheBookkeeping(nativeBridge);
-        assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
+        cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping);
+        assetManager = new AssetManager(cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
         container = new TestContainer();
         operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
         adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);
@@ -162,14 +165,14 @@ describe('CampaignRefreshManager', () => {
             options: {}
         };
 
-        CampaignRefreshManager.ParsingErrorRefillDelay = 0; // prevent tests from hanging due to long retry timeouts
+        RefreshManager.ParsingErrorRefillDelay = 0; // prevent tests from hanging due to long retry timeouts
     });
 
     describe('PLC campaigns', () => {
         beforeEach(() => {
             configuration = new Configuration(JSON.parse(ConfigurationAuctionPlc));
             campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager);
-            campaignRefreshManager = new CampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration, focusManager);
+            campaignRefreshManager = new OldCampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration, focusManager, sessionManager, clientInfo, request, cache, operativeEventManager);
         });
 
         it('get campaign should return undefined', () => {
