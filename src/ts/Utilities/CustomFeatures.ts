@@ -102,6 +102,10 @@ export class CustomFeatures {
         }
     }
 
+    public static isPlayableConfigurationEnabled(originalResourceUrl: string) {
+        return originalResourceUrl.match(/playables\/production\/unity/);
+    }
+
     public static isExampleGameId(gameId: string): boolean {
         return gameId === '14850' || gameId === '14851';
     }
