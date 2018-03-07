@@ -110,7 +110,7 @@ export class AdMobView extends View<IAdMobEventHandler> {
 
     private getIFrameSrcDoc(): Promise<string> {
         const markup = this._campaign.getDynamicMarkup();
-        const dom = new DOMParser().parseFromString(markup, "text/html");
+        const dom = new DOMParser().parseFromString(markup, 'text/html');
         if (!dom) {
             return Promise.reject(new Error('Not a valid HTML document => ' + markup));
         }

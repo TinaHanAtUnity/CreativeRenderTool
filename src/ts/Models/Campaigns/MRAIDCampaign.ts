@@ -53,7 +53,7 @@ export class MRAIDCampaign extends ProgrammaticCampaign<IMRAIDCampaign> {
         return this.get('resourceAsset');
     }
 
-    public setResourceUrl(url: string,): void {
+    public setResourceUrl(url: string): void {
         this.set('resourceAsset', new HTML(url, this.getSession()));
     }
 

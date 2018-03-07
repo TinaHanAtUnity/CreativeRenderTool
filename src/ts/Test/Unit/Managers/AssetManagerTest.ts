@@ -274,7 +274,7 @@ describe('AssetManagerTest', () => {
         const asset2 = new HTML('https:/www.google.fi/2', TestFixtures.getSession());
         const campaign = new TestCampaign([asset], []);
         const campaign2 = new TestCampaign([asset2], []);
-        return Promise.all([assetManager.setup(campaign),assetManager.setup(campaign2)]).then(() => {
+        return Promise.all([assetManager.setup(campaign), assetManager.setup(campaign2)]).then(() => {
             assert(asset.isCached(), 'First asset was not cached');
             assert(asset2.isCached(), 'Second asset was not cached');
         });

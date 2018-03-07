@@ -207,7 +207,7 @@ describe('MRAIDEventHandlersTest', () => {
                 sinon.stub(mraidAdUnit, 'sendClick');
                 mraidEventHandler = new MRAIDEventHandler(nativeBridge, mraidAdUnit, mraidAdUnitParameters);
 
-                mraidEventHandler.onMraidAnalyticsEvent(15, 12, 0,'win_screen', {'level': 2});
+                mraidEventHandler.onMraidAnalyticsEvent(15, 12, 0, 'win_screen', {'level': 2});
 
                 const kafkaObject: any = {};
                 kafkaObject.type = 'win_screen';

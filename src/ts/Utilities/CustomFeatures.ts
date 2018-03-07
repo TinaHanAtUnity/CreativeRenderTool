@@ -114,7 +114,7 @@ export class CustomFeatures {
         if(abGroup === 8 || abGroup === 10) {
             return new AdUnitStyle({ctaButtonColor: this.getColor()});
         } else {
-            return new AdUnitStyle({ctaButtonColor: "#167dfb"});
+            return new AdUnitStyle({ctaButtonColor: '#167dfb'});
         }
     }
 

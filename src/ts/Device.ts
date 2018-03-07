@@ -29,12 +29,12 @@ const changeOrientation = () => {
     /* Calculate orientation based on width and height by default */
     let orientation: string = window.innerWidth / window.innerHeight >= 1 ? 'landscape' : 'portrait';
 
-    if (typeof window.orientation !== "undefined" && platform === "ios" && !isIOS7) {
-        orientation = (Math.abs(<number>window.orientation) === 90) ? "landscape" : "portrait";
+    if (typeof window.orientation !== 'undefined' && platform === 'ios' && !isIOS7) {
+        orientation = (Math.abs(<number>window.orientation) === 90) ? 'landscape' : 'portrait';
     }
 
-    document.body.classList.remove("landscape");
-    document.body.classList.remove("portrait");
+    document.body.classList.remove('landscape');
+    document.body.classList.remove('portrait');
     document.body.classList.add(orientation);
 
     runningResizeEvent = false;

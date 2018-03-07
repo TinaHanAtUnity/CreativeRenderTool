@@ -484,7 +484,7 @@ describe('CampaignRefreshManager', () => {
             return campaignRefreshManager.refresh().then(() => {
                 diagnosticsStub.restore();
                 assert.equal(receivedErrorType , 'auction_request_failed', 'Incorrect error type');
-                assert.equal(receivedError.error.message ,'test error', 'Incorrect error message');
+                assert.equal(receivedError.error.message , 'test error', 'Incorrect error message');
             });
         });
 
@@ -504,7 +504,7 @@ describe('CampaignRefreshManager', () => {
             return campaignRefreshManager.refresh().then(() => {
                 diagnosticsStub.restore();
                 assert.equal(receivedErrorType , 'auction_request_failed', 'Incorrect error type');
-                assert.equal(receivedError.error.message ,'test error', 'Incorrect error message');
+                assert.equal(receivedError.error.message , 'test error', 'Incorrect error message');
             });
         });
 
@@ -531,7 +531,7 @@ describe('CampaignRefreshManager', () => {
             return campaignRefreshManager.refresh().then(() => {
                 diagnosticsStub.restore();
                 assert.equal(receivedErrorType , 'auction_request_failed', 'Incorrect error type');
-                assert.equal(receivedError.error.message ,'Unsupported content-type: wrong/contentType', 'Incorrect error message');
+                assert.equal(receivedError.error.message , 'Unsupported content-type: wrong/contentType', 'Incorrect error message');
             });
         });
 
@@ -557,8 +557,8 @@ describe('CampaignRefreshManager', () => {
 
             return campaignRefreshManager.refresh().then(() => {
                 diagnosticsStub.restore();
-                assert.equal(receivedErrorType , 'auction_request_failed', 'Incorrect error type');
-                assert.equal(receivedError.error.message ,'model: AuctionResponse key: contentType with value: 1: integer is not in: string', 'Incorrect error message');
+                assert.equal(receivedErrorType, 'auction_request_failed', 'Incorrect error type');
+                assert.equal(receivedError.error.message, 'model: AuctionResponse key: contentType with value: 1: integer is not in: string', 'Incorrect error message');
             });
         });
     });

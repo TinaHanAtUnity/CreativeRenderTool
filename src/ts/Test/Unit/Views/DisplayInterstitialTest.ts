@@ -18,7 +18,7 @@ describe('DisplayInterstitial View', () => {
     let campaign: DisplayInterstitialCampaign;
     let sandbox: sinon.SinonSandbox;
 
-    describe('on Display Interstitial Markup Campaign',() => {
+    describe('on Display Interstitial Markup Campaign', () => {
         viewUnitTests();
     });
 

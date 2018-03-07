@@ -1,4 +1,4 @@
-import { Campaign, ICampaign} from 'Models/Campaign';
+import { Campaign, ICampaign } from 'Models/Campaign';
 import { HTML } from 'Models/Assets/HTML';
 
 export interface IPromoCampaign extends ICampaign {
@@ -11,7 +11,7 @@ export interface IPromoCampaign extends ICampaign {
 export class PromoCampaign extends Campaign<IPromoCampaign> {
     constructor(campaign: IPromoCampaign) {
         super('PromoCampaign', {
-            ... Campaign.Schema,
+            ... Campaign.Schema, 
             iapProductId: ['string'],
             additionalTrackingEvents: ['object', 'undefined'],
             dynamicMarkup: ['string', 'undefined'],
