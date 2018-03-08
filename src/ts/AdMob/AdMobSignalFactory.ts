@@ -31,7 +31,17 @@ export class AdMobSignalFactory {
 
         signal.setAdLoadDuration(adUnit.getRequestToViewTime());
 
-        return Promise.resolve(signal);
+        const promises = [];
+
+        promises.push(this._deviceInfo.getBatteryLevel().then(batteryLevel => {
+            signal.setDeviceBatteryLevel(this.getBatteryLevel(batteryLevel));
+        }).catch(() => {
+            this.logFailure(this._nativeBridge, 'batteryLevel');
+        }));
+
+        return Promise.all(promises).then(() => {
+            return signal;
+        });
     }
 
     public getAdRequestSignal(): Promise<AdMobSignal> {
