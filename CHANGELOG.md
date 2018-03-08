@@ -1,4 +1,4 @@
-# Pending
+# Thu Mar  8 09:59:59 UTC 2018
 
 * Playable configuration file support
 * Refactor campaign refresh manager - part one
