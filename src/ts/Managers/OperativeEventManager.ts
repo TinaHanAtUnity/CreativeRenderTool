@@ -247,7 +247,9 @@ export class OperativeEventManager {
             infoJson.id = id;
             infoJson.ts = (new Date()).toISOString();
             infoJson.event_type = eventType;
-            infoJson.sourceGameId = this._clientInfo.getGameId();
+            if(campaign instanceof XPromoCampaign) {
+                infoJson.sourceGameId = campaign.getGameId();
+            }
 
             HttpKafka.sendEvent(kafkaType, infoJson);
         };
