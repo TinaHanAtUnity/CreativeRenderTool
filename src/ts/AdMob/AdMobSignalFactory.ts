@@ -29,7 +29,7 @@ export class AdMobSignalFactory {
     public getOptionalSignal(adUnit: AdMobAdUnit): Promise<AdMobOptionalSignal> {
         const signal = new AdMobOptionalSignal();
 
-        signal.setAdLoadDuration(adUnit.getRequestToViewTime());
+        signal.setAdLoadDuration(adUnit.getRequestToReadyTime());
 
         const promises = [];
 
