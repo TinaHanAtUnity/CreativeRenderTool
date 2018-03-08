@@ -12,7 +12,7 @@ import { IMotionEvent } from 'Native/Api/AndroidAdUnit';
 import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { AdMobOptionalSignal } from 'Models/AdMobOptionalSignal';
-import { SdkStats } from '../Utilities/SdkStats';
+import { SdkStats } from 'Utilities/SdkStats';
 
 export class AdMobSignalFactory {
     private _nativeBridge: NativeBridge;
@@ -32,6 +32,7 @@ export class AdMobSignalFactory {
 
         signal.setAdLoadDuration(adUnit.getRequestToReadyTime());
         signal.setSequenceNumber(SdkStats.getAdRequestOrdinal());
+        signal.setPriorClickCount(SdkStats.getAdClickOrdinal());
 
         const promises = [];
 
@@ -51,6 +52,7 @@ export class AdMobSignalFactory {
     }
 
     public getClickSignal(touchInfo: ITouchInfo, adUnit: AdMobAdUnit): Promise<AdMobSignal> {
+        SdkStats.increaseAdClickOrdinal();
         return this.getCommonSignal().then(signal => {
             // todo: touch duration
             // todo: touch distance

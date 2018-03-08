@@ -110,6 +110,14 @@ export class SdkStats {
         return SdkStats._adRequestOrdinal;
     }
 
+    public static increaseAdClickOrdinal(): void {
+        SdkStats._adClickOrdinal++;
+    }
+
+    public static getAdClickOrdinal(): number {
+        return SdkStats._adClickOrdinal;
+    }
+
     public static setInitTimestamp(): void {
         SdkStats._initTimestamp = Date.now();
     }
@@ -158,6 +166,7 @@ export class SdkStats {
 
     private static _initialized: boolean = false;
     private static _adRequestOrdinal: number = 0;
+    private static _adClickOrdinal: number = 0;
     private static _initTimestamp: number;
     private static _latestAdRequestTimestamp: number;
     private static _latestAdRequestDuration: number;
