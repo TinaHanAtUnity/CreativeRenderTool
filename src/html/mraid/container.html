@@ -54,6 +54,8 @@
                 var width = window.innerWidth;
                 var height = window.innerHeight;
 
+                var playableConfiguration = {};
+
                 var setState = function(newState) {
                     state = newState;
                     trigger('stateChange', [newState]);
@@ -218,6 +220,10 @@
                         state: state
                     }, '*');
                 };
+
+                this.getConfiguration = function() {
+                    return playableConfiguration;
+                }
             };
             window.mraid = new MRAID();
         })();

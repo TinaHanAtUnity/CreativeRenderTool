@@ -68,13 +68,6 @@ export class TestFixtures {
             creativeId: undefined,
             seatId: undefined,
             meta: meta,
-            appCategory: undefined,
-            appSubCategory: undefined,
-            advertiserDomain: undefined,
-            advertiserCampaignId: undefined,
-            advertiserBundleId: undefined,
-            useWebViewUserAgentForTracking: undefined,
-            buyerId: undefined,
             session: session
         };
     }
@@ -145,27 +138,30 @@ export class TestFixtures {
     }
 
     public static getPlayableMRAIDCampaignParams(json: any, storeName: StoreName): IMRAIDCampaign {
+        const mraidContentJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
+        const mraidJson = json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'];
         const session = this.getSession();
         return {
-            ... this.getCometCampaignBaseParams(session, json.id, this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup(), undefined),
-            useWebViewUserAgentForTracking: false,
-            resourceAsset: json.resourceUrl ? new HTML(json.resourceUrl, session) : undefined,
+            ... this.getCometCampaignBaseParams(session, mraidContentJson.id, this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup(), undefined),
+            useWebViewUserAgentForTracking: mraidJson.useWebViewUserAgentForTracking,
+            resourceAsset: mraidContentJson.resourceUrl ? new HTML(mraidContentJson.resourceUrl, session) : undefined,
             resource: undefined,
-            dynamicMarkup: json.dynamicMarkup,
-            additionalTrackingEvents: undefined,
-            clickAttributionUrl: json.clickAttributionUrl,
-            clickAttributionUrlFollowsRedirects: json.clickAttributionUrlFollowsRedirects,
-            clickUrl: json.clickUrl ? json.clickAttributionUrl : undefined,
-            videoEventUrls: json.videoEventUrls ? json.videoEventUrls : undefined,
-            gameName: json.gameName,
-            gameIcon: json.gameIcon ? new Image(json.gameIcon, session) : undefined,
-            rating: json.rating,
-            ratingCount: json.ratingCount,
-            landscapeImage: json.endScreenLandscape ? new Image(json.endScreenLandscape, session) : undefined,
-            portraitImage: json.endScreenPortrait ? new Image(json.endScreenPortrait, session) : undefined,
-            bypassAppSheet: json.bypassAppSheet,
+            dynamicMarkup: mraidContentJson.dynamicMarkup,
+            trackingUrls: {},
+            clickAttributionUrl: mraidContentJson.clickAttributionUrl,
+            clickAttributionUrlFollowsRedirects: mraidContentJson.clickAttributionUrlFollowsRedirects,
+            clickUrl: mraidContentJson.clickUrl ? mraidContentJson.clickAttributionUrl : undefined,
+            videoEventUrls: mraidContentJson.videoEventUrls ? mraidContentJson.videoEventUrls : undefined,
+            gameName: mraidContentJson.gameName,
+            gameIcon: mraidContentJson.gameIcon ? new Image(mraidContentJson.gameIcon, session) : undefined,
+            rating: mraidContentJson.rating,
+            ratingCount: mraidContentJson.ratingCount,
+            landscapeImage: mraidContentJson.endScreenLandscape ? new Image(mraidContentJson.endScreenLandscape, session) : undefined,
+            portraitImage: mraidContentJson.endScreenPortrait ? new Image(mraidContentJson.endScreenPortrait, session) : undefined,
+            bypassAppSheet: mraidContentJson.bypassAppSheet,
             store: storeName,
-            appStoreId: json.appStoreId
+            appStoreId: mraidContentJson.appStoreId,
+            playableConfiguration: undefined
         };
     }
 
@@ -181,13 +177,6 @@ export class TestFixtures {
             creativeId: mraidJson.creativeId || undefined,
             seatId: mraidJson.seatId || undefined,
             meta: mraidJson.meta || undefined,
-            appCategory: undefined,
-            appSubCategory: undefined,
-            advertiserDomain: undefined,
-            advertiserCampaignId: undefined,
-            advertiserBundleId: undefined,
-            useWebViewUserAgentForTracking: mraidJson.useWebViewUserAgentForTracking,
-            buyerId: undefined,
             session: session
         };
     }
@@ -203,7 +192,7 @@ export class TestFixtures {
             resourceAsset: mraidContentJson.inlinedUrl ? new HTML(mraidContentJson.inlinedUrl, session) : undefined,
             resource: '<div>resource</div>',
             dynamicMarkup: mraidContentJson.dynamicMarkup,
-            additionalTrackingEvents: mraidJson.trackingUrls,
+            trackingUrls: mraidJson.trackingUrls,
             clickAttributionUrl: mraidContentJson.clickAttributionUrl,
             clickAttributionUrlFollowsRedirects: mraidContentJson.clickAttributionUrlFollowsRedirects,
             clickUrl: mraidContentJson.clickUrl ? mraidContentJson.clickAttributionUrl : undefined,
@@ -216,7 +205,9 @@ export class TestFixtures {
             portraitImage: mraidContentJson.endScreenPortrait ? new Image(mraidContentJson.endScreenPortrait, session) : undefined,
             bypassAppSheet: mraidContentJson.bypassAppSheet,
             store: undefined,
-            appStoreId: mraidContentJson.appStoreId
+            appStoreId: mraidContentJson.appStoreId,
+            useWebViewUserAgentForTracking: mraidJson.useWebViewUserAgentForTracking,
+            playableConfiguration: undefined
         };
     }
 
@@ -231,13 +222,6 @@ export class TestFixtures {
             creativeId: 'creativeId',
             seatId: 12345,
             meta: undefined,
-            appCategory: 'appCategory',
-            appSubCategory: 'appSubCategory',
-            advertiserDomain: 'advertiserDomain',
-            advertiserCampaignId: 'advertiserCampaignId',
-            advertiserBundleId: 'advertiserBundleId',
-            useWebViewUserAgentForTracking: false,
-            buyerId: 'buyerId',
             session: session
         };
     }
@@ -264,7 +248,14 @@ export class TestFixtures {
             hasEndscreen: !!vast.getCompanionPortraitUrl() || !!vast.getCompanionLandscapeUrl(),
             portrait: portraitAsset,
             landscape: landscapeAsset,
-            tracking: undefined
+            appCategory: 'appCategory',
+            appSubcategory: 'appSubCategory',
+            advertiserDomain: 'advertiserDomain',
+            advertiserCampaignId: 'advertiserCampaignId',
+            advertiserBundleId: 'advertiserBundleId',
+            useWebViewUserAgentForTracking: false,
+            buyerId: 'buyerId',
+            trackingUrls: {}
         };
     }
 
@@ -281,20 +272,14 @@ export class TestFixtures {
             creativeId: json.creativeId || undefined,
             seatId: json.seatId || undefined,
             meta: json.meta,
-            appCategory: undefined,
-            appSubCategory: undefined,
-            advertiserDomain: undefined,
-            advertiserCampaignId: undefined,
-            advertiserBundleId: undefined,
-            useWebViewUserAgentForTracking: json.useWebViewUserAgentForTracking,
-            buyerId: undefined,
             session: session
         };
 
         return {
             ... baseCampaignParams,
             dynamicMarkup: json.content,
-            tracking: json.display.tracking || undefined
+            trackingUrls: json.display.tracking || undefined,
+            useWebViewUserAgentForTracking: false
         };
     }
 
@@ -310,13 +295,6 @@ export class TestFixtures {
             creativeId: json.creativeId || undefined,
             seatId: json.seatId || undefined,
             meta: undefined,
-            appCategory: json.appCategory || undefined,
-            appSubCategory: json.appSubCategory || undefined,
-            advertiserDomain: json.advertiserDomain || undefined,
-            advertiserCampaignId: json.advertiserCampaignId || undefined,
-            advertiserBundleId: json.advertiserBundleId || undefined,
-            useWebViewUserAgentForTracking: json.useWebViewUserAgentForTracking,
-            buyerId: json.buyerId || undefined,
             session: session
         };
     }
@@ -325,7 +303,15 @@ export class TestFixtures {
         return {
             ... this.getVPAIDCampaignBaseParams(json),
             vpaid: vpaid,
-            tracking: json.trackingUrls
+            trackingUrls: json.trackingUrls,
+            appCategory: json.appCategory || undefined,
+            appSubcategory: json.appSubCategory || undefined,
+            advertiserDomain: json.advertiserDomain || undefined,
+            advertiserCampaignId: json.advertiserCampaignId || undefined,
+            advertiserBundleId: json.advertiserBundleId || undefined,
+            useWebViewUserAgentForTracking: false,
+            buyerId: json.buyerId || undefined,
+
         };
     }
 
@@ -365,14 +351,12 @@ export class TestFixtures {
 
     public static getPlayableMRAIDCampaignFollowsRedirects(): MRAIDCampaign {
         const json = JSON.parse(OnCometMraidPlcCampaignFollowsRedirects);
-        const playableMraidJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
-        return new MRAIDCampaign(this.getPlayableMRAIDCampaignParams(playableMraidJson, StoreName.GOOGLE));
+        return new MRAIDCampaign(this.getPlayableMRAIDCampaignParams(json, StoreName.GOOGLE));
     }
 
     public static getPlayableMRAIDCampaign(): MRAIDCampaign {
         const json = JSON.parse(OnCometMraidPlcCampaign);
-        const playableMraidJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
-        return new MRAIDCampaign(this.getPlayableMRAIDCampaignParams(playableMraidJson, StoreName.GOOGLE));
+        return new MRAIDCampaign(this.getPlayableMRAIDCampaignParams(json, StoreName.GOOGLE));
     }
 
     public static getProgrammaticMRAIDCampaign(): MRAIDCampaign {

@@ -15,7 +15,7 @@ import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
 import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 import { SessionManager } from 'Managers/SessionManager';
 import { JsonParser } from 'Utilities/JsonParser';
-import { CampaignRefreshManager } from 'Managers/CampaignRefreshManager';
+import { RefreshManager } from 'Managers/RefreshManager';
 import { CacheStatus } from 'Utilities/Cache';
 import { AuctionResponse } from 'Models/AuctionResponse';
 import { Session } from 'Models/Session';
@@ -220,7 +220,7 @@ export class CampaignManager {
 
             for(const placement of noFill) {
                 promises.push(this.handleNoFill(placement));
-                refreshDelay = CampaignRefreshManager.NoFillDelay;
+                refreshDelay = RefreshManager.NoFillDelay;
             }
 
             let campaigns: number = 0;
@@ -236,6 +236,7 @@ export class CampaignManager {
                 }
             }
 
+            this._nativeBridge.Sdk.logInfo('AdPlan received with ' + campaigns + ' campaigns and refreshDelay ' + refreshDelay);
             this.onAdPlanReceived.trigger(refreshDelay, campaigns);
 
             for(const mediaId in fill) {
@@ -373,8 +374,7 @@ export class CampaignManager {
         if(this._clientInfo.getPlatform() === Platform.IOS && this._deviceInfo instanceof IosDeviceInfo) {
             url = Url.addParameters(url, {
                 osVersion: this._deviceInfo.getOsVersion(),
-                screenScale: this._deviceInfo.getScreenScale(),
-                screenDensity: this._deviceInfo.getScreenScale()
+                screenScale: this._deviceInfo.getScreenScale()
             });
         } else if(this._clientInfo.getPlatform() === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
             url = Url.addParameters(url, {

@@ -52,7 +52,7 @@ describe('ComScoreTrackingServiceTest', () => {
 
     describe('when calling sendEvent', () => {
         it('thirdPartyManger\'s sendEvent is called', () => {
-            comscoreService.sendEvent('play', TestFixtures.getSession().getId(), '20', 15, TestFixtures.getCampaign().getCreativeId(), TestFixtures.getCampaign().getCategory(), TestFixtures.getCampaign().getSubCategory());
+            comscoreService.sendEvent('play', TestFixtures.getSession().getId(), '20', 15, TestFixtures.getCampaign().getCreativeId(), undefined, undefined);
             sinon.assert.calledOnce(<sinon.SinonSpy>thirdPartyEventManager.sendEvent);
         });
     });
@@ -74,9 +74,9 @@ describe('ComScoreTrackingServiceTest', () => {
         let queryParamsDictEnd: any;
 
         const fillComscoreParams = () => {
-            comscoreService.sendEvent('play', TestFixtures.getSession().getId(), '20', 0, TestFixtures.getCampaign().getCreativeId(), TestFixtures.getCampaign().getCategory(), TestFixtures.getCampaign().getSubCategory());
+            comscoreService.sendEvent('play', TestFixtures.getSession().getId(), '20', 0, TestFixtures.getCampaign().getCreativeId(), undefined, undefined);
             urlPlay = spy.args[0][2];
-            comscoreService.sendEvent('end', TestFixtures.getSession().getId(), '20', 15, TestFixtures.getCampaign().getCreativeId(), TestFixtures.getCampaign().getCategory(), TestFixtures.getCampaign().getSubCategory());
+            comscoreService.sendEvent('end', TestFixtures.getSession().getId(), '20', 15, TestFixtures.getCampaign().getCreativeId(), undefined, undefined);
             urlEnd = spy.args[1][2];
             queryParamsDictPlay = getDictFromQueryString(urlPlay.split('?')[1]);
             queryParamsDictEnd = getDictFromQueryString(urlEnd.split('?')[1]);

@@ -68,6 +68,7 @@ $close-button-default($scale-size, $with-styles = true) {
     width is not necessarily, but requires for Android <= 4.3
     due to pseudo elements partial support, also width must be bigger than font-size
   */
+  z-index: 100;
   width: $scale-size * $default-font-size * $close-button-width * 1.75;
   font-size: $scale-size * $default-font-size * $close-button-width;
   line-height: @width;
