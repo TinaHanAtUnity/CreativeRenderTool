@@ -1,3 +1,10 @@
+# Pending
+
+* Remove progress bar from groups 16 and 17
+* Revert "Show time to close / skip for mraid overlays" from groups 18 and 19
+* Add URL whitelist check for Android display interstitial ad unit
+* Add missing_default_placement diagnostic event
+
 # Thu Mar  8 09:59:59 UTC 2018
 
 * Playable configuration file support
