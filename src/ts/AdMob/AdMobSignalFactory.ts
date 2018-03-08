@@ -12,6 +12,7 @@ import { IMotionEvent } from 'Native/Api/AndroidAdUnit';
 import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { AdMobOptionalSignal } from 'Models/AdMobOptionalSignal';
+import { SdkStats } from '../Utilities/SdkStats';
 
 export class AdMobSignalFactory {
     private _nativeBridge: NativeBridge;
@@ -30,6 +31,7 @@ export class AdMobSignalFactory {
         const signal = new AdMobOptionalSignal();
 
         signal.setAdLoadDuration(adUnit.getRequestToReadyTime());
+        signal.setSequenceNumber(SdkStats.getAdRequestOrdinal());
 
         const promises = [];
 
