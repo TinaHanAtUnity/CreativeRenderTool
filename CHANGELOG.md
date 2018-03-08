@@ -1,3 +1,9 @@
+# Pending
+
+* Playable configuration file support
+* Refactor campaign refresh manager - part one
+* Improve test stability
+
 # Wed Mar  7 06:32:14 UTC 2018
 
 * Reduce info level logging

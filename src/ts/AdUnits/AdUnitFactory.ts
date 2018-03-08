@@ -52,7 +52,6 @@ import { XPromoEndScreenEventHandler } from 'EventHandlers/XPromoEndScreenEventH
 import { XPromoVideoEventHandlers } from 'EventHandlers/XPromoVideoEventHandlers';
 import { AdMobEventHandler } from 'EventHandlers/AdmobEventHandler';
 import { InterstitialOverlay } from 'Views/InterstitialOverlay';
-import { ProgressBarOverlay } from 'Views/ProgressBarOverlay';
 import { AbstractOverlay } from 'Views/AbstractOverlay';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { Closer } from 'Views/Closer';
@@ -482,17 +481,9 @@ export class AdUnitFactory {
 
     private static createOverlay(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractOverlay {
         if (!parameters.placement.allowSkip()) {
-            let overlay: AbstractOverlay;
-            if (parameters.campaign.getAbGroup() === 16 || parameters.campaign.getAbGroup() === 17) {
-                overlay = new ProgressBarOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup());
-                if (parameters.placement.disableVideoControlsFade()) {
-                    overlay.setFadeEnabled(false);
-                }
-            } else {
-                overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup());
-                if (parameters.placement.disableVideoControlsFade()) {
-                    overlay.setFadeEnabled(false);
-                }
+            const overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup());
+            if (parameters.placement.disableVideoControlsFade()) {
+                overlay.setFadeEnabled(false);
             }
             return overlay;
         } else {
@@ -521,14 +512,10 @@ export class AdUnitFactory {
             if (parameters.placement.skipEndCardOnClose() || enabledGameIds.indexOf(parameters.clientInfo.getGameId()) !== -1) {
                 overlay = new InterstitialOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
             } else {
-                if (parameters.campaign.getAbGroup() === 16 || parameters.campaign.getAbGroup() === 17) {
-                    overlay = new ProgressBarOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup());
-                } else {
-                    overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup());
-                }
+                overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup());
             }
 
-            if(parameters.placement.disableVideoControlsFade() || CustomFeatures.isFadeDisabled(parameters.clientInfo.getGameId())) {
+            if (parameters.placement.disableVideoControlsFade() || CustomFeatures.isFadeDisabled(parameters.clientInfo.getGameId())) {
                 overlay.setFadeEnabled(false);
             }
             return overlay;

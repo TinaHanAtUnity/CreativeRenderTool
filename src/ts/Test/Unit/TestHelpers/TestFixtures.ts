@@ -160,7 +160,8 @@ export class TestFixtures {
             portraitImage: mraidContentJson.endScreenPortrait ? new Image(mraidContentJson.endScreenPortrait, session) : undefined,
             bypassAppSheet: mraidContentJson.bypassAppSheet,
             store: storeName,
-            appStoreId: mraidContentJson.appStoreId
+            appStoreId: mraidContentJson.appStoreId,
+            playableConfiguration: undefined
         };
     }
 
@@ -205,7 +206,8 @@ export class TestFixtures {
             bypassAppSheet: mraidContentJson.bypassAppSheet,
             store: undefined,
             appStoreId: mraidContentJson.appStoreId,
-            useWebViewUserAgentForTracking: mraidJson.useWebViewUserAgentForTracking
+            useWebViewUserAgentForTracking: mraidJson.useWebViewUserAgentForTracking,
+            playableConfiguration: undefined
         };
     }
 
