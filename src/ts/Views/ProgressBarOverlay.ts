@@ -266,16 +266,10 @@ export class ProgressBarOverlay extends AbstractOverlay {
 
     private fade(value: boolean) {
         if (value) {
-            this._skipElement.classList.add('progress-fade');
-            this._muteButtonElement.classList.add('progress-fade');
-            this._timerElement.classList.add('progress-fade');
-            (<HTMLElement>this._progressElement.parentElement).classList.add('progress-fade');
+            this._container.classList.add('progress-fade');
             this._fadeStatus = false;
         } else {
-            this._skipElement.classList.remove('progress-fade');
-            this._muteButtonElement.classList.remove('progress-fade');
-            this._timerElement.classList.remove('progress-fade');
-            (<HTMLElement>this._progressElement.parentElement).classList.remove('progress-fade');
+            this._container.classList.remove('progress-fade');
             this._fadeStatus = true;
         }
     }
