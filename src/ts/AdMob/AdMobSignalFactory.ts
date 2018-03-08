@@ -26,8 +26,11 @@ export class AdMobSignalFactory {
         this._focusManager = focusManager;
     }
 
-    public getOptionalSignal(): Promise<AdMobOptionalSignal> {
+    public getOptionalSignal(adUnit: AdMobAdUnit): Promise<AdMobOptionalSignal> {
         const signal = new AdMobOptionalSignal();
+
+        signal.setAdLoadDuration(adUnit.getRequestToViewTime());
+
         return Promise.resolve(signal);
     }
 
