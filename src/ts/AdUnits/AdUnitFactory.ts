@@ -52,7 +52,7 @@ import { XPromoEndScreenEventHandler } from 'EventHandlers/XPromoEndScreenEventH
 import { XPromoVideoEventHandlers } from 'EventHandlers/XPromoVideoEventHandlers';
 import { AdMobEventHandler } from 'EventHandlers/AdmobEventHandler';
 import { InterstitialOverlay } from 'Views/InterstitialOverlay';
-import { AbstractOverlay } from 'Views/AbstractOverlay';
+import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { Closer } from 'Views/Closer';
 import { Privacy } from 'Views/Privacy';
@@ -479,7 +479,7 @@ export class AdUnitFactory {
         return adUnit;
     }
 
-    private static createOverlay(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractOverlay {
+    private static createOverlay(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractVideoOverlay {
         if (!parameters.placement.allowSkip()) {
             const overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup());
             if (parameters.placement.disableVideoControlsFade()) {
@@ -488,7 +488,7 @@ export class AdUnitFactory {
             return overlay;
         } else {
 
-            let overlay: AbstractOverlay;
+            let overlay: AbstractVideoOverlay;
 
             // Scopely's game IDs
             const enabledGameIds = ['15334',

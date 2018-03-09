@@ -1,4 +1,3 @@
-import { IOverlayHandler } from 'Views/AbstractOverlay';
 import { FinishState } from 'Constants/FinishState';
 import { NativeBridge } from 'Native/NativeBridge';
 import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'AdUnits/VPAIDAdUnit';

@@ -3,9 +3,9 @@ import InterstitialOverlayTemplate from 'html/InterstitialOverlay.html';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
-import { AbstractOverlay } from 'Views/AbstractOverlay';
+import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
 
-export class InterstitialOverlay extends AbstractOverlay {
+export class InterstitialOverlay extends AbstractVideoOverlay {
 
     private _spinnerEnabled: boolean = false;
 
@@ -90,7 +90,7 @@ export class InterstitialOverlay extends AbstractOverlay {
     }
 
     public setVideoProgress(value: number): void {
-        if(AbstractOverlay.AutoSkip) {
+        if(AbstractVideoOverlay.AutoSkip) {
             this._handlers.forEach(handler => handler.onOverlaySkip(value));
         }
 
