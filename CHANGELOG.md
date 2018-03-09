@@ -1,3 +1,8 @@
+# Pending
+
+* Add target game ID to xpromo events
+* Remove hard-coded game IDs which were used to enable overlay features
+
 # Fri Mar  9 09:37:38 UTC 2018
 
 * Remove progress bar from groups 16 and 17
