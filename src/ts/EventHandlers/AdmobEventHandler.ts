@@ -16,6 +16,7 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
 import { ClientInfo } from 'Models/ClientInfo';
 import { AdMobSignal } from 'Models/AdMobSignal';
+import { AdMobOptionalSignal } from 'Models/AdMobOptionalSignal';
 
 export interface IAdMobEventHandlerParameters {
     adUnit: AdMobAdUnit;
@@ -158,6 +159,12 @@ export class AdMobEventHandler implements IAdMobEventHandler {
             signal.setTouchMoveTotal(touchInfo.counts.move);
             signal.setTouchCancelTotal(touchInfo.counts.cancel);
             signal.setTouchDuration(touchInfo.duration);
+            return signal;
+        });
+    }
+
+    private getOptionalSignal(): Promise<AdMobOptionalSignal> {
+        return this._adMobSignalFactory.getOptionalSignal(this._adUnit).then((signal) => {
             return signal;
         });
     }
