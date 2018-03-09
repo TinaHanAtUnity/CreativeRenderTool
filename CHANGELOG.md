@@ -1,4 +1,4 @@
-# Pending
+# Fri Mar  9 08:07:15 UTC 2018
 
 * Remove progress bar from groups 16 and 17
 * Revert "Show time to close / skip for mraid overlays" from groups 18 and 19
