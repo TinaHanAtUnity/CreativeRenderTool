@@ -5,7 +5,7 @@ import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
 import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
 
-export class InterstitialOverlay extends AbstractVideoOverlay {
+export class ClosableVideoOverlay extends AbstractVideoOverlay {
 
     private _spinnerEnabled: boolean = false;
 
