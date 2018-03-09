@@ -52,7 +52,6 @@ export class AdMobSignalFactory {
     }
 
     public getClickSignal(touchInfo: ITouchInfo, adUnit: AdMobAdUnit): Promise<AdMobSignal> {
-        SdkStats.increaseAdClickOrdinal();
         return this.getCommonSignal().then(signal => {
             // todo: touch duration
             // todo: touch distance
