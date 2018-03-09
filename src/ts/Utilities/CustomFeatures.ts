@@ -11,6 +11,10 @@ export class CustomFeatures {
         return gameId === '1300023' || gameId === '1300024';
     }
 
+    public static isPlayableConfigurationEnabled(originalResourceUrl: string) {
+        return originalResourceUrl.match(/playables\/production\/unity/);
+    }
+
     public static getAdUnitStyle(abGroup: number): AdUnitStyle {
         if(abGroup === 8 || abGroup === 10) {
             return new AdUnitStyle({ctaButtonColor: this.getColor()});
