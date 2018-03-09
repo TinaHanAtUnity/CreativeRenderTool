@@ -27,7 +27,7 @@ export class ClosableVideoOverlay extends AbstractVideoOverlay {
     private _fadeStatus: boolean = true;
 
     constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, abGroup: number = 0) {
-        super(nativeBridge, 'interstitial-overlay', muted, abGroup);
+        super(nativeBridge, 'closable-video-overlay', muted, abGroup);
 
         const localization = new Localization(language, 'overlay');
         this._template = new Template(InterstitialOverlayTemplate, localization);
