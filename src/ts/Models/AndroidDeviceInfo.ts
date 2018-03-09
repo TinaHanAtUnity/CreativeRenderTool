@@ -8,6 +8,8 @@ export interface IAndroidDeviceInfo extends IDeviceInfo {
     androidId: string;
     isGoogleStoreInstalled: boolean;
     isXiaomiStoreInstalled: boolean;
+    isGoogleMapsInstalled: boolean;
+    isTelephonyInstalled: boolean;
     apiLevel: number;
     freeExternalSpace: number;
     totalExternalSpace: number;
@@ -36,6 +38,8 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
 
     public static GooglePlayPackageName = 'com.android.vending';
     public static XiaomiPackageName = 'com.xiaomi.gamecenter';
+    public static GoogleMapsPackageName = 'com.google.android.gms.maps';
+    public static TelephonyPackageName = 'com.android.telephony';
 
     constructor(nativeBridge: NativeBridge) {
         super('AndroidDeviceInfo', {
@@ -43,6 +47,8 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
             androidId: ['string'],
             isGoogleStoreInstalled: ['boolean'],
             isXiaomiStoreInstalled: ['boolean'],
+            isGoogleMapsInstalled: ['boolean'],
+            isTelephonyInstalled: ['boolean'],
             apiLevel: ['number'],
             freeExternalSpace: ['number'],
             totalExternalSpace: ['number'],
@@ -81,6 +87,8 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
             promises.push(this._nativeBridge.DeviceInfo.Android.getScreenLayout().then(screenLayout => this.set('screenLayout', screenLayout)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._nativeBridge.DeviceInfo.Android.isAppInstalled(AndroidDeviceInfo.GooglePlayPackageName).then(isGoogleInstalled => this.set('isGoogleStoreInstalled', isGoogleInstalled)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._nativeBridge.DeviceInfo.Android.isAppInstalled(AndroidDeviceInfo.XiaomiPackageName).then(isXiaomiInstalled => this.set('isXiaomiStoreInstalled', isXiaomiInstalled)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._nativeBridge.DeviceInfo.Android.isAppInstalled(AndroidDeviceInfo.GoogleMapsPackageName).then(isGoogleMapsInstalled => this.set('isGoogleMapsInstalled', isGoogleMapsInstalled)).catch(err => this.handleDeviceInfoError(err)));
+            promises.push(this._nativeBridge.DeviceInfo.Android.isAppInstalled(AndroidDeviceInfo.TelephonyPackageName).then(isTelephonyInstalled => this.set('isGoogleMapsInstalled', isTelephonyInstalled)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._nativeBridge.DeviceInfo.Android.getDeviceMaxVolume(StreamType.STREAM_MUSIC).then(maxVolume => this.set('maxVolume', maxVolume)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._nativeBridge.DeviceInfo.Android.getApkDigest().then(apkDigest => this.set('apkDigest', apkDigest)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._nativeBridge.DeviceInfo.Android.getCertificateFingerprint().then(certificateFingerPrint => this.set('certificateFingerPrint', certificateFingerPrint)).catch(err => this.handleDeviceInfoError(err)));
@@ -124,6 +132,14 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
 
     public isXiaomiStoreInstalled(): boolean {
         return this.get('isXiaomiStoreInstalled');
+    }
+
+    public isGoogleMapsInstalled(): boolean {
+        return this.get('isGoogleMapsInstalled');
+    }
+
+    public isTelephonyInstalled(): boolean {
+        return this.get('isTelephonyInstalled');
     }
 
     public getAndroidId(): string {

@@ -34,8 +34,23 @@ export class AdMobSignalFactory {
         signal.setSequenceNumber(SdkStats.getAdRequestOrdinal());
         signal.setPriorClickCount(SdkStats.getAdClickOrdinal());
 
-        const promises = [];
+        let deviceIncapabilities = '';
+        if (this._deviceInfo instanceof AndroidDeviceInfo) {
+            if (!(<AndroidDeviceInfo>this._deviceInfo).isGoogleStoreInstalled()) {
+                deviceIncapabilities += 'a';
+            }
+            if (!(<AndroidDeviceInfo>this._deviceInfo).isGoogleMapsInstalled()) {
+                deviceIncapabilities += 'm';
+            }
+            if (!(<AndroidDeviceInfo>this._deviceInfo).isTelephonyInstalled()) {
+                deviceIncapabilities += 't';
+            }
+        } else {
+            deviceIncapabilities += 'atm';
+        }
+        signal.setDeviceIncapabilities(deviceIncapabilities);
 
+        const promises = [];
         promises.push(this._deviceInfo.getBatteryLevel().then(batteryLevel => {
             signal.setDeviceBatteryLevel(this.getBatteryLevel(batteryLevel));
         }).catch(() => {
