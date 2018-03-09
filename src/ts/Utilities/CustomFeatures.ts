@@ -2,6 +2,7 @@
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 
 export class CustomFeatures {
+
     public static isExampleGameId(gameId: string): boolean {
         return gameId === '14850' || gameId === '14851';
     }
