@@ -41,6 +41,7 @@ import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
 import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
+import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 
 describe('AdUnitFactoryTest', () => {
 
@@ -76,10 +77,20 @@ describe('AdUnitFactoryTest', () => {
         config = new Configuration(JSON.parse(ConfigurationJson));
         deviceInfo = <DeviceInfo>{getLanguage: () => 'en', getAdvertisingIdentifier: () => '000', getLimitAdTracking: () => false};
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-        sessionManager = new SessionManager(nativeBridge);
-        operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
-        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
+        sessionManager = new SessionManager(nativeBridge, request);
+        const campaign = TestFixtures.getCampaign();
 
+        operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
+            nativeBridge: nativeBridge,
+            request: request,
+            metaDataManager: metaDataManager,
+            sessionManager: sessionManager,
+            clientInfo: clientInfo,
+            deviceInfo: deviceInfo,
+            campaign: campaign
+        });
+
+        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
         sandbox.stub(MoatViewabilityService, 'initMoat');
 
         adUnitParameters = {
@@ -92,15 +103,12 @@ describe('AdUnitFactoryTest', () => {
             operativeEventManager: operativeEventManager,
             comScoreTrackingService: comScoreService,
             placement: TestFixtures.getPlacement(),
-            campaign: TestFixtures.getCampaign(),
+            campaign: campaign,
             configuration: config,
             request: request,
             options: {}
         };
-        sandbox.stub(operativeEventManager, 'sendStart').returns(Promise.resolve());
-        sandbox.stub(operativeEventManager, 'sendView').returns(Promise.resolve());
-        sandbox.stub(operativeEventManager, 'sendThirdQuartile').returns(Promise.resolve());
-        sandbox.stub(operativeEventManager, 'sendSkip').returns(Promise.resolve());
+
         sandbox.spy(thirdPartyEventManager, 'sendEvent');
         sandbox.stub(nativeBridge.WebPlayer, 'setSettings').returns(Promise.resolve());
         sandbox.stub(nativeBridge.WebPlayer, 'clearSettings').returns(Promise.resolve());
@@ -114,9 +122,23 @@ describe('AdUnitFactoryTest', () => {
         it('should call onVideoError on video controller error ', () => {
             sandbox.stub(PerformanceVideoEventHandlers, 'onVideoError').returns(null);
 
+            adUnitParameters.operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
+                nativeBridge: nativeBridge,
+                request: request,
+                metaDataManager: metaDataManager,
+                sessionManager: sessionManager,
+                clientInfo: clientInfo,
+                deviceInfo: deviceInfo,
+                campaign: TestFixtures.getCampaign()
+            });
+
+            sandbox.stub(operativeEventManager, 'sendStart').returns(Promise.resolve());
+            sandbox.stub(operativeEventManager, 'sendView').returns(Promise.resolve());
+            sandbox.stub(operativeEventManager, 'sendThirdQuartile').returns(Promise.resolve());
+            sandbox.stub(operativeEventManager, 'sendSkip').returns(Promise.resolve());
+
             const videoAdUnit = <PerformanceAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
             videoAdUnit.onError.trigger();
-
             sinon.assert.calledOnce(<sinon.SinonSpy>PerformanceVideoEventHandlers.onVideoError);
         });
     });
@@ -129,9 +151,23 @@ describe('AdUnitFactoryTest', () => {
             const vastCampaign = TestFixtures.getEventVastCampaign();
             adUnitParameters.campaign = vastCampaign;
             adUnitParameters.forceOrientation = ForceOrientation.NONE;
+            adUnitParameters.operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
+                nativeBridge: nativeBridge,
+                request: request,
+                metaDataManager: metaDataManager,
+                sessionManager: sessionManager,
+                clientInfo: clientInfo,
+                deviceInfo: deviceInfo,
+                campaign: vastCampaign
+            });
+
+            sandbox.stub(operativeEventManager, 'sendStart').returns(Promise.resolve());
+            sandbox.stub(operativeEventManager, 'sendView').returns(Promise.resolve());
+            sandbox.stub(operativeEventManager, 'sendThirdQuartile').returns(Promise.resolve());
+            sandbox.stub(operativeEventManager, 'sendSkip').returns(Promise.resolve());
+
             const videoAdUnit = <VastAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
             videoAdUnit.onError.trigger();
-
             sinon.assert.calledOnce(<sinon.SinonSpy>VastVideoEventHandlers.onVideoError);
         });
     });
@@ -152,7 +188,23 @@ describe('AdUnitFactoryTest', () => {
                 resourceUrl.setFileId('1234');
             }
 
+            operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
+                nativeBridge: nativeBridge,
+                request: request,
+                metaDataManager: metaDataManager,
+                sessionManager: sessionManager,
+                clientInfo: clientInfo,
+                deviceInfo: deviceInfo,
+                campaign: campaign
+            });
+
+            sandbox.stub(operativeEventManager, 'sendStart').returns(Promise.resolve());
+            sandbox.stub(operativeEventManager, 'sendView').returns(Promise.resolve());
+            sandbox.stub(operativeEventManager, 'sendThirdQuartile').returns(Promise.resolve());
+            sandbox.stub(operativeEventManager, 'sendSkip').returns(Promise.resolve());
+
             adUnitParameters.campaign = campaign;
+            adUnitParameters.operativeEventManager = operativeEventManager;
             adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
         });
 
@@ -241,6 +293,21 @@ describe('AdUnitFactoryTest', () => {
             beforeEach(() => {
                 campaign = TestFixtures.getDisplayInterstitialCampaign();
                 adUnitParameters.campaign = campaign;
+                adUnitParameters.operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
+                    nativeBridge: nativeBridge,
+                    request: request,
+                    metaDataManager: metaDataManager,
+                    sessionManager: sessionManager,
+                    clientInfo: clientInfo,
+                    deviceInfo: deviceInfo,
+                    campaign: campaign
+                });
+
+                sandbox.stub(operativeEventManager, 'sendStart').returns(Promise.resolve());
+                sandbox.stub(operativeEventManager, 'sendView').returns(Promise.resolve());
+                sandbox.stub(operativeEventManager, 'sendThirdQuartile').returns(Promise.resolve());
+                sandbox.stub(operativeEventManager, 'sendSkip').returns(Promise.resolve());
+
                 adUnit = <DisplayInterstitialAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
             });
 
@@ -259,6 +326,7 @@ describe('AdUnitFactoryTest', () => {
     describe('Promo AdUnit', () => {
         let promoAdUnit: PromoAdUnit;
         let campaign: PromoCampaign;
+
         beforeEach(() => {
             campaign = TestFixtures.getPromoCampaign();
             sandbox.stub(PurchasingUtilities, 'productPrice').returns("3 €");
@@ -266,6 +334,20 @@ describe('AdUnitFactoryTest', () => {
                 getId: sinon.stub().returns('1111')
             });
             adUnitParameters.campaign = campaign;
+            adUnitParameters.operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
+                nativeBridge: nativeBridge,
+                request: request,
+                metaDataManager: metaDataManager,
+                sessionManager: sessionManager,
+                clientInfo: clientInfo,
+                deviceInfo: deviceInfo,
+                campaign: campaign
+            });
+
+            sandbox.stub(operativeEventManager, 'sendStart').returns(Promise.resolve());
+            sandbox.stub(operativeEventManager, 'sendView').returns(Promise.resolve());
+            sandbox.stub(operativeEventManager, 'sendThirdQuartile').returns(Promise.resolve());
+            sandbox.stub(operativeEventManager, 'sendSkip').returns(Promise.resolve());
 
             promoAdUnit = <PromoAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
         });
@@ -295,10 +377,24 @@ describe('AdUnitFactoryTest', () => {
         let campaign: XPromoCampaign;
 
         beforeEach(() => {
-
             campaign = TestFixtures.getXPromoCampaign();
 
             adUnitParameters.campaign = campaign;
+            adUnitParameters.operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
+                nativeBridge: nativeBridge,
+                request: request,
+                metaDataManager: metaDataManager,
+                sessionManager: sessionManager,
+                clientInfo: clientInfo,
+                deviceInfo: deviceInfo,
+                campaign: campaign
+            });
+
+            sandbox.stub(operativeEventManager, 'sendStart').returns(Promise.resolve());
+            sandbox.stub(operativeEventManager, 'sendView').returns(Promise.resolve());
+            sandbox.stub(operativeEventManager, 'sendThirdQuartile').returns(Promise.resolve());
+            sandbox.stub(operativeEventManager, 'sendSkip').returns(Promise.resolve());
+
             adUnit = <XPromoAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
         });
 

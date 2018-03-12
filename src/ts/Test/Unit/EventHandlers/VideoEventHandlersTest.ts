@@ -25,7 +25,7 @@ import { Video } from 'Models/Assets/Video';
 import { TestEnvironment } from 'Utilities/TestEnvironment';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { FocusManager } from 'Managers/FocusManager';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { IOperativeEventManagerParams, OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
@@ -34,6 +34,7 @@ import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { IXPromoAdUnitParameters, XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
 import { XPromoEndScreen } from 'Views/XPromoEndScreen';
+import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 
 describe('VideoEventHandlersTest', () => {
 
@@ -53,6 +54,7 @@ describe('VideoEventHandlersTest', () => {
     let request: Request;
     let performanceAdUnitParameters: IPerformanceAdUnitParameters;
     let vastAdUnitParameters: IVastAdUnitParameters;
+    let operativeEventManagerParams: IOperativeEventManagerParams;
     let comScoreService: ComScoreTrackingService;
     let spyComScore: sinon.SinonSpy;
     let placement: Placement;
@@ -79,13 +81,25 @@ describe('VideoEventHandlersTest', () => {
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
 
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        sessionManager = new SessionManager(nativeBridge);
-        operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+        sessionManager = new SessionManager(nativeBridge, request);
+        vastCampaign = TestFixtures.getEventVastCampaign();
+        performanceCampaign = TestFixtures.getCampaign();
+
+        operativeEventManagerParams = {
+            nativeBridge: nativeBridge,
+            request: request,
+            metaDataManager: metaDataManager,
+            sessionManager: sessionManager,
+            clientInfo: clientInfo,
+            deviceInfo: deviceInfo,
+            campaign: performanceCampaign
+        };
+
+        operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
+
         comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
         video = new Video('', TestFixtures.getSession());
 
-        vastCampaign = TestFixtures.getEventVastCampaign();
-        performanceCampaign = TestFixtures.getCampaign();
         placement = TestFixtures.getPlacement();
         overlay = new Overlay(nativeBridge, false, 'en', configuration.getGamerId(), configuration.getAbGroup());
         endScreen = new PerformanceEndScreen(nativeBridge, performanceCampaign, true, 'en', '12345');
@@ -401,6 +415,8 @@ describe('VideoEventHandlersTest', () => {
             sinon.stub(vast, 'getVideoUrl').returns(video.getUrl());
             vastCampaign = TestFixtures.getEventVastCampaign();
             sinon.stub(vastCampaign, 'getVideo').returns(video);
+            operativeEventManagerParams.campaign = vastCampaign;
+            vastAdUnitParameters.operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
             const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
             sinon.stub(vastAdUnit, 'isPrepareCalled').returns(true);
             VideoEventHandlers.onVideoPrepared(nativeBridge, vastAdUnit, 10, vastCampaign);
@@ -427,6 +443,8 @@ describe('VideoEventHandlersTest', () => {
                 getVideo: () => video
             };
             vastAdUnitParameters.campaign = vastCampaign;
+            operativeEventManagerParams.campaign = vastCampaign;
+            vastAdUnitParameters.operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
             const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
             sinon.stub(vastAdUnit, 'isPrepareCalled').returns(true);
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('http://foo.com');
@@ -442,6 +460,8 @@ describe('VideoEventHandlersTest', () => {
                 getVideo: () => video
             };
             vastAdUnitParameters.campaign = vastCampaign;
+            operativeEventManagerParams.campaign = vastCampaign;
+            vastAdUnitParameters.operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
             const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
             sinon.stub(vastAdUnit, 'isPrepareCalled').returns(true);
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns(null);
@@ -465,6 +485,8 @@ describe('VideoEventHandlersTest', () => {
                 getVideo: () => video
             };
             vastAdUnitParameters.campaign = vastCampaign;
+            operativeEventManagerParams.campaign = vastCampaign;
+            vastAdUnitParameters.operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
             const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
             sinon.stub(vastAdUnit, 'isPrepareCalled').returns(true);
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('http://foo.com');
@@ -480,6 +502,8 @@ describe('VideoEventHandlersTest', () => {
                 getVideo: () => video
             };
             vastAdUnitParameters.campaign = vastCampaign;
+            operativeEventManagerParams.campaign = vastCampaign;
+            vastAdUnitParameters.operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
             const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
             sinon.stub(vastAdUnit, 'isPrepareCalled').returns(true);
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns(null);
@@ -597,6 +621,8 @@ describe('VideoEventHandlersTest', () => {
         it('should send start event to HttpKafka on XPromos', () => {
             sinon.spy(operativeEventManager, 'sendHttpKafkaEvent');
             sinon.spy(operativeEventManager, 'sendEvent');
+            operativeEventManagerParams.campaign = xPromoCampaign;
+            xPromoAdUnitParameters.operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
 
             const xPromoAdUnit = new XPromoAdUnit(nativeBridge, xPromoAdUnitParameters);
 

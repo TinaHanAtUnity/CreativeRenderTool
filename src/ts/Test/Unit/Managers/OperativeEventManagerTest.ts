@@ -20,6 +20,7 @@ import { Placement } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
 import { DeviceInfoApi } from 'Native/Api/DeviceInfo';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
+import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 
 class TestStorageApi extends StorageApi {
 
@@ -195,8 +196,16 @@ describe('OperativeEventManagerTest', () => {
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
 
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        sessionManager = new SessionManager(nativeBridge);
-        operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+        sessionManager = new SessionManager(nativeBridge, request);
+        operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
+            nativeBridge: nativeBridge,
+            request: request,
+            metaDataManager: metaDataManager,
+            sessionManager: sessionManager,
+            clientInfo: clientInfo,
+            deviceInfo: deviceInfo,
+            campaign: TestFixtures.getCampaign()
+        });
     });
 
     it('Send successful operative event', () => {
@@ -291,7 +300,7 @@ describe('OperativeEventManagerTest', () => {
             const previousPlacementId = 'foobar1';
 
             operativeEventManager.setGamerServerId('foobar');
-            operativeEventManager.setPreviousPlacementId(previousPlacementId);
+            OperativeEventManager.setPreviousPlacementId(previousPlacementId);
 
             (<sinon.SinonStub>nativeBridge.DeviceInfo.getUniqueEventId).returns(Promise.resolve('42'));
             (<sinon.SinonStub>nativeBridge.DeviceInfo.getNetworkType).returns(Promise.resolve(13));
