@@ -1,3 +1,9 @@
+# Pending
+
+* Enable Android native bridge 1ms autobatching on all groups
+* Rename InterstitialOverlay to ClosableVideoOverlay
+* Fix tslint configuration and fix linter errors
+
 # Mon Mar 12 10:13:52 UTC 2018
 
 * Add target game ID to xpromo events
