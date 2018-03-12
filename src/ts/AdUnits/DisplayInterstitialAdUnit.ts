@@ -11,7 +11,7 @@ import { Placement } from 'Models/Placement';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Diagnostics } from 'Utilities/Diagnostics';
-import { IWebPlayerWebSettingsAndroid, IWebPlayerWebSettingsIos } from "Native/Api/WebPlayer";
+import { IWebPlayerWebSettingsAndroid, IWebPlayerWebSettingsIos } from 'Native/Api/WebPlayer';
 import { Url } from 'Utilities/Url';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 
@@ -150,7 +150,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
     }
 
     private onPageStarted(url: string): void {
-        this._nativeBridge.Sdk.logDebug("DisplayInterstitialAdUnit: onPageStarted triggered for url: " + url);
+        this._nativeBridge.Sdk.logDebug('DisplayInterstitialAdUnit: onPageStarted triggered for url: ' + url);
         if(!this._receivedOnPageStart) {
             this._receivedOnPageStart = true;
             return;
@@ -173,7 +173,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
             return;
         }
         this._handlingShouldOverrideUrlLoading = true;
-        this._nativeBridge.Sdk.logDebug("DisplayInterstitialAdUnit: shouldOverrideUrlLoading triggered for url: '" + url);
+        this._nativeBridge.Sdk.logDebug('DisplayInterstitialAdUnit: shouldOverrideUrlLoading triggered for url: \'' + url);
         if (!url || !Url.isProtocolWhitelisted(url, this._nativeBridge.getPlatform())) {
             this._handlingShouldOverrideUrlLoading = false;
             return;
@@ -190,7 +190,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
             }).then( () => {
                 this._handlingShouldOverrideUrlLoading = false;
             }).catch( (e) => {
-                this._nativeBridge.Sdk.logDebug("DisplayInterstitialAdUnit: Cannot open url: '" + url + "': " + e);
+                this._nativeBridge.Sdk.logDebug('DisplayInterstitialAdUnit: Cannot open url: \'' + url + '\': ' + e);
                 this._handlingShouldOverrideUrlLoading = false;
             });
         }
@@ -224,7 +224,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
                 'javaScriptCanOpenWindowsAutomatically': true
             };
         }
-        return this._nativeBridge.WebPlayer.setSettings(webPlayerSettings,{}).then( () => {
+        return this._nativeBridge.WebPlayer.setSettings(webPlayerSettings, {}).then( () => {
             return this._container.open(this, ['webplayer', 'webview'], false, this._forceOrientation, true, false, true, false, this._options).catch((e) => {
                 this.hide();
             });

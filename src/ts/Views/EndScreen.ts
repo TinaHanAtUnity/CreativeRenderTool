@@ -80,7 +80,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         }
 
         const endScreenAlt = this.getEndscreenAlt();
-        if (typeof endScreenAlt === "string") {
+        if (typeof endScreenAlt === 'string') {
             this._container.classList.add(endScreenAlt);
         }
     }

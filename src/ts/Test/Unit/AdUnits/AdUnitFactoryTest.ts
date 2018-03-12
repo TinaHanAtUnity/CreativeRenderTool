@@ -261,7 +261,7 @@ describe('AdUnitFactoryTest', () => {
         let campaign: PromoCampaign;
         beforeEach(() => {
             campaign = TestFixtures.getPromoCampaign();
-            sandbox.stub(PurchasingUtilities, 'productPrice').returns("3 €");
+            sandbox.stub(PurchasingUtilities, 'productPrice').returns('3 €');
             sandbox.stub(campaign, 'getSession').returns({
                 getId: sinon.stub().returns('1111')
             });

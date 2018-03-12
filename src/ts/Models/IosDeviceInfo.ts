@@ -44,7 +44,7 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
     }
 
     public getStores(): string {
-        return "apple";
+        return 'apple';
     }
 
     public getScreenScale(): number {

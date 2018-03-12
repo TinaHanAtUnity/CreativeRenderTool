@@ -100,6 +100,6 @@ export class Cache {
         return 10159440; // same as default DeviceInfo.getFreeSpace
     }
 
-    private static _fileIdMap: { [key: string]: string } = {};
+    private static _fileIdMap: { [key: string]: string } = {};
 
 }
