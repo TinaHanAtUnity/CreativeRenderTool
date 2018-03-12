@@ -145,10 +145,10 @@ export class ProgressBarOverlay extends AbstractOverlay {
         this._skipRemaining = this._skipDuration - this._videoProgress;
 
         if (this._skipRemaining <= 0) {
-            (<HTMLElement>this._skipElement.children[0]).innerText = this._localization.translate('Skip');
+            (<HTMLElement>this._skipElement.children[0]).innerText = 'Skip';
             (<HTMLElement>this._skipElement.children[1]).style.display = 'inline';
         } else {
-            (<HTMLElement>this._skipElement.children[0]).innerText = `${this._localization.translate('Skip in')} ${this.formatTimer(Math.ceil(this._skipRemaining / 1000))}`;
+            (<HTMLElement>this._skipElement.children[0]).innerText = `Skip in ${this.formatTimer(Math.ceil(this._skipRemaining / 1000))}`;
             (<HTMLElement>this._skipElement.children[1]).style.display = 'none';
         }
 
