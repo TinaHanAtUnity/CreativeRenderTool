@@ -1,4 +1,4 @@
-# Pending
+# Mon Mar 12 10:13:52 UTC 2018
 
 * Add target game ID to xpromo events
 * Remove hard-coded game IDs which were used to enable overlay features
