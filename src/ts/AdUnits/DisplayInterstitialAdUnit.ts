@@ -174,14 +174,12 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
         }
         this._handlingShouldOverrideUrlLoading = true;
         this._nativeBridge.Sdk.logDebug('DisplayInterstitialAdUnit: shouldOverrideUrlLoading triggered for url: \'' + url);
-        if (!url) {
+        if (!url || !Url.isProtocolWhitelisted(url, this._nativeBridge.getPlatform())) {
             this._handlingShouldOverrideUrlLoading = false;
             return;
         }
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            if( Url.isProtocolWhitelisted(url) ) {
-                this._nativeBridge.UrlScheme.open(url);
-            }
+            this._nativeBridge.UrlScheme.open(url);
             this._handlingShouldOverrideUrlLoading = false;
             return;
         }

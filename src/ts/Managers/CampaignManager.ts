@@ -15,7 +15,7 @@ import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
 import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 import { SessionManager } from 'Managers/SessionManager';
 import { JsonParser } from 'Utilities/JsonParser';
-import { CampaignRefreshManager } from 'Managers/CampaignRefreshManager';
+import { RefreshManager } from 'Managers/RefreshManager';
 import { CacheStatus } from 'Utilities/Cache';
 import { AuctionResponse } from 'Models/AuctionResponse';
 import { Session } from 'Models/Session';
@@ -220,7 +220,7 @@ export class CampaignManager {
 
             for(const placement of noFill) {
                 promises.push(this.handleNoFill(placement));
-                refreshDelay = CampaignRefreshManager.NoFillDelay;
+                refreshDelay = RefreshManager.NoFillDelay;
             }
 
             let campaigns: number = 0;
