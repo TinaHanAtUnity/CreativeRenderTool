@@ -1,4 +1,4 @@
-import { Platform } from "Constants/Platform";
+import { Platform } from 'Constants/Platform';
 
 export interface IUrl {
     protocol: string;

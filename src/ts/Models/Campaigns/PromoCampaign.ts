@@ -11,7 +11,7 @@ export interface IPromoCampaign extends ICampaign {
 export class PromoCampaign extends Campaign<IPromoCampaign> {
     constructor(campaign: IPromoCampaign) {
         super('PromoCampaign', {
-            ... Campaign.Schema, 
+            ... Campaign.Schema,
             iapProductId: ['string'],
             additionalTrackingEvents: ['object', 'undefined'],
             dynamicMarkup: ['string', 'undefined'],
