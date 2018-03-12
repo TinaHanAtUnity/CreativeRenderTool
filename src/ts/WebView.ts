@@ -50,6 +50,8 @@ import { OldCampaignRefreshManager } from 'Managers/OldCampaignRefreshManager';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
+import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
+import { Campaign } from 'Models/Campaign';
 
 export class WebView {
 
@@ -72,7 +74,7 @@ export class WebView {
     private _currentAdUnit: AbstractAdUnit;
 
     private _sessionManager: SessionManager;
-    private _operativeEventManager: OperativeEventManager;
+    // private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _comScoreTrackingService: ComScoreTrackingService;
     private _wakeUpManager: WakeUpManager;
@@ -142,8 +144,7 @@ export class WebView {
                 this._container = new ViewController(this._nativeBridge, this._deviceInfo, this._focusManager);
             }
             HttpKafka.setDeviceInfo(this._deviceInfo);
-            this._sessionManager = new SessionManager(this._nativeBridge);
-            this._operativeEventManager = new OperativeEventManager(this._nativeBridge, this._request, this._metadataManager, this._sessionManager, this._clientInfo, this._deviceInfo);
+            this._sessionManager = new SessionManager(this._nativeBridge, this._request);
 
             this._initializedAt = Date.now();
             this._nativeBridge.Sdk.initComplete();
@@ -213,7 +214,7 @@ export class WebView {
 
             this._assetManager = new AssetManager(this._cache, this._configuration.getCacheMode(), this._deviceInfo, this._cacheBookkeeping);
             this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._adMobSignalFactory, this._request, this._clientInfo, this._deviceInfo, this._metadataManager);
-            this._refreshManager = new OldCampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration, this._focusManager, this._sessionManager, this._clientInfo, this._request, this._cache, this._operativeEventManager);
+            this._refreshManager = new OldCampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration, this._focusManager, this._sessionManager, this._clientInfo, this._request, this._cache);
 
             SdkStats.initialize(this._nativeBridge, this._request, this._configuration, this._sessionManager, this._campaignManager, this._metadataManager, this._clientInfo);
 
@@ -221,7 +222,7 @@ export class WebView {
         }).then(() => {
             this._initialized = true;
 
-            return this._sessionManager.sendUnsentSessions(this._operativeEventManager);
+            return this._sessionManager.sendUnsentSessions();
         }).catch(error => {
             if(error instanceof ConfigError) {
                 error = { 'message': error.message, 'name': error.name };
@@ -306,7 +307,15 @@ export class WebView {
                 deviceInfo: this._deviceInfo,
                 clientInfo: this._clientInfo,
                 thirdPartyEventManager: this._thirdPartyEventManager,
-                operativeEventManager: this._operativeEventManager,
+                operativeEventManager: OperativeEventManagerFactory.createOperativeEventManager({
+                    nativeBridge: this._nativeBridge,
+                    request: this._request,
+                    metaDataManager: this._metadataManager,
+                    sessionManager: this._sessionManager,
+                    clientInfo: this._clientInfo,
+                    deviceInfo: this._deviceInfo,
+                    campaign: campaign
+                }),
                 comScoreTrackingService: this._comScoreTrackingService,
                 placement: placement,
                 campaign: campaign,
@@ -335,7 +344,7 @@ export class WebView {
                 }
             }
 
-            this._operativeEventManager.setPreviousPlacementId(this._campaignManager.getPreviousPlacementId());
+            OperativeEventManager.setPreviousPlacementId(this._campaignManager.getPreviousPlacementId());
             this._campaignManager.setPreviousPlacementId(placementId);
             this._currentAdUnit.show();
         });
