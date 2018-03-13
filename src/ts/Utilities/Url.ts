@@ -114,6 +114,6 @@ export class Url {
         return false;
     }
 
-    private static iosWhitelistedProtocols = ['itunes', 'itms', 'itmss'];
+    private static iosWhitelistedProtocols = ['itunes', 'itms', 'itmss', 'http', 'https'];
     private static androidWhitelistedProtocols = ['market', 'http', 'https'];
 }
