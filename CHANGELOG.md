@@ -1,4 +1,4 @@
-# Pending
+# Tue Mar 13 08:20:24 UTC 2018
 
 * Enable Android native bridge 1ms autobatching on all groups
 * Rename InterstitialOverlay to ClosableVideoOverlay
