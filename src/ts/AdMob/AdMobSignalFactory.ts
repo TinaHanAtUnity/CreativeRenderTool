@@ -36,6 +36,7 @@ export class AdMobSignalFactory {
 
         signal.setAdLoadDuration(adUnit.getRequestToReadyTime());
         signal.setSequenceNumber(SdkStats.getAdRequestOrdinal());
+        signal.setIsNetworkMetered(this._deviceInfo.getNetworkMetered());
 
         let deviceIncapabilities = '';
         if (this._deviceInfo instanceof AndroidDeviceInfo) {

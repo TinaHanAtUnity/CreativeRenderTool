@@ -62,6 +62,14 @@ export class DeviceInfoApi extends NativeApi {
         return this._nativeBridge.invoke<number>(this._apiClass, 'getNetworkType');
     }
 
+    public getNetworkMetered(): Promise<boolean> {
+        // iOS does not currently support metered network connection
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            return this._nativeBridge.invoke<boolean>(this._apiClass, 'getNetworkMetered');
+        }
+        return Promise.resolve(false);
+    }
+
     public getNetworkOperator(): Promise<string> {
         // note: iOS device without a SIM card will return an empty reply instead of a string. This is a quick workaround.
         if(this._nativeBridge.getPlatform() === Platform.IOS) {

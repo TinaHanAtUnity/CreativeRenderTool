@@ -31,6 +31,7 @@ export interface IDeviceInfo {
     glVersion: string;
     maxVolume: number;
     headset: boolean;
+    meteredNetwork: boolean;
 }
 
 export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Model<T> {
@@ -61,6 +62,7 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
         glVersion: ['string'],
         maxVolume: ['number'],
         headset: ['boolean'],
+        meteredNetwork: ['boolean']
     };
 
     protected _nativeBridge: NativeBridge;
@@ -109,6 +111,17 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
             this.set('networkType', networkType);
             return this.get('networkType');
         });
+    }
+
+    public getNetworkMetered(): boolean {
+        if (this.get('meteredNetwork')) {
+            return this.get('meteredNetwork');
+        }
+        this._nativeBridge.DeviceInfo.getNetworkMetered().then(meteredNetwork => {
+            this.set('meteredNetwork', meteredNetwork);
+            return meteredNetwork;
+        });
+        return false;
     }
 
     public getNetworkOperator(): Promise<string | null> {
