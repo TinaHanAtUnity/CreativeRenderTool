@@ -13,18 +13,22 @@ import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { AdMobOptionalSignal } from 'Models/AdMobOptionalSignal';
 import { SdkStats } from 'Utilities/SdkStats';
+import { MetaDataManager } from 'Managers/MetaDataManager';
+import { UserMetaData } from 'Models/MetaData/UserMetaData';
 
 export class AdMobSignalFactory {
     private _nativeBridge: NativeBridge;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _focusManager: FocusManager;
+    private _metaDataManager: MetaDataManager;
 
-    constructor(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo, focusManager: FocusManager) {
+    constructor(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo, focusManager: FocusManager, metaDataManager: MetaDataManager) {
         this._nativeBridge = nativeBridge;
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._focusManager = focusManager;
+        this._metaDataManager = metaDataManager;
     }
 
     public getOptionalSignal(adUnit: AdMobAdUnit): Promise<AdMobOptionalSignal> {
@@ -32,7 +36,6 @@ export class AdMobSignalFactory {
 
         signal.setAdLoadDuration(adUnit.getRequestToReadyTime());
         signal.setSequenceNumber(SdkStats.getAdRequestOrdinal());
-        signal.setPriorClickCount(SdkStats.getAdClickOrdinal());
 
         let deviceIncapabilities = '';
         if (this._deviceInfo instanceof AndroidDeviceInfo) {
@@ -55,6 +58,22 @@ export class AdMobSignalFactory {
             signal.setDeviceBatteryLevel(this.getBatteryLevel(batteryLevel));
         }).catch(() => {
             this.logFailure(this._nativeBridge, 'batteryLevel');
+        }));
+
+        promises.push(this._metaDataManager.fetch(UserMetaData, false).then(user => {
+            if (user) {
+                signal.setPriorClickCount(user.getClickCount());
+            }
+        }).catch(() => {
+            this.logFailure(this._nativeBridge, 'priorClickCount');
+        }));
+
+        promises.push(this._metaDataManager.fetch(UserMetaData, false).then(user => {
+            if (user) {
+                signal.setNumPriorUserRequests(user.getRequestCount());
+            }
+        }).catch(() => {
+            this.logFailure(this._nativeBridge, 'numPriorUserRequests');
         }));
 
         return Promise.all(promises).then(() => {

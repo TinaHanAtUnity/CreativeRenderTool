@@ -21,6 +21,8 @@ import { Placement } from 'Models/Placement';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
+import { UserMetaData } from 'Models/MetaData/UserMetaData';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class OperativeEventManager {
 
@@ -184,6 +186,16 @@ export class OperativeEventManager {
         const fulfilled = ([id, infoJson]: [string, any]) => {
             this.sendEvent('click', id, session.getId(), this.createClickEventUrl(campaign), JSON.stringify(infoJson));
         };
+
+        this._metaDataManager.fetch(UserMetaData, false).then(user => {
+            if (user) {
+                this._nativeBridge.Storage.set<number>(StorageType.PRIVATE, 'user.clickCount',user.getClickCount()+1);
+            }
+        }).catch(() => {
+            Diagnostics.trigger('user_metadata_failure', {
+                signal: 'clickCount'
+            });
+        });
 
         return this.createUniqueEventMetadata(session, placement, campaign, this._sessionManager.getGameSessionId(), this._gamerServerId, this.getPreviousPlacementId(), videoOrientation, adUnitStyle).then(fulfilled);
     }

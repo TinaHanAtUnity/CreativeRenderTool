@@ -6,13 +6,14 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { Platform } from 'Constants/Platform';
 import { NativeBridge } from 'Native/NativeBridge';
 import { MetaDataManager } from 'Managers/MetaDataManager';
-import { StorageType } from 'Native/Api/Storage';
+import { StorageType, StorageApi } from 'Native/Api/Storage';
 import { AssetManager } from 'Managers/AssetManager';
 import { WebViewError } from 'Errors/WebViewError';
 import { Configuration } from 'Models/Configuration';
 import { Campaign } from 'Models/Campaign';
 import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
 import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
+import { UserMetaData } from 'Models/MetaData/UserMetaData';
 import { SessionManager } from 'Managers/SessionManager';
 import { JsonParser } from 'Utilities/JsonParser';
 import { CampaignRefreshManager } from 'Managers/CampaignRefreshManager';
@@ -139,6 +140,17 @@ export class CampaignManager {
                 if(response) {
                     SdkStats.setAdRequestDuration(Date.now() - requestTimestamp);
                     SdkStats.increaseAdRequestOrdinal();
+
+                    this._metaDataManager.fetch(UserMetaData, false).then(user => {
+                        if (user) {
+                            this._nativeBridge.Storage.set<number>(StorageType.PRIVATE, 'user.requestCount',user.getRequestCount()+1);
+                        }
+                    }).catch(() => {
+                        Diagnostics.trigger('user_metadata_failure', {
+                            signal: 'requestCount'
+                        });
+                    });
+
                     this._rawResponse = response.response;
                     return this.parseCampaigns(response).catch((e) => {
                         this.handleError(e, this._configuration.getPlacementIds());

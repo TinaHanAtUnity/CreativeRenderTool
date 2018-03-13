@@ -9,6 +9,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { unity_proto } from '../../../../proto/unity_proto.js';
 import * as protobuf from 'protobufjs/minimal';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
+import { MetaDataManager } from 'Managers/MetaDataManager';
 
 describe('AdMobSignalFactoryTest', () => {
     xit('basic test', () => {
@@ -16,8 +17,9 @@ describe('AdMobSignalFactoryTest', () => {
         const clientInfo: ClientInfo = TestFixtures.getClientInfo();
         const deviceInfo: AndroidDeviceInfo = TestFixtures.getAndroidDeviceInfo();
         const focusManager: FocusManager = new FocusManager(nativeBridge);
+        const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
 
-        return new AdMobSignalFactory(nativeBridge, clientInfo, deviceInfo, focusManager).getAdRequestSignal().then(signal => {
+        return new AdMobSignalFactory(nativeBridge, clientInfo, deviceInfo, focusManager, metaDataManager).getAdRequestSignal().then(signal => {
             const encodedMsg: string = signal.getBase64ProtoBuf();
 
             const buffer = new Uint8Array(protobuf.util.base64.length(encodedMsg));
