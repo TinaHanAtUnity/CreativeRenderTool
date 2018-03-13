@@ -74,6 +74,7 @@
 | simulator | boolean | If device is a simulator, not a real device | SDK | ios |
 | requestSignal | string | Base64 encoded string from AdMob protobuf signals | SDK | all |
 | adUnitStyle | object | Style of the ad unit | SDK | all |
+| sessionDepth | all | False | True | number | For a given session, how many ads have been delivered currently using adRequestOrdinal | SDK | all |
 
 
 
@@ -151,6 +152,7 @@
 | versionCode | no | False | True | number | Application internal version code for Android apps, available only for SDK 2.1.1 and later | SDK | android |
 | simulator | ios | False | True | boolean | If device is a simulator, not a real device | SDK | ios |
 | requestSignal | all | False | True | string | Base64 encoded string from AdMob protobuf signals | SDK | all |
+| sessionDepth | all | False | True | number | For a given session, how many ads have been delivered currently using adRequestOrdinal | SDK | all |
 
 
 
