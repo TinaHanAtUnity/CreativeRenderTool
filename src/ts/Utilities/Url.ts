@@ -14,19 +14,23 @@ export class Url {
 
     public static encode(url: string): string {
         if(url) {
-            url = url.replace(/"/g, '%22');
-            url = url.replace(/</g, '%3C');
-            url = url.replace(/>/g, '%3E');
-            url = url.replace(/#/g, '%23');
-            url = url.replace(/{/g, '%7B');
-            url = url.replace(/}/g, '%7D');
-            url = url.replace(/\|/g, '%7C');
-            url = url.replace(/\\/g, '%5C');
-            url = url.replace(/\^/g, '%5E');
-            url = url.replace(/~/g, '%7E');
-            url = url.replace(/\[/g, '%5B');
-            url = url.replace(/]/g, '%5D');
-            url = url.replace(/`/g, '%60');
+            let encodedUrl = '';
+            let i = 0;
+
+            while(i < url.length) {
+                // Skip already encoded URL characters
+                if (url[i] === '%' && (url.length - i >= 3) && Url.isNumber(url[i + 1]) && Url.isNumber(url[i + 2])) {
+                    encodedUrl += url[i++];
+                    encodedUrl += url[i++];
+                    encodedUrl += url[i++];
+                    continue;
+                }
+
+                encodedUrl += encodeURI(url[i]);
+                i++;
+            }
+
+            return encodedUrl;
         }
 
         return url;
@@ -87,7 +91,7 @@ export class Url {
     public static isValid(url: string): boolean {
         // note: this is not an attempt for full URL validation, instead this just checks that protocol is http(s) and
         // all URL characters are legal following RFC3986, using ASCII character ranges &-; and ?-[ is intentional
-        if(url && (url.match(/^http:./i) || url.match(/^https:./i) && url.match(/^([\!\$\#\&-\;\=\?-\[\]_a-z~{}|\\^`]|[\u00A1-\uFFFF]|%[0-9a-fA-F]{2})+$/i))) {
+        if(url && (url.match(/^http:./i) || url.match(/^https:./i) && url.match(/^([\!\$\#\&-\;\=\?-\[\]_a-z~{}|\\^`]|%[0-9a-fA-F]{2})+$/i))) {
             return true;
         }
 
@@ -116,4 +120,8 @@ export class Url {
 
     private static iosWhitelistedProtocols = ['itunes', 'itms', 'itmss'];
     private static androidWhitelistedProtocols = ['market', 'http', 'https'];
+
+    private static isNumber(c: string): boolean {
+        return c.match(/^[0-9a-fA-F]$/) !== null;
+    }
 }
