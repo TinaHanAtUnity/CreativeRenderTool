@@ -1,4 +1,4 @@
-import { Campaign, ICampaign} from 'Models/Campaign';
+import { Campaign, ICampaign } from 'Models/Campaign';
 import { HTML } from 'Models/Assets/HTML';
 
 export interface IPromoCampaign extends ICampaign {

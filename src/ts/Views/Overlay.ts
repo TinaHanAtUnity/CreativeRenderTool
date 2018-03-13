@@ -4,10 +4,10 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
 import { Platform } from 'Constants/Platform';
-import { AbstractOverlay } from 'Views/AbstractOverlay';
+import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 
-export class Overlay extends AbstractOverlay {
+export class Overlay extends AbstractVideoOverlay {
 
     private _localization: Localization;
 

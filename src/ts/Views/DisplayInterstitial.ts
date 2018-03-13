@@ -152,7 +152,7 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
     private onCloseEvent(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
-        if(this._canSkip && !this._canClose) {
+        if (this._canSkip && !this._canClose) {
             this._handlers.forEach(handler => handler.onDisplayInterstitialSkip());
         } else if(this._canClose) {
             this._handlers.forEach(handler => handler.onDisplayInterstitialClose());

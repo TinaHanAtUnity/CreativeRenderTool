@@ -1,3 +1,5 @@
+import { Platform } from 'Constants/Platform';
+
 export interface IUrl {
     protocol: string;
     host: string;
@@ -92,8 +94,19 @@ export class Url {
         return false;
     }
 
-    public static isProtocolWhitelisted(url: string): boolean {
-        for (const protocol of this.whitelistedProtocols) {
+    public static isProtocolWhitelisted(url: string, platform: Platform): boolean {
+        let whitelisted: string[] = [];
+
+        switch (platform) {
+            case Platform.IOS:
+                whitelisted = this.iosWhitelistedProtocols;
+                break;
+            case Platform.ANDROID:
+                whitelisted = this.androidWhitelistedProtocols;
+                break;
+        }
+
+        for (const protocol of whitelisted) {
             if (url.indexOf(protocol) === 0) {
                 return true;
             }
@@ -101,5 +114,6 @@ export class Url {
         return false;
     }
 
-    private static whitelistedProtocols = ['market', 'itunes', 'itms', 'itmss'];
+    private static iosWhitelistedProtocols = ['itunes', 'itms', 'itmss'];
+    private static androidWhitelistedProtocols = ['market', 'http', 'https'];
 }

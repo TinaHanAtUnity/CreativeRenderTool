@@ -151,7 +151,7 @@ export class CacheBookkeeping {
     }
 
     public writeFileForCampaign(campaignId: string, fileId: string): Promise<void> {
-        return this._nativeBridge.Storage.set(StorageType.PRIVATE, 'cache.campaigns.' + campaignId + "." + FileId.getFileIdHash(fileId), {extension: FileId.getFileIdExtension(fileId)}).then(() => {
+        return this._nativeBridge.Storage.set(StorageType.PRIVATE, 'cache.campaigns.' + campaignId + '.' + FileId.getFileIdHash(fileId), {extension: FileId.getFileIdExtension(fileId)}).then(() => {
             this._nativeBridge.Storage.write(StorageType.PRIVATE);
         }).catch(() => {
             return Promise.resolve();

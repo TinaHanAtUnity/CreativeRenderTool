@@ -3,9 +3,9 @@ import ProgressBarOverlayTemplate from 'html/ProgressBarOverlay.html';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
-import { AbstractOverlay } from 'Views/AbstractOverlay';
+import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
 
-export class ProgressBarOverlay extends AbstractOverlay {
+export class ProgressBarOverlay extends AbstractVideoOverlay {
 
     private _localization: Localization;
 

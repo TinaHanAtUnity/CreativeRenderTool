@@ -1,3 +1,21 @@
+# Tue Mar 13 08:20:24 UTC 2018
+
+* Enable Android native bridge 1ms autobatching on all groups
+* Rename InterstitialOverlay to ClosableVideoOverlay
+* Fix tslint configuration and fix linter errors
+
+# Mon Mar 12 10:13:52 UTC 2018
+
+* Add target game ID to xpromo events
+* Remove hard-coded game IDs which were used to enable overlay features
+
+# Fri Mar  9 09:37:38 UTC 2018
+
+* Remove progress bar from groups 16 and 17
+* Revert "Show time to close / skip for mraid overlays" from groups 18 and 19
+* Add URL whitelist check for Android display interstitial ad unit
+* Add missing_default_placement diagnostic event
+
 # Thu Mar  8 09:59:59 UTC 2018
 
 * Playable configuration file support

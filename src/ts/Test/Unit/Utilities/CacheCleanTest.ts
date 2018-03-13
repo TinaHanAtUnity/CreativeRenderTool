@@ -59,7 +59,7 @@ class TestStorageApi extends StorageApi {
     public get<T>(type: StorageType, key: string): Promise<T> {
         if(key && key.match(/^cache\.files\./)) {
             let id: string = key.substring(12);
-            id = id.split(".")[0];
+            id = id.split('.')[0];
 
             if(this._contents && this._contents.cache && this._contents.cache.files && this._contents.cache.files[id]) {
                 return Promise.resolve(<any>this._contents.cache.files[id]);
@@ -164,7 +164,7 @@ class TestStorageApi extends StorageApi {
     }
 
     public hasFileEntry(fileId: string): boolean {
-        fileId = fileId.split(".")[0];
+        fileId = fileId.split('.')[0];
         if(this._contents && this._contents.cache && this._contents.cache.files && this._contents.cache.files[fileId]) {
             return true;
         }

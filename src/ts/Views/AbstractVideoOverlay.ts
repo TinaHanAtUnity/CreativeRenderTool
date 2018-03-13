@@ -9,10 +9,10 @@ export interface IOverlayHandler {
     onOverlayClose(): void;
 }
 
-export abstract class AbstractOverlay extends View<IOverlayHandler> {
+export abstract class AbstractVideoOverlay extends View<IOverlayHandler> {
 
     public static setAutoSkip(value: boolean) {
-        AbstractOverlay.AutoSkip = value;
+        AbstractVideoOverlay.AutoSkip = value;
     }
 
     protected static AutoSkip: boolean = false;

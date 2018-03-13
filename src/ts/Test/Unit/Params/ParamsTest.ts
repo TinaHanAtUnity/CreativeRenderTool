@@ -465,7 +465,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with first quartile event', () => {
-                return operativeEventManager.sendFirstQuartile(campaign.getSession(), TestFixtures.getPlacement(),campaign).then(() => {
+                return operativeEventManager.sendFirstQuartile(campaign.getSession(), TestFixtures.getPlacement(), campaign).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 

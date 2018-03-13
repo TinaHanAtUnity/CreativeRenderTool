@@ -13,14 +13,14 @@ describe('LocalizationTest', () => {
 
     it('should correctly concatenate 100000 to "100 k" for english language users', () => {
         const numberOfReviews = 100000;
-        assert.equal(new Localization('en_US', '').abbreviate(numberOfReviews), "100 k", 'Concatenation did not return expected string');
-        assert.equal(new Localization('en_UK', '').abbreviate(numberOfReviews), "100 k", 'Concatenation did not return expected string');
+        assert.equal(new Localization('en_US', '').abbreviate(numberOfReviews), '100 k', 'Concatenation did not return expected string');
+        assert.equal(new Localization('en_UK', '').abbreviate(numberOfReviews), '100 k', 'Concatenation did not return expected string');
     });
 
     it('should correctly concatenate 1000000 to "1 m" for english language users', () => {
         const numberOfReviews = 1000000;
-        assert.equal(new Localization('en_US', '').abbreviate(numberOfReviews), "1 m", 'Concatenation did not return expected string');
-        assert.equal(new Localization('en_UK', '').abbreviate(numberOfReviews), "1 m", 'Concatenation did not return expected string');
+        assert.equal(new Localization('en_US', '').abbreviate(numberOfReviews), '1 m', 'Concatenation did not return expected string');
+        assert.equal(new Localization('en_UK', '').abbreviate(numberOfReviews), '1 m', 'Concatenation did not return expected string');
     });
 
     it('should return phrase if language is not found', () => {
