@@ -1,7 +1,7 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { ClientInfo } from 'Models/ClientInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
-import { AnalyticsStorage, IIAPInstrumentation } from 'Analytics/AnalyticsStorage';
+import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Request, INativeResponse } from 'Utilities/Request';
 import { AnalyticsProtocol, IAnalyticsObject, IAnalyticsCommonObject } from 'Analytics/AnalyticsProtocol';
@@ -87,10 +87,6 @@ export class AnalyticsManager {
                     this._storage.setVersions(this._clientInfo.getApplicationVersion(), this._deviceInfo.getOsVersion());
                 }
 
-                this._storage.getIAPTransactions().then(transactions => {
-                    this.sendIAPTransactions(transactions);
-                });
-
                 this.subscribeListeners();
             });
         }
@@ -105,7 +101,6 @@ export class AnalyticsManager {
         this._focusManager.onAppBackground.subscribe(() => this.onAppBackground());
         this._focusManager.onActivityResumed.subscribe((activity) => this.onActivityResumed(activity));
         this._focusManager.onActivityPaused.subscribe((activity) => this.onActivityPaused(activity));
-        this._nativeBridge.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, data));
     }
 
     private sendNewSession(): void {
@@ -128,14 +123,6 @@ export class AnalyticsManager {
         AnalyticsProtocol.getDeviceInfoObject(this._nativeBridge, this._clientInfo, this._deviceInfo).then(deviceInfoObject => {
             this.send(deviceInfoObject);
         });
-    }
-
-    private sendIAPTransactions(transactions: IIAPInstrumentation[]): void {
-        for(const item of transactions) {
-            this._storage.getIntegerId().then(id => {
-                this.send(AnalyticsProtocol.getIAPTransactionObject(id, item));
-            });
-        }
     }
 
     private onAppForeground(): void {
@@ -174,10 +161,6 @@ export class AnalyticsManager {
         if(!this._topActivity) {
             this._topActivity = activity;
         }
-    }
-
-    private onStorageSet(eventType: string, data: any) {
-        // todo: handle IAP purchase data with new 2.1.1 storage format
     }
 
     private send(event: IAnalyticsObject): Promise<INativeResponse> {
