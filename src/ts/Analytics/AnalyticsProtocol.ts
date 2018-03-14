@@ -65,20 +65,6 @@ interface IAnalyticsAppRunningEvent {
     local_time_offset: number;
 }
 
-interface IAnalyticsTransactionEvent {
-    ts: number;
-    transactionId: number;
-    productId: string;
-    amount: number;
-    currency: string;
-    receipt?: IAnalyticsTransactionReceipt;
-}
-
-interface IAnalyticsTransactionReceipt {
-    data?: string;
-    signature?: string;
-}
-
 export class AnalyticsProtocol {
     public static getCommonObject(platform: Platform, userId: string, sessionId: number, clientInfo: ClientInfo, deviceInfo: DeviceInfo, configuration: Configuration): IAnalyticsCommonObject {
         const common: IAnalyticsCommonObjectInternal = {
@@ -167,28 +153,6 @@ export class AnalyticsProtocol {
         return {
             type: 'analytics.appRunning.v1',
             msg: appRunningEvent
-        };
-    }
-
-    public static getIAPTransactionObject(transactionId: number, instrumentation: IIAPInstrumentation): IAnalyticsObject {
-        const transactionEvent: IAnalyticsTransactionEvent = {
-            ts: Date.now(),
-            transactionId: transactionId,
-            productId: instrumentation.productId,
-            amount: instrumentation.price,
-            currency: instrumentation.currency,
-        };
-
-        if(instrumentation.signature || instrumentation.receiptPurchaseData) {
-            transactionEvent.receipt = {
-                data: instrumentation.receiptPurchaseData,
-                signature: instrumentation.signature
-            };
-        }
-
-        return {
-            type: 'analytics.transaction.v1',
-            msg: transactionEvent
         };
     }
 

@@ -1,5 +1,18 @@
 # Pending
 
+* Disable DeviceInfo.getApkDigest to fix Android 2.2.0 issues
+* Encode UTF-8 characters in asset URLs before giving them to native SDK
+* Display ads: Open links in new browser for iOS also
+* Disable failing cache tests
+
+# Wed Mar 14 09:55:49 UTC 2018
+
+* Progress bar video overlay A/B test in groups 16 & 17
+* Send targetGameId as a string value in xpromo events
+* Remove IAP transaction metadata support
+
+# Tue Mar 13 08:20:24 UTC 2018
+
 * Enable Android native bridge 1ms autobatching on all groups
 * Rename InterstitialOverlay to ClosableVideoOverlay
 * Fix tslint configuration and fix linter errors
