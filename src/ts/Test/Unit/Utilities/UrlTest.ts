@@ -50,6 +50,31 @@ describe('UrlTest', () => {
             const url = 'http://test.com?param=|Hello|%20|HelloAgain|';
             assert.equal(Url.encode(url), 'http://test.com?param=%7CHello%7C%20%7CHelloAgain%7C', 'Url not encoded as expected');
         });
+
+        it('should encode utf8 characters', () => {
+            const url = 'http://test.com?param=%7CHello%7C%20%7CHelloAgain%7C/FRVideo19unity封面.png';
+            assert.equal(Url.encode(url), 'http://test.com?param=%7CHello%7C%20%7CHelloAgain%7C/FRVideo19unity%E5%B0%81%E9%9D%A2.png', 'Url not encoded as expected');
+        });
+
+        it('should encode %', () => {
+            const url = 'http://test.com?param=%7C%%7C%25';
+            assert.equal(Url.encode(url), 'http://test.com?param=%7C%25%7C%25', 'Url not encoded as expected');
+        });
+
+        it('should encode % in the end', () => {
+            const url = 'http://test.com?param=%';
+            assert.equal(Url.encode(url), 'http://test.com?param=%25', 'Url not encoded as expected');
+        });
+
+        it('should encode % in wrong url escape', () => {
+            const url = 'http://test.com?param=%2';
+            assert.equal(Url.encode(url), 'http://test.com?param=%252', 'Url not encoded as expected');
+        });
+
+        it('should encode % in wrong url escape with letters', () => {
+            const url = 'http://test.com?param=%wb';
+            assert.equal(Url.encode(url), 'http://test.com?param=%25wb', 'Url not encoded as expected');
+        });
     });
 
     describe('validating UTF-8', () => {
