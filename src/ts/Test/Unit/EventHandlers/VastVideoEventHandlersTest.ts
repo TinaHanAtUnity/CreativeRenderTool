@@ -260,7 +260,7 @@ describe('VastVideoEventHandlers tests', () => {
         });
     });
 
-    describe('onVideoError', ()=> {
+    describe('onVideoError', () => {
         it('should hide ad unit', () => {
             VastVideoEventHandlers.onVideoError(testAdUnit);
             sinon.assert.called(<sinon.SinonSpy>testAdUnit.hide);

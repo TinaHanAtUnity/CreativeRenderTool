@@ -253,7 +253,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
             case StoreName.XIAOMI:
                 return 'migamecenter://details?pkgname=' + parameters.appStoreId + '&channel=unityAds&from=' + packageName + '&trace=' + parameters.gamerId;
             default:
-                return "";
+                return '';
         }
     }
 }

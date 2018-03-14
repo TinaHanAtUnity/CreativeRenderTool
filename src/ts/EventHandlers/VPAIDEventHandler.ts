@@ -2,7 +2,6 @@ import { IVPAIDHandler, VPAID } from 'Views/VPAID';
 import { NativeBridge } from 'Native/NativeBridge';
 import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'AdUnits/VPAIDAdUnit';
 import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
-import { AbstractOverlay } from 'Views/AbstractOverlay';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
@@ -60,7 +59,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     }
 
     public onVPAIDEvent(eventType: string, args: any[]) {
-        this._nativeBridge.Sdk.logDebug(`vpaid event ${eventType} with args ${args && args.length ? args.join(' '): 'None'}`);
+        this._nativeBridge.Sdk.logDebug(`vpaid event ${eventType} with args ${args && args.length ? args.join(' ') : 'None'}`);
         const handler = this._vpaidEventHandlers[eventType];
         if (handler) {
             handler.apply(this, args);

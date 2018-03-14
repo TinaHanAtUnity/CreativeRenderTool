@@ -176,10 +176,6 @@ export class WebView {
             this._configuration = configuration;
             HttpKafka.setConfiguration(this._configuration);
 
-            if(this._configuration.getAbGroup() === 12 || this._configuration.getAbGroup() === 13) {
-                this._nativeBridge.setAutoBatchInterval(1);
-            }
-
             PurchasingUtilities.setConfiguration(this._configuration);
             PurchasingUtilities.setClientInfo(this._clientInfo);
             PurchasingUtilities.sendPurchaseInitializationEvent(this._nativeBridge);

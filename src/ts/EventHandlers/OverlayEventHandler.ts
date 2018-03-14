@@ -1,4 +1,4 @@
-import { IOverlayHandler } from 'Views/AbstractOverlay';
+import { IOverlayHandler } from 'Views/AbstractVideoOverlay';
 import { NativeBridge } from 'Native/NativeBridge';
 import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';

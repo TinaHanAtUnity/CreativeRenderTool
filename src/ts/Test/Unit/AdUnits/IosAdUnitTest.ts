@@ -103,7 +103,7 @@ describe('IosAdUnitTest', () => {
     it('should close ad unit', () => {
         nativeBridge = TestFixtures.getNativeBridge(Platform.IOS);
         focusManager = new FocusManager(nativeBridge);
-        container = new ViewController(nativeBridge,TestFixtures.getIosDeviceInfo(), focusManager);
+        container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager);
         const stub = sinon.stub(nativeBridge.IosAdUnit, 'close').returns(Promise.resolve());
 
         return container.close().then(() => {

@@ -1,13 +1,11 @@
-import OverlayTemplate from 'html/Overlay.html';
+import ProgressBarOverlayTemplate from 'html/ProgressBarOverlay.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
-import { Platform } from 'Constants/Platform';
 import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
-import { CustomFeatures } from 'Utilities/CustomFeatures';
 
-export class Overlay extends AbstractVideoOverlay {
+export class ProgressBarOverlay extends AbstractVideoOverlay {
 
     private _localization: Localization;
 
@@ -30,6 +28,7 @@ export class Overlay extends AbstractVideoOverlay {
     private _muteButtonElement: HTMLElement;
     private _debugMessageElement: HTMLElement;
     private _callButtonElement: HTMLElement;
+    private _timerElement: HTMLElement;
 
     private _progressElement: HTMLElement;
 
@@ -37,7 +36,7 @@ export class Overlay extends AbstractVideoOverlay {
     private _fadeStatus: boolean = true;
 
     constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, abGroup: number = 0) {
-        super(nativeBridge, 'overlay', muted, abGroup);
+        super(nativeBridge, 'progress-bar-overlay', muted, abGroup);
 
         this._localization = new Localization(language, 'overlay');
 
@@ -45,7 +44,7 @@ export class Overlay extends AbstractVideoOverlay {
             muted
         };
 
-        this._template = new Template(OverlayTemplate, this._localization);
+        this._template = new Template(ProgressBarOverlayTemplate, this._localization);
 
         this._bindings = [
             {
@@ -74,22 +73,34 @@ export class Overlay extends AbstractVideoOverlay {
             }
         ];
 
-        if(CustomFeatures.isTimehopApp(gameId)) {
+        if(gameId === '1300023' || gameId === '1300024') {
             this._bindings.push({
                 event: 'swipe',
                 listener: (event: Event) => this.onSkipEvent(event)
             });
         }
+
     }
 
     public render(): void {
         super.render();
+
         this._skipElement = <HTMLElement>this._container.querySelector('.skip-hit-area');
+        this._skipElement.style.display = 'none';
+        (<HTMLElement>this._skipElement.children[1]).style.display = 'none';
+
         this._spinnerElement = <HTMLElement>this._container.querySelector('.buffering-spinner');
         this._muteButtonElement = <HTMLElement>this._container.querySelector('.mute-button');
         this._debugMessageElement = <HTMLElement>this._container.querySelector('.debug-message-text');
+
         this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
+        this._callButtonElement.style.display = 'none';
+
         this._progressElement = <HTMLElement>this._container.querySelector('.progress');
+        this.removeCssTransition();
+        this._progressElement.style.width = '0';
+
+        this._timerElement = <HTMLElement>this._container.querySelector('.timer');
     }
 
     public setSpinnerEnabled(value: boolean): void {
@@ -114,7 +125,7 @@ export class Overlay extends AbstractVideoOverlay {
     }
 
     public setVideoProgress(value: number): void {
-        if(Overlay.AutoSkip) {
+        if(ProgressBarOverlay.AutoSkip) {
             this._handlers.forEach(handler => handler.onOverlaySkip(value));
         }
 
@@ -125,18 +136,35 @@ export class Overlay extends AbstractVideoOverlay {
             }, 3000);
         }
 
+        const delta = (value - this._videoProgress) || 0;
+
         this._videoProgress = value;
-        if(this._skipEnabled && this._skipRemaining > 0) {
-            this._skipRemaining = this._skipDuration - value;
-            if(this._skipRemaining <= 0) {
-                this.setSkipElementVisible(true);
-                this.updateProgressCircle(this._skipElement, 1);
-            } else {
-                this.updateProgressCircle(this._skipElement, (this._skipDuration - this._skipRemaining) / this._skipDuration);
-            }
+
+        this.setSkipElementVisible(this._skipEnabled);
+
+        this._skipRemaining = this._skipDuration - this._videoProgress;
+
+        if (this._skipRemaining <= 0) {
+            (<HTMLElement>this._skipElement.children[0]).innerText = 'Skip';
+            (<HTMLElement>this._skipElement.children[1]).style.display = 'inline';
+        } else {
+            (<HTMLElement>this._skipElement.children[0]).innerText = `Skip in ${this.formatTimer(Math.ceil(this._skipRemaining / 1000))}`;
+            (<HTMLElement>this._skipElement.children[1]).style.display = 'none';
         }
-        this._progressElement.setAttribute('data-seconds',  Math.round((this._videoDuration - value) / 1000).toString());
-        this.updateProgressCircle(this._progressElement, this._videoProgress / this._videoDuration);
+
+        this._timerElement.innerText = this.formatTimer(Math.ceil((this._videoDuration - this._videoProgress) / 1000));
+
+        const progressInPercentages = Math.ceil(100 / this._videoDuration * this._videoProgress);
+
+        if (delta >= 0) {
+            if (this._progressElement.style.transition === '' && this._progressElement.style.webkitTransition === '') {
+                this.setCssTransition();
+            }
+            this._progressElement.style.width = '100%';
+        } else {
+            this.removeCssTransition();
+            this._progressElement.style.width = `${progressInPercentages}%`;
+        }
     }
 
     public setMuteEnabled(value: boolean) {
@@ -178,6 +206,12 @@ export class Overlay extends AbstractVideoOverlay {
         event.preventDefault();
         event.stopPropagation();
         this.resetFadeTimer();
+
+        if(!this._fadeStatus) {
+            this.fade(false);
+            return;
+        }
+
         if(this._muted) {
             this._muteButtonElement.classList.remove('muted');
             this._muted = false;
@@ -212,39 +246,13 @@ export class Overlay extends AbstractVideoOverlay {
         }
     }
 
-    private updateProgressCircle(container: HTMLElement, value: number) {
-        const wrapperElement = <HTMLElement>container.querySelector('.progress-wrapper');
-
-        if(this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() < 15) {
-            wrapperElement.style.display = 'none';
-            this._container.style.display = 'none';
-            /* tslint:disable:no-unused-expression */
-            this._container.offsetHeight;
-            /* tslint:enable:no-unused-expression */
-            this._container.style.display = 'block';
-            return;
-        }
-
-        const leftCircleElement = <HTMLElement>container.querySelector('.circle-left');
-        const rightCircleElement = <HTMLElement>container.querySelector('.circle-right');
-
-        const degrees = value * 360;
-        leftCircleElement.style.webkitTransform = 'rotate(' + degrees + 'deg)';
-
-        if(value >= 0.5) {
-            wrapperElement.style.webkitAnimationName = 'close-progress-wrapper';
-            rightCircleElement.style.webkitAnimationName = 'right-spin';
-        }
-    }
-
     private setSkipElementVisible(value: boolean) {
         if(this._skipVisible !== value) {
             this._skipVisible = value;
-            const skipIconElement = <HTMLElement>this._container.querySelector('.skip');
             if(value) {
-                skipIconElement.classList.add('enabled');
+                this._skipElement.style.display = 'block';
             } else {
-                skipIconElement.classList.remove('enabled');
+                this._skipElement.style.display = 'none';
             }
         }
     }
@@ -258,23 +266,40 @@ export class Overlay extends AbstractVideoOverlay {
 
     private fade(value: boolean) {
         if (value) {
-            this._skipElement.classList.remove('slide-back-in-place');
-            this._skipElement.classList.add('slide-up');
-            this._progressElement.classList.remove('slide-back-in-place');
-            this._progressElement.classList.add('slide-up');
-            this._muteButtonElement.classList.remove('slide-back-in-place');
-            this._muteButtonElement.classList.add('slide-down');
-            this._container.style.pointerEvents = 'auto';
+            this._container.classList.add('progress-fade');
             this._fadeStatus = false;
         } else {
-            this._container.style.pointerEvents = 'none';
-            this._skipElement.classList.remove('slide-up');
-            this._skipElement.classList.add('slide-back-in-place');
-            this._progressElement.classList.remove('slide-up');
-            this._progressElement.classList.add('slide-back-in-place');
-            this._muteButtonElement.classList.remove('slide-down');
-            this._muteButtonElement.classList.add('slide-back-in-place');
+            this._container.classList.remove('progress-fade');
             this._fadeStatus = true;
         }
+    }
+
+    private formatTimer(ms: number): string {
+        const minutes = Math.floor(ms / 60);
+        const seconds = ms % 60;
+
+        let minutesStr = String(minutes);
+        let secondsStr = String(seconds);
+
+        if (minutes < 10) {
+            minutesStr = '0' + minutes;
+        }
+
+        if (seconds < 10) {
+            secondsStr = '0' + seconds;
+        }
+
+        return `${minutesStr}:${secondsStr}`;
+    }
+
+    private setCssTransition(): void {
+        const transitionRule = `width ${(this._videoDuration - this._videoProgress) / 1000}s linear`;
+        this._progressElement.style.transition = transitionRule;
+        this._progressElement.style.webkitTransition = transitionRule;
+    }
+
+    private removeCssTransition(): void {
+        this._progressElement.style.transition = '';
+        this._progressElement.style.webkitTransition = '';
     }
 }

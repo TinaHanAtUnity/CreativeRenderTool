@@ -9,10 +9,9 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Request } from 'Utilities/Request';
 import { ClientInfo } from 'Models/ClientInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
-import { StorageApi, StorageType, StorageError, StorageEvent } from 'Native/Api/Storage';
+import { StorageApi, StorageType, StorageError } from 'Native/Api/Storage';
 import { IAnalyticsObject } from 'Analytics/AnalyticsProtocol';
 import { RequestApi } from 'Native/Api/Request';
-import { IIAPInstrumentation } from 'Analytics/AnalyticsStorage';
 import { FocusManager } from 'Managers/FocusManager';
 import { Configuration } from 'Models/Configuration';
 
@@ -107,34 +106,6 @@ describe('AnalyticsManagerTest', () => {
 
             sinon.assert.called(requestSpy);
             assert.equal(TestHelper.getEventType(requestSpy.getCall(0).args[1]), 'analytics.appRunning.v1');
-        });
-    });
-
-    // todo: refactor this test when actual functionality in AnalyticsManager is fixed
-    xit('should send transaction event', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
-        const transaction: IIAPInstrumentation = {
-            receiptPurchaseData: 'test_purchase_data',
-            'price': 1,
-            'currency': 'USD',
-            'signature': 'test_signature',
-            'productId': 'test_id',
-            'ts': 1493905891004
-        };
-        storage.setValue('iap.purchases', [transaction]);
-
-        analyticsManager.init().then(() => {
-            let count = 0;
-            nativeBridge.Request = new FakeRequestApi(nativeBridge, (url: string, body: string) => {
-                if(count === 0) {
-                    assert.equal(TestHelper.getEventType(body), 'analytics.deviceInfo.v1');
-                } else if(count === 1) {
-                    assert.equal(TestHelper.getEventType(body), 'analytics.transaction.v1');
-                    done();
-                }
-                ++count;
-            });
-
-            nativeBridge.Storage.onSet.trigger(StorageEvent[StorageEvent.SET], {});
         });
     });
 });

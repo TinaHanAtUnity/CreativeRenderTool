@@ -100,19 +100,19 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
     }
 
     public getStores(): string {
-        let storeString = "";
+        let storeString = '';
 
         if (this.isGoogleStoreInstalled()) {
-            storeString = "google";
+            storeString = 'google';
         }
         if (this.isXiaomiStoreInstalled()) {
-            storeString = "xiaomi";
+            storeString = 'xiaomi';
         }
         if (this.isXiaomiStoreInstalled() && this.isGoogleStoreInstalled()) {
-            storeString = "xiaomi,google";
+            storeString = 'xiaomi,google';
         }
         if (!this.isXiaomiStoreInstalled() && !this.isGoogleStoreInstalled()) {
-            storeString = "none";
+            storeString = 'none';
         }
 
         return storeString;
