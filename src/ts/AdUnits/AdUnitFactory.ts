@@ -53,6 +53,7 @@ import { XPromoVideoEventHandlers } from 'EventHandlers/XPromoVideoEventHandlers
 import { AdMobEventHandler } from 'EventHandlers/AdmobEventHandler';
 import { ClosableVideoOverlay } from 'Views/ClosableVideoOverlay';
 import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
+import { ProgressBarOverlay } from 'Views/ProgressBarOverlay';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { Closer } from 'Views/Closer';
 import { Privacy } from 'Views/Privacy';
@@ -481,9 +482,17 @@ export class AdUnitFactory {
 
     private static createOverlay(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractVideoOverlay {
         if (!parameters.placement.allowSkip()) {
-            const overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup());
-            if (parameters.placement.disableVideoControlsFade()) {
-                overlay.setFadeEnabled(false);
+            let overlay: AbstractVideoOverlay;
+            if (parameters.campaign.getAbGroup() === 16 || parameters.campaign.getAbGroup() === 17) {
+                overlay = new ProgressBarOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup());
+                if (parameters.placement.disableVideoControlsFade()) {
+                    overlay.setFadeEnabled(false);
+                }
+            } else {
+                overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup());
+                if (parameters.placement.disableVideoControlsFade()) {
+                    overlay.setFadeEnabled(false);
+                }
             }
             return overlay;
         } else {
@@ -492,7 +501,11 @@ export class AdUnitFactory {
             if (parameters.placement.skipEndCardOnClose()) {
                 overlay = new ClosableVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
             } else {
-                overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup());
+                if (parameters.campaign.getAbGroup() === 16 || parameters.campaign.getAbGroup() === 17) {
+                    overlay = new ProgressBarOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup());
+                } else {
+                    overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup());
+                }
             }
 
             if (parameters.placement.disableVideoControlsFade()) {
