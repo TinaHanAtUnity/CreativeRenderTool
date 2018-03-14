@@ -1,4 +1,4 @@
-# Pending
+# Wed Mar 14 09:55:49 UTC 2018
 
 * Progress bar video overlay A/B test in groups 16 & 17
 * Send targetGameId as a string value in xpromo events
