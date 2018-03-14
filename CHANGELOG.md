@@ -1,3 +1,10 @@
+# Pending
+
+* Disable DeviceInfo.getApkDigest to fix Android 2.2.0 issues
+* Encode UTF-8 characters in asset URLs before giving them to native SDK
+* Display ads: Open links in new browser for iOS also
+* Disable failing cache tests
+
 # Wed Mar 14 09:55:49 UTC 2018
 
 * Progress bar video overlay A/B test in groups 16 & 17
