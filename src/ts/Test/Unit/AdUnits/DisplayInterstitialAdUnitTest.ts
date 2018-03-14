@@ -70,7 +70,7 @@ describe('DisplayInterstitialAdUnit', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
-                campaign:campaign
+                campaign: campaign
             });
             comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
