@@ -77,7 +77,7 @@ export class OperativeEventManager {
         this._campaign = params.campaign;
     }
 
-    public sendStart(session: Session, placement: Placement, campaign: Campaign, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<void> {
+    public sendStart(session: Session, placement: Placement, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<void> {
         if(session.getEventSent(EventType.START)) {
             return Promise.resolve();
         }
@@ -101,7 +101,7 @@ export class OperativeEventManager {
         });
     }
 
-    public sendFirstQuartile(session: Session, placement: Placement, campaign: Campaign, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<void> {
+    public sendFirstQuartile(session: Session, placement: Placement, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<void> {
         if(session.getEventSent(EventType.FIRST_QUARTILE)) {
             return Promise.resolve(void(0));
         }
@@ -115,7 +115,7 @@ export class OperativeEventManager {
         return this.createUniqueEventMetadata(session, placement, this._sessionManager.getGameSessionId(), this._gamerServerId, OperativeEventManager.getPreviousPlacementId(), videoOrientation, adUnitStyle).then(fulfilled);
     }
 
-    public sendMidpoint(session: Session, placement: Placement, campaign: Campaign, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<void> {
+    public sendMidpoint(session: Session, placement: Placement, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<void> {
         if(session.getEventSent(EventType.MIDPOINT)) {
             return Promise.resolve(void(0));
         }
@@ -129,7 +129,7 @@ export class OperativeEventManager {
         return this.createUniqueEventMetadata(session, placement, this._sessionManager.getGameSessionId(), this._gamerServerId, OperativeEventManager.getPreviousPlacementId(), videoOrientation, adUnitStyle).then(fulfilled);
     }
 
-    public sendThirdQuartile(session: Session, placement: Placement, campaign: Campaign, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<void> {
+    public sendThirdQuartile(session: Session, placement: Placement, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<void> {
         if(session.getEventSent(EventType.THIRD_QUARTILE)) {
             return Promise.resolve(void(0));
         }
@@ -143,7 +143,7 @@ export class OperativeEventManager {
         return this.createUniqueEventMetadata(session, placement, this._sessionManager.getGameSessionId(), this._gamerServerId, OperativeEventManager.getPreviousPlacementId(), videoOrientation, adUnitStyle).then(fulfilled);
     }
 
-    public sendSkip(session: Session, placement: Placement, campaign: Campaign, videoProgress?: number, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<void> {
+    public sendSkip(session: Session, placement: Placement, videoProgress?: number, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<void> {
         if(session.getEventSent(EventType.SKIP)) {
             return Promise.resolve(void(0));
         }
@@ -177,7 +177,7 @@ export class OperativeEventManager {
         return this.createUniqueEventMetadata(session, placement, this._sessionManager.getGameSessionId(), this._gamerServerId, OperativeEventManager.getPreviousPlacementId(), videoOrientation, adUnitStyle).then(fulfilled);
     }
 
-    public sendView(session: Session, placement: Placement, campaign: Campaign, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<void> {
+    public sendView(session: Session, placement: Placement, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<void> {
         if(session.getEventSent(EventType.VIEW)) {
             return Promise.resolve(void(0));
         }
@@ -190,7 +190,7 @@ export class OperativeEventManager {
         return this.createUniqueEventMetadata(session, placement, this._sessionManager.getGameSessionId(), this._gamerServerId, OperativeEventManager.getPreviousPlacementId(), videoOrientation, adUnitStyle).then(fulfilled);
     }
 
-    public sendClick(session: Session, placement: Placement, campaign: Campaign, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<void> {
+    public sendClick(session: Session, placement: Placement, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<void> {
         if(session.getEventSent(EventType.CLICK)) {
             return Promise.resolve(void(0));
         }
@@ -226,7 +226,7 @@ export class OperativeEventManager {
         });
     }
 
-    public sendHttpKafkaEvent(kafkaType: string, eventType: string, session: Session, placement: Placement, campaign: Campaign, videoOrientation?: string) {
+    public sendHttpKafkaEvent(kafkaType: string, eventType: string, session: Session, placement: Placement, videoOrientation?: string) {
         const fulfilled = ([id, infoJson]: [string, any]) => {
 
             // todo: clears duplicate data for httpkafka, should be cleaned up

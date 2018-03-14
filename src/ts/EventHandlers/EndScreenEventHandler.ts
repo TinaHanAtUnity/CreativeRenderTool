@@ -80,9 +80,9 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
 
         if(!(this._adUnit instanceof XPromoAdUnit)) {
-            this._operativeEventManager.sendClick(this._campaign.getSession(), this._placement, this._campaign, this.getVideoOrientation(), parameters.adUnitStyle);
+            this._operativeEventManager.sendClick(this._campaign.getSession(), this._placement, this.getVideoOrientation(), parameters.adUnitStyle);
         } else {
-            this._operativeEventManager.sendHttpKafkaEvent('ads.xpromo.operative.videoclick.v1.json', 'click',  this._campaign.getSession(), this._placement, this._campaign, this.getVideoOrientation());
+            this._operativeEventManager.sendHttpKafkaEvent('ads.xpromo.operative.videoclick.v1.json', 'click',  this._campaign.getSession(), this._placement, this.getVideoOrientation());
             if(this._campaign instanceof XPromoCampaign) {
                 const clickTrackingUrls = this._campaign.getTrackingUrlsForEvent('click');
                 for (const url of clickTrackingUrls) {
@@ -105,9 +105,9 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
 
         if(!(this._adUnit instanceof XPromoAdUnit)) {
-            this._operativeEventManager.sendClick(this._campaign.getSession(), this._placement, this._campaign, this.getVideoOrientation(), parameters.adUnitStyle);
+            this._operativeEventManager.sendClick(this._campaign.getSession(), this._placement, this.getVideoOrientation(), parameters.adUnitStyle);
         } else {
-            this._operativeEventManager.sendHttpKafkaEvent('ads.xpromo.operative.videoclick.v1.json', 'click', this._campaign.getSession(), this._placement, this._campaign, this.getVideoOrientation());
+            this._operativeEventManager.sendHttpKafkaEvent('ads.xpromo.operative.videoclick.v1.json', 'click', this._campaign.getSession(), this._placement, this.getVideoOrientation());
             if(this._campaign instanceof XPromoCampaign) {
                 const clickTrackingUrls = this._campaign.getTrackingUrlsForEvent('click');
                 for (const url of clickTrackingUrls) {

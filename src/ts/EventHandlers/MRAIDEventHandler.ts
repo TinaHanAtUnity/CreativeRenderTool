@@ -43,13 +43,13 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
     public onMraidClick(url: string): Promise<void> {
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
         if(!this._campaign.getSession().getEventSent(EventType.THIRD_QUARTILE)) {
-            this._operativeEventManager.sendThirdQuartile(this._campaign.getSession(), this._placement, this._campaign);
+            this._operativeEventManager.sendThirdQuartile(this._campaign.getSession(), this._placement);
         }
         if(!this._campaign.getSession().getEventSent(EventType.VIEW)) {
-            this._operativeEventManager.sendView(this._campaign.getSession(), this._placement, this._campaign);
+            this._operativeEventManager.sendView(this._campaign.getSession(), this._placement);
         }
         if(!this._campaign.getSession().getEventSent(EventType.CLICK)) {
-            this._operativeEventManager.sendClick(this._campaign.getSession(), this._placement, this._campaign);
+            this._operativeEventManager.sendClick(this._campaign.getSession(), this._placement);
         }
 
         this._adUnit.sendClick();
@@ -70,7 +70,7 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
     }
 
     public onMraidReward(): void {
-        this._operativeEventManager.sendThirdQuartile(this._campaign.getSession(), this._placement, this._campaign);
+        this._operativeEventManager.sendThirdQuartile(this._campaign.getSession(), this._placement);
     }
 
     public onMraidSkip(): void {
