@@ -121,7 +121,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             });
 
             sinon.assert.notCalled(<sinon.SinonSpy>operativeEventManager.sendClick);
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendHttpKafkaEvent, 'ads.xpromo.operative.videoclick.v1.json', 'click', campaign.getSession(), placement, campaign, xPromoAdUnit.getVideoOrientation());
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendHttpKafkaEvent, 'ads.xpromo.operative.videoclick.v1.json', 'click', campaign.getSession(), placement, xPromoAdUnit.getVideoOrientation());
         });
 
     });
@@ -202,7 +202,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             });
 
             sinon.assert.notCalled(<sinon.SinonSpy>operativeEventManager.sendClick);
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendHttpKafkaEvent, 'ads.xpromo.operative.videoclick.v1.json', 'click', campaign.getSession(), placement, campaign, xPromoAdUnit.getVideoOrientation());
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendHttpKafkaEvent, 'ads.xpromo.operative.videoclick.v1.json', 'click', campaign.getSession(), placement, xPromoAdUnit.getVideoOrientation());
         });
     });
 });

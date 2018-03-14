@@ -198,7 +198,7 @@ describe('VideoEventHandlersTest', () => {
 
             VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, comScoreService, performanceAdUnit, 1, TestFixtures.getConfiguration(), performanceCampaign, placement);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendStart, performanceCampaign.getSession(), placement, performanceCampaign);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendStart, performanceCampaign.getSession(), placement);
         });
 
         it('should invoke onUnityAdsStart callback ', () => {
@@ -249,7 +249,7 @@ describe('VideoEventHandlersTest', () => {
             performanceAdUnit.getVideo().setPosition(4000);
             VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, comScoreService, performanceAdUnit, 6000, TestFixtures.getConfiguration(), performanceCampaign, placement);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendFirstQuartile, performanceCampaign.getSession(), placement, performanceCampaign);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendFirstQuartile, performanceCampaign.getSession(), placement);
         });
 
         it('should send midpoint event', () => {
@@ -259,7 +259,7 @@ describe('VideoEventHandlersTest', () => {
             performanceAdUnit.getVideo().setPosition(9000);
             VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, comScoreService, performanceAdUnit, 11000, TestFixtures.getConfiguration(), performanceCampaign, placement);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendMidpoint, performanceCampaign.getSession(), placement, performanceCampaign);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendMidpoint, performanceCampaign.getSession(), placement);
         });
 
         it('should send third quartile event', () => {
@@ -269,7 +269,7 @@ describe('VideoEventHandlersTest', () => {
             performanceAdUnit.getVideo().setPosition(14000);
             VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, comScoreService, performanceAdUnit, 16000, TestFixtures.getConfiguration(), performanceCampaign, placement);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile, performanceCampaign.getSession(), placement, performanceCampaign);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile, performanceCampaign.getSession(), placement);
         });
     });
 
@@ -299,7 +299,7 @@ describe('VideoEventHandlersTest', () => {
         it('should send view to session manager', () => {
             VideoEventHandlers.onVideoCompleted(operativeEventManager, thirdPartyEventManager, comScoreService, performanceAdUnit, performanceCampaign, placement);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendView, performanceCampaign.getSession(), placement, performanceCampaign);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendView, performanceCampaign.getSession(), placement);
         });
 
         it('should hide overlay', () => {
@@ -331,7 +331,7 @@ describe('VideoEventHandlersTest', () => {
 
             sinon.assert.notCalled(<sinon.SinonSpy>comScoreService.sendEvent);
             sinon.assert.notCalled(<sinon.SinonSpy>operativeEventManager.sendView);
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendHttpKafkaEvent, 'ads.xpromo.operative.videoview.v1.json', 'view', xPromoAdUnitParameters.campaign.getSession(), placement, xPromoAdUnitParameters.campaign, xPromoAdUnit.getVideoOrientation());
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendHttpKafkaEvent, 'ads.xpromo.operative.videoview.v1.json', 'view', xPromoAdUnitParameters.campaign.getSession(), placement, xPromoAdUnit.getVideoOrientation());
         });
     });
 
@@ -629,7 +629,7 @@ describe('VideoEventHandlersTest', () => {
             VideoEventHandlers.onVideoProgress(nativeBridge, operativeEventManager, thirdPartyEventManager, comScoreService, xPromoAdUnit, 1, TestFixtures.getConfiguration(), xPromoCampaign, placement);
 
             sinon.assert.notCalled(<sinon.SinonSpy>operativeEventManager.sendEvent);
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendHttpKafkaEvent, 'ads.xpromo.operative.videostart.v1.json', 'start', xPromoAdUnitParameters.campaign.getSession(), placement, xPromoAdUnitParameters.campaign, xPromoAdUnit.getVideoOrientation());
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendHttpKafkaEvent, 'ads.xpromo.operative.videostart.v1.json', 'start', xPromoAdUnitParameters.campaign.getSession(), placement, xPromoAdUnit.getVideoOrientation());
         });
     });
 });
