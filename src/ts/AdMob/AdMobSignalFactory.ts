@@ -37,6 +37,8 @@ export class AdMobSignalFactory {
         signal.setAdLoadDuration(adUnit.getRequestToReadyTime());
         signal.setSequenceNumber(SdkStats.getAdRequestOrdinal());
         signal.setIsNetworkMetered(this._deviceInfo.getNetworkMetered());
+        signal.setIsJailbroken(this._deviceInfo.isRooted());
+        signal.setIsDeviceCharging(this.checkChargingStatus());
 
         let deviceIncapabilities = '';
         if (this._deviceInfo instanceof AndroidDeviceInfo) {
@@ -85,6 +87,12 @@ export class AdMobSignalFactory {
     public getAdRequestSignal(): Promise<AdMobSignal> {
         return this.getCommonSignal();
     }
+
+    public checkChargingStatus(): boolean {
+        if (this._deviceInfo.get('batteryStatus') === 2) {
+            return true;
+        }
+        return false;    }
 
     public getClickSignal(touchInfo: ITouchInfo, adUnit: AdMobAdUnit): Promise<AdMobSignal> {
         return this.getCommonSignal().then(signal => {
