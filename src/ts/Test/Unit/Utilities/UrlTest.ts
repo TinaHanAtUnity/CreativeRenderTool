@@ -78,11 +78,11 @@ describe('UrlTest', () => {
     });
 
     describe('validating UTF-8', () => {
-        it('should not allow unicode utf-8 characters', () => {
+        it('should allow unicode utf-8 characters', () => {
             let url = 'https://cdn-highwinds.unityads.unity3d.com/assets/29587943-3ee9-4490-a181-de372e9c7097/FRVideo19unity封面.png';
-            assert.isFalse(Url.isValid(url), 'Should allow unicode characters, test 1');
+            assert.isTrue(Url.isValid(url), 'Should allow unicode characters, test 1');
             url = 'https://cdn.unityads.unity3d.com/assets/f28676c2-5feb-4aa7-94fb-70c9c901cd57/800×600.png';
-            assert.isFalse(Url.isValid(url), 'Should allow unicode characters, test 2');
+            assert.isTrue(Url.isValid(url), 'Should allow unicode characters, test 2');
         });
     });
 
