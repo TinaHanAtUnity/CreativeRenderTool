@@ -39,22 +39,7 @@ export class AdMobSignalFactory {
         signal.setIsNetworkMetered(this._deviceInfo.getNetworkMetered());
         signal.setIsJailbroken(this._deviceInfo.isRooted());
         signal.setIsDeviceCharging(this.checkChargingStatus());
-
-        let deviceIncapabilities = '';
-        if (this._deviceInfo instanceof AndroidDeviceInfo) {
-            if (!(<AndroidDeviceInfo>this._deviceInfo).isGoogleStoreInstalled()) {
-                deviceIncapabilities += 'a';
-            }
-            if (!(<AndroidDeviceInfo>this._deviceInfo).isGoogleMapsInstalled()) {
-                deviceIncapabilities += 'm';
-            }
-            if (!(<AndroidDeviceInfo>this._deviceInfo).isTelephonyInstalled()) {
-                deviceIncapabilities += 't';
-            }
-        } else {
-            deviceIncapabilities += 'atm';
-        }
-        signal.setDeviceIncapabilities(deviceIncapabilities);
+        signal.setDeviceIncapabilities(this.checkDeviceIncapabilities());
 
         const promises = [];
         promises.push(this._deviceInfo.getBatteryLevel().then(batteryLevel => {
@@ -92,7 +77,26 @@ export class AdMobSignalFactory {
         if (this._deviceInfo.get('batteryStatus') === 2) {
             return true;
         }
-        return false;    }
+        return false;
+    }
+
+    public checkDeviceIncapabilities(): string {
+        let deviceIncapabilities = '';
+        if (this._deviceInfo instanceof AndroidDeviceInfo) {
+            if (!(<AndroidDeviceInfo>this._deviceInfo).isGoogleStoreInstalled()) {
+                deviceIncapabilities += 'a';
+            }
+            if (!(<AndroidDeviceInfo>this._deviceInfo).isGoogleMapsInstalled()) {
+                deviceIncapabilities += 'm';
+            }
+            if (!(<AndroidDeviceInfo>this._deviceInfo).isTelephonyInstalled()) {
+                deviceIncapabilities += 't';
+            }
+        } else {
+            deviceIncapabilities += 'atm';
+        }
+        return deviceIncapabilities;
+    }
 
     public getClickSignal(touchInfo: ITouchInfo, adUnit: AdMobAdUnit): Promise<AdMobSignal> {
         return this.getCommonSignal().then(signal => {
