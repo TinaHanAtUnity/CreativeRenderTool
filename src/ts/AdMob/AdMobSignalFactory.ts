@@ -36,7 +36,6 @@ export class AdMobSignalFactory {
 
         signal.setAdLoadDuration(adUnit.getRequestToReadyTime());
         signal.setSequenceNumber(SdkStats.getAdRequestOrdinal());
-        signal.setIsNetworkMetered(this._deviceInfo.getNetworkMetered());
         signal.setIsJailbroken(this._deviceInfo.isRooted());
         signal.setIsDeviceCharging(this.checkChargingStatus());
         signal.setDeviceIncapabilities(this.checkDeviceIncapabilities());
