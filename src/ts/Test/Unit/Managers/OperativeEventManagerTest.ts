@@ -179,7 +179,7 @@ describe('OperativeEventManagerTest', () => {
     let request: Request;
     let metaDataManager: MetaDataManager;
     let sessionManager: SessionManager;
-    let operativeEventManagerParams: IOperativeEventManagerParams;
+    let operativeEventManagerParams: IOperativeEventManagerParams<Campaign>;
     let campaign: Campaign = TestFixtures.getCampaign();
 
     beforeEach(() => {
@@ -313,7 +313,7 @@ describe('OperativeEventManagerTest', () => {
 
         describe('should send the proper data', () => {
             it('common data', () => {
-                return operativeEventManager.sendClick(session, placement).then(() => {
+                return operativeEventManager.sendClick(placement).then(() => {
                     assert(requestSpy.calledOnce, 'Operative event did not send POST request');
                     const data = JSON.parse(requestSpy.getCall(0).args[1]);
 
@@ -345,7 +345,7 @@ describe('OperativeEventManagerTest', () => {
             });
 
             it('PerformanceCampaign specific', () => {
-                return operativeEventManager.sendClick(session, placement).then(() => {
+                return operativeEventManager.sendClick(placement).then(() => {
                     assert(requestSpy.calledOnce, 'Operative event did not send POST request');
                     const data = JSON.parse(requestSpy.getCall(0).args[1]);
                     const url = requestSpy.getCall(0).args[0];
@@ -364,7 +364,7 @@ describe('OperativeEventManagerTest', () => {
                 };
 
                 operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(params);
-                return operativeEventManager.sendClick(session, placement).then(() => {
+                return operativeEventManager.sendClick(placement).then(() => {
                     assert(requestSpy.calledOnce, 'Operative event did not send POST request');
                     const data = JSON.parse(requestSpy.getCall(0).args[1]);
                     const url = requestSpy.getCall(0).args[0];
@@ -383,7 +383,7 @@ describe('OperativeEventManagerTest', () => {
                 };
 
                 operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(params);
-                return operativeEventManager.sendClick(session, placement).then(() => {
+                return operativeEventManager.sendClick(placement).then(() => {
                     assert(requestSpy.calledOnce, 'Operative event did not send POST request');
                     const data = JSON.parse(requestSpy.getCall(0).args[1]);
                     const url = requestSpy.getCall(0).args[0];
@@ -402,7 +402,7 @@ describe('OperativeEventManagerTest', () => {
                 };
 
                 operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(params);
-                return operativeEventManager.sendClick(session, placement).then(() => {
+                return operativeEventManager.sendClick(placement).then(() => {
                     assert(requestSpy.calledOnce, 'Operative event did not send POST request');
                     const data = JSON.parse(requestSpy.getCall(0).args[1]);
                     const url = requestSpy.getCall(0).args[0];
@@ -421,7 +421,7 @@ describe('OperativeEventManagerTest', () => {
                 };
 
                 operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(params);
-                return operativeEventManager.sendClick(session, placement).then(() => {
+                return operativeEventManager.sendClick(placement).then(() => {
                     assert(requestSpy.calledOnce, 'Operative event did not send POST request');
                     const data = JSON.parse(requestSpy.getCall(0).args[1]);
                     const url = requestSpy.getCall(0).args[0];

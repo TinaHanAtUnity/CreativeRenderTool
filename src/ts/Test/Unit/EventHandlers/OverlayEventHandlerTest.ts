@@ -132,7 +132,7 @@ describe('OverlayEventHandlerTest', () => {
         });
 
         it('should send skip', () => {
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendSkip, campaign.getSession(), placement, performanceAdUnit.getVideo().getPosition());
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendSkip, placement, performanceAdUnit.getVideo().getPosition());
         });
 
         it('should call reconfigure', () => {
