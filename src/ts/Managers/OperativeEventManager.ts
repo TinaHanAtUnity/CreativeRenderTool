@@ -241,7 +241,42 @@ export class OperativeEventManager {
         });
     }
 
-    protected getInfoJson(placement: Placement, eventId: string, gameSession: number, gamerSid?: string, previousPlacementId?: string, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<[string, any]> {
+    protected createVideoEventUrl(type: string): string {
+        return [
+            OperativeEventManager.VideoEventBaseUrl,
+            this._campaign.getGamerId(),
+            'video',
+            type,
+            this._campaign.getId(),
+            this._clientInfo.getGameId()
+        ].join('/');
+    }
+
+    protected createClickEventUrl(): string {
+        let url: string | undefined;
+        let parameters: any;
+
+        url = [
+            OperativeEventManager.ClickEventBaseUrl,
+            this._campaign.getId(),
+            'click',
+            this._campaign.getGamerId(),
+        ].join('/');
+        parameters = {
+            gameId: this._clientInfo.getGameId(),
+            redirect: false
+        };
+
+        return Url.addParameters(url, parameters);
+    }
+
+    protected createUniqueEventMetadata(placement: Placement, gameSession: number, gamerSid?: string, previousPlacementId?: string, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<[string, any]> {
+        return this._nativeBridge.DeviceInfo.getUniqueEventId().then(id => {
+            return this.getInfoJson(placement, id, gameSession, gamerSid, previousPlacementId, videoOrientation, adUnitStyle);
+        });
+    }
+
+    private getInfoJson(placement: Placement, eventId: string, gameSession: number, gamerSid?: string, previousPlacementId?: string, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<[string, any]> {
         let infoJson: any = {
             'eventId': eventId,
             'auctionId': this._campaign.getSession().getId(),
@@ -313,41 +348,6 @@ export class OperativeEventManager {
             }
 
             return <[string, any]>[eventId, infoJson];
-        });
-    }
-
-    protected createVideoEventUrl(type: string): string {
-        return [
-            OperativeEventManager.VideoEventBaseUrl,
-            this._campaign.getGamerId(),
-            'video',
-            type,
-            this._campaign.getId(),
-            this._clientInfo.getGameId()
-        ].join('/');
-    }
-
-    protected createClickEventUrl(): string {
-        let url: string | undefined;
-        let parameters: any;
-
-        url = [
-            OperativeEventManager.ClickEventBaseUrl,
-            this._campaign.getId(),
-            'click',
-            this._campaign.getGamerId(),
-        ].join('/');
-        parameters = {
-            gameId: this._clientInfo.getGameId(),
-            redirect: false
-        };
-
-        return Url.addParameters(url, parameters);
-    }
-
-    protected createUniqueEventMetadata(placement: Placement, gameSession: number, gamerSid?: string, previousPlacementId?: string, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<[string, any]> {
-        return this._nativeBridge.DeviceInfo.getUniqueEventId().then(id => {
-            return this.getInfoJson(placement, id, gameSession, gamerSid, previousPlacementId, videoOrientation, adUnitStyle);
         });
     }
 }
