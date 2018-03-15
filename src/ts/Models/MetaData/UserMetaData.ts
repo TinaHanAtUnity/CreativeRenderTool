@@ -14,7 +14,7 @@ export class UserMetaData extends BaseMetaData<IUserMetaData> {
         });
 
         this.set('category', 'user');
-        this.set('keys', ['requestCount', 'version']);
+        this.set('keys', ['requestCount', 'clickCount']);
     }
 
     public getRequestCount(): number {
