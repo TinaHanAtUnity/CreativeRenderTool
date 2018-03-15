@@ -14,24 +14,6 @@ export class PerformanceOperativeEventManager extends OperativeEventManager {
         this._performanceCampaign = params.campaign;
     }
 
-    protected getInfoJson(placement: Placement, eventId: string, gameSession: number, gamerSid?: string, previousPlacementId?: string, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<[string, any]> {
-        return super.getInfoJson(placement, eventId, gameSession, gamerSid, previousPlacementId, videoOrientation, adUnitStyle).then(([id, infoJson]) => {
-            const landscapeVideo = this._performanceCampaign.getVideo();
-            const portraitVideo = this._performanceCampaign.getPortraitVideo();
-            if(landscapeVideo && landscapeVideo.isCached()) {
-                infoJson.cached = true;
-                infoJson.cachedOrientation = 'landscape';
-            } else if(portraitVideo && portraitVideo.isCached()) {
-                infoJson.cached = true;
-                infoJson.cachedOrientation = 'portrait';
-            } else {
-                infoJson.cached = false;
-            }
-
-            return <[string, any]>[id, infoJson];
-        });
-    }
-
     protected createVideoEventUrl(type: string): string {
         return this._performanceCampaign.getVideoEventUrl(type);
     }

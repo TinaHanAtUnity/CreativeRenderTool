@@ -42,21 +42,4 @@ export class XPromoOperativeEventManager extends OperativeEventManager {
 
         return this.createUniqueEventMetadata(placement, this._sessionManager.getGameSessionId(), this._gamerServerId, OperativeEventManager.getPreviousPlacementId(), videoOrientation).then(fulfilled);
     }
-    protected getInfoJson(placement: Placement, eventId: string, gameSession: number, gamerSid?: string, previousPlacementId?: string, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<[string, any]> {
-        return super.getInfoJson(placement, eventId, gameSession, gamerSid, previousPlacementId, videoOrientation, adUnitStyle).then(([id, infoJson]) => {
-            const landscapeVideo = this._xPromoCampaign.getVideo();
-            const portraitVideo = this._xPromoCampaign.getPortraitVideo();
-            if(landscapeVideo && landscapeVideo.isCached()) {
-                infoJson.cached = true;
-                infoJson.cachedOrientation = 'landscape';
-            } else if(portraitVideo && portraitVideo.isCached()) {
-                infoJson.cached = true;
-                infoJson.cachedOrientation = 'portrait';
-            } else {
-                infoJson.cached = false;
-            }
-
-            return <[string, any]>[id, infoJson];
-        });
-    }
 }
