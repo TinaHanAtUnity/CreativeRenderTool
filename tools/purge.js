@@ -26,18 +26,6 @@ const cdnConfig = {
         'bearer': process.env.HIGHWINDS_BEARER,
         'account_hash': process.env.HIGHWINDS_ACCOUNT_HASH
     },
-    'chinanetcenter': {
-        'base_urls': [
-            'china-cdn.unityads.unity3d.com',
-            'cdn.unityads.unity3d.com',
-            'geocdn.unityads.unity3d.com',
-            'config.unityads.unity3d.com',
-            'webview.unityads.unity3d.com'
-        ],
-        'check_url': 'china-cdn.unityads.unity3d.com',
-        'username': process.env.CHINANETCENTER_USERNAME,
-        'password': process.env.CHINANETCENTER_PASSWORD
-    },
     'alibabacloud': {
         'base_urls': [
             'china-cdn2.unityads.unity3d.com',
@@ -299,14 +287,12 @@ if(branch === '2.0.6') {
 let purgeList = [
     purgeAkamai(urlRoot),
     purgeHighwinds(urlRoot),
-    purgeChinaNetCenter(urlRoot),
     purgeAliBabaCloud(urlRoot)
 ];
 
 if(branch === '2.0.6') {
     purgeList.push(purgeAkamai('/webview/2.0.6'));
     purgeList.push(purgeHighwinds('/webview/2.0.6'));
-    purgeList.push(purgeChinaNetCenter('/webview/2.0.6'));
     purgeList.push(purgeAliBabaCloud('/webview/2.0.6'));
 }
 
