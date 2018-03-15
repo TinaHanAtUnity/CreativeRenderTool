@@ -46,12 +46,11 @@ import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { OldCampaignRefreshManager } from 'Managers/OldCampaignRefreshManager';
+import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
-import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
-import { Campaign } from 'Models/Campaign';
 
 export class WebView {
 
@@ -74,7 +73,6 @@ export class WebView {
     private _currentAdUnit: AbstractAdUnit;
 
     private _sessionManager: SessionManager;
-    // private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _comScoreTrackingService: ComScoreTrackingService;
     private _wakeUpManager: WakeUpManager;
