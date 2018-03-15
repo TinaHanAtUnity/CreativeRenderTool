@@ -393,7 +393,7 @@ export class WebView {
             this._campaignManager.setPreviousPlacementId(placement.getId());
 
             // Temporary for realtime testing purposes
-            if ((placement.getRealtimeData) && (testGroup === 7 || testGroup === 8)) {
+            if ((placement.getRealtimeData()) && (testGroup === 7 || testGroup === 8)) {
                 const latency = Date.now() - start;
                 Diagnostics.trigger('realtime_render_latency', {
                     latency: latency,
