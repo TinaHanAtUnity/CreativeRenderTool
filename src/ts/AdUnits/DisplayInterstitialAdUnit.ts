@@ -158,7 +158,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
         if(this._clickEventHasBeenSent) {
             return;
         }
-        this._operativeEventManager.sendClick(this._campaign.getSession(), this._placement);
+        this._operativeEventManager.sendClick(this._placement);
         this._clickEventHasBeenSent = true;
 
         for (let trackingUrl of this._campaign.getTrackingUrlsForEvent('click')) {
@@ -206,7 +206,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
             url = url.replace(/%SDK_VERSION%/, this._operativeEventManager.getClientInfo().getSdkVersion().toString());
             this._thirdPartyEventManager.sendEvent('display impression', this._campaign.getSession().getId(), url);
         }
-        this._operativeEventManager.sendStart(this._campaign.getSession(), this._placement).then(() => {
+        this._operativeEventManager.sendStart(this._placement).then(() => {
             this.onStartProcessed.trigger();
         });
     }
