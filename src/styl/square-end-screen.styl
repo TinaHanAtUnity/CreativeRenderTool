@@ -7,7 +7,12 @@
   }
 
   .privacy-button {
+    bottom: 0;
     left: 0;
+  }
+
+  .unityads-logo {
+    bottom: 0;
   }
 
   .game-image-container {
@@ -92,7 +97,7 @@
     }
 
     .game-background-blurred {
-      display: block;
+      display: none;
     }
   }
 }
@@ -118,6 +123,19 @@
 
     .download-container {
       font-size: 1.05rem;
+    }
+  }
+}
+
+/* iPhone X fixes */
+@media only screen and (device-width : 375px) and (device-height : 812px) and (-webkit-device-pixel-ratio : 3) {
+  &.landscape #end-screen.square-end-screen {
+    .game-image {
+      background-position: left;
+    }
+
+    .privacy-button {
+      left: -14px;
     }
   }
 }
