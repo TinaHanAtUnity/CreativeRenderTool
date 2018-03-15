@@ -439,5 +439,12 @@
     "description": "Style of the ad unit",
     "provider": "SDK",
     "platforms": "all"
+  },
+  {
+    "key": "sessionDepth",
+    "type": "number",
+    "description": "For a given session, how many ads have been delivered currently using adRequestOrdinal",
+    "provider": "SDK",
+    "platforms": "all"
   }
 ]
