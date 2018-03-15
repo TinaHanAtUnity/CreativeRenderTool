@@ -167,24 +167,47 @@ export class AnalyticsProtocol {
     }
 
     private static getScreen(nativeBridge: NativeBridge, deviceInfo: DeviceInfo): Promise<string> {
-        return Promise.all([
-            deviceInfo.getScreenWidth(),
-            deviceInfo.getScreenHeight(),
-        ]).then(([width, height]) => {
-            let screenWidth = width;
-            let screenHeight = height;
-            if (screenHeight > screenWidth) {
-                screenWidth = height;
-                screenHeight = width;
-            }
+        if(nativeBridge.getPlatform() === Platform.IOS) {
+            return Promise.all([
+                deviceInfo.getScreenWidth(),
+                deviceInfo.getScreenHeight(),
+                nativeBridge.DeviceInfo.Ios.isStatusBarHidden(),
+                nativeBridge.DeviceInfo.Ios.getStatusBarHeight()
+            ]).then(([width, height, statusBarHidden, statusBarHeight]) => {
+                let screenWidth = width;
+                let screenHeight = height;
 
-            if(nativeBridge.getPlatform() === Platform.IOS && deviceInfo instanceof IosDeviceInfo) {
-                screenWidth = screenWidth / deviceInfo.getScreenScale();
-                screenHeight = screenHeight / deviceInfo.getScreenScale();
-            }
+                if(!statusBarHidden) {
+                    screenHeight = screenHeight + statusBarHeight;
+                }
 
-            return Promise.resolve(screenWidth + ' x ' + screenHeight);
-        });
+                if (screenHeight > screenWidth) {
+                    screenWidth = height;
+                    screenHeight = width;
+                }
+
+                if(deviceInfo instanceof IosDeviceInfo) {
+                    screenWidth = screenWidth * deviceInfo.getScreenScale();
+                    screenHeight = screenHeight * deviceInfo.getScreenScale();
+                }
+
+                return Promise.resolve(screenWidth + ' x ' + screenHeight);
+            });
+        } else {
+            return Promise.all([
+                deviceInfo.getScreenWidth(),
+                deviceInfo.getScreenHeight(),
+            ]).then(([width, height]) => {
+                let screenWidth = width;
+                let screenHeight = height;
+                if (screenHeight > screenWidth) {
+                    screenWidth = height;
+                    screenHeight = width;
+                }
+
+                return Promise.resolve(screenWidth + ' x ' + screenHeight);
+            });
+        }
     }
 
     private static getDeviceModel(nativeBridge: NativeBridge, deviceInfo: DeviceInfo): Promise<string> {
