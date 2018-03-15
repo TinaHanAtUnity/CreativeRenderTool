@@ -22,6 +22,7 @@ import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { SessionManager } from 'Managers/SessionManager';
 
 import EventTestVast from 'xml/EventTestVast.xml';
+import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 
 describe('VastEndScreenEventHandlersTest', () => {
     const handleInvocation = sinon.spy();
@@ -51,8 +52,17 @@ describe('VastEndScreenEventHandlersTest', () => {
         const clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         const deviceInfo = TestFixtures.getAndroidDeviceInfo();
         const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        const sessionManager = new SessionManager(nativeBridge);
-        const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+        const sessionManager = new SessionManager(nativeBridge, request);
+        const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
+            nativeBridge: nativeBridge,
+            request: request,
+            metaDataManager: metaDataManager,
+            sessionManager: sessionManager,
+            clientInfo: clientInfo,
+            deviceInfo: deviceInfo,
+            campaign: campaign
+        });
+
         const video = new Video('', TestFixtures.getSession());
         const overlay = new Overlay(nativeBridge, true, 'en', 'testGameId');
         comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);

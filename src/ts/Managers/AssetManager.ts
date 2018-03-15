@@ -219,7 +219,7 @@ export class AssetManager {
     }
 
     private queueAsset(url: string, diagnostics: ICacheDiagnostics, cacheType: CacheType): Promise<string[]> {
-        return new Promise<string[]>((resolve,reject) => {
+        return new Promise<string[]>((resolve, reject) => {
             const queueObject: IAssetQueueObject = {
                 url: url,
                 diagnostics: diagnostics,
@@ -320,7 +320,7 @@ export class AssetManager {
     }
 
     private registerCampaign(campaign: Campaign, id: number): Promise<Campaign> {
-        return new Promise<Campaign>((resolve,reject) => {
+        return new Promise<Campaign>((resolve, reject) => {
             const queueObject: ICampaignQueueObject = {
                 campaign: campaign,
                 resolved: false,

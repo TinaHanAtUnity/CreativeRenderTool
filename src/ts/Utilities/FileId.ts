@@ -33,12 +33,12 @@ export class FileId {
     }
 
     public static getFileIdHash(fileId: string): string {
-        const fileIdSplit = fileId.split(".", 2);
+        const fileIdSplit = fileId.split('.', 2);
         return fileIdSplit[0];
     }
 
     public static getFileIdExtension(fileId: string): string {
-        const fileIdSplit = fileId.split(".", 2);
+        const fileIdSplit = fileId.split('.', 2);
         return fileIdSplit[1];
     }
 

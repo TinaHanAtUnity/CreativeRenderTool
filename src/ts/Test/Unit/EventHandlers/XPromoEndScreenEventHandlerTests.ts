@@ -18,13 +18,14 @@ import { XPromoCampaign, StoreName } from 'Models/Campaigns/XPromoCampaign';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { Video } from 'Models/Assets/Video';
 import { FocusManager } from 'Managers/FocusManager';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { XPromoEndScreen } from 'Views/XPromoEndScreen';
 import { Placement } from 'Models/Placement';
 import { XPromoEndScreenEventHandler } from 'EventHandlers/XPromoEndScreenEventHandler';
 import { IXPromoAdUnitParameters, XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
+import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
+import { XPromoOperativeEventManager } from 'Managers/XPromoOperativeEventManager';
 
 describe('XPromoEndScreenEventHandlerTest', () => {
 
@@ -35,7 +36,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
     let xPromoAdUnit: XPromoAdUnit;
     let metaDataManager: MetaDataManager;
     let focusManager: FocusManager;
-    let operativeEventManager: OperativeEventManager;
+    let operativeEventManager: XPromoOperativeEventManager;
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
     let thirdPartyEventManager: ThirdPartyEventManager;
@@ -63,8 +64,16 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
             deviceInfo = TestFixtures.getAndroidDeviceInfo();
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-            sessionManager = new SessionManager(nativeBridge);
-            operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+            sessionManager = new SessionManager(nativeBridge, request);
+            operativeEventManager = <XPromoOperativeEventManager>OperativeEventManagerFactory.createOperativeEventManager({
+                nativeBridge: nativeBridge,
+                request: request,
+                metaDataManager: metaDataManager,
+                sessionManager: sessionManager,
+                clientInfo: clientInfo,
+                deviceInfo: deviceInfo,
+                campaign: campaign
+            });
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
             comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
@@ -112,7 +121,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             });
 
             sinon.assert.notCalled(<sinon.SinonSpy>operativeEventManager.sendClick);
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendHttpKafkaEvent, 'ads.xpromo.operative.videoclick.v1.json', 'click', campaign.getSession(), placement, campaign, xPromoAdUnit.getVideoOrientation());
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendHttpKafkaEvent, 'ads.xpromo.operative.videoclick.v1.json', 'click', placement, xPromoAdUnit.getVideoOrientation());
         });
 
     });
@@ -132,8 +141,16 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             clientInfo = TestFixtures.getClientInfo(Platform.IOS);
             deviceInfo = TestFixtures.getIosDeviceInfo();
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-            sessionManager = new SessionManager(nativeBridge);
-            operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+            sessionManager = new SessionManager(nativeBridge, request);
+            operativeEventManager = <XPromoOperativeEventManager>OperativeEventManagerFactory.createOperativeEventManager({
+                nativeBridge: nativeBridge,
+                request: request,
+                metaDataManager: metaDataManager,
+                sessionManager: sessionManager,
+                clientInfo: clientInfo,
+                deviceInfo: deviceInfo,
+                campaign: campaign
+            });
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 
             sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
@@ -185,7 +202,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             });
 
             sinon.assert.notCalled(<sinon.SinonSpy>operativeEventManager.sendClick);
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendHttpKafkaEvent, 'ads.xpromo.operative.videoclick.v1.json', 'click', campaign.getSession(), placement, campaign, xPromoAdUnit.getVideoOrientation());
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendHttpKafkaEvent, 'ads.xpromo.operative.videoclick.v1.json', 'click', placement, xPromoAdUnit.getVideoOrientation());
         });
     });
 });

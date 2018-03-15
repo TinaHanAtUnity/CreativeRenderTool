@@ -14,14 +14,14 @@ describe('PurchasingUtilitiesTest', () => {
     let nativeBridge: NativeBridge;
     let purchasing: PurchasingApi;
     let sdk: SdkApi;
-    const promoCatalog = "[\n  {\n    \"localizedPriceString\" : \"$0.00\",\n    \"localizedTitle\" : \"Sword of Minimal Value\",\n    \"productId\" : \"myPromo\"\n  },\n  {\n    \"localizedPriceString\" : \"$0.99\",\n    \"localizedTitle\" : \"100 in-game Gold Coins\",\n    \"productId\" : \"100.gold.coins\"\n  }\n]";
+    const promoCatalog = '[\n  {\n    \"localizedPriceString\" : \"$0.00\",\n    \"localizedTitle\" : \"Sword of Minimal Value\",\n    \"productId\" : \"myPromo\"\n  },\n  {\n    \"localizedPriceString\" : \"$0.99\",\n    \"localizedTitle\" : \"100 in-game Gold Coins\",\n    \"productId\" : \"100.gold.coins\"\n  }\n]';
     const iapPayload: IPromoPayload = {
-        gamerId: "111",
+        gamerId: '111',
         iapPromo: true,
-        gameId: "222",
+        gameId: '222',
         abGroup: 1,
         request: IPromoRequest.PURCHASE,
-        purchaseTrackingUrls: ["https://www.scooooooooter.com", "https://www.scottyboy.com"]
+        purchaseTrackingUrls: ['https://www.scooooooooter.com', 'https://www.scottyboy.com']
     };
 
     beforeEach(() => {
@@ -71,12 +71,12 @@ describe('PurchasingUtilitiesTest', () => {
 
             it('should indicate the correct price for an available product', () => {
                 sinon.assert.called(<sinon.SinonStub>purchasing.getPromoCatalog);
-                assert.equal("$0.99", PurchasingUtilities.productPrice('100.gold.coins'), 'unexpected product price');
+                assert.equal('$0.99', PurchasingUtilities.productPrice('100.gold.coins'), 'unexpected product price');
             });
 
             it('should indicate the correct description for an available product', () => {
                 sinon.assert.called(<sinon.SinonStub>purchasing.getPromoCatalog);
-                assert.equal("100 in-game Gold Coins", PurchasingUtilities.productDescription('100.gold.coins'), 'unexpected product description');
+                assert.equal('100 in-game Gold Coins', PurchasingUtilities.productDescription('100.gold.coins'), 'unexpected product description');
             });
         });
 

@@ -1,6 +1,6 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { NativeApi } from 'Native/NativeApi';
-import { Observable1, Observable0, Observable2 } from "Utilities/Observable";
+import { Observable1, Observable0, Observable2 } from 'Utilities/Observable';
 
 // Platform specific, first three are available on both Android & iOS. The rest are Android only.
 export enum WebplayerEvent {
@@ -123,8 +123,8 @@ export interface IWebPlayerWebSettingsAndroid {
     setSupportZoom?: [ boolean ];
     setTextZoom?: [ number ];
     setUseWideViewPort?: [ boolean ];
-    setLayoutAlgorithm?: [ { type: "Enum", className: "android.webkit.WebSettings$LayoutAlgorithm",
-        value: "NARROW_COLUMNS" | "NORMAL" | "SINGLE_COLUMN" | "TEXT_AUTOSIZING" } ];
+    setLayoutAlgorithm?: [ { type: 'Enum', className: 'android.webkit.WebSettings$LayoutAlgorithm',
+        value: 'NARROW_COLUMNS' | 'NORMAL' | 'SINGLE_COLUMN' | 'TEXT_AUTOSIZING' } ];
 }
 
 export interface IWebPlayerPlayerSettingsAndroid {

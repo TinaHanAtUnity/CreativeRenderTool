@@ -5,6 +5,7 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { SdkStats } from 'Utilities/SdkStats';
+import { Request } from 'Utilities/Request';
 
 export class SessionManager {
     public static getSessionKey(sessionId: string): string {
@@ -16,10 +17,12 @@ export class SessionManager {
     }
 
     private _nativeBridge: NativeBridge;
+    private _request: Request;
     private _gameSessionId: number;
 
-    constructor(nativeBridge: NativeBridge) {
+    constructor(nativeBridge: NativeBridge, request: Request) {
         this._nativeBridge = nativeBridge;
+        this._request = request;
     }
 
     public create(id: string): Session {
@@ -44,14 +47,14 @@ export class SessionManager {
         });
     }
 
-    public sendUnsentSessions(operativeEventManager: OperativeEventManager): Promise<any[]> {
+    public sendUnsentSessions(): Promise<any[]> {
         return this.getUnsentSessions().then(sessions => {
             const promises = sessions.map(sessionId => {
                 return this.isSessionOutdated(sessionId).then(outdated => {
                     if(outdated) {
                         return this.deleteSession(sessionId);
                     } else {
-                        return operativeEventManager.sendUnsentEvents(sessionId);
+                        return this.sendUnsentEvents(sessionId);
                     }
                 });
             });
@@ -90,5 +93,38 @@ export class SessionManager {
         }).catch(() => {
             return true;
         });
+    }
+
+    private sendUnsentEvents(sessionId: string): Promise<any[]> {
+        return this.getUnsentEvents(sessionId).then(events => {
+            return Promise.all(events.map(eventId => {
+                return this.resendEvent(sessionId, eventId);
+            }));
+        });
+    }
+
+    private getUnsentEvents(sessionId: string): Promise<string[]> {
+        return this._nativeBridge.Storage.getKeys(StorageType.PRIVATE, 'session.' + sessionId + '.operative', false);
+    }
+
+    private resendEvent(sessionId: string, eventId: string): Promise<void | void[]> {
+        return this.getStoredEvent(sessionId, eventId).then(([url, data]) => {
+            this._nativeBridge.Sdk.logDebug('Unity Ads operative event: resending operative event to ' + url + ' (session ' + sessionId + ', event ' + eventId + ')');
+            return this._request.post(url, data);
+        }).then(() => {
+            return Promise.all([
+                this._nativeBridge.Storage.delete(StorageType.PRIVATE, OperativeEventManager.getEventKey(sessionId, eventId)),
+                this._nativeBridge.Storage.write(StorageType.PRIVATE)
+            ]);
+        }).catch(() => {
+            // ignore failed resends, they will be retried later
+        });
+    }
+
+    private getStoredEvent(sessionId: string, eventId: string): Promise<string[]> {
+        return Promise.all([
+            this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, OperativeEventManager.getUrlKey(sessionId, eventId)),
+            this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, OperativeEventManager.getDataKey(sessionId, eventId))
+        ]);
     }
 }
