@@ -1,3 +1,10 @@
+# Pending
+
+* iOS screen size fix for analytics
+* Split operative event manager into multiple operative event managers
+* XPromo: parse meta field
+* Use almost white background color in end screen
+
 # Thu Mar 15 09:31:49 UTC 2018
 
 * Disable DeviceInfo.getApkDigest to fix Android 2.2.0 issues
