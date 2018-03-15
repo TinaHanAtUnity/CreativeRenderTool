@@ -26,6 +26,7 @@ import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 
 import EventTestVast from 'xml/EventTestVast.xml';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
+import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 
 describe('VastVideoEventHandlers tests', () => {
     const handleInvocation = sinon.spy();
@@ -81,9 +82,17 @@ describe('VastVideoEventHandlers tests', () => {
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        sessionManager = new SessionManager(nativeBridge);
+        sessionManager = new SessionManager(nativeBridge, request);
 
-        const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+        const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
+            nativeBridge: nativeBridge,
+            request: request,
+            metaDataManager: metaDataManager,
+            sessionManager: sessionManager,
+            clientInfo: clientInfo,
+            deviceInfo: deviceInfo,
+            campaign: campaign
+        });
         const comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         vastAdUnitParameters = {

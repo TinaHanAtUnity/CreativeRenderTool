@@ -9,7 +9,7 @@ import { RequestApi } from 'Native/Api/Request';
 import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { FocusManager } from 'Managers/FocusManager';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { IOperativeEventManagerParams, OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 import { Platform } from 'Constants/Platform';
@@ -20,6 +20,9 @@ import { Placement } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
 import { DeviceInfoApi } from 'Native/Api/DeviceInfo';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
+import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
+import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
+import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 
 class TestStorageApi extends StorageApi {
 
@@ -176,6 +179,8 @@ describe('OperativeEventManagerTest', () => {
     let request: Request;
     let metaDataManager: MetaDataManager;
     let sessionManager: SessionManager;
+    let operativeEventManagerParams: IOperativeEventManagerParams<Campaign>;
+    let campaign: Campaign = TestFixtures.getCampaign();
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -195,8 +200,17 @@ describe('OperativeEventManagerTest', () => {
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
 
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        sessionManager = new SessionManager(nativeBridge);
-        operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+        sessionManager = new SessionManager(nativeBridge, request);
+        operativeEventManagerParams = {
+            nativeBridge: nativeBridge,
+            request: request,
+            metaDataManager: metaDataManager,
+            sessionManager: sessionManager,
+            clientInfo: clientInfo,
+            deviceInfo: deviceInfo,
+            campaign: campaign
+        };
+        operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
     });
 
     it('Send successful operative event', () => {
@@ -275,58 +289,147 @@ describe('OperativeEventManagerTest', () => {
     describe('sending clicks', () => {
         let placement: Placement;
         let session: Session;
-        let campaign: Campaign;
+        let requestSpy: any;
+        const uniqueEventID = '42';
+        const gamerSid = 'foobar';
+        const previousPlacementId = 'foobar1';
 
         beforeEach(() => {
             placement = TestFixtures.getPlacement();
             session = TestFixtures.getSession();
             campaign = TestFixtures.getCampaign();
             nativeBridge.DeviceInfo = sinon.createStubInstance(DeviceInfoApi);
-        });
-
-        it('should send the proper data', () => {
-            const requestSpy = sinon.spy(request, 'post');
-            const uniqueEventID = '42';
-            const gamerSid = 'foobar';
-            const previousPlacementId = 'foobar1';
+            requestSpy = sinon.spy(request, 'post');
 
             operativeEventManager.setGamerServerId('foobar');
-            operativeEventManager.setPreviousPlacementId(previousPlacementId);
+            OperativeEventManager.setPreviousPlacementId(previousPlacementId);
 
             (<sinon.SinonStub>nativeBridge.DeviceInfo.getUniqueEventId).returns(Promise.resolve('42'));
             (<sinon.SinonStub>nativeBridge.DeviceInfo.getNetworkType).returns(Promise.resolve(13));
             (<sinon.SinonStub>nativeBridge.DeviceInfo.getConnectionType).returns(Promise.resolve('wifi'));
             (<sinon.SinonStub>nativeBridge.DeviceInfo.getScreenWidth).returns(Promise.resolve(1280));
             (<sinon.SinonStub>nativeBridge.DeviceInfo.getScreenHeight).returns(Promise.resolve(768));
+        });
 
-            return operativeEventManager.sendClick(session, placement, campaign).then(() => {
-                assert(requestSpy.calledOnce, 'Operative event did not send POST request');
-                const data = JSON.parse(requestSpy.getCall(0).args[1]);
+        describe('should send the proper data', () => {
+            it('common data', () => {
+                return operativeEventManager.sendClick(placement).then(() => {
+                    assert(requestSpy.calledOnce, 'Operative event did not send POST request');
+                    const data = JSON.parse(requestSpy.getCall(0).args[1]);
 
-                assert.equal(data.auctionId, session.getId());
-                assert.equal(data.gameSessionId, sessionManager.getGameSessionId());
-                assert.equal(data.gamerId, campaign.getGamerId());
-                assert.equal(data.campaignId, campaign.getId());
-                assert.equal(data.adType, campaign.getAdType());
-                assert.equal(data.correlationId, campaign.getCorrelationId());
-                assert.equal(data.creativeId, campaign.getCreativeId());
-                assert.equal(data.seatId, campaign.getSeatId());
-                assert.equal(data.placementId, placement.getId());
-                assert.equal(data.apiLevel, deviceInfo.getApiLevel());
-                assert.equal(data.advertisingTrackingId, deviceInfo.getAdvertisingIdentifier());
-                assert.equal(data.limitAdTracking, deviceInfo.getLimitAdTracking());
-                assert.equal(data.osVersion, deviceInfo.getOsVersion());
-                assert.equal(data.sid, gamerSid);
-                assert.equal(data.deviceMake, deviceInfo.getManufacturer());
-                assert.equal(data.deviceModel, deviceInfo.getModel());
-                assert.equal(data.sdkVersion, clientInfo.getSdkVersion());
-                assert.equal(data.previousPlacementId, previousPlacementId);
-                assert.equal(data.bundleId, clientInfo.getApplicationName());
-                assert.equal(data.meta, campaign.getMeta());
-                assert.equal(data.screenDensity, deviceInfo.getScreenDensity());
-                assert.equal(data.screenSize, deviceInfo.getScreenLayout());
-                assert.equal(data.platform, Platform[clientInfo.getPlatform()].toLowerCase());
-                assert.equal(data.language, deviceInfo.getLanguage());
+                    assert.equal(data.auctionId, session.getId());
+                    assert.equal(data.gameSessionId, sessionManager.getGameSessionId());
+                    assert.equal(data.gamerId, campaign.getGamerId());
+                    assert.equal(data.campaignId, campaign.getId());
+                    assert.equal(data.adType, campaign.getAdType());
+                    assert.equal(data.correlationId, campaign.getCorrelationId());
+                    assert.equal(data.creativeId, campaign.getCreativeId());
+                    assert.equal(data.seatId, campaign.getSeatId());
+                    assert.equal(data.placementId, placement.getId());
+                    assert.equal(data.apiLevel, deviceInfo.getApiLevel());
+                    assert.equal(data.advertisingTrackingId, deviceInfo.getAdvertisingIdentifier());
+                    assert.equal(data.limitAdTracking, deviceInfo.getLimitAdTracking());
+                    assert.equal(data.osVersion, deviceInfo.getOsVersion());
+                    assert.equal(data.sid, gamerSid);
+                    assert.equal(data.deviceMake, deviceInfo.getManufacturer());
+                    assert.equal(data.deviceModel, deviceInfo.getModel());
+                    assert.equal(data.sdkVersion, clientInfo.getSdkVersion());
+                    assert.equal(data.previousPlacementId, previousPlacementId);
+                    assert.equal(data.bundleId, clientInfo.getApplicationName());
+                    assert.equal(data.meta, campaign.getMeta());
+                    assert.equal(data.screenDensity, deviceInfo.getScreenDensity());
+                    assert.equal(data.screenSize, deviceInfo.getScreenLayout());
+                    assert.equal(data.platform, Platform[clientInfo.getPlatform()].toLowerCase());
+                    assert.equal(data.language, deviceInfo.getLanguage());
+                });
+            });
+
+            it('PerformanceCampaign specific', () => {
+                return operativeEventManager.sendClick(placement).then(() => {
+                    assert(requestSpy.calledOnce, 'Operative event did not send POST request');
+                    const data = JSON.parse(requestSpy.getCall(0).args[1]);
+                    const url = requestSpy.getCall(0).args[0];
+
+                    assert.equal(url, (<PerformanceCampaign>campaign).getClickUrl() + '&redirect=false', 'URL not what was expected');
+                    assert.isDefined(data.cached, 'cached -value should be defined');
+                    assert.isFalse(data.cached, 'cached -value should be false');
+                });
+            });
+
+            it('XPromoCampaign specific', () => {
+                campaign = TestFixtures.getXPromoCampaign();
+                const params = {
+                    ... operativeEventManagerParams,
+                    campaign: campaign
+                };
+
+                operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(params);
+                return operativeEventManager.sendClick(placement).then(() => {
+                    assert(requestSpy.calledOnce, 'Operative event did not send POST request');
+                    const data = JSON.parse(requestSpy.getCall(0).args[1]);
+                    const url = requestSpy.getCall(0).args[0];
+
+                    assert.equal(url, 'https://adserver.unityads.unity3d.com/mobile/campaigns/' + campaign.getId() + '/click/' + campaign.getGamerId() + '?gameId=' + clientInfo.getGameId() + '&redirect=false', 'URL not what was expected');
+                    assert.isDefined(data.cached, 'cached -value should be defined');
+                    assert.isFalse(data.cached, 'cached -value should be false');
+                });
+            });
+
+            it('VastCampaign specific', () => {
+                campaign = TestFixtures.getEventVastCampaign();
+                const params = {
+                    ... operativeEventManagerParams,
+                    campaign: campaign
+                };
+
+                operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(params);
+                return operativeEventManager.sendClick(placement).then(() => {
+                    assert(requestSpy.calledOnce, 'Operative event did not send POST request');
+                    const data = JSON.parse(requestSpy.getCall(0).args[1]);
+                    const url = requestSpy.getCall(0).args[0];
+
+                    assert.equal(url, 'https://adserver.unityads.unity3d.com/mobile/campaigns/' + campaign.getId() + '/click/' + campaign.getGamerId() + '?gameId=' + clientInfo.getGameId() + '&redirect=false', 'URL not what was expected');
+                    assert.isDefined(data.cached, 'cached -value should be defined');
+                    assert.isFalse(data.cached, 'cached -value should be false');
+                });
+            });
+
+            it('MRAIDCampaign specific', () => {
+                campaign = TestFixtures.getPlayableMRAIDCampaign();
+                const params = {
+                    ... operativeEventManagerParams,
+                    campaign: campaign
+                };
+
+                operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(params);
+                return operativeEventManager.sendClick(placement).then(() => {
+                    assert(requestSpy.calledOnce, 'Operative event did not send POST request');
+                    const data = JSON.parse(requestSpy.getCall(0).args[1]);
+                    const url = requestSpy.getCall(0).args[0];
+
+                    assert.equal(url, (<MRAIDCampaign>campaign).getClickUrl() + '&redirect=false', 'URL not what was expected');
+                    assert.isDefined(data.cached, 'cached -value should be defined');
+                    assert.isFalse(data.cached, 'cached -value should be false');
+                });
+            });
+
+            it('DisplayInterstitialCampaign specific', () => {
+                campaign = TestFixtures.getDisplayInterstitialCampaign();
+                const params = {
+                    ... operativeEventManagerParams,
+                    campaign: campaign
+                };
+
+                operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(params);
+                return operativeEventManager.sendClick(placement).then(() => {
+                    assert(requestSpy.calledOnce, 'Operative event did not send POST request');
+                    const data = JSON.parse(requestSpy.getCall(0).args[1]);
+                    const url = requestSpy.getCall(0).args[0];
+
+                    assert.equal(url, 'https://adserver.unityads.unity3d.com/mobile/campaigns/' + campaign.getId() + '/click/' + campaign.getGamerId() + '?gameId=' + clientInfo.getGameId() + '&redirect=false', 'URL not what was expected');
+                    assert.isDefined(data.cached, 'cached -value should be defined');
+                    assert.isFalse(data.cached, 'cached -value should be false');
+                });
             });
         });
     });

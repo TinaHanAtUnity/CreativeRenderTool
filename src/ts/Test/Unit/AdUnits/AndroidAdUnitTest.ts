@@ -22,6 +22,7 @@ import { SessionManager } from 'Managers/SessionManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { Request } from 'Utilities/Request';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
+import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 
 describe('AndroidAdUnitTest', () => {
     let nativeBridge: NativeBridge;
@@ -42,10 +43,18 @@ describe('AndroidAdUnitTest', () => {
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         const request = new Request(nativeBridge, wakeUpManager);
         const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        const sessionManager = new SessionManager(nativeBridge);
+        const sessionManager = new SessionManager(nativeBridge, request);
         const deviceInfo = TestFixtures.getAndroidDeviceInfo();
         container = new Activity(nativeBridge, deviceInfo);
-        const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+        const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
+            nativeBridge: nativeBridge,
+            request: request,
+            metaDataManager: metaDataManager,
+            sessionManager: sessionManager,
+            clientInfo: clientInfo,
+            deviceInfo: deviceInfo,
+            campaign: TestFixtures.getCampaign()
+        });
         const comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         adUnitParams = {

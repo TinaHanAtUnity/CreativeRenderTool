@@ -26,6 +26,7 @@ import { SessionManager } from 'Managers/SessionManager';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 
 import EventTestVast from 'xml/EventTestVast.xml';
+import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 
 describe('VastAdUnit', () => {
 
@@ -79,9 +80,18 @@ describe('VastAdUnit', () => {
             video.setDuration(duration);
         }
 
-        const sessionManager = new SessionManager(nativeBridge);
+        const sessionManager = new SessionManager(nativeBridge, request);
         const metaDataManager = new MetaDataManager(nativeBridge);
-        const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+        const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
+            nativeBridge: nativeBridge,
+            request: request,
+            metaDataManager: metaDataManager,
+            sessionManager: sessionManager,
+            clientInfo: clientInfo,
+            deviceInfo: deviceInfo,
+            campaign: vastCampaign
+        });
+
         const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
         comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 

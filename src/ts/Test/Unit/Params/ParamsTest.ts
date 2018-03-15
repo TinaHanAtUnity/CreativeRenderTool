@@ -31,6 +31,7 @@ import { AndroidDeviceInfoApi, IPackageInfo } from 'Native/Api/AndroidDeviceInfo
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
+import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 
 class TestStorageApi extends StorageApi {
     public get<T>(storageType: StorageType, key: string): Promise<T> {
@@ -226,7 +227,7 @@ class TestHelper {
     }
 
     public static getSessionManager(nativeBridge: NativeBridge, request: Request): SessionManager {
-        const sessionManager: SessionManager = new SessionManager(nativeBridge);
+        const sessionManager: SessionManager = new SessionManager(nativeBridge, request);
         return sessionManager;
     }
 }
@@ -279,7 +280,7 @@ describe('Event parameters should match specifications', () => {
             const deviceInfo: DeviceInfo = TestFixtures.getAndroidDeviceInfo();
             const cacheBookkeeping: CacheBookkeeping = new CacheBookkeeping(nativeBridge);
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
-            const sessionManager = new SessionManager(nativeBridge);
+            const sessionManager = new SessionManager(nativeBridge, request);
             const adMobSignalFactory = new AdMobSignalFactory(nativeBridge, clientInfo, deviceInfo, focusManager);
             sinon.stub(nativeBridge.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));
             sinon.stub(sessionManager, 'startNewSession').returns(Promise.resolve(new Session('abdce-12345')));
@@ -305,7 +306,7 @@ describe('Event parameters should match specifications', () => {
             const deviceInfo: DeviceInfo = TestFixtures.getIosDeviceInfo();
             const cacheBookkeeping: CacheBookkeeping = new CacheBookkeeping(nativeBridge);
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
-            const sessionManager = new SessionManager(nativeBridge);
+            const sessionManager = new SessionManager(nativeBridge, request);
             const adMobSignalFactory = new AdMobSignalFactory(nativeBridge, clientInfo, deviceInfo, focusManager);
             sinon.stub(nativeBridge.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));
             sinon.stub(sessionManager, 'startNewSession').returns(Promise.resolve(new Session('abdce-12345')));
@@ -331,10 +332,19 @@ describe('Event parameters should match specifications', () => {
             const sessionManager: SessionManager = TestHelper.getSessionManager(nativeBridge, request);
             const clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
             const deviceInfo = TestFixtures.getAndroidDeviceInfo();
-            sessionManager.setGameSessionId(1234);
-            const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
             const campaign: PerformanceCampaign = TestFixtures.getCampaign();
-            return operativeEventManager.sendClick(campaign.getSession(), TestFixtures.getPlacement(), campaign).then(() => {
+            sessionManager.setGameSessionId(1234);
+            const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
+                nativeBridge: nativeBridge,
+                request: request,
+                metaDataManager: metaDataManager,
+                sessionManager: sessionManager,
+                clientInfo: clientInfo,
+                deviceInfo: deviceInfo,
+                campaign: campaign
+            });
+            OperativeEventManager.setPreviousPlacementId(undefined);
+            return operativeEventManager.sendClick(TestFixtures.getPlacement()).then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];
 
@@ -353,9 +363,18 @@ describe('Event parameters should match specifications', () => {
             const clientInfo = TestFixtures.getClientInfo(Platform.IOS);
             const deviceInfo = TestFixtures.getIosDeviceInfo();
             sessionManager.setGameSessionId(1234);
-            const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
             const campaign: PerformanceCampaign = TestFixtures.getCampaign();
-            return operativeEventManager.sendClick(campaign.getSession(), TestFixtures.getPlacement(), campaign).then(() => {
+            const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
+                nativeBridge: nativeBridge,
+                request: request,
+                metaDataManager: metaDataManager,
+                sessionManager: sessionManager,
+                clientInfo: clientInfo,
+                deviceInfo: deviceInfo,
+                campaign: campaign
+            });
+            OperativeEventManager.setPreviousPlacementId(undefined);
+            return operativeEventManager.sendClick(TestFixtures.getPlacement()).then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];
 
@@ -384,12 +403,21 @@ describe('Event parameters should match specifications', () => {
                 const clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
                 const deviceInfo = TestFixtures.getAndroidDeviceInfo();
                 sessionManager.setGameSessionId(1234);
-                operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
                 campaign = TestFixtures.getCampaign();
+                operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
+                    nativeBridge: nativeBridge,
+                    request: request,
+                    metaDataManager: metaDataManager,
+                    sessionManager: sessionManager,
+                    clientInfo: clientInfo,
+                    deviceInfo: deviceInfo,
+                    campaign: campaign
+                });
+                OperativeEventManager.setPreviousPlacementId(undefined);
             });
 
             it('with start event', () => {
-                return operativeEventManager.sendStart(campaign.getSession(), TestFixtures.getPlacement(), campaign).then(() => {
+                return operativeEventManager.sendStart(TestFixtures.getPlacement()).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -399,7 +427,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with first quartile event', () => {
-                return operativeEventManager.sendFirstQuartile(campaign.getSession(), TestFixtures.getPlacement(), campaign).then(() => {
+                return operativeEventManager.sendFirstQuartile(TestFixtures.getPlacement()).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -409,7 +437,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with midpoint event', () => {
-                return operativeEventManager.sendMidpoint(campaign.getSession(), TestFixtures.getPlacement(), campaign).then(() => {
+                return operativeEventManager.sendMidpoint(TestFixtures.getPlacement()).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -419,7 +447,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with third quartile event', () => {
-                return operativeEventManager.sendThirdQuartile(campaign.getSession(), TestFixtures.getPlacement(), campaign).then(() => {
+                return operativeEventManager.sendThirdQuartile(TestFixtures.getPlacement()).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -429,7 +457,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with end event', () => {
-                return operativeEventManager.sendView(campaign.getSession(), TestFixtures.getPlacement(), campaign).then(() => {
+                return operativeEventManager.sendView(TestFixtures.getPlacement()).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -450,12 +478,21 @@ describe('Event parameters should match specifications', () => {
                 const clientInfo = TestFixtures.getClientInfo(Platform.IOS);
                 const deviceInfo = TestFixtures.getIosDeviceInfo();
                 sessionManager.setGameSessionId(1234);
-                operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
                 campaign = TestFixtures.getCampaign();
+                operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
+                    nativeBridge: nativeBridge,
+                    request: request,
+                    metaDataManager: metaDataManager,
+                    sessionManager: sessionManager,
+                    clientInfo: clientInfo,
+                    deviceInfo: deviceInfo,
+                    campaign: campaign
+                });
+                OperativeEventManager.setPreviousPlacementId(undefined);
             });
 
             it('with start event', () => {
-                return operativeEventManager.sendStart(campaign.getSession(), TestFixtures.getPlacement(), campaign).then(() => {
+                return operativeEventManager.sendStart(TestFixtures.getPlacement()).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -465,7 +502,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with first quartile event', () => {
-                return operativeEventManager.sendFirstQuartile(campaign.getSession(), TestFixtures.getPlacement(), campaign).then(() => {
+                return operativeEventManager.sendFirstQuartile(TestFixtures.getPlacement()).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -475,7 +512,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with midpoint event', () => {
-                return operativeEventManager.sendMidpoint(campaign.getSession(), TestFixtures.getPlacement(), campaign).then(() => {
+                return operativeEventManager.sendMidpoint(TestFixtures.getPlacement()).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -485,7 +522,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with third quartile event', () => {
-                return operativeEventManager.sendThirdQuartile(campaign.getSession(), TestFixtures.getPlacement(), campaign).then(() => {
+                return operativeEventManager.sendThirdQuartile(TestFixtures.getPlacement()).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -495,7 +532,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with end event', () => {
-                return operativeEventManager.sendView(campaign.getSession(), TestFixtures.getPlacement(), campaign).then(() => {
+                return operativeEventManager.sendView(TestFixtures.getPlacement()).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
