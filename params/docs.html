@@ -7,7 +7,7 @@
                }
                </style>
                <body><br><br><h3> TOC <h3>
-<a href="#all-parameters">All Parameters</a><br><a href="#configuration-request">Configuration request</a><br><a href="#ad-request">Ad request</a><br><a href="#video-events">Video events</a><br><a href="#click-event">Click event</a><br><br><br></h3> <a name="all-parameters"></a> <h3> All Parameters </h3>
+<a href="#all-parameters">All Parameters</a><br><a href="#configuration-request">Configuration request</a><br><a href="#ad-request">Ad request</a><br><a href="#video-events">Video events</a><br><a href="#click-event">Click event</a><br><br><br></h3> <a name="all-parameters"></a> <h3> All Parameters </h3> 
  <table> <tr><th>key</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
 <tr><td>adapterName</td><td>string</td><td>Unity adapter between game code and SDK, "AssetStore" for Asset Store package and "Engine" for Unity engine integration layer</td><td>SDK</td><td>all</td></tr>
 <tr><td>adapterVersion</td><td>string</td><td>SDK version name for adapter, should be in sync with SDK version</td><td>SDK</td><td>all</td></tr>
@@ -72,7 +72,7 @@
 <tr><td>simulator</td><td>boolean</td><td>If device is a simulator, not a real device</td><td>SDK</td><td>ios</td></tr>
 <tr><td>requestSignal</td><td>string</td><td>Base64 encoded string from AdMob protobuf signals</td><td>SDK</td><td>all</td></tr>
 <tr><td>adUnitStyle</td><td>object</td><td>Style of the ad unit</td><td>SDK</td><td>all</td></tr>
- </table><br><br></h3> <a name="configuration-request"></a> <h3> Configuration request </h3>
+ </table><br><br></h3> <a name="configuration-request"></a> <h3> Configuration request </h3> 
  <table> <tr><th>key</th><th>required</th><th>queryString</th><th>body</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
 <tr><td>bundleId</td><td>all</td><td>True</td><td>False</td><td>string</td><td>Bundle identifier for the app</td><td>SDK</td><td>all</td></tr>
 <tr><td>encrypted</td><td>all</td><td>True</td><td>False</td><td>boolean</td><td>If true, app is encrypted for app store distribution and game is live</td><td>SDK</td><td>all</td></tr>
@@ -93,7 +93,7 @@
 <tr><td>frameworkVersion</td><td>no</td><td>True</td><td>False</td><td>string</td><td>Unity engine version</td><td>SDK</td><td>all</td></tr>
 <tr><td>adapterName</td><td>no</td><td>True</td><td>False</td><td>string</td><td>Unity adapter between game code and SDK, "AssetStore" for Asset Store package and "Engine" for Unity engine integration layer</td><td>SDK</td><td>all</td></tr>
 <tr><td>adapterVersion</td><td>no</td><td>True</td><td>False</td><td>string</td><td>SDK version name for adapter, should be in sync with SDK version</td><td>SDK</td><td>all</td></tr>
- </table><br><br></h3> <a name="ad-request"></a> <h3> Ad request </h3>
+ </table><br><br></h3> <a name="ad-request"></a> <h3> Ad request </h3> 
  <table> <tr><th>key</th><th>required</th><th>queryString</th><th>body</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
 <tr><td>advertisingTrackingId</td><td>no</td><td>True</td><td>False</td><td>string</td><td>Advertising identifier in raw format</td><td>SDK</td><td>all</td></tr>
 <tr><td>limitAdTracking</td><td>no</td><td>True</td><td>False</td><td>boolean</td><td>boolean if user has limited tracking or not</td><td>SDK</td><td>all</td></tr>
@@ -141,8 +141,7 @@
 <tr><td>versionCode</td><td>no</td><td>False</td><td>True</td><td>number</td><td>Application internal version code for Android apps, available only for SDK 2.1.1 and later</td><td>SDK</td><td>android</td></tr>
 <tr><td>simulator</td><td>ios</td><td>False</td><td>True</td><td>boolean</td><td>If device is a simulator, not a real device</td><td>SDK</td><td>ios</td></tr>
 <tr><td>requestSignal</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Base64 encoded string from AdMob protobuf signals</td><td>SDK</td><td>all</td></tr>
-<tr><td>realtimeRequest</td><td>all</td><td>True</td><td>False</td><td>boolean</td><td>If ad request is done at show time for immediate streaming</td><td>SDK</td><td>all</td></tr>
- </table><br><br></h3> <a name="video-events"></a> <h3> Video events </h3>
+ </table><br><br></h3> <a name="video-events"></a> <h3> Video events </h3> 
  <table> <tr><th>key</th><th>required</th><th>queryString</th><th>body</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
 <tr><td>eventId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Unique event identifier</td><td>SDK</td><td>all</td></tr>
 <tr><td>auctionId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Unique identifier for joining ad requests and operative events. This identifies one ad unit lifecycle so e.g. ad request, start and end events share same auctionId.</td><td>SDK</td><td>all</td></tr>
@@ -179,7 +178,7 @@
 <tr><td>platform</td><td>all</td><td>False</td><td>True</td><td>string</td><td>"android" or "ios"</td><td>SDK</td><td>all</td></tr>
 <tr><td>language</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Device language code (e.g. en_US or fr_CA)</td><td>SDK</td><td>all</td></tr>
 <tr><td>adUnitStyle</td><td>no</td><td>False</td><td>True</td><td>object</td><td>Style of the ad unit</td><td>SDK</td><td>all</td></tr>
- </table><br><br></h3> <a name="click-event"></a> <h3> Click event </h3>
+ </table><br><br></h3> <a name="click-event"></a> <h3> Click event </h3> 
  <table> <tr><th>key</th><th>required</th><th>queryString</th><th>body</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
 <tr><td>gameId</td><td>all</td><td>True</td><td>False</td><td>string</td><td>Source game identifier</td><td>App</td><td>all</td></tr>
 <tr><td>redirect</td><td>all</td><td>True</td><td>False</td><td>boolean</td><td>Legacy parameter, always false</td><td>SDK</td><td>all</td></tr>

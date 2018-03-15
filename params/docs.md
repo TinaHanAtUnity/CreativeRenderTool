@@ -73,11 +73,7 @@
 | versionCode | number | Application internal version code for Android apps, available only for SDK 2.1.1 and later | SDK | android |
 | simulator | boolean | If device is a simulator, not a real device | SDK | ios |
 | requestSignal | string | Base64 encoded string from AdMob protobuf signals | SDK | all |
-<<<<<<< HEAD
-| realtimeRequest | boolean | If ad request is done at show time for immediate streaming | SDK | all |
-=======
 | adUnitStyle | object | Style of the ad unit | SDK | all |
->>>>>>> master
 
 
 
@@ -155,7 +151,6 @@
 | versionCode | no | False | True | number | Application internal version code for Android apps, available only for SDK 2.1.1 and later | SDK | android |
 | simulator | ios | False | True | boolean | If device is a simulator, not a real device | SDK | ios |
 | requestSignal | all | False | True | string | Base64 encoded string from AdMob protobuf signals | SDK | all |
-| realtimeRequest | all | True | False | boolean | If ad request is done at show time for immediate streaming | SDK | all |
 
 
 

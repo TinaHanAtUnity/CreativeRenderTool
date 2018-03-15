@@ -280,38 +280,34 @@ export class WebView {
             return;
         }
 
-        if (placement.getRealtimeData()) {
+        // Temporary for realtime testing purposes
+        const testGroup = this._configuration.getAbGroup();
+        if (placement.getRealtimeData() && (testGroup === 7 || testGroup === 8)) {
+            this._campaignManager.resetRealtimeDataForPlacements();
             this._nativeBridge.Sdk.logInfo('Unity Ads is requesting realtime fill for placement ' + placement.getId());
-            const testGroup = this._configuration.getAbGroup();
             const start = Date.now();
             this._campaignManager.requestRealtime(placement, campaign.getSession()).then(realtimeCampaign => {
 
                 // Temporary for realtime testing purposes
-                if (testGroup === 7 || testGroup === 8) {
-                    const latency = Date.now() - start;
-                    Diagnostics.trigger('realtime_network_latency', {
-                        latency: latency,
-                        session: campaign.getSession(),
-                        auctionId: campaign.getSession().getId()
-                    });
-                    this._nativeBridge.Sdk.logInfo(`Unity Ads received a realtime request in ${latency} ms.`);
-                }
+                const latency = Date.now() - start;
+                Diagnostics.trigger('realtime_network_latency', {
+                    latency: latency,
+                    auctionId: campaign.getSession().getId()
+                });
+                this._nativeBridge.Sdk.logInfo(`Unity Ads received a realtime request in ${latency} ms.`);
 
                 if(realtimeCampaign) {
                     this._nativeBridge.Sdk.logInfo('Unity Ads received new fill for placement ' + placement.getId() + ', streaming new ad unit');
                     placement.setCurrentCampaign(realtimeCampaign);
                     this.showAd(placement, realtimeCampaign, options);
                 } else {
-                    if (testGroup === 7 || testGroup === 8) {
-                        Diagnostics.trigger('realtime_no_fill', {}, campaign.getSession());
-                    }
+                    Diagnostics.trigger('realtime_no_fill', {}, campaign.getSession());
                     this._nativeBridge.Sdk.logInfo('Unity Ads received no new fill for placement ' + placement.getId() + ', opening old ad unit');
                     this.showAd(placement, campaign, options);
                 }
-            }).catch((e) => {
-                if (testGroup === 7 || testGroup === 8) {
-                    Diagnostics.trigger('realtime_error', e, campaign.getSession());
-                }
+            }).catch(() => {
+                const error = new DiagnosticError(new Error('Realtime error'), { auctionId: campaign.getSession().getId() });
+                Diagnostics.trigger('realtime_error', error);
                 this._nativeBridge.Sdk.logInfo('Unity Ads realtime fill request for placement ' + placement.getId() + ' failed, opening old ad unit');
                 this.showAd(placement, campaign, options);
             });
@@ -391,17 +387,6 @@ export class WebView {
 
             this._operativeEventManager.setPreviousPlacementId(this._campaignManager.getPreviousPlacementId());
             this._campaignManager.setPreviousPlacementId(placement.getId());
-
-            // Temporary for realtime testing purposes
-            if ((placement.getRealtimeData()) && (testGroup === 7 || testGroup === 8)) {
-                const latency = Date.now() - start;
-                Diagnostics.trigger('realtime_render_latency', {
-                    latency: latency,
-                    session: campaign.getSession(),
-                    auctionId: campaign.getSession().getId()
-                });
-                this._nativeBridge.Sdk.logInfo(`Unity Ads rendered a realtime placement in ${latency} ms.`);
-            }
             this._currentAdUnit.show();
         });
     }
@@ -559,10 +544,6 @@ export class WebView {
                 } else if(this._nativeBridge.getPlatform() === Platform.IOS) {
                     CampaignManager.setCampaignResponse(CreativeUrlResponseIos.replace('{CREATIVE_URL_PLACEHOLDER}', creativeUrl));
                 }
-            }
-
-            if(TestEnvironment.get('realtimePlacement')) {
-                ConfigManager.setTestRealtimePlacement(TestEnvironment.get('realtimePlacement'));
             }
         });
     }

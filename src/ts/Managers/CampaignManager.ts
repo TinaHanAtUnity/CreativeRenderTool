@@ -190,6 +190,13 @@ export class CampaignManager {
         });
     }
 
+    public resetRealtimeDataForPlacements() {
+        const placements = this._configuration.getPlacements();
+        Object.keys(placements).forEach((placementId) => {
+            placements[placementId].setRealtimeData(undefined);
+        });
+    }
+
     private parseCampaigns(response: INativeResponse): Promise<void[]> {
         let json;
         try {
@@ -226,7 +233,7 @@ export class CampaignManager {
                     } else {
                         noFill.push(placement);
                     }
-                    this.resetRealtimeDataForPlacements();
+
                     if(json.realtimeData && json.realtimeData[placement]) {
                         this._configuration.getPlacement(placement).setRealtimeData(json.realtimeData[placement]);
                     }
@@ -286,13 +293,6 @@ export class CampaignManager {
         }
     }
 
-    private resetRealtimeDataForPlacements() {
-        const placements = this._configuration.getPlacements();
-        Object.keys(placements).forEach((placementId) => {
-            placements[placementId].setRealtimeData(undefined);
-        });
-    }
-
     private parseRealtimeCampaign(response: INativeResponse, session: Session, placement: Placement): Promise<Campaign | void> {
         const json = JsonParser.parse(response.response);
 
@@ -303,7 +303,6 @@ export class CampaignManager {
                 const oldCampaign = placement.getCurrentCampaign();
 
                 if(oldCampaign && oldCampaign.getMediaId() === mediaId) {
-                    // todo: update tracking urls for old campaign
                     return Promise.resolve(oldCampaign);
                 }
 
@@ -376,6 +375,8 @@ export class CampaignManager {
                 // vast-vpaid can be both VPAID or VAST, so in this case we use the VAST parser
                 // which can parse both.
                 return new ProgrammaticVPAIDParser();
+            case 'purchasing/iap':
+                return new PromoCampaignParser();
             default:
                 throw new Error('Unsupported content-type: ' + contentType);
         }

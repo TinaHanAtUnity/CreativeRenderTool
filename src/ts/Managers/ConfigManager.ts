@@ -86,10 +86,6 @@ export class ConfigManager {
         ConfigManager.ConfigBaseUrl = baseUrl + '/games';
     }
 
-    public static setTestRealtimePlacement(placementId: string): void {
-        ConfigManager.TestRealtimePlacement = placementId;
-    }
-
     public static setAbGroup(abGroup: number) {
         ConfigManager.AbGroup = abGroup;
     }
