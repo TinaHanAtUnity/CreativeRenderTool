@@ -13,9 +13,7 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 import { PerformanceOperativeEventManager } from 'Managers/PerformanceOperativeEventManager';
 import { XPromoOperativeEventManager } from 'Managers/XPromoOperativeEventManager';
-import { VastOperativeEventManager } from 'Managers/VastOperativeEventManager';
 import { MRAIDOperativeEventManager } from 'Managers/MRAIDOperativeEventManager';
-import { DisplayInterstitialOperativeEventManager } from 'Managers/DisplayInterstitialOperativeEventManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 
 describe('OperativeEventManagerFactoryTest', () => {
@@ -73,21 +71,6 @@ describe('OperativeEventManagerFactoryTest', () => {
             assert.isTrue(manager instanceof XPromoOperativeEventManager, 'Manager not instance of XPromoOperativeEventManager');
         });
 
-        it('with VastCampaign', () => {
-            const campaign = TestFixtures.getEventVastCampaign();
-            const manager = OperativeEventManagerFactory.createOperativeEventManager({
-                nativeBridge: nativeBridge,
-                request: request,
-                metaDataManager: metaDataManager,
-                sessionManager: sessionManager,
-                clientInfo: clientInfo,
-                deviceInfo: deviceInfo,
-                campaign: campaign
-            });
-
-            assert.isTrue(manager instanceof VastOperativeEventManager, 'Manager not instance of VastOperativeEventManager');
-        });
-
         it('with MRAIDCampaign', () => {
             const campaign = TestFixtures.getPlayableMRAIDCampaign();
             const manager = OperativeEventManagerFactory.createOperativeEventManager({
@@ -101,21 +84,6 @@ describe('OperativeEventManagerFactoryTest', () => {
             });
 
             assert.isTrue(manager instanceof MRAIDOperativeEventManager, 'Manager not instance of MRAIDOperativeEventManager');
-        });
-
-        it('with DisplayInterstitialCampaign', () => {
-            const campaign = TestFixtures.getDisplayInterstitialCampaign();
-            const manager = OperativeEventManagerFactory.createOperativeEventManager({
-                nativeBridge: nativeBridge,
-                request: request,
-                metaDataManager: metaDataManager,
-                sessionManager: sessionManager,
-                clientInfo: clientInfo,
-                deviceInfo: deviceInfo,
-                campaign: campaign
-            });
-
-            assert.isTrue(manager instanceof DisplayInterstitialOperativeEventManager, 'Manager not instance of DisplayInterstitialOperativeEventManager');
         });
 
         it('with all other campaign types', () => {
