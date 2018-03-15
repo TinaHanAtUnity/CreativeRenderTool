@@ -1,4 +1,4 @@
-import { EventType, Session } from 'Models/Session';
+import { EventType } from 'Models/Session';
 import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
 import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
 import { HttpKafka } from 'Utilities/HttpKafka';
@@ -12,7 +12,7 @@ import { Url } from 'Utilities/Url';
 import { StorageType } from 'Native/Api/Storage';
 import { INativeResponse, Request } from 'Utilities/Request';
 import { SessionManager } from 'Managers/SessionManager';
-import { Campaign, ICampaign } from 'Models/Campaign';
+import { Campaign } from 'Models/Campaign';
 import { Placement } from 'Models/Placement';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
