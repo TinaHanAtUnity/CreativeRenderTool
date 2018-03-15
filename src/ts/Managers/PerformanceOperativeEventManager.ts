@@ -8,14 +8,14 @@ import { Url } from 'Utilities/Url';
 export class PerformanceOperativeEventManager extends OperativeEventManager {
     private _performanceCampaign: PerformanceCampaign;
 
-    constructor(params: IOperativeEventManagerParams) {
+    constructor(params: IOperativeEventManagerParams<PerformanceCampaign>) {
         super(params);
 
-        this._performanceCampaign = <PerformanceCampaign>params.campaign;
+        this._performanceCampaign = params.campaign;
     }
 
-    protected getInfoJson(session: Session, placement: Placement, eventId: string, gameSession: number, gamerSid?: string, previousPlacementId?: string, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<[string, any]> {
-        return super.getInfoJson(session, placement, eventId, gameSession, gamerSid, previousPlacementId, videoOrientation, adUnitStyle).then(([id, infoJson]) => {
+    protected getInfoJson(placement: Placement, eventId: string, gameSession: number, gamerSid?: string, previousPlacementId?: string, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<[string, any]> {
+        return super.getInfoJson(placement, eventId, gameSession, gamerSid, previousPlacementId, videoOrientation, adUnitStyle).then(([id, infoJson]) => {
             const landscapeVideo = this._performanceCampaign.getVideo();
             const portraitVideo = this._performanceCampaign.getPortraitVideo();
             if(landscapeVideo && landscapeVideo.isCached()) {

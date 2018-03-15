@@ -8,14 +8,14 @@ import { Url } from 'Utilities/Url';
 export class MRAIDOperativeEventManager extends OperativeEventManager {
     private _mraidCampaign: MRAIDCampaign;
 
-    constructor(params: IOperativeEventManagerParams) {
+    constructor(params: IOperativeEventManagerParams<MRAIDCampaign>) {
         super(params);
 
-        this._mraidCampaign = <MRAIDCampaign>params.campaign;
+        this._mraidCampaign = params.campaign;
     }
 
-    protected getInfoJson(session: Session, placement: Placement, eventId: string, gameSession: number, gamerSid?: string, previousPlacementId?: string, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<[string, any]> {
-        return super.getInfoJson(session, placement, eventId, gameSession, gamerSid, previousPlacementId, videoOrientation, adUnitStyle).then(([id, infoJson]) => {
+    protected getInfoJson(placement: Placement, eventId: string, gameSession: number, gamerSid?: string, previousPlacementId?: string, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<[string, any]> {
+        return super.getInfoJson(placement, eventId, gameSession, gamerSid, previousPlacementId, videoOrientation, adUnitStyle).then(([id, infoJson]) => {
             const resouceUrl = this._mraidCampaign.getResourceUrl();
             if((resouceUrl && resouceUrl.isCached()) || this._mraidCampaign.getResource()) {
                 infoJson.cached = true;

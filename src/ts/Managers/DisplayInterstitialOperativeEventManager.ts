@@ -7,14 +7,14 @@ import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitia
 export class DisplayInterstitialOperativeEventManager extends OperativeEventManager {
     private _displayInterstitialCampaign: DisplayInterstitialCampaign;
 
-    constructor(params: IOperativeEventManagerParams) {
+    constructor(params: IOperativeEventManagerParams<DisplayInterstitialCampaign>) {
         super(params);
 
-        this._displayInterstitialCampaign = <DisplayInterstitialCampaign>params.campaign;
+        this._displayInterstitialCampaign = params.campaign;
     }
 
-    protected getInfoJson(session: Session, placement: Placement, eventId: string, gameSession: number, gamerSid?: string, previousPlacementId?: string, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<[string, any]> {
-        return super.getInfoJson(session, placement, eventId, gameSession, gamerSid, previousPlacementId, videoOrientation, adUnitStyle).then(([id, infoJson]) => {
+    protected getInfoJson(placement: Placement, eventId: string, gameSession: number, gamerSid?: string, previousPlacementId?: string, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<[string, any]> {
+        return super.getInfoJson(placement, eventId, gameSession, gamerSid, previousPlacementId, videoOrientation, adUnitStyle).then(([id, infoJson]) => {
             infoJson.cached = false;
             return <[string, any]>[id, infoJson];
         });
