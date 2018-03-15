@@ -153,6 +153,7 @@ describe('CampaignRefreshManager', () => {
             sessionManager: sessionManager,
             clientInfo: clientInfo,
             deviceInfo: deviceInfo,
+            configuration: configuration,
             campaign: campaign
         });
         adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);

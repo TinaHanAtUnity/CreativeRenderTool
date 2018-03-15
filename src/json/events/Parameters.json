@@ -439,5 +439,12 @@
     "description": "Style of the ad unit",
     "provider": "SDK",
     "platforms": "all"
+  },
+  {
+    "key": "token",
+    "type": "string",
+    "description": "Signed JSON Web Token (JWT) with orthogonal (statistically independent) A/B groups for each Unity Monetization component",
+    "provider": "Server",
+    "platforms": "all"
   }
 ]

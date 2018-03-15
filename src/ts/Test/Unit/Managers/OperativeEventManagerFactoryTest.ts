@@ -15,6 +15,7 @@ import { PerformanceOperativeEventManager } from 'Managers/PerformanceOperativeE
 import { XPromoOperativeEventManager } from 'Managers/XPromoOperativeEventManager';
 import { MRAIDOperativeEventManager } from 'Managers/MRAIDOperativeEventManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { Configuration } from 'Models/Configuration';
 
 describe('OperativeEventManagerFactoryTest', () => {
     const handleInvocation = sinon.spy();
@@ -26,6 +27,7 @@ describe('OperativeEventManagerFactoryTest', () => {
     let sessionManager: SessionManager;
     let clientInfo: ClientInfo;
     let deviceInfo: DeviceInfo;
+    let configuration: Configuration;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -38,6 +40,7 @@ describe('OperativeEventManagerFactoryTest', () => {
         metaDataManager = new MetaDataManager(nativeBridge);
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
+        configuration = TestFixtures.getConfiguration();
     });
 
     describe('should return correct type of operative manager', () => {
@@ -50,6 +53,7 @@ describe('OperativeEventManagerFactoryTest', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
+                configuration: configuration,
                 campaign: campaign
             });
 
@@ -65,6 +69,7 @@ describe('OperativeEventManagerFactoryTest', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
+                configuration: configuration,
                 campaign: campaign
             });
 
@@ -80,6 +85,7 @@ describe('OperativeEventManagerFactoryTest', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
+                configuration: configuration,
                 campaign: campaign
             });
 
@@ -95,6 +101,7 @@ describe('OperativeEventManagerFactoryTest', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
+                configuration: configuration,
                 campaign: campaign
             });
 
