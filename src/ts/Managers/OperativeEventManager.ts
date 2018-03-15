@@ -16,6 +16,7 @@ import { Campaign, ICampaign } from 'Models/Campaign';
 import { Placement } from 'Models/Placement';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
+import { CampaignAssetStatus } from 'Utilities/CampaignAssetStatus';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {
     nativeBridge: NativeBridge;
@@ -262,7 +263,9 @@ export class OperativeEventManager {
             'bundleId': this._clientInfo.getApplicationName(),
             'meta': this._campaign.getMeta(),
             'platform': Platform[this._clientInfo.getPlatform()].toLowerCase(),
-            'language': this._deviceInfo.getLanguage()
+            'language': this._deviceInfo.getLanguage(),
+            'cached': CampaignAssetStatus.isCached(this._campaign),
+            'cachedOrientation': CampaignAssetStatus.getCachedOrientation(this._campaign)
         };
 
         if(this._clientInfo.getPlatform() === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
