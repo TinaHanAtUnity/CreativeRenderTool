@@ -111,9 +111,11 @@ export class CampaignManager {
 
         this._requesting = true;
 
+        this.resetRealtimeDataForPlacements();
         return Promise.all([this.createRequestUrl(false), this.createRequestBody(nofillRetry)]).then(([requestUrl, requestBody]) => {
             this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
             const body = JSON.stringify(requestBody);
+
             SdkStats.setAdRequestTimestamp();
             const requestTimestamp: number = Date.now();
             return Promise.resolve().then((): Promise<INativeResponse> => {
