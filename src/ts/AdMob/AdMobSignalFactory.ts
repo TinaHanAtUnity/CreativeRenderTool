@@ -72,31 +72,6 @@ export class AdMobSignalFactory {
         return this.getCommonSignal();
     }
 
-    public checkChargingStatus(): boolean {
-        if (this._deviceInfo.get('batteryStatus') === 2) {
-            return true;
-        }
-        return false;
-    }
-
-    public checkDeviceIncapabilities(): string {
-        let deviceIncapabilities = '';
-        if (this._deviceInfo instanceof AndroidDeviceInfo) {
-            if (!(<AndroidDeviceInfo>this._deviceInfo).isGoogleStoreInstalled()) {
-                deviceIncapabilities += 'a';
-            }
-            if (!(<AndroidDeviceInfo>this._deviceInfo).isGoogleMapsInstalled()) {
-                deviceIncapabilities += 'm';
-            }
-            if (!(<AndroidDeviceInfo>this._deviceInfo).isTelephonyInstalled()) {
-                deviceIncapabilities += 't';
-            }
-        } else {
-            deviceIncapabilities += 'atm';
-        }
-        return deviceIncapabilities;
-    }
-
     public getClickSignal(touchInfo: ITouchInfo, adUnit: AdMobAdUnit): Promise<AdMobSignal> {
         return this.getCommonSignal().then(signal => {
             // todo: touch duration
@@ -418,5 +393,30 @@ export class AdMobSignalFactory {
         } else {
             return 1; // portrait
         }
+    }
+
+    private checkChargingStatus(): boolean {
+        if (this._deviceInfo.get('batteryStatus') === 2) {
+            return true;
+        }
+        return false;
+    }
+
+    private checkDeviceIncapabilities(): string {
+        let deviceIncapabilities = '';
+        if (this._deviceInfo instanceof AndroidDeviceInfo) {
+            if (!(<AndroidDeviceInfo>this._deviceInfo).isGoogleStoreInstalled()) {
+                deviceIncapabilities += 'a';
+            }
+            if (!(<AndroidDeviceInfo>this._deviceInfo).isGoogleMapsInstalled()) {
+                deviceIncapabilities += 'm';
+            }
+            if (!(<AndroidDeviceInfo>this._deviceInfo).isTelephonyInstalled()) {
+                deviceIncapabilities += 't';
+            }
+        } else {
+            deviceIncapabilities += 'atm';
+        }
+        return deviceIncapabilities;
     }
 }
