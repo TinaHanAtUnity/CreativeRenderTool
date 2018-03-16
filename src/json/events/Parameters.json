@@ -441,6 +441,13 @@
     "platforms": "all"
   },
   {
+    "key": "sessionDepth",
+    "type": "number",
+    "description": "For a given session, how many ads have been delivered currently using adRequestOrdinal",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
     "key": "token",
     "type": "string",
     "description": "Signed JSON Web Token (JWT) with orthogonal (statistically independent) A/B groups for each Unity Monetization component",

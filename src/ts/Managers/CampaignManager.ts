@@ -510,6 +510,7 @@ export class CampaignManager {
 
                 body.placements = placementRequest;
                 body.properties = this._configuration.getProperties();
+                body.sessionDepth = SdkStats.getAdRequestOrdinal();
 
                 return body;
             });
