@@ -408,7 +408,7 @@ export class TestFixtures {
             true,
             'http://example.com/config.json',
             'http://example.com/index.html',
-            null,
+            'abcdefgh12345678',
             '2.0.0-webview',
             123456,
             false
