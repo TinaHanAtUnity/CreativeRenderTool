@@ -73,6 +73,7 @@ describe('VastAdUnit', () => {
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         vastCampaign = TestFixtures.getEventVastCampaign();
         const video = vastCampaign.getVideo();
+        const configuration = TestFixtures.getConfiguration();
 
         let duration = vastCampaign.getVast().getDuration();
         if(duration) {
@@ -89,6 +90,7 @@ describe('VastAdUnit', () => {
             sessionManager: sessionManager,
             clientInfo: clientInfo,
             deviceInfo: deviceInfo,
+            configuration: configuration,
             campaign: vastCampaign
         });
 
@@ -106,7 +108,7 @@ describe('VastAdUnit', () => {
             comScoreTrackingService: comScoreService,
             placement: placement,
             campaign: vastCampaign,
-            configuration: TestFixtures.getConfiguration(),
+            configuration: configuration,
             request: request,
             options: {},
             endScreen: undefined,

@@ -1,5 +1,10 @@
 # Pending
 
+* Support for new A/B testing framework
+* Add sessionDepth parameter to ad requests
+
+# Fri Mar 16 07:04:01 UTC 2018
+
 * iOS screen size fix for analytics
 * Split operative event manager into multiple operative event managers
 * XPromo: parse meta field

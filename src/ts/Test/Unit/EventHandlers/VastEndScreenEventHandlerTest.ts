@@ -53,6 +53,7 @@ describe('VastEndScreenEventHandlersTest', () => {
         const deviceInfo = TestFixtures.getAndroidDeviceInfo();
         const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         const sessionManager = new SessionManager(nativeBridge, request);
+        const configuration = TestFixtures.getConfiguration();
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             nativeBridge: nativeBridge,
             request: request,
@@ -60,6 +61,7 @@ describe('VastEndScreenEventHandlersTest', () => {
             sessionManager: sessionManager,
             clientInfo: clientInfo,
             deviceInfo: deviceInfo,
+            configuration: configuration,
             campaign: campaign
         });
 
@@ -78,7 +80,7 @@ describe('VastEndScreenEventHandlersTest', () => {
             comScoreTrackingService: comScoreService,
             placement: TestFixtures.getPlacement(),
             campaign: campaign,
-            configuration: TestFixtures.getConfiguration(),
+            configuration: configuration,
             request: request,
             options: {},
             endScreen: undefined,

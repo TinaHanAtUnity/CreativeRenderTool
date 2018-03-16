@@ -208,6 +208,7 @@ describe('OperativeEventManagerTest', () => {
             sessionManager: sessionManager,
             clientInfo: clientInfo,
             deviceInfo: deviceInfo,
+            configuration: TestFixtures.getConfiguration(),
             campaign: campaign
         };
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);

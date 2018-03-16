@@ -90,6 +90,7 @@ describe('VastOverlayEventHandlersTest', () => {
             return Promise.resolve(url);
         });
 
+        const configuration = TestFixtures.getConfiguration();
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             nativeBridge: nativeBridge,
             request: request,
@@ -97,6 +98,7 @@ describe('VastOverlayEventHandlersTest', () => {
             sessionManager: sessionManager,
             clientInfo: clientInfo,
             deviceInfo: deviceInfo,
+            configuration: configuration,
             campaign: campaign
         });
 
@@ -113,7 +115,7 @@ describe('VastOverlayEventHandlersTest', () => {
             comScoreTrackingService: comScoreService,
             placement: TestFixtures.getPlacement(),
             campaign: campaign,
-            configuration: TestFixtures.getConfiguration(),
+            configuration: configuration,
             request: request,
             options: {},
             endScreen: undefined,

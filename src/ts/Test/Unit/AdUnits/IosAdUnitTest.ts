@@ -48,6 +48,7 @@ describe('IosAdUnitTest', () => {
         const deviceInfo = TestFixtures.getIosDeviceInfo();
         container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager);
         const campaign = TestFixtures.getCampaign();
+        const configuration = TestFixtures.getConfiguration();
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             nativeBridge: nativeBridge,
             request: request,
@@ -55,6 +56,7 @@ describe('IosAdUnitTest', () => {
             sessionManager: sessionManager,
             clientInfo: clientInfo,
             deviceInfo: deviceInfo,
+            configuration: configuration,
             campaign: campaign
         });
         const comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
@@ -70,7 +72,7 @@ describe('IosAdUnitTest', () => {
             comScoreTrackingService: comScoreService,
             placement: TestFixtures.getPlacement(),
             campaign: campaign,
-            configuration: TestFixtures.getConfiguration(),
+            configuration: configuration,
             request: request,
             options: {}
         };

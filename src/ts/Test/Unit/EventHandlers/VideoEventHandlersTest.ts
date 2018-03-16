@@ -94,6 +94,7 @@ describe('VideoEventHandlersTest', () => {
             sessionManager: sessionManager,
             clientInfo: clientInfo,
             deviceInfo: deviceInfo,
+            configuration: configuration,
             campaign: performanceCampaign
         };
 
