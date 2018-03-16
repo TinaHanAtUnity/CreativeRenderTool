@@ -87,6 +87,7 @@ describe('AdUnitFactoryTest', () => {
             sessionManager: sessionManager,
             clientInfo: clientInfo,
             deviceInfo: deviceInfo,
+            configuration: config,
             campaign: campaign
         });
 
@@ -129,6 +130,7 @@ describe('AdUnitFactoryTest', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
+                configuration: config,
                 campaign: TestFixtures.getCampaign()
             });
 
@@ -158,6 +160,7 @@ describe('AdUnitFactoryTest', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
+                configuration: config,
                 campaign: vastCampaign
             });
 
@@ -195,6 +198,7 @@ describe('AdUnitFactoryTest', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
+                configuration: config,
                 campaign: campaign
             });
 
@@ -300,6 +304,7 @@ describe('AdUnitFactoryTest', () => {
                     sessionManager: sessionManager,
                     clientInfo: clientInfo,
                     deviceInfo: deviceInfo,
+                    configuration: config,
                     campaign: campaign
                 });
 
@@ -341,6 +346,7 @@ describe('AdUnitFactoryTest', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
+                configuration: config,
                 campaign: campaign
             });
 
@@ -387,6 +393,7 @@ describe('AdUnitFactoryTest', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
+                configuration: config,
                 campaign: campaign
             });
 

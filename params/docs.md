@@ -74,7 +74,8 @@
 | simulator | boolean | If device is a simulator, not a real device | SDK | ios |
 | requestSignal | string | Base64 encoded string from AdMob protobuf signals | SDK | all |
 | adUnitStyle | object | Style of the ad unit | SDK | all |
-| sessionDepth | all | False | True | number | For a given session, how many ads have been delivered currently using adRequestOrdinal | SDK | all |
+| sessionDepth | number | For a given session, how many ads have been delivered currently using adRequestOrdinal | SDK | all |
+| token | string | Signed JSON Web Token (JWT) with orthogonal (statistically independent) A/B groups for each Unity Monetization component | Server | all |
 
 
 
@@ -153,6 +154,7 @@
 | simulator | ios | False | True | boolean | If device is a simulator, not a real device | SDK | ios |
 | requestSignal | all | False | True | string | Base64 encoded string from AdMob protobuf signals | SDK | all |
 | sessionDepth | all | False | True | number | For a given session, how many ads have been delivered currently using adRequestOrdinal | SDK | all |
+| token | all | False | True | string | Signed JSON Web Token (JWT) with orthogonal (statistically independent) A/B groups for each Unity Monetization component | Server | all |
 
 
 
@@ -194,6 +196,7 @@
 | platform | all | False | True | string | "android" or "ios" | SDK | all |
 | language | all | False | True | string | Device language code (e.g. en_US or fr_CA) | SDK | all |
 | adUnitStyle | no | False | True | object | Style of the ad unit | SDK | all |
+| token | all | False | True | string | Signed JSON Web Token (JWT) with orthogonal (statistically independent) A/B groups for each Unity Monetization component | Server | all |
 
 
 
@@ -234,4 +237,5 @@
 | platform | all | False | True | string | "android" or "ios" | SDK | all |
 | language | all | False | True | string | Device language code (e.g. en_US or fr_CA) | SDK | all |
 | adUnitStyle | no | False | True | object | Style of the ad unit | SDK | all |
+| token | all | False | True | string | Signed JSON Web Token (JWT) with orthogonal (statistically independent) A/B groups for each Unity Monetization component | Server | all |
 

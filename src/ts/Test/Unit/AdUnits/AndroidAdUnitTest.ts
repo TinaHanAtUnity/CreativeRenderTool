@@ -45,6 +45,7 @@ describe('AndroidAdUnitTest', () => {
         const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         const sessionManager = new SessionManager(nativeBridge, request);
         const deviceInfo = TestFixtures.getAndroidDeviceInfo();
+        const configuration = TestFixtures.getConfiguration();
         container = new Activity(nativeBridge, deviceInfo);
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             nativeBridge: nativeBridge,
@@ -53,6 +54,7 @@ describe('AndroidAdUnitTest', () => {
             sessionManager: sessionManager,
             clientInfo: clientInfo,
             deviceInfo: deviceInfo,
+            configuration: configuration,
             campaign: TestFixtures.getCampaign()
         });
         const comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
@@ -68,7 +70,7 @@ describe('AndroidAdUnitTest', () => {
             comScoreTrackingService: comScoreService,
             placement: TestFixtures.getPlacement(),
             campaign: TestFixtures.getCampaign(),
-            configuration: TestFixtures.getConfiguration(),
+            configuration: configuration,
             request: request,
             options: {}
         };

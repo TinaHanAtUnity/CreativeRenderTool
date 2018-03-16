@@ -66,6 +66,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
             sessionManager: sessionManager,
             clientInfo: clientInfo,
             deviceInfo: deviceInfo,
+            configuration: configuration,
             campaign: campaign
         });
         endScreen = new PerformanceEndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
@@ -83,7 +84,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
             comScoreTrackingService: comScoreService,
             placement: TestFixtures.getPlacement(),
             campaign: campaign,
-            configuration: TestFixtures.getConfiguration(),
+            configuration: configuration,
             request: request,
             options: {},
             endScreen: endScreen,

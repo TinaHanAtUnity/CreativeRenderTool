@@ -200,6 +200,7 @@ describe('SessionManagerTest', () => {
             sessionManager: sessionManager,
             clientInfo: clientInfo,
             deviceInfo: deviceInfo,
+            configuration: TestFixtures.getConfiguration(),
             campaign: TestFixtures.getCampaign()
         });
     });

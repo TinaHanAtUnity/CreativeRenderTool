@@ -47,5 +47,6 @@
   "gamerId": "57a35671bb58271e002d93c9",
   "abGroup": 99,
   "properties": "abcdefgh12345678",
-  "projectId": "abcd-1234"
+  "projectId": "abcd-1234",
+  "token": "abcd.1234.5678"
 }

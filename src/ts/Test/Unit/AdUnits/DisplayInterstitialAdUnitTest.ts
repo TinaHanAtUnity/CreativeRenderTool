@@ -56,6 +56,7 @@ describe('DisplayInterstitialAdUnit', () => {
             const focusManager = new FocusManager(nativeBridge);
             const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request = new Request(nativeBridge, wakeUpManager);
+            const configuration = TestFixtures.getConfiguration();
             container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
             sandbox.stub(container, 'open').returns(Promise.resolve());
             sandbox.stub(container, 'close').returns(Promise.resolve());
@@ -70,6 +71,7 @@ describe('DisplayInterstitialAdUnit', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
+                configuration: configuration,
                 campaign: campaign
             });
             comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
@@ -91,7 +93,7 @@ describe('DisplayInterstitialAdUnit', () => {
                 comScoreTrackingService: comScoreService,
                 placement: TestFixtures.getPlacement(),
                 campaign: campaign,
-                configuration: TestFixtures.getConfiguration(),
+                configuration: configuration,
                 request: request,
                 options: {},
                 view: view
