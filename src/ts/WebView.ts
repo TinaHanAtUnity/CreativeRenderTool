@@ -382,6 +382,16 @@ export class WebView {
 
             OperativeEventManager.setPreviousPlacementId(this._campaignManager.getPreviousPlacementId());
             this._campaignManager.setPreviousPlacementId(placement.getId());
+
+            // Temporary for realtime testing purposes
+            this._currentAdUnit.onStart.subscribe(() => {
+                Diagnostics.trigger('realtime_render_latency', {
+                    latency: Date.now() - start,
+                    auctionId: campaign.getSession().getId(),
+                    abGroup: testGroup
+                });
+            });
+
             this._currentAdUnit.show();
         });
     }
