@@ -384,13 +384,15 @@ export class WebView {
             this._campaignManager.setPreviousPlacementId(placement.getId());
 
             // Temporary for realtime testing purposes
-            this._currentAdUnit.onStart.subscribe(() => {
-                Diagnostics.trigger('realtime_render_latency', {
-                    latency: Date.now() - start,
-                    auctionId: campaign.getSession().getId(),
-                    abGroup: testGroup
+            if (placement.getRealtimeData()) {
+                this._currentAdUnit.onStart.subscribe(() => {
+                    Diagnostics.trigger('realtime_render_latency', {
+                        latency: Date.now() - start,
+                        auctionId: campaign.getSession().getId(),
+                        abGroup: testGroup
+                    });
                 });
-            });
+            }
 
             this._currentAdUnit.show();
         });
