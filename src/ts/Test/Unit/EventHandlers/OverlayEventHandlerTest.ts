@@ -27,6 +27,7 @@ import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { Placement } from 'Models/Placement';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
+import { Configuration } from 'Models/Configuration';
 
 describe('OverlayEventHandlerTest', () => {
 
@@ -50,6 +51,7 @@ describe('OverlayEventHandlerTest', () => {
     let comScoreService: ComScoreTrackingService;
     let campaign: PerformanceCampaign;
     let placement: Placement;
+    let configuration: Configuration;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -63,6 +65,7 @@ describe('OverlayEventHandlerTest', () => {
         request = new Request(nativeBridge, wakeUpManager);
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
+        configuration = TestFixtures.getConfiguration();
 
         campaign = TestFixtures.getCampaign();
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
@@ -74,11 +77,12 @@ describe('OverlayEventHandlerTest', () => {
             sessionManager: sessionManager,
             clientInfo: clientInfo,
             deviceInfo: deviceInfo,
+            configuration: configuration,
             campaign: campaign
         });
         container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
         video = new Video('', TestFixtures.getSession());
-        endScreen = new PerformanceEndScreen(nativeBridge, campaign, TestFixtures.getConfiguration().isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
+        endScreen = new PerformanceEndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
         comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
         placement = TestFixtures.getPlacement();
@@ -94,7 +98,7 @@ describe('OverlayEventHandlerTest', () => {
             comScoreTrackingService: comScoreService,
             placement: placement,
             campaign: campaign,
-            configuration: TestFixtures.getConfiguration(),
+            configuration: configuration,
             request: request,
             options: {},
             endScreen: endScreen,

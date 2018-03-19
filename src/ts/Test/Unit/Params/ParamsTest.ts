@@ -341,6 +341,7 @@ describe('Event parameters should match specifications', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
+                configuration: TestFixtures.getConfiguration(),
                 campaign: campaign
             });
             OperativeEventManager.setPreviousPlacementId(undefined);
@@ -371,6 +372,7 @@ describe('Event parameters should match specifications', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
+                configuration: TestFixtures.getConfiguration(),
                 campaign: campaign
             });
             OperativeEventManager.setPreviousPlacementId(undefined);
@@ -411,6 +413,7 @@ describe('Event parameters should match specifications', () => {
                     sessionManager: sessionManager,
                     clientInfo: clientInfo,
                     deviceInfo: deviceInfo,
+                    configuration: TestFixtures.getConfiguration(),
                     campaign: campaign
                 });
                 OperativeEventManager.setPreviousPlacementId(undefined);
@@ -486,6 +489,7 @@ describe('Event parameters should match specifications', () => {
                     sessionManager: sessionManager,
                     clientInfo: clientInfo,
                     deviceInfo: deviceInfo,
+                    configuration: TestFixtures.getConfiguration(),
                     campaign: campaign
                 });
                 OperativeEventManager.setPreviousPlacementId(undefined);

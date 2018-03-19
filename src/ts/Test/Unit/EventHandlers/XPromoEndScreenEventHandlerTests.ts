@@ -65,6 +65,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             deviceInfo = TestFixtures.getAndroidDeviceInfo();
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
             sessionManager = new SessionManager(nativeBridge, request);
+            const configuration = TestFixtures.getConfiguration();
             operativeEventManager = <XPromoOperativeEventManager>OperativeEventManagerFactory.createOperativeEventManager({
                 nativeBridge: nativeBridge,
                 request: request,
@@ -72,6 +73,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
+                configuration: configuration,
                 campaign: campaign
             });
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
@@ -83,7 +85,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             sinon.spy(nativeBridge.Intent, 'launch');
 
             const video = new Video('', TestFixtures.getSession());
-            endScreen = new XPromoEndScreen(nativeBridge, TestFixtures.getXPromoCampaign(), TestFixtures.getConfiguration().isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
+            endScreen = new XPromoEndScreen(nativeBridge, TestFixtures.getXPromoCampaign(), configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
             placement = TestFixtures.getPlacement();
 
@@ -98,7 +100,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 comScoreTrackingService: comScoreService,
                 placement: placement,
                 campaign: campaign,
-                configuration: TestFixtures.getConfiguration(),
+                configuration: configuration,
                 request: request,
                 options: {},
                 endScreen: endScreen,
@@ -142,6 +144,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             deviceInfo = TestFixtures.getIosDeviceInfo();
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
             sessionManager = new SessionManager(nativeBridge, request);
+            const configuration = TestFixtures.getConfiguration();
             operativeEventManager = <XPromoOperativeEventManager>OperativeEventManagerFactory.createOperativeEventManager({
                 nativeBridge: nativeBridge,
                 request: request,
@@ -149,6 +152,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
+                configuration: configuration,
                 campaign: campaign
             });
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
@@ -160,7 +164,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             campaign.set('store', StoreName.APPLE);
             campaign.set('appStoreId', '11111');
 
-            endScreen = new XPromoEndScreen(nativeBridge, campaign, TestFixtures.getConfiguration().isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
+            endScreen = new XPromoEndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
 
             xPromoAdUnitParameters = {
@@ -174,7 +178,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 comScoreTrackingService: comScoreService,
                 placement: TestFixtures.getPlacement(),
                 campaign: campaign,
-                configuration: TestFixtures.getConfiguration(),
+                configuration: configuration,
                 request: request,
                 options: {},
                 endScreen: endScreen,

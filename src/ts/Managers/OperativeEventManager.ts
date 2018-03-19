@@ -17,6 +17,7 @@ import { Placement } from 'Models/Placement';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { CampaignAssetInfo } from 'Utilities/CampaignAssetInfo';
+import { Configuration } from 'Models/Configuration';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {
     nativeBridge: NativeBridge;
@@ -25,6 +26,7 @@ export interface IOperativeEventManagerParams<T extends Campaign> {
     sessionManager: SessionManager;
     clientInfo: ClientInfo;
     deviceInfo: DeviceInfo;
+    configuration: Configuration;
     campaign: T;
 }
 
@@ -66,6 +68,7 @@ export class OperativeEventManager {
     private _metaDataManager: MetaDataManager;
     private _deviceInfo: DeviceInfo;
     private _request: Request;
+    private _configuration: Configuration;
     private _campaign: Campaign;
 
     constructor(params: IOperativeEventManagerParams<Campaign>) {
@@ -75,6 +78,7 @@ export class OperativeEventManager {
         this._clientInfo = params.clientInfo;
         this._deviceInfo = params.deviceInfo;
         this._request = params.request;
+        this._configuration = params.configuration;
         this._campaign = params.campaign;
     }
 
@@ -300,7 +304,8 @@ export class OperativeEventManager {
             'platform': Platform[this._clientInfo.getPlatform()].toLowerCase(),
             'language': this._deviceInfo.getLanguage(),
             'cached': CampaignAssetInfo.isCached(this._campaign),
-            'cachedOrientation': CampaignAssetInfo.getCachedVideoOrientation(this._campaign)
+            'cachedOrientation': CampaignAssetInfo.getCachedVideoOrientation(this._campaign),
+            'token': this._configuration.getToken()
         };
 
         if(this._clientInfo.getPlatform() === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {

@@ -308,6 +308,7 @@ export class WebView {
                     sessionManager: this._sessionManager,
                     clientInfo: this._clientInfo,
                     deviceInfo: this._deviceInfo,
+                    configuration: this._configuration,
                     campaign: campaign
                 }),
                 comScoreTrackingService: this._comScoreTrackingService,
