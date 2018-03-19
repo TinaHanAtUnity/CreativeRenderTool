@@ -43,6 +43,8 @@ import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
 import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 
+import { FLAM } from 'Utilities/FLAM';
+
 describe('AdUnitFactoryTest', () => {
 
     let sandbox: sinon.SinonSandbox;
@@ -139,6 +141,8 @@ describe('AdUnitFactoryTest', () => {
             sandbox.stub(operativeEventManager, 'sendThirdQuartile').returns(Promise.resolve());
             sandbox.stub(operativeEventManager, 'sendSkip').returns(Promise.resolve());
 
+            sandbox.stub(FLAM, 'measure').returns(Promise.resolve());
+
             const videoAdUnit = <PerformanceAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
             videoAdUnit.onError.trigger();
             sinon.assert.calledOnce(<sinon.SinonSpy>PerformanceVideoEventHandlers.onVideoError);
@@ -206,6 +210,8 @@ describe('AdUnitFactoryTest', () => {
             sandbox.stub(operativeEventManager, 'sendView').returns(Promise.resolve());
             sandbox.stub(operativeEventManager, 'sendThirdQuartile').returns(Promise.resolve());
             sandbox.stub(operativeEventManager, 'sendSkip').returns(Promise.resolve());
+
+            sandbox.stub(FLAM, 'measure').returns(Promise.resolve());
 
             adUnitParameters.campaign = campaign;
             adUnitParameters.operativeEventManager = operativeEventManager;
