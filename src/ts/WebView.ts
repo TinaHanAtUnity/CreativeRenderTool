@@ -273,7 +273,7 @@ export class WebView {
 
         // Temporary for realtime testing purposes
         const testGroup = this._configuration.getAbGroup();
-        if (placement.getRealtimeData() && (testGroup === 7 || testGroup === 8)) {
+        if (placement.getRealtimeData() && (testGroup === 100 || testGroup === 101)) {
             this._nativeBridge.Sdk.logInfo('Unity Ads is requesting realtime fill for placement ' + placement.getId());
             const start = Date.now();
             this._campaignManager.requestRealtime(placement, campaign.getSession()).then(realtimeCampaign => {
