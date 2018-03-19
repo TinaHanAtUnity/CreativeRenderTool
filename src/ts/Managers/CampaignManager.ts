@@ -36,7 +36,7 @@ import { RequestError } from 'Errors/RequestError';
 import { CacheError } from 'Native/Api/Cache';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { IosDeviceInfo } from 'Models/IosDeviceInfo';
-import { CampaignParserFactory } from './CampaignParserFactory';
+import { CampaignParserFactory } from 'Managers/CampaignParserFactory';
 
 export class CampaignManager {
 
