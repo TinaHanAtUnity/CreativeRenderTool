@@ -1,4 +1,4 @@
-import { IOverlayHandler } from 'Views/AbstractOverlay';
+import { IOverlayHandler } from 'Views/AbstractVideoOverlay';
 import { NativeBridge } from 'Native/NativeBridge';
 import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
@@ -38,7 +38,7 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
         this._nativeBridge.VideoPlayer.pause();
         this._adUnit.setActive(false);
         this._adUnit.setFinishState(FinishState.SKIPPED);
-        this._operativeEventManager.sendSkip(this._campaign.getSession(), this._placement, this._campaign, this._adUnit.getVideo().getPosition(), this.getVideoOrientation(), this._adUnitStyle);
+        this._operativeEventManager.sendSkip(this._placement, this._adUnit.getVideo().getPosition(), this.getVideoOrientation(), this._adUnitStyle);
         this.sendComscoreEvent();
 
         this._adUnit.getContainer().reconfigure(ViewConfiguration.ENDSCREEN);
@@ -67,7 +67,7 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
         this._nativeBridge.VideoPlayer.pause();
         this._adUnit.setActive(false);
         this._adUnit.setFinishState(FinishState.SKIPPED);
-        this._operativeEventManager.sendSkip(this._campaign.getSession(), this._placement, this._campaign, this._adUnit.getVideo().getPosition(), this.getVideoOrientation());
+        this._operativeEventManager.sendSkip(this._placement, this._adUnit.getVideo().getPosition(), this.getVideoOrientation());
 
         this._adUnit.onFinish.trigger();
 

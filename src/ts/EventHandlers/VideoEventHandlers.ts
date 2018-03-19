@@ -20,6 +20,7 @@ import { XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
+import { XPromoOperativeEventManager } from 'Managers/XPromoOperativeEventManager';
 
 export class VideoEventHandlers {
 
@@ -105,7 +106,7 @@ export class VideoEventHandlers {
             }
 
             if(!(adUnit instanceof XPromoAdUnit)) {
-                operativeEventManager.sendStart(campaign.getSession(), placement, campaign, this.getVideoOrientation(adUnit), adUnitStyle).then(() => {
+                operativeEventManager.sendStart(placement, this.getVideoOrientation(adUnit), adUnitStyle).then(() => {
                     adUnit.onStartProcessed.trigger();
                 });
 
@@ -119,8 +120,8 @@ export class VideoEventHandlers {
                     subCategory = campaign.getSubcategory();
                 }
                 comScoreTrackingService.sendEvent('play', sessionId, comScoreDuration, position, creativeId, category, subCategory);
-            } else {
-                operativeEventManager.sendHttpKafkaEvent('ads.xpromo.operative.videostart.v1.json', 'start', campaign.getSession(), placement, campaign, this.getVideoOrientation(adUnit));
+            } else if(operativeEventManager instanceof XPromoOperativeEventManager) {
+                operativeEventManager.sendHttpKafkaEvent('ads.xpromo.operative.videostart.v1.json', 'start', placement, this.getVideoOrientation(adUnit));
                 if(campaign instanceof XPromoCampaign) {
                     const clickTrackingUrls = campaign.getTrackingUrlsForEvent('start');
                     for (const url of clickTrackingUrls) {
@@ -229,11 +230,11 @@ export class VideoEventHandlers {
             adUnit.getVideo().setPosition(position);
 
             if(previousQuartile === 0 && adUnit.getVideo().getQuartile() === 1) {
-                operativeEventManager.sendFirstQuartile(campaign.getSession(), placement, campaign, this.getVideoOrientation(adUnit), adUnitStyle);
+                operativeEventManager.sendFirstQuartile(placement, this.getVideoOrientation(adUnit), adUnitStyle);
             } else if(previousQuartile === 1 && adUnit.getVideo().getQuartile() === 2) {
-                operativeEventManager.sendMidpoint(campaign.getSession(), placement, campaign, this.getVideoOrientation(adUnit), adUnitStyle);
+                operativeEventManager.sendMidpoint(placement, this.getVideoOrientation(adUnit), adUnitStyle);
             } else if(previousQuartile === 2 && adUnit.getVideo().getQuartile() === 3) {
-                operativeEventManager.sendThirdQuartile(campaign.getSession(), placement, campaign, this.getVideoOrientation(adUnit), adUnitStyle);
+                operativeEventManager.sendThirdQuartile(placement, this.getVideoOrientation(adUnit), adUnitStyle);
             }
         }
 
@@ -253,15 +254,15 @@ export class VideoEventHandlers {
         adUnit.setFinishState(FinishState.COMPLETED);
 
         if(!(adUnit instanceof XPromoAdUnit)) {
-            operativeEventManager.sendView(campaign.getSession(), placement, campaign, this.getVideoOrientation(adUnit), adUnitStyle);
+            operativeEventManager.sendView(placement, this.getVideoOrientation(adUnit), adUnitStyle);
 
             const comScorePlayedTime = adUnit.getVideo().getPosition();
             const comScoreDuration = (adUnit.getVideo().getDuration()).toString(10);
             const sessionId = campaign.getSession().getId();
             const creativeId = campaign.getCreativeId();
             comScoreTrackingService.sendEvent('end', sessionId, comScoreDuration, comScorePlayedTime, creativeId, undefined, undefined);
-        } else {
-            operativeEventManager.sendHttpKafkaEvent('ads.xpromo.operative.videoview.v1.json', 'view', campaign.getSession(), placement, campaign, this.getVideoOrientation(adUnit));
+        } else if(operativeEventManager instanceof XPromoOperativeEventManager) {
+            operativeEventManager.sendHttpKafkaEvent('ads.xpromo.operative.videoview.v1.json', 'view', placement, this.getVideoOrientation(adUnit));
             if(campaign instanceof XPromoCampaign) {
                 const clickTrackingUrls = campaign.getTrackingUrlsForEvent('view');
                 for (const url of clickTrackingUrls) {

@@ -39,7 +39,7 @@ export class XPromoCampaignParser extends CampaignParser {
             correlationId: undefined,
             creativeId: undefined,
             seatId: undefined,
-            meta: undefined,
+            meta: json.meta,
             session: session
         };
 

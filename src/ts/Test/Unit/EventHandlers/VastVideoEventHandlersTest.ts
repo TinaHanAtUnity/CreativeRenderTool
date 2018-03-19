@@ -26,6 +26,7 @@ import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 
 import EventTestVast from 'xml/EventTestVast.xml';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
+import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 
 describe('VastVideoEventHandlers tests', () => {
     const handleInvocation = sinon.spy();
@@ -81,9 +82,19 @@ describe('VastVideoEventHandlers tests', () => {
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        sessionManager = new SessionManager(nativeBridge);
+        sessionManager = new SessionManager(nativeBridge, request);
 
-        const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+        const configuration = TestFixtures.getConfiguration();
+        const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
+            nativeBridge: nativeBridge,
+            request: request,
+            metaDataManager: metaDataManager,
+            sessionManager: sessionManager,
+            clientInfo: clientInfo,
+            deviceInfo: deviceInfo,
+            configuration: configuration,
+            campaign: campaign
+        });
         const comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         vastAdUnitParameters = {
@@ -97,7 +108,7 @@ describe('VastVideoEventHandlers tests', () => {
             comScoreTrackingService: comScoreService,
             placement: placement,
             campaign: campaign,
-            configuration: TestFixtures.getConfiguration(),
+            configuration: configuration,
             request: request,
             options: {},
             endScreen: undefined,
@@ -251,7 +262,7 @@ describe('VastVideoEventHandlers tests', () => {
         });
     });
 
-    describe('onVideoError', ()=> {
+    describe('onVideoError', () => {
         it('should hide ad unit', () => {
             VastVideoEventHandlers.onVideoError(testAdUnit);
             sinon.assert.called(<sinon.SinonSpy>testAdUnit.hide);

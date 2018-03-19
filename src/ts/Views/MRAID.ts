@@ -76,8 +76,6 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
             const skipLength = this._placement.allowSkipInSeconds();
             this._closeRemaining = MRAID.CloseLength;
             let skipRemaining = skipLength;
-            this.updateProgressTimer(skipRemaining);
-
             this._updateInterval = setInterval(() => {
                 if(this._closeRemaining > 0) {
                     this._closeRemaining--;
@@ -95,12 +93,9 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
                     clearInterval(this._updateInterval);
                     this._canClose = true;
                 }
-                this.updateProgressTimer(skipRemaining);
             }, 1000);
         } else {
             this._closeRemaining = MRAID.CloseLength;
-            this.updateProgressTimer(this._closeRemaining);
-
             this._updateInterval = setInterval(() => {
                 const progress = (MRAID.CloseLength - this._closeRemaining) / MRAID.CloseLength;
                 if(progress >= 0.75 && !this._didReward) {
@@ -117,7 +112,6 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
                     this._closeElement.style.opacity = '1';
                     this.updateProgressCircle(this._closeElement, 1);
                 }
-                this.updateProgressTimer(this._closeRemaining);
             }, 1000);
         }
 
@@ -175,23 +169,6 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         if(value >= 0.5) {
             wrapperElement.style.webkitAnimationName = 'close-progress-wrapper';
             rightCircleElement.style.webkitAnimationName = 'right-spin';
-        }
-    }
-
-    private updateProgressTimer(remainingCloseSkipTime: number) {
-        const abGroup = this._campaign.getAbGroup();
-
-        if (abGroup !== 18 && abGroup !== 19) {
-            return;
-        }
-
-        const closeIcon = <HTMLElement>this._closeElement.querySelector('.icon-close');
-        if (remainingCloseSkipTime > 0) {
-            closeIcon.classList.add('number');
-            closeIcon.innerText = String(remainingCloseSkipTime);
-        } else {
-            closeIcon.classList.remove('number');
-            closeIcon.innerText = '';
         }
     }
 

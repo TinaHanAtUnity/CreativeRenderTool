@@ -29,8 +29,8 @@ import { ProgrammaticAdMobParser } from 'Parsers/ProgrammaticAdMobParser';
 import { CampaignParser } from 'Parsers/CampaignParser';
 import { PromoCampaignParser } from 'Parsers/PromoCampaignParser';
 import { ProgrammaticVPAIDParser } from 'Parsers/ProgrammaticVPAIDParser';
-import { XPromoCampaignParser } from "Parsers/XPromoCampaignParser";
-import { AdMobSignalFactory} from 'AdMob/AdMobSignalFactory';
+import { XPromoCampaignParser } from 'Parsers/XPromoCampaignParser';
+import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { RequestError } from 'Errors/RequestError';
 import { CacheError } from 'Native/Api/Cache';
@@ -417,7 +417,8 @@ export class CampaignManager {
             language: this._deviceInfo.getLanguage(),
             gameSessionId: this._sessionManager.getGameSessionId(),
             timeZone: this._deviceInfo.getTimeZone(),
-            simulator: this._deviceInfo instanceof IosDeviceInfo ? this._deviceInfo.isSimulator() : undefined
+            simulator: this._deviceInfo instanceof IosDeviceInfo ? this._deviceInfo.isSimulator() : undefined,
+            token: this._configuration.getToken()
         };
 
         if (this.getPreviousPlacementId()) {
@@ -480,6 +481,7 @@ export class CampaignManager {
 
                 body.placements = placementRequest;
                 body.properties = this._configuration.getProperties();
+                body.sessionDepth = SdkStats.getAdRequestOrdinal();
 
                 return body;
             });

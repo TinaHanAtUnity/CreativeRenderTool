@@ -19,6 +19,7 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { FocusManager } from 'Managers/FocusManager';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
+import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 
 describe('PerformanceVideoEventHandlersTest', () => {
 
@@ -47,12 +48,22 @@ describe('PerformanceVideoEventHandlersTest', () => {
         const clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         const deviceInfo = TestFixtures.getAndroidDeviceInfo();
         const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        const sessionManager = new SessionManager(nativeBridge);
-        const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
-        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
-
+        const sessionManager = new SessionManager(nativeBridge, request);
         const campaign = TestFixtures.getCampaign();
-        endScreen = new PerformanceEndScreen(nativeBridge, campaign, TestFixtures.getConfiguration().isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
+        const configuration = TestFixtures.getConfiguration();
+        const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
+            nativeBridge: nativeBridge,
+            request: request,
+            metaDataManager: metaDataManager,
+            sessionManager: sessionManager,
+            clientInfo: clientInfo,
+            deviceInfo: deviceInfo,
+            configuration: configuration,
+            campaign: campaign
+        });
+
+        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
+        endScreen = new PerformanceEndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
 
         performanceAdUnitParameters = {
@@ -66,7 +77,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
             comScoreTrackingService: comScoreService,
             placement: TestFixtures.getPlacement(),
             campaign: campaign,
-            configuration: TestFixtures.getConfiguration(),
+            configuration: configuration,
             request: request,
             options: {},
             endScreen: endScreen,

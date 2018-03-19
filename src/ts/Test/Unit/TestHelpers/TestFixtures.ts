@@ -150,7 +150,7 @@ export class TestFixtures {
             trackingUrls: {},
             clickAttributionUrl: mraidContentJson.clickAttributionUrl,
             clickAttributionUrlFollowsRedirects: mraidContentJson.clickAttributionUrlFollowsRedirects,
-            clickUrl: mraidContentJson.clickUrl ? mraidContentJson.clickAttributionUrl : undefined,
+            clickUrl: mraidContentJson.clickUrl ? mraidContentJson.clickUrl : undefined,
             videoEventUrls: mraidContentJson.videoEventUrls ? mraidContentJson.videoEventUrls : undefined,
             gameName: mraidContentJson.gameName,
             gameIcon: mraidContentJson.gameIcon ? new Image(mraidContentJson.gameIcon, session) : undefined,

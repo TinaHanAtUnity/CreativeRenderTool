@@ -198,7 +198,7 @@ describe('CampaignManager', () => {
         deviceInfo = new AndroidDeviceInfo(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        sessionManager = new SessionManager(nativeBridge);
+        sessionManager = new SessionManager(nativeBridge, request);
         adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);
         (<sinon.SinonStub>adMobSignalFactory.getAdRequestSignal).returns(Promise.resolve(new AdMobSignal()));
     });
@@ -703,7 +703,7 @@ describe('CampaignManager', () => {
                 assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('start'), [
                     'http://customTrackingUrl/start',
                     'http://customTrackingUrl/start2',
-                    "http://customTrackingUrl/start3/%ZONE%/blah?sdkVersion=?%SDK_VERSION%"
+                    'http://customTrackingUrl/start3/%ZONE%/blah?sdkVersion=?%SDK_VERSION%'
                 ]);
                 assert.deepEqual(triggeredCampaign.getVast().getTrackingEventUrls('firstQuartile'), [
                     'http://customTrackingUrl/firstQuartile'
@@ -1016,8 +1016,8 @@ describe('CampaignManager', () => {
                     assert.equal(triggeredCampaign.getCorrelationId(), 'zzzz');
                     assert.equal((<VastCampaign>triggeredCampaign).getVideo().getUrl(), 'https://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
                     assert.deepEqual((<VastCampaign>triggeredCampaign).getVast().getTrackingEventUrls('start'), [
-                        "https://ads-brand-postback.unityads.unity3d.com/brands/2000/%ZONE%/impression/common?data=HriweFDQPzT1jnyWbt-UA8UKb9IOsNlB9YIUyM9eE5ujdz4eYZgsoFvzcfOR0945o8vsJZHvyi000XO4SVoOkgxlWcUpHRArDKtM16J5jLAhZkWxULyJ0JywIVC3Tebds1o5ZYQ5_KsbpqCbO-q56Jd3AKgbIlTgIDjATlSFf8AiOl96Y81UkZutA8jx4E2sQTCKg1ar6uXQvuXV6KG4IYdx8Jr5e9ZFvgjy6kxbgbuyuEw2_SKzmBCsj3Q2qOM_YxDzaxd5xa2kJ5H9udVwtLUs8OnndWj-k0f__xj958kx6pBvcCwm-xfQiP8zA0DuMq7IHqGt9uvzuvcSN8XX3klwoaYNjZGcggH_AvNoJMPM2lfBidn6cPGOk9IXNNdvT7s42Ss05RSVVqIm87eGmWWVfoSut_UIMTMes1JtxuSuBKCk3abJdUm1GhdJ8OTF3mOVJ1vKj7M%3D",
-                        "https://www.dummy-url.com"
+                        'https://ads-brand-postback.unityads.unity3d.com/brands/2000/%ZONE%/impression/common?data=HriweFDQPzT1jnyWbt-UA8UKb9IOsNlB9YIUyM9eE5ujdz4eYZgsoFvzcfOR0945o8vsJZHvyi000XO4SVoOkgxlWcUpHRArDKtM16J5jLAhZkWxULyJ0JywIVC3Tebds1o5ZYQ5_KsbpqCbO-q56Jd3AKgbIlTgIDjATlSFf8AiOl96Y81UkZutA8jx4E2sQTCKg1ar6uXQvuXV6KG4IYdx8Jr5e9ZFvgjy6kxbgbuyuEw2_SKzmBCsj3Q2qOM_YxDzaxd5xa2kJ5H9udVwtLUs8OnndWj-k0f__xj958kx6pBvcCwm-xfQiP8zA0DuMq7IHqGt9uvzuvcSN8XX3klwoaYNjZGcggH_AvNoJMPM2lfBidn6cPGOk9IXNNdvT7s42Ss05RSVVqIm87eGmWWVfoSut_UIMTMes1JtxuSuBKCk3abJdUm1GhdJ8OTF3mOVJ1vKj7M%3D',
+                        'https://www.dummy-url.com'
                     ]);
                 });
             });
@@ -1044,16 +1044,16 @@ describe('CampaignManager', () => {
                     assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getResourceUrl(), new HTML('https://img.serveroute.com/mini_8ball_fast/inlined.html', triggeredCampaign.getSession()));
                     assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getDynamicMarkup(), 'var markup = \'dynamic\';');
                     assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getTrackingUrls(), {
-                        "impression": [
-                            "http://test.impression.com/blah1",
-                            "http://test.impression.com/blah2",
-                            "http://test.impression.com/%ZONE%/blah?sdkVersion=%SDK_VERSION%"
+                        'impression': [
+                            'http://test.impression.com/blah1',
+                            'http://test.impression.com/blah2',
+                            'http://test.impression.com/%ZONE%/blah?sdkVersion=%SDK_VERSION%'
                         ],
-                        "complete": [
-                            "http://test.complete.com/complete1"
+                        'complete': [
+                            'http://test.complete.com/complete1'
                         ],
-                        "click": [
-                            "http://test.complete.com/click1"
+                        'click': [
+                            'http://test.complete.com/click1'
                         ]
                     });
                 });
@@ -1157,7 +1157,7 @@ describe('CampaignManager', () => {
     });
 
     it('should have cachedCampaigns in request body', () => {
-        let requestData: string = "{}";
+        let requestData: string = '{}';
         sinon.stub(request, 'post').callsFake((url: string, data: string = '', headers: Array<[string, string]> = [], options?: any) => {
             requestData = data;
             return Promise.resolve();

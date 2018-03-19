@@ -30,7 +30,7 @@ describe('DisplayInterstitialEventHandler', () => {
     let operativeEventManager: OperativeEventManager;
     let comScoreService: ComScoreTrackingService;
 
-    describe('on Display Interstitial Markup Campaign',() => {
+    describe('on Display Interstitial Markup Campaign', () => {
         eventHandlerTests();
     });
 
