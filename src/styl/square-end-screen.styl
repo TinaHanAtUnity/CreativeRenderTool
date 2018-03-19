@@ -1,4 +1,5 @@
 @import "vars.styl";
+@import "square-end-screen-media-queries.styl";
 
 #end-screen.square-end-screen {
   .campaign-container {
@@ -47,10 +48,6 @@
     background-size: cover;
   }
 
-  .end-screen-info {
-    width: 90%;
-  }
-
   .end-screen-info-background {
     position: relative;
     z-index: 6;
@@ -76,12 +73,25 @@
 }
 
 
+/** Styles for devices that can show the full sized image without blurred background **/
+
+@media (max-aspect-ratio: 290/460) and (orientation: portrait), (min-aspect-ratio: 470/290) and (orientation: landscape) {
+  #end-screen.square-end-screen {
+    .game-background-blurred {
+      display: none;
+    }
+  }
+}
 
 @media (max-aspect-ratio: 290/460 ) and (orientation: portrait) {
   body {
     &.portrait #end-screen.square-end-screen {
       .end-screen-info-background {
         height: auto;
+      }
+
+      .download-container {
+        margin: .55rem auto;
       }
     }
   }
@@ -97,14 +107,6 @@
     .end-screen-info-background {
       height: auto;
     }
-
-    .game-background-blurred {
-      display: none;
-    }
-
-    .game-rating, .name-container {
-      font-size: 1.4rem;
-    }
   }
 }
 
@@ -115,24 +117,12 @@
       height: 100%;
     }
 
-    .game-background-blurred {
-      display: none;
-    }
-
     .end-screen-info-background {
       width: auto;
     }
 
-    .download-container {
-      width: 90%;
-    }
-
-    .download-container {
-      font-size: 1.05rem;
-    }
-
-    .game-rating, .name-container {
-      font-size: 1.4rem;
+    .unityads-logo {
+      width: 100%;
     }
   }
 }
@@ -146,6 +136,14 @@
 
     .privacy-button {
       left: -14px;
+    }
+
+    .download-container {
+      font-size: 1.05rem;
+    }
+
+    .game-rating, .name-container {
+      font-size: 1.2rem;
     }
   }
 }
