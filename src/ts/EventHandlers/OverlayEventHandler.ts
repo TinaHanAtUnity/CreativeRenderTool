@@ -38,7 +38,7 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
         this._nativeBridge.VideoPlayer.pause();
         this._adUnit.setActive(false);
         this._adUnit.setFinishState(FinishState.SKIPPED);
-        this._operativeEventManager.sendSkip(this._campaign.getSession(), this._placement, this._campaign, this._adUnit.getVideo().getPosition(), this.getVideoOrientation(), this._adUnitStyle);
+        this._operativeEventManager.sendSkip(this._placement, this._adUnit.getVideo().getPosition(), this.getVideoOrientation(), this._adUnitStyle);
         this.sendComscoreEvent();
 
         this._adUnit.getContainer().reconfigure(ViewConfiguration.ENDSCREEN);
@@ -67,7 +67,7 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
         this._nativeBridge.VideoPlayer.pause();
         this._adUnit.setActive(false);
         this._adUnit.setFinishState(FinishState.SKIPPED);
-        this._operativeEventManager.sendSkip(this._campaign.getSession(), this._placement, this._campaign, this._adUnit.getVideo().getPosition(), this.getVideoOrientation());
+        this._operativeEventManager.sendSkip(this._placement, this._adUnit.getVideo().getPosition(), this.getVideoOrientation());
 
         this._adUnit.onFinish.trigger();
 

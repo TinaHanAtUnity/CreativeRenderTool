@@ -15,7 +15,6 @@ import { Request } from 'Utilities/Request';
 import { HTML } from 'Models/Assets/HTML';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
-import { Platform } from 'Constants/Platform';
 import { FocusManager } from 'Managers/FocusManager';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
 

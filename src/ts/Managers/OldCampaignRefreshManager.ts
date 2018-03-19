@@ -31,7 +31,6 @@ export class OldCampaignRefreshManager extends RefreshManager {
     private _clientInfo: ClientInfo;
     private _request: Request;
     private _cache: Cache;
-    private _operativeEventManager: OperativeEventManager;
     private _refillTimestamp: number;
     private _needsRefill = true;
     private _refreshAllowed = true;
@@ -47,7 +46,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
     // this constant is intentionally named "magic" constant because the value is only a best guess and not a real technical constant
     private _startRefreshMagicConstant: number = 5000;
 
-    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, campaignManager: CampaignManager, configuration: Configuration, focusManager: FocusManager, sessionManager: SessionManager, clientInfo: ClientInfo, request: Request, cache: Cache, operativeEventManager: OperativeEventManager) {
+    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, campaignManager: CampaignManager, configuration: Configuration, focusManager: FocusManager, sessionManager: SessionManager, clientInfo: ClientInfo, request: Request, cache: Cache) {
         super();
 
         this._nativeBridge = nativeBridge;
@@ -59,7 +58,6 @@ export class OldCampaignRefreshManager extends RefreshManager {
         this._clientInfo = clientInfo;
         this._request = request;
         this._cache = cache;
-        this._operativeEventManager = operativeEventManager;
         this._refillTimestamp = 0;
         this._campaignCount = 0;
         this._parsingErrorCount = 0;
@@ -429,7 +427,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
                 }
             } else {
                 this.refresh();
-                this._sessionManager.sendUnsentSessions(this._operativeEventManager);
+                this._sessionManager.sendUnsentSessions();
             }
         });
     }

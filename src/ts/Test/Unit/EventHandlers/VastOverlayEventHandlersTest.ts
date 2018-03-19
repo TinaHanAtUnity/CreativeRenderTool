@@ -26,6 +26,7 @@ import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { MOAT } from 'Views/MOAT';
 import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 import { SinonSandbox } from 'sinon';
+import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 
 describe('VastOverlayEventHandlersTest', () => {
     let campaign: VastCampaign;
@@ -83,13 +84,24 @@ describe('VastOverlayEventHandlersTest', () => {
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        sessionManager = new SessionManager(nativeBridge);
+        sessionManager = new SessionManager(nativeBridge, request);
         request = new Request(nativeBridge, new WakeUpManager(nativeBridge, new FocusManager(nativeBridge)));
         sinon.stub(request, 'followRedirectChain').callsFake((url) => {
             return Promise.resolve(url);
         });
 
-        const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+        const configuration = TestFixtures.getConfiguration();
+        const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
+            nativeBridge: nativeBridge,
+            request: request,
+            metaDataManager: metaDataManager,
+            sessionManager: sessionManager,
+            clientInfo: clientInfo,
+            deviceInfo: deviceInfo,
+            configuration: configuration,
+            campaign: campaign
+        });
+
         comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         vastAdUnitParameters = {
@@ -103,7 +115,7 @@ describe('VastOverlayEventHandlersTest', () => {
             comScoreTrackingService: comScoreService,
             placement: TestFixtures.getPlacement(),
             campaign: campaign,
-            configuration: TestFixtures.getConfiguration(),
+            configuration: configuration,
             request: request,
             options: {},
             endScreen: undefined,
