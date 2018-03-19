@@ -39,6 +39,7 @@ export class AdMobSignalFactory {
         signal.setIsJailbroken(this._deviceInfo.isRooted());
         signal.setIsDeviceCharging(this.checkChargingStatus());
         signal.setDeviceIncapabilities(this.checkDeviceIncapabilities());
+        signal.setDeviceSubModel(this._deviceInfo.getModel());
 
         const promises = [];
         promises.push(this._deviceInfo.getBatteryLevel().then(batteryLevel => {
