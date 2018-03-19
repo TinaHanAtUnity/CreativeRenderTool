@@ -64,6 +64,8 @@ import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
 import { PromoEventHandler } from 'EventHandlers/PromoEventHandler';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 
+import { FLAM } from 'Utilities/FLAM';
+
 export class AdUnitFactory {
 
     public static createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractAdUnit {
@@ -105,6 +107,8 @@ export class AdUnitFactory {
             endScreen: endScreen,
             adUnitStyle: adUnitStyle
         };
+
+        FLAM.measure(document.body);
 
         const performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
         const performanceOverlayEventHandler = new PerformanceOverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
@@ -256,6 +260,8 @@ export class AdUnitFactory {
     private static createMRAIDAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<MRAIDCampaign>): MRAIDAdUnit {
         const resourceUrl = parameters.campaign.getResourceUrl();
         let endScreen: MRAIDEndScreen | undefined;
+
+        FLAM.measure(document.body);
 
         let mraid: MRAIDView<IMRAIDViewHandler>;
         if(resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity|roll-the-ball/)) {
