@@ -273,7 +273,7 @@ export class WebView {
 
         // Temporary for realtime testing purposes
         const testGroup = this._configuration.getAbGroup();
-        if (placement.getRealtimeData() && (testGroup === 100 || testGroup === 101)) {
+        if (placement.getRealtimeData()) {
             this._nativeBridge.Sdk.logInfo('Unity Ads is requesting realtime fill for placement ' + placement.getId());
             const start = Date.now();
             this._campaignManager.requestRealtime(placement, campaign.getSession()).then(realtimeCampaign => {
@@ -282,7 +282,8 @@ export class WebView {
                 const latency = Date.now() - start;
                 Diagnostics.trigger('realtime_network_latency', {
                     latency: latency,
-                    auctionId: campaign.getSession().getId()
+                    auctionId: campaign.getSession().getId(),
+                    abGroup: testGroup
                 });
                 this._nativeBridge.Sdk.logInfo(`Unity Ads received a realtime request in ${latency} ms.`);
 
