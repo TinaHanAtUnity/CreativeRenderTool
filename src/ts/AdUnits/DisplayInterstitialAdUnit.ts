@@ -103,10 +103,6 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
         });
     }
 
-    public isCached(): boolean {
-        return false;
-    }
-
     public description(): string {
         return 'programmaticImage';
     }
