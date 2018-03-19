@@ -132,7 +132,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
             videoOrientation = 'portrait';
         }
 
-        this._nativeBridge.Sdk.logDebug('Returning ' + videoOrientation + ' as video orientation for locked orientation ' + ForceOrientation[this._container.getLockedOrientation()].toLowerCase());
+        this._nativeBridge.Sdk.logDebug('Returning ' + videoOrientation + ' as video orientation for locked orientation ' + ForceOrientation[this._container.getLockedOrientation()]);
 
         return videoOrientation;
     }
