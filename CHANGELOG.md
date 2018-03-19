@@ -1,3 +1,8 @@
+# Pending
+
+* Easter theme A/B test in groups 16 & 17
+* Remove overlay A/B test from groups 16 & 17
+
 # Mon Mar 19 07:48:44 UTC 2018
 
 * Support for new A/B testing framework
