@@ -1,4 +1,4 @@
-# Pending
+# Mon Mar 19 07:48:44 UTC 2018
 
 * Support for new A/B testing framework
 * Add sessionDepth parameter to ad requests
