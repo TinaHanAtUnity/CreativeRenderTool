@@ -1,3 +1,5 @@
+import { Platform } from 'Constants/Platform';
+
 export interface IUrl {
     protocol: string;
     host: string;
@@ -12,19 +14,23 @@ export class Url {
 
     public static encode(url: string): string {
         if(url) {
-            url = url.replace(/"/g, '%22');
-            url = url.replace(/</g, '%3C');
-            url = url.replace(/>/g, '%3E');
-            url = url.replace(/#/g, '%23');
-            url = url.replace(/{/g, '%7B');
-            url = url.replace(/}/g, '%7D');
-            url = url.replace(/\|/g, '%7C');
-            url = url.replace(/\\/g, '%5C');
-            url = url.replace(/\^/g, '%5E');
-            url = url.replace(/~/g, '%7E');
-            url = url.replace(/\[/g, '%5B');
-            url = url.replace(/]/g, '%5D');
-            url = url.replace(/`/g, '%60');
+            let encodedUrl = '';
+            let i = 0;
+
+            while(i < url.length) {
+                // Skip already encoded URL characters
+                if (url[i] === '%' && (url.length - i >= 3) && Url.isNumber(url[i + 1]) && Url.isNumber(url[i + 2])) {
+                    encodedUrl += url[i++];
+                    encodedUrl += url[i++];
+                    encodedUrl += url[i++];
+                    continue;
+                }
+
+                encodedUrl += encodeURI(url[i]);
+                i++;
+            }
+
+            return encodedUrl;
         }
 
         return url;
@@ -92,8 +98,19 @@ export class Url {
         return false;
     }
 
-    public static isProtocolWhitelisted(url: string): boolean {
-        for (const protocol of this.whitelistedProtocols) {
+    public static isProtocolWhitelisted(url: string, platform: Platform): boolean {
+        let whitelisted: string[] = [];
+
+        switch (platform) {
+            case Platform.IOS:
+                whitelisted = this.iosWhitelistedProtocols;
+                break;
+            case Platform.ANDROID:
+                whitelisted = this.androidWhitelistedProtocols;
+                break;
+        }
+
+        for (const protocol of whitelisted) {
             if (url.indexOf(protocol) === 0) {
                 return true;
             }
@@ -101,5 +118,10 @@ export class Url {
         return false;
     }
 
-    private static whitelistedProtocols = ['market', 'itunes', 'itms', 'itmss'];
+    private static iosWhitelistedProtocols = ['itunes', 'itms', 'itmss', 'http', 'https'];
+    private static androidWhitelistedProtocols = ['market', 'http', 'https'];
+
+    private static isNumber(c: string): boolean {
+        return c.match(/^[0-9a-fA-F]$/) !== null;
+    }
 }

@@ -82,9 +82,9 @@ export class AdMobSignalFactory {
                     if(results[MotionEventAction[MotionEventAction.ACTION_DOWN]]) {
                         const downIndex: number = results[MotionEventAction[MotionEventAction.ACTION_DOWN]];
 
-                        return this._nativeBridge.AndroidAdUnit.getMotionEventData({ "0": [downIndex] }).then(motionData => {
-                            if(motionData["0"] && motionData["0"][downIndex.toString()]) {
-                                const motionEvent: IMotionEvent = motionData["0"][downIndex.toString()];
+                        return this._nativeBridge.AndroidAdUnit.getMotionEventData({ '0': [downIndex] }).then(motionData => {
+                            if(motionData['0'] && motionData['0'][downIndex.toString()]) {
+                                const motionEvent: IMotionEvent = motionData['0'][downIndex.toString()];
                                 signal.setAndroidTouchObscured(motionEvent.isObscured);
                                 signal.setTouchToolType(motionEvent.toolType);
                                 signal.setTouchSource(motionEvent.source);
@@ -95,7 +95,7 @@ export class AdMobSignalFactory {
                         });
                     }
                 }).catch(() => {
-                    this.logFailure(this._nativeBridge,'motionEventCount');
+                    this.logFailure(this._nativeBridge, 'motionEventCount');
                 }));
             }
             return Promise.all(promises).then(() => {
@@ -137,7 +137,7 @@ export class AdMobSignalFactory {
             this.logFailure(nativeBridge, 'connectionType');
         }));
 
-        promises.push(Promise.all([this._deviceInfo.getScreenWidth(),this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
+        promises.push(Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
             if (this._nativeBridge.getPlatform() === Platform.IOS && this._deviceInfo instanceof IosDeviceInfo) {
                 signal.setScreenWidth(width * this._deviceInfo.getScreenScale());
                 signal.setScreenHeight(height * this._deviceInfo.getScreenScale());
@@ -176,12 +176,6 @@ export class AdMobSignalFactory {
             }).catch(() => {
                 signal.setUsbConnected(2); // failed to get usb connection status
                 this.logFailure(nativeBridge, 'usbConnected');
-            }));
-
-            promises.push(this._nativeBridge.DeviceInfo.Android.getApkDigest().then(apkdigest => {
-                signal.setApkHash(apkdigest);
-            }).catch(() => {
-                this.logFailure(nativeBridge, 'apkHash');
             }));
 
             promises.push(this._nativeBridge.DeviceInfo.Android.getCertificateFingerprint().then(certificate => {

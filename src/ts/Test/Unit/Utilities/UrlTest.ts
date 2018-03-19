@@ -2,6 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 
 import { Url } from 'Utilities/Url';
+import { Platform } from 'Constants/Platform';
 
 describe('UrlTest', () => {
 
@@ -49,6 +50,31 @@ describe('UrlTest', () => {
             const url = 'http://test.com?param=|Hello|%20|HelloAgain|';
             assert.equal(Url.encode(url), 'http://test.com?param=%7CHello%7C%20%7CHelloAgain%7C', 'Url not encoded as expected');
         });
+
+        it('should encode utf8 characters', () => {
+            const url = 'http://test.com?param=%7CHello%7C%20%7CHelloAgain%7C/FRVideo19unity封面.png';
+            assert.equal(Url.encode(url), 'http://test.com?param=%7CHello%7C%20%7CHelloAgain%7C/FRVideo19unity%E5%B0%81%E9%9D%A2.png', 'Url not encoded as expected');
+        });
+
+        it('should encode %', () => {
+            const url = 'http://test.com?param=%7C%%7C%25';
+            assert.equal(Url.encode(url), 'http://test.com?param=%7C%25%7C%25', 'Url not encoded as expected');
+        });
+
+        it('should encode % in the end', () => {
+            const url = 'http://test.com?param=%';
+            assert.equal(Url.encode(url), 'http://test.com?param=%25', 'Url not encoded as expected');
+        });
+
+        it('should encode % in wrong url escape', () => {
+            const url = 'http://test.com?param=%2';
+            assert.equal(Url.encode(url), 'http://test.com?param=%252', 'Url not encoded as expected');
+        });
+
+        it('should encode % in wrong url escape with letters', () => {
+            const url = 'http://test.com?param=%wb';
+            assert.equal(Url.encode(url), 'http://test.com?param=%25wb', 'Url not encoded as expected');
+        });
     });
 
     describe('validating UTF-8', () => {
@@ -57,6 +83,45 @@ describe('UrlTest', () => {
             assert.isTrue(Url.isValid(url), 'Should allow unicode characters, test 1');
             url = 'https://cdn.unityads.unity3d.com/assets/f28676c2-5feb-4aa7-94fb-70c9c901cd57/800×600.png';
             assert.isTrue(Url.isValid(url), 'Should allow unicode characters, test 2');
+        });
+    });
+
+    describe('whitelisting IOS', function() {
+        it('should return true', function() {
+            ['itunes', 'itms', 'itmss', 'http', 'https'].forEach((protocol) => {
+                const url = protocol + '://cdn-highwinds.unityads.unity3d.com/assets/29587943-3ee9-4490-a181-de372e9c7097/FRVideo19unity封面.png';
+                assert.isTrue(Url.isProtocolWhitelisted(url, Platform.IOS), `for protocol ${protocol}`);
+          });
+        });
+        it('should return false', function() {
+            ['market', 'tcp', 'bla'].forEach((protocol) => {
+                const url = protocol + '://cdn-highwinds.unityads.unity3d.com/assets/29587943-3ee9-4490-a181-de372e9c7097/FRVideo19unity封面.png';
+                assert.isFalse(Url.isProtocolWhitelisted(url, Platform.IOS), `for protocol ${protocol}`);
+          });
+        });
+    });
+
+    describe('whitelisting ANDROID', function() {
+        it('should return true', function() {
+            ['market', 'http', 'https'].forEach((protocol) => {
+                const url = protocol + '://cdn-highwinds.unityads.unity3d.com/assets/29587943-3ee9-4490-a181-de372e9c7097/FRVideo19unity封面.png';
+                assert.isTrue(Url.isProtocolWhitelisted(url, Platform.ANDROID), `for protocol ${protocol}`);
+          });
+        });
+        it('should return false', function() {
+            ['itunes', 'itmss', 'itms', 'bla'].forEach((protocol) => {
+                const url = protocol + '://cdn-highwinds.unityads.unity3d.com/assets/29587943-3ee9-4490-a181-de372e9c7097/FRVideo19unity封面.png';
+                assert.isFalse(Url.isProtocolWhitelisted(url, Platform.ANDROID), `for protocol ${protocol}`);
+          });
+        });
+    });
+
+    describe('whitelisting TEST', function() {
+        it('should always return false', function() {
+            ['market', 'http', 'https', 'itmss', 'itunes', 'itms'].forEach((protocol) => {
+                const url = protocol + '://cdn-highwinds.unityads.unity3d.com/assets/29587943-3ee9-4490-a181-de372e9c7097/FRVideo19unity封面.png';
+                assert.isFalse(Url.isProtocolWhitelisted(url, Platform.TEST), `for protocol ${protocol}`);
+          });
         });
     });
 });

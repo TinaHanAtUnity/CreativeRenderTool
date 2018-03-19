@@ -14,6 +14,7 @@ import { SdkStats } from 'Utilities/SdkStats';
 import { Session } from 'Models/Session';
 import { FileId } from 'Utilities/FileId';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
+import { Url } from 'Utilities/Url';
 
 export enum CacheStatus {
     OK,

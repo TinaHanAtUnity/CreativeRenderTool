@@ -60,6 +60,12 @@ export class ConfigManager {
 
                         throw new Error('gamerId missing in PLC config');
                     }
+                    if(!config.getDefaultPlacement()) {
+                        Diagnostics.trigger('missing_default_placement', {
+                            configUrl: url,
+                            configResponse: response.response
+                        });
+                    }
                     return config;
                 } catch(error) {
                     Diagnostics.trigger('config_parsing_failed', {

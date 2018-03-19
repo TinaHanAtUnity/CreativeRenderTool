@@ -20,6 +20,7 @@ import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
+import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 
 describe('DisplayInterstitialAdUnit', () => {
     let adUnit: DisplayInterstitialAdUnit;
@@ -55,14 +56,24 @@ describe('DisplayInterstitialAdUnit', () => {
             const focusManager = new FocusManager(nativeBridge);
             const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request = new Request(nativeBridge, wakeUpManager);
+            const configuration = TestFixtures.getConfiguration();
             container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
             sandbox.stub(container, 'open').returns(Promise.resolve());
             sandbox.stub(container, 'close').returns(Promise.resolve());
             clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
             deviceInfo = TestFixtures.getAndroidDeviceInfo();
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-            sessionManager = new SessionManager(nativeBridge);
-            operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+            sessionManager = new SessionManager(nativeBridge, request);
+            operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
+                nativeBridge: nativeBridge,
+                request: request,
+                metaDataManager: metaDataManager,
+                sessionManager: sessionManager,
+                clientInfo: clientInfo,
+                deviceInfo: deviceInfo,
+                configuration: configuration,
+                campaign: campaign
+            });
             comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
             view = new DisplayInterstitial(nativeBridge, placement, campaign);
@@ -82,7 +93,7 @@ describe('DisplayInterstitialAdUnit', () => {
                 comScoreTrackingService: comScoreService,
                 placement: TestFixtures.getPlacement(),
                 campaign: campaign,
-                configuration: TestFixtures.getConfiguration(),
+                configuration: configuration,
                 request: request,
                 options: {},
                 view: view

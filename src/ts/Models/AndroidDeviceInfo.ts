@@ -82,7 +82,6 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
             promises.push(this._nativeBridge.DeviceInfo.Android.isAppInstalled(AndroidDeviceInfo.GooglePlayPackageName).then(isGoogleInstalled => this.set('isGoogleStoreInstalled', isGoogleInstalled)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._nativeBridge.DeviceInfo.Android.isAppInstalled(AndroidDeviceInfo.XiaomiPackageName).then(isXiaomiInstalled => this.set('isXiaomiStoreInstalled', isXiaomiInstalled)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._nativeBridge.DeviceInfo.Android.getDeviceMaxVolume(StreamType.STREAM_MUSIC).then(maxVolume => this.set('maxVolume', maxVolume)).catch(err => this.handleDeviceInfoError(err)));
-            promises.push(this._nativeBridge.DeviceInfo.Android.getApkDigest().then(apkDigest => this.set('apkDigest', apkDigest)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._nativeBridge.DeviceInfo.Android.getCertificateFingerprint().then(certificateFingerPrint => this.set('certificateFingerPrint', certificateFingerPrint)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._nativeBridge.DeviceInfo.Android.getBoard().then(board => this.set('board', board)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._nativeBridge.DeviceInfo.Android.getBootloader().then(bootLoader => this.set('bootLoader', bootLoader)).catch(err => this.handleDeviceInfoError(err)));
@@ -100,19 +99,19 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
     }
 
     public getStores(): string {
-        let storeString = "";
+        let storeString = '';
 
         if (this.isGoogleStoreInstalled()) {
-            storeString = "google";
+            storeString = 'google';
         }
         if (this.isXiaomiStoreInstalled()) {
-            storeString = "xiaomi";
+            storeString = 'xiaomi';
         }
         if (this.isXiaomiStoreInstalled() && this.isGoogleStoreInstalled()) {
-            storeString = "xiaomi,google";
+            storeString = 'xiaomi,google';
         }
         if (!this.isXiaomiStoreInstalled() && !this.isGoogleStoreInstalled()) {
-            storeString = "none";
+            storeString = 'none';
         }
 
         return storeString;

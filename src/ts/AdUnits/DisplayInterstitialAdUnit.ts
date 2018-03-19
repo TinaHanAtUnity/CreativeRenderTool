@@ -11,7 +11,7 @@ import { Placement } from 'Models/Placement';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Diagnostics } from 'Utilities/Diagnostics';
-import { IWebPlayerWebSettingsAndroid, IWebPlayerWebSettingsIos } from "Native/Api/WebPlayer";
+import { IWebPlayerWebSettingsAndroid, IWebPlayerWebSettingsIos } from 'Native/Api/WebPlayer';
 import { Url } from 'Utilities/Url';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 
@@ -150,7 +150,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
     }
 
     private onPageStarted(url: string): void {
-        this._nativeBridge.Sdk.logDebug("DisplayInterstitialAdUnit: onPageStarted triggered for url: " + url);
+        this._nativeBridge.Sdk.logDebug('DisplayInterstitialAdUnit: onPageStarted triggered for url: ' + url);
         if(!this._receivedOnPageStart) {
             this._receivedOnPageStart = true;
             return;
@@ -158,7 +158,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
         if(this._clickEventHasBeenSent) {
             return;
         }
-        this._operativeEventManager.sendClick(this._campaign.getSession(), this._placement, this._campaign);
+        this._operativeEventManager.sendClick(this._placement);
         this._clickEventHasBeenSent = true;
 
         for (let trackingUrl of this._campaign.getTrackingUrlsForEvent('click')) {
@@ -173,29 +173,37 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
             return;
         }
         this._handlingShouldOverrideUrlLoading = true;
-        this._nativeBridge.Sdk.logDebug("DisplayInterstitialAdUnit: shouldOverrideUrlLoading triggered for url: '" + url);
-        if (!url) {
-            this._handlingShouldOverrideUrlLoading = false;
-            return;
-        }
-        if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            if( Url.isProtocolWhitelisted(url) ) {
-                this._nativeBridge.UrlScheme.open(url);
-            }
-            this._handlingShouldOverrideUrlLoading = false;
-            return;
-        }
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            this._nativeBridge.Intent.launch({
-                'action': 'android.intent.action.VIEW',
-                'uri': url
-            }).then( () => {
-                this._handlingShouldOverrideUrlLoading = false;
-            }).catch( (e) => {
-                this._nativeBridge.Sdk.logDebug("DisplayInterstitialAdUnit: Cannot open url: '" + url + "': " + e);
+        if (this._nativeBridge.getPlatform() === Platform.IOS && url === 'about:blank') {
+            this.setWebplayerSettings(false).then( () => {
                 this._handlingShouldOverrideUrlLoading = false;
             });
+            return;
         }
+        this._nativeBridge.Sdk.logDebug('DisplayInterstitialAdUnit: shouldOverrideUrlLoading triggered for url: "' + url);
+        if (!url || !Url.isProtocolWhitelisted(url, this._nativeBridge.getPlatform())) {
+            this._handlingShouldOverrideUrlLoading = false;
+            return;
+        }
+        this.openUrlInBrowser(url);
+    }
+
+    private openUrlInBrowser(url: string): Promise<void> {
+        let openPromise: Promise<void>;
+        if (this._nativeBridge.getPlatform() === Platform.IOS) {
+            openPromise = this._nativeBridge.UrlScheme.open(url);
+        } else {
+            openPromise = this._nativeBridge.Intent.launch({
+                'action': 'android.intent.action.VIEW',
+                'uri': url
+            });
+        }
+
+        return Promise.resolve(openPromise).then( () => {
+            this._handlingShouldOverrideUrlLoading = false;
+        }).catch( (e) => {
+            this._nativeBridge.Sdk.logWarning('DisplayInterstitialAdUnit: Cannot open url: "' + url + '": ' + e);
+            this._handlingShouldOverrideUrlLoading = false;
+        });
     }
 
     private unsetReferences(): void {
@@ -208,7 +216,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
             url = url.replace(/%SDK_VERSION%/, this._operativeEventManager.getClientInfo().getSdkVersion().toString());
             this._thirdPartyEventManager.sendEvent('display impression', this._campaign.getSession().getId(), url);
         }
-        this._operativeEventManager.sendStart(this._campaign.getSession(), this._placement, this._campaign).then(() => {
+        this._operativeEventManager.sendStart(this._placement).then(() => {
             this.onStartProcessed.trigger();
         });
     }
@@ -226,7 +234,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
                 'javaScriptCanOpenWindowsAutomatically': true
             };
         }
-        return this._nativeBridge.WebPlayer.setSettings(webPlayerSettings,{}).then( () => {
+        return this._nativeBridge.WebPlayer.setSettings(webPlayerSettings, {}).then( () => {
             return this._container.open(this, ['webplayer', 'webview'], false, this._forceOrientation, true, false, true, false, this._options).catch((e) => {
                 this.hide();
             });
@@ -246,16 +254,16 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
         return size * (density / 160);
     }
 
-    private setWebplayerSettings(): Promise<void> {
+    private setWebplayerSettings(shouldOverrideUrlLoadingReturnValue: boolean): Promise<void> {
         const eventSettings = {
             'onPageStarted': {'sendEvent': true},
-            'shouldOverrideUrlLoading': {'sendEvent': true, 'returnValue': true, 'callSuper': false}
+            'shouldOverrideUrlLoading': {'sendEvent': true, 'returnValue': shouldOverrideUrlLoadingReturnValue, 'callSuper': false}
         };
         return this._nativeBridge.WebPlayer.setEventSettings(eventSettings);
     }
 
     private setWebPlayerContent(): Promise<void> {
-        return this.setWebplayerSettings().then( () => {
+        return this.setWebplayerSettings(true).then( () => {
             const markup = this._campaign.getDynamicMarkup();
             return this.setWebPlayerData(markup, 'text/html', 'UTF-8').then( () => {
                 this._contentReady = true;

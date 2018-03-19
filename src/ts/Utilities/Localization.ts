@@ -220,10 +220,10 @@ export class Localization {
             return number.toString();
         }
         if (number >= 1000000) {
-            return (Math.floor(number / 1000000)).toString() + " " + localizedAbbreviations.million;
+            return (Math.floor(number / 1000000)).toString() + ' ' + localizedAbbreviations.million;
         }
         if (number >= 10000) {
-            return (Math.floor(number / 1000)).toString() + " " + localizedAbbreviations.thousand;
+            return (Math.floor(number / 1000)).toString() + ' ' + localizedAbbreviations.thousand;
         }
         return number.toString();
     }

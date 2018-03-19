@@ -15,7 +15,7 @@ import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
 import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 import { SessionManager } from 'Managers/SessionManager';
 import { JsonParser } from 'Utilities/JsonParser';
-import { CampaignRefreshManager } from 'Managers/CampaignRefreshManager';
+import { RefreshManager } from 'Managers/RefreshManager';
 import { CacheStatus } from 'Utilities/Cache';
 import { AuctionResponse } from 'Models/AuctionResponse';
 import { Session } from 'Models/Session';
@@ -29,8 +29,8 @@ import { ProgrammaticAdMobParser } from 'Parsers/ProgrammaticAdMobParser';
 import { CampaignParser } from 'Parsers/CampaignParser';
 import { PromoCampaignParser } from 'Parsers/PromoCampaignParser';
 import { ProgrammaticVPAIDParser } from 'Parsers/ProgrammaticVPAIDParser';
-import { XPromoCampaignParser } from "Parsers/XPromoCampaignParser";
-import { AdMobSignalFactory} from 'AdMob/AdMobSignalFactory';
+import { XPromoCampaignParser } from 'Parsers/XPromoCampaignParser';
+import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { Placement } from 'Models/Placement';
 import { RequestError } from 'Errors/RequestError';
@@ -247,7 +247,7 @@ export class CampaignManager {
 
             for(const placement of noFill) {
                 promises.push(this.handleNoFill(placement));
-                refreshDelay = CampaignRefreshManager.NoFillDelay;
+                refreshDelay = RefreshManager.NoFillDelay;
             }
 
             let campaigns: number = 0;
@@ -510,7 +510,8 @@ export class CampaignManager {
             language: this._deviceInfo.getLanguage(),
             gameSessionId: this._sessionManager.getGameSessionId(),
             timeZone: this._deviceInfo.getTimeZone(),
-            simulator: this._deviceInfo instanceof IosDeviceInfo ? this._deviceInfo.isSimulator() : undefined
+            simulator: this._deviceInfo instanceof IosDeviceInfo ? this._deviceInfo.isSimulator() : undefined,
+            token: this._configuration.getToken()
         };
 
         if (this.getPreviousPlacementId()) {
@@ -586,6 +587,7 @@ export class CampaignManager {
 
                 body.placements = placementRequest;
                 body.properties = this._configuration.getProperties();
+                body.sessionDepth = SdkStats.getAdRequestOrdinal();
 
                 return body;
             });
