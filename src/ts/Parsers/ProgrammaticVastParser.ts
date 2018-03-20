@@ -47,7 +47,8 @@ export class ProgrammaticVastParser extends CampaignParser {
             creativeId: response.getCreativeId() || undefined,
             seatId: response.getSeatId() || undefined,
             meta: undefined,
-            session: session
+            session: session,
+            mediaId: response.getMediaId()
         };
 
         const portraitUrl = vast.getCompanionPortraitUrl();

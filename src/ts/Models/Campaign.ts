@@ -15,6 +15,7 @@ export interface ICampaign {
     seatId: number | undefined;
     meta: string | undefined;
     session: Session;
+    mediaId: string;
 }
 
 export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T> {
@@ -28,7 +29,8 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         creativeId: ['string', 'undefined'],
         seatId: ['number', 'undefined'],
         meta: ['string', 'undefined'],
-        session: ['object']
+        session: ['object'],
+        mediaId: ['string']
     };
 
     constructor(name: string, schema: ISchema<T>, data: T) {
@@ -80,12 +82,21 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         return willExpireAt !== undefined && Date.now() > willExpireAt;
     }
 
+    public setMediaId(id: string) {
+        this.set('mediaId', id);
+    }
+
+    public getMediaId(): string {
+        return this.get('mediaId');
+    }
+
     public getDTO(): { [key: string]: any } {
         return {
             'id': this.getId(),
             'gamerId': this.getGamerId(),
             'abGroup': this.getAbGroup(),
-            'willExpireAt': this.getWillExpireAt()
+            'willExpireAt': this.getWillExpireAt(),
+            'mediaId': this.getMediaId()
         };
     }
 

@@ -26,7 +26,8 @@ export class PromoCampaignParser extends CampaignParser {
                         creativeId: undefined,
                         seatId: undefined,
                         meta: promoJson.meta,
-                        session: session
+                        session: session,
+                        mediaId: response.getMediaId()
                     };
 
                     const promoCampaignParams: IPromoCampaign = {
