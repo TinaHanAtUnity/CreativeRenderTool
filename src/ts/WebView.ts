@@ -48,6 +48,7 @@ import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { OldCampaignRefreshManager } from 'Managers/OldCampaignRefreshManager';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
+import { MissedImpressionManager } from 'Managers/MissedImpressionManager';
 
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
@@ -80,6 +81,7 @@ export class WebView {
     private _focusManager: FocusManager;
     private _analyticsManager: AnalyticsManager;
     private _adMobSignalFactory: AdMobSignalFactory;
+    private _missedImpressionManager: MissedImpressionManager;
 
     private _showing: boolean = false;
     private _initialized: boolean = false;
@@ -147,6 +149,8 @@ export class WebView {
 
             this._initializedAt = Date.now();
             this._nativeBridge.Sdk.initComplete();
+
+            this._missedImpressionManager = new MissedImpressionManager(this._nativeBridge);
 
             this._wakeUpManager.setListenConnectivity(true);
             if(this._nativeBridge.getPlatform() === Platform.IOS) {
