@@ -3,18 +3,26 @@
 export class FLAM {
     public static runCount: number = 0;
     public static webGlSupport: boolean;
+    public static fpsCount: number = 0;
+    public static fpsSum: number = 0;
     public static fps: number = 0;
+    public static lowestFps: number = 999;
+    public static highestFps: number = 0;
     public static image: HTMLImageElement;
 
     public static get Now() {
         return performance ? performance.now() : Date.now();
     }
 
+    public static get AverageFps() {
+        return this.runCount > 0 ? this.fpsSum / this.fpsCount : 0;
+    }
+
     public static measure(webviewContext: HTMLElement) {
         const canvas = FLAM.createTestCanvas();
         const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
         webviewContext.appendChild(canvas);
-        //
+
         const filterStrength = 20;
         let frameTime = 0;
         let lastLoop = FLAM.Now;
@@ -22,6 +30,10 @@ export class FLAM {
 
         FLAM.image = new Image();
         FLAM.image.src = FLAM.getBase64Image();
+
+        this.runCount++;
+
+        const ts = Date.now();
 
         FLAM.setRAF(function _retry() {
             /* REFACTOR THIS */
@@ -43,12 +55,26 @@ export class FLAM {
             FLAM.draw2dCube(canvas, {x: canvas.width / 2, y: canvas.height / 1.25}, {translate: true});
             FLAM.draw2dCube(canvas, {x: canvas.width / 2, y: canvas.height / 2}, {wobbleEffect: true});
 
-            FLAM.drawImage(canvas, {x: canvas.width / 2, y: canvas.height / 2}, true);
+            FLAM.drawImage(canvas, true);
 
             ctx.restore();
 
             FLAM.fps = 1000 / frameTime;
-            FLAM.setRAF(_retry);
+
+            setTimeout(() => {
+                FLAM.fpsCount++;
+                FLAM.fpsSum += FLAM.fps;
+
+                FLAM.lowestFps = FLAM.fps < FLAM.lowestFps ? FLAM.fps : FLAM.lowestFps;
+                FLAM.highestFps = FLAM.fps > FLAM.highestFps ? FLAM.fps : FLAM.highestFps;
+            }, 2000);
+
+            if (ts + 5 * 1000 < Date.now()) {
+                console.log('average', FLAM.AverageFps);
+                console.dir(FLAM);
+            } else {
+                FLAM.setRAF(_retry);
+            }
         });
     }
 
@@ -97,7 +123,7 @@ export class FLAM {
             wobble = Math.sin(Date.now() / 250) * canvas.height / 50;
         }
 
-        if(effect && effect.translate) {
+        if (effect && effect.translate) {
             translate = Math.sin(Date.now() / 250) * canvas.width / 10;
         }
 
@@ -140,7 +166,7 @@ export class FLAM {
         ctx.fill();
     }
 
-    private static drawImage(canvas: HTMLCanvasElement, position: { x: number, y: number }, wobbleEffect = false) {
+    private static drawImage(canvas: HTMLCanvasElement, wobbleEffect = false) {
         const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
 
         let wobble = 0;
