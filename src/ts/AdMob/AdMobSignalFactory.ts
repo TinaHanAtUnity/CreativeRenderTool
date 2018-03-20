@@ -70,8 +70,8 @@ export class AdMobSignalFactory {
                 } else {
                     const androidGravityConstant: number = 9.80665; // Android system constant SensorManager.GRAVITY_EARTH
                     signal.setAccelerometerX(data.x / androidGravityConstant * -100);
-                    signal.setAccelerometerX(data.y / androidGravityConstant * -100);
-                    signal.setAccelerometerX(data.z / androidGravityConstant * -100);
+                    signal.setAccelerometerY(data.y / androidGravityConstant * -100);
+                    signal.setAccelerometerZ(data.z / androidGravityConstant * -100);
                 }
             }).catch(() => {
                 this.logFailure(this._nativeBridge, 'accelerometer');

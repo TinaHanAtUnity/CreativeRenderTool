@@ -1,5 +1,6 @@
 import { Model } from 'Models/Model';
 import { Campaign } from 'Models/Campaign';
+import { Session } from 'Models/Session';
 
 export enum PlacementState {
     READY,
@@ -25,6 +26,7 @@ interface IPlacement {
     disableVideoControlsFade: boolean | undefined;
 
     adTypes: string[] | undefined;
+    realtimeData: string | undefined;
 
     state: PlacementState;
     previousState: PlacementState;
@@ -46,6 +48,7 @@ export class Placement extends Model<IPlacement> {
             skipEndCardOnClose: ['boolean', 'undefined'],
             disableVideoControlsFade: ['boolean', 'undefined'],
             adTypes: ['array', 'undefined'],
+            realtimeData: ['string', 'undefined'],
             state: ['number'],
             previousState: ['number'],
             placementStateChanged: ['boolean'],
@@ -146,6 +149,14 @@ export class Placement extends Model<IPlacement> {
 
     public setCurrentCampaign(campaign: Campaign | undefined): void {
         this.set('currentCampaign', campaign);
+    }
+
+    public getRealtimeData(): string | undefined {
+        return this.get('realtimeData');
+    }
+
+    public setRealtimeData(value: string | undefined) {
+        this.set('realtimeData', value);
     }
 
     public getDTO(): { [key: string]: any } {

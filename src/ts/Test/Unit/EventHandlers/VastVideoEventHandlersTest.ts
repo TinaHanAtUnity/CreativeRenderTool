@@ -84,6 +84,7 @@ describe('VastVideoEventHandlers tests', () => {
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         sessionManager = new SessionManager(nativeBridge, request);
 
+        const configuration = TestFixtures.getConfiguration();
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             nativeBridge: nativeBridge,
             request: request,
@@ -91,6 +92,7 @@ describe('VastVideoEventHandlers tests', () => {
             sessionManager: sessionManager,
             clientInfo: clientInfo,
             deviceInfo: deviceInfo,
+            configuration: configuration,
             campaign: campaign
         });
         const comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
@@ -106,7 +108,7 @@ describe('VastVideoEventHandlers tests', () => {
             comScoreTrackingService: comScoreService,
             placement: placement,
             campaign: campaign,
-            configuration: TestFixtures.getConfiguration(),
+            configuration: configuration,
             request: request,
             options: {},
             endScreen: undefined,

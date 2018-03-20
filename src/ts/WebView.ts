@@ -37,6 +37,7 @@ import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
 import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { SdkStats } from 'Utilities/SdkStats';
+import { Campaign } from 'Models/Campaign';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
@@ -270,6 +271,46 @@ export class WebView {
             return;
         }
 
+        // Temporary for realtime testing purposes
+        const testGroup = this._configuration.getAbGroup();
+        if (placement.getRealtimeData()) {
+            this._nativeBridge.Sdk.logInfo('Unity Ads is requesting realtime fill for placement ' + placement.getId());
+            const start = Date.now();
+            this._campaignManager.requestRealtime(placement, campaign.getSession()).then(realtimeCampaign => {
+
+                // Temporary for realtime testing purposes
+                const latency = Date.now() - start;
+                Diagnostics.trigger('realtime_network_latency', {
+                    latency: latency,
+                    auctionId: campaign.getSession().getId(),
+                    abGroup: testGroup
+                });
+                this._nativeBridge.Sdk.logInfo(`Unity Ads received a realtime request in ${latency} ms.`);
+
+                if(realtimeCampaign) {
+                    this._nativeBridge.Sdk.logInfo('Unity Ads received new fill for placement ' + placement.getId() + ', streaming new ad unit');
+                    placement.setCurrentCampaign(realtimeCampaign);
+                    this.showAd(placement, realtimeCampaign, options);
+                } else {
+                    Diagnostics.trigger('realtime_no_fill', {}, campaign.getSession());
+                    this._nativeBridge.Sdk.logInfo('Unity Ads received no new fill for placement ' + placement.getId() + ', opening old ad unit');
+                    this.showAd(placement, campaign, options);
+                }
+            }).catch(() => {
+                const error = new DiagnosticError(new Error('Realtime error'), { auctionId: campaign.getSession().getId() });
+                Diagnostics.trigger('realtime_error', error);
+                this._nativeBridge.Sdk.logInfo('Unity Ads realtime fill request for placement ' + placement.getId() + ' failed, opening old ad unit');
+                this.showAd(placement, campaign, options);
+            });
+        } else {
+            this.showAd(placement, campaign, options);
+        }
+    }
+
+    private showAd(placement: Placement, campaign: Campaign, options: any) {
+        const testGroup = this._configuration.getAbGroup();
+        const start = Date.now();
+
         this._showing = true;
 
         if(this._configuration.getCacheMode() !== CacheMode.DISABLED) {
@@ -283,7 +324,7 @@ export class WebView {
         ]).then(([screenWidth, screenHeight, connectionType]) => {
             if(campaign.isConnectionNeeded() && connectionType === 'none') {
                 this._showing = false;
-                this.showError(true, placementId, 'No connection');
+                this.showError(true, placement.getId(), 'No connection');
 
                 const error = new DiagnosticError(new Error('No connection is available'), {
                     id: campaign.getId(),
@@ -308,6 +349,7 @@ export class WebView {
                     sessionManager: this._sessionManager,
                     clientInfo: this._clientInfo,
                     deviceInfo: this._deviceInfo,
+                    configuration: this._configuration,
                     campaign: campaign
                 }),
                 comScoreTrackingService: this._comScoreTrackingService,
@@ -339,7 +381,19 @@ export class WebView {
             }
 
             OperativeEventManager.setPreviousPlacementId(this._campaignManager.getPreviousPlacementId());
-            this._campaignManager.setPreviousPlacementId(placementId);
+            this._campaignManager.setPreviousPlacementId(placement.getId());
+
+            // Temporary for realtime testing purposes
+            if (placement.getRealtimeData()) {
+                this._currentAdUnit.onStart.subscribe(() => {
+                    Diagnostics.trigger('realtime_render_latency', {
+                        latency: Date.now() - start,
+                        auctionId: campaign.getSession().getId(),
+                        abGroup: testGroup
+                    });
+                });
+            }
+
             this._currentAdUnit.show();
         });
     }

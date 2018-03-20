@@ -39,7 +39,8 @@ export class XPromoCampaignParser extends CampaignParser {
             creativeId: undefined,
             seatId: undefined,
             meta: json.meta,
-            session: session
+            session: session,
+            mediaId: response.getMediaId()
         };
 
         const parameters: IXPromoCampaign = {
