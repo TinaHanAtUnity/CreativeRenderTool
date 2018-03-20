@@ -3,7 +3,7 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { CampaignManager } from 'Managers/CampaignManager';
 import { Campaign } from 'Models/Campaign';
 import { WebViewError } from 'Errors/WebViewError';
-import { PlacementState } from 'Models/Placement';
+import { Placement, PlacementState } from 'Models/Placement';
 import { Configuration } from 'Models/Configuration';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
@@ -66,7 +66,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
         this._mustReinitialize = false;
 
         this._campaignManager.onCampaign.subscribe((placementId, campaign) => this.onCampaign(placementId, campaign));
-        this._campaignManager.onNoFill.subscribe(placementId => this.onNoFill(placementId));
+        this._campaignManager.onNoFill.subscribe((placementId) => this.onNoFill(placementId));
         this._campaignManager.onError.subscribe((error, placementIds, session) => this.onError(error, placementIds, session));
         this._campaignManager.onConnectivityError.subscribe((placementIds) => this.onConnectivityError(placementIds));
         this._campaignManager.onAdPlanReceived.subscribe((refreshDelay, campaignCount) => this.onAdPlanReceived(refreshDelay, campaignCount));

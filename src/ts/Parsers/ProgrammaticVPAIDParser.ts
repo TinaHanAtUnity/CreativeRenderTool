@@ -34,7 +34,8 @@ export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
                     creativeId: response.getCreativeId() || undefined,
                     seatId: response.getSeatId() || undefined,
                     meta: undefined,
-                    session: session
+                    session: session,
+                    mediaId: response.getMediaId()
                 };
 
                 const vpaidCampaignParams: IVPAIDCampaign = {

@@ -22,7 +22,8 @@ export class ProgrammaticAdMobParser extends CampaignParser {
             creativeId: response.getCreativeId() || undefined,
             seatId: response.getSeatId() || undefined,
             meta: undefined,
-            session: session
+            session: session,
+            mediaId: response.getMediaId()
         };
 
         const adMobCampaignParams: IAdMobCampaign = {

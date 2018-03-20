@@ -37,7 +37,8 @@ export class ProgrammaticMraidParser extends CampaignParser {
             creativeId: response.getCreativeId() || undefined,
             seatId: response.getSeatId() || undefined,
             meta: jsonMraid.meta,
-            session: session
+            session: session,
+            mediaId: response.getMediaId()
         };
 
         const parameters: IMRAIDCampaign = {

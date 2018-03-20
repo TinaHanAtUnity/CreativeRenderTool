@@ -1,4 +1,9 @@
-# Pending
+# Tue Mar 20 21:51:37 UTC 2018
+
+* Initial support for realtime auction
+* Fix AdMob accelerometer fraud signals
+
+# Tue Mar 20 06:58:53 UTC 2018
 
 * Easter theme A/B test in groups 16 & 17
 * Remove overlay A/B test from groups 16 & 17
