@@ -46,7 +46,6 @@ export class ConfigManager {
                 try {
                     const configJson = JsonParser.parse(response.response);
                     const config: Configuration = new Configuration(configJson);
-
                     nativeBridge.Sdk.logInfo('Received configuration with ' + config.getPlacementCount() + ' placements for gamer ' + config.getGamerId() + ' (A/B group ' + config.getAbGroup() + ')');
                     if(config.getGamerId()) {
                         if(nativeBridge.getPlatform() === Platform.IOS && deviceInfo.getLimitAdTracking()) {
@@ -98,7 +97,6 @@ export class ConfigManager {
 
     private static ConfigBaseUrl: string = 'https://publisher-config.unityads.unity3d.com/games';
     private static AbGroup: number | undefined;
-    private static TestRealtimePlacement: string | undefined;
 
     private static createConfigUrl(clientInfo: ClientInfo, deviceInfo: DeviceInfo, framework?: FrameworkMetaData, adapter?: AdapterMetaData, gamerId?: string): string {
         let url: string = [
