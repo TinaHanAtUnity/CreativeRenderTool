@@ -8,7 +8,7 @@ export class MissedImpressionManager {
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
 
-        this._nativeBridge.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType,data));
+        this._nativeBridge.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, data));
     }
 
     private onStorageSet(eventType: string, data: any) {

@@ -25,14 +25,14 @@ describe('MissedImpressionManagerTest', () => {
     });
 
     it('should send events when developer sets metadata', () => {
-        nativeBridge.Storage.onSet.trigger(StorageType[StorageType.PUBLIC], {"mediation":{"missedImpressionOrdinal":{"value":1,"ts":123456789}}});
+        nativeBridge.Storage.onSet.trigger(StorageType[StorageType.PUBLIC], {'mediation': { 'missedImpressionOrdinal': {'value': 1, 'ts': 123456789 }}});
 
         assert.isTrue(kafkaSpy.calledOnce, 'missed impression event was not sent to httpkafka');
         assert.isTrue(kafkaSpy.calledWith('ads.sdk2.events.missedimpression.json', { ordinal: 1 }), 'missed impression event arguments incorrect');
     });
 
     it('should not send events when other metadata is set', () => {
-        nativeBridge.Storage.onSet.trigger(StorageType[StorageType.PUBLIC], {"player":{"server_id":{"value":"test","ts":123456789}}});
+        nativeBridge.Storage.onSet.trigger(StorageType[StorageType.PUBLIC], {'player': {'server_id': { 'value': 'test', 'ts': 123456789 }}});
 
         assert.isFalse(kafkaSpy.called, 'missed impression event was triggered for unrelated storage event');
     });
