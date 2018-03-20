@@ -1,4 +1,4 @@
-# Pending
+# Tue Mar 20 21:51:37 UTC 2018
 
 * Initial support for realtime auction
 * Fix AdMob accelerometer fraud signals
