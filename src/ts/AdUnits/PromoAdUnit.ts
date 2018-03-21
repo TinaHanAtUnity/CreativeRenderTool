@@ -1,21 +1,18 @@
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
-import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Placement } from 'Models/Placement';
 import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 import { Promo } from 'Views/Promo';
 import { IObserver0 } from 'Utilities/IObserver';
 import { FinishState } from 'Constants/FinishState';
-import { SessionManager } from 'Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { PurchasingApi } from 'Native/Api/Purchasing';
 
 export interface IPromoAdUnitParameters extends IAdUnitParameters<PromoCampaign> {
     view: Promo;
 }
 
 export class PromoAdUnit extends AbstractAdUnit {
-    private _sessionManager: SessionManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _promoView: Promo;
     private _options: any;
@@ -73,10 +70,6 @@ export class PromoAdUnit extends AbstractAdUnit {
     public sendClick(): void {
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
         this.sendTrackingEvent('click');
-    }
-
-    public isCached(): boolean {
-        return this._campaign.getCreativeResource().isCached();
     }
 
     public description(): string {
