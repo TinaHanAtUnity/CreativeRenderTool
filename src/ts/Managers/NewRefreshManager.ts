@@ -84,10 +84,7 @@ export class NewRefreshManager extends RefreshManager {
 
         // todo: invalidating ad units based on ad unit onStart trigger is somewhat dangerous
         // todo: ad units should be invalidated for each show invocation, not when ad unit says it's starting
-        const onStartObserver = this._currentAdUnit.onStart.subscribe(() => {
-            this._currentAdUnit.onStart.unsubscribe(onStartObserver);
-            this.invalidateFill();
-        });
+        this._currentAdUnit.onStart.subscribe(() => this.onAdUnitStart());
         this._currentAdUnit.onStartProcessed.subscribe(() => this.onAdUnitStartProcessed());
         this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());
         // todo: onFinish should be renamed to onEndScreen or something similar, currently onFinish vs. onClose naming is super confusing
