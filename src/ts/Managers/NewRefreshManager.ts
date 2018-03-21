@@ -172,7 +172,7 @@ export class NewRefreshManager extends RefreshManager {
         this.handlePlacementStateChange(placementId, PlacementState.NO_FILL);
     }
 
-    private onError(error: WebViewError, placementIds: string[], session?: Session) {
+    private onError(error: WebViewError | Error, placementIds: string[], session?: Session) {
         if(this._fillState === FillState.REQUESTING) {
             this._fillState = FillState.FILL_RECEIVED;
         }
