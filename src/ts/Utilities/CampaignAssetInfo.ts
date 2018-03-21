@@ -24,8 +24,8 @@ export class CampaignAssetInfo {
         } else if(campaign instanceof VastCampaign) {
             return campaign.getVideo().isCached();
         } else if(campaign instanceof MRAIDCampaign) {
-            const resouceUrl = campaign.getResourceUrl();
-            if((resouceUrl && resouceUrl.isCached()) || campaign.getResource()) {
+            const resourceUrl = campaign.getResourceUrl();
+            if((resourceUrl && resourceUrl.isCached()) || campaign.getResource()) {
                 return true;
             }
         } else if(campaign instanceof PromoCampaign) {
