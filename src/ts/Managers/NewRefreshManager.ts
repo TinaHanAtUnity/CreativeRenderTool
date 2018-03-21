@@ -13,6 +13,7 @@ import { WebViewError } from 'Errors/WebViewError';
 import { Session } from 'Models/Session';
 import { ReinitManager } from 'Managers/ReinitManager';
 import { PlacementManager } from 'Managers/PlacementManager';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 enum FillState {
     MUST_REFILL, // should ask for new fill at the first available opportunity
@@ -57,6 +58,7 @@ export class NewRefreshManager extends RefreshManager {
         this._configuration = configuration;
         this._focusManager = focusManager;
         this._reinitManager = reinitManager;
+        this._placementManager = placementManager;
 
         this._campaignManager.onCampaign.subscribe((placementId, campaign) => this.onCampaign(placementId, campaign));
         this._campaignManager.onNoFill.subscribe(placementId => this.onNoFill(placementId));
@@ -72,7 +74,7 @@ export class NewRefreshManager extends RefreshManager {
         }
     }
 
-    // todo: this method is redundant and should just be replaced with direct invocations to PlacementManager
+    // todo: remove method, use PlacementManager instead
     public getCampaign(placementId: string): Campaign | undefined {
         return this._placementManager.getCampaign(placementId);
     }
@@ -146,34 +148,88 @@ export class NewRefreshManager extends RefreshManager {
     }
 
     public setPlacementState(placementId: string, placementState: PlacementState): void {
-        // todo: implement method
+        // todo: remove method, use PlacementManager instead
     }
 
     public sendPlacementStateChanges(placementId: string): void {
-        // todo: implement method
+        // todo: remove method, use PlacementManager instead
     }
 
     public setPlacementStates(placementState: PlacementState, placementIds: string[]): void {
-        // todo: implement method
+        // todo: remove method, use PlacementManager instead
     }
 
     private onCampaign(placementId: string, campaign: Campaign) {
-        // todo: implement method
+        this._parsingErrorCount = 0;
+
+        this._placementManager.setCampaign(placementId, campaign);
+        this.handlePlacementStateChange(placementId, PlacementState.READY);
     }
 
     private onNoFill(placementId: string) {
-        // todo: implement method
+        this._parsingErrorCount = 0;
+
+        this.handlePlacementStateChange(placementId, PlacementState.NO_FILL);
     }
 
     private onError(error: WebViewError, placementIds: string[], session?: Session) {
-        // todo: implement method
+        if(this._fillState === FillState.REQUESTING) {
+            this._fillState = FillState.FILL_RECEIVED;
+        }
+
+        // todo: this diagnostic handling is copied from old refresh manager and it's the exact anti-pattern that's been causing a lot of trouble
+        // todo: proper solution is to break this one massive auction_request_failed to smaller more well-defined diagnostic events
+        if(error instanceof Error) {
+            error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
+        }
+
+        Diagnostics.trigger('auction_request_failed', {
+            error: error,
+        }, session);
+
+        this._nativeBridge.Sdk.logError('Unity Ads ad request error: ' + JSON.stringify(error));
+
+        const minimumRefreshTimestamp = Date.now() + RefreshManager.ErrorRefillDelay * 1000;
+        if(this._refillTimestamp === 0 || this._refillTimestamp > minimumRefreshTimestamp) {
+            this._refillTimestamp = minimumRefreshTimestamp;
+            this._nativeBridge.Sdk.logDebug('Unity Ads will refresh ads in ' + RefreshManager.ErrorRefillDelay + ' seconds');
+        }
+
+        for(const placementId of placementIds) {
+            this.handlePlacementStateChange(placementId, PlacementState.NO_FILL);
+        }
+
+        // parsing errors are retried only if there is only one campaign in ad plan
+        // therefore all parsing error retry logic is written with the assumption that there is only one campaign
+        if(this._campaignCount === 1) {
+            this._parsingErrorCount++;
+
+            if(this._parsingErrorCount === 1 && RefreshManager.ParsingErrorRefillDelay > 0) {
+                const retryDelaySeconds: number = RefreshManager.ParsingErrorRefillDelay + Math.random() * RefreshManager.ParsingErrorRefillDelay;
+                this._nativeBridge.Sdk.logDebug('Unity Ads retrying failed campaign in ' + retryDelaySeconds + ' seconds');
+                this._refillTimestamp = Date.now() + RefreshManager.ParsingErrorRefillDelay * 1000;
+                setTimeout(() => {
+                    this._nativeBridge.Sdk.logDebug('Unity Ads retrying failed campaign now');
+                    this.refresh();
+                }, retryDelaySeconds * 1000);
+            }
+        }
     }
 
     private onConnectivityError(placementIds: string[]) {
-        // todo: implement method
+        this._fillState = FillState.MUST_REFILL;
+        this._refillTimestamp = Date.now();
+
+        this._nativeBridge.Sdk.logDebug('Unity Ads failed to contact server, retrying after next system event');
+
+        for(const placementId of placementIds) {
+            this.handlePlacementStateChange(placementId, PlacementState.NO_FILL);
+        }
     }
 
     private onAdPlanReceived(refreshDelay: number, campaignCount: number) {
+        this._fillState = FillState.FILL_RECEIVED;
+
         this._campaignCount = campaignCount;
 
         if(campaignCount === 0) {
@@ -212,7 +268,7 @@ export class NewRefreshManager extends RefreshManager {
     }
 
     private onNetworkConnected() {
-        // todo: implement method
+        this.refresh();
     }
 
     private onAppForeground() {
@@ -264,12 +320,23 @@ export class NewRefreshManager extends RefreshManager {
 
     private checkForExpiredCampaigns(): boolean {
         for(const placementId of this._configuration.getPlacementIds()) {
-            const campaign = this._configuration.getPlacement(placementId).getCurrentCampaign();
+            const campaign = this._placementManager.getCampaign(placementId);
             if(campaign && campaign.isExpired()) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    private handlePlacementStateChange(placementId: string, newState: PlacementState): void {
+        if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
+            const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
+                this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
+                this._placementManager.setPlacementState(placementId, newState);
+            });
+        } else {
+            this._placementManager.setPlacementState(placementId, newState);
+        }
     }
 }
