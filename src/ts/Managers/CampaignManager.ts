@@ -37,6 +37,7 @@ import { RequestError } from 'Errors/RequestError';
 import { CacheError } from 'Native/Api/Cache';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { IosDeviceInfo } from 'Models/IosDeviceInfo';
+import { CampaignParserFactory } from 'Managers/CampaignParserFactory';
 
 export class CampaignManager {
 
@@ -321,7 +322,7 @@ export class CampaignManager {
 
     private handleCampaign(response: AuctionResponse, session: Session): Promise<void> {
         this._nativeBridge.Sdk.logDebug('Parsing campaign ' + response.getContentType() + ': ' + response.getContent());
-        const parser: CampaignParser = this.getCampaignParser(response.getContentType(), session);
+        const parser: CampaignParser = this.getCampaignParser(response.getContentType());
 
         const parseTimestamp = Date.now();
         return parser.parse(this._nativeBridge, this._request, response, session, this._configuration.getGamerId(), this.getAbGroup()).then((campaign) => {
@@ -347,7 +348,7 @@ export class CampaignManager {
     private handleRealtimeCampaign(response: AuctionResponse, session: Session): Promise<Campaign> {
         this._nativeBridge.Sdk.logDebug('Parsing campaign ' + response.getContentType() + ': ' + response.getContent());
 
-        const parser: CampaignParser = this.getCampaignParser(response.getContentType(), session);
+        const parser: CampaignParser = this.getCampaignParser(response.getContentType());
 
         return parser.parse(this._nativeBridge, this._request, response, session, this._configuration.getGamerId(), this.getAbGroup()).then((campaign) => {
             campaign.setMediaId(response.getMediaId());
@@ -356,32 +357,8 @@ export class CampaignManager {
         });
     }
 
-    private getCampaignParser(contentType: string, session: Session): CampaignParser {
-        switch(contentType) {
-            case 'comet/campaign':
-                return new CometCampaignParser();
-            case 'xpromo/video':
-                return new XPromoCampaignParser();
-            case 'programmatic/vast':
-                return new ProgrammaticVastParser();
-            case 'programmatic/mraid-url':
-                return new ProgrammaticMraidUrlParser();
-            case 'programmatic/mraid':
-                return new ProgrammaticMraidParser();
-            case 'programmatic/static-interstitial':
-                return new ProgrammaticStaticInterstitialParser();
-            case 'programmatic/admob-video':
-                Diagnostics.trigger('admob_ad_received', {}, session);
-                return new ProgrammaticAdMobParser();
-            case 'programmatic/vast-vpaid':
-                // vast-vpaid can be both VPAID or VAST, so in this case we use the VAST parser
-                // which can parse both.
-                return new ProgrammaticVPAIDParser();
-            case 'purchasing/iap':
-                return new PromoCampaignParser();
-            default:
-                throw new Error('Unsupported content-type: ' + contentType);
-        }
+    private getCampaignParser(contentType: string): CampaignParser {
+        return CampaignParserFactory.getCampaignParser(contentType);
     }
 
     private handleNoFill(placement: string): Promise<void> {

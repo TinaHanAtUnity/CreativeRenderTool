@@ -7,6 +7,7 @@ import { AuctionResponse } from 'Models/AuctionResponse';
 import { Session } from 'Models/Session';
 
 export class ProgrammaticStaticInterstitialParser extends CampaignParser {
+    public static ContentType = 'programmatic/static-interstitial';
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
         const dynamicMarkup = decodeURIComponent(response.getContent());
         const cacheTTL = response.getCacheTTL();

@@ -1,4 +1,9 @@
-# Pending
+# Wed Mar 21 11:34:25 UTC 2018
+
+* Adds MissingImpressionOrdinal support for SDK < 2.1.2
+* Refactor CampaignParser creation to CampaignParserFactory
+
+# Tue Mar 20 21:51:37 UTC 2018
 
 * Initial support for realtime auction
 * Fix AdMob accelerometer fraud signals
