@@ -1,3 +1,8 @@
+# Staged
+
+* Adds MissingImpressionOrdinal support for SDK < 2.1.2
+* Refactor CampaignParser creation to CampaignParserFactory
+
 # Tue Mar 20 21:51:37 UTC 2018
 
 * Initial support for realtime auction
