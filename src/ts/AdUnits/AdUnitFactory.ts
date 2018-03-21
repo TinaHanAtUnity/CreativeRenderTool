@@ -108,7 +108,11 @@ export class AdUnitFactory {
             adUnitStyle: adUnitStyle
         };
 
-        FLAM.measure(document.body);
+        try {
+            FLAM.measure(document.body);
+        } catch (e) {
+            console.log("e", e);
+        }
 
         const performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
         const performanceOverlayEventHandler = new PerformanceOverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);

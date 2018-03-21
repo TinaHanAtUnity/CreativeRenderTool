@@ -11,11 +11,11 @@ export class FLAM {
     public static image: HTMLImageElement;
 
     public static get Now() {
-        return performance ? performance.now() : Date.now();
+        return window.performance ? window.performance.now() : Date.now();
     }
 
     public static get AverageFps() {
-        return this.runCount > 0 ? this.fpsSum / this.fpsCount : 0;
+        return this.runCount > 0 ? Math.round(this.fpsSum / this.fpsCount) : 0;
     }
 
     public static measure(webviewContext: HTMLElement) {
@@ -42,24 +42,37 @@ export class FLAM {
             lastLoop = thisLoop;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.save();
 
             FLAM.showFPS(canvas);
 
-            FLAM.draw2dCube(canvas, {x: 0, y: canvas.height / 2.5});
+            FLAM.draw2dCube(canvas, {x: 0, y: canvas.height / 2.5}, {rotate: true});
             FLAM.draw2dCube(canvas, {x: 0, y: canvas.height});
             FLAM.draw2dCube(canvas, {x: canvas.width, y: canvas.height / 2.5});
             FLAM.draw2dCube(canvas, {x: canvas.width, y: canvas.height});
 
+            /* Draw circle */
+            ctx.strokeStyle = 'blue';
+            ctx.arc(canvas.width * Math.random(), canvas.height * Math.random(), 50, 0, Math.PI * 2);
+            ctx.stroke();
+
+            /* Draw heart */
+            ctx.strokeStyle = 'red';
+            ctx.moveTo(canvas.width * Math.random(), canvas.height * Math.random());
+            ctx.bezierCurveTo(75, 37, 70, 25, 50, 25);
+            ctx.bezierCurveTo(20, 25, 20, 62.5, 20, 62.5);
+            ctx.bezierCurveTo(20, 80, 40, 102, 75, 120);
+            ctx.bezierCurveTo(110, 102, 130, 80, 130, 62.5);
+            ctx.bezierCurveTo(130, 62.5, 130, 25, 100, 25);
+            ctx.bezierCurveTo(85, 25, 75, 37, 75, 40);
+            ctx.stroke();
+
             /* Center */
             FLAM.draw2dCube(canvas, {x: canvas.width / 2, y: canvas.height / 1.25}, {translate: true});
             FLAM.draw2dCube(canvas, {x: canvas.width / 2, y: canvas.height / 2}, {wobbleEffect: true});
+            //
+            FLAM.drawImages(canvas, true);
 
-            FLAM.drawImage(canvas, true);
-
-            ctx.restore();
-
-            FLAM.fps = 1000 / frameTime;
+            FLAM.fps = Math.round(1000 / frameTime);
 
             setTimeout(() => {
                 FLAM.fpsCount++;
@@ -98,6 +111,7 @@ export class FLAM {
         canvas.id = 'playground';
         canvas.style.position = 'absolute';
         canvas.style.zIndex = '999';
+        // canvas.style.opacity = '0';
 
         return canvas;
     }
@@ -110,7 +124,7 @@ export class FLAM {
 
         ctx.font = `15px serif`;
         ctx.fillStyle = 'yellow';
-        ctx.fillText(`${(FLAM.fps).toFixed(1)} fps`, 10, 20);
+        ctx.fillText(`${(FLAM.fps)} fps`, 10, 20);
     }
 
     private static draw2dCube(canvas: HTMLCanvasElement, position: { x: number, y: number }, effect?: { wobbleEffect?: boolean, rotate?: boolean, translate?: boolean }) {
@@ -166,7 +180,7 @@ export class FLAM {
         ctx.fill();
     }
 
-    private static drawImage(canvas: HTMLCanvasElement, wobbleEffect = false) {
+    private static drawImages(canvas: HTMLCanvasElement, wobbleEffect = false) {
         const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
 
         let wobble = 0;
@@ -177,6 +191,13 @@ export class FLAM {
 
         if (FLAM.image.complete) {
             ctx.drawImage(FLAM.image, canvas.width / 2 - FLAM.image.width / 2, canvas.height / 2 + wobble - FLAM.image.height / 2);
+            for (let i = 0; i < 500; i++) {
+                ctx.save();
+                ctx.rotate(360 * Math.random() * Math.PI / 180);
+                ctx.scale(2 * Math.random(), 2 * Math.random());
+                ctx.drawImage(FLAM.image, canvas.width * Math.random(), canvas.height * Math.random());
+                ctx.restore();
+            }
         }
     }
 
