@@ -125,9 +125,6 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
             this._deviceInfo.getScreenWidth(),
             this._deviceInfo.getScreenHeight()
         ];
-        if(this._deviceInfo instanceof AndroidDeviceInfo) {
-            promises.push(Promise.resolve(this._deviceInfo.getScreenDensity()));
-        }
         Promise.all(promises).then(([screenWidth, screenHeight]) => {
             const screenDensity = this.getScreenDensity();
             return this.setWebPlayerViewFrame(screenWidth, screenHeight, screenDensity)
