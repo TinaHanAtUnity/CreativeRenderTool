@@ -1,4 +1,4 @@
-# Staged
+# Wed Mar 21 11:34:25 UTC 2018
 
 * Adds MissingImpressionOrdinal support for SDK < 2.1.2
 * Refactor CampaignParser creation to CampaignParserFactory
