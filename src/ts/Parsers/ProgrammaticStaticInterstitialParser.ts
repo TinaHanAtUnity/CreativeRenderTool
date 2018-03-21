@@ -30,7 +30,9 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
             ... baseCampaignParams,
             dynamicMarkup: dynamicMarkup,
             trackingUrls: response.getTrackingUrls(),
-            useWebViewUserAgentForTracking: false
+            useWebViewUserAgentForTracking: false,
+            width: response.getWidth() || undefined,
+            height: response.getHeight() || undefined
         };
 
         return Promise.resolve(new DisplayInterstitialCampaign(displayInterstitialParams));

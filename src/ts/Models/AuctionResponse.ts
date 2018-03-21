@@ -19,6 +19,8 @@ export interface IAuctionResponse {
     useWebViewUserAgentForTracking: boolean | undefined;
     buyerId: string | undefined;
     mediaId: string;
+    width: number | undefined;
+    height: number | undefined;
 }
 
 export class AuctionResponse extends Model<IAuctionResponse> {
@@ -40,7 +42,9 @@ export class AuctionResponse extends Model<IAuctionResponse> {
             advertiserBundleId: ['string', 'undefined'],
             useWebViewUserAgentForTracking: ['boolean', 'undefined'],
             buyerId: ['string', 'undefined'],
-            mediaId: ['string']
+            mediaId: ['string'],
+            width: ['number', 'undefined'],
+            height: ['number', 'undefined']
         });
 
         this.set('placements', placements);
@@ -60,6 +64,8 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         this.set('useWebViewUserAgentForTracking', data.useWebViewUserAgentForTracking || false);
         this.set('buyerId', data.buyerId);
         this.set('mediaId', mediaId);
+        this.set('width', data.width);
+        this.set('height', data.height);
     }
 
     public getPlacements(): string[] {
@@ -132,6 +138,14 @@ export class AuctionResponse extends Model<IAuctionResponse> {
 
     public getMediaId(): string {
         return this.get('mediaId');
+    }
+
+    public getWidth(): number | undefined {
+        return this.get('width');
+    }
+
+    public getHeight(): number | undefined {
+        return this.get('height');
     }
 
     public getDTO(): {[key: string]: any } {

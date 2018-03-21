@@ -5,13 +5,17 @@ import { IProgrammaticCampaign, ProgrammaticCampaign } from 'Models/Campaigns/Pr
 
 export interface IDisplayInterstitialCampaign extends IProgrammaticCampaign {
     dynamicMarkup: string;
+    width: number | undefined;
+    height: number | undefined;
 }
 
 export class DisplayInterstitialCampaign extends ProgrammaticCampaign<IDisplayInterstitialCampaign> {
     constructor(campaign: IDisplayInterstitialCampaign) {
         super('DisplayInterstitialCampaign', {
             ... ProgrammaticCampaign.Schema,
-            dynamicMarkup: ['string', 'undefined']
+            dynamicMarkup: ['string', 'undefined'],
+            width: ['number', 'undefined'],
+            height: ['number', 'undefined']
         }, campaign);
     }
 
@@ -29,5 +33,13 @@ export class DisplayInterstitialCampaign extends ProgrammaticCampaign<IDisplayIn
 
     public isConnectionNeeded(): boolean {
         return false;
+    }
+
+    public getWidth(): number | undefined {
+        return this.get('width');
+    }
+
+    public getHeight(): number | undefined {
+        return this.get('height');
     }
 }

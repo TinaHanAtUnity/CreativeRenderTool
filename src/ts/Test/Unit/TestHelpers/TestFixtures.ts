@@ -284,7 +284,9 @@ export class TestFixtures {
             ... baseCampaignParams,
             dynamicMarkup: json.content,
             trackingUrls: json.display.tracking || undefined,
-            useWebViewUserAgentForTracking: false
+            useWebViewUserAgentForTracking: false,
+            width: json.display.width || undefined,
+            height: json.display.height || undefined
         };
     }
 

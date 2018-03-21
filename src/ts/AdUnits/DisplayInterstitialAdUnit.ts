@@ -121,22 +121,41 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
             this._deviceInfo.getScreenWidth(),
             this._deviceInfo.getScreenHeight()
         ];
-        if(this._deviceInfo instanceof AndroidDeviceInfo) {
-            promises.push(Promise.resolve(this._deviceInfo.getScreenDensity()));
-        }
-        Promise.all(promises).then(([screenWidth, screenHeight, screenDensity]) => {
-            let webviewAreaSize = Math.max( Math.min(screenWidth, screenHeight) * this._closeAreaMinRatio, this._closeAreaMinPixels );
-            if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                webviewAreaSize = this.getAndroidViewSize(webviewAreaSize, screenDensity);
-            }
-            const webviewXPos = screenWidth - webviewAreaSize;
-            const webviewYPos = 0;
-            this._container.setViewFrame('webview', Math.floor(webviewXPos), Math.floor(webviewYPos), Math.floor(webviewAreaSize), Math.floor(webviewAreaSize)).then(() => {
-                return this._container.setViewFrame('webplayer', 0, 0, Math.floor(screenWidth), Math.floor(screenHeight)).then(() => {
-                    return this.setWebPlayerContent();
-                });
-            });
+        Promise.all(promises).then(([screenWidth, screenHeight]) => {
+            const screenDensity = this.getScreenDensity();
+            return this.setWebPlayerViewFrame(screenWidth, screenHeight, screenDensity)
+                .then(() => this.setWebViewViewFrame(screenWidth, screenHeight, screenDensity))
+                .then(() => this.setWebPlayerContent());
         });
+    }
+
+    private getScreenDensity(): number {
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            return (<AndroidDeviceInfo>this._deviceInfo).getScreenDensity();
+        }
+        return 0;
+    }
+
+    private setWebPlayerViewFrame(screenWidth: number, screenHeight: number, screenDensity: number): Promise<void> {
+        let creativeWidth = this._campaign.getWidth() || screenWidth;
+        let creativeHeight = this._campaign.getHeight() || screenHeight;
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            creativeWidth = Math.floor(this.getAndroidViewSize(creativeWidth, screenDensity));
+            creativeHeight = Math.floor(this.getAndroidViewSize(creativeHeight, screenDensity));
+        }
+        const xPos = Math.floor((screenWidth / 2) - (creativeWidth / 2));
+        const yPos = Math.floor((screenHeight / 2) - (creativeHeight / 2));
+        return this._container.setViewFrame('webplayer', xPos, yPos, creativeWidth, creativeHeight);
+    }
+
+    private setWebViewViewFrame(screenWidth: number, screenHeight: number, screenDensity: number): Promise<void> {
+        let webviewAreaSize = Math.max( Math.min(screenWidth, screenHeight) * this._closeAreaMinRatio, this._closeAreaMinPixels );
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            webviewAreaSize = this.getAndroidViewSize(webviewAreaSize, screenDensity);
+        }
+        const webviewXPos = screenWidth - webviewAreaSize;
+        const webviewYPos = 0;
+        return this._container.setViewFrame('webview', Math.floor(webviewXPos), Math.floor(webviewYPos), Math.floor(webviewAreaSize), Math.floor(webviewAreaSize));
     }
 
     private onSystemKill(): void {
@@ -260,8 +279,9 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
 
     private setWebPlayerContent(): Promise<void> {
         return this.setWebplayerSettings(true).then( () => {
-            const markup = this._campaign.getDynamicMarkup();
-            return this.setWebPlayerData(markup, 'text/html', 'UTF-8').then( () => {
+            let markup = this._campaign.getDynamicMarkup();
+            markup = '<script>' + markup + '</script>';
+            return this.setWebPlayerData(markup, 'text/html', 'UTF-8').then(() => {
                 this._contentReady = true;
             });
         });
