@@ -20,6 +20,7 @@ interface IRequestOptions {
     retryDelay: number;
     followRedirects: boolean;
     retryWithConnectionEvents: boolean;
+    timeout?: number;
 }
 
 interface INativeRequest {
@@ -195,16 +196,23 @@ export class Request {
     }
 
     private invokeRequest(id: number, nativeRequest: INativeRequest): Promise<string> {
+        let connectTimeout = Request._connectTimeout;
+        let readTimeout = Request._readTimeout;
+        if(nativeRequest.options.timeout) {
+            connectTimeout = nativeRequest.options.timeout;
+            readTimeout = nativeRequest.options.timeout;
+        }
+
         Request._requests[id] = nativeRequest;
         switch(nativeRequest.method) {
             case RequestMethod.GET:
-                return this._nativeBridge.Request.get(id.toString(), nativeRequest.url, nativeRequest.headers, Request._connectTimeout, Request._readTimeout);
+                return this._nativeBridge.Request.get(id.toString(), nativeRequest.url, nativeRequest.headers, connectTimeout, readTimeout);
 
             case RequestMethod.POST:
-                return this._nativeBridge.Request.post(id.toString(), nativeRequest.url, nativeRequest.data || '', nativeRequest.headers, Request._connectTimeout, Request._readTimeout);
+                return this._nativeBridge.Request.post(id.toString(), nativeRequest.url, nativeRequest.data || '', nativeRequest.headers, connectTimeout, readTimeout);
 
             case RequestMethod.HEAD:
-                return this._nativeBridge.Request.head(id.toString(), nativeRequest.url, nativeRequest.headers, Request._connectTimeout, Request._readTimeout);
+                return this._nativeBridge.Request.head(id.toString(), nativeRequest.url, nativeRequest.headers, connectTimeout, readTimeout);
 
             default:
                 throw new Error('Unsupported request method "' + nativeRequest.method + '"');

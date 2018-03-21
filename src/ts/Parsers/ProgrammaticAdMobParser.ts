@@ -7,6 +7,7 @@ import { AuctionResponse } from 'Models/AuctionResponse';
 import { Session } from 'Models/Session';
 
 export class ProgrammaticAdMobParser extends CampaignParser {
+    public static ContentType = 'programmatic/admob-video';
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
         const markup = response.getContent();
         const cacheTTL = response.getCacheTTL();
@@ -21,7 +22,8 @@ export class ProgrammaticAdMobParser extends CampaignParser {
             creativeId: response.getCreativeId() || undefined,
             seatId: response.getSeatId() || undefined,
             meta: undefined,
-            session: session
+            session: session,
+            mediaId: response.getMediaId()
         };
 
         const adMobCampaignParams: IAdMobCampaign = {

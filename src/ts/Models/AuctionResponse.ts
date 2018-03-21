@@ -18,10 +18,11 @@ export interface IAuctionResponse {
     advertiserBundleId: string | undefined;
     useWebViewUserAgentForTracking: boolean | undefined;
     buyerId: string | undefined;
+    mediaId: string;
 }
 
 export class AuctionResponse extends Model<IAuctionResponse> {
-    constructor(placements: string[], data: any, correlationId: string) {
+    constructor(placements: string[], data: any, mediaId: string, correlationId: string) {
         super('AuctionResponse', {
             placements: ['array'],
             contentType: ['string'],
@@ -38,7 +39,8 @@ export class AuctionResponse extends Model<IAuctionResponse> {
             advertiserDomain: ['string', 'undefined'],
             advertiserBundleId: ['string', 'undefined'],
             useWebViewUserAgentForTracking: ['boolean', 'undefined'],
-            buyerId: ['string', 'undefined']
+            buyerId: ['string', 'undefined'],
+            mediaId: ['string']
         });
 
         this.set('placements', placements);
@@ -57,6 +59,7 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         this.set('advertiserBundleId', data.bundleId);
         this.set('useWebViewUserAgentForTracking', data.useWebViewUserAgentForTracking || false);
         this.set('buyerId', data.buyerId);
+        this.set('mediaId', mediaId);
     }
 
     public getPlacements(): string[] {
@@ -127,6 +130,10 @@ export class AuctionResponse extends Model<IAuctionResponse> {
         return this.get('buyerId');
     }
 
+    public getMediaId(): string {
+        return this.get('mediaId');
+    }
+
     public getDTO(): {[key: string]: any } {
         return {
             'placements': this.getPlacements(),
@@ -141,7 +148,8 @@ export class AuctionResponse extends Model<IAuctionResponse> {
             'appCategory': this.getCategory(),
             'appSubCategory': this.getSubCategory(),
             'useWebViewUserAgentForTracking': this.getUseWebViewUserAgentForTracking(),
-            'buyerId': this.getBuyerId()
+            'buyerId': this.getBuyerId(),
+            'mediaId': this.getMediaId()
         };
     }
 }

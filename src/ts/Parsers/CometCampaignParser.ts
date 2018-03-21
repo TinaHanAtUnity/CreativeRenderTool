@@ -13,6 +13,7 @@ import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class CometCampaignParser extends CampaignParser {
+    public static ContentType = 'comet/campaign';
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
         const json = response.getJsonContent();
 
@@ -42,7 +43,8 @@ export class CometCampaignParser extends CampaignParser {
             creativeId: undefined,
             seatId: undefined,
             meta: json.meta,
-            session: session
+            session: session,
+            mediaId: response.getMediaId()
         };
 
         if(json && json.mraidUrl) {
