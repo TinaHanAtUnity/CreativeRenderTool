@@ -49,6 +49,10 @@ export class CampaignManager {
         CampaignManager.CampaignId = campaignId;
     }
 
+    public static setSessionId(sessionId: string) {
+        CampaignManager.SessionId = sessionId;
+    }
+
     public static setCountry(country: string) {
         CampaignManager.Country = country;
     }
@@ -68,6 +72,7 @@ export class CampaignManager {
     private static BaseUrl: string = 'https://auction.unityads.unity3d.com/v4/games';
 
     private static CampaignId: string | undefined;
+    private static SessionId: string | undefined;
     private static Country: string | undefined;
 
     public readonly onCampaign = new Observable2<string, Campaign>();
@@ -433,6 +438,12 @@ export class CampaignManager {
         if(CampaignManager.CampaignId) {
             url = Url.addParameters(url, {
                 forceCampaignId: CampaignManager.CampaignId
+            });
+        }
+
+        if(CampaignManager.SessionId) {
+            url = Url.addParameters(url, {
+                forceSessionId: CampaignManager.SessionId
             });
         }
 
