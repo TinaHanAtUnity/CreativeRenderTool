@@ -12,11 +12,12 @@ import { Platform } from 'Constants/Platform';
 import { WebViewError } from 'Errors/WebViewError';
 import { Session } from 'Models/Session';
 import { ReinitManager } from 'Managers/ReinitManager';
+import { PlacementManager } from 'Managers/PlacementManager';
 
 enum FillState {
     MUST_REFILL, // should ask for new fill at the first available opportunity
     REQUESTING, // currently requesting new fill, avoid overlapping requests
-    FILL_RECEIVED, // fill or no fill successfully received
+    FILL_RECEIVED, // auction response (fill or no fill) successfully received
     MUST_REINIT // should reinit SDK at the first available opportunity
 }
 
@@ -27,6 +28,7 @@ export class NewRefreshManager extends RefreshManager {
     private _configuration: Configuration;
     private _focusManager: FocusManager;
     private _reinitManager: ReinitManager;
+    private _placementManager: PlacementManager;
 
     private _currentAdUnit: AbstractAdUnit;
 
@@ -34,13 +36,19 @@ export class NewRefreshManager extends RefreshManager {
     private _fillState: FillState = FillState.MUST_REFILL;
     private _adUnitStartTimestamp: number = 0;
 
+    private _campaignCount: number = 0;
+    private _noFills: number = 0;
+    private _parsingErrorCount: number = 0;
+
     // constant value that determines the delay for refreshing ads after backend has processed a start event
     // set to five seconds because backend should usually process start event in less than one second but
     // we want to be safe in case of error situations on the backend and mistimings on the device
     // this constant is intentionally named "magic" constant because the value is only a best guess and not a real technical constant
     private _startRefreshMagicConstant: number = 5000;
 
-    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, campaignManager: CampaignManager, configuration: Configuration, focusManager: FocusManager, reinitManager: ReinitManager) {
+    private _maxAdPlanTTL: number = 14400; // four hours (in seconds)
+
+    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, campaignManager: CampaignManager, configuration: Configuration, focusManager: FocusManager, reinitManager: ReinitManager, placementManager: PlacementManager) {
         super();
 
         this._nativeBridge = nativeBridge;
@@ -48,6 +56,7 @@ export class NewRefreshManager extends RefreshManager {
         this._campaignManager = campaignManager;
         this._configuration = configuration;
         this._focusManager = focusManager;
+        this._reinitManager = reinitManager;
 
         this._campaignManager.onCampaign.subscribe((placementId, campaign) => this.onCampaign(placementId, campaign));
         this._campaignManager.onNoFill.subscribe(placementId => this.onNoFill(placementId));
@@ -63,14 +72,9 @@ export class NewRefreshManager extends RefreshManager {
         }
     }
 
-    // todo: this method is redundant and should just be replaced with direct placement.getCurrentCampaign() invocations
+    // todo: this method is redundant and should just be replaced with direct invocations to PlacementManager
     public getCampaign(placementId: string): Campaign | undefined {
-        const placement = this._configuration.getPlacement(placementId);
-        if(placement) {
-            return placement.getCurrentCampaign();
-        }
-
-        return undefined;
+        return this._placementManager.getCampaign(placementId);
     }
 
     public setCurrentAdUnit(adUnit: AbstractAdUnit): void {
@@ -80,6 +84,7 @@ export class NewRefreshManager extends RefreshManager {
         // todo: ad units should be invalidated for each show invocation, not when ad unit says it's starting
         const onStartObserver = this._currentAdUnit.onStart.subscribe(() => {
             this._currentAdUnit.onStart.unsubscribe(onStartObserver);
+            this.invalidateFill();
         });
         this._currentAdUnit.onStartProcessed.subscribe(() => this.onAdUnitStartProcessed());
         this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());
@@ -87,16 +92,36 @@ export class NewRefreshManager extends RefreshManager {
         this._currentAdUnit.onFinish.subscribe(() => this.onAdUnitFinish());
     }
 
-    // todo: redundant method, should be removed
-    public setRefreshAllowed(bool: boolean): void { }
+    public setRefreshAllowed(bool: boolean): void {
+        // todo: redundant method, should be removed
+    }
 
     public refresh(nofillRetry?: boolean): Promise<INativeResponse | void> {
-
-        // todo: implement method
-        return Promise.resolve();
+        if(this.shouldRefill(Date.now())) {
+            return this._reinitManager.shouldReinitialize().then(reinit => {
+                if(reinit) {
+                    if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
+                        this._fillState = FillState.MUST_REINIT;
+                    } else {
+                        this._reinitManager.reinitialize();
+                    }
+                } else {
+                    this.invalidateFill();
+                    this._fillState = FillState.REQUESTING;
+                    this._campaignManager.request(nofillRetry);
+                }
+            });
+        } else {
+            return Promise.resolve();
+        }
     }
 
     public shouldRefill(timestamp: number): boolean {
+        // no new ad requests if previous request is in progress or webview must reinit
+        if(this._fillState === FillState.REQUESTING || this._fillState === FillState.MUST_REINIT) {
+            return false;
+        }
+
         // no new ad requests immediately after ad unit start
         if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
             if(this._adUnitStartTimestamp !== 0 && timestamp < this._adUnitStartTimestamp + this._startRefreshMagicConstant) {
@@ -117,7 +142,7 @@ export class NewRefreshManager extends RefreshManager {
             return true;
         }
 
-        return false;
+        return this.checkForExpiredCampaigns();
     }
 
     public setPlacementState(placementId: string, placementState: PlacementState): void {
@@ -149,7 +174,41 @@ export class NewRefreshManager extends RefreshManager {
     }
 
     private onAdPlanReceived(refreshDelay: number, campaignCount: number) {
-        // todo: implement method
+        this._campaignCount = campaignCount;
+
+        if(campaignCount === 0) {
+            this._noFills++;
+
+            let delay: number = 0;
+
+            // delay starts from 20 secs, then increased 50% for each additional no fill (20 secs, 30 secs, 45 secs etc.)
+            if(this._noFills > 0 && this._noFills < 15) {
+                delay = 20;
+                for(let i: number = 1; i < this._noFills; i++) {
+                    delay = delay * 1.5;
+                }
+            }
+
+            if(delay > 0) {
+                this._refillTimestamp = Date.now() + delay * 1000;
+                delay = delay + Math.random() * 10; // add 0-10 second random delay
+                this._nativeBridge.Sdk.logDebug('Unity Ads ad plan will be refreshed in ' + delay + ' seconds');
+                setTimeout(() => {
+                    this.refresh(true);
+                }, delay * 1000);
+                return;
+            }
+        } else {
+            this._noFills = 0;
+        }
+
+        let adjustedDelay: number = refreshDelay;
+        if(refreshDelay === 0 || refreshDelay > this._maxAdPlanTTL) {
+            adjustedDelay = this._maxAdPlanTTL;
+        }
+
+        this._refillTimestamp = Date.now() + adjustedDelay * 1000;
+        this._nativeBridge.Sdk.logDebug('Unity Ads ad plan will expire in ' + adjustedDelay + ' seconds');
     }
 
     private onNetworkConnected() {
@@ -165,20 +224,13 @@ export class NewRefreshManager extends RefreshManager {
     }
 
     private onActivityResumed(activity: string) {
-        if(activity !== 'com.unity3d.ads.adunit.AdUnitActivity' &&
-            activity !== 'com.unity3d.ads.adunit.AdUnitTransparentActivity' &&
-            activity !== 'com.unity3d.ads.adunit.AdUnitTransparentSoftwareActivity' &&
-            activity !== 'com.unity3d.ads.adunit.AdUnitSoftwareActivity') {
-            this.refresh();
-        }
+        this.refresh();
     }
 
     private onAdUnitStart() {
         this._adUnitStartTimestamp = Date.now();
         this.invalidateFill();
-        this.setPlacementStates(PlacementState.WAITING, this._configuration.getPlacementIds());
         this._fillState = FillState.MUST_REFILL;
-        this._refillTimestamp = 0;
     }
 
     private onAdUnitStartProcessed() {
@@ -202,9 +254,22 @@ export class NewRefreshManager extends RefreshManager {
     }
 
     private invalidateFill() {
-        const placementIds: string[] = this._configuration.getPlacementIds();
-        for(const placementId of placementIds) {
-            this._configuration.getPlacement(placementId).setCurrentCampaign(undefined);
+        this._placementManager.clearCampaigns();
+        this._placementManager.setAllPlacementStates(PlacementState.WAITING);
+        this._refillTimestamp = 0;
+
+        this._campaignCount = 0;
+        this._noFills = 0;
+    }
+
+    private checkForExpiredCampaigns(): boolean {
+        for(const placementId of this._configuration.getPlacementIds()) {
+            const campaign = this._configuration.getPlacement(placementId).getCurrentCampaign();
+            if(campaign && campaign.isExpired()) {
+                return true;
+            }
         }
+
+        return false;
     }
 }
