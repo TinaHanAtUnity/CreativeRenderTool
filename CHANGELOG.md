@@ -1,3 +1,7 @@
+# Wed Mar 21 22:18:31 UTC 2018
+
+* Asset Caching Refactor
+
 # Wed Mar 21 11:34:25 UTC 2018
 
 * Adds MissingImpressionOrdinal support for SDK < 2.1.2
