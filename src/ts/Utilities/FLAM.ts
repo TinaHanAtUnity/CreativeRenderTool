@@ -1,5 +1,7 @@
 /* https://stackoverflow.com/questions/4787431/check-fps-in-js */
 
+import { Diagnostics } from 'Utilities/Diagnostics';
+
 export class FLAM {
     public static runCount: number = 0;
     public static webGlSupport: boolean;
@@ -83,8 +85,20 @@ export class FLAM {
             }, 2000);
 
             if (ts + 5 * 1000 < Date.now()) {
-                console.log('average', FLAM.AverageFps);
-                console.dir(FLAM);
+                // console.log('average', FLAM.AverageFps);
+                Diagnostics.trigger('canvas_performance_test', {
+                    runCount: FLAM.runCount,
+                    fpsCount: FLAM.fpsCount,
+                    fpsSum: FLAM.fpsSum,
+                    lowestFps: FLAM.lowestFps,
+                    highestFps: FLAM.lowestFps,
+                    averageFps: FLAM.AverageFps,
+                    other: '',
+                    score: 0,
+                    testType: '',
+                    testVersion: 1,
+                    device: window.navigator.userAgent
+                });
             } else {
                 FLAM.setRAF(_retry);
             }

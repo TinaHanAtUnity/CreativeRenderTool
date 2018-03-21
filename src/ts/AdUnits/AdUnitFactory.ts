@@ -64,6 +64,7 @@ import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
 import { PromoEventHandler } from 'EventHandlers/PromoEventHandler';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 
+import { Diagnostics } from 'Utilities/Diagnostics';
 import { FLAM } from 'Utilities/FLAM';
 
 export class AdUnitFactory {
@@ -111,7 +112,10 @@ export class AdUnitFactory {
         try {
             FLAM.measure(document.body);
         } catch (e) {
-            console.log("e", e);
+            Diagnostics.trigger('canvas_performance_test_error', {
+                error: e,
+                device: window.navigator.userAgent
+            });
         }
 
         const performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
