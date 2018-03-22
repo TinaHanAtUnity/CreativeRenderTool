@@ -27,6 +27,7 @@ import { IosPreferencesApi } from 'Native/Api/IosPreferences';
 import { SensorInfoApi } from 'Native/Api/SensorInfo';
 import { PurchasingApi } from 'Native/Api/Purchasing';
 import { PermissionsApi } from 'Native/Api/Permissions';
+import { MainBundleApi } from 'Native/Api/MainBundle';
 
 export enum CallbackStatus {
     OK,
@@ -74,6 +75,7 @@ export class NativeBridge implements INativeBridge {
     public UrlScheme: UrlSchemeApi;
     public WebPlayer: WebPlayerApi;
     public Permissions: PermissionsApi;
+    public MainBundle: MainBundleApi;
 
     private _callbackId: number = 1;
     private _callbackTable: {[key: number]: CallbackContainer<any>} = {};
@@ -121,6 +123,7 @@ export class NativeBridge implements INativeBridge {
         this.UrlScheme = new UrlSchemeApi(this);
         this.WebPlayer = new WebPlayerApi(this);
         this.Permissions = new PermissionsApi(this);
+        this.MainBundle = new MainBundleApi(this);
     }
 
     public registerCallback<T>(resolve: (value?: T | PromiseLike<T>) => void, reject: (reason?: any) => void): number {
@@ -248,6 +251,8 @@ export class NativeBridge implements INativeBridge {
             case EventCategory[EventCategory.PERMISSIONS]:
                 if(this.getPlatform() === Platform.ANDROID) {
                     this.Permissions.Android.handleEvent(event, parameters);
+                } else {
+                    this.Permissions.Ios.handleEvent(event, parameters);
                 }
                 break;
 
