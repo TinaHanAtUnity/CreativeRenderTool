@@ -2,6 +2,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { IVideoAdUnitParameters, VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { XPromoEndScreen } from 'Views/XPromoEndScreen';
+import { CampaignAssetInfo } from 'Utilities/CampaignAssetInfo';
 
 export interface IXPromoAdUnitParameters extends IVideoAdUnitParameters<XPromoCampaign> {
     endScreen: XPromoEndScreen;
@@ -14,13 +15,7 @@ export class XPromoAdUnit extends VideoAdUnit<XPromoCampaign> {
     constructor(nativeBridge: NativeBridge, parameters: IXPromoAdUnitParameters) {
         super(nativeBridge, parameters);
 
-        const campaign = parameters.campaign;
-        const landscapeVideo = campaign.getVideo();
-        const landscapeVideoCached = landscapeVideo && landscapeVideo.isCached();
-        const portraitVideo = campaign.getPortraitVideo();
-        const portraitVideoCached = portraitVideo && portraitVideo.isCached();
-
-        parameters.overlay.setSpinnerEnabled(!landscapeVideoCached && !portraitVideoCached);
+        parameters.overlay.setSpinnerEnabled(!CampaignAssetInfo.isCached(parameters.campaign));
 
         this._endScreen = parameters.endScreen;
         this._endScreen.render();

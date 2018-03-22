@@ -4,7 +4,6 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { VPAID } from 'Views/VPAID';
 import { FinishState } from 'Constants/FinishState';
 import { Platform } from 'Constants/Platform';
-import { Url } from 'Utilities/Url';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { Timer } from 'Utilities/Timer';
@@ -81,10 +80,6 @@ export class VPAIDAdUnit extends AbstractAdUnit {
 
     public description(): string {
         return 'vpaid';
-    }
-
-    public isCached(): boolean {
-        return false;
     }
 
     public openUrl(url: string | null) {
