@@ -57,53 +57,9 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
         super.show();
 
         window.addEventListener('message', this._messageListener);
-
-        const closeLength = 5;
-
-        if(this._placement.allowSkip()) {
-            const skipLength = this._placement.allowSkipInSeconds();
-            let closeRemaining = closeLength;
-            let skipRemaining = skipLength;
-            const updateInterval = window.setInterval(() => {
-                if(closeRemaining > 0) {
-                    closeRemaining--;
-                }
-                if(skipRemaining > 0) {
-                    skipRemaining--;
-                    this.updateProgressCircle(this._closeElement, (skipLength - skipRemaining) / skipLength);
-                }
-                if(skipRemaining <= 0) {
-                    this._canSkip = true;
-                    this._closeElement.style.opacity = '1';
-                    this.updateProgressCircle(this._closeElement, 1);
-                }
-                if (closeRemaining <= 0) {
-                    this.clearTimer(updateInterval);
-                    this._canClose = true;
-                }
-            }, 1000);
-            this._timers.push(updateInterval);
-        } else {
-            let closeRemaining = closeLength;
-            const updateInterval = window.setInterval(() => {
-                const progress = (closeLength - closeRemaining) / closeLength;
-                if(progress >= 0.75 && !this._didReward) {
-                    this._handlers.forEach(handler => handler.onDisplayInterstitialReward());
-                    this._didReward = true;
-                }
-                if(closeRemaining > 0) {
-                    closeRemaining--;
-                    this.updateProgressCircle(this._closeElement, progress);
-                }
-                if (closeRemaining <= 0) {
-                    this.clearTimer(updateInterval);
-                    this._canClose = true;
-                    this._closeElement.style.opacity = '1';
-                    this.updateProgressCircle(this._closeElement, 1);
-                }
-            }, 1000);
-            this._timers.push(updateInterval);
-        }
+        this._canClose = true;
+        this._closeElement.style.opacity = '1';
+        this.updateProgressCircle(this._closeElement, 1);
     }
 
     public hide() {
@@ -124,7 +80,7 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
         window.clearInterval(handle);
     }
 
-    private updateProgressCircle(container: HTMLElement, value: number) {
+    private updateProgressCircle(container: HTMLElement, progress: number) {
         const wrapperElement = <HTMLElement>container.querySelector('.progress-wrapper');
 
         if(this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() < 15) {
@@ -140,10 +96,10 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
         const leftCircleElement = <HTMLElement>container.querySelector('.circle-left');
         const rightCircleElement = <HTMLElement>container.querySelector('.circle-right');
 
-        const degrees = value * 360;
+        const degrees = progress * 360;
         leftCircleElement.style.webkitTransform = 'rotate(' + degrees + 'deg)';
 
-        if(value >= 0.5) {
+        if(progress >= 0.5) {
             wrapperElement.style.webkitAnimationName = 'close-progress-wrapper';
             rightCircleElement.style.webkitAnimationName = 'right-spin';
         }
