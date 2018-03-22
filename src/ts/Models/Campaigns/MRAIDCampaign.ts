@@ -25,6 +25,7 @@ export interface IMRAIDCampaign extends IProgrammaticCampaign {
     store: StoreName | undefined;
     appStoreId: string | undefined;
     playableConfiguration: IPlayableConfiguration | undefined;
+    arEnabled: boolean | undefined;
 }
 
 export interface IPlayableConfiguration {
@@ -52,7 +53,8 @@ export class MRAIDCampaign extends ProgrammaticCampaign<IMRAIDCampaign> {
             store: ['number', 'undefined'],
             appStoreId: ['string', 'undefined'],
             videoEventUrls: ['object', 'undefined'],
-            playableConfiguration: ['object', 'undefined']
+            playableConfiguration: ['object', 'undefined'],
+            arEnabled: ['boolean', 'undefined']
         }, campaign);
     }
 
@@ -141,6 +143,10 @@ export class MRAIDCampaign extends ProgrammaticCampaign<IMRAIDCampaign> {
 
     public getBypassAppSheet(): boolean | undefined {
         return this.get('bypassAppSheet');
+    }
+
+    public getArEnabled(): boolean | undefined {
+        return this.get('arEnabled');
     }
 
     public getStore(): StoreName | undefined {
