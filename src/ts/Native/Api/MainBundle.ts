@@ -1,7 +1,7 @@
 import { NativeApi } from 'Native/NativeApi';
 import { NativeBridge } from 'Native/NativeBridge';
 
-export class MainBundle extends NativeApi {
+export class MainBundleApi extends NativeApi {
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'MainBundle');
     }
