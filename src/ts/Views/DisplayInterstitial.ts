@@ -9,8 +9,6 @@ import { Platform } from 'Constants/Platform';
 import { Template } from 'Utilities/Template';
 
 export interface IDisplayInterstitialHandler {
-    onDisplayInterstitialReward(): void;
-    onDisplayInterstitialSkip(): void;
     onDisplayInterstitialClose(): void;
 }
 
@@ -21,9 +19,6 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
 
     private _closeElement: HTMLElement;
 
-    private _canClose = false;
-    private _canSkip = false;
-    private _didReward = false;
     private _webPlayerPrepared = false;
 
     private _messageListener: EventListener;
@@ -57,7 +52,6 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
         super.show();
 
         window.addEventListener('message', this._messageListener);
-        this._canClose = true;
         this._closeElement.style.opacity = '1';
         this.updateProgressCircle(this._closeElement, 1);
     }
@@ -108,11 +102,7 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
     private onCloseEvent(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
-        if (this._canSkip && !this._canClose) {
-            this._handlers.forEach(handler => handler.onDisplayInterstitialSkip());
-        } else if(this._canClose) {
-            this._handlers.forEach(handler => handler.onDisplayInterstitialClose());
-        }
+        this._handlers.forEach(handler => handler.onDisplayInterstitialClose());
     }
 
     private onMessage(e: MessageEvent) {
