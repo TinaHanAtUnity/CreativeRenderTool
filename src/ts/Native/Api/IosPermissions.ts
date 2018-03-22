@@ -6,6 +6,11 @@ enum PermissionsEvent {
     PERMISSIONS_RESULT,
 }
 
+export enum IosPermission {
+    AVMediaTypeVideo = 'vide',
+    AVMediaTypeAudio = 'soun'
+}
+
 export class IosPermissionsApi extends NativeApi {
     public readonly onPermissionsResult = new Observable2<string, boolean>();
 
@@ -13,11 +18,11 @@ export class IosPermissionsApi extends NativeApi {
         super(nativeBridge, 'Permissions');
     }
 
-    public checkPermission(permission: string): Promise<boolean> {
+    public checkPermission(permission: IosPermission): Promise<boolean> {
         return this._nativeBridge.invoke<boolean>(this._apiClass, 'checkPermission', [permission]);
     }
 
-    public requestPermissions(permission: string): Promise<void> {
+    public requestPermission(permission: IosPermission): Promise<void> {
         return this._nativeBridge.invoke<void>(this._apiClass, 'requestPermission', [permission]);
     }
 
