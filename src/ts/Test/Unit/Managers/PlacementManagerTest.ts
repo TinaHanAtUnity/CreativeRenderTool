@@ -39,7 +39,7 @@ describe('PlacementManagerTest', () => {
 
         placementManager.setCampaign('unknown', testCampaign);
 
-        assert.isUndefined(placementManager.getCampaign('unknown'), 'unknown placement returns a campaign after setCampaign invocation')
+        assert.isUndefined(placementManager.getCampaign('unknown'), 'unknown placement returns a campaign after setCampaign invocation');
     });
 
     it('should clear campaigns', () => {
