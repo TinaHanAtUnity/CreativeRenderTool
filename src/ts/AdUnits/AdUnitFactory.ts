@@ -269,7 +269,7 @@ export class AdUnitFactory {
         const resourceUrl = parameters.campaign.getResourceUrl();
         let endScreen: MRAIDEndScreen | undefined;
 
-        FLAM.measure(document.body);
+        FLAM.measure(document.body, nativeBridge);
 
         let mraid: MRAIDView<IMRAIDViewHandler>;
         if(resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity|roll-the-ball/)) {
