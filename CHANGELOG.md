@@ -1,3 +1,8 @@
+# Staged
+
+* Display Centering
+* ForceSessionId parameter for APIN
+
 # Wed Mar 21 22:18:31 UTC 2018
 
 * Asset Caching Refactor
