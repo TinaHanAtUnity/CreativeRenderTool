@@ -43,6 +43,7 @@ import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xm
 
 import * as sinon from 'sinon';
 
+const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
     public static getPlacement(): Placement {
         return new Placement({
@@ -68,7 +69,8 @@ export class TestFixtures {
             creativeId: undefined,
             seatId: undefined,
             meta: meta,
-            session: session
+            session: session,
+            mediaId: TestMediaID
         };
     }
 
@@ -177,7 +179,8 @@ export class TestFixtures {
             creativeId: mraidJson.creativeId || undefined,
             seatId: mraidJson.seatId || undefined,
             meta: mraidJson.meta || undefined,
-            session: session
+            session: session,
+            mediaId: TestMediaID
         };
     }
 
@@ -222,7 +225,8 @@ export class TestFixtures {
             creativeId: 'creativeId',
             seatId: 12345,
             meta: undefined,
-            session: session
+            session: session,
+            mediaId: TestMediaID
         };
     }
 
@@ -272,14 +276,17 @@ export class TestFixtures {
             creativeId: json.creativeId || undefined,
             seatId: json.seatId || undefined,
             meta: json.meta,
-            session: session
+            session: session,
+            mediaId: TestMediaID
         };
 
         return {
             ... baseCampaignParams,
             dynamicMarkup: json.content,
             trackingUrls: json.display.tracking || undefined,
-            useWebViewUserAgentForTracking: false
+            useWebViewUserAgentForTracking: false,
+            width: json.display.width || undefined,
+            height: json.display.height || undefined
         };
     }
 
@@ -295,7 +302,8 @@ export class TestFixtures {
             creativeId: json.creativeId || undefined,
             seatId: json.seatId || undefined,
             meta: undefined,
-            session: session
+            session: session,
+            mediaId: TestMediaID
         };
     }
 

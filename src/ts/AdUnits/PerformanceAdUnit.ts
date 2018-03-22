@@ -3,6 +3,7 @@ import { IVideoAdUnitParameters, VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
+import { CampaignAssetInfo } from 'Utilities/CampaignAssetInfo';
 
 export interface IPerformanceAdUnitParameters extends IVideoAdUnitParameters<PerformanceCampaign> {
     endScreen: PerformanceEndScreen;
@@ -16,13 +17,7 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
     constructor(nativeBridge: NativeBridge, parameters: IPerformanceAdUnitParameters) {
         super(nativeBridge, parameters);
 
-        const campaign = parameters.campaign;
-        const landscapeVideo = campaign.getVideo();
-        const landscapeVideoCached = landscapeVideo && landscapeVideo.isCached();
-        const portraitVideo = campaign.getPortraitVideo();
-        const portraitVideoCached = portraitVideo && portraitVideo.isCached();
-
-        parameters.overlay.setSpinnerEnabled(!landscapeVideoCached && !portraitVideoCached);
+        parameters.overlay.setSpinnerEnabled(!CampaignAssetInfo.isCached(parameters.campaign));
 
         this._endScreen = parameters.endScreen;
         this._endScreen.render();

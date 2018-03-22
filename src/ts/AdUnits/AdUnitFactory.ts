@@ -63,6 +63,7 @@ import { Promo } from 'Views/Promo';
 import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
 import { PromoEventHandler } from 'EventHandlers/PromoEventHandler';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
+import { CampaignAssetInfo } from 'Utilities/CampaignAssetInfo';
 
 export class AdUnitFactory {
 
@@ -96,7 +97,7 @@ export class AdUnitFactory {
         const overlay = this.createOverlay(nativeBridge, parameters);
         const adUnitStyle = CustomFeatures.getAdUnitStyle(parameters.campaign.getAbGroup());
         const endScreen = new PerformanceEndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), adUnitStyle);
-        const video = this.getOrientedVideo(<PerformanceCampaign>parameters.campaign, parameters.forceOrientation);
+        const video = this.getVideo(parameters.campaign, parameters.forceOrientation);
 
         const performanceAdUnitParameters: IPerformanceAdUnitParameters = {
             ... parameters,
@@ -136,7 +137,7 @@ export class AdUnitFactory {
     private static createXPromoAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<XPromoCampaign>): XPromoAdUnit {
         const overlay = this.createOverlay(nativeBridge, parameters);
         const endScreen = new XPromoEndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
-        const video = this.getOrientedVideo(<XPromoCampaign>parameters.campaign, parameters.forceOrientation);
+        const video = this.getVideo(parameters.campaign, parameters.forceOrientation);
 
         const xPromoAdUnitParameters: IXPromoAdUnitParameters = {
             ... parameters,
@@ -398,58 +399,6 @@ export class AdUnitFactory {
         });
     }
 
-    private static getOrientedVideo(campaign: PerformanceCampaign | XPromoCampaign, forceOrientation: ForceOrientation): Video {
-        const landscapeVideo = AdUnitFactory.getLandscapeVideo(campaign);
-        const portraitVideo = AdUnitFactory.getPortraitVideo(campaign);
-
-        if(forceOrientation === ForceOrientation.LANDSCAPE) {
-            if(landscapeVideo) {
-                return landscapeVideo;
-            }
-            if(portraitVideo) {
-                return portraitVideo;
-            }
-        }
-
-        if(forceOrientation === ForceOrientation.PORTRAIT) {
-            if(portraitVideo) {
-                return portraitVideo;
-            }
-            if(landscapeVideo) {
-                return landscapeVideo;
-            }
-        }
-
-        throw new WebViewError('Unable to select an oriented video');
-    }
-
-    private static getLandscapeVideo(campaign: PerformanceCampaign | XPromoCampaign): Video | undefined {
-        const video = campaign.getVideo();
-        const streaming = campaign.getStreamingVideo();
-        if(video) {
-            if(video.isCached()) {
-                return video;
-            }
-            if(streaming) {
-                return streaming;
-            }
-        }
-        return undefined;
-    }
-
-    private static getPortraitVideo(campaign: PerformanceCampaign | XPromoCampaign): Video | undefined {
-        const video = campaign.getPortraitVideo();
-        const streaming = campaign.getStreamingPortraitVideo();
-        if(video) {
-            if(video.isCached()) {
-                return video;
-            }
-            if(streaming) {
-                return streaming;
-            }
-        }
-        return undefined;
-    }
     private static createAdMobAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<AdMobCampaign>): AdMobAdUnit {
         // AdMobSignalFactory will always be defined, checking and throwing just to remove the undefined type.
         if (!parameters.adMobSignalFactory) {
@@ -500,5 +449,14 @@ export class AdUnitFactory {
             }
             return overlay;
         }
+    }
+
+    private static getVideo(campaign: Campaign, forceOrientation: ForceOrientation): Video {
+        const video = CampaignAssetInfo.getOrientedVideo(campaign, forceOrientation);
+        if(!video) {
+            throw new WebViewError('Unable to select an oriented video');
+        }
+
+        return video;
     }
 }

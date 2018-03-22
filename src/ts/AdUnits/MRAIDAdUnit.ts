@@ -132,15 +132,6 @@ export class MRAIDAdUnit extends AbstractAdUnit {
         this._orientationProperties = properties;
     }
 
-    public isCached(): boolean {
-        const asset: HTML | undefined = this._campaign.getResourceUrl();
-        if(asset) {
-            return asset.isCached();
-        }
-
-        return false;
-    }
-
     public description(): string {
         return 'mraid';
     }
