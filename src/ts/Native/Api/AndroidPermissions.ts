@@ -7,6 +7,11 @@ enum PermissionsEvent {
     PERMISSIONS_ERROR
 }
 
+export enum AndroidPermission {
+    CAMERA = 'android.permission.CAMERA',
+    RECORD_AUDIO = 'android.permission.RECORD_AUDIO'
+}
+
 export class AndroidPermissionsApi extends NativeApi {
     public readonly onPermissionsResult = new Observable3<number, string[], number[]>();
     public readonly onPermissionsError = new Observable1<string>();
@@ -19,11 +24,11 @@ export class AndroidPermissionsApi extends NativeApi {
         return this._nativeBridge.invoke<string[]>(this._apiClass, 'getPermissions');
     }
 
-    public checkPermission(permission: string): Promise<number> {
+    public checkPermission(permission: AndroidPermission): Promise<number> {
         return this._nativeBridge.invoke<number>(this._apiClass, 'checkPermission', [permission]);
     }
 
-    public requestPermissions(permissions: string[], requestCode: number): Promise<void> {
+    public requestPermissions(permissions: AndroidPermission[], requestCode: number): Promise<void> {
         return this._nativeBridge.invoke<void>(this._apiClass, 'requestPermissions', [permissions, requestCode]);
     }
 
