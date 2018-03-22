@@ -81,19 +81,17 @@ export class FLAM {
                 FLAM.fpsCount++;
                 FLAM.fpsSum += FLAM.fps;
 
-                FLAM.lowestFps = FLAM.fps < FLAM.lowestFps ? FLAM.fps : FLAM.lowestFps;
-                FLAM.highestFps = FLAM.fps > FLAM.highestFps ? FLAM.fps : FLAM.highestFps;
+                FLAM.lowestFps = (FLAM.fps < FLAM.lowestFps) ? FLAM.fps : FLAM.lowestFps;
+                FLAM.highestFps = (FLAM.fps > FLAM.highestFps) ? FLAM.fps : FLAM.highestFps;
             }, 2000);
 
             if (ts + 5 * 1000 < Date.now()) {
-                // console.log('average', FLAM.AverageFps);
-
                 const data = {
                     runCount: FLAM.runCount,
                     fpsCount: FLAM.fpsCount,
                     fpsSum: FLAM.fpsSum,
                     lowestFps: FLAM.lowestFps,
-                    highestFps: FLAM.lowestFps,
+                    highestFps: FLAM.highestFps,
                     averageFps: FLAM.AverageFps,
                     other: '',
                     score: 0,
@@ -103,8 +101,7 @@ export class FLAM {
                 };
 
                 Diagnostics.trigger('canvas_performance_test', data);
-                nativeBridge.Sdk.logDebug(JSON.stringify(data));
-
+                nativeBridge.Sdk.logInfo(JSON.stringify(data));
             } else {
                 FLAM.setRAF(_retry);
             }
