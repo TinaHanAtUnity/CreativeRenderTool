@@ -1,6 +1,7 @@
 /* https://stackoverflow.com/questions/4787431/check-fps-in-js */
 
 import { Diagnostics } from 'Utilities/Diagnostics';
+import { NativeBridge } from 'Native/NativeBridge';
 
 export class FLAM {
     public static runCount: number = 0;
@@ -20,7 +21,7 @@ export class FLAM {
         return this.runCount > 0 ? Math.round(this.fpsSum / this.fpsCount) : 0;
     }
 
-    public static measure(webviewContext: HTMLElement) {
+    public static measure(webviewContext: HTMLElement, nativeBridge: NativeBridge) {
         const canvas = FLAM.createTestCanvas();
         const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
         webviewContext.appendChild(canvas);
@@ -86,7 +87,8 @@ export class FLAM {
 
             if (ts + 5 * 1000 < Date.now()) {
                 // console.log('average', FLAM.AverageFps);
-                Diagnostics.trigger('canvas_performance_test', {
+
+                const data = {
                     runCount: FLAM.runCount,
                     fpsCount: FLAM.fpsCount,
                     fpsSum: FLAM.fpsSum,
@@ -98,7 +100,11 @@ export class FLAM {
                     testType: '',
                     testVersion: 1,
                     device: window.navigator.userAgent
-                });
+                };
+
+                Diagnostics.trigger('canvas_performance_test', data);
+                nativeBridge.Sdk.logDebug(JSON.stringify(data));
+
             } else {
                 FLAM.setRAF(_retry);
             }

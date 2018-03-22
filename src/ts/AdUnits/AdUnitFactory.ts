@@ -110,7 +110,7 @@ export class AdUnitFactory {
         };
 
         try {
-            FLAM.measure(document.body);
+            FLAM.measure(document.body, nativeBridge);
         } catch (e) {
             Diagnostics.trigger('canvas_performance_test_error', {
                 error: e,
