@@ -16,7 +16,7 @@ import { Campaign } from 'Models/Campaign';
 import { Placement } from 'Models/Placement';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
-import { CampaignAssetStatus } from 'Utilities/CampaignAssetStatus';
+import { CampaignAssetInfo } from 'Utilities/CampaignAssetInfo';
 import { Configuration } from 'Models/Configuration';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {
@@ -303,8 +303,8 @@ export class OperativeEventManager {
             'meta': this._campaign.getMeta(),
             'platform': Platform[this._clientInfo.getPlatform()].toLowerCase(),
             'language': this._deviceInfo.getLanguage(),
-            'cached': CampaignAssetStatus.isCached(this._campaign),
-            'cachedOrientation': CampaignAssetStatus.getCachedOrientation(this._campaign),
+            'cached': CampaignAssetInfo.isCached(this._campaign),
+            'cachedOrientation': CampaignAssetInfo.getCachedVideoOrientation(this._campaign),
             'token': this._configuration.getToken()
         };
 

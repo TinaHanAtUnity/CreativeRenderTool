@@ -87,10 +87,6 @@ export class AdMobAdUnit extends AbstractAdUnit {
         return this._container.close();
     }
 
-    public isCached(): boolean {
-        return false;
-    }
-
     public description(): string {
         return 'AdMob';
     }

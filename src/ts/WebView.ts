@@ -462,6 +462,10 @@ export class WebView {
                 CampaignManager.setCampaignId(TestEnvironment.get('campaignId'));
             }
 
+            if(TestEnvironment.get('sessionId')) {
+                CampaignManager.setSessionId(TestEnvironment.get('sessionId'));
+            }
+
             if(TestEnvironment.get('country')) {
                 CampaignManager.setCountry(TestEnvironment.get('country'));
             }
