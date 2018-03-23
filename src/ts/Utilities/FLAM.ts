@@ -59,7 +59,7 @@ export class FLAM {
             ctx.stroke();
 
             /* Draw heart */
-            ctx.strokeStyle = 'red';
+            ctx.fillStyle = 'red';
             ctx.moveTo(canvas.width * Math.random(), canvas.height * Math.random());
             ctx.bezierCurveTo(75, 37, 70, 25, 50, 25);
             ctx.bezierCurveTo(20, 25, 20, 62.5, 20, 62.5);
@@ -67,13 +67,16 @@ export class FLAM {
             ctx.bezierCurveTo(110, 102, 130, 80, 130, 62.5);
             ctx.bezierCurveTo(130, 62.5, 130, 25, 100, 25);
             ctx.bezierCurveTo(85, 25, 75, 37, 75, 40);
-            ctx.stroke();
+            ctx.fill();
 
             /* Center */
             FLAM.draw2dCube(canvas, {x: canvas.width / 2, y: canvas.height / 1.25}, {translate: true});
             FLAM.draw2dCube(canvas, {x: canvas.width / 2, y: canvas.height / 2}, {wobbleEffect: true});
-            //
+
             FLAM.drawImages(canvas, true);
+
+            /* Copy image data */
+            // const imageData = ctx.getImageData(50, 50, 100, 100);
 
             FLAM.fps = Math.round(1000 / frameTime);
 
@@ -93,14 +96,14 @@ export class FLAM {
                     lowestFps: FLAM.lowestFps,
                     highestFps: FLAM.highestFps,
                     averageFps: FLAM.AverageFps,
-                    other: '',
+                    other: new Date(),
                     score: 0,
                     testType: '',
-                    testVersion: 2,
-                    device: window.navigator.userAgent
+                    testVersion: 3,
+                    device: window.navigator.userAgent,
                 };
 
-                Diagnostics.trigger('canvas_performance_test', data);
+                // Diagnostics.trigger('canvas_performance_test', data);
                 nativeBridge.Sdk.logInfo(JSON.stringify(data));
             } else {
                 FLAM.setRAF(_retry);
@@ -207,12 +210,14 @@ export class FLAM {
         }
 
         if (FLAM.image.complete) {
+
             ctx.drawImage(FLAM.image, canvas.width / 2 - FLAM.image.width / 2, canvas.height / 2 + wobble - FLAM.image.height / 2);
+
             for (let i = 0; i < 500; i++) {
                 ctx.save();
                 ctx.rotate(360 * Math.random() * Math.PI / 180);
                 ctx.scale(2 * Math.random(), 2 * Math.random());
-                ctx.drawImage(FLAM.image, canvas.width * Math.random(), canvas.height * Math.random());
+                ctx.drawImage(FLAM.image, canvas.width / 2 * Math.random(), canvas.height * Math.random());
                 ctx.restore();
             }
         }
