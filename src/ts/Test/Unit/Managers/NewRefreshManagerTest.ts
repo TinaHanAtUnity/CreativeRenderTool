@@ -28,6 +28,7 @@ import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { SdkApi } from 'Native/Api/Sdk';
+import { ListenerApi } from 'Native/Api/Listener';
 
 describe('NewRefreshManagerTest', () => {
     let nativeBridge: NativeBridge;
@@ -203,5 +204,21 @@ describe('NewRefreshManagerTest', () => {
             assert.isFalse(requestSpy.called, 'ad request was triggered for valid ad plan');
             assert.isFalse(reinitSpy.called, 'reinit check was triggered for valid ad plan');
         });
+    });
+
+    it('should handle new campaign', () => {
+        const oneHourInSeconds: number = 3600;
+
+        const refreshManager: NewRefreshManager = new NewRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration, focusManager, reinitManager, placementManager);
+
+        nativeBridge.Listener = new ListenerApi(nativeBridge);
+        const listenerSpy = sinon.spy(nativeBridge.Listener, 'sendReadyEvent');
+
+        campaignManager.onAdPlanReceived.trigger(oneHourInSeconds, 1);
+        campaignManager.onCampaign.trigger('video', campaign);
+
+        assert.isDefined(placementManager.getCampaign('video'), 'campaign was not set for correct placement');
+        assert.equal((<PerformanceCampaign>placementManager.getCampaign('video')).getId(), campaign.getId(), 'campaign was set incorrectly');
+        assert.isTrue(listenerSpy.calledOnceWithExactly('video'), 'ready event was not sent correctly');
     });
 });
