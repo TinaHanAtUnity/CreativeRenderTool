@@ -170,9 +170,7 @@ export class NewRefreshManager extends RefreshManager {
     }
 
     private onError(error: WebViewError | Error, placementIds: string[], session?: Session) {
-        if(this._fillState === FillState.REQUESTING) {
-            this._fillState = FillState.FILL_RECEIVED;
-        }
+        this._fillState = FillState.FILL_RECEIVED;
 
         // todo: this diagnostic handling is copied from old refresh manager and it's the exact anti-pattern that's been causing a lot of trouble
         // todo: proper solution is to break this one massive auction_request_failed to smaller more well-defined diagnostic events
