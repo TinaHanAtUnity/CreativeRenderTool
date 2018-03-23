@@ -1,3 +1,7 @@
+# Pending
+
+* Test new ad request refresh logic and reinit logic in groups 8 and 9
+
 # Thu Mar 22 20:52:53 UTC 2018
 
 * Remove ramdom CTA button colour test from groups 8 & 10
