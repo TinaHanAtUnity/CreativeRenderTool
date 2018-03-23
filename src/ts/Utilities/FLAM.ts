@@ -96,7 +96,7 @@ export class FLAM {
                     other: '',
                     score: 0,
                     testType: '',
-                    testVersion: 1,
+                    testVersion: 2,
                     device: window.navigator.userAgent
                 };
 
