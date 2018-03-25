@@ -92,7 +92,7 @@ export class NativeBridge implements INativeBridge {
 
         this._platform = platform;
         this._backend = backend;
-        this.AR = new ARApi(this)
+        this.AR = new ARApi(this);
         this.AppSheet = new AppSheetApi(this);
 
         if(platform === Platform.IOS) {
