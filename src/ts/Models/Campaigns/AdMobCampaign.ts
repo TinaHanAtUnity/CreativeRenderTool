@@ -2,7 +2,7 @@ import { Campaign, ICampaign } from 'Models/Campaign';
 import { Asset } from 'Models/Assets/Asset';
 import { ProgrammaticCampaign, IProgrammaticCampaign } from 'Models/Campaigns/ProgrammaticCampaign';
 import { Video } from 'Models/Assets/Video';
-import { Model } from '../Model';
+import { Model } from 'Models/Model';
 
 export interface IAdMobVideo {
     mediaFileURL: string;
