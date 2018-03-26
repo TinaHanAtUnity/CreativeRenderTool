@@ -126,10 +126,13 @@ export class AdMobView extends View<IAdMobEventHandler> {
         if (video) {
             const scriptEl = dom.querySelector('body script');
             const mediaFileURL = this.encodeURLForHTML(video.getMediaFileURL());
-            const cachedFileURL = this.encodeURLForHTML(video.getVideo().getCachedUrl()!);
-            if (scriptEl && scriptEl.textContent) {
-                const replacedSrc = scriptEl.textContent.replace(mediaFileURL, cachedFileURL);
-                scriptEl.textContent = replacedSrc;
+            let cachedFileURL = video.getVideo().getCachedUrl();
+            if (cachedFileURL) {
+                cachedFileURL = this.encodeURLForHTML(cachedFileURL);
+                if (scriptEl && scriptEl.textContent) {
+                    const replacedSrc = scriptEl.textContent.replace(mediaFileURL, cachedFileURL);
+                    scriptEl.textContent = replacedSrc;
+                }
             }
         }
     }
