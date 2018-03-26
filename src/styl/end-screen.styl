@@ -3,10 +3,12 @@
 
 $end-screen-mixin($scale-size = $default-scale-size) {
 
+  $common-margin = $default-size * $scale-size * .25;
+
   #end-screen {
     .btn-close-region {
       $close-button-default($scale-size);
-      padding: $default-size * $scale-size * .25;
+      padding: $common-margin;
     }
     .download-container {
       $download-container-default($scale-size);
@@ -38,7 +40,7 @@ $end-screen-mixin($scale-size = $default-scale-size) {
 
     .privacy-button {
       $privacy-button-default($scale-size);
-      margin: 0 0 0 $default-size * $scale-size * .25;
+      margin: 0 0 0 $common-margin;
     }
   }
 
@@ -73,131 +75,278 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       }
     }
   }
-}
 
-body {
-  &.portrait #end-screen {
-    .game-background-portrait {
-      display: block;
+  body {
+    &.portrait #end-screen {
+      .game-background-portrait-blurred,
+      .game-background-portrait {
+        display: block;
+      }
+      .game-background-landscape-blurred,
+      .game-background-landscape {
+        display: none;
+      }
+
+      .row-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+      }
+
+      .column-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+      }
+
+      .game-background-container,
+      .game-background {
+        width: 100%;
+        height: 100%;
+      }
+
+      .game-background-container {
+        height: 50%;
+      }
+
+      .end-screen-info-background {
+        width: 100%;
+        height: 50%;
+      }
+
+      .privacy-button {
+        left: 0;
+      }
+
+      .game-icon {
+        align-self: center;
+      }
     }
-    .game-background-landscape {
-      display: none;
+
+    &.landscape #end-screen {
+      .game-background-portrait-blurred,
+      .game-background-portrait {
+        display: none;
+      }
+      .game-background-landscape-blurred,
+      .game-background-landscape {
+        display: block;
+      }
+
+      .end-screen-info {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        .game-icon {
+          margin: 0 auto;
+        }
+
+      }
+
+      .game-background-container,
+      .game-background {
+        width: 100%;
+        height: 100%;
+      }
+
+      .game-background-container {
+        width: 50%;
+      }
+
+      .campaign-container {
+        display: flex;
+      }
+
+      .end-screen-info-background {
+        width: 50%;
+        height: 100%;
+        text-align: center;
+      }
+
+      .privacy-button {
+        left: 50%;
+      }
+
+      .unityads-logo {
+        width: 50%;
+      }
     }
 
     .row-container {
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-    }
-
-    .column-container {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: flex-start;
-    }
-
-    .game-background {
-      width: 100%;
-      height: 50%;
-    }
-
-    .end-screen-info-background {
-      width: 100%;
-      height: 50%;
-    }
-
-    .privacy-button {
-      left: 0;
-    }
-
-    .game-icon {
-      align-self: center;
+      position: relative;
     }
   }
 
-  &.landscape #end-screen {
-    .game-background-portrait {
-      display: none;
-    }
-    .game-background-landscape {
-      display: block;
-    }
-
-    .end-screen-info {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-
-      .game-icon {
-        margin: 0 auto;
-      }
-
-    }
-
-    .game-background {
-      width: 50%;
-      height: 100%;
-    }
-
-    .campaign-container {
-      display: flex;
-    }
-
-    .end-screen-info-background {
-      width: 50%;
-      height: 100%;
-      text-align: center;
-    }
-
-    .privacy-button {
-      left: 50%;
-    }
-
-    .unityads-logo {
-      width: 50%;
-    }
-  }
-
-  .row-container {
-    position: relative;
-  }
-}
-
-#end-screen {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: transparent;
-
-  .campaign-container {
+  #end-screen {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    background: $white;
+    background-color: transparent;
+
+    .campaign-container {
+      width: 100%;
+      height: 100%;
+      background: $white;
+    }
+
+    .game-background {
+      background-color: $black;
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+    }
+
+    .end-screen-info-background {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      align-content: center;
+      height: 100%;
+      justify-content: center;
+      background-color: $end-screen-background-color;
+    }
   }
 
-  .game-background {
-    background-color: $black;
-    background-position: center;
-    background-size: cover;
-    background-repeat: no-repeat;
-  }
+  $iphone-button-right = calc(env(safe-area-inset-right) - 1rem);
 
-  .end-screen-info-background {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    align-content: center;
-    height: 100%;
-    justify-content: center;
-    background-color: $end-screen-background-color;
+  /* iPhone X */
+  @media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
+    body {
+      #end-screen {
+        .campaign-container {
+          position: relative;
+          overflow: hidden;
+        }
+
+        .game-background-blurred {
+          position: absolute;
+          display: block;
+          margin: 0;
+          width: 100%;
+          height: calc(50% + env(safe-area-inset-top));
+          // @stylint off
+          height: calc(50% + constant(safe-area-inset-top));
+          // @stylint on
+          filter: blur(5px) brightness(.8) opacity(.68);
+          transform: scale(1.4);
+          background-color: transparent;
+          background-size: cover;
+        }
+
+        .game-background-container {
+          position: relative;
+          z-index: 6;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+      }
+
+      &.landscape #end-screen,
+      &.portrait #end-screen {
+        .game-background {
+          width: 80%;
+          height: 80%;
+        }
+        .end-screen-info-background {
+          position: relative;
+          z-index: 7;
+        }
+      }
+
+      &.portrait #end-screen {
+        .game-background-container {
+          height: calc(50% + env(safe-area-inset-top));
+          // @stylint off
+          height: calc(50% + constant(safe-area-inset-top));
+          // @stylint on
+        }
+
+        .end-screen-info-background {
+          height: calc(50% - env(safe-area-inset-top));
+          // @stylint off
+          height: calc(50% - constant(safe-area-inset-top));
+          // @stylint on
+        }
+
+        .game-background {
+          position: absolute;
+          margin-top: .5rem;
+          width: 90vw;
+          height: 90vw;
+        }
+
+        .btn-close-region {
+          top: calc(constant(safe-area-inset-top) - 1.25rem);
+          // @stylint off
+          top: calc(env(safe-area-inset-top) - 1.25rem);
+          // @stylint on
+          line-height: auto;
+        }
+
+        .unityads-logo {
+          margin-bottom: .15rem;
+        }
+
+        .privacy-button {
+          left: 0;
+          margin-left: 1rem;
+        }
+      }
+
+      &.landscape #end-screen {
+        .game-background-blurred {
+          width: calc(100vh + env(safe-area-inset-left));
+          height: 100%;
+        }
+
+        .game-background-container {
+          width: calc(100vh + env(safe-area-inset-left));
+          // @stylint off
+          width: calc(100vh + constant(safe-area-inset-left));
+          // @stylint on
+        }
+
+        .game-background {
+          margin-left: calc(env(safe-area-inset-left) / 2);
+          // @stylint off
+          margin-left: calc(env(safe-area-inset-left) / 2);
+          // @stylint on
+          width: 85vh;
+          height: 85vh;
+        }
+
+        .end-screen-info-background {
+          flex-grow: 1;
+          width: auto;
+        }
+
+        .btn-close-region {
+          right: "calc(env(safe-area-inset-right) - 6 * %s)" % ($common-margin);
+        }
+
+        .privacy-button {
+          right: "calc(constant(safe-area-inset-right) - %s)" % ($common-margin);
+          // @stylint off
+          right: "calc(env(safe-area-inset-right) - %s)" % ($common-margin);
+          // @stylint on
+          bottom: $common-margin;
+          left: auto;
+        }
+
+        .unityads-logo {
+          bottom: .45rem;
+        }
+      }
+    }
   }
 }
 
 $end-screen-mixin();
-
