@@ -1,5 +1,10 @@
-# Staged
+# Pending
 
+* Test new ad request refresh logic and reinit logic in groups 9 and 11
+
+# Thu Mar 22 20:52:53 UTC 2018
+
+* Remove ramdom CTA button colour test from groups 8 & 10
 * Display Centering
 * ForceSessionId parameter for APIN
 
