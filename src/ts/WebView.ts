@@ -219,7 +219,7 @@ export class WebView {
             this._assetManager = new AssetManager(this._cache, this._configuration.getCacheMode(), this._deviceInfo, this._cacheBookkeeping);
             this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._adMobSignalFactory, this._request, this._clientInfo, this._deviceInfo, this._metadataManager);
 
-            if(this._configuration.getAbGroup() === 10 || this._configuration.getAbGroup() === 11) {
+            if(this._configuration.getAbGroup() === 9 || this._configuration.getAbGroup() === 11) {
                 this._placementManager = new PlacementManager(this._nativeBridge, this._configuration);
                 this._reinitManager = new ReinitManager(this._nativeBridge, this._clientInfo, this._request, this._cache);
                 this._refreshManager = new NewRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration, this._focusManager, this._reinitManager, this._placementManager);
