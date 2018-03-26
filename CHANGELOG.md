@@ -1,3 +1,8 @@
+# Pending
+
+* Caching support hack for AdMob ad units
+* Fix IAP promo Android back button handling
+
 # Mon Mar 26 10:16:09 UTC 2018
 
 * Test new ad request refresh logic and reinit logic in groups 9 and 11
