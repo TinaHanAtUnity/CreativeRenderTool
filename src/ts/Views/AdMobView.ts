@@ -115,9 +115,30 @@ export class AdMobView extends View<IAdMobEventHandler> {
             return Promise.reject(new Error('Not a valid HTML document => ' + markup));
         }
         this.removeScriptTags(dom);
+        this.injectVideoURL(dom);
         return this.injectScripts(dom).then(() => {
             return dom.documentElement.outerHTML;
         });
+    }
+
+    private injectVideoURL(dom: Document) {
+        const video = this._campaign.getVideo();
+        if (video) {
+            const scriptEl = dom.querySelector('body script');
+            const mediaFileURL = this.encodeURLForHTML(video.getMediaFileURL());
+            let cachedFileURL = video.getVideo().getCachedUrl();
+            if (cachedFileURL) {
+                cachedFileURL = this.encodeURLForHTML(cachedFileURL);
+                if (scriptEl && scriptEl.textContent) {
+                    const replacedSrc = scriptEl.textContent.replace(mediaFileURL, cachedFileURL);
+                    scriptEl.textContent = replacedSrc;
+                }
+            }
+        }
+    }
+
+    private encodeURLForHTML(str: string): string {
+        return str.replace(/[&=]/g, (c) => '\\x' + c.charCodeAt(0).toString(16));
     }
 
     private removeScriptTags(dom: Document) {
