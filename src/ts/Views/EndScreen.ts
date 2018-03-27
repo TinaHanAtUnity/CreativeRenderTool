@@ -1,5 +1,6 @@
 import EndScreenTemplate from 'html/EndScreen.html';
 import SquareEndScreenTemplate from 'html/SquareEndScreen.html';
+import FancyEndScreenTemplate from 'html/FancyEndScreen.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -23,6 +24,11 @@ export interface IEndScreenHandler {
 const GDPR_OPT_OUT_BASE  = 'gdpr-pop-up-base';
 
 const SQUARE_END_SCREEN = 'square-end-screen';
+
+const FANCY_END_SCREEN = 'square-end-screen';
+// TODO: Use actual group and campaign id
+const FANCY_END_SCREEN_CAMPAIGN_ID = '5a84800a6ac4fd047aa50595';
+const FANCY_END_SCREEN_AB_GROUP = 5;
 
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
 
@@ -98,6 +104,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         }
 
         const endScreenAlt = this.getEndscreenAlt();
+        console.log("END SCReen aLT: ", endScreenAlt);
         if (typeof endScreenAlt === 'string') {
             this._container.classList.add(endScreenAlt);
             document.documentElement.classList.add(endScreenAlt);
@@ -155,7 +162,12 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             return SQUARE_END_SCREEN;
         }
 
-        return undefined;
+        if (campaignId === FANCY_END_SCREEN_CAMPAIGN_ID && this._abGroup === FANCY_END_SCREEN_AB_GROUP) {
+            return FANCY_END_SCREEN;
+        }
+
+        // TODO return undefined
+        return FANCY_END_SCREEN;
     }
 
     protected abstract onDownloadEvent(event: Event): void;
@@ -187,6 +199,8 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     private getTemplate() {
         if (this.getEndscreenAlt() === SQUARE_END_SCREEN) {
             return SquareEndScreenTemplate;
+        }  else if (this.getEndscreenAlt() === FANCY_END_SCREEN) {
+            return FancyEndScreenTemplate;
         }
 
         return EndScreenTemplate;
