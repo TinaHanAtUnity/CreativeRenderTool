@@ -104,7 +104,7 @@ export class NewRefreshManager extends RefreshManager {
                     } else {
                         this._reinitManager.reinitialize();
                     }
-                } else {
+                } else if(this.shouldRefill(Date.now())) { // check refill status again to prevent a race condition
                     this.invalidateFill();
                     this._fillState = FillState.REQUESTING;
                     this._campaignManager.request(nofillRetry);
