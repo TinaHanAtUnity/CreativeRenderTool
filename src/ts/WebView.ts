@@ -234,6 +234,10 @@ export class WebView {
             this._initialized = true;
 
             return this._sessionManager.sendUnsentSessions();
+        }).then(() => {
+            if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                this._nativeBridge.setAutoBatchEnabled(false);
+            }
         }).catch(error => {
             if(error instanceof ConfigError) {
                 error = { 'message': error.message, 'name': error.name };
@@ -410,7 +414,11 @@ export class WebView {
                 });
             }
 
-            this._currentAdUnit.show();
+            this._currentAdUnit.show().then(() => {
+                if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                    this._nativeBridge.setAutoBatchEnabled(true);
+                }
+            });
         });
     }
 
@@ -424,6 +432,10 @@ export class WebView {
 
     private onAdUnitClose(): void {
         this._showing = false;
+
+        if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            this._nativeBridge.setAutoBatchEnabled(false);
+        }
     }
 
     private isShowing(): boolean {
