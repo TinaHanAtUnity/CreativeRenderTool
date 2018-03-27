@@ -397,21 +397,8 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         return timeInSeconds;
     }
 
-    /*
-    [NSString
-      stringWithFormat:@"if (window.WebARonARKitSetData) "
-      @"window.WebARonARKitSetData({"
-      @"\"position\":[%f,%f,%f],"
-      @"\"orientation\":[%f,%f,%f,%f],"
-      @"\"viewMatrix\":[%f,%f,%f,%f,%f,%f,%f,%"
-      @"f,%f,%f,%f,%f,%f,%f,%f,%f],"
-      @"\"projectionMatrix\":[%f,%f,%f,%f,%f,%f,%f,%"
-      @"f,%f,%f,%f,%f,%f,%f,%f,%f]"
-      @"});"
-     */
-
     private onARFrameUpdated(parameters: string) {
         this._nativeBridge.Sdk.logDebug('onARFrameUpdated ' + JSON.stringify(this._iframe.contentWindow.postMessage));
-        this._iframe.contentWindow.postMessage({ type: 'AREvent', parameters }, '*');
+        this._iframe.contentWindow.postMessage({ type: 'AREvent', data: parameters }, '*');
     }
 }

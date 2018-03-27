@@ -1265,10 +1265,29 @@
 
             var WebARonARKitVRDisplay = new VRDisplay();
 
-            window.addEventListener('message', function(message) {
-                if (message.type === 'AREvent') {
-                    nativeLog('XXXXX AREvent ' + message.parameters);
-                }
+
+            /*
+            [NSString
+              stringWithFormat:@"if (window.WebARonARKitSetData) "
+              @"window.WebARonARKitSetData({"
+              @"\"position\":[%f,%f,%f],"
+              @"\"orientation\":[%f,%f,%f,%f],"
+              @"\"viewMatrix\":[%f,%f,%f,%f,%f,%f,%f,%"
+              @"f,%f,%f,%f,%f,%f,%f,%f,%f],"
+              @"\"projectionMatrix\":[%f,%f,%f,%f,%f,%f,%f,%"
+              @"f,%f,%f,%f,%f,%f,%f,%f,%f]"
+              @"});"
+             */
+
+            document.addEventListener('DOMContentLoaded', function() {
+               nativeLog('XXXXX DOMContentLoaded');
+                window.addEventListener('message', function(message) {
+                    if (message.data.type === 'AREvent') {
+                        const parameters = JSON.parse(message.data.data);
+                        nativeLog('XXXXX AREvent WOOHOO ' + JSON.stringify(message.data.data));
+                        window.WebARonARKitSetData(parameters);
+                    }
+                });
             });
 
             //
