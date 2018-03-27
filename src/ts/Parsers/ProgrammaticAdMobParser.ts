@@ -10,8 +10,6 @@ import { Vast } from 'Models/Vast/Vast';
 import { VastParser } from 'Utilities/VastParser';
 import { FileId } from 'Utilities/FileId';
 
-const after = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
 export class ProgrammaticAdMobParser extends CampaignParser {
     public static ContentType = 'programmatic/admob-video';
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
