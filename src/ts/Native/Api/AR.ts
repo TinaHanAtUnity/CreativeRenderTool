@@ -26,12 +26,12 @@ export class ARApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._apiClass, 'restartSession');
     }
 
-    public setDepthFar(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setDepthFar');
+    public setDepthFar(depth: number): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'setDepthFar', [depth]);
     }
 
-    public setDepthNear(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setDepthNear');
+    public setDepthNear(depth: number): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'setDepthNear', [depth]);
     }
 
     public handleEvent(event: string, parameters: any[]): void {

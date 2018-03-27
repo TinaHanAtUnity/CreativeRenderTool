@@ -182,7 +182,28 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         }
     }
 
+    private onAREvent(event: MessageEvent): void {
+        const { data } = event;
+        const message = data.split(':');
+        const functionName = message[0];
+        const args = message[1].split(',');
+        switch (functionName) {
+            case 'resetPose':
+                this._nativeBridge.AR.restartSession();
+                break;
+
+            case 'setDepthNear':
+                this._nativeBridge.AR.setDepthNear(parseFloat(args[0]));
+                break;
+
+            case 'setDepthFar':
+                this._nativeBridge.AR.setDepthFar(parseFloat(args[0]));
+                break;
+        }
+    }
+
     private onMessage(event: MessageEvent) {
+        this._nativeBridge.Sdk.logDebug('Event received: ' + JSON.stringify(event.data));
         switch(event.data.type) {
             case 'loaded':
                 this._loaded = true;
@@ -223,6 +244,11 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
                     }
                 }
                 break;
+
+            case 'ar':
+                this.onAREvent(event);
+                break;
+
             default:
                 break;
         }
