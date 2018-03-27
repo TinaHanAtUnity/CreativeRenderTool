@@ -130,7 +130,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     protected getEndscreenAlt(campaign?: Campaign) {
-        if(this._abGroup === 18 || this._abGroup === 19) {
+        if(this._abGroup === 5) {
             return undefined;
         }
 
