@@ -34,6 +34,14 @@ export class ARApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._apiClass, 'setDepthNear', [depth]);
     }
 
+    public showCameraFeed(): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'showCameraFeed');
+    }
+
+    public hideCameraFeed(): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'hideCameraFeed');
+    }
+
     public handleEvent(event: string, parameters: any[]): void {
         switch (event) {
             case AREvent[AREvent.AR_PLANES_ADDED]:

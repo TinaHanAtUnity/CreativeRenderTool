@@ -405,6 +405,7 @@
                 var CAMERA_FEED_HIDE_TIMEOUT_IN_MILLIS = 1000;
                 function hideCameraFeed() {
                     if (this.showingCameraFeed_) {
+                        nativeLog('HideCameraFeed');
                         nativeHideCameraFeed();
                         this.showingCameraFeed_ = false;
                     }
@@ -412,8 +413,10 @@
                 hideCameraFeed = hideCameraFeed.bind(this);
                 this.showCameraFeed_ = function() {
                     // If the camera is not being shown, enable it.
+                    nativeLog('ShowCameraFeed1');
                     if (!this.showingCameraFeed_) {
                         nativeShowCameraFeed();
+                        nativeLog('ShowCameraFeed2');
                         this.showingCameraFeed_ = true;
                     }
                     // Set a timeout to hide the camera feed if a significant amount of time passed since the last call to this function
@@ -1261,6 +1264,12 @@
             };
 
             var WebARonARKitVRDisplay = new VRDisplay();
+
+            window.addEventListener('message', function(message) {
+                if (message.type === 'AREvent') {
+                    nativeLog('XXXXX AREvent ' + message.parameters);
+                }
+            });
 
             //
             /**

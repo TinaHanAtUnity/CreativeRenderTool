@@ -80,6 +80,8 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 selector: '.privacy-button'
             }
         ];
+
+        this._nativeBridge.AR.onFrameUpdated.subscribe(parameters => this.onARFrameUpdated(parameters));
     }
 
     public render(): void {
@@ -303,6 +305,37 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
     }
 
+    private onAREvent(event: MessageEvent): void {
+        const { data } = event.data;
+        const message = data.split(':');
+        const functionName = message[0];
+        const args = message[1].split(',');
+
+        switch (functionName) {
+            case 'resetPose':
+                this._nativeBridge.AR.restartSession();
+                break;
+
+            case 'setDepthNear':
+                this._nativeBridge.AR.setDepthNear(parseFloat(args[0]));
+                break;
+
+            case 'setDepthFar':
+                this._nativeBridge.AR.setDepthFar(parseFloat(args[0]));
+                break;
+
+            case 'showCameraFeed':
+                this._nativeBridge.AR.showCameraFeed();
+                break;
+
+            case 'hideCameraFeed':
+                this._nativeBridge.AR.hideCameraFeed();
+                break;
+            case 'log':
+                this._nativeBridge.Sdk.logDebug('NATIVELOG ' + JSON.stringify(args));
+        }
+    }
+
     private onMessage(event: MessageEvent) {
         switch(event.data.type) {
             case 'open':
@@ -349,6 +382,9 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                         break;
                 }
                 break;
+            case 'ar':
+                this.onAREvent(event);
+                break;
             default:
                 break;
         }
@@ -359,5 +395,23 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
             return undefined;
         }
         return timeInSeconds;
+    }
+
+    /*
+    [NSString
+      stringWithFormat:@"if (window.WebARonARKitSetData) "
+      @"window.WebARonARKitSetData({"
+      @"\"position\":[%f,%f,%f],"
+      @"\"orientation\":[%f,%f,%f,%f],"
+      @"\"viewMatrix\":[%f,%f,%f,%f,%f,%f,%f,%"
+      @"f,%f,%f,%f,%f,%f,%f,%f,%f],"
+      @"\"projectionMatrix\":[%f,%f,%f,%f,%f,%f,%f,%"
+      @"f,%f,%f,%f,%f,%f,%f,%f,%f]"
+      @"});"
+     */
+
+    private onARFrameUpdated(parameters: string) {
+        this._nativeBridge.Sdk.logDebug('onARFrameUpdated ' + JSON.stringify(this._iframe.contentWindow.postMessage));
+        this._iframe.contentWindow.postMessage({ type: 'AREvent', parameters }, '*');
     }
 }
