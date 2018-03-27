@@ -258,7 +258,8 @@ export class AdUnitFactory {
         let endScreen: MRAIDEndScreen | undefined;
 
         let mraid: MRAIDView<IMRAIDViewHandler>;
-        if(resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity|roll-the-ball/)) {
+        const isPlayable = (resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity|roll-the-ball/)) || parameters.campaign.getArEnabled();
+        if(isPlayable) {
             mraid = new PlayableMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.configuration.isCoppaCompliant());
         } else {
             mraid = new MRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.configuration.isCoppaCompliant());
