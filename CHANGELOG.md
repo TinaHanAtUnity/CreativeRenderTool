@@ -1,7 +1,8 @@
 # Pending
 
-* Caching support hack for AdMob ad units
+* Easter theme to all groups except 5
 * Fix IAP promo Android back button handling
+* Fix race condition in new refresh manager
 
 # Mon Mar 26 10:16:09 UTC 2018
 
