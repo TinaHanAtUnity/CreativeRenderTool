@@ -1,4 +1,5 @@
 import EndScreenTemplate from 'html/EndScreen.html';
+import IPhoneXEndScreenTemplate from 'html/IPhoneXEndScreen.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -18,6 +19,9 @@ export interface IEndScreenHandler {
     onKeyEvent(keyCode: number): void;
 }
 
+const IPHONE_X_STYLES_AB_GROUP = 5;
+const IPHONE_X_STYLES_ID = 'iphone-x-styles';
+
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
 
     protected _localization: Localization;
@@ -36,7 +40,12 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._gameName = gameName;
         this._adUnitStyle = adUnitStyle;
 
-        this._template = new Template(EndScreenTemplate, this._localization);
+        const endScreenAlt = this.getEndscreenAlt();
+        if (endScreenAlt === IPHONE_X_STYLES_ID) {
+            this._template = new Template(IPhoneXEndScreenTemplate, this._localization);
+        } else {
+            this._template = new Template(EndScreenTemplate, this._localization);
+        }
 
         this._bindings = [
             {
@@ -128,6 +137,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     protected getEndscreenAlt(campaign?: Campaign) {
+        if(this._abGroup === IPHONE_X_STYLES_AB_GROUP && this.isIPhoneX()) {
+            return IPHONE_X_STYLES_ID;
+        }
+
         return undefined;
     }
 
@@ -144,5 +157,21 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._privacy.render();
         document.body.appendChild(this._privacy.container());
         this._privacy.addEventHandler(this);
+    }
+
+    private isIPhoneX(): boolean {
+        const isIPhone: boolean = /iPhone/.test(navigator.userAgent);
+
+        if (!isIPhone) {
+            return false;
+        }
+
+        const ratio: number = window.devicePixelRatio;
+        const screenSize = {
+            height: window.screen.height * ratio,
+            width: window.screen.width * ratio,
+        };
+
+        return (screenSize.height === 1125 && screenSize.width === 2436) || (screenSize.height === 2436 && screenSize.width === 1125);
     }
 }
