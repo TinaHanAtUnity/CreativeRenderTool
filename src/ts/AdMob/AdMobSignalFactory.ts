@@ -37,7 +37,6 @@ export class AdMobSignalFactory {
         signal.setAdLoadDuration(adUnit.getRequestToReadyTime());
         signal.setSequenceNumber(SdkStats.getAdRequestOrdinal());
         signal.setIsJailbroken(this._deviceInfo.isRooted());
-        signal.setIsDeviceCharging(this.checkChargingStatus());
         signal.setDeviceIncapabilities(this.checkDeviceIncapabilities());
         signal.setDeviceSubModel(this._deviceInfo.getModel());
 
@@ -46,6 +45,12 @@ export class AdMobSignalFactory {
             signal.setDeviceBatteryLevel(this.getBatteryLevel(batteryLevel));
         }).catch(() => {
             this.logFailure(this._nativeBridge, 'batteryLevel');
+        }));
+
+        promises.push(this._deviceInfo.getBatteryStatus().then(batteryStatus => {
+            signal.setIsDeviceCharging(this.getBatteryStatus(this._clientInfo, batteryStatus) === 2);
+        }).catch(() => {
+            this.logFailure(this._nativeBridge, 'batteryStatus');
         }));
 
         promises.push(this._metaDataManager.fetch(UserMetaData, false).then(user => {
@@ -388,13 +393,6 @@ export class AdMobSignalFactory {
         } else {
             return 1; // portrait
         }
-    }
-
-    private checkChargingStatus(): boolean {
-        if (this._deviceInfo.get('batteryStatus') === 2) {
-            return true;
-        }
-        return false;
     }
 
     private checkDeviceIncapabilities(): string {
