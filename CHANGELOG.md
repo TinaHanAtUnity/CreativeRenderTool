@@ -1,3 +1,7 @@
+# Pending
+
+* Another attempt at fixing race condition in new refresh manager
+
 # Wed Mar 28 07:54:36 UTC 2018
 
 * AdMob caching changes
