@@ -8,8 +8,7 @@ import { Session } from 'Models/Session';
 import { Video } from 'Models/Assets/Video';
 import { Vast } from 'Models/Vast/Vast';
 import { VastParser } from 'Utilities/VastParser';
-
-const after = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+import { FileId } from 'Utilities/FileId';
 
 export class ProgrammaticAdMobParser extends CampaignParser {
     public static ContentType = 'programmatic/admob-video';
@@ -22,6 +21,9 @@ export class ProgrammaticAdMobParser extends CampaignParser {
         });
 
         return videoPromise.then((video: AdMobVideo | null) => {
+            if (video) {
+                this.updateFileID(video);
+            }
             const baseCampaignParams: ICampaign = {
                 id: this.getProgrammaticCampaignId(nativeBridge),
                 gamerId: gamerId,
@@ -100,5 +102,21 @@ export class ProgrammaticAdMobParser extends CampaignParser {
 
     private replaceHexChars(str: string) {
         return str.replace(/\\x([0-9A-Fa-f]{2})/g, (match, code) => String.fromCharCode(parseInt(code, 16)));
+    }
+
+    private updateFileID(video: AdMobVideo) {
+        const videoID = this.getVideoID(video.getMediaFileURL());
+        const url = video.getVideo().getOriginalUrl();
+        if (videoID && url) {
+            FileId.setFileID(url, videoID);
+        }
+    }
+
+    private getVideoID(url: string): string | null {
+        const match = url.match(/video_id=([^&]*)/);
+        if (match && match.length === 2) {
+            return match[1];
+        }
+        return null;
     }
 }
