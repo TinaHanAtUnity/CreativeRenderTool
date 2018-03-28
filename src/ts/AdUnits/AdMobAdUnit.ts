@@ -15,6 +15,7 @@ import { Double } from 'Utilities/Double';
 import { SensorDelay } from 'Constants/Android/SensorDelay';
 import { IClickSignalResponse } from 'Views/AFMABridge';
 import { SdkStats } from 'Utilities/SdkStats';
+import { UserCountData } from 'Utilities/UserCountData';
 
 export interface IAdMobAdUnitParameters extends IAdUnitParameters<AdMobCampaign> {
     view: AdMobView;
@@ -101,6 +102,18 @@ export class AdMobAdUnit extends AbstractAdUnit {
     public sendClickEvent() {
         this.sendTrackingEvent('click');
         this._operativeEventManager.sendClick(this._placement);
+
+        UserCountData.getClickCount(this._nativeBridge).then((clickCount) => {
+            if (clickCount) {
+                UserCountData.setRequestCount(clickCount + 1, this._nativeBridge);
+            } else {
+                UserCountData.setRequestCount(0, this._nativeBridge);
+            }
+        }).catch(() => {
+            Diagnostics.trigger('request_count_failure', {
+                signal: 'requestCount'
+            });
+        });
     }
 
     public sendStartEvent() {

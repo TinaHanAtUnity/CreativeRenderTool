@@ -14,7 +14,7 @@ import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { AdMobOptionalSignal } from 'Models/AdMobOptionalSignal';
 import { SdkStats } from 'Utilities/SdkStats';
 import { MetaDataManager } from 'Managers/MetaDataManager';
-import { UserMetaData } from 'Models/MetaData/UserMetaData';
+import { UserCountData } from 'Utilities/UserCountData';
 
 export class AdMobSignalFactory {
     private _nativeBridge: NativeBridge;
@@ -53,20 +53,20 @@ export class AdMobSignalFactory {
             this.logFailure(this._nativeBridge, 'batteryStatus');
         }));
 
-        promises.push(this._metaDataManager.fetch(UserMetaData, false).then(user => {
-            if (user) {
-                signal.setPriorClickCount(user.getClickCount());
+        promises.push(UserCountData.getRequestCount(this._nativeBridge).then((requestCount) => {
+            if (requestCount) {
+                signal.setNumPriorUserRequests(requestCount);
+            }
+        }).catch(() => {
+            this.logFailure(this._nativeBridge, 'numPriorUserRequets');
+        }));
+
+        promises.push(UserCountData.getClickCount(this._nativeBridge).then(clickCount => {
+            if (clickCount) {
+                signal.setPriorClickCount(clickCount);
             }
         }).catch(() => {
             this.logFailure(this._nativeBridge, 'priorClickCount');
-        }));
-
-        promises.push(this._metaDataManager.fetch(UserMetaData, false).then(user => {
-            if (user) {
-                signal.setNumPriorUserRequests(user.getRequestCount());
-            }
-        }).catch(() => {
-            this.logFailure(this._nativeBridge, 'numPriorUserRequests');
         }));
 
         return Promise.all(promises).then(() => {

@@ -13,7 +13,6 @@ import { Configuration } from 'Models/Configuration';
 import { Campaign } from 'Models/Campaign';
 import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
 import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
-import { UserMetaData } from 'Models/MetaData/UserMetaData';
 import { SessionManager } from 'Managers/SessionManager';
 import { JsonParser } from 'Utilities/JsonParser';
 import { RefreshManager } from 'Managers/RefreshManager';
@@ -39,6 +38,7 @@ import { CacheError } from 'Native/Api/Cache';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 import { CampaignParserFactory } from 'Managers/CampaignParserFactory';
+import { UserCountData } from 'Utilities/UserCountData';
 
 export class CampaignManager {
 
@@ -142,18 +142,7 @@ export class CampaignManager {
                 });
             }).then(response => {
                 if(response) {
-                    SdkStats.setAdRequestDuration(Date.now() - requestTimestamp);
-                    SdkStats.increaseAdRequestOrdinal();
-
-                    this._metaDataManager.fetch(UserMetaData, false).then(user => {
-                        if (user) {
-                            this._nativeBridge.Storage.set<number>(StorageType.PRIVATE, 'user.requestCount', user.getRequestCount() + 1);
-                        }
-                    }).catch(() => {
-                        Diagnostics.trigger('user_metadata_failure', {
-                            signal: 'requestCount'
-                        });
-                    });
+                    this.setSDKSignalValues(requestTimestamp);
 
                     return this.parseCampaigns(response).catch((e) => {
                         this.handleError(e, this._configuration.getPlacementIds());
@@ -608,5 +597,22 @@ export class CampaignManager {
         } else {
             return Promise.resolve(undefined);
         }
+    }
+
+    private setSDKSignalValues(requestTimestamp: number): void {
+        SdkStats.setAdRequestDuration(Date.now() - requestTimestamp);
+        SdkStats.increaseAdRequestOrdinal();
+
+        UserCountData.getRequestCount(this._nativeBridge).then((requestCount) => {
+            if (requestCount) {
+                UserCountData.setRequestCount(requestCount + 1, this._nativeBridge);
+            } else {
+                UserCountData.setRequestCount(0, this._nativeBridge);
+            }
+        }).catch(() => {
+            Diagnostics.trigger('request_count_failure', {
+                signal: 'requestCount'
+            });
+        });
     }
 }
