@@ -97,6 +97,8 @@ export class NewRefreshManager extends RefreshManager {
 
     public refresh(nofillRetry?: boolean): Promise<INativeResponse | void> {
         if(this.shouldRefill(Date.now())) {
+            this._fillState = FillState.REQUESTING;
+
             return this._reinitManager.shouldReinitialize().then(reinit => {
                 if(reinit) {
                     if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
@@ -104,9 +106,8 @@ export class NewRefreshManager extends RefreshManager {
                     } else {
                         this._reinitManager.reinitialize();
                     }
-                } else if(this.shouldRefill(Date.now())) { // check refill status again to prevent a race condition
+                } else {
                     this.invalidateFill();
-                    this._fillState = FillState.REQUESTING;
                     this._campaignManager.request(nofillRetry);
                 }
             });
