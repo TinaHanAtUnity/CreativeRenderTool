@@ -82,6 +82,10 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         ];
 
         this._nativeBridge.AR.onFrameUpdated.subscribe(parameters => this.onARFrameUpdated(parameters));
+        this._nativeBridge.AR.onAnchorsUpdated.subscribe(parameters => this.onARAnchorsUpdated(parameters));
+        this._nativeBridge.AR.onPlanesAdded.subscribe(parameters => this.onARPlanesAdded(parameters));
+        this._nativeBridge.AR.onPlanesUpdated.subscribe(parameters => this.onARPlanesUpdated(parameters));
+        this._nativeBridge.AR.onPlanesRemoved.subscribe(parameters => this.onARPlanesRemoved(parameters));
     }
 
     public render(): void {
@@ -398,7 +402,22 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     private onARFrameUpdated(parameters: string) {
-        this._nativeBridge.Sdk.logDebug('onARFrameUpdated ' + JSON.stringify(this._iframe.contentWindow.postMessage));
-        this._iframe.contentWindow.postMessage({ type: 'AREvent', data: parameters }, '*');
+        this._iframe.contentWindow.postMessage({ type: 'AREvent', data: {parameters, event: 'frameupdate'} }, '*');
+    }
+
+    private onARPlanesAdded(parameters: string) {
+        this._iframe.contentWindow.postMessage({type: 'AREvent', data: {parameters, event: 'planesadded'}}, '*');
+    }
+
+    private onARPlanesUpdated(parameters: string) {
+        this._iframe.contentWindow.postMessage({type: 'AREvent', data: {parameters, event: 'planesupdated'}}, '*');
+    }
+
+    private onARPlanesRemoved(parameters: string) {
+        this._iframe.contentWindow.postMessage({type: 'AREvent', data: {parameters, event: 'planesremoved'}}, '*');
+    }
+
+    private onARAnchorsUpdated(parameters: string) {
+        this._iframe.contentWindow.postMessage({type: 'AREvent', data: {parameters, event: 'anchorsupdated'}}, '*');
     }
 }
