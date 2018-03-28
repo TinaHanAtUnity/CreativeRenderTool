@@ -9,6 +9,7 @@ import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { Campaign } from 'Models/Campaign';
 import { IEndScreenDownloadParameters } from 'EventHandlers/EndScreenEventHandler';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
 
 export interface IEndScreenHandler {
     onEndScreenDownload(parameters: IEndScreenDownloadParameters): void;
@@ -16,6 +17,8 @@ export interface IEndScreenHandler {
     onEndScreenClose(): void;
     onKeyEvent(keyCode: number): void;
 }
+
+const easterEndScreenId = 'easter-end-screen';
 
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
 
@@ -55,7 +58,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             }
         ];
 
-        if (gameId === '1300023' || gameId === '1300024') {
+        if (CustomFeatures.isTimehopApp(gameId)) {
             this._isSwipeToCloseEnabled = true;
 
             this._bindings.push({
@@ -79,7 +82,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         }
 
         const endScreenAlt = this.getEndscreenAlt();
-        if (typeof endScreenAlt === "string") {
+        if (typeof endScreenAlt === 'string') {
             this._container.classList.add(endScreenAlt);
         }
     }
@@ -127,7 +130,11 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     protected getEndscreenAlt(campaign?: Campaign) {
-        return undefined;
+        if(this._abGroup === 5) {
+            return undefined;
+        }
+
+        return easterEndScreenId;
     }
 
     protected abstract onDownloadEvent(event: Event): void;

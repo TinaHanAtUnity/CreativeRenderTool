@@ -9,6 +9,7 @@ import { Session } from 'Models/Session';
 import { Image } from 'Models/Assets/Image';
 
 export class ProgrammaticMraidParser extends CampaignParser {
+    public static ContentType = 'programmatic/mraid';
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
         const jsonMraid = response.getJsonContent();
 
@@ -36,7 +37,8 @@ export class ProgrammaticMraidParser extends CampaignParser {
             creativeId: response.getCreativeId() || undefined,
             seatId: response.getSeatId() || undefined,
             meta: jsonMraid.meta,
-            session: session
+            session: session,
+            mediaId: response.getMediaId()
         };
 
         const parameters: IMRAIDCampaign = {
@@ -58,7 +60,8 @@ export class ProgrammaticMraidParser extends CampaignParser {
             bypassAppSheet: undefined,
             store: undefined,
             appStoreId: undefined,
-            useWebViewUserAgentForTracking: false
+            useWebViewUserAgentForTracking: false,
+            playableConfiguration: undefined
         };
 
         return Promise.resolve(new MRAIDCampaign(parameters));

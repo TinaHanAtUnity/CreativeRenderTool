@@ -2,9 +2,10 @@
   "extends": "tslint:recommended",
   "rulesDirectory": ["node_modules/tslint-microsoft-contrib"],
   "rules": {
-    "quotemark": ["single"],
+    "quotemark": [true, "single"],
     "variable-name": false,
     "whitespace": [
+      true,
       "check-decl",
       "check-operator",
       "check-module",

@@ -2,6 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 
 import { Url } from 'Utilities/Url';
+import { Platform } from 'Constants/Platform';
 
 describe('UrlTest', () => {
 
@@ -32,10 +33,10 @@ describe('UrlTest', () => {
         });
 
         it('should not validate illegal URLs', () => {
-            assert.equal(false, Url.isValid('rtmp://a.rtmp.youtube.com/videolive?ns=yt-live'), 'invalid url was accepted');
-            assert.equal(false, Url.isValid('https://example.net/"url".png'), 'invalid url was accepted');
-            assert.equal(false, Url.isValid(''), 'invalid url was accepted');
-            assert.equal(false, Url.isValid('https://bs.serving-sys.com/Serving?cn=display&c=23&pl=VAST&pli=19864721&PluID=0&pos=9317&ncu=https://i.w55c.net/cl?t=1&btid=YTdmNGEwZTItZGJmYi00YWJmLTgxYTYtOGQ1Y2QxNDE0YjU0fFRGdVE2WmU1T0p8MTQ4MjQyODcyMTAyNHwxfDBGUkxJUmFKejF8MFJkUlU2cmgyMHwzMGM1ZWY3YS1iNTk0LTRjMzEtODQ1OC02ZmM3YTdjZDQ5MzFfZ2FfR0VOX0VYfDI1ODIzMzd8fHx8MTcuMFB8VVNE&ei=TREMOR&rurl=&ord=2611507143758033&cim=1\n\n\n<SCRIPT  language=\'JavaScript1.1\' SRC=\"https://pixel.adsafeprotected.com/rjss/st/69577/12006978/skeleton.js\"></SCRIPT>\n<NOSCRIPT><IMG SRC=\"https://pixel.adsafeprotected.com/rfw/st/69577/12006977/skeleton.gif\" BORDER=0 WIDTH=1 HEIGHT=1 ALT=\"\"></NOSCRIPT>&cb=1482428721026'), 'invalid url was accepted');
+            assert.equal(false, Url.isValid('rtmp://a.rtmp.youtube.com/videolive?ns=yt-live'), 'invalid url was accepted, test 1');
+            assert.equal(false, Url.isValid('https://example.net/"url".png'), 'invalid url was accepted, test 2');
+            assert.equal(false, Url.isValid(''), 'invalid url was accepted, test 3');
+            assert.equal(false, Url.isValid('https://bs.serving-sys.com/Serving?cn=display&c=23&pl=VAST&pli=19864721&PluID=0&pos=9317&ncu=https://i.w55c.net/cl?t=1&btid=YTdmNGEwZTItZGJmYi00YWJmLTgxYTYtOGQ1Y2QxNDE0YjU0fFRGdVE2WmU1T0p8MTQ4MjQyODcyMTAyNHwxfDBGUkxJUmFKejF8MFJkUlU2cmgyMHwzMGM1ZWY3YS1iNTk0LTRjMzEtODQ1OC02ZmM3YTdjZDQ5MzFfZ2FfR0VOX0VYfDI1ODIzMzd8fHx8MTcuMFB8VVNE&ei=TREMOR&rurl=&ord=2611507143758033&cim=1\n\n\n<SCRIPT  language=\'JavaScript1.1\' SRC=\"https://pixel.adsafeprotected.com/rjss/st/69577/12006978/skeleton.js\"></SCRIPT>\n<NOSCRIPT><IMG SRC=\"https://pixel.adsafeprotected.com/rfw/st/69577/12006977/skeleton.gif\" BORDER=0 WIDTH=1 HEIGHT=1 ALT=\"\"></NOSCRIPT>&cb=1482428721026'), 'invalid url was accepted, test 4');
         });
     });
 
@@ -48,6 +49,79 @@ describe('UrlTest', () => {
         it('should not encode already encoded stuff', () => {
             const url = 'http://test.com?param=|Hello|%20|HelloAgain|';
             assert.equal(Url.encode(url), 'http://test.com?param=%7CHello%7C%20%7CHelloAgain%7C', 'Url not encoded as expected');
+        });
+
+        it('should encode utf8 characters', () => {
+            const url = 'http://test.com?param=%7CHello%7C%20%7CHelloAgain%7C/FRVideo19unity封面.png';
+            assert.equal(Url.encode(url), 'http://test.com?param=%7CHello%7C%20%7CHelloAgain%7C/FRVideo19unity%E5%B0%81%E9%9D%A2.png', 'Url not encoded as expected');
+        });
+
+        it('should encode %', () => {
+            const url = 'http://test.com?param=%7C%%7C%25';
+            assert.equal(Url.encode(url), 'http://test.com?param=%7C%25%7C%25', 'Url not encoded as expected');
+        });
+
+        it('should encode % in the end', () => {
+            const url = 'http://test.com?param=%';
+            assert.equal(Url.encode(url), 'http://test.com?param=%25', 'Url not encoded as expected');
+        });
+
+        it('should encode % in wrong url escape', () => {
+            const url = 'http://test.com?param=%2';
+            assert.equal(Url.encode(url), 'http://test.com?param=%252', 'Url not encoded as expected');
+        });
+
+        it('should encode % in wrong url escape with letters', () => {
+            const url = 'http://test.com?param=%wb';
+            assert.equal(Url.encode(url), 'http://test.com?param=%25wb', 'Url not encoded as expected');
+        });
+    });
+
+    describe('validating UTF-8', () => {
+        it('should allow unicode utf-8 characters', () => {
+            let url = 'https://cdn-highwinds.unityads.unity3d.com/assets/29587943-3ee9-4490-a181-de372e9c7097/FRVideo19unity封面.png';
+            assert.isTrue(Url.isValid(url), 'Should allow unicode characters, test 1');
+            url = 'https://cdn.unityads.unity3d.com/assets/f28676c2-5feb-4aa7-94fb-70c9c901cd57/800×600.png';
+            assert.isTrue(Url.isValid(url), 'Should allow unicode characters, test 2');
+        });
+    });
+
+    describe('whitelisting IOS', function() {
+        it('should return true', function() {
+            ['itunes', 'itms', 'itmss', 'http', 'https'].forEach((protocol) => {
+                const url = protocol + '://cdn-highwinds.unityads.unity3d.com/assets/29587943-3ee9-4490-a181-de372e9c7097/FRVideo19unity封面.png';
+                assert.isTrue(Url.isProtocolWhitelisted(url, Platform.IOS), `for protocol ${protocol}`);
+          });
+        });
+        it('should return false', function() {
+            ['market', 'tcp', 'bla'].forEach((protocol) => {
+                const url = protocol + '://cdn-highwinds.unityads.unity3d.com/assets/29587943-3ee9-4490-a181-de372e9c7097/FRVideo19unity封面.png';
+                assert.isFalse(Url.isProtocolWhitelisted(url, Platform.IOS), `for protocol ${protocol}`);
+          });
+        });
+    });
+
+    describe('whitelisting ANDROID', function() {
+        it('should return true', function() {
+            ['market', 'http', 'https'].forEach((protocol) => {
+                const url = protocol + '://cdn-highwinds.unityads.unity3d.com/assets/29587943-3ee9-4490-a181-de372e9c7097/FRVideo19unity封面.png';
+                assert.isTrue(Url.isProtocolWhitelisted(url, Platform.ANDROID), `for protocol ${protocol}`);
+          });
+        });
+        it('should return false', function() {
+            ['itunes', 'itmss', 'itms', 'bla'].forEach((protocol) => {
+                const url = protocol + '://cdn-highwinds.unityads.unity3d.com/assets/29587943-3ee9-4490-a181-de372e9c7097/FRVideo19unity封面.png';
+                assert.isFalse(Url.isProtocolWhitelisted(url, Platform.ANDROID), `for protocol ${protocol}`);
+          });
+        });
+    });
+
+    describe('whitelisting TEST', function() {
+        it('should always return false', function() {
+            ['market', 'http', 'https', 'itmss', 'itunes', 'itms'].forEach((protocol) => {
+                const url = protocol + '://cdn-highwinds.unityads.unity3d.com/assets/29587943-3ee9-4490-a181-de372e9c7097/FRVideo19unity封面.png';
+                assert.isFalse(Url.isProtocolWhitelisted(url, Platform.TEST), `for protocol ${protocol}`);
+          });
         });
     });
 });

@@ -87,10 +87,6 @@ export class AdMobAdUnit extends AbstractAdUnit {
         return this._container.close();
     }
 
-    public isCached(): boolean {
-        return false;
-    }
-
     public description(): string {
         return 'AdMob';
     }
@@ -104,18 +100,18 @@ export class AdMobAdUnit extends AbstractAdUnit {
 
     public sendClickEvent() {
         this.sendTrackingEvent('click');
-        this._operativeEventManager.sendClick(this._campaign.getSession(), this._placement, this._campaign);
+        this._operativeEventManager.sendClick(this._placement);
     }
 
     public sendStartEvent() {
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
         this.sendTrackingEvent('start');
-        this._operativeEventManager.sendStart(this._campaign.getSession(), this._placement, this._campaign);
+        this._operativeEventManager.sendStart(this._placement);
     }
 
     public sendSkipEvent() {
         this.sendTrackingEvent('skip');
-        this._operativeEventManager.sendSkip(this._campaign.getSession(), this._placement, this._campaign);
+        this._operativeEventManager.sendSkip(this._placement);
     }
 
     public sendCompleteEvent() {
@@ -123,8 +119,8 @@ export class AdMobAdUnit extends AbstractAdUnit {
     }
 
     public sendRewardEvent() {
-        this._operativeEventManager.sendThirdQuartile(this._campaign.getSession(), this._placement, this._campaign);
-        this._operativeEventManager.sendView(this._campaign.getSession(), this._placement, this._campaign);
+        this._operativeEventManager.sendThirdQuartile(this._placement);
+        this._operativeEventManager.sendView(this._placement);
     }
 
     public sendOpenableIntentsResponse(response: IOpenableIntentsResponse) {
@@ -155,7 +151,7 @@ export class AdMobAdUnit extends AbstractAdUnit {
     }
 
     public getRequestToReadyTime() {
-        return SdkStats.getReadyEventTimestamp(this._placement.getId())-SdkStats.getAdRequestTimestamp();
+        return SdkStats.getReadyEventTimestamp(this._placement.getId()) - SdkStats.getAdRequestTimestamp();
     }
 
     private showView() {

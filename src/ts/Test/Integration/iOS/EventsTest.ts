@@ -40,21 +40,31 @@ describe('EventsTest', () => {
         }
     };
 
-    beforeEach((done) => {
+    beforeEach(function(done) {
+        this.timeout(7000);
         const xhr = new XMLHttpRequest();
+        xhr.timeout = 5000;
         xhr.onload = (event: Event) => {
             const responseObj: any = JSON.parse(xhr.responseText);
             currentGameId = responseObj.game_id;
             done();
         };
+        xhr.onerror = (error: ErrorEvent) => {
+            throw error;
+        };
         xhr.open('GET', 'https://fake-ads-backend.applifier.info/setup/first_perf_then_vast?token=373a221f4df5c659f2df918f899fa403');
         xhr.send();
     });
 
-    afterEach((done) => {
+    afterEach(function(done) {
+        this.timeout(7000);
         const xhr = new XMLHttpRequest();
+        xhr.timeout = 5000;
         xhr.onload = (event: Event) => {
             done();
+        };
+        xhr.onerror = (error: ErrorEvent) => {
+            throw error;
         };
         xhr.open('GET', 'https://fake-ads-backend.applifier.info/fabulous/' + currentGameId + '/remove?token=373a221f4df5c659f2df918f899fa403');
         xhr.send();

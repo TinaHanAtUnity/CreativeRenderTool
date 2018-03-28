@@ -4,7 +4,7 @@ export class DOMUtils {
 
     public static parseFromString(markup: string, type: string): Document {
         if (/^\s*text\/html\s*(?:;|$)/i.test(type)) {
-            const doc = document.implementation.createHTMLDocument("");
+            const doc = document.implementation.createHTMLDocument('');
             if (markup.toLowerCase().indexOf('<!doctype') > -1) {
                 doc.documentElement.innerHTML = markup;
             } else {

@@ -33,12 +33,12 @@ export class FileId {
     }
 
     public static getFileIdHash(fileId: string): string {
-        const fileIdSplit = fileId.split(".", 2);
+        const fileIdSplit = fileId.split('.', 2);
         return fileIdSplit[0];
     }
 
     public static getFileIdExtension(fileId: string): string {
-        const fileIdSplit = fileId.split(".", 2);
+        const fileIdSplit = fileId.split('.', 2);
         return fileIdSplit[1];
     }
 
@@ -46,6 +46,10 @@ export class FileId {
         return nativeBridge.Cache.getFilePath(fileId).then(filePath => {
             return 'file://' + filePath;
         });
+    }
+
+    public static setFileID(url: string, fileId: string) {
+        this._fileIds[url] = fileId;
     }
 
     private static _fileIds: { [key: string]: string } = {};

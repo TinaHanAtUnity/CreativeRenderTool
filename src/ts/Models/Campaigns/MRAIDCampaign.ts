@@ -24,6 +24,12 @@ export interface IMRAIDCampaign extends IProgrammaticCampaign {
     bypassAppSheet: boolean | undefined;
     store: StoreName | undefined;
     appStoreId: string | undefined;
+    playableConfiguration: IPlayableConfiguration | undefined;
+}
+
+export interface IPlayableConfiguration {
+    default?: any;
+    [key: string]: any;
 }
 
 export class MRAIDCampaign extends ProgrammaticCampaign<IMRAIDCampaign> {
@@ -45,7 +51,8 @@ export class MRAIDCampaign extends ProgrammaticCampaign<IMRAIDCampaign> {
             bypassAppSheet: ['boolean', 'undefined'],
             store: ['number', 'undefined'],
             appStoreId: ['string', 'undefined'],
-            videoEventUrls: ['object', 'undefined']
+            videoEventUrls: ['object', 'undefined'],
+            playableConfiguration: ['object', 'undefined']
         }, campaign);
     }
 
@@ -53,7 +60,7 @@ export class MRAIDCampaign extends ProgrammaticCampaign<IMRAIDCampaign> {
         return this.get('resourceAsset');
     }
 
-    public setResourceUrl(url: string,): void {
+    public setResourceUrl(url: string): void {
         this.set('resourceAsset', new HTML(url, this.getSession()));
     }
 
@@ -87,6 +94,10 @@ export class MRAIDCampaign extends ProgrammaticCampaign<IMRAIDCampaign> {
 
     public getLandscape(): Image | undefined {
         return this.get('landscapeImage');
+    }
+
+    public getPlayableConfiguration(): IPlayableConfiguration | undefined {
+        return this.get('playableConfiguration');
     }
 
     public getRequiredAssets() {
@@ -147,6 +158,10 @@ export class MRAIDCampaign extends ProgrammaticCampaign<IMRAIDCampaign> {
     public getVideoEventUrl(eventType: string): string | undefined {
         const urls = this.get('videoEventUrls');
         return urls ? urls[eventType] : undefined;
+    }
+
+    public setPlayableConfiguration(configuration: IPlayableConfiguration) {
+        this.set('playableConfiguration', configuration);
     }
 
     public isConnectionNeeded(): boolean {

@@ -73,7 +73,7 @@ export class MRAIDAdUnit extends AbstractAdUnit {
         this._mraid.show();
         this.onStart.trigger();
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
-        this._operativeEventManager.sendStart(this._campaign.getSession(), this._placement, this._campaign).then(() => {
+        this._operativeEventManager.sendStart(this._placement).then(() => {
             this.onStartProcessed.trigger();
         });
         this.sendTrackingEvent('impression');
@@ -107,14 +107,14 @@ export class MRAIDAdUnit extends AbstractAdUnit {
         const finishState = this.getFinishState();
         if(finishState === FinishState.COMPLETED) {
             if(!this._campaign.getSession().getEventSent(EventType.THIRD_QUARTILE)) {
-                this._operativeEventManager.sendThirdQuartile(this._campaign.getSession(), this._placement, this._campaign);
+                this._operativeEventManager.sendThirdQuartile(this._placement);
             }
             if(!this._campaign.getSession().getEventSent(EventType.VIEW)) {
-                this._operativeEventManager.sendView(this._campaign.getSession(), this._placement, this._campaign);
+                this._operativeEventManager.sendView(this._placement);
             }
             this.sendTrackingEvent('complete');
         } else if(finishState === FinishState.SKIPPED) {
-            this._operativeEventManager.sendSkip(this._campaign.getSession(), this._placement, this._campaign);
+            this._operativeEventManager.sendSkip(this._placement);
         }
 
         this.onFinish.trigger();
@@ -130,15 +130,6 @@ export class MRAIDAdUnit extends AbstractAdUnit {
 
     public setOrientationProperties(properties: IOrientationProperties): void {
         this._orientationProperties = properties;
-    }
-
-    public isCached(): boolean {
-        const asset: HTML | undefined = this._campaign.getResourceUrl();
-        if(asset) {
-            return asset.isCached();
-        }
-
-        return false;
     }
 
     public description(): string {

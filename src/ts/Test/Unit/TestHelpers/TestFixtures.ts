@@ -43,6 +43,7 @@ import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xm
 
 import * as sinon from 'sinon';
 
+const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
     public static getPlacement(): Placement {
         return new Placement({
@@ -68,7 +69,8 @@ export class TestFixtures {
             creativeId: undefined,
             seatId: undefined,
             meta: meta,
-            session: session
+            session: session,
+            mediaId: TestMediaID
         };
     }
 
@@ -150,7 +152,7 @@ export class TestFixtures {
             trackingUrls: {},
             clickAttributionUrl: mraidContentJson.clickAttributionUrl,
             clickAttributionUrlFollowsRedirects: mraidContentJson.clickAttributionUrlFollowsRedirects,
-            clickUrl: mraidContentJson.clickUrl ? mraidContentJson.clickAttributionUrl : undefined,
+            clickUrl: mraidContentJson.clickUrl ? mraidContentJson.clickUrl : undefined,
             videoEventUrls: mraidContentJson.videoEventUrls ? mraidContentJson.videoEventUrls : undefined,
             gameName: mraidContentJson.gameName,
             gameIcon: mraidContentJson.gameIcon ? new Image(mraidContentJson.gameIcon, session) : undefined,
@@ -160,7 +162,8 @@ export class TestFixtures {
             portraitImage: mraidContentJson.endScreenPortrait ? new Image(mraidContentJson.endScreenPortrait, session) : undefined,
             bypassAppSheet: mraidContentJson.bypassAppSheet,
             store: storeName,
-            appStoreId: mraidContentJson.appStoreId
+            appStoreId: mraidContentJson.appStoreId,
+            playableConfiguration: undefined
         };
     }
 
@@ -176,7 +179,8 @@ export class TestFixtures {
             creativeId: mraidJson.creativeId || undefined,
             seatId: mraidJson.seatId || undefined,
             meta: mraidJson.meta || undefined,
-            session: session
+            session: session,
+            mediaId: TestMediaID
         };
     }
 
@@ -205,7 +209,8 @@ export class TestFixtures {
             bypassAppSheet: mraidContentJson.bypassAppSheet,
             store: undefined,
             appStoreId: mraidContentJson.appStoreId,
-            useWebViewUserAgentForTracking: mraidJson.useWebViewUserAgentForTracking
+            useWebViewUserAgentForTracking: mraidJson.useWebViewUserAgentForTracking,
+            playableConfiguration: undefined
         };
     }
 
@@ -220,7 +225,8 @@ export class TestFixtures {
             creativeId: 'creativeId',
             seatId: 12345,
             meta: undefined,
-            session: session
+            session: session,
+            mediaId: TestMediaID
         };
     }
 
@@ -270,14 +276,17 @@ export class TestFixtures {
             creativeId: json.creativeId || undefined,
             seatId: json.seatId || undefined,
             meta: json.meta,
-            session: session
+            session: session,
+            mediaId: TestMediaID
         };
 
         return {
             ... baseCampaignParams,
             dynamicMarkup: json.content,
             trackingUrls: json.display.tracking || undefined,
-            useWebViewUserAgentForTracking: false
+            useWebViewUserAgentForTracking: false,
+            width: json.display.width || undefined,
+            height: json.display.height || undefined
         };
     }
 
@@ -293,7 +302,8 @@ export class TestFixtures {
             creativeId: json.creativeId || undefined,
             seatId: json.seatId || undefined,
             meta: undefined,
-            session: session
+            session: session,
+            mediaId: TestMediaID
         };
     }
 

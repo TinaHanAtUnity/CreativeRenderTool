@@ -29,8 +29,8 @@ export class DisplayInterstitialEventHandler implements IDisplayInterstitialHand
     }
 
     public onDisplayInterstitialClose(): void {
-        this._operativeEventManager.sendThirdQuartile(this._campaign.getSession(), this._placement, this._campaign);
-        this._operativeEventManager.sendView(this._campaign.getSession(), this._placement, this._campaign);
+        this._operativeEventManager.sendThirdQuartile(this._placement);
+        this._operativeEventManager.sendView(this._placement);
         this._adUnit.hide();
     }
 }

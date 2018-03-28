@@ -16,6 +16,7 @@ import { Platform } from 'Constants/Platform';
 import { SessionManager } from 'Managers/SessionManager';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
+import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 
 class TestStorageApi extends StorageApi {
 
@@ -191,8 +192,17 @@ describe('SessionManagerTest', () => {
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
 
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        sessionManager = new SessionManager(nativeBridge);
-        operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+        sessionManager = new SessionManager(nativeBridge, request);
+        operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
+            nativeBridge: nativeBridge,
+            request: request,
+            metaDataManager: metaDataManager,
+            sessionManager: sessionManager,
+            clientInfo: clientInfo,
+            deviceInfo: deviceInfo,
+            configuration: TestFixtures.getConfiguration(),
+            campaign: TestFixtures.getCampaign()
+        });
     });
 
     xit('Retry failed event', () => {
@@ -211,7 +221,7 @@ describe('SessionManagerTest', () => {
 
         const requestSpy = sinon.spy(request, 'post');
 
-        return sessionManager.sendUnsentSessions(operativeEventManager).then(() => {
+        return sessionManager.sendUnsentSessions().then(() => {
             assert(requestSpy.calledOnce, 'Retry failed event did not send POST request');
             assert.equal(url, requestSpy.getCall(0).args[0], 'Retry failed event url does not match');
             assert.equal(data, requestSpy.getCall(0).args[1], 'Retry failed event data does not match');
@@ -250,7 +260,7 @@ describe('SessionManagerTest', () => {
 
         storageApi.set(StorageType.PRIVATE, sessionTsKey, threeMonthsAgo);
 
-        return sessionManager.sendUnsentSessions(operativeEventManager).then(() => {
+        return sessionManager.sendUnsentSessions().then(() => {
             return storageApi.get<number>(StorageType.PRIVATE, sessionTsKey).then(() => {
                 assert.fail('Old session found in storage but it should have been deleted');
             }).catch(error => {
@@ -266,7 +276,7 @@ describe('SessionManagerTest', () => {
 
         storageApi.set(StorageType.PRIVATE, randomKey, 'test');
 
-        return sessionManager.sendUnsentSessions(operativeEventManager).then(() => {
+        return sessionManager.sendUnsentSessions().then(() => {
             return storageApi.get<number>(StorageType.PRIVATE, randomKey).then(() => {
                 assert.fail('Session without timestamp found in storage but it should have been deleted');
             }).catch(error => {

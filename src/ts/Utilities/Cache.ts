@@ -14,6 +14,7 @@ import { SdkStats } from 'Utilities/SdkStats';
 import { Session } from 'Models/Session';
 import { FileId } from 'Utilities/FileId';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
+import { Url } from 'Utilities/Url';
 
 export enum CacheStatus {
     OK,
@@ -310,7 +311,6 @@ export class Cache {
         if(callback) {
             callback.startTimestamp = Date.now();
             callback.contentLength = totalSize;
-
             if(size === 0) {
                 this._cacheBookkeeping.writeFileEntry(callback.fileId, this._cacheBookkeeping.createFileInfo(false, size, totalSize, FileId.getFileIdExtension(callback.fileId)));
                 this.sendDiagnostic(CacheDiagnosticEvent.STARTED, callback);
@@ -318,7 +318,6 @@ export class Cache {
             } else {
                 this.sendDiagnostic(CacheDiagnosticEvent.RESUMED, callback);
             }
-
             // reject all files larger than 20 megabytes
             if(totalSize > this._maxFileSize) {
                 this._nativeBridge.Cache.stop();

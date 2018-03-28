@@ -90,7 +90,7 @@ class TestRequestApi extends RequestApi {
             const responseCodes = url.match(/3[0-9]{2}/);
             if (responseCodes && responseCodes.length > 0) {
                 const responseCode = responseCodes[0];
-                this.sendSuccessResponse(id, url, 'Redirect response', parseInt(responseCode, 10),[['location', 'http://www.example.org/endurl/']]);
+                this.sendSuccessResponse(id, url, 'Redirect response', parseInt(responseCode, 10), [['location', 'http://www.example.org/endurl/']]);
             }
         } else if (url.indexOf('/recursiveResponseCode') !== -1) {
             this.sendSuccessResponse(id, url, 'Recursive redirect response', 301, [['location', 'http://www.example.org/recursiveResponseCode/']]);

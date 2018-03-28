@@ -5,6 +5,7 @@ import { Template } from 'Utilities/Template';
 import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
 import { NativeBridge } from 'Native/NativeBridge';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
 
 export interface IVPAIDEndScreenHandler {
     onVPAIDEndScreenClick(): void;
@@ -43,7 +44,7 @@ export class VPAIDEndScreen extends View<IVPAIDEndScreenHandler> {
             }
         ];
 
-        if(gameId === '1300023' || gameId === '1300024') {
+        if(CustomFeatures.isTimehopApp(gameId)) {
             this._isSwipeToCloseEnabled = true;
 
             this._bindings.push({

@@ -105,8 +105,8 @@ describe('UserMetaDataTest', () => {
         const metaDataManager = new MetaDataManager(nativeBridge);
         return metaDataManager.fetch(UserMetaData, true, ['requestCount', 'clickCount']).then(metaData => {
             if(metaData) {
-                assert.equal(metaData.getRequestCount(), 0,'');
-                assert.equal(metaData.getClickCount(), 0,'');
+                assert.equal(metaData.getRequestCount(), 0, '');
+                assert.equal(metaData.getClickCount(), 0, '');
 
                 storageApi.setStorage({
                     user: {
@@ -116,8 +116,8 @@ describe('UserMetaDataTest', () => {
                 return metaDataManager.fetch(UserMetaData, true, ['clickCount']).then(metaData2 => {
                     assert.equal(metaData, metaData2, 'UserMetaData was redefined');
                     if (metaData2) {
-                        assert.equal(metaData.getRequestCount(), 0,'');
-                        assert.equal(metaData.getClickCount(), 1,'');
+                        assert.equal(metaData.getRequestCount(), 0, '');
+                        assert.equal(metaData.getClickCount(), 1, '');
                         assert.deepEqual(metaData2.getDTO(), {
                             requestCount: 0,
                             clickCount: 1
@@ -152,7 +152,7 @@ describe('UserMetaDataTest', () => {
         const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
         return metaDataManager.fetch(UserMetaData).then(metaData => {
             if(metaData) {
-                assert.equal(metaData.getClickCount(), 0,'');
+                assert.equal(metaData.getClickCount(), 0, '');
                 assert.equal(metaData.getRequestCount(), undefined, '');
             } else {
                 throw new Error('UserMetaData is not defined');

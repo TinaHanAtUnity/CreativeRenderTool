@@ -9,8 +9,11 @@ import { Session } from 'Models/Session';
 import { Video } from 'Models/Assets/Video';
 import { Image } from 'Models/Assets/Image';
 import { HTML } from 'Models/Assets/HTML';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class CometCampaignParser extends CampaignParser {
+    public static ContentType = 'comet/campaign';
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
         const json = response.getJsonContent();
 
@@ -40,7 +43,8 @@ export class CometCampaignParser extends CampaignParser {
             creativeId: undefined,
             seatId: undefined,
             meta: json.meta,
-            session: session
+            session: session,
+            mediaId: response.getMediaId()
         };
 
         if(json && json.mraidUrl) {
@@ -63,10 +67,28 @@ export class CometCampaignParser extends CampaignParser {
                 bypassAppSheet: json.bypassAppSheet,
                 store: storeName,
                 appStoreId: json.appStoreId,
-                trackingUrls: {}
+                trackingUrls: {},
+                playableConfiguration: undefined
             };
 
-            return Promise.resolve(new MRAIDCampaign(parameters));
+            const mraidCampaign = new MRAIDCampaign(parameters);
+
+            if(CustomFeatures.isPlayableConfigurationEnabled(json.mraidUrl)) {
+                const playableConfigurationUrl = json.mraidUrl.replace(/index\.html/, 'configuration.json');
+                request.get(playableConfigurationUrl).then(configurationResponse => {
+                    try {
+                        const playableConfiguration = JSON.parse(configurationResponse.response);
+                        mraidCampaign.setPlayableConfiguration(playableConfiguration);
+                    } catch (e) {
+                        Diagnostics.trigger('playable_configuration_invalid_json', {
+                            configuration: configurationResponse.response
+                        });
+                    }
+                }).catch(error => {
+                    // ignore failed requests
+                });
+            }
+            return Promise.resolve(mraidCampaign);
         } else {
             const parameters: IPerformanceCampaign = {
                 ... baseCampaignParams,

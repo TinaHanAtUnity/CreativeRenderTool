@@ -1,27 +1,27 @@
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
-import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Placement } from 'Models/Placement';
 import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 import { Promo } from 'Views/Promo';
 import { IObserver0 } from 'Utilities/IObserver';
 import { FinishState } from 'Constants/FinishState';
-import { SessionManager } from 'Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { PurchasingApi } from 'Native/Api/Purchasing';
+import { Platform } from 'Constants/Platform';
+import { KeyCode } from 'Constants/Android/KeyCode';
 
 export interface IPromoAdUnitParameters extends IAdUnitParameters<PromoCampaign> {
     view: Promo;
 }
 
 export class PromoAdUnit extends AbstractAdUnit {
-    private _sessionManager: SessionManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _promoView: Promo;
     private _options: any;
     private _placement: Placement;
     private _campaign: PromoCampaign;
 
+    private _keyDownListener: (kc: number) => void;
     private _onSystemKillObserver: IObserver0;
     private _additionalTrackingEvents: { [eventName: string]: string[] } | undefined;
 
@@ -34,6 +34,7 @@ export class PromoAdUnit extends AbstractAdUnit {
         this._options = parameters.options;
         this._placement = parameters.placement;
         this._campaign = parameters.campaign;
+        this._keyDownListener = (kc: number) => this.onKeyDown(kc);
     }
 
     public show(): Promise<void> {
@@ -45,6 +46,10 @@ export class PromoAdUnit extends AbstractAdUnit {
         this._promoView.show();
         this.sendTrackingEvent('impression');
 
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            this._nativeBridge.AndroidAdUnit.onKeyDown.subscribe(this._keyDownListener);
+        }
+
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
 
         return this._container.open(this, ['webview'], false, ForceOrientation.NONE, true, true, false, true, this._options);
@@ -55,6 +60,10 @@ export class PromoAdUnit extends AbstractAdUnit {
             return Promise.resolve();
         }
         this.setShowing(false);
+
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            this._nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(this._keyDownListener);
+        }
 
         this._container.onSystemKill.unsubscribe(this._onSystemKillObserver);
 
@@ -75,12 +84,14 @@ export class PromoAdUnit extends AbstractAdUnit {
         this.sendTrackingEvent('click');
     }
 
-    public isCached(): boolean {
-        return this._campaign.getCreativeResource().isCached();
-    }
-
     public description(): string {
         return 'promo';
+    }
+
+    private onKeyDown(key: number) {
+        if (key === KeyCode.BACK) {
+            this.hide();
+        }
     }
 
     private sendTrackingEvent(eventName: string): void {

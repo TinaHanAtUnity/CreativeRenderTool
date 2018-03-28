@@ -78,7 +78,7 @@ if(!('classList' in document.documentElement) && Object.defineProperty && typeof
     // Firefox/Opera/IE throw errors on unsupported types
     try {
         // WebKit returns null on unsupported types
-        if ((new DOMParser()).parseFromString("", "text/html")) {
+        if ((new DOMParser()).parseFromString('', 'text/html')) {
             // text/html parsing is natively supported
             return;
         }

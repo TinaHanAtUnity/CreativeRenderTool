@@ -4,9 +4,10 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
 import { Platform } from 'Constants/Platform';
-import { AbstractOverlay } from 'Views/AbstractOverlay';
+import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
 
-export class Overlay extends AbstractOverlay {
+export class Overlay extends AbstractVideoOverlay {
 
     private _localization: Localization;
 
@@ -73,7 +74,7 @@ export class Overlay extends AbstractOverlay {
             }
         ];
 
-        if(gameId === '1300023' || gameId === '1300024') {
+        if(CustomFeatures.isTimehopApp(gameId)) {
             this._bindings.push({
                 event: 'swipe',
                 listener: (event: Event) => this.onSkipEvent(event)

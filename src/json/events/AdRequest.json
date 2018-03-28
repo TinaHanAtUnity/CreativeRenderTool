@@ -276,6 +276,18 @@
       "required": "all",
       "queryString": false,
       "body": true
+    },
+    {
+      "parameter": "sessionDepth",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "token",
+      "required": "all",
+      "queryString": false,
+      "body": true
     }
   ]
 }

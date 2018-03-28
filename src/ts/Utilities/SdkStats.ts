@@ -16,6 +16,7 @@ import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
 import { ClientInfo } from 'Models/ClientInfo';
+import { CampaignAssetInfo } from 'Utilities/CampaignAssetInfo';
 
 interface ISdkStatsEvent {
     eventTimestamp: number;
@@ -269,7 +270,7 @@ export class SdkStats {
     }
 
     private static isCampaignCached(campaign: Campaign): boolean {
-        const asset: Asset | undefined = SdkStats.getMainAsset(campaign);
+        const asset: Asset | undefined = CampaignAssetInfo.getCachedAsset(campaign);
         if(asset && asset.isCached()) {
             return true;
         }
@@ -278,7 +279,7 @@ export class SdkStats {
 
     private static getAssetSize(campaign: Campaign): Promise<number> {
         if(SdkStats.isCampaignCached(campaign)) {
-            const asset: Asset | undefined = SdkStats.getMainAsset(campaign);
+            const asset: Asset | undefined = CampaignAssetInfo.getCachedAsset(campaign);
 
             if(asset) {
                 return SdkStats._nativeBridge.Cache.getFileInfo(<string>asset.getFileId()).then((fileInfo: IFileInfo) => {
@@ -299,7 +300,7 @@ export class SdkStats {
     }
 
     private static getCachedMsAgo(campaign: Campaign): number | undefined {
-        const asset: Asset | undefined = SdkStats.getMainAsset(campaign);
+        const asset: Asset | undefined = CampaignAssetInfo.getCachedAsset(campaign);
 
         if(asset) {
             const fileId: string | undefined = asset.getFileId();
@@ -315,7 +316,7 @@ export class SdkStats {
     }
 
     private static getCachingDuration(campaign: Campaign): number | undefined {
-        const asset: Asset | undefined = SdkStats.getMainAsset(campaign);
+        const asset: Asset | undefined = CampaignAssetInfo.getCachedAsset(campaign);
 
         if(asset) {
             const fileId: string | undefined = asset.getFileId();
@@ -324,31 +325,6 @@ export class SdkStats {
                 if(SdkStats._cachingStarted[fileId] && SdkStats._cachingFinished[fileId]) {
                     return SdkStats._cachingFinished[fileId] - SdkStats._cachingStarted[fileId];
                 }
-            }
-        }
-
-        return undefined;
-    }
-
-    // todo: fragile method that breaks when we add new campaign types
-    private static getMainAsset(campaign: Campaign): Asset | undefined {
-        if(campaign instanceof PerformanceCampaign) {
-            const video = (<PerformanceCampaign>campaign).getVideo();
-            const portraitVideo = (<PerformanceCampaign>campaign).getPortraitVideo();
-            if(video && video.isCached()) {
-                return video;
-            } else if(portraitVideo && portraitVideo.isCached()) {
-                return portraitVideo;
-            }
-        } else if(campaign instanceof VastCampaign) {
-            const video = (<VastCampaign>campaign).getVideo();
-            if(video && video.isCached()) {
-                return video;
-            }
-        } else if(campaign instanceof MRAIDCampaign) {
-            const resource = (<MRAIDCampaign>campaign).getResourceUrl();
-            if(resource && resource.isCached()) {
-                return resource;
             }
         }
 
