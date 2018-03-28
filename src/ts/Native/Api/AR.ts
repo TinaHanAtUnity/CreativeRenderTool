@@ -42,6 +42,14 @@ export class ARApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._apiClass, 'hideCameraFeed');
     }
 
+    public addAnchor(identifier: string, matrix: string): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'addAnchor', [identifier, matrix]);
+    }
+
+    public removeAnchor(identifier: string): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'removeAnchor', [identifier]);
+    }
+
     public handleEvent(event: string, parameters: any[]): void {
         switch (event) {
             case AREvent[AREvent.AR_PLANES_ADDED]:

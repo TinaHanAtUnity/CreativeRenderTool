@@ -335,6 +335,15 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
             case 'hideCameraFeed':
                 this._nativeBridge.AR.hideCameraFeed();
                 break;
+
+            case 'addAnchor':
+                this._nativeBridge.AR.addAnchor(args[0], args[1]);
+                break;
+
+            case 'removeAnchor':
+                this._nativeBridge.AR.removeAnchor(args[0]);
+                break;
+
             case 'log':
                 this._nativeBridge.Sdk.logDebug('NATIVELOG ' + JSON.stringify(args));
         }
