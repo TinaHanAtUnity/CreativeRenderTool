@@ -606,8 +606,6 @@ export class CampaignManager {
         UserCountData.getRequestCount(this._nativeBridge).then((requestCount) => {
             if (requestCount) {
                 UserCountData.setRequestCount(requestCount + 1, this._nativeBridge);
-            } else {
-                UserCountData.setRequestCount(0, this._nativeBridge);
             }
         }).catch(() => {
             Diagnostics.trigger('request_count_failure', {
