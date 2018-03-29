@@ -83,7 +83,7 @@ export class NativeBridge implements INativeBridge {
     private _autoBatchEnabled: boolean;
     private _autoBatch: BatchInvocation;
     private _autoBatchTimer: any; // todo: should be number but causes naming clash with nodejs Timer
-    private _autoBatchInterval = 50;
+    private _autoBatchInterval = 1;
 
     constructor(backend: IWebViewBridge, platform: Platform = Platform.TEST, autoBatch = true) {
         this._autoBatchEnabled = autoBatch;

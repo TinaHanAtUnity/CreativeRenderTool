@@ -14,7 +14,6 @@ import { IVastAdUnitParameters, VastAdUnit } from 'AdUnits/VastAdUnit';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Overlay } from 'Views/Overlay';
-import { Platform } from 'Constants/Platform';
 import { VastEndScreen } from 'Views/VastEndScreen';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
@@ -26,6 +25,8 @@ import { MOAT } from 'Views/MOAT';
 import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 
 import EventTestVast from 'xml/EventTestVast.xml';
+import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
+import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 
 describe('VastVideoEventHandlers tests', () => {
     const handleInvocation = sinon.spy();
@@ -63,7 +64,7 @@ describe('VastVideoEventHandlers tests', () => {
         metaDataManager = new MetaDataManager(nativeBridge);
         campaign = TestFixtures.getEventVastCampaign();
         clientInfo = TestFixtures.getClientInfo();
-        container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
 
         placement = new Placement({
@@ -77,13 +78,23 @@ describe('VastVideoEventHandlers tests', () => {
             muteVideo: false
         });
 
-        deviceInfo = new DeviceInfo(nativeBridge);
+        deviceInfo = new AndroidDeviceInfo(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        sessionManager = new SessionManager(nativeBridge);
+        sessionManager = new SessionManager(nativeBridge, request);
 
-        const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+        const configuration = TestFixtures.getConfiguration();
+        const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
+            nativeBridge: nativeBridge,
+            request: request,
+            metaDataManager: metaDataManager,
+            sessionManager: sessionManager,
+            clientInfo: clientInfo,
+            deviceInfo: deviceInfo,
+            configuration: configuration,
+            campaign: campaign
+        });
         const comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         vastAdUnitParameters = {
@@ -97,7 +108,7 @@ describe('VastVideoEventHandlers tests', () => {
             comScoreTrackingService: comScoreService,
             placement: placement,
             campaign: campaign,
-            configuration: TestFixtures.getConfiguration(),
+            configuration: configuration,
             request: request,
             options: {},
             endScreen: undefined,
@@ -251,7 +262,7 @@ describe('VastVideoEventHandlers tests', () => {
         });
     });
 
-    describe('onVideoError', ()=> {
+    describe('onVideoError', () => {
         it('should hide ad unit', () => {
             VastVideoEventHandlers.onVideoError(testAdUnit);
             sinon.assert.called(<sinon.SinonSpy>testAdUnit.hide);

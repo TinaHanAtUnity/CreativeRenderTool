@@ -1,11 +1,11 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { DeviceInfo } from 'Models/DeviceInfo';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 import { UIInterfaceOrientation } from 'Constants/iOS/UIInterfaceOrientation';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { AdUnitContainer, ForceOrientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 import { Double } from 'Utilities/Double';
 import { FocusManager } from 'Managers/FocusManager';
+import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 
 interface IIosOptions {
     supportedOrientations: UIInterfaceOrientationMask;
@@ -22,7 +22,7 @@ export class ViewController extends AdUnitContainer {
 
     private _nativeBridge: NativeBridge;
     private _focusManager: FocusManager;
-    private _deviceInfo: DeviceInfo;
+    private _deviceInfo: IosDeviceInfo;
     private _showing: boolean;
     private _paused = false;
     private _options: IIosOptions;
@@ -33,7 +33,7 @@ export class ViewController extends AdUnitContainer {
     private _onAppBackgroundObserver: any;
     private _onAppForegroundObserver: any;
 
-    constructor(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, focusManager: FocusManager) {
+    constructor(nativeBridge: NativeBridge, deviceInfo: IosDeviceInfo, focusManager: FocusManager) {
         super();
 
         this._nativeBridge = nativeBridge;

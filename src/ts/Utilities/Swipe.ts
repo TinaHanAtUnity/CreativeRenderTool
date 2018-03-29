@@ -6,19 +6,14 @@ export class Swipe {
     private _startX: number;
     private _startY: number;
 
-    private _ignoreLength: boolean;
-
     private _onTouchEndListener: ((event: TouchEvent) => any);
     private _onTouchCancelListener: ((event: TouchEvent) => any);
     private _onTouchMoveListener: ((event: TouchEvent) => any);
 
-    constructor(element: HTMLElement, ignoreLength: boolean = false) {
+    constructor(element: HTMLElement) {
         this._element = element;
         this._startX = 0;
         this._startY = 0;
-
-        this._ignoreLength = ignoreLength;
-
         this._element.addEventListener('touchstart', (event) => this.onTouchStart(event), false);
     }
 
@@ -38,35 +33,27 @@ export class Swipe {
         this._element.removeEventListener('touchcancel', this._onTouchCancelListener, false);
         this._element.removeEventListener('touchmove', this._onTouchCancelListener, false);
 
-        if (this._ignoreLength) {
-            this.emitEvent(event);
-        } else {
-            const endX = event.changedTouches[0].clientX;
-            const endY = event.changedTouches[0].clientY;
+        const endX = event.changedTouches[0].clientX;
+        const endY = event.changedTouches[0].clientY;
 
-            const xDiff = this._startX - endX;
-            const yDiff = this._startY - endY;
+        const xDiff = this._startX - endX;
+        const yDiff = this._startY - endY;
 
-            if (Math.abs(xDiff) > Math.abs(yDiff)) {
-                if (Math.abs(xDiff) > Swipe._moveTolerance) {
-                    // left or right swipe
-                    this.emitEvent(event);
+        if(Math.abs( xDiff ) > Math.abs( yDiff ) ) {
+            if (Math.abs(xDiff) > Swipe._moveTolerance) {
+                // left or right swipe
+                const swipeEvent = document.createEvent('MouseEvent');
+                swipeEvent.initMouseEvent('swipe', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+
+                event.stopPropagation();
+                if(!event.target.dispatchEvent(swipeEvent)) {
+                    event.preventDefault();
                 }
             }
         }
 
         this._startX = 0;
         this._startY = 0;
-    }
-
-    private emitEvent(event: TouchEvent) {
-        const swipeEvent = document.createEvent('MouseEvent');
-        swipeEvent.initMouseEvent('swipe', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-
-        event.stopPropagation();
-        if (!event.target.dispatchEvent(swipeEvent)) {
-            event.preventDefault();
-        }
     }
 
     private onTouchCancel(event: TouchEvent) {

@@ -3,9 +3,9 @@ import InterstitialOverlayTemplate from 'html/InterstitialOverlay.html';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
-import { AbstractOverlay } from 'Views/AbstractOverlay';
+import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
 
-export class InterstitialOverlay extends AbstractOverlay {
+export class ClosableVideoOverlay extends AbstractVideoOverlay {
 
     private _spinnerEnabled: boolean = false;
 
@@ -27,7 +27,7 @@ export class InterstitialOverlay extends AbstractOverlay {
     private _fadeStatus: boolean = true;
 
     constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, abGroup: number = 0) {
-        super(nativeBridge, 'interstitial-overlay', muted, abGroup);
+        super(nativeBridge, 'closable-video-overlay', muted, abGroup);
 
         const localization = new Localization(language, 'overlay');
         this._template = new Template(InterstitialOverlayTemplate, localization);
@@ -90,7 +90,7 @@ export class InterstitialOverlay extends AbstractOverlay {
     }
 
     public setVideoProgress(value: number): void {
-        if(AbstractOverlay.AutoSkip) {
+        if(AbstractVideoOverlay.AutoSkip) {
             this._handlers.forEach(handler => handler.onOverlaySkip(value));
         }
 

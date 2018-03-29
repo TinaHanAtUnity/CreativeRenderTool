@@ -2,7 +2,7 @@ import { MetaData } from 'Utilities/MetaData';
 
 export class TestEnvironment {
     public static setup(metaData: MetaData): Promise<string[]> {
-        const clearMetaDataPromise = metaData.get("test.clearTestMetaData", false);
+        const clearMetaDataPromise = metaData.get('test.clearTestMetaData', false);
         const getKeysPromise = metaData.getKeys('test');
         return Promise.all([clearMetaDataPromise, getKeysPromise]).then(([[clearKeyFound, clearKeyValue], keys]) => {
             let deleteValue = false;

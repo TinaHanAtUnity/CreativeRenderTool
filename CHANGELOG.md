@@ -1,4 +1,139 @@
-# Staged
+# Wed Mar 28 20:07:19 UTC 2018
+
+* Another attempt at fixing race condition in new refresh manager
+
+# Wed Mar 28 07:54:36 UTC 2018
+
+* AdMob caching changes
+
+# Tue Mar 27 18:28:05 UTC 2018
+
+* Easter theme to all groups except 5
+* Fix IAP promo Android back button handling
+* Fix race condition in new refresh manager
+
+# Mon Mar 26 10:16:09 UTC 2018
+
+* Test new ad request refresh logic and reinit logic in groups 9 and 11
+
+# Thu Mar 22 20:52:53 UTC 2018
+
+* Remove ramdom CTA button colour test from groups 8 & 10
+* Display Centering
+* ForceSessionId parameter for APIN
+
+# Wed Mar 21 22:18:31 UTC 2018
+
+* Asset Caching Refactor
+
+# Wed Mar 21 11:34:25 UTC 2018
+
+* Adds MissingImpressionOrdinal support for SDK < 2.1.2
+* Refactor CampaignParser creation to CampaignParserFactory
+
+# Tue Mar 20 21:51:37 UTC 2018
+
+* Initial support for realtime auction
+* Fix AdMob accelerometer fraud signals
+
+# Tue Mar 20 06:58:53 UTC 2018
+
+* Easter theme A/B test in groups 16 & 17
+* Remove overlay A/B test from groups 16 & 17
+
+# Mon Mar 19 07:48:44 UTC 2018
+
+* Support for new A/B testing framework
+* Add sessionDepth parameter to ad requests
+
+# Fri Mar 16 07:04:01 UTC 2018
+
+* iOS screen size fix for analytics
+* Split operative event manager into multiple operative event managers
+* XPromo: parse meta field
+* Use almost white background color in end screen
+
+# Thu Mar 15 09:31:49 UTC 2018
+
+* Disable DeviceInfo.getApkDigest to fix Android 2.2.0 issues
+* Encode UTF-8 characters in asset URLs before giving them to native SDK
+* Display ads: Open links in new browser for iOS also
+* Disable failing cache tests
+
+# Wed Mar 14 09:55:49 UTC 2018
+
+* Progress bar video overlay A/B test in groups 16 & 17
+* Send targetGameId as a string value in xpromo events
+* Remove IAP transaction metadata support
+
+# Tue Mar 13 08:20:24 UTC 2018
+
+* Enable Android native bridge 1ms autobatching on all groups
+* Rename InterstitialOverlay to ClosableVideoOverlay
+* Fix tslint configuration and fix linter errors
+
+# Mon Mar 12 10:13:52 UTC 2018
+
+* Add target game ID to xpromo events
+* Remove hard-coded game IDs which were used to enable overlay features
+
+# Fri Mar  9 09:37:38 UTC 2018
+
+* Remove progress bar from groups 16 and 17
+* Revert "Show time to close / skip for mraid overlays" from groups 18 and 19
+* Add URL whitelist check for Android display interstitial ad unit
+* Add missing_default_placement diagnostic event
+
+# Thu Mar  8 09:59:59 UTC 2018
+
+* Playable configuration file support
+* Refactor campaign refresh manager - part one
+* Improve test stability
+
+# Wed Mar  7 06:32:14 UTC 2018
+
+* Reduce info level logging
+* Moved hard-coded game IDs to CustomFeatures
+* Improved error message for invalid game ID
+
+# Tue Mar  6 11:43:29 UTC 2018
+
+* Add source game id to xpromo events
+* Allow certain range unicode characters in urls
+* Obfuscate spam idenfiers in AFMA container
+* AFMA: fix click signals
+
+# Tue Mar  6 06:29:39 UTC 2018
+
+* Test Android native bridge with 1ms autobatching on groups 12 and 13
+* Fix Android problem with close button, landscape orientation and scaled fonts
+
+# Fri Mar  2 09:31:54 UTC 2018
+
+* Refactor some programmatic properties away from base campaign model
+* Update dependencies
+
+# Thu Mar  1 10:39:02 UTC 2018
+
+* Validate and encode all incoming asset URLs
+* Fix cache redirections on 2.2.0
+* Show time to close / skip for MRAID overlays on group 18 and 19
+* Fix creative slot colliding with video slot for VPAID
+* Fixed issue with how setViewFrame was being used
+
+# Wed Feb 28 13:55:33 UTC 2018
+
+* Fixes for openUrl and sendEvent for VPAID
+* New AdMob spam signals for SDK 2.2.0
+* Refactor and add missing device infos
+* Overlay progress bar AB test for groups 16 & 17
+* Remove lunar theme AB test
+
+# Fri Feb 23 15:10:28 UTC 2018
+
+* Fix MOAT init & closing due to bad merge
+
+# Fri Feb 23 10:27:13 UTC 2018
 
 * Purchasing utilities cleanup
 * Disable app sheet on iPhone iOS 11

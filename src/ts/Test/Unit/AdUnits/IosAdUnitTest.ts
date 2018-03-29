@@ -19,6 +19,7 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { Request } from 'Utilities/Request';
 import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
+import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 
 describe('IosAdUnitTest', () => {
     let nativeBridge: NativeBridge;
@@ -43,10 +44,21 @@ describe('IosAdUnitTest', () => {
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         const request = new Request(nativeBridge, wakeUpManager);
         const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        const sessionManager = new SessionManager(nativeBridge);
-        const deviceInfo = TestFixtures.getDeviceInfo(Platform.IOS);
-        container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS), focusManager);
-        const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+        const sessionManager = new SessionManager(nativeBridge, request);
+        const deviceInfo = TestFixtures.getIosDeviceInfo();
+        container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager);
+        const campaign = TestFixtures.getCampaign();
+        const configuration = TestFixtures.getConfiguration();
+        const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
+            nativeBridge: nativeBridge,
+            request: request,
+            metaDataManager: metaDataManager,
+            sessionManager: sessionManager,
+            clientInfo: clientInfo,
+            deviceInfo: deviceInfo,
+            configuration: configuration,
+            campaign: campaign
+        });
         const comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         adUnitParams = {
@@ -59,8 +71,8 @@ describe('IosAdUnitTest', () => {
             operativeEventManager: operativeEventManager,
             comScoreTrackingService: comScoreService,
             placement: TestFixtures.getPlacement(),
-            campaign: TestFixtures.getCampaign(),
-            configuration: TestFixtures.getConfiguration(),
+            campaign: campaign,
+            configuration: configuration,
             request: request,
             options: {}
         };
@@ -93,7 +105,7 @@ describe('IosAdUnitTest', () => {
     it('should close ad unit', () => {
         nativeBridge = TestFixtures.getNativeBridge(Platform.IOS);
         focusManager = new FocusManager(nativeBridge);
-        container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS), focusManager);
+        container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager);
         const stub = sinon.stub(nativeBridge.IosAdUnit, 'close').returns(Promise.resolve());
 
         return container.close().then(() => {
@@ -105,7 +117,7 @@ describe('IosAdUnitTest', () => {
     // note: when reconfigure method is enhanced with some actual parameters, this test needs to be refactored
     it('should reconfigure ad unit', () => {
         nativeBridge = TestFixtures.getNativeBridge(Platform.IOS);
-        container = new ViewController(nativeBridge, TestFixtures.getDeviceInfo(Platform.IOS), focusManager);
+        container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager);
 
         const stubViews = sinon.stub(nativeBridge.IosAdUnit, 'setViews').returns(Promise.resolve());
         const stubOrientation = sinon.stub(nativeBridge.IosAdUnit, 'setSupportedOrientations').returns(Promise.resolve());

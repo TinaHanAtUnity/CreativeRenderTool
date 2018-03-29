@@ -13,6 +13,7 @@ import { Video } from 'Models/Assets/Video';
 import { Image } from 'Models/Assets/Image';
 
 export class ProgrammaticVastParser extends CampaignParser {
+    public static ContentType = 'programmatic/vast';
     public static setVastParserMaxDepth(depth: number): void {
         ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH = depth;
     }
@@ -47,36 +48,37 @@ export class ProgrammaticVastParser extends CampaignParser {
             creativeId: response.getCreativeId() || undefined,
             seatId: response.getSeatId() || undefined,
             meta: undefined,
-            appCategory: response.getCategory() || undefined,
-            appSubCategory: response.getSubCategory() || undefined,
-            advertiserDomain: response.getAdvertiserDomain() || undefined,
-            advertiserCampaignId: response.getAdvertiserCampaignId() || undefined,
-            advertiserBundleId: response.getAdvertiserBundleId() || undefined,
-            useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking(),
-            buyerId: response.getBuyerId() || undefined,
-            session: session
+            session: session,
+            mediaId: response.getMediaId()
         };
 
         const portraitUrl = vast.getCompanionPortraitUrl();
         let portraitAsset;
         if(portraitUrl) {
-            portraitAsset = new Image(portraitUrl, session);
+            portraitAsset = new Image(this.validateAndEncodeUrl(portraitUrl, session), session);
         }
 
         const landscapeUrl = vast.getCompanionLandscapeUrl();
         let landscapeAsset;
         if(landscapeUrl) {
-            landscapeAsset = new Image(landscapeUrl, session);
+            landscapeAsset = new Image(this.validateAndEncodeUrl(landscapeUrl, session), session);
         }
 
         const vastCampaignParms: IVastCampaign = {
             ... baseCampaignParams,
             vast: vast,
-            video: new Video(vast.getVideoUrl(), session),
+            video: new Video(this.validateAndEncodeUrl(vast.getVideoUrl(), session), session),
             hasEndscreen: !!vast.getCompanionPortraitUrl() || !!vast.getCompanionLandscapeUrl(),
             portrait: portraitAsset,
             landscape: landscapeAsset,
-            tracking: response.getTrackingUrls()
+            trackingUrls: response.getTrackingUrls(),
+            useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking(),
+            buyerId: response.getBuyerId() || undefined,
+            appCategory: response.getCategory() || undefined,
+            appSubcategory: response.getSubCategory() || undefined,
+            advertiserDomain: response.getAdvertiserDomain() || undefined,
+            advertiserCampaignId: response.getAdvertiserCampaignId() || undefined,
+            advertiserBundleId: response.getAdvertiserBundleId() || undefined,
         };
 
         const campaign = new VastCampaign(vastCampaignParms);

@@ -7,6 +7,7 @@ import { AuctionResponse } from 'Models/AuctionResponse';
 import { Session } from 'Models/Session';
 
 export class ProgrammaticStaticInterstitialParser extends CampaignParser {
+    public static ContentType = 'programmatic/static-interstitial';
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
         const dynamicMarkup = decodeURIComponent(response.getContent());
         const cacheTTL = response.getCacheTTL();
@@ -21,20 +22,17 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
             creativeId: response.getCreativeId() || undefined,
             seatId: response.getSeatId() || undefined,
             meta: undefined,
-            appCategory: undefined,
-            appSubCategory: undefined,
-            advertiserDomain: undefined,
-            advertiserCampaignId: undefined,
-            advertiserBundleId: undefined,
-            useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking(),
-            buyerId: undefined,
-            session: session
+            session: session,
+            mediaId: response.getMediaId()
         };
 
         const displayInterstitialParams: IDisplayInterstitialCampaign = {
             ... baseCampaignParams,
             dynamicMarkup: dynamicMarkup,
-            tracking: response.getTrackingUrls() || undefined
+            trackingUrls: response.getTrackingUrls(),
+            useWebViewUserAgentForTracking: false,
+            width: response.getWidth() || undefined,
+            height: response.getHeight() || undefined
         };
 
         return Promise.resolve(new DisplayInterstitialCampaign(displayInterstitialParams));

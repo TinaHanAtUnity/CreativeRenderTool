@@ -4,8 +4,6 @@ import { INativeResponse } from 'Utilities/Request';
 import { Platform } from 'Constants/Platform';
 import { VastParser } from 'Utilities/VastParser';
 import { NativeBridge } from 'Native/NativeBridge';
-import { FakeDeviceInfo } from './FakeDeviceInfo';
-import { DeviceInfo } from 'Models/DeviceInfo';
 import { IPerformanceCampaign, PerformanceCampaign, StoreName } from 'Models/Campaigns/PerformanceCampaign';
 import { IXPromoCampaign, XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { IMRAIDCampaign, MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
@@ -20,10 +18,15 @@ import { Image } from 'Models/Assets/Image';
 import { HTML } from 'Models/Assets/HTML';
 import { Video } from 'Models/Assets/Video';
 import { Vast } from 'Models/Vast/Vast';
-import { IVPAIDCampaign, VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
-import { VPAIDParser } from 'Utilities/VPAIDParser';
+import { IVPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
 import { VPAID } from 'Models/VPAID/VPAID';
 import { IPromoCampaign, PromoCampaign } from 'Models/Campaigns/PromoCampaign';
+import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
+import { IosDeviceInfo } from 'Models/IosDeviceInfo';
+import { FakeAndroidDeviceInfo } from 'Test/Unit/TestHelpers/FakeAndroidDeviceInfo';
+import { RingerMode } from 'Constants/Android/RingerMode';
+import { UIUserInterfaceIdiom } from 'Constants/iOS/UIUserInterfaceIdiom';
+import { FakeIosDeviceInfo } from 'Test/Unit/TestHelpers/FakeIosDeviceInfo';
 
 import DummyPromoCampaign from 'json/DummyPromoCampaign.json';
 import OnCometMraidPlcCampaignFollowsRedirects from 'json/OnCometMraidPlcCampaignFollowsRedirects.json';
@@ -34,14 +37,13 @@ import OnXPromoPlcCampaign from 'json/OnXPromoPlcCampaign.json';
 import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCampaign.json';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
-import DummyDisplayInterstitialUrlCampaign from 'json/DummyDisplayInterstitialUrlCampaign.json';
 import VastCompanionXml from 'xml/VastCompanionAd.xml';
 import EventTestVast from 'xml/EventTestVast.xml';
-import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
-import { Campaign } from 'Models/Campaign';
-import { FocusManager } from 'Managers/FocusManager';
 import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xml';
 
+import * as sinon from 'sinon';
+
+const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
     public static getPlacement(): Placement {
         return new Placement({
@@ -67,14 +69,8 @@ export class TestFixtures {
             creativeId: undefined,
             seatId: undefined,
             meta: meta,
-            appCategory: undefined,
-            appSubCategory: undefined,
-            advertiserDomain: undefined,
-            advertiserCampaignId: undefined,
-            advertiserBundleId: undefined,
-            useWebViewUserAgentForTracking: undefined,
-            buyerId: undefined,
-            session: session
+            session: session,
+            mediaId: TestMediaID
         };
     }
 
@@ -144,27 +140,30 @@ export class TestFixtures {
     }
 
     public static getPlayableMRAIDCampaignParams(json: any, storeName: StoreName): IMRAIDCampaign {
+        const mraidContentJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
+        const mraidJson = json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'];
         const session = this.getSession();
         return {
-            ... this.getCometCampaignBaseParams(session, json.id, this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup(), undefined),
-            useWebViewUserAgentForTracking: false,
-            resourceAsset: json.resourceUrl ? new HTML(json.resourceUrl, session) : undefined,
+            ... this.getCometCampaignBaseParams(session, mraidContentJson.id, this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup(), undefined),
+            useWebViewUserAgentForTracking: mraidJson.useWebViewUserAgentForTracking,
+            resourceAsset: mraidContentJson.resourceUrl ? new HTML(mraidContentJson.resourceUrl, session) : undefined,
             resource: undefined,
-            dynamicMarkup: json.dynamicMarkup,
-            additionalTrackingEvents: undefined,
-            clickAttributionUrl: json.clickAttributionUrl,
-            clickAttributionUrlFollowsRedirects: json.clickAttributionUrlFollowsRedirects,
-            clickUrl: json.clickUrl ? json.clickAttributionUrl : undefined,
-            videoEventUrls: json.videoEventUrls ? json.videoEventUrls : undefined,
-            gameName: json.gameName,
-            gameIcon: json.gameIcon ? new Image(json.gameIcon, session) : undefined,
-            rating: json.rating,
-            ratingCount: json.ratingCount,
-            landscapeImage: json.endScreenLandscape ? new Image(json.endScreenLandscape, session) : undefined,
-            portraitImage: json.endScreenPortrait ? new Image(json.endScreenPortrait, session) : undefined,
-            bypassAppSheet: json.bypassAppSheet,
+            dynamicMarkup: mraidContentJson.dynamicMarkup,
+            trackingUrls: {},
+            clickAttributionUrl: mraidContentJson.clickAttributionUrl,
+            clickAttributionUrlFollowsRedirects: mraidContentJson.clickAttributionUrlFollowsRedirects,
+            clickUrl: mraidContentJson.clickUrl ? mraidContentJson.clickUrl : undefined,
+            videoEventUrls: mraidContentJson.videoEventUrls ? mraidContentJson.videoEventUrls : undefined,
+            gameName: mraidContentJson.gameName,
+            gameIcon: mraidContentJson.gameIcon ? new Image(mraidContentJson.gameIcon, session) : undefined,
+            rating: mraidContentJson.rating,
+            ratingCount: mraidContentJson.ratingCount,
+            landscapeImage: mraidContentJson.endScreenLandscape ? new Image(mraidContentJson.endScreenLandscape, session) : undefined,
+            portraitImage: mraidContentJson.endScreenPortrait ? new Image(mraidContentJson.endScreenPortrait, session) : undefined,
+            bypassAppSheet: mraidContentJson.bypassAppSheet,
             store: storeName,
-            appStoreId: json.appStoreId
+            appStoreId: mraidContentJson.appStoreId,
+            playableConfiguration: undefined
         };
     }
 
@@ -180,14 +179,8 @@ export class TestFixtures {
             creativeId: mraidJson.creativeId || undefined,
             seatId: mraidJson.seatId || undefined,
             meta: mraidJson.meta || undefined,
-            appCategory: undefined,
-            appSubCategory: undefined,
-            advertiserDomain: undefined,
-            advertiserCampaignId: undefined,
-            advertiserBundleId: undefined,
-            useWebViewUserAgentForTracking: mraidJson.useWebViewUserAgentForTracking,
-            buyerId: undefined,
-            session: session
+            session: session,
+            mediaId: TestMediaID
         };
     }
 
@@ -202,7 +195,7 @@ export class TestFixtures {
             resourceAsset: mraidContentJson.inlinedUrl ? new HTML(mraidContentJson.inlinedUrl, session) : undefined,
             resource: '<div>resource</div>',
             dynamicMarkup: mraidContentJson.dynamicMarkup,
-            additionalTrackingEvents: mraidJson.trackingUrls,
+            trackingUrls: mraidJson.trackingUrls,
             clickAttributionUrl: mraidContentJson.clickAttributionUrl,
             clickAttributionUrlFollowsRedirects: mraidContentJson.clickAttributionUrlFollowsRedirects,
             clickUrl: mraidContentJson.clickUrl ? mraidContentJson.clickAttributionUrl : undefined,
@@ -215,7 +208,9 @@ export class TestFixtures {
             portraitImage: mraidContentJson.endScreenPortrait ? new Image(mraidContentJson.endScreenPortrait, session) : undefined,
             bypassAppSheet: mraidContentJson.bypassAppSheet,
             store: undefined,
-            appStoreId: mraidContentJson.appStoreId
+            appStoreId: mraidContentJson.appStoreId,
+            useWebViewUserAgentForTracking: mraidJson.useWebViewUserAgentForTracking,
+            playableConfiguration: undefined
         };
     }
 
@@ -230,14 +225,8 @@ export class TestFixtures {
             creativeId: 'creativeId',
             seatId: 12345,
             meta: undefined,
-            appCategory: 'appCategory',
-            appSubCategory: 'appSubCategory',
-            advertiserDomain: 'advertiserDomain',
-            advertiserCampaignId: 'advertiserCampaignId',
-            advertiserBundleId: 'advertiserBundleId',
-            useWebViewUserAgentForTracking: false,
-            buyerId: 'buyerId',
-            session: session
+            session: session,
+            mediaId: TestMediaID
         };
     }
 
@@ -263,7 +252,14 @@ export class TestFixtures {
             hasEndscreen: !!vast.getCompanionPortraitUrl() || !!vast.getCompanionLandscapeUrl(),
             portrait: portraitAsset,
             landscape: landscapeAsset,
-            tracking: undefined
+            appCategory: 'appCategory',
+            appSubcategory: 'appSubCategory',
+            advertiserDomain: 'advertiserDomain',
+            advertiserCampaignId: 'advertiserCampaignId',
+            advertiserBundleId: 'advertiserBundleId',
+            useWebViewUserAgentForTracking: false,
+            buyerId: 'buyerId',
+            trackingUrls: {}
         };
     }
 
@@ -280,20 +276,17 @@ export class TestFixtures {
             creativeId: json.creativeId || undefined,
             seatId: json.seatId || undefined,
             meta: json.meta,
-            appCategory: undefined,
-            appSubCategory: undefined,
-            advertiserDomain: undefined,
-            advertiserCampaignId: undefined,
-            advertiserBundleId: undefined,
-            useWebViewUserAgentForTracking: json.useWebViewUserAgentForTracking,
-            buyerId: undefined,
-            session: session
+            session: session,
+            mediaId: TestMediaID
         };
 
         return {
             ... baseCampaignParams,
             dynamicMarkup: json.content,
-            tracking: json.display.tracking || undefined
+            trackingUrls: json.display.tracking || undefined,
+            useWebViewUserAgentForTracking: false,
+            width: json.display.width || undefined,
+            height: json.display.height || undefined
         };
     }
 
@@ -309,14 +302,8 @@ export class TestFixtures {
             creativeId: json.creativeId || undefined,
             seatId: json.seatId || undefined,
             meta: undefined,
-            appCategory: json.appCategory || undefined,
-            appSubCategory: json.appSubCategory || undefined,
-            advertiserDomain: json.advertiserDomain || undefined,
-            advertiserCampaignId: json.advertiserCampaignId || undefined,
-            advertiserBundleId: json.advertiserBundleId || undefined,
-            useWebViewUserAgentForTracking: json.useWebViewUserAgentForTracking,
-            buyerId: json.buyerId || undefined,
-            session: session
+            session: session,
+            mediaId: TestMediaID
         };
     }
 
@@ -324,7 +311,15 @@ export class TestFixtures {
         return {
             ... this.getVPAIDCampaignBaseParams(json),
             vpaid: vpaid,
-            tracking: json.trackingUrls
+            trackingUrls: json.trackingUrls,
+            appCategory: json.appCategory || undefined,
+            appSubcategory: json.appSubCategory || undefined,
+            advertiserDomain: json.advertiserDomain || undefined,
+            advertiserCampaignId: json.advertiserCampaignId || undefined,
+            advertiserBundleId: json.advertiserBundleId || undefined,
+            useWebViewUserAgentForTracking: false,
+            buyerId: json.buyerId || undefined,
+
         };
     }
 
@@ -364,14 +359,12 @@ export class TestFixtures {
 
     public static getPlayableMRAIDCampaignFollowsRedirects(): MRAIDCampaign {
         const json = JSON.parse(OnCometMraidPlcCampaignFollowsRedirects);
-        const playableMraidJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
-        return new MRAIDCampaign(this.getPlayableMRAIDCampaignParams(playableMraidJson, StoreName.GOOGLE));
+        return new MRAIDCampaign(this.getPlayableMRAIDCampaignParams(json, StoreName.GOOGLE));
     }
 
     public static getPlayableMRAIDCampaign(): MRAIDCampaign {
         const json = JSON.parse(OnCometMraidPlcCampaign);
-        const playableMraidJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
-        return new MRAIDCampaign(this.getPlayableMRAIDCampaignParams(playableMraidJson, StoreName.GOOGLE));
+        return new MRAIDCampaign(this.getPlayableMRAIDCampaignParams(json, StoreName.GOOGLE));
     }
 
     public static getProgrammaticMRAIDCampaign(): MRAIDCampaign {
@@ -430,12 +423,12 @@ export class TestFixtures {
         ]);
     }
 
-    public static getDeviceInfo(platform?: Platform): DeviceInfo {
-        if(typeof platform === 'undefined') {
-            platform = Platform.ANDROID;
-        }
+    public static getAndroidDeviceInfo(): AndroidDeviceInfo {
+        return new FakeAndroidDeviceInfo(TestFixtures.getNativeBridge());
+    }
 
-        return new FakeDeviceInfo(TestFixtures.getNativeBridge(), platform);
+    public static getIosDeviceInfo(): IosDeviceInfo {
+        return new FakeIosDeviceInfo(TestFixtures.getNativeBridge());
     }
 
     public static getOkNativeResponse(): INativeResponse {
@@ -502,4 +495,77 @@ export class TestFixtures {
         const json = JSON.parse(DummyDisplayInterstitialCampaign);
         return decodeURIComponent(json.display.markup);
     }
+
+    public static getFakeNativeDeviceInfo(): any {
+        return {
+            getConnectionType: sinon.stub().returns(Promise.resolve('wifi')),
+            getNetworkType: sinon.stub().returns(Promise.resolve(0)),
+            getAdvertisingTrackingId: sinon.stub().returns(Promise.resolve('12345')),
+            getLimitAdTrackingFlag: sinon.stub().returns(Promise.resolve(true)),
+            getOsVersion: sinon.stub().returns(Promise.resolve('testVersion')),
+            getModel: sinon.stub().returns(Promise.resolve('testModel')),
+            getScreenHeight: sinon.stub().returns(Promise.resolve(1200)),
+            getScreenWidth: sinon.stub().returns(Promise.resolve(800)),
+            getSystemLanguage: sinon.stub().returns(Promise.resolve('fi')),
+            isRooted: sinon.stub().returns(Promise.resolve(true)),
+            getTimeZone: sinon.stub().returns(Promise.resolve('+0100')),
+            getTotalMemory: sinon.stub().returns(Promise.resolve(1024)),
+            getHeadset: sinon.stub().returns(Promise.resolve(true)),
+            getScreenBrightness: sinon.stub().returns(Promise.resolve(0.7)),
+            getBatteryLevel: sinon.stub().returns(Promise.resolve(0.3)),
+            getBatteryStatus: sinon.stub().returns(Promise.resolve(1)),
+            getFreeMemory: sinon.stub().returns(Promise.resolve(1024)),
+            getNetworkOperatorName: sinon.stub().returns(Promise.resolve('operatorName')),
+            getNetworkOperator: sinon.stub().returns(Promise.resolve('operator')),
+            getCPUCount: sinon.stub().returns(Promise.resolve(1)),
+            getGLVersion: sinon.stub().returns(Promise.resolve('2.0'))
+        };
+    }
+
+    public static getFakeNativeAndroidDeviceInfo(): any {
+        return {
+            getAndroidId: sinon.stub().returns(Promise.resolve('17')),
+            getApiLevel: sinon.stub().returns(Promise.resolve(16)),
+            getManufacturer: sinon.stub().returns(Promise.resolve('N')),
+            getScreenDensity: sinon.stub().returns(Promise.resolve(2)),
+            getScreenLayout: sinon.stub().returns(Promise.resolve(1)),
+            getTotalSpace: sinon.stub().returns(Promise.resolve(2048)),
+            getRingerMode: sinon.stub().returns(Promise.resolve(RingerMode.RINGER_MODE_NORMAL)),
+            getDeviceVolume: sinon.stub().returns(Promise.resolve(0.5)),
+            getFreeSpace: sinon.stub().returns(Promise.resolve(16)),
+            isAppInstalled: sinon.stub().returns(Promise.resolve(true)),
+            getDeviceMaxVolume: sinon.stub().returns(Promise.resolve(1)),
+            getApkDigest: sinon.stub().returns(Promise.resolve('apkDigest')),
+            getCertificateFingerprint: sinon.stub().returns(Promise.resolve('certificateFingerPrint')),
+            getBoard: sinon.stub().returns(Promise.resolve('board')),
+            getBootloader: sinon.stub().returns(Promise.resolve('bootLoader')),
+            getBrand: sinon.stub().returns(Promise.resolve('brand')),
+            getDevice: sinon.stub().returns(Promise.resolve('device')),
+            getHardware: sinon.stub().returns(Promise.resolve('hardware')),
+            getHost: sinon.stub().returns(Promise.resolve('host')),
+            getProduct: sinon.stub().returns(Promise.resolve('product')),
+            getFingerprint: sinon.stub().returns(Promise.resolve('fingerPrint')),
+            getSupportedAbis: sinon.stub().returns(Promise.resolve( ['supported_abi_1', 'supported_abi_2'])),
+            getSensorList: sinon.stub().returns(Promise.resolve([])),
+            isUSBConnected: sinon.stub().returns(Promise.resolve(false)),
+            getUptime: sinon.stub().returns(Promise.resolve(10000)),
+            getElapsedRealtime: sinon.stub().returns(Promise.resolve(10000))
+        };
+    }
+
+    public static getFakeNativeIosDeviceInfo(): any {
+        return {
+            getUserInterfaceIdiom: sinon.stub().returns(Promise.resolve(UIUserInterfaceIdiom.UIUserInterfaceIdiomPad)),
+            getScreenScale: sinon.stub().returns(Promise.resolve(2)),
+            isSimulator: sinon.stub().returns(Promise.resolve(true)),
+            getTotalSpace: sinon.stub().returns(Promise.resolve(1024)),
+            getDeviceVolume: sinon.stub().returns(Promise.resolve(0.5)),
+            getFreeSpace: sinon.stub().returns(Promise.resolve(16)),
+            getStatusBarHeight: sinon.stub().returns(Promise.resolve(40)),
+            getStatusBarWidth: sinon.stub().returns(Promise.resolve(768)),
+            getDeviceMaxVolume: sinon.stub().returns(Promise.resolve(1)),
+            getSensorList: sinon.stub().returns(Promise.resolve([])),
+        };
+    }
+
 }

@@ -51,8 +51,8 @@ import { XPromoOverlayEventHandler } from 'EventHandlers/XPromoOverlayEventHandl
 import { XPromoEndScreenEventHandler } from 'EventHandlers/XPromoEndScreenEventHandler';
 import { XPromoVideoEventHandlers } from 'EventHandlers/XPromoVideoEventHandlers';
 import { AdMobEventHandler } from 'EventHandlers/AdmobEventHandler';
-import { InterstitialOverlay } from 'Views/InterstitialOverlay';
-import { AbstractOverlay } from 'Views/AbstractOverlay';
+import { ClosableVideoOverlay } from 'Views/ClosableVideoOverlay';
+import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { Closer } from 'Views/Closer';
 import { Privacy } from 'Views/Privacy';
@@ -64,6 +64,7 @@ import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
 import { PromoEventHandler } from 'EventHandlers/PromoEventHandler';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
+import { CampaignAssetInfo } from 'Utilities/CampaignAssetInfo';
 
 export class AdUnitFactory {
 
@@ -97,7 +98,7 @@ export class AdUnitFactory {
         const overlay = this.createOverlay(nativeBridge, parameters);
         const adUnitStyle = CustomFeatures.getAdUnitStyle(parameters.campaign.getAbGroup());
         const endScreen = new PerformanceEndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), adUnitStyle);
-        const video = this.getOrientedVideo(<PerformanceCampaign>parameters.campaign, parameters.forceOrientation);
+        const video = this.getVideo(parameters.campaign, parameters.forceOrientation);
 
         const performanceAdUnitParameters: IPerformanceAdUnitParameters = {
             ... parameters,
@@ -137,7 +138,7 @@ export class AdUnitFactory {
     private static createXPromoAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<XPromoCampaign>): XPromoAdUnit {
         const overlay = this.createOverlay(nativeBridge, parameters);
         const endScreen = new XPromoEndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
-        const video = this.getOrientedVideo(<XPromoCampaign>parameters.campaign, parameters.forceOrientation);
+        const video = this.getVideo(parameters.campaign, parameters.forceOrientation);
 
         const xPromoAdUnitParameters: IXPromoAdUnitParameters = {
             ... parameters,
@@ -400,58 +401,6 @@ export class AdUnitFactory {
         });
     }
 
-    private static getOrientedVideo(campaign: PerformanceCampaign | XPromoCampaign, forceOrientation: ForceOrientation): Video {
-        const landscapeVideo = AdUnitFactory.getLandscapeVideo(campaign);
-        const portraitVideo = AdUnitFactory.getPortraitVideo(campaign);
-
-        if(forceOrientation === ForceOrientation.LANDSCAPE) {
-            if(landscapeVideo) {
-                return landscapeVideo;
-            }
-            if(portraitVideo) {
-                return portraitVideo;
-            }
-        }
-
-        if(forceOrientation === ForceOrientation.PORTRAIT) {
-            if(portraitVideo) {
-                return portraitVideo;
-            }
-            if(landscapeVideo) {
-                return landscapeVideo;
-            }
-        }
-
-        throw new WebViewError('Unable to select an oriented video');
-    }
-
-    private static getLandscapeVideo(campaign: PerformanceCampaign | XPromoCampaign): Video | undefined {
-        const video = campaign.getVideo();
-        const streaming = campaign.getStreamingVideo();
-        if(video) {
-            if(video.isCached()) {
-                return video;
-            }
-            if(streaming) {
-                return streaming;
-            }
-        }
-        return undefined;
-    }
-
-    private static getPortraitVideo(campaign: PerformanceCampaign | XPromoCampaign): Video | undefined {
-        const video = campaign.getPortraitVideo();
-        const streaming = campaign.getStreamingPortraitVideo();
-        if(video) {
-            if(video.isCached()) {
-                return video;
-            }
-            if(streaming) {
-                return streaming;
-            }
-        }
-        return undefined;
-    }
     private static createAdMobAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<AdMobCampaign>): AdMobAdUnit {
         // AdMobSignalFactory will always be defined, checking and throwing just to remove the undefined type.
         if (!parameters.adMobSignalFactory) {
@@ -481,45 +430,35 @@ export class AdUnitFactory {
         return adUnit;
     }
 
-    private static createOverlay(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractOverlay {
-        if(!parameters.placement.allowSkip()) {
+    private static createOverlay(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractVideoOverlay {
+        if (!parameters.placement.allowSkip()) {
             const overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup());
-            if(parameters.placement.disableVideoControlsFade()) {
+            if (parameters.placement.disableVideoControlsFade()) {
                 overlay.setFadeEnabled(false);
             }
             return overlay;
         } else {
-            let overlay: AbstractOverlay;
+            let overlay: AbstractVideoOverlay;
 
-            // Scopely's game IDs
-            const enabledGameIds = ['15334',
-                '15333',
-                '24447',
-                '11595',
-                '11591',
-                '1178487',
-                '50650',
-                '130204',
-                '1413314',
-                '1307778',
-                '1413315',
-                '130205',
-                '24446',
-                '17671',
-                '130854',
-                '1307777',
-                '1495013'];
-
-            if(parameters.placement.skipEndCardOnClose() || enabledGameIds.indexOf(parameters.clientInfo.getGameId()) !== -1) {
-                overlay = new InterstitialOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+            if (parameters.placement.skipEndCardOnClose()) {
+                overlay = new ClosableVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
             } else {
                 overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup());
             }
 
-            if(parameters.placement.disableVideoControlsFade() || CustomFeatures.isFadeDisabled(parameters.clientInfo.getGameId())) {
+            if (parameters.placement.disableVideoControlsFade()) {
                 overlay.setFadeEnabled(false);
             }
             return overlay;
         }
+    }
+
+    private static getVideo(campaign: Campaign, forceOrientation: ForceOrientation): Video {
+        const video = CampaignAssetInfo.getOrientedVideo(campaign, forceOrientation);
+        if(!video) {
+            throw new WebViewError('Unable to select an oriented video');
+        }
+
+        return video;
     }
 }

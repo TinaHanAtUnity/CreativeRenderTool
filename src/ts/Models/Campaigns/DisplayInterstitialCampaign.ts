@@ -1,37 +1,26 @@
 import { Campaign, ICampaign } from 'Models/Campaign';
 import { Asset } from 'Models/Assets/Asset';
 import { ISchema } from 'Models/Model';
+import { IProgrammaticCampaign, ProgrammaticCampaign } from 'Models/Campaigns/ProgrammaticCampaign';
 
-export interface IDisplayInterstitialCampaign extends ICampaign {
+export interface IDisplayInterstitialCampaign extends IProgrammaticCampaign {
     dynamicMarkup: string;
-    tracking: object | undefined;
+    width: number | undefined;
+    height: number | undefined;
 }
 
-export class DisplayInterstitialCampaign extends Campaign<IDisplayInterstitialCampaign> {
-    public static Schema: ISchema<IDisplayInterstitialCampaign> = {
-        ... Campaign.Schema,
-        dynamicMarkup: ['string'],
-        tracking: ['object', 'undefined']
-    };
-
+export class DisplayInterstitialCampaign extends ProgrammaticCampaign<IDisplayInterstitialCampaign> {
     constructor(campaign: IDisplayInterstitialCampaign) {
         super('DisplayInterstitialCampaign', {
-            ... Campaign.Schema,
+            ... ProgrammaticCampaign.Schema,
             dynamicMarkup: ['string', 'undefined'],
-            tracking: ['object', 'undefined']
+            width: ['number', 'undefined'],
+            height: ['number', 'undefined']
         }, campaign);
     }
 
     public getDynamicMarkup(): string {
         return this.get('dynamicMarkup');
-    }
-
-    public getTrackingUrlsForEvent(eventName: string): string[] {
-        const tracking = this.get('tracking');
-        if (tracking) {
-            return (<any>tracking)[eventName] || [];
-        }
-        return [];
     }
 
     public getRequiredAssets(): Asset[] {
@@ -44,5 +33,13 @@ export class DisplayInterstitialCampaign extends Campaign<IDisplayInterstitialCa
 
     public isConnectionNeeded(): boolean {
         return false;
+    }
+
+    public getWidth(): number | undefined {
+        return this.get('width');
+    }
+
+    public getHeight(): number | undefined {
+        return this.get('height');
     }
 }

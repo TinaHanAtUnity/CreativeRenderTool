@@ -13,6 +13,7 @@ import { RequestError } from 'Errors/RequestError';
 import { StorageType } from 'Native/Api/Storage';
 import { Platform } from 'Constants/Platform';
 import { Diagnostics } from 'Utilities/Diagnostics';
+import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 
 export class ConfigManager {
 
@@ -57,6 +58,12 @@ export class ConfigManager {
                         });
 
                         throw new Error('gamerId missing in PLC config');
+                    }
+                    if(!config.getDefaultPlacement()) {
+                        Diagnostics.trigger('missing_default_placement', {
+                            configUrl: url,
+                            configResponse: response.response
+                        });
                     }
                     return config;
                 } catch(error) {
@@ -112,7 +119,7 @@ export class ConfigManager {
             forceAbGroup: ConfigManager.AbGroup
         });
 
-        if(clientInfo.getPlatform() === Platform.ANDROID) {
+        if(clientInfo.getPlatform() === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
             url = Url.addParameters(url, {
                 deviceMake: deviceInfo.getManufacturer()
             });
@@ -123,7 +130,7 @@ export class ConfigManager {
                 advertisingTrackingId: deviceInfo.getAdvertisingIdentifier(),
                 limitAdTracking: deviceInfo.getLimitAdTracking()
             });
-        } else if(clientInfo.getPlatform() === Platform.ANDROID) {
+        } else if(clientInfo.getPlatform() === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
             url = Url.addParameters(url, {
                 androidId: deviceInfo.getAndroidId()
             });

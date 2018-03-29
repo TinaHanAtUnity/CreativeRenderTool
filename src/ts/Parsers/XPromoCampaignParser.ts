@@ -10,6 +10,7 @@ import { Video } from 'Models/Assets/Video';
 import { Image } from 'Models/Assets/Image';
 
 export class XPromoCampaignParser extends CampaignParser {
+    public static ContentType = 'xpromo/video';
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
         const json = response.getJsonContent();
 
@@ -39,14 +40,8 @@ export class XPromoCampaignParser extends CampaignParser {
             creativeId: undefined,
             seatId: undefined,
             meta: json.meta,
-            appCategory: undefined,
-            appSubCategory: undefined,
-            advertiserDomain: undefined,
-            advertiserCampaignId: undefined,
-            advertiserBundleId: undefined,
-            useWebViewUserAgentForTracking: undefined,
-            buyerId: undefined,
-            session: session
+            session: session,
+            mediaId: response.getMediaId()
         };
 
         const parameters: IXPromoCampaign = {
@@ -55,26 +50,26 @@ export class XPromoCampaignParser extends CampaignParser {
             appStoreId: json.appStoreId,
             gameId: json.gameId,
             gameName: json.gameName,
-            gameIcon: new Image(json.gameIcon, session),
+            gameIcon: new Image(this.validateAndEncodeUrl(json.gameIcon, session), session),
             rating: json.rating,
             ratingCount: json.ratingCount,
-            landscapeImage: new Image(json.endScreenLandscape, session),
-            portraitImage: new Image(json.endScreenPortrait, session),
-            clickAttributionUrl: json.clickAttributionUrl,
+            landscapeImage: new Image(this.validateAndEncodeUrl(json.endScreenLandscape, session), session),
+            portraitImage: new Image(this.validateAndEncodeUrl(json.endScreenPortrait, session), session),
+            clickAttributionUrl: json.clickAttributionUrl ? this.validateAndEncodeUrl(json.clickAttributionUrl, session) : undefined,
             clickAttributionUrlFollowsRedirects: json.clickAttributionUrlFollowsRedirects,
             bypassAppSheet: json.bypassAppSheet,
-            trackingUrls: response.getTrackingUrls(),
+            trackingUrls: response.getTrackingUrls() ? this.validateAndEncodeTrackingUrls(response.getTrackingUrls(), session) : undefined,
             store: storeName
         };
 
         if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
-            parameters.video = new Video(json.trailerDownloadable, session, json.trailerDownloadableSize);
-            parameters.streamingVideo = new Video(json.trailerStreaming, session);
+            parameters.video = new Video(this.validateAndEncodeUrl(json.trailerDownloadable, session), session, json.trailerDownloadableSize);
+            parameters.streamingVideo = new Video(this.validateAndEncodeUrl(json.trailerStreaming, session), session);
         }
 
         if(json.trailerPortraitDownloadable && json.trailerPortraitDownloadableSize && json.trailerPortraitStreaming) {
-            parameters.videoPortrait = new Video(json.trailerPortraitDownloadable, session, json.trailerPortraitDownloadableSize);
-            parameters.streamingPortraitVideo = new Video(json.trailerPortraitStreaming, session);
+            parameters.videoPortrait = new Video(this.validateAndEncodeUrl(json.trailerPortraitDownloadable, session), session, json.trailerPortraitDownloadableSize);
+            parameters.streamingPortraitVideo = new Video(this.validateAndEncodeUrl(json.trailerPortraitStreaming, session), session);
         }
 
         return Promise.resolve(new XPromoCampaign(parameters));

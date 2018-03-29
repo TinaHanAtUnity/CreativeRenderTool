@@ -4,7 +4,6 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { VPAID } from 'Views/VPAID';
 import { FinishState } from 'Constants/FinishState';
 import { Platform } from 'Constants/Platform';
-import { Url } from 'Utilities/Url';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { Timer } from 'Utilities/Timer';
@@ -83,10 +82,6 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         return 'vpaid';
     }
 
-    public isCached(): boolean {
-        return false;
-    }
-
     public openUrl(url: string | null) {
         if (url) {
             if (this._nativeBridge.getPlatform() === Platform.IOS) {
@@ -101,7 +96,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     }
 
     public sendTrackingEvent(eventType: string) {
-        const urls = this._vpaidCampaign.getTrackingEventUrls(eventType);
+        const urls = this._vpaidCampaign.getTrackingUrlsForEvent(eventType);
 
         for (const url of urls) {
             this.sendThirdPartyEvent(`vpaid ${eventType}`, url);
@@ -262,6 +257,8 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     }
 
     private onUrlLoad(url: string) {
-        this.openUrl(url);
+        if (url.indexOf('file://') !== 0 && url.indexOf('about:blank') !== 0) {
+            this.openUrl(url);
+        }
     }
 }

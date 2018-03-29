@@ -59,7 +59,7 @@ describe('MRAIDEventHandlersTest', () => {
             sinon.spy(nativeBridge.Listener, 'sendClickEvent');
 
             focusManager = new FocusManager(nativeBridge);
-            container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+            container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
             request = sinon.createStubInstance(Request);
             metaDataManager = new MetaDataManager(nativeBridge);
             placement = TestFixtures.getPlacement();
@@ -68,7 +68,7 @@ describe('MRAIDEventHandlersTest', () => {
 
             request = new Request(nativeBridge, wakeUpManager);
             clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-            deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
+            deviceInfo = TestFixtures.getAndroidDeviceInfo();
 
             thirdPartyEventManager = sinon.createStubInstance(ThirdPartyEventManager);
             sessionManager = sinon.createStubInstance(SessionManager);
@@ -107,17 +107,17 @@ describe('MRAIDEventHandlersTest', () => {
 
         it('should send a click with session manager', () => {
             mraidEventHandler.onMraidClick('http://example.net');
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, mraidCampaign.getSession(), placement, mraidCampaign);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, placement);
         });
 
         it('should send a view with session manager', () => {
             mraidEventHandler.onMraidClick('http://example.net');
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendView, mraidCampaign.getSession(), placement, mraidCampaign);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendView, placement);
         });
 
         it('should send a third quartile event with session manager', () => {
             mraidEventHandler.onMraidClick('http://example.net');
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile, mraidCampaign.getSession(), placement, mraidCampaign);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile, placement);
         });
 
         it('should send a native click event', () => {
@@ -207,7 +207,7 @@ describe('MRAIDEventHandlersTest', () => {
                 sinon.stub(mraidAdUnit, 'sendClick');
                 mraidEventHandler = new MRAIDEventHandler(nativeBridge, mraidAdUnit, mraidAdUnitParameters);
 
-                mraidEventHandler.onMraidAnalyticsEvent(15, 12, 0,'win_screen', {'level': 2});
+                mraidEventHandler.onMraidAnalyticsEvent(15, 12, 0, 'win_screen', {'level': 2});
 
                 const kafkaObject: any = {};
                 kafkaObject.type = 'win_screen';

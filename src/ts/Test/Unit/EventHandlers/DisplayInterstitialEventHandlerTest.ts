@@ -30,7 +30,7 @@ describe('DisplayInterstitialEventHandler', () => {
     let operativeEventManager: OperativeEventManager;
     let comScoreService: ComScoreTrackingService;
 
-    describe('on Display Interstitial Markup Campaign',() => {
+    describe('on Display Interstitial Markup Campaign', () => {
         eventHandlerTests();
     });
 
@@ -55,11 +55,11 @@ describe('DisplayInterstitialEventHandler', () => {
 
             sandbox.stub(nativeBridge, 'getApiLevel').returns(16);
 
-            const container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+            const container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
             const focusManager = sinon.createStubInstance(FocusManager);
             const request = sinon.createStubInstance(Request);
             const clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-            const deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
+            const deviceInfo = TestFixtures.getAndroidDeviceInfo();
             const thirdPartyEventManager = sinon.createStubInstance(ThirdPartyEventManager);
             operativeEventManager = sinon.createStubInstance(OperativeEventManager);
             comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
@@ -114,14 +114,6 @@ describe('DisplayInterstitialEventHandler', () => {
             });
         });
         */
-
-        describe('on skip', () => {
-            it('should hide the adUnit', () => {
-                sandbox.stub(displayInterstitialAdUnit, 'hide');
-                displayInterstitialEventHandler.onDisplayInterstitialSkip();
-                sinon.assert.called(<sinon.SinonSpy>displayInterstitialAdUnit.hide);
-            });
-        });
 
         describe('on close', () => {
             it('should hide the adUnit', () => {

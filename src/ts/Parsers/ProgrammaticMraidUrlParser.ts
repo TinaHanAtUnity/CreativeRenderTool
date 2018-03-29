@@ -10,6 +10,7 @@ import { Image } from 'Models/Assets/Image';
 import { HTML } from 'Models/Assets/HTML';
 
 export class ProgrammaticMraidUrlParser extends CampaignParser {
+    public static ContentType = 'programmatic/mraid-url';
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
         const jsonMraidUrl = response.getJsonContent();
 
@@ -36,26 +37,21 @@ export class ProgrammaticMraidUrlParser extends CampaignParser {
             creativeId: response.getCreativeId() || undefined,
             seatId: response.getSeatId() || undefined,
             meta: jsonMraidUrl.meta,
-            appCategory: undefined,
-            appSubCategory: undefined,
-            advertiserDomain: undefined,
-            advertiserCampaignId: undefined,
-            advertiserBundleId: undefined,
-            useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking(),
-            buyerId: undefined,
-            session: session
+            session: session,
+            mediaId: response.getMediaId()
         };
 
         const parameters: IMRAIDCampaign = {
             ... baseCampaignParams,
-            resourceAsset: jsonMraidUrl.inlinedUrl ? new HTML(jsonMraidUrl.inlinedUrl, session) : undefined,
+            resourceAsset: jsonMraidUrl.inlinedUrl ? new HTML(this.validateAndEncodeUrl(jsonMraidUrl.inlinedUrl, session), session) : undefined,
             resource: undefined,
             dynamicMarkup: jsonMraidUrl.dynamicMarkup,
-            additionalTrackingEvents: response.getTrackingUrls(),
-            clickAttributionUrl: jsonMraidUrl.clickAttributionUrl,
+            trackingUrls: response.getTrackingUrls(),
+            clickAttributionUrl: jsonMraidUrl.clickAttributionUrl ? this.validateAndEncodeUrl(jsonMraidUrl.clickAttributionUrl, session) : undefined,
             clickAttributionUrlFollowsRedirects: jsonMraidUrl.clickAttributionUrlFollowsRedirects,
-            clickUrl: jsonMraidUrl.clickUrl ? jsonMraidUrl.clickUrl : undefined,
-            videoEventUrls: undefined,
+            clickUrl: jsonMraidUrl.clickUrl ? this.validateAndEncodeUrl(jsonMraidUrl.clickUrl, session) : undefined,
+            videoEventUrls: {},
+            useWebViewUserAgentForTracking: false,
             gameName: undefined,
             gameIcon: undefined,
             rating: undefined,
@@ -64,7 +60,8 @@ export class ProgrammaticMraidUrlParser extends CampaignParser {
             portraitImage: undefined,
             bypassAppSheet: undefined,
             store: undefined,
-            appStoreId: undefined
+            appStoreId: undefined,
+            playableConfiguration: undefined
         };
 
         return Promise.resolve(new MRAIDCampaign(parameters));

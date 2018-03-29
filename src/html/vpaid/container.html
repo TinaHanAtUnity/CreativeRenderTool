@@ -5,14 +5,14 @@
     </style>
 </head>
 <body>
-    <video
-        playsinline="true"
-        webkit-playsinline="true"
-        poster="data:image/svg+xml;base64,">
-    </video>
-    <div class="video-player-slot"></div>
-
+    <div class="ad-container">
+        <video
+            playsinline="true"
+            webkit-playsinline="true"
+            poster="data:image/svg+xml;base64,"></video>
+        <div class="video-player-slot"></div>
     </div>
+
     <script src="<%= data.vpaidSrcUrl %>"></script>
     <script>
         (function(global) {
@@ -218,7 +218,7 @@
                 this._subscribeToEvent = function(eventName) {
                     _this._creative.subscribe(function() {
                         var args = [eventName].concat(Array.prototype.slice.call(arguments));
-                        _this._handleEvent.apply(_this, args);
+                        _this._handleEvent(args);
                     }, eventName, _this);
                 }
 
@@ -226,14 +226,9 @@
                     return window.getVPAIDAd;
                 };
 
-                this._handleEvent = function() {
-                    var args = Array.prototype.slice.call(arguments);
-                    var eventType = args.shift();
-                    var eventData = [eventType];
-                    eventData.push(args);
-
-                    window.nativebridge.sendEvent('VPAID', eventData);
-                    console.log('unity', 'Got VPAID event', eventType);
+                this._handleEvent = function(args) {
+                    window.nativebridge.sendEvent('VPAID', args);
+                    console.log('unity', 'Got VPAID event', args[0]);
                 };
 
                 this._initAd = function(initOpts) {

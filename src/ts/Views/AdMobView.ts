@@ -8,7 +8,7 @@ import { Placement } from 'Models/Placement';
 import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
 import { Template } from 'Utilities/Template';
 import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
-import { AFMABridge, ITouchInfo, IClickSignalResponse } from 'Views/AFMABridge';
+import { AFMABridge, IOpenableIntentsResponse, IOpenableIntentsRequest, ITouchInfo, IClickSignalResponse } from 'Views/AFMABridge';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
@@ -23,6 +23,7 @@ export interface IAdMobEventHandler {
     onShow(): void;
     onVideoStart(): void;
     onSetOrientationProperties(allowOrientation: boolean, forceOrientation: ForceOrientation): void;
+    onOpenableIntentsRequest(request: IOpenableIntentsRequest): void;
     onTrackingEvent(event: string, data?: any): void;
     onClickSignalRequest(touchInfo: ITouchInfo): void;
 }
@@ -58,6 +59,7 @@ export class AdMobView extends View<IAdMobEventHandler> {
             onAFMAOpenInAppStore: () => { /**/ },
             onAFMAOpenStoreOverlay: () => { /**/ },
             onAFMARewardedVideoStart: () => this.onVideoStart(),
+            onAFMAResolveOpenableIntents: (request) => this.onResolveOpenableIntents(request),
             onAFMATrackingEvent: (event, data?) => this.onTrackingEvent(event, data),
             onAFMAClickSignalRequest: (touchInfo) => this.onClickSignalRequest(touchInfo)
         });
@@ -90,6 +92,10 @@ export class AdMobView extends View<IAdMobEventHandler> {
         this._afmaBridge.onBackPressed();
     }
 
+    public sendOpenableIntentsResponse(response: IOpenableIntentsResponse) {
+        this._afmaBridge.sendOpenableIntentsResult(response);
+    }
+
     public sendClickSignalResponse(response: IClickSignalResponse) {
         this._afmaBridge.sendClickSignalResponse(response);
     }
@@ -104,14 +110,35 @@ export class AdMobView extends View<IAdMobEventHandler> {
 
     private getIFrameSrcDoc(): Promise<string> {
         const markup = this._campaign.getDynamicMarkup();
-        const dom = new DOMParser().parseFromString(markup, "text/html");
+        const dom = new DOMParser().parseFromString(markup, 'text/html');
         if (!dom) {
             return Promise.reject(new Error('Not a valid HTML document => ' + markup));
         }
         this.removeScriptTags(dom);
+        this.injectVideoURL(dom);
         return this.injectScripts(dom).then(() => {
             return dom.documentElement.outerHTML;
         });
+    }
+
+    private injectVideoURL(dom: Document) {
+        const video = this._campaign.getVideo();
+        if (video) {
+            const scriptEl = dom.querySelector('body script');
+            const mediaFileURL = this.encodeURLForHTML(video.getMediaFileURL());
+            let cachedFileURL = video.getVideo().getCachedUrl();
+            if (cachedFileURL) {
+                cachedFileURL = this.encodeURLForHTML(cachedFileURL);
+                if (scriptEl && scriptEl.textContent) {
+                    const replacedSrc = scriptEl.textContent.replace(mediaFileURL, cachedFileURL);
+                    scriptEl.textContent = replacedSrc;
+                }
+            }
+        }
+    }
+
+    private encodeURLForHTML(str: string): string {
+        return str.replace(/[&=]/g, (c) => '\\x' + c.charCodeAt(0).toString(16));
     }
 
     private removeScriptTags(dom: Document) {
@@ -161,10 +188,16 @@ export class AdMobView extends View<IAdMobEventHandler> {
     private onSetOrientationProperties(allowOrientation: boolean, forceOrientation: ForceOrientation) {
         this._handlers.forEach((h) => h.onSetOrientationProperties(allowOrientation, forceOrientation));
     }
-    private onTrackingEvent(event: string, data?: any) {
-        this._handlers.forEach((h) => h.onTrackingEvent(event, data));
+
+    private onResolveOpenableIntents(request: IOpenableIntentsRequest) {
+        this._handlers.forEach((h) => h.onOpenableIntentsRequest(request));
     }
+
     private onClickSignalRequest(touchInfo: ITouchInfo) {
         this._handlers.forEach((h) => h.onClickSignalRequest(touchInfo));
+    }
+
+    private onTrackingEvent(event: string, data?: any) {
+        this._handlers.forEach((h) => h.onTrackingEvent(event, data));
     }
 }

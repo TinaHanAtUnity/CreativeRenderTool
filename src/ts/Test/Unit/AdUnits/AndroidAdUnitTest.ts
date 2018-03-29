@@ -22,6 +22,7 @@ import { SessionManager } from 'Managers/SessionManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { Request } from 'Utilities/Request';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
+import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 
 describe('AndroidAdUnitTest', () => {
     let nativeBridge: NativeBridge;
@@ -42,10 +43,20 @@ describe('AndroidAdUnitTest', () => {
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         const request = new Request(nativeBridge, wakeUpManager);
         const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        const sessionManager = new SessionManager(nativeBridge);
-        const deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
-        container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
-        const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+        const sessionManager = new SessionManager(nativeBridge, request);
+        const deviceInfo = TestFixtures.getAndroidDeviceInfo();
+        const configuration = TestFixtures.getConfiguration();
+        container = new Activity(nativeBridge, deviceInfo);
+        const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
+            nativeBridge: nativeBridge,
+            request: request,
+            metaDataManager: metaDataManager,
+            sessionManager: sessionManager,
+            clientInfo: clientInfo,
+            deviceInfo: deviceInfo,
+            configuration: configuration,
+            campaign: TestFixtures.getCampaign()
+        });
         const comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         adUnitParams = {
@@ -59,7 +70,7 @@ describe('AndroidAdUnitTest', () => {
             comScoreTrackingService: comScoreService,
             placement: TestFixtures.getPlacement(),
             campaign: TestFixtures.getCampaign(),
-            configuration: TestFixtures.getConfiguration(),
+            configuration: configuration,
             request: request,
             options: {}
         };
@@ -92,7 +103,7 @@ describe('AndroidAdUnitTest', () => {
 
     it('should close ad unit', () => {
         nativeBridge = TestFixtures.getNativeBridge(Platform.ANDROID);
-        container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
         const stub = sinon.stub(nativeBridge.AndroidAdUnit, 'close').returns(Promise.resolve());
 
         return container.close().then(() => {
@@ -104,7 +115,7 @@ describe('AndroidAdUnitTest', () => {
     // note: when reconfigure method is enhanced with some actual parameters, this test needs to be refactored
     it('should reconfigure ad unit', () => {
         nativeBridge = TestFixtures.getNativeBridge(Platform.ANDROID);
-        container = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
 
         const stubViews = sinon.stub(nativeBridge.AndroidAdUnit, 'setViews').returns(Promise.resolve());
         const stubOrientation = sinon.stub(nativeBridge.AndroidAdUnit, 'setOrientation').returns(Promise.resolve());

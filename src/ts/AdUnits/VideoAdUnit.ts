@@ -3,7 +3,7 @@ import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { FinishState } from 'Constants/FinishState';
 import { Double } from 'Utilities/Double';
 import { Video } from 'Models/Assets/Video';
-import { AbstractOverlay } from 'Views/AbstractOverlay';
+import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
 import { IosUtils } from 'Utilities/IosUtils';
 import { Platform } from 'Constants/Platform';
 import { DeviceInfo } from 'Models/DeviceInfo';
@@ -14,10 +14,12 @@ import { WebViewError } from 'Errors/WebViewError';
 import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Campaign } from 'Models/Campaign';
 import { Placement } from 'Models/Placement';
+import { CampaignAssetInfo, VideoType } from 'Utilities/CampaignAssetInfo';
+import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 
 export interface IVideoAdUnitParameters<T extends Campaign> extends IAdUnitParameters<T> {
     video: Video;
-    overlay: AbstractOverlay;
+    overlay: AbstractVideoOverlay;
 }
 
 export abstract class VideoAdUnit<T extends Campaign = Campaign> extends AbstractAdUnit {
@@ -32,14 +34,14 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     protected _options: any;
     private _video: Video;
     private _active: boolean;
-    private _overlay: AbstractOverlay | undefined;
+    private _overlay: AbstractVideoOverlay | undefined;
     private _deviceInfo: DeviceInfo;
-    private _videoOrientation: 'landscape' | 'portrait' | undefined;
     private _lowMemory: boolean;
     private _prepareCalled: boolean;
     private _videoReady: boolean;
     private _placement: Placement;
     private _campaign: T;
+    private _finalVideoUrl: string;
 
     constructor(nativeBridge: NativeBridge, parameters: IVideoAdUnitParameters<T>) {
         super(nativeBridge, parameters);
@@ -103,11 +105,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         this._prepareCalled = prepareCalled;
     }
 
-    public isCached(): boolean {
-        return this._video.isCached();
-    }
-
-    public getOverlay(): AbstractOverlay | undefined {
+    public getOverlay(): AbstractVideoOverlay | undefined {
         return this._overlay;
     }
 
@@ -128,7 +126,15 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     }
 
     public getVideoOrientation(): 'landscape' | 'portrait' | undefined {
-        return this._videoOrientation;
+        let videoOrientation: 'landscape' | 'portrait' | undefined = 'landscape';
+        const portraitVideo = CampaignAssetInfo.getPortraitVideo(this._campaign);
+        if(portraitVideo && this._finalVideoUrl === portraitVideo.getUrl()) {
+            videoOrientation = 'portrait';
+        }
+
+        this._nativeBridge.Sdk.logDebug('Returning ' + videoOrientation + ' as video orientation for locked orientation ' + ForceOrientation[this._container.getLockedOrientation()]);
+
+        return videoOrientation;
     }
 
     public isLowMemory(): boolean {
@@ -166,6 +172,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
             }
 
             this.getValidVideoUrl().then(url => {
+                this._finalVideoUrl = url;
                 this.setPrepareCalled(true);
                 this._nativeBridge.VideoPlayer.prepare(url, new Double(this._placement.muteVideo() ? 0.0 : 1.0), 10000);
             });
@@ -182,10 +189,10 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     protected onSystemInterrupt(interruptStarted: boolean): void {
         if(this.isShowing() && this.isActive()) {
             if(interruptStarted) {
-                this._nativeBridge.Sdk.logInfo('Pausing Unity Ads video playback due to interrupt');
+                this._nativeBridge.Sdk.logDebug('Pausing Unity Ads video playback due to interrupt');
                 this._nativeBridge.VideoPlayer.pause();
             } else if (!interruptStarted && this.isVideoReady() && !this.getContainer().isPaused()) {
-                this._nativeBridge.Sdk.logInfo('Continuing Unity Ads video playback after interrupt');
+                this._nativeBridge.Sdk.logDebug('Continuing Unity Ads video playback after interrupt');
                 this._nativeBridge.VideoPlayer.play();
             }
         }
@@ -211,27 +218,14 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     private getValidVideoUrl(): Promise<string> {
         let streamingUrl: string = this.getVideo().getOriginalUrl();
 
-        if(this._campaign instanceof PerformanceCampaign) {
-            const orientation = this.getForceOrientation();
-
-            const landscapeStreaming = this._campaign.getStreamingVideo();
-            const portraitStreaming = this._campaign.getStreamingPortraitVideo();
-
-            if(orientation === ForceOrientation.LANDSCAPE) {
-                if(landscapeStreaming) {
-                    streamingUrl = landscapeStreaming.getOriginalUrl();
-                } else if(portraitStreaming) {
-                    streamingUrl = portraitStreaming.getOriginalUrl();
-                }
-            } else if(orientation === ForceOrientation.PORTRAIT) {
-                if(portraitStreaming) {
-                    streamingUrl = portraitStreaming.getOriginalUrl();
-                } else if(landscapeStreaming) {
-                    streamingUrl = landscapeStreaming.getOriginalUrl();
-                }
-            } else {
+        if(this._campaign instanceof PerformanceCampaign || this._campaign instanceof XPromoCampaign) {
+            // Should this use this._container.getLockedOrientation() instead?
+            const orientedStreamingVideo = CampaignAssetInfo.getOrientedVideo(this._campaign, this.getForceOrientation(), VideoType.STREAM);
+            if(!orientedStreamingVideo) {
                 throw new WebViewError('Unable to fallback to an oriented streaming video');
             }
+
+            streamingUrl = orientedStreamingVideo.getOriginalUrl();
         }
 
         // check that if we think video has been cached, it is still available on device cache directory
@@ -281,17 +275,6 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
             } else {
                 return this.getVideo().getUrl();
             }
-        }).then(finalVideoUrl => {
-            this._videoOrientation = 'landscape';
-            if(this._campaign instanceof PerformanceCampaign) {
-                const portraitVideo = this._campaign.getPortraitVideo();
-                const portraitStreamingVideo = this._campaign.getStreamingPortraitVideo();
-                if((portraitVideo && finalVideoUrl === portraitVideo.getCachedUrl()) || (portraitStreamingVideo && finalVideoUrl === portraitStreamingVideo.getOriginalUrl())) {
-                    this._videoOrientation = 'portrait';
-                }
-            }
-            this._nativeBridge.Sdk.logDebug('Choosing ' + this._videoOrientation + ' video for locked orientation ' + ForceOrientation[this._container.getLockedOrientation()].toLowerCase());
-            return finalVideoUrl;
         });
     }
 }

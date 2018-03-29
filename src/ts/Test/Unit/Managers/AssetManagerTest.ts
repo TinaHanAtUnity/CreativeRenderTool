@@ -15,7 +15,6 @@ import { Request } from 'Utilities/Request';
 import { HTML } from 'Models/Assets/HTML';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
-import { Platform } from 'Constants/Platform';
 import { FocusManager } from 'Managers/FocusManager';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
 
@@ -193,7 +192,7 @@ describe('AssetManagerTest', () => {
         request = new Request(nativeBridge, wakeUpManager);
         cacheApi = nativeBridge.Cache = new TestCacheApi(nativeBridge);
         storageApi = nativeBridge.Storage = new TestStorageApi(nativeBridge);
-        deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
+        deviceInfo = TestFixtures.getAndroidDeviceInfo();
         cacheBookkeeping = new CacheBookkeeping(nativeBridge);
     });
 
@@ -274,7 +273,7 @@ describe('AssetManagerTest', () => {
         const asset2 = new HTML('https:/www.google.fi/2', TestFixtures.getSession());
         const campaign = new TestCampaign([asset], []);
         const campaign2 = new TestCampaign([asset2], []);
-        return Promise.all([assetManager.setup(campaign),assetManager.setup(campaign2)]).then(() => {
+        return Promise.all([assetManager.setup(campaign), assetManager.setup(campaign2)]).then(() => {
             assert(asset.isCached(), 'First asset was not cached');
             assert(asset2.isCached(), 'Second asset was not cached');
         });

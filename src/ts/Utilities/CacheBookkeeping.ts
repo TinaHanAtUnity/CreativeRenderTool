@@ -66,9 +66,9 @@ export class CacheBookkeeping {
                 }
 
                 if (deleteFiles.length > 0) {
-                    this._nativeBridge.Sdk.logInfo('Unity Ads cache: Deleting ' + deleteFiles.length + ' old files (' + (deleteSize / 1024) + 'kB), keeping ' + keepFiles.length + ' cached files (' + (keepSize / 1024) + 'kB)');
+                    this._nativeBridge.Sdk.logDebug('Unity Ads cache: Deleting ' + deleteFiles.length + ' old files (' + (deleteSize / 1024) + 'kB), keeping ' + keepFiles.length + ' cached files (' + (keepSize / 1024) + 'kB)');
                 } else {
-                    this._nativeBridge.Sdk.logInfo('Unity Ads cache: Keeping ' + keepFiles.length + ' cached files (' + (keepSize / 1024) + 'kB)');
+                    this._nativeBridge.Sdk.logDebug('Unity Ads cache: Keeping ' + keepFiles.length + ' cached files (' + (keepSize / 1024) + 'kB)');
                 }
 
                 let dirty: boolean = false;
@@ -96,7 +96,7 @@ export class CacheBookkeeping {
                         } else {
                             // file not fully downloaded, deleting it
                             return Promise.all([
-                                this._nativeBridge.Sdk.logInfo('Unity ads cache: Deleting partial download ' + file),
+                                this._nativeBridge.Sdk.logDebug('Unity ads cache: Deleting partial download ' + file),
                                 this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.files.' + FileId.getFileIdHash(file)).catch((error) => {
                                     this._nativeBridge.Sdk.logDebug('Error while removing file storage entry for partially downloaded file');
                                 }),
@@ -107,7 +107,7 @@ export class CacheBookkeeping {
                     }).catch(() => {
                         // entry not found in bookkeeping so delete file
                         return Promise.all([
-                            this._nativeBridge.Sdk.logInfo('Unity ads cache: Deleting desynced download ' + file),
+                            this._nativeBridge.Sdk.logDebug('Unity ads cache: Deleting desynced download ' + file),
                             this._nativeBridge.Cache.deleteFile(file)
                         ]);
                     }));
@@ -151,7 +151,7 @@ export class CacheBookkeeping {
     }
 
     public writeFileForCampaign(campaignId: string, fileId: string): Promise<void> {
-        return this._nativeBridge.Storage.set(StorageType.PRIVATE, 'cache.campaigns.' + campaignId + "." + FileId.getFileIdHash(fileId), {extension: FileId.getFileIdExtension(fileId)}).then(() => {
+        return this._nativeBridge.Storage.set(StorageType.PRIVATE, 'cache.campaigns.' + campaignId + '.' + FileId.getFileIdHash(fileId), {extension: FileId.getFileIdExtension(fileId)}).then(() => {
             this._nativeBridge.Storage.write(StorageType.PRIVATE);
         }).catch(() => {
             return Promise.resolve();

@@ -25,6 +25,7 @@ describe('AFMABridge', () => {
             onAFMAOpenInAppStore: sinon.spy(),
             onAFMAOpenStoreOverlay: sinon.spy(),
             onAFMARewardedVideoStart: sinon.spy(),
+            onAFMAResolveOpenableIntents: sinon.spy(),
             onAFMATrackingEvent: sinon.spy(),
             onAFMAClickSignalRequest: sinon.spy()
         };
@@ -53,7 +54,7 @@ describe('AFMABridge', () => {
     };
 
     describe('receiving AFMA events', () => {
-        const tests: [{ event: AFMAEvents, data?: any, verify: any }] = [{
+        const tests = [{
             event: AFMAEvents.OPEN_URL,
             data: {
                 url: 'unityads.unity3d.com'
@@ -61,22 +62,22 @@ describe('AFMABridge', () => {
             verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAOpenURL, data.url)
         }, {
             event: AFMAEvents.CLOSE,
-            verify: () => sinon.assert.called(<sinon.SinonSpy>handler.onAFMAClose)
+            verify: (data?: any) => sinon.assert.called(<sinon.SinonSpy>handler.onAFMAClose)
         }, {
             event: AFMAEvents.FORCE_ORIENTATION,
             data: {
                 orientation: 'portrait'
             },
-            verify: () => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAForceOrientation, ForceOrientation.PORTRAIT)
+            verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAForceOrientation, ForceOrientation.PORTRAIT)
         }, {
             event: AFMAEvents.FORCE_ORIENTATION,
             data: {
                 orientation: 'landscape'
             },
-            verify: () => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAForceOrientation, ForceOrientation.LANDSCAPE)
+            verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAForceOrientation, ForceOrientation.LANDSCAPE)
         }, {
             event: AFMAEvents.REWARDED_VIDEO_START,
-            verify: () => sinon.assert.called(<sinon.SinonSpy>handler.onAFMARewardedVideoStart)
+            verify: (data?: any) => sinon.assert.called(<sinon.SinonSpy>handler.onAFMARewardedVideoStart)
         }, {
             event: AFMAEvents.CLICK,
             data: {
@@ -112,6 +113,16 @@ describe('AFMABridge', () => {
             },
             verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAFetchAppStoreOverlay, data.productId)
         }, {
+            event: AFMAEvents.OPEN_INTENTS_REQUEST,
+            data: {
+                id: 1,
+                intents: [{
+                    id: '1',
+                    packageName: 'com.unity3d.ads.foo'
+                }]
+            },
+            verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAResolveOpenableIntents, data)
+        }, {
             event: AFMAEvents.TRACKING,
             data: {
                 event: 'foo'
@@ -123,7 +134,7 @@ describe('AFMABridge', () => {
                 start: { x: 1, y: 1 },
                 end: { x: 2, y: 2}
             },
-            verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAClickSignalRequest, data.data)
+            verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAClickSignalRequest, data)
         }];
 
         for (const test of tests) {

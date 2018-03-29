@@ -26,6 +26,7 @@ import { SessionManager } from 'Managers/SessionManager';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 
 import EventTestVast from 'xml/EventTestVast.xml';
+import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 
 describe('VastAdUnit', () => {
 
@@ -63,15 +64,16 @@ describe('VastAdUnit', () => {
         });
 
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-        deviceInfo = TestFixtures.getDeviceInfo(Platform.ANDROID);
+        deviceInfo = TestFixtures.getAndroidDeviceInfo();
         const nativeBridge = TestFixtures.getNativeBridge();
         focusManager = new FocusManager(nativeBridge);
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         const request = new Request(nativeBridge, wakeUpManager);
-        const activity = new Activity(nativeBridge, TestFixtures.getDeviceInfo(Platform.ANDROID));
+        const activity = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         vastCampaign = TestFixtures.getEventVastCampaign();
         const video = vastCampaign.getVideo();
+        const configuration = TestFixtures.getConfiguration();
 
         let duration = vastCampaign.getVast().getDuration();
         if(duration) {
@@ -79,9 +81,19 @@ describe('VastAdUnit', () => {
             video.setDuration(duration);
         }
 
-        const sessionManager = new SessionManager(nativeBridge);
+        const sessionManager = new SessionManager(nativeBridge, request);
         const metaDataManager = new MetaDataManager(nativeBridge);
-        const operativeEventManager = new OperativeEventManager(nativeBridge, request, metaDataManager, sessionManager, clientInfo, deviceInfo);
+        const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
+            nativeBridge: nativeBridge,
+            request: request,
+            metaDataManager: metaDataManager,
+            sessionManager: sessionManager,
+            clientInfo: clientInfo,
+            deviceInfo: deviceInfo,
+            configuration: configuration,
+            campaign: vastCampaign
+        });
+
         const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
         comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
@@ -96,7 +108,7 @@ describe('VastAdUnit', () => {
             comScoreTrackingService: comScoreService,
             placement: placement,
             campaign: vastCampaign,
-            configuration: TestFixtures.getConfiguration(),
+            configuration: configuration,
             request: request,
             options: {},
             endScreen: undefined,

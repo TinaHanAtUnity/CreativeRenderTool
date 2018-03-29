@@ -9,8 +9,11 @@ import { Session } from 'Models/Session';
 import { Video } from 'Models/Assets/Video';
 import { Image } from 'Models/Assets/Image';
 import { HTML } from 'Models/Assets/HTML';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class CometCampaignParser extends CampaignParser {
+    public static ContentType = 'comet/campaign';
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
         const json = response.getJsonContent();
 
@@ -40,40 +43,52 @@ export class CometCampaignParser extends CampaignParser {
             creativeId: undefined,
             seatId: undefined,
             meta: json.meta,
-            appCategory: undefined,
-            appSubCategory: undefined,
-            advertiserDomain: undefined,
-            advertiserCampaignId: undefined,
-            advertiserBundleId: undefined,
-            useWebViewUserAgentForTracking: undefined,
-            buyerId: undefined,
-            session: session
+            session: session,
+            mediaId: response.getMediaId()
         };
 
         if(json && json.mraidUrl) {
             const parameters: IMRAIDCampaign = {
                 ... baseCampaignParams,
                 useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking(),
-                resourceAsset: json.mraidUrl ? new HTML(json.mraidUrl, session) : undefined,
+                resourceAsset: json.mraidUrl ? new HTML(this.validateAndEncodeUrl(json.mraidUrl, session), session) : undefined,
                 resource: undefined,
                 dynamicMarkup: json.dynamicMarkup,
-                additionalTrackingEvents: undefined,
-                clickAttributionUrl: json.clickAttributionUrl,
+                clickAttributionUrl: json.clickAttributionUrl ? this.validateAndEncodeUrl(json.clickAttributionUrl, session) : undefined,
                 clickAttributionUrlFollowsRedirects: json.clickAttributionUrlFollowsRedirects,
-                clickUrl: json.clickUrl ? json.clickUrl : undefined,
-                videoEventUrls: json.videoEventUrls ? json.videoEventUrls : undefined,
+                clickUrl: json.clickUrl ? this.validateAndEncodeUrl(json.clickUrl, session) : undefined,
+                videoEventUrls: json.videoEventUrls ? this.validateAndEncodeVideoEventUrls(json.videoEventUrls, session) : undefined,
                 gameName: json.gameName,
-                gameIcon: json.gameIcon ? new Image(json.gameIcon, session) : undefined,
+                gameIcon: json.gameIcon ? new Image(this.validateAndEncodeUrl(json.gameIcon, session), session) : undefined,
                 rating: json.rating,
                 ratingCount: json.ratingCount,
-                landscapeImage: json.endScreenLandscape ? new Image(json.endScreenLandscape, session) : undefined,
-                portraitImage: json.endScreenPortrait ? new Image(json.endScreenPortrait, session) : undefined,
+                landscapeImage: json.endScreenLandscape ? new Image(this.validateAndEncodeUrl(json.endScreenLandscape, session), session) : undefined,
+                portraitImage: json.endScreenPortrait ? new Image(this.validateAndEncodeUrl(json.endScreenPortrait, session), session) : undefined,
                 bypassAppSheet: json.bypassAppSheet,
                 store: storeName,
-                appStoreId: json.appStoreId
+                appStoreId: json.appStoreId,
+                trackingUrls: {},
+                playableConfiguration: undefined
             };
 
-            return Promise.resolve(new MRAIDCampaign(parameters));
+            const mraidCampaign = new MRAIDCampaign(parameters);
+
+            if(CustomFeatures.isPlayableConfigurationEnabled(json.mraidUrl)) {
+                const playableConfigurationUrl = json.mraidUrl.replace(/index\.html/, 'configuration.json');
+                request.get(playableConfigurationUrl).then(configurationResponse => {
+                    try {
+                        const playableConfiguration = JSON.parse(configurationResponse.response);
+                        mraidCampaign.setPlayableConfiguration(playableConfiguration);
+                    } catch (e) {
+                        Diagnostics.trigger('playable_configuration_invalid_json', {
+                            configuration: configurationResponse.response
+                        });
+                    }
+                }).catch(error => {
+                    // ignore failed requests
+                });
+            }
+            return Promise.resolve(mraidCampaign);
         } else {
             const parameters: IPerformanceCampaign = {
                 ... baseCampaignParams,
@@ -81,30 +96,42 @@ export class CometCampaignParser extends CampaignParser {
                 appStoreId: json.appStoreId,
                 gameId: json.gameId,
                 gameName: json.gameName,
-                gameIcon: new Image(json.gameIcon, session),
+                gameIcon: new Image(this.validateAndEncodeUrl(json.gameIcon, session), session),
                 rating: json.rating,
                 ratingCount: json.ratingCount,
-                landscapeImage: new Image(json.endScreenLandscape, session),
-                portraitImage: new Image(json.endScreenPortrait, session),
-                clickAttributionUrl: json.clickAttributionUrl,
+                landscapeImage: new Image(this.validateAndEncodeUrl(json.endScreenLandscape, session), session),
+                portraitImage: new Image(this.validateAndEncodeUrl(json.endScreenPortrait, session), session),
+                clickAttributionUrl: json.clickAttributionUrl ? this.validateAndEncodeUrl(json.clickAttributionUrl, session) : undefined,
                 clickAttributionUrlFollowsRedirects: json.clickAttributionUrlFollowsRedirects,
-                clickUrl: json.clickUrl,
-                videoEventUrls: json.videoEventUrls,
+                clickUrl: this.validateAndEncodeUrl(json.clickUrl, session),
+                videoEventUrls: this.validateAndEncodeVideoEventUrls(json.videoEventUrls, session),
                 bypassAppSheet: json.bypassAppSheet,
                 store: storeName
             };
 
             if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
-                parameters.video = new Video(json.trailerDownloadable, session, json.trailerDownloadableSize);
-                parameters.streamingVideo = new Video(json.trailerStreaming, session);
+                parameters.video = new Video(this.validateAndEncodeUrl(json.trailerDownloadable, session), session, json.trailerDownloadableSize);
+                parameters.streamingVideo = new Video(this.validateAndEncodeUrl(json.trailerStreaming, session), session);
             }
 
             if(json.trailerPortraitDownloadable && json.trailerPortraitDownloadableSize && json.trailerPortraitStreaming) {
-                parameters.videoPortrait = new Video(json.trailerPortraitDownloadable, session, json.trailerPortraitDownloadableSize);
-                parameters.streamingPortraitVideo = new Video(json.trailerPortraitStreaming, session);
+                parameters.videoPortrait = new Video(this.validateAndEncodeUrl(json.trailerPortraitDownloadable, session), session, json.trailerPortraitDownloadableSize);
+                parameters.streamingPortraitVideo = new Video(this.validateAndEncodeUrl(json.trailerPortraitStreaming, session), session);
             }
 
             return Promise.resolve(new PerformanceCampaign(parameters));
         }
+    }
+
+    private validateAndEncodeVideoEventUrls(urls: { [eventType: string]: string }, session: Session): { [eventType: string]: string } {
+        if(urls && urls !== null) {
+            for(const urlKey in urls) {
+                if(urls.hasOwnProperty(urlKey)) {
+                    urls[urlKey] = this.validateAndEncodeUrl(urls[urlKey], session);
+                }
+            }
+        }
+
+        return urls;
     }
 }

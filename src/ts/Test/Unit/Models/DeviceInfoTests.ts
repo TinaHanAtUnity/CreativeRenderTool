@@ -10,10 +10,13 @@ import { UIUserInterfaceIdiom } from 'Constants/iOS/UIUserInterfaceIdiom';
 import { EventCategory } from 'Constants/EventCategory';
 import { DeviceInfoApi, DeviceInfoEvent } from 'Native/Api/DeviceInfo';
 import { StreamType } from 'Constants/Android/StreamType';
+import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
+import { IosDeviceInfo } from 'Models/IosDeviceInfo';
+import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 
 describe('DeviceInfoTest', () => {
 
-    let deviceInfo: DeviceInfo;
+    let deviceInfo: AndroidDeviceInfo;
     let nativeBridge: NativeBridge;
 
     beforeEach(() => {
@@ -22,27 +25,15 @@ describe('DeviceInfoTest', () => {
                 return Platform.TEST;
             },
             DeviceInfo: {
-                getConnectionType: sinon.stub().returns(Promise.resolve('wifi')),
-                getNetworkType: sinon.stub().returns(Promise.resolve(0)),
-                getAdvertisingTrackingId: sinon.stub().returns(Promise.resolve('12345')),
-                getLimitAdTrackingFlag: sinon.stub().returns(Promise.resolve(true)),
-                getOsVersion: sinon.stub().returns(Promise.resolve('testVersion')),
-                getModel: sinon.stub().returns(Promise.resolve('testModel')),
-                getScreenHeight: sinon.stub().returns(Promise.resolve(1200)),
-                getScreenWidth: sinon.stub().returns(Promise.resolve(800)),
-                getSystemLanguage: sinon.stub().returns(Promise.resolve('fi')),
-                isRooted: sinon.stub().returns(Promise.resolve(true)),
-                getTimeZone: sinon.stub().returns(Promise.resolve('+0100')),
-                getTotalMemory: sinon.stub().returns(Promise.resolve(1024)),
-                getHeadset: sinon.stub().returns(Promise.resolve(true)),
-                getScreenBrightness: sinon.stub().returns(Promise.resolve(0.7)),
-                getBatteryLevel: sinon.stub().returns(Promise.resolve(0.3)),
-                getBatteryStatus: sinon.stub().returns(Promise.resolve(1)),
-                getFreeMemory: sinon.stub().returns(Promise.resolve(1024)),
+                ... TestFixtures.getFakeNativeDeviceInfo(),
+
+                Android: {
+                    ... TestFixtures.getFakeNativeAndroidDeviceInfo()
+                }
             },
 
         };
-        deviceInfo = new DeviceInfo(nativeBridge);
+        deviceInfo = new AndroidDeviceInfo(nativeBridge);
         return deviceInfo.fetch();
 
     });
@@ -53,12 +44,17 @@ describe('DeviceInfoTest', () => {
                 return Platform.TEST;
             },
             DeviceInfo: {
+                ... TestFixtures.getFakeNativeDeviceInfo(),
                 getScreenHeight: sinon.stub().returns(Promise.resolve(1200.123)),
                 getScreenWidth: sinon.stub().returns(Promise.resolve(800.123)),
+
+                Android: {
+                    ... TestFixtures.getFakeNativeAndroidDeviceInfo()
+                }
             }
         };
 
-        deviceInfo = new DeviceInfo(nativeBridge);
+        deviceInfo = new AndroidDeviceInfo(nativeBridge);
 
         Promise.all<any>([
             deviceInfo.getScreenHeight(),
@@ -96,7 +92,7 @@ describe('DeviceInfoTest', () => {
 
 describe('DeviceInfoTest Android', () => {
 
-    let deviceInfo: DeviceInfo;
+    let deviceInfo: AndroidDeviceInfo;
     let nativeBridge: NativeBridge;
     let deviceInfoApi: DeviceInfoApi;
 
@@ -106,41 +102,14 @@ describe('DeviceInfoTest Android', () => {
                 return Platform.ANDROID;
             },
             DeviceInfo: {
-                getConnectionType: sinon.stub().returns(Promise.resolve('wifi')),
-                getNetworkType: sinon.stub().returns(Promise.resolve(0)),
-                getAdvertisingTrackingId: sinon.stub().returns(Promise.resolve('12345')),
-                getLimitAdTrackingFlag: sinon.stub().returns(Promise.resolve(true)),
-                getOsVersion: sinon.stub().returns(Promise.resolve('testVersion')),
-                getModel: sinon.stub().returns(Promise.resolve('testModel')),
-                getScreenHeight: sinon.stub().returns(Promise.resolve(1200)),
-                getScreenWidth: sinon.stub().returns(Promise.resolve(800)),
-                getSystemLanguage: sinon.stub().returns(Promise.resolve('fi')),
-                isRooted: sinon.stub().returns(Promise.resolve(true)),
-                getTimeZone: sinon.stub().returns(Promise.resolve('+0100')),
-                getTotalMemory: sinon.stub().returns(Promise.resolve(1024)),
-                getHeadset: sinon.stub().returns(Promise.resolve(true)),
-                getScreenBrightness: sinon.stub().returns(Promise.resolve(0.7)),
-                getBatteryLevel: sinon.stub().returns(Promise.resolve(0.3)),
-                getBatteryStatus: sinon.stub().returns(Promise.resolve(1)),
-                getFreeMemory: sinon.stub().returns(Promise.resolve(1024)),
-                getNetworkOperatorName: sinon.stub().returns(Promise.resolve('operatorName')),
-                getNetworkOperator: sinon.stub().returns(Promise.resolve('operator')),
+                ... TestFixtures.getFakeNativeDeviceInfo(),
 
                 Android: {
-                    getAndroidId: sinon.stub().returns(Promise.resolve('17')),
-                    getApiLevel: sinon.stub().returns(Promise.resolve(16)),
-                    getManufacturer: sinon.stub().returns(Promise.resolve('N')),
-                    getScreenDensity: sinon.stub().returns(Promise.resolve(2)),
-                    getScreenLayout: sinon.stub().returns(Promise.resolve(1)),
-                    getTotalSpace: sinon.stub().returns(Promise.resolve(2048)),
-                    getRingerMode: sinon.stub().returns(Promise.resolve(RingerMode.RINGER_MODE_NORMAL)),
-                    getDeviceVolume: sinon.stub().returns(Promise.resolve(0.5)),
-                    getFreeSpace: sinon.stub().returns(Promise.resolve(16)),
-                    isAppInstalled: sinon.stub().returns(Promise.resolve(true))
+                    ... TestFixtures.getFakeNativeAndroidDeviceInfo()
                 }
             },
         };
-        deviceInfo = new DeviceInfo(nativeBridge);
+        deviceInfo = new AndroidDeviceInfo(nativeBridge);
 
         return deviceInfo.fetch().then(() => deviceInfo.getDTO()).then((dto: any) => {
             assert.equal(dto.androidId, undefined);
@@ -164,42 +133,16 @@ describe('DeviceInfoTest Android', () => {
                 return Platform.ANDROID;
             },
             DeviceInfo: {
-                getConnectionType: sinon.stub().returns(Promise.resolve('wifi')),
-                getNetworkType: sinon.stub().returns(Promise.resolve(0)),
+                ... TestFixtures.getFakeNativeDeviceInfo(),
                 getAdvertisingTrackingId: sinon.stub().returns(Promise.resolve(undefined)),
-                getLimitAdTrackingFlag: sinon.stub().returns(Promise.resolve(undefined)),
-                getOsVersion: sinon.stub().returns(Promise.resolve('testVersion')),
-                getModel: sinon.stub().returns(Promise.resolve('testModel')),
-                getScreenHeight: sinon.stub().returns(Promise.resolve(1200)),
-                getScreenWidth: sinon.stub().returns(Promise.resolve(800)),
-                getSystemLanguage: sinon.stub().returns(Promise.resolve('fi')),
-                isRooted: sinon.stub().returns(Promise.resolve(true)),
-                getTimeZone: sinon.stub().returns(Promise.resolve('+0100')),
-                getTotalMemory: sinon.stub().returns(Promise.resolve(1024)),
-                getHeadset: sinon.stub().returns(Promise.resolve(true)),
-                getScreenBrightness: sinon.stub().returns(Promise.resolve(0.7)),
-                getBatteryLevel: sinon.stub().returns(Promise.resolve(0.3)),
-                getBatteryStatus: sinon.stub().returns(Promise.resolve(1)),
-                getFreeMemory: sinon.stub().returns(Promise.resolve(1024)),
-                getNetworkOperatorName: sinon.stub().returns(Promise.resolve('operatorName')),
-                getNetworkOperator: sinon.stub().returns(Promise.resolve('operator')),
 
                 Android: {
-                    getAndroidId: sinon.stub().returns(Promise.resolve('17')),
-                    getApiLevel: sinon.stub().returns(Promise.resolve(16)),
-                    getManufacturer: sinon.stub().returns(Promise.resolve('N')),
-                    getScreenDensity: sinon.stub().returns(Promise.resolve(2)),
-                    getScreenLayout: sinon.stub().returns(Promise.resolve(1)),
-                    getTotalSpace: sinon.stub().returns(Promise.resolve(2048)),
-                    getRingerMode: sinon.stub().returns(Promise.resolve(RingerMode.RINGER_MODE_NORMAL)),
-                    getDeviceVolume: sinon.stub().returns(Promise.resolve(0.5)),
-                    getFreeSpace: sinon.stub().returns(Promise.resolve(16)),
-                    isAppInstalled: sinon.stub().returns(Promise.resolve(true)),
+                    ... TestFixtures.getFakeNativeAndroidDeviceInfo()
                 }
             },
 
         };
-        deviceInfo = new DeviceInfo(nativeBridge);
+        deviceInfo = new AndroidDeviceInfo(nativeBridge);
 
         return deviceInfo.fetch().then(() => deviceInfo.getDTO()).then((dto: any) => {
             assert.equal(dto.androidId, '17');
@@ -220,41 +163,14 @@ describe('DeviceInfoTest Android', () => {
                 }
             },
             DeviceInfo: {
-                getConnectionType: sinon.stub().returns(Promise.resolve('wifi')),
-                getNetworkType: sinon.stub().returns(Promise.resolve(0)),
-                getAdvertisingTrackingId: sinon.stub().returns(Promise.resolve('12345')),
-                getLimitAdTrackingFlag: sinon.stub().returns(Promise.resolve(true)),
-                getOsVersion: sinon.stub().returns(Promise.resolve('testVersion')),
-                getModel: sinon.stub().returns(Promise.resolve('testModel')),
-                getScreenHeight: sinon.stub().returns(Promise.resolve(1200)),
-                getScreenWidth: sinon.stub().returns(Promise.resolve(800)),
-                getSystemLanguage: sinon.stub().returns(Promise.resolve('fi')),
-                isRooted: sinon.stub().returns(Promise.resolve(true)),
-                getTimeZone: sinon.stub().returns(Promise.resolve('+0100')),
-                getTotalMemory: sinon.stub().returns(Promise.resolve(1024)),
-                getHeadset: sinon.stub().returns(Promise.resolve(true)),
-                getScreenBrightness: sinon.stub().returns(Promise.resolve(0.7)),
-                getBatteryLevel: sinon.stub().returns(Promise.resolve(0.3)),
-                getBatteryStatus: sinon.stub().returns(Promise.resolve(1)),
-                getFreeMemory: sinon.stub().returns(Promise.resolve(1024)),
-                getNetworkOperatorName: sinon.stub().returns(Promise.resolve('operatorName')),
-                getNetworkOperator: sinon.stub().returns(Promise.resolve('operator')),
+                ... TestFixtures.getFakeNativeDeviceInfo(),
 
                 Android: {
-                    getAndroidId: sinon.stub().returns(Promise.resolve('17')),
-                    getApiLevel: sinon.stub().returns(Promise.resolve(16)),
-                    getManufacturer: sinon.stub().returns(Promise.resolve('N')),
-                    getScreenDensity: sinon.stub().returns(Promise.resolve(2)),
-                    getScreenLayout: sinon.stub().returns(Promise.resolve(1)),
-                    getTotalSpace: sinon.stub().returns(Promise.resolve(2048)),
-                    getRingerMode: sinon.stub().returns(Promise.resolve(RingerMode.RINGER_MODE_NORMAL)),
-                    getDeviceVolume: sinon.stub().returns(Promise.resolve(0.5)),
-                    getFreeSpace: sinon.stub().returns(Promise.resolve(16)),
-                    isAppInstalled: sinon.stub().returns(Promise.resolve(true))
+                    ... TestFixtures.getFakeNativeAndroidDeviceInfo()
                 }
             },
         };
-        deviceInfo = new DeviceInfo(nativeBridge);
+        deviceInfo = new AndroidDeviceInfo(nativeBridge);
         deviceInfoApi = new DeviceInfoApi(nativeBridge);
 
         let receivedStreamType = -1;
@@ -282,7 +198,7 @@ describe('DeviceInfoTest Android', () => {
 
 describe('DeviceInfoTest iOS', () => {
 
-    let deviceInfo: DeviceInfo;
+    let deviceInfo: IosDeviceInfo;
     let nativeBridge: NativeBridge;
     let deviceInfoApi: DeviceInfoApi;
 
@@ -300,38 +216,14 @@ describe('DeviceInfoTest iOS', () => {
                 }
             },
             DeviceInfo: {
-                getConnectionType: sinon.stub().returns(Promise.resolve('wifi')),
-                getNetworkType: sinon.stub().returns(Promise.resolve(0)),
-                getAdvertisingTrackingId: sinon.stub().returns(Promise.resolve('12345')),
-                getLimitAdTrackingFlag: sinon.stub().returns(Promise.resolve(true)),
-                getOsVersion: sinon.stub().returns(Promise.resolve('testVersion')),
-                getModel: sinon.stub().returns(Promise.resolve('testModel')),
-                getScreenHeight: sinon.stub().returns(Promise.resolve(1200)),
-                getScreenWidth: sinon.stub().returns(Promise.resolve(800)),
-                getSystemLanguage: sinon.stub().returns(Promise.resolve('fi')),
-                isRooted: sinon.stub().returns(Promise.resolve(true)),
-                getTimeZone: sinon.stub().returns(Promise.resolve('+0100')),
-                getTotalMemory: sinon.stub().returns(Promise.resolve(1024)),
-                getHeadset: sinon.stub().returns(Promise.resolve(true)),
-                getScreenBrightness: sinon.stub().returns(Promise.resolve(0.7)),
-                getBatteryLevel: sinon.stub().returns(Promise.resolve(0.3)),
-                getBatteryStatus: sinon.stub().returns(Promise.resolve(1)),
-                getFreeMemory: sinon.stub().returns(Promise.resolve(1024)),
-                getNetworkOperatorName: sinon.stub().returns(Promise.resolve('operatorName')),
-                getNetworkOperator: sinon.stub().returns(Promise.resolve('operator')),
+                ... TestFixtures.getFakeNativeDeviceInfo(),
 
                 Ios: {
-                    getUserInterfaceIdiom: sinon.stub().returns(Promise.resolve(UIUserInterfaceIdiom.UIUserInterfaceIdiomPad)),
-                    getScreenScale: sinon.stub().returns(Promise.resolve(2)),
-                    isSimulator: sinon.stub().returns(Promise.resolve(true)),
-                    getTotalSpace: sinon.stub().returns(Promise.resolve(1024)),
-                    getDeviceVolume: sinon.stub().returns(Promise.resolve(0.5)),
-                    getFreeSpace: sinon.stub().returns(Promise.resolve(16)),
-                    getStatusBarHeight: sinon.stub().returns(Promise.resolve(40)),
+                    ... TestFixtures.getFakeNativeIosDeviceInfo()
                 }
             },
         };
-        deviceInfo = new DeviceInfo(nativeBridge);
+        deviceInfo = new IosDeviceInfo(nativeBridge);
         deviceInfoApi = new DeviceInfoApi(nativeBridge);
         return deviceInfo.fetch();
     });
@@ -372,7 +264,7 @@ describe('DeviceInfoTest iOS', () => {
 
 describe('DeviceInfoTest catch random reject', () => {
 
-    let deviceInfo: DeviceInfo;
+    let deviceInfo: AndroidDeviceInfo;
     let nativeBridge: NativeBridge;
 
     beforeEach(() => {
@@ -384,29 +276,18 @@ describe('DeviceInfoTest catch random reject', () => {
                 logWarning: (msg: string) => { return; },
             },
             DeviceInfo: {
-                getConnectionType: sinon.stub().returns(Promise.resolve('wifi')),
-                getNetworkType: sinon.stub().returns(Promise.resolve(0)),
-                // reject promise
+                ... TestFixtures.getFakeNativeDeviceInfo(),
                 getAdvertisingTrackingId: sinon.stub().returns(Promise.reject(new Error('advertisingIdError'))),
-                getLimitAdTrackingFlag: sinon.stub().returns(Promise.resolve(true)),
-                getOsVersion: sinon.stub().returns(Promise.resolve('testVersion')),
-                getModel: sinon.stub().returns(Promise.resolve('testModel')),
-                getScreenHeight: sinon.stub().returns(Promise.resolve(1200)),
-                getScreenWidth: sinon.stub().returns(Promise.resolve(800)),
-                getSystemLanguage: sinon.stub().returns(Promise.resolve('fi')),
-                // reject promise
                 isRooted: sinon.stub().returns(Promise.reject(new Error('testError'))),
-                getTimeZone: sinon.stub().returns(Promise.resolve('+0100')),
-                getTotalMemory: sinon.stub().returns(Promise.resolve(1024)),
-                getHeadset: sinon.stub().returns(Promise.resolve(true)),
-                getScreenBrightness: sinon.stub().returns(Promise.resolve(0.7)),
-                getBatteryLevel: sinon.stub().returns(Promise.resolve(0.3)),
-                getBatteryStatus: sinon.stub().returns(Promise.resolve(1)),
-                getFreeMemory: sinon.stub().returns(Promise.resolve(1024)),
+
+                Android: {
+                    ... TestFixtures.getFakeNativeAndroidDeviceInfo()
+                }
             },
 
         };
-        deviceInfo = new DeviceInfo(nativeBridge);
+
+        deviceInfo = new AndroidDeviceInfo(nativeBridge);
         return deviceInfo.fetch();
 
     });
@@ -436,7 +317,7 @@ describe('DeviceInfoTest catch random reject', () => {
 
 describe('DeviceInfoTest reject promises', () => {
 
-    let deviceInfo: DeviceInfo;
+    let deviceInfo: AndroidDeviceInfo;
     let nativeBridge: NativeBridge;
 
     beforeEach(() => {
@@ -468,7 +349,7 @@ describe('DeviceInfoTest reject promises', () => {
             },
 
         };
-        deviceInfo = new DeviceInfo(nativeBridge);
+        deviceInfo = new AndroidDeviceInfo(nativeBridge);
         return deviceInfo.fetch();
     });
 });

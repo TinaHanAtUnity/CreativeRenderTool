@@ -3,7 +3,9 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { Platform } from 'Constants/Platform';
 import { IIAPInstrumentation } from 'Analytics/AnalyticsStorage';
 import { Configuration } from 'Models/Configuration';
+import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { NativeBridge } from 'Native/NativeBridge';
+import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 
 export interface IAnalyticsObject {
     type: string;
@@ -61,20 +63,6 @@ interface IAnalyticsAppRunningEvent {
     ts: number;
     duration: number;
     local_time_offset: number;
-}
-
-interface IAnalyticsTransactionEvent {
-    ts: number;
-    transactionId: number;
-    productId: string;
-    amount: number;
-    currency: string;
-    receipt?: IAnalyticsTransactionReceipt;
-}
-
-interface IAnalyticsTransactionReceipt {
-    data?: string;
-    signature?: string;
 }
 
 export class AnalyticsProtocol {
@@ -168,28 +156,6 @@ export class AnalyticsProtocol {
         };
     }
 
-    public static getIAPTransactionObject(transactionId: number, instrumentation: IIAPInstrumentation): IAnalyticsObject {
-        const transactionEvent: IAnalyticsTransactionEvent = {
-            ts: Date.now(),
-            transactionId: transactionId,
-            productId: instrumentation.productId,
-            amount: instrumentation.price,
-            currency: instrumentation.currency,
-        };
-
-        if(instrumentation.signature || instrumentation.receiptPurchaseData) {
-            transactionEvent.receipt = {
-                data: instrumentation.receiptPurchaseData,
-                signature: instrumentation.signature
-            };
-        }
-
-        return {
-            type: 'analytics.transaction.v1',
-            msg: transactionEvent
-        };
-    }
-
     private static getAdvertisingIdentifier(deviceInfo: DeviceInfo): string | undefined {
         const adsid: string | undefined | null = deviceInfo.getAdvertisingIdentifier();
 
@@ -201,41 +167,68 @@ export class AnalyticsProtocol {
     }
 
     private static getScreen(nativeBridge: NativeBridge, deviceInfo: DeviceInfo): Promise<string> {
-        return Promise.all([
-            deviceInfo.getScreenWidth(),
-            deviceInfo.getScreenHeight(),
-        ]).then(([width, height]) => {
-            let screenWidth = width;
-            let screenHeight = height;
-            if (screenHeight > screenWidth) {
-                screenWidth = height;
-                screenHeight = width;
-            }
+        if(nativeBridge.getPlatform() === Platform.IOS) {
+            return Promise.all([
+                deviceInfo.getScreenWidth(),
+                deviceInfo.getScreenHeight(),
+                nativeBridge.DeviceInfo.Ios.isStatusBarHidden(),
+                nativeBridge.DeviceInfo.Ios.getStatusBarHeight()
+            ]).then(([width, height, statusBarHidden, statusBarHeight]) => {
+                let screenWidth = width;
+                let screenHeight = height;
 
-            if(nativeBridge.getPlatform() === Platform.IOS) {
-                screenWidth = screenWidth / deviceInfo.getScreenScale();
-                screenHeight = screenHeight / deviceInfo.getScreenScale();
-            }
+                if(!statusBarHidden) {
+                    screenHeight = screenHeight + statusBarHeight;
+                }
 
-            return Promise.resolve(screenWidth + ' x ' + screenHeight);
-        });
+                if (screenHeight > screenWidth) {
+                    screenWidth = height;
+                    screenHeight = width;
+                }
+
+                if(deviceInfo instanceof IosDeviceInfo) {
+                    screenWidth = screenWidth * deviceInfo.getScreenScale();
+                    screenHeight = screenHeight * deviceInfo.getScreenScale();
+                }
+
+                return Promise.resolve(screenWidth + ' x ' + screenHeight);
+            });
+        } else {
+            return Promise.all([
+                deviceInfo.getScreenWidth(),
+                deviceInfo.getScreenHeight(),
+            ]).then(([width, height]) => {
+                let screenWidth = width;
+                let screenHeight = height;
+                if (screenHeight > screenWidth) {
+                    screenWidth = height;
+                    screenHeight = width;
+                }
+
+                return Promise.resolve(screenWidth + ' x ' + screenHeight);
+            });
+        }
     }
 
     private static getDeviceModel(nativeBridge: NativeBridge, deviceInfo: DeviceInfo): Promise<string> {
         if(nativeBridge.getPlatform() === Platform.IOS) {
             return Promise.resolve(deviceInfo.getModel());
-        } else {
+        } else if (nativeBridge.getPlatform() === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
             return nativeBridge.DeviceInfo.Android.getDevice().then(device => {
                 return deviceInfo.getManufacturer() + '/' + deviceInfo.getModel() + '/' + device;
             });
+        } else {
+            return Promise.resolve('');
         }
     }
 
     private static getOsVersion(nativeBridge: NativeBridge, deviceInfo: DeviceInfo): string {
         if(nativeBridge.getPlatform() === Platform.IOS) {
             return 'iOS ' + deviceInfo.getOsVersion();
-        } else {
+        } else if (nativeBridge.getPlatform() === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {
             return 'Android OS ' + deviceInfo.getOsVersion() + ' / API-' + deviceInfo.getApiLevel();
+        } else {
+            return '';
         }
     }
 }

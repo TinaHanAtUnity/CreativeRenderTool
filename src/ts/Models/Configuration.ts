@@ -21,6 +21,7 @@ interface IConfiguration {
     analytics: boolean;
     test: boolean;
     projectId: string;
+    token: string;
 }
 
 export class Configuration extends Model<IConfiguration> {
@@ -37,7 +38,8 @@ export class Configuration extends Model<IConfiguration> {
             defaultPlacement: ['object'],
             analytics: ['boolean'],
             test: ['boolean'],
-            projectId: ['string']
+            projectId: ['string'],
+            token: ['string']
         });
 
         this.set('enabled', configJson.enabled);
@@ -47,6 +49,7 @@ export class Configuration extends Model<IConfiguration> {
         this.set('abGroup', configJson.abGroup);
         this.set('gamerId', configJson.gamerId);
         this.set('properties', configJson.properties);
+        this.set('token', configJson.token);
 
         this.set('analytics', configJson.analytics ? true : false);
 
@@ -113,6 +116,10 @@ export class Configuration extends Model<IConfiguration> {
 
     public getProperties(): string {
         return this.get('properties');
+    }
+
+    public getToken(): string {
+        return this.get('token');
     }
 
     public getCacheMode(): CacheMode {

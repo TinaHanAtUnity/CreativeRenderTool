@@ -1,4 +1,5 @@
 import MRAIDTemplate from 'html/MRAID.html';
+import MRAIDContainer from 'html/mraid/container.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
@@ -58,7 +59,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
 
-        this.createMRAID().then(mraid => {
+        this.createMRAID(MRAIDContainer).then(mraid => {
             this._nativeBridge.Sdk.logError('setting iframe srcdoc (' + mraid.length + ')');
             iframe.srcdoc = mraid;
         }).catch(e => this._nativeBridge.Sdk.logError('failed to create mraid: ' + e));
