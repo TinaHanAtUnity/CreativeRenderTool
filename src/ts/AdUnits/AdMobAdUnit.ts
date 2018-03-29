@@ -105,9 +105,9 @@ export class AdMobAdUnit extends AbstractAdUnit {
 
         UserCountData.getClickCount(this._nativeBridge).then((clickCount) => {
             if (clickCount) {
-                UserCountData.setRequestCount(clickCount + 1, this._nativeBridge);
+                UserCountData.setClickCount(clickCount + 1, this._nativeBridge);
             } else {
-                UserCountData.setRequestCount(0, this._nativeBridge);
+                UserCountData.setClickCount(0, this._nativeBridge);
             }
         }).catch(() => {
             Diagnostics.trigger('request_count_failure', {
