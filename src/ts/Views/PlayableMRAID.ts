@@ -10,7 +10,7 @@ import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
-import { JsonParser } from 'Utilities/JsonParser';
+import { IObserver1 } from '../Utilities/IObserver';
 
 export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -39,6 +39,12 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _backgroundTimestamp: number;
 
     private _configuration: any;
+
+    private _arFrameUpdatedObserver: IObserver1<string>;
+    private _arPlanesAddedObserver: IObserver1<string>;
+    private _arPlanesUpdatedObserver: IObserver1<string>;
+    private _arPlanesRemovedObserver: IObserver1<string>;
+    private _arAnchorsUpdatedObserver: IObserver1<string>;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string, coppaCompliant: boolean) {
         super(nativeBridge, 'playable-mraid', placement, campaign, coppaCompliant);
@@ -80,12 +86,6 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 selector: '.privacy-button'
             }
         ];
-
-        this._nativeBridge.AR.onFrameUpdated.subscribe(parameters => this.onARFrameUpdated(parameters));
-        this._nativeBridge.AR.onAnchorsUpdated.subscribe(parameters => this.onARAnchorsUpdated(parameters));
-        this._nativeBridge.AR.onPlanesAdded.subscribe(parameters => this.onARPlanesAdded(parameters));
-        this._nativeBridge.AR.onPlanesUpdated.subscribe(parameters => this.onARPlanesUpdated(parameters));
-        this._nativeBridge.AR.onPlanesRemoved.subscribe(parameters => this.onARPlanesRemoved(parameters));
     }
 
     public render(): void {
@@ -113,6 +113,11 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         this.createMRAID(container).then(mraid => {
             iframe.onload = () => this.onIframeLoaded();
             iframe.srcdoc = mraid;
+            this._arFrameUpdatedObserver = this._nativeBridge.AR.onFrameUpdated.subscribe(parameters => this.onARFrameUpdated(parameters));
+            this._arPlanesAddedObserver = this._nativeBridge.AR.onPlanesAdded.subscribe(parameters => this.onARPlanesAdded(parameters));
+            this._arPlanesUpdatedObserver = this._nativeBridge.AR.onPlanesUpdated.subscribe(parameters => this.onARPlanesUpdated(parameters));
+            this._arPlanesRemovedObserver = this._nativeBridge.AR.onPlanesRemoved.subscribe(parameters => this.onARPlanesRemoved(parameters));
+            this._arAnchorsUpdatedObserver = this._nativeBridge.AR.onAnchorsUpdated.subscribe(parameters => this.onARAnchorsUpdated(parameters));
         });
 
         this._messageListener = (event: MessageEvent) => this.onMessage(event);
@@ -307,6 +312,12 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         } else if(this._canClose) {
             this._handlers.forEach(handler => handler.onMraidClose());
         }
+
+        this._nativeBridge.AR.onFrameUpdated.unsubscribe(this._arFrameUpdatedObserver);
+        this._nativeBridge.AR.onPlanesAdded.unsubscribe(this._arPlanesAddedObserver);
+        this._nativeBridge.AR.onPlanesUpdated.unsubscribe(this._arPlanesUpdatedObserver);
+        this._nativeBridge.AR.onPlanesRemoved.unsubscribe(this._arPlanesRemovedObserver);
+        this._nativeBridge.AR.onAnchorsUpdated.unsubscribe(this._arAnchorsUpdatedObserver);
     }
 
     private onAREvent(event: MessageEvent): Promise<void> {
