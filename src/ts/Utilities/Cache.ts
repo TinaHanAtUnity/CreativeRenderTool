@@ -1,20 +1,18 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { CacheError, IFileInfo } from 'Native/Api/Cache';
+import { CacheError } from 'Native/Api/Cache';
 import { StorageType } from 'Native/Api/Storage';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Request } from 'Utilities/Request';
-import { Video } from 'Models/Assets/Video';
 import { HttpKafka } from 'Utilities/HttpKafka';
 import { Observable0 } from 'Utilities/Observable';
-import { VideoInfo } from 'Utilities/VideoInfo';
+import { FileInfo } from 'Utilities/FileInfo';
 import { Campaign } from 'Models/Campaign';
 import { SdkStats } from 'Utilities/SdkStats';
 import { Session } from 'Models/Session';
 import { FileId } from 'Utilities/FileId';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
-import { Url } from 'Utilities/Url';
 
 export enum CacheStatus {
     OK,
@@ -83,7 +81,6 @@ export class Cache {
     private _retryDelay: number = 10000;
 
     private readonly _maxFileSize = 20971520;
-    private readonly _maxVideoDuration = 40000;
 
     private _currentDownloadPosition: number = -1;
     private _lastProgressEvent: number;
@@ -125,7 +122,7 @@ export class Cache {
 
     public cache(url: string, diagnostics: ICacheDiagnostics, campaign: Campaign): Promise<string[]> {
         return Promise.all<boolean, string>([
-            this.isCached(url),
+            FileInfo.isCached(this._nativeBridge, this._cacheBookkeeping, url),
             FileId.getFileId(url, this._nativeBridge)
         ]).then(([isCached, fileId]) => {
             if(isCached) {
@@ -148,21 +145,6 @@ export class Cache {
         });
     }
 
-    public isCached(url: string): Promise<boolean> {
-        return FileId.getFileId(url, this._nativeBridge).then(fileId => {
-            return this.getFileInfo(fileId).then(fileInfo => {
-                if(fileInfo && fileInfo.found && fileInfo.size > 0) {
-                    return this._cacheBookkeeping.getFileInfo(fileId).then(cacheResponse => {
-                        return cacheResponse.fullyDownloaded;
-                    }).catch(() => {
-                        return false;
-                    });
-                }
-                return false;
-            });
-        });
-    }
-
     public stop(): void {
         let activeDownload: boolean = false;
 
@@ -182,33 +164,6 @@ export class Cache {
         }
     }
 
-    public isVideoValid(video: Video, campaign: Campaign): Promise<boolean> {
-        return FileId.getFileId(video.getOriginalUrl(), this._nativeBridge).then(fileId => {
-            return VideoInfo.getVideoInfo(this._nativeBridge, fileId).then(([width, height, duration]) => {
-                const isValid = (width > 0 && height > 0 && duration > 0 && duration <= this._maxVideoDuration);
-                let errorType = 'video_validation_failed';
-                if(duration > this._maxVideoDuration) {
-                    errorType = 'video_validation_failed_video_too_long';
-                }
-                if(!isValid) {
-                    Diagnostics.trigger(errorType, {
-                        url: video.getOriginalUrl(),
-                        width: width,
-                        height: height,
-                        duration: duration
-                    }, campaign.getSession());
-                }
-                return isValid;
-            }).catch(error => {
-                Diagnostics.trigger('video_validation_failed', {
-                    url: video.getOriginalUrl(),
-                    error: error
-                }, campaign.getSession());
-                return false;
-            });
-        });
-    }
-
     public isPaused(): boolean {
         return this._paused;
     }
@@ -223,16 +178,10 @@ export class Cache {
         });
     }
 
-    private getFileInfo(fileId: string): Promise<IFileInfo | undefined> {
-        return this._nativeBridge.Cache.getFileInfo(fileId).catch(() => {
-            return Promise.resolve(undefined);
-        });
-    }
-
     private downloadFile(url: string, fileId: string): void {
         this._currentUrl = url;
 
-        this.getFileInfo(fileId).then(fileInfo => {
+        FileInfo.getFileInfo(this._nativeBridge, fileId).then(fileInfo => {
             let append = false;
             let headers: Array<[string, string]> = [];
 
