@@ -309,43 +309,43 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
     }
 
-    private onAREvent(event: MessageEvent): void {
+    private onAREvent(event: MessageEvent): Promise<void> {
         const { data } = event.data;
         const message = data.split(':');
         const functionName = message[0];
         const args = message[1].split(',');
+        this._nativeBridge.Sdk.logDebug('AR LOG DEBUG: ' + functionName + ' args: ' + JSON.stringify(args));
 
         switch (functionName) {
             case 'resetPose':
-                this._nativeBridge.AR.restartSession();
-                break;
+                return this._nativeBridge.AR.restartSession();
 
             case 'setDepthNear':
-                this._nativeBridge.AR.setDepthNear(parseFloat(args[0]));
-                break;
+                return this._nativeBridge.AR.setDepthNear(parseFloat(args[0]));
 
             case 'setDepthFar':
-                this._nativeBridge.AR.setDepthFar(parseFloat(args[0]));
-                break;
+                return this._nativeBridge.AR.setDepthFar(parseFloat(args[0]));
 
             case 'showCameraFeed':
-                this._nativeBridge.AR.showCameraFeed();
-                break;
+                return this._nativeBridge.AR.showCameraFeed();
 
             case 'hideCameraFeed':
-                this._nativeBridge.AR.hideCameraFeed();
-                break;
+                return this._nativeBridge.AR.hideCameraFeed();
 
             case 'addAnchor':
-                this._nativeBridge.AR.addAnchor(args[0], args[1]);
-                break;
+                return this._nativeBridge.AR.addAnchor(args[0], args[1]);
 
             case 'removeAnchor':
-                this._nativeBridge.AR.removeAnchor(args[0]);
-                break;
+                return this._nativeBridge.AR.removeAnchor(args[0]);
+
+            case 'advanceFrame':
+                return this._nativeBridge.AR.advanceFrame();
 
             case 'log':
-                this._nativeBridge.Sdk.logDebug('NATIVELOG ' + JSON.stringify(args));
+                return this._nativeBridge.Sdk.logDebug('NATIVELOG ' + JSON.stringify(args));
+
+            default:
+                throw new Error('Unknown AR message');
         }
     }
 
@@ -396,7 +396,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 }
                 break;
             case 'ar':
-                this.onAREvent(event);
+                this.onAREvent(event).catch((reason) => this._nativeBridge.Sdk.logError('AR message error: ' + reason.toString()));
                 break;
             default:
                 break;
@@ -411,22 +411,32 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     private onARFrameUpdated(parameters: string) {
-        this._iframe.contentWindow.postMessage({ type: 'AREvent', data: {parameters, event: 'frameupdate'} }, '*');
+        if (this._iframeLoaded) {
+            this._iframe.contentWindow.postMessage({type: 'AREvent', data: {parameters, event: 'frameupdate'}}, '*');
+        }
     }
 
     private onARPlanesAdded(parameters: string) {
-        this._iframe.contentWindow.postMessage({type: 'AREvent', data: {parameters, event: 'planesadded'}}, '*');
+        if (this._iframeLoaded) {
+            this._iframe.contentWindow.postMessage({type: 'AREvent', data: {parameters, event: 'planesadded'}}, '*');
+        }
     }
 
     private onARPlanesUpdated(parameters: string) {
-        this._iframe.contentWindow.postMessage({type: 'AREvent', data: {parameters, event: 'planesupdated'}}, '*');
+        if (this._iframeLoaded) {
+            this._iframe.contentWindow.postMessage({type: 'AREvent', data: {parameters, event: 'planesupdated'}}, '*');
+        }
     }
 
     private onARPlanesRemoved(parameters: string) {
-        this._iframe.contentWindow.postMessage({type: 'AREvent', data: {parameters, event: 'planesremoved'}}, '*');
+        if (this._iframeLoaded) {
+            this._iframe.contentWindow.postMessage({type: 'AREvent', data: {parameters, event: 'planesremoved'}}, '*');
+        }
     }
 
     private onARAnchorsUpdated(parameters: string) {
-        this._iframe.contentWindow.postMessage({type: 'AREvent', data: {parameters, event: 'anchorsupdated'}}, '*');
+        if (this._iframeLoaded) {
+            this._iframe.contentWindow.postMessage({type: 'AREvent', data: {parameters, event: 'anchorsupdated'}}, '*');
+        }
     }
 }

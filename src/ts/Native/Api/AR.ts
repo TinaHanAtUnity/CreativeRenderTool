@@ -50,6 +50,10 @@ export class ARApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._apiClass, 'removeAnchor', [identifier]);
     }
 
+    public advanceFrame(): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'advanceFrame');
+    }
+
     public handleEvent(event: string, parameters: any[]): void {
         switch (event) {
             case AREvent[AREvent.AR_PLANES_ADDED]:
