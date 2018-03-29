@@ -1,3 +1,7 @@
+# Wed Mar 28 20:07:19 UTC 2018
+
+* Another attempt at fixing race condition in new refresh manager
+
 # Wed Mar 28 07:54:36 UTC 2018
 
 * AdMob caching changes
