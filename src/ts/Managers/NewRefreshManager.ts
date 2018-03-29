@@ -290,7 +290,7 @@ export class NewRefreshManager extends RefreshManager {
             }
 
             const noFillRetryTimestamp: number = Date.now() + delay * 1000;
-            if(delay > 0 && noFillRetryTimestamp > this._refillTimestamp) {
+            if(delay > 0 && noFillRetryTimestamp < this._refillTimestamp) {
                 this._fillState = FillState.NOFILL_RETRY;
                 this._noFillRetryTimestamp = noFillRetryTimestamp;
                 delay = delay + Math.random() * 10; // add 0-10 second random delay
