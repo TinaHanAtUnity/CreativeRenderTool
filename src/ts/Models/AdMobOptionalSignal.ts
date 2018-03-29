@@ -13,14 +13,9 @@ interface IAdMobOptionalSignal {
     priorClickCount: number;
     deviceIncapabilities: string;
     hasIAPCapability: boolean;
-    latitude: number;
-    longitude: number;
-    locationRadius: number;
     iuSizes: string;
     adtest: boolean;
     isJailbroken: boolean;
-    userGender: string;
-    userAge: number;
 }
 
 export class AdMobOptionalSignal extends Model<IAdMobOptionalSignal> {
@@ -38,14 +33,9 @@ export class AdMobOptionalSignal extends Model<IAdMobOptionalSignal> {
             priorClickCount: ['number', 'undefined'],
             deviceIncapabilities: ['string', 'undefined'],
             hasIAPCapability: ['boolean', 'undefined'],
-            latitude: ['number', 'undefined'],
-            longitude: ['number', 'undefined'],
-            locationRadius: ['number', 'undefined'],
             iuSizes: ['string', 'undefined'],
             adtest: ['boolean', 'undefined'],
-            isJailbroken: ['boolean', 'undefined'],
-            userGender: ['string', 'undefined'],
-            userAge: ['number', 'undefined']
+            isJailbroken: ['boolean', 'undefined']
         });
     }
     public getSequenceNumber(): number {
@@ -84,15 +74,6 @@ export class AdMobOptionalSignal extends Model<IAdMobOptionalSignal> {
     public getHasIAPCapability(): boolean {
         return this.get('hasIAPCapability');
     }
-    public getLatitude(): number {
-        return this.get('latitude');
-    }
-    public getLongitude(): number {
-        return this.get('longitude');
-    }
-    public getLocationRadius(): number {
-        return this.get('locationRadius');
-    }
     public getAdtest(): boolean {
         return this.get('adtest');
     }
@@ -102,13 +83,6 @@ export class AdMobOptionalSignal extends Model<IAdMobOptionalSignal> {
     public getIUSizes(): string {
         return this.get('iuSizes');
     }
-    public getUserGender(): string {
-        return this.get('userGender');
-    }
-    public getUserAge(): number {
-        return this.get('userAge');
-    }
-
     public setSequenceNumber(sequenceNumber: number) {
         this.set('sequenceNumber', sequenceNumber);
     }
@@ -145,15 +119,6 @@ export class AdMobOptionalSignal extends Model<IAdMobOptionalSignal> {
     public setHasIAPCapability(hasIAPCapability: boolean) {
         this.set('hasIAPCapability', hasIAPCapability);
     }
-    public setLatitude(latitude: number) {
-        this.set('latitude', latitude);
-    }
-    public setLongitude(longitude: number) {
-        this.set('longitude', longitude);
-    }
-    public setLocationRadius(locationRadius: number) {
-        this.set('locationRadius', locationRadius);
-    }
     public setAdtest(adtest: boolean) {
         this.set('adtest', adtest);
     }
@@ -162,12 +127,6 @@ export class AdMobOptionalSignal extends Model<IAdMobOptionalSignal> {
     }
     public setIUSizes(iuSizes: string) {
         this.set('iuSizes', iuSizes);
-    }
-    public setUserGender(userGender: string) {
-        this.set('userGender', userGender);
-    }
-    public setUserAge(userAge: number) {
-        this.set('userAge', userAge);
     }
 
     public getDTO() {
@@ -183,12 +142,7 @@ export class AdMobOptionalSignal extends Model<IAdMobOptionalSignal> {
             prior_click_count: this.getPriorClickCount(),
             device_incapabilities: this.getDeviceIncapabilities(),
             cap_noiap: this.getHasIAPCapability(),
-            latitude: this.getLatitude(),
-            longitude: this.getLongitude(),
-            radius: this.getLocationRadius(),
             iu_sizes: this.getIUSizes(),
-            user_gender: this.getUserGender(),
-            user_age: this.getUserAge(),
             adtest: this.getAdtest(),
             ios_jailbroken: this.getIsJailbroken()
         };
