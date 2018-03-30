@@ -1,5 +1,6 @@
 # Fri Mar 30 05:33:42 UTC 2018
 
+* Change AdMob video asset to be optional for streaming fallback.
 * Disable precaching on AdMob for iOS completely.
 
 # Wed Mar 28 20:07:19 UTC 2018
