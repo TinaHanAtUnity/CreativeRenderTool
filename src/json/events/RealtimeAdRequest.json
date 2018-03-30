@@ -1,0 +1,305 @@
+{
+  "event": "Realtime ad request",
+  "parameters": [
+    {
+      "parameter": "advertisingTrackingId",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "limitAdTracking",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "androidId",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "deviceMake",
+      "required": "android",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "deviceModel",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "platform",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "screenDensity",
+      "required": "android",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "screenScale",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "screenWidth",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "screenHeight",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "sdkVersion",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "screenSize",
+      "required": "android",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "osVersion",
+      "required": "ios",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "apiLevel",
+      "required": "android",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "test",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "connectionType",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "networkType",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "stores",
+      "required": "yes",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "gamerId",
+      "required": "yes",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "bundleVersion",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "bundleId",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "language",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "timeZone",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "webviewUa",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "deviceFreeSpace",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "networkOperator",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "coppa",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "networkOperatorName",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "gameSessionId",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "mediationName",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "mediationVersion",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "mediationOrdinal",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "frameworkName",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "frameworkVersion",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "forceAbGroup",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "forceCampaignId",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "force_country",
+      "required": "no",
+      "queryString": true,
+      "body": false
+    },
+    {
+      "parameter": "cachedCampaigns",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "previousPlacementId",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "properties",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "placements",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "wiredHeadset",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "volume",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "versionCode",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "simulator",
+      "required": "ios",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "requestSignal",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "sessionDepth",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "token",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "realtimeData",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "auctionId",
+      "required": "all",
+      "queryString": true,
+      "body": false
+    }
+  ]
+}
