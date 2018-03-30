@@ -328,7 +328,8 @@ export class CampaignManager {
                 return Promise.resolve(); // no fill
             }
         } else {
-            throw Error('No placements found');
+            this._nativeBridge.Sdk.logError('No placements found in realtime campaign json.');
+            return Promise.resolve();
         }
     }
 
