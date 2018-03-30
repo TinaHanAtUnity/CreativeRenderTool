@@ -1,3 +1,7 @@
+# Fri Mar 30 05:33:42 UTC 2018
+
+* Disable precaching on AdMob for iOS completely.
+
 # Wed Mar 28 20:07:19 UTC 2018
 
 * Another attempt at fixing race condition in new refresh manager
