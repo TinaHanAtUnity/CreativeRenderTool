@@ -22,6 +22,10 @@ export class ARApi extends NativeApi {
         super(nativeBridge, 'AR');
     }
 
+    public isARSupported(): Promise<boolean> {
+        return this._nativeBridge.invoke<boolean>(this._apiClass, 'isARSupported');
+    }
+
     public restartSession(): Promise<void> {
         return this._nativeBridge.invoke<void>(this._apiClass, 'restartSession');
     }
