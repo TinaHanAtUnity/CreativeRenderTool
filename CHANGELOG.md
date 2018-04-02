@@ -1,3 +1,10 @@
+# Mon Apr 2 22:38:47 UTC 2018
+
+* Realtime latency optimization and tracking.
+* Reduce duration of closeable state for display interstitial.
+* Issue logging for IAP.
+* Remove AdMob diagnostic messages.
+
 # Fri Mar 30 05:33:42 UTC 2018
 
 * Change AdMob video asset to be optional for streaming fallback.
