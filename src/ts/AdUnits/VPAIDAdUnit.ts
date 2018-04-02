@@ -68,7 +68,9 @@ export class VPAIDAdUnit extends AbstractAdUnit {
 
         return this.setupWebPlayer().then(() => {
             this._urlLoadingObserver = this._nativeBridge.WebPlayer.shouldOverrideUrlLoading.subscribe((url, method) => this.onUrlLoad(url));
-            return this._container.open(this, ['webplayer', 'webview'], false, this._forceOrientation, false, false, true, false, this._options);
+            return this._container.open(this, ['webplayer', 'webview'], false, this._forceOrientation, false, false, true, false, this._options).then(() => {
+                this.onStart.trigger();
+            });
         });
     }
 
@@ -182,7 +184,6 @@ export class VPAIDAdUnit extends AbstractAdUnit {
 
     private onShow() {
         this.setShowing(true);
-        this.onStart.trigger();
         // todo: is the timer needed at all?
         // this._timer.start();
 
