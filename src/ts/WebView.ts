@@ -197,7 +197,8 @@ export class WebView {
                 throw error;
             }
 
-            if(this._configuration.isAnalyticsEnabled() || CustomFeatures.isExampleGameId(this._clientInfo.getGameId())) {
+            const isAnalyticsEnabled = (this._configuration.isAnalyticsEnabled() || CustomFeatures.isExampleGameId(this._clientInfo.getGameId())) && !CustomFeatures.isAnalyticsDisabled(this._clientInfo.getGameId());
+            if(isAnalyticsEnabled) {
                 this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo, this._configuration, this._focusManager);
                 return this._analyticsManager.init().then(() => {
                     this._sessionManager.setGameSessionId(this._analyticsManager.getGameSessionId());
