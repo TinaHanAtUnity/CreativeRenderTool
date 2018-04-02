@@ -453,5 +453,12 @@
     "description": "Signed JSON Web Token (JWT) with orthogonal (statistically independent) A/B groups for each Unity Monetization component",
     "provider": "Server",
     "platforms": "all"
+  },
+  {
+    "key": "realtimeData",
+    "type": "object",
+    "description": "If the placement contains data to show a realtime placement",
+    "provider": "Server",
+    "platforms": "all"
   }
 ]
