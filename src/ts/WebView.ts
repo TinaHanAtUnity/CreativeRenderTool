@@ -405,7 +405,7 @@ export class WebView {
             if (placement.getRealtimeData()) {
                 this._currentAdUnit.onStart.subscribe(() => {
                     const startDelay = Date.now() - start;
-                    Diagnostics.trigger('realtime_start_delay', {
+                    Diagnostics.trigger('realtime_delay', {
                         requestDelay: this._requestDelay,
                         startDelay: startDelay,
                         totalDelay: this._requestDelay + startDelay,
