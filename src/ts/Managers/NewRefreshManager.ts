@@ -19,7 +19,13 @@ enum FillState {
     MUST_REFILL, // should ask for new fill at the first available opportunity
     REQUESTING, // currently requesting new fill, avoid overlapping requests
     FILL_RECEIVED, // auction response (fill or no fill) successfully received
+    NOFILL_RETRY, // retrying after no fill
     MUST_REINIT // should reinit SDK at the first available opportunity
+}
+
+export interface IRefillFlags {
+    shouldRefill: boolean;
+    noFillRetry?: boolean;
 }
 
 export class NewRefreshManager extends RefreshManager {
@@ -34,6 +40,7 @@ export class NewRefreshManager extends RefreshManager {
     private _currentAdUnit: AbstractAdUnit;
 
     private _refillTimestamp: number = 0; // timestamp for next ad refresh, zero means no deadline is set
+    private _noFillRetryTimestamp: number = 0;
     private _fillState: FillState = FillState.MUST_REFILL;
     private _adUnitStartTimestamp: number = 0;
 
@@ -95,8 +102,11 @@ export class NewRefreshManager extends RefreshManager {
         // todo: redundant method, should be removed
     }
 
+    // todo: remove noFillRetry from parameters
     public refresh(nofillRetry?: boolean): Promise<INativeResponse | void> {
-        if(this.shouldRefill(Date.now())) {
+        const refillFlags: IRefillFlags = this.getRefillState(Date.now());
+
+        if(refillFlags.shouldRefill) {
             this._fillState = FillState.REQUESTING;
 
             return this._reinitManager.shouldReinitialize().then(reinit => {
@@ -108,7 +118,7 @@ export class NewRefreshManager extends RefreshManager {
                     }
                 } else {
                     this.invalidateFill();
-                    this._campaignManager.request(nofillRetry);
+                    this._campaignManager.request(refillFlags.noFillRetry);
                 }
             });
         } else {
@@ -117,32 +127,63 @@ export class NewRefreshManager extends RefreshManager {
     }
 
     public shouldRefill(timestamp: number): boolean {
+        // todo: remove method
+        return false;
+    }
+
+    // returns shouldRefill true/false and optional noFillRetry flag
+    public getRefillState(timestamp: number): IRefillFlags {
         // no new ad requests if previous request is in progress or webview must reinit
         if(this._fillState === FillState.REQUESTING || this._fillState === FillState.MUST_REINIT) {
-            return false;
+            return {
+                shouldRefill: false
+            };
         }
 
         // no new ad requests immediately after ad unit start
         if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
             if(this._adUnitStartTimestamp !== 0 && timestamp < this._adUnitStartTimestamp + this._startRefreshMagicConstant) {
-                return false;
+                return {
+                    shouldRefill: false
+                };
             }
         }
 
         // no background ad requests
         if(!this._focusManager.isAppForeground()) {
-            return false;
+            return {
+                shouldRefill: false
+            };
         }
 
         if(this._fillState === FillState.MUST_REFILL) {
-            return true;
+            return {
+                shouldRefill: true
+            };
         }
 
         if(this._refillTimestamp !== 0 && timestamp > this._refillTimestamp) {
-            return true;
+            return {
+                shouldRefill: true
+            };
         }
 
-        return this.checkForExpiredCampaigns();
+        if(this.checkForExpiredCampaigns()) {
+            return {
+                shouldRefill: true
+            };
+        }
+
+        if(this._fillState === FillState.NOFILL_RETRY && this._noFillRetryTimestamp !== 0 && timestamp > this._noFillRetryTimestamp) {
+            return {
+                shouldRefill: true,
+                noFillRetry: true
+            };
+        }
+
+        return {
+            shouldRefill: false
+        };
     }
 
     public setPlacementState(placementId: string, placementState: PlacementState): void {
@@ -228,6 +269,13 @@ export class NewRefreshManager extends RefreshManager {
 
         this._campaignCount = campaignCount;
 
+        let adjustedDelay: number = refreshDelay;
+        if(refreshDelay === 0 || refreshDelay > this._maxAdPlanTTL) {
+            adjustedDelay = this._maxAdPlanTTL;
+        }
+
+        this._refillTimestamp = Date.now() + adjustedDelay * 1000;
+
         if(campaignCount === 0) {
             this._noFills++;
 
@@ -241,26 +289,21 @@ export class NewRefreshManager extends RefreshManager {
                 }
             }
 
-            if(delay > 0) {
-                this._refillTimestamp = Date.now() + delay * 1000;
+            const noFillRetryTimestamp: number = Date.now() + delay * 1000;
+            if(delay > 0 && noFillRetryTimestamp < this._refillTimestamp) {
+                this._fillState = FillState.NOFILL_RETRY;
+                this._noFillRetryTimestamp = noFillRetryTimestamp;
                 delay = delay + Math.random() * 10; // add 0-10 second random delay
                 this._nativeBridge.Sdk.logDebug('Unity Ads ad plan will be refreshed in ' + delay + ' seconds');
                 setTimeout(() => {
-                    this.refresh(true);
+                    this.refresh();
                 }, delay * 1000);
                 return;
             }
         } else {
             this._noFills = 0;
+            this._nativeBridge.Sdk.logDebug('Unity Ads ad plan will expire in ' + adjustedDelay + ' seconds');
         }
-
-        let adjustedDelay: number = refreshDelay;
-        if(refreshDelay === 0 || refreshDelay > this._maxAdPlanTTL) {
-            adjustedDelay = this._maxAdPlanTTL;
-        }
-
-        this._refillTimestamp = Date.now() + adjustedDelay * 1000;
-        this._nativeBridge.Sdk.logDebug('Unity Ads ad plan will expire in ' + adjustedDelay + ' seconds');
     }
 
     private onNetworkConnected() {
@@ -309,6 +352,7 @@ export class NewRefreshManager extends RefreshManager {
         this._placementManager.clearCampaigns();
         this._placementManager.setAllPlacementStates(PlacementState.WAITING);
         this._refillTimestamp = 0;
+        this._noFillRetryTimestamp = 0;
 
         this._campaignCount = 0;
         this._noFills = 0;
