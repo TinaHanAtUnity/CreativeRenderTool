@@ -59,7 +59,6 @@ export class AdMobAdUnit extends AbstractAdUnit {
     public show(): Promise<void> {
         this._requestToViewTime = Date.now() - SdkStats.getAdRequestTimestamp();
         this.setShowing(true);
-        this.onStart.trigger();
 
         this.sendTrackingEvent('show');
         if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
@@ -68,6 +67,7 @@ export class AdMobAdUnit extends AbstractAdUnit {
         this.subscribeToLifecycle();
 
         return this._container.open(this, ['webview'], true, this._forceOrientation, true, false, true, false, this._options).then(() => {
+            this.onStart.trigger();
             if (this._startTime === 0) {
                 this._startTime = Date.now();
             }
