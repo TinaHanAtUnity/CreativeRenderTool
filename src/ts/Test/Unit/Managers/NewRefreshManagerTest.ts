@@ -112,7 +112,7 @@ describe('NewRefreshManagerTest', () => {
         refreshManager.setCurrentAdUnit(adUnit);
 
         return refreshManager.refresh().then(() => {
-            assert.isFalse(refreshManager.shouldRefill(Date.now()), 'tried to refill when SDK should reinitialize');
+            assert.isFalse(refreshManager.getRefillState(Date.now()).shouldRefill, 'tried to refill when SDK should reinitialize');
         });
     });
 
@@ -124,7 +124,7 @@ describe('NewRefreshManagerTest', () => {
         refreshManager.setCurrentAdUnit(adUnit);
         adUnit.onStart.trigger();
 
-        assert.isFalse(refreshManager.shouldRefill(Date.now()), 'tried to refill immediately after ad unit start');
+        assert.isFalse(refreshManager.getRefillState(Date.now()).shouldRefill, 'tried to refill immediately after ad unit start');
     });
 
     it('should not refill when app is in background', () => {
@@ -132,13 +132,13 @@ describe('NewRefreshManagerTest', () => {
 
         sinon.stub(focusManager, 'isAppForeground').returns(false);
 
-        assert.isFalse(refreshManager.shouldRefill(Date.now()), 'tried to refill when app is in background');
+        assert.isFalse(refreshManager.getRefillState(Date.now()).shouldRefill, 'tried to refill when app is in background');
     });
 
     it('should refill after init', () => {
         const refreshManager: NewRefreshManager = new NewRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration, focusManager, reinitManager, placementManager);
 
-        assert.isTrue(refreshManager.shouldRefill(Date.now()), 'did not refill when SDK is initializing');
+        assert.isTrue(refreshManager.getRefillState(Date.now()).shouldRefill, 'did not refill when SDK is initializing');
     });
 
     it('should refill according to ad plan TTL', () => {
@@ -148,8 +148,8 @@ describe('NewRefreshManagerTest', () => {
 
         campaignManager.onAdPlanReceived.trigger(oneHourInSeconds, 1);
 
-        assert.isFalse(refreshManager.shouldRefill(Date.now()), 'tried to refill when valid ad plan was received');
-        assert.isTrue(refreshManager.shouldRefill(Date.now() + twoHoursInMilliseconds), 'did not refill after ad plan expired');
+        assert.isFalse(refreshManager.getRefillState(Date.now()).shouldRefill, 'tried to refill when valid ad plan was received');
+        assert.isTrue(refreshManager.getRefillState(Date.now() + twoHoursInMilliseconds).shouldRefill, 'did not refill after ad plan expired');
     });
 
     // ideally ad plan TTL and campaign expiration should be in sync but this tests for the desync case where individual campaign has somehow expired before ad plan TTL has expired
@@ -162,7 +162,7 @@ describe('NewRefreshManagerTest', () => {
         campaignManager.onAdPlanReceived.trigger(oneHourInSeconds, 1);
         campaignManager.onCampaign.trigger('video', campaign);
 
-        assert.isTrue(refreshManager.shouldRefill(Date.now()), 'did not refill when there was one expired campaign');
+        assert.isTrue(refreshManager.getRefillState(Date.now()).shouldRefill, 'did not refill when there was one expired campaign');
     });
 
     it('should reinitialize when webview has been updated', () => {
