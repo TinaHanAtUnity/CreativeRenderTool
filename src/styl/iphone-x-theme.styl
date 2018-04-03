@@ -142,6 +142,9 @@ $end-screen-mixin($scale-size = $default-scale-size) {
     &.landscape #end-screen.iphone-x-styles {
       .game-background-blurred {
         width: calc(100vh + env(safe-area-inset-left));
+        // @stylint off
+        width: calc(100vh + constant(safe-area-inset-left));
+        // @stylint on
         height: 100%;
       }
 
@@ -155,7 +158,7 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       .game-background {
         margin-left: calc(env(safe-area-inset-left) / 2);
         // @stylint off
-        margin-left: calc(env(safe-area-inset-left) / 2);
+        margin-left: calc(constant(safe-area-inset-left) / 2);
         // @stylint on
         width: 85vh;
         height: 85vh;
