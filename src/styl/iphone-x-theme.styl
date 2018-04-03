@@ -173,7 +173,8 @@ $end-screen-mixin($scale-size = $default-scale-size) {
         right: env(safe-area-inset-right);
         // @stylint off
         right: constant(safe-area-inset-right);
-        padding-right: 0.1rem;
+        // @stylint on
+        padding-right: .1rem;
         padding-left: 1.2rem;
         width: auto;
       }
@@ -182,13 +183,14 @@ $end-screen-mixin($scale-size = $default-scale-size) {
         right: env(safe-area-inset-right);
         // @stylint off
         right: constant(safe-area-inset-right);
-        padding-right: .3rem;
-        bottom: $common-margin;
+        // @stylint on
         left: auto;
+        padding-right: .3rem;
+        line-height: 1rem;
       }
 
       .unityads-logo {
-        bottom: .45rem;
+        margin-bottom: .13rem;
       }
     }
   }
