@@ -114,17 +114,19 @@ $end-screen-mixin($scale-size = $default-scale-size) {
 
       .game-background {
         position: absolute;
-        margin-top: .5rem;
+        margin-top: 9vw;
         width: 90vw;
         height: 90vw;
       }
 
       .btn-close-region {
-        top: calc(constant(safe-area-inset-top) - 1.25rem);
+        top: constant(safe-area-inset-top);
         // @stylint off
-        top: calc(env(safe-area-inset-top) - 1.25rem);
+        top: env(safe-area-inset-top);
         // @stylint on
-        line-height: auto;
+        padding-top: 0;
+        padding-bottom: 1rem;
+        line-height: 1rem;
       }
 
       .unityads-logo {
@@ -165,11 +167,19 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       }
 
       .btn-close-region {
-        right: .7rem;
+        right: env(safe-area-inset-right);
+        // @stylint off
+        right: constant(safe-area-inset-right);
+        padding-right: 0.1rem;
+        padding-left: 1.2rem;
+        width: auto;
       }
 
       .privacy-button {
-        right: 1.7rem;
+        right: env(safe-area-inset-right);
+        // @stylint off
+        right: constant(safe-area-inset-right);
+        padding-right: .3rem;
         bottom: $common-margin;
         left: auto;
       }
