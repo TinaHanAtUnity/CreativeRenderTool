@@ -19,7 +19,7 @@ export interface IEndScreenHandler {
     onKeyEvent(keyCode: number): void;
 }
 
-const IPHONE_X_STYLES_AB_GROUPS = [1];
+const IPHONE_X_STYLES_AB_GROUPS = [18, 19];
 const IPHONE_X_STYLES_ID = 'iphone-x-styles';
 
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
