@@ -54,7 +54,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             {
                 event: 'click',
                 listener: (event: Event) => this.onPrivacyEvent(event),
-                selector: '.privacy-button'
+                selector: '.privacy-button, .gdpr-link'
             }
         ];
 
@@ -104,6 +104,8 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
                 this._handlers.forEach(handler => handler.onEndScreenClose());
             }, AbstractAdUnit.getAutoCloseDelay());
         }
+
+        this._container.classList.add('on-show');
     }
 
     public hide(): void {

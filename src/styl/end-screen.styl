@@ -41,10 +41,13 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       $privacy-button-default($scale-size);
       margin: 0 0 0 $default-size * $scale-size * .25;
     }
+
+    .gdpr-pop-up {
+      $gdpr-pop-up($scale-size);
+    }
   }
 
   body {
-
     &.portrait #end-screen {
       .column-container {
         margin-left: $default-size * $scale-size * .5;
@@ -52,6 +55,15 @@ $end-screen-mixin($scale-size = $default-scale-size) {
 
       .download-container {
         margin: $default-size * $scale-size * .75 auto;
+      }
+
+      .gdpr-pop-up {
+        margin: 0 5%;
+
+        .gdpr-text,
+        .gdpr-pop-up {
+          will-change: transform;
+        }
       }
     }
 
@@ -77,6 +89,21 @@ $end-screen-mixin($scale-size = $default-scale-size) {
 }
 
 body {
+
+  $animation-duration = 1s;
+  $animation-delay = .75s;
+  $text-animation-delay = $animation-delay + $animation-duration + .2s;
+
+  #end-screen.on-show {
+    .gdpr-text {
+      animation: gdpr-text-flow 7.5s linear $text-animation-delay forwards;
+    }
+
+    .gdpr-pop-up {
+      animation: gdpr-slide-down $animation-duration ease-in $animation-delay forwards;
+    }
+  }
+
   &.portrait #end-screen {
     .game-background-portrait {
       display: block;
@@ -114,6 +141,12 @@ body {
 
     .game-icon {
       align-self: center;
+    }
+
+    &.on-show {
+      .gdpr-text {
+        animation: gdpr-text-flow 7.5s linear $text-animation-delay forwards;
+      }
     }
   }
 
@@ -159,6 +192,13 @@ body {
     .unityads-logo {
       width: 50%;
     }
+
+    &.on-show {
+      .gdpr-text {
+        animation: gdpr-text-flow 5s linear $text-animation-delay forwards;
+      }
+
+    }
   }
 
   .row-container {
@@ -202,3 +242,22 @@ body {
 
 $end-screen-mixin();
 
+@keyframes gdpr-slide-down {
+  from {
+    transform: translateY(-100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes gdpr-text-flow {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-110%);
+  }
+}
