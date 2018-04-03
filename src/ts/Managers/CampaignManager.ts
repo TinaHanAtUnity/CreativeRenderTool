@@ -585,7 +585,7 @@ export class CampaignManager {
                 body.placements = placementRequest;
                 body.properties = this._configuration.getProperties();
                 body.sessionDepth = SdkStats.getAdRequestOrdinal();
-                Object.assign(this._realtimeBody, body);
+                this._realtimeBody = JSON.parse(JSON.stringify(body));
                 return body;
             });
         });
