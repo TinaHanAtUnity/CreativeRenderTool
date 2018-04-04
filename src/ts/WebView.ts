@@ -56,6 +56,8 @@ import { ReinitManager } from 'Managers/ReinitManager';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
+import { Timer } from 'Utilities/Timer';
+import { TimeoutError, Promises } from 'Utilities/Promises';
 
 export class WebView {
 
@@ -95,6 +97,7 @@ export class WebView {
     private _metadataManager: MetaDataManager;
 
     private _creativeUrl?: string;
+    private _requestDelay: number;
 
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
@@ -219,7 +222,7 @@ export class WebView {
             this._assetManager = new AssetManager(this._cache, this._configuration.getCacheMode(), this._deviceInfo, this._cacheBookkeeping);
             this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._adMobSignalFactory, this._request, this._clientInfo, this._deviceInfo, this._metadataManager);
 
-            if(this._configuration.getAbGroup() === 9 || this._configuration.getAbGroup() === 11) {
+            if(this._configuration.getAbGroup() === 9 || this._configuration.getAbGroup() === 10) {
                 this._placementManager = new PlacementManager(this._nativeBridge, this._configuration);
                 this._reinitManager = new ReinitManager(this._nativeBridge, this._clientInfo, this._request, this._cache);
                 this._refreshManager = new NewRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration, this._focusManager, this._reinitManager, this._placementManager);
@@ -287,21 +290,14 @@ export class WebView {
             return;
         }
 
-        // Temporary for realtime testing purposes
-        const testGroup = this._configuration.getAbGroup();
         if (placement.getRealtimeData()) {
             this._nativeBridge.Sdk.logInfo('Unity Ads is requesting realtime fill for placement ' + placement.getId());
             const start = Date.now();
-            this._campaignManager.requestRealtime(placement, campaign.getSession()).then(realtimeCampaign => {
 
-                // Temporary for realtime testing purposes
-                const latency = Date.now() - start;
-                Diagnostics.trigger('realtime_network_latency', {
-                    latency: latency,
-                    auctionId: campaign.getSession().getId(),
-                    abGroup: testGroup
-                });
-                this._nativeBridge.Sdk.logInfo(`Unity Ads received a realtime request in ${latency} ms.`);
+            const realtimeTimeoutInMillis = 1500;
+            Promises.withTimeout(this._campaignManager.requestRealtime(placement, campaign.getSession()), realtimeTimeoutInMillis).then(realtimeCampaign => {
+                this._requestDelay = Date.now() - start;
+                this._nativeBridge.Sdk.logInfo(`Unity Ads received a realtime request in ${this._requestDelay} ms.`);
 
                 if(realtimeCampaign) {
                     this._nativeBridge.Sdk.logInfo('Unity Ads received new fill for placement ' + placement.getId() + ', streaming new ad unit');
@@ -312,9 +308,15 @@ export class WebView {
                     this._nativeBridge.Sdk.logInfo('Unity Ads received no new fill for placement ' + placement.getId() + ', opening old ad unit');
                     this.showAd(placement, campaign, options);
                 }
-            }).catch(() => {
-                const error = new DiagnosticError(new Error('Realtime error'), { auctionId: campaign.getSession().getId() });
-                Diagnostics.trigger('realtime_error', error);
+            }).catch((e) => {
+                if (e instanceof TimeoutError) {
+                    Diagnostics.trigger('realtime_network_timeout', {
+                        auctionId: campaign.getSession().getId(),
+                    });
+                }
+                Diagnostics.trigger('realtime_error', {
+                    error: e
+                });
                 this._nativeBridge.Sdk.logInfo('Unity Ads realtime fill request for placement ' + placement.getId() + ' failed, opening old ad unit');
                 this.showAd(placement, campaign, options);
             });
@@ -402,10 +404,12 @@ export class WebView {
             // Temporary for realtime testing purposes
             if (placement.getRealtimeData()) {
                 this._currentAdUnit.onStart.subscribe(() => {
-                    Diagnostics.trigger('realtime_render_latency', {
-                        latency: Date.now() - start,
+                    const startDelay = Date.now() - start;
+                    Diagnostics.trigger('realtime_delay', {
+                        requestDelay: this._requestDelay,
+                        startDelay: startDelay,
+                        totalDelay: this._requestDelay + startDelay,
                         auctionId: campaign.getSession().getId(),
-                        abGroup: testGroup
                     });
                 });
             }

@@ -62,7 +62,6 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
 
     public show(): Promise<void> {
         this.setShowing(true);
-        this.onStart.trigger();
         this.setActive(true);
 
         this._onShowObserver = this._container.onShow.subscribe(() => this.onShow());
@@ -70,7 +69,9 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         this._onSystemInterruptObserver = this._container.onSystemInterrupt.subscribe((interruptStarted) => this.onSystemInterrupt(interruptStarted));
         this._onLowMemoryWarningObserver = this._container.onLowMemoryWarning.subscribe(() => this.onLowMemoryWarning());
 
-        return this._container.open(this, ['videoplayer', 'webview'], true, this.getForceOrientation(), this._placement.disableBackButton(), false, true, false, this._options);
+        return this._container.open(this, ['videoplayer', 'webview'], true, this.getForceOrientation(), this._placement.disableBackButton(), false, true, false, this._options).then(() => {
+            this.onStart.trigger();
+        });
     }
 
     public hide(): Promise<void> {

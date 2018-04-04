@@ -9,13 +9,15 @@ import { Video } from 'Models/Assets/Video';
 import { Vast } from 'Models/Vast/Vast';
 import { VastParser } from 'Utilities/VastParser';
 import { FileId } from 'Utilities/FileId';
+import { Platform } from 'Constants/Platform';
 
 export class ProgrammaticAdMobParser extends CampaignParser {
     public static ContentType = 'programmatic/admob-video';
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
         const markup = response.getContent();
         const cacheTTL = response.getCacheTTL();
-        const videoPromise = this.getVideoFromMarkup(markup, request, session).catch((e) => {
+        const platform = nativeBridge.getPlatform();
+        const videoPromise = this.getVideoFromMarkup(markup, request, session, platform).catch((e) => {
             nativeBridge.Sdk.logError(`Unable to parse video from markup due to: ${e.message}`);
             return null;
         });
@@ -51,7 +53,10 @@ export class ProgrammaticAdMobParser extends CampaignParser {
 
     }
 
-    private getVideoFromMarkup(markup: string, request: Request, session: Session): Promise<AdMobVideo> {
+    private getVideoFromMarkup(markup: string, request: Request, session: Session, platform: Platform): Promise<AdMobVideo> {
+        if (platform === Platform.IOS) {
+            return Promise.reject(new Error('iOS precaching to file not supported for HTML5 video player'));
+        }
         try {
             const dom = new DOMParser().parseFromString(markup, 'text/html');
             if (!dom) {

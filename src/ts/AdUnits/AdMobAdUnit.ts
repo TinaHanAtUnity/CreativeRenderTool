@@ -59,19 +59,15 @@ export class AdMobAdUnit extends AbstractAdUnit {
     public show(): Promise<void> {
         this._requestToViewTime = Date.now() - SdkStats.getAdRequestTimestamp();
         this.setShowing(true);
-        this.onStart.trigger();
 
         this.sendTrackingEvent('show');
-        Diagnostics.trigger('admob_ad_show', {
-            placement: this._placement.getId()
-        }, this._campaign.getSession());
-
         if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
             this._nativeBridge.AndroidAdUnit.onKeyDown.subscribe(this._keyDownListener);
         }
         this.subscribeToLifecycle();
 
         return this._container.open(this, ['webview'], true, this._forceOrientation, true, false, true, false, this._options).then(() => {
+            this.onStart.trigger();
             if (this._startTime === 0) {
                 this._startTime = Date.now();
             }
@@ -93,9 +89,6 @@ export class AdMobAdUnit extends AbstractAdUnit {
 
     public sendImpressionEvent() {
         this.sendTrackingEvent('impression');
-        Diagnostics.trigger('admob_ad_impression', {
-            placement: this._placement.getId()
-        }, this._campaign.getSession());
     }
 
     public sendClickEvent() {
@@ -178,11 +171,6 @@ export class AdMobAdUnit extends AbstractAdUnit {
             this._nativeBridge.AndroidAdUnit.endMotionEventCapture();
             this._nativeBridge.AndroidAdUnit.clearMotionEventCapture();
         }
-
-        Diagnostics.trigger('admob_ad_close', {
-            placement: this._placement.getId(),
-            finishState: this.getFinishState()
-        }, this._campaign.getSession());
 
         if (this.getFinishState() === FinishState.SKIPPED) {
             this.sendSkipEvent();
