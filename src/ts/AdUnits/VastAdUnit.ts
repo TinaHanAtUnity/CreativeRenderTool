@@ -11,11 +11,6 @@ import { StreamType } from 'Constants/Android/StreamType';
 import { Platform } from 'Constants/Platform';
 import { Placement } from 'Models/Placement';
 
-enum Orientation {
-    LANDSCAPE,
-    PORTRAIT
-}
-
 class DeviceOrientation {
     public static getDeviceOrientation(): Orientation {
         let height = window.innerHeight;
