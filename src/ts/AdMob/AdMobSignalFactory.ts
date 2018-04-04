@@ -13,7 +13,6 @@ import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { AdMobOptionalSignal } from 'Models/AdMobOptionalSignal';
 import { SdkStats } from 'Utilities/SdkStats';
-import { MetaDataManager } from 'Managers/MetaDataManager';
 import { UserCountData } from 'Utilities/UserCountData';
 
 export class AdMobSignalFactory {
@@ -21,14 +20,12 @@ export class AdMobSignalFactory {
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _focusManager: FocusManager;
-    private _metaDataManager: MetaDataManager;
 
-    constructor(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo, focusManager: FocusManager, metaDataManager: MetaDataManager) {
+    constructor(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo, focusManager: FocusManager) {
         this._nativeBridge = nativeBridge;
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._focusManager = focusManager;
-        this._metaDataManager = metaDataManager;
     }
 
     public getOptionalSignal(adUnit: AdMobAdUnit): Promise<AdMobOptionalSignal> {

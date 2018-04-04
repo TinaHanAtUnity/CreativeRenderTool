@@ -19,7 +19,7 @@ describe('AdMobSignalFactoryTest', () => {
         const focusManager: FocusManager = new FocusManager(nativeBridge);
         const metaDataManager: MetaDataManager = new MetaDataManager(nativeBridge);
 
-        return new AdMobSignalFactory(nativeBridge, clientInfo, deviceInfo, focusManager, metaDataManager).getAdRequestSignal().then(signal => {
+        return new AdMobSignalFactory(nativeBridge, clientInfo, deviceInfo, focusManager).getAdRequestSignal().then(signal => {
             const encodedMsg: string = signal.getBase64ProtoBuf();
 
             const buffer = new Uint8Array(protobuf.util.base64.length(encodedMsg));
