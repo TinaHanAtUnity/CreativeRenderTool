@@ -1,6 +1,6 @@
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
-import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Placement } from 'Models/Placement';
 import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 import { Promo } from 'Views/Promo';
@@ -52,7 +52,7 @@ export class PromoAdUnit extends AbstractAdUnit {
 
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
 
-        return this._container.open(this, ['webview'], false, ForceOrientation.NONE, true, true, false, true, this._options);
+        return this._container.open(this, ['webview'], false, Orientation.NONE, true, true, false, true, this._options);
     }
 
     public hide(): Promise<void> {
