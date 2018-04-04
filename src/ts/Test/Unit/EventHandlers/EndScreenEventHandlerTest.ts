@@ -13,7 +13,7 @@ import { Request, INativeResponse } from 'Utilities/Request';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { Platform } from 'Constants/Platform';
-import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { ViewController } from 'AdUnits/Containers/ViewController';
 import { PerformanceCampaign, StoreName } from 'Models/Campaigns/PerformanceCampaign';
@@ -90,7 +90,7 @@ describe('EndScreenEventHandlerTest', () => {
             placement = TestFixtures.getPlacement();
 
             performanceAdUnitParameters = {
-                forceOrientation: ForceOrientation.LANDSCAPE,
+                forceOrientation: Orientation.LANDSCAPE,
                 focusManager: focusManager,
                 container: container,
                 deviceInfo: deviceInfo,
@@ -251,7 +251,7 @@ describe('EndScreenEventHandlerTest', () => {
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
 
             performanceAdUnitParameters = {
-                forceOrientation: ForceOrientation.LANDSCAPE,
+                forceOrientation: Orientation.LANDSCAPE,
                 focusManager: focusManager,
                 container: container,
                 deviceInfo: deviceInfo,

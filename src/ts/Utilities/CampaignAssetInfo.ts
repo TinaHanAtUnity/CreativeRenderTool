@@ -4,7 +4,7 @@ import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Video } from 'Models/Assets/Video';
-import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 import { Asset } from 'Models/Assets/Asset';
 
@@ -54,12 +54,12 @@ export class CampaignAssetInfo {
         return undefined;
     }
 
-    public static getOrientedVideo(campaign: Campaign, forceOrientation: ForceOrientation, videoType?: VideoType): Video | undefined {
+    public static getOrientedVideo(campaign: Campaign, forceOrientation: Orientation, videoType?: VideoType): Video | undefined {
         if(campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign || campaign instanceof VastCampaign) {
             const landscapeVideo = CampaignAssetInfo.getLandscapeVideo(campaign, videoType);
             const portraitVideo = CampaignAssetInfo.getPortraitVideo(campaign, videoType);
 
-            if(forceOrientation === ForceOrientation.LANDSCAPE) {
+            if(forceOrientation === Orientation.LANDSCAPE) {
                 if(landscapeVideo) {
                     return landscapeVideo;
                 }
@@ -68,7 +68,7 @@ export class CampaignAssetInfo {
                 }
             }
 
-            if(forceOrientation === ForceOrientation.PORTRAIT) {
+            if(forceOrientation === Orientation.PORTRAIT) {
                 if(portraitVideo) {
                     return portraitVideo;
                 }
@@ -125,7 +125,7 @@ export class CampaignAssetInfo {
 
     public static getCachedAsset(campaign: Campaign): Asset | undefined {
         if(campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign || campaign instanceof VastCampaign) {
-            return CampaignAssetInfo.getOrientedVideo(campaign, ForceOrientation.LANDSCAPE, VideoType.CACHE);
+            return CampaignAssetInfo.getOrientedVideo(campaign, Orientation.LANDSCAPE, VideoType.CACHE);
         } else if(campaign instanceof MRAIDCampaign) {
             const resource = (<MRAIDCampaign>campaign).getResourceUrl();
             if(resource && resource.isCached()) {
