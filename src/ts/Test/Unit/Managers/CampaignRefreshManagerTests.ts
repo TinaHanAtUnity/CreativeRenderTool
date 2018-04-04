@@ -498,7 +498,6 @@ describe('CampaignRefreshManager', () => {
             return campaignRefreshManager.refresh().then(() => {
                 diagnosticsStub.restore();
                 assert.equal(receivedErrorType , 'campaign_caching_failed', 'Incorrect error type');
-                // assert.equal(receivedError.error.message , 'test error', 'Incorrect error message');
             });
         });
 
