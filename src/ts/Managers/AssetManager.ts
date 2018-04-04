@@ -9,8 +9,8 @@ import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { WebViewError } from 'Errors/WebViewError';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
-import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
 import { CampaignAssetInfo } from 'Utilities/CampaignAssetInfo';
+import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 
 enum CacheType {
     REQUIRED,
@@ -279,7 +279,7 @@ export class AssetManager {
             this._deviceInfo.getScreenWidth(),
             this._deviceInfo.getScreenHeight()
         ]).then(([screenWidth, screenHeight]) => {
-            const orientation: ForceOrientation = screenWidth >= screenHeight ? ForceOrientation.LANDSCAPE : ForceOrientation.PORTRAIT;
+            const orientation: Orientation = screenWidth >= screenHeight ? Orientation.LANDSCAPE : Orientation.PORTRAIT;
             const video = CampaignAssetInfo.getOrientedVideo(campaign, orientation);
 
             if(video) {

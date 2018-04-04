@@ -21,7 +21,7 @@ import { Placement, PlacementState } from 'Models/Placement';
 import { SessionManager } from 'Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
-import { AdUnitContainer, ForceOrientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, Orientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
@@ -161,7 +161,7 @@ describe('CampaignRefreshManager', () => {
         comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         adUnitParams = {
-            forceOrientation: ForceOrientation.NONE,
+            forceOrientation: Orientation.NONE,
             focusManager: focusManager,
             container: container,
             deviceInfo: deviceInfo,
@@ -578,7 +578,7 @@ describe('CampaignRefreshManager', () => {
 });
 
 export class TestContainer extends AdUnitContainer {
-    public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, options: any): Promise<void> {
+    public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, options: any): Promise<void> {
         return Promise.resolve();
     }
     public close(): Promise<void> {
@@ -587,7 +587,7 @@ export class TestContainer extends AdUnitContainer {
     public reconfigure(configuration: ViewConfiguration): Promise<any[]> {
         return Promise.all([]);
     }
-    public reorient(allowRotation: boolean, forceOrientation: ForceOrientation): Promise<any[]> {
+    public reorient(allowRotation: boolean, forceOrientation: Orientation): Promise<any[]> {
         return Promise.all([]);
     }
     public isPaused(): boolean {

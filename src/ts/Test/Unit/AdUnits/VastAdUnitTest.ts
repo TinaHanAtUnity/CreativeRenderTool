@@ -14,7 +14,7 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Placement } from 'Models/Placement';
 import { Platform } from 'Constants/Platform';
 import { VastEndScreen } from 'Views/VastEndScreen';
-import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { Video } from 'Models/Assets/Video';
 import { FocusManager } from 'Managers/FocusManager';
@@ -98,7 +98,7 @@ describe('VastAdUnit', () => {
         comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         vastAdUnitParameters = {
-            forceOrientation: ForceOrientation.LANDSCAPE,
+            forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
             container: activity,
             deviceInfo: deviceInfo,

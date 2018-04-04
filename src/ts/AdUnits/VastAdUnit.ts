@@ -4,17 +4,12 @@ import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { IVideoAdUnitParameters, VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { VastEndScreen } from 'Views/VastEndScreen';
-import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { MOAT } from 'Views/MOAT';
 import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 import { StreamType } from 'Constants/Android/StreamType';
 import { Platform } from 'Constants/Platform';
 import { Placement } from 'Models/Placement';
-
-enum Orientation {
-    LANDSCAPE,
-    PORTRAIT
-}
 
 class DeviceOrientation {
     public static getDeviceOrientation(): Orientation {
@@ -211,9 +206,9 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
 
     private getCompanionForOrientation(): VastCreativeCompanionAd | null {
         let orientation = DeviceOrientation.getDeviceOrientation();
-        if (this._forceOrientation === ForceOrientation.LANDSCAPE) {
+        if (this._forceOrientation === Orientation.LANDSCAPE) {
             orientation = Orientation.LANDSCAPE;
-        } else if (this._forceOrientation === ForceOrientation.PORTRAIT) {
+        } else if (this._forceOrientation === Orientation.PORTRAIT) {
             orientation = Orientation.PORTRAIT;
         }
 
