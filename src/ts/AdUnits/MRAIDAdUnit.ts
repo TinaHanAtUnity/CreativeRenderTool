@@ -4,7 +4,7 @@ import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { FinishState } from 'Constants/FinishState';
 import { IObserver0 } from 'Utilities/IObserver';
 import { MRAIDView, IOrientationProperties, IMRAIDViewHandler } from 'Views/MRAIDView';
-import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { HTML } from 'Models/Assets/HTML';
 import { EndScreen } from 'Views/EndScreen';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
@@ -60,7 +60,7 @@ export class MRAIDAdUnit extends AbstractAdUnit {
 
         this._orientationProperties = {
             allowOrientationChange: true,
-            forceOrientation: ForceOrientation.NONE
+            forceOrientation: Orientation.NONE
         };
 
         this._options = parameters.options;
