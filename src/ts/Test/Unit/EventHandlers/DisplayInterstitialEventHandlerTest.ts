@@ -13,7 +13,7 @@ import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { Request } from 'Utilities/Request';
-import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { DisplayInterstitialAdUnit, IDisplayInterstitialAdUnitParameters } from 'AdUnits/DisplayInterstitialAdUnit';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { DisplayInterstitialEventHandler } from 'EventHandlers/DisplayInterstitialEventHandler';
@@ -65,7 +65,7 @@ describe('DisplayInterstitialEventHandler', () => {
             comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
             displayInterstitialAdUnitParameters = {
-                forceOrientation: ForceOrientation.LANDSCAPE,
+                forceOrientation: Orientation.LANDSCAPE,
                 focusManager: focusManager,
                 container: container,
                 deviceInfo: deviceInfo,
