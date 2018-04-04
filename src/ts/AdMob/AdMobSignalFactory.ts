@@ -11,6 +11,7 @@ import { MotionEventAction } from 'Constants/Android/MotionEventAction';
 import { IMotionEvent } from 'Native/Api/AndroidAdUnit';
 import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
+import { IPackageInfo } from 'Native/Api/AndroidDeviceInfo';
 import { AdMobOptionalSignal } from 'Models/AdMobOptionalSignal';
 import { SdkStats } from 'Utilities/SdkStats';
 import { UserCountData } from 'Utilities/UserCountData';
@@ -20,6 +21,8 @@ export class AdMobSignalFactory {
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _focusManager: FocusManager;
+    private _packageInstaller: string;
+    private _packageVersionCode: number;
 
     constructor(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo, focusManager: FocusManager) {
         this._nativeBridge = nativeBridge;
@@ -73,6 +76,11 @@ export class AdMobSignalFactory {
 
     public getAdRequestSignal(): Promise<AdMobSignal> {
         return this.getCommonSignal();
+    }
+
+    public setAdmobPackageInfo(installer: string, versionCode: number): void {
+        this._packageInstaller = installer;
+        this._packageVersionCode = versionCode;
     }
 
     public getClickSignal(touchInfo: ITouchInfo, adUnit: AdMobAdUnit): Promise<AdMobSignal> {
@@ -203,19 +211,26 @@ export class AdMobSignalFactory {
         }));
 
         if(nativeBridge.getPlatform() === Platform.ANDROID) {
-            promises.push(nativeBridge.DeviceInfo.Android.getPackageInfo(this._clientInfo.getApplicationName()).then(packageInfo => {
-                if(packageInfo.installer) {
-                    signal.setAppInstaller(packageInfo.installer);
-                } else {
-                    signal.setAppInstaller('unknown');
-                }
+            if (this._packageInstaller && this._packageVersionCode) {
+                signal.setAppInstaller(this._packageInstaller);
+                signal.setAppVersionCode(this._packageVersionCode);
+            } else {
+                promises.push(nativeBridge.DeviceInfo.Android.getPackageInfo(this._clientInfo.getApplicationName()).then(packageInfo => {
+                    if(packageInfo.installer) {
+                        signal.setAppInstaller(packageInfo.installer);
+                        this._packageInstaller = packageInfo.installer;
+                    } else {
+                        signal.setAppInstaller('unknown');
+                    }
 
-                if(packageInfo.versionCode) {
-                    signal.setAppVersionCode(packageInfo.versionCode);
-                }
-            }).catch(() => {
-                this.logFailure(nativeBridge, 'packageInfo');
-            }));
+                    if(packageInfo.versionCode) {
+                        signal.setAppVersionCode(packageInfo.versionCode);
+                        this._packageVersionCode = packageInfo.versionCode;
+                    }
+                }).catch(() => {
+                    this.logFailure(nativeBridge, 'packageInfo');
+                }));
+            }
 
             promises.push(this._nativeBridge.DeviceInfo.Android.isUSBConnected().then(usb => {
                 signal.setUsbConnected(usb ? 1 : 0);

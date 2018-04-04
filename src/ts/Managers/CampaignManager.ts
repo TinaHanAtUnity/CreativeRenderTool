@@ -93,6 +93,8 @@ export class CampaignManager {
     private _request: Request;
     private _deviceInfo: DeviceInfo;
     private _previousPlacementId: string | undefined;
+    private _versionCode: number;
+    private _fullyCachedCampaigns: string[] | undefined;
 
     constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager) {
         this._nativeBridge = nativeBridge;
@@ -118,6 +120,7 @@ export class CampaignManager {
 
         this._requesting = true;
 
+        this._fullyCachedCampaigns = undefined;
         this.resetRealtimeDataForPlacements();
         return Promise.all([this.createRequestUrl(false), this.createRequestBody(nofillRetry)]).then(([requestUrl, requestBody]) => {
             this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
@@ -192,7 +195,11 @@ export class CampaignManager {
     }
 
     public getFullyCachedCampaigns(): Promise<string[]> {
+        if (this._fullyCachedCampaigns) {
+            return Promise.resolve(this._fullyCachedCampaigns);
+        }
         return this._nativeBridge.Storage.getKeys(StorageType.PRIVATE, 'cache.campaigns', false).then((campaignKeys) => {
+            this._fullyCachedCampaigns = campaignKeys;
             return campaignKeys;
         }).catch(() => {
             return [];
@@ -322,7 +329,8 @@ export class CampaignManager {
                 return Promise.resolve(); // no fill
             }
         } else {
-            throw Error('No placements found');
+            this._nativeBridge.Sdk.logError('No placements found in realtime campaign json.');
+            return Promise.resolve();
         }
     }
 
@@ -474,7 +482,6 @@ export class CampaignManager {
                 networkType: networkType,
                 gamerId: this._configuration.getGamerId()
             });
-
             return url;
         });
     }
@@ -577,13 +584,15 @@ export class CampaignManager {
                 body.placements = placementRequest;
                 body.properties = this._configuration.getProperties();
                 body.sessionDepth = SdkStats.getAdRequestOrdinal();
-
                 return body;
             });
         });
     }
 
     private getVersionCode(): Promise<number | undefined> {
+        if (this._versionCode) {
+            return Promise.resolve(this._versionCode);
+        }
         if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
             return this._nativeBridge.DeviceInfo.Android.getPackageInfo(this._clientInfo.getApplicationName()).then(packageInfo => {
                 if(packageInfo.versionCode) {

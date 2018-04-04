@@ -115,14 +115,6 @@ describe('DisplayInterstitialEventHandler', () => {
         });
         */
 
-        describe('on skip', () => {
-            it('should hide the adUnit', () => {
-                sandbox.stub(displayInterstitialAdUnit, 'hide');
-                displayInterstitialEventHandler.onDisplayInterstitialSkip();
-                sinon.assert.called(<sinon.SinonSpy>displayInterstitialAdUnit.hide);
-            });
-        });
-
         describe('on close', () => {
             it('should hide the adUnit', () => {
                 sandbox.stub(displayInterstitialAdUnit, 'hide');

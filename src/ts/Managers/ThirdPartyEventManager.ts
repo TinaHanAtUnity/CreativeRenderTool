@@ -3,6 +3,7 @@ import { Request, INativeResponse } from 'Utilities/Request';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Analytics } from 'Utilities/Analytics';
 import { RequestError } from 'Errors/RequestError';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class ThirdPartyEventManager {
 
@@ -37,6 +38,12 @@ export class ThirdPartyEventManager {
             retryDelay: 0,
             followRedirects: true,
             retryWithConnectionEvents: false
+        }).then((response) => {
+            if (!Request.is2xxSuccessful(response.responseCode)) {
+                throw new Error(`Received error response code of ${response.responseCode} from tracker ${url}`);
+            }
+
+            return response;
         }).catch(error => {
             if(error instanceof RequestError) {
                 error = new DiagnosticError(new Error(error.message), {
@@ -47,6 +54,7 @@ export class ThirdPartyEventManager {
                     response: (<RequestError>error).nativeResponse
                 });
             }
+            Diagnostics.trigger('third_party_event_failed', error);
             return Analytics.trigger('third_party_event_failed', error);
         });
     }
