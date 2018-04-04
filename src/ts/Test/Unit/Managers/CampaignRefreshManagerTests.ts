@@ -16,7 +16,7 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { VastParser } from 'Utilities/VastParser';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { AssetManager } from 'Managers/AssetManager';
-import { Cache } from 'Utilities/Cache';
+import { Cache, CacheStatus } from 'Utilities/Cache';
 import { Placement, PlacementState } from 'Models/Placement';
 import { SessionManager } from 'Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
@@ -459,7 +459,7 @@ describe('CampaignRefreshManager', () => {
                 const error: Error = new Error('TestErrorMessage');
                 error.name = 'TestErrorMessage';
                 error.stack = 'TestErrorStack';
-                campaignManager.onError.trigger(error, ['premium', 'video'], undefined);
+                campaignManager.onError.trigger(error, ['premium', 'video'], 'test_diagnostics_type', undefined);
                 return Promise.resolve();
             });
 
@@ -475,7 +475,7 @@ describe('CampaignRefreshManager', () => {
 
         it('should send diagnostics when campaign caching fails', () => {
             sinon.stub(assetManager, 'setup').callsFake(() => {
-                throw new Error('test error');
+                throw CacheStatus.FAILED;
             });
 
             let receivedErrorType: string;
@@ -497,8 +497,8 @@ describe('CampaignRefreshManager', () => {
 
             return campaignRefreshManager.refresh().then(() => {
                 diagnosticsStub.restore();
-                assert.equal(receivedErrorType , 'auction_request_failed', 'Incorrect error type');
-                assert.equal(receivedError.error.message , 'test error', 'Incorrect error message');
+                assert.equal(receivedErrorType , 'campaign_caching_failed', 'Incorrect error type');
+                // assert.equal(receivedError.error.message , 'test error', 'Incorrect error message');
             });
         });
 
@@ -544,7 +544,7 @@ describe('CampaignRefreshManager', () => {
 
             return campaignRefreshManager.refresh().then(() => {
                 diagnosticsStub.restore();
-                assert.equal(receivedErrorType , 'auction_request_failed', 'Incorrect error type');
+                assert.equal(receivedErrorType , 'handle_campaign_error', 'Incorrect error type');
                 assert.equal(receivedError.error.message , 'Unsupported content-type: wrong/contentType', 'Incorrect error message');
             });
         });
@@ -571,7 +571,7 @@ describe('CampaignRefreshManager', () => {
 
             return campaignRefreshManager.refresh().then(() => {
                 diagnosticsStub.restore();
-                assert.equal(receivedErrorType, 'auction_request_failed', 'Incorrect error type');
+                assert.equal(receivedErrorType, 'error_creating_handle_campaign_chain', 'Incorrect error type');
                 assert.equal(receivedError.error.message, 'model: AuctionResponse key: contentType with value: 1: integer is not in: string', 'Incorrect error message');
             });
         });
