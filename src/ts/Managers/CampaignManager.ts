@@ -489,7 +489,7 @@ export class CampaignManager {
     private createRequestBody(nofillRetry?: boolean, realtimePlacement?: Placement): Promise<any> {
         const placementRequest: any = {};
 
-        if(realtimePlacement) {
+        if(realtimePlacement && this._realtimeBody) {
             placementRequest[realtimePlacement.getId()] = {
                 adTypes: realtimePlacement.getAdTypes(),
                 allowSkip: realtimePlacement.allowSkip(),
@@ -502,6 +502,7 @@ export class CampaignManager {
             }
             return Promise.resolve(this._realtimeBody);
         }
+        this._realtimeBody = undefined;
 
         const promises: Array<Promise<any>> = [];
         promises.push(this._deviceInfo.getFreeSpace());
