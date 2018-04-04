@@ -54,7 +54,7 @@ export class AdMobSignalFactory {
         }));
 
         promises.push(UserCountData.getRequestCount(this._nativeBridge).then((requestCount) => {
-            if (requestCount) {
+            if (typeof requestCount === 'number') {
                 signal.setNumPriorUserRequests(requestCount);
             }
         }).catch(() => {
@@ -62,7 +62,7 @@ export class AdMobSignalFactory {
         }));
 
         promises.push(UserCountData.getClickCount(this._nativeBridge).then(clickCount => {
-            if (clickCount) {
+            if (typeof clickCount === 'number') {
                 signal.setPriorClickCount(clickCount);
             }
         }).catch(() => {

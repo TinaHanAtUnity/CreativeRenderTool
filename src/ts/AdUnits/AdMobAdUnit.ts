@@ -104,7 +104,7 @@ export class AdMobAdUnit extends AbstractAdUnit {
         this._operativeEventManager.sendClick(this._placement);
 
         UserCountData.getClickCount(this._nativeBridge).then((clickCount) => {
-            if (clickCount) {
+            if (typeof clickCount === 'number') {
                 UserCountData.setClickCount(clickCount + 1, this._nativeBridge);
             }
         }).catch(() => {

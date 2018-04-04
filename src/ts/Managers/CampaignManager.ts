@@ -604,7 +604,7 @@ export class CampaignManager {
         SdkStats.increaseAdRequestOrdinal();
 
         UserCountData.getRequestCount(this._nativeBridge).then((requestCount) => {
-            if (requestCount) {
+            if (typeof requestCount === 'number') {
                 UserCountData.setRequestCount(requestCount + 1, this._nativeBridge);
             }
         }).catch(() => {
