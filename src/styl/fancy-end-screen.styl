@@ -6,11 +6,33 @@ $border-radius = .2rem;
 $end-screen-mixin($scale-size = $default-scale-size) {
 
   #end-screen.fancy-end-screen {
+    .content-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 5%;
+      height: 100%;
+    }
+
+    .end-screen-info-background {
+      position: relative;
+      align-items: center;
+      width: auto;
+      background-color: transparent;
+    }
+
+    .end-screen-info {
+      align-items: stretch;
+      margin-bottom: 1rem;
+      width: 80%;
+    }
 
     .game-image-container {
       display: flex;
       align-items: center;
       justify-content: center;
+      width: 100%;
+      height: 100%;
     }
 
     .store-container {
@@ -26,9 +48,10 @@ $end-screen-mixin($scale-size = $default-scale-size) {
 
     .download-container {
       z-index: 5;
+      margin: 0;
       padding: .4rem;
-      width: 100%;
-      border-radius: $border-radius;
+      width: auto;
+      border-radius: $scale-size * $default-size * .2;
       background-color: $white;
       color: $download-text;
       text-align: start;
@@ -39,7 +62,10 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       position: static;
       display: flex;
       align-items: center;
+      margin-bottom: .8rem;
       width: 100%;
+      border-radius: $scale-size * $default-size * .3;
+      background-color: rgba(23, 22, 34, .8);
     }
 
     // TODO: Set proper max-width
@@ -61,10 +87,6 @@ $end-screen-mixin($scale-size = $default-scale-size) {
     .campaign-container {
       display: flex;
       flex-direction: column;
-    }
-
-    .privacy-button {
-      left: 0;
     }
 
     .game-image-container {
@@ -96,48 +118,65 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       background-size: cover;
     }
 
-    .end-screen-info {
-      margin-bottom: .4rem;
-      width: 100%;
-      border-radius: $border-radius;
-      background-color: rgba(23, 22, 34, .8);
-    }
-
-    .end-screen-info-background {
-      width: auto;
-      background-color: $white;
-    }
-
     .game-background-landscape-blurred,
     .game-background-landscape {
       display: none;
     }
 
-    .game-background-portrait-blurred {
-      width: 50%;
-      height: 100%;
-    }
-
     .game-background {
       width: 80%;
       height: 80%;
-      border-radius: $border-radius;
+      border-radius: $scale-size * $default-size * .3;
+    }
+
+    .bottom-container {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+    }
+
+    .unityads-logo {
+      position: absolute;
+      right: auto;
+      left: 0;
+      width: 4rem;
+      height: 1rem;
+      background-position: left;
+    }
+
+    .privacy-button {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: auto;
+      font-size: $scale-size * $default-font-size * .8;
+    }
+  }
+
+  &.portrait #end-screen.fancy-end-screen {
+    .download-container {
+      margin: 0;
+    }
+
+    .privacy-button {
+      left: auto;
+    }
+
+    .game-background {
+      height: 100%;
     }
   }
 
   &.landscape #end-screen.fancy-end-screen {
     .end-screen-info-background {
-      position: relative;
       flex: 5;
       align-items: stretch;
       width: auto;
-      background-color: transparent;
     }
 
     .content-container {
-      display: flex;
       flex-direction: row;
-      margin: 5%;
+      width: auto;
       height: 100%;
     }
 
@@ -147,16 +186,6 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       .game-icon {
         margin: .3rem 1rem .3rem .3rem;
       }
-    }
-
-    .download-container {
-      width: auto;
-    }
-
-    .bottom-container {
-      position: absolute;
-      bottom: 0;
-      width: 100%;
     }
 
     .game-background-portrait-blurred,
@@ -183,23 +212,6 @@ $end-screen-mixin($scale-size = $default-scale-size) {
 
     .btn-close-region {
       color: $white;
-    }
-
-    .unityads-logo {
-      position: absolute;
-      right: auto;
-      left: 0;
-      width: 3rem;
-      height: .6rem;
-      background-position: left;
-    }
-
-    .privacy-button {
-      position: absolute;
-      right: 0;
-      bottom: 0;
-      left: auto;
-      font-size: $scale-size * $default-font-size * .4;
     }
   }
 }
