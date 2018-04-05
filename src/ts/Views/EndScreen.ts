@@ -25,7 +25,7 @@ const GDPR_OPT_OUT_BASE  = 'gdpr-pop-up-base';
 
 const SQUARE_END_SCREEN = 'square-end-screen';
 
-const FANCY_END_SCREEN = 'square-end-screen';
+const FANCY_END_SCREEN = 'fancy-end-screen';
 // TODO: Use actual group and campaign id
 const FANCY_END_SCREEN_CAMPAIGN_ID = '5a84800a6ac4fd047aa50595';
 const FANCY_END_SCREEN_AB_GROUP = 5;
