@@ -5,7 +5,6 @@ import { NativeBridge } from 'Native/NativeBridge';
 
 export class FLAM {
     public static runCount: number = 0;
-    public static webGlSupport: boolean;
     public static fpsCount: number = 0;
     public static fpsSum: number = 0;
     public static fps: number = 0;
@@ -13,102 +12,20 @@ export class FLAM {
     public static highestFps: number = 0;
     public static image: HTMLImageElement;
 
-    public static get Now() {
+    private static get Now() {
         return window.performance ? window.performance.now() : Date.now();
     }
 
-    public static get AverageFps() {
+    private static get AverageFps() {
         return this.runCount > 0 ? Math.round(this.fpsSum / this.fpsCount) : 0;
     }
 
     public static measure(webviewContext: HTMLElement, nativeBridge: NativeBridge) {
         const canvas = FLAM.createTestCanvas();
-        const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
         webviewContext.appendChild(canvas);
 
-        const filterStrength = 20;
-        let frameTime = 0;
-        let lastLoop = FLAM.Now;
-        let thisLoop;
-
-        FLAM.image = new Image();
-        FLAM.image.src = FLAM.getBase64Image();
-
-        this.runCount++;
-
-        const ts = Date.now();
-
-        FLAM.setRAF(function _retry() {
-            /* REFACTOR THIS */
-            const thisFrameTime = (thisLoop = FLAM.Now) - lastLoop;
-            frameTime += (thisFrameTime - frameTime) / filterStrength;
-            lastLoop = thisLoop;
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            FLAM.showFPS(canvas);
-
-            FLAM.draw2dCube(canvas, {x: 0, y: canvas.height / 2.5}, {rotate: true});
-            FLAM.draw2dCube(canvas, {x: 0, y: canvas.height});
-            FLAM.draw2dCube(canvas, {x: canvas.width, y: canvas.height / 2.5});
-            FLAM.draw2dCube(canvas, {x: canvas.width, y: canvas.height});
-
-            /* Draw circle */
-            ctx.strokeStyle = 'blue';
-            ctx.arc(canvas.width * Math.random(), canvas.height * Math.random(), 50, 0, Math.PI * 2);
-            ctx.stroke();
-
-            /* Draw heart */
-            ctx.fillStyle = 'red';
-            ctx.moveTo(canvas.width * Math.random(), canvas.height * Math.random());
-            ctx.bezierCurveTo(75, 37, 70, 25, 50, 25);
-            ctx.bezierCurveTo(20, 25, 20, 62.5, 20, 62.5);
-            ctx.bezierCurveTo(20, 80, 40, 102, 75, 120);
-            ctx.bezierCurveTo(110, 102, 130, 80, 130, 62.5);
-            ctx.bezierCurveTo(130, 62.5, 130, 25, 100, 25);
-            ctx.bezierCurveTo(85, 25, 75, 37, 75, 40);
-            ctx.fill();
-
-            /* Center */
-            FLAM.draw2dCube(canvas, {x: canvas.width / 2, y: canvas.height / 1.25}, {translate: true});
-            FLAM.draw2dCube(canvas, {x: canvas.width / 2, y: canvas.height / 2}, {wobbleEffect: true});
-
-            FLAM.drawImages(canvas, true);
-
-            /* Copy image data */
-            // const imageData = ctx.getImageData(50, 50, 100, 100);
-
-            FLAM.fps = Math.round(1000 / frameTime);
-
-            setTimeout(() => {
-                FLAM.fpsCount++;
-                FLAM.fpsSum += FLAM.fps;
-
-                FLAM.lowestFps = (FLAM.fps < FLAM.lowestFps) ? FLAM.fps : FLAM.lowestFps;
-                FLAM.highestFps = (FLAM.fps > FLAM.highestFps) ? FLAM.fps : FLAM.highestFps;
-            }, 2000);
-
-            if (ts + 5 * 1000 < Date.now()) {
-                const data = {
-                    runCount: FLAM.runCount,
-                    fpsCount: FLAM.fpsCount,
-                    fpsSum: FLAM.fpsSum,
-                    lowestFps: FLAM.lowestFps,
-                    highestFps: FLAM.highestFps,
-                    averageFps: FLAM.AverageFps,
-                    other: new Date(),
-                    score: 0,
-                    testType: '',
-                    testVersion: 3,
-                    device: window.navigator.userAgent,
-                };
-
-                // Diagnostics.trigger('canvas_performance_test', data);
-                nativeBridge.Sdk.logInfo(JSON.stringify(data));
-            } else {
-                FLAM.setRAF(_retry);
-            }
-        });
+        FLAM.runCount++;
+        FLAM.updateCanvas(canvas, nativeBridge);
     }
 
     private static setRAF(callback: () => any) {
@@ -136,15 +53,74 @@ export class FLAM {
         return canvas;
     }
 
-    private static showFPS(canvas: HTMLCanvasElement) {
+    private static recordFPS(fps: number, canvas?: HTMLCanvasElement) {
+        FLAM.fps = fps;
+        FLAM.fpsCount++;
+        FLAM.fpsSum += FLAM.fps;
+
+        FLAM.lowestFps = (FLAM.fps < FLAM.lowestFps) ? FLAM.fps : FLAM.lowestFps;
+        FLAM.highestFps = (FLAM.fps > FLAM.highestFps) ? FLAM.fps : FLAM.highestFps;
+
+        if (typeof canvas !== 'undefined') {
+            const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
+
+            ctx.fillStyle = 'gray';
+            ctx.fillRect(0, 10, 60, 15);
+
+            ctx.font = `15px serif`;
+            ctx.fillStyle = 'yellow';
+            ctx.fillText(`${(FLAM.fps)} fps`, 10, 20);
+        }
+    }
+
+    private static updateCanvas(canvas: HTMLCanvasElement, nativeBridge: NativeBridge) {
+        const startTime = FLAM.Now;
+        const testDuration = 5 * 1000;
+        const recordFPSDelay = 2 * 1000;
+
         const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
 
-        ctx.fillStyle = 'gray';
-        ctx.fillRect(0, 10, 60, 15);
+        const filterStrength = 20;
+        let frameTime = 0;
+        let lastLoop = FLAM.Now;
+        let thisLoop;
 
-        ctx.font = `15px serif`;
-        ctx.fillStyle = 'yellow';
-        ctx.fillText(`${(FLAM.fps)} fps`, 10, 20);
+        FLAM.loadImage();
+
+        FLAM.setRAF(function _retry() {
+            const thisFrameTime = (thisLoop = FLAM.Now) - lastLoop;
+            frameTime += (thisFrameTime - frameTime) / filterStrength;
+            lastLoop = thisLoop;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            FLAM.draw2dCube(canvas, {x: 0, y: canvas.height / 2.5}, {rotate: true});
+            FLAM.draw2dCube(canvas, {x: 0, y: canvas.height});
+            FLAM.draw2dCube(canvas, {x: canvas.width, y: canvas.height / 2.5});
+            FLAM.draw2dCube(canvas, {x: canvas.width, y: canvas.height});
+            FLAM.draw2dCube(canvas, {x: canvas.width / 2, y: canvas.height / 1.25}, {translate: true});
+            FLAM.draw2dCube(canvas, {x: canvas.width / 2, y: canvas.height / 2}, {wobbleEffect: true});
+
+            FLAM.drawCircle(canvas);
+            FLAM.drawHeart(canvas);
+
+            FLAM.drawImages(canvas, {wobbleEffect: true});
+
+            /* Copy image data */
+            // const imageData = ctx.getImageData(50, 50, 100, 100);
+
+            /* Skipping first values, while some devices are still adjusting */
+            if (startTime + recordFPSDelay < FLAM.Now) {
+                FLAM.recordFPS(Math.round(1000 / frameTime));
+            }
+
+            if (startTime + testDuration < FLAM.Now) {
+                FLAM.sendData(nativeBridge);
+                FLAM.cleanUp();
+            } else {
+                FLAM.setRAF(_retry);
+            }
+        });
     }
 
     private static draw2dCube(canvas: HTMLCanvasElement, position: { x: number, y: number }, effect?: { wobbleEffect?: boolean, rotate?: boolean, translate?: boolean }) {
@@ -200,12 +176,12 @@ export class FLAM {
         ctx.fill();
     }
 
-    private static drawImages(canvas: HTMLCanvasElement, wobbleEffect = false) {
+    private static drawImages(canvas: HTMLCanvasElement, effect?: { wobbleEffect?: boolean, rotate?: boolean, translate?: boolean }) {
         const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
 
         let wobble = 0;
 
-        if (wobbleEffect) {
+        if (effect && effect.wobbleEffect) {
             wobble = Math.sin(Date.now() / 250) * canvas.height / 50;
         }
 
@@ -220,6 +196,57 @@ export class FLAM {
                 ctx.drawImage(FLAM.image, canvas.width / 2 * Math.random(), canvas.height * Math.random());
                 ctx.restore();
             }
+        }
+    }
+
+    private static drawCircle(canvas: HTMLCanvasElement) {
+        const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
+        ctx.strokeStyle = 'blue';
+        ctx.arc(canvas.width * Math.random(), canvas.height * Math.random(), 50, 0, Math.PI * 2);
+        ctx.stroke();
+    }
+
+    private static drawHeart(canvas: HTMLCanvasElement) {
+        const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
+        ctx.fillStyle = 'red';
+        ctx.moveTo(canvas.width * Math.random(), canvas.height * Math.random());
+        ctx.bezierCurveTo(75, 37, 70, 25, 50, 25);
+        ctx.bezierCurveTo(20, 25, 20, 62.5, 20, 62.5);
+        ctx.bezierCurveTo(20, 80, 40, 102, 75, 120);
+        ctx.bezierCurveTo(110, 102, 130, 80, 130, 62.5);
+        ctx.bezierCurveTo(130, 62.5, 130, 25, 100, 25);
+        ctx.bezierCurveTo(85, 25, 75, 37, 75, 40);
+        ctx.fill();
+
+    }
+
+    private static sendData(nativeBridge: NativeBridge) {
+        const data = {
+            runCount: FLAM.runCount,
+            fpsCount: FLAM.fpsCount,
+            fpsSum: FLAM.fpsSum,
+            lowestFps: FLAM.lowestFps,
+            highestFps: FLAM.highestFps,
+            averageFps: FLAM.AverageFps,
+            other: FLAM.Now,
+            score: 0,
+            testType: '',
+            testVersion: 3,
+            device: window.navigator.userAgent,
+        };
+
+        // Diagnostics.trigger('canvas_performance_test', data);
+        nativeBridge.Sdk.logInfo(JSON.stringify(data));
+    }
+
+    private static cleanUp() {
+        /* Clean up */
+    }
+
+    private static loadImage() {
+        if (typeof FLAM.image === 'undefined') {
+            FLAM.image = new Image();
+            FLAM.image.src = FLAM.getBase64Image();
         }
     }
 
