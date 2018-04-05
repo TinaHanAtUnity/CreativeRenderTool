@@ -1,4 +1,4 @@
-# Pending
+# Thu Apr 5 20:28:31 UTC 2018
 
 * Fixed a bug where streaming video was cached and shown by default
 * Rename ForceOrientation to Orientation
