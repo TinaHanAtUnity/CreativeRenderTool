@@ -1,3 +1,8 @@
+# Pending
+
+* Fixed a bug where streaming video was cached and shown by default
+* Rename ForceOrientation to Orientation
+
 # Wed Apr 4 20:10:07 UTC 2018 
 
 * Start new refresh manager A/B test in groups 9 & 10
