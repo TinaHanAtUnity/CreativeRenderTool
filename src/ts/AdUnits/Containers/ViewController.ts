@@ -2,7 +2,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 import { UIInterfaceOrientation } from 'Constants/iOS/UIInterfaceOrientation';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
-import { AdUnitContainer, ForceOrientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, Orientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 import { Double } from 'Utilities/Double';
 import { FocusManager } from 'Managers/FocusManager';
 import { IosDeviceInfo } from 'Models/IosDeviceInfo';
@@ -45,7 +45,7 @@ export class ViewController extends AdUnitContainer {
         this._onNotificationObserver = this._nativeBridge.Notification.onNotification.subscribe((event, parameters) => this.onNotification(event, parameters));
     }
 
-    public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: IIosOptions): Promise<void> {
+    public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: IIosOptions): Promise<void> {
         this.resetDiagnosticsEvents();
         this.addDiagnosticsEvent({type: 'open'});
         this._options = options;
@@ -69,7 +69,7 @@ export class ViewController extends AdUnitContainer {
         this._nativeBridge.Notification.addAVNotificationObserver(ViewController._audioSessionInterrupt, ['AVAudioSessionInterruptionTypeKey', 'AVAudioSessionInterruptionOptionKey']);
         this._nativeBridge.Notification.addAVNotificationObserver(ViewController._audioSessionRouteChange, ['AVAudioSessionRouteChangeReasonKey']);
 
-        this._nativeBridge.Sdk.logInfo('Opening ' + adUnit.description() + ' ad with orientation ' + ForceOrientation[this._lockedOrientation]);
+        this._nativeBridge.Sdk.logInfo('Opening ' + adUnit.description() + ' ad with orientation ' + Orientation[this._lockedOrientation]);
 
         let hideStatusBar = true;
         if(allowStatusBar) {
@@ -122,7 +122,7 @@ export class ViewController extends AdUnitContainer {
         });
     }
 
-    public reorient(allowRotation: boolean, forceOrientation: ForceOrientation): Promise<any> {
+    public reorient(allowRotation: boolean, forceOrientation: Orientation): Promise<any> {
         this.addDiagnosticsEvent({type: 'reorient'});
         return this._nativeBridge.IosAdUnit.setShouldAutorotate(allowRotation).then(() => {
             return this._nativeBridge.IosAdUnit.setSupportedOrientations(this.getOrientation(this._options, allowRotation, forceOrientation));
@@ -149,9 +149,9 @@ export class ViewController extends AdUnitContainer {
         return this._nativeBridge.IosAdUnit.getViews();
     }
 
-    private getOrientation(options: IIosOptions, allowRotation: boolean, forceOrientation: ForceOrientation) {
+    private getOrientation(options: IIosOptions, allowRotation: boolean, forceOrientation: Orientation) {
         let orientation: UIInterfaceOrientationMask = options.supportedOrientations;
-        if(forceOrientation === ForceOrientation.LANDSCAPE) {
+        if(forceOrientation === Orientation.LANDSCAPE) {
             switch (options.statusBarOrientation) {
                 case UIInterfaceOrientation.LANDSCAPE_LEFT:
                     orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_LEFT;
@@ -162,7 +162,7 @@ export class ViewController extends AdUnitContainer {
                 default:
                     break;
             }
-        } else if(forceOrientation === ForceOrientation.PORTRAIT) {
+        } else if(forceOrientation === Orientation.PORTRAIT) {
             switch (options.statusBarOrientation) {
                 case UIInterfaceOrientation.PORTRAIT:
                     orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT;

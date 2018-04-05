@@ -1,5 +1,7 @@
-# Staged 
+# Wed Apr 4 20:10:07 UTC 2018 
 
+* Start new refresh manager A/B test in groups 9 & 10
+* Stop refresh manager A/B test in groups 9 & 11
 * Add proper handling of no fill retrying to NewRefreshManager
 * Micro-optimization for ordering native invocations during ad unit opening
 * Remove easter theme.

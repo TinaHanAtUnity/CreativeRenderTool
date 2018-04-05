@@ -11,7 +11,7 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { WebViewError } from 'Errors/WebViewError';
-import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Campaign } from 'Models/Campaign';
 import { Placement } from 'Models/Placement';
 import { CampaignAssetInfo, VideoType } from 'Utilities/CampaignAssetInfo';
@@ -133,7 +133,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
             videoOrientation = 'portrait';
         }
 
-        this._nativeBridge.Sdk.logDebug('Returning ' + videoOrientation + ' as video orientation for locked orientation ' + ForceOrientation[this._container.getLockedOrientation()]);
+        this._nativeBridge.Sdk.logDebug('Returning ' + videoOrientation + ' as video orientation for locked orientation ' + Orientation[this._container.getLockedOrientation()]);
 
         return videoOrientation;
     }

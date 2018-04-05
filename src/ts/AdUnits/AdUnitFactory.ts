@@ -16,7 +16,7 @@ import { Platform } from 'Constants/Platform';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { PerformanceVideoEventHandlers } from 'EventHandlers/PerformanceVideoEventHandlers';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
-import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Overlay } from 'Views/Overlay';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
@@ -451,7 +451,7 @@ export class AdUnitFactory {
         }
     }
 
-    private static getVideo(campaign: Campaign, forceOrientation: ForceOrientation): Video {
+    private static getVideo(campaign: Campaign, forceOrientation: Orientation): Video {
         const video = CampaignAssetInfo.getOrientedVideo(campaign, forceOrientation);
         if(!video) {
             throw new WebViewError('Unable to select an oriented video');

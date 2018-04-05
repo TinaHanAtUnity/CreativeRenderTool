@@ -6,7 +6,7 @@ import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'AdUnits/VPAIDAdUnit';
 import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
 import { VPAID } from 'Views/VPAID';
 import { NativeBridge } from 'Native/NativeBridge';
-import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
 import { FocusManager } from 'Managers/FocusManager';
 import { ClientInfo } from 'Models/ClientInfo';
@@ -49,7 +49,7 @@ describe('VPAIDAdUnit', () => {
             container: sinon.createStubInstance(Activity),
             configuration: sinon.createStubInstance(Configuration),
             request: sinon.createStubInstance(Request),
-            forceOrientation: ForceOrientation.NONE,
+            forceOrientation: Orientation.NONE,
             options: {}
         };
 
