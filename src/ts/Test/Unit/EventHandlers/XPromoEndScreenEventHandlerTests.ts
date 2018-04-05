@@ -11,7 +11,7 @@ import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { Request, INativeResponse } from 'Utilities/Request';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Platform } from 'Constants/Platform';
-import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { ViewController } from 'AdUnits/Containers/ViewController';
 import { XPromoCampaign, StoreName } from 'Models/Campaigns/XPromoCampaign';
@@ -90,7 +90,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             placement = TestFixtures.getPlacement();
 
             xPromoAdUnitParameters = {
-                forceOrientation: ForceOrientation.LANDSCAPE,
+                forceOrientation: Orientation.LANDSCAPE,
                 focusManager: focusManager,
                 container: container,
                 deviceInfo: deviceInfo,
@@ -168,7 +168,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
 
             xPromoAdUnitParameters = {
-                forceOrientation: ForceOrientation.LANDSCAPE,
+                forceOrientation: Orientation.LANDSCAPE,
                 focusManager: focusManager,
                 container: container,
                 deviceInfo: deviceInfo,

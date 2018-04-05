@@ -1,3 +1,25 @@
+# Thu Apr 5 20:28:31 UTC 2018
+
+* Fixed a bug where streaming video was cached and shown by default
+* Rename ForceOrientation to Orientation
+
+# Wed Apr 4 20:10:07 UTC 2018 
+
+* Start new refresh manager A/B test in groups 9 & 10
+* Stop refresh manager A/B test in groups 9 & 11
+* Add proper handling of no fill retrying to NewRefreshManager
+* Micro-optimization for ordering native invocations during ad unit opening
+* Remove easter theme.
+* Temporarily enable sending diagnostic for third party tracker errors
+* Cleanup Assetmanagers getOrientedVideo to use CampaignAssetInfo methods
+
+# Mon Apr 2 22:38:47 UTC 2018
+
+* Realtime latency optimization and tracking.
+* Reduce duration of closeable state for display interstitial.
+* Issue logging for IAP.
+* Remove AdMob diagnostic messages.
+
 # Fri Mar 30 05:33:42 UTC 2018
 
 * Change AdMob video asset to be optional for streaming fallback.

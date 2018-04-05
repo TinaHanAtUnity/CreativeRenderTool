@@ -19,7 +19,7 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { Platform } from 'Constants/Platform';
-import { AdUnitContainer, ForceOrientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, Orientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { Video } from 'Models/Assets/Video';
 import { TestEnvironment } from 'Utilities/TestEnvironment';
@@ -108,7 +108,7 @@ describe('VideoEventHandlersTest', () => {
         endScreen = new PerformanceEndScreen(nativeBridge, performanceCampaign, true, 'en', '12345');
 
         vastAdUnitParameters = {
-            forceOrientation: ForceOrientation.LANDSCAPE,
+            forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
             container: container,
             deviceInfo: deviceInfo,
@@ -127,7 +127,7 @@ describe('VideoEventHandlersTest', () => {
         };
 
         performanceAdUnitParameters = {
-            forceOrientation: ForceOrientation.LANDSCAPE,
+            forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
             container: container,
             deviceInfo: deviceInfo,
@@ -148,7 +148,7 @@ describe('VideoEventHandlersTest', () => {
         xPromoCampaign = TestFixtures.getXPromoCampaign();
         xPromoEndScreen = new XPromoEndScreen(nativeBridge, xPromoCampaign, true, 'en', '12345');
         xPromoAdUnitParameters = {
-            forceOrientation: ForceOrientation.LANDSCAPE,
+            forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
             container: container,
             deviceInfo: deviceInfo,
