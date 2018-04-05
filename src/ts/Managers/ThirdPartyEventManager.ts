@@ -4,6 +4,7 @@ import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Analytics } from 'Utilities/Analytics';
 import { RequestError } from 'Errors/RequestError';
 import { Diagnostics } from 'Utilities/Diagnostics';
+import { Url } from 'Utilities/Url';
 
 export class ThirdPartyEventManager {
 
@@ -38,20 +39,17 @@ export class ThirdPartyEventManager {
             retryDelay: 0,
             followRedirects: true,
             retryWithConnectionEvents: false
-        }).then((response) => {
-            if (!Request.is2xxSuccessful(response.responseCode)) {
-                throw new Error(`Received error response code of ${response.responseCode} from tracker ${url}`);
-            }
-
-            return response;
         }).catch(error => {
+            const urlParts = Url.parse(url);
             if(error instanceof RequestError) {
                 error = new DiagnosticError(new Error(error.message), {
                     request: (<RequestError>error).nativeRequest,
                     event: event,
                     sessionId: sessionId,
                     url: url,
-                    response: (<RequestError>error).nativeResponse
+                    response: (<RequestError>error).nativeResponse,
+                    host: urlParts.host,
+                    protocol: urlParts.protocol
                 });
             }
             Diagnostics.trigger('third_party_event_failed', error);
