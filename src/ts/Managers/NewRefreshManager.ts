@@ -102,7 +102,7 @@ export class NewRefreshManager extends RefreshManager {
         // todo: redundant method, should be removed
     }
 
-    public refreshFromCache(requestUrl: string, cachedResponse: string): Promise<INativeResponse | void> {
+    public refreshFromCache(cachedResponse: INativeResponse): Promise<INativeResponse | void> {
         const refillFlags: IRefillFlags = this.getRefillState(Date.now());
 
         if(refillFlags.shouldRefill) {
@@ -117,7 +117,7 @@ export class NewRefreshManager extends RefreshManager {
                     }
                 } else {
                     this.invalidateFill();
-                    this._campaignManager.requestFromCache(requestUrl, cachedResponse).then(() => {
+                    this._campaignManager.requestFromCache(cachedResponse).then(() => {
                         this._campaignManager.request(refillFlags.noFillRetry);
                    });
                 }

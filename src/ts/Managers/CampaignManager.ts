@@ -38,6 +38,7 @@ import { CacheError } from 'Native/Api/Cache';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 import { CampaignParserFactory } from 'Managers/CampaignParserFactory';
+import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
 
 export class CampaignManager {
 
@@ -86,6 +87,7 @@ export class CampaignManager {
     protected _assetManager: AssetManager;
     protected _configuration: Configuration;
     protected _clientInfo: ClientInfo;
+    protected _cacheBookkeeping: CacheBookkeeping;
     private _adMobSignalFactory: AdMobSignalFactory;
     private _sessionManager: SessionManager;
     private _metaDataManager: MetaDataManager;
@@ -96,7 +98,7 @@ export class CampaignManager {
     private _fullyCachedCampaigns: string[] | undefined;
     private _skipErrors: boolean;
 
-    constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager) {
+    constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeeping) {
         this._nativeBridge = nativeBridge;
         this._configuration = configuration;
         this._assetManager = assetManager;
@@ -106,10 +108,12 @@ export class CampaignManager {
         this._deviceInfo = deviceInfo;
         this._metaDataManager = metaDataManager;
         this._adMobSignalFactory = adMobSignalFactory;
+        this._cacheBookkeeping = cacheBookkeeping;
         this._requesting = false;
+        this._skipErrors = false;
     }
 
-    public requestFromCache(requestUrl: string, cachedResponse: string): Promise<void[] | void> {
+    public requestFromCache(cachedResponse: INativeResponse): Promise<void[] | void> {
         if(this._requesting) {
             return Promise.resolve();
         }
@@ -123,14 +127,9 @@ export class CampaignManager {
         this._fullyCachedCampaigns = undefined;
         this.resetRealtimeDataForPlacements();
 
-        this._nativeBridge.Sdk.logInfo('Requesting ad plan from cache ' + requestUrl);
+        this._nativeBridge.Sdk.logInfo('Requesting ad plan from cache ' + cachedResponse.url);
 
-        return this.parseCampaigns({
-                url: requestUrl,
-                response: cachedResponse,
-                responseCode: 200,
-                headers: []
-            }).then(() => {
+        return this.parseCampaigns(cachedResponse).then(() => {
                 this._skipErrors = false;
                 this._requesting = false;
             }).catch((error) => {
@@ -167,9 +166,6 @@ export class CampaignManager {
                         headers: []
                     });
                 }
-                this._nativeBridge.Storage.set<string>(StorageType.PRIVATE, 'cachedCampaignUrl', requestUrl).catch(() => {
-                    // ignore errors, assume caching not paused
-                });
                 return this._request.post(requestUrl, body, [], {
                     retries: 2,
                     retryDelay: 10000,
@@ -178,9 +174,7 @@ export class CampaignManager {
                 });
             }).then(response => {
                 if(response) {
-                    this._nativeBridge.Storage.set<string>(StorageType.PRIVATE, 'cachedCampaignResponse', response.response).catch(() => {
-                        // ignore errors, assume caching not paused
-                    });
+                    this._cacheBookkeeping.setCachedCampaignResponse(response);
                     SdkStats.setAdRequestDuration(Date.now() - requestTimestamp);
                     SdkStats.increaseAdRequestOrdinal();
                     return this.parseCampaigns(response).catch((e) => {

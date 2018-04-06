@@ -4,6 +4,7 @@ import { StorageType } from 'Native/Api/Storage';
 import { NativeBridge } from 'Native/NativeBridge';
 import { ICacheCampaignsResponse } from 'Utilities/Cache';
 import { FileId } from 'Utilities/FileId';
+import { INativeResponse } from 'Utilities/Request';
 
 export interface IFileBookkeepingInfo {
     fullyDownloaded: boolean;
@@ -179,6 +180,40 @@ export class CacheBookkeeping {
     public removeFileEntry(fileId: string): void {
         this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.files.' + FileId.getFileIdHash(fileId));
         this._nativeBridge.Storage.write(StorageType.PRIVATE);
+    }
+
+    public getCachedCampaignResponse(): Promise<INativeResponse | undefined> {
+        const cacheCampaignUrlPromise = this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, 'cache.campaign.url');
+        const cachedCampaignResponsePromise = this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, 'cache.campaign.response');
+
+        return Promise.all([cacheCampaignUrlPromise, cachedCampaignResponsePromise]).then(([requestUrl, cachedResponse]) =>
+            ({
+                url: requestUrl,
+                response: cachedResponse,
+                responseCode: 200,
+                headers: []
+            } as INativeResponse)
+        ).catch(() => {
+            return undefined;
+        });
+    }
+
+    public setCachedCampaignResponse(response: INativeResponse): Promise<any> {
+        const cacheCampaignUrlPromise = this._nativeBridge.Storage.set<string>(StorageType.PRIVATE, 'cache.campaign.url', response.url);
+        const cachedCampaignResponsePromise = this._nativeBridge.Storage.set<string>(StorageType.PRIVATE, 'cache.campaign.response', response.response);
+
+        return Promise.all([cacheCampaignUrlPromise, cachedCampaignResponsePromise]).catch(() => {
+            // ignore error
+        });
+    }
+
+    public deleteCachedCampaignResponse(): Promise<any> {
+        const cacheCampaignUrlPromise = this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.campaign.url');
+        const cachedCampaignResponsePromise = this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.campaign.response');
+
+        return Promise.all([cacheCampaignUrlPromise, cachedCampaignResponsePromise]).catch(error => {
+            // ignore error
+        });
     }
 
     private deleteCacheBookKeepingData(): Promise<void> {

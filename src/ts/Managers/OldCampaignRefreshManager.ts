@@ -126,7 +126,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
         return Promise.resolve();
     }
 
-    public refreshFromCache(requestUrl: string, cachedResponse: string): Promise<INativeResponse | void> {
+    public refreshFromCache(cachedResponse: INativeResponse): Promise<INativeResponse | void> {
         if(!this._refreshAllowed) {
             return Promise.resolve();
         }
@@ -135,7 +135,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
             this._refillTimestamp = 0;
             this.invalidateCampaigns(false, this._configuration.getPlacementIds());
             this._campaignCount = 0;
-            return this._campaignManager.requestFromCache(requestUrl, cachedResponse).then(() => {
+            return this._campaignManager.requestFromCache(cachedResponse).then(() => {
                 return this._campaignManager.request();
            });
         } else if(this.checkForExpiredCampaigns()) {
