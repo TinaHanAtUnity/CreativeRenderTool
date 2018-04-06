@@ -9,7 +9,7 @@ import { Platform } from 'Constants/Platform';
 import { IVastAdUnitParameters, VastAdUnit } from 'AdUnits/VastAdUnit';
 import { VastEndScreen } from 'Views/VastEndScreen';
 import { VastEndScreenEventHandler } from 'EventHandlers/VastEndScreenEventHandler';
-import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { Video } from 'Models/Assets/Video';
 import { Request } from 'Utilities/Request';
@@ -70,7 +70,7 @@ describe('VastEndScreenEventHandlersTest', () => {
         comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         vastAdUnitParameters = {
-            forceOrientation: ForceOrientation.LANDSCAPE,
+            forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
             container: container,
             deviceInfo: deviceInfo,

@@ -9,8 +9,6 @@ import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { WebViewError } from 'Errors/WebViewError';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
-import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
-import { CampaignAssetInfo } from 'Utilities/CampaignAssetInfo';
 
 enum CacheType {
     REQUIRED,
@@ -279,11 +277,28 @@ export class AssetManager {
             this._deviceInfo.getScreenWidth(),
             this._deviceInfo.getScreenHeight()
         ]).then(([screenWidth, screenHeight]) => {
-            const orientation: ForceOrientation = screenWidth >= screenHeight ? ForceOrientation.LANDSCAPE : ForceOrientation.PORTRAIT;
-            const video = CampaignAssetInfo.getOrientedVideo(campaign, orientation);
+            const landscape = screenWidth >= screenHeight;
+            const portrait = screenHeight > screenWidth;
 
-            if(video) {
-                return video;
+            const landscapeVideo = campaign.getVideo();
+            const portraitVideo = campaign.getPortraitVideo();
+
+            if(landscape) {
+                if(landscapeVideo) {
+                    return landscapeVideo;
+                }
+                if(portraitVideo) {
+                    return portraitVideo;
+                }
+            }
+
+            if(portrait) {
+                if(portraitVideo) {
+                    return portraitVideo;
+                }
+                if(landscapeVideo) {
+                    return landscapeVideo;
+                }
             }
 
             throw new WebViewError('Unable to select oriented video for caching');
