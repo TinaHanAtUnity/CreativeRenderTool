@@ -94,6 +94,7 @@ export class CampaignManager {
     private _previousPlacementId: string | undefined;
     private _versionCode: number;
     private _fullyCachedCampaigns: string[] | undefined;
+    private _skipErrors: boolean;
 
     constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager) {
         this._nativeBridge = nativeBridge;
@@ -106,6 +107,36 @@ export class CampaignManager {
         this._metaDataManager = metaDataManager;
         this._adMobSignalFactory = adMobSignalFactory;
         this._requesting = false;
+    }
+
+    public requestFromCache(requestUrl: string, cachedResponse: string): Promise<void[] | void> {
+        if(this._requesting) {
+            return Promise.resolve();
+        }
+
+        this._assetManager.enableCaching();
+        this._assetManager.checkFreeSpace();
+
+        this._skipErrors = true;
+        this._requesting = true;
+
+        this._fullyCachedCampaigns = undefined;
+        this.resetRealtimeDataForPlacements();
+
+        this._nativeBridge.Sdk.logInfo('Requesting ad plan from cache ' + requestUrl);
+
+        return this.parseCampaigns({
+                url: requestUrl,
+                response: cachedResponse,
+                responseCode: 200,
+                headers: []
+            }).then(() => {
+                this._skipErrors = false;
+                this._requesting = false;
+            }).catch((error) => {
+                this._skipErrors = false;
+                this._requesting = false;
+            });
     }
 
     public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
@@ -136,6 +167,9 @@ export class CampaignManager {
                         headers: []
                     });
                 }
+                this._nativeBridge.Storage.set<string>(StorageType.PRIVATE, 'cachedCampaignUrl', requestUrl).catch(() => {
+                    // ignore errors, assume caching not paused
+                });
                 return this._request.post(requestUrl, body, [], {
                     retries: 2,
                     retryDelay: 10000,
@@ -144,6 +178,9 @@ export class CampaignManager {
                 });
             }).then(response => {
                 if(response) {
+                    this._nativeBridge.Storage.set<string>(StorageType.PRIVATE, 'cachedCampaignResponse', response.response).catch(() => {
+                        // ignore errors, assume caching not paused
+                    });
                     SdkStats.setAdRequestDuration(Date.now() - requestTimestamp);
                     SdkStats.increaseAdRequestOrdinal();
                     return this.parseCampaigns(response).catch((e) => {
@@ -376,13 +413,17 @@ export class CampaignManager {
 
     private handleNoFill(placement: string): Promise<void> {
         this._nativeBridge.Sdk.logDebug('PLC no fill for placement ' + placement);
-        this.onNoFill.trigger(placement);
+        if (!this._skipErrors) {
+            this.onNoFill.trigger(placement);
+        }
         return Promise.resolve();
     }
 
     private handleError(error: any, placementIds: string[], session?: Session): Promise<void> {
         this._nativeBridge.Sdk.logDebug('PLC error ' + error);
-        this.onError.trigger(error, placementIds, session);
+        if (!this._skipErrors) {
+            this.onError.trigger(error, placementIds, session);
+        }
 
         return Promise.resolve();
     }

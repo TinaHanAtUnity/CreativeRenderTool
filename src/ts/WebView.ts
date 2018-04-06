@@ -58,6 +58,7 @@ import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
 import { Timer } from 'Utilities/Timer';
 import { TimeoutError, Promises } from 'Utilities/Promises';
+import { StorageType } from 'Native/Api/Storage';
 
 export class WebView {
 
@@ -99,6 +100,9 @@ export class WebView {
     private _creativeUrl?: string;
     private _requestDelay: number;
 
+    private _cachedCampaignUrl: string | null;
+    private _cachedCampaignResponse: string | null;
+
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
 
@@ -122,6 +126,9 @@ export class WebView {
             } else if(this._clientInfo.getPlatform() === Platform.IOS) {
                 this._deviceInfo = new IosDeviceInfo(this._nativeBridge);
             }
+
+            this._cachedCampaignUrl = null;
+            this._cachedCampaignResponse = null;
 
             this._focusManager = new FocusManager(this._nativeBridge);
             this._wakeUpManager = new WakeUpManager(this._nativeBridge, this._focusManager);
@@ -182,9 +189,20 @@ export class WebView {
                 Diagnostics.trigger('cleaning_cache_failed', error);
             });
 
-            return Promise.all([configPromise, cachePromise]);
-        }).then(([configuration]) => {
+            const cacheCampaignUrlPromise = this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, 'cachedCampaignUrl').catch(() => {
+                // ignore errors, assume caching not paused
+                return null;
+            });
+            const cachedCampaignResponsePromise = this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, 'cachedCampaignResponse').catch(() => {
+                // ignore errors, assume caching not paused
+                return null;
+            });
+
+            return Promise.all([configPromise, cacheCampaignUrlPromise, cachedCampaignResponsePromise, cachePromise]);
+        }).then(([configuration, cachedCampaignUrl, cachedCampaignResponse]) => {
             this._configuration = configuration;
+            this._cachedCampaignUrl = cachedCampaignUrl;
+            this._cachedCampaignResponse = cachedCampaignResponse;
             HttpKafka.setConfiguration(this._configuration);
 
             PurchasingUtilities.setConfiguration(this._configuration);
@@ -232,7 +250,11 @@ export class WebView {
 
             SdkStats.initialize(this._nativeBridge, this._request, this._configuration, this._sessionManager, this._campaignManager, this._metadataManager, this._clientInfo);
 
-            return this._refreshManager.refresh();
+            if (this._cachedCampaignUrl !== null && this._cachedCampaignResponse !== null) {
+                return this._refreshManager.refreshFromCache(this._cachedCampaignUrl, this._cachedCampaignResponse);
+            } else {
+                return this._refreshManager.refresh();
+            }
         }).then(() => {
             this._initialized = true;
 
@@ -289,6 +311,14 @@ export class WebView {
             Diagnostics.trigger('campaign_expired', error, campaign.getSession());
             return;
         }
+
+        this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cachedCampaignUrl').catch(() => {
+            // ignore errors, assume caching not paused
+        });
+
+        this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cachedCampaignResponse').catch(() => {
+            // ignore errors, assume caching not paused
+        });
 
         if (placement.getRealtimeData()) {
             this._nativeBridge.Sdk.logInfo('Unity Ads is requesting realtime fill for placement ' + placement.getId());
