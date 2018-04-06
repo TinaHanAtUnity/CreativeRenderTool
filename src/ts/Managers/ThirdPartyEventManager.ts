@@ -52,7 +52,6 @@ export class ThirdPartyEventManager {
                     protocol: urlParts.protocol
                 });
             }
-            Diagnostics.trigger('third_party_event_failed', error);
             return Analytics.trigger('third_party_event_failed', error);
         });
     }
