@@ -57,6 +57,8 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
         this._template = new Template(this.getTemplate(), this._localization);
 
+        this._template = new Template(this.getTemplate(), this._localization);
+
         this._bindings = [
             {
                 event: 'click',
@@ -104,7 +106,6 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         }
 
         const endScreenAlt = this.getEndscreenAlt();
-        console.log("END SCReen aLT: ", endScreenAlt);
         if (typeof endScreenAlt === 'string') {
             this._container.classList.add(endScreenAlt);
             document.documentElement.classList.add(endScreenAlt);

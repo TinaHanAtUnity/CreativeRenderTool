@@ -1,7 +1,34 @@
 @import "vars.styl";
 
 $download-text = #4943B6;
-$border-radius = .2rem;
+
+@media (min-width: 1025px)
+  html.fancy-end-screen {
+    font-size: $default-px-size * 1.5;
+  }
+
+/***********
+* Portrait
+***********/
+@media (max-width: 768px) and (min-width: 569px) and (orientation: portrait)
+  html.fancy-end-screen {
+    font-size: $default-px-size * 1.5;
+  }
+
+/***********
+* Landscape
+***********/
+@media (orientation: landscape)
+  @media (min-width: 960px) and (max-width: 1024px) {
+    html.fancy-end-screen {
+      font-size: $default-px-size * 1.5;
+    }
+  }
+
+@media (max-width: 960px) and (min-width: 768px) and (orientation: landscape)
+  html.fancy-end-screen {
+    font-size: $default-px-size * 1.4;
+  }
 
 $end-screen-mixin($scale-size = $default-scale-size) {
 
@@ -23,8 +50,7 @@ $end-screen-mixin($scale-size = $default-scale-size) {
 
     .end-screen-info {
       align-items: stretch;
-      margin-bottom: 1rem;
-      width: 80%;
+      width: 77%;
     }
 
     .game-image-container {
@@ -42,20 +68,8 @@ $end-screen-mixin($scale-size = $default-scale-size) {
 
     .column-container {
       flex-grow: 1;
-      margin: 0 .3rem 0 0;
+      margin: .3rem;
       text-align: left;
-    }
-
-    .download-container {
-      z-index: 5;
-      margin: 0;
-      padding: .4rem;
-      width: auto;
-      border-radius: $scale-size * $default-size * .2;
-      background-color: $white;
-      color: $download-text;
-      text-align: start;
-      //font-size: $scale-size * $default-font-size;
     }
 
     .row-container {
@@ -70,18 +84,39 @@ $end-screen-mixin($scale-size = $default-scale-size) {
 
     // TODO: Set proper max-width
     .name-container {
+      margin-bottom: .2rem;
       color: $white;
-      //font-size: $scale-size * $default-font-size;
+      font-weight: bold;
+      font-size: $scale-size * $default-font-size * .9;
     }
 
-    .game-icon {
-      //$game-icon-default($scale-size * .5);
-      margin: .3rem 1rem .3rem .3rem;
+    .download-container {
+      z-index: 5;
+      margin: 0;
+      padding: .6rem .8rem;
+      width: auto;
+      border-radius: $scale-size * $default-size * .15;
+      background-color: $white;
+      color: $download-text;
+      text-align: start;
+      font-weight: bold;
+      font-size: $scale-size * $default-font-size;
+    }
+
+    .game-rating {
+      color: transparent;
+      letter-spacing: 2px;
+      font-size: .7rem;
+      line-height: 1rem;
     }
 
     .game-rating-count {
-      color: rgba(255, 255, 255, .8);
-      font-size: $scale-size * $default-font-size * .5;
+      color: rgba(255, 255, 255, .6);
+      font-size: .6rem;
+    }
+
+    .game-rating-mask {
+      color: rgba(255, 255, 255, .6);
     }
 
     .campaign-container {
@@ -123,6 +158,10 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       display: none;
     }
 
+    .game-icon {
+      margin: .6rem .5rem;
+    }
+
     .game-background {
       width: 80%;
       height: 80%;
@@ -153,65 +192,84 @@ $end-screen-mixin($scale-size = $default-scale-size) {
     }
   }
 
-  &.portrait #end-screen.fancy-end-screen {
-    .download-container {
-      margin: 0;
-    }
+  body {
+    &.portrait #end-screen.fancy-end-screen {
+      .content-container {
+        margin: 12% 4% 4% 4%;
+      }
 
-    .privacy-button {
-      left: auto;
-    }
+      .end-screen-info {
+        margin-top: 4%;
+      }
 
-    .game-background {
-      height: 100%;
-    }
-  }
+      .download-container {
+        margin: 0;
+      }
 
-  &.landscape #end-screen.fancy-end-screen {
-    .end-screen-info-background {
-      flex: 5;
-      align-items: stretch;
-      width: auto;
-    }
+      .privacy-button {
+        left: auto;
+      }
 
-    .content-container {
-      flex-direction: row;
-      width: auto;
-      height: 100%;
-    }
-
-    .end-screen-info {
-      width: auto;
-
-      .game-icon {
-        margin: .3rem 1rem .3rem .3rem;
+      .game-background {
+        height: 100%;
       }
     }
 
-    .game-background-portrait-blurred,
-    .game-background-portrait {
-      display: none;
-    }
+    &.landscape #end-screen.fancy-end-screen {
+      .end-screen-info-background {
+        flex: 5;
+        align-items: stretch;
+        width: auto;
+      }
 
-    .game-background-landscape-blurred,
-    .game-background-landscape {
-      display: block;
-    }
+      .content-container {
+        flex-direction: row;
+        width: auto;
+        height: 100%;
+      }
 
-    .game-background {
-      width: 100%;
-      height: 100%;
-    }
+      .end-screen-info {
+        align-items: stretch;
+        width: auto;
 
-    .game-image-container {
-      flex: 6;
-      margin-right: 5%;
-      width: 30%;
-      height: 100%;
-    }
+        .game-icon {
+          margin: .6rem .5rem;
+        }
+      }
 
-    .btn-close-region {
-      color: $white;
+      .game-background-portrait-blurred,
+      .game-background-portrait {
+        display: none;
+      }
+
+      .game-background-landscape-blurred,
+      .game-background-landscape {
+        display: block;
+      }
+
+      .game-background {
+        width: 100%;
+        height: 100%;
+      }
+
+      .game-image-container {
+        flex: 6;
+        margin-right: 5%;
+        width: 30%;
+        height: 100%;
+      }
+
+      .column-container {
+        margin: .3rem;
+      }
+
+      .btn-close-region {
+        color: $white;
+      }
+
+      .privacy-button {
+        left: auto;
+      }
     }
   }
 }
