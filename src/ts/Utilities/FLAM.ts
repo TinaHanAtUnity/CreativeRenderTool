@@ -24,11 +24,10 @@ export class FLAM {
         const canvas = FLAM.createTestCanvas();
         webviewContext.appendChild(canvas);
 
-        FLAM.runCount++;
-        FLAM.updateCanvas(canvas, nativeBridge);
+        FLAM.runUpdateLoop(canvas, nativeBridge);
     }
 
-    private static setRAF(callback: () => any) {
+    private static requestAnimationFrame(callback: () => any) {
         if (typeof window.requestAnimationFrame !== 'undefined') {
             window.requestAnimationFrame(callback);
         } else if (typeof window.webkitRequestAnimationFrame !== 'undefined') {
@@ -73,7 +72,7 @@ export class FLAM {
         }
     }
 
-    private static updateCanvas(canvas: HTMLCanvasElement, nativeBridge: NativeBridge) {
+    private static runUpdateLoop(canvas: HTMLCanvasElement, nativeBridge: NativeBridge) {
         const startTime = FLAM.Now;
         const testDuration = 5 * 1000;
         const recordFPSDelay = 2 * 1000;
@@ -87,7 +86,7 @@ export class FLAM {
 
         FLAM.loadImage();
 
-        FLAM.setRAF(function _retry() {
+        FLAM.requestAnimationFrame(function drawFrame() {
             const thisFrameTime = (thisLoop = FLAM.Now) - lastLoop;
             frameTime += (thisFrameTime - frameTime) / filterStrength;
             lastLoop = thisLoop;
@@ -118,7 +117,7 @@ export class FLAM {
                 FLAM.sendData(nativeBridge);
                 FLAM.cleanUp();
             } else {
-                FLAM.setRAF(_retry);
+                FLAM.requestAnimationFrame(drawFrame);
             }
         });
     }
@@ -221,6 +220,8 @@ export class FLAM {
     }
 
     private static sendData(nativeBridge: NativeBridge) {
+        FLAM.runCount++;
+
         const data = {
             runCount: FLAM.runCount,
             fpsCount: FLAM.fpsCount,
