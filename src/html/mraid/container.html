@@ -1277,6 +1277,10 @@
                                 break;
                             case 'anchorsupdated':
                                 window.WebARonARKitDispatchARDisplayEvent({type: message.data.data.event, anchors: parameters});
+                                break;
+                            case 'windowresized':
+                                window.WebARonARKitSetWindowSize(parameters);
+                                break;
                         }
                     }
                 });

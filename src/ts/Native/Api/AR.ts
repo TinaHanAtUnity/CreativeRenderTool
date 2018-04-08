@@ -1,13 +1,14 @@
 import { NativeApi } from '../NativeApi';
 import { NativeBridge } from '../NativeBridge';
-import { Observable1 } from '../../Utilities/Observable';
+import {Observable1, Observable2} from '../../Utilities/Observable';
 
 enum AREvent {
     AR_PLANES_ADDED,
     AR_PLANES_REMOVED,
     AR_PLANES_UPDATED,
     AR_ANCHORS_UPDATED,
-    AR_FRAME_UPDATED
+    AR_FRAME_UPDATED,
+    AR_WINDOW_RESIZED
 }
 
 export class ARApi extends NativeApi {
@@ -17,6 +18,7 @@ export class ARApi extends NativeApi {
     public readonly onPlanesUpdated = new Observable1<string>();
     public readonly onAnchorsUpdated = new Observable1<string>();
     public readonly onFrameUpdated = new Observable1<string>();
+    public readonly onWindowResized = new Observable2<number, number>();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'AR');
@@ -74,6 +76,9 @@ export class ARApi extends NativeApi {
                 break;
             case AREvent[AREvent.AR_FRAME_UPDATED]:
                 this.onFrameUpdated.trigger(parameters[0]);
+                break;
+            case AREvent[AREvent.AR_WINDOW_RESIZED]:
+                this.onWindowResized.trigger(parameters[0], parameters[1]);
                 break;
         }
     }

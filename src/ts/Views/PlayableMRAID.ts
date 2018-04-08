@@ -10,7 +10,7 @@ import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
-import { IObserver1 } from '../Utilities/IObserver';
+import { IObserver1, IObserver2 } from '../Utilities/IObserver';
 
 export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -45,6 +45,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _arPlanesUpdatedObserver: IObserver1<string>;
     private _arPlanesRemovedObserver: IObserver1<string>;
     private _arAnchorsUpdatedObserver: IObserver1<string>;
+    private _arWindowResizedObserver: IObserver2<number, number>;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string, coppaCompliant: boolean) {
         super(nativeBridge, 'playable-mraid', placement, campaign, coppaCompliant);
@@ -118,6 +119,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
             this._arPlanesUpdatedObserver = this._nativeBridge.AR.onPlanesUpdated.subscribe(parameters => this.handleAREvent('planesupdated', parameters));
             this._arPlanesRemovedObserver = this._nativeBridge.AR.onPlanesRemoved.subscribe(parameters => this.handleAREvent('planesremoved', parameters));
             this._arAnchorsUpdatedObserver = this._nativeBridge.AR.onAnchorsUpdated.subscribe(parameters => this.handleAREvent('anchorsupdated', parameters));
+            this._arWindowResizedObserver = this._nativeBridge.AR.onWindowResized.subscribe((width, height) => this.handleAREvent('windowresized', JSON.stringify({width, height})));
         });
 
         this._messageListener = (event: MessageEvent) => this.onMessage(event);
@@ -318,6 +320,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         this._nativeBridge.AR.onPlanesUpdated.unsubscribe(this._arPlanesUpdatedObserver);
         this._nativeBridge.AR.onPlanesRemoved.unsubscribe(this._arPlanesRemovedObserver);
         this._nativeBridge.AR.onAnchorsUpdated.unsubscribe(this._arAnchorsUpdatedObserver);
+        this._nativeBridge.AR.onWindowResized.unsubscribe(this._arWindowResizedObserver);
     }
 
     private onAREvent(event: MessageEvent): Promise<void> {
@@ -325,7 +328,6 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         const message = data.split(':');
         const functionName = message[0];
         const args = message[1].split(',');
-        this._nativeBridge.Sdk.logDebug('AR LOG DEBUG: ' + functionName + ' args: ' + JSON.stringify(args));
 
         switch (functionName) {
             case 'resetPose':
