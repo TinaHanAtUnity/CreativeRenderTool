@@ -1,5 +1,6 @@
 import PlayableMRAIDTemplate from 'html/PlayableMRAID.html';
 import MRAIDContainer from 'html/mraid/container.html';
+import WebARScript from 'html/mraid/webar.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { Placement } from 'Models/Placement';
@@ -110,6 +111,9 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 this._configuration = {};
             }
             container = container.replace('var playableConfiguration = {};', 'var playableConfiguration = ' + JSON.stringify(this._configuration) + ';');
+        }
+        if (this._campaign.getArEnabled()) {
+            container = container.replace('<script id=\"webar\"></script>', WebARScript);
         }
         this.createMRAID(container).then(mraid => {
             iframe.onload = () => this.onIframeLoaded();
