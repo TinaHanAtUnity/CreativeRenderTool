@@ -1,6 +1,6 @@
 import { NativeApi } from '../NativeApi';
 import { NativeBridge } from '../NativeBridge';
-import {Observable1, Observable2} from '../../Utilities/Observable';
+import { Observable1, Observable2 } from '../../Utilities/Observable';
 
 enum AREvent {
     AR_PLANES_ADDED,
