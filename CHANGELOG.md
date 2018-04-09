@@ -1,8 +1,15 @@
-# Staged 
+# Thu Apr 5 20:28:31 UTC 2018
 
+* Fixed a bug where streaming video was cached and shown by default
+* Rename ForceOrientation to Orientation
+
+# Wed Apr 4 20:10:07 UTC 2018 
+
+* Start new refresh manager A/B test in groups 9 & 10
+* Stop refresh manager A/B test in groups 9 & 11
 * Add proper handling of no fill retrying to NewRefreshManager
 * Micro-optimization for ordering native invocations during ad unit opening
-* Disables Analytics for all Disney games
+* Remove easter theme.
 * Temporarily enable sending diagnostic for third party tracker errors
 * Cleanup Assetmanagers getOrientedVideo to use CampaignAssetInfo methods
 

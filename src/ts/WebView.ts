@@ -25,7 +25,7 @@ import { HttpKafka } from 'Utilities/HttpKafka';
 import { ConfigError } from 'Errors/ConfigError';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { AssetManager } from 'Managers/AssetManager';
-import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { ViewController } from 'AdUnits/Containers/ViewController';
 import { TestEnvironment } from 'Utilities/TestEnvironment';
@@ -197,8 +197,7 @@ export class WebView {
                 throw error;
             }
 
-            const isAnalyticsEnabled = (this._configuration.isAnalyticsEnabled() || CustomFeatures.isExampleGameId(this._clientInfo.getGameId())) && !CustomFeatures.isAnalyticsDisabled(this._clientInfo.getGameId());
-            if(isAnalyticsEnabled) {
+            if(this._configuration.isAnalyticsEnabled() || CustomFeatures.isExampleGameId(this._clientInfo.getGameId())) {
                 this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo, this._configuration, this._focusManager);
                 return this._analyticsManager.init().then(() => {
                     this._sessionManager.setGameSessionId(this._analyticsManager.getGameSessionId());
@@ -220,10 +219,10 @@ export class WebView {
             const defaultPlacement = this._configuration.getDefaultPlacement();
             this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
 
-            this._assetManager = new AssetManager(this._cache, this._configuration.getCacheMode(), this._deviceInfo, this._cacheBookkeeping);
+            this._assetManager = new AssetManager(this._cache, this._configuration.getCacheMode(), this._deviceInfo, this._cacheBookkeeping, this._nativeBridge);
             this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._adMobSignalFactory, this._request, this._clientInfo, this._deviceInfo, this._metadataManager);
 
-            if(this._configuration.getAbGroup() === 9 || this._configuration.getAbGroup() === 11) {
+            if(this._configuration.getAbGroup() === 9 || this._configuration.getAbGroup() === 10) {
                 this._placementManager = new PlacementManager(this._nativeBridge, this._configuration);
                 this._reinitManager = new ReinitManager(this._nativeBridge, this._clientInfo, this._request, this._cache);
                 this._refreshManager = new NewRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration, this._focusManager, this._reinitManager, this._placementManager);
@@ -352,7 +351,7 @@ export class WebView {
                 return;
             }
 
-            const orientation = screenWidth >= screenHeight ? ForceOrientation.LANDSCAPE : ForceOrientation.PORTRAIT;
+            const orientation = screenWidth >= screenHeight ? Orientation.LANDSCAPE : Orientation.PORTRAIT;
             this._comScoreTrackingService = new ComScoreTrackingService(this._thirdPartyEventManager, this._nativeBridge, this._deviceInfo);
             this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, {
                 forceOrientation: orientation,

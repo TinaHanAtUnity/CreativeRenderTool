@@ -19,7 +19,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { VastAdUnit } from 'AdUnits/VastAdUnit';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { Activity } from 'AdUnits/Containers/Activity';
-import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
@@ -95,7 +95,7 @@ describe('AdUnitFactoryTest', () => {
         sandbox.stub(MoatViewabilityService, 'initMoat');
 
         adUnitParameters = {
-            forceOrientation: ForceOrientation.LANDSCAPE,
+            forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
             container: container,
             deviceInfo: deviceInfo,
@@ -152,7 +152,7 @@ describe('AdUnitFactoryTest', () => {
             sandbox.stub(vast, 'getVideoUrl').returns('http://www.google.fi');
             const vastCampaign = TestFixtures.getEventVastCampaign();
             adUnitParameters.campaign = vastCampaign;
-            adUnitParameters.forceOrientation = ForceOrientation.NONE;
+            adUnitParameters.forceOrientation = Orientation.NONE;
             adUnitParameters.operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
                 nativeBridge: nativeBridge,
                 request: request,

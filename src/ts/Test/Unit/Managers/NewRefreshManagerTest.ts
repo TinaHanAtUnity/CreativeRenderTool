@@ -20,7 +20,7 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { NewRefreshManager } from 'Managers/NewRefreshManager';
 import { TestAdUnit } from 'Test/Unit/TestHelpers/TestAdUnit';
-import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
@@ -66,7 +66,7 @@ describe('NewRefreshManagerTest', () => {
         cacheBookKeeping = new CacheBookkeeping(nativeBridge);
         cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookKeeping);
         reinitManager = new ReinitManager(nativeBridge, clientInfo, request, cache);
-        assetManager = new AssetManager(cache, CacheMode.DISABLED, deviceInfo, cacheBookKeeping);
+        assetManager = new AssetManager(cache, CacheMode.DISABLED, deviceInfo, cacheBookKeeping, nativeBridge);
         sessionManager = new SessionManager(nativeBridge, request);
         metaDataManager = new MetaDataManager(nativeBridge);
         adMobSignalFactory = new AdMobSignalFactory(nativeBridge, clientInfo, deviceInfo, focusManager);
@@ -86,7 +86,7 @@ describe('NewRefreshManagerTest', () => {
         comScoreTrackingService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
         container = new Activity(nativeBridge, deviceInfo);
         adUnit = new TestAdUnit(nativeBridge, {
-            forceOrientation: ForceOrientation.NONE,
+            forceOrientation: Orientation.NONE,
             focusManager: focusManager,
             container: container,
             deviceInfo: deviceInfo,
