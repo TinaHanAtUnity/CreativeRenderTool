@@ -22,6 +22,9 @@ export interface IEndScreenHandler {
 const IPHONE_X_STYLES_AB_GROUPS = [18, 19];
 const IPHONE_X_STYLES_ID = 'iphone-x-styles';
 
+const GDPR_OPT_OUT_BASE  = 'gdpr-pop-up-base';
+const GDPR_OPT_OUT_ALT  = 'gdpr-pop-up-alt';
+
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
 
     protected _localization: Localization;
@@ -135,6 +138,14 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     protected getEndscreenAlt(campaign?: Campaign) {
         if(this.useIPhoneXStyle()) {
             return IPHONE_X_STYLES_ID;
+        }
+
+        if (this._abGroup === 16) {
+            return GDPR_OPT_OUT_BASE;
+        }
+
+        if (this._abGroup === 17) {
+            return GDPR_OPT_OUT_ALT;
         }
 
         return undefined;
