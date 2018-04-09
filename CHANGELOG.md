@@ -1,4 +1,4 @@
-# Staged
+# Mon Apr 9 20:36:04 UTC 2018
 
 * Removed special case for roll-the-ball playable
 * Revised iPhone X layout (AB groups 18 & 19)
