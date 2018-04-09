@@ -1,6 +1,3 @@
-import { NativeBridge } from 'Native/NativeBridge';
-import { Campaign } from 'Models/Campaign';
-import { AuctionResponse } from 'Models/AuctionResponse';
 import { CampaignParser } from 'Parsers/CampaignParser';
 import { CometCampaignParser } from 'Parsers/CometCampaignParser';
 import { XPromoCampaignParser } from 'Parsers/XPromoCampaignParser';

@@ -9,7 +9,7 @@ import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { TestEnvironment } from 'Utilities/TestEnvironment';
 import { AdUnitContainer, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 import { Configuration } from 'Models/Configuration';
-import { VideoInfo } from 'Utilities/VideoInfo';
+import { FileInfo } from 'Utilities/FileInfo';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
@@ -189,7 +189,7 @@ export class VideoEventHandlers {
                         nativeBridge.Cache.getFileInfo(fileId).then((fileInfo) => {
                             error.fileInfo = fileInfo;
                             if(fileInfo.found) {
-                                return VideoInfo.getVideoInfo(nativeBridge, fileId).then(([width, height, duration]) => {
+                                return FileInfo.getVideoInfo(nativeBridge, fileId).then(([width, height, duration]) => {
                                     const videoInfo: any = {
                                         width: width,
                                         height: height,
