@@ -11,7 +11,7 @@ import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
-import { IObserver1, IObserver2 } from '../Utilities/IObserver';
+import { IObserver1, IObserver2 } from 'Utilities/IObserver';
 
 export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
