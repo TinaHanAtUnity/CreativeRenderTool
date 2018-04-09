@@ -11,7 +11,7 @@ import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Platform } from 'Constants/Platform';
-import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 
 import { Placement } from 'Models/Placement';
@@ -105,7 +105,7 @@ describe('VastOverlayEventHandlersTest', () => {
         comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         vastAdUnitParameters = {
-            forceOrientation: ForceOrientation.LANDSCAPE,
+            forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
             container: container,
             deviceInfo: deviceInfo,

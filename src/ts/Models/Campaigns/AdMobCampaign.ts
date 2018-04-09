@@ -56,6 +56,10 @@ export class AdMobCampaign extends ProgrammaticCampaign<IAdMobCampaign> {
     }
 
     public getRequiredAssets(): Asset[] {
+        return [];
+    }
+
+    public getOptionalAssets(): Asset[] {
         const assets = [];
         const video = this.get('video');
         if (video) {
@@ -64,11 +68,7 @@ export class AdMobCampaign extends ProgrammaticCampaign<IAdMobCampaign> {
         return assets;
     }
 
-    public getOptionalAssets(): Asset[] {
-        return [];
-    }
-
     public isConnectionNeeded(): boolean {
-        return false;
+        return true;
     }
 }

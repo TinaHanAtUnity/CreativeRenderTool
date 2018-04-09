@@ -9,6 +9,8 @@ import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { WebViewError } from 'Errors/WebViewError';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
+import { FileInfo } from 'Utilities/FileInfo';
+import { NativeBridge } from 'Native/NativeBridge';
 
 enum CacheType {
     REQUIRED,
@@ -42,8 +44,9 @@ export class AssetManager {
     private _optionalQueue: IAssetQueueObject[];
     private _campaignQueue: { [id: number]: ICampaignQueueObject };
     private _queueId: number;
+    private _nativeBridge: NativeBridge;
 
-    constructor(cache: Cache, cacheMode: CacheMode, deviceInfo: DeviceInfo, cacheBookkeeping: CacheBookkeeping) {
+    constructor(cache: Cache, cacheMode: CacheMode, deviceInfo: DeviceInfo, cacheBookkeeping: CacheBookkeeping, nativeBridge: NativeBridge) {
         this._cache = cache;
         this._cacheMode = cacheMode;
         this._cacheBookkeeping = cacheBookkeeping;
@@ -55,6 +58,7 @@ export class AssetManager {
         this._optionalQueue = [];
         this._campaignQueue = {};
         this._queueId = 0;
+        this._nativeBridge = nativeBridge;
 
         if(cacheMode === CacheMode.ADAPTIVE) {
             this._cache.onFastConnectionDetected.subscribe(() => this.onFastConnectionDetected());
@@ -261,7 +265,7 @@ export class AssetManager {
         const promises = [];
         for(const asset of assets) {
             if(asset instanceof Video) {
-                promises.push(this._cache.isVideoValid(asset, campaign).then(valid => {
+                promises.push(FileInfo.isVideoValid(this._nativeBridge, asset, campaign).then(valid => {
                     if(!valid) {
                         throw new Error('Video failed to validate: ' + asset.getOriginalUrl());
                     }

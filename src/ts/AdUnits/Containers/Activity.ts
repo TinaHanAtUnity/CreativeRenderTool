@@ -3,7 +3,7 @@ import { KeyCode } from 'Constants/Android/KeyCode';
 import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
 import { NativeBridge } from 'Native/NativeBridge';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
-import { AdUnitContainer, ForceOrientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, Orientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 import { Rotation } from 'Constants/Android/Rotation';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 
@@ -49,7 +49,7 @@ export class Activity extends AdUnitContainer {
         this._onDestroyObserver = this._nativeBridge.AndroidAdUnit.onDestroy.subscribe((finishing, activityId) => this.onDestroy(finishing, activityId));
     }
 
-    public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: IAndroidOptions): Promise<void> {
+    public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: IAndroidOptions): Promise<void> {
         this.resetDiagnosticsEvents();
         this.addDiagnosticsEvent({type: 'open'});
         this._activityId++;
@@ -75,7 +75,7 @@ export class Activity extends AdUnitContainer {
 
         const hardwareAccel: boolean = this.isHardwareAccelerationAllowed();
 
-        this._nativeBridge.Sdk.logInfo('Opening ' + adUnit.description() + ' ad unit with orientation ' + ForceOrientation[this._lockedOrientation] + ', hardware acceleration ' + (hardwareAccel ? 'enabled' : 'disabled'));
+        this._nativeBridge.Sdk.logInfo('Opening ' + adUnit.description() + ' ad unit with orientation ' + Orientation[this._lockedOrientation] + ', hardware acceleration ' + (hardwareAccel ? 'enabled' : 'disabled'));
 
         this._onFocusGainedObserver = this._nativeBridge.AndroidAdUnit.onFocusGained.subscribe(() => this.onSystemInterrupt.trigger(false));
         this._onFocusLostObserver = this._nativeBridge.AndroidAdUnit.onFocusLost.subscribe(() => this.onSystemInterrupt.trigger(true));
@@ -126,7 +126,7 @@ export class Activity extends AdUnitContainer {
         });
     }
 
-    public reorient(allowRotation: boolean, forceOrientation: ForceOrientation): Promise<any> {
+    public reorient(allowRotation: boolean, forceOrientation: Orientation): Promise<any> {
         this.addDiagnosticsEvent({type: 'reorient'});
         return this._nativeBridge.AndroidAdUnit.setOrientation(this.getOrientation(allowRotation, forceOrientation, this._androidOptions));
     }
@@ -143,10 +143,10 @@ export class Activity extends AdUnitContainer {
         return this._nativeBridge.AndroidAdUnit.getViews();
     }
 
-    private getOrientation(allowRotation: boolean, forceOrientation: ForceOrientation, options: IAndroidOptions) {
+    private getOrientation(allowRotation: boolean, forceOrientation: Orientation, options: IAndroidOptions) {
         let orientation = ScreenOrientation.SCREEN_ORIENTATION_FULL_SENSOR;
         if(allowRotation) {
-            if(forceOrientation === ForceOrientation.PORTRAIT) {
+            if(forceOrientation === Orientation.PORTRAIT) {
                 if (options.requestedOrientation === ScreenOrientation.SCREEN_ORIENTATION_PORTRAIT) {
                     orientation = ScreenOrientation.SCREEN_ORIENTATION_PORTRAIT;
                 } else if (options.requestedOrientation === ScreenOrientation.SCREEN_ORIENTATION_REVERSE_PORTRAIT) {
@@ -158,7 +158,7 @@ export class Activity extends AdUnitContainer {
                 } else {
                     orientation = ScreenOrientation.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
                 }
-            } else if(forceOrientation === ForceOrientation.LANDSCAPE) {
+            } else if(forceOrientation === Orientation.LANDSCAPE) {
                 if (options.requestedOrientation === ScreenOrientation.SCREEN_ORIENTATION_LANDSCAPE) {
                     orientation = ScreenOrientation.SCREEN_ORIENTATION_LANDSCAPE;
                 } else if (options.requestedOrientation === ScreenOrientation.SCREEN_ORIENTATION_REVERSE_LANDSCAPE) {
@@ -172,9 +172,9 @@ export class Activity extends AdUnitContainer {
                 }
             }
         } else {
-            if(forceOrientation === ForceOrientation.PORTRAIT) {
+            if(forceOrientation === Orientation.PORTRAIT) {
                 orientation = ScreenOrientation.SCREEN_ORIENTATION_PORTRAIT;
-            } else if(forceOrientation === ForceOrientation.LANDSCAPE) {
+            } else if(forceOrientation === Orientation.LANDSCAPE) {
                 orientation = ScreenOrientation.SCREEN_ORIENTATION_LANDSCAPE;
             } else {
                 orientation = ScreenOrientation.SCREEN_ORIENTATION_LOCKED;
