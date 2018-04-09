@@ -75,6 +75,14 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         this._adUnit.hide();
     }
 
+    public onOptOut(optOut: boolean): void {
+        // todo: send event
+    }
+
+    public onOptOutPopupShow(): void {
+        // todo: save status to the Storage
+    }
+
     public abstract onKeyEvent(keyCode: number): void;
 
     private onDownloadAndroid(parameters: IEndScreenDownloadParameters): void {

@@ -17,6 +17,8 @@ export interface IEndScreenHandler {
     onEndScreenPrivacy(url: string): void;
     onEndScreenClose(): void;
     onKeyEvent(keyCode: number): void;
+    onOptOut(optOut: boolean): void;
+    onOptOutPopupShow(): void;
 }
 
 const IPHONE_X_STYLES_AB_GROUPS = [18, 19];
@@ -34,14 +36,17 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     private _privacy: Privacy;
     private _isSwipeToCloseEnabled: boolean = false;
     private _abGroup: number;
+    private _showOptOutPopup: boolean;
 
-    constructor(nativeBridge: NativeBridge, coppaCompliant: boolean, language: string, gameId: string, gameName: string | undefined, abGroup: number, adUnitStyle?: AdUnitStyle) {
+    constructor(nativeBridge: NativeBridge, coppaCompliant: boolean, language: string, gameId: string, gameName: string | undefined, abGroup: number, adUnitStyle?: AdUnitStyle, showOptOutPopup: boolean = false) {
         super(nativeBridge, 'end-screen');
         this._coppaCompliant = coppaCompliant;
         this._localization = new Localization(language, 'endscreen');
         this._abGroup = abGroup;
         this._gameName = gameName;
         this._adUnitStyle = adUnitStyle;
+        this._showOptOutPopup = showOptOutPopup;
+
         this._template = new Template(this.getTemplate(), this._localization);
 
         this._bindings = [
@@ -58,7 +63,12 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             {
                 event: 'click',
                 listener: (event: Event) => this.onPrivacyEvent(event),
-                selector: '.privacy-button, .gdpr-link'
+                selector: '.privacy-button'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onOptOutBannerEvent(event),
+                selector: '.gdpr-link'
             }
         ];
 
@@ -93,6 +103,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
     public show(): void {
         super.show();
+
+        if (this._showOptOutPopup) {
+            this._handlers.forEach(handler => handler.onOptOutPopupShow());
+        }
 
         // todo: the following hack prevents game name from overflowing to more than two lines in the endscreen
         // for some reason webkit-line-clamp is not applied without some kind of a hack
@@ -136,16 +150,17 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     protected getEndscreenAlt(campaign?: Campaign) {
-        if(this.useIPhoneXStyle()) {
+        if (this.useIPhoneXStyle()) {
             return IPHONE_X_STYLES_ID;
         }
 
-        if (this._abGroup === 16) {
-            return GDPR_OPT_OUT_BASE;
-        }
-
-        if (this._abGroup === 17) {
-            return GDPR_OPT_OUT_ALT;
+        if (this._showOptOutPopup) {
+            if (this._abGroup === 16) {
+                return GDPR_OPT_OUT_BASE;
+            }
+            if (this._abGroup === 17) {
+                return GDPR_OPT_OUT_ALT;
+            }
         }
 
         return undefined;
@@ -160,6 +175,17 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
     private onPrivacyEvent(event: Event): void {
         event.preventDefault();
+        this._privacy = new Privacy(this._nativeBridge, this._coppaCompliant);
+        this._privacy.render();
+        document.body.appendChild(this._privacy.container());
+        this._privacy.addEventHandler(this);
+    }
+
+    private onOptOutBannerEvent(event: Event) {
+        event.preventDefault();
+
+        this._handlers.forEach(handler => handler.onOptOut(true));
+
         this._privacy = new Privacy(this._nativeBridge, this._coppaCompliant);
         this._privacy.render();
         document.body.appendChild(this._privacy.container());
