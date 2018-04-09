@@ -85,13 +85,11 @@ export class CampaignAssetInfo {
         if(campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign) {
             const video = campaign.getVideo();
             const streaming = campaign.getStreamingVideo();
-            if(video) {
-                if(video.isCached() && videoType !== VideoType.STREAM) {
-                    return video;
-                }
-                if(streaming && videoType !== VideoType.CACHE) {
-                    return streaming;
-                }
+            if(video && video.isCached() && videoType !== VideoType.STREAM) {
+                return video;
+            }
+            if(streaming && videoType !== VideoType.CACHE) {
+                return streaming;
             }
         } else if(campaign instanceof VastCampaign) {
             const video = campaign.getVideo();
@@ -109,14 +107,11 @@ export class CampaignAssetInfo {
         if(campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign) {
             const video = campaign.getPortraitVideo();
             const streaming = campaign.getStreamingPortraitVideo();
-
-            if(video) {
-                if(video.isCached() && videoType !== VideoType.STREAM) {
-                    return video;
-                }
-                if(streaming && videoType !== VideoType.CACHE) {
-                    return streaming;
-                }
+            if(video && video.isCached() && videoType !== VideoType.STREAM) {
+                return video;
+            }
+            if(streaming && videoType !== VideoType.CACHE) {
+                return streaming;
             }
         }
 
