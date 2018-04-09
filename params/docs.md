@@ -76,6 +76,7 @@
 | adUnitStyle | object | Style of the ad unit | SDK | all |
 | sessionDepth | number | For a given session, how many ads have been delivered currently using adRequestOrdinal | SDK | all |
 | token | string | Signed JSON Web Token (JWT) with orthogonal (statistically independent) A/B groups for each Unity Monetization component | Server | all |
+| realtimeData | object | If the placement contains data to show a realtime placement | Server | all |
 
 
 

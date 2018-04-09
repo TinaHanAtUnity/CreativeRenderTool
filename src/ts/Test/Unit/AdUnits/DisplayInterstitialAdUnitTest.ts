@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 
 import { DisplayInterstitialAdUnit, IDisplayInterstitialAdUnitParameters } from 'AdUnits/DisplayInterstitialAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
-import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { SessionManager } from 'Managers/SessionManager';
 import { Placement } from 'Models/Placement';
 import { Request } from 'Utilities/Request';
@@ -83,7 +83,7 @@ describe('DisplayInterstitialAdUnit', () => {
             sandbox.stub(view, 'hide');
 
             displayInterstitialAdUnitParameters = {
-                forceOrientation: ForceOrientation.LANDSCAPE,
+                forceOrientation: Orientation.LANDSCAPE,
                 focusManager: focusManager,
                 container: container,
                 deviceInfo: deviceInfo,

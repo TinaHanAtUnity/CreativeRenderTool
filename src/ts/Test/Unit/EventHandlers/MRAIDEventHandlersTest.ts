@@ -15,7 +15,7 @@ import { Platform } from 'Constants/Platform';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { MetaDataManager } from 'Managers/MetaDataManager';
-import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { MRAID } from 'Views/MRAID';
 import { Placement } from 'Models/Placement';
 import { HttpKafka } from 'Utilities/HttpKafka';
@@ -83,7 +83,7 @@ describe('MRAIDEventHandlersTest', () => {
             sinon.stub(mraidView, 'container').returns(document.createElement('div'));
 
             mraidAdUnitParameters = {
-                forceOrientation: ForceOrientation.LANDSCAPE,
+                forceOrientation: Orientation.LANDSCAPE,
                 focusManager: focusManager,
                 container: container,
                 deviceInfo: deviceInfo,

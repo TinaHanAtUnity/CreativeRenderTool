@@ -11,7 +11,7 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { WebViewError } from 'Errors/WebViewError';
-import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Campaign } from 'Models/Campaign';
 import { Placement } from 'Models/Placement';
 import { CampaignAssetInfo, VideoType } from 'Utilities/CampaignAssetInfo';
@@ -62,7 +62,6 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
 
     public show(): Promise<void> {
         this.setShowing(true);
-        this.onStart.trigger();
         this.setActive(true);
 
         this._onShowObserver = this._container.onShow.subscribe(() => this.onShow());
@@ -70,7 +69,9 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         this._onSystemInterruptObserver = this._container.onSystemInterrupt.subscribe((interruptStarted) => this.onSystemInterrupt(interruptStarted));
         this._onLowMemoryWarningObserver = this._container.onLowMemoryWarning.subscribe(() => this.onLowMemoryWarning());
 
-        return this._container.open(this, ['videoplayer', 'webview'], true, this.getForceOrientation(), this._placement.disableBackButton(), false, true, false, this._options);
+        return this._container.open(this, ['videoplayer', 'webview'], true, this.getForceOrientation(), this._placement.disableBackButton(), false, true, false, this._options).then(() => {
+            this.onStart.trigger();
+        });
     }
 
     public hide(): Promise<void> {
@@ -132,7 +133,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
             videoOrientation = 'portrait';
         }
 
-        this._nativeBridge.Sdk.logDebug('Returning ' + videoOrientation + ' as video orientation for locked orientation ' + ForceOrientation[this._container.getLockedOrientation()]);
+        this._nativeBridge.Sdk.logDebug('Returning ' + videoOrientation + ' as video orientation for locked orientation ' + Orientation[this._container.getLockedOrientation()]);
 
         return videoOrientation;
     }
