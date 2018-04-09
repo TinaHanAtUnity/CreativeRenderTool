@@ -1,6 +1,7 @@
 @import "vars.styl";
 
 $download-text = #4943B6;
+$campaign-container = #37363E;
 
 @media (min-width: 1025px)
   html.fancy-end-screen {
@@ -124,6 +125,7 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      background-color: $campaign-container;
     }
 
     .game-image-container {
@@ -149,7 +151,7 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       margin: 0;
       width: 100%;
       height: 100%;
-      filter: blur(5px) brightness(.8) opacity(.68);
+      filter: blur(25px) brightness(.8) opacity(.51);
       transform: scale(1.4);
       background-color: transparent;
       background-size: cover;
