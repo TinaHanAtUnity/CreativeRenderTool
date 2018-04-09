@@ -48,9 +48,9 @@ $end-screen-mixin($scale-size = $default-scale-size) {
     }
 
     &.on-show .gdpr-pop-up {
-      left: 100%;
+      bottom: -100%;
       opacity: 0;
-      transition: opacity .75s ease-out 7s, left .25s linear 8s;
+      transition: opacity .25s ease-out 7s, bottom .25s linear 8s;
     }
 
     &:not(.gdpr-pop-up-base):not(.gdpr-pop-up-alt) {
