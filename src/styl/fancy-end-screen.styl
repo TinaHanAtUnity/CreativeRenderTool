@@ -1,6 +1,5 @@
 @import "vars.styl";
 
-$download-text = #4943B6;
 $campaign-container = #37363E;
 
 @media (min-width: 1025px)
@@ -51,7 +50,7 @@ $end-screen-mixin($scale-size = $default-scale-size) {
 
     .end-screen-info {
       align-items: stretch;
-      width: 77%;
+      width: 85%;
     }
 
     .game-image-container {
@@ -96,12 +95,6 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       margin: 0;
       padding: .6rem .8rem;
       width: auto;
-      border-radius: $scale-size * $default-size * .15;
-      background-color: $white;
-      color: $download-text;
-      text-align: start;
-      font-weight: bold;
-      font-size: $scale-size * $default-font-size;
     }
 
     .game-rating {
@@ -181,9 +174,11 @@ $end-screen-mixin($scale-size = $default-scale-size) {
     .unityads-logo {
       position: absolute;
       right: auto;
+      bottom: 0;
       left: 0;
       width: 4rem;
-      height: 1rem;
+      height: 1.4rem;
+      background-image: url("../img/unityads-white.png");
       background-position: left;
     }
 
@@ -192,14 +187,19 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       right: 0;
       bottom: 0;
       left: auto;
-      font-size: $scale-size * $default-font-size * .8;
+      font-size: .8rem;
+      line-height: 1.2rem;
     }
   }
 
   body {
     &.portrait #end-screen.fancy-end-screen {
       .content-container {
-        margin: 12% 4% 4% 4%;
+        margin: 4% 4% 4% 4%;
+      }
+
+      .btn-close-region {
+        margin: 2%;
       }
 
       .end-screen-info {
@@ -208,6 +208,7 @@ $end-screen-mixin($scale-size = $default-scale-size) {
 
       .download-container {
         margin: 0;
+        border-radius: .3rem;
       }
 
       .privacy-button {
