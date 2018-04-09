@@ -240,7 +240,8 @@ export class WebView {
 
             SdkStats.initialize(this._nativeBridge, this._request, this._configuration, this._sessionManager, this._campaignManager, this._metadataManager, this._clientInfo);
 
-            if (this._cachedCampaignResponse !== undefined) {
+            const enableCachedResponse = this._configuration.getAbGroup() === 7 || this._configuration.getAbGroup() === 8;
+            if (this._cachedCampaignResponse !== undefined && enableCachedResponse) {
                 return this._refreshManager.refreshFromCache(this._cachedCampaignResponse);
             } else {
                 return this._refreshManager.refresh();
