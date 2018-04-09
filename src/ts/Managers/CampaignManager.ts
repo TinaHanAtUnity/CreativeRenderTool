@@ -397,6 +397,11 @@ export class CampaignManager {
     private createRequestUrl(realtime: boolean, session?: Session): Promise<string> {
 
         if (realtime && this._realtimeUrl) {
+            if (session) {
+                this._realtimeUrl = Url.addParameters(this._realtimeUrl, {
+                    auctionId: session.getId()
+                });
+            }
             return Promise.resolve(this._realtimeUrl);
         }
         this._realtimeUrl = undefined;
@@ -421,11 +426,6 @@ export class CampaignManager {
             stores: this._deviceInfo.getStores()
         });
 
-        if(realtime && session) {
-            url = Url.addParameters(url, {
-                auctionId: session.getId()
-            });
-        }
         if(this._clientInfo.getPlatform() === Platform.IOS && this._deviceInfo instanceof IosDeviceInfo) {
             url = Url.addParameters(url, {
                 osVersion: this._deviceInfo.getOsVersion(),
@@ -482,6 +482,7 @@ export class CampaignManager {
                 networkType: networkType,
                 gamerId: this._configuration.getGamerId()
             });
+            this._realtimeUrl = JSON.parse(JSON.stringify(url));
             return url;
         });
     }
