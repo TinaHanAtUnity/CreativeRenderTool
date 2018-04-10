@@ -132,6 +132,10 @@ export class SdkStats {
         SdkStats._readyEventSent[placementId] = Date.now();
     }
 
+    public static getReadyEventTimestamp(placementId: string): number {
+        return SdkStats._readyEventSent[placementId];
+    }
+
     public static setCachingStartTimestamp(fileId: string): void {
         SdkStats._cachingStarted[fileId] = Date.now();
     }

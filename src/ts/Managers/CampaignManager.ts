@@ -1,4 +1,4 @@
-import { Observable1, Observable2, Observable3 } from 'Utilities/Observable';
+import { Observable1, Observable2, Observable4 } from 'Utilities/Observable';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Url } from 'Utilities/Url';
 import { Request, INativeResponse } from 'Utilities/Request';
@@ -6,7 +6,7 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { Platform } from 'Constants/Platform';
 import { NativeBridge } from 'Native/NativeBridge';
 import { MetaDataManager } from 'Managers/MetaDataManager';
-import { StorageType } from 'Native/Api/Storage';
+import { StorageType, StorageApi } from 'Native/Api/Storage';
 import { AssetManager } from 'Managers/AssetManager';
 import { WebViewError } from 'Errors/WebViewError';
 import { Configuration } from 'Models/Configuration';
@@ -20,16 +20,7 @@ import { CacheStatus } from 'Utilities/Cache';
 import { AuctionResponse } from 'Models/AuctionResponse';
 import { Session } from 'Models/Session';
 import { SdkStats } from 'Utilities/SdkStats';
-import { CometCampaignParser } from 'Parsers/CometCampaignParser';
-import { ProgrammaticVastParser } from 'Parsers/ProgrammaticVastParser';
-import { ProgrammaticMraidUrlParser } from 'Parsers/ProgrammaticMraidUrlParser';
-import { ProgrammaticMraidParser } from 'Parsers/ProgrammaticMraidParser';
-import { ProgrammaticStaticInterstitialParser } from 'Parsers/ProgrammaticStaticInterstitialParser';
-import { ProgrammaticAdMobParser } from 'Parsers/ProgrammaticAdMobParser';
 import { CampaignParser } from 'Parsers/CampaignParser';
-import { PromoCampaignParser } from 'Parsers/PromoCampaignParser';
-import { ProgrammaticVPAIDParser } from 'Parsers/ProgrammaticVPAIDParser';
-import { XPromoCampaignParser } from 'Parsers/XPromoCampaignParser';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { Placement } from 'Models/Placement';
@@ -39,6 +30,7 @@ import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 import { CampaignParserFactory } from 'Managers/CampaignParserFactory';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
+import { UserCountData } from 'Utilities/UserCountData';
 
 export class CampaignManager {
 
@@ -78,7 +70,7 @@ export class CampaignManager {
 
     public readonly onCampaign = new Observable2<string, Campaign>();
     public readonly onNoFill = new Observable1<string>();
-    public readonly onError = new Observable3<WebViewError, string[], Session | undefined>();
+    public readonly onError = new Observable4<WebViewError, string[], string, Session | undefined>();
     public readonly onConnectivityError = new Observable1<string[]>();
     public readonly onAdPlanReceived = new Observable2<number, number>();
 
@@ -175,10 +167,10 @@ export class CampaignManager {
             }).then(response => {
                 if(response) {
                     this._cacheBookkeeping.setCachedCampaignResponse(response);
-                    SdkStats.setAdRequestDuration(Date.now() - requestTimestamp);
-                    SdkStats.increaseAdRequestOrdinal();
+                    this.setSDKSignalValues(requestTimestamp);
+
                     return this.parseCampaigns(response).catch((e) => {
-                        this.handleError(e, this._configuration.getPlacementIds());
+                        this.handleError(e, this._configuration.getPlacementIds(), 'parse_campaigns_error');
                     });
                 }
                 throw new WebViewError('Empty campaign response', 'CampaignRequestError');
@@ -192,7 +184,7 @@ export class CampaignManager {
                         return Promise.resolve();
                     }
                 }
-                return this.handleError(error, this._configuration.getPlacementIds());
+                return this.handleError(error, this._configuration.getPlacementIds(), 'auction_request_failed');
             });
         });
     }
@@ -319,16 +311,16 @@ export class CampaignManager {
                             if(error === CacheStatus.STOPPED) {
                                 return Promise.resolve();
                             } else if(error === CacheStatus.FAILED) {
-                                return this.handleError(new WebViewError('Caching failed', 'CacheStatusFailed'), fill[mediaId], session);
+                                return this.handleError(new WebViewError('Caching failed', 'CacheStatusFailed'), fill[mediaId], 'campaign_caching_failed', session);
                             } else if(error === CacheError[CacheError.FILE_NOT_FOUND]) {
                                 // handle native API Cache.getFilePath failure (related to Android cache directory problems?)
-                                return this.handleError(new WebViewError('Getting file path failed', 'GetFilePathFailed'), fill[mediaId], session);
+                                return this.handleError(new WebViewError('Getting file path failed', 'GetFilePathFailed'), fill[mediaId], 'campaign_caching_get_file_path_failed', session);
                             }
 
-                            return this.handleError(error, fill[mediaId], session);
+                            return this.handleError(error, fill[mediaId], 'handle_campaign_error', session);
                         }));
                     } catch(error) {
-                        this.handleError(error, fill[mediaId], session);
+                        this.handleError(error, fill[mediaId], 'error_creating_handle_campaign_chain', session);
                     }
                 }
             }
@@ -366,7 +358,13 @@ export class CampaignManager {
 
     private handleCampaign(response: AuctionResponse, session: Session): Promise<void> {
         this._nativeBridge.Sdk.logDebug('Parsing campaign ' + response.getContentType() + ': ' + response.getContent());
-        const parser: CampaignParser = this.getCampaignParser(response.getContentType());
+        let parser: CampaignParser;
+
+        try {
+            parser = this.getCampaignParser(response.getContentType());
+        } catch (e) {
+            return Promise.reject(e);
+        }
 
         const parseTimestamp = Date.now();
         return parser.parse(this._nativeBridge, this._request, response, session, this._configuration.getGamerId(), this.getAbGroup()).then((campaign) => {
@@ -413,10 +411,10 @@ export class CampaignManager {
         return Promise.resolve();
     }
 
-    private handleError(error: any, placementIds: string[], session?: Session): Promise<void> {
+    private handleError(error: any, placementIds: string[], diagnosticsType: string, session?: Session): Promise<void> {
         this._nativeBridge.Sdk.logDebug('PLC error ' + error);
         if (!this._skipErrors) {
-            this.onError.trigger(error, placementIds, session);
+            this.onError.trigger(error, placementIds, diagnosticsType, session);
         }
 
         return Promise.resolve();
@@ -640,5 +638,20 @@ export class CampaignManager {
         } else {
             return Promise.resolve(undefined);
         }
+    }
+
+    private setSDKSignalValues(requestTimestamp: number): void {
+        SdkStats.setAdRequestDuration(Date.now() - requestTimestamp);
+        SdkStats.increaseAdRequestOrdinal();
+
+        UserCountData.getRequestCount(this._nativeBridge).then((requestCount) => {
+            if (typeof requestCount === 'number') {
+                UserCountData.setRequestCount(requestCount + 1, this._nativeBridge);
+            }
+        }).catch(() => {
+            Diagnostics.trigger('request_count_failure', {
+                signal: 'requestCount'
+            });
+        });
     }
 }

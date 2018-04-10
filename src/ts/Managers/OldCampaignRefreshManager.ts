@@ -67,7 +67,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
 
         this._campaignManager.onCampaign.subscribe((placementId, campaign) => this.onCampaign(placementId, campaign));
         this._campaignManager.onNoFill.subscribe((placementId) => this.onNoFill(placementId));
-        this._campaignManager.onError.subscribe((error, placementIds, session) => this.onError(error, placementIds, session));
+        this._campaignManager.onError.subscribe((error, placementIds, diagnosticsType, session) => this.onError(error, placementIds, diagnosticsType, session));
         this._campaignManager.onConnectivityError.subscribe((placementIds) => this.onConnectivityError(placementIds));
         this._campaignManager.onAdPlanReceived.subscribe((refreshDelay, campaignCount) => this.onAdPlanReceived(refreshDelay, campaignCount));
         this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
@@ -224,14 +224,14 @@ export class OldCampaignRefreshManager extends RefreshManager {
         this.handlePlacementState(placementId, PlacementState.NO_FILL);
     }
 
-    private onError(error: WebViewError | Error, placementIds: string[], session?: Session) {
+    private onError(error: WebViewError | Error, placementIds: string[], diagnosticsType: string, session?: Session) {
         this.invalidateCampaigns(this._needsRefill, placementIds);
 
         if(error instanceof Error) {
             error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
         }
 
-        Diagnostics.trigger('auction_request_failed', {
+        Diagnostics.trigger(diagnosticsType, {
             error: error,
         }, session);
         this._nativeBridge.Sdk.logError(JSON.stringify(error));

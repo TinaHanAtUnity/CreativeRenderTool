@@ -1,3 +1,14 @@
+# Mon Apr 9 20:36:04 UTC 2018
+
+* Removed special case for roll-the-ball playable
+* Revised iPhone X layout (AB groups 18 & 19)
+* Cache utility cleanup
+* Split auction request failed diagnostics
+* Remove dependency of main video asset existing to be able to return streaming asset
+* Add host and proto to third_party_event_failed analytic (also remove duplicate diagnostic)
+* Fixes Listener start event not being sent in AdMob ads for versions <2.2.0
+* Fixes quartile name in AdMob ads for versions <2.2.0
+
 # Thu Apr 5 20:28:31 UTC 2018
 
 * Fixed a bug where streaming video was cached and shown by default
