@@ -6,7 +6,7 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { Platform } from 'Constants/Platform';
 import { NativeBridge } from 'Native/NativeBridge';
 import { MetaDataManager } from 'Managers/MetaDataManager';
-import { StorageType } from 'Native/Api/Storage';
+import { StorageType, StorageApi } from 'Native/Api/Storage';
 import { AssetManager } from 'Managers/AssetManager';
 import { WebViewError } from 'Errors/WebViewError';
 import { Configuration } from 'Models/Configuration';
@@ -29,6 +29,7 @@ import { CacheError } from 'Native/Api/Cache';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 import { CampaignParserFactory } from 'Managers/CampaignParserFactory';
+import { UserCountData } from 'Utilities/UserCountData';
 
 export class CampaignManager {
 
@@ -135,8 +136,8 @@ export class CampaignManager {
                 });
             }).then(response => {
                 if(response) {
-                    SdkStats.setAdRequestDuration(Date.now() - requestTimestamp);
-                    SdkStats.increaseAdRequestOrdinal();
+                    this.setSDKSignalValues(requestTimestamp);
+
                     return this.parseCampaigns(response).catch((e) => {
                         this.handleError(e, this._configuration.getPlacementIds(), 'parse_campaigns_error');
                     });
@@ -602,5 +603,20 @@ export class CampaignManager {
         } else {
             return Promise.resolve(undefined);
         }
+    }
+
+    private setSDKSignalValues(requestTimestamp: number): void {
+        SdkStats.setAdRequestDuration(Date.now() - requestTimestamp);
+        SdkStats.increaseAdRequestOrdinal();
+
+        UserCountData.getRequestCount(this._nativeBridge).then((requestCount) => {
+            if (typeof requestCount === 'number') {
+                UserCountData.setRequestCount(requestCount + 1, this._nativeBridge);
+            }
+        }).catch(() => {
+            Diagnostics.trigger('request_count_failure', {
+                signal: 'requestCount'
+            });
+        });
     }
 }
