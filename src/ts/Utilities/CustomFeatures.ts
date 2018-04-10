@@ -43,7 +43,7 @@ export class CustomFeatures {
         'DE',
         'EE',
         'IE',
-        'EL',
+        'GR',
         'ES',
         'FR',
         'HR',
@@ -63,6 +63,6 @@ export class CustomFeatures {
         'SK',
         'FI',
         'SE',
-        'UK'
+        'GB'
     ];
 }
