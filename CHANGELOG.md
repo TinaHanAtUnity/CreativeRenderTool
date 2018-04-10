@@ -2,6 +2,7 @@
 
 * Optional Admob Signals
 * Unit tests for Campaign Parsers
+* Assume native calls from previous auction request for realtime speedup
 
 # Mon Apr 9 20:36:04 UTC 2018
 
