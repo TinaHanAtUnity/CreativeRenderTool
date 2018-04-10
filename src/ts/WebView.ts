@@ -339,7 +339,7 @@ export class WebView {
             this._deviceInfo.getScreenWidth(),
             this._deviceInfo.getScreenHeight(),
             this._deviceInfo.getConnectionType(),
-            CustomFeatures.showGDPRPopup(this._nativeBridge, campaign.getAbGroup())
+            CustomFeatures.showGDPRPopup(this._nativeBridge, this._configuration, campaign.getAbGroup())
         ]).then(([screenWidth, screenHeight, connectionType, showGDPRPopup]) => {
             if(campaign.isConnectionNeeded() && connectionType === 'none') {
                 this._showing = false;
