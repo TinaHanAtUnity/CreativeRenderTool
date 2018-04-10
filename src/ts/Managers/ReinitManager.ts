@@ -47,8 +47,9 @@ export class ReinitManager {
             return Promise.resolve(false);
         }
 
+        this._configJsonCheckTimestamp = Date.now();
+
         return this.getConfigJson().then(response => {
-            this._configJsonCheckTimestamp = Date.now();
             const configJson = JsonParser.parse(response.response);
             return configJson.hash !== this._clientInfo.getWebviewHash();
         }).catch((error) => {

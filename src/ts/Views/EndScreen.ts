@@ -1,4 +1,5 @@
 import EndScreenTemplate from 'html/EndScreen.html';
+import IPhoneXEndScreenTemplate from 'html/IPhoneXEndScreen.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -18,7 +19,8 @@ export interface IEndScreenHandler {
     onKeyEvent(keyCode: number): void;
 }
 
-const easterEndScreenId = 'easter-end-screen';
+const IPHONE_X_STYLES_AB_GROUPS = [18, 19];
+const IPHONE_X_STYLES_ID = 'iphone-x-styles';
 
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
 
@@ -37,8 +39,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._abGroup = abGroup;
         this._gameName = gameName;
         this._adUnitStyle = adUnitStyle;
-
-        this._template = new Template(EndScreenTemplate, this._localization);
+        this._template = new Template(this.getTemplate(), this._localization);
 
         this._bindings = [
             {
@@ -83,7 +84,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
         const endScreenAlt = this.getEndscreenAlt();
         if (typeof endScreenAlt === 'string') {
-            this._container.classList.add(endScreenAlt);
+            this._container.classList.add(...endScreenAlt.split(' '));
         }
     }
 
@@ -130,8 +131,8 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     protected getEndscreenAlt(campaign?: Campaign) {
-        if(this._abGroup === 16 || this._abGroup === 17) {
-            return easterEndScreenId;
+        if(this.useIPhoneXStyle()) {
+            return IPHONE_X_STYLES_ID;
         }
 
         return undefined;
@@ -150,5 +151,33 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._privacy.render();
         document.body.appendChild(this._privacy.container());
         this._privacy.addEventHandler(this);
+    }
+
+    private isIPhoneX(): boolean {
+        const isIPhone: boolean = /iPhone/.test(navigator.userAgent);
+
+        if (!isIPhone) {
+            return false;
+        }
+
+        const ratio: number = window.devicePixelRatio;
+        const screenSize = {
+            height: window.screen.height * ratio,
+            width: window.screen.width * ratio,
+        };
+
+        return (screenSize.height === 1125 && screenSize.width === 2436) || (screenSize.height === 2436 && screenSize.width === 1125);
+    }
+
+    private useIPhoneXStyle(): boolean {
+        return IPHONE_X_STYLES_AB_GROUPS.indexOf(this._abGroup) > -1 && this.isIPhoneX();
+    }
+
+    private getTemplate() {
+        if (this.useIPhoneXStyle()) {
+            return IPhoneXEndScreenTemplate;
+        }
+
+        return EndScreenTemplate;
     }
 }

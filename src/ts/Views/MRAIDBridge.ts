@@ -1,4 +1,4 @@
-import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { NativeBridge } from 'Native/NativeBridge';
 
 export enum MRAIDEvents {
@@ -11,7 +11,7 @@ export enum MRAIDEvents {
 }
 
 export interface IMRAIDHandler {
-    onSetOrientationProperties(allowOrientation: boolean, orientation: ForceOrientation): void;
+    onSetOrientationProperties(allowOrientation: boolean, orientation: Orientation): void;
 }
 
 export interface IMRAIDMessage {
@@ -60,17 +60,17 @@ export class MRAIDBridge {
     }
 
     private handleSetOrientationProperties(properties: IMRAIDOrientationProperties) {
-        let forceOrientation = ForceOrientation.NONE;
+        let forceOrientation = Orientation.NONE;
         if (properties.forceOrientation) {
             switch (properties.forceOrientation) {
             case 'landscape':
-                forceOrientation = ForceOrientation.LANDSCAPE;
+                forceOrientation = Orientation.LANDSCAPE;
                 break;
             case 'portrait':
-                forceOrientation = ForceOrientation.PORTRAIT;
+                forceOrientation = Orientation.PORTRAIT;
                 break;
             case 'none':
-                forceOrientation = ForceOrientation.NONE;
+                forceOrientation = Orientation.NONE;
                 break;
             }
         }

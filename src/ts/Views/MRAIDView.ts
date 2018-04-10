@@ -1,7 +1,7 @@
 import { View } from 'Views/View';
 import { Placement } from 'Models/Placement';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
-import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { WebViewError } from 'Errors/WebViewError';
 import { Platform } from 'Constants/Platform';
 import { NativeBridge } from 'Native/NativeBridge';
@@ -11,7 +11,7 @@ import { DOMUtils } from 'Utilities/DOMUtils';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
-    forceOrientation: ForceOrientation;
+    forceOrientation: Orientation;
 }
 
 export interface IMRAIDViewHandler {

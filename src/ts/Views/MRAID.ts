@@ -7,7 +7,7 @@ import { Observable0 } from 'Utilities/Observable';
 import { Placement } from 'Models/Placement';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Platform } from 'Constants/Platform';
-import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Template } from 'Utilities/Template';
 
 export class MRAID extends MRAIDView<IMRAIDViewHandler> {
@@ -200,14 +200,14 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
                 break;
 
             case 'orientation':
-                let forceOrientation = ForceOrientation.NONE;
+                let forceOrientation = Orientation.NONE;
                 switch(event.data.properties.forceOrientation) {
                     case 'portrait':
-                        forceOrientation = ForceOrientation.PORTRAIT;
+                        forceOrientation = Orientation.PORTRAIT;
                         break;
 
                     case 'landscape':
-                        forceOrientation = ForceOrientation.LANDSCAPE;
+                        forceOrientation = Orientation.LANDSCAPE;
                         break;
 
                     default:

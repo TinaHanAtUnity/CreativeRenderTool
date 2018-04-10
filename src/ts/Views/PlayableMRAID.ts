@@ -6,7 +6,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Placement } from 'Models/Placement';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Platform } from 'Constants/Platform';
-import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
 import { Diagnostics } from 'Utilities/Diagnostics';
@@ -375,14 +375,14 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 this._handlers.forEach(handler => handler.onMraidClose());
                 break;
             case 'orientation':
-                let forceOrientation = ForceOrientation.NONE;
+                let forceOrientation = Orientation.NONE;
                 switch(event.data.properties.forceOrientation) {
                     case 'portrait':
-                        forceOrientation = ForceOrientation.PORTRAIT;
+                        forceOrientation = Orientation.PORTRAIT;
                         break;
 
                     case 'landscape':
-                        forceOrientation = ForceOrientation.LANDSCAPE;
+                        forceOrientation = Orientation.LANDSCAPE;
                         break;
 
                     default:

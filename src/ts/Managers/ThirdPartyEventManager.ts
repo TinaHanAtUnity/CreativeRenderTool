@@ -3,6 +3,8 @@ import { Request, INativeResponse } from 'Utilities/Request';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Analytics } from 'Utilities/Analytics';
 import { RequestError } from 'Errors/RequestError';
+import { Diagnostics } from 'Utilities/Diagnostics';
+import { Url } from 'Utilities/Url';
 
 export class ThirdPartyEventManager {
 
@@ -38,13 +40,16 @@ export class ThirdPartyEventManager {
             followRedirects: true,
             retryWithConnectionEvents: false
         }).catch(error => {
+            const urlParts = Url.parse(url);
             if(error instanceof RequestError) {
                 error = new DiagnosticError(new Error(error.message), {
                     request: (<RequestError>error).nativeRequest,
                     event: event,
                     sessionId: sessionId,
                     url: url,
-                    response: (<RequestError>error).nativeResponse
+                    response: (<RequestError>error).nativeResponse,
+                    host: urlParts.host,
+                    protocol: urlParts.protocol
                 });
             }
             return Analytics.trigger('third_party_event_failed', error);

@@ -11,12 +11,18 @@ import { MotionEventAction } from 'Constants/Android/MotionEventAction';
 import { IMotionEvent } from 'Native/Api/AndroidAdUnit';
 import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
+import { IPackageInfo } from 'Native/Api/AndroidDeviceInfo';
+import { AdMobOptionalSignal } from 'Models/AdMobOptionalSignal';
+import { SdkStats } from 'Utilities/SdkStats';
+import { UserCountData } from 'Utilities/UserCountData';
 
 export class AdMobSignalFactory {
     private _nativeBridge: NativeBridge;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _focusManager: FocusManager;
+    private _packageInstaller: string;
+    private _packageVersionCode: number;
 
     constructor(nativeBridge: NativeBridge, clientInfo: ClientInfo, deviceInfo: DeviceInfo, focusManager: FocusManager) {
         this._nativeBridge = nativeBridge;
@@ -25,8 +31,56 @@ export class AdMobSignalFactory {
         this._focusManager = focusManager;
     }
 
+    public getOptionalSignal(adUnit: AdMobAdUnit): Promise<AdMobOptionalSignal> {
+        const signal = new AdMobOptionalSignal();
+
+        signal.setAdLoadDuration(adUnit.getRequestToReadyTime());
+        signal.setSequenceNumber(SdkStats.getAdRequestOrdinal());
+        signal.setIsJailbroken(this._deviceInfo.isRooted());
+        signal.setDeviceIncapabilities(this.checkDeviceIncapabilities());
+        signal.setDeviceSubModel(this._deviceInfo.getModel());
+
+        const promises = [];
+        promises.push(this._deviceInfo.getBatteryLevel().then(batteryLevel => {
+            signal.setDeviceBatteryLevel(this.getBatteryLevel(batteryLevel));
+        }).catch(() => {
+            this.logFailure(this._nativeBridge, 'batteryLevel');
+        }));
+
+        promises.push(this._deviceInfo.getBatteryStatus().then(batteryStatus => {
+            signal.setIsDeviceCharging(this.getBatteryStatus(this._clientInfo, batteryStatus) === 2);
+        }).catch(() => {
+            this.logFailure(this._nativeBridge, 'batteryStatus');
+        }));
+
+        promises.push(UserCountData.getRequestCount(this._nativeBridge).then((requestCount) => {
+            if (typeof requestCount === 'number') {
+                signal.setNumPriorUserRequests(requestCount);
+            }
+        }).catch(() => {
+            this.logFailure(this._nativeBridge, 'numPriorUserRequets');
+        }));
+
+        promises.push(UserCountData.getClickCount(this._nativeBridge).then(clickCount => {
+            if (typeof clickCount === 'number') {
+                signal.setPriorClickCount(clickCount);
+            }
+        }).catch(() => {
+            this.logFailure(this._nativeBridge, 'priorClickCount');
+        }));
+
+        return Promise.all(promises).then(() => {
+            return signal;
+        });
+    }
+
     public getAdRequestSignal(): Promise<AdMobSignal> {
         return this.getCommonSignal();
+    }
+
+    public setAdmobPackageInfo(installer: string, versionCode: number): void {
+        this._packageInstaller = installer;
+        this._packageVersionCode = versionCode;
     }
 
     public getClickSignal(touchInfo: ITouchInfo, adUnit: AdMobAdUnit): Promise<AdMobSignal> {
@@ -157,19 +211,26 @@ export class AdMobSignalFactory {
         }));
 
         if(nativeBridge.getPlatform() === Platform.ANDROID) {
-            promises.push(nativeBridge.DeviceInfo.Android.getPackageInfo(this._clientInfo.getApplicationName()).then(packageInfo => {
-                if(packageInfo.installer) {
-                    signal.setAppInstaller(packageInfo.installer);
-                } else {
-                    signal.setAppInstaller('unknown');
-                }
+            if (this._packageInstaller && this._packageVersionCode) {
+                signal.setAppInstaller(this._packageInstaller);
+                signal.setAppVersionCode(this._packageVersionCode);
+            } else {
+                promises.push(nativeBridge.DeviceInfo.Android.getPackageInfo(this._clientInfo.getApplicationName()).then(packageInfo => {
+                    if(packageInfo.installer) {
+                        signal.setAppInstaller(packageInfo.installer);
+                        this._packageInstaller = packageInfo.installer;
+                    } else {
+                        signal.setAppInstaller('unknown');
+                    }
 
-                if(packageInfo.versionCode) {
-                    signal.setAppVersionCode(packageInfo.versionCode);
-                }
-            }).catch(() => {
-                this.logFailure(nativeBridge, 'packageInfo');
-            }));
+                    if(packageInfo.versionCode) {
+                        signal.setAppVersionCode(packageInfo.versionCode);
+                        this._packageVersionCode = packageInfo.versionCode;
+                    }
+                }).catch(() => {
+                    this.logFailure(nativeBridge, 'packageInfo');
+                }));
+            }
 
             promises.push(this._nativeBridge.DeviceInfo.Android.isUSBConnected().then(usb => {
                 signal.setUsbConnected(usb ? 1 : 0);
@@ -344,5 +405,23 @@ export class AdMobSignalFactory {
         } else {
             return 1; // portrait
         }
+    }
+
+    private checkDeviceIncapabilities(): string {
+        let deviceIncapabilities = '';
+        if (this._deviceInfo instanceof AndroidDeviceInfo) {
+            if (!(<AndroidDeviceInfo>this._deviceInfo).isGoogleStoreInstalled()) {
+                deviceIncapabilities += 'a';
+            }
+            if (!(<AndroidDeviceInfo>this._deviceInfo).isGoogleMapsInstalled()) {
+                deviceIncapabilities += 'm';
+            }
+            if (!(<AndroidDeviceInfo>this._deviceInfo).isTelephonyInstalled()) {
+                deviceIncapabilities += 't';
+            }
+        } else {
+            deviceIncapabilities += 'atm';
+        }
+        return deviceIncapabilities;
     }
 }

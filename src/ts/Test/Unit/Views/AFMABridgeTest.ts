@@ -1,7 +1,7 @@
 import 'mocha';
 import * as sinon from 'sinon';
 import { IAFMAHandler, AFMABridge, AFMAEvents } from 'Views/AFMABridge';
-import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { NativeBridge } from 'Native/NativeBridge';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 
@@ -68,13 +68,13 @@ describe('AFMABridge', () => {
             data: {
                 orientation: 'portrait'
             },
-            verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAForceOrientation, ForceOrientation.PORTRAIT)
+            verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAForceOrientation, Orientation.PORTRAIT)
         }, {
             event: AFMAEvents.FORCE_ORIENTATION,
             data: {
                 orientation: 'landscape'
             },
-            verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAForceOrientation, ForceOrientation.LANDSCAPE)
+            verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAForceOrientation, Orientation.LANDSCAPE)
         }, {
             event: AFMAEvents.REWARDED_VIDEO_START,
             verify: (data?: any) => sinon.assert.called(<sinon.SinonSpy>handler.onAFMARewardedVideoStart)

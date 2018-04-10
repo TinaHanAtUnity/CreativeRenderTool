@@ -15,6 +15,7 @@ import { Double } from 'Utilities/Double';
 import { SensorDelay } from 'Constants/Android/SensorDelay';
 import { IClickSignalResponse } from 'Views/AFMABridge';
 import { SdkStats } from 'Utilities/SdkStats';
+import { UserCountData } from 'Utilities/UserCountData';
 
 export interface IAdMobAdUnitParameters extends IAdUnitParameters<AdMobCampaign> {
     view: AdMobView;
@@ -59,19 +60,15 @@ export class AdMobAdUnit extends AbstractAdUnit {
     public show(): Promise<void> {
         this._requestToViewTime = Date.now() - SdkStats.getAdRequestTimestamp();
         this.setShowing(true);
-        this.onStart.trigger();
 
         this.sendTrackingEvent('show');
-        Diagnostics.trigger('admob_ad_show', {
-            placement: this._placement.getId()
-        }, this._campaign.getSession());
-
         if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
             this._nativeBridge.AndroidAdUnit.onKeyDown.subscribe(this._keyDownListener);
         }
         this.subscribeToLifecycle();
 
         return this._container.open(this, ['webview'], true, this._forceOrientation, true, false, true, false, this._options).then(() => {
+            this.onStart.trigger();
             if (this._startTime === 0) {
                 this._startTime = Date.now();
             }
@@ -87,24 +84,27 @@ export class AdMobAdUnit extends AbstractAdUnit {
         return this._container.close();
     }
 
-    public isCached(): boolean {
-        return false;
-    }
-
     public description(): string {
         return 'AdMob';
     }
 
     public sendImpressionEvent() {
         this.sendTrackingEvent('impression');
-        Diagnostics.trigger('admob_ad_impression', {
-            placement: this._placement.getId()
-        }, this._campaign.getSession());
     }
 
     public sendClickEvent() {
         this.sendTrackingEvent('click');
         this._operativeEventManager.sendClick(this._placement);
+
+        UserCountData.getClickCount(this._nativeBridge).then((clickCount) => {
+            if (typeof clickCount === 'number') {
+                UserCountData.setClickCount(clickCount + 1, this._nativeBridge);
+            }
+        }).catch(() => {
+            Diagnostics.trigger('request_count_failure', {
+                signal: 'requestCount'
+            });
+        });
     }
 
     public sendStartEvent() {
@@ -154,6 +154,10 @@ export class AdMobAdUnit extends AbstractAdUnit {
         return this._requestToViewTime;
     }
 
+    public getRequestToReadyTime() {
+        return SdkStats.getReadyEventTimestamp(this._placement.getId()) - SdkStats.getAdRequestTimestamp();
+    }
+
     private showView() {
         this._view.show();
         document.body.appendChild(this._view.container());
@@ -182,11 +186,6 @@ export class AdMobAdUnit extends AbstractAdUnit {
             this._nativeBridge.AndroidAdUnit.endMotionEventCapture();
             this._nativeBridge.AndroidAdUnit.clearMotionEventCapture();
         }
-
-        Diagnostics.trigger('admob_ad_close', {
-            placement: this._placement.getId(),
-            finishState: this.getFinishState()
-        }, this._campaign.getSession());
 
         if (this.getFinishState() === FinishState.SKIPPED) {
             this.sendSkipEvent();
