@@ -480,7 +480,7 @@ export class CampaignManager {
                 networkType: networkType,
                 gamerId: this._configuration.getGamerId()
             });
-            this._realtimeUrl = JSON.parse(JSON.stringify(url));
+            this._realtimeUrl = url;
             return url;
         });
     }
@@ -585,7 +585,7 @@ export class CampaignManager {
                 body.placements = placementRequest;
                 body.properties = this._configuration.getProperties();
                 body.sessionDepth = SdkStats.getAdRequestOrdinal();
-                this._realtimeBody = JSON.parse(JSON.stringify(body));
+                this._realtimeBody = body;
                 return body;
             });
         });
