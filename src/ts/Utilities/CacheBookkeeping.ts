@@ -202,7 +202,7 @@ export class CacheBookkeeping {
         const cacheCampaignUrlPromise = this._nativeBridge.Storage.set<string>(StorageType.PRIVATE, 'cache.campaign.url', response.url);
         const cachedCampaignResponsePromise = this._nativeBridge.Storage.set<string>(StorageType.PRIVATE, 'cache.campaign.response', response.response);
 
-        return Promise.all([cacheCampaignUrlPromise, cachedCampaignResponsePromise]).catch(() => {
+        return Promise.all([cacheCampaignUrlPromise, cachedCampaignResponsePromise]).then(() => this._nativeBridge.Storage.write(StorageType.PRIVATE)).catch(() => {
             // ignore error
         });
     }
@@ -211,7 +211,7 @@ export class CacheBookkeeping {
         const cacheCampaignUrlPromise = this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.campaign.url');
         const cachedCampaignResponsePromise = this._nativeBridge.Storage.delete(StorageType.PRIVATE, 'cache.campaign.response');
 
-        return Promise.all([cacheCampaignUrlPromise, cachedCampaignResponsePromise]).catch(error => {
+        return Promise.all([cacheCampaignUrlPromise, cachedCampaignResponsePromise]).then(() => this._nativeBridge.Storage.write(StorageType.PRIVATE)).catch(error => {
             // ignore error
         });
     }
