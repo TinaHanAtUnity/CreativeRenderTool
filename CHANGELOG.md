@@ -1,3 +1,8 @@
+# Staged
+
+* Optional Admob Signals
+* Unit tests for Campaign Parsers
+
 # Mon Apr 9 20:36:04 UTC 2018
 
 * Removed special case for roll-the-ball playable

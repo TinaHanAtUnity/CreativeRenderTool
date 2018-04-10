@@ -16,6 +16,7 @@ import { Campaign } from 'Models/Campaign';
 import { Placement } from 'Models/Placement';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
+import { Diagnostics } from 'Utilities/Diagnostics';
 import { CampaignAssetInfo } from 'Utilities/CampaignAssetInfo';
 import { Configuration } from 'Models/Configuration';
 

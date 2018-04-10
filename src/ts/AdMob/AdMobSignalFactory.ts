@@ -12,6 +12,9 @@ import { IMotionEvent } from 'Native/Api/AndroidAdUnit';
 import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { IPackageInfo } from 'Native/Api/AndroidDeviceInfo';
+import { AdMobOptionalSignal } from 'Models/AdMobOptionalSignal';
+import { SdkStats } from 'Utilities/SdkStats';
+import { UserCountData } from 'Utilities/UserCountData';
 
 export class AdMobSignalFactory {
     private _nativeBridge: NativeBridge;
@@ -26,6 +29,49 @@ export class AdMobSignalFactory {
         this._clientInfo = clientInfo;
         this._deviceInfo = deviceInfo;
         this._focusManager = focusManager;
+    }
+
+    public getOptionalSignal(adUnit: AdMobAdUnit): Promise<AdMobOptionalSignal> {
+        const signal = new AdMobOptionalSignal();
+
+        signal.setAdLoadDuration(adUnit.getRequestToReadyTime());
+        signal.setSequenceNumber(SdkStats.getAdRequestOrdinal());
+        signal.setIsJailbroken(this._deviceInfo.isRooted());
+        signal.setDeviceIncapabilities(this.checkDeviceIncapabilities());
+        signal.setDeviceSubModel(this._deviceInfo.getModel());
+
+        const promises = [];
+        promises.push(this._deviceInfo.getBatteryLevel().then(batteryLevel => {
+            signal.setDeviceBatteryLevel(this.getBatteryLevel(batteryLevel));
+        }).catch(() => {
+            this.logFailure(this._nativeBridge, 'batteryLevel');
+        }));
+
+        promises.push(this._deviceInfo.getBatteryStatus().then(batteryStatus => {
+            signal.setIsDeviceCharging(this.getBatteryStatus(this._clientInfo, batteryStatus) === 2);
+        }).catch(() => {
+            this.logFailure(this._nativeBridge, 'batteryStatus');
+        }));
+
+        promises.push(UserCountData.getRequestCount(this._nativeBridge).then((requestCount) => {
+            if (typeof requestCount === 'number') {
+                signal.setNumPriorUserRequests(requestCount);
+            }
+        }).catch(() => {
+            this.logFailure(this._nativeBridge, 'numPriorUserRequets');
+        }));
+
+        promises.push(UserCountData.getClickCount(this._nativeBridge).then(clickCount => {
+            if (typeof clickCount === 'number') {
+                signal.setPriorClickCount(clickCount);
+            }
+        }).catch(() => {
+            this.logFailure(this._nativeBridge, 'priorClickCount');
+        }));
+
+        return Promise.all(promises).then(() => {
+            return signal;
+        });
     }
 
     public getAdRequestSignal(): Promise<AdMobSignal> {
@@ -359,5 +405,23 @@ export class AdMobSignalFactory {
         } else {
             return 1; // portrait
         }
+    }
+
+    private checkDeviceIncapabilities(): string {
+        let deviceIncapabilities = '';
+        if (this._deviceInfo instanceof AndroidDeviceInfo) {
+            if (!(<AndroidDeviceInfo>this._deviceInfo).isGoogleStoreInstalled()) {
+                deviceIncapabilities += 'a';
+            }
+            if (!(<AndroidDeviceInfo>this._deviceInfo).isGoogleMapsInstalled()) {
+                deviceIncapabilities += 'm';
+            }
+            if (!(<AndroidDeviceInfo>this._deviceInfo).isTelephonyInstalled()) {
+                deviceIncapabilities += 't';
+            }
+        } else {
+            deviceIncapabilities += 'atm';
+        }
+        return deviceIncapabilities;
     }
 }
