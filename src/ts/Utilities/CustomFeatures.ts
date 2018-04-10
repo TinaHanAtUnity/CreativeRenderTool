@@ -24,7 +24,7 @@ export class CustomFeatures {
     public static showGDPRPopup(nativeBridge: NativeBridge, abGroup: number): Promise<boolean> {
         // todo: check is the user in an EU country
         if(abGroup === 16 || abGroup === 17) {
-            return nativeBridge.Storage.get(StorageType.PRIVATE, 'gdpr.value').then(value => {
+            return nativeBridge.Storage.get(StorageType.PRIVATE, 'gdpr.popupshown.value').then(value => {
                 return !<boolean>value;
             }).catch(error => {
                 return true;

@@ -17,8 +17,7 @@ export interface IEndScreenHandler {
     onEndScreenPrivacy(url: string): void;
     onEndScreenClose(): void;
     onKeyEvent(keyCode: number): void;
-    onOptOut(optOut: boolean): void;
-    onOptOutPopupShow(): void;
+    onOptOutPopupShown(clicked: boolean): void;
 }
 
 const IPHONE_X_STYLES_AB_GROUPS = [18, 19];
@@ -37,6 +36,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     private _isSwipeToCloseEnabled: boolean = false;
     private _abGroup: number;
     private _showOptOutPopup: boolean;
+    private _gdprPopupClicked = false;
 
     constructor(nativeBridge: NativeBridge, coppaCompliant: boolean, language: string, gameId: string, gameName: string | undefined, abGroup: number, adUnitStyle?: AdUnitStyle, showOptOutPopup: boolean = false) {
         super(nativeBridge, 'end-screen');
@@ -67,7 +67,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             },
             {
                 event: 'click',
-                listener: (event: Event) => this.onOptOutBannerEvent(event),
+                listener: (event: Event) => this.onOptOutPopupEvent(event),
                 selector: '.gdpr-link'
             }
         ];
@@ -103,10 +103,6 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
     public show(): void {
         super.show();
-
-        if (this._showOptOutPopup) {
-            this._handlers.forEach(handler => handler.onOptOutPopupShow());
-        }
 
         // todo: the following hack prevents game name from overflowing to more than two lines in the endscreen
         // for some reason webkit-line-clamp is not applied without some kind of a hack
@@ -170,6 +166,9 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
     private onCloseEvent(event: Event): void {
         event.preventDefault();
+        if (this._showOptOutPopup) {
+            this._handlers.forEach(handler => handler.onOptOutPopupShown(this._gdprPopupClicked));
+        }
         this._handlers.forEach(handler => handler.onEndScreenClose());
     }
 
@@ -181,10 +180,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._privacy.addEventHandler(this);
     }
 
-    private onOptOutBannerEvent(event: Event) {
+    private onOptOutPopupEvent(event: Event) {
         event.preventDefault();
 
-        this._handlers.forEach(handler => handler.onOptOut(true));
+        this._gdprPopupClicked = true;
 
         this._privacy = new Privacy(this._nativeBridge, this._coppaCompliant);
         this._privacy.render();
