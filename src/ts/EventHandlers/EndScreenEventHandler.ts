@@ -20,6 +20,7 @@ import { XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { XPromoOperativeEventManager } from 'Managers/XPromoOperativeEventManager';
+import { StorageType } from 'Native/Api/Storage';
 
 export interface IEndScreenDownloadParameters {
     clickAttributionUrl: string | undefined;
@@ -80,7 +81,8 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     }
 
     public onOptOutPopupShow(): void {
-        // todo: save status to the Storage
+        this._nativeBridge.Storage.set(StorageType.PRIVATE, 'gdpr.value', true);
+        this._nativeBridge.Storage.write(StorageType.PRIVATE);
     }
 
     public abstract onKeyEvent(keyCode: number): void;

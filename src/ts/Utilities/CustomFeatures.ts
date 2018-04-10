@@ -1,5 +1,7 @@
 
 import { AdUnitStyle } from 'Models/AdUnitStyle';
+import { StorageType } from 'Native/Api/Storage';
+import { NativeBridge } from 'Native/NativeBridge';
 
 export class CustomFeatures {
 
@@ -19,7 +21,17 @@ export class CustomFeatures {
         return new AdUnitStyle({ctaButtonColor: '#167dfb'});
     }
 
-    public static isGDPROptOutPopupTest(abGroup: number): boolean {
-        return abGroup === 16 || abGroup === 17;
+    public static showGDPRPopup(nativeBridge: NativeBridge, abGroup: number): Promise<boolean> {
+        // todo: check is the user in an EU country
+        if(abGroup === 16 || abGroup === 17) {
+            return nativeBridge.Storage.get(StorageType.PRIVATE, 'gdpr.value').then(value => {
+                return !<boolean>value;
+            }).catch(error => {
+                return true;
+            });
+
+        } else {
+            return Promise.resolve(false);
+        }
     }
 }
