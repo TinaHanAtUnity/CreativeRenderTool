@@ -69,7 +69,7 @@ export class NewRefreshManager extends RefreshManager {
 
         this._campaignManager.onCampaign.subscribe((placementId, campaign) => this.onCampaign(placementId, campaign));
         this._campaignManager.onNoFill.subscribe(placementId => this.onNoFill(placementId));
-        this._campaignManager.onError.subscribe((error, placementIds, session) => this.onError(error, placementIds, session));
+        this._campaignManager.onError.subscribe((error, placementIds, diagnosticsType, session) => this.onError(error, placementIds, diagnosticsType, session));
         this._campaignManager.onConnectivityError.subscribe((placementIds) => this.onConnectivityError(placementIds));
         this._campaignManager.onAdPlanReceived.subscribe((refreshDelay, campaignCount) => this.onAdPlanReceived(refreshDelay, campaignCount));
         this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
@@ -211,7 +211,7 @@ export class NewRefreshManager extends RefreshManager {
         this.handlePlacementStateChange(placementId, PlacementState.NO_FILL);
     }
 
-    private onError(error: WebViewError | Error, placementIds: string[], session?: Session) {
+    private onError(error: WebViewError | Error, placementIds: string[], diagnosticsType: string, session?: Session) {
         this._fillState = FillState.FILL_RECEIVED;
 
         // todo: this diagnostic handling is copied from old refresh manager and it's the exact anti-pattern that's been causing a lot of trouble
@@ -220,7 +220,7 @@ export class NewRefreshManager extends RefreshManager {
             error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
         }
 
-        Diagnostics.trigger('auction_request_failed', {
+        Diagnostics.trigger(diagnosticsType, {
             error: error,
         }, session);
 
