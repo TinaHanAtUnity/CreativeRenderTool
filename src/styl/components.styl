@@ -63,11 +63,9 @@ $name-container-default($scale-size, $with-styles = true) {
 }
 
 $gdpr-pop-up($scale-size, $with-styles = true) {
-  border-radius: $default-size * $scale-size * .25 $default-size * $scale-size * .25 0 0;
-
   .gdpr-text {
     padding: $scale-size * $default-font-size * .5;
-    font-size: $scale-size * $default-font-size * .6;
+    font-size: $scale-size * $default-font-size * .5;
   }
 
   if($with-styles) {
@@ -77,7 +75,7 @@ $gdpr-pop-up($scale-size, $with-styles = true) {
     z-index: 100;
     width: 100%;
     background-color: $end-screen-background-color;
-    box-shadow: 0 0 15px 5px rgba(0, 0, 0, .5);
+    box-shadow: 0 0 15px 0 rgba(0, 0, 0, .1);
     opacity: 1;
 
     .gdpr-text {
