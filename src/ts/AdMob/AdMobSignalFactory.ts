@@ -117,7 +117,7 @@ export class AdMobSignalFactory {
             this.logFailure(this._nativeBridge, 'granularSpeedBucket_connectionType');
         }));
 
-        promises.push(Promise.all([this._deviceInfo.getScreenWidth(),this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
+        promises.push(Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
             signal.setIUSizes(`${width}x${height} | ${height}x${width}`);
         }).catch(() => {
             this.logFailure(this._nativeBridge, 'iuSizes');
