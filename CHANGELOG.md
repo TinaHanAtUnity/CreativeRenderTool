@@ -1,3 +1,10 @@
+# Staged
+
+* Honor using WebView UA for tracking for MRAID click attribution
+* GDPR pop-up A/B test (groups 16 & 17)
+* Enable the App Sheet on iOS 11.3
+* Add androidId to operative event data if platform is android
+
 # Tue Apr 10 20:41:22 UTC 2018
 
 * Optional Admob Signals
