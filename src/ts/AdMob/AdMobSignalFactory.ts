@@ -80,33 +80,7 @@ export class AdMobSignalFactory {
                 signal.setGranularSpeedBucket('wi');
             } else if (connectionType === 'cellular') {
                 this._deviceInfo.getNetworkType().then(networkType => {
-                    let bucket: string = 'unknown';
-                    if (networkType === 0) {
-                        bucket = 'unknown';
-                    } else if (networkType === 1 ||
-                                networkType === 16 ||
-                                networkType === 2 ||
-                                networkType === 4 ||
-                                networkType === 7 ||
-                                networkType === 11) {
-                        bucket = 'ed';
-                    } else if (networkType === 3 ||
-                                networkType === 5 ||
-                                networkType === 6 ||
-                                networkType === 8 ||
-                                networkType === 9 ||
-                                networkType === 10 ||
-                                networkType === 12 ||
-                                networkType === 14 ||
-                                networkType === 15 ||
-                                networkType === 17) {
-                        bucket = '3g';
-                    } else if (networkType === 13 ||
-                                networkType === 18 ||
-                                networkType === 19) {
-                        bucket = '4g';
-                    }
-                    signal.setGranularSpeedBucket(bucket);
+                    signal.setGranularSpeedBucket(this.getNetworkValue(networkType));
                 }).catch(() => {
                     this.logFailure(this._nativeBridge, 'granularSpeedBucket_networkType');
                 });
@@ -118,7 +92,7 @@ export class AdMobSignalFactory {
         }));
 
         promises.push(Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
-            signal.setIUSizes(`${width}x${height} | ${height}x${width}`);
+            signal.setIUSizes(`${width}x${height}|${height}x${width}`);
         }).catch(() => {
             this.logFailure(this._nativeBridge, 'iuSizes');
         }));
@@ -478,4 +452,35 @@ export class AdMobSignalFactory {
         }
         return deviceIncapabilities;
     }
+
+    private getNetworkValue(networkType: number): string {
+        let bucket: string = 'unknown';
+        if (networkType === 0) {
+            bucket = 'unknown';
+        } else if (networkType === 1 ||
+                    networkType === 16 ||
+                    networkType === 2 ||
+                    networkType === 4 ||
+                    networkType === 7 ||
+                    networkType === 11) {
+            bucket = 'ed';
+        } else if (networkType === 3 ||
+                    networkType === 5 ||
+                    networkType === 6 ||
+                    networkType === 8 ||
+                    networkType === 9 ||
+                    networkType === 10 ||
+                    networkType === 12 ||
+                    networkType === 14 ||
+                    networkType === 15 ||
+                    networkType === 17) {
+            bucket = '3g';
+        } else if (networkType === 13 ||
+                    networkType === 18 ||
+                    networkType === 19) {
+            bucket = '4g';
+        }
+        return bucket;
+    }
+
 }
