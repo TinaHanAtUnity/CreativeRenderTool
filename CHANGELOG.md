@@ -1,7 +1,8 @@
-# Staged
+# Tue Apr 10 20:41:22 UTC 2018
 
 * Optional Admob Signals
 * Unit tests for Campaign Parsers
+* Assume native calls from previous auction request for realtime speedup
 
 # Mon Apr 9 20:36:04 UTC 2018
 
