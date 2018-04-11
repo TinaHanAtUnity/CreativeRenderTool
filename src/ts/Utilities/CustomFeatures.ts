@@ -3,7 +3,7 @@ import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { StorageType } from 'Native/Api/Storage';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Configuration } from 'Models/Configuration';
-import { StorageError } from "../Native/Api/Storage";
+import { StorageError } from 'Native/Api/Storage';
 
 export class CustomFeatures {
 
