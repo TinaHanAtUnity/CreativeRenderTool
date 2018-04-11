@@ -254,6 +254,12 @@
   .slide-down {
     slide-animation(.4s, ease-in, 250%);
   }
+
+  #end-screen.gdpr-pop-up-base .gdpr-pop-up,
+  #end-screen.gdpr-pop-up-alt .gdpr-pop-up {
+    bottom: constant(safe-area-inset-bottom);
+    bottom: env(safe-area-inset-bottom);
+  }
 }
 // @stylint on
 
