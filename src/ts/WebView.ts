@@ -338,8 +338,9 @@ export class WebView {
         Promise.all([
             this._deviceInfo.getScreenWidth(),
             this._deviceInfo.getScreenHeight(),
-            this._deviceInfo.getConnectionType()
-        ]).then(([screenWidth, screenHeight, connectionType]) => {
+            this._deviceInfo.getConnectionType(),
+            CustomFeatures.showGDPRPopup(this._nativeBridge, this._configuration, campaign.getAbGroup())
+        ]).then(([screenWidth, screenHeight, connectionType, showGDPRPopup]) => {
             if(campaign.isConnectionNeeded() && connectionType === 'none') {
                 this._showing = false;
                 this.showError(true, placement.getId(), 'No connection');
@@ -376,7 +377,8 @@ export class WebView {
                 configuration: this._configuration,
                 request: this._request,
                 options: options,
-                adMobSignalFactory: this._adMobSignalFactory
+                adMobSignalFactory: this._adMobSignalFactory,
+                showGDPRPopup: showGDPRPopup
             });
             this._refreshManager.setCurrentAdUnit(this._currentAdUnit);
             this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());

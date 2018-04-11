@@ -20,6 +20,9 @@ import { XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { XPromoOperativeEventManager } from 'Managers/XPromoOperativeEventManager';
+import { StorageType } from 'Native/Api/Storage';
+import { HttpKafka } from 'Utilities/HttpKafka';
+import { Configuration } from 'Models/Configuration';
 
 export interface IEndScreenDownloadParameters {
     clickAttributionUrl: string | undefined;
@@ -40,6 +43,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     private _deviceInfo: DeviceInfo;
     private _placement: Placement;
     private _campaign: T;
+    private _configuration: Configuration;
 
     constructor(nativeBridge: NativeBridge, adUnit: T2, parameters: IAdUnitParameters<T>) {
         this._nativeBridge = nativeBridge;
@@ -50,6 +54,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         this._deviceInfo = parameters.deviceInfo;
         this._placement = parameters.placement;
         this._campaign = parameters.campaign;
+        this._configuration = parameters.configuration;
     }
 
     public onEndScreenDownload(parameters: IEndScreenDownloadParameters): void {
@@ -73,6 +78,23 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
 
     public onEndScreenClose(): void {
         this._adUnit.hide();
+    }
+
+    public onOptOutPopupShown(popupClicked: true): void {
+        const kafkaObject: any = {};
+        kafkaObject.timestamp = Date.now();
+        kafkaObject.popupShown = true;
+        kafkaObject.popupClicked = popupClicked;
+        kafkaObject.gamerId = this._configuration.getGamerId();
+
+        HttpKafka.sendEvent('ads.sdk2.events.gdprtest.json', kafkaObject);
+
+        Promise.all([
+            this._nativeBridge.Storage.set(StorageType.PRIVATE, 'gdpr.popupshown.value', true),
+            this._nativeBridge.Storage.write(StorageType.PRIVATE)
+        ]).catch(err => {
+            //
+        });
     }
 
     public abstract onKeyEvent(keyCode: number): void;
