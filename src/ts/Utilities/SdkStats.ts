@@ -136,6 +136,10 @@ export class SdkStats {
         return SdkStats._readyEventSent[placementId];
     }
 
+    public static getRequestToReadyTime(placementId: string): number {
+        return SdkStats.getReadyEventTimestamp(placementId) - SdkStats.getAdRequestTimestamp();
+    }
+
     public static setCachingStartTimestamp(fileId: string): void {
         SdkStats._cachingStarted[fileId] = Date.now();
     }
