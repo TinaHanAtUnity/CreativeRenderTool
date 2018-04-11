@@ -562,7 +562,7 @@ describe('Event parameters should match specifications', () => {
                 skipInSeconds: 5,
                 disableBackButton: true,
                 useDeviceOrientationForVideo: false,
-                muteVideo: false,
+                muteVideo: false
             });
             realtimePlacement.setRealtimeData('XXXscootVids');
         });
@@ -573,7 +573,6 @@ describe('Event parameters should match specifications', () => {
             const focusManager = new FocusManager(nativeBridge);
             const wakeUpManager: WakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request: Request = new Request(nativeBridge, wakeUpManager);
-            const requestSpy: any = sinon.spy(request, 'post');
             const clientInfo: ClientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
             const deviceInfo: DeviceInfo = TestFixtures.getAndroidDeviceInfo();
             const cacheBookkeeping: CacheBookkeeping = new CacheBookkeeping(nativeBridge);
@@ -585,11 +584,14 @@ describe('Event parameters should match specifications', () => {
             sinon.stub(sessionManager, 'startNewSession').returns(Promise.resolve(session));
             sessionManager.setGameSessionId(1234);
             const campaignManager: CampaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager);
-            return campaignManager.requestRealtime(realtimePlacement, session).then(() => {
-                const url: string = requestSpy.getCall(0).args[0];
-                const body: string = requestSpy.getCall(0).args[1];
-                const verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getRealtimeAdRequestParams(), url, body);
-                verifier.assert();
+            campaignManager.request().then(() => {
+                const requestSpy: any = sinon.spy(request, 'post');
+                return campaignManager.requestRealtime(realtimePlacement, session).then(() => {
+                    const url: string = requestSpy.getCall(0).args[0];
+                    const body: string = requestSpy.getCall(0).args[1];
+                    const verifier: SpecVerifier = new SpecVerifier(Platform.ANDROID, ParamsTestData.getRealtimeAdRequestParams(), url, body);
+                    verifier.assert();
+                });
             });
        });
 
@@ -599,7 +601,6 @@ describe('Event parameters should match specifications', () => {
             const focusManager = new FocusManager(nativeBridge);
             const wakeUpManager: WakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request: Request = new Request(nativeBridge, wakeUpManager);
-            const requestSpy: any = sinon.spy(request, 'post');
             const clientInfo: ClientInfo = TestFixtures.getClientInfo(Platform.IOS);
             const deviceInfo: DeviceInfo = TestFixtures.getIosDeviceInfo();
             const cacheBookkeeping: CacheBookkeeping = new CacheBookkeeping(nativeBridge);
@@ -611,11 +612,14 @@ describe('Event parameters should match specifications', () => {
             sinon.stub(sessionManager, 'startNewSession').returns(Promise.resolve(session));
             sessionManager.setGameSessionId(1234);
             const campaignManager: CampaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager);
-            return campaignManager.requestRealtime(realtimePlacement, session).then(() => {
-                const url: string = requestSpy.getCall(0).args[0];
-                const body: string = requestSpy.getCall(0).args[1];
-                const verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getRealtimeAdRequestParams(), url, body);
-                verifier.assert();
+            campaignManager.request().then(() => {
+                const requestSpy: any = sinon.spy(request, 'post');
+                return campaignManager.requestRealtime(realtimePlacement, session).then(() => {
+                    const url: string = requestSpy.getCall(0).args[0];
+                    const body: string = requestSpy.getCall(0).args[1];
+                    const verifier: SpecVerifier = new SpecVerifier(Platform.IOS, ParamsTestData.getRealtimeAdRequestParams(), url, body);
+                    verifier.assert();
+                });
             });
         });
     });

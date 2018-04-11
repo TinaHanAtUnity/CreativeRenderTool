@@ -16,8 +16,12 @@ export class ThirdPartyEventManager {
         this._request = request;
     }
 
-    public clickAttributionEvent(url: string, redirects: boolean): Promise<INativeResponse> {
-        return this._request.get(url, [], {
+    public clickAttributionEvent(url: string, redirects: boolean, useWebViewUA?: boolean): Promise<INativeResponse> {
+        const headers: Array<[string, string]> = [];
+        if (typeof navigator !== 'undefined' && navigator.userAgent && useWebViewUA) {
+            headers.push(['User-Agent', navigator.userAgent]);
+        }
+        return this._request.get(url, headers, {
             retries: 0,
             retryDelay: 0,
             followRedirects: redirects,
