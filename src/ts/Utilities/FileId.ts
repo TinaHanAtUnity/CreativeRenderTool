@@ -48,5 +48,9 @@ export class FileId {
         });
     }
 
+    public static setFileID(url: string, fileId: string) {
+        this._fileIds[url] = fileId;
+    }
+
     private static _fileIds: { [key: string]: string } = {};
 }

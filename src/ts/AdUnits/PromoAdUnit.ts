@@ -1,12 +1,14 @@
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
-import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Placement } from 'Models/Placement';
 import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 import { Promo } from 'Views/Promo';
 import { IObserver0 } from 'Utilities/IObserver';
 import { FinishState } from 'Constants/FinishState';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { Platform } from 'Constants/Platform';
+import { KeyCode } from 'Constants/Android/KeyCode';
 
 export interface IPromoAdUnitParameters extends IAdUnitParameters<PromoCampaign> {
     view: Promo;
@@ -19,6 +21,7 @@ export class PromoAdUnit extends AbstractAdUnit {
     private _placement: Placement;
     private _campaign: PromoCampaign;
 
+    private _keyDownListener: (kc: number) => void;
     private _onSystemKillObserver: IObserver0;
     private _additionalTrackingEvents: { [eventName: string]: string[] } | undefined;
 
@@ -31,20 +34,26 @@ export class PromoAdUnit extends AbstractAdUnit {
         this._options = parameters.options;
         this._placement = parameters.placement;
         this._campaign = parameters.campaign;
+        this._keyDownListener = (kc: number) => this.onKeyDown(kc);
     }
 
     public show(): Promise<void> {
         // Always set to complete to avoid errors.
         this.setFinishState(FinishState.COMPLETED);
         this.setShowing(true);
-        this.onStart.trigger();
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
         this._promoView.show();
         this.sendTrackingEvent('impression');
 
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            this._nativeBridge.AndroidAdUnit.onKeyDown.subscribe(this._keyDownListener);
+        }
+
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
 
-        return this._container.open(this, ['webview'], false, ForceOrientation.NONE, true, true, false, true, this._options);
+        return this._container.open(this, ['webview'], false, Orientation.NONE, true, true, false, true, this._options).then(() => {
+            this.onStart.trigger();
+        });
     }
 
     public hide(): Promise<void> {
@@ -52,6 +61,10 @@ export class PromoAdUnit extends AbstractAdUnit {
             return Promise.resolve();
         }
         this.setShowing(false);
+
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            this._nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(this._keyDownListener);
+        }
 
         this._container.onSystemKill.unsubscribe(this._onSystemKillObserver);
 
@@ -74,6 +87,12 @@ export class PromoAdUnit extends AbstractAdUnit {
 
     public description(): string {
         return 'promo';
+    }
+
+    private onKeyDown(key: number) {
+        if (key === KeyCode.BACK) {
+            this.hide();
+        }
     }
 
     private sendTrackingEvent(eventName: string): void {

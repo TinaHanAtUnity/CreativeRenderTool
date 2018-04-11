@@ -5,7 +5,7 @@ import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'AdUnits/VPAIDAdUnit';
 import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
 import { VPAID } from 'Views/VPAID';
 import { NativeBridge } from 'Native/NativeBridge';
-import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { Platform } from 'Constants/Platform';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
@@ -47,7 +47,7 @@ describe('VPAIDEventHandlerTest', () => {
             container: sinon.createStubInstance(Activity),
             configuration: sinon.createStubInstance(Configuration),
             request: sinon.createStubInstance(Request),
-            forceOrientation: ForceOrientation.NONE,
+            forceOrientation: Orientation.NONE,
             options: {}
         };
         adUnit = sinon.createStubInstance(VPAIDAdUnit);

@@ -68,7 +68,8 @@ export class CometCampaignParser extends CampaignParser {
                 store: storeName,
                 appStoreId: json.appStoreId,
                 trackingUrls: {},
-                playableConfiguration: undefined
+                playableConfiguration: undefined,
+                arEnabled: json.arEnabled
             };
 
             const mraidCampaign = new MRAIDCampaign(parameters);

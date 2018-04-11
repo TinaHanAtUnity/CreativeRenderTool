@@ -16,7 +16,7 @@ import { Platform } from 'Constants/Platform';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { PerformanceVideoEventHandlers } from 'EventHandlers/PerformanceVideoEventHandlers';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
-import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Overlay } from 'Views/Overlay';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
@@ -259,14 +259,12 @@ export class AdUnitFactory {
         let endScreen: MRAIDEndScreen | undefined;
 
         let mraid: MRAIDView<IMRAIDViewHandler>;
-        if(resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity|roll-the-ball/)) {
+        const isPlayable = (resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) || parameters.campaign.getArEnabled();
+        if (isPlayable) {
             mraid = new PlayableMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.configuration.isCoppaCompliant());
+            endScreen = new MRAIDEndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         } else {
             mraid = new MRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.configuration.isCoppaCompliant());
-        }
-
-        if(resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) {
-            endScreen = new MRAIDEndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         }
 
         const mraidAdUnitParameters: IMRAIDAdUnitParameters = {
@@ -451,7 +449,7 @@ export class AdUnitFactory {
         }
     }
 
-    private static getVideo(campaign: Campaign, forceOrientation: ForceOrientation): Video {
+    private static getVideo(campaign: Campaign, forceOrientation: Orientation): Video {
         const video = CampaignAssetInfo.getOrientedVideo(campaign, forceOrientation);
         if(!video) {
             throw new WebViewError('Unable to select an oriented video');

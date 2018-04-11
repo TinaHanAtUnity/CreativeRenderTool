@@ -28,6 +28,7 @@ import { SensorInfoApi } from 'Native/Api/SensorInfo';
 import { PurchasingApi } from 'Native/Api/Purchasing';
 import { PermissionsApi } from 'Native/Api/Permissions';
 import { MainBundleApi } from 'Native/Api/MainBundle';
+import { ARApi } from 'Native/Api/AR';
 
 export enum CallbackStatus {
     OK,
@@ -51,6 +52,7 @@ export class NativeBridge implements INativeBridge {
         }
     }
 
+    public AR: ARApi;
     public AppSheet: AppSheetApi;
     public AndroidAdUnit: AndroidAdUnitApi;
     public AndroidPreferences: AndroidPreferencesApi;
@@ -94,6 +96,7 @@ export class NativeBridge implements INativeBridge {
 
         this._platform = platform;
         this._backend = backend;
+        this.AR = new ARApi(this);
         this.AppSheet = new AppSheetApi(this);
 
         if(platform === Platform.IOS) {
@@ -246,6 +249,9 @@ export class NativeBridge implements INativeBridge {
 
             case EventCategory[EventCategory.WEBPLAYER]:
                 this.WebPlayer.handleEvent(event, parameters);
+                break;
+            case EventCategory[EventCategory.AR]:
+                this.AR.handleEvent(event, parameters);
                 break;
 
             case EventCategory[EventCategory.PERMISSIONS]:

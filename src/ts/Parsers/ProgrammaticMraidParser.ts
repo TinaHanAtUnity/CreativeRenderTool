@@ -61,7 +61,8 @@ export class ProgrammaticMraidParser extends CampaignParser {
             store: undefined,
             appStoreId: undefined,
             useWebViewUserAgentForTracking: false,
-            playableConfiguration: undefined
+            playableConfiguration: undefined,
+            arEnabled: undefined
         };
 
         return Promise.resolve(new MRAIDCampaign(parameters));

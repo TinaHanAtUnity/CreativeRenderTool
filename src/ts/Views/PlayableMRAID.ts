@@ -1,16 +1,17 @@
 import PlayableMRAIDTemplate from 'html/PlayableMRAID.html';
 import MRAIDContainer from 'html/mraid/container.html';
+import WebARScript from 'html/mraid/webar.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { Placement } from 'Models/Placement';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Platform } from 'Constants/Platform';
-import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
-import { JsonParser } from 'Utilities/JsonParser';
+import { IObserver1, IObserver2 } from 'Utilities/IObserver';
 
 export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -39,6 +40,13 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _backgroundTimestamp: number;
 
     private _configuration: any;
+
+    private _arFrameUpdatedObserver: IObserver1<string>;
+    private _arPlanesAddedObserver: IObserver1<string>;
+    private _arPlanesUpdatedObserver: IObserver1<string>;
+    private _arPlanesRemovedObserver: IObserver1<string>;
+    private _arAnchorsUpdatedObserver: IObserver1<string>;
+    private _arWindowResizedObserver: IObserver2<number, number>;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string, coppaCompliant: boolean) {
         super(nativeBridge, 'playable-mraid', placement, campaign, coppaCompliant);
@@ -104,9 +112,18 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
             }
             container = container.replace('var playableConfiguration = {};', 'var playableConfiguration = ' + JSON.stringify(this._configuration) + ';');
         }
+        if (this._campaign.getArEnabled()) {
+            container = container.replace('<script id=\"webar\"></script>', WebARScript);
+        }
         this.createMRAID(container).then(mraid => {
             iframe.onload = () => this.onIframeLoaded();
             iframe.srcdoc = mraid;
+            this._arFrameUpdatedObserver = this._nativeBridge.AR.onFrameUpdated.subscribe(parameters => this.handleAREvent('frameupdate', parameters));
+            this._arPlanesAddedObserver = this._nativeBridge.AR.onPlanesAdded.subscribe(parameters => this.handleAREvent('planesadded', parameters));
+            this._arPlanesUpdatedObserver = this._nativeBridge.AR.onPlanesUpdated.subscribe(parameters => this.handleAREvent('planesupdated', parameters));
+            this._arPlanesRemovedObserver = this._nativeBridge.AR.onPlanesRemoved.subscribe(parameters => this.handleAREvent('planesremoved', parameters));
+            this._arAnchorsUpdatedObserver = this._nativeBridge.AR.onAnchorsUpdated.subscribe(parameters => this.handleAREvent('anchorsupdated', parameters));
+            this._arWindowResizedObserver = this._nativeBridge.AR.onWindowResized.subscribe((width, height) => this.handleAREvent('windowresized', JSON.stringify({width, height})));
         });
 
         this._messageListener = (event: MessageEvent) => this.onMessage(event);
@@ -301,6 +318,52 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         } else if(this._canClose) {
             this._handlers.forEach(handler => handler.onMraidClose());
         }
+
+        this._nativeBridge.AR.onFrameUpdated.unsubscribe(this._arFrameUpdatedObserver);
+        this._nativeBridge.AR.onPlanesAdded.unsubscribe(this._arPlanesAddedObserver);
+        this._nativeBridge.AR.onPlanesUpdated.unsubscribe(this._arPlanesUpdatedObserver);
+        this._nativeBridge.AR.onPlanesRemoved.unsubscribe(this._arPlanesRemovedObserver);
+        this._nativeBridge.AR.onAnchorsUpdated.unsubscribe(this._arAnchorsUpdatedObserver);
+        this._nativeBridge.AR.onWindowResized.unsubscribe(this._arWindowResizedObserver);
+    }
+
+    private onAREvent(event: MessageEvent): Promise<void> {
+        const { data } = event.data;
+        const message = data.split(':');
+        const functionName = message[0];
+        const args = message[1].split(',');
+
+        switch (functionName) {
+            case 'resetPose':
+                return this._nativeBridge.AR.restartSession();
+
+            case 'setDepthNear':
+                return this._nativeBridge.AR.setDepthNear(parseFloat(args[0]));
+
+            case 'setDepthFar':
+                return this._nativeBridge.AR.setDepthFar(parseFloat(args[0]));
+
+            case 'showCameraFeed':
+                return this._nativeBridge.AR.showCameraFeed();
+
+            case 'hideCameraFeed':
+                return this._nativeBridge.AR.hideCameraFeed();
+
+            case 'addAnchor':
+                return this._nativeBridge.AR.addAnchor(args[0], args[1]);
+
+            case 'removeAnchor':
+                return this._nativeBridge.AR.removeAnchor(args[0]);
+
+            case 'advanceFrame':
+                return this._nativeBridge.AR.advanceFrame();
+
+            case 'log':
+                return this._nativeBridge.Sdk.logDebug('NATIVELOG ' + JSON.stringify(args));
+
+            default:
+                throw new Error('Unknown AR message');
+        }
     }
 
     private onMessage(event: MessageEvent) {
@@ -312,14 +375,14 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 this._handlers.forEach(handler => handler.onMraidClose());
                 break;
             case 'orientation':
-                let forceOrientation = ForceOrientation.NONE;
+                let forceOrientation = Orientation.NONE;
                 switch(event.data.properties.forceOrientation) {
                     case 'portrait':
-                        forceOrientation = ForceOrientation.PORTRAIT;
+                        forceOrientation = Orientation.PORTRAIT;
                         break;
 
                     case 'landscape':
-                        forceOrientation = ForceOrientation.LANDSCAPE;
+                        forceOrientation = Orientation.LANDSCAPE;
                         break;
 
                     default:
@@ -349,6 +412,9 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                         break;
                 }
                 break;
+            case 'ar':
+                this.onAREvent(event).catch((reason) => this._nativeBridge.Sdk.logError('AR message error: ' + reason.toString()));
+                break;
             default:
                 break;
         }
@@ -359,5 +425,11 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
             return undefined;
         }
         return timeInSeconds;
+    }
+
+    private handleAREvent(event: string, parameters: string) {
+        if (this._iframeLoaded) {
+            this._iframe.contentWindow.postMessage({type: 'AREvent', data: {parameters, event}}, '*');
+        }
     }
 }
