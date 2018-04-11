@@ -84,8 +84,8 @@ export class CampaignManager {
     private _request: Request;
     private _deviceInfo: DeviceInfo;
     private _previousPlacementId: string | undefined;
-    private _versionCode: number;
-    private _fullyCachedCampaigns: string[] | undefined;
+    private _realtimeUrl: string | undefined;
+    private _realtimeBody: any = {};
 
     constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager) {
         this._nativeBridge = nativeBridge;
@@ -111,7 +111,6 @@ export class CampaignManager {
 
         this._requesting = true;
 
-        this._fullyCachedCampaigns = undefined;
         this.resetRealtimeDataForPlacements();
         return Promise.all([this.createRequestUrl(false), this.createRequestBody(nofillRetry)]).then(([requestUrl, requestBody]) => {
             this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
@@ -186,11 +185,7 @@ export class CampaignManager {
     }
 
     public getFullyCachedCampaigns(): Promise<string[]> {
-        if (this._fullyCachedCampaigns) {
-            return Promise.resolve(this._fullyCachedCampaigns);
-        }
         return this._nativeBridge.Storage.getKeys(StorageType.PRIVATE, 'cache.campaigns', false).then((campaignKeys) => {
-            this._fullyCachedCampaigns = campaignKeys;
             return campaignKeys;
         }).catch(() => {
             return [];
@@ -398,6 +393,17 @@ export class CampaignManager {
     }
 
     private createRequestUrl(realtime: boolean, session?: Session): Promise<string> {
+
+        if (realtime && this._realtimeUrl) {
+            if (session) {
+                this._realtimeUrl = Url.addParameters(this._realtimeUrl, {
+                    auctionId: session.getId()
+                });
+            }
+            return Promise.resolve(this._realtimeUrl);
+        }
+        this._realtimeUrl = undefined;
+
         let url: string = this.getBaseUrl();
 
         if(this._deviceInfo.getAdvertisingIdentifier()) {
@@ -418,11 +424,6 @@ export class CampaignManager {
             stores: this._deviceInfo.getStores()
         });
 
-        if(realtime && session) {
-            url = Url.addParameters(url, {
-                auctionId: session.getId()
-            });
-        }
         if(this._clientInfo.getPlatform() === Platform.IOS && this._deviceInfo instanceof IosDeviceInfo) {
             url = Url.addParameters(url, {
                 osVersion: this._deviceInfo.getOsVersion(),
@@ -479,11 +480,29 @@ export class CampaignManager {
                 networkType: networkType,
                 gamerId: this._configuration.getGamerId()
             });
+            this._realtimeUrl = url;
             return url;
         });
     }
 
     private createRequestBody(nofillRetry?: boolean, realtimePlacement?: Placement): Promise<any> {
+        const placementRequest: any = {};
+
+        if(realtimePlacement && this._realtimeBody) {
+            placementRequest[realtimePlacement.getId()] = {
+                adTypes: realtimePlacement.getAdTypes(),
+                allowSkip: realtimePlacement.allowSkip(),
+            };
+
+            if(realtimePlacement.getRealtimeData()) {
+                const realtimeDataObject: any = {};
+                realtimeDataObject[realtimePlacement.getId()] = realtimePlacement.getRealtimeData();
+                this._realtimeBody.realtimeData = realtimeDataObject;
+            }
+            return Promise.resolve(this._realtimeBody);
+        }
+        this._realtimeBody = undefined;
+
         const promises: Array<Promise<any>> = [];
         promises.push(this._deviceInfo.getFreeSpace());
         promises.push(this._deviceInfo.getNetworkOperator());
@@ -553,43 +572,26 @@ export class CampaignManager {
                     body.frameworkVersion = framework.getVersion();
                 }
 
-                const placementRequest: any = {};
-
-                if(realtimePlacement) {
-                    placementRequest[realtimePlacement.getId()] = {
-                        adTypes: realtimePlacement.getAdTypes(),
-                        allowSkip: realtimePlacement.allowSkip(),
-                    };
-
-                    if(realtimePlacement.getRealtimeData()) {
-                        const realtimeDataObject: any = {};
-                        realtimeDataObject[realtimePlacement.getId()] = realtimePlacement.getRealtimeData();
-                        body.realtimeData = realtimeDataObject;
-                    }
-                } else {
-                    const placements = this._configuration.getPlacements();
-                    for(const placement in placements) {
-                        if(placements.hasOwnProperty(placement)) {
-                            placementRequest[placement] = {
-                                adTypes: placements[placement].getAdTypes(),
-                                allowSkip: placements[placement].allowSkip(),
-                            };
-                        }
+                const placements = this._configuration.getPlacements();
+                for(const placement in placements) {
+                    if(placements.hasOwnProperty(placement)) {
+                        placementRequest[placement] = {
+                            adTypes: placements[placement].getAdTypes(),
+                            allowSkip: placements[placement].allowSkip(),
+                        };
                     }
                 }
 
                 body.placements = placementRequest;
                 body.properties = this._configuration.getProperties();
                 body.sessionDepth = SdkStats.getAdRequestOrdinal();
+                this._realtimeBody = body;
                 return body;
             });
         });
     }
 
     private getVersionCode(): Promise<number | undefined> {
-        if (this._versionCode) {
-            return Promise.resolve(this._versionCode);
-        }
         if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
             return this._nativeBridge.DeviceInfo.Android.getPackageInfo(this._clientInfo.getApplicationName()).then(packageInfo => {
                 if(packageInfo.versionCode) {

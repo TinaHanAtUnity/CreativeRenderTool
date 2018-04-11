@@ -132,8 +132,9 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
 
     private handleClickAttribution() {
         const clickAttributionUrl = this._campaign.getClickAttributionUrl();
+        const useWebViewUA = this._campaign.getUseWebViewUserAgentForTracking();
         if(this._campaign.getClickAttributionUrlFollowsRedirects() && clickAttributionUrl) {
-            this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, true).then(response => {
+            this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, true, useWebViewUA).then(response => {
                 const location = Request.getHeader(response.headers, 'location');
                 if(location) {
                     this.openUrl(location);
@@ -157,7 +158,7 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
             });
         } else {
             if (clickAttributionUrl) {
-                this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, false);
+                this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, false, useWebViewUA);
             }
         }
     }
