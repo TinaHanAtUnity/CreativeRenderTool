@@ -315,7 +315,8 @@ export class OperativeEventManager {
                 'apiLevel': this._deviceInfo.getApiLevel(),
                 'deviceMake': this._deviceInfo.getManufacturer(),
                 'screenDensity': this._deviceInfo.getScreenDensity(),
-                'screenSize': this._deviceInfo.getScreenLayout()
+                'screenSize': this._deviceInfo.getScreenLayout(),
+                'androidId': this._deviceInfo.getAndroidId()
             };
         }
 
