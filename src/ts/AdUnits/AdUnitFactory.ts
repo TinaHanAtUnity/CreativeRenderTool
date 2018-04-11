@@ -63,6 +63,7 @@ import { Promo } from 'Views/Promo';
 import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
 import { PromoEventHandler } from 'EventHandlers/PromoEventHandler';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
+import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 import { CampaignAssetInfo } from 'Utilities/CampaignAssetInfo';
 
 export class AdUnitFactory {
@@ -328,6 +329,7 @@ export class AdUnitFactory {
 
         promoView.onClose.subscribe(() => PromoEventHandler.onClose(nativeBridge, promoAdUnit, parameters.campaign.getGamerId(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup(), parameters.campaign.getTrackingUrlsForEvent('purchase')));
         promoView.onPromo.subscribe((productId) => PromoEventHandler.onPromo(nativeBridge, promoAdUnit, productId, parameters.campaign.getTrackingUrlsForEvent('purchase')));
+        nativeBridge.Purchasing.onIAPSendEvent.subscribe((iapPayload) => PurchasingUtilities.handleSendIAPEvent(nativeBridge, iapPayload));
 
         return promoAdUnit;
     }
