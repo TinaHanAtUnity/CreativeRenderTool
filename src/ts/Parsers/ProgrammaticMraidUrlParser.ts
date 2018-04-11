@@ -51,7 +51,7 @@ export class ProgrammaticMraidUrlParser extends CampaignParser {
             clickAttributionUrlFollowsRedirects: jsonMraidUrl.clickAttributionUrlFollowsRedirects,
             clickUrl: jsonMraidUrl.clickUrl ? this.validateAndEncodeUrl(jsonMraidUrl.clickUrl, session) : undefined,
             videoEventUrls: {},
-            useWebViewUserAgentForTracking: false,
+            useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking() || false,
             gameName: undefined,
             gameIcon: undefined,
             rating: undefined,
