@@ -4,7 +4,7 @@ import { BatteryStatus } from 'Constants/Android/BatteryStatus';
 import { ISchema, Model } from 'Models/Model';
 import { Platform } from 'Constants/Platform';
 import { StorageType } from 'Native/Api/AndroidDeviceInfo';
-import { IosDeviceInfo } from './IosDeviceInfo';
+import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 
 export interface IDeviceInfo {
     advertisingIdentifier: string | undefined | null;
