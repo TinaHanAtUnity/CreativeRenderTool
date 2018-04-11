@@ -1,3 +1,90 @@
+# Tue Apr 10 20:41:22 UTC 2018
+
+* Optional Admob Signals
+* Unit tests for Campaign Parsers
+* Assume native calls from previous auction request for realtime speedup
+
+# Mon Apr 9 20:36:04 UTC 2018
+
+* Removed special case for roll-the-ball playable
+* Revised iPhone X layout (AB groups 18 & 19)
+* Cache utility cleanup
+* Split auction request failed diagnostics
+* Remove dependency of main video asset existing to be able to return streaming asset
+* Add host and proto to third_party_event_failed analytic (also remove duplicate diagnostic)
+* Fixes Listener start event not being sent in AdMob ads for versions <2.2.0
+* Fixes quartile name in AdMob ads for versions <2.2.0
+
+# Thu Apr 5 20:28:31 UTC 2018
+
+* Fixed a bug where streaming video was cached and shown by default
+* Rename ForceOrientation to Orientation
+
+# Wed Apr 4 20:10:07 UTC 2018 
+
+* Start new refresh manager A/B test in groups 9 & 10
+* Stop refresh manager A/B test in groups 9 & 11
+* Add proper handling of no fill retrying to NewRefreshManager
+* Micro-optimization for ordering native invocations during ad unit opening
+* Remove easter theme.
+* Temporarily enable sending diagnostic for third party tracker errors
+* Cleanup Assetmanagers getOrientedVideo to use CampaignAssetInfo methods
+
+# Mon Apr 2 22:38:47 UTC 2018
+
+* Realtime latency optimization and tracking.
+* Reduce duration of closeable state for display interstitial.
+* Issue logging for IAP.
+* Remove AdMob diagnostic messages.
+
+# Fri Mar 30 05:33:42 UTC 2018
+
+* Change AdMob video asset to be optional for streaming fallback.
+* Disable precaching on AdMob for iOS completely.
+
+# Wed Mar 28 20:07:19 UTC 2018
+
+* Another attempt at fixing race condition in new refresh manager
+
+# Wed Mar 28 07:54:36 UTC 2018
+
+* AdMob caching changes
+
+# Tue Mar 27 18:28:05 UTC 2018
+
+* Easter theme to all groups except 5
+* Fix IAP promo Android back button handling
+* Fix race condition in new refresh manager
+
+# Mon Mar 26 10:16:09 UTC 2018
+
+* Test new ad request refresh logic and reinit logic in groups 9 and 11
+
+# Thu Mar 22 20:52:53 UTC 2018
+
+* Remove ramdom CTA button colour test from groups 8 & 10
+* Display Centering
+* ForceSessionId parameter for APIN
+
+# Wed Mar 21 22:18:31 UTC 2018
+
+* Asset Caching Refactor
+
+# Wed Mar 21 11:34:25 UTC 2018
+
+* Adds MissingImpressionOrdinal support for SDK < 2.1.2
+* Refactor CampaignParser creation to CampaignParserFactory
+
+# Tue Mar 20 21:51:37 UTC 2018
+
+* Initial support for realtime auction
+* Fix AdMob accelerometer fraud signals
+
+# Tue Mar 20 06:58:53 UTC 2018
+
+* Easter theme A/B test in groups 16 & 17
+* Remove overlay A/B test from groups 16 & 17
+
 # Mon Mar 19 07:48:44 UTC 2018
 
 * Support for new A/B testing framework

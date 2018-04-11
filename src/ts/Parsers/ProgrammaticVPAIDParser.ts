@@ -10,6 +10,7 @@ import { Campaign, ICampaign } from 'Models/Campaign';
 import { VastMediaFile } from 'Models/Vast/VastMediaFile';
 
 export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
+    public static ContentType = 'programmatic/vast-vpaid';
 
     private _vpaidParser: VPAIDParser = new VPAIDParser();
 
@@ -33,7 +34,8 @@ export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
                     creativeId: response.getCreativeId() || undefined,
                     seatId: response.getSeatId() || undefined,
                     meta: undefined,
-                    session: session
+                    session: session,
+                    mediaId: response.getMediaId()
                 };
 
                 const vpaidCampaignParams: IVPAIDCampaign = {

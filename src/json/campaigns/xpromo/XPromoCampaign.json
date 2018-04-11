@@ -1,0 +1,20 @@
+{
+    "contentType": "xpromo/video",
+    "adType": "VIDEO",
+    "seatId": 9000,
+    "trackingUrls": {
+    "click": [
+        "https://fake-ads-backend.applifier.info/ack/510?event=click"
+    ],
+    "start": [
+        "https://fake-ads-backend.applifier.info/ack/510?event=start"
+    ],
+    "view": [
+        "https://fake-ads-backend.applifier.info/ack/510?event=view"
+    ]
+    },
+    "content": "{   \"appStoreId\": \"com.iUnity.angryBots\",   \"bypassAppSheet\": false,   \"endScreenLandscape\": \"http://cdn.unityads.unity3d.com/impact/11017/test_endscreen_landscape.png\",   \"endScreenPortrait\": \"http://cdn.unityads.unity3d.com/impact/11017/test_endscreen_portrait.png\",   \"gameIcon\": \"http://cdn.unityads.unity3d.com/impact/11017/test_game_icon.png\",   \"gameId\": 11017,   \"gameName\": \"Android XPromo - Fake Ads Backend\",   \"store\": \"google\",   \"id\": \"000000000000000000000000\",   \"rating\": 4.500000,   \"ratingCount\": 10000,   \"trailerDownloadable\": \"http://cdn.unityads.unity3d.com/impact/11017/red_test_trailer.mp4\",   \"trailerDownloadableSize\": 1445875,   \"trailerStreaming\": \"http://cdn.unityads.unity3d.com/impact/11017/red_test_trailer.mp4\" } ",
+    "campaignId": "000000000000000000000001",
+    "cacheTTL": 123,
+    "creativeId": "not-defined-in-fab"
+}

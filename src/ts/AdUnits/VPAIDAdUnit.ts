@@ -4,7 +4,6 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { VPAID } from 'Views/VPAID';
 import { FinishState } from 'Constants/FinishState';
 import { Platform } from 'Constants/Platform';
-import { Url } from 'Utilities/Url';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { Timer } from 'Utilities/Timer';
@@ -69,7 +68,9 @@ export class VPAIDAdUnit extends AbstractAdUnit {
 
         return this.setupWebPlayer().then(() => {
             this._urlLoadingObserver = this._nativeBridge.WebPlayer.shouldOverrideUrlLoading.subscribe((url, method) => this.onUrlLoad(url));
-            return this._container.open(this, ['webplayer', 'webview'], false, this._forceOrientation, false, false, true, false, this._options);
+            return this._container.open(this, ['webplayer', 'webview'], false, this._forceOrientation, false, false, true, false, this._options).then(() => {
+                this.onStart.trigger();
+            });
         });
     }
 
@@ -81,10 +82,6 @@ export class VPAIDAdUnit extends AbstractAdUnit {
 
     public description(): string {
         return 'vpaid';
-    }
-
-    public isCached(): boolean {
-        return false;
     }
 
     public openUrl(url: string | null) {
@@ -187,7 +184,6 @@ export class VPAIDAdUnit extends AbstractAdUnit {
 
     private onShow() {
         this.setShowing(true);
-        this.onStart.trigger();
         // todo: is the timer needed at all?
         // this._timer.start();
 

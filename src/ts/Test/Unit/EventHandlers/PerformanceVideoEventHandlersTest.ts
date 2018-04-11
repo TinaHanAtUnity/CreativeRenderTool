@@ -7,7 +7,7 @@ import { Overlay } from 'Views/Overlay';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { PerformanceVideoEventHandlers } from 'EventHandlers/PerformanceVideoEventHandlers';
 import { Platform } from 'Constants/Platform';
-import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { Video } from 'Models/Assets/Video';
 import { Request } from 'Utilities/Request';
@@ -67,7 +67,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
 
         performanceAdUnitParameters = {
-            forceOrientation: ForceOrientation.LANDSCAPE,
+            forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
             container: container,
             deviceInfo: deviceInfo,

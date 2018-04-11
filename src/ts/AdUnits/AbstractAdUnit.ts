@@ -2,7 +2,7 @@ import { Placement } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
 import { Observable0 } from 'Utilities/Observable';
 import { NativeBridge } from 'Native/NativeBridge';
-import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { FinishState } from 'Constants/FinishState';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
@@ -13,9 +13,10 @@ import { Request } from 'Utilities/Request';
 import { FocusManager } from 'Managers/FocusManager';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
+import { CampaignAssetInfo } from 'Utilities/CampaignAssetInfo';
 
 export interface IAdUnitParameters<T extends Campaign> {
-    forceOrientation: ForceOrientation;
+    forceOrientation: Orientation;
     focusManager: FocusManager;
     container: AdUnitContainer;
     deviceInfo: DeviceInfo;
@@ -59,11 +60,12 @@ export abstract class AbstractAdUnit {
     public readonly onError = new Observable0();
 
     protected readonly _nativeBridge: NativeBridge;
-    protected readonly _forceOrientation: ForceOrientation;
+    protected readonly _forceOrientation: Orientation;
     protected readonly _container: AdUnitContainer;
 
     private _showing: boolean;
     private _finishState: FinishState;
+    private _baseCampaign: Campaign;
 
     constructor(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>) {
         this._nativeBridge = nativeBridge;
@@ -71,6 +73,7 @@ export abstract class AbstractAdUnit {
         this._container = parameters.container;
         this._showing = false;
         this._finishState = FinishState.ERROR;
+        this._baseCampaign = parameters.campaign;
     }
 
     public abstract show(): Promise<void>;
@@ -79,7 +82,9 @@ export abstract class AbstractAdUnit {
 
     public abstract description(): string;
 
-    public abstract isCached(): boolean;
+    public isCached(): boolean {
+        return CampaignAssetInfo.isCached(this._baseCampaign);
+    }
 
     public isShowing() {
         return this._showing;
@@ -93,7 +98,7 @@ export abstract class AbstractAdUnit {
         return this._container;
     }
 
-    public getForceOrientation(): ForceOrientation {
+    public getForceOrientation(): Orientation {
         return this._forceOrientation;
     }
 

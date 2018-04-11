@@ -4,7 +4,7 @@ import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { FinishState } from 'Constants/FinishState';
 import { IObserver0 } from 'Utilities/IObserver';
 import { MRAIDView, IOrientationProperties, IMRAIDViewHandler } from 'Views/MRAIDView';
-import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { HTML } from 'Models/Assets/HTML';
 import { EndScreen } from 'Views/EndScreen';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
@@ -60,7 +60,7 @@ export class MRAIDAdUnit extends AbstractAdUnit {
 
         this._orientationProperties = {
             allowOrientationChange: true,
-            forceOrientation: ForceOrientation.NONE
+            forceOrientation: Orientation.NONE
         };
 
         this._options = parameters.options;
@@ -71,7 +71,6 @@ export class MRAIDAdUnit extends AbstractAdUnit {
         this.setShowing(true);
         this.setShowingMRAID(true);
         this._mraid.show();
-        this.onStart.trigger();
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
         this._operativeEventManager.sendStart(this._placement).then(() => {
             this.onStartProcessed.trigger();
@@ -83,7 +82,9 @@ export class MRAIDAdUnit extends AbstractAdUnit {
         this._onSystemInterruptObserver = this._container.onSystemInterrupt.subscribe((interruptStarted) => this.onSystemInterrupt(interruptStarted));
         this._onPauseObserver = this._container.onAndroidPause.subscribe(() => this.onSystemPause());
 
-        return this._container.open(this, ['webview'], this._orientationProperties.allowOrientationChange, this._orientationProperties.forceOrientation, true, false, true, false, this._options);
+        return this._container.open(this, ['webview'], this._orientationProperties.allowOrientationChange, this._orientationProperties.forceOrientation, true, false, true, false, this._options).then(() => {
+            this.onStart.trigger();
+        });
     }
 
     public hide(): Promise<void> {
@@ -130,15 +131,6 @@ export class MRAIDAdUnit extends AbstractAdUnit {
 
     public setOrientationProperties(properties: IOrientationProperties): void {
         this._orientationProperties = properties;
-    }
-
-    public isCached(): boolean {
-        const asset: HTML | undefined = this._campaign.getResourceUrl();
-        if(asset) {
-            return asset.isCached();
-        }
-
-        return false;
     }
 
     public description(): string {
