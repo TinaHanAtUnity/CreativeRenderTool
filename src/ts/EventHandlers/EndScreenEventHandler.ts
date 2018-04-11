@@ -89,8 +89,12 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
 
         HttpKafka.sendEvent('ads.sdk2.events.gdprtest.json', kafkaObject);
 
-        this._nativeBridge.Storage.set(StorageType.PRIVATE, 'gdpr.popupshown.value', true);
-        this._nativeBridge.Storage.write(StorageType.PRIVATE);
+        Promise.all([
+            this._nativeBridge.Storage.set(StorageType.PRIVATE, 'gdpr.popupshown.value', true),
+            this._nativeBridge.Storage.write(StorageType.PRIVATE)
+        ]).catch(err => {
+            //
+        });
     }
 
     public abstract onKeyEvent(keyCode: number): void;
