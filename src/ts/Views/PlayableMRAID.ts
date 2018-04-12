@@ -114,6 +114,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
         if (this._campaign.getArEnabled()) {
             container = container.replace('<script id=\"webar\"></script>', WebARScript);
+            iframe.classList.add('fullscreen');
         }
         this.createMRAID(container).then(mraid => {
             iframe.onload = () => this.onIframeLoaded();
