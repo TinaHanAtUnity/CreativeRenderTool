@@ -152,6 +152,14 @@ export class SdkStats {
         SdkStats._parseDuration[placementId] = duration;
     }
 
+    public static setFrameSetStartTimestamp(placementId: string): void {
+        SdkStats._frameSetStarted[placementId] = Date.now();
+    }
+
+    public static getFrameSetStartTimestamp(placementId: string): number {
+        return SdkStats._frameSetStarted[placementId];
+    }
+
     private static _nativeBridge: NativeBridge;
     private static _request: Request;
     private static _configuration: Configuration;
@@ -170,6 +178,7 @@ export class SdkStats {
     private static _readyEventSent: { [id: string]: number } = {};
     private static _cachingStarted: { [id: string]: number } = {};
     private static _cachingFinished: { [id: string]: number } = {};
+    private static _frameSetStarted: { [id: string]: number } = {};
 
     private static isTestActive(): boolean {
         const gameSessionId: number = SdkStats._sessionManager.getGameSessionId();

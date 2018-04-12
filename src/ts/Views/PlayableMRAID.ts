@@ -11,6 +11,7 @@ import { Localization } from 'Utilities/Localization';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
 import { JsonParser } from 'Utilities/JsonParser';
+import { SdkStats } from 'Utilities/SdkStats';
 
 export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -106,6 +107,8 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
         this.createMRAID(container).then(mraid => {
             iframe.onload = () => this.onIframeLoaded();
+            SdkStats.setFrameSetStartTimestamp(this._placement.getId());
+            this._nativeBridge.Sdk.logInfo('Unity Ads placement ' + this._placement.getId() + ' set iframe.src started ' + SdkStats.getFrameSetStartTimestamp(this._placement.getId()));
             iframe.srcdoc = mraid;
         });
 
@@ -173,6 +176,9 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
             this.showMRAIDAd();
         }
+
+        const frameLoadDuration = Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId());
+        this._nativeBridge.Sdk.logInfo('Unity Ads placement ' + this._placement.getId() + ' iframe load duration ' + frameLoadDuration + ' ms');
     }
 
     private showLoadingScreen() {
