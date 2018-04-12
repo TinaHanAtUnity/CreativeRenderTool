@@ -2,29 +2,49 @@
 
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { NativeBridge } from 'Native/NativeBridge';
+import { StorageType } from 'Native/Api/Storage';
 
 export class FLAM {
+    public static canvas: HTMLCanvasElement = document.createElement('canvas');
+    public static image: HTMLImageElement = new Image();
     public static runCount: number = 0;
     public static fpsCount: number = 0;
     public static fpsSum: number = 0;
     public static fps: number = 0;
     public static lowestFps: number = 999;
     public static highestFps: number = 0;
-    public static image: HTMLImageElement;
 
-    private static get Now() {
-        return window.performance ? window.performance.now() : Date.now();
+    public static measure(webviewContext: HTMLElement, nativeBridge: NativeBridge) {
+        if (!FLAM.isImageLoaded) {
+            FLAM.loadImage(true);
+        }
+
+        FLAM.prepareCanvas();
+
+        webviewContext.appendChild(FLAM.canvas);
+
+        FLAM.runUpdateLoop(FLAM.canvas, nativeBridge);
+
+        //
+        // nativeBridge.Storage.get(StorageType.PRIVATE, 'flam.averageFps').then(function () {
+        //     console.log('I am done!', arguments);
+        // });
     }
 
-    private static get AverageFps() {
+    private static get AverageFps(): number {
         return this.runCount > 0 ? Math.round(this.fpsSum / this.fpsCount) : 0;
     }
 
-    public static measure(webviewContext: HTMLElement, nativeBridge: NativeBridge) {
-        const canvas = FLAM.createTestCanvas();
-        webviewContext.appendChild(canvas);
+    private static get isImageLoaded(): boolean {
+        return !!(this.image && this.image.complete && this.image.height > 0 && this.image.width > 0);
+    }
 
-        FLAM.runUpdateLoop(canvas, nativeBridge);
+    private static get isSupportWebP(): boolean {
+        return !!(this.isImageLoaded && this.image.src && this.image.src.indexOf('image/webp;') > 0);
+    }
+
+    private static get Now(): number {
+        return window.performance ? window.performance.now() : Date.now();
     }
 
     private static requestAnimationFrame(callback: () => any) {
@@ -37,19 +57,15 @@ export class FLAM {
         }
     }
 
-    private static createTestCanvas(): HTMLCanvasElement {
-        const canvas = <HTMLCanvasElement>document.createElement('canvas');
-
-        /* Use css prop to avoid extra dependencies */
-        canvas.style.width = '100%';
-        canvas.style.height = '50%';
-        canvas.style.top = '25%';
-        canvas.id = 'playground';
-        canvas.style.position = 'absolute';
-        canvas.style.zIndex = '999';
-        // canvas.style.opacity = '0';
-
-        return canvas;
+    private static prepareCanvas() {
+        /* Use css prop in js to avoid extra files */
+        FLAM.canvas.style.width = '100%';
+        FLAM.canvas.style.height = '50%';
+        FLAM.canvas.style.top = '25%';
+        FLAM.canvas.id = 'playground';
+        FLAM.canvas.style.position = 'absolute';
+        FLAM.canvas.style.zIndex = '999';
+        FLAM.canvas.style.opacity = '0';
     }
 
     private static recordFPS(fps: number, canvas?: HTMLCanvasElement) {
@@ -84,8 +100,7 @@ export class FLAM {
         let lastLoop = FLAM.Now;
         let thisLoop;
 
-        FLAM.loadImage();
-
+        /* Test start */
         FLAM.requestAnimationFrame(function drawFrame() {
             const thisFrameTime = (thisLoop = FLAM.Now) - lastLoop;
             frameTime += (thisFrameTime - frameTime) / filterStrength;
@@ -103,7 +118,9 @@ export class FLAM {
             FLAM.drawCircle(canvas);
             FLAM.drawHeart(canvas);
 
-            FLAM.drawImages(canvas, {wobbleEffect: true});
+            if (FLAM.isImageLoaded) {
+                FLAM.drawImages(canvas, {wobbleEffect: true});
+            }
 
             /* Copy image data */
             // const imageData = ctx.getImageData(50, 50, 100, 100);
@@ -114,12 +131,14 @@ export class FLAM {
             }
 
             if (startTime + testDuration < FLAM.Now) {
-                FLAM.sendData(nativeBridge);
+                FLAM.storeData(nativeBridge);
                 FLAM.cleanUp();
             } else {
                 FLAM.requestAnimationFrame(drawFrame);
             }
         });
+
+        /* Test end */
     }
 
     private static draw2dCube(canvas: HTMLCanvasElement, position: { x: number, y: number }, effect?: { wobbleEffect?: boolean, rotate?: boolean, translate?: boolean }) {
@@ -184,17 +203,14 @@ export class FLAM {
             wobble = Math.sin(Date.now() / 250) * canvas.height / 50;
         }
 
-        if (FLAM.image.complete) {
+        ctx.drawImage(FLAM.image, canvas.width / 2 - FLAM.image.width / 2, canvas.height / 2 + wobble - FLAM.image.height / 2);
 
-            ctx.drawImage(FLAM.image, canvas.width / 2 - FLAM.image.width / 2, canvas.height / 2 + wobble - FLAM.image.height / 2);
-
-            for (let i = 0; i < 500; i++) {
-                ctx.save();
-                ctx.rotate(360 * Math.random() * Math.PI / 180);
-                ctx.scale(2 * Math.random(), 2 * Math.random());
-                ctx.drawImage(FLAM.image, canvas.width / 2 * Math.random(), canvas.height * Math.random());
-                ctx.restore();
-            }
+        for (let i = 0; i < 500; i++) {
+            ctx.save();
+            ctx.rotate(360 * Math.random() * Math.PI / 180);
+            ctx.scale(2 * Math.random(), 2 * Math.random());
+            ctx.drawImage(FLAM.image, canvas.width / 2 * Math.random(), canvas.height * Math.random());
+            ctx.restore();
         }
     }
 
@@ -219,7 +235,7 @@ export class FLAM {
 
     }
 
-    private static sendData(nativeBridge: NativeBridge) {
+    private static storeData(nativeBridge: NativeBridge) {
         FLAM.runCount++;
 
         const data = {
@@ -229,30 +245,46 @@ export class FLAM {
             lowestFps: FLAM.lowestFps,
             highestFps: FLAM.highestFps,
             averageFps: FLAM.AverageFps,
-            other: FLAM.Now,
-            score: 0,
-            testType: '',
-            testVersion: 3,
+            testVersion: '1',
+            ts: new Date(),
             device: window.navigator.userAgent,
+            other: `webp > ${FLAM.isSupportWebP}`
         };
 
         // Diagnostics.trigger('canvas_performance_test', data);
         nativeBridge.Sdk.logInfo(JSON.stringify(data));
+        // nativeBridge.Storage.set(StorageType.PRIVATE, 'flam.runCount', FLAM.runCount);
+        // nativeBridge.Storage.set(StorageType.PRIVATE, 'flam.averageFps', data.averageFps);
+        // nativeBridge.Storage.set(StorageType.PRIVATE, 'flam.averageFps', data.averageFps);
+        // nativeBridge.Storage.set(StorageType.PRIVATE, 'flam.averageFps', data.averageFps);
+        // nativeBridge.Storage.write(StorageType.PRIVATE);
     }
 
     private static cleanUp() {
-        /* Clean up */
+        if (FLAM.canvas && FLAM.canvas.parentElement) {
+            FLAM.canvas.parentElement.removeChild(FLAM.canvas);
+        }
+
+        FLAM.canvas = document.createElement('canvas');
+        FLAM.image = new Image();
     }
 
-    private static loadImage() {
-        if (typeof FLAM.image === 'undefined') {
-            FLAM.image = new Image();
-            FLAM.image.src = FLAM.getBase64Image();
+    private static loadImage(webp: boolean = false) {
+        FLAM.image.onload = FLAM.image.onerror = () => {
+            if (!FLAM.isImageLoaded && webp) {
+                FLAM.image = new Image();
+                FLAM.loadImage();
+            }
+        };
+
+        FLAM.image.src = FLAM.getBase64Image(webp);
+    }
+
+    private static getBase64Image(webp: boolean): string {
+        if (webp) {
+            return 'data:image/webp;base64,UklGRr4EAABXRUJQVlA4WAoAAAAQAAAAhwAAHwAAQUxQSN8DAAABT8egbSRH7xx/1O0bgYjIy2+ZAwo5j8ycknNm9uFN9txlzTGnbJB227axNzt4Yye1bbsNatu2bdu2bdu2bSPOu37HfRo8I2i/RfR/AvRft1y3rVsyvhwtl1xLhJhcGVvkpLNfsG6UoZWIw/zpBOZkaPvhx9W5kVOM82nS+eQ2H7U+uds/Xeowc8bKa9Ob55X8X/P8PjFF02I2BGkksaHpUQ9gqqvMxdBiKHRKi/BxQzw0iC9+6VBPYKQsKydwQVGw3CJHwexGSMFcHvkLKLh516bBkmeQn2f+qXwv78hXMMTwLFDIz6Kgv+GoFB5eJdAqb8vO1WzUDxgr68Mk1JT/G176GIeidxnzos9X/PFn1BPgRYRGRt+NjHNCUuvN0dc8JI2J/l3O8Pk00Sj0evfOA+fGGyOvrJp/fE+wXXoBE2XdAjZI2oazmnGGI8YybldJAj7+hteeY3hd48Z7Eu+P6Qz1JPfbXHAz2t477pBU6pSkvMcWS/Wf5Ja0YotNekP8WFl7P+J7YUl9oJ5xkkPGEm5UjuN788BCeyF8MO8DNIyvIe5hH1guVXLSReb+hjuaSCp5ylWS9+PamrhQkvKcskdv4HR4VF0zaj6MkqRCnHSkwhRJRWPoN8AYytcgaQnfwjSXL6FG8WvqtjkZmr5MjZ/mliRfWwwDcJLMO56Gy5mqSlE8XST5vWeoxTC+hkhVEuigF6yROXm+sl0OTUaHndLkm7MivWXPaUayr7gYOlLa4hQHjcUWXSUFvGNIsnSB/Q2gpuG4XEJa0T8ZrfdIKj7t2PWBLrbQBOBks3btzXbroa+Rx7nHxTjBRWNTGvTjyzVuOYzI+6XLlBl6Ohndt8my5qW59tB4iO4p68DXfMgtqStEGiuJjZKqfk6DXF+A/jIXnF23fv26t+X+tn2smgRLUs77NtE4oK+VusBiSRugjtEKfu/eHU0aaC38ymOEPsglSXPmqORJSar9IoeOdjcC79pFk4BeVm7niSkr72e88zccuwC+HuVhVeglKfAHI4byM1AjiQ016iSyR2bfIzKrPPUrdqtksfJ9nzaTIl60z+lfev9q22gMOLtbKAKOKBzWydKt3dLNE4sX7NwopGPnIpIcLTuXKtG5lUOlOrfxMBok0sBidlMLLSwfuH/vnp0zSklS9ZXHjx0Z7mEfjQH6W2gjRPWDrlY23MsTL4tU9wlxka0HrV69/cCgWv5Szs/cvUp8KbtUSGK00t1z8OrQoDLTnMBVF7uM//amaPpTGdP5PglYJLsGBQcoHW654n481i1sk267lx64/RUQny+jMwPqjTq9zyUz8I8eAFZQOCC4AAAAcAcAnQEqiAAgAD5dJI1Fo6IhHGQAOAXEs4BmTDQD8AKcA/ACdAPsALE56AKnZ5i1Ko9StFNYg1zFXyDf0WjMESyEhAAA/vxKJxy2PF0Pn/4v/6Dv/jt//QSNDy8LMpPPJn5pn+jOv//7QjWsHvZ4aaQINLm9HuOyH+4jv//7QjbR1mUP//9M9H/dgxvMdQIYb2ox/al9UmdquGntYJr1u6/FKFpv/HB7LN2T9O2RW2Tiqnp+gAAAAA==';
+        } else {
+            return 'data:image/png;base64,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';
         }
     }
-
-    private static getBase64Image(): string {
-        return 'data:image/png;base64,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';
-    }
-
 }
