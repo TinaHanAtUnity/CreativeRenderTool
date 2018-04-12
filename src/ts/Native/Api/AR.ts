@@ -1,6 +1,6 @@
 import { NativeApi } from 'Native/NativeApi';
 import { NativeBridge } from 'Native/NativeBridge';
-import { Observable1, Observable2 } from 'Utilities/Observable';
+import { Observable0, Observable1, Observable2 } from 'Utilities/Observable';
 
 enum AREvent {
     AR_PLANES_ADDED,
@@ -8,7 +8,10 @@ enum AREvent {
     AR_PLANES_UPDATED,
     AR_ANCHORS_UPDATED,
     AR_FRAME_UPDATED,
-    AR_WINDOW_RESIZED
+    AR_WINDOW_RESIZED,
+    AR_ERROR,
+    AR_SESSION_INTERRUPTED,
+    AR_SESSION_INTERRUPTION_ENDED
 }
 
 export class ARApi extends NativeApi {
@@ -19,6 +22,9 @@ export class ARApi extends NativeApi {
     public readonly onAnchorsUpdated = new Observable1<string>();
     public readonly onFrameUpdated = new Observable1<string>();
     public readonly onWindowResized = new Observable2<number, number>();
+    public readonly onError = new Observable1<number>();
+    public readonly onSessionInterrupted = new Observable0();
+    public readonly onSessionInterruptionEnded = new Observable0();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'AR');
@@ -79,6 +85,15 @@ export class ARApi extends NativeApi {
                 break;
             case AREvent[AREvent.AR_WINDOW_RESIZED]:
                 this.onWindowResized.trigger(parameters[0], parameters[1]);
+                break;
+            case AREvent[AREvent.AR_ERROR]:
+                this.onError.trigger(parameters[0]);
+                break;
+            case AREvent[AREvent.AR_SESSION_INTERRUPTED]:
+                this.onSessionInterrupted.trigger();
+                break;
+            case AREvent[AREvent.AR_SESSION_INTERRUPTION_ENDED]:
+                this.onSessionInterruptionEnded.trigger();
                 break;
         }
     }

@@ -1051,6 +1051,11 @@
                         case 'windowresized':
                             window.WebARonARKitSetWindowSize(parameters);
                             break;
+                        case 'error':
+                        case 'sessioninterrupted':
+                        case 'sessioninterruptionended':
+                            // TODO: handle these
+                            break;
                     }
                 }
             });
