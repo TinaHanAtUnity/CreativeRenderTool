@@ -88,7 +88,7 @@ export class CampaignManager {
     private _previousPlacementId: string | undefined;
     private _versionCode: number;
     private _fullyCachedCampaigns: string[] | undefined;
-    private _skipErrors: boolean;
+    private _ignoreEvents: boolean;
 
     constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeeping) {
         this._nativeBridge = nativeBridge;
@@ -102,7 +102,7 @@ export class CampaignManager {
         this._adMobSignalFactory = adMobSignalFactory;
         this._cacheBookkeeping = cacheBookkeeping;
         this._requesting = false;
-        this._skipErrors = false;
+        this._ignoreEvents = false;
     }
 
     public requestFromCache(cachedResponse: INativeResponse): Promise<void[] | void> {
@@ -113,7 +113,7 @@ export class CampaignManager {
         this._assetManager.enableCaching();
         this._assetManager.checkFreeSpace();
 
-        this._skipErrors = true;
+        this._ignoreEvents = true;
         this._requesting = true;
 
         this._fullyCachedCampaigns = undefined;
@@ -122,10 +122,10 @@ export class CampaignManager {
         this._nativeBridge.Sdk.logInfo('Requesting ad plan from cache ' + cachedResponse.url);
 
         return this.parseCampaigns(cachedResponse).then(() => {
-                this._skipErrors = false;
+                this._ignoreEvents = false;
                 this._requesting = false;
             }).catch((error) => {
-                this._skipErrors = false;
+                this._ignoreEvents = false;
                 this._requesting = false;
             });
     }
@@ -299,8 +299,10 @@ export class CampaignManager {
                 }
             }
 
-            this._nativeBridge.Sdk.logInfo('AdPlan received with ' + campaigns + ' campaigns and refreshDelay ' + refreshDelay);
-            this.onAdPlanReceived.trigger(refreshDelay, campaigns);
+            if (!this._ignoreEvents) {
+                this._nativeBridge.Sdk.logInfo('AdPlan received with ' + campaigns + ' campaigns and refreshDelay ' + refreshDelay);
+                this.onAdPlanReceived.trigger(refreshDelay, campaigns);
+            }
 
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
@@ -405,7 +407,7 @@ export class CampaignManager {
 
     private handleNoFill(placement: string): Promise<void> {
         this._nativeBridge.Sdk.logDebug('PLC no fill for placement ' + placement);
-        if (!this._skipErrors) {
+        if (!this._ignoreEvents) {
             this.onNoFill.trigger(placement);
         }
         return Promise.resolve();
@@ -413,7 +415,7 @@ export class CampaignManager {
 
     private handleError(error: any, placementIds: string[], diagnosticsType: string, session?: Session): Promise<void> {
         this._nativeBridge.Sdk.logDebug('PLC error ' + error);
-        if (!this._skipErrors) {
+        if (!this._ignoreEvents) {
             this.onError.trigger(error, placementIds, diagnosticsType, session);
         }
 

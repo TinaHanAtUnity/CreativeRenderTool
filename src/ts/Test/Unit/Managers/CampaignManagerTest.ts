@@ -1214,10 +1214,84 @@ describe('CampaignManager', () => {
             triggeredCampaign = <MRAIDCampaign>campaign;
         });
 
+        let onAdPlanReceived = false;
+        campaignManager.onAdPlanReceived.subscribe(() => {
+            onAdPlanReceived = true;
+        });
+
         return campaignManager.requestFromCache({
             response: OnProgrammaticMraidUrlPlcCampaignJson
         } as INativeResponse).then(() => {
             assert.equal(triggeredCampaign.getAbGroup(), 99);
+            assert.isFalse(onAdPlanReceived, 'onAdPlanReceived was triggered');
+        });
+    });
+
+    it('should request from cached response, no fill', () => {
+        const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping);
+
+        let triggeredCampaign: MRAIDCampaign;
+        campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
+            triggeredCampaign = <MRAIDCampaign>campaign;
+        });
+
+        let noFill = false;
+        campaignManager.onNoFill.subscribe(() => {
+            noFill = true;
+        });
+
+        let onError = false;
+        campaignManager.onError.subscribe(() => {
+            onError = true;
+        });
+
+        let onAdPlanReceived = false;
+        campaignManager.onAdPlanReceived.subscribe(() => {
+            onAdPlanReceived = true;
+        });
+
+        return campaignManager.requestFromCache({
+            response: OnProgrammaticVastPlcCampaignNullData
+        } as INativeResponse).then(() => {
+            assert.isUndefined(triggeredCampaign);
+            assert.isFalse(noFill, 'onNoFill was triggered');
+            assert.isFalse(onError, 'onError was triggered');
+            assert.isFalse(onAdPlanReceived, 'onAdPlanReceived was triggered');
+        });
+    });
+
+    it('should request from cached response, error', () => {
+        const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping);
+
+        let triggeredCampaign: MRAIDCampaign;
+        campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
+            triggeredCampaign = <MRAIDCampaign>campaign;
+        });
+
+        let noFill = false;
+        campaignManager.onNoFill.subscribe(() => {
+            noFill = true;
+        });
+
+        let onError = false;
+        campaignManager.onError.subscribe(() => {
+            onError = true;
+        });
+
+        let onAdPlanReceived = false;
+        campaignManager.onAdPlanReceived.subscribe(() => {
+            onAdPlanReceived = true;
+        });
+
+        return campaignManager.requestFromCache({
+            response: OnProgrammaticVastPlcCampaignNullData
+        } as INativeResponse).then(() => {
+            assert.isUndefined(triggeredCampaign);
+            assert.isFalse(noFill, 'onNoFill was triggered');
+            assert.isFalse(onError, 'onError was triggered');
+            assert.isFalse(onAdPlanReceived, 'onAdPlanReceived was triggered');
         });
     });
 });
