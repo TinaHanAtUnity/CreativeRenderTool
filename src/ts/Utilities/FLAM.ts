@@ -6,7 +6,7 @@ import { StorageType } from 'Native/Api/Storage';
 
 export class FLAM {
     public static canvas: HTMLCanvasElement = document.createElement('canvas');
-    public static image: HTMLImageElement = new Image();
+    public static image: HTMLImageElement = document.createElement('img');
     public static runCount: number = 0;
     public static fpsCount: number = 0;
     public static fpsSum: number = 0;
@@ -251,7 +251,7 @@ export class FLAM {
             other: `webp > ${FLAM.isSupportWebP}`
         };
 
-        // Diagnostics.trigger('canvas_performance_test', data);
+        Diagnostics.trigger('canvas_performance_test', data);
         nativeBridge.Sdk.logInfo(JSON.stringify(data));
         // nativeBridge.Storage.set(StorageType.PRIVATE, 'flam.runCount', FLAM.runCount);
         // nativeBridge.Storage.set(StorageType.PRIVATE, 'flam.averageFps', data.averageFps);
@@ -266,13 +266,13 @@ export class FLAM {
         }
 
         FLAM.canvas = document.createElement('canvas');
-        FLAM.image = new Image();
+        FLAM.image = document.createElement('img');
     }
 
     private static loadImage(webp: boolean = false) {
         FLAM.image.onload = FLAM.image.onerror = () => {
             if (!FLAM.isImageLoaded && webp) {
-                FLAM.image = new Image();
+                FLAM.image = document.createElement('img');
                 FLAM.loadImage();
             }
         };
