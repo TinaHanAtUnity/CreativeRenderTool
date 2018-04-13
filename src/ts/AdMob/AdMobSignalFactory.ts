@@ -75,20 +75,16 @@ export class AdMobSignalFactory {
             this.logFailure(this._nativeBridge, 'priorClickCount');
         }));
 
-        promises.push(this._deviceInfo.getConnectionType().then(connectionType => {
+        promises.push(Promise.all([this._deviceInfo.getConnectionType(), this._deviceInfo.getNetworkType()]).then(([connectionType, networkType]) => {
             if (connectionType === 'wifi') {
                 signal.setGranularSpeedBucket('wi');
             } else if (connectionType === 'cellular') {
-                this._deviceInfo.getNetworkType().then(networkType => {
-                    signal.setGranularSpeedBucket(this.getNetworkValue(networkType));
-                }).catch(() => {
-                    this.logFailure(this._nativeBridge, 'granularSpeedBucket_networkType');
-                });
+                signal.setGranularSpeedBucket(this.getNetworkValue(networkType));
             } else {
                 signal.setGranularSpeedBucket('unknown');
             }
         }).catch(() => {
-            this.logFailure(this._nativeBridge, 'granularSpeedBucket_connectionType');
+            this.logFailure(this._nativeBridge, 'granularSpeedBucket');
         }));
 
         promises.push(Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
