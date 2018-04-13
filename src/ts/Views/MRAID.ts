@@ -60,7 +60,6 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
 
         this.createMRAID(MRAIDContainer).then(mraid => {
-            this._nativeBridge.Sdk.logError('setting iframe srcdoc (' + mraid.length + ')');
             iframe.srcdoc = mraid;
         }).catch(e => this._nativeBridge.Sdk.logError('failed to create mraid: ' + e));
 
