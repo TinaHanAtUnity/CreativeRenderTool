@@ -53,7 +53,13 @@ export class AdMobSignalFactory {
             this.logFailure(this._nativeBridge, 'batteryStatus');
         }));
 
-        promises.push(UserCountData.getRequestCount(this._nativeBridge).then((requestCount) => {
+        promises.push(this._deviceInfo.getNetworkMetered().then(isNetworkMetered => {
+            signal.setIsNetworkMetered(isNetworkMetered);
+        }).catch(() => {
+            this.logFailure(this._nativeBridge, 'networkMetered');
+        }));
+
+        promises.push(UserCountData.getRequestCount(this._nativeBridge).then(requestCount => {
             if (typeof requestCount === 'number') {
                 signal.setNumPriorUserRequests(requestCount);
             }
@@ -67,6 +73,28 @@ export class AdMobSignalFactory {
             }
         }).catch(() => {
             this.logFailure(this._nativeBridge, 'priorClickCount');
+        }));
+
+        promises.push(this._deviceInfo.getConnectionType().then(connectionType => {
+            if (connectionType === 'wifi') {
+                signal.setGranularSpeedBucket('wi');
+            } else if (connectionType === 'cellular') {
+                this._deviceInfo.getNetworkType().then(networkType => {
+                    signal.setGranularSpeedBucket(this.getNetworkValue(networkType));
+                }).catch(() => {
+                    this.logFailure(this._nativeBridge, 'granularSpeedBucket_networkType');
+                });
+            } else {
+                signal.setGranularSpeedBucket('unknown');
+            }
+        }).catch(() => {
+            this.logFailure(this._nativeBridge, 'granularSpeedBucket_connectionType');
+        }));
+
+        promises.push(Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
+            signal.setIUSizes(`${width}x${height}|${height}x${width}`);
+        }).catch(() => {
+            this.logFailure(this._nativeBridge, 'iuSizes');
         }));
 
         return Promise.all(promises).then(() => {
@@ -424,4 +452,35 @@ export class AdMobSignalFactory {
         }
         return deviceIncapabilities;
     }
+
+    private getNetworkValue(networkType: number): string {
+        let bucket: string = 'unknown';
+        if (networkType === 0) {
+            bucket = 'unknown';
+        } else if (networkType === 1 ||
+                    networkType === 16 ||
+                    networkType === 2 ||
+                    networkType === 4 ||
+                    networkType === 7 ||
+                    networkType === 11) {
+            bucket = 'ed';
+        } else if (networkType === 3 ||
+                    networkType === 5 ||
+                    networkType === 6 ||
+                    networkType === 8 ||
+                    networkType === 9 ||
+                    networkType === 10 ||
+                    networkType === 12 ||
+                    networkType === 14 ||
+                    networkType === 15 ||
+                    networkType === 17) {
+            bucket = '3g';
+        } else if (networkType === 13 ||
+                    networkType === 18 ||
+                    networkType === 19) {
+            bucket = '4g';
+        }
+        return bucket;
+    }
+
 }
