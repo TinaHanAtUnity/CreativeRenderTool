@@ -139,7 +139,6 @@ export class AdMobOptionalSignal extends Model<IAdMobOptionalSignal> {
             device_battery_charging: this.getIsDeviceCharging(),
             device_battery_level: this.getDeviceBatteryLevel(),
             android_market_version: this.getAndroidMarketVersion(),
-            // ad_load_duration: this.getAdLoadDuration(),
             prior_click_count: this.getPriorClickCount(),
             device_incapabilities: this.getDeviceIncapabilities(),
             ios_jailbroken: this.getIsJailbroken(),

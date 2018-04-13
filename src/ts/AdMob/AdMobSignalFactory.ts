@@ -34,7 +34,9 @@ export class AdMobSignalFactory {
     public getOptionalSignal(): Promise<AdMobOptionalSignal> {
         const signal = new AdMobOptionalSignal();
 
-        // signal.setAdLoadDuration(adUnit.getRequestToReadyTime()); // admobadunit passed as param for this guy
+        // todo: signal.setAdLoadDuration(adUnit.getRequestToReadyTime());
+        // todo: hasIAPCapability
+        // todo: adtest
         signal.setSequenceNumber(SdkStats.getAdRequestOrdinal());
         signal.setIsJailbroken(this._deviceInfo.isRooted());
         signal.setDeviceIncapabilities(this.checkDeviceIncapabilities());
