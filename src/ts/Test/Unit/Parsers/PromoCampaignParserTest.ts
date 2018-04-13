@@ -60,8 +60,8 @@ describe('PromoCampaignParser', () => {
 
             beforeEach(() => {
                 sandbox = sinon.createSandbox();
-                PurchasingUtilities.productAvailable = sandbox.stub().returns(true);
-                PurchasingUtilities.refreshCatalog = sandbox.stub().returns(Promise.resolve());
+                sandbox.stub(PurchasingUtilities, 'productAvailable').returns(true);
+                sandbox.stub(PurchasingUtilities, 'refreshCatalog').returns(Promise.resolve());
                 return parse(JSON.parse(IAPPromoCampaign));
             });
 
