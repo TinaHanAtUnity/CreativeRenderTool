@@ -1,3 +1,15 @@
+# Wed Apr 11 22:16:33 UTC 2018
+
+* Honor using WebView UA for tracking for MRAID click attribution
+* Enable the App Sheet on iOS 11.3
+* Add androidId to operative event data if platform is android
+
+# Tue Apr 10 20:41:22 UTC 2018
+
+* Optional Admob Signals
+* Unit tests for Campaign Parsers
+* Assume native calls from previous auction request for realtime speedup
+
 # Mon Apr 9 20:36:04 UTC 2018
 
 * Removed special case for roll-the-ball playable

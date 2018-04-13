@@ -41,10 +41,57 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       $privacy-button-default($scale-size);
       margin: 0 0 0 $default-size * $scale-size * .25;
     }
+
+    &.gdpr-pop-up-base,
+    &.gdpr-pop-up-alt {
+      .gdpr-pop-up {
+        $gdpr-pop-up($scale-size);
+        will-change: opacity, left;
+      }
+
+      &.on-show .gdpr-pop-up {
+        bottom: -100%;
+        opacity: 0;
+        transition: opacity .25s ease-out 10s, bottom .25s linear 10.5s;
+      }
+
+      $gdpr-scale-size = $scale-size * .9;
+
+      .name-container {
+        $name-container-default($gdpr-scale-size);
+      }
+
+      .download-container {
+        $download-container-default($gdpr-scale-size);
+      }
+
+      .game-rating {
+        $game-rating-default($gdpr-scale-size);
+      }
+
+      .game-rating-mask {
+        $game-rating-mask-default($gdpr-scale-size);
+      }
+
+      .game-rating-count {
+        $game-rating-count-default($gdpr-scale-size);
+      }
+
+      .game-icon {
+        $game-icon-default($gdpr-scale-size);
+      }
+
+    }
+
+    &:not(.gdpr-pop-up-base):not(.gdpr-pop-up-alt) {
+      .gdpr-pop-up {
+        display: none;
+      }
+    }
+
   }
 
   body {
-
     &.portrait #end-screen {
       .column-container {
         margin-left: $default-size * $scale-size * .5;
@@ -77,6 +124,7 @@ $end-screen-mixin($scale-size = $default-scale-size) {
 }
 
 body {
+
   &.portrait #end-screen {
     .game-background-portrait {
       display: block;
@@ -159,6 +207,13 @@ body {
     .unityads-logo {
       width: 50%;
     }
+
+    &.gdpr-pop-up-alt {
+      .gdpr-pop-up {
+        left: 50%;
+        width: 50%;
+      }
+    }
   }
 
   .row-container {
@@ -201,4 +256,3 @@ body {
 }
 
 $end-screen-mixin();
-

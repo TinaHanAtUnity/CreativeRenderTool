@@ -116,6 +116,10 @@ export class PurchasingUtilities {
         });
     }
 
+    public static handleSendIAPEvent(nativeBridge: NativeBridge, iapPayload: string): void {
+        // TODO: Handle IAPPayload/send event/do something with the payload
+    }
+
     public static productAvailable(productId: string): boolean {
         if (this.purchasesAvailable()) {
             return (productId in this._catalog.getProducts());
