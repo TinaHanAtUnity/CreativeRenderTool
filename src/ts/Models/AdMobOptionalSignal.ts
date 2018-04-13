@@ -137,14 +137,13 @@ export class AdMobOptionalSignal extends Model<IAdMobOptionalSignal> {
             mobile_device_submodel: this.getDeviceSubModel(),
             prior_user_requests: this.getNumPriorUserRequests(),
             device_battery_charging: this.getIsDeviceCharging(),
+            device_battery_level: this.getDeviceBatteryLevel(),
             android_market_version: this.getAndroidMarketVersion(),
-            ad_load_duration: this.getAdLoadDuration(),
+            // ad_load_duration: this.getAdLoadDuration(),
             prior_click_count: this.getPriorClickCount(),
             device_incapabilities: this.getDeviceIncapabilities(),
-            cap_noiap: this.getHasIAPCapability(),
-            iu_sizes: this.getIUSizes(),
-            adtest: this.getAdtest(),
-            ios_jailbroken: this.getIsJailbroken()
+            ios_jailbroken: this.getIsJailbroken(),
+            iu_sizes: this.getIUSizes()
         };
     }
 }

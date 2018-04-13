@@ -33,6 +33,7 @@ import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { Placement } from 'Models/Placement';
+import { AdMobOptionalSignal } from 'Models/AdMobOptionalSignal';
 
 class TestStorageApi extends StorageApi {
     public get<T>(storageType: StorageType, key: string): Promise<T> {
@@ -234,6 +235,7 @@ class TestHelper {
 }
 
 describe('Event parameters should match specifications', () => {
+
     describe('with config request', () => {
         it('on Android', () => {
             const nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.ANDROID);
@@ -283,6 +285,7 @@ describe('Event parameters should match specifications', () => {
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
             const sessionManager = new SessionManager(nativeBridge, request);
             const adMobSignalFactory = new AdMobSignalFactory(nativeBridge, clientInfo, deviceInfo, focusManager);
+            sinon.stub(adMobSignalFactory, 'getOptionalSignal').returns(Promise.resolve(new AdMobOptionalSignal()));
             sinon.stub(nativeBridge.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));
             sinon.stub(sessionManager, 'startNewSession').returns(Promise.resolve(new Session('abdce-12345')));
             sessionManager.setGameSessionId(1234);
@@ -309,6 +312,7 @@ describe('Event parameters should match specifications', () => {
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
             const sessionManager = new SessionManager(nativeBridge, request);
             const adMobSignalFactory = new AdMobSignalFactory(nativeBridge, clientInfo, deviceInfo, focusManager);
+            sinon.stub(adMobSignalFactory, 'getOptionalSignal').returns(Promise.resolve(new AdMobOptionalSignal()));
             sinon.stub(nativeBridge.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));
             sinon.stub(sessionManager, 'startNewSession').returns(Promise.resolve(new Session('abdce-12345')));
             sessionManager.setGameSessionId(1234);

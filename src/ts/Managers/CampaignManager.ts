@@ -514,6 +514,9 @@ export class CampaignManager {
         promises.push(this._adMobSignalFactory.getAdRequestSignal().then(signal => {
             return signal.getBase64ProtoBufNonEncoded();
         }));
+        promises.push(this._adMobSignalFactory.getOptionalSignal().then(signal => {
+            return signal.getDTO();
+        }));
 
         const body: any = {
             bundleVersion: this._clientInfo.getApplicationVersion(),
@@ -538,13 +541,14 @@ export class CampaignManager {
             body.nofillRetry = true;
         }
 
-        return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName, headset, volume, fullyCachedCampaignIds, versionCode, requestSignal]) => {
+        return Promise.all(promises).then(([freeSpace, networkOperator, networkOperatorName, headset, volume, fullyCachedCampaignIds, versionCode, requestSignal, optionalSignal]) => {
             body.deviceFreeSpace = freeSpace;
             body.networkOperator = networkOperator;
             body.networkOperatorName = networkOperatorName;
             body.wiredHeadset = headset;
             body.volume = volume;
             body.requestSignal = requestSignal;
+            body.ext = optionalSignal;
 
             if(fullyCachedCampaignIds && fullyCachedCampaignIds.length > 0) {
                 body.cachedCampaigns = fullyCachedCampaignIds;

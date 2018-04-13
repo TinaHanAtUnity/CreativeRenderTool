@@ -67,6 +67,7 @@ import OnProgrammaticVastPlcCampaignMissingErrorUrls from 'json/OnProgrammaticVa
 import OnProgrammaticVastPlcCampaignAdLevelErrorUrls from 'json/OnProgrammaticVastPlcCampaignAdLevelErrorUrls.json';
 import OnProgrammaticVastPlcCampaignCustomTracking from 'json/OnProgrammaticVastPlcCampaignCustomTracking.json';
 import OnStaticInterstitialDisplayCampaign from 'json/OnStaticInterstitialDisplayCampaign.json';
+import { AdMobOptionalSignal } from 'Models/AdMobOptionalSignal';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -201,6 +202,7 @@ describe('CampaignManager', () => {
         sessionManager = new SessionManager(nativeBridge, request);
         adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);
         (<sinon.SinonStub>adMobSignalFactory.getAdRequestSignal).returns(Promise.resolve(new AdMobSignal()));
+        (<sinon.SinonStub>adMobSignalFactory.getOptionalSignal).returns(Promise.resolve(new AdMobOptionalSignal()));
     });
 
     describe('on VAST campaign', () => {

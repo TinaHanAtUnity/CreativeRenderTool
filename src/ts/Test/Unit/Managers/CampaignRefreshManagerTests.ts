@@ -37,6 +37,7 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { AdMobSignal } from 'Models/AdMobSignal';
+import { AdMobOptionalSignal } from 'Models/AdMobOptionalSignal';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
 import { OldCampaignRefreshManager } from 'Managers/OldCampaignRefreshManager';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
@@ -158,6 +159,7 @@ describe('CampaignRefreshManager', () => {
         });
         adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);
         (<sinon.SinonStub>adMobSignalFactory.getAdRequestSignal).returns(Promise.resolve(new AdMobSignal()));
+        (<sinon.SinonStub>adMobSignalFactory.getOptionalSignal).returns(Promise.resolve(new AdMobOptionalSignal()));
         comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         adUnitParams = {

@@ -31,10 +31,10 @@ export class AdMobSignalFactory {
         this._focusManager = focusManager;
     }
 
-    public getOptionalSignal(adUnit: AdMobAdUnit): Promise<AdMobOptionalSignal> {
+    public getOptionalSignal(): Promise<AdMobOptionalSignal> {
         const signal = new AdMobOptionalSignal();
 
-        signal.setAdLoadDuration(adUnit.getRequestToReadyTime());
+        // signal.setAdLoadDuration(adUnit.getRequestToReadyTime()); // admobadunit passed as param for this guy
         signal.setSequenceNumber(SdkStats.getAdRequestOrdinal());
         signal.setIsJailbroken(this._deviceInfo.isRooted());
         signal.setDeviceIncapabilities(this.checkDeviceIncapabilities());

@@ -460,5 +460,12 @@
     "description": "If the placement contains data to show a realtime placement",
     "provider": "Server",
     "platforms": "all"
+  },
+  {
+    "key": "ext",
+    "type": "object",
+    "description": "JSON string for optional signals for admob",
+    "provider": "SDK",
+    "platforms": "all"
   }
 ]
