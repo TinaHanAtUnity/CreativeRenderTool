@@ -5,7 +5,7 @@ import { Configuration, CacheMode } from 'Models/Configuration';
 import { CampaignManager } from 'Managers/CampaignManager';
 import { Cache } from 'Utilities/Cache';
 import { Placement } from 'Models/Placement';
-import { Request } from 'Utilities/Request';
+import { Request, INativeResponse } from 'Utilities/Request';
 import { SessionManager } from 'Managers/SessionManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Diagnostics } from 'Utilities/Diagnostics';
@@ -58,6 +58,7 @@ import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
 import { Timer } from 'Utilities/Timer';
 import { TimeoutError, Promises } from 'Utilities/Promises';
+import { StorageType } from 'Native/Api/Storage';
 
 export class WebView {
 
@@ -99,6 +100,8 @@ export class WebView {
     private _creativeUrl?: string;
     private _requestDelay: number;
 
+    private _cachedCampaignResponse: INativeResponse | undefined;
+
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
 
@@ -122,6 +125,8 @@ export class WebView {
             } else if(this._clientInfo.getPlatform() === Platform.IOS) {
                 this._deviceInfo = new IosDeviceInfo(this._nativeBridge);
             }
+
+            this._cachedCampaignResponse = undefined;
 
             this._focusManager = new FocusManager(this._nativeBridge);
             this._wakeUpManager = new WakeUpManager(this._nativeBridge, this._focusManager);
@@ -182,9 +187,12 @@ export class WebView {
                 Diagnostics.trigger('cleaning_cache_failed', error);
             });
 
-            return Promise.all([configPromise, cachePromise]);
-        }).then(([configuration]) => {
+            const cachedCampaignResponsePromise = this._cacheBookkeeping.getCachedCampaignResponse();
+
+            return Promise.all([configPromise, cachedCampaignResponsePromise, cachePromise]);
+        }).then(([configuration, cachedCampaignResponse]) => {
             this._configuration = configuration;
+            this._cachedCampaignResponse = cachedCampaignResponse;
             HttpKafka.setConfiguration(this._configuration);
 
             PurchasingUtilities.setConfiguration(this._configuration);
@@ -220,7 +228,7 @@ export class WebView {
             this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
 
             this._assetManager = new AssetManager(this._cache, this._configuration.getCacheMode(), this._deviceInfo, this._cacheBookkeeping, this._nativeBridge);
-            this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._adMobSignalFactory, this._request, this._clientInfo, this._deviceInfo, this._metadataManager);
+            this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._adMobSignalFactory, this._request, this._clientInfo, this._deviceInfo, this._metadataManager, this._cacheBookkeeping);
 
             if(this._configuration.getAbGroup() === 9 || this._configuration.getAbGroup() === 10) {
                 this._placementManager = new PlacementManager(this._nativeBridge, this._configuration);
@@ -232,7 +240,12 @@ export class WebView {
 
             SdkStats.initialize(this._nativeBridge, this._request, this._configuration, this._sessionManager, this._campaignManager, this._metadataManager, this._clientInfo);
 
-            return this._refreshManager.refresh();
+            const enableCachedResponse = this._configuration.getAbGroup() === 7 || this._configuration.getAbGroup() === 8;
+            if (this._cachedCampaignResponse !== undefined && enableCachedResponse) {
+                return this._refreshManager.refreshFromCache(this._cachedCampaignResponse);
+            } else {
+                return this._refreshManager.refresh();
+            }
         }).then(() => {
             this._initialized = true;
 
@@ -289,6 +302,8 @@ export class WebView {
             Diagnostics.trigger('campaign_expired', error, campaign.getSession());
             return;
         }
+
+        this._cacheBookkeeping.deleteCachedCampaignResponse();
 
         if (placement.getRealtimeData()) {
             this._nativeBridge.Sdk.logInfo('Unity Ads is requesting realtime fill for placement ' + placement.getId());

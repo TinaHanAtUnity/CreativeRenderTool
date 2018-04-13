@@ -184,7 +184,7 @@ describe('CampaignRefreshManager', () => {
     describe('PLC campaigns', () => {
         beforeEach(() => {
             configuration = new Configuration(JSON.parse(ConfigurationAuctionPlc));
-            campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager);
+            campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping);
             campaignRefreshManager = new OldCampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration, focusManager, sessionManager, clientInfo, request, cache);
         });
 
