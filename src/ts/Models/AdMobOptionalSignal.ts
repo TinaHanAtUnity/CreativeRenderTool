@@ -8,7 +8,7 @@ interface IAdMobOptionalSignal {
     numPriorUserRequests: number;
     isDeviceCharging: boolean;
     deviceBatteryLevel: number;
-    androidMarketVersion: number;
+    androidMarketVersion: string;
     adLoadDuration: number;
     priorClickCount: number;
     deviceIncapabilities: string;
@@ -28,7 +28,7 @@ export class AdMobOptionalSignal extends Model<IAdMobOptionalSignal> {
             numPriorUserRequests: ['number'],
             isDeviceCharging: ['boolean'],
             deviceBatteryLevel: ['number'],
-            androidMarketVersion: ['number'],
+            androidMarketVersion: ['string'],
             adLoadDuration: ['number'],
             priorClickCount: ['number'],
             deviceIncapabilities: ['string'],
@@ -59,7 +59,7 @@ export class AdMobOptionalSignal extends Model<IAdMobOptionalSignal> {
     public getDeviceBatteryLevel(): number {
         return this.get('deviceBatteryLevel');
     }
-    public getAndroidMarketVersion(): number {
+    public getAndroidMarketVersion(): string {
         return this.get('androidMarketVersion');
     }
     public getAdLoadDuration(): number {
@@ -104,7 +104,7 @@ export class AdMobOptionalSignal extends Model<IAdMobOptionalSignal> {
     public setDeviceBatteryLevel(deviceBatteryLevel: number) {
         this.set('deviceBatteryLevel', deviceBatteryLevel);
     }
-    public setAndroidMarketVersion(androidMarketVersion: number) {
+    public setAndroidMarketVersion(androidMarketVersion: string) {
         this.set('androidMarketVersion', androidMarketVersion);
     }
     public setAdLoadDuration(adLoadDuration: number) {
