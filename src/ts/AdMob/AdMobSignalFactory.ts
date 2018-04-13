@@ -69,15 +69,17 @@ export class AdMobSignalFactory {
             this.logFailure(this._nativeBridge, 'numPriorUserRequets');
         }));
 
-        // promises.push(this._nativeBridge.DeviceInfo.Android.getPackageInfo(this._clientInfo.getApplicationName()).then(packageInfo => {
-        //     if (packageInfo.versionCode && packageInfo.packageName) {
-        //         signal.setAndroidMarketVersion(`${packageInfo.versionCode}.${packageInfo.packageName}`);
-        //     } else {
-        //         signal.setAndroidMarketVersion('null');
-        //     }
-        // }).catch(() => {
-        //     this.logFailure(this._nativeBridge, 'androidMarketVersion');
-        // }));
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            promises.push(this._nativeBridge.DeviceInfo.Android.getPackageInfo(this._clientInfo.getApplicationName()).then(packageInfo => {
+                if (packageInfo.versionCode && packageInfo.packageName) {
+                    signal.setAndroidMarketVersion(`${packageInfo.versionCode}.${packageInfo.packageName}`);
+                } else {
+                    signal.setAndroidMarketVersion('null');
+                }
+            }).catch(() => {
+                this.logFailure(this._nativeBridge, 'androidMarketVersion');
+            }));
+        }
 
         promises.push(UserCountData.getClickCount(this._nativeBridge).then(clickCount => {
             if (typeof clickCount === 'number') {
