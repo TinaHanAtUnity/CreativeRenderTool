@@ -21,21 +21,21 @@ interface IAdMobOptionalSignal {
 export class AdMobOptionalSignal extends Model<IAdMobOptionalSignal> {
     constructor() {
         super('AdMobOptionalSignal', {
-            sequenceNumber: ['number', 'undefined'],
-            granularSpeedBucket: ['string', 'undefined'],
-            isNetworkMetered: ['boolean', 'undefined'],
-            deviceSubModel: ['string', 'undefined'],
-            numPriorUserRequests: ['number', 'undefined'],
-            isDeviceCharging: ['boolean', 'undefined'],
-            deviceBatteryLevel: ['number', 'undefined'],
-            androidMarketVersion: ['number', 'undefined'],
-            adLoadDuration: ['number', 'undefined'],
-            priorClickCount: ['number', 'undefined'],
-            deviceIncapabilities: ['string', 'undefined'],
-            hasIAPCapability: ['boolean', 'undefined'],
-            iuSizes: ['string', 'undefined'],
-            adtest: ['boolean', 'undefined'],
-            isJailbroken: ['boolean', 'undefined']
+            sequenceNumber: ['number'],
+            granularSpeedBucket: ['string'],
+            isNetworkMetered: ['boolean'],
+            deviceSubModel: ['string'],
+            numPriorUserRequests: ['number'],
+            isDeviceCharging: ['boolean'],
+            deviceBatteryLevel: ['number'],
+            androidMarketVersion: ['number'],
+            adLoadDuration: ['number'],
+            priorClickCount: ['number'],
+            deviceIncapabilities: ['string'],
+            hasIAPCapability: ['boolean'],
+            iuSizes: ['string'],
+            adtest: ['boolean'],
+            isJailbroken: ['boolean']
         });
     }
     public getSequenceNumber(): number {
