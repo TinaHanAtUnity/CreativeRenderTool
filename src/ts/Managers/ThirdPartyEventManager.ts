@@ -3,6 +3,8 @@ import { Request, INativeResponse } from 'Utilities/Request';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Analytics } from 'Utilities/Analytics';
 import { RequestError } from 'Errors/RequestError';
+import { Diagnostics } from 'Utilities/Diagnostics';
+import { Url } from 'Utilities/Url';
 
 export class ThirdPartyEventManager {
 
@@ -14,8 +16,12 @@ export class ThirdPartyEventManager {
         this._request = request;
     }
 
-    public clickAttributionEvent(url: string, redirects: boolean): Promise<INativeResponse> {
-        return this._request.get(url, [], {
+    public clickAttributionEvent(url: string, redirects: boolean, useWebViewUA?: boolean): Promise<INativeResponse> {
+        const headers: Array<[string, string]> = [];
+        if (typeof navigator !== 'undefined' && navigator.userAgent && useWebViewUA) {
+            headers.push(['User-Agent', navigator.userAgent]);
+        }
+        return this._request.get(url, headers, {
             retries: 0,
             retryDelay: 0,
             followRedirects: redirects,
@@ -38,13 +44,16 @@ export class ThirdPartyEventManager {
             followRedirects: true,
             retryWithConnectionEvents: false
         }).catch(error => {
+            const urlParts = Url.parse(url);
             if(error instanceof RequestError) {
                 error = new DiagnosticError(new Error(error.message), {
                     request: (<RequestError>error).nativeRequest,
                     event: event,
                     sessionId: sessionId,
                     url: url,
-                    response: (<RequestError>error).nativeResponse
+                    response: (<RequestError>error).nativeResponse,
+                    host: urlParts.host,
+                    protocol: urlParts.protocol
                 });
             }
             return Analytics.trigger('third_party_event_failed', error);

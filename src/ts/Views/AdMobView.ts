@@ -7,10 +7,9 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Placement } from 'Models/Placement';
 import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
 import { Template } from 'Utilities/Template';
-import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { AFMABridge, IOpenableIntentsResponse, IOpenableIntentsRequest, ITouchInfo, IClickSignalResponse } from 'Views/AFMABridge';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
-import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
 import { MRAIDBridge } from 'Views/MRAIDBridge';
 import { SdkStats } from 'Utilities/SdkStats';
@@ -22,7 +21,7 @@ export interface IAdMobEventHandler {
     onGrantReward(): void;
     onShow(): void;
     onVideoStart(): void;
-    onSetOrientationProperties(allowOrientation: boolean, forceOrientation: ForceOrientation): void;
+    onSetOrientationProperties(allowOrientation: boolean, forceOrientation: Orientation): void;
     onOpenableIntentsRequest(request: IOpenableIntentsRequest): void;
     onTrackingEvent(event: string, data?: any): void;
     onClickSignalRequest(touchInfo: ITouchInfo): void;
@@ -64,7 +63,7 @@ export class AdMobView extends View<IAdMobEventHandler> {
             onAFMAClickSignalRequest: (touchInfo) => this.onClickSignalRequest(touchInfo)
         });
         this._mraidBridge = new MRAIDBridge(nativeBridge, {
-            onSetOrientationProperties: (allowOrientation: boolean, forceOrientation: ForceOrientation) => this.onSetOrientationProperties(allowOrientation, forceOrientation)
+            onSetOrientationProperties: (allowOrientation: boolean, forceOrientation: Orientation) => this.onSetOrientationProperties(allowOrientation, forceOrientation)
         });
 
         this._bindings = [];
@@ -185,7 +184,7 @@ export class AdMobView extends View<IAdMobEventHandler> {
         this._handlers.forEach((h) => h.onVideoStart());
     }
 
-    private onSetOrientationProperties(allowOrientation: boolean, forceOrientation: ForceOrientation) {
+    private onSetOrientationProperties(allowOrientation: boolean, forceOrientation: Orientation) {
         this._handlers.forEach((h) => h.onSetOrientationProperties(allowOrientation, forceOrientation));
     }
 

@@ -5,7 +5,7 @@ import { Configuration, CacheMode } from 'Models/Configuration';
 import { CampaignManager } from 'Managers/CampaignManager';
 import { Cache } from 'Utilities/Cache';
 import { Placement } from 'Models/Placement';
-import { Request } from 'Utilities/Request';
+import { Request, INativeResponse } from 'Utilities/Request';
 import { SessionManager } from 'Managers/SessionManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Diagnostics } from 'Utilities/Diagnostics';
@@ -25,7 +25,7 @@ import { HttpKafka } from 'Utilities/HttpKafka';
 import { ConfigError } from 'Errors/ConfigError';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { AssetManager } from 'Managers/AssetManager';
-import { AdUnitContainer, ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { ViewController } from 'AdUnits/Containers/ViewController';
 import { TestEnvironment } from 'Utilities/TestEnvironment';
@@ -49,13 +49,11 @@ import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { OldCampaignRefreshManager } from 'Managers/OldCampaignRefreshManager';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { MissedImpressionManager } from 'Managers/MissedImpressionManager';
-import { NewRefreshManager } from 'Managers/NewRefreshManager';
-import { PlacementManager } from 'Managers/PlacementManager';
-import { ReinitManager } from 'Managers/ReinitManager';
 
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
+import { TimeoutError, Promises } from 'Utilities/Promises';
 
 export class WebView {
 
@@ -74,8 +72,6 @@ export class WebView {
     private _cache: Cache;
     private _cacheBookkeeping: CacheBookkeeping;
     private _container: AdUnitContainer;
-    private _reinitManager: ReinitManager;
-    private _placementManager: PlacementManager;
 
     private _currentAdUnit: AbstractAdUnit;
 
@@ -95,6 +91,9 @@ export class WebView {
     private _metadataManager: MetaDataManager;
 
     private _creativeUrl?: string;
+    private _requestDelay: number;
+
+    private _cachedCampaignResponse: INativeResponse | undefined;
 
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
@@ -119,6 +118,8 @@ export class WebView {
             } else if(this._clientInfo.getPlatform() === Platform.IOS) {
                 this._deviceInfo = new IosDeviceInfo(this._nativeBridge);
             }
+
+            this._cachedCampaignResponse = undefined;
 
             this._focusManager = new FocusManager(this._nativeBridge);
             this._wakeUpManager = new WakeUpManager(this._nativeBridge, this._focusManager);
@@ -179,9 +180,12 @@ export class WebView {
                 Diagnostics.trigger('cleaning_cache_failed', error);
             });
 
-            return Promise.all([configPromise, cachePromise]);
-        }).then(([configuration]) => {
+            const cachedCampaignResponsePromise = this._cacheBookkeeping.getCachedCampaignResponse();
+
+            return Promise.all([configPromise, cachedCampaignResponsePromise, cachePromise]);
+        }).then(([configuration, cachedCampaignResponse]) => {
             this._configuration = configuration;
+            this._cachedCampaignResponse = cachedCampaignResponse;
             HttpKafka.setConfiguration(this._configuration);
 
             PurchasingUtilities.setConfiguration(this._configuration);
@@ -216,20 +220,19 @@ export class WebView {
             const defaultPlacement = this._configuration.getDefaultPlacement();
             this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
 
-            this._assetManager = new AssetManager(this._cache, this._configuration.getCacheMode(), this._deviceInfo, this._cacheBookkeeping);
-            this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._adMobSignalFactory, this._request, this._clientInfo, this._deviceInfo, this._metadataManager);
+            this._assetManager = new AssetManager(this._cache, this._configuration.getCacheMode(), this._deviceInfo, this._cacheBookkeeping, this._nativeBridge);
+            this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._adMobSignalFactory, this._request, this._clientInfo, this._deviceInfo, this._metadataManager, this._cacheBookkeeping);
 
-            if(this._configuration.getAbGroup() === 9 || this._configuration.getAbGroup() === 11) {
-                this._placementManager = new PlacementManager(this._nativeBridge, this._configuration);
-                this._reinitManager = new ReinitManager(this._nativeBridge, this._clientInfo, this._request, this._cache);
-                this._refreshManager = new NewRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration, this._focusManager, this._reinitManager, this._placementManager);
-            } else {
-                this._refreshManager = new OldCampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration, this._focusManager, this._sessionManager, this._clientInfo, this._request, this._cache);
-            }
+            this._refreshManager = new OldCampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration, this._focusManager, this._sessionManager, this._clientInfo, this._request, this._cache);
 
             SdkStats.initialize(this._nativeBridge, this._request, this._configuration, this._sessionManager, this._campaignManager, this._metadataManager, this._clientInfo);
 
-            return this._refreshManager.refresh();
+            const enableCachedResponse = this._configuration.getAbGroup() === 7 || this._configuration.getAbGroup() === 8;
+            if (this._cachedCampaignResponse !== undefined && enableCachedResponse) {
+                return this._refreshManager.refreshFromCache(this._cachedCampaignResponse);
+            } else {
+                return this._refreshManager.refresh();
+            }
         }).then(() => {
             this._initialized = true;
 
@@ -291,21 +294,16 @@ export class WebView {
             return;
         }
 
-        // Temporary for realtime testing purposes
-        const testGroup = this._configuration.getAbGroup();
+        this._cacheBookkeeping.deleteCachedCampaignResponse();
+
         if (placement.getRealtimeData()) {
             this._nativeBridge.Sdk.logInfo('Unity Ads is requesting realtime fill for placement ' + placement.getId());
             const start = Date.now();
-            this._campaignManager.requestRealtime(placement, campaign.getSession()).then(realtimeCampaign => {
 
-                // Temporary for realtime testing purposes
-                const latency = Date.now() - start;
-                Diagnostics.trigger('realtime_network_latency', {
-                    latency: latency,
-                    auctionId: campaign.getSession().getId(),
-                    abGroup: testGroup
-                });
-                this._nativeBridge.Sdk.logInfo(`Unity Ads received a realtime request in ${latency} ms.`);
+            const realtimeTimeoutInMillis = 1500;
+            Promises.withTimeout(this._campaignManager.requestRealtime(placement, campaign.getSession()), realtimeTimeoutInMillis).then(realtimeCampaign => {
+                this._requestDelay = Date.now() - start;
+                this._nativeBridge.Sdk.logInfo(`Unity Ads received a realtime request in ${this._requestDelay} ms.`);
 
                 if(realtimeCampaign) {
                     this._nativeBridge.Sdk.logInfo('Unity Ads received new fill for placement ' + placement.getId() + ', streaming new ad unit');
@@ -316,9 +314,15 @@ export class WebView {
                     this._nativeBridge.Sdk.logInfo('Unity Ads received no new fill for placement ' + placement.getId() + ', opening old ad unit');
                     this.showAd(placement, campaign, options);
                 }
-            }).catch(() => {
-                const error = new DiagnosticError(new Error('Realtime error'), { auctionId: campaign.getSession().getId() });
-                Diagnostics.trigger('realtime_error', error);
+            }).catch((e) => {
+                if (e instanceof TimeoutError) {
+                    Diagnostics.trigger('realtime_network_timeout', {
+                        auctionId: campaign.getSession().getId(),
+                    });
+                }
+                Diagnostics.trigger('realtime_error', {
+                    error: e
+                });
                 this._nativeBridge.Sdk.logInfo('Unity Ads realtime fill request for placement ' + placement.getId() + ' failed, opening old ad unit');
                 this.showAd(placement, campaign, options);
             });
@@ -340,8 +344,9 @@ export class WebView {
         Promise.all([
             this._deviceInfo.getScreenWidth(),
             this._deviceInfo.getScreenHeight(),
-            this._deviceInfo.getConnectionType()
-        ]).then(([screenWidth, screenHeight, connectionType]) => {
+            this._deviceInfo.getConnectionType(),
+            CustomFeatures.showGDPRPopup(this._nativeBridge, this._configuration, campaign.getAbGroup())
+        ]).then(([screenWidth, screenHeight, connectionType, showGDPRPopup]) => {
             if(campaign.isConnectionNeeded() && connectionType === 'none') {
                 this._showing = false;
                 this.showError(true, placement.getId(), 'No connection');
@@ -353,7 +358,7 @@ export class WebView {
                 return;
             }
 
-            const orientation = screenWidth >= screenHeight ? ForceOrientation.LANDSCAPE : ForceOrientation.PORTRAIT;
+            const orientation = screenWidth >= screenHeight ? Orientation.LANDSCAPE : Orientation.PORTRAIT;
             this._comScoreTrackingService = new ComScoreTrackingService(this._thirdPartyEventManager, this._nativeBridge, this._deviceInfo);
             this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, {
                 forceOrientation: orientation,
@@ -378,7 +383,8 @@ export class WebView {
                 configuration: this._configuration,
                 request: this._request,
                 options: options,
-                adMobSignalFactory: this._adMobSignalFactory
+                adMobSignalFactory: this._adMobSignalFactory,
+                showGDPRPopup: showGDPRPopup
             });
             this._refreshManager.setCurrentAdUnit(this._currentAdUnit);
             this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());
@@ -406,10 +412,12 @@ export class WebView {
             // Temporary for realtime testing purposes
             if (placement.getRealtimeData()) {
                 this._currentAdUnit.onStart.subscribe(() => {
-                    Diagnostics.trigger('realtime_render_latency', {
-                        latency: Date.now() - start,
+                    const startDelay = Date.now() - start;
+                    Diagnostics.trigger('realtime_delay', {
+                        requestDelay: this._requestDelay,
+                        startDelay: startDelay,
+                        totalDelay: this._requestDelay + startDelay,
                         auctionId: campaign.getSession().getId(),
-                        abGroup: testGroup
                     });
                 });
             }

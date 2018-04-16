@@ -62,6 +62,33 @@ $name-container-default($scale-size, $with-styles = true) {
   }
 }
 
+$gdpr-pop-up($scale-size, $with-styles = true) {
+  .gdpr-text {
+    padding: $scale-size * $default-font-size * .5;
+    font-size: $scale-size * $default-font-size * .5;
+  }
+
+  if($with-styles) {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    width: 100%;
+    background-color: $end-screen-background-color;
+    box-shadow: 0 0 15px 0 rgba(0, 0, 0, .1);
+    opacity: 1;
+
+    .gdpr-text {
+      z-index: 110;
+      text-align: center;
+
+      .gdpr-link {
+        color: $blue;
+      }
+    }
+  }
+}
+
 $close-button-width = 1.25;
 $close-button-default($scale-size, $with-styles = true) {
   /*

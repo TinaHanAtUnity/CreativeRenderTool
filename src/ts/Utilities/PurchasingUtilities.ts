@@ -82,6 +82,7 @@ export class PurchasingUtilities {
 
     public static beginPurchaseEvent(nativeBridge: NativeBridge, iapPayload: string): Promise<void> {
         if (!PurchasingUtilities._didSuccessfullyInitiatePurchaseEvent) {
+            this.logIssue(nativeBridge, 'purchase_never_intitialized', 'IAP Promo initialization never happened.');
             return PurchasingUtilities.sendPurchaseInitializationEvent(nativeBridge).then(() => {
                 return this.sendPurchasingCommandIfReady(nativeBridge, iapPayload);
             });
@@ -113,6 +114,10 @@ export class PurchasingUtilities {
                 });
             });
         });
+    }
+
+    public static handleSendIAPEvent(nativeBridge: NativeBridge, iapPayload: string): void {
+        // TODO: Handle IAPPayload/send event/do something with the payload
     }
 
     public static productAvailable(productId: string): boolean {

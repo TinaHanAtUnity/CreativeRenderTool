@@ -1,6 +1,6 @@
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
-import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Placement } from 'Models/Placement';
 import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 import { Promo } from 'Views/Promo';
@@ -41,7 +41,6 @@ export class PromoAdUnit extends AbstractAdUnit {
         // Always set to complete to avoid errors.
         this.setFinishState(FinishState.COMPLETED);
         this.setShowing(true);
-        this.onStart.trigger();
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
         this._promoView.show();
         this.sendTrackingEvent('impression');
@@ -52,7 +51,9 @@ export class PromoAdUnit extends AbstractAdUnit {
 
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
 
-        return this._container.open(this, ['webview'], false, ForceOrientation.NONE, true, true, false, true, this._options);
+        return this._container.open(this, ['webview'], false, Orientation.NONE, true, true, false, true, this._options).then(() => {
+            this.onStart.trigger();
+        });
     }
 
     public hide(): Promise<void> {

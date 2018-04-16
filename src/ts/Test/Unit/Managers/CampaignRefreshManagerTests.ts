@@ -16,12 +16,12 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { VastParser } from 'Utilities/VastParser';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { AssetManager } from 'Managers/AssetManager';
-import { Cache } from 'Utilities/Cache';
+import { Cache, CacheStatus } from 'Utilities/Cache';
 import { Placement, PlacementState } from 'Models/Placement';
 import { SessionManager } from 'Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
-import { AdUnitContainer, ForceOrientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
+import { AdUnitContainer, Orientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
@@ -143,7 +143,7 @@ describe('CampaignRefreshManager', () => {
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
         cacheBookkeeping = new CacheBookkeeping(nativeBridge);
         cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping);
-        assetManager = new AssetManager(cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping);
+        assetManager = new AssetManager(cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
         container = new TestContainer();
         const campaign = TestFixtures.getCampaign();
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
@@ -161,7 +161,7 @@ describe('CampaignRefreshManager', () => {
         comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         adUnitParams = {
-            forceOrientation: ForceOrientation.NONE,
+            forceOrientation: Orientation.NONE,
             focusManager: focusManager,
             container: container,
             deviceInfo: deviceInfo,
@@ -182,7 +182,7 @@ describe('CampaignRefreshManager', () => {
     describe('PLC campaigns', () => {
         beforeEach(() => {
             configuration = new Configuration(JSON.parse(ConfigurationAuctionPlc));
-            campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager);
+            campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping);
             campaignRefreshManager = new OldCampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration, focusManager, sessionManager, clientInfo, request, cache);
         });
 
@@ -459,7 +459,7 @@ describe('CampaignRefreshManager', () => {
                 const error: Error = new Error('TestErrorMessage');
                 error.name = 'TestErrorMessage';
                 error.stack = 'TestErrorStack';
-                campaignManager.onError.trigger(error, ['premium', 'video'], undefined);
+                campaignManager.onError.trigger(error, ['premium', 'video'], 'test_diagnostics_type', undefined);
                 return Promise.resolve();
             });
 
@@ -475,7 +475,7 @@ describe('CampaignRefreshManager', () => {
 
         it('should send diagnostics when campaign caching fails', () => {
             sinon.stub(assetManager, 'setup').callsFake(() => {
-                throw new Error('test error');
+                throw CacheStatus.FAILED;
             });
 
             let receivedErrorType: string;
@@ -497,8 +497,7 @@ describe('CampaignRefreshManager', () => {
 
             return campaignRefreshManager.refresh().then(() => {
                 diagnosticsStub.restore();
-                assert.equal(receivedErrorType , 'auction_request_failed', 'Incorrect error type');
-                assert.equal(receivedError.error.message , 'test error', 'Incorrect error message');
+                assert.equal(receivedErrorType , 'campaign_caching_failed', 'Incorrect error type');
             });
         });
 
@@ -544,7 +543,7 @@ describe('CampaignRefreshManager', () => {
 
             return campaignRefreshManager.refresh().then(() => {
                 diagnosticsStub.restore();
-                assert.equal(receivedErrorType , 'auction_request_failed', 'Incorrect error type');
+                assert.equal(receivedErrorType , 'handle_campaign_error', 'Incorrect error type');
                 assert.equal(receivedError.error.message , 'Unsupported content-type: wrong/contentType', 'Incorrect error message');
             });
         });
@@ -571,7 +570,7 @@ describe('CampaignRefreshManager', () => {
 
             return campaignRefreshManager.refresh().then(() => {
                 diagnosticsStub.restore();
-                assert.equal(receivedErrorType, 'auction_request_failed', 'Incorrect error type');
+                assert.equal(receivedErrorType, 'error_creating_handle_campaign_chain', 'Incorrect error type');
                 assert.equal(receivedError.error.message, 'model: AuctionResponse key: contentType with value: 1: integer is not in: string', 'Incorrect error message');
             });
         });
@@ -579,7 +578,7 @@ describe('CampaignRefreshManager', () => {
 });
 
 export class TestContainer extends AdUnitContainer {
-    public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: ForceOrientation, disableBackbutton: boolean, options: any): Promise<void> {
+    public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, options: any): Promise<void> {
         return Promise.resolve();
     }
     public close(): Promise<void> {
@@ -588,7 +587,7 @@ export class TestContainer extends AdUnitContainer {
     public reconfigure(configuration: ViewConfiguration): Promise<any[]> {
         return Promise.all([]);
     }
-    public reorient(allowRotation: boolean, forceOrientation: ForceOrientation): Promise<any[]> {
+    public reorient(allowRotation: boolean, forceOrientation: Orientation): Promise<any[]> {
         return Promise.all([]);
     }
     public isPaused(): boolean {

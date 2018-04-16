@@ -4,7 +4,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Platform } from 'Constants/Platform';
 import { FinishState } from 'Constants/FinishState';
 import { Timer } from 'Utilities/Timer';
-import { ForceOrientation } from 'AdUnits/Containers/AdUnitContainer';
+import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Request } from 'Utilities/Request';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { Session } from 'Models/Session';
@@ -16,6 +16,7 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
 import { ClientInfo } from 'Models/ClientInfo';
 import { AdMobSignal } from 'Models/AdMobSignal';
+import { AdMobOptionalSignal } from 'Models/AdMobOptionalSignal';
 
 export interface IAdMobEventHandlerParameters {
     adUnit: AdMobAdUnit;
@@ -110,7 +111,7 @@ export class AdMobEventHandler implements IAdMobEventHandler {
         // this._timeoutTimer.start();
     }
 
-    public onSetOrientationProperties(allowOrientation: boolean, forceOrientation: ForceOrientation) {
+    public onSetOrientationProperties(allowOrientation: boolean, forceOrientation: Orientation) {
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
             this._adUnit.getContainer().reorient(true, forceOrientation);
         } else {
@@ -158,6 +159,12 @@ export class AdMobEventHandler implements IAdMobEventHandler {
             signal.setTouchMoveTotal(touchInfo.counts.move);
             signal.setTouchCancelTotal(touchInfo.counts.cancel);
             signal.setTouchDuration(touchInfo.duration);
+            return signal;
+        });
+    }
+
+    private getOptionalSignal(): Promise<AdMobOptionalSignal> {
+        return this._adMobSignalFactory.getOptionalSignal(this._adUnit).then((signal) => {
             return signal;
         });
     }

@@ -4,6 +4,7 @@ import { BatteryStatus } from 'Constants/Android/BatteryStatus';
 import { ISchema, Model } from 'Models/Model';
 import { Platform } from 'Constants/Platform';
 import { StorageType } from 'Native/Api/AndroidDeviceInfo';
+import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 
 export interface IDeviceInfo {
     advertisingIdentifier: string | undefined | null;
@@ -12,6 +13,7 @@ export interface IDeviceInfo {
     volume: number;
     networkOperator: string | null;
     networkOperatorName: string | null;
+    networkMetered: boolean;
     screenWidth: number;
     screenHeight: number;
     screenBrightness: number;
@@ -42,6 +44,7 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
         volume: ['number'],
         networkOperator: ['string', 'null'],
         networkOperatorName: ['string', 'null'],
+        networkMetered: ['boolean'],
         screenWidth: ['integer'],
         screenHeight: ['integer'],
         screenBrightness: ['number'],
@@ -108,6 +111,16 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
         return this._nativeBridge.DeviceInfo.getNetworkType().then(networkType => {
             this.set('networkType', networkType);
             return this.get('networkType');
+        });
+    }
+
+    public getNetworkMetered(): Promise<boolean> {
+        if (this._nativeBridge.getPlatform() === Platform.IOS) {
+            return Promise.resolve(false);
+        }
+        return this._nativeBridge.DeviceInfo.getNetworkMetered().then(isNetworkMetered => {
+            this.set('networkMetered', isNetworkMetered);
+            return this.get('networkMetered');
         });
     }
 

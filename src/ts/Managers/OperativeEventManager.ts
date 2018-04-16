@@ -16,6 +16,7 @@ import { Campaign } from 'Models/Campaign';
 import { Placement } from 'Models/Placement';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
+import { Diagnostics } from 'Utilities/Diagnostics';
 import { CampaignAssetInfo } from 'Utilities/CampaignAssetInfo';
 import { Configuration } from 'Models/Configuration';
 
@@ -314,7 +315,8 @@ export class OperativeEventManager {
                 'apiLevel': this._deviceInfo.getApiLevel(),
                 'deviceMake': this._deviceInfo.getManufacturer(),
                 'screenDensity': this._deviceInfo.getScreenDensity(),
-                'screenSize': this._deviceInfo.getScreenLayout()
+                'screenSize': this._deviceInfo.getScreenLayout(),
+                'androidId': this._deviceInfo.getAndroidId()
             };
         }
 

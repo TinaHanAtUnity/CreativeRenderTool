@@ -12,6 +12,8 @@ import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { FocusManager } from 'Managers/FocusManager';
 import { FileId } from 'Utilities/FileId';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
+import { FileInfo } from 'Utilities/FileInfo';
+import { SinonStub } from 'sinon';
 
 class TestCacheApi extends CacheApi {
 
@@ -158,6 +160,7 @@ describe('CacheTest', () => {
     let cacheBookkeeping: CacheBookkeeping;
     let cacheManager: Cache;
     let wakeUpManager: WakeUpManager;
+    let isCachedStub: SinonStub;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -172,7 +175,11 @@ describe('CacheTest', () => {
         request = new Request(nativeBridge, wakeUpManager);
         cacheBookkeeping = new CacheBookkeeping(nativeBridge);
         cacheManager = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, {retries: 3, retryDelay: 1000});
-        sinon.stub(cacheManager, 'isCached').returns(Promise.resolve(false));
+        isCachedStub = sinon.stub(FileInfo, 'isCached').returns(Promise.resolve(false));
+    });
+
+    afterEach(() => {
+        isCachedStub.restore();
     });
 
     it('Get local file url for cached file', () => {
