@@ -1,4 +1,4 @@
-# Pending
+# Mon Apr 16 20:50:03 UTC 2018
 
 * Android batching A/B test in groups 9 & 10
 * Use cached campaign when intializing SDK (A/B test in groups 7 & 8)
