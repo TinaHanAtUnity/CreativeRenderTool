@@ -238,7 +238,7 @@ export class WebView {
 
             return this._sessionManager.sendUnsentSessions();
         }).then(() => {
-            if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            if(this._nativeBridge.getPlatform() === Platform.ANDROID && (this._configuration.getAbGroup() === 9 || this._configuration.getAbGroup() === 10)) {
                 this._nativeBridge.setAutoBatchEnabled(false);
             }
         }).catch(error => {
@@ -423,7 +423,7 @@ export class WebView {
             }
 
             this._currentAdUnit.show().then(() => {
-                if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                if(this._nativeBridge.getPlatform() === Platform.ANDROID && (this._configuration.getAbGroup() === 9 || this._configuration.getAbGroup() === 10)) {
                     this._nativeBridge.setAutoBatchEnabled(true);
                 }
             });
@@ -441,7 +441,7 @@ export class WebView {
     private onAdUnitClose(): void {
         this._showing = false;
 
-        if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+        if(this._nativeBridge.getPlatform() === Platform.ANDROID && (this._configuration.getAbGroup() === 9 || this._configuration.getAbGroup() === 10)) {
             this._nativeBridge.setAutoBatchEnabled(false);
         }
     }
