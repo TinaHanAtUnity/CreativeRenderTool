@@ -31,7 +31,7 @@ export class ARApi extends NativeApi {
     }
 
     public isARSupported(): Promise<boolean> {
-        return this._nativeBridge.invoke<boolean>(this._apiClass, 'isARSupported');
+        return this._nativeBridge.invoke<boolean>(this._apiClass, 'isARSupported', ['ARWorldTrackingConfiguration']);
     }
 
     public restartSession(): Promise<void> {
