@@ -1,3 +1,11 @@
+# Pending
+
+* Android batching A/B test in groups 9 & 10
+* Use cached campaign when intializing SDK (A/B test in groups 7 & 8)
+* Remove refresh manager A/B test from groups 9 & 10
+* Add support for last three admob optional signals
+* Remove session_start_failed -diagnostics fro now
+
 # Wed Apr 11 22:16:33 UTC 2018
 
 * Honor using WebView UA for tracking for MRAID click attribution
