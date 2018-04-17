@@ -1,4 +1,4 @@
-# Pending
+# Tue Apr 17 10:14:11 UTC 2018
 
 * GDPR pop-up A/B test in groups 16 & 17
 
