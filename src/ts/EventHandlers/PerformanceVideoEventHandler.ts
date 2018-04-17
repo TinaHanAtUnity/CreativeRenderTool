@@ -1,55 +1,46 @@
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
-import { IVideoEventHandler } from 'Native/Api/VideoPlayer';
 import { IVideoEventHandlerParams } from 'EventHandlers/BaseVideoEventHandler';
+import { VideoEventHandler } from 'EventHandlers/VideoEventHandler';
+import { TestEnvironment } from 'Utilities/TestEnvironment';
 
-export class PerformanceVideoEventHandlers implements IVideoEventHandler {
+export class PerformanceVideoEventHandler extends VideoEventHandler {
 
-    private _adUnit: PerformanceAdUnit;
+    private _performanceAdUnit: PerformanceAdUnit;
 
     constructor(params: IVideoEventHandlerParams) {
-        this._adUnit = <PerformanceAdUnit>params.adUnit;
+        super(params);
+        this._performanceAdUnit = <PerformanceAdUnit>params.adUnit;
     }
 
-    public onProgress(progress: number): void {
-        // EMPTY
+    public onCompleted(url: string): void {
+        super.onCompleted(url);
+
+        const endScreen = this._performanceAdUnit.getEndScreen();
+
+        if(endScreen) {
+            endScreen.show();
+        }
     }
 
     public onPrepared(url: string, duration: number, width: number, height: number): void {
-        // EMPTY
+        super.onPrepared(url, duration, width, height);
+
+        const overlay = this._adUnit.getOverlay();
+        if(TestEnvironment.get('debugOverlayEnabled') && overlay) {
+            overlay.setDebugMessage('Performance Ad');
+        }
     }
 
-    public onPrepareTimeout(url: string): void {
-        // EMPTY
-    }
+    protected handleVideoError(errorType?: string, errorData?: any): void {
+        super.handleVideoError(errorType, errorData);
 
-    public onPlay(url: string): void {
-        // EMPTY
-    }
-
-    public onPause(url: string): void {
-        // EMPTY
-    }
-
-    public onSeek(url: string): void {
-        // EMPTY
-    }
-
-    public onStop(url: string): void {
-        // EMPTY
-    }
-
-    public onCompleted(url: string) {
-        const endScreen = this._adUnit.getEndScreen();
-
-        if (endScreen) {
+        const endScreen = this._performanceAdUnit.getEndScreen();
+        if(endScreen) {
             endScreen.show();
         }
     }
 
-    public onVideoError(adUnit: PerformanceAdUnit) {
-        const endScreen = adUnit.getEndScreen();
-        if (endScreen) {
-            endScreen.show();
-        }
+    protected getVideoOrientation(): string | undefined {
+        return this._performanceAdUnit.getVideoOrientation();
     }
 }
