@@ -3,6 +3,7 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { RequestError } from 'Errors/RequestError';
 import { Platform } from 'Constants/Platform';
 import { CallbackContainer } from 'Utilities/CallbackContainer';
+import { JaegerSpan, JaegerTags, JaegerNetworkTags } from 'Jaeger/JaegerSpan';
 
 const enum RequestStatus {
     COMPLETE,
@@ -37,72 +38,6 @@ export interface INativeResponse {
     response: string;
     responseCode: number;
     headers: Array<[string, string]>;
-}
-
-class JaegerLocalEndpoint {
-    private serviceName: string;
-
-    constructor(serviceName: string) {
-        this.serviceName = serviceName;
-    }
-}
-
-class JaegerTags {
-    private sdkVersion: string = '1.0.0';
-    private deviceType: string = 'Android';
-}
-
-class JaegerAnnotation {
-    private timestamp: number = Date.now() * 1000;
-    private value: string;
-
-    constructor(value: string) {
-        this.value = value;
-    }
-}
-class JaegerSpan {
-
-    private static uuidv4(): string {
-        return 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
-            return v.toString(16);
-          });
-    }
-
-    private traceId: string = JaegerSpan.uuidv4().substring(8, 24);
-    private name: string;
-    private id: string = JaegerSpan.uuidv4().substring(8, 24);
-    private kind: string = 'CLIENT';
-    private timestamp: number = Date.now() * 1000;
-    private duration: number = 0;
-    private debug: boolean = true;
-    private shared: boolean = true;
-    private localEndpoint: JaegerLocalEndpoint;
-    private annotations: JaegerAnnotation[] = [];
-    private tags: JaegerTags = new JaegerTags();
-
-    constructor(name: string, serviceName: string, annotations: JaegerAnnotation[]) {
-        this.name = name;
-        this.localEndpoint = new JaegerLocalEndpoint(serviceName);
-        this.annotations = annotations;
-    }
-
-    public getTraceId(): string {
-        return this.traceId;
-    }
-
-    public getId(): string {
-        return this.id;
-    }
-
-    public getTimeStamp(): number {
-        return this.timestamp;
-    }
-
-    public setDuration(duration: number) {
-        this.duration = duration;
-    }
-
 }
 
 export class Request {
@@ -169,7 +104,15 @@ export class Request {
         // headers.push(['uber-trace-id', jaegerTraceId]);
         const id = Request._callbackId++;
         const promise = this.registerCallback(id).then((resp) => {
-            jaegerSpan.setDuration(Date.now() * 1000 - jaegerSpan.getTimeStamp());
+            const jaegerTags = new JaegerNetworkTags(this._nativeBridge.getPlatform(), resp.responseCode.toString());
+            jaegerSpan.setTags(jaegerTags);
+            jaegerSpan.setDuration(JaegerSpan.genTimestamp() - jaegerSpan.getTimeStamp());
+            this.postJaeger(jaegerSpan);
+            return resp;
+        }).catch((resp) => {
+            const jaegerTags = new JaegerNetworkTags(this._nativeBridge.getPlatform(), resp.nativeResponse.responseCode.toString());
+            jaegerSpan.setTags(jaegerTags);
+            jaegerSpan.setDuration(JaegerSpan.genTimestamp() - jaegerSpan.getTimeStamp());
             this.postJaeger(jaegerSpan);
             return resp;
         });
@@ -195,7 +138,15 @@ export class Request {
         // headers.push(['uber-trace-id', jaegerTraceId]);
         const id = Request._callbackId++;
         const promise = this.registerCallback(id).then((resp) => {
-            jaegerSpan.setDuration(Date.now() * 1000 - jaegerSpan.getTimeStamp());
+            const jaegerTags = new JaegerNetworkTags(this._nativeBridge.getPlatform(), resp.responseCode.toString());
+            jaegerSpan.setTags(jaegerTags);
+            jaegerSpan.setDuration(JaegerSpan.genTimestamp() - jaegerSpan.getTimeStamp());
+            this.postJaeger(jaegerSpan);
+            return resp;
+        }).catch((resp) => {
+            const jaegerTags = new JaegerNetworkTags(this._nativeBridge.getPlatform(), resp.nativeResponse.responseCode.toString());
+            jaegerSpan.setTags(jaegerTags);
+            jaegerSpan.setDuration(JaegerSpan.genTimestamp() - jaegerSpan.getTimeStamp());
             this.postJaeger(jaegerSpan);
             return resp;
         });
