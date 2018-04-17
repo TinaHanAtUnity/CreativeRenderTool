@@ -61,9 +61,9 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
 
         this.createMRAID(MRAIDContainer).then(mraid => {
-            this._nativeBridge.Sdk.logInfo('setting iframe srcdoc (' + mraid.length + ')');
+            this._nativeBridge.Sdk.logDebug('setting iframe srcdoc (' + mraid.length + ')');
             SdkStats.setFrameSetStartTimestamp(this._placement.getId());
-            this._nativeBridge.Sdk.logInfo('Unity Ads placement ' + this._placement.getId() + ' set iframe.src started ' + SdkStats.getFrameSetStartTimestamp(this._placement.getId()));
+            this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' set iframe.src started ' + SdkStats.getFrameSetStartTimestamp(this._placement.getId()));
             iframe.srcdoc = mraid;
         }).catch(e => this._nativeBridge.Sdk.logError('failed to create mraid: ' + e));
 
@@ -191,7 +191,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
                 this._loaded = true;
                 this.onLoaded.trigger();
                 const frameLoadDuration = Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId());
-                this._nativeBridge.Sdk.logInfo('Unity Ads placement ' + this._placement.getId() + ' iframe load duration ' + frameLoadDuration + ' ms');
+                this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' iframe load duration ' + frameLoadDuration + ' ms');
                 break;
 
             case 'open':
