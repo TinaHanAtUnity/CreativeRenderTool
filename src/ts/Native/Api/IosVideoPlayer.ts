@@ -1,5 +1,4 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { Observable1, Observable2 } from 'Utilities/Observable';
 import { NativeApi } from 'Native/NativeApi';
 
 export enum IosVideoPlayerEvent {
@@ -7,17 +6,19 @@ export enum IosVideoPlayerEvent {
     BUFFER_EMPTY,
     BUFFER_FULL,
     GENERIC_ERROR,
-    PREPARE_ERROR,
     VIDEOVIEW_NULL
+}
+
+export interface IIosVideoEventHandler {
+    onLikelyToKeepUp(url: string, likelyToKeepUp: boolean): void;
+    onBufferEmpty(url: string, bufferIsEmpty: boolean): void;
+    onBufferFull(url: string, bufferIsFull: boolean): void;
+    onGenericError(url: string, description: string): void;
 }
 
 export class IosVideoPlayerApi extends NativeApi {
 
-    public readonly onLikelyToKeepUp = new Observable2<string, boolean>();
-    public readonly onBufferEmpty = new Observable2<string, boolean>();
-    public readonly onBufferFull = new Observable2<string, boolean>();
-    public readonly onGenericError = new Observable2<string, string>();
-    public readonly onPrepareError = new Observable1<string>();
+    protected _handlers: IIosVideoEventHandler[] = [];
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'VideoPlayer');
@@ -26,23 +27,19 @@ export class IosVideoPlayerApi extends NativeApi {
     public handleEvent(event: string, parameters: any[]): void {
         switch(event) {
             case IosVideoPlayerEvent[IosVideoPlayerEvent.LIKELY_TO_KEEP_UP]:
-                this.onLikelyToKeepUp.trigger(parameters[0], parameters[1]);
+                this._handlers.forEach(handler => handler.onLikelyToKeepUp(parameters[0], parameters[1]));
                 break;
 
             case IosVideoPlayerEvent[IosVideoPlayerEvent.BUFFER_EMPTY]:
-                this.onBufferEmpty.trigger(parameters[0], parameters[1]);
+                this._handlers.forEach(handler => handler.onBufferEmpty(parameters[0], parameters[1]));
                 break;
 
             case IosVideoPlayerEvent[IosVideoPlayerEvent.BUFFER_FULL]:
-                this.onBufferFull.trigger(parameters[0], parameters[1]);
+                this._handlers.forEach(handler => handler.onBufferFull(parameters[0], parameters[1]));
                 break;
 
             case IosVideoPlayerEvent[IosVideoPlayerEvent.GENERIC_ERROR]:
-                this.onGenericError.trigger(parameters[0], parameters[1]);
-                break;
-
-            case IosVideoPlayerEvent[IosVideoPlayerEvent.PREPARE_ERROR]:
-                this.onPrepareError.trigger(parameters[0]);
+                this._handlers.forEach(handler => handler.onGenericError(parameters[0], parameters[1]));
                 break;
 
             default:
@@ -50,4 +47,18 @@ export class IosVideoPlayerApi extends NativeApi {
         }
     }
 
+    public addEventHandler(handler: IIosVideoEventHandler): IIosVideoEventHandler {
+        this._handlers.push(handler);
+        return handler;
+    }
+
+    public removeEventHandler(handler: IIosVideoEventHandler): void {
+        if(this._handlers.length) {
+            if(typeof handler !== 'undefined') {
+                this._handlers = this._handlers.filter(storedHandler => storedHandler !== handler);
+            } else {
+                this._handlers = [];
+            }
+        }
+    }
 }

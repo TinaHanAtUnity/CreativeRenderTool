@@ -1,6 +1,5 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { NativeApi } from 'Native/NativeApi';
-import { Observable0, Observable1, Observable3 } from 'Utilities/Observable';
 
 enum AndroidVideoPlayerEvent {
     INFO
@@ -16,14 +15,18 @@ export enum AndroidVideoPlayerError {
     ILLEGAL_STATE
 }
 
+export interface IAndroidVideoEventHandler {
+    onInfo(url: string, what: number, extra: number): void;
+    onGenericError(url: string, what: number, extra: number): void;
+    onPrepareError(url: string): void;
+    onSeekToError(url: string): void;
+    onPauseError(url: string): void;
+    onIllegalStateError(url: string, isPlaying: boolean): void;
+}
+
 export class AndroidVideoPlayerApi extends NativeApi {
 
-    public readonly onInfo = new Observable3<string, number, number>();
-    public readonly onGenericError = new Observable3<string, number, number>();
-    public readonly onPrepareError = new Observable1<string>();
-    public readonly onSeekToError = new Observable1<string>();
-    public readonly onPauseError = new Observable1<string>();
-    public readonly onIllegalStateError = new Observable0();
+    protected _handlers: IAndroidVideoEventHandler[] = [];
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'VideoPlayer');
@@ -36,27 +39,27 @@ export class AndroidVideoPlayerApi extends NativeApi {
     public handleEvent(event: string, parameters: any[]): void {
         switch(event) {
             case AndroidVideoPlayerEvent[AndroidVideoPlayerEvent.INFO]:
-                this.onInfo.trigger(parameters[0], parameters[1], parameters[2]);
+                this._handlers.forEach(handler => handler.onInfo(parameters[0], parameters[1], parameters[2]));
                 break;
 
             case AndroidVideoPlayerError[AndroidVideoPlayerError.GENERIC_ERROR]:
-                this.onGenericError.trigger(parameters[0], parameters[1], parameters[2]);
+                this._handlers.forEach(handler => handler.onGenericError(parameters[0], parameters[1], parameters[2]));
                 break;
 
             case AndroidVideoPlayerError[AndroidVideoPlayerError.PAUSE_ERROR]:
-                this.onPauseError.trigger(parameters[0]);
+                this._handlers.forEach(handler => handler.onPauseError(parameters[0]));
                 break;
 
             case AndroidVideoPlayerError[AndroidVideoPlayerError.PREPARE_ERROR]:
-                this.onPrepareError.trigger(parameters[0]);
+                this._handlers.forEach(handler => handler.onPrepareError(parameters[0]));
                 break;
 
             case AndroidVideoPlayerError[AndroidVideoPlayerError.SEEKTO_ERROR]:
-                this.onSeekToError.trigger(parameters[0]);
+                this._handlers.forEach(handler => handler.onSeekToError(parameters[0]));
                 break;
 
             case AndroidVideoPlayerError[AndroidVideoPlayerError.ILLEGAL_STATE]:
-                this.onIllegalStateError.trigger();
+                this._handlers.forEach(handler => handler.onIllegalStateError(parameters[0], parameters[1]));
                 break;
 
             default:
@@ -64,4 +67,18 @@ export class AndroidVideoPlayerApi extends NativeApi {
         }
     }
 
+    public addEventHandler(handler: IAndroidVideoEventHandler): IAndroidVideoEventHandler {
+        this._handlers.push(handler);
+        return handler;
+    }
+
+    public removeEventHandler(handler: IAndroidVideoEventHandler): void {
+        if(this._handlers.length) {
+            if(typeof handler !== 'undefined') {
+                this._handlers = this._handlers.filter(storedHandler => storedHandler !== handler);
+            } else {
+                this._handlers = [];
+            }
+        }
+    }
 }
