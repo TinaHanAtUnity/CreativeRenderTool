@@ -24,7 +24,20 @@ export class CustomFeatures {
     }
 
     public static showGDPRPopup(nativeBridge: NativeBridge, configuration: Configuration, abGroup: number): Promise<boolean> {
-        return Promise.resolve(false);
+        if((abGroup === 16 || abGroup === 17) && this._euCountries.indexOf(configuration.getCountry()) !== -1) {
+            return nativeBridge.Storage.get(StorageType.PRIVATE, 'gdpr.popupshown.value').then(value => {
+                return !<boolean>value;
+            }).catch(([error]) => {
+                if (error === StorageError[StorageError.COULDNT_GET_VALUE]) {
+                    return true;
+                } else {
+                    return false;
+                }
+            });
+
+        } else {
+            return Promise.resolve(false);
+        }
     }
 
     private static _euCountries = [

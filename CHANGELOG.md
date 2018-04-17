@@ -1,3 +1,7 @@
+# Tue Apr 17 10:14:11 UTC 2018
+
+* GDPR pop-up A/B test in groups 16 & 17
+
 # Mon Apr 16 20:50:03 UTC 2018
 
 * Android batching A/B test in groups 9 & 10
