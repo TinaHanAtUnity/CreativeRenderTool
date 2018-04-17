@@ -90,16 +90,10 @@ export class JaegerSpan {
         return this.id;
     }
 
-    public getTimeStamp(): number {
-        return this.timestamp;
-    }
-
-    public setDuration(duration: number) {
-        this.duration = duration;
-    }
-
-    public setTags(tags: JaegerTags) {
+    public stop(platform: Platform, responseCode: string) {
+        const tags = new JaegerNetworkTags(platform, responseCode);
         this.tags = tags;
+        this.duration = JaegerSpan.genTimestamp() - this.timestamp;
     }
 
 }

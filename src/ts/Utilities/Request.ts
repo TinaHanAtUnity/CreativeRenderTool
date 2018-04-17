@@ -99,21 +99,17 @@ export class Request {
             options = Request.getDefaultRequestOptions();
         }
 
-        const jaegerSpan = new JaegerSpan(url, 'Client Request', []);
+        const jaegerSpan = new JaegerSpan(url, 'Client Request', []); // start the span
         const jaegerTraceId: string = jaegerSpan.getTraceId() + ':' + jaegerSpan.getId() + ':' + jaegerSpan.getId() + ':01';
         // headers.push(['uber-trace-id', jaegerTraceId]);
         const id = Request._callbackId++;
         const promise = this.registerCallback(id).then((resp) => {
-            const jaegerTags = new JaegerNetworkTags(this._nativeBridge.getPlatform(), resp.responseCode.toString());
-            jaegerSpan.setTags(jaegerTags);
-            jaegerSpan.setDuration(JaegerSpan.genTimestamp() - jaegerSpan.getTimeStamp());
-            this.postJaeger(jaegerSpan);
+            jaegerSpan.stop(this._nativeBridge.getPlatform(), resp.responseCode.toString());
+            this.postToJaeger(jaegerSpan);
             return resp;
         }).catch((resp) => {
-            const jaegerTags = new JaegerNetworkTags(this._nativeBridge.getPlatform(), resp.nativeResponse.responseCode.toString());
-            jaegerSpan.setTags(jaegerTags);
-            jaegerSpan.setDuration(JaegerSpan.genTimestamp() - jaegerSpan.getTimeStamp());
-            this.postJaeger(jaegerSpan);
+            jaegerSpan.stop(this._nativeBridge.getPlatform(), resp.nativeResponse.responseCode.toString());
+            this.postToJaeger(jaegerSpan);
             return resp;
         });
         this.invokeRequest(id, {
@@ -133,21 +129,17 @@ export class Request {
 
         headers.push(['Content-Type', 'application/json']);
 
-        const jaegerSpan = new JaegerSpan(url, 'Client Request', []);
+        const jaegerSpan = new JaegerSpan(url, 'Client Request', []); // start the span
         const jaegerTraceId: string = jaegerSpan.getTraceId() + ':' + jaegerSpan.getId() + ':' + jaegerSpan.getId() + ':01';
         // headers.push(['uber-trace-id', jaegerTraceId]);
         const id = Request._callbackId++;
         const promise = this.registerCallback(id).then((resp) => {
-            const jaegerTags = new JaegerNetworkTags(this._nativeBridge.getPlatform(), resp.responseCode.toString());
-            jaegerSpan.setTags(jaegerTags);
-            jaegerSpan.setDuration(JaegerSpan.genTimestamp() - jaegerSpan.getTimeStamp());
-            this.postJaeger(jaegerSpan);
+            jaegerSpan.stop(this._nativeBridge.getPlatform(), resp.responseCode.toString());
+            this.postToJaeger(jaegerSpan);
             return resp;
         }).catch((resp) => {
-            const jaegerTags = new JaegerNetworkTags(this._nativeBridge.getPlatform(), resp.nativeResponse.responseCode.toString());
-            jaegerSpan.setTags(jaegerTags);
-            jaegerSpan.setDuration(JaegerSpan.genTimestamp() - jaegerSpan.getTimeStamp());
-            this.postJaeger(jaegerSpan);
+            jaegerSpan.stop(this._nativeBridge.getPlatform(), resp.nativeResponse.responseCode.toString());
+            this.postToJaeger(jaegerSpan);
             return resp;
         });
         this.invokeRequest(id, {
@@ -220,7 +212,7 @@ export class Request {
         });
     }
 
-    private postJaeger(span: JaegerSpan) {
+    private postToJaeger(span: JaegerSpan) {
         const headers: Array<[string, string]> = [];
         const options: IRequestOptions = Request.getDefaultRequestOptions();
         const url: string = 'http://10.1.83.159:9411/api/v2/spans';
