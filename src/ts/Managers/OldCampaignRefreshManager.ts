@@ -126,6 +126,25 @@ export class OldCampaignRefreshManager extends RefreshManager {
         return Promise.resolve();
     }
 
+    public refreshFromCache(cachedResponse: INativeResponse): Promise<INativeResponse | void> {
+        if(!this._refreshAllowed) {
+            return Promise.resolve();
+        }
+        if(this.shouldRefill(this._refillTimestamp)) {
+            this.setPlacementStates(PlacementState.WAITING, this._configuration.getPlacementIds());
+            this._refillTimestamp = 0;
+            this.invalidateCampaigns(false, this._configuration.getPlacementIds());
+            this._campaignCount = 0;
+            return this._campaignManager.requestFromCache(cachedResponse).then(() => {
+                return this._campaignManager.request();
+           });
+        } else if(this.checkForExpiredCampaigns()) {
+            return this.onCampaignExpired();
+        }
+
+        return Promise.resolve();
+    }
+
     public shouldRefill(timestamp: number): boolean {
         if(this._needsRefill) {
             return true;

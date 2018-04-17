@@ -5,7 +5,7 @@ import { Configuration, CacheMode } from 'Models/Configuration';
 import { CampaignManager } from 'Managers/CampaignManager';
 import { Cache } from 'Utilities/Cache';
 import { Placement } from 'Models/Placement';
-import { Request } from 'Utilities/Request';
+import { Request, INativeResponse } from 'Utilities/Request';
 import { SessionManager } from 'Managers/SessionManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Diagnostics } from 'Utilities/Diagnostics';
@@ -49,14 +49,10 @@ import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { OldCampaignRefreshManager } from 'Managers/OldCampaignRefreshManager';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { MissedImpressionManager } from 'Managers/MissedImpressionManager';
-import { NewRefreshManager } from 'Managers/NewRefreshManager';
-import { PlacementManager } from 'Managers/PlacementManager';
-import { ReinitManager } from 'Managers/ReinitManager';
 
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
-import { Timer } from 'Utilities/Timer';
 import { TimeoutError, Promises } from 'Utilities/Promises';
 
 export class WebView {
@@ -76,8 +72,6 @@ export class WebView {
     private _cache: Cache;
     private _cacheBookkeeping: CacheBookkeeping;
     private _container: AdUnitContainer;
-    private _reinitManager: ReinitManager;
-    private _placementManager: PlacementManager;
 
     private _currentAdUnit: AbstractAdUnit;
 
@@ -98,6 +92,8 @@ export class WebView {
 
     private _creativeUrl?: string;
     private _requestDelay: number;
+
+    private _cachedCampaignResponse: INativeResponse | undefined;
 
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
@@ -122,6 +118,8 @@ export class WebView {
             } else if(this._clientInfo.getPlatform() === Platform.IOS) {
                 this._deviceInfo = new IosDeviceInfo(this._nativeBridge);
             }
+
+            this._cachedCampaignResponse = undefined;
 
             this._focusManager = new FocusManager(this._nativeBridge);
             this._wakeUpManager = new WakeUpManager(this._nativeBridge, this._focusManager);
@@ -182,9 +180,12 @@ export class WebView {
                 Diagnostics.trigger('cleaning_cache_failed', error);
             });
 
-            return Promise.all([configPromise, cachePromise]);
-        }).then(([configuration]) => {
+            const cachedCampaignResponsePromise = this._cacheBookkeeping.getCachedCampaignResponse();
+
+            return Promise.all([configPromise, cachedCampaignResponsePromise, cachePromise]);
+        }).then(([configuration, cachedCampaignResponse]) => {
             this._configuration = configuration;
+            this._cachedCampaignResponse = cachedCampaignResponse;
             HttpKafka.setConfiguration(this._configuration);
 
             PurchasingUtilities.setConfiguration(this._configuration);
@@ -220,23 +221,26 @@ export class WebView {
             this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
 
             this._assetManager = new AssetManager(this._cache, this._configuration.getCacheMode(), this._deviceInfo, this._cacheBookkeeping, this._nativeBridge);
-            this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._adMobSignalFactory, this._request, this._clientInfo, this._deviceInfo, this._metadataManager);
+            this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._adMobSignalFactory, this._request, this._clientInfo, this._deviceInfo, this._metadataManager, this._cacheBookkeeping);
 
-            if(this._configuration.getAbGroup() === 9 || this._configuration.getAbGroup() === 10) {
-                this._placementManager = new PlacementManager(this._nativeBridge, this._configuration);
-                this._reinitManager = new ReinitManager(this._nativeBridge, this._clientInfo, this._request, this._cache);
-                this._refreshManager = new NewRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration, this._focusManager, this._reinitManager, this._placementManager);
-            } else {
-                this._refreshManager = new OldCampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration, this._focusManager, this._sessionManager, this._clientInfo, this._request, this._cache);
-            }
+            this._refreshManager = new OldCampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration, this._focusManager, this._sessionManager, this._clientInfo, this._request, this._cache);
 
             SdkStats.initialize(this._nativeBridge, this._request, this._configuration, this._sessionManager, this._campaignManager, this._metadataManager, this._clientInfo);
 
-            return this._refreshManager.refresh();
+            const enableCachedResponse = this._configuration.getAbGroup() === 7 || this._configuration.getAbGroup() === 8;
+            if (this._cachedCampaignResponse !== undefined && enableCachedResponse) {
+                return this._refreshManager.refreshFromCache(this._cachedCampaignResponse);
+            } else {
+                return this._refreshManager.refresh();
+            }
         }).then(() => {
             this._initialized = true;
 
             return this._sessionManager.sendUnsentSessions();
+        }).then(() => {
+            if(this._nativeBridge.getPlatform() === Platform.ANDROID && (this._configuration.getAbGroup() === 9 || this._configuration.getAbGroup() === 10)) {
+                this._nativeBridge.setAutoBatchEnabled(false);
+            }
         }).catch(error => {
             if(error instanceof ConfigError) {
                 error = { 'message': error.message, 'name': error.name };
@@ -289,6 +293,8 @@ export class WebView {
             Diagnostics.trigger('campaign_expired', error, campaign.getSession());
             return;
         }
+
+        this._cacheBookkeeping.deleteCachedCampaignResponse();
 
         if (placement.getRealtimeData()) {
             this._nativeBridge.Sdk.logInfo('Unity Ads is requesting realtime fill for placement ' + placement.getId());
@@ -416,7 +422,11 @@ export class WebView {
                 });
             }
 
-            this._currentAdUnit.show();
+            this._currentAdUnit.show().then(() => {
+                if(this._nativeBridge.getPlatform() === Platform.ANDROID && (this._configuration.getAbGroup() === 9 || this._configuration.getAbGroup() === 10)) {
+                    this._nativeBridge.setAutoBatchEnabled(true);
+                }
+            });
         });
     }
 
@@ -430,6 +440,10 @@ export class WebView {
 
     private onAdUnitClose(): void {
         this._showing = false;
+
+        if(this._nativeBridge.getPlatform() === Platform.ANDROID && (this._configuration.getAbGroup() === 9 || this._configuration.getAbGroup() === 10)) {
+            this._nativeBridge.setAutoBatchEnabled(false);
+        }
     }
 
     private isShowing(): boolean {
