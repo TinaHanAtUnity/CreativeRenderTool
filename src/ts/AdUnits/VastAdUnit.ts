@@ -139,12 +139,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         }
     }
 
-    public sendProgressEvents(sessionId: string, sdkVersion: number, position: number, oldPosition: number) {
-        this.sendQuartileEvent(sessionId, sdkVersion, position, oldPosition, 1, 'firstQuartile');
-        this.sendQuartileEvent(sessionId, sdkVersion, position, oldPosition, 2, 'midpoint');
-        this.sendQuartileEvent(sessionId, sdkVersion, position, oldPosition, 3, 'thirdQuartile');
-    }
-
     public getVideoClickThroughURL(): string | null {
         const url = this._vastCampaign.getVast().getVideoClickThroughURL();
         if (this.isValidURL(url)) {
@@ -219,23 +213,10 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         }
     }
 
-    private sendQuartileEvent(sessionId: string, sdkVersion: number, position: number, oldPosition: number, quartile: number, quartileEventName: string) {
-        if (this.getTrackingEventUrls(quartileEventName)) {
-            const duration = this._vastCampaign.getVideo().getDuration();
-            if (duration && duration > 0 && position > duration * 0.25 * quartile && oldPosition < duration * 0.25 * quartile) {
-                this.sendTrackingEvent(quartileEventName, sessionId, sdkVersion);
-            }
-        }
-    }
-
     private sendThirdPartyEvent(event: string, sessionId: string, sdkVersion: number, url: string): void {
         url = url.replace(/%ZONE%/, this._vastPlacement.getId());
         url = url.replace(/%SDK_VERSION%/, sdkVersion.toString());
         this._thirdPartyEventManager.sendEvent(event, sessionId, url, this._vastCampaign.getUseWebViewUserAgentForTracking());
-    }
-
-    private getTrackingEventUrls(eventName: string): string[] | null {
-        return this._vastCampaign.getVast().getTrackingEventUrls(eventName);
     }
 
     private isValidURL(url: string | null): boolean {
