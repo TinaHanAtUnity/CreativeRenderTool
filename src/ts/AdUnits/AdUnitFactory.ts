@@ -68,6 +68,8 @@ import { CampaignAssetInfo } from 'Utilities/CampaignAssetInfo';
 import { IVideoEventHandlerParams } from 'EventHandlers/BaseVideoEventHandler';
 import { AndroidVideoEventHandler } from 'EventHandlers/AndroidVideoEventHandler';
 import { IosVideoEventHandler } from 'EventHandlers/IosVideoEventHandler';
+import { XPromoOperativeEventManager } from 'Managers/XPromoOperativeEventManager';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
 
 export class AdUnitFactory {
 
@@ -118,7 +120,7 @@ export class AdUnitFactory {
         endScreen.addEventHandler(endScreenEventHandler);
 
         const videoEventHandlerParams = this.getVideoEventHandlerParams(nativeBridge, performanceAdUnit, video, performanceAdUnitParameters.adUnitStyle, performanceAdUnitParameters);
-        this.prepareVideoPlayer(PerformanceVideoEventHandler, videoEventHandlerParams);
+        this.prepareVideoPlayer(PerformanceVideoEventHandler, <IVideoEventHandlerParams<PerformanceAdUnit>>videoEventHandlerParams);
 
         if (nativeBridge.getPlatform() === Platform.ANDROID) {
             const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => endScreenEventHandler.onKeyEvent(keyCode));
@@ -151,7 +153,7 @@ export class AdUnitFactory {
         endScreen.addEventHandler(endScreenEventHandler);
 
         const videoEventHandlerParams = this.getVideoEventHandlerParams(nativeBridge, xPromoAdUnit, video, undefined, xPromoAdUnitParameters);
-        this.prepareVideoPlayer(XPromoVideoEventHandler, videoEventHandlerParams);
+        this.prepareVideoPlayer(XPromoVideoEventHandler, <IVideoEventHandlerParams<XPromoAdUnit, XPromoCampaign, XPromoOperativeEventManager>>videoEventHandlerParams);
 
         if (nativeBridge.getPlatform() === Platform.ANDROID) {
             const onBackKeyObserver = nativeBridge.AndroidAdUnit.onKeyDown.subscribe((keyCode, eventTime, downTime, repeatCount) => endScreenEventHandler.onKeyEvent(keyCode));
@@ -203,7 +205,7 @@ export class AdUnitFactory {
         overlay.addEventHandler(vastOverlayHandler);
 
         const videoEventHandlerParams = this.getVideoEventHandlerParams(nativeBridge, vastAdUnit, parameters.campaign.getVideo(), undefined, vastAdUnitParameters);
-        const vastVideoEventHandler = this.prepareVideoPlayer(VastVideoEventHandler, videoEventHandlerParams);
+        const vastVideoEventHandler = this.prepareVideoPlayer(VastVideoEventHandler, <IVideoEventHandlerParams<VastAdUnit, VastCampaign>>videoEventHandlerParams);
 
         let onVolumeChangeObserverAndroid: IObserver3<number, number, number>;
         let onVolumeChangeObserverIOS: IObserver2<number, number>;
@@ -323,7 +325,7 @@ export class AdUnitFactory {
         return displayInterstitialAdUnit;
     }
 
-    private static prepareVideoPlayer<T extends VideoEventHandler>(VideoEventHandlerConstructor: { new(p: IVideoEventHandlerParams): T; }, params: IVideoEventHandlerParams): T {
+    private static prepareVideoPlayer<T extends VideoEventHandler, T2 extends VideoAdUnit, T3 extends Campaign, T4 extends OperativeEventManager, ParamsType extends IVideoEventHandlerParams<T2, T3, T4>>(VideoEventHandlerConstructor: { new(p: ParamsType): T; }, params: ParamsType): T {
         const nativeBridge = params.nativeBrige;
         const adUnit = params.adUnit;
         const videoEventHandler = new VideoEventHandlerConstructor(params);
