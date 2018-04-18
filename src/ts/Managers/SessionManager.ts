@@ -38,11 +38,6 @@ export class SessionManager {
             this._nativeBridge.Storage.set<number>(StorageType.PRIVATE, sessionTimestampKey, timestamp),
             this._nativeBridge.Storage.write(StorageType.PRIVATE)
         ]).catch(error => {
-            Diagnostics.trigger('session_start_failed', new DiagnosticError(error, {
-                key: sessionTimestampKey,
-                timestamp: timestamp,
-                adRequestOrdinal: SdkStats.getAdRequestOrdinal()
-            }));
             return Promise.resolve([]);
         });
     }
