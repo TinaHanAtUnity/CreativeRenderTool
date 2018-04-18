@@ -188,7 +188,7 @@ describe('VideoEventHandlersTest', () => {
             clientInfo: clientInfo
         };
 
-        performanceVideoEventHandler = new PerformanceVideoEventHandler(videoEventHandlerParams);
+        performanceVideoEventHandler = new PerformanceVideoEventHandler(<IVideoEventHandlerParams<PerformanceAdUnit, PerformanceCampaign>>videoEventHandlerParams);
 
         sinon.stub(performanceAdUnit, 'isPrepareCalled').returns(true);
         sinon.stub(performanceAdUnitParameters.campaign, 'getAbGroup').returns(5);
@@ -357,7 +357,7 @@ describe('VideoEventHandlersTest', () => {
             const xPromoAdUnit = new XPromoAdUnit(nativeBridge, xPromoAdUnitParameters);
             videoEventHandlerParams.campaign = operativeEventManagerParams.campaign;
             videoEventHandlerParams.operativeEventManager = xPromoOperativeEventManager;
-            const xPromoVideoEventHandler = new XPromoVideoEventHandler(videoEventHandlerParams);
+            const xPromoVideoEventHandler = new XPromoVideoEventHandler(<IVideoEventHandlerParams<XPromoAdUnit, XPromoCampaign, XPromoOperativeEventManager>>videoEventHandlerParams);
 
             xPromoVideoEventHandler.onCompleted('https://test.com');
 
@@ -454,7 +454,7 @@ describe('VideoEventHandlersTest', () => {
             videoEventHandlerParams.campaign = vastCampaign;
             videoEventHandlerParams.adUnit = vastAdUnit;
             videoEventHandlerParams.operativeEventManager = vastAdUnitParameters.operativeEventManager;
-            const vastVideoEventHandler = new VastVideoEventHandler(videoEventHandlerParams);
+            const vastVideoEventHandler = new VastVideoEventHandler(<IVideoEventHandlerParams<VastAdUnit, VastCampaign>>videoEventHandlerParams);
             vastVideoEventHandler.onPrepared(video.getUrl(), video.getDuration(), 1024, 768);
 
             sinon.assert.calledWith(<sinon.SinonSpy>overlay.setDebugMessage, 'Programmatic Ad');
@@ -487,7 +487,7 @@ describe('VideoEventHandlersTest', () => {
             videoEventHandlerParams.campaign = vastCampaign;
             videoEventHandlerParams.adUnit = vastAdUnit;
             videoEventHandlerParams.operativeEventManager = vastAdUnitParameters.operativeEventManager;
-            const vastVideoEventHandler = new VastVideoEventHandler(videoEventHandlerParams);
+            const vastVideoEventHandler = new VastVideoEventHandler(<IVideoEventHandlerParams<VastAdUnit, VastCampaign>>videoEventHandlerParams);
             vastVideoEventHandler.onPrepared(video.getUrl(), video.getDuration(), 1024, 768);
 
             sinon.assert.calledWith(<sinon.SinonSpy>overlay.setCallButtonVisible, true);
@@ -508,7 +508,7 @@ describe('VideoEventHandlersTest', () => {
             videoEventHandlerParams.campaign = vastCampaign;
             videoEventHandlerParams.adUnit = vastAdUnit;
             videoEventHandlerParams.operativeEventManager = vastAdUnitParameters.operativeEventManager;
-            const vastVideoEventHandler = new VastVideoEventHandler(videoEventHandlerParams);
+            const vastVideoEventHandler = new VastVideoEventHandler(<IVideoEventHandlerParams<VastAdUnit, VastCampaign>>videoEventHandlerParams);
             vastVideoEventHandler.onPrepared(video.getUrl(), video.getDuration(), 1024, 768);
 
             sinon.assert.notCalled(<sinon.SinonSpy>overlay.setCallButtonVisible);
@@ -529,7 +529,7 @@ describe('VideoEventHandlersTest', () => {
             videoEventHandlerParams.campaign = vastCampaign;
             videoEventHandlerParams.adUnit = vastAdUnit;
             videoEventHandlerParams.operativeEventManager = vastAdUnitParameters.operativeEventManager;
-            const vastVideoEventHandler = new VastVideoEventHandler(videoEventHandlerParams);
+            const vastVideoEventHandler = new VastVideoEventHandler(<IVideoEventHandlerParams<VastAdUnit, VastCampaign>>videoEventHandlerParams);
             vastVideoEventHandler.onPrepared(video.getUrl(), video.getDuration(), 1024, 768);
 
             sinon.assert.calledWith(<sinon.SinonSpy>overlay.setFadeEnabled, false);
@@ -550,7 +550,7 @@ describe('VideoEventHandlersTest', () => {
             videoEventHandlerParams.campaign = vastCampaign;
             videoEventHandlerParams.adUnit = vastAdUnit;
             videoEventHandlerParams.operativeEventManager = vastAdUnitParameters.operativeEventManager;
-            const vastVideoEventHandler = new VastVideoEventHandler(videoEventHandlerParams);
+            const vastVideoEventHandler = new VastVideoEventHandler(<IVideoEventHandlerParams<VastAdUnit, VastCampaign>>videoEventHandlerParams);
             vastVideoEventHandler.onPrepared(video.getUrl(), video.getDuration(), 1024, 768);
 
             sinon.assert.notCalled(<sinon.SinonSpy>overlay.setFadeEnabled);
@@ -563,7 +563,7 @@ describe('VideoEventHandlersTest', () => {
             const xPromoAdUnit = new XPromoAdUnit(nativeBridge, xPromoAdUnitParameters);
             xPromoAdUnit.setPrepareCalled(true);
             videoEventHandlerParams.campaign = operativeEventManagerParams.campaign;
-            const xPromoVideoEventHandler = new XPromoVideoEventHandler(videoEventHandlerParams);
+            const xPromoVideoEventHandler = new XPromoVideoEventHandler(<IVideoEventHandlerParams<XPromoAdUnit, XPromoCampaign, XPromoOperativeEventManager>>videoEventHandlerParams);
 
             xPromoVideoEventHandler.onPrepared('https://test.com', 10000, 1024, 768);
 
@@ -673,7 +673,7 @@ describe('VideoEventHandlersTest', () => {
             videoEventHandlerParams.campaign = operativeEventManagerParams.campaign;
             videoEventHandlerParams.adUnit = xPromoAdUnit;
             videoEventHandlerParams.operativeEventManager = xPromoOperativeEventManager;
-            const xPromoVideoEventHandler = new XPromoVideoEventHandler(videoEventHandlerParams);
+            const xPromoVideoEventHandler = new XPromoVideoEventHandler(<IVideoEventHandlerParams<XPromoAdUnit, XPromoCampaign, XPromoOperativeEventManager>>videoEventHandlerParams);
 
             xPromoVideoEventHandler.onProgress(1);
 

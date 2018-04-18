@@ -27,6 +27,7 @@ import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Configuration } from 'Models/Configuration';
+import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 
 describe('PerformanceVideoEventHandlersTest', () => {
 
@@ -109,7 +110,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
             clientInfo: clientInfo
         };
 
-        performanceVideoEventHandler = new PerformanceVideoEventHandler(videoEventHandlerParams);
+        performanceVideoEventHandler = new PerformanceVideoEventHandler(<IVideoEventHandlerParams<PerformanceAdUnit, PerformanceCampaign>>videoEventHandlerParams);
     });
 
     describe('with onVideoCompleted', () => {

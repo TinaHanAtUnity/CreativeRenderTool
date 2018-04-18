@@ -139,7 +139,7 @@ describe('VastVideoEventHandler tests', () => {
             clientInfo: clientInfo
         };
 
-        vastVideoEventHandler = new VastVideoEventHandler(videoEventHandlerParams);
+        vastVideoEventHandler = new VastVideoEventHandler(<IVideoEventHandlerParams<VastAdUnit, VastCampaign>>videoEventHandlerParams);
     });
 
     afterEach(() => {
@@ -195,7 +195,7 @@ describe('VastVideoEventHandler tests', () => {
             const adUnitWithTrackers = new VastAdUnit(nativeBridge, vastAdUnitParameters);
             videoEventHandlerParams.adUnit = adUnitWithTrackers;
             videoEventHandlerParams.campaign = vastAdUnitParameters.campaign;
-            vastVideoEventHandler = new VastVideoEventHandler(videoEventHandlerParams);
+            vastVideoEventHandler = new VastVideoEventHandler(<IVideoEventHandlerParams<VastAdUnit, VastCampaign>>videoEventHandlerParams);
 
             const mockEventManager = sinon.mock(thirdPartyEventManager);
             mockEventManager.expects('sendEvent').withArgs('vast start', '12345', 'http://customTrackingUrl/start');
@@ -308,7 +308,7 @@ describe('VastVideoEventHandler tests', () => {
             vastAdUnitParameters.endScreen = vastEndScreen;
             vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
             videoEventHandlerParams.adUnit = vastAdUnit;
-            vastVideoEventHandler = new VastVideoEventHandler(videoEventHandlerParams);
+            vastVideoEventHandler = new VastVideoEventHandler(<IVideoEventHandlerParams<VastAdUnit, VastCampaign>>videoEventHandlerParams);
         });
 
         it('should show end screen when onVideoCompleted', () => {
