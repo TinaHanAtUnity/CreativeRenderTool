@@ -9,7 +9,6 @@ export class IosVideoEventHandler extends BaseVideoEventHandler implements IIosV
 
     public onLikelyToKeepUp(url: string, likelyToKeepUp: boolean): void {
         const container = this._adUnit.getContainer();
-        container.addDiagnosticsEvent({type: 'onIosVideoLikelyToKeepUp', likelyToKeepUp: likelyToKeepUp, hasStarted: this._video.hasStarted()});
         if(!container.isPaused() && this._video.hasStarted() && likelyToKeepUp) {
             this._nativeBridge.VideoPlayer.play();
         }
@@ -24,7 +23,6 @@ export class IosVideoEventHandler extends BaseVideoEventHandler implements IIosV
     }
 
     public onGenericError(url: string, description: string): void {
-        this._adUnit.getContainer().addDiagnosticsEvent({type: 'onIosGenericVideoError', description: description});
         this._nativeBridge.Sdk.logError('Unity Ads video player generic error '  + url + ' ' + description);
 
         this.handleVideoError('video_player_generic_error', {

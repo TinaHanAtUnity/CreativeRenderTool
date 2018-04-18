@@ -12,7 +12,6 @@ export class AndroidVideoEventHandler extends BaseVideoEventHandler implements I
     }
 
     public onGenericError(url: string, what: number, extra: number): void {
-        this._adUnit.getContainer().addDiagnosticsEvent({type: 'onAndroidGenericVideoError', what: what, extra: extra});
         this._nativeBridge.Sdk.logError('Unity Ads video player error ' + ' ' + what + ' ' + extra + ' ' + url);
 
         this.handleVideoError('video_player_generic_error', {
@@ -24,7 +23,6 @@ export class AndroidVideoEventHandler extends BaseVideoEventHandler implements I
     }
 
     public onPrepareError(url: string): void {
-        this._adUnit.getContainer().addDiagnosticsEvent({type: 'onPrepareError'});
         this._nativeBridge.Sdk.logError('Unity Ads video player prepare error '  + url);
 
         this.handleVideoError('video_player_prepare_error', {
@@ -34,7 +32,6 @@ export class AndroidVideoEventHandler extends BaseVideoEventHandler implements I
     }
 
     public onSeekToError(url: string): void {
-        this._adUnit.getContainer().addDiagnosticsEvent({type: 'onSeekToError'});
         this._nativeBridge.Sdk.logError('Unity Ads video player seek to error '  + url);
 
         this.handleVideoError('video_player_seek_to_error', {
@@ -44,7 +41,6 @@ export class AndroidVideoEventHandler extends BaseVideoEventHandler implements I
     }
 
     public onPauseError(url: string): void {
-        this._adUnit.getContainer().addDiagnosticsEvent({type: 'onPauseError'});
         this._nativeBridge.Sdk.logError('Unity Ads video player pause error '  + url);
 
         this.handleVideoError('video_player_pause_error', {
@@ -54,7 +50,6 @@ export class AndroidVideoEventHandler extends BaseVideoEventHandler implements I
     }
 
     public onIllegalStateError(url: string, isPlaying: boolean): void {
-        this._adUnit.getContainer().addDiagnosticsEvent({type: 'onIllegalStateError'});
         this._nativeBridge.Sdk.logError('Unity Ads video player illegal state error');
 
         this.handleVideoError('video_player_illegal_state_error', {

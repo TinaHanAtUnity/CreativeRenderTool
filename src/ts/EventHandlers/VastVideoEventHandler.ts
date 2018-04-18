@@ -13,10 +13,10 @@ export class VastVideoEventHandler extends VideoEventHandler {
     private _vastCampaign: VastCampaign;
     private _clientInfo: ClientInfo;
 
-    constructor(params: IVideoEventHandlerParams) {
+    constructor(params: IVideoEventHandlerParams<VastAdUnit, VastCampaign>) {
         super(params);
-        this._vastAdUnit = <VastAdUnit>params.adUnit;
-        this._vastCampaign = <VastCampaign>params.campaign;
+        this._vastAdUnit = params.adUnit;
+        this._vastCampaign = params.campaign;
         this._clientInfo = params.clientInfo;
     }
 

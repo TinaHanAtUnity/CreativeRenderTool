@@ -38,11 +38,9 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
     }
 
     public onProgress(progress: number): void {
-        this._adUnit.getContainer().addDiagnosticsEvent({type: 'onVideoProgress', position: progress});
         const overlay = this._adUnit.getOverlay();
 
         if(progress > 0 && !this._video.hasStarted()) {
-            this._adUnit.getContainer().addDiagnosticsEvent({type: 'videoStarted'});
             this._video.setStarted(true);
 
             if(overlay) {
@@ -77,7 +75,6 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
 
                 // if video player has been repeating the same video position for more than 5000 milliseconds, video player is stuck
                 if(repeats > repeatTreshold) {
-                    this._adUnit.getContainer().addDiagnosticsEvent({type: 'videoStuck'});
                     this._nativeBridge.Sdk.logError('Unity Ads video player stuck to ' + progress + 'ms position');
 
                     const error: any = {
@@ -91,8 +88,6 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
                         lowMemory: this._adUnit.isLowMemory()
                     };
 
-                    const container = this._adUnit.getContainer();
-                    error.events = container.getDiagnosticsEvents();
                     const fileId = this._video.getFileId();
 
                     if(fileId) {
@@ -154,7 +149,6 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
     }
 
     public onCompleted(url: string): void {
-        this._adUnit.getContainer().addDiagnosticsEvent({type: 'onVideoCompleted'});
         this._adUnit.setActive(false);
         this._adUnit.setFinishState(FinishState.COMPLETED);
 
@@ -168,7 +162,6 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
             return;
         }
 
-        this._adUnit.getContainer().addDiagnosticsEvent({type: 'onVideoPrepared'});
         this._adUnit.setPrepareCalled(false);
         this._adUnit.setVideoReady(true);
 
@@ -218,7 +211,6 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
     }
 
     public onPrepareTimeout(url: string): void {
-        this._adUnit.getContainer().addDiagnosticsEvent({type: 'onVideoPrepareTimeout'});
         this._nativeBridge.Sdk.logError('Unity Ads video player prepare timeout '  + url);
 
         this.handleVideoError('video_player_prepare_timeout', {
@@ -228,7 +220,6 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
     }
 
     public onPlay(url: string): void {
-        this._adUnit.getContainer().addDiagnosticsEvent({type: 'onVideoPlay'});
         this._nativeBridge.VideoPlayer.setProgressEventInterval(this._adUnit.getProgressInterval());
     }
 

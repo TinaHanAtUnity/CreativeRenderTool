@@ -7,9 +7,9 @@ export class PerformanceVideoEventHandler extends VideoEventHandler {
 
     private _performanceAdUnit: PerformanceAdUnit;
 
-    constructor(params: IVideoEventHandlerParams) {
+    constructor(params: IVideoEventHandlerParams<PerformanceAdUnit>) {
         super(params);
-        this._performanceAdUnit = <PerformanceAdUnit>params.adUnit;
+        this._performanceAdUnit = params.adUnit;
     }
 
     public onCompleted(url: string): void {

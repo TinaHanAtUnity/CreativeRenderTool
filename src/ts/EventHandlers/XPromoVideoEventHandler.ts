@@ -10,10 +10,10 @@ export class XPromoVideoEventHandler extends VideoEventHandler {
     private _xpromoAdUnit: XPromoAdUnit;
     private _xpromoOperativeEventManager: XPromoOperativeEventManager;
 
-    constructor(params: IVideoEventHandlerParams) {
+    constructor(params: IVideoEventHandlerParams<XPromoAdUnit, XPromoCampaign, XPromoOperativeEventManager>) {
         super(params);
-        this._xpromoAdUnit = <XPromoAdUnit>params.adUnit;
-        this._xpromoOperativeEventManager = <XPromoOperativeEventManager>params.operativeEventManager;
+        this._xpromoAdUnit = params.adUnit;
+        this._xpromoOperativeEventManager = params.operativeEventManager;
     }
 
     public onCompleted(url: string): void {
