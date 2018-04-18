@@ -182,6 +182,7 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
             });
             Diagnostics.trigger('video_too_long', error, this._campaign.getSession());
             this.handleVideoError('video_too_long_error');
+            return;
         }
 
         const overlay = this._adUnit.getOverlay();
