@@ -14,11 +14,11 @@ import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 
-export interface IVideoEventHandlerParams {
+export interface IVideoEventHandlerParams<T extends VideoAdUnit = VideoAdUnit, T2 extends Campaign = Campaign, T3 extends OperativeEventManager = OperativeEventManager> {
     nativeBrige: NativeBridge;
-    adUnit: VideoAdUnit;
-    campaign: Campaign;
-    operativeEventManager: OperativeEventManager;
+    adUnit: T;
+    campaign: T2;
+    operativeEventManager: T3;
     thirdPartyEventManager: ThirdPartyEventManager;
     comScoreTrackingService: ComScoreTrackingService;
     configuration: Configuration;
@@ -43,12 +43,10 @@ export abstract class BaseVideoEventHandler {
     }
 
     protected updateViewsOnVideoError() {
-        this._adUnit.getContainer().addDiagnosticsEvent({type: 'updateViewsOnVideoError'});
         this._adUnit.getContainer().reconfigure(ViewConfiguration.ENDSCREEN);
     }
 
     protected afterVideoCompleted() {
-        this._adUnit.getContainer().addDiagnosticsEvent({type: 'afterVideoCompleted'});
         this._adUnit.getContainer().reconfigure(ViewConfiguration.ENDSCREEN);
 
         const overlay = this._adUnit.getOverlay();
