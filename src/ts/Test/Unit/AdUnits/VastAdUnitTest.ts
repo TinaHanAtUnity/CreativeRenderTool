@@ -242,38 +242,6 @@ describe('VastAdUnit', () => {
     });
 
     describe('VastAdUnit progress event test', () => {
-
-        const testQuartileEvent = (quartile: number, quartileEventName: string) => {
-            const mockEventManager = sinon.mock(thirdPartyEventManager);
-            mockEventManager.expects('sendEvent').withArgs(`vast ${quartileEventName}`, '123', `http://localhost:3500/brands/14851/${quartileEventName}?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123`);
-
-            const duration = vastCampaign.getVideo().getDuration();
-            const quartilePosition = duration * 0.25 * quartile;
-            vastAdUnit.sendProgressEvents('123', 2000, quartilePosition + 100, quartilePosition - 100);
-            mockEventManager.verify();
-        };
-
-        it('sends first quartile events from VAST', () => {
-            // given a VAST placement
-            // when the session manager is told that the video has completed
-            // then the VAST complete callback URL should be requested by the event manager
-            testQuartileEvent(1, 'firstQuartile');
-        });
-
-        it('sends midpoint events from VAST', () => {
-            // given a VAST placement
-            // when the session manager is told that the video has completed
-            // then the VAST complete callback URL should be requested by the event manager
-            testQuartileEvent(2, 'midpoint');
-        });
-
-        it('sends third quartile events from VAST', () => {
-            // given a VAST placement
-            // when the session manager is told that the video has completed
-            // then the VAST complete callback URL should be requested by the event manager
-            testQuartileEvent(3, 'thirdQuartile');
-        });
-
         it('sends video click through tracking event from VAST', () => {
             const mockEventManager = sinon.mock(thirdPartyEventManager);
             mockEventManager.expects('sendEvent').withArgs('vast video click', '123', 'http://myTrackingURL.com/click');

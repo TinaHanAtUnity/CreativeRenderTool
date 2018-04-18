@@ -5,7 +5,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Overlay } from 'Views/Overlay';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
-import { PerformanceVideoEventHandlers } from 'EventHandlers/PerformanceVideoEventHandlers';
+import { PerformanceVideoEventHandler } from 'EventHandlers/PerformanceVideoEventHandler';
 import { Platform } from 'Constants/Platform';
 import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
@@ -20,6 +20,13 @@ import { FocusManager } from 'Managers/FocusManager';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
+import { IVideoEventHandlerParams } from 'EventHandlers/BaseVideoEventHandler';
+import { Placement } from 'Models/Placement';
+import { Campaign } from 'Models/Campaign';
+import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
+import { AdUnitStyle } from 'Models/AdUnitStyle';
+import { ClientInfo } from 'Models/ClientInfo';
+import { Configuration } from 'Models/Configuration';
 
 describe('PerformanceVideoEventHandlersTest', () => {
 
@@ -31,6 +38,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
     let video: Video;
     let performanceAdUnitParameters: IPerformanceAdUnitParameters;
     let comScoreService: ComScoreTrackingService;
+    let performanceVideoEventHandler: PerformanceVideoEventHandler;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -86,12 +94,28 @@ describe('PerformanceVideoEventHandlersTest', () => {
         };
 
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
+
+        const videoEventHandlerParams: IVideoEventHandlerParams = {
+            nativeBrige: nativeBridge,
+            adUnit: performanceAdUnit,
+            campaign: campaign,
+            operativeEventManager: operativeEventManager,
+            thirdPartyEventManager: thirdPartyEventManager,
+            comScoreTrackingService: comScoreService,
+            configuration: configuration,
+            placement: TestFixtures.getPlacement(),
+            video: video,
+            adUnitStyle: undefined,
+            clientInfo: clientInfo
+        };
+
+        performanceVideoEventHandler = new PerformanceVideoEventHandler(videoEventHandlerParams);
     });
 
     describe('with onVideoCompleted', () => {
         it('should show end screen', () => {
             sinon.spy(endScreen, 'show');
-            PerformanceVideoEventHandlers.onVideoCompleted(performanceAdUnit);
+            performanceVideoEventHandler.onCompleted(video.getUrl());
             sinon.assert.called(<sinon.SinonSpy>endScreen.show);
         });
     });
@@ -99,7 +123,10 @@ describe('PerformanceVideoEventHandlersTest', () => {
     describe('with onVideoError', () => {
         it('should show end screen', () => {
             sinon.spy(endScreen, 'show');
-            PerformanceVideoEventHandlers.onVideoError(performanceAdUnit);
+            // Set prepare called so that error will trigger
+            performanceAdUnit.setPrepareCalled(true);
+            // Cause an error by giving too large duration
+            performanceVideoEventHandler.onPrepared(video.getUrl(), 50000, 1024, 768);
             sinon.assert.called(<sinon.SinonSpy>endScreen.show);
         });
     });
