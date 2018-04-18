@@ -49,7 +49,6 @@ export class VastVideoEventHandler extends VideoEventHandler {
             }
             session.setEventSent(EventType.VAST_COMPLETE);
         }
-        this._vastAdUnit.sendTrackingEvent('complete', session.getId(), this._clientInfo.getSdkVersion());
 
         const moat = MoatViewabilityService.getMoat();
         if(moat) {
@@ -160,6 +159,12 @@ export class VastVideoEventHandler extends VideoEventHandler {
         } else {
             this._vastAdUnit.hide();
         }
+    }
+
+    protected handleCompleteEvent(url: string): void {
+        super.handleCompleteEvent(url);
+        const session = this._vastCampaign.getSession();
+        this._vastAdUnit.sendTrackingEvent('complete', session.getId(), this._clientInfo.getSdkVersion());
     }
 
     private sendThirdPartyTrackingEvent(eventName: string): void {
