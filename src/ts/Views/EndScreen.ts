@@ -11,6 +11,7 @@ import { Campaign } from 'Models/Campaign';
 import { IEndScreenDownloadParameters } from 'EventHandlers/EndScreenEventHandler';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { Platform } from 'Constants/Platform';
 
 export interface IEndScreenHandler {
     onEndScreenDownload(parameters: IEndScreenDownloadParameters): void;
@@ -40,8 +41,9 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     private _showOptOutPopup: boolean;
     private _gdprPopupClicked = false;
     private _campaignId: string | undefined;
+    private _osVersion: string | undefined;
 
-    constructor(nativeBridge: NativeBridge, coppaCompliant: boolean, language: string, gameId: string, gameName: string | undefined, abGroup: number, adUnitStyle?: AdUnitStyle, showOptOutPopup: boolean = false, campaignId?: string | undefined) {
+    constructor(nativeBridge: NativeBridge, coppaCompliant: boolean, language: string, gameId: string, gameName: string | undefined, abGroup: number, adUnitStyle?: AdUnitStyle, showOptOutPopup: boolean = false, campaignId?: string | undefined, osVersion?: string | undefined) {
         super(nativeBridge, 'end-screen');
         this._coppaCompliant = coppaCompliant;
         this._localization = new Localization(language, 'endscreen');
@@ -50,6 +52,8 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._adUnitStyle = adUnitStyle;
         this._showOptOutPopup = showOptOutPopup;
         this._campaignId = campaignId;
+        this._osVersion = osVersion;
+
         this._template = new Template(this.getTemplate(), this._localization);
 
         this._bindings = [
@@ -160,7 +164,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         }
 
         const campaignId = campaign ? campaign.getId() : this._campaignId;
-        if (campaignId === SQUARE_END_SCREEN_CAMPAIGN_ID && this._abGroup === SQUARE_END_SCREEN_AB_GROUP) {
+        if (!this.isAndroid4Device() && campaignId === SQUARE_END_SCREEN_CAMPAIGN_ID && this._abGroup === SQUARE_END_SCREEN_AB_GROUP) {
             return SQUARE_END_SCREEN;
         }
 
@@ -194,6 +198,30 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._privacy.render();
         document.body.appendChild(this._privacy.container());
         this._privacy.addEventHandler(this);
+    }
+
+    private isAndroid4Device() {
+        if (!this._osVersion || this._nativeBridge.getPlatform() === Platform.IOS) {
+            return true;
+        }
+        console.log('OS VERSION', this._osVersion);
+        return this._osVersion.match(/^4\./);
+    }
+
+    private isIPhoneX(): boolean {
+        const isIPhone: boolean = /iPhone/.test(navigator.userAgent);
+
+        if (!isIPhone) {
+            return false;
+        }
+
+        const ratio: number = window.devicePixelRatio;
+        const screenSize = {
+            height: window.screen.height * ratio,
+            width: window.screen.width * ratio,
+        };
+
+        return (screenSize.height === 1125 && screenSize.width === 2436) || (screenSize.height === 2436 && screenSize.width === 1125);
     }
 
     private getTemplate() {
