@@ -25,7 +25,7 @@ const GDPR_OPT_OUT_ALT  = 'gdpr-pop-up-alt';
 
 const SQUARE_END_SCREEN = 'square-end-screen';
 // TODO: Use actual group and campaign id
-const SQUARE_END_SCREEN_CAMPAIGN_ID = '5a84800a6ac4fd047aa50595';
+const SQUARE_END_SCREEN_CAMPAIGN_ID = '59c2364247257b1456ac3778';
 const SQUARE_END_SCREEN_AB_GROUP = 5;
 
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
