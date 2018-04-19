@@ -525,18 +525,29 @@ export class CampaignManager {
         const placementRequest: any = {};
 
         if(realtimePlacement && this._realtimeBody) {
-            placementRequest[realtimePlacement.getId()] = {
-                adTypes: realtimePlacement.getAdTypes(),
-                allowSkip: realtimePlacement.allowSkip(),
-            };
-            this._realtimeBody.placements = placementRequest;
+
+            const placements = this._configuration.getPlacements();
+            for (const placement in placements) {
+                if (placements.hasOwnProperty(placement)) {
+                    placementRequest[placement] = {
+                        adTypes: placements[placement].getAdTypes(),
+                        allowSkip: placements[placement].allowSkip(),
+                    };
+                }
+            }
 
             if(realtimePlacement.getRealtimeData()) {
                 const realtimeDataObject: any = {};
                 realtimeDataObject[realtimePlacement.getId()] = realtimePlacement.getRealtimeData();
                 this._realtimeBody.realtimeData = realtimeDataObject;
             }
-            return Promise.resolve(this._realtimeBody);
+
+            return this._deviceInfo.getFreeSpace().then((freeSpace) => {
+                if (freeSpace) {
+                    this._realtimeBody.deviceFreeSpace = freeSpace;
+                }
+                return Promise.resolve(this._realtimeBody);
+            });
         }
         this._realtimeBody = undefined;
 
