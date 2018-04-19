@@ -29,6 +29,7 @@ import { CacheError } from 'Native/Api/Cache';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 import { CampaignParserFactory } from 'Managers/CampaignParserFactory';
+import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
 import { UserCountData } from 'Utilities/UserCountData';
 
 export class CampaignManager {
@@ -78,6 +79,7 @@ export class CampaignManager {
     protected _assetManager: AssetManager;
     protected _configuration: Configuration;
     protected _clientInfo: ClientInfo;
+    protected _cacheBookkeeping: CacheBookkeeping;
     private _adMobSignalFactory: AdMobSignalFactory;
     private _sessionManager: SessionManager;
     private _metaDataManager: MetaDataManager;
@@ -86,8 +88,9 @@ export class CampaignManager {
     private _previousPlacementId: string | undefined;
     private _realtimeUrl: string | undefined;
     private _realtimeBody: any = {};
+    private _ignoreEvents: boolean;
 
-    constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager) {
+    constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeeping) {
         this._nativeBridge = nativeBridge;
         this._configuration = configuration;
         this._assetManager = assetManager;
@@ -97,7 +100,33 @@ export class CampaignManager {
         this._deviceInfo = deviceInfo;
         this._metaDataManager = metaDataManager;
         this._adMobSignalFactory = adMobSignalFactory;
+        this._cacheBookkeeping = cacheBookkeeping;
         this._requesting = false;
+        this._ignoreEvents = false;
+    }
+
+    public requestFromCache(cachedResponse: INativeResponse): Promise<void[] | void> {
+        if(this._requesting) {
+            return Promise.resolve();
+        }
+
+        this._assetManager.enableCaching();
+        this._assetManager.checkFreeSpace();
+
+        this._ignoreEvents = true;
+        this._requesting = true;
+
+        this.resetRealtimeDataForPlacements();
+
+        this._nativeBridge.Sdk.logInfo('Requesting ad plan from cache ' + cachedResponse.url);
+
+        return this.parseCampaigns(cachedResponse).then(() => {
+                this._ignoreEvents = false;
+                this._requesting = false;
+            }).catch((error) => {
+                this._ignoreEvents = false;
+                this._requesting = false;
+            });
     }
 
     public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
@@ -135,6 +164,7 @@ export class CampaignManager {
                 });
             }).then(response => {
                 if(response) {
+                    this._cacheBookkeeping.setCachedCampaignResponse(response);
                     this.setSDKSignalValues(requestTimestamp);
 
                     return this.parseCampaigns(response).catch((e) => {
@@ -263,8 +293,10 @@ export class CampaignManager {
                 }
             }
 
-            this._nativeBridge.Sdk.logInfo('AdPlan received with ' + campaigns + ' campaigns and refreshDelay ' + refreshDelay);
-            this.onAdPlanReceived.trigger(refreshDelay, campaigns);
+            if (!this._ignoreEvents) {
+                this._nativeBridge.Sdk.logInfo('AdPlan received with ' + campaigns + ' campaigns and refreshDelay ' + refreshDelay);
+                this.onAdPlanReceived.trigger(refreshDelay, campaigns);
+            }
 
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
@@ -369,13 +401,17 @@ export class CampaignManager {
 
     private handleNoFill(placement: string): Promise<void> {
         this._nativeBridge.Sdk.logDebug('PLC no fill for placement ' + placement);
-        this.onNoFill.trigger(placement);
+        if (!this._ignoreEvents) {
+            this.onNoFill.trigger(placement);
+        }
         return Promise.resolve();
     }
 
     private handleError(error: any, placementIds: string[], diagnosticsType: string, session?: Session): Promise<void> {
         this._nativeBridge.Sdk.logDebug('PLC error ' + error);
-        this.onError.trigger(error, placementIds, diagnosticsType, session);
+        if (!this._ignoreEvents) {
+            this.onError.trigger(error, placementIds, diagnosticsType, session);
+        }
 
         return Promise.resolve();
     }
@@ -493,6 +529,7 @@ export class CampaignManager {
                 adTypes: realtimePlacement.getAdTypes(),
                 allowSkip: realtimePlacement.allowSkip(),
             };
+            this._realtimeBody.placements = placementRequest;
 
             if(realtimePlacement.getRealtimeData()) {
                 const realtimeDataObject: any = {};

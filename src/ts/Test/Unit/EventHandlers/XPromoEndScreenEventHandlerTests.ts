@@ -137,6 +137,10 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 handleCallback
             }, Platform.IOS);
 
+            campaign = TestFixtures.getXPromoCampaign();
+            campaign.set('store', StoreName.APPLE);
+            campaign.set('appStoreId', '11111');
+
             container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager);
             const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request = new Request(nativeBridge, wakeUpManager);
@@ -159,10 +163,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
 
             sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
             sinon.stub(operativeEventManager, 'sendHttpKafkaEvent').returns(resolvedPromise);
+            sinon.stub(deviceInfo, 'getOsVersion').returns('9.0');
             const video = new Video('', TestFixtures.getSession());
-            campaign = TestFixtures.getXPromoCampaign();
-            campaign.set('store', StoreName.APPLE);
-            campaign.set('appStoreId', '11111');
 
             endScreen = new XPromoEndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
@@ -191,11 +193,6 @@ describe('XPromoEndScreenEventHandlerTest', () => {
         });
 
         it('should send a click to HttpKafka', () => {
-            sinon.stub(deviceInfo, 'getOsVersion').returns('9.0');
-            xPromoAdUnitParameters.deviceInfo = deviceInfo;
-            xPromoAdUnit = new XPromoAdUnit(nativeBridge, xPromoAdUnitParameters);
-            endScreenEventHandler = new XPromoEndScreenEventHandler(nativeBridge, xPromoAdUnit, xPromoAdUnitParameters);
-
             endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                 appStoreId: xPromoAdUnitParameters.campaign.getAppStoreId(),
                 bypassAppSheet: xPromoAdUnitParameters.campaign.getBypassAppSheet(),
