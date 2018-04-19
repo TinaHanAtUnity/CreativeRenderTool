@@ -1,3 +1,8 @@
+# Thu Apr 19 10:15:46 UTC 2018
+
+* Add more realtime diagnostic information for kibana
+* Fetch and add sid when sending xpromo events (redeem callback fix for xpromo)
+
 # Tue Apr 17 10:14:11 UTC 2018
 
 * GDPR pop-up A/B test in groups 16 & 17

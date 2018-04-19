@@ -92,6 +92,7 @@ export class WebView {
 
     private _creativeUrl?: string;
     private _requestDelay: number;
+    private _wasRealtimePlacement: boolean = false;
 
     private _cachedCampaignResponse: INativeResponse | undefined;
 
@@ -307,6 +308,7 @@ export class WebView {
 
                 if(realtimeCampaign) {
                     this._nativeBridge.Sdk.logInfo('Unity Ads received new fill for placement ' + placement.getId() + ', streaming new ad unit');
+                    this._wasRealtimePlacement = true;
                     placement.setCurrentCampaign(realtimeCampaign);
                     this.showAd(placement, realtimeCampaign, options);
                 } else {
@@ -418,6 +420,8 @@ export class WebView {
                         startDelay: startDelay,
                         totalDelay: this._requestDelay + startDelay,
                         auctionId: campaign.getSession().getId(),
+                        wasRealtime: this._wasRealtimePlacement,
+                        campaignRawResponse: campaign.getAdType()
                     });
                 });
             }
