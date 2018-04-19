@@ -1,4 +1,4 @@
-# Pending
+# Thu Apr 19 10:15:46 UTC 2018
 
 * Add more realtime diagnostic information for kibana
 * Fetch and add sid when sending xpromo events (redeem callback fix for xpromo)
