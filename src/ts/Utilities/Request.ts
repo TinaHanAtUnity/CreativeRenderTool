@@ -258,8 +258,12 @@ export class Request {
             this.jaegerManager.stopNetworkSpan(jaegerSpan, this._nativeBridge.getPlatform(), resp.responseCode.toString());
             return resp;
         }).catch((resp) => {
-            this.jaegerManager.stopNetworkSpan(jaegerSpan, this._nativeBridge.getPlatform(), resp.nativeResponse.responseCode.toString());
-            return resp;
+            let responseCode: string = '';
+            if (resp && resp.nativeResponse && resp.nativeResponse.responseCode) {
+                responseCode = resp.nativeResponse.responseCode.toString();
+            }
+            this.jaegerManager.stopNetworkSpan(jaegerSpan, this._nativeBridge.getPlatform(), responseCode);
+            throw resp;
         });
     }
 
@@ -285,8 +289,12 @@ export class Request {
             this.jaegerManager.stopNetworkSpan(jaegerSpan, this._nativeBridge.getPlatform(), resp.responseCode.toString());
             return resp;
         }).catch((resp) => {
-            this.jaegerManager.stopNetworkSpan(jaegerSpan, this._nativeBridge.getPlatform(), resp.nativeResponse.responseCode.toString());
-            return resp;
+            let responseCode: string = '';
+            if (resp && resp.nativeResponse && resp.nativeResponse.responseCode) {
+                responseCode = resp.nativeResponse.responseCode.toString();
+            }
+            this.jaegerManager.stopNetworkSpan(jaegerSpan, this._nativeBridge.getPlatform(), responseCode);
+            throw resp;
         });
     }
 

@@ -85,8 +85,8 @@ export class JaegerSpan {
     private tags: JaegerTags = new JaegerTags(Platform.TEST);
 
     constructor(name: string, serviceName: string, annotations: JaegerAnnotation[]) {
-        this.name = name;
-        this.localEndpoint = new JaegerLocalEndpoint(serviceName);
+        this.name = this.stripQueryAndFragment(name);
+        this.localEndpoint = new JaegerLocalEndpoint(this.stripQueryAndFragment(serviceName));
         this.annotations = annotations;
     }
 
@@ -108,6 +108,10 @@ export class JaegerSpan {
         const tags = new JaegerProcessTags(platform, errorMessage);
         this.tags = tags;
         this.duration = JaegerSpan.genTimestamp() - this.timestamp;
+    }
+
+    private stripQueryAndFragment(url: string): string {
+        return url.split(/[?#]/)[0];
     }
 
 }
