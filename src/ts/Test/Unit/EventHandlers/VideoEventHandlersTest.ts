@@ -329,6 +329,7 @@ describe('VideoEventHandlersTest', () => {
             operativeEventManagerParams.campaign = TestFixtures.getXPromoCampaign();
             const xPromoOperativeEventManager = <XPromoOperativeEventManager>OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
             sinon.spy(xPromoOperativeEventManager, 'sendView');
+            sinon.spy(xPromoOperativeEventManager, 'sendViewEvent');
             sinon.spy(xPromoOperativeEventManager, 'sendHttpKafkaEvent');
 
             const xPromoAdUnit = new XPromoAdUnit(nativeBridge, xPromoAdUnitParameters);
@@ -337,6 +338,7 @@ describe('VideoEventHandlersTest', () => {
 
             sinon.assert.notCalled(<sinon.SinonSpy>comScoreService.sendEvent);
             sinon.assert.notCalled(<sinon.SinonSpy>xPromoOperativeEventManager.sendView);
+            sinon.assert.called(<sinon.SinonSpy>xPromoOperativeEventManager.sendViewEvent);
             sinon.assert.calledWith(<sinon.SinonSpy>xPromoOperativeEventManager.sendHttpKafkaEvent, 'ads.xpromo.operative.videoview.v1.json', 'view', placement, xPromoAdUnit.getVideoOrientation());
         });
     });
@@ -628,7 +630,7 @@ describe('VideoEventHandlersTest', () => {
             operativeEventManagerParams.campaign = TestFixtures.getXPromoCampaign();
             const xPromoOperativeEventManager = <XPromoOperativeEventManager>OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
 
-            sinon.spy(xPromoOperativeEventManager, 'sendHttpKafkaEvent');
+            sinon.spy(xPromoOperativeEventManager, 'sendStartEvent');
             sinon.spy(xPromoOperativeEventManager, 'sendEvent');
             operativeEventManagerParams.campaign = xPromoCampaign;
             xPromoAdUnitParameters.operativeEventManager = xPromoOperativeEventManager;
@@ -638,7 +640,7 @@ describe('VideoEventHandlersTest', () => {
             VideoEventHandlers.onVideoProgress(nativeBridge, xPromoOperativeEventManager, thirdPartyEventManager, comScoreService, xPromoAdUnit, 1, TestFixtures.getConfiguration(), xPromoCampaign, placement);
 
             sinon.assert.notCalled(<sinon.SinonSpy>xPromoOperativeEventManager.sendEvent);
-            sinon.assert.calledWith(<sinon.SinonSpy>xPromoOperativeEventManager.sendHttpKafkaEvent, 'ads.xpromo.operative.videostart.v1.json', 'start', placement, xPromoAdUnit.getVideoOrientation());
+            sinon.assert.called(<sinon.SinonSpy>xPromoOperativeEventManager.sendStartEvent);
         });
     });
 });
