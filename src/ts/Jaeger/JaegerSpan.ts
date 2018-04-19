@@ -1,5 +1,4 @@
-import { NativeBridge } from "Native/NativeBridge";
-import { Platform } from "Constants/Platform";
+import { Platform } from 'Constants/Platform';
 
 class JaegerLocalEndpoint {
     private serviceName: string;
@@ -37,6 +36,15 @@ export class JaegerNetworkTags extends JaegerTags {
     constructor(platform: Platform, statusCode: string) {
         super(platform);
         this.statusCode = statusCode;
+    }
+}
+
+class JaegerProcessTags extends JaegerTags {
+    private errorMessage?: string;
+
+    constructor(platform: Platform, errorMessage?: string) {
+        super(platform);
+        this.errorMessage = errorMessage;
     }
 }
 
@@ -90,8 +98,14 @@ export class JaegerSpan {
         return this.id;
     }
 
-    public stop(platform: Platform, responseCode: string) {
+    public stopNetwork(platform: Platform, responseCode: string) {
         const tags = new JaegerNetworkTags(platform, responseCode);
+        this.tags = tags;
+        this.duration = JaegerSpan.genTimestamp() - this.timestamp;
+    }
+
+    public stopProcess(platform: Platform, errorMessage?: string) {
+        const tags = new JaegerProcessTags(platform, errorMessage);
         this.tags = tags;
         this.duration = JaegerSpan.genTimestamp() - this.timestamp;
     }

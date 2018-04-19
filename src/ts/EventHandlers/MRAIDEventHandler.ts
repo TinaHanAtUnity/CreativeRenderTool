@@ -8,7 +8,7 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { EventType } from 'Models/Session';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
-import { Request } from 'Utilities/Request';
+import { Request, NativeRequestBridge } from 'Utilities/Request';
 import { Platform } from 'Constants/Platform';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { RequestError } from 'Errors/RequestError';
@@ -135,7 +135,7 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
         const useWebViewUA = this._campaign.getUseWebViewUserAgentForTracking();
         if(this._campaign.getClickAttributionUrlFollowsRedirects() && clickAttributionUrl) {
             this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, true, useWebViewUA).then(response => {
-                const location = Request.getHeader(response.headers, 'location');
+                const location = NativeRequestBridge.getHeader(response.headers, 'location');
                 if(location) {
                     this.openUrl(location);
                 } else {

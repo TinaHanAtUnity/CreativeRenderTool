@@ -58,6 +58,8 @@ import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
 import { Timer } from 'Utilities/Timer';
 import { TimeoutError, Promises } from 'Utilities/Promises';
+import { JaegerSpan } from 'Jaeger/JaegerSpan';
+import { JaegerManager } from 'Jaeger/JaegerManager';
 
 export class WebView {
 
@@ -108,6 +110,7 @@ export class WebView {
     }
 
     public initialize(): Promise<void | any[]> {
+        const jaegerInitSpan = new JaegerSpan('initialize', 'Client Process', []); // start a span
         return this._nativeBridge.Sdk.loadComplete().then((data) => {
             this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
 
@@ -132,6 +135,8 @@ export class WebView {
             this._thirdPartyEventManager = new ThirdPartyEventManager(this._nativeBridge, this._request);
             this._metadataManager = new MetaDataManager(this._nativeBridge);
             this._adMobSignalFactory = new AdMobSignalFactory(this._nativeBridge, this._clientInfo, this._deviceInfo, this._focusManager);
+
+            this._request.jaegerManager.addOpenSpan(jaegerInitSpan);
 
             HttpKafka.setRequest(this._request);
             HttpKafka.setClientInfo(this._clientInfo);
@@ -186,6 +191,7 @@ export class WebView {
         }).then(([configuration]) => {
             this._configuration = configuration;
             HttpKafka.setConfiguration(this._configuration);
+            this._request.jaegerManager.setJaegerTracingEnabled(this._configuration.isJaegerTracingEnabled());
 
             PurchasingUtilities.setConfiguration(this._configuration);
             PurchasingUtilities.setClientInfo(this._clientInfo);
@@ -235,9 +241,12 @@ export class WebView {
             return this._refreshManager.refresh();
         }).then(() => {
             this._initialized = true;
+            this._request.jaegerManager.stopProcessSpan(jaegerInitSpan, this._nativeBridge.getPlatform());
 
             return this._sessionManager.sendUnsentSessions();
         }).catch(error => {
+            this._request.jaegerManager.stopProcessSpan(jaegerInitSpan, this._nativeBridge.getPlatform(), JSON.stringify(error));
+
             if(error instanceof ConfigError) {
                 error = { 'message': error.message, 'name': error.name };
                 this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], error.message);

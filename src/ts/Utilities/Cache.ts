@@ -4,7 +4,7 @@ import { StorageType } from 'Native/Api/Storage';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
-import { Request } from 'Utilities/Request';
+import { Request, NativeRequestBridge } from 'Utilities/Request';
 import { HttpKafka } from 'Utilities/HttpKafka';
 import { Observable0 } from 'Utilities/Observable';
 import { FileInfo } from 'Utilities/FileInfo';
@@ -302,17 +302,17 @@ export class Cache {
 
         const callback = this._callbacks[url];
         if(callback) {
-            if(Request.AllowedResponseCodes.exec(responseCode.toString())) {
+            if(NativeRequestBridge.AllowedResponseCodes.exec(responseCode.toString())) {
                 this._cacheBookkeeping.writeFileEntry(callback.fileId, this._cacheBookkeeping.createFileInfo(true, size, totalSize, FileId.getFileIdExtension(callback.fileId)));
                 this.sendDiagnostic(CacheDiagnosticEvent.FINISHED, callback);
                 this.fulfillCallback(url, CacheStatus.OK);
                 SdkStats.setCachingFinishTimestamp(callback.fileId);
                 return;
-            } else if(Request.RedirectResponseCodes.exec(responseCode.toString())) {
+            } else if(NativeRequestBridge.RedirectResponseCodes.exec(responseCode.toString())) {
                 this.sendDiagnostic(CacheDiagnosticEvent.REDIRECTED, callback);
                 this._cacheBookkeeping.removeFileEntry(callback.fileId);
                 this._nativeBridge.Cache.deleteFile(callback.fileId);
-                const location = Request.getHeader(headers, 'location');
+                const location = NativeRequestBridge.getHeader(headers, 'location');
                 if(location) {
                     let fileId = callback.fileId;
                     let originalUrl = url;
@@ -413,7 +413,7 @@ export class Cache {
 
     private handleRequestRangeError(callback: ICallbackObject, url: string): void {
         Promise.all([this._nativeBridge.Cache.getFileInfo(callback.fileId), this._request.head(url)]).then(([fileInfo, response]) => {
-            const contentLength = Request.getHeader(response.headers, 'Content-Length');
+            const contentLength = NativeRequestBridge.getHeader(response.headers, 'Content-Length');
 
             if(response.responseCode === 200 && fileInfo.found && contentLength && fileInfo.size === parseInt(contentLength, 10) && fileInfo.size > 0) {
                 Diagnostics.trigger('cache_desync_fixed', {
