@@ -11,7 +11,7 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { RequestError } from 'Errors/RequestError';
 import { DiagnosticError } from 'Errors/DiagnosticError';
-import { Request, NativeRequestBridge } from 'Utilities/Request';
+import { NativeRequestBridge } from 'Utilities/Request';
 import { Campaign } from 'Models/Campaign';
 import { Placement } from 'Models/Placement';
 import { Url } from 'Utilities/Url';

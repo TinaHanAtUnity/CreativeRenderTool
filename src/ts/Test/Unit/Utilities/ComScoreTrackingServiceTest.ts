@@ -11,6 +11,8 @@ import { Platform } from 'Constants/Platform';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { FocusManager } from 'Managers/FocusManager';
 import { Request } from 'Utilities/Request';
+import { DH_NOT_SUITABLE_GENERATOR } from 'constants';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 describe('ComScoreTrackingServiceTest', () => {
     const stubbedDateNowPlay: number = 3333;
@@ -25,7 +27,6 @@ describe('ComScoreTrackingServiceTest', () => {
     let thirdPartyEventManager: ThirdPartyEventManager;
     let focusManager: FocusManager;
 
-    let spy: sinon.SinonSpy;
     let comscoreService: ComScoreTrackingService;
     let sha1edAdvertisingTrackingId: string;
 
@@ -42,30 +43,37 @@ describe('ComScoreTrackingServiceTest', () => {
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         comscoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
-        spy = sinon.spy(thirdPartyEventManager, 'sendEvent');
         sha1edAdvertisingTrackingId = '55315d765868baf4ae1b54681af18d4db20a6056';
     });
 
-    afterEach(() => {
-        spy.reset();
-    });
-
     describe('when calling sendEvent', () => {
+        let sendEventStub: sinon.SinonStub;
+        beforeEach(() => {
+            sendEventStub = sinon.stub(thirdPartyEventManager, 'sendEvent');
+        });
+
+        afterEach(() => {
+            sendEventStub.restore();
+        });
+
         it('thirdPartyManger\'s sendEvent is called', () => {
             comscoreService.sendEvent('play', TestFixtures.getSession().getId(), '20', 15, TestFixtures.getCampaign().getCreativeId(), undefined, undefined);
-            sinon.assert.calledOnce(<sinon.SinonSpy>thirdPartyEventManager.sendEvent);
+            sinon.assert.calledOnce(<sinon.SinonStub>thirdPartyEventManager.sendEvent);
         });
     });
 
     describe('when constructing url via setEventUrl()', () => {
+        let sendEventStub: sinon.SinonStub;
 
         beforeEach(() => {
             sinon.stub(Date, 'now').onFirstCall().callsFake(() => stubbedDateNowPlay)
                 .onSecondCall().callsFake(() => stubbedDateNowEnd);
+            sendEventStub = sinon.stub(thirdPartyEventManager, 'sendEvent');
         });
 
         afterEach(() => {
             (<sinon.SinonStub>Date.now).restore();
+            sendEventStub.restore();
         });
 
         let urlPlay: string;
@@ -75,9 +83,9 @@ describe('ComScoreTrackingServiceTest', () => {
 
         const fillComscoreParams = () => {
             comscoreService.sendEvent('play', TestFixtures.getSession().getId(), '20', 0, TestFixtures.getCampaign().getCreativeId(), undefined, undefined);
-            urlPlay = spy.args[0][2];
             comscoreService.sendEvent('end', TestFixtures.getSession().getId(), '20', 15, TestFixtures.getCampaign().getCreativeId(), undefined, undefined);
-            urlEnd = spy.args[1][2];
+            urlPlay = sendEventStub.firstCall.args[2];
+            urlEnd = sendEventStub.secondCall.args[2];
             queryParamsDictPlay = getDictFromQueryString(urlPlay.split('?')[1]);
             queryParamsDictEnd = getDictFromQueryString(urlEnd.split('?')[1]);
         };

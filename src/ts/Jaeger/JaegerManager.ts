@@ -20,6 +20,10 @@ export class JaegerManager {
         this._isJaegerTracingEnabled = value;
     }
 
+    public isJaegerTracingEnabled(): boolean {
+        return this._isJaegerTracingEnabled;
+    }
+
     public getTraceId(span: JaegerSpan): string {
         const jaegerFlags = this._isJaegerTracingEnabled ? '01' : '00';
         const jaegerTraceId: string = span.getTraceId() + ':' + span.getId() + ':' + span.getId() + ':' + jaegerFlags;

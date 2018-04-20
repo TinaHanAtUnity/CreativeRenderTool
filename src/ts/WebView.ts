@@ -55,7 +55,6 @@ import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
 import { TimeoutError, Promises } from 'Utilities/Promises';
 import { JaegerSpan } from 'Jaeger/JaegerSpan';
-import { JaegerManager } from 'Jaeger/JaegerManager';
 
 export class WebView {
 

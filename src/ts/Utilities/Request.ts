@@ -245,9 +245,10 @@ export class Request {
         }
 
         const jaegerSpan = this.jaegerManager.startSpan(url, 'Client Request', []); // start a span
-        const jaegerTraceId = this.jaegerManager.getTraceId(jaegerSpan);
-
-        headers.push(['uber-trace-id', jaegerTraceId]);
+        if (this.jaegerManager.isJaegerTracingEnabled()) {
+            const jaegerTraceId = this.jaegerManager.getTraceId(jaegerSpan);
+            headers.push(['uber-trace-id', jaegerTraceId]);
+        }
         return this._nativeRequest.invokeRequest({
             method: RequestMethod.GET,
             url: url,
@@ -275,9 +276,10 @@ export class Request {
         headers.push(['Content-Type', 'application/json']);
 
         const jaegerSpan = this.jaegerManager.startSpan(url, 'Client Request', []); // start a span
-        const jaegerTraceId: string = this.jaegerManager.getTraceId(jaegerSpan);
-
-        headers.push(['uber-trace-id', jaegerTraceId]);
+        if (this.jaegerManager.isJaegerTracingEnabled()) {
+            const jaegerTraceId: string = this.jaegerManager.getTraceId(jaegerSpan);
+            headers.push(['uber-trace-id', jaegerTraceId]);
+        }
         return this._nativeRequest.invokeRequest({
             method: RequestMethod.POST,
             url: url,
