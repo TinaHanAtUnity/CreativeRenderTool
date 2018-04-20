@@ -11,10 +11,11 @@ import { Image } from 'Models/Assets/Image';
 import { HTML } from 'Models/Assets/HTML';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { Diagnostics } from 'Utilities/Diagnostics';
+import { SquareEndScreenUtilities } from 'Utilities/SquareEndScreenUtilities';
 
 export class CometCampaignParser extends CampaignParser {
     public static ContentType = 'comet/campaign';
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number, osVersion?: string): Promise<Campaign> {
         const json = response.getJsonContent();
 
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';
@@ -117,6 +118,12 @@ export class CometCampaignParser extends CampaignParser {
             if(json.trailerPortraitDownloadable && json.trailerPortraitDownloadableSize && json.trailerPortraitStreaming) {
                 parameters.videoPortrait = new Video(this.validateAndEncodeUrl(json.trailerPortraitDownloadable, session), session, json.trailerPortraitDownloadableSize);
                 parameters.streamingPortraitVideo = new Video(this.validateAndEncodeUrl(json.trailerPortraitStreaming, session), session);
+            }
+
+            if(SquareEndScreenUtilities.useSquareEndScreenAlt(abGroup, nativeBridge.getPlatform(), baseCampaignParams.id, osVersion)) {
+                const customImage = new Image(this.validateAndEncodeUrl(SquareEndScreenUtilities.getCustomImage(baseCampaignParams.id), session), session);
+                parameters.landscapeImage = customImage;
+                parameters.portraitImage = customImage;
             }
 
             return Promise.resolve(new PerformanceCampaign(parameters));

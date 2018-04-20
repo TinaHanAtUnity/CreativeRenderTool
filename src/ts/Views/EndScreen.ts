@@ -12,6 +12,7 @@ import { IEndScreenDownloadParameters } from 'EventHandlers/EndScreenEventHandle
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { Platform } from 'Constants/Platform';
+import { SquareEndScreenUtilities } from 'Utilities/SquareEndScreenUtilities';
 
 export interface IEndScreenHandler {
     onEndScreenDownload(parameters: IEndScreenDownloadParameters): void;
@@ -25,9 +26,6 @@ const GDPR_OPT_OUT_BASE  = 'gdpr-pop-up-base';
 const GDPR_OPT_OUT_ALT  = 'gdpr-pop-up-alt';
 
 const SQUARE_END_SCREEN = 'square-end-screen';
-// TODO: Use actual group and campaign id
-const SQUARE_END_SCREEN_CAMPAIGN_ID = '59c2364247257b1456ac3778';
-const SQUARE_END_SCREEN_AB_GROUP = 5;
 
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
 
@@ -164,7 +162,8 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         }
 
         const campaignId = campaign ? campaign.getId() : this._campaignId;
-        if (!this.isAndroid4Device() && campaignId === SQUARE_END_SCREEN_CAMPAIGN_ID && this._abGroup === SQUARE_END_SCREEN_AB_GROUP) {
+        const platform = this._nativeBridge.getPlatform();
+        if (SquareEndScreenUtilities.useSquareEndScreenAlt(this._abGroup, platform, campaignId, this._osVersion)) {
             return SQUARE_END_SCREEN;
         }
 
@@ -198,14 +197,6 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._privacy.render();
         document.body.appendChild(this._privacy.container());
         this._privacy.addEventHandler(this);
-    }
-
-    private isAndroid4Device() {
-        if (!this._osVersion || this._nativeBridge.getPlatform() === Platform.IOS) {
-            return true;
-        }
-        console.log('OS VERSION', this._osVersion);
-        return this._osVersion.match(/^4\./);
     }
 
     private isIPhoneX(): boolean {
