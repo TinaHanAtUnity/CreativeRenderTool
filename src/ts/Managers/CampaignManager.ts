@@ -529,6 +529,7 @@ export class CampaignManager {
                 adTypes: realtimePlacement.getAdTypes(),
                 allowSkip: realtimePlacement.allowSkip(),
             };
+            this._realtimeBody.placements = placementRequest;
 
             if(realtimePlacement.getRealtimeData()) {
                 const realtimeDataObject: any = {};

@@ -10,6 +10,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { CampaignManager } from 'Managers/CampaignManager';
 import { Platform } from 'Constants/Platform';
 import { WebViewError } from 'Errors/WebViewError';
+import { SdkStats } from 'Utilities/SdkStats';
 import { Session } from 'Models/Session';
 import { ReinitManager } from 'Managers/ReinitManager';
 import { PlacementManager } from 'Managers/PlacementManager';
@@ -399,9 +400,19 @@ export class NewRefreshManager extends RefreshManager {
             const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
                 this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
                 this._placementManager.setPlacementState(placementId, newState);
+                if (newState === PlacementState.READY) {
+                    SdkStats.setReadyEventTimestamp(placementId);
+                    SdkStats.sendReadyEvent(placementId);
+                    this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + placementId + ' request to ready time took ' + SdkStats.getRequestToReadyTime(placementId));
+                }
             });
         } else {
             this._placementManager.setPlacementState(placementId, newState);
+            if (newState === PlacementState.READY) {
+                SdkStats.setReadyEventTimestamp(placementId);
+                SdkStats.sendReadyEvent(placementId);
+                this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + placementId + ' request to ready time took ' + SdkStats.getRequestToReadyTime(placementId));
+            }
         }
     }
 }

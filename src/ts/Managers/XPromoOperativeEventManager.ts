@@ -1,9 +1,9 @@
 import { IOperativeEventManagerParams, OperativeEventManager } from 'Managers/OperativeEventManager';
-import { Session } from 'Models/Session';
-import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { Placement } from 'Models/Placement';
-import { IXPromoCampaign, XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
+import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { HttpKafka } from 'Utilities/HttpKafka';
+import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
+import { EventType } from 'Models/Session';
 
 export class XPromoOperativeEventManager extends OperativeEventManager {
     private _xPromoCampaign: XPromoCampaign;
@@ -12,6 +12,53 @@ export class XPromoOperativeEventManager extends OperativeEventManager {
         super(params);
 
         this._xPromoCampaign = params.campaign;
+    }
+
+    public sendStartEvent(placement: Placement, videoOrientation?: string): Promise<void> {
+        const session = this._campaign.getSession();
+
+        if(session.getEventSent(EventType.START)) {
+            return Promise.resolve();
+        }
+
+        session.setEventSent(EventType.START);
+
+        return this._metaDataManager.fetch(PlayerMetaData, false).then(player => {
+            if(player) {
+                this.setGamerServerId(player.getServerId());
+            } else {
+                this.setGamerServerId(undefined);
+            }
+            return this.sendHttpKafkaEvent('ads.xpromo.operative.videostart.v1.json', 'start', placement, videoOrientation);
+        }).then(() => {
+            return;
+        });
+    }
+
+    public sendViewEvent(placement: Placement, videoOrientation?: string): Promise<void> {
+        const session = this._campaign.getSession();
+
+        if(session.getEventSent(EventType.VIEW)) {
+            return Promise.resolve(void(0));
+        }
+        session.setEventSent(EventType.VIEW);
+
+        return this.sendHttpKafkaEvent('ads.xpromo.operative.videoview.v1.json', 'view', placement, videoOrientation).then(() => {
+            return;
+        });
+    }
+
+    public sendClickEvent(placement: Placement, videoOrientation?: string): Promise<void> {
+        const session = this._campaign.getSession();
+
+        if(session.getEventSent(EventType.CLICK)) {
+            return Promise.resolve(void(0));
+        }
+        session.setEventSent(EventType.CLICK);
+
+        return this.sendHttpKafkaEvent('ads.xpromo.operative.videoclick.v1.json', 'click', placement, videoOrientation).then(() => {
+            return;
+        });
     }
 
     public sendHttpKafkaEvent(kafkaType: string, eventType: string, placement: Placement, videoOrientation?: string) {
@@ -37,7 +84,7 @@ export class XPromoOperativeEventManager extends OperativeEventManager {
             infoJson.sourceGameId = this._clientInfo.getGameId();
             infoJson.targetGameId = this._xPromoCampaign.getGameId().toString();
 
-            HttpKafka.sendEvent(kafkaType, infoJson);
+            return HttpKafka.sendEvent(kafkaType, infoJson);
         };
 
         return this.createUniqueEventMetadata(placement, this._sessionManager.getGameSessionId(), this._gamerServerId, OperativeEventManager.getPreviousPlacementId(), videoOrientation).then(fulfilled);

@@ -336,6 +336,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
                 if(placementState === PlacementState.READY) {
                     SdkStats.setReadyEventTimestamp(placementId);
                     SdkStats.sendReadyEvent(placementId);
+                    this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + placementId + ' request to ready time took ' + SdkStats.getRequestToReadyTime(placementId));
                 }
             });
         } else {
@@ -345,6 +346,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
             if(placementState === PlacementState.READY) {
                 SdkStats.setReadyEventTimestamp(placementId);
                 SdkStats.sendReadyEvent(placementId);
+                this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + placementId + ' request to ready time took ' + SdkStats.getRequestToReadyTime(placementId));
             }
         }
     }
