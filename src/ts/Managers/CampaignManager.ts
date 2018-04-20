@@ -543,10 +543,13 @@ export class CampaignManager {
             }
 
             return this._deviceInfo.getFreeSpace().then((freeSpace) => {
-                if (freeSpace) {
-                    this._realtimeBody.deviceFreeSpace = freeSpace;
-                }
-                return Promise.resolve(this._realtimeBody);
+                this._realtimeBody.deviceFreeSpace = freeSpace;
+                return this._realtimeBody;
+            }).catch((e) => {
+                Diagnostics.trigger('Realtime deviceInfo call failed.', {
+                    error: e
+                });
+                return this._realtimeBody;
             });
         }
         this._realtimeBody = undefined;
