@@ -15,7 +15,7 @@ export class SquareEndScreenUtilities {
     }
 
     public static getCustomImage(campaignId: string): string {
-        return SQUARE_CAMPAIGNS['59c2364247257b1456ac3778'];
+        return SQUARE_CAMPAIGNS[campaignId];
     }
 
     public static useSquareEndScreenAlt(abGroup: number, platform: Platform, campaignId?: string, osVersion?: string): boolean {
