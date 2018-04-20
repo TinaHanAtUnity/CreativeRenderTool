@@ -6,8 +6,7 @@ export const SQUARE_CAMPAIGNS: {[index: string]: string } = {
     '5abb8d9377477502d0bb4cae': 'https://cdn.unityads.unity3d.com/abtests/800_images/jelly.jpg' // Toons Blast
 };
 
-// TODO: Use actual group and campaign id
-export const SQUARE_END_SCREEN_AB_GROUP = 5;
+export const SQUARE_END_SCREEN_AB_GROUPS = [18, 19];
 
 export class SquareEndScreenUtilities {
 
@@ -24,11 +23,15 @@ export class SquareEndScreenUtilities {
             return false;
         }
 
-        if (this.hasCustomImage(campaignId) && this.isDeviceSupported(osVersion, platform) && abGroup === SQUARE_END_SCREEN_AB_GROUP) {
+        if (this.hasCustomImage(campaignId) && this.isDeviceSupported(osVersion, platform) && this.isInCorrectABGroup(abGroup)) {
             return true;
         }
 
         return false;
+    }
+
+    public static isInCorrectABGroup(abGroup: number) {
+        return SQUARE_END_SCREEN_AB_GROUPS.indexOf(abGroup) > -1;
     }
 
     public static isDeviceSupported(osVersion: string, platform: Platform): boolean {

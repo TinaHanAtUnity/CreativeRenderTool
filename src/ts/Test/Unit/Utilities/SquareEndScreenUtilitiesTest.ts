@@ -3,23 +3,34 @@ import { assert } from 'chai';
 
 import { IosUtils } from 'Utilities/IosUtils';
 import { Platform } from 'Constants/Platform';
-import { SquareEndScreenUtilities, SQUARE_CAMPAIGNS, SQUARE_END_SCREEN_AB_GROUP } from 'Utilities/SquareEndScreenUtilities';
+import { SquareEndScreenUtilities, SQUARE_CAMPAIGNS, SQUARE_END_SCREEN_AB_GROUPS } from 'Utilities/SquareEndScreenUtilities';
 
 const CAMPAIGN_IDS = Object.keys(SQUARE_CAMPAIGNS);
 
 describe('SquareEndScreenUtilitiesTest', () => {
 
-    describe('hasCustomImage', () => {
+    describe('hasCustomImage()', () => {
         it('returns true for a campaign that is included in SQUARE_CAMPAIGNS', () => {
             assert.isTrue(SquareEndScreenUtilities.hasCustomImage(CAMPAIGN_IDS[0]));
         });
 
         it('returns false for a campaign that is not included in SQUARE_CAMPAIGNS', () => {
-            assert.isTrue(SquareEndScreenUtilities.hasCustomImage('abc'));
+            assert.isFalse(SquareEndScreenUtilities.hasCustomImage('abc'));
         });
     });
 
-    describe('isDeviceSupported', () => {
+    describe('isInCorrectABGroup()', () => {
+       it('returns true for abGroups that are included in the test', () => {
+           assert.isTrue(SquareEndScreenUtilities.isInCorrectABGroup(SQUARE_END_SCREEN_AB_GROUPS[0]));
+           assert.isTrue(SquareEndScreenUtilities.isInCorrectABGroup(SQUARE_END_SCREEN_AB_GROUPS[1]));
+       });
+
+        it('returns false for abGroups that are included in the test', () => {
+            assert.isFalse(SquareEndScreenUtilities.isInCorrectABGroup(5));
+        });
+    });
+
+    describe('isDeviceSupported()', () => {
         it('should always return true for iOS', () => {
             assert.isTrue(SquareEndScreenUtilities.isDeviceSupported('4.0', Platform.IOS), 'Should return true with osVersion 4.0');
             assert.isTrue(SquareEndScreenUtilities.isDeviceSupported('8.0', Platform.IOS), 'Should return true with osVersion 8.0');
@@ -43,11 +54,10 @@ describe('SquareEndScreenUtilitiesTest', () => {
         });
     })
 
-    describe('useSquareEndScreenAlt', () => {
+    describe('useSquareEndScreenAlt()', () => {
         it('should return true when abGroup, campaignId match and the device is supported', () => {
-            assert.isTrue(SquareEndScreenUtilities.useSquareEndScreenAlt(SQUARE_END_SCREEN_AB_GROUP, Platform.IOS, CAMPAIGN_IDS[0], '4.0'), `Should return true for campaign ${CAMPAIGN_IDS[0]} and iOS device`);
-            assert.isTrue(SquareEndScreenUtilities.useSquareEndScreenAlt(SQUARE_END_SCREEN_AB_GROUP, Platform.ANDROID, CAMPAIGN_IDS[2], '5.0'), `Should return true for campaign ${CAMPAIGN_IDS[2]} and supported Android device`);
-            assert.isTrue(SquareEndScreenUtilities.useSquareEndScreenAlt(SQUARE_END_SCREEN_AB_GROUP, Platform.ANDROID, CAMPAIGN_IDS[2], '4.0'), `Should return true for campaign ${CAMPAIGN_IDS[2]} and non supported Android device`);
+            assert.isTrue(SquareEndScreenUtilities.useSquareEndScreenAlt(SQUARE_END_SCREEN_AB_GROUPS[0], Platform.IOS, CAMPAIGN_IDS[0], '4.0'), `Should return true for campaign ${CAMPAIGN_IDS[0]} and iOS device`);
+            assert.isTrue(SquareEndScreenUtilities.useSquareEndScreenAlt(SQUARE_END_SCREEN_AB_GROUPS[0], Platform.ANDROID, CAMPAIGN_IDS[2], '5.0'), `Should return true for campaign ${CAMPAIGN_IDS[2]} and supported Android device`);
         });
 
         it('should return false when abGroup does not match', () => {
@@ -57,20 +67,20 @@ describe('SquareEndScreenUtilitiesTest', () => {
         });
 
         it('should return false when campaignId does not match', () => {
-            assert.isFalse(SquareEndScreenUtilities.useSquareEndScreenAlt(SQUARE_END_SCREEN_AB_GROUP, Platform.IOS, 'abc', '4.0'), 'Should return false with campaignId abc and iOS device');
-            assert.isFalse(SquareEndScreenUtilities.useSquareEndScreenAlt(SQUARE_END_SCREEN_AB_GROUP, Platform.ANDROID, 'lmn', '5.0'), 'Should return false with campaignId lmn and Android device');
+            assert.isFalse(SquareEndScreenUtilities.useSquareEndScreenAlt(SQUARE_END_SCREEN_AB_GROUPS[0], Platform.IOS, 'abc', '4.0'), 'Should return false with campaignId abc and iOS device');
+            assert.isFalse(SquareEndScreenUtilities.useSquareEndScreenAlt(SQUARE_END_SCREEN_AB_GROUPS[0], Platform.ANDROID, 'lmn', '5.0'), 'Should return false with campaignId lmn and Android device');
         });
 
         it('should return false when osVersion is missing', () => {
-            assert.isFalse(SquareEndScreenUtilities.useSquareEndScreenAlt(SQUARE_END_SCREEN_AB_GROUP, Platform.IOS, CAMPAIGN_IDS[0]), 'Should return false when osVersion is missing');
+            assert.isFalse(SquareEndScreenUtilities.useSquareEndScreenAlt(SQUARE_END_SCREEN_AB_GROUPS[0], Platform.IOS, CAMPAIGN_IDS[0]), 'Should return false when osVersion is missing');
         });
 
         it('should return false when campaignId is missing', () => {
-            assert.isFalse(SquareEndScreenUtilities.useSquareEndScreenAlt(SQUARE_END_SCREEN_AB_GROUP, Platform.IOS, undefined, '8.0'), 'Should return false when campaignId is missing');
+            assert.isFalse(SquareEndScreenUtilities.useSquareEndScreenAlt(SQUARE_END_SCREEN_AB_GROUPS[0], Platform.IOS, undefined, '8.0'), 'Should return false when campaignId is missing');
         });
 
         it('should return false when device is not supported', () => {
-            assert.isFalse(SquareEndScreenUtilities.useSquareEndScreenAlt(SQUARE_END_SCREEN_AB_GROUP, Platform.ANDROID, CAMPAIGN_IDS[0], '4.4'), 'Should return false for non-supported android');
+            assert.isFalse(SquareEndScreenUtilities.useSquareEndScreenAlt(SQUARE_END_SCREEN_AB_GROUPS[0], Platform.ANDROID, CAMPAIGN_IDS[0], '4.4'), 'Should return false for non-supported android');
         });
     });
 });
