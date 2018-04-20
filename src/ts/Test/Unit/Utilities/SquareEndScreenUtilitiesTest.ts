@@ -25,9 +25,9 @@ describe('SquareEndScreenUtilitiesTest', () => {
            assert.isTrue(SquareEndScreenUtilities.isInCorrectABGroup(SQUARE_END_SCREEN_AB_GROUPS[1]));
        });
 
-        it('returns false for abGroups that are included in the test', () => {
+       it('returns false for abGroups that are included in the test', () => {
             assert.isFalse(SquareEndScreenUtilities.isInCorrectABGroup(5));
-        });
+       });
     });
 
     describe('isDeviceSupported()', () => {
@@ -52,7 +52,7 @@ describe('SquareEndScreenUtilitiesTest', () => {
             assert.isFalse(SquareEndScreenUtilities.isDeviceSupported('4.8.8', Platform.ANDROID), 'Should return false with osVersion 4.8.8');
             assert.isFalse(SquareEndScreenUtilities.isDeviceSupported('4ok', Platform.ANDROID), 'Should return false with osVersion 4ok');
         });
-    })
+    });
 
     describe('useSquareEndScreenAlt()', () => {
         it('should return true when abGroup, campaignId match and the device is supported', () => {
