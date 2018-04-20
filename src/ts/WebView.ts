@@ -424,6 +424,7 @@ export class WebView {
                     });
                 });
             }
+            this._wasRealtimePlacement = false;
 
             this._currentAdUnit.show().then(() => {
                 if(this._nativeBridge.getPlatform() === Platform.ANDROID && (this._configuration.getAbGroup() === 9 || this._configuration.getAbGroup() === 10)) {

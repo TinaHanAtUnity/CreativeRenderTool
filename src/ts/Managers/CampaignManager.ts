@@ -546,9 +546,7 @@ export class CampaignManager {
                 this._realtimeBody.deviceFreeSpace = freeSpace;
                 return this._realtimeBody;
             }).catch((e) => {
-                Diagnostics.trigger('Realtime deviceInfo call failed.', {
-                    error: e
-                });
+                // Try the request with the original request value anyways
                 return this._realtimeBody;
             });
         }
