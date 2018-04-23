@@ -1,5 +1,5 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { NativeApi } from 'Native/NativeApi';
+import { NativeApiWithEventHandlers } from 'Native/NativeApiWithEventHandlers';
 
 export enum IosVideoPlayerEvent {
     LIKELY_TO_KEEP_UP,
@@ -16,9 +16,7 @@ export interface IIosVideoEventHandler {
     onGenericError(url: string, description: string): void;
 }
 
-export class IosVideoPlayerApi extends NativeApi {
-
-    protected _handlers: IIosVideoEventHandler[] = [];
+export class IosVideoPlayerApi extends NativeApiWithEventHandlers<IIosVideoEventHandler> {
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'VideoPlayer');
@@ -44,21 +42,6 @@ export class IosVideoPlayerApi extends NativeApi {
 
             default:
                 throw new Error('VideoPlayer event ' + event + ' does not have an observable');
-        }
-    }
-
-    public addEventHandler(handler: IIosVideoEventHandler): IIosVideoEventHandler {
-        this._handlers.push(handler);
-        return handler;
-    }
-
-    public removeEventHandler(handler: IIosVideoEventHandler): void {
-        if(this._handlers.length) {
-            if(typeof handler !== 'undefined') {
-                this._handlers = this._handlers.filter(storedHandler => storedHandler !== handler);
-            } else {
-                this._handlers = [];
-            }
         }
     }
 }

@@ -1,5 +1,5 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { NativeApi } from 'Native/NativeApi';
+import { NativeApiWithEventHandlers } from 'Native/NativeApiWithEventHandlers';
 
 enum AndroidVideoPlayerEvent {
     INFO
@@ -24,9 +24,7 @@ export interface IAndroidVideoEventHandler {
     onIllegalStateError(url: string, isPlaying: boolean): void;
 }
 
-export class AndroidVideoPlayerApi extends NativeApi {
-
-    protected _handlers: IAndroidVideoEventHandler[] = [];
+export class AndroidVideoPlayerApi extends NativeApiWithEventHandlers<IAndroidVideoEventHandler> {
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'VideoPlayer');
@@ -64,21 +62,6 @@ export class AndroidVideoPlayerApi extends NativeApi {
 
             default:
                 throw new Error('VideoPlayer event ' + event + ' does not have an observable');
-        }
-    }
-
-    public addEventHandler(handler: IAndroidVideoEventHandler): IAndroidVideoEventHandler {
-        this._handlers.push(handler);
-        return handler;
-    }
-
-    public removeEventHandler(handler: IAndroidVideoEventHandler): void {
-        if(this._handlers.length) {
-            if(typeof handler !== 'undefined') {
-                this._handlers = this._handlers.filter(storedHandler => storedHandler !== handler);
-            } else {
-                this._handlers = [];
-            }
         }
     }
 }

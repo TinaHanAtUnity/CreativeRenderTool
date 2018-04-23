@@ -1,9 +1,9 @@
 import { Double } from 'Utilities/Double';
 import { NativeBridge } from 'Native/NativeBridge';
-import { NativeApi } from 'Native/NativeApi';
 import { Platform } from 'Constants/Platform';
 import { IosVideoPlayerApi } from 'Native/Api/IosVideoPlayer';
 import { AndroidVideoPlayerApi } from 'Native/Api/AndroidVideoPlayer';
+import { NativeApiWithEventHandlers } from 'Native/NativeApiWithEventHandlers';
 
 enum VideoPlayerEvent {
     PROGRESS,
@@ -27,11 +27,10 @@ export interface IVideoEventHandler {
     onStop(url: string): void;
 }
 
-export class VideoPlayerApi extends NativeApi {
+export class VideoPlayerApi extends NativeApiWithEventHandlers<IVideoEventHandler> {
 
     public Ios: IosVideoPlayerApi;
     public Android: AndroidVideoPlayerApi;
-    protected _handlers: IVideoEventHandler[] = [];
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'VideoPlayer');
@@ -126,21 +125,6 @@ export class VideoPlayerApi extends NativeApi {
                 } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
                     this.Android.handleEvent(event, parameters);
                 }
-        }
-    }
-
-    public addEventHandler(handler: IVideoEventHandler): IVideoEventHandler {
-        this._handlers.push(handler);
-        return handler;
-    }
-
-    public removeEventHandler(handler: IVideoEventHandler): void {
-        if(this._handlers.length) {
-            if(typeof handler !== 'undefined') {
-                this._handlers = this._handlers.filter(storedHandler => storedHandler !== handler);
-            } else {
-                this._handlers = [];
-            }
         }
     }
 }
