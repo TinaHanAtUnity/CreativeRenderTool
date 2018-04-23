@@ -1,3 +1,10 @@
+# Staged 
+
+* Use NewRefreshManager as default.
+* Additional logging for request to ready time and IFrame loading time.
+* Additional realtime request diagnostics.
+* Modify value passed to Purchasing as a combination of game id and token.
+
 # Thu Apr 19 10:15:46 UTC 2018
 
 * Add more realtime diagnostic information for kibana
