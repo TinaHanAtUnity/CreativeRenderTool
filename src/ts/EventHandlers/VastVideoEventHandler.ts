@@ -95,10 +95,10 @@ export class VastVideoEventHandler extends VideoEventHandler {
             session.setEventSent(EventType.IMPRESSION);
         }
 
-        this._vastAdUnit.sendImpressionEvent(session.getId(), this._clientInfo.getSdkVersion());
-        this._vastAdUnit.sendTrackingEvent('creativeView', session.getId(), this._clientInfo.getSdkVersion());
-        this._vastAdUnit.sendTrackingEvent('start', session.getId(), this._clientInfo.getSdkVersion());
-        this._vastAdUnit.sendTrackingEvent('impression', session.getId(), this._clientInfo.getSdkVersion());
+        this.sendThirdPartyImpressionEvent();
+        this.sendThirdPartyTrackingEvent('creativeView');
+        this.sendThirdPartyTrackingEvent('start');
+        this.sendThirdPartyTrackingEvent('impression');
 
         const moat = MoatViewabilityService.getMoat();
         if(moat) {
@@ -163,8 +163,16 @@ export class VastVideoEventHandler extends VideoEventHandler {
 
     protected handleCompleteEvent(url: string): void {
         super.handleCompleteEvent(url);
-        const session = this._vastCampaign.getSession();
-        this._vastAdUnit.sendTrackingEvent('complete', session.getId(), this._clientInfo.getSdkVersion());
+        this.sendThirdPartyTrackingEvent('complete');
+    }
+
+    private sendThirdPartyImpressionEvent(): void {
+        const impressionUrls = this._vastCampaign.getVast().getImpressionUrls();
+        if (impressionUrls) {
+            for (const impressionUrl of impressionUrls) {
+                this.sendThirdPartyEvent('vast impression', impressionUrl);
+            }
+        }
     }
 
     private sendThirdPartyTrackingEvent(eventName: string): void {
