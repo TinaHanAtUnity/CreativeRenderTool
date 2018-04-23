@@ -121,15 +121,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         return this._muted;
     }
 
-    public sendImpressionEvent(sessionId: string, sdkVersion: number): void {
-        const impressionUrls = this._vastCampaign.getVast().getImpressionUrls();
-        if (impressionUrls) {
-            for (const impressionUrl of impressionUrls) {
-                this.sendThirdPartyEvent('vast impression', sessionId, sdkVersion, impressionUrl);
-            }
-        }
-    }
-
     public sendTrackingEvent(eventName: string, sessionId: string, sdkVersion: number): void {
         const trackingEventUrls = this._vastCampaign.getVast().getTrackingEventUrls(eventName);
         if (trackingEventUrls) {
