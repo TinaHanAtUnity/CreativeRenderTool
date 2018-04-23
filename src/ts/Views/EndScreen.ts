@@ -199,22 +199,6 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._privacy.addEventHandler(this);
     }
 
-    private isIPhoneX(): boolean {
-        const isIPhone: boolean = /iPhone/.test(navigator.userAgent);
-
-        if (!isIPhone) {
-            return false;
-        }
-
-        const ratio: number = window.devicePixelRatio;
-        const screenSize = {
-            height: window.screen.height * ratio,
-            width: window.screen.width * ratio,
-        };
-
-        return (screenSize.height === 1125 && screenSize.width === 2436) || (screenSize.height === 2436 && screenSize.width === 1125);
-    }
-
     private getTemplate() {
         if (this.getEndscreenAlt() === SQUARE_END_SCREEN) {
             return SquareEndScreenTemplate;
