@@ -9,11 +9,13 @@ export class XPromoVideoEventHandler extends VideoEventHandler {
 
     private _xpromoAdUnit: XPromoAdUnit;
     private _xpromoOperativeEventManager: XPromoOperativeEventManager;
+    private _xpromoCampaign: XPromoCampaign;
 
     constructor(params: IVideoEventHandlerParams<XPromoAdUnit, XPromoCampaign, XPromoOperativeEventManager>) {
         super(params);
         this._xpromoAdUnit = params.adUnit;
         this._xpromoOperativeEventManager = params.operativeEventManager;
+        this._xpromoCampaign = params.campaign;
     }
 
     public onCompleted(url: string): void {
@@ -35,23 +37,19 @@ export class XPromoVideoEventHandler extends VideoEventHandler {
     }
 
     protected handleStartEvent(progress: number): void {
-        this._xpromoOperativeEventManager.sendHttpKafkaEvent('ads.xpromo.operative.videostart.v1.json', 'start', this._placement, this.getVideoOrientation());
-        if(this._campaign instanceof XPromoCampaign) {
-            const clickTrackingUrls = this._campaign.getTrackingUrlsForEvent('start');
-            for (const url of clickTrackingUrls) {
-                this._thirdPartyEventManager.sendEvent('xpromo start', this._campaign.getSession().getId(), url);
-            }
+        this._xpromoOperativeEventManager.sendStartEvent(this._placement, this.getVideoOrientation());
+        const clickTrackingUrls = this._xpromoCampaign.getTrackingUrlsForEvent('start');
+        for (const url of clickTrackingUrls) {
+            this._thirdPartyEventManager.sendEvent('xpromo start', this._xpromoCampaign.getSession().getId(), url);
         }
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
     }
 
     protected handleCompleteEvent(): void {
-        this._xpromoOperativeEventManager.sendHttpKafkaEvent('ads.xpromo.operative.videoview.v1.json', 'view', this._placement, this.getVideoOrientation());
-        if(this._campaign instanceof XPromoCampaign) {
-            const clickTrackingUrls = this._campaign.getTrackingUrlsForEvent('view');
-            for (const clickUrl of clickTrackingUrls) {
-                this._thirdPartyEventManager.sendEvent('xpromo view', this._campaign.getSession().getId(), clickUrl);
-            }
+        this._xpromoOperativeEventManager.sendViewEvent(this._placement, this.getVideoOrientation());
+        const clickTrackingUrls = this._xpromoCampaign.getTrackingUrlsForEvent('view');
+        for (const clickUrl of clickTrackingUrls) {
+            this._thirdPartyEventManager.sendEvent('xpromo view', this._xpromoCampaign.getSession().getId(), clickUrl);
         }
     }
 

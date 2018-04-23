@@ -136,6 +136,10 @@ export class SdkStats {
         return SdkStats._readyEventSent[placementId];
     }
 
+    public static getRequestToReadyTime(placementId: string): number {
+        return SdkStats.getReadyEventTimestamp(placementId) - SdkStats.getAdRequestTimestamp();
+    }
+
     public static setCachingStartTimestamp(fileId: string): void {
         SdkStats._cachingStarted[fileId] = Date.now();
     }
@@ -146,6 +150,14 @@ export class SdkStats {
 
     public static setParseDuration(placementId: string, duration: number): void {
         SdkStats._parseDuration[placementId] = duration;
+    }
+
+    public static setFrameSetStartTimestamp(placementId: string): void {
+        SdkStats._frameSetStarted[placementId] = Date.now();
+    }
+
+    public static getFrameSetStartTimestamp(placementId: string): number {
+        return SdkStats._frameSetStarted[placementId];
     }
 
     private static _nativeBridge: NativeBridge;
@@ -166,6 +178,7 @@ export class SdkStats {
     private static _readyEventSent: { [id: string]: number } = {};
     private static _cachingStarted: { [id: string]: number } = {};
     private static _cachingFinished: { [id: string]: number } = {};
+    private static _frameSetStarted: { [id: string]: number } = {};
 
     private static isTestActive(): boolean {
         const gameSessionId: number = SdkStats._sessionManager.getGameSessionId();
