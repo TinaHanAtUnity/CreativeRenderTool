@@ -30,6 +30,8 @@ import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 import { CampaignParserFactory } from 'Managers/CampaignParserFactory';
 import { UserCountData } from 'Utilities/UserCountData';
+import { IosPermission } from '../Native/Api/IosPermissions';
+import { AndroidPermission } from '../Native/Api/AndroidPermissions';
 
 export class CampaignManager {
 
@@ -471,7 +473,13 @@ export class CampaignManager {
         promises.push(this._deviceInfo.getConnectionType());
         promises.push(this._deviceInfo.getNetworkType());
 
-        return Promise.all(promises).then(([screenWidth, screenHeight, connectionType, networkType]) => {
+        if (this._clientInfo.getPlatform() === Platform.IOS && this._deviceInfo instanceof IosDeviceInfo) {
+            promises.push(this._nativeBridge.Permissions.Ios.checkPermission(IosPermission.AVMediaTypeVideo));
+        } else if (this._clientInfo.getPlatform() === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
+            promises.push(this._nativeBridge.Permissions.Android.checkPermission(AndroidPermission.CAMERA));
+        }
+
+        return Promise.all(promises).then(([screenWidth, screenHeight, connectionType, networkType, cameraPermission]) => {
             url = Url.addParameters(url, {
                 screenWidth: screenWidth,
                 screenHeight: screenHeight,
@@ -479,6 +487,11 @@ export class CampaignManager {
                 networkType: networkType,
                 gamerId: this._configuration.getGamerId()
             });
+            if (cameraPermission) {
+                url = Url.addParameters(url, {
+                    cameraPermission: cameraPermission
+                });
+            }
             return url;
         });
     }
