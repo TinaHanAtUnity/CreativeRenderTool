@@ -28,6 +28,7 @@ import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFact
 import { IVideoEventHandlerParams } from 'EventHandlers/BaseVideoEventHandler';
 
 import EventTestVast from 'xml/EventTestVast.xml';
+import { Vast } from 'Models/Vast/Vast';
 
 describe('VastVideoEventHandler tests', () => {
     const handleInvocation = sinon.spy();
@@ -133,7 +134,7 @@ describe('VastVideoEventHandler tests', () => {
             thirdPartyEventManager: thirdPartyEventManager,
             comScoreTrackingService: comScoreService,
             configuration: configuration,
-            placement: TestFixtures.getPlacement(),
+            placement: placement,
             video: campaign.getVideo(),
             adUnitStyle: undefined,
             clientInfo: clientInfo
@@ -326,6 +327,62 @@ describe('VastVideoEventHandler tests', () => {
 
             sinon.assert.called(<sinon.SinonSpy>vastEndScreen.show);
             sinon.assert.notCalled(<sinon.SinonSpy>testAdUnit.hide);
+        });
+    });
+
+    describe('sendImpressionEvent', () => {
+        let vast: Vast;
+
+        beforeEach(() => {
+            vast = campaign.getVast();
+        });
+
+        it('should replace "%ZONE%" in the url with the placement id', () => {
+            const urlTemplate = 'http://foo.biz/%ZONE%/456';
+            sandbox.stub(vast, 'getImpressionUrls').returns([ urlTemplate ]);
+
+            const mockEventManager = sinon.mock(thirdPartyEventManager);
+            const expectation = mockEventManager.expects('sendEvent').thrice();
+            vastVideoEventHandler.onPlay('https://test.com');
+            mockEventManager.verify();
+            assert.equal(expectation.getCall(0).args[0], 'vast impression', 'First event sent should be \'vast impression\'');
+            assert.equal(expectation.getCall(0).args[2], 'http://foo.biz/' + placement.getId() + '/456', 'First event url incorrect');
+        });
+
+        it('should replace "%SDK_VERSION%" in the url with the SDK version', () => {
+            const urlTemplate = 'http://foo.biz/%SDK_VERSION%/456';
+            sandbox.stub(vast, 'getImpressionUrls').returns([ urlTemplate ]);
+
+            const mockEventManager = sinon.mock(thirdPartyEventManager);
+            const expectation = mockEventManager.expects('sendEvent').thrice();
+            vastVideoEventHandler.onPlay('https://test.com');
+            mockEventManager.verify();
+            assert.equal(expectation.getCall(0).args[0], 'vast impression', 'First event sent should be \'vast impression\'');
+            assert.equal(expectation.getCall(0).args[2], 'http://foo.biz/2000/456', 'First event url incorrect');
+        });
+
+        it('should replace "%SDK_VERSION%" in the url with the SDK version as a query parameter', () => {
+            const urlTemplate = 'http://ads-brand-postback.unityads.unity3d.com/brands/2002/defaultVideoAndPictureZone/impression/common?adSourceId=2&advertiserDomain=appnexus.com&advertisingTrackingId=49f7acaa-81f2-4887-9f3b-cd124854879c&cc=USD&creativeId=54411305&dealCode=&demandSeatId=1&fillSource=appnexus&floor=0&gamerId=5834bc21b54e3b0100f44c92&gross=0&networkId=&precomputedFloor=0&seatId=958&value=1.01&sdkVersion=%SDK_VERSION%';
+            sandbox.stub(vast, 'getImpressionUrls').returns([ urlTemplate ]);
+
+            const mockEventManager = sinon.mock(thirdPartyEventManager);
+            const expectation = mockEventManager.expects('sendEvent').thrice();
+            vastVideoEventHandler.onPlay('https://test.com');
+            mockEventManager.verify();
+            assert.equal(expectation.getCall(0).args[0], 'vast impression', 'First event sent should be \'vast impression\'');
+            assert.equal(expectation.getCall(0).args[2], 'http://ads-brand-postback.unityads.unity3d.com/brands/2002/defaultVideoAndPictureZone/impression/common?adSourceId=2&advertiserDomain=appnexus.com&advertisingTrackingId=49f7acaa-81f2-4887-9f3b-cd124854879c&cc=USD&creativeId=54411305&dealCode=&demandSeatId=1&fillSource=appnexus&floor=0&gamerId=5834bc21b54e3b0100f44c92&gross=0&networkId=&precomputedFloor=0&seatId=958&value=1.01&sdkVersion=2000', 'First event url incorrect');
+        });
+
+        it('should replace both "%ZONE%" and "%SDK_VERSION%" in the url with corresponding parameters', () => {
+            const urlTemplate = 'http://foo.biz/%ZONE%/%SDK_VERSION%/456';
+            sandbox.stub(vast, 'getImpressionUrls').returns([ urlTemplate ]);
+
+            const mockEventManager = sinon.mock(thirdPartyEventManager);
+            const expectation = mockEventManager.expects('sendEvent').thrice();
+            vastVideoEventHandler.onPlay('https://test.com');
+            mockEventManager.verify();
+            assert.equal(expectation.getCall(0).args[0], 'vast impression', 'First event sent should be \'vast impression\'');
+            assert.equal(expectation.getCall(0).args[2], 'http://foo.biz/' + placement.getId() + '/2000/456', 'First event url incorrect');
         });
     });
 });

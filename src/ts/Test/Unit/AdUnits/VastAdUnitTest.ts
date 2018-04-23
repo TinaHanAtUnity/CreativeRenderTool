@@ -5,7 +5,6 @@ import * as sinon from 'sinon';
 import { IVastAdUnitParameters, VastAdUnit } from 'AdUnits/VastAdUnit';
 import { VastCreativeCompanionAd } from 'Models/Vast/VastCreativeCompanionAd';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
-import { Vast } from 'Models/Vast/Vast';
 import { Overlay } from 'Views/Overlay';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
@@ -20,7 +19,6 @@ import { Video } from 'Models/Assets/Video';
 import { FocusManager } from 'Managers/FocusManager';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { SessionManager } from 'Managers/SessionManager';
 import { MetaDataManager } from 'Managers/MetaDataManager';
@@ -142,50 +140,6 @@ describe('VastAdUnit', () => {
 
             sinon.assert.calledOnce(<sinon.SinonSpy>thirdPartyEventManager.sendEvent);
             sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendEvent, 'vast start', 'sessionId', 'http://ads-brand-postback.unityads.unity3d.com/brands/2002/defaultVideoAndPictureZone/' + placement.getId() + '/impression/common?adSourceId=2&advertiserDomain=appnexus.com&advertisingTrackingId=49f7acaa-81f2-4887-9f3b-cd124854879c&cc=USD&creativeId=54411305&dealCode=&demandSeatId=1&fillSource=appnexus&floor=0&gamerId=5834bc21b54e3b0100f44c92&gross=0&networkId=&precomputedFloor=0&seatId=958&value=1.01&sdkVersion=1234');
-        });
-    });
-
-    describe('sendImpressionEvent', () => {
-        let vast: Vast;
-
-        beforeEach(() => {
-            vast = vastCampaign.getVast();
-            sandbox.stub(thirdPartyEventManager, 'sendEvent').returns(null);
-        });
-
-        it('should replace "%ZONE%" in the url with the placement id', () => {
-            const urlTemplate = 'http://foo.biz/%ZONE%/456';
-            sandbox.stub(vast, 'getImpressionUrls').returns([ urlTemplate ]);
-            vastAdUnit.sendImpressionEvent('sessionId', 1234);
-            sinon.assert.calledOnce(<sinon.SinonSpy>thirdPartyEventManager.sendEvent);
-            sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendEvent, 'vast impression', 'sessionId', 'http://foo.biz/' + placement.getId() + '/456');
-        });
-
-        it('should replace "%SDK_VERSION%" in the url with the SDK version', () => {
-            const urlTemplate = 'http://foo.biz/%SDK_VERSION%/456';
-            sandbox.stub(vast, 'getImpressionUrls').returns([ urlTemplate ]);
-            vastAdUnit.sendImpressionEvent('sessionId', 1234);
-
-            sinon.assert.calledOnce(<sinon.SinonSpy>thirdPartyEventManager.sendEvent);
-            sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendEvent, 'vast impression', 'sessionId', 'http://foo.biz/1234/456');
-        });
-
-        it('should replace "%SDK_VERSION%" in the url with the SDK version as a query parameter', () => {
-            const urlTemplate = 'http://ads-brand-postback.unityads.unity3d.com/brands/2002/defaultVideoAndPictureZone/impression/common?adSourceId=2&advertiserDomain=appnexus.com&advertisingTrackingId=49f7acaa-81f2-4887-9f3b-cd124854879c&cc=USD&creativeId=54411305&dealCode=&demandSeatId=1&fillSource=appnexus&floor=0&gamerId=5834bc21b54e3b0100f44c92&gross=0&networkId=&precomputedFloor=0&seatId=958&value=1.01&sdkVersion=%SDK_VERSION%';
-            sandbox.stub(vast, 'getImpressionUrls').returns([ urlTemplate ]);
-            vastAdUnit.sendImpressionEvent('sessionId', 1234);
-
-            sinon.assert.calledOnce(<sinon.SinonSpy>thirdPartyEventManager.sendEvent);
-            sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendEvent, 'vast impression', 'sessionId', 'http://ads-brand-postback.unityads.unity3d.com/brands/2002/defaultVideoAndPictureZone/impression/common?adSourceId=2&advertiserDomain=appnexus.com&advertisingTrackingId=49f7acaa-81f2-4887-9f3b-cd124854879c&cc=USD&creativeId=54411305&dealCode=&demandSeatId=1&fillSource=appnexus&floor=0&gamerId=5834bc21b54e3b0100f44c92&gross=0&networkId=&precomputedFloor=0&seatId=958&value=1.01&sdkVersion=1234');
-        });
-
-        it('should replace both "%ZONE%" and "%SDK_VERSION%" in the url with corresponding parameters', () => {
-            const urlTemplate = 'http://foo.biz/%ZONE%/%SDK_VERSION%/456';
-            sandbox.stub(vast, 'getImpressionUrls').returns([ urlTemplate ]);
-            vastAdUnit.sendImpressionEvent('sessionId', 1234);
-
-            sinon.assert.calledOnce(<sinon.SinonSpy>thirdPartyEventManager.sendEvent);
-            sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendEvent, 'vast impression', 'sessionId', 'http://foo.biz/' + placement.getId() + '/1234/456');
         });
     });
 
