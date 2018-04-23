@@ -1,5 +1,4 @@
 import EndScreenTemplate from 'html/EndScreen.html';
-import IPhoneXEndScreenTemplate from 'html/IPhoneXEndScreen.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -19,9 +18,6 @@ export interface IEndScreenHandler {
     onKeyEvent(keyCode: number): void;
     onOptOutPopupShown(clicked: boolean): void;
 }
-
-const IPHONE_X_STYLES_AB_GROUPS = [18, 19];
-const IPHONE_X_STYLES_ID = 'iphone-x-styles';
 
 const GDPR_OPT_OUT_BASE  = 'gdpr-pop-up-base';
 const GDPR_OPT_OUT_ALT  = 'gdpr-pop-up-alt';
@@ -97,7 +93,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
         const endScreenAlt = this.getEndscreenAlt();
         if (typeof endScreenAlt === 'string') {
-            this._container.classList.add(...endScreenAlt.split(' '));
+            this._container.classList.add(endScreenAlt);
         }
     }
 
@@ -146,10 +142,6 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     protected getEndscreenAlt(campaign?: Campaign) {
-        if (this.useIPhoneXStyle()) {
-            return IPHONE_X_STYLES_ID;
-        }
-
         if (this._showOptOutPopup) {
             if (this._abGroup === 16) {
                 return GDPR_OPT_OUT_BASE;
@@ -191,31 +183,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._privacy.addEventHandler(this);
     }
 
-    private isIPhoneX(): boolean {
-        const isIPhone: boolean = /iPhone/.test(navigator.userAgent);
-
-        if (!isIPhone) {
-            return false;
-        }
-
-        const ratio: number = window.devicePixelRatio;
-        const screenSize = {
-            height: window.screen.height * ratio,
-            width: window.screen.width * ratio,
-        };
-
-        return (screenSize.height === 1125 && screenSize.width === 2436) || (screenSize.height === 2436 && screenSize.width === 1125);
-    }
-
-    private useIPhoneXStyle(): boolean {
-        return IPHONE_X_STYLES_AB_GROUPS.indexOf(this._abGroup) > -1 && this.isIPhoneX();
-    }
-
     private getTemplate() {
-        if (this.useIPhoneXStyle()) {
-            return IPhoneXEndScreenTemplate;
-        }
-
         return EndScreenTemplate;
     }
 }
