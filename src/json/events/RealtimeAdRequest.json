@@ -300,6 +300,12 @@
       "required": "all",
       "queryString": true,
       "body": false
+    },
+    {
+      "parameter": "projectId",
+      "required": "all",
+      "queryString": false,
+      "body": true
     }
   ]
 }

@@ -460,5 +460,12 @@
     "description": "If the placement contains data to show a realtime placement",
     "provider": "Server",
     "platforms": "all"
+  },
+  {
+    "key": "projectId",
+    "type": "string",
+    "description": "Unity project ID",
+    "provider": "Server",
+    "platforms": "all"
   }
 ]
