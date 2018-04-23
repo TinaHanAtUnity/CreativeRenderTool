@@ -14,6 +14,18 @@ enum AREvent {
     AR_SESSION_INTERRUPTION_ENDED
 }
 
+export interface IARConfigurationProperties {
+    configurationName: string;
+    lightEstimationEnabled?: boolean;
+    worldAlignment?: number;
+    planeDetection?: number;
+}
+
+export interface IARRunProperties {
+    runOptions?: number;
+    configuration?: IARConfigurationProperties;
+}
+
 export class ARApi extends NativeApi {
 
     public readonly onPlanesAdded = new Observable1<string>();
@@ -34,8 +46,8 @@ export class ARApi extends NativeApi {
         return this._nativeBridge.invoke<boolean>(this._apiClass, 'isARSupported', ['ARWorldTrackingConfiguration']);
     }
 
-    public restartSession(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'restartSession');
+    public restartSession(arRunProperties: IARRunProperties): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'restartSession', [arRunProperties]);
     }
 
     public setDepthFar(depth: number): Promise<void> {

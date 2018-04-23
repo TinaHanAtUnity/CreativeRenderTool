@@ -345,7 +345,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         switch (functionName) {
             case 'resetPose':
-                return this._nativeBridge.AR.restartSession();
+                return this._nativeBridge.AR.restartSession(JSON.parse(args[0]));
 
             case 'setDepthNear':
                 return this._nativeBridge.AR.setDepthNear(parseFloat(args[0]));

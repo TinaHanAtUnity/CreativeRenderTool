@@ -81,8 +81,8 @@
             callNativeFunction('showCameraFeed');
         }
 
-        function nativeResetPose() {
-            callNativeFunction('resetPose');
+        function nativeResetPose(arRunProperties) {
+            callNativeFunction('resetPose', JSON.stringify(arRunProperties));
         }
 
         function nativeSetDepthNear(depthNear) {
@@ -251,8 +251,8 @@
             /**
              * Resets the pose of the device so the current transform is world origin.
              */
-            this.resetPose = function() {
-                nativeResetPose();
+            this.resetPose = function(arRunProperties) {
+                nativeResetPose(arRunProperties);
             };
 
             var depthNear = 0.01;
