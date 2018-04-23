@@ -5,7 +5,7 @@ import { IosUtils } from 'Utilities/IosUtils';
 import { Platform } from 'Constants/Platform';
 import { SquareEndScreenUtilities, SQUARE_CAMPAIGNS, SQUARE_END_SCREEN_AB_GROUPS } from 'Utilities/SquareEndScreenUtilities';
 
-const CAMPAIGN_IDS = Object.keys(SQUARE_CAMPAIGNS);
+const CAMPAIGN_IDS = SQUARE_CAMPAIGNS[0].campaignIds;
 
 describe('SquareEndScreenUtilitiesTest', () => {
 

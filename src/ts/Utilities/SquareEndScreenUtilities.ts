@@ -2,7 +2,6 @@ import { Platform } from 'Constants/Platform';
 
 export const SQUARE_CAMPAIGNS = [
     {
-        id: 'homescapes',
         customImage: 'http://cdn.unityads.unity3d.com/abtests/800_images/homescapes.jpg',
         campaignIds: [
             '59c20aaed34ca7123046fed0',
@@ -19,7 +18,6 @@ export const SQUARE_CAMPAIGNS = [
         ]
     },
     {
-        id: 'angrybirds2',
         customImage: 'http://cdn.unityads.unity3d.com/abtests/800_images/angrybirds2.jpg',
         campaignIds: [
             '5abb8462149ff500300f0748',
@@ -33,7 +31,6 @@ export const SQUARE_CAMPAIGNS = [
         ],
     },
     {
-        id: 'toonblast',
         customImage: 'http://cdn.unityads.unity3d.com/abtests/800_images/jelly.jpg',
         campaignIds: [
             '5a707dde709a4005ecf945cd',
