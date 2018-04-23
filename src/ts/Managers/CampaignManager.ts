@@ -473,13 +473,7 @@ export class CampaignManager {
         promises.push(this._deviceInfo.getConnectionType());
         promises.push(this._deviceInfo.getNetworkType());
 
-        if (this._clientInfo.getPlatform() === Platform.IOS && this._deviceInfo instanceof IosDeviceInfo) {
-            promises.push(this._nativeBridge.Permissions.Ios.checkPermission(IosPermission.AVMediaTypeVideo));
-        } else if (this._clientInfo.getPlatform() === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
-            promises.push(this._nativeBridge.Permissions.Android.checkPermission(AndroidPermission.CAMERA));
-        }
-
-        return Promise.all(promises).then(([screenWidth, screenHeight, connectionType, networkType, cameraPermission]) => {
+        return Promise.all(promises).then(([screenWidth, screenHeight, connectionType, networkType]) => {
             url = Url.addParameters(url, {
                 screenWidth: screenWidth,
                 screenHeight: screenHeight,
@@ -487,11 +481,6 @@ export class CampaignManager {
                 networkType: networkType,
                 gamerId: this._configuration.getGamerId()
             });
-            if (cameraPermission) {
-                url = Url.addParameters(url, {
-                    cameraPermission: cameraPermission
-                });
-            }
             return url;
         });
     }
