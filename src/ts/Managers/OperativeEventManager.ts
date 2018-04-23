@@ -65,12 +65,12 @@ export class OperativeEventManager {
     protected _gamerServerId: string | undefined;
     protected _sessionManager: SessionManager;
     protected _clientInfo: ClientInfo;
+    protected _campaign: Campaign;
+    protected _metaDataManager: MetaDataManager;
     private _nativeBridge: NativeBridge;
-    private _metaDataManager: MetaDataManager;
     private _deviceInfo: DeviceInfo;
     private _request: Request;
     private _configuration: Configuration;
-    private _campaign: Campaign;
 
     constructor(params: IOperativeEventManagerParams<Campaign>) {
         this._nativeBridge = params.nativeBridge;
@@ -315,7 +315,8 @@ export class OperativeEventManager {
                 'apiLevel': this._deviceInfo.getApiLevel(),
                 'deviceMake': this._deviceInfo.getManufacturer(),
                 'screenDensity': this._deviceInfo.getScreenDensity(),
-                'screenSize': this._deviceInfo.getScreenLayout()
+                'screenSize': this._deviceInfo.getScreenLayout(),
+                'androidId': this._deviceInfo.getAndroidId()
             };
         }
 

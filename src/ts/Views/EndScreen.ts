@@ -1,5 +1,4 @@
 import EndScreenTemplate from 'html/EndScreen.html';
-import IPhoneXEndScreenTemplate from 'html/IPhoneXEndScreen.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -17,10 +16,11 @@ export interface IEndScreenHandler {
     onEndScreenPrivacy(url: string): void;
     onEndScreenClose(): void;
     onKeyEvent(keyCode: number): void;
+    onOptOutPopupShown(clicked: boolean): void;
 }
 
-const IPHONE_X_STYLES_AB_GROUPS = [18, 19];
-const IPHONE_X_STYLES_ID = 'iphone-x-styles';
+const GDPR_OPT_OUT_BASE  = 'gdpr-pop-up-base';
+const GDPR_OPT_OUT_ALT  = 'gdpr-pop-up-alt';
 
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
 
@@ -31,14 +31,18 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     private _privacy: Privacy;
     private _isSwipeToCloseEnabled: boolean = false;
     private _abGroup: number;
+    private _showOptOutPopup: boolean;
+    private _gdprPopupClicked = false;
 
-    constructor(nativeBridge: NativeBridge, coppaCompliant: boolean, language: string, gameId: string, gameName: string | undefined, abGroup: number, adUnitStyle?: AdUnitStyle) {
+    constructor(nativeBridge: NativeBridge, coppaCompliant: boolean, language: string, gameId: string, gameName: string | undefined, abGroup: number, adUnitStyle?: AdUnitStyle, showOptOutPopup: boolean = false) {
         super(nativeBridge, 'end-screen');
         this._coppaCompliant = coppaCompliant;
         this._localization = new Localization(language, 'endscreen');
         this._abGroup = abGroup;
         this._gameName = gameName;
         this._adUnitStyle = adUnitStyle;
+        this._showOptOutPopup = showOptOutPopup;
+
         this._template = new Template(this.getTemplate(), this._localization);
 
         this._bindings = [
@@ -56,6 +60,11 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
                 event: 'click',
                 listener: (event: Event) => this.onPrivacyEvent(event),
                 selector: '.privacy-button'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onOptOutPopupEvent(event),
+                selector: '.gdpr-link'
             }
         ];
 
@@ -84,7 +93,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
         const endScreenAlt = this.getEndscreenAlt();
         if (typeof endScreenAlt === 'string') {
-            this._container.classList.add(...endScreenAlt.split(' '));
+            this._container.classList.add(endScreenAlt);
         }
     }
 
@@ -105,6 +114,8 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
                 this._handlers.forEach(handler => handler.onEndScreenClose());
             }, AbstractAdUnit.getAutoCloseDelay());
         }
+
+        this._container.classList.add('on-show');
     }
 
     public hide(): void {
@@ -131,8 +142,13 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     protected getEndscreenAlt(campaign?: Campaign) {
-        if(this.useIPhoneXStyle()) {
-            return IPHONE_X_STYLES_ID;
+        if (this._showOptOutPopup) {
+            if (this._abGroup === 16) {
+                return GDPR_OPT_OUT_BASE;
+            }
+            if (this._abGroup === 17) {
+                return GDPR_OPT_OUT_ALT;
+            }
         }
 
         return undefined;
@@ -142,6 +158,9 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
     private onCloseEvent(event: Event): void {
         event.preventDefault();
+        if (this._showOptOutPopup) {
+            this._handlers.forEach(handler => handler.onOptOutPopupShown(this._gdprPopupClicked));
+        }
         this._handlers.forEach(handler => handler.onEndScreenClose());
     }
 
@@ -153,31 +172,18 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._privacy.addEventHandler(this);
     }
 
-    private isIPhoneX(): boolean {
-        const isIPhone: boolean = /iPhone/.test(navigator.userAgent);
+    private onOptOutPopupEvent(event: Event) {
+        event.preventDefault();
 
-        if (!isIPhone) {
-            return false;
-        }
+        this._gdprPopupClicked = true;
 
-        const ratio: number = window.devicePixelRatio;
-        const screenSize = {
-            height: window.screen.height * ratio,
-            width: window.screen.width * ratio,
-        };
-
-        return (screenSize.height === 1125 && screenSize.width === 2436) || (screenSize.height === 2436 && screenSize.width === 1125);
-    }
-
-    private useIPhoneXStyle(): boolean {
-        return IPHONE_X_STYLES_AB_GROUPS.indexOf(this._abGroup) > -1 && this.isIPhoneX();
+        this._privacy = new Privacy(this._nativeBridge, this._coppaCompliant);
+        this._privacy.render();
+        document.body.appendChild(this._privacy.container());
+        this._privacy.addEventHandler(this);
     }
 
     private getTemplate() {
-        if (this.useIPhoneXStyle()) {
-            return IPhoneXEndScreenTemplate;
-        }
-
         return EndScreenTemplate;
     }
 }

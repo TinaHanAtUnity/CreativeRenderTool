@@ -155,7 +155,7 @@ export class AdMobAdUnit extends AbstractAdUnit {
     }
 
     public getRequestToReadyTime() {
-        return SdkStats.getReadyEventTimestamp(this._placement.getId()) - SdkStats.getAdRequestTimestamp();
+        return SdkStats.getRequestToReadyTime(this._placement.getId());
     }
 
     private showView() {

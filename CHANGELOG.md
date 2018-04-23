@@ -1,3 +1,32 @@
+# Thu Apr 19 10:15:46 UTC 2018
+
+* Add more realtime diagnostic information for kibana
+* Fetch and add sid when sending xpromo events (redeem callback fix for xpromo)
+
+# Tue Apr 17 10:14:11 UTC 2018
+
+* GDPR pop-up A/B test in groups 16 & 17
+
+# Mon Apr 16 20:50:03 UTC 2018
+
+* Android batching A/B test in groups 9 & 10
+* Use cached campaign when intializing SDK (A/B test in groups 7 & 8)
+* Remove refresh manager A/B test from groups 9 & 10
+* Add support for last three admob optional signals
+* Remove session_start_failed -diagnostics fro now
+
+# Wed Apr 11 22:16:33 UTC 2018
+
+* Honor using WebView UA for tracking for MRAID click attribution
+* Enable the App Sheet on iOS 11.3
+* Add androidId to operative event data if platform is android
+
+# Tue Apr 10 20:41:22 UTC 2018
+
+* Optional Admob Signals
+* Unit tests for Campaign Parsers
+* Assume native calls from previous auction request for realtime speedup
+
 # Mon Apr 9 20:36:04 UTC 2018
 
 * Removed special case for roll-the-ball playable

@@ -60,7 +60,7 @@ export class ProgrammaticMraidParser extends CampaignParser {
             bypassAppSheet: undefined,
             store: undefined,
             appStoreId: undefined,
-            useWebViewUserAgentForTracking: false,
+            useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking() || false,
             playableConfiguration: undefined,
             arEnabled: undefined
         };

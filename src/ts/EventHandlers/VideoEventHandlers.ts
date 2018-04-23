@@ -121,7 +121,7 @@ export class VideoEventHandlers {
                 }
                 comScoreTrackingService.sendEvent('play', sessionId, comScoreDuration, position, creativeId, category, subCategory);
             } else if(operativeEventManager instanceof XPromoOperativeEventManager) {
-                operativeEventManager.sendHttpKafkaEvent('ads.xpromo.operative.videostart.v1.json', 'start', placement, this.getVideoOrientation(adUnit));
+                operativeEventManager.sendStartEvent(placement, this.getVideoOrientation(adUnit));
                 if(campaign instanceof XPromoCampaign) {
                     const clickTrackingUrls = campaign.getTrackingUrlsForEvent('start');
                     for (const url of clickTrackingUrls) {
@@ -262,7 +262,7 @@ export class VideoEventHandlers {
             const creativeId = campaign.getCreativeId();
             comScoreTrackingService.sendEvent('end', sessionId, comScoreDuration, comScorePlayedTime, creativeId, undefined, undefined);
         } else if(operativeEventManager instanceof XPromoOperativeEventManager) {
-            operativeEventManager.sendHttpKafkaEvent('ads.xpromo.operative.videoview.v1.json', 'view', placement, this.getVideoOrientation(adUnit));
+            operativeEventManager.sendViewEvent(placement, this.getVideoOrientation(adUnit));
             if(campaign instanceof XPromoCampaign) {
                 const clickTrackingUrls = campaign.getTrackingUrlsForEvent('view');
                 for (const url of clickTrackingUrls) {

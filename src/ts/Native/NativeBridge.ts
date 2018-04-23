@@ -289,6 +289,10 @@ export class NativeBridge implements INativeBridge {
         return this._platform;
     }
 
+    public setAutoBatchEnabled(enabled: boolean) {
+        this._autoBatchEnabled = enabled;
+    }
+
     private invokeBatch(batch: BatchInvocation): void {
         this._backend.handleInvocation(JSON.stringify(batch.getBatch()).replace(NativeBridge._doubleRegExp, '$1'));
     }
