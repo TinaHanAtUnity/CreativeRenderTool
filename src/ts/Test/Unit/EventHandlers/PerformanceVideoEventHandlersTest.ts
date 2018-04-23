@@ -13,7 +13,6 @@ import { Video } from 'Models/Assets/Video';
 import { Request } from 'Utilities/Request';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { SessionManager } from 'Managers/SessionManager';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { FocusManager } from 'Managers/FocusManager';
@@ -21,12 +20,6 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { IVideoEventHandlerParams } from 'EventHandlers/BaseVideoEventHandler';
-import { Placement } from 'Models/Placement';
-import { Campaign } from 'Models/Campaign';
-import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
-import { AdUnitStyle } from 'Models/AdUnitStyle';
-import { ClientInfo } from 'Models/ClientInfo';
-import { Configuration } from 'Models/Configuration';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 
 describe('PerformanceVideoEventHandlersTest', () => {
