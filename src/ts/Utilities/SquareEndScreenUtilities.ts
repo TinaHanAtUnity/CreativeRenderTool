@@ -74,7 +74,6 @@ export class SquareEndScreenUtilities {
     public static getCustomImage(campaignId: string): string | undefined {
         for (const campaign of SQUARE_CAMPAIGNS) {
             if (campaign.campaignIds.indexOf(campaignId) > -1) {
-                console.log("FOUND: ", campaign, campaignId);
                 return campaign.customImage;
             }
         }
