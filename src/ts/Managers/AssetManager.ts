@@ -204,7 +204,7 @@ export class AssetManager {
                     throw new Error('Caching stopped');
                 }
 
-                const promise = this.queueAsset(asset.getUrl(), this.getCacheDiagnostics(asset, campaign), cacheType).then(([fileId, fileUrl]) => {
+                const promise = this.queueAsset(asset.getOriginalUrl(), this.getCacheDiagnostics(asset, campaign), cacheType).then(([fileId, fileUrl]) => {
                     asset.setFileId(fileId);
                     asset.setCachedUrl(fileUrl);
                     return fileId;
