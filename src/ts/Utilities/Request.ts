@@ -3,21 +3,19 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { RequestError } from 'Errors/RequestError';
 import { Platform } from 'Constants/Platform';
 import { CallbackContainer } from 'Utilities/CallbackContainer';
-import { JaegerSpan, JaegerTags, JaegerNetworkTags } from 'Jaeger/JaegerSpan';
-import { JaegerManager } from 'Jaeger/JaegerManager';
 
 const enum RequestStatus {
     COMPLETE,
     FAILED
 }
 
-export const enum RequestMethod {
+const enum RequestMethod {
     GET,
     POST,
     HEAD
 }
 
-export interface IRequestOptions {
+interface IRequestOptions {
     retries: number;
     retryDelay: number;
     followRedirects: boolean;
@@ -41,7 +39,7 @@ export interface INativeResponse {
     headers: Array<[string, string]>;
 }
 
-export class NativeRequestBridge {
+export class Request {
 
     public static AllowedResponseCodes = new RegExp('2[0-9]{2}');
     public static RedirectResponseCodes = new RegExp('30[0-8]');
@@ -58,7 +56,23 @@ export class NativeRequestBridge {
         return null;
     }
 
-    public static getDefaultRequestOptions(): IRequestOptions {
+    public static is2xxSuccessful(sc: number): boolean {
+        return sc >= 200 && sc < 300;
+    }
+
+    public static is3xxRedirect(sc: number): boolean {
+        return sc >= 300 && sc < 400;
+    }
+
+    private static _connectTimeout = 30000;
+    private static _readTimeout = 30000;
+    private static _redirectLimit = 10;
+
+    private static _callbackId: number = 1;
+    private static _callbacks: { [key: number]: CallbackContainer<INativeResponse> } = {};
+    private static _requests: { [key: number]: INativeRequest } = {};
+
+    private static getDefaultRequestOptions(): IRequestOptions {
         return {
             retries: 0,
             retryDelay: 0,
@@ -66,13 +80,6 @@ export class NativeRequestBridge {
             retryWithConnectionEvents: false
         };
     }
-
-    private static _connectTimeout = 30000;
-    private static _readTimeout = 30000;
-
-    private static _callbackId: number = 1;
-    private static _callbacks: { [key: number]: CallbackContainer<INativeResponse> } = {};
-    private static _requests: { [key: number]: INativeRequest } = {};
 
     private _nativeBridge: NativeBridge;
     private _wakeUpManager: WakeUpManager;
@@ -86,223 +93,46 @@ export class NativeRequestBridge {
         this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
     }
 
-    public invokeRequest(nativeRequest: INativeRequest): Promise<INativeResponse> {
-        const id = NativeRequestBridge._callbackId++;
-        const promise = this.registerCallback(id);
-        this._invokeRequest(id, nativeRequest);
-        return promise;
-    }
-
-    private _invokeRequest(id: number, nativeRequest: INativeRequest): Promise<string> {
-        let connectTimeout = NativeRequestBridge._connectTimeout;
-        let readTimeout = NativeRequestBridge._readTimeout;
-        if(nativeRequest.options.timeout) {
-            connectTimeout = nativeRequest.options.timeout;
-            readTimeout = nativeRequest.options.timeout;
-        }
-
-        NativeRequestBridge._requests[id] = nativeRequest;
-        switch(nativeRequest.method) {
-            case RequestMethod.GET:
-                return this._nativeBridge.Request.get(id.toString(), nativeRequest.url, nativeRequest.headers, connectTimeout, readTimeout);
-
-            case RequestMethod.POST:
-                return this._nativeBridge.Request.post(id.toString(), nativeRequest.url, nativeRequest.data || '', nativeRequest.headers, connectTimeout, readTimeout);
-
-            case RequestMethod.HEAD:
-                return this._nativeBridge.Request.head(id.toString(), nativeRequest.url, nativeRequest.headers, connectTimeout, readTimeout);
-
-            default:
-                throw new Error('Unsupported request method "' + nativeRequest.method + '"');
-        }
-    }
-
-    private registerCallback(id: number): Promise<INativeResponse> {
-        return new Promise<INativeResponse>((resolve, reject) => {
-            NativeRequestBridge._callbacks[id] = new CallbackContainer(resolve, reject);
-        });
-    }
-
-    private finishRequest(id: number, status: RequestStatus, ...parameters: any[]) {
-        const callbackObject = NativeRequestBridge._callbacks[id];
-        if(callbackObject) {
-            if(status === RequestStatus.COMPLETE) {
-                callbackObject.resolve(...parameters);
-            } else {
-                callbackObject.reject(...parameters);
-            }
-            delete NativeRequestBridge._callbacks[id];
-            delete NativeRequestBridge._requests[id];
-        }
-    }
-
-    private handleFailedRequest(id: number, nativeRequest: INativeRequest, errorMessage: string, nativeResponse?: INativeResponse): void {
-        if(nativeRequest.retryCount < nativeRequest.options.retries) {
-            nativeRequest.retryCount++;
-            setTimeout(() => {
-                this._invokeRequest(id, nativeRequest);
-            }, nativeRequest.options.retryDelay);
-        } else {
-            if(!nativeRequest.options.retryWithConnectionEvents) {
-                this.finishRequest(id, RequestStatus.FAILED, new RequestError(errorMessage, nativeRequest, nativeResponse));
-            }
-        }
-    }
-
-    private onRequestComplete(rawId: string, url: string, response: string, responseCode: number, headers: Array<[string, string]>): void {
-        const id = parseInt(rawId, 10);
-        const nativeResponse: INativeResponse = {
-            url: url,
-            response: response,
-            responseCode: responseCode,
-            headers: headers
-        };
-        const nativeRequest = NativeRequestBridge._requests[id];
-
-        if(!nativeRequest) {
-            // ignore events without matching id, might happen when webview reinits
-            return;
-        }
-        if(NativeRequestBridge.AllowedResponseCodes.exec(responseCode.toString())) {
-            this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
-        } else if(NativeRequestBridge.RedirectResponseCodes.exec(responseCode.toString())) {
-            if(nativeRequest.options.followRedirects) {
-                const location = NativeRequestBridge.getHeader(headers, 'location');
-                if(location && this.followRedirects(location)) {
-                    nativeRequest.url = location;
-                    this._invokeRequest(id, nativeRequest);
-                } else {
-                    this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
-                }
-            } else {
-                this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
-            }
-        } else if(NativeRequestBridge.ErrorResponseCodes.exec(responseCode.toString())) {
-            this.finishRequest(id, RequestStatus.FAILED, new RequestError('FAILED_WITH_ERROR_RESPONSE', nativeRequest, nativeResponse));
-        } else {
-            this.finishRequest(id, RequestStatus.FAILED, new RequestError('FAILED_WITH_UNKNOWN_RESPONSE_CODE', nativeRequest, nativeResponse));
-        }
-    }
-
-    private followRedirects(location: string) {
-        if(location.match(/^https?/i) && !location.match(/^https:\/\/itunes\.apple\.com/i) && !location.match(/\.apk$/i)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    private onRequestFailed(rawId: string, url: string, error: string): void {
-        const id = parseInt(rawId, 10);
-        const nativeRequest = NativeRequestBridge._requests[id];
-
-        if(!nativeRequest) {
-            // ignore events without matching id, might happen when webview reinits
-            return;
-        }
-
-        this.handleFailedRequest(id, nativeRequest, error);
-    }
-
-    private onNetworkConnected(): void {
-        for(const id in NativeRequestBridge._requests) {
-            if(NativeRequestBridge._requests.hasOwnProperty(id)) {
-                const request: INativeRequest = NativeRequestBridge._requests[id];
-                if(request.options.retryWithConnectionEvents && request.options.retries === request.retryCount) {
-                    this._invokeRequest(parseInt(id, 10), request);
-                }
-            }
-        }
-    }
-}
-
-export class Request {
-
-    public static is2xxSuccessful(sc: number): boolean {
-        return sc >= 200 && sc < 300;
-    }
-
-    public static is3xxRedirect(sc: number): boolean {
-        return sc >= 300 && sc < 400;
-    }
-
-    private static _redirectLimit = 10;
-
-    public jaegerManager: JaegerManager;
-
-    private _nativeRequest: NativeRequestBridge;
-    private _nativeBridge: NativeBridge;
-
-    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager) {
-        this._nativeRequest = new NativeRequestBridge(nativeBridge, wakeUpManager);
-        this._nativeBridge = nativeBridge;
-        this.jaegerManager = new JaegerManager(this._nativeRequest);
-    }
-
     public get(url: string, headers: Array<[string, string]> = [], options?: IRequestOptions): Promise<INativeResponse> {
         if(typeof options === 'undefined') {
-            options = NativeRequestBridge.getDefaultRequestOptions();
+            options = Request.getDefaultRequestOptions();
         }
 
-        const jaegerSpan = this.jaegerManager.startSpan(url, 'Client Request', []); // start a span
-        if (this.jaegerManager.isJaegerTracingEnabled()) {
-            const jaegerTraceId = this.jaegerManager.getTraceId(jaegerSpan);
-            headers.push(['uber-trace-id', jaegerTraceId]);
-        }
-        return this._nativeRequest.invokeRequest({
+        const id = Request._callbackId++;
+        const promise = this.registerCallback(id);
+        this.invokeRequest(id, {
             method: RequestMethod.GET,
             url: url,
             headers: headers,
             retryCount: 0,
             options: options
-        }).then((resp) => {
-            this.jaegerManager.stopNetworkSpan(jaegerSpan, this._nativeBridge.getPlatform(), resp.responseCode.toString());
-            return resp;
-        }).catch((resp) => {
-            let responseCode: string = '';
-            if (resp && resp.nativeResponse && resp.nativeResponse.responseCode) {
-                responseCode = resp.nativeResponse.responseCode.toString();
-            }
-            this.jaegerManager.stopNetworkSpan(jaegerSpan, this._nativeBridge.getPlatform(), responseCode);
-            throw resp;
         });
+        return promise;
     }
 
     public post(url: string, data: string = '', headers: Array<[string, string]> = [], options?: IRequestOptions): Promise<INativeResponse> {
         if(typeof options === 'undefined') {
-            options = NativeRequestBridge.getDefaultRequestOptions();
+            options = Request.getDefaultRequestOptions();
         }
 
         headers.push(['Content-Type', 'application/json']);
 
-        const jaegerSpan = this.jaegerManager.startSpan(url, 'Client Request', []); // start a span
-        if (this.jaegerManager.isJaegerTracingEnabled()) {
-            const jaegerTraceId: string = this.jaegerManager.getTraceId(jaegerSpan);
-            headers.push(['uber-trace-id', jaegerTraceId]);
-        }
-        return this._nativeRequest.invokeRequest({
+        const id = Request._callbackId++;
+        const promise = this.registerCallback(id);
+        this.invokeRequest(id, {
             method: RequestMethod.POST,
             url: url,
             data: data,
             headers: headers,
             retryCount: 0,
             options: options
-        }).then((resp) => {
-            this.jaegerManager.stopNetworkSpan(jaegerSpan, this._nativeBridge.getPlatform(), resp.responseCode.toString());
-            return resp;
-        }).catch((resp) => {
-            let responseCode: string = '';
-            if (resp && resp.nativeResponse && resp.nativeResponse.responseCode) {
-                responseCode = resp.nativeResponse.responseCode.toString();
-            }
-            this.jaegerManager.stopNetworkSpan(jaegerSpan, this._nativeBridge.getPlatform(), responseCode);
-            throw resp;
         });
+        return promise;
     }
 
     public head(url: string, headers: Array<[string, string]> = [], options?: IRequestOptions): Promise<INativeResponse> {
         if(typeof options === 'undefined') {
-            options = NativeRequestBridge.getDefaultRequestOptions();
+            options = Request.getDefaultRequestOptions();
         }
 
         // fix for Android 4.0 and older, https://code.google.com/p/android/issues/detail?id=24672
@@ -310,13 +140,16 @@ export class Request {
             headers.push(['Accept-Encoding', '']);
         }
 
-        return this._nativeRequest.invokeRequest({
+        const id = Request._callbackId++;
+        const promise = this.registerCallback(id);
+        this.invokeRequest(id, {
             method: RequestMethod.HEAD,
             url: url,
             headers: headers,
             retryCount: 0,
             options: options
         });
+        return promise;
     }
 
     // Follows the redirects of a URL, returning the final location.
@@ -334,7 +167,7 @@ export class Request {
                 } else {
                     this.head(requestUrl).then((response: INativeResponse) => {
                         if (Request.is3xxRedirect(response.responseCode)) {
-                            const location = NativeRequestBridge.getHeader(response.headers, 'location');
+                            const location = Request.getHeader(response.headers, 'location');
                             if (location) {
                                 makeRequest(location);
                             } else {
@@ -356,4 +189,125 @@ export class Request {
         });
     }
 
+    private registerCallback(id: number): Promise<INativeResponse> {
+        return new Promise<INativeResponse>((resolve, reject) => {
+            Request._callbacks[id] = new CallbackContainer(resolve, reject);
+        });
+    }
+
+    private invokeRequest(id: number, nativeRequest: INativeRequest): Promise<string> {
+        let connectTimeout = Request._connectTimeout;
+        let readTimeout = Request._readTimeout;
+        if(nativeRequest.options.timeout) {
+            connectTimeout = nativeRequest.options.timeout;
+            readTimeout = nativeRequest.options.timeout;
+        }
+
+        Request._requests[id] = nativeRequest;
+        switch(nativeRequest.method) {
+            case RequestMethod.GET:
+                return this._nativeBridge.Request.get(id.toString(), nativeRequest.url, nativeRequest.headers, connectTimeout, readTimeout);
+
+            case RequestMethod.POST:
+                return this._nativeBridge.Request.post(id.toString(), nativeRequest.url, nativeRequest.data || '', nativeRequest.headers, connectTimeout, readTimeout);
+
+            case RequestMethod.HEAD:
+                return this._nativeBridge.Request.head(id.toString(), nativeRequest.url, nativeRequest.headers, connectTimeout, readTimeout);
+
+            default:
+                throw new Error('Unsupported request method "' + nativeRequest.method + '"');
+        }
+    }
+
+    private finishRequest(id: number, status: RequestStatus, ...parameters: any[]) {
+        const callbackObject = Request._callbacks[id];
+        if(callbackObject) {
+            if(status === RequestStatus.COMPLETE) {
+                callbackObject.resolve(...parameters);
+            } else {
+                callbackObject.reject(...parameters);
+            }
+            delete Request._callbacks[id];
+            delete Request._requests[id];
+        }
+    }
+
+    private handleFailedRequest(id: number, nativeRequest: INativeRequest, errorMessage: string, nativeResponse?: INativeResponse): void {
+        if(nativeRequest.retryCount < nativeRequest.options.retries) {
+            nativeRequest.retryCount++;
+            setTimeout(() => {
+                this.invokeRequest(id, nativeRequest);
+            }, nativeRequest.options.retryDelay);
+        } else {
+            if(!nativeRequest.options.retryWithConnectionEvents) {
+                this.finishRequest(id, RequestStatus.FAILED, new RequestError(errorMessage, nativeRequest, nativeResponse));
+            }
+        }
+    }
+
+    private onRequestComplete(rawId: string, url: string, response: string, responseCode: number, headers: Array<[string, string]>): void {
+        const id = parseInt(rawId, 10);
+        const nativeResponse: INativeResponse = {
+            url: url,
+            response: response,
+            responseCode: responseCode,
+            headers: headers
+        };
+        const nativeRequest = Request._requests[id];
+
+        if(!nativeRequest) {
+            // ignore events without matching id, might happen when webview reinits
+            return;
+        }
+        if(Request.AllowedResponseCodes.exec(responseCode.toString())) {
+            this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
+        } else if(Request.RedirectResponseCodes.exec(responseCode.toString())) {
+            if(nativeRequest.options.followRedirects) {
+                const location = Request.getHeader(headers, 'location');
+                if(location && this.followRedirects(location)) {
+                    nativeRequest.url = location;
+                    this.invokeRequest(id, nativeRequest);
+                } else {
+                    this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
+                }
+            } else {
+                this.finishRequest(id, RequestStatus.COMPLETE, nativeResponse);
+            }
+        } else if(Request.ErrorResponseCodes.exec(responseCode.toString())) {
+            this.finishRequest(id, RequestStatus.FAILED, new RequestError('FAILED_WITH_ERROR_RESPONSE', nativeRequest, nativeResponse));
+        } else {
+            this.finishRequest(id, RequestStatus.FAILED, new RequestError('FAILED_WITH_UNKNOWN_RESPONSE_CODE', nativeRequest, nativeResponse));
+        }
+    }
+
+    private followRedirects(location: string) {
+        if(location.match(/^https?/i) && !location.match(/^https:\/\/itunes\.apple\.com/i) && !location.match(/\.apk$/i)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private onRequestFailed(rawId: string, url: string, error: string): void {
+        const id = parseInt(rawId, 10);
+        const nativeRequest = Request._requests[id];
+
+        if(!nativeRequest) {
+            // ignore events without matching id, might happen when webview reinits
+            return;
+        }
+
+        this.handleFailedRequest(id, nativeRequest, error);
+    }
+
+    private onNetworkConnected(): void {
+        for(const id in Request._requests) {
+            if(Request._requests.hasOwnProperty(id)) {
+                const request: INativeRequest = Request._requests[id];
+                if(request.options.retryWithConnectionEvents && request.options.retries === request.retryCount) {
+                    this.invokeRequest(parseInt(id, 10), request);
+                }
+            }
+        }
+    }
 }

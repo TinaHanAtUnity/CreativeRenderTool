@@ -1,21 +1,58 @@
 import { Platform } from 'Constants/Platform';
 
-class JaegerLocalEndpoint {
-    private serviceName: string;
+interface IJaegerLocalEndpoint {
+    readonly serviceName: string;
+}
+class JaegerLocalEndpoint implements IJaegerLocalEndpoint {
+    public serviceName: string;
 
     constructor(serviceName: string) {
         this.serviceName = serviceName;
     }
 }
 
-export class JaegerTags {
-    private deviceType: string;
+interface IJaegerAnnotation {
+    readonly timestamp: number;
+    readonly value: string;
+}
+class JaegerAnnotation implements IJaegerAnnotation {
+    public timestamp: number = JaegerSpan.genTimestamp();
+    public value: string;
 
-    constructor(platform: Platform) {
-        this.deviceType = this.getDescription(platform);
+    constructor(value: string) {
+        this.value = value;
+    }
+}
+
+export interface IJaegerSpan {
+    readonly traceId: string;
+    readonly name: string;
+    readonly parentId?: string;
+    readonly id: string;
+    readonly kind: string;
+    readonly timestamp: number;
+    readonly duration: number;
+    readonly debug: boolean;
+    readonly shared: boolean;
+    readonly localEndpoint: IJaegerLocalEndpoint;
+    readonly annotations: IJaegerAnnotation[];
+    readonly tags: any;
+}
+
+export enum JaegerTags {
+    StatusCode = 'status.code',
+    DeviceType = 'device.type',
+    Error = 'error',
+    ErrorMessage = 'error.message',
+}
+
+export class JaegerSpan implements IJaegerSpan {
+
+    public static genTimestamp(): number {
+        return Date.now() * 1000;
     }
 
-    private getDescription(platform: Platform): string {
+    public static getPlatform(platform: Platform): string {
         switch(platform) {
             case Platform.ANDROID: {
                 return 'ANDROID';
@@ -28,39 +65,9 @@ export class JaegerTags {
             }
         }
     }
-}
 
-export class JaegerNetworkTags extends JaegerTags {
-    private statusCode: string;
-
-    constructor(platform: Platform, statusCode: string) {
-        super(platform);
-        this.statusCode = statusCode;
-    }
-}
-
-class JaegerProcessTags extends JaegerTags {
-    private errorMessage?: string;
-
-    constructor(platform: Platform, errorMessage?: string) {
-        super(platform);
-        this.errorMessage = errorMessage;
-    }
-}
-
-export class JaegerAnnotation {
-    private timestamp: number = JaegerSpan.genTimestamp();
-    private value: string;
-
-    constructor(value: string) {
-        this.value = value;
-    }
-}
-
-export class JaegerSpan {
-
-    public static genTimestamp(): number {
-        return Date.now() * 1000;
+    public static stripQueryAndFragment(url: string): string {
+        return url.split(/[?#]/)[0];
     }
 
     // https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
@@ -72,46 +79,40 @@ export class JaegerSpan {
           });
     }
 
-    private traceId: string = JaegerSpan.uuidv4().substring(8, 24);
-    private name: string;
-    private id: string = JaegerSpan.uuidv4().substring(8, 24);
-    private kind: string = 'CLIENT';
-    private timestamp: number = JaegerSpan.genTimestamp();
-    private duration: number = 0;
-    private debug: boolean = true;
-    private shared: boolean = true;
-    private localEndpoint: JaegerLocalEndpoint;
-    private annotations: JaegerAnnotation[] = [];
-    private tags: JaegerTags = new JaegerTags(Platform.TEST);
+    public traceId: string = JaegerSpan.uuidv4().substring(8, 24);
+    public name: string;
+    public id: string = JaegerSpan.uuidv4().substring(8, 24);
+    public parentId?: string;
+    public kind: string = 'CLIENT';
+    public timestamp: number = JaegerSpan.genTimestamp();
+    public duration: number = 0;
+    public debug: boolean = true;
+    public shared: boolean = true;
+    public localEndpoint: IJaegerLocalEndpoint = new JaegerLocalEndpoint('ads-sdk');
+    public annotations: IJaegerAnnotation[] = [];
+    public tags: any = {};
 
-    constructor(name: string, serviceName: string, annotations: JaegerAnnotation[]) {
-        this.name = this.stripQueryAndFragment(name);
-        this.localEndpoint = new JaegerLocalEndpoint(this.stripQueryAndFragment(serviceName));
-        this.annotations = annotations;
+    constructor(operation: string, parentId?: string, traceId?: string) {
+        if (parentId) {
+            this.parentId = parentId;
+        }
+        if (traceId) {
+            this.traceId = traceId;
+        }
+        this.name = JaegerSpan.stripQueryAndFragment(operation);
     }
 
-    public getTraceId(): string {
-        return this.traceId;
+    public addTag(key: JaegerTags, value: string) {
+        this.tags[key] = value;
     }
 
-    public getId(): string {
-        return this.id;
+    public addAnnotation(value: string) {
+        const annotation = new JaegerAnnotation(value);
+        this.annotations.push(annotation);
     }
 
-    public stopNetwork(platform: Platform, responseCode: string) {
-        const tags = new JaegerNetworkTags(platform, responseCode);
-        this.tags = tags;
+    public stop() {
         this.duration = JaegerSpan.genTimestamp() - this.timestamp;
-    }
-
-    public stopProcess(platform: Platform, errorMessage?: string) {
-        const tags = new JaegerProcessTags(platform, errorMessage);
-        this.tags = tags;
-        this.duration = JaegerSpan.genTimestamp() - this.timestamp;
-    }
-
-    private stripQueryAndFragment(url: string): string {
-        return url.split(/[?#]/)[0];
     }
 
 }

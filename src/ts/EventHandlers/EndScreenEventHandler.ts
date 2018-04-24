@@ -11,7 +11,7 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { RequestError } from 'Errors/RequestError';
 import { DiagnosticError } from 'Errors/DiagnosticError';
-import { NativeRequestBridge } from 'Utilities/Request';
+import { Request } from 'Utilities/Request';
 import { Campaign } from 'Models/Campaign';
 import { Placement } from 'Models/Placement';
 import { Url } from 'Utilities/Url';
@@ -155,7 +155,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
 
         if(parameters.clickAttributionUrlFollowsRedirects && parameters.clickAttributionUrl) {
             this._thirdPartyEventManager.clickAttributionEvent(parameters.clickAttributionUrl, true).then(response => {
-                const location = NativeRequestBridge.getHeader(response.headers, 'location');
+                const location = Request.getHeader(response.headers, 'location');
                 if(location) {
                     if(platform === Platform.ANDROID) {
                         const parsedLocation = Url.parse(location);

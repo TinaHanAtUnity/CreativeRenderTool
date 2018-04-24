@@ -1,7 +1,7 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { NativeRequestBridge, RequestMethod, IRequestOptions } from 'Utilities/Request';
+import { Request } from 'Utilities/Request';
 import { WakeUpManager } from 'Managers/WakeUpManager';
-import { JaegerSpan, JaegerAnnotation } from './JaegerSpan';
+import { JaegerSpan, IJaegerSpan } from 'Jaeger/JaegerSpan';
 import { Platform } from 'Constants/Platform';
 
 export class JaegerManager {
@@ -9,11 +9,11 @@ export class JaegerManager {
     private static _openSpans: Map<string, JaegerSpan> = new Map();
     private static _closedSpans: Map<string, JaegerSpan> = new Map();
 
-    private _nativeRequestBridge: NativeRequestBridge;
+    private _request: Request;
     private _isJaegerTracingEnabled: boolean = false;
 
-    constructor(nativeRequestBridge: NativeRequestBridge) {
-        this._nativeRequestBridge = nativeRequestBridge;
+    constructor(request: Request) {
+        this._request = request;
     }
 
     public setJaegerTracingEnabled(value: boolean) {
@@ -24,33 +24,27 @@ export class JaegerManager {
         return this._isJaegerTracingEnabled;
     }
 
-    public getTraceId(span: JaegerSpan): string {
+    public getTraceId(span: IJaegerSpan): [string, string] {
         const jaegerFlags = this._isJaegerTracingEnabled ? '01' : '00';
-        const jaegerTraceId: string = span.getTraceId() + ':' + span.getId() + ':' + span.getId() + ':' + jaegerFlags;
-        return jaegerTraceId;
+        const parentId = span.parentId ? span.parentId : '0';
+        const jaegerTraceId: string = span.traceId + ':' + span.id + ':' + parentId + ':' + jaegerFlags;
+        return ['uber-trace-id', jaegerTraceId];
     }
 
     public addOpenSpan(span: JaegerSpan) {
-        JaegerManager._openSpans.set(span.getId(), span);
+        JaegerManager._openSpans.set(span.id, span);
     }
 
-    public startSpan(name: string, serviceName: string, annotations: JaegerAnnotation[]): JaegerSpan {
-        const span = new JaegerSpan(name, serviceName, annotations);
-        JaegerManager._openSpans.set(span.getId(), span);
+    public startSpan(operation: string, parentId?: string, traceId?: string): JaegerSpan {
+        const span = new JaegerSpan(operation, parentId, traceId);
+        JaegerManager._openSpans.set(span.id, span);
         return span;
     }
 
-    public stopNetworkSpan(span: JaegerSpan, platform: Platform, statusCode: string) {
-        span.stopNetwork(platform, statusCode);
-        JaegerManager._closedSpans.set(span.getId(), span);
-        JaegerManager._openSpans.delete(span.getId());
-        this.flushClosedSpans();
-    }
-
-    public stopProcessSpan(span: JaegerSpan, platform: Platform, error?: string) {
-        span.stopProcess(platform, error);
-        JaegerManager._closedSpans.set(span.getId(), span);
-        JaegerManager._openSpans.delete(span.getId());
+    public stop(span: JaegerSpan) {
+        span.stop();
+        JaegerManager._closedSpans.set(span.id, span);
+        JaegerManager._openSpans.delete(span.id);
         this.flushClosedSpans();
     }
 
@@ -70,20 +64,12 @@ export class JaegerManager {
     private postToJaeger(spans: JaegerSpan[]) {
         if (this._isJaegerTracingEnabled === true) {
             const headers: Array<[string, string]> = [];
-            const options: IRequestOptions = NativeRequestBridge.getDefaultRequestOptions();
-            const url: string = 'http://10.1.83.159:9411/api/v2/spans'; // TODO point to real jaeger
+            const url: string = 'http://tracing-collector-stg.internal.unity3d.com/api/v2/spans'; // TODO point to real jaeger
             const data: string = JSON.stringify(spans);
 
             headers.push(['Content-Type', 'application/json']);
 
-            this._nativeRequestBridge.invokeRequest({
-                method: RequestMethod.POST,
-                url: url,
-                data: data,
-                headers: headers,
-                retryCount: 0,
-                options: options
-            });
+            this._request.post(url, data, headers);
         }
     }
 

@@ -1,5 +1,5 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { Request, INativeResponse, NativeRequestBridge } from 'Utilities/Request';
+import { Request, INativeResponse } from 'Utilities/Request';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Analytics } from 'Utilities/Analytics';
 import { RequestError } from 'Errors/RequestError';
@@ -31,7 +31,7 @@ export class ThirdPartyEventManager {
 
     public sendEvent(event: string, sessionId: string, url: string, useWebViewUserAgentForTracking?: boolean, headers?: Array<[string, string]>): Promise<INativeResponse> {
         headers = headers || [];
-        if (!NativeRequestBridge.getHeader(headers, 'User-Agent')) {
+        if (!Request.getHeader(headers, 'User-Agent')) {
             if (typeof navigator !== 'undefined' && navigator.userAgent && useWebViewUserAgentForTracking === true) {
                 headers.push(['User-Agent', navigator.userAgent]);
             }
