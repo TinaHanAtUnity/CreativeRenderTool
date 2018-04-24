@@ -58,7 +58,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             {
                 event: 'click',
                 listener: (event: Event) => this.onDownloadEvent(event),
-                selector: '.game-background, .download-container, .game-icon'
+                selector: '.game-background, .download-container, .game-icon, .game-image'
             },
             {
                 event: 'click',
