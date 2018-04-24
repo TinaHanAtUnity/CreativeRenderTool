@@ -634,6 +634,7 @@ export class CampaignManager {
                 body.placements = placementRequest;
                 body.properties = this._configuration.getProperties();
                 body.sessionDepth = SdkStats.getAdRequestOrdinal();
+                body.projectId = this._configuration.getUnityProjectId();
                 this._realtimeBody = body;
                 return body;
             });
