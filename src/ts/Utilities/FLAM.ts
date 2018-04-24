@@ -55,7 +55,6 @@ class FLAMSingleton {
     }
 
     private _processFLAMTest(ft: IFLAMTest): Promise<boolean> {
-        console.log('Running', ft.name);
         return new Promise((resolve) => {
             if (ft.type === 'video') {
                 const el = <HTMLVideoElement>document.createElement('video');
@@ -103,8 +102,6 @@ class FLAMSingleton {
             other: `FLAM test for ${test.name}: ${pass ? 'PASSED' : 'FAILED'}`,
             ts: new Date()
         };
-
-        console.log(data.other);
 
         Diagnostics.trigger('flam_measure_test', data);
         nativeBridge.Storage.set(StorageType.PRIVATE, `flam.${test.name}`, pass);
