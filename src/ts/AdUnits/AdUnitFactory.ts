@@ -111,9 +111,9 @@ export class AdUnitFactory {
         };
 
         try {
-            FLAM.measure(document.body, nativeBridge);
+            FLAM.measure(['webp', 'hevc', 'vp9'], nativeBridge);
         } catch (e) {
-            Diagnostics.trigger('canvas_performance_test_error', {
+            Diagnostics.trigger('flam_measure_test_error', {
                 error: e,
                 device: window.navigator.userAgent
             });
@@ -270,7 +270,14 @@ export class AdUnitFactory {
         const resourceUrl = parameters.campaign.getResourceUrl();
         let endScreen: MRAIDEndScreen | undefined;
 
-        FLAM.measure(document.body, nativeBridge);
+        try {
+            FLAM.measure(['webp', 'hevc', 'vp9'], nativeBridge);
+        } catch (e) {
+            Diagnostics.trigger('flam_measure_test_error', {
+                error: e,
+                device: window.navigator.userAgent
+            });
+        }
 
         let mraid: MRAIDView<IMRAIDViewHandler>;
         if(resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) {
