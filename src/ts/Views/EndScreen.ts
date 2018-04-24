@@ -41,7 +41,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     private _campaignId: string | undefined;
     private _osVersion: string | undefined;
 
-    constructor(nativeBridge: NativeBridge, coppaCompliant: boolean, language: string, gameId: string, gameName: string | undefined, abGroup: number, adUnitStyle?: AdUnitStyle, showOptOutPopup: boolean = false, campaignId?: string | undefined, osVersion?: string | undefined) {
+    constructor(nativeBridge: NativeBridge, coppaCompliant: boolean, language: string, gameId: string, gameName: string | undefined, abGroup: number, adUnitStyle?: AdUnitStyle, showOptOutPopup: boolean = false, campaignId?: string, osVersion?: string) {
         super(nativeBridge, 'end-screen');
         this._coppaCompliant = coppaCompliant;
         this._localization = new Localization(language, 'endscreen');
