@@ -3,7 +3,6 @@ import * as sinon from 'sinon';
 import { assert } from 'chai';
 
 import { AdUnitFactory } from 'AdUnits/AdUnitFactory';
-import { Vast } from 'Models/Vast/Vast';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Request } from 'Utilities/Request';
@@ -12,12 +11,8 @@ import { Platform } from 'Constants/Platform';
 import { Configuration } from 'Models/Configuration';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { SessionManager } from 'Managers/SessionManager';
-import { VastVideoEventHandlers } from 'EventHandlers/VastVideoEventHandlers';
-import { PerformanceVideoEventHandlers } from 'EventHandlers/PerformanceVideoEventHandlers';
 import { NativeBridge } from 'Native/NativeBridge';
 
-import { VastAdUnit } from 'AdUnits/VastAdUnit';
-import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { MetaDataManager } from 'Managers/MetaDataManager';
@@ -117,62 +112,6 @@ describe('AdUnitFactoryTest', () => {
 
     afterEach(() => {
         sandbox.restore();
-    });
-
-    describe('Performance AdUnit', () => {
-        it('should call onVideoError on video controller error ', () => {
-            sandbox.stub(PerformanceVideoEventHandlers, 'onVideoError').returns(null);
-
-            adUnitParameters.operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
-                nativeBridge: nativeBridge,
-                request: request,
-                metaDataManager: metaDataManager,
-                sessionManager: sessionManager,
-                clientInfo: clientInfo,
-                deviceInfo: deviceInfo,
-                configuration: config,
-                campaign: TestFixtures.getCampaign()
-            });
-
-            sandbox.stub(operativeEventManager, 'sendStart').returns(Promise.resolve());
-            sandbox.stub(operativeEventManager, 'sendView').returns(Promise.resolve());
-            sandbox.stub(operativeEventManager, 'sendThirdQuartile').returns(Promise.resolve());
-            sandbox.stub(operativeEventManager, 'sendSkip').returns(Promise.resolve());
-
-            const videoAdUnit = <PerformanceAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
-            videoAdUnit.onError.trigger();
-            sinon.assert.calledOnce(<sinon.SinonSpy>PerformanceVideoEventHandlers.onVideoError);
-        });
-    });
-
-    describe('VAST AdUnit', () => {
-        it('should call onVideoError on video controller error', () => {
-            sandbox.stub(VastVideoEventHandlers, 'onVideoError').returns(null);
-            const vast = new Vast([], []);
-            sandbox.stub(vast, 'getVideoUrl').returns('http://www.google.fi');
-            const vastCampaign = TestFixtures.getEventVastCampaign();
-            adUnitParameters.campaign = vastCampaign;
-            adUnitParameters.forceOrientation = Orientation.NONE;
-            adUnitParameters.operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
-                nativeBridge: nativeBridge,
-                request: request,
-                metaDataManager: metaDataManager,
-                sessionManager: sessionManager,
-                clientInfo: clientInfo,
-                deviceInfo: deviceInfo,
-                configuration: config,
-                campaign: vastCampaign
-            });
-
-            sandbox.stub(operativeEventManager, 'sendStart').returns(Promise.resolve());
-            sandbox.stub(operativeEventManager, 'sendView').returns(Promise.resolve());
-            sandbox.stub(operativeEventManager, 'sendThirdQuartile').returns(Promise.resolve());
-            sandbox.stub(operativeEventManager, 'sendSkip').returns(Promise.resolve());
-
-            const videoAdUnit = <VastAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
-            videoAdUnit.onError.trigger();
-            sinon.assert.calledOnce(<sinon.SinonSpy>VastVideoEventHandlers.onVideoError);
-        });
     });
 
     describe('MRAID AdUnit', () => {
