@@ -4,6 +4,7 @@ import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { HttpKafka } from 'Utilities/HttpKafka';
 import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
 import { EventType } from 'Models/Session';
+import { INativeResponse } from 'Utilities/Request';
 
 export class XPromoOperativeEventManager extends OperativeEventManager {
     private _xPromoCampaign: XPromoCampaign;
@@ -61,7 +62,7 @@ export class XPromoOperativeEventManager extends OperativeEventManager {
         });
     }
 
-    public sendHttpKafkaEvent(kafkaType: string, eventType: string, placement: Placement, videoOrientation?: string) {
+    public sendHttpKafkaEvent(kafkaType: string, eventType: string, placement: Placement, videoOrientation?: string): Promise<INativeResponse> {
         const fulfilled = ([id, infoJson]: [string, any]) => {
 
             // todo: clears duplicate data for httpkafka, should be cleaned up
