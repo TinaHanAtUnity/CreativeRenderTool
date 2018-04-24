@@ -15,7 +15,7 @@ import { Url } from 'Utilities/Url';
 import OnCometMraidPlcCampaign from 'json/campaigns/performance/CometMraidUrlCampaign.json';
 import OnCometVideoPlcCampaign from 'json/campaigns/performance/CometVideoCampaign.json';
 
-import { SQUARE_CAMPAIGNS, SQUARE_END_SCREEN_AB_GROUPS } from '../../../Utilities/SquareEndScreenUtilities';
+import { SQUARE_CAMPAIGNS, SQUARE_END_SCREEN_AB_GROUPS } from 'Utilities/SquareEndScreenUtilities';
 
 describe('CometCampaignParser', () => {
     const placements = ['TestPlacement'];
