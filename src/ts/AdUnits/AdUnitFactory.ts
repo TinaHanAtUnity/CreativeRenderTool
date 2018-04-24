@@ -303,7 +303,7 @@ export class AdUnitFactory {
         promoView.render();
         document.body.appendChild(promoView.container());
 
-        promoView.onClose.subscribe(() => PromoEventHandler.onClose(nativeBridge, promoAdUnit, parameters.campaign.getGamerId(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup(), parameters.campaign.getTrackingUrlsForEvent('purchase')));
+        promoView.onClose.subscribe(() => PromoEventHandler.onClose(nativeBridge, promoAdUnit, parameters.campaign.getGamerId(), parameters.clientInfo.getGameId() + '|' + parameters.configuration.getToken(), parameters.campaign.getAbGroup(), parameters.campaign.getTrackingUrlsForEvent('purchase')));
         promoView.onPromo.subscribe((productId) => PromoEventHandler.onPromo(nativeBridge, promoAdUnit, productId, parameters.campaign.getTrackingUrlsForEvent('purchase')));
         nativeBridge.Purchasing.onIAPSendEvent.subscribe((iapPayload) => PurchasingUtilities.handleSendIAPEvent(nativeBridge, iapPayload));
 

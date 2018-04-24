@@ -525,18 +525,30 @@ export class CampaignManager {
         const placementRequest: any = {};
 
         if(realtimePlacement && this._realtimeBody) {
-            placementRequest[realtimePlacement.getId()] = {
-                adTypes: realtimePlacement.getAdTypes(),
-                allowSkip: realtimePlacement.allowSkip(),
-            };
-            this._realtimeBody.placements = placementRequest;
+
+            const placements = this._configuration.getPlacements();
+            for (const placement in placements) {
+                if (placements.hasOwnProperty(placement)) {
+                    placementRequest[placement] = {
+                        adTypes: placements[placement].getAdTypes(),
+                        allowSkip: placements[placement].allowSkip(),
+                    };
+                }
+            }
 
             if(realtimePlacement.getRealtimeData()) {
                 const realtimeDataObject: any = {};
                 realtimeDataObject[realtimePlacement.getId()] = realtimePlacement.getRealtimeData();
                 this._realtimeBody.realtimeData = realtimeDataObject;
             }
-            return Promise.resolve(this._realtimeBody);
+
+            return this._deviceInfo.getFreeSpace().then((freeSpace) => {
+                this._realtimeBody.deviceFreeSpace = freeSpace;
+                return this._realtimeBody;
+            }).catch((e) => {
+                // Try the request with the original request value anyways
+                return this._realtimeBody;
+            });
         }
         this._realtimeBody = undefined;
 
@@ -622,6 +634,7 @@ export class CampaignManager {
                 body.placements = placementRequest;
                 body.properties = this._configuration.getProperties();
                 body.sessionDepth = SdkStats.getAdRequestOrdinal();
+                body.projectId = this._configuration.getUnityProjectId();
                 this._realtimeBody = body;
                 return body;
             });
