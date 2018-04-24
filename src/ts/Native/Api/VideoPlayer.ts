@@ -1,10 +1,9 @@
 import { Double } from 'Utilities/Double';
 import { NativeBridge } from 'Native/NativeBridge';
-import { Observable1, Observable4 } from 'Utilities/Observable';
-import { NativeApi } from 'Native/NativeApi';
 import { Platform } from 'Constants/Platform';
 import { IosVideoPlayerApi } from 'Native/Api/IosVideoPlayer';
 import { AndroidVideoPlayerApi } from 'Native/Api/AndroidVideoPlayer';
+import { NativeApiWithEventHandlers } from 'Native/NativeApiWithEventHandlers';
 
 enum VideoPlayerEvent {
     PROGRESS,
@@ -17,19 +16,21 @@ enum VideoPlayerEvent {
     STOP,
 }
 
-export class VideoPlayerApi extends NativeApi {
+export interface IVideoEventHandler {
+    onProgress(progress: number): void;
+    onCompleted(url: string): void;
+    onPrepared(url: string, duration: number, width: number, height: number): void;
+    onPrepareTimeout(url: string): void;
+    onPlay(url: string): void;
+    onPause(url: string): void;
+    onSeek(url: string): void;
+    onStop(url: string): void;
+}
+
+export class VideoPlayerApi extends NativeApiWithEventHandlers<IVideoEventHandler> {
 
     public Ios: IosVideoPlayerApi;
     public Android: AndroidVideoPlayerApi;
-
-    public readonly onProgress = new Observable1<number>();
-    public readonly onCompleted = new Observable1<string>();
-    public readonly onPrepared = new Observable4<string, number, number, number>();
-    public readonly onPrepareTimeout = new Observable1<string>();
-    public readonly onPlay = new Observable1<string>();
-    public readonly onPause = new Observable1<string>();
-    public readonly onSeek = new Observable1<string>();
-    public readonly onStop = new Observable1<string>();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'VideoPlayer');
@@ -87,35 +88,35 @@ export class VideoPlayerApi extends NativeApi {
     public handleEvent(event: string, parameters: any[]): void {
         switch(event) {
             case VideoPlayerEvent[VideoPlayerEvent.PROGRESS]:
-                this.onProgress.trigger(parameters[0]);
+                this._handlers.forEach(handler => handler.onProgress(parameters[0]));
                 break;
 
             case VideoPlayerEvent[VideoPlayerEvent.COMPLETED]:
-                this.onCompleted.trigger(parameters[0]);
+                this._handlers.forEach(handler => handler.onCompleted(parameters[0]));
                 break;
 
             case VideoPlayerEvent[VideoPlayerEvent.PREPARED]:
-                this.onPrepared.trigger(parameters[0], parameters[1], parameters[2], parameters[3]);
+                this._handlers.forEach(handler => handler.onPrepared(parameters[0], parameters[1], parameters[2], parameters[3]));
                 break;
 
             case VideoPlayerEvent[VideoPlayerEvent.PREPARE_TIMEOUT]:
-                this.onPrepareTimeout.trigger(parameters[0]);
+                this._handlers.forEach(handler => handler.onPrepareTimeout(parameters[0]));
                 break;
 
             case VideoPlayerEvent[VideoPlayerEvent.PLAY]:
-                this.onPlay.trigger(parameters[0]);
+                this._handlers.forEach(handler => handler.onPlay(parameters[0]));
                 break;
 
             case VideoPlayerEvent[VideoPlayerEvent.PAUSE]:
-                this.onPause.trigger(parameters[0]);
+                this._handlers.forEach(handler => handler.onPause(parameters[0]));
                 break;
 
             case VideoPlayerEvent[VideoPlayerEvent.SEEKTO]:
-                this.onSeek.trigger(parameters[0]);
+                this._handlers.forEach(handler => handler.onSeek(parameters[0]));
                 break;
 
             case VideoPlayerEvent[VideoPlayerEvent.STOP]:
-                this.onStop.trigger(parameters[0]);
+                this._handlers.forEach(handler => handler.onStop(parameters[0]));
                 break;
 
             default:
@@ -126,5 +127,4 @@ export class VideoPlayerApi extends NativeApi {
                 }
         }
     }
-
 }

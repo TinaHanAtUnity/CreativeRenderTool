@@ -288,6 +288,12 @@
       "required": "all",
       "queryString": false,
       "body": true
+    },
+    {
+      "parameter": "projectId",
+      "required": "all",
+      "queryString": false,
+      "body": true
     }
   ]
 }

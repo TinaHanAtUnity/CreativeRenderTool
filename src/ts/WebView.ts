@@ -447,7 +447,7 @@ export class WebView {
             this._campaignManager.setPreviousPlacementId(placement.getId());
 
             // Temporary for realtime testing purposes
-            if (placement.getRealtimeData()) {
+            if (this._wasRealtimePlacement) {
                 this._currentAdUnit.onStart.subscribe(() => {
                     const startDelay = Date.now() - start;
                     Diagnostics.trigger('realtime_delay', {
@@ -455,11 +455,11 @@ export class WebView {
                         startDelay: startDelay,
                         totalDelay: this._requestDelay + startDelay,
                         auctionId: campaign.getSession().getId(),
-                        wasRealtime: this._wasRealtimePlacement,
-                        campaignRawResponse: campaign.getAdType()
+                        adUnitDescription: this._currentAdUnit.description()
                     });
                 });
             }
+            this._wasRealtimePlacement = false;
 
             this._currentAdUnit.show().then(() => {
                 if(this._nativeBridge.getPlatform() === Platform.ANDROID && (this._configuration.getAbGroup() === 9 || this._configuration.getAbGroup() === 10)) {
