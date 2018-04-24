@@ -11,8 +11,6 @@ import { Platform } from 'Constants/Platform';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { FocusManager } from 'Managers/FocusManager';
 import { Request } from 'Utilities/Request';
-import { DH_NOT_SUITABLE_GENERATOR } from 'constants';
-import { Diagnostics } from 'Utilities/Diagnostics';
 
 describe('ComScoreTrackingServiceTest', () => {
     const stubbedDateNowPlay: number = 3333;

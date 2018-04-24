@@ -37,6 +37,8 @@ export interface IJaegerSpan {
     readonly localEndpoint: IJaegerLocalEndpoint;
     readonly annotations: IJaegerAnnotation[];
     readonly tags: any;
+
+    stop(): void;
 }
 
 export enum JaegerTags {

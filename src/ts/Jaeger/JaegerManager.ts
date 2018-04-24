@@ -1,13 +1,13 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { Request } from 'Utilities/Request';
 import { WakeUpManager } from 'Managers/WakeUpManager';
-import { JaegerSpan, IJaegerSpan } from 'Jaeger/JaegerSpan';
+import { IJaegerSpan, JaegerSpan } from 'Jaeger/JaegerSpan';
 import { Platform } from 'Constants/Platform';
 
 export class JaegerManager {
 
-    private static _openSpans: Map<string, JaegerSpan> = new Map();
-    private static _closedSpans: Map<string, JaegerSpan> = new Map();
+    private static _openSpans: Map<string, IJaegerSpan> = new Map();
+    private static _closedSpans: Map<string, IJaegerSpan> = new Map();
 
     private _request: Request;
     private _isJaegerTracingEnabled: boolean = false;
@@ -31,7 +31,7 @@ export class JaegerManager {
         return ['uber-trace-id', jaegerTraceId];
     }
 
-    public addOpenSpan(span: JaegerSpan) {
+    public addOpenSpan(span: IJaegerSpan) {
         JaegerManager._openSpans.set(span.id, span);
     }
 
@@ -41,7 +41,7 @@ export class JaegerManager {
         return span;
     }
 
-    public stop(span: JaegerSpan) {
+    public stop(span: IJaegerSpan) {
         span.stop();
         JaegerManager._closedSpans.set(span.id, span);
         JaegerManager._openSpans.delete(span.id);
@@ -50,8 +50,8 @@ export class JaegerManager {
 
     private flushClosedSpans() {
         if (JaegerManager._openSpans.size <= 0) {
-            const spans: JaegerSpan[] = [];
-            JaegerManager._closedSpans.forEach((value: JaegerSpan, key: string) => {
+            const spans: IJaegerSpan[] = [];
+            JaegerManager._closedSpans.forEach((value: IJaegerSpan, key: string) => {
                 spans.push(value);
             });
             JaegerManager._closedSpans.clear();
@@ -61,10 +61,10 @@ export class JaegerManager {
         }
     }
 
-    private postToJaeger(spans: JaegerSpan[]) {
+    private postToJaeger(spans: IJaegerSpan[]) {
         if (this._isJaegerTracingEnabled === true) {
             const headers: Array<[string, string]> = [];
-            const url: string = 'http://tracing-collector-stg.internal.unity3d.com/api/v2/spans'; // TODO point to real jaeger
+            const url: string = 'http://tracing-collector-stg.internal.unity3d.com/api/v2/spans';
             const data: string = JSON.stringify(spans);
 
             headers.push(['Content-Type', 'application/json']);

@@ -202,7 +202,7 @@ export class CampaignManager {
             return resp;
         }).catch((error) => {
             jaegerSpan.addTag(JaegerTags.Error, 'true');
-            jaegerSpan.addTag(JaegerTags.Error, error.message);
+            jaegerSpan.addTag(JaegerTags.ErrorMessage, error.message);
             jaegerSpan.addAnnotation(error.message);
             this._jaegerManager.stop(jaegerSpan);
             throw new Error(error);

@@ -273,6 +273,9 @@ export class WebView {
                 this._nativeBridge.setAutoBatchEnabled(false);
             }
         }).catch(error => {
+            jaegerInitSpan.addAnnotation(error.message);
+            jaegerInitSpan.addTag(JaegerTags.Error, 'true');
+            jaegerInitSpan.addTag(JaegerTags.ErrorMessage, error.message);
             this._jaegerManager.stop(jaegerInitSpan);
 
             if(error instanceof ConfigError) {

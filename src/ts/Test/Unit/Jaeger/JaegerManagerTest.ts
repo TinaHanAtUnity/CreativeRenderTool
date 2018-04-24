@@ -53,7 +53,8 @@ describe('JaegerManager', () => {
                 shared: true,
                 localEndpoint: { serviceName: 'blah' },
                 annotations: [],
-                tags: new Map()
+                tags: new Map(),
+                stop: sinon.stub()
             };
         });
 
@@ -83,7 +84,8 @@ describe('JaegerManager', () => {
                 localEndpoint: { serviceName: 'blah' },
                 annotations: [],
                 tags: new Map(),
-                parentId: '45bcdf4512c14332'
+                parentId: '45bcdf4512c14332',
+                stop: sinon.stub()
             };
             const traceId = jaegerManager.getTraceId(jaegerSpan);
             assert.equal(traceId[0], 'uber-trace-id');
@@ -103,7 +105,8 @@ describe('JaegerManager', () => {
                 localEndpoint: { serviceName: 'blah' },
                 annotations: [],
                 tags: new Map(),
-                parentId: '45bcdf4512c14332'
+                parentId: '45bcdf4512c14332',
+                stop: sinon.stub()
             };
             jaegerManager.setJaegerTracingEnabled(true);
             const traceId = jaegerManager.getTraceId(jaegerSpan);
