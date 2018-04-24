@@ -1,3 +1,7 @@
+# Tue Apr 24 15:26:28 UTC 2018
+
+* Revert NewRefreshManager and use only OldCampaignRefreshManager
+
 # Tue Apr 24 07:09:48 UTC 2018
 
 * Use NewRefreshManager as default.
