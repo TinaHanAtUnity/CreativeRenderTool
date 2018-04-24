@@ -60,7 +60,7 @@ export class Tap {
             });
 
             event.stopPropagation();
-            if(!event.target.dispatchEvent(fakeEvent)) {
+            if(event.target && !event.target.dispatchEvent(fakeEvent)) {
                 event.preventDefault();
             }
         }
