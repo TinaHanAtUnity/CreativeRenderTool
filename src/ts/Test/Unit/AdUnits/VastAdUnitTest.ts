@@ -119,7 +119,7 @@ describe('VastAdUnit', () => {
         vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
     });
 
-    afterEach(() => sandbox.restore);
+    afterEach(() => sandbox.restore());
 
     describe('sendTrackingEvent', () => {
         it('should replace "%ZONE%" in the url with the placement id', () => {
