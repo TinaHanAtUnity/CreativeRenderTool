@@ -182,7 +182,7 @@ export class PurchasingUtilities {
             iapPayload.gamerId = PurchasingUtilities._configuration.getGamerId();
             iapPayload.iapPromo = true;
             iapPayload.abGroup = PurchasingUtilities._configuration.getAbGroup();
-            iapPayload.gameId = PurchasingUtilities._clientInfo.getGameId();
+            iapPayload.gameId = PurchasingUtilities._clientInfo.getGameId() + '|' + PurchasingUtilities._configuration.getToken();
             iapPayload.request = IPromoRequest.SETIDS;
         }
         return iapPayload;
