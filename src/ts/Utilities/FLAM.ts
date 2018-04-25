@@ -121,7 +121,16 @@ class FLAMSingleton {
     }
 
     private _getFLAMTestByName(name: string): IFLAMTest | undefined {
-        return this._FLAMTests.find((ft) => ft.name === name);
+        if (typeof this._FLAMTests.find === 'function') {
+            return this._FLAMTests.find((ft) => ft.name === name);
+        } else {
+            /* Apparently some old android devices don't know about find function... */
+            let ft;
+            for (const _ft of this._FLAMTests) {
+                ft = _ft.name === name ? _ft : undefined;
+            }
+            return ft;
+        }
     }
 
     private _storeData(test: IFLAMTest, pass: boolean, nativeBridge: NativeBridge) {
