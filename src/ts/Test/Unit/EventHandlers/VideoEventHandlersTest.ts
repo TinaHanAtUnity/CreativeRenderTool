@@ -107,7 +107,7 @@ describe('VideoEventHandlersTest', () => {
 
         placement = TestFixtures.getPlacement();
         overlay = new Overlay(nativeBridge, false, 'en', configuration.getGamerId(), configuration.getAbGroup());
-        endScreen = new PerformanceEndScreen(nativeBridge, performanceCampaign, true, 'en', '12345');
+        endScreen = new PerformanceEndScreen(nativeBridge, performanceCampaign, true, 'en', '12345', '8.0');
 
         vastAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,

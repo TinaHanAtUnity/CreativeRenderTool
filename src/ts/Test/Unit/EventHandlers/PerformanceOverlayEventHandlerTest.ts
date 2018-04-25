@@ -67,7 +67,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
             configuration: configuration,
             campaign: campaign
         });
-        endScreen = new PerformanceEndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
+        endScreen = new PerformanceEndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId(), deviceInfo.getOsVersion());
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
 
         performanceAdUnitParameters = {

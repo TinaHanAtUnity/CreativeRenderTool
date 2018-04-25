@@ -162,7 +162,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             return SQUARE_END_SCREEN;
         }
 
-        if (this._abGroup === FANCY_END_SCREEN_AB_GROUP) {
+        if (this._abGroup === FANCY_END_SCREEN_AB_GROUP && this.canShowFancyEndSCreen()) {
             return FANCY_END_SCREEN;
         }
 
@@ -187,13 +187,20 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
     private onOptOutPopupEvent(event: Event) {
         event.preventDefault();
-
         this._gdprPopupClicked = true;
 
         this._privacy = new Privacy(this._nativeBridge, this._coppaCompliant);
         this._privacy.render();
         document.body.appendChild(this._privacy.container());
         this._privacy.addEventHandler(this);
+    }
+
+    private canShowFancyEndSCreen() {
+        if (!this._osVersion || this._nativeBridge.getPlatform() === Platform.IOS) {
+            return true;
+        }
+        console.log('OS VERSION', this._osVersion);
+        return !this._osVersion.match(/^4/);
     }
 
     private getTemplate() {
