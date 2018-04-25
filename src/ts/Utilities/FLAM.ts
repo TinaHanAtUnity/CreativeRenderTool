@@ -19,7 +19,7 @@ interface IFLAMErrorData {
 }
 
 /*
-* Basic class to measure webview capabilities of certain device
+* Basic class to measure webview capabilities of device
 * */
 class FLAMSingleton {
 
