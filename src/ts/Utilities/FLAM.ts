@@ -10,6 +10,9 @@ interface IFLAMTest {
     base64data: string;
 }
 
+/*
+* Class to measure webview capabilities of certain device
+* */
 class FLAMSingleton {
 
     public static getStoredData(testName: string, nativeBridge: NativeBridge): Promise<boolean> {
