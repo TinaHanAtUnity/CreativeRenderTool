@@ -37,7 +37,7 @@ export class ConfigManager {
             }
 
             const url: string = ConfigManager.createConfigUrl(clientInfo, deviceInfo, framework, adapter, gamerId);
-            jaegerSpan.addTag(JaegerTags.DeviceType, JaegerSpan.getPlatform(nativeBridge.getPlatform()));
+            jaegerSpan.addTag(JaegerTags.DeviceType, Platform[nativeBridge.getPlatform()]);
             nativeBridge.Sdk.logInfo('Requesting configuration from ' + url);
             return request.get(url, [], {
                 retries: 2,

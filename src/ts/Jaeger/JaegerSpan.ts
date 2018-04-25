@@ -54,20 +54,6 @@ export class JaegerSpan implements IJaegerSpan {
         return Date.now() * 1000;
     }
 
-    public static getPlatform(platform: Platform): string {
-        switch(platform) {
-            case Platform.ANDROID: {
-                return 'ANDROID';
-            }
-            case Platform.IOS: {
-                return 'IOS';
-            }
-            default: {
-                return 'TEST';
-            }
-        }
-    }
-
     public static stripQueryAndFragment(url: string): string {
         return url.split(/[?#]/)[0];
     }

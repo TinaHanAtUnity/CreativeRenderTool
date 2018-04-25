@@ -146,7 +146,7 @@ export class CampaignManager {
 
         this.resetRealtimeDataForPlacements();
         const jaegerSpan = this._jaegerManager.startSpan('CampaignManagerRequest');
-        jaegerSpan.addTag(JaegerTags.DeviceType, JaegerSpan.getPlatform(this._nativeBridge.getPlatform()));
+        jaegerSpan.addTag(JaegerTags.DeviceType, Platform[this._nativeBridge.getPlatform()]);
         return Promise.all([this.createRequestUrl(false), this.createRequestBody(nofillRetry)]).then(([requestUrl, requestBody]) => {
             this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
             const body = JSON.stringify(requestBody);

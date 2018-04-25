@@ -246,7 +246,7 @@ export class WebView {
 
             const enableCachedResponse = this._configuration.getAbGroup() === 7 || this._configuration.getAbGroup() === 8;
             const refreshSpan = this._jaegerManager.startSpan('Refresh', jaegerInitSpan.id, jaegerInitSpan.traceId);
-            refreshSpan.addTag(JaegerTags.DeviceType, JaegerSpan.getPlatform(this._nativeBridge.getPlatform()));
+            refreshSpan.addTag(JaegerTags.DeviceType, Platform[this._nativeBridge.getPlatform()]);
             let refreshPromise;
             if (this._cachedCampaignResponse !== undefined && enableCachedResponse) {
                 refreshPromise = this._refreshManager.refreshFromCache(this._cachedCampaignResponse, refreshSpan);

@@ -24,23 +24,6 @@ describe('JaegerSpan', () => {
 
     });
 
-    describe('on getPlatform', () => {
-        it('should return ANDROID when platform is android', () => {
-            const platform = JaegerSpan.getPlatform(Platform.ANDROID);
-            assert.equal(platform, 'ANDROID');
-        });
-
-        it('should return IOS when platform is ios', () => {
-            const platform = JaegerSpan.getPlatform(Platform.IOS);
-            assert.equal(platform, 'IOS');
-        });
-
-        it('should return TEST when platform is test', () => {
-            const platform = JaegerSpan.getPlatform(Platform.TEST);
-            assert.equal(platform, 'TEST');
-        });
-    });
-
     describe('on stripQueryAndFragment', () => {
         it('should return without query when only query is supplied', () => {
             const urlString = JaegerSpan.stripQueryAndFragment('http://google.com/test?key=value&hello=world');
@@ -134,7 +117,7 @@ describe('JaegerSpan', () => {
         });
 
         it('span should have tag in map', () => {
-            span.addTag(JaegerTags.DeviceType, JaegerSpan.getPlatform(Platform.IOS));
+            span.addTag(JaegerTags.DeviceType, Platform[Platform.IOS]);
             assert.equal(span.tags[JaegerTags.DeviceType], 'IOS');
             const addTagFunc = (tmpSpan: JaegerSpan) => {
                 tmpSpan.addTag(JaegerTags.StatusCode, '200');
