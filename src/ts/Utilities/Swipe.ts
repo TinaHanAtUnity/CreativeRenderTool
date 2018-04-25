@@ -46,7 +46,7 @@ export class Swipe {
                 swipeEvent.initMouseEvent('swipe', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
 
                 event.stopPropagation();
-                if(!event.target.dispatchEvent(swipeEvent)) {
+                if(event.target && !event.target.dispatchEvent(swipeEvent)) {
                     event.preventDefault();
                 }
             }
