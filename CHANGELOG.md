@@ -1,3 +1,8 @@
+# Pending
+
+* Refactor video event handlers
+* Update dependencies
+
 # Tue Apr 24 15:26:28 UTC 2018
 
 * Revert NewRefreshManager and use only OldCampaignRefreshManager
