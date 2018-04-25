@@ -38,9 +38,19 @@ class FLAMSingleton {
             const ft = this._getFLAMTestByName(testName);
             if (typeof ft !== 'undefined') {
                 FLAMSingleton.getStoredData(ft.name, nativeBridge).then((pass: boolean) => {
-                    nativeBridge.Sdk.logDebug(`FLAM test for ${ft.name}: ${pass ? 'PASSED' : 'FAILED'}`);
+                    if (typeof pass === 'boolean') {
+                        nativeBridge.Sdk.logDebug(`FLAM test for ${ft.name}: ${pass ? 'PASSED' : 'FAILED'}`);
+                    } else {
+                        Diagnostics.trigger('flam_measure_test_error', {
+                            error: new Error(`Not boolean type value was saved for test: ${ft.name} test saved`),
+                            device: window.navigator.userAgent
+                        });
+
+                        nativeBridge.Storage.delete(StorageType.PRIVATE, `flam.${ft.name}`);
+                        nativeBridge.Storage.write(StorageType.PRIVATE);
+                    }
                 }).catch(() => {
-                    /* No data about test is written into device's memory => run test */
+                    /* No data about test has been written into device's memory => run test */
                     this._processFLAMTest(ft).then((pass: boolean) => {
                         this._storeData(ft, pass, nativeBridge);
                     });
@@ -65,8 +75,8 @@ class FLAMSingleton {
                     const isLoaded = el.readyState === 4 && el.videoHeight > 0 && el.videoWidth > 0;
 
                     /* Let's test how much we can rely on canPlayType API */
-                    if ((canPlayType === '' && isLoaded) || ((canPlayType === 'maybe') || (canPlayType === 'probably') && !isLoaded)) {
-                        Diagnostics.trigger('flam_measure_test_warning', {
+                    if ((canPlayType === '' && isLoaded) || (canPlayType === 'probably' && !isLoaded)) {
+                        Diagnostics.trigger('flam_measure_test_error', {
                             message: 'canPlayType and FLAM test do not match',
                             device: window.navigator.userAgent,
                             testName: ft.name,
@@ -79,7 +89,6 @@ class FLAMSingleton {
                 };
 
                 el.src = ft.base64data;
-                document.body.appendChild(el);
             }
 
             if (ft.type === 'img') {
@@ -99,8 +108,10 @@ class FLAMSingleton {
 
     private _storeData(test: IFLAMTest, pass: boolean, nativeBridge: NativeBridge) {
         const data = {
-            other: `FLAM test for ${test.name}: ${pass ? 'PASSED' : 'FAILED'}`,
-            ts: new Date()
+            test: test.name,
+            result: pass ? 'PASSED' : 'FAILED',
+            ts: new Date(),
+            device: window.navigator.userAgent
         };
 
         Diagnostics.trigger('flam_measure_test', data);
