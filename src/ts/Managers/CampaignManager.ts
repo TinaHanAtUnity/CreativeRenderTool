@@ -31,6 +31,7 @@ import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 import { CampaignParserFactory } from 'Managers/CampaignParserFactory';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
 import { UserCountData } from 'Utilities/UserCountData';
+import { GameSessionStats } from "../Utilities/GameSessionStats";
 
 export class CampaignManager {
 
@@ -134,6 +135,8 @@ export class CampaignManager {
         if(this._requesting) {
             return Promise.resolve();
         }
+
+        GameSessionStats.addNewAdRequest();
 
         this._assetManager.enableCaching();
         this._assetManager.checkFreeSpace();
@@ -635,6 +638,7 @@ export class CampaignManager {
                 body.properties = this._configuration.getProperties();
                 body.sessionDepth = SdkStats.getAdRequestOrdinal();
                 body.projectId = this._configuration.getUnityProjectId();
+                body.gameSessionStats = GameSessionStats.getDTO();
                 this._realtimeBody = body;
                 return body;
             });

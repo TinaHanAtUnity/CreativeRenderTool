@@ -51,6 +51,7 @@ import { MissedImpressionManager } from 'Managers/MissedImpressionManager';
 import { NewRefreshManager } from 'Managers/NewRefreshManager';
 import { PlacementManager } from 'Managers/PlacementManager';
 import { ReinitManager } from 'Managers/ReinitManager';
+import { GameSessionStats } from 'Utilities/GameSessionStats';
 
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
@@ -139,6 +140,7 @@ export class WebView {
             HttpKafka.setRequest(this._request);
             HttpKafka.setClientInfo(this._clientInfo);
             SdkStats.setInitTimestamp();
+            GameSessionStats.init();
 
             return Promise.all([this._deviceInfo.fetch(), this.setupTestEnvironment()]);
         }).then(() => {
@@ -340,6 +342,8 @@ export class WebView {
     }
 
     private showAd(placement: Placement, campaign: Campaign, options: any) {
+        GameSessionStats.addNewStart(placement, campaign);
+
         const testGroup = this._configuration.getAbGroup();
         const start = Date.now();
 

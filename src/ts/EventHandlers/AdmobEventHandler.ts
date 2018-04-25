@@ -17,6 +17,7 @@ import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
 import { ClientInfo } from 'Models/ClientInfo';
 import { AdMobSignal } from 'Models/AdMobSignal';
 import { AdMobOptionalSignal } from 'Models/AdMobOptionalSignal';
+import { GameSessionStats } from "../Utilities/GameSessionStats";
 
 export interface IAdMobEventHandlerParameters {
     adUnit: AdMobAdUnit;
@@ -99,6 +100,7 @@ export class AdMobEventHandler implements IAdMobEventHandler {
     public onGrantReward(): void {
         this._adUnit.sendRewardEvent();
         this._adUnit.setFinishState(FinishState.COMPLETED);
+        GameSessionStats.addNewView(undefined, this._campaign);
     }
 
     public onVideoStart(): void {

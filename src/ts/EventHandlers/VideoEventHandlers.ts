@@ -21,6 +21,7 @@ import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { XPromoOperativeEventManager } from 'Managers/XPromoOperativeEventManager';
+import { GameSessionStats } from "../Utilities/GameSessionStats";
 
 export class VideoEventHandlers {
 
@@ -252,6 +253,7 @@ export class VideoEventHandlers {
         adUnit.getContainer().addDiagnosticsEvent({type: 'onVideoCompleted'});
         adUnit.setActive(false);
         adUnit.setFinishState(FinishState.COMPLETED);
+        GameSessionStats.addNewView(placement, campaign);
 
         if(!(adUnit instanceof XPromoAdUnit)) {
             operativeEventManager.sendView(placement, this.getVideoOrientation(adUnit), adUnitStyle);

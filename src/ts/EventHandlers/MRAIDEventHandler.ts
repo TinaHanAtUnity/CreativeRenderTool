@@ -15,6 +15,7 @@ import { RequestError } from 'Errors/RequestError';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { FinishState } from 'Constants/FinishState';
 import { Placement } from 'Models/Placement';
+import { GameSessionStats } from 'Utilities/GameSessionStats';
 
 export class MRAIDEventHandler implements IMRAIDViewHandler {
 
@@ -71,6 +72,7 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
 
     public onMraidReward(): void {
         this._operativeEventManager.sendThirdQuartile(this._placement);
+        GameSessionStats.addNewView(this._placement, this._campaign);
     }
 
     public onMraidSkip(): void {
