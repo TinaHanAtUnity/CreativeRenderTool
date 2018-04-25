@@ -143,7 +143,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
     public setViewableState(viewable: boolean) {
         if(this._loaded) {
-            this._iframe.contentWindow.postMessage({
+            this._iframe.contentWindow!.postMessage({
                 type: 'viewable',
                 value: viewable
             }, '*');
