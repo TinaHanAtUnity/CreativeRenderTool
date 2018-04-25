@@ -86,6 +86,7 @@ export class AdUnitFactory {
         } else if(parameters.campaign instanceof MRAIDCampaign) {
             return this.createMRAIDAdUnit(nativeBridge, <IAdUnitParameters<MRAIDCampaign>>parameters);
         } else if(parameters.campaign instanceof PerformanceCampaign) {
+            FLAM.measure(['webp', 'hevc', 'vp9'], nativeBridge);
             return this.createPerformanceAdUnit(nativeBridge, <IAdUnitParameters<PerformanceCampaign>>parameters);
         } else if (parameters.campaign instanceof DisplayInterstitialCampaign) {
             return this.createDisplayInterstitialAdUnit(nativeBridge, <IAdUnitParameters<DisplayInterstitialCampaign>>parameters);
@@ -115,16 +116,6 @@ export class AdUnitFactory {
             endScreen: endScreen,
             adUnitStyle: adUnitStyle
         };
-
-        try {
-            FLAM.measure(['webp', 'hevc', 'vp9'], nativeBridge);
-        } catch (e) {
-            Diagnostics.trigger('flam_measure_test_error', {
-                error: e,
-                message: 'Unhandled runtime error',
-                device: window.navigator.userAgent
-            });
-        }
 
         const performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
         const performanceOverlayEventHandler = new PerformanceOverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
@@ -248,16 +239,6 @@ export class AdUnitFactory {
     private static createMRAIDAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<MRAIDCampaign>): MRAIDAdUnit {
         const resourceUrl = parameters.campaign.getResourceUrl();
         let endScreen: MRAIDEndScreen | undefined;
-
-        try {
-            FLAM.measure(['webp', 'hevc', 'vp9'], nativeBridge);
-        } catch (e) {
-            Diagnostics.trigger('flam_measure_test_error', {
-                error: e,
-                message: 'Unhandled runtime error',
-                device: window.navigator.userAgent
-            });
-        }
 
         let mraid: MRAIDView<IMRAIDViewHandler>;
         if(resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) {

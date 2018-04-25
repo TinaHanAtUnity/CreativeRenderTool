@@ -10,8 +10,16 @@ interface IFLAMTest {
     base64data: string;
 }
 
+interface IFLAMErrorData {
+    test: string;
+    errorName?: string;
+    errorMessage?: string;
+    canPlayType?: string;
+    isLoaded?: boolean;
+}
+
 /*
-* Class to measure webview capabilities of certain device
+* Basic class to measure webview capabilities of certain device
 * */
 class FLAMSingleton {
 
@@ -28,29 +36,41 @@ class FLAMSingleton {
 
     constructor() {
         if (FLAMSingleton._instance) {
-            Diagnostics.trigger('flam_measure_test_error', {
-                error: new Error('Error: Singleton class, use exposed functions directly'),
-                device: window.navigator.userAgent
-            });
+            throw new Error('Error: Singleton class; Use exposed functions directly');
         }
+
         FLAMSingleton._instance = this;
     }
 
     public measure(testNameArr: string[], nativeBridge: NativeBridge) {
-        testNameArr.map((testName) => {
-            const ft = this._getFLAMTestByName(testName);
+        /*
+        * Let's wrap this function due to experimental nature of this class.
+        * Even though it should not cause any major issues. Random errors on
+        * some specific devices could be expected.
+        * */
+        try {
+            this._measure.apply(this, arguments);
+        } catch (error) {
+            this._sendDiagnosticsError('FLAM runtime error', {
+                test: String(testNameArr),
+                errorName: error.name,
+                errorMessage: error.message
+            });
+        }
+    }
+
+    private _measure(testNameArr: string[], nativeBridge: NativeBridge) {
+        testNameArr.map((name) => {
+            const ft = this._getFLAMTestByName(name);
             if (typeof ft !== 'undefined') {
                 FLAMSingleton.getStoredData(ft.name, nativeBridge).then((pass: boolean) => {
                     if (typeof pass === 'boolean') {
                         nativeBridge.Sdk.logDebug(`FLAM test for ${ft.name}: ${pass ? 'PASSED' : 'FAILED'}`);
                     } else {
-                        Diagnostics.trigger('flam_measure_test_error', {
-                            error: new Error(`Not boolean type value was saved for test: ${ft.name} test saved`),
-                            device: window.navigator.userAgent
-                        });
-
                         nativeBridge.Storage.delete(StorageType.PRIVATE, `flam.${ft.name}`);
                         nativeBridge.Storage.write(StorageType.PRIVATE);
+
+                        this._sendDiagnosticsError(`Saved value is not a boolean`, {test: ft.name});
                     }
                 }).catch(() => {
                     /* No data about test has been written into device's memory => run test */
@@ -59,10 +79,7 @@ class FLAMSingleton {
                     });
                 });
             } else {
-                Diagnostics.trigger('flam_measure_test_error', {
-                    error: new Error(`No test named: ${testName}`),
-                    device: window.navigator.userAgent
-                });
+                this._sendDiagnosticsError(`Test not found`, {test: name});
             }
         });
     }
@@ -79,10 +96,8 @@ class FLAMSingleton {
 
                     /* Let's test how much we can rely on canPlayType API */
                     if ((canPlayType === '' && isLoaded) || (canPlayType === 'probably' && !isLoaded)) {
-                        Diagnostics.trigger('flam_measure_test_error', {
-                            message: 'canPlayType and FLAM test do not match',
-                            device: window.navigator.userAgent,
-                            testName: ft.name,
+                        this._sendDiagnosticsError('canPlayType and FLAM test do not match', {
+                            test: ft.name,
                             canPlayType,
                             isLoaded
                         });
@@ -112,14 +127,19 @@ class FLAMSingleton {
     private _storeData(test: IFLAMTest, pass: boolean, nativeBridge: NativeBridge) {
         const data = {
             test: test.name,
-            result: pass ? 'PASSED' : 'FAILED',
-            ts: new Date(),
-            device: window.navigator.userAgent
+            result: pass ? 'PASSED' : 'FAILED'
         };
 
         Diagnostics.trigger('flam_measure_test', data);
         nativeBridge.Storage.set(StorageType.PRIVATE, `flam.${test.name}`, pass);
         nativeBridge.Storage.write(StorageType.PRIVATE);
+    }
+
+    private _sendDiagnosticsError(message: string, data: IFLAMErrorData) {
+        Diagnostics.trigger('flam_measure_test_error', {
+            message,
+            ...data
+        });
     }
 }
 
