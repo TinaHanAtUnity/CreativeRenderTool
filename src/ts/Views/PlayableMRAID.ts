@@ -345,19 +345,18 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private onAREvent(event: MessageEvent): Promise<void> {
         const { data } = event.data;
-        const message = data.split(':');
-        const functionName = message[0];
-        const args = message[1].split(',');
+        const functionName = data.functionName;
+        const args = data.args;
 
         switch (functionName) {
             case 'resetPose':
-                return this._nativeBridge.AR.restartSession(JSON.parse(args[0]));
+                return this._nativeBridge.AR.restartSession(args[0]);
 
             case 'setDepthNear':
-                return this._nativeBridge.AR.setDepthNear(parseFloat(args[0]));
+                return this._nativeBridge.AR.setDepthNear(args[0]);
 
             case 'setDepthFar':
-                return this._nativeBridge.AR.setDepthFar(parseFloat(args[0]));
+                return this._nativeBridge.AR.setDepthFar(args[0]);
 
             case 'showCameraFeed':
                 return this._nativeBridge.AR.showCameraFeed();

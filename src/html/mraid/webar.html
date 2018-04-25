@@ -56,21 +56,13 @@
         // Platform independent functions between ARKit and ARCore
         function callNativeFunction(functionName) {
             var args = Array.prototype.slice.call(arguments, 1);
-            if (window.ARCore) {
-                if (args.length > 0) {
-                    return window.ARCore[functionName].apply(window.ARCore, args);
-                } else {
-                    return window.ARCore[functionName]();
+            return window.parent.postMessage({
+                type: 'ar',
+                data: {
+                    functionName: functionName,
+                    args: args
                 }
-            }
-            else {
-                // return window.webkit.messageHandlers.WebARonARKit.postMessage(
-                //     functionName + ':' + args.join(','));
-                return window.parent.postMessage({
-                    type: 'ar',
-                    data: functionName + ':' + args.join(','),
-                }, '*');
-            }
+            }, '*');
         }
 
         function nativeHideCameraFeed() {
@@ -82,7 +74,7 @@
         }
 
         function nativeResetPose(arRunProperties) {
-            callNativeFunction('resetPose', JSON.stringify(arRunProperties));
+            callNativeFunction('resetPose', arRunProperties);
         }
 
         function nativeSetDepthNear(depthNear) {
@@ -97,7 +89,7 @@
             callNativeFunction('addAnchor', identifier, modelMatrixString);
         }
 
-        function nativeRemoveAnchor(identifier, modelMatrixString) {
+        function nativeRemoveAnchor(identifier) {
             callNativeFunction('removeAnchor', identifier);
         }
 
