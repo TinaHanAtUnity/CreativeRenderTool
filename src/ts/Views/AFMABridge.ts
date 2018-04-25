@@ -136,7 +136,7 @@ export class AFMABridge {
     }
 
     private postMessage(event: string, data?: any) {
-        this._iframe.contentWindow.postMessage({
+        this._iframe.contentWindow!.postMessage({
             type: 'afma',
             event: event,
             data: data

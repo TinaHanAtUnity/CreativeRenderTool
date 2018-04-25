@@ -116,6 +116,10 @@ export class PurchasingUtilities {
         });
     }
 
+    public static handleSendIAPEvent(nativeBridge: NativeBridge, iapPayload: string): void {
+        // TODO: Handle IAPPayload/send event/do something with the payload
+    }
+
     public static productAvailable(productId: string): boolean {
         if (this.purchasesAvailable()) {
             return (productId in this._catalog.getProducts());
@@ -178,7 +182,7 @@ export class PurchasingUtilities {
             iapPayload.gamerId = PurchasingUtilities._configuration.getGamerId();
             iapPayload.iapPromo = true;
             iapPayload.abGroup = PurchasingUtilities._configuration.getAbGroup();
-            iapPayload.gameId = PurchasingUtilities._clientInfo.getGameId();
+            iapPayload.gameId = PurchasingUtilities._clientInfo.getGameId() + '|' + PurchasingUtilities._configuration.getToken();
             iapPayload.request = IPromoRequest.SETIDS;
         }
         return iapPayload;

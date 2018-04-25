@@ -10,6 +10,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { CampaignManager } from 'Managers/CampaignManager';
 import { Platform } from 'Constants/Platform';
 import { WebViewError } from 'Errors/WebViewError';
+import { SdkStats } from 'Utilities/SdkStats';
 import { Session } from 'Models/Session';
 import { ReinitManager } from 'Managers/ReinitManager';
 import { PlacementManager } from 'Managers/PlacementManager';
@@ -100,6 +101,31 @@ export class NewRefreshManager extends RefreshManager {
 
     public setRefreshAllowed(bool: boolean): void {
         // todo: redundant method, should be removed
+    }
+
+    public refreshFromCache(cachedResponse: INativeResponse): Promise<INativeResponse | void> {
+        const refillFlags: IRefillFlags = this.getRefillState(Date.now());
+
+        if(refillFlags.shouldRefill) {
+            this._fillState = FillState.REQUESTING;
+
+            return this._reinitManager.shouldReinitialize().then(reinit => {
+                if(reinit) {
+                    if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
+                        this._fillState = FillState.MUST_REINIT;
+                    } else {
+                        this._reinitManager.reinitialize();
+                    }
+                } else {
+                    this.invalidateFill();
+                    this._campaignManager.requestFromCache(cachedResponse).then(() => {
+                        this._campaignManager.request(refillFlags.noFillRetry);
+                   });
+                }
+            });
+        } else {
+            return Promise.resolve();
+        }
     }
 
     // todo: remove noFillRetry from parameters
@@ -374,9 +400,19 @@ export class NewRefreshManager extends RefreshManager {
             const onCloseObserver = this._currentAdUnit.onClose.subscribe(() => {
                 this._currentAdUnit.onClose.unsubscribe(onCloseObserver);
                 this._placementManager.setPlacementState(placementId, newState);
+                if (newState === PlacementState.READY) {
+                    SdkStats.setReadyEventTimestamp(placementId);
+                    SdkStats.sendReadyEvent(placementId);
+                    this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + placementId + ' request to ready time took ' + SdkStats.getRequestToReadyTime(placementId));
+                }
             });
         } else {
             this._placementManager.setPlacementState(placementId, newState);
+            if (newState === PlacementState.READY) {
+                SdkStats.setReadyEventTimestamp(placementId);
+                SdkStats.sendReadyEvent(placementId);
+                this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + placementId + ' request to ready time took ' + SdkStats.getRequestToReadyTime(placementId));
+            }
         }
     }
 }

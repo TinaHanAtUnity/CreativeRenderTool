@@ -11,6 +11,7 @@ import { Localization } from 'Utilities/Localization';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
 import { JsonParser } from 'Utilities/JsonParser';
+import { SdkStats } from 'Utilities/SdkStats';
 
 export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -106,6 +107,8 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
         this.createMRAID(container).then(mraid => {
             iframe.onload = () => this.onIframeLoaded();
+            SdkStats.setFrameSetStartTimestamp(this._placement.getId());
+            this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' set iframe.src started ' + SdkStats.getFrameSetStartTimestamp(this._placement.getId()));
             iframe.srcdoc = mraid;
         });
 
@@ -120,7 +123,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     public hide() {
-        this._iframe.contentWindow.postMessage({
+        this._iframe.contentWindow!.postMessage({
             type: 'viewable',
             value: false
         }, '*');
@@ -148,7 +151,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     public setViewableState(viewable: boolean) {
         if(this._iframeLoaded && !this._loadingScreenTimeout) {
-            this._iframe.contentWindow.postMessage({
+            this._iframe.contentWindow!.postMessage({
                 type: 'viewable',
                 value: viewable
             }, '*');
@@ -173,6 +176,9 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
             this.showMRAIDAd();
         }
+
+        const frameLoadDuration = Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId());
+        this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' iframe load duration ' + frameLoadDuration + ' ms');
     }
 
     private showLoadingScreen() {
@@ -256,7 +262,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 const timeFromShow = this.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
                 const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
                 this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_start', undefined));
-                this._iframe.contentWindow.postMessage({
+                this._iframe.contentWindow!.postMessage({
                     type: 'viewable',
                     value: true
                 }, '*');
