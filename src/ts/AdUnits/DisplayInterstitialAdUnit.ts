@@ -14,7 +14,7 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { IWebPlayerWebSettingsAndroid, IWebPlayerWebSettingsIos } from 'Native/Api/WebPlayer';
 import { Url } from 'Utilities/Url';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
-import { GameSessionStats } from "../Utilities/GameSessionStats";
+import { GameSessionStats } from 'Utilities/GameSessionStats';
 
 export interface IDisplayInterstitialAdUnitParameters extends IAdUnitParameters<DisplayInterstitialCampaign> {
     view: DisplayInterstitial;
@@ -74,7 +74,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
 
             // Display ads are always completed.
             this.setFinishState(FinishState.COMPLETED);
-            GameSessionStats.addNewView(this._placement, this._campaign);
+            GameSessionStats.addView(this._campaign);
             return Promise.resolve();
         });
     }

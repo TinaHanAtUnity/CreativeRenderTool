@@ -342,7 +342,7 @@ export class WebView {
     }
 
     private showAd(placement: Placement, campaign: Campaign, options: any) {
-        GameSessionStats.addNewStart(placement, campaign);
+        GameSessionStats.addStart(campaign);
 
         const testGroup = this._configuration.getAbGroup();
         const start = Date.now();
