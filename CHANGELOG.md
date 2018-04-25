@@ -1,3 +1,8 @@
+# Wed Apr 25 20:41:26 UTC 2018
+
+* Refactor video event handlers
+* Update dependencies
+
 # Thu Apr 19 10:15:46 UTC 2018
 
 * Add more realtime diagnostic information for kibana
