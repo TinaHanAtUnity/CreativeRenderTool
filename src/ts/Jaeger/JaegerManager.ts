@@ -6,8 +6,8 @@ import { Platform } from 'Constants/Platform';
 
 export class JaegerManager {
 
-    private static _openSpans: Map<string, IJaegerSpan> = new Map();
-    private static _closedSpans: Map<string, IJaegerSpan> = new Map();
+    private static _openSpans: { [jaegerId: string]: IJaegerSpan } = {};
+    private static _closedSpans: { [jaegerId: string]: IJaegerSpan } = {};
 
     private _request: Request;
     private _isJaegerTracingEnabled: boolean = false;
@@ -32,29 +32,30 @@ export class JaegerManager {
     }
 
     public addOpenSpan(span: IJaegerSpan) {
-        JaegerManager._openSpans.set(span.id, span);
+        JaegerManager._openSpans[span.id] = span;
     }
 
     public startSpan(operation: string, parentId?: string, traceId?: string): JaegerSpan {
         const span = new JaegerSpan(operation, parentId, traceId);
-        JaegerManager._openSpans.set(span.id, span);
+        JaegerManager._openSpans[span.id] = span;
         return span;
     }
 
     public stop(span: IJaegerSpan) {
         span.stop();
-        JaegerManager._closedSpans.set(span.id, span);
-        JaegerManager._openSpans.delete(span.id);
+        JaegerManager._closedSpans[span.id] = span;
+        delete JaegerManager._openSpans[span.id];
         this.flushClosedSpans();
     }
 
     private flushClosedSpans() {
-        if (JaegerManager._openSpans.size <= 0) {
+        if (Object.keys(JaegerManager._openSpans).length <= 0) {
             const spans: IJaegerSpan[] = [];
-            JaegerManager._closedSpans.forEach((value: IJaegerSpan, key: string) => {
-                spans.push(value);
+            Object.keys(JaegerManager._closedSpans).forEach(key => {
+                spans.push(JaegerManager._closedSpans[key]);
+                delete JaegerManager._closedSpans[key];
             });
-            JaegerManager._closedSpans.clear();
+
             if (spans.length > 0) { // only post if we have spans
                 this.postToJaeger(spans);
             }

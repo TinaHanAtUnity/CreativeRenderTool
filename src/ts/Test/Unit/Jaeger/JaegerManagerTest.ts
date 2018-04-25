@@ -167,7 +167,25 @@ describe('JaegerManager', () => {
             assert.equal(requestPostStub.firstCall.args[1], JSON.stringify([span]));
             assert.equal(JSON.stringify(requestPostStub.firstCall.args[2]), JSON.stringify([['Content-Type', 'application/json']]));
             assert.equal(requestPostStub.firstCall.args.length, 3);
+            // second call should not have the first span
+            const secondSpan = jaegerManager.startSpan('second test stopNetworkSpan');
+            jaegerManager.stop(secondSpan);
+            assert.equal(requestPostStub.callCount, 2);
+            assert.equal(requestPostStub.secondCall.args[1], JSON.stringify([secondSpan]));
         });
+
+        it('should call request.post once when multiple spans are created', () => {
+            const secondSpan = jaegerManager.startSpan('second test stopNetworkSpan');
+            jaegerManager.stop(secondSpan);
+            jaegerManager.stop(span);
+            assert.equal(requestPostStub.callCount, 1);
+            assert.equal(requestPostStub.firstCall.args[0], 'http://tracing-collector-stg.internal.unity3d.com/api/v2/spans');
+            const postedSpans: IJaegerSpan[] = JSON.parse(requestPostStub.firstCall.args[1]);
+            assert.equal(postedSpans.length, 2);
+            assert.equal(JSON.stringify(requestPostStub.firstCall.args[2]), JSON.stringify([['Content-Type', 'application/json']]));
+            assert.equal(requestPostStub.firstCall.args.length, 3);
+        });
+
     });
 
 });
