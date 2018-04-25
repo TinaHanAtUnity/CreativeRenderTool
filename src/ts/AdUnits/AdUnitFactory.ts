@@ -121,6 +121,7 @@ export class AdUnitFactory {
         } catch (e) {
             Diagnostics.trigger('flam_measure_test_error', {
                 error: e,
+                message: "Unhandled runtime error",
                 device: window.navigator.userAgent
             });
         }
@@ -253,6 +254,7 @@ export class AdUnitFactory {
         } catch (e) {
             Diagnostics.trigger('flam_measure_test_error', {
                 error: e,
+                message: "Unhandled runtime error",
                 device: window.navigator.userAgent
             });
         }
