@@ -233,13 +233,9 @@ export class CacheBookkeeping {
 
     private cleanCacheBookKeeping(): Promise<void> {
         return this.getKeys().then((cacheKeys) => {
-            const promises: Array<Promise<any>> = [];
-
-            for(const cacheKey of cacheKeys) {
-                if(cacheKey && !(cacheKey.toUpperCase() in CacheKey)) {
-                    promises.push(this._nativeBridge.Storage.delete(StorageType.PRIVATE, this._rootKey + '.' + cacheKey));
-                }
-            }
+            const promises: Array<Promise<any>> = cacheKeys
+                .filter(cacheKey => cacheKey && !(cacheKey.toUpperCase() in CacheKey))
+                .map(cacheKey => this._nativeBridge.Storage.delete(StorageType.PRIVATE, this._rootKey + '.' + cacheKey));
 
             if(promises.length > 0) {
                 return Promise.all(promises).catch(() => {
@@ -276,9 +272,7 @@ export class CacheBookkeeping {
     private makeCacheKey(key: CacheKey, ...subKeys: string[]): string {
         let finalKey = this._rootKey + '.' + key;
         if(subKeys && subKeys.length > 0) {
-            for(const subKey of subKeys) {
-                finalKey += '.' + subKey;
-            }
+            finalKey = subKeys.reduce((previousValue, currentValue) => previousValue + '.' + currentValue, finalKey);
         }
 
         return finalKey;
