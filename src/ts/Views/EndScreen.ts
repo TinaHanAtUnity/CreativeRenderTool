@@ -162,12 +162,12 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             return SQUARE_END_SCREEN;
         }
 
-        if (this._abGroup === FANCY_END_SCREEN_AB_GROUP && this.canShowFancyEndSCreen()) {
+        if (this._abGroup === FANCY_END_SCREEN_AB_GROUP && this.canShowFancyEndScreen()) {
             return FANCY_END_SCREEN;
         }
 
         // TODO return undefined
-        return FANCY_END_SCREEN;
+        return undefined;
     }
 
     protected abstract onDownloadEvent(event: Event): void;
@@ -195,12 +195,12 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._privacy.addEventHandler(this);
     }
 
-    private canShowFancyEndSCreen() {
+    private canShowFancyEndScreen() {
         if (!this._osVersion || this._nativeBridge.getPlatform() === Platform.IOS) {
             return true;
         }
-        console.log('OS VERSION', this._osVersion);
-        return !this._osVersion.match(/^4/);
+
+        return !!!this._osVersion.match(/^4/);
     }
 
     private getTemplate() {
