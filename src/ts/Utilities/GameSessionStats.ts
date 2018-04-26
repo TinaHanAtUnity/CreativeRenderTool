@@ -21,7 +21,6 @@ export class GameSessionStats {
         } else {
             this._campaignStartCounter[campaign.getId()] = 1;
         }
-        console.log('campaignStarts' + JSON.stringify(this._campaignStartCounter));
 
         if (campaign instanceof PerformanceCampaign) {
             if (this._targetStartCounter[campaign.getGameId()]) {
@@ -29,7 +28,6 @@ export class GameSessionStats {
             } else {
                 this._targetStartCounter[campaign.getGameId()] = 1;
             }
-            console.log('targetStarts ' + JSON.stringify(this._targetStartCounter));
         }
     }
 
@@ -41,7 +39,6 @@ export class GameSessionStats {
         } else {
             this._campaignViewCounter[campaign.getId()] = 1;
         }
-        console.log('campaignViews ' + JSON.stringify(this._campaignViewCounter));
 
         if (campaign instanceof PerformanceCampaign) {
             if (this._targetViewCounter[campaign.getGameId()]) {
@@ -49,7 +46,6 @@ export class GameSessionStats {
             } else {
                 this._targetViewCounter[campaign.getGameId()] = 1;
             }
-            console.log('targetViews ' + JSON.stringify(this._targetViewCounter));
         }
 
     }
