@@ -1,4 +1,4 @@
-# Pending
+# Wed Apr 25 20:47:11 UTC 2018
 
 * Refactor video event handlers
 * Update dependencies
