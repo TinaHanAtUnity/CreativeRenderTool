@@ -22,7 +22,6 @@ export class DisplayInterstitialEventHandler implements IDisplayInterstitialHand
 
     public onDisplayInterstitialClose(): void {
         this._operativeEventManager.sendThirdQuartile(this._placement);
-
         this._operativeEventManager.sendView(this._placement);
         this._adUnit.hide();
     }
