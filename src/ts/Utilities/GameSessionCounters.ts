@@ -2,7 +2,7 @@ import { Campaign } from 'Models/Campaign';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 
-export class GameSessionStats {
+export class GameSessionCounters {
 
     public static init() {
         this._adRequestCount = 0;

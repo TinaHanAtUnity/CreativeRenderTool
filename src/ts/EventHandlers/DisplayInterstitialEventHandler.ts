@@ -4,6 +4,7 @@ import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { DisplayInterstitialAdUnit, IDisplayInterstitialAdUnitParameters } from 'AdUnits/DisplayInterstitialAdUnit';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { Placement } from 'Models/Placement';
+import { GameSessionCounters } from 'Utilities/GameSessionCounters';
 
 export class DisplayInterstitialEventHandler implements IDisplayInterstitialHandler {
     private _nativeBridge: NativeBridge;
@@ -22,6 +23,9 @@ export class DisplayInterstitialEventHandler implements IDisplayInterstitialHand
 
     public onDisplayInterstitialClose(): void {
         this._operativeEventManager.sendThirdQuartile(this._placement);
+
+        GameSessionCounters.addView(this._campaign);
+
         this._operativeEventManager.sendView(this._placement);
         this._adUnit.hide();
     }

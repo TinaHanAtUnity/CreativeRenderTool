@@ -18,7 +18,7 @@ import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { CampaignAssetInfo } from 'Utilities/CampaignAssetInfo';
 import { Configuration } from 'Models/Configuration';
-import { GameSessionStats } from 'Utilities/GameSessionStats';
+import { GameSessionCounters } from 'Utilities/GameSessionCounters';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {
     nativeBridge: NativeBridge;
@@ -307,7 +307,7 @@ export class OperativeEventManager {
             'cached': CampaignAssetInfo.isCached(this._campaign),
             'cachedOrientation': CampaignAssetInfo.getCachedVideoOrientation(this._campaign),
             'token': this._configuration.getToken(),
-            'gameSessionCounters': GameSessionStats.getDTO()
+            'gameSessionCounters': GameSessionCounters.getDTO()
         };
 
         if(this._clientInfo.getPlatform() === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
