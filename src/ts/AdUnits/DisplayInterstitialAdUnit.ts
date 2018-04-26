@@ -14,7 +14,6 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { IWebPlayerWebSettingsAndroid, IWebPlayerWebSettingsIos } from 'Native/Api/WebPlayer';
 import { Url } from 'Utilities/Url';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
-import { GameSessionCounters } from 'Utilities/GameSessionCounters';
 
 export interface IDisplayInterstitialAdUnitParameters extends IAdUnitParameters<DisplayInterstitialCampaign> {
     view: DisplayInterstitial;

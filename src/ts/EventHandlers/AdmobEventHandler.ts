@@ -10,6 +10,7 @@ import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { Session } from 'Models/Session';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { Url } from 'Utilities/Url';
+import { SdkStats } from 'Utilities/SdkStats';
 import { ITouchInfo, IOpenableIntentsRequest } from 'Views/AFMABridge';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
