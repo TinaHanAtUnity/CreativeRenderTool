@@ -49,6 +49,7 @@ import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { OldCampaignRefreshManager } from 'Managers/OldCampaignRefreshManager';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { MissedImpressionManager } from 'Managers/MissedImpressionManager';
+import { GameSessionCounters } from 'Utilities/GameSessionCounters';
 
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
@@ -135,6 +136,7 @@ export class WebView {
             HttpKafka.setRequest(this._request);
             HttpKafka.setClientInfo(this._clientInfo);
             SdkStats.setInitTimestamp();
+            GameSessionCounters.init();
 
             return Promise.all([this._deviceInfo.fetch(), this.setupTestEnvironment()]);
         }).then(() => {

@@ -16,9 +16,9 @@ import { Campaign } from 'Models/Campaign';
 import { Placement } from 'Models/Placement';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
-import { Diagnostics } from 'Utilities/Diagnostics';
 import { CampaignAssetInfo } from 'Utilities/CampaignAssetInfo';
 import { Configuration } from 'Models/Configuration';
+import { GameSessionCounters } from 'Utilities/GameSessionCounters';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {
     nativeBridge: NativeBridge;
@@ -91,6 +91,8 @@ export class OperativeEventManager {
         }
 
         session.setEventSent(EventType.START);
+
+        GameSessionCounters.addStart(this._campaign);
 
         return this._metaDataManager.fetch(PlayerMetaData, false).then(player => {
             if(player) {
@@ -201,6 +203,8 @@ export class OperativeEventManager {
         }
         session.setEventSent(EventType.VIEW);
 
+        GameSessionCounters.addView(this._campaign);
+
         const fulfilled = ([id, infoJson]: [string, any]) => {
             this.sendEvent('view', id, infoJson.sessionId, this.createVideoEventUrl('video_end'), JSON.stringify(infoJson));
         };
@@ -306,7 +310,8 @@ export class OperativeEventManager {
             'language': this._deviceInfo.getLanguage(),
             'cached': CampaignAssetInfo.isCached(this._campaign),
             'cachedOrientation': CampaignAssetInfo.getCachedVideoOrientation(this._campaign),
-            'token': this._configuration.getToken()
+            'token': this._configuration.getToken(),
+            'gameSessionCounters': GameSessionCounters.getDTO()
         };
 
         if(this._clientInfo.getPlatform() === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
