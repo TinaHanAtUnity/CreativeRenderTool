@@ -46,11 +46,9 @@ import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { OldCampaignRefreshManager } from 'Managers/OldCampaignRefreshManager';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { MissedImpressionManager } from 'Managers/MissedImpressionManager';
-import { NewRefreshManager } from 'Managers/NewRefreshManager';
-import { PlacementManager } from 'Managers/PlacementManager';
-import { ReinitManager } from 'Managers/ReinitManager';
 import { GameSessionStats } from 'Utilities/GameSessionStats';
 
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
@@ -71,8 +69,6 @@ export class WebView {
 
     private _campaignManager: CampaignManager;
     private _refreshManager: RefreshManager;
-    private _reinitManager: ReinitManager;
-    private _placementManager: PlacementManager;
     private _assetManager: AssetManager;
     private _cache: Cache;
     private _cacheBookkeeping: CacheBookkeeping;
@@ -230,18 +226,11 @@ export class WebView {
             this._assetManager = new AssetManager(this._cache, this._configuration.getCacheMode(), this._deviceInfo, this._cacheBookkeeping, this._nativeBridge);
             this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._adMobSignalFactory, this._request, this._clientInfo, this._deviceInfo, this._metadataManager, this._cacheBookkeeping);
 
-            this._reinitManager = new ReinitManager(this._nativeBridge, this._clientInfo, this._request, this._cache);
-            this._placementManager = new PlacementManager(this._nativeBridge, this._configuration);
-            this._refreshManager = new NewRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration, this._focusManager, this._reinitManager, this._placementManager);
+            this._refreshManager = new OldCampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration, this._focusManager, this._sessionManager, this._clientInfo, this._request, this._cache);
 
             SdkStats.initialize(this._nativeBridge, this._request, this._configuration, this._sessionManager, this._campaignManager, this._metadataManager, this._clientInfo);
 
-            const enableCachedResponse = this._configuration.getAbGroup() === 7 || this._configuration.getAbGroup() === 8;
-            if (this._cachedCampaignResponse !== undefined && enableCachedResponse) {
-                return this._refreshManager.refreshFromCache(this._cachedCampaignResponse);
-            } else {
-                return this._refreshManager.refresh();
-            }
+            return this._refreshManager.refresh();
         }).then(() => {
             this._initialized = true;
 

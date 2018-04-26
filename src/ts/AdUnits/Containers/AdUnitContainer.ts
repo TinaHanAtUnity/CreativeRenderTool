@@ -33,8 +33,6 @@ export abstract class AdUnitContainer {
 
     protected _lockedOrientation: Orientation;
 
-    private _diagnosticsEvents: any[] = [];
-
     public abstract open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: any): Promise<void>;
     public abstract close(): Promise<void>;
     public abstract reconfigure(configuration: ViewConfiguration): Promise<any[]>;
@@ -45,17 +43,5 @@ export abstract class AdUnitContainer {
 
     public getLockedOrientation() {
         return this._lockedOrientation;
-    }
-
-    public getDiagnosticsEvents(): any[] {
-        return this._diagnosticsEvents;
-    }
-
-    public addDiagnosticsEvent(event: any): void {
-        this._diagnosticsEvents.push(event);
-    }
-
-    public resetDiagnosticsEvents(): void {
-        this._diagnosticsEvents = [];
     }
 }

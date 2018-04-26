@@ -1,4 +1,13 @@
-# Staged 
+# Wed Apr 25 20:47:11 UTC 2018
+
+* Refactor video event handlers
+* Update dependencies
+
+# Tue Apr 24 15:26:28 UTC 2018
+
+* Revert NewRefreshManager and use only OldCampaignRefreshManager
+
+# Tue Apr 24 07:09:48 UTC 2018
 
 * Use NewRefreshManager as default.
 * Additional logging for request to ready time and IFrame loading time.

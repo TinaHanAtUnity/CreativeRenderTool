@@ -49,7 +49,7 @@ xdescribe('MOAT View', () => {
             messageListener = sinon.spy();
             iframe = <HTMLIFrameElement>moat.container().querySelector('iframe');
             document.body.appendChild(moat.container());
-            iframe.contentWindow.addEventListener('message', messageListener);
+            iframe.contentWindow!.addEventListener('message', messageListener);
 
             fakeMoatIds = {
                 level1: 1,
@@ -104,7 +104,7 @@ xdescribe('MOAT View', () => {
             messageListener = sinon.spy();
             iframe = <HTMLIFrameElement>moat.container().querySelector('iframe');
             document.body.appendChild(moat.container());
-            iframe.contentWindow.addEventListener('message', messageListener);
+            iframe.contentWindow!.addEventListener('message', messageListener);
             moat.triggerVideoEvent('test', 1);
         });
 
@@ -134,7 +134,7 @@ xdescribe('MOAT View', () => {
             messageListener = sinon.spy();
             iframe = <HTMLIFrameElement>moat.container().querySelector('iframe');
             document.body.appendChild(moat.container());
-            iframe.contentWindow.addEventListener('message', messageListener);
+            iframe.contentWindow!.addEventListener('message', messageListener);
             moat.triggerViewabilityEvent('testViewabilityEvent', 'test');
         });
 
