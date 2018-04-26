@@ -159,7 +159,7 @@ export class CacheBookkeeping {
     }
 
     public writeFileForCampaign(campaignId: string, fileId: string): Promise<void> {
-        return this._nativeBridge.Storage.set(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGNS, campaignId + '.' + FileId.getFileIdHash(fileId)), {extension: FileId.getFileIdExtension(fileId)}).then(() => {
+        return this._nativeBridge.Storage.set(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGNS, campaignId, FileId.getFileIdHash(fileId)), {extension: FileId.getFileIdExtension(fileId)}).then(() => {
             this._nativeBridge.Storage.write(StorageType.PRIVATE);
         }).catch(() => {
             return Promise.resolve();
@@ -242,9 +242,10 @@ export class CacheBookkeeping {
             }
 
             if(promises.length > 0) {
-                promises.push(this._nativeBridge.Storage.write(StorageType.PRIVATE));
-                return Promise.all(promises).then(() => {
+                return Promise.all(promises).catch(() => {
                     return Promise.resolve();
+                }).then(() => {
+                    return this._nativeBridge.Storage.write(StorageType.PRIVATE);
                 }).catch(() => {
                     return Promise.resolve();
                 });
@@ -272,10 +273,12 @@ export class CacheBookkeeping {
         return this.getKeysForKey(this.makeCacheKey(CacheKey.FILES), false);
     }
 
-    private makeCacheKey(key: CacheKey, subKey?: string): string {
+    private makeCacheKey(key: CacheKey, ...subKeys: string[]): string {
         let finalKey = this._rootKey + '.' + key;
-        if(subKey) {
-            finalKey += '.' + subKey;
+        if(subKeys && subKeys.length > 0) {
+            for(const subKey of subKeys) {
+                finalKey += '.' + subKey;
+            }
         }
 
         return finalKey;
