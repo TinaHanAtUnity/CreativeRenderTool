@@ -82,7 +82,10 @@ export class MRAIDAdUnit extends AbstractAdUnit {
         this._onSystemInterruptObserver = this._container.onSystemInterrupt.subscribe((interruptStarted) => this.onSystemInterrupt(interruptStarted));
         this._onPauseObserver = this._container.onAndroidPause.subscribe(() => this.onSystemPause());
 
-        const views: string[] = [...(this._campaign.getArEnabled() ? ['arview'] : []), 'webview'];
+        const views: string[] = ['webview'];
+        if (this._campaign.getAdType() === 'MRAID-AR') {
+            views.unshift('arview');
+        }
 
         return this._container.open(this, views, this._orientationProperties.allowOrientationChange, this._orientationProperties.forceOrientation, true, false, true, false, this._options).then(() => {
             this.onStart.trigger();

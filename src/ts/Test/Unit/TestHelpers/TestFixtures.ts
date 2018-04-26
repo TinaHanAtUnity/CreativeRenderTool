@@ -164,7 +164,6 @@ export class TestFixtures {
             store: storeName,
             appStoreId: mraidContentJson.appStoreId,
             playableConfiguration: undefined,
-            arEnabled: undefined
         };
     }
 
@@ -212,7 +211,6 @@ export class TestFixtures {
             appStoreId: mraidContentJson.appStoreId,
             useWebViewUserAgentForTracking: mraidJson.useWebViewUserAgentForTracking,
             playableConfiguration: undefined,
-            arEnabled: undefined
         };
     }
 
