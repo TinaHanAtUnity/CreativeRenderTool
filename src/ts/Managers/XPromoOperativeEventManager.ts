@@ -5,6 +5,7 @@ import { HttpKafka } from 'Utilities/HttpKafka';
 import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
 import { EventType } from 'Models/Session';
 import { INativeResponse } from 'Utilities/Request';
+import { GameSessionCounters } from 'Utilities/GameSessionCounters';
 
 export class XPromoOperativeEventManager extends OperativeEventManager {
     private _xPromoCampaign: XPromoCampaign;
@@ -23,6 +24,8 @@ export class XPromoOperativeEventManager extends OperativeEventManager {
         }
 
         session.setEventSent(EventType.START);
+
+        GameSessionCounters.addStart(this._xPromoCampaign);
 
         return this._metaDataManager.fetch(PlayerMetaData, false).then(player => {
             if(player) {
@@ -43,6 +46,8 @@ export class XPromoOperativeEventManager extends OperativeEventManager {
             return Promise.resolve(void(0));
         }
         session.setEventSent(EventType.VIEW);
+
+        GameSessionCounters.addView(this._xPromoCampaign);
 
         return this.sendHttpKafkaEvent('ads.xpromo.operative.videoview.v1.json', 'view', placement, videoOrientation).then(() => {
             return;

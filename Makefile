@@ -256,6 +256,23 @@ test-unit: build-proto
 
 	TEST_FILTER=Test/Unit node --trace-warnings test-utils/node_runner.js
 
+test-unit-debug: MODULE = system
+test-unit-debug: TARGET = es5
+test-unit-debug: build-proto
+	@echo
+	@echo Transpiling .ts to .js for local tests
+	@echo
+
+	$(TYPESCRIPT) --project . --module $(MODULE) --target $(TARGET)
+
+	@echo
+	@echo Running unit tests
+	@echo
+
+	TEST_FILTER=Test/Unit node inspect --trace-warnings test-utils/node_runner.js
+
+
+
 test-integration: MODULE = system
 test-integration: TARGET = es5
 test-integration: build-proto
