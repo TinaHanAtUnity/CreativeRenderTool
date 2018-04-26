@@ -13,6 +13,7 @@ import { ConfigError } from 'Errors/ConfigError';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { MetaDataManager } from 'Managers/MetaDataManager';
+import { JaegerSpan } from 'Jaeger/JaegerSpan';
 
 class TestStorageApi extends StorageApi {
 
@@ -81,7 +82,8 @@ describe('ConfigManagerTest', () => {
         });
 
         it('calling fetch should return configuration', () => {
-            ConfigManager.fetch(nativeBridge, requestMock, TestFixtures.getClientInfo(), TestFixtures.getAndroidDeviceInfo(), metaDataManager);
+            const span = sinon.createStubInstance(JaegerSpan);
+            ConfigManager.fetch(nativeBridge, requestMock, TestFixtures.getClientInfo(), TestFixtures.getAndroidDeviceInfo(), metaDataManager, span);
 
             return configPromise.then((configuration) => {
                 assert.isNotNull(configuration);
@@ -106,7 +108,8 @@ describe('ConfigManagerTest', () => {
         });
 
         it('calling fetch should return error', () => {
-            return ConfigManager.fetch(nativeBridge, requestMock, TestFixtures.getClientInfo(), TestFixtures.getAndroidDeviceInfo(), metaDataManager).then(() => {
+            const span = sinon.createStubInstance(JaegerSpan);
+            return ConfigManager.fetch(nativeBridge, requestMock, TestFixtures.getClientInfo(), TestFixtures.getAndroidDeviceInfo(), metaDataManager, span).then(() => {
                 assert.fail('should not resolve');
             }).catch(error => {
                 assert.instanceOf(error, Error);
@@ -130,7 +133,8 @@ describe('ConfigManagerTest', () => {
         });
 
         it('calling fetch should throw ConfigError', () => {
-            return ConfigManager.fetch(nativeBridge, requestMock, TestFixtures.getClientInfo(), TestFixtures.getAndroidDeviceInfo(), metaDataManager).then(() => {
+            const span = sinon.createStubInstance(JaegerSpan);
+            return ConfigManager.fetch(nativeBridge, requestMock, TestFixtures.getClientInfo(), TestFixtures.getAndroidDeviceInfo(), metaDataManager, span).then(() => {
                 assert.fail('should not resolve');
             }).catch(error => {
                 assert.instanceOf(error, ConfigError);
@@ -154,7 +158,8 @@ describe('ConfigManagerTest', () => {
         });
 
         it('calling fetch should throw ConfigError', () => {
-            return ConfigManager.fetch(nativeBridge, requestMock, TestFixtures.getClientInfo(), TestFixtures.getAndroidDeviceInfo(), metaDataManager).then(() => {
+            const span = sinon.createStubInstance(JaegerSpan);
+            return ConfigManager.fetch(nativeBridge, requestMock, TestFixtures.getClientInfo(), TestFixtures.getAndroidDeviceInfo(), metaDataManager, span).then(() => {
                 assert.fail('should not resolve');
             }).catch(error => {
                 assert.instanceOf(error, DiagnosticError);

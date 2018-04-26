@@ -31,6 +31,8 @@ import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 import { CampaignParserFactory } from 'Managers/CampaignParserFactory';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
 import { UserCountData } from 'Utilities/UserCountData';
+import { JaegerManager } from 'Jaeger/JaegerManager';
+import { JaegerTags, JaegerSpan } from 'Jaeger/JaegerSpan';
 import { GameSessionCounters } from 'Utilities/GameSessionCounters';
 
 export class CampaignManager {
@@ -90,8 +92,9 @@ export class CampaignManager {
     private _realtimeUrl: string | undefined;
     private _realtimeBody: any = {};
     private _ignoreEvents: boolean;
+    private _jaegerManager: JaegerManager;
 
-    constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeeping) {
+    constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeeping, jaegerManager: JaegerManager) {
         this._nativeBridge = nativeBridge;
         this._configuration = configuration;
         this._assetManager = assetManager;
@@ -104,6 +107,7 @@ export class CampaignManager {
         this._cacheBookkeeping = cacheBookkeeping;
         this._requesting = false;
         this._ignoreEvents = false;
+        this._jaegerManager = jaegerManager;
     }
 
     public requestFromCache(cachedResponse: INativeResponse): Promise<void[] | void> {
@@ -144,6 +148,8 @@ export class CampaignManager {
         this._requesting = true;
 
         this.resetRealtimeDataForPlacements();
+        const jaegerSpan = this._jaegerManager.startSpan('CampaignManagerRequest');
+        jaegerSpan.addTag(JaegerTags.DeviceType, Platform[this._nativeBridge.getPlatform()]);
         return Promise.all([this.createRequestUrl(false), this.createRequestBody(nofillRetry)]).then(([requestUrl, requestBody]) => {
             this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
             const body = JSON.stringify(requestBody);
@@ -159,13 +165,20 @@ export class CampaignManager {
                         headers: []
                     });
                 }
-                return this._request.post(requestUrl, body, [], {
+                const headers: Array<[string, string]> = [];
+                if (this._jaegerManager.isJaegerTracingEnabled()) {
+                    headers.push(this._jaegerManager.getTraceId(jaegerSpan));
+                }
+                return this._request.post(requestUrl, body, headers, {
                     retries: 2,
                     retryDelay: 10000,
                     followRedirects: false,
                     retryWithConnectionEvents: false
                 });
             }).then(response => {
+                if (response && response.responseCode) {
+                    jaegerSpan.addTag(JaegerTags.StatusCode, response.responseCode.toString());
+                }
                 if(response) {
                     this._cacheBookkeeping.setCachedCampaignResponse(response);
                     this.setSDKSignalValues(requestTimestamp);
@@ -187,6 +200,15 @@ export class CampaignManager {
                 }
                 return this.handleError(error, this._configuration.getPlacementIds(), 'auction_request_failed');
             });
+        }).then((resp) => {
+            this._jaegerManager.stop(jaegerSpan);
+            return resp;
+        }).catch((error) => {
+            jaegerSpan.addTag(JaegerTags.Error, 'true');
+            jaegerSpan.addTag(JaegerTags.ErrorMessage, error.message);
+            jaegerSpan.addAnnotation(error.message);
+            this._jaegerManager.stop(jaegerSpan);
+            throw new Error(error);
         });
     }
 

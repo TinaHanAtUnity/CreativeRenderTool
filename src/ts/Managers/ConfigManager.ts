@@ -14,10 +14,11 @@ import { StorageType } from 'Native/Api/Storage';
 import { Platform } from 'Constants/Platform';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
+import { JaegerSpan, JaegerTags } from 'Jaeger/JaegerSpan';
 
 export class ConfigManager {
 
-    public static fetch(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager): Promise<Configuration> {
+    public static fetch(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, jaegerSpan: JaegerSpan): Promise<Configuration> {
         return Promise.all([
             metaDataManager.fetch(FrameworkMetaData),
             metaDataManager.fetch(AdapterMetaData),
@@ -36,6 +37,7 @@ export class ConfigManager {
             }
 
             const url: string = ConfigManager.createConfigUrl(clientInfo, deviceInfo, framework, adapter, gamerId);
+            jaegerSpan.addTag(JaegerTags.DeviceType, Platform[nativeBridge.getPlatform()]);
             nativeBridge.Sdk.logInfo('Requesting configuration from ' + url);
             return request.get(url, [], {
                 retries: 2,
@@ -43,6 +45,7 @@ export class ConfigManager {
                 followRedirects: false,
                 retryWithConnectionEvents: true
             }).then(response => {
+                jaegerSpan.addTag(JaegerTags.StatusCode, response.responseCode.toString());
                 try {
                     const configJson = JsonParser.parse(response.response);
                     const config: Configuration = new Configuration(configJson);
@@ -77,11 +80,17 @@ export class ConfigManager {
             }).catch(error => {
                 if (error instanceof RequestError) {
                     const requestError = <RequestError>error;
+                    if (requestError.nativeResponse && requestError.nativeResponse.responseCode) {
+                        jaegerSpan.addTag(JaegerTags.StatusCode, requestError.nativeResponse.responseCode.toString());
+                    }
                     if (requestError.nativeResponse && requestError.nativeResponse.response) {
                         const responseObj = JsonParser.parse(requestError.nativeResponse.response);
                         error = new ConfigError((new Error(responseObj.error)));
                     }
                 }
+                jaegerSpan.addTag(JaegerTags.Error, 'true');
+                jaegerSpan.addTag(JaegerTags.ErrorMessage, error.message);
+                jaegerSpan.addAnnotation(error.message);
                 throw error;
             });
         });

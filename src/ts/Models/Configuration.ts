@@ -22,6 +22,7 @@ interface IConfiguration {
     test: boolean;
     projectId: string;
     token: string;
+    jaegerTracing: boolean;
 }
 
 export class Configuration extends Model<IConfiguration> {
@@ -39,7 +40,8 @@ export class Configuration extends Model<IConfiguration> {
             analytics: ['boolean'],
             test: ['boolean'],
             projectId: ['string'],
-            token: ['string']
+            token: ['string'],
+            jaegerTracing: ['boolean']
         });
 
         this.set('enabled', configJson.enabled);
@@ -52,6 +54,7 @@ export class Configuration extends Model<IConfiguration> {
         this.set('token', configJson.token);
 
         this.set('analytics', configJson.analytics ? true : false);
+        this.set('jaegerTracing', configJson.jaegerTracing ? true : false);
 
         this.set('test', configJson.test ? true : false);
 
@@ -104,6 +107,10 @@ export class Configuration extends Model<IConfiguration> {
 
     public isAnalyticsEnabled(): boolean {
         return this.get('analytics');
+    }
+
+    public isJaegerTracingEnabled(): boolean {
+        return this.get('jaegerTracing');
     }
 
     public getAbGroup(): number {
