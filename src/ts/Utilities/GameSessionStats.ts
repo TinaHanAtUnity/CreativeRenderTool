@@ -55,9 +55,6 @@ export class GameSessionStats {
         this._adRequestCount++;
     }
 
-    // todo: is it ok to collect click data?
-    // public addNewClick()
-
     public static getDTO(): { [key: string]: any } {
         return { adRequests: this._adRequestCount,
             starts: this._totalStartCount,
