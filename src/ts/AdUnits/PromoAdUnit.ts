@@ -40,7 +40,6 @@ export class PromoAdUnit extends AbstractAdUnit {
     public show(): Promise<void> {
         // Always set to complete to avoid errors.
         this.setFinishState(FinishState.COMPLETED);
-
         this.setShowing(true);
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
         this._promoView.show();

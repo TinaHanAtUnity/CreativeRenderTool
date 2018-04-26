@@ -267,8 +267,8 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
     }
 
     protected handleCompleteEvent(url: string): void {
-        this._operativeEventManager.sendView(this._placement, this.getVideoOrientation(), this._adUnitStyle);
         GameSessionStats.addView(this._campaign);
+        this._operativeEventManager.sendView(this._placement, this.getVideoOrientation(), this._adUnitStyle);
 
         const comScorePlayedTime = this._video.getPosition();
         const comScoreDuration = (this._video.getDuration()).toString(10);
