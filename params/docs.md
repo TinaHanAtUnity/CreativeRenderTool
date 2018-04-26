@@ -77,6 +77,8 @@
 | sessionDepth | number | For a given session, how many ads have been delivered currently using adRequestOrdinal | SDK | all |
 | token | string | Signed JSON Web Token (JWT) with orthogonal (statistically independent) A/B groups for each Unity Monetization component | Server | all |
 | realtimeData | object | If the placement contains data to show a realtime placement | Server | all |
+| projectId | string | Unity project ID | Server | all |
+| gameSessionCounters | object | Game session based counts of starts, views and ad requests | SDK | all |
 
 
 
@@ -156,6 +158,8 @@
 | requestSignal | all | False | True | string | Base64 encoded string from AdMob protobuf signals | SDK | all |
 | sessionDepth | all | False | True | number | For a given session, how many ads have been delivered currently using adRequestOrdinal | SDK | all |
 | token | all | False | True | string | Signed JSON Web Token (JWT) with orthogonal (statistically independent) A/B groups for each Unity Monetization component | Server | all |
+| projectId | all | False | True | string | Unity project ID | Server | all |
+| gameSessionCounters | all | False | True | object | Game session based counts of starts, views and ad requests | SDK | all |
 
 
 
@@ -198,6 +202,8 @@
 | language | all | False | True | string | Device language code (e.g. en_US or fr_CA) | SDK | all |
 | adUnitStyle | no | False | True | object | Style of the ad unit | SDK | all |
 | token | all | False | True | string | Signed JSON Web Token (JWT) with orthogonal (statistically independent) A/B groups for each Unity Monetization component | Server | all |
+| androidId | android | False | True | string | Android ID | SDK | android |
+| gameSessionCounters | all | False | True | object | Game session based counts of starts, views and ad requests | SDK | all |
 
 
 
@@ -239,4 +245,6 @@
 | language | all | False | True | string | Device language code (e.g. en_US or fr_CA) | SDK | all |
 | adUnitStyle | no | False | True | object | Style of the ad unit | SDK | all |
 | token | all | False | True | string | Signed JSON Web Token (JWT) with orthogonal (statistically independent) A/B groups for each Unity Monetization component | Server | all |
+| androidId | android | False | True | string | Android ID | SDK | android |
+| gameSessionCounters | all | False | True | object | Game session based counts of starts, views and ad requests | SDK | all |
 

@@ -462,6 +462,20 @@
     "platforms": "all"
   },
   {
+    "key": "projectId",
+    "type": "string",
+    "description": "Unity project ID",
+    "provider": "Server",
+    "platforms": "all"
+  },
+  {
+    "key": "gameSessionCounters",
+    "type": "object",
+    "description": "Game session based counts of starts, views and ad requests",
+    "provider": "SDK",
+    "platforms": "all"
+  },
+  {
     "key": "ext",
     "type": "object",
     "description": "JSON string for optional signals for admob",

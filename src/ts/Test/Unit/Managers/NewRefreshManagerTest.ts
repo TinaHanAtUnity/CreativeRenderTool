@@ -29,6 +29,8 @@ import { Activity } from 'AdUnits/Containers/Activity';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { SdkApi } from 'Native/Api/Sdk';
 import { ListenerApi } from 'Native/Api/Listener';
+import { JaegerManager } from 'Jaeger/JaegerManager';
+import { JaegerSpan } from 'Jaeger/JaegerSpan';
 
 describe('NewRefreshManagerTest', () => {
     let nativeBridge: NativeBridge;
@@ -53,6 +55,7 @@ describe('NewRefreshManagerTest', () => {
     let comScoreTrackingService: ComScoreTrackingService;
     let container: Activity;
     let adUnit: TestAdUnit;
+    let jaegerManager: JaegerManager;
 
     beforeEach(() => {
         nativeBridge = TestFixtures.getNativeBridge();
@@ -70,7 +73,9 @@ describe('NewRefreshManagerTest', () => {
         sessionManager = new SessionManager(nativeBridge, request);
         metaDataManager = new MetaDataManager(nativeBridge);
         adMobSignalFactory = new AdMobSignalFactory(nativeBridge, clientInfo, deviceInfo, focusManager);
-        campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookKeeping);
+        jaegerManager = sinon.createStubInstance(JaegerManager);
+        jaegerManager.startSpan = sinon.stub().returns(new JaegerSpan('test'));
+        campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookKeeping, jaegerManager);
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         campaign = TestFixtures.getCampaign();
         operativeEventManager = new OperativeEventManager({

@@ -75,6 +75,8 @@
 <tr><td>sessionDepth</td><td>number</td><td>For a given session, how many ads have been delivered currently using adRequestOrdinal</td><td>SDK</td><td>all</td></tr>
 <tr><td>token</td><td>string</td><td>Signed JSON Web Token (JWT) with orthogonal (statistically independent) A/B groups for each Unity Monetization component</td><td>Server</td><td>all</td></tr>
 <tr><td>realtimeData</td><td>object</td><td>If the placement contains data to show a realtime placement</td><td>Server</td><td>all</td></tr>
+<tr><td>projectId</td><td>string</td><td>Unity project ID</td><td>Server</td><td>all</td></tr>
+<tr><td>gameSessionCounters</td><td>object</td><td>Game session based counts of starts, views and ad requests</td><td>SDK</td><td>all</td></tr>
  </table><br><br></h3> <a name="configuration-request"></a> <h3> Configuration request </h3> 
  <table> <tr><th>key</th><th>required</th><th>queryString</th><th>body</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
 <tr><td>bundleId</td><td>all</td><td>True</td><td>False</td><td>string</td><td>Bundle identifier for the app</td><td>SDK</td><td>all</td></tr>
@@ -146,6 +148,8 @@
 <tr><td>requestSignal</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Base64 encoded string from AdMob protobuf signals</td><td>SDK</td><td>all</td></tr>
 <tr><td>sessionDepth</td><td>all</td><td>False</td><td>True</td><td>number</td><td>For a given session, how many ads have been delivered currently using adRequestOrdinal</td><td>SDK</td><td>all</td></tr>
 <tr><td>token</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Signed JSON Web Token (JWT) with orthogonal (statistically independent) A/B groups for each Unity Monetization component</td><td>Server</td><td>all</td></tr>
+<tr><td>projectId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Unity project ID</td><td>Server</td><td>all</td></tr>
+<tr><td>gameSessionCounters</td><td>all</td><td>False</td><td>True</td><td>object</td><td>Game session based counts of starts, views and ad requests</td><td>SDK</td><td>all</td></tr>
  </table><br><br></h3> <a name="video-events"></a> <h3> Video events </h3> 
  <table> <tr><th>key</th><th>required</th><th>queryString</th><th>body</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
 <tr><td>eventId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Unique event identifier</td><td>SDK</td><td>all</td></tr>
@@ -184,6 +188,8 @@
 <tr><td>language</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Device language code (e.g. en_US or fr_CA)</td><td>SDK</td><td>all</td></tr>
 <tr><td>adUnitStyle</td><td>no</td><td>False</td><td>True</td><td>object</td><td>Style of the ad unit</td><td>SDK</td><td>all</td></tr>
 <tr><td>token</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Signed JSON Web Token (JWT) with orthogonal (statistically independent) A/B groups for each Unity Monetization component</td><td>Server</td><td>all</td></tr>
+<tr><td>androidId</td><td>android</td><td>False</td><td>True</td><td>string</td><td>Android ID</td><td>SDK</td><td>android</td></tr>
+<tr><td>gameSessionCounters</td><td>all</td><td>False</td><td>True</td><td>object</td><td>Game session based counts of starts, views and ad requests</td><td>SDK</td><td>all</td></tr>
  </table><br><br></h3> <a name="click-event"></a> <h3> Click event </h3> 
  <table> <tr><th>key</th><th>required</th><th>queryString</th><th>body</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
 <tr><td>gameId</td><td>all</td><td>True</td><td>False</td><td>string</td><td>Source game identifier</td><td>App</td><td>all</td></tr>
@@ -221,4 +227,6 @@
 <tr><td>language</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Device language code (e.g. en_US or fr_CA)</td><td>SDK</td><td>all</td></tr>
 <tr><td>adUnitStyle</td><td>no</td><td>False</td><td>True</td><td>object</td><td>Style of the ad unit</td><td>SDK</td><td>all</td></tr>
 <tr><td>token</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Signed JSON Web Token (JWT) with orthogonal (statistically independent) A/B groups for each Unity Monetization component</td><td>Server</td><td>all</td></tr>
+<tr><td>androidId</td><td>android</td><td>False</td><td>True</td><td>string</td><td>Android ID</td><td>SDK</td><td>android</td></tr>
+<tr><td>gameSessionCounters</td><td>all</td><td>False</td><td>True</td><td>object</td><td>Game session based counts of starts, views and ad requests</td><td>SDK</td><td>all</td></tr>
  </table></body></html>

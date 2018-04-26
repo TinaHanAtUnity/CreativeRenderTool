@@ -49,11 +49,14 @@ import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { OldCampaignRefreshManager } from 'Managers/OldCampaignRefreshManager';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { MissedImpressionManager } from 'Managers/MissedImpressionManager';
+import { GameSessionCounters } from 'Utilities/GameSessionCounters';
 
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
 import { TimeoutError, Promises } from 'Utilities/Promises';
+import { JaegerSpan, JaegerTags } from 'Jaeger/JaegerSpan';
+import { JaegerManager } from 'Jaeger/JaegerManager';
 
 export class WebView {
 
@@ -83,6 +86,7 @@ export class WebView {
     private _analyticsManager: AnalyticsManager;
     private _adMobSignalFactory: AdMobSignalFactory;
     private _missedImpressionManager: MissedImpressionManager;
+    private _jaegerManager: JaegerManager;
 
     private _showing: boolean = false;
     private _initialized: boolean = false;
@@ -105,7 +109,9 @@ export class WebView {
     }
 
     public initialize(): Promise<void | any[]> {
+        const jaegerInitSpan = new JaegerSpan('Initialize'); // start a span
         return this._nativeBridge.Sdk.loadComplete().then((data) => {
+            jaegerInitSpan.addAnnotation('nativeBridge loadComplete');
             this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
 
             if(!/^\d+$/.test( this._clientInfo.getGameId())) {
@@ -131,10 +137,13 @@ export class WebView {
             this._thirdPartyEventManager = new ThirdPartyEventManager(this._nativeBridge, this._request);
             this._metadataManager = new MetaDataManager(this._nativeBridge);
             this._adMobSignalFactory = new AdMobSignalFactory(this._nativeBridge, this._clientInfo, this._deviceInfo, this._focusManager);
+            this._jaegerManager = new JaegerManager(this._request);
+            this._jaegerManager.addOpenSpan(jaegerInitSpan);
 
             HttpKafka.setRequest(this._request);
             HttpKafka.setClientInfo(this._clientInfo);
             SdkStats.setInitTimestamp();
+            GameSessionCounters.init();
 
             return Promise.all([this._deviceInfo.fetch(), this.setupTestEnvironment()]);
         }).then(() => {
@@ -168,12 +177,20 @@ export class WebView {
                 this._focusManager.setListenAndroidLifecycle(true);
             }
 
+            const configSpan = this._jaegerManager.startSpan('FetchConfiguration', jaegerInitSpan.id, jaegerInitSpan.traceId);
             let configPromise;
             if(this._creativeUrl) {
                 configPromise = Promise.resolve(new Configuration(JsonParser.parse(CreativeUrlConfiguration)));
             } else {
-                configPromise = ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, this._metadataManager);
+                configPromise = ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, this._metadataManager, configSpan);
             }
+            configPromise.then((configuration) => {
+                this._jaegerManager.stop(configSpan);
+                return configuration;
+            }).catch((error) => {
+                this._jaegerManager.stop(configSpan);
+                throw new Error(error);
+            });
 
             const cachePromise = this._cacheBookkeeping.cleanCache().catch(error => {
                 // don't fail init due to cache cleaning issues, instead just log and report diagnostics
@@ -188,6 +205,7 @@ export class WebView {
             this._configuration = configuration;
             this._cachedCampaignResponse = cachedCampaignResponse;
             HttpKafka.setConfiguration(this._configuration);
+            this._jaegerManager.setJaegerTracingEnabled(this._configuration.isJaegerTracingEnabled());
 
             PurchasingUtilities.setConfiguration(this._configuration);
             PurchasingUtilities.setClientInfo(this._clientInfo);
@@ -222,27 +240,42 @@ export class WebView {
             this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
 
             this._assetManager = new AssetManager(this._cache, this._configuration.getCacheMode(), this._deviceInfo, this._cacheBookkeeping, this._nativeBridge);
-            this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._adMobSignalFactory, this._request, this._clientInfo, this._deviceInfo, this._metadataManager, this._cacheBookkeeping);
+            this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._adMobSignalFactory, this._request, this._clientInfo, this._deviceInfo, this._metadataManager, this._cacheBookkeeping, this._jaegerManager);
 
             this._refreshManager = new OldCampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration, this._focusManager, this._sessionManager, this._clientInfo, this._request, this._cache);
 
             SdkStats.initialize(this._nativeBridge, this._request, this._configuration, this._sessionManager, this._campaignManager, this._metadataManager, this._clientInfo);
 
             const enableCachedResponse = this._configuration.getAbGroup() === 7 || this._configuration.getAbGroup() === 8;
+            const refreshSpan = this._jaegerManager.startSpan('Refresh', jaegerInitSpan.id, jaegerInitSpan.traceId);
+            refreshSpan.addTag(JaegerTags.DeviceType, Platform[this._nativeBridge.getPlatform()]);
+            let refreshPromise;
             if (this._cachedCampaignResponse !== undefined && enableCachedResponse) {
-                return this._refreshManager.refreshFromCache(this._cachedCampaignResponse);
+                refreshPromise = this._refreshManager.refreshFromCache(this._cachedCampaignResponse, refreshSpan);
             } else {
-                return this._refreshManager.refresh();
+                refreshPromise = this._refreshManager.refresh();
             }
+            refreshPromise.then((resp) => {
+                this._jaegerManager.stop(refreshSpan);
+                return resp;
+            }).catch((error) => {
+                refreshSpan.addTag(JaegerTags.Error, 'true');
+                refreshSpan.addTag(JaegerTags.ErrorMessage, error.message);
+                this._jaegerManager.stop(refreshSpan);
+                throw new Error(error);
+            });
+            return refreshPromise;
         }).then(() => {
             this._initialized = true;
+            this._jaegerManager.stop(jaegerInitSpan);
 
             return this._sessionManager.sendUnsentSessions();
-        }).then(() => {
-            if(this._nativeBridge.getPlatform() === Platform.ANDROID && (this._configuration.getAbGroup() === 9 || this._configuration.getAbGroup() === 10)) {
-                this._nativeBridge.setAutoBatchEnabled(false);
-            }
         }).catch(error => {
+            jaegerInitSpan.addAnnotation(error.message);
+            jaegerInitSpan.addTag(JaegerTags.Error, 'true');
+            jaegerInitSpan.addTag(JaegerTags.ErrorMessage, error.message);
+            this._jaegerManager.stop(jaegerInitSpan);
+
             if(error instanceof ConfigError) {
                 error = { 'message': error.message, 'name': error.name };
                 this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INITIALIZE_FAILED], error.message);
@@ -412,7 +445,7 @@ export class WebView {
             this._campaignManager.setPreviousPlacementId(placement.getId());
 
             // Temporary for realtime testing purposes
-            if (placement.getRealtimeData()) {
+            if (this._wasRealtimePlacement) {
                 this._currentAdUnit.onStart.subscribe(() => {
                     const startDelay = Date.now() - start;
                     Diagnostics.trigger('realtime_delay', {
@@ -420,17 +453,13 @@ export class WebView {
                         startDelay: startDelay,
                         totalDelay: this._requestDelay + startDelay,
                         auctionId: campaign.getSession().getId(),
-                        wasRealtime: this._wasRealtimePlacement,
-                        campaignRawResponse: campaign.getAdType()
+                        adUnitDescription: this._currentAdUnit.description()
                     });
                 });
             }
+            this._wasRealtimePlacement = false;
 
-            this._currentAdUnit.show().then(() => {
-                if(this._nativeBridge.getPlatform() === Platform.ANDROID && (this._configuration.getAbGroup() === 9 || this._configuration.getAbGroup() === 10)) {
-                    this._nativeBridge.setAutoBatchEnabled(true);
-                }
-            });
+            this._currentAdUnit.show();
         });
     }
 
@@ -444,10 +473,6 @@ export class WebView {
 
     private onAdUnitClose(): void {
         this._showing = false;
-
-        if(this._nativeBridge.getPlatform() === Platform.ANDROID && (this._configuration.getAbGroup() === 9 || this._configuration.getAbGroup() === 10)) {
-            this._nativeBridge.setAutoBatchEnabled(false);
-        }
     }
 
     private isShowing(): boolean {

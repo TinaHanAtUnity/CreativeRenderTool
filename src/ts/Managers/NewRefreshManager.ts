@@ -15,6 +15,7 @@ import { Session } from 'Models/Session';
 import { ReinitManager } from 'Managers/ReinitManager';
 import { PlacementManager } from 'Managers/PlacementManager';
 import { Diagnostics } from 'Utilities/Diagnostics';
+import { JaegerSpan } from 'Jaeger/JaegerSpan';
 
 enum FillState {
     MUST_REFILL, // should ask for new fill at the first available opportunity
@@ -103,7 +104,8 @@ export class NewRefreshManager extends RefreshManager {
         // todo: redundant method, should be removed
     }
 
-    public refreshFromCache(cachedResponse: INativeResponse): Promise<INativeResponse | void> {
+    public refreshFromCache(cachedResponse: INativeResponse, span: JaegerSpan): Promise<INativeResponse | void> {
+        span.addAnnotation('refreshFromCache');
         const refillFlags: IRefillFlags = this.getRefillState(Date.now());
 
         if(refillFlags.shouldRefill) {
@@ -111,12 +113,14 @@ export class NewRefreshManager extends RefreshManager {
 
             return this._reinitManager.shouldReinitialize().then(reinit => {
                 if(reinit) {
+                    span.addAnnotation('reinit');
                     if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
                         this._fillState = FillState.MUST_REINIT;
                     } else {
                         this._reinitManager.reinitialize();
                     }
                 } else {
+                    span.addAnnotation('invalidating fill');
                     this.invalidateFill();
                     this._campaignManager.requestFromCache(cachedResponse).then(() => {
                         this._campaignManager.request(refillFlags.noFillRetry);
