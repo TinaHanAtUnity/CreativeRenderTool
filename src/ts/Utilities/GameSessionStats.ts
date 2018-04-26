@@ -1,5 +1,6 @@
 import { Campaign } from 'Models/Campaign';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
+import { XPromoCampaign } from "../Models/Campaigns/XPromoCampaign";
 
 export class GameSessionStats {
 
@@ -22,7 +23,7 @@ export class GameSessionStats {
             this._campaignStartCounter[campaign.getId()] = 1;
         }
 
-        if (campaign instanceof PerformanceCampaign) {
+        if (campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign) {
             if (this._targetStartCounter[campaign.getGameId()]) {
                 this._targetStartCounter[campaign.getGameId()] = ++this._targetStartCounter[campaign.getGameId()];
             } else {
@@ -40,7 +41,7 @@ export class GameSessionStats {
             this._campaignViewCounter[campaign.getId()] = 1;
         }
 
-        if (campaign instanceof PerformanceCampaign) {
+        if (campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign) {
             if (this._targetViewCounter[campaign.getGameId()]) {
                 this._targetViewCounter[campaign.getGameId()] = ++this._targetViewCounter[campaign.getGameId()];
             } else {
