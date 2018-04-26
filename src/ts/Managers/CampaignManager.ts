@@ -31,8 +31,6 @@ import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 import { CampaignParserFactory } from 'Managers/CampaignParserFactory';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
 import { UserCountData } from 'Utilities/UserCountData';
-import { IosPermission } from '../Native/Api/IosPermissions';
-import { AndroidPermission } from '../Native/Api/AndroidPermissions';
 
 export class CampaignManager {
 
