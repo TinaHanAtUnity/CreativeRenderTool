@@ -17,17 +17,21 @@ export class GameSessionCounters {
     public static addStart(campaign: Campaign) {
         this._totalStartCount++;
 
-        if (this._campaignStartCounter[campaign.getId()]) {
-            this._campaignStartCounter[campaign.getId()] = ++this._campaignStartCounter[campaign.getId()];
+        const campaignId = campaign.getId();
+        if (this._campaignStartCounter[campaignId]) {
+            let campaignStartCount = this._campaignStartCounter[campaignId];
+            this._campaignStartCounter[campaignId] = ++campaignStartCount;
         } else {
-            this._campaignStartCounter[campaign.getId()] = 1;
+            this._campaignStartCounter[campaignId] = 1;
         }
 
         if (campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign) {
-            if (this._targetStartCounter[campaign.getGameId()]) {
-                this._targetStartCounter[campaign.getGameId()] = ++this._targetStartCounter[campaign.getGameId()];
+            const targetGameId = campaign.getGameId();
+            if (this._targetStartCounter[targetGameId]) {
+                let targetStartCount = this._targetStartCounter[targetGameId];
+                this._targetStartCounter[targetGameId] = ++targetStartCount;
             } else {
-                this._targetStartCounter[campaign.getGameId()] = 1;
+                this._targetStartCounter[targetGameId] = 1;
             }
         }
     }
@@ -35,17 +39,21 @@ export class GameSessionCounters {
     public static addView(campaign: Campaign) {
         this._totalViewCount++;
 
-        if (this._campaignViewCounter[campaign.getId()]) {
-            this._campaignViewCounter[campaign.getId()] = ++this._campaignViewCounter[campaign.getId()];
+        const campaignId = campaign.getId();
+        if (this._campaignViewCounter[campaignId]) {
+            let campaignViewCount = this._campaignViewCounter[campaignId];
+            this._campaignViewCounter[campaignId] = ++campaignViewCount;
         } else {
-            this._campaignViewCounter[campaign.getId()] = 1;
+            this._campaignViewCounter[campaignId] = 1;
         }
 
         if (campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign) {
-            if (this._targetViewCounter[campaign.getGameId()]) {
-                this._targetViewCounter[campaign.getGameId()] = ++this._targetViewCounter[campaign.getGameId()];
+            const targetGameId = campaign.getGameId();
+            if (this._targetViewCounter[targetGameId]) {
+                let targetViewCount = this._targetViewCounter[targetGameId];
+                this._targetViewCounter[targetGameId] = ++targetViewCount;
             } else {
-                this._targetViewCounter[campaign.getGameId()] = 1;
+                this._targetViewCounter[targetGameId] = 1;
             }
         }
 
