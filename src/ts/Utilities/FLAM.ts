@@ -125,11 +125,11 @@ class FLAMSingleton {
             return this._FLAMTests.find((ft) => ft.name === name);
         } else {
             /* Apparently some old android devices don't know about find function... */
-            let ft;
             for (const _ft of this._FLAMTests) {
-                ft = _ft.name === name ? _ft : undefined;
+                if (_ft.name === name) {
+                    return _ft;
+                }
             }
-            return ft;
         }
     }
 
