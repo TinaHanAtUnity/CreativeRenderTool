@@ -86,7 +86,10 @@ export class AdUnitFactory {
         } else if(parameters.campaign instanceof MRAIDCampaign) {
             return this.createMRAIDAdUnit(nativeBridge, <IAdUnitParameters<MRAIDCampaign>>parameters);
         } else if(parameters.campaign instanceof PerformanceCampaign) {
-            FLAM.measure(['webp', 'hevc', 'vp9'], nativeBridge);
+            const abGroup = parameters && parameters.campaign && parameters.campaign.getAbGroup();
+            if (abGroup === 16 || abGroup === 17) {
+                FLAM.measure(['webp', 'hevc', 'vp9'], nativeBridge);
+            }
             return this.createPerformanceAdUnit(nativeBridge, <IAdUnitParameters<PerformanceCampaign>>parameters);
         } else if (parameters.campaign instanceof DisplayInterstitialCampaign) {
             return this.createDisplayInterstitialAdUnit(nativeBridge, <IAdUnitParameters<DisplayInterstitialCampaign>>parameters);
