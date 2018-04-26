@@ -234,16 +234,23 @@ export class CacheBookkeeping {
     private cleanCacheBookKeeping(): Promise<void> {
         return this.getKeys().then((cacheKeys) => {
             const promises: Array<Promise<any>> = [];
+
             for(const cacheKey of cacheKeys) {
                 if(cacheKey && !(cacheKey.toUpperCase() in CacheKey)) {
                     promises.push(this._nativeBridge.Storage.delete(StorageType.PRIVATE, this._rootKey + '.' + cacheKey));
                 }
             }
-            return Promise.all(promises).then(() => {
-                return Promise.resolve();
-            }).catch(() => {
-                return Promise.resolve();
-            });
+
+            if(promises.length > 0) {
+                promises.push(this._nativeBridge.Storage.write(StorageType.PRIVATE));
+                return Promise.all(promises).then(() => {
+                    return Promise.resolve();
+                }).catch(() => {
+                    return Promise.resolve();
+                });
+            }
+
+            return Promise.resolve();
         }).catch(() => {
             return Promise.resolve();
         });
