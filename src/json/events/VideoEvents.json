@@ -222,6 +222,12 @@
       "required": "android",
       "queryString": false,
       "body": true
+    },
+    {
+      "parameter": "gameSessionCounters",
+      "required": "all",
+      "queryString": false,
+      "body": true
     }
   ]
 }
