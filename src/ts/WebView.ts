@@ -235,10 +235,6 @@ export class WebView {
             this._initialized = true;
 
             return this._sessionManager.sendUnsentSessions();
-        }).then(() => {
-            if(this._nativeBridge.getPlatform() === Platform.ANDROID && (this._configuration.getAbGroup() === 9 || this._configuration.getAbGroup() === 10)) {
-                this._nativeBridge.setAutoBatchEnabled(false);
-            }
         }).catch(error => {
             if(error instanceof ConfigError) {
                 error = { 'message': error.message, 'name': error.name };
@@ -423,11 +419,7 @@ export class WebView {
             }
             this._wasRealtimePlacement = false;
 
-            this._currentAdUnit.show().then(() => {
-                if(this._nativeBridge.getPlatform() === Platform.ANDROID && (this._configuration.getAbGroup() === 9 || this._configuration.getAbGroup() === 10)) {
-                    this._nativeBridge.setAutoBatchEnabled(true);
-                }
-            });
+            this._currentAdUnit.show();
         });
     }
 
@@ -441,10 +433,6 @@ export class WebView {
 
     private onAdUnitClose(): void {
         this._showing = false;
-
-        if(this._nativeBridge.getPlatform() === Platform.ANDROID && (this._configuration.getAbGroup() === 9 || this._configuration.getAbGroup() === 10)) {
-            this._nativeBridge.setAutoBatchEnabled(false);
-        }
     }
 
     private isShowing(): boolean {
