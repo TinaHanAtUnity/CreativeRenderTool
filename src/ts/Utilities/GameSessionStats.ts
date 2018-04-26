@@ -1,6 +1,6 @@
 import { Campaign } from 'Models/Campaign';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
-import { XPromoCampaign } from "../Models/Campaigns/XPromoCampaign";
+import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 
 export class GameSessionStats {
 

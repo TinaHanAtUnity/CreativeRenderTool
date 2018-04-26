@@ -14,7 +14,7 @@ import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { IVideoEventHandler } from 'Native/Api/VideoPlayer';
 import { Video } from 'Models/Assets/Video';
 import { BaseVideoEventHandler, IVideoEventHandlerParams } from 'EventHandlers/BaseVideoEventHandler';
-import { GameSessionStats } from "../Utilities/GameSessionStats";
+import { GameSessionStats } from 'Utilities/GameSessionStats';
 
 export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEventHandler {
 
