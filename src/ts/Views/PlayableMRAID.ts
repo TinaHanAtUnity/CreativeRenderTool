@@ -453,7 +453,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private handleAREvent(event: string, parameters: string) {
         if (this._iframeLoaded) {
-            this._iframe.contentWindow.postMessage({type: 'AREvent', data: {parameters, event}}, '*');
+            this._iframe.contentWindow!.postMessage({type: 'AREvent', data: {parameters, event}}, '*');
         }
     }
 }
