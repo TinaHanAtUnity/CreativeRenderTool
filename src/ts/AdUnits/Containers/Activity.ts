@@ -50,8 +50,6 @@ export class Activity extends AdUnitContainer {
     }
 
     public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: IAndroidOptions): Promise<void> {
-        this.resetDiagnosticsEvents();
-        this.addDiagnosticsEvent({type: 'open'});
         this._activityId++;
         this._currentActivityFinished = false;
         this._androidOptions = options;
@@ -84,12 +82,10 @@ export class Activity extends AdUnitContainer {
     }
 
     public close(): Promise<void> {
-        this.addDiagnosticsEvent({type: 'closeTried'});
         if(!this._currentActivityFinished) {
             this._currentActivityFinished = true;
             this._nativeBridge.AndroidAdUnit.onFocusLost.unsubscribe(this._onFocusLostObserver);
             this._nativeBridge.AndroidAdUnit.onFocusGained.unsubscribe(this._onFocusGainedObserver);
-            this.addDiagnosticsEvent({type: 'close'});
             return this._nativeBridge.AndroidAdUnit.close();
         } else {
             return Promise.resolve();
@@ -97,7 +93,6 @@ export class Activity extends AdUnitContainer {
     }
 
     public reconfigure(configuration: ViewConfiguration): Promise<any[]> {
-        this.addDiagnosticsEvent({type: 'reconfigure'});
         const promises: Array<Promise<any>> = [];
 
         return Promise.all([
@@ -127,7 +122,6 @@ export class Activity extends AdUnitContainer {
     }
 
     public reorient(allowRotation: boolean, forceOrientation: Orientation): Promise<any> {
-        this.addDiagnosticsEvent({type: 'reorient'});
         return this._nativeBridge.AndroidAdUnit.setOrientation(this.getOrientation(allowRotation, forceOrientation, this._androidOptions));
     }
 
@@ -184,31 +178,25 @@ export class Activity extends AdUnitContainer {
     }
 
     private onResume(activityId: number): void {
-        this.addDiagnosticsEvent({type: 'onResumeTried'});
         if(activityId === this._activityId) {
-            this.addDiagnosticsEvent({type: 'onResume'});
             this.onShow.trigger();
         }
     }
 
     private onPause(finishing: boolean, activityId: number): void {
-        this.addDiagnosticsEvent({type: 'onPauseTried'});
         this.onAndroidPause.trigger();
         if(finishing && activityId === this._activityId) {
             if(!this._currentActivityFinished) {
                 this._currentActivityFinished = true;
-                this.addDiagnosticsEvent({type: 'onPause'});
                 this.onSystemKill.trigger();
             }
         }
     }
 
     private onDestroy(finishing: boolean, activityId: number): void {
-        this.addDiagnosticsEvent({type: 'onDestroyTried'});
         if(finishing && activityId === this._activityId) {
             if(!this._currentActivityFinished) {
                 this._currentActivityFinished = true;
-                this.addDiagnosticsEvent({type: 'onDestroy'});
                 this.onSystemKill.trigger();
             }
         }

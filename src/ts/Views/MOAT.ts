@@ -69,7 +69,7 @@ export class MOAT extends View<VastCampaign> {
             }
 
             this._nativeBridge.Sdk.logDebug('Calling MOAT init with: ' + JSON.stringify(ids) + ' duration: ' + duration + ' url: ' + url);
-            this._iframe.contentWindow.postMessage({
+            this._iframe.contentWindow!.postMessage({
                 type: 'init',
                 data: {
                     ids,
@@ -78,7 +78,7 @@ export class MOAT extends View<VastCampaign> {
                     moatData
                 }
             }, '*');
-            this._iframe.contentWindow.postMessage({
+            this._iframe.contentWindow!.postMessage({
                 type: 'resize',
                 width: window.innerWidth,
                 height: window.innerHeight

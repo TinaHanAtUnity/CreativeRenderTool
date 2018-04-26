@@ -154,7 +154,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     public hide() {
-        this._iframe.contentWindow.postMessage({
+        this._iframe.contentWindow!.postMessage({
             type: 'viewable',
             value: false
         }, '*');
@@ -182,7 +182,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     public setViewableState(viewable: boolean) {
         if(this._iframeLoaded && !this._loadingScreenTimeout) {
-            this._iframe.contentWindow.postMessage({
+            this._iframe.contentWindow!.postMessage({
                 type: 'viewable',
                 value: viewable
             }, '*');
@@ -293,7 +293,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 const timeFromShow = this.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
                 const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
                 this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_start', undefined));
-                this._iframe.contentWindow.postMessage({
+                this._iframe.contentWindow!.postMessage({
                     type: 'viewable',
                     value: true
                 }, '*');
