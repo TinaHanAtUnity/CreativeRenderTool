@@ -67,12 +67,12 @@ export class GameSessionStats {
             viewsPerTarget: this._targetViewCounter };
     }
 
-    private static _adRequestCount: number;
-    private static _totalStartCount: number;
-    private static _totalViewCount: number;
-    private static _targetStartCounter: {[id: string]: number};
-    private static _targetViewCounter: {[id: string]: number};
-    private static _campaignStartCounter: {[id: string]: number};
-    private static _campaignViewCounter: {[id: string]: number};
+    private static _adRequestCount: number = 0;
+    private static _totalStartCount: number = 0;
+    private static _totalViewCount: number = 0;
+    private static _targetStartCounter: {[id: string]: number} = {};
+    private static _targetViewCounter: {[id: string]: number} = {};
+    private static _campaignStartCounter: {[id: string]: number} = {};
+    private static _campaignViewCounter: {[id: string]: number} = {};
 
 }
