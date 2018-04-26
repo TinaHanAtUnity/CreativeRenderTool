@@ -1,4 +1,4 @@
-# Pending
+# Thu Apr 26 20:23:59 UTC 2018
 
 * Initial support for Jaeger tracing service
 * Fix cache bookkeeping cleaning problems
