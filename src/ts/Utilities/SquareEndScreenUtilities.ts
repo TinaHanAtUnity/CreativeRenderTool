@@ -2,7 +2,7 @@ import { Platform } from 'Constants/Platform';
 
 export const SQUARE_CAMPAIGNS = [
     {
-        customImage: 'http://cdn.unityads.unity3d.com/abtests/800_images/homescapes.jpg',
+        customImage: 'https://cdn.unityads.unity3d.com/abtests/800_images/homescapes.jpg',
         campaignIds: [
             '59c20aaed34ca7123046fed0',
             '59c209f17e8caf1258703669',
@@ -18,7 +18,7 @@ export const SQUARE_CAMPAIGNS = [
         ]
     },
     {
-        customImage: 'http://cdn.unityads.unity3d.com/abtests/800_images/angrybirds2.jpg',
+        customImage: 'https://cdn.unityads.unity3d.com/abtests/800_images/angrybirds2.jpg',
         campaignIds: [
             '5abb8462149ff500300f0748',
             '5abb8462149ff500300f0749',
@@ -31,7 +31,7 @@ export const SQUARE_CAMPAIGNS = [
         ],
     },
     {
-        customImage: 'http://cdn.unityads.unity3d.com/abtests/800_images/jelly.jpg',
+        customImage: 'https://cdn.unityads.unity3d.com/abtests/800_images/jelly.jpg',
         campaignIds: [
             '5a707dde709a4005ecf945cd',
             '5a707ddf4f24e305b07a9da0',
