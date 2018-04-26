@@ -186,8 +186,6 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     private onMessage(event: MessageEvent) {
-        /* @todo: Are we keeping this? If so, it needs to be more descriptive (what event/who received it) */
-        this._nativeBridge.Sdk.logDebug('Event received: ' + JSON.stringify(event.data));
         switch(event.data.type) {
             case 'loaded':
                 this._loaded = true;
