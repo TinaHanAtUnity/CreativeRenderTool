@@ -12,7 +12,8 @@ export class PermissionsApi extends NativeApi {
         super(nativeBridge, 'Permissions');
 
         if (nativeBridge.getPlatform() === Platform.ANDROID) {
-            this.Android = new AndroidPermissionsApi(nativeBridge);
+            // TODO: uncomment when Android SDK has permission support
+            // this.Android = new AndroidPermissionsApi(nativeBridge);
         } else if(nativeBridge.getPlatform() === Platform.IOS) {
             this.Ios = new IosPermissionsApi(nativeBridge);
         }
