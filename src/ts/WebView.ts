@@ -49,6 +49,7 @@ import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { OldCampaignRefreshManager } from 'Managers/OldCampaignRefreshManager';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { MissedImpressionManager } from 'Managers/MissedImpressionManager';
+import { GameSessionCounters } from 'Utilities/GameSessionCounters';
 
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
@@ -142,6 +143,7 @@ export class WebView {
             HttpKafka.setRequest(this._request);
             HttpKafka.setClientInfo(this._clientInfo);
             SdkStats.setInitTimestamp();
+            GameSessionCounters.init();
 
             return Promise.all([this._deviceInfo.fetch(), this.setupTestEnvironment()]);
         }).then(() => {
@@ -268,10 +270,6 @@ export class WebView {
             this._jaegerManager.stop(jaegerInitSpan);
 
             return this._sessionManager.sendUnsentSessions();
-        }).then(() => {
-            if(this._nativeBridge.getPlatform() === Platform.ANDROID && (this._configuration.getAbGroup() === 9 || this._configuration.getAbGroup() === 10)) {
-                this._nativeBridge.setAutoBatchEnabled(false);
-            }
         }).catch(error => {
             jaegerInitSpan.addAnnotation(error.message);
             jaegerInitSpan.addTag(JaegerTags.Error, 'true');
@@ -461,11 +459,7 @@ export class WebView {
             }
             this._wasRealtimePlacement = false;
 
-            this._currentAdUnit.show().then(() => {
-                if(this._nativeBridge.getPlatform() === Platform.ANDROID && (this._configuration.getAbGroup() === 9 || this._configuration.getAbGroup() === 10)) {
-                    this._nativeBridge.setAutoBatchEnabled(true);
-                }
-            });
+            this._currentAdUnit.show();
         });
     }
 
@@ -479,10 +473,6 @@ export class WebView {
 
     private onAdUnitClose(): void {
         this._showing = false;
-
-        if(this._nativeBridge.getPlatform() === Platform.ANDROID && (this._configuration.getAbGroup() === 9 || this._configuration.getAbGroup() === 10)) {
-            this._nativeBridge.setAutoBatchEnabled(false);
-        }
     }
 
     private isShowing(): boolean {
