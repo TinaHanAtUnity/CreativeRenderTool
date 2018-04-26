@@ -63,7 +63,7 @@ describe('JaegerSpan', () => {
             assert.equal(span.parentId, '1234567890123456');
         });
 
-        it('span should have traceId of length 16 with only 0-9 & a-z', () => {
+        it('span should have traceId of length 16 with only 0-9 and a-z', () => {
             assert.lengthOf(span.traceId, 16);
             assert.isTrue(/^[a-z0-9]*$/.test(span.traceId));
         });
@@ -72,7 +72,7 @@ describe('JaegerSpan', () => {
             assert.equal(span.name, 'initialization');
         });
 
-        it('span should have id of length 16 with only 0-9 & a-z', () => {
+        it('span should have id of length 16 with only 0-9 and a-z', () => {
             assert.lengthOf(span.id, 16);
             assert.isTrue(/^[a-z0-9]*$/.test(span.traceId));
         });
