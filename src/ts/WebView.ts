@@ -331,8 +331,6 @@ export class WebView {
     }
 
     private showAd(placement: Placement, campaign: Campaign, options: any) {
-        GameSessionCounters.addStart(campaign);
-
         const testGroup = this._configuration.getAbGroup();
         const start = Date.now();
 

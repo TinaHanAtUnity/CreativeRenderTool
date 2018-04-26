@@ -11,7 +11,6 @@ import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { EventType } from 'Models/Session';
 import { Placement } from 'Models/Placement';
-import { GameSessionCounters } from 'Utilities/GameSessionCounters';
 
 export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign> {
     mraid: MRAIDView<IMRAIDViewHandler>;
@@ -107,8 +106,6 @@ export class MRAIDAdUnit extends AbstractAdUnit {
 
         const finishState = this.getFinishState();
         if(finishState === FinishState.COMPLETED) {
-            GameSessionCounters.addView(this._campaign);
-
             if(!this._campaign.getSession().getEventSent(EventType.THIRD_QUARTILE)) {
                 this._operativeEventManager.sendThirdQuartile(this._placement);
             }

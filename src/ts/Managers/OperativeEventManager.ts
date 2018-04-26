@@ -92,6 +92,8 @@ export class OperativeEventManager {
 
         session.setEventSent(EventType.START);
 
+        GameSessionCounters.addStart(this._campaign);
+
         return this._metaDataManager.fetch(PlayerMetaData, false).then(player => {
             if(player) {
                 this.setGamerServerId(player.getServerId());
@@ -200,6 +202,8 @@ export class OperativeEventManager {
             return Promise.resolve(void(0));
         }
         session.setEventSent(EventType.VIEW);
+
+        GameSessionCounters.addView(this._campaign);
 
         const fulfilled = ([id, infoJson]: [string, any]) => {
             this.sendEvent('view', id, infoJson.sessionId, this.createVideoEventUrl('video_end'), JSON.stringify(infoJson));

@@ -11,7 +11,6 @@ import { DiagnosticError } from 'Errors/DiagnosticError';
 import { FinishState } from 'Constants/FinishState';
 import { Placement } from 'Models/Placement';
 import { Closer } from 'Views/Closer';
-import { GameSessionCounters } from 'Utilities/GameSessionCounters';
 
 export class VPAIDEventHandler implements IVPAIDHandler {
     private _nativeBridge: NativeBridge;
@@ -172,7 +171,6 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     private onAdVideoComplete() {
         this._adUnit.sendTrackingEvent('complete');
         this._adUnit.setFinishState(FinishState.COMPLETED);
-        GameSessionCounters.addView(this._campaign);
         this._operativeEventManager.sendView(this._placement);
         this.sendComscoreEvent('end', (this._adDuration - this._adRemainingTime) * 1000);
     }

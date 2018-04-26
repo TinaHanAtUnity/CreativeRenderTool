@@ -14,7 +14,6 @@ import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { IVideoEventHandler } from 'Native/Api/VideoPlayer';
 import { Video } from 'Models/Assets/Video';
 import { BaseVideoEventHandler, IVideoEventHandlerParams } from 'EventHandlers/BaseVideoEventHandler';
-import { GameSessionCounters } from 'Utilities/GameSessionCounters';
 
 export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEventHandler {
 
@@ -267,7 +266,6 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
     }
 
     protected handleCompleteEvent(url: string): void {
-        GameSessionCounters.addView(this._campaign);
         this._operativeEventManager.sendView(this._placement, this.getVideoOrientation(), this._adUnitStyle);
 
         const comScorePlayedTime = this._video.getPosition();
