@@ -20,6 +20,7 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { Cache } from 'Utilities/Cache';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { JaegerSpan } from 'Jaeger/JaegerSpan';
+import { UserCountData } from 'Utilities/UserCountData';
 
 export class OldCampaignRefreshManager extends RefreshManager {
     private _nativeBridge: NativeBridge;
@@ -340,6 +341,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
                 if(placementState === PlacementState.READY) {
                     SdkStats.setReadyEventTimestamp(placementId);
                     SdkStats.sendReadyEvent(placementId);
+                    UserCountData.setPriorRequestToReadyTime(SdkStats.getRequestToReadyTime(placementId), this._nativeBridge);
                     this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + placementId + ' request to ready time took ' + SdkStats.getRequestToReadyTime(placementId));
                 }
             });
@@ -350,6 +352,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
             if(placementState === PlacementState.READY) {
                 SdkStats.setReadyEventTimestamp(placementId);
                 SdkStats.sendReadyEvent(placementId);
+                UserCountData.setPriorRequestToReadyTime(SdkStats.getRequestToReadyTime(placementId), this._nativeBridge);
                 this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + placementId + ' request to ready time took ' + SdkStats.getRequestToReadyTime(placementId));
             }
         }
