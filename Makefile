@@ -333,7 +333,11 @@ watch-fast: BUILD_DIR = build/dev
 watch-fast: MODULE = system
 watch-fast: TARGET = es5
 watch-fast: build-dev-no-ts
-	$(CONCURRENTLY) --names build,tsc,test --kill-others "watchman-make -p 'src/index.html' 'src/styl/*.styl' 'src/html/*.html' -t build-dev-no-ts" "$(TYPESCRIPT) --watch --preserveWatchOutput --project . --module $(MODULE) --target $(TARGET) --outDir $(BUILD_DIR)/js" "node test-utils/test-watcher.js"
+	$(CONCURRENTLY) --names build,tsc,test \
+									--kill-others \
+									"watchman-make -p 'src/index.html' 'src/styl/*.styl' 'src/html/*.html' -t build-dev-no-ts" \
+									"$(TYPESCRIPT) --watch --preserveWatchOutput --project . --module $(MODULE) --target $(TARGET) --outDir $(BUILD_DIR)/js" \
+									"node test-utils/test-watcher.js"
 
 setup: clean
 	rm -rf node_modules && npm install
