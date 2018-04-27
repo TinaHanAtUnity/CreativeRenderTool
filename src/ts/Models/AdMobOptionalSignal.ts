@@ -142,7 +142,8 @@ export class AdMobOptionalSignal extends Model<IAdMobOptionalSignal> {
             prior_click_count: this.getPriorClickCount(),
             device_incapabilities: this.getDeviceIncapabilities(),
             ios_jailbroken: this.getIsJailbroken(),
-            iu_sizes: this.getIUSizes()
+            iu_sizes: this.getIUSizes(),
+            ad_load_duration: this.getAdLoadDuration()
         };
     }
 }

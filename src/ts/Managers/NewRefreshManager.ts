@@ -16,6 +16,7 @@ import { ReinitManager } from 'Managers/ReinitManager';
 import { PlacementManager } from 'Managers/PlacementManager';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { JaegerSpan } from 'Jaeger/JaegerSpan';
+import { UserCountData } from 'Utilities/UserCountData';
 
 enum FillState {
     MUST_REFILL, // should ask for new fill at the first available opportunity
@@ -407,6 +408,7 @@ export class NewRefreshManager extends RefreshManager {
                 if (newState === PlacementState.READY) {
                     SdkStats.setReadyEventTimestamp(placementId);
                     SdkStats.sendReadyEvent(placementId);
+                    UserCountData.setPriorRequestToReadyTime(SdkStats.getRequestToReadyTime(placementId), this._nativeBridge);
                     this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + placementId + ' request to ready time took ' + SdkStats.getRequestToReadyTime(placementId));
                 }
             });
@@ -415,6 +417,7 @@ export class NewRefreshManager extends RefreshManager {
             if (newState === PlacementState.READY) {
                 SdkStats.setReadyEventTimestamp(placementId);
                 SdkStats.sendReadyEvent(placementId);
+                UserCountData.setPriorRequestToReadyTime(SdkStats.getRequestToReadyTime(placementId), this._nativeBridge);
                 this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + placementId + ' request to ready time took ' + SdkStats.getRequestToReadyTime(placementId));
             }
         }

@@ -86,6 +86,14 @@ export class AdMobSignalFactory {
             this.logFailure(this._nativeBridge, 'priorClickCount');
         }));
 
+        promises.push(UserCountData.getPriorRequestToReadyTime(this._nativeBridge).then(priorReadyTime => {
+            if (typeof priorReadyTime === 'number') {
+                signal.setAdLoadDuration(priorReadyTime);
+            }
+        }).catch(() => {
+            this.logFailure(this._nativeBridge, 'PriorRequestToReadyTime');
+        }));
+
         promises.push(Promise.all([this._deviceInfo.getConnectionType(), this._deviceInfo.getNetworkType()]).then(([connectionType, networkType]) => {
             if (connectionType === 'wifi') {
                 signal.setGranularSpeedBucket('wi');
