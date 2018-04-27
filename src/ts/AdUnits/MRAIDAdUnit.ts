@@ -83,7 +83,10 @@ export class MRAIDAdUnit extends AbstractAdUnit {
         this._onPauseObserver = this._container.onAndroidPause.subscribe(() => this.onSystemPause());
 
         const views: string[] = ['webview'];
-        if (this._campaign.getAdType() === 'MRAID-AR') {
+        // TODO: Remove /ar/ folder check once we have MRAID-AR type support on the server side
+        const resourceUrl = this._campaign.getResourceUrl();
+        const isARURL = resourceUrl && resourceUrl.getOriginalUrl().match(/\/ar\//);
+        if (this._campaign.getAdType() === 'MRAID-AR' || isARURL) {
             views.unshift('arview');
         }
 

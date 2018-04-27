@@ -117,7 +117,10 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
             container = container.replace('var playableConfiguration = {};', 'var playableConfiguration = ' + JSON.stringify(this._configuration) + ';');
         }
 
-        const isMRAIDAR = this._campaign.getAdType() === 'MRAID-AR';
+        // TODO: Remove /ar/ folder check once we have MRAID-AR type support on the server side
+        const resourceUrl = this._campaign.getResourceUrl();
+        const isARURL = resourceUrl && resourceUrl.getOriginalUrl().match(/\/ar\//);
+        const isMRAIDAR = this._campaign.getAdType() === 'MRAID-AR' || isARURL;
         if (isMRAIDAR) {
             container = container.replace('<script id=\"webar\"></script>', WebARScript);
             iframe.classList.add('fullscreen');

@@ -238,7 +238,8 @@ export class AdUnitFactory {
 
         let mraid: MRAIDView<IMRAIDViewHandler>;
         const isMRAIDAR = parameters.campaign.getAdType() === 'MRAID-AR';
-        const isPlayable = (resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) || isMRAIDAR;
+        // TODO: Remove /ar/ folder check once we have MRAID-AR type support on the server side
+        const isPlayable = (resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity|\/ar\//)) || isMRAIDAR;
         if (isPlayable) {
             mraid = new PlayableMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.configuration.isCoppaCompliant());
             endScreen = new MRAIDEndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
