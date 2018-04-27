@@ -15,7 +15,7 @@ interface IFLAMErrorData {
     errorName?: string;
     errorMessage?: string;
     canPlayType?: string;
-    isLoaded?: boolean;
+    pass?: boolean;
 }
 
 /*
@@ -28,11 +28,12 @@ class FLAMSingleton {
     }
 
     private static _instance: FLAMSingleton;
-    private _FLAMTests: IFLAMTest[] = [
-        {name: 'webp', type: 'img', base64data: Base64Data.images.webp},
-        {name: 'hevc', type: 'video', base64data: Base64Data.video.hevc},
-        {name: 'vp9', type: 'video', base64data: Base64Data.video.vp9}
-    ];
+    private _FLAMTestResult: { [key: string]: boolean } = {};
+    private _FLAMTests: { [key: string]: IFLAMTest } = {
+        webp: {name: 'webp', type: 'img', base64data: Base64Data.images.webp},
+        hevc: {name: 'hevc', type: 'video', base64data: Base64Data.video.hevc},
+        vp9: {name: 'vp9', type: 'video', base64data: Base64Data.video.vp9}
+    };
 
     constructor() {
         if (FLAMSingleton._instance) {
@@ -42,49 +43,57 @@ class FLAMSingleton {
         FLAMSingleton._instance = this;
     }
 
-    public measure(testNameArr: string[], nativeBridge: NativeBridge) {
+    public measure(testsNames: string[], nativeBridge: NativeBridge) {
         /*
         * Let's wrap this function due to experimental nature of this class.
         * Even though it should not cause any major issues. Random errors on
         * some specific devices could be expected.
         * */
         try {
-            this._measure.apply(this, arguments);
+            this.runTests.apply(this, arguments);
         } catch (error) {
-            this._sendDiagnosticsError('FLAM runtime error', {
-                test: String(testNameArr),
+            this.sendDiagnosticsError('FLAM runtime error', {
+                test: String(testsNames),
                 errorName: error.name,
                 errorMessage: error.message
             });
         }
     }
 
-    private _measure(testNameArr: string[], nativeBridge: NativeBridge) {
-        testNameArr.map((name) => {
-            const ft = this._getFLAMTestByName(name);
-            if (typeof ft !== 'undefined') {
-                FLAMSingleton.getStoredData(ft.name, nativeBridge).then((pass: boolean) => {
-                    if (typeof pass === 'boolean') {
-                        nativeBridge.Sdk.logDebug(`FLAM test for ${ft.name}: ${pass ? 'PASSED' : 'FAILED'}`);
-                    } else {
-                        nativeBridge.Storage.delete(StorageType.PRIVATE, `flam.${ft.name}`);
-                        nativeBridge.Storage.write(StorageType.PRIVATE);
-
-                        this._sendDiagnosticsError(`Saved value is not a boolean`, {test: ft.name});
-                    }
-                }).catch(() => {
-                    /* No data about test has been written into device's memory => run test */
-                    this._processFLAMTest(ft).then((pass: boolean) => {
-                        this._storeData(ft, pass, nativeBridge);
+    private runTests(testsNames: string[], nativeBridge: NativeBridge) {
+        const testsFinishedPromises = testsNames.map((name: string) => {
+            return new Promise((resolve) => {
+                const ft = this.getFLAMTestByName(name);
+                if (typeof ft !== 'undefined') {
+                    FLAMSingleton.getStoredData(name, nativeBridge).then((pass: boolean) => {
+                        if (typeof pass !== 'boolean') {
+                            /*TODO: Let's see if there will be eny cases like this.*/
+                            this.sendDiagnosticsError(`Saved value is not a boolean`, {test: name});
+                            nativeBridge.Storage.delete(StorageType.PRIVATE, `flam.${name}`);
+                            nativeBridge.Storage.write(StorageType.PRIVATE);
+                        }
+                        nativeBridge.Sdk.logDebug(`Data already exists for ${name}: ${this.translateTestResult(pass)}`);
+                        resolve();
+                    }).catch(() => {
+                        /* No data about test has been written into device's memory => run test */
+                        this.processFLAMTest(ft).then((pass) => {
+                            this._FLAMTestResult[name] = pass;
+                            resolve();
+                        });
                     });
-                });
-            } else {
-                this._sendDiagnosticsError(`Test not found`, {test: name});
-            }
+                } else {
+                    this.sendDiagnosticsError(`Test not found`, {test: name});
+                    resolve();
+                }
+            });
+        });
+
+        Promise.all(testsFinishedPromises).then(() => {
+            this.storeData(nativeBridge);
         });
     }
 
-    private _processFLAMTest(ft: IFLAMTest): Promise<boolean> {
+    private processFLAMTest(ft: IFLAMTest): Promise<boolean> {
         return new Promise((resolve) => {
             if (ft.type === 'video') {
                 const el = <HTMLVideoElement>document.createElement('video');
@@ -92,18 +101,18 @@ class FLAMSingleton {
                 const canPlayType = el.canPlayType(`video/${MIMEType}`);
 
                 el.onloadeddata = el.onerror = () => {
-                    const isLoaded = el.readyState === 4 && el.videoHeight > 0 && el.videoWidth > 0;
+                    const pass = el.readyState === 4 && el.videoHeight > 0 && el.videoWidth > 0;
 
                     /* Let's test how much we can rely on canPlayType API */
-                    if ((canPlayType === '' && isLoaded) || (canPlayType === 'probably' && !isLoaded)) {
-                        this._sendDiagnosticsError('canPlayType and FLAM test do not match', {
+                    if ((canPlayType === '' && pass) || (canPlayType === 'probably' && !pass)) {
+                        this.sendDiagnosticsError('canPlayType and FLAM test do not match', {
                             test: ft.name,
                             canPlayType,
-                            isLoaded
+                            pass
                         });
                     }
 
-                    resolve(isLoaded);
+                    resolve(pass);
                 };
 
                 el.src = ft.base64data;
@@ -120,35 +129,39 @@ class FLAMSingleton {
         });
     }
 
-    private _getFLAMTestByName(name: string): IFLAMTest | undefined {
-        if (typeof this._FLAMTests.find === 'function') {
-            return this._FLAMTests.find((ft) => ft.name === name);
-        } else {
-            /* Apparently some old android devices don't know about find function... */
-            for (const _ft of this._FLAMTests) {
-                if (_ft.name === name) {
-                    return _ft;
-                }
+    private getFLAMTestByName(name: string): IFLAMTest | undefined {
+        return this._FLAMTests[name];
+    }
+
+    private storeData(nativeBridge: NativeBridge) {
+        Diagnostics.trigger('flam_measure_test', this._FLAMTestResult);
+
+        for (const name in this._FLAMTestResult) {
+            if (this._FLAMTestResult.hasOwnProperty(name)) {
+                const pass = this._FLAMTestResult[name];
+                nativeBridge.Sdk.logDebug(`FLAM test for ${name}: ${this.translateTestResult(pass)}`);
+                nativeBridge.Storage.set(StorageType.PRIVATE, `flam.${name}`, pass);
             }
         }
-    }
 
-    private _storeData(test: IFLAMTest, pass: boolean, nativeBridge: NativeBridge) {
-        const data = {
-            test: test.name,
-            result: pass ? 'PASSED' : 'FAILED'
-        };
-
-        Diagnostics.trigger('flam_measure_test', data);
-        nativeBridge.Storage.set(StorageType.PRIVATE, `flam.${test.name}`, pass);
         nativeBridge.Storage.write(StorageType.PRIVATE);
+
+        this._FLAMTestResult = {};
     }
 
-    private _sendDiagnosticsError(message: string, data: IFLAMErrorData) {
+    private sendDiagnosticsError(message: string, data: IFLAMErrorData) {
         Diagnostics.trigger('flam_measure_test_error', {
             message,
             ...data
         });
+    }
+
+    private translateTestResult(pass: boolean | undefined): string {
+        if (typeof pass === 'boolean') {
+            return pass ? 'PASSED' : 'FAILED';
+        } else {
+            return 'N/A';
+        }
     }
 }
 
