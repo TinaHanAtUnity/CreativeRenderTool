@@ -67,12 +67,12 @@ class FLAMSingleton {
                 if (typeof ft !== 'undefined') {
                     FLAMSingleton.getStoredData(name, nativeBridge).then((pass: boolean) => {
                         if (typeof pass !== 'boolean') {
-                            /*TODO: Let's see if there will be eny cases like this.*/
+                            /* TODO: Let's see if there will be eny cases like this. */
                             this.sendDiagnosticsError(`Saved value is not a boolean`, {test: name});
                             nativeBridge.Storage.delete(StorageType.PRIVATE, `flam.${name}`);
                             nativeBridge.Storage.write(StorageType.PRIVATE);
                         }
-                        nativeBridge.Sdk.logDebug(`Data already exists for ${name}: ${this.translateTestResult(pass)}`);
+                        nativeBridge.Sdk.logDebug(`FLAM: Data already exists for ${name}: ${this.translateTestResult(pass)}`);
                         resolve();
                     }).catch(() => {
                         /* No data about test has been written into device's memory => run test */
@@ -139,7 +139,7 @@ class FLAMSingleton {
         for (const name in this._FLAMTestResult) {
             if (this._FLAMTestResult.hasOwnProperty(name)) {
                 const pass = this._FLAMTestResult[name];
-                nativeBridge.Sdk.logDebug(`FLAM test for ${name}: ${this.translateTestResult(pass)}`);
+                nativeBridge.Sdk.logDebug(`FLAM: Test for ${name}: ${this.translateTestResult(pass)}`);
                 nativeBridge.Storage.set(StorageType.PRIVATE, `flam.${name}`, pass);
             }
         }
