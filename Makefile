@@ -1,5 +1,6 @@
 # Binaries
 BIN = node_modules/.bin
+CONCURRENTLY = $(BIN)/concurrently
 TYPESCRIPT = $(BIN)/tsc
 TSLINT = $(BIN)/tslint
 STYLUS = $(BIN)/stylus
@@ -37,7 +38,7 @@ BUILD_DIR = build
 # For platform specific operations
 OS := $(shell uname)
 
-.PHONY: build-browser build-dev build-release build-test build-dir build-ts build-js build-css build-static clean lint test test-unit test-integration test-coverage watch setup deploy
+.PHONY: build-browser build-dev build-release build-test build-dir build-ts build-js build-css build-static clean lint test test-unit test-integration test-coverage watch setup deploy build-dev-no-ts watch-fast
 
 build-browser: BUILD_DIR = build/browser
 build-browser: MODULE = system
@@ -59,6 +60,8 @@ build-dev: build-dir build-static build-css build-proto build-ts
 		var s=fs.readFileSync('$(SYSTEM_JS)', o);\
 		var i=fs.readFileSync('$(BUILD_DIR)/index.html', o);\
 		fs.writeFileSync('$(BUILD_DIR)/index.html', i.replace('{ES6_PROMISE}', p).replace('{SYSTEM_JS}', s), o);"
+
+build-dev-no-ts: build-dir build-static build-css build-proto
 
 build-release: BUILD_DIR = build/release
 build-release: MODULE = es2015
@@ -325,6 +328,12 @@ endif
 
 watch:
 	watchman-make -p 'src/index.html' 'src/ts/**/*.ts' 'src/styl/*.styl' 'src/html/*.html' -t build-dev -p 'src/ts/Test/**/*.ts' -t test
+
+watch-fast: BUILD_DIR = build/dev
+watch-fast: MODULE = system
+watch-fast: TARGET = es5
+watch-fast: build-dev-no-ts
+	$(CONCURRENTLY) --names build,tsc,test --kill-others "watchman-make -p 'src/index.html' 'src/styl/*.styl' 'src/html/*.html' -t build-dev-no-ts" "$(TYPESCRIPT) --watch --preserveWatchOutput --project . --module $(MODULE) --target $(TARGET) --outDir $(BUILD_DIR)/js" "node test-utils/test-watcher.js"
 
 setup: clean
 	rm -rf node_modules && npm install
