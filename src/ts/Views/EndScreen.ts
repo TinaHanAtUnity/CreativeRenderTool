@@ -121,6 +121,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     public hide(): void {
         super.hide();
 
+        if (this._showOptOutPopup) {
+            this._handlers.forEach(handler => handler.onOptOutPopupShown(this._gdprPopupClicked));
+        }
+
         if (this._privacy) {
             this._privacy.hide();
             this._privacy.container().parentElement!.removeChild(this._privacy.container());
@@ -158,9 +162,6 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
     private onCloseEvent(event: Event): void {
         event.preventDefault();
-        if (this._showOptOutPopup) {
-            this._handlers.forEach(handler => handler.onOptOutPopupShown(this._gdprPopupClicked));
-        }
         this._handlers.forEach(handler => handler.onEndScreenClose());
     }
 
