@@ -23,7 +23,6 @@ export interface IEndScreenHandler {
 }
 
 const GDPR_OPT_OUT_BASE  = 'gdpr-pop-up-base';
-const GDPR_OPT_OUT_ALT  = 'gdpr-pop-up-alt';
 
 const SQUARE_END_SCREEN = 'square-end-screen';
 
@@ -131,6 +130,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     public hide(): void {
         super.hide();
 
+        if (this._showOptOutPopup) {
+            this._handlers.forEach(handler => handler.onOptOutPopupShown(this._gdprPopupClicked));
+        }
+
         if (this._privacy) {
             this._privacy.hide();
             this._privacy.container().parentElement!.removeChild(this._privacy.container());
@@ -153,11 +156,8 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
     protected getEndscreenAlt(campaign?: Campaign) {
         if (this._showOptOutPopup) {
-            if (this._abGroup === 16) {
+            if (this._abGroup === 18 || this._abGroup === 19) {
                 return GDPR_OPT_OUT_BASE;
-            }
-            if (this._abGroup === 17) {
-                return GDPR_OPT_OUT_ALT;
             }
         }
 
@@ -174,9 +174,6 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
     private onCloseEvent(event: Event): void {
         event.preventDefault();
-        if (this._showOptOutPopup) {
-            this._handlers.forEach(handler => handler.onOptOutPopupShown(this._gdprPopupClicked));
-        }
         this._handlers.forEach(handler => handler.onEndScreenClose());
     }
 
