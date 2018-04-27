@@ -63,7 +63,7 @@ export const SQUARE_CAMPAIGNS = [
     }
 ];
 
-export const SQUARE_END_SCREEN_AB_GROUPS = [16, 17];
+export const SQUARE_END_SCREEN_AB_GROUPS = [5, 6];
 
 export class SquareEndScreenUtilities {
 
