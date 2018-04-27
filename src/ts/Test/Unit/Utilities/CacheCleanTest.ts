@@ -564,8 +564,9 @@ describe('CacheCleanTest', () => {
         });
 
         return cacheBookkeeping.cleanCache().then(() => {
-            assert.equal(storageSpy.callCount, 1, 'Should have called storage delete once');
-            assert.equal(storageSpy.getCall(0).args[1], 'cache', 'Cache cleanup should have deleted the whole cache entry');
+            assert.equal(storageSpy.callCount, 2, 'Should have called storage delete once');
+            assert.equal(storageSpy.getCall(0).args[1], 'cache.test1', 'Cache cleanup should have deleted the first file entry');
+            assert.equal(storageSpy.getCall(1).args[1], 'cache.test2', 'Cache cleanup should have deleted the second file entry');
             assert.equal(cacheSpy.callCount, 2, 'Should have deleted two files from cache');
             assert.equal(cacheSpy.getCall(0).args[0], 'test1.mp4', 'Fist file deleted should be \'test1\'');
             assert.equal(cacheSpy.getCall(1).args[0], 'test2.mp4', 'Fist file deleted should be \'test2\'');
@@ -588,8 +589,9 @@ describe('CacheCleanTest', () => {
         });
 
         return cacheBookkeeping.cleanCache().then(() => {
-            assert.equal(storageSpy.callCount, 1, 'Should have called storage delete once');
-            assert.equal(storageSpy.getCall(0).args[1], 'cache', 'Cache cleanup should have deleted the whole cache entry');
+            assert.equal(storageSpy.callCount, 2, 'Should have called storage delete once');
+            assert.equal(storageSpy.getCall(0).args[1], 'cache.test1', 'Cache cleanup should have deleted the first file entry');
+            assert.equal(storageSpy.getCall(1).args[1], 'cache.test2', 'Cache cleanup should have deleted the second file entry');
             assert.isFalse(storageApi.isDirty(), 'Cache cleanup left storage dirty');
         });
     });
