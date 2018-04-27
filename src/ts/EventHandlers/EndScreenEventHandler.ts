@@ -80,7 +80,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         this._adUnit.hide();
     }
 
-    public onOptOutPopupShown(popupClicked: true): void {
+    public onOptOutPopupShown(popupClicked: boolean): void {
         const kafkaObject: any = {};
         kafkaObject.timestamp = Date.now();
         kafkaObject.popupShown = true;

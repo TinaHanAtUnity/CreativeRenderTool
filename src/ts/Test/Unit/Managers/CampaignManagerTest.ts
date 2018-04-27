@@ -69,6 +69,7 @@ import OnProgrammaticVastPlcCampaignCustomTracking from 'json/OnProgrammaticVast
 import OnStaticInterstitialDisplayCampaign from 'json/OnStaticInterstitialDisplayCampaign.json';
 import { JaegerManager } from 'Jaeger/JaegerManager';
 import { JaegerSpan } from 'Jaeger/JaegerSpan';
+import { AdMobOptionalSignal } from 'Models/AdMobOptionalSignal';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -207,6 +208,7 @@ describe('CampaignManager', () => {
         jaegerManager.isJaegerTracingEnabled = sinon.stub().returns(false);
         jaegerManager.startSpan = sinon.stub().returns(new JaegerSpan('test'));
         (<sinon.SinonStub>adMobSignalFactory.getAdRequestSignal).returns(Promise.resolve(new AdMobSignal()));
+        (<sinon.SinonStub>adMobSignalFactory.getOptionalSignal).returns(Promise.resolve(new AdMobOptionalSignal()));
     });
 
     describe('on VAST campaign', () => {

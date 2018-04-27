@@ -8,7 +8,7 @@ interface IAdMobOptionalSignal {
     numPriorUserRequests: number;
     isDeviceCharging: boolean;
     deviceBatteryLevel: number;
-    androidMarketVersion: number;
+    androidMarketVersion: string;
     adLoadDuration: number;
     priorClickCount: number;
     deviceIncapabilities: string;
@@ -21,21 +21,21 @@ interface IAdMobOptionalSignal {
 export class AdMobOptionalSignal extends Model<IAdMobOptionalSignal> {
     constructor() {
         super('AdMobOptionalSignal', {
-            sequenceNumber: ['number', 'undefined'],
-            granularSpeedBucket: ['string', 'undefined'],
-            isNetworkMetered: ['boolean', 'undefined'],
-            deviceSubModel: ['string', 'undefined'],
-            numPriorUserRequests: ['number', 'undefined'],
-            isDeviceCharging: ['boolean', 'undefined'],
-            deviceBatteryLevel: ['number', 'undefined'],
-            androidMarketVersion: ['number', 'undefined'],
-            adLoadDuration: ['number', 'undefined'],
-            priorClickCount: ['number', 'undefined'],
-            deviceIncapabilities: ['string', 'undefined'],
-            hasIAPCapability: ['boolean', 'undefined'],
-            iuSizes: ['string', 'undefined'],
-            adtest: ['boolean', 'undefined'],
-            isJailbroken: ['boolean', 'undefined']
+            sequenceNumber: ['number'],
+            granularSpeedBucket: ['string'],
+            isNetworkMetered: ['boolean'],
+            deviceSubModel: ['string'],
+            numPriorUserRequests: ['number'],
+            isDeviceCharging: ['boolean'],
+            deviceBatteryLevel: ['number'],
+            androidMarketVersion: ['string'],
+            adLoadDuration: ['number'],
+            priorClickCount: ['number'],
+            deviceIncapabilities: ['string'],
+            hasIAPCapability: ['boolean'],
+            iuSizes: ['string'],
+            adtest: ['boolean'],
+            isJailbroken: ['boolean']
         });
     }
     public getSequenceNumber(): number {
@@ -59,7 +59,7 @@ export class AdMobOptionalSignal extends Model<IAdMobOptionalSignal> {
     public getDeviceBatteryLevel(): number {
         return this.get('deviceBatteryLevel');
     }
-    public getAndroidMarketVersion(): number {
+    public getAndroidMarketVersion(): string {
         return this.get('androidMarketVersion');
     }
     public getAdLoadDuration(): number {
@@ -104,7 +104,7 @@ export class AdMobOptionalSignal extends Model<IAdMobOptionalSignal> {
     public setDeviceBatteryLevel(deviceBatteryLevel: number) {
         this.set('deviceBatteryLevel', deviceBatteryLevel);
     }
-    public setAndroidMarketVersion(androidMarketVersion: number) {
+    public setAndroidMarketVersion(androidMarketVersion: string) {
         this.set('androidMarketVersion', androidMarketVersion);
     }
     public setAdLoadDuration(adLoadDuration: number) {
@@ -137,14 +137,13 @@ export class AdMobOptionalSignal extends Model<IAdMobOptionalSignal> {
             mobile_device_submodel: this.getDeviceSubModel(),
             prior_user_requests: this.getNumPriorUserRequests(),
             device_battery_charging: this.getIsDeviceCharging(),
+            device_battery_level: this.getDeviceBatteryLevel(),
             android_market_version: this.getAndroidMarketVersion(),
-            ad_load_duration: this.getAdLoadDuration(),
             prior_click_count: this.getPriorClickCount(),
             device_incapabilities: this.getDeviceIncapabilities(),
-            cap_noiap: this.getHasIAPCapability(),
+            ios_jailbroken: this.getIsJailbroken(),
             iu_sizes: this.getIUSizes(),
-            adtest: this.getAdtest(),
-            ios_jailbroken: this.getIsJailbroken()
+            ad_load_duration: this.getAdLoadDuration()
         };
     }
 }
