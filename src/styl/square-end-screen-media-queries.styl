@@ -1,0 +1,45 @@
+@import "vars.styl";
+
+/*
+  Overrides for the square end screen image
+*/
+
+/*
+  No {} for root media rule due to formatting tool becomes insane.
+  And for whatever reason lint tool allows it only here, probably because it is nested media rule.
+*/
+
+@media (max-width: 1700px) and (min-width: 1025px) {
+  html.square-end-screen {
+    font-size: $default-px-size * 1.9;
+  }
+}
+
+/**********
+* Portrait
+***********/
+@media (max-aspect-ratio: 290/460 ) and (orientation: portrait)
+
+
+  @media (min-width: 360px) and (max-width: 413px) {
+    html.square-end-screen {
+      font-size: $default-px-size * 1;
+    }
+  }
+
+/***********
+* Landscape
+***********/
+@media (min-aspect-ratio: 470/290) and (orientation: landscape)
+
+  @media (min-width: 960px) and (max-width: 1024px) {
+    html.square-end-screen {
+      font-size: $default-px-size * 1.5;
+    }
+  }
+
+  @media (min-width: 569px) and (max-width: 768px) {
+    html.square-end-screen {
+      font-size: $default-px-size * 1;
+    }
+  }
