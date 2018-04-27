@@ -1,3 +1,9 @@
+# Thu Apr 26 20:23:59 UTC 2018
+
+* Initial support for Jaeger tracing service
+* Fix cache bookkeeping cleaning problems
+* Send game session start, view and ad request counters
+
 # Thu Apr 26 11:21:20 UTC 2018
 
 * Remove backup campaign test from groups 7 and 8

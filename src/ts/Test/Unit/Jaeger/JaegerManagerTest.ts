@@ -9,7 +9,6 @@ import { AssertionError } from 'assert';
 import { platform } from 'os';
 import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';
-import { Diagnostics } from 'Utilities/Diagnostics';
 
 describe('JaegerManager', () => {
 
@@ -53,7 +52,7 @@ describe('JaegerManager', () => {
                 shared: true,
                 localEndpoint: { serviceName: 'blah' },
                 annotations: [],
-                tags: new Map(),
+                tags: {},
                 stop: sinon.stub()
             };
         });
@@ -83,7 +82,7 @@ describe('JaegerManager', () => {
                 shared: true,
                 localEndpoint: { serviceName: 'blah' },
                 annotations: [],
-                tags: new Map(),
+                tags: {},
                 parentId: '45bcdf4512c14332',
                 stop: sinon.stub()
             };
@@ -104,7 +103,7 @@ describe('JaegerManager', () => {
                 shared: true,
                 localEndpoint: { serviceName: 'blah' },
                 annotations: [],
-                tags: new Map(),
+                tags: {},
                 parentId: '45bcdf4512c14332',
                 stop: sinon.stub()
             };

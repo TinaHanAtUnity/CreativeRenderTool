@@ -36,7 +36,7 @@ export interface IJaegerSpan {
     readonly shared: boolean;
     readonly localEndpoint: IJaegerLocalEndpoint;
     readonly annotations: IJaegerAnnotation[];
-    readonly tags: any;
+    readonly tags: { [key: string]: string };
 
     stop(): void;
 }
@@ -78,7 +78,7 @@ export class JaegerSpan implements IJaegerSpan {
     public shared: boolean = true;
     public localEndpoint: IJaegerLocalEndpoint = new JaegerLocalEndpoint('ads-sdk');
     public annotations: IJaegerAnnotation[] = [];
-    public tags: any = {};
+    public tags: { [key: string]: string } = {};
 
     constructor(operation: string, parentId?: string, traceId?: string) {
         if (parentId) {
