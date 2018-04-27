@@ -164,7 +164,7 @@ export class AdMobEventHandler implements IAdMobEventHandler {
     }
 
     private getOptionalSignal(): Promise<AdMobOptionalSignal> {
-        return this._adMobSignalFactory.getOptionalSignal(this._adUnit).then((signal) => {
+        return this._adMobSignalFactory.getOptionalSignal().then((signal) => {
             return signal;
         });
     }

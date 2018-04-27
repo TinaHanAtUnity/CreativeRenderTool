@@ -35,6 +35,7 @@ import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFact
 import { Placement } from 'Models/Placement';
 import { JaegerSpan } from 'Jaeger/JaegerSpan';
 import { JaegerManager } from 'Jaeger/JaegerManager';
+import { AdMobOptionalSignal } from 'Models/AdMobOptionalSignal';
 
 class TestStorageApi extends StorageApi {
     public get<T>(storageType: StorageType, key: string): Promise<T> {
@@ -236,6 +237,7 @@ class TestHelper {
 }
 
 describe('Event parameters should match specifications', () => {
+
     describe('with config request', () => {
         it('on Android', () => {
             const nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.ANDROID);
@@ -289,6 +291,7 @@ describe('Event parameters should match specifications', () => {
             const adMobSignalFactory = new AdMobSignalFactory(nativeBridge, clientInfo, deviceInfo, focusManager);
             const jaegerManager = sinon.createStubInstance(JaegerManager);
             jaegerManager.startSpan = sinon.stub().returns(new JaegerSpan('test'));
+            sinon.stub(adMobSignalFactory, 'getOptionalSignal').returns(Promise.resolve(new AdMobOptionalSignal()));
             sinon.stub(nativeBridge.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));
             sinon.stub(sessionManager, 'startNewSession').returns(Promise.resolve(new Session('abdce-12345')));
             sessionManager.setGameSessionId(1234);
@@ -317,6 +320,7 @@ describe('Event parameters should match specifications', () => {
             const adMobSignalFactory = new AdMobSignalFactory(nativeBridge, clientInfo, deviceInfo, focusManager);
             const jaegerManager = sinon.createStubInstance(JaegerManager);
             jaegerManager.startSpan = sinon.stub().returns(new JaegerSpan('test'));
+            sinon.stub(adMobSignalFactory, 'getOptionalSignal').returns(Promise.resolve(new AdMobOptionalSignal()));
             sinon.stub(nativeBridge.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('abdce-12345'));
             sinon.stub(sessionManager, 'startNewSession').returns(Promise.resolve(new Session('abdce-12345')));
             sessionManager.setGameSessionId(1234);

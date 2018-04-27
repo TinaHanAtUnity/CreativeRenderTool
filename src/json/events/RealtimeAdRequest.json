@@ -312,6 +312,12 @@
       "required": "all",
       "queryString": false,
       "body": true
+    },
+    {
+      "parameter": "ext",
+      "required": "all",
+      "queryString": false,
+      "body": true
     }
   ]
 }

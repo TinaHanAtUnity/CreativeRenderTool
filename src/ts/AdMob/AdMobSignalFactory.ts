@@ -31,10 +31,9 @@ export class AdMobSignalFactory {
         this._focusManager = focusManager;
     }
 
-    public getOptionalSignal(adUnit: AdMobAdUnit): Promise<AdMobOptionalSignal> {
+    public getOptionalSignal(): Promise<AdMobOptionalSignal> {
         const signal = new AdMobOptionalSignal();
 
-        signal.setAdLoadDuration(adUnit.getRequestToReadyTime());
         signal.setSequenceNumber(SdkStats.getAdRequestOrdinal());
         signal.setIsJailbroken(this._deviceInfo.isRooted());
         signal.setDeviceIncapabilities(this.checkDeviceIncapabilities());
@@ -67,6 +66,18 @@ export class AdMobSignalFactory {
             this.logFailure(this._nativeBridge, 'numPriorUserRequets');
         }));
 
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            promises.push(this._nativeBridge.DeviceInfo.Android.getPackageInfo(this._clientInfo.getApplicationName()).then(packageInfo => {
+                if (packageInfo.versionCode && packageInfo.packageName) {
+                    signal.setAndroidMarketVersion(`${packageInfo.versionCode}.${packageInfo.packageName}`);
+                } else {
+                    signal.setAndroidMarketVersion('null');
+                }
+            }).catch(() => {
+                this.logFailure(this._nativeBridge, 'androidMarketVersion');
+            }));
+        }
+
         promises.push(UserCountData.getClickCount(this._nativeBridge).then(clickCount => {
             if (typeof clickCount === 'number') {
                 signal.setPriorClickCount(clickCount);
@@ -75,20 +86,24 @@ export class AdMobSignalFactory {
             this.logFailure(this._nativeBridge, 'priorClickCount');
         }));
 
-        promises.push(this._deviceInfo.getConnectionType().then(connectionType => {
+        promises.push(UserCountData.getPriorRequestToReadyTime(this._nativeBridge).then(priorReadyTime => {
+            if (typeof priorReadyTime === 'number') {
+                signal.setAdLoadDuration(priorReadyTime);
+            }
+        }).catch(() => {
+            this.logFailure(this._nativeBridge, 'PriorRequestToReadyTime');
+        }));
+
+        promises.push(Promise.all([this._deviceInfo.getConnectionType(), this._deviceInfo.getNetworkType()]).then(([connectionType, networkType]) => {
             if (connectionType === 'wifi') {
                 signal.setGranularSpeedBucket('wi');
             } else if (connectionType === 'cellular') {
-                this._deviceInfo.getNetworkType().then(networkType => {
-                    signal.setGranularSpeedBucket(this.getNetworkValue(networkType));
-                }).catch(() => {
-                    this.logFailure(this._nativeBridge, 'granularSpeedBucket_networkType');
-                });
+                signal.setGranularSpeedBucket(this.getNetworkValue(networkType));
             } else {
                 signal.setGranularSpeedBucket('unknown');
             }
         }).catch(() => {
-            this.logFailure(this._nativeBridge, 'granularSpeedBucket_connectionType');
+            this.logFailure(this._nativeBridge, 'granularSpeedBucket');
         }));
 
         promises.push(Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
