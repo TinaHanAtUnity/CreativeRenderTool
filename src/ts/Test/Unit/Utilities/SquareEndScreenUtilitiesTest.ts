@@ -26,7 +26,7 @@ describe('SquareEndScreenUtilitiesTest', () => {
        });
 
        it('returns false for abGroups that are included in the test', () => {
-            assert.isFalse(SquareEndScreenUtilities.isInCorrectABGroup(5));
+            assert.isFalse(SquareEndScreenUtilities.isInCorrectABGroup(1));
        });
     });
 
@@ -61,7 +61,7 @@ describe('SquareEndScreenUtilitiesTest', () => {
         });
 
         it('should return false when abGroup does not match', () => {
-            assert.isFalse(SquareEndScreenUtilities.useSquareEndScreenAlt(6, Platform.IOS, CAMPAIGN_IDS[0], '4.0'), 'Should return false with abGroup 6 and iOS device');
+            assert.isFalse(SquareEndScreenUtilities.useSquareEndScreenAlt(1, Platform.IOS, CAMPAIGN_IDS[0], '4.0'), 'Should return false with abGroup 6 and iOS device');
             assert.isFalse(SquareEndScreenUtilities.useSquareEndScreenAlt(3, Platform.ANDROID, CAMPAIGN_IDS[1], '5.0'), 'Should return false with abGroup 3 and supported Android device');
             assert.isFalse(SquareEndScreenUtilities.useSquareEndScreenAlt(3, Platform.ANDROID, CAMPAIGN_IDS[1], '4.0'), 'Should return false with abGroup 3 and non-supported Android device');
         });
