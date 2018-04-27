@@ -71,9 +71,6 @@ import { IosVideoEventHandler } from 'EventHandlers/IosVideoEventHandler';
 import { XPromoOperativeEventManager } from 'Managers/XPromoOperativeEventManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 
-import { Diagnostics } from 'Utilities/Diagnostics';
-import { FLAM } from 'Utilities/FLAM';
-
 export class AdUnitFactory {
 
     public static createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractAdUnit {
@@ -86,10 +83,6 @@ export class AdUnitFactory {
         } else if(parameters.campaign instanceof MRAIDCampaign) {
             return this.createMRAIDAdUnit(nativeBridge, <IAdUnitParameters<MRAIDCampaign>>parameters);
         } else if(parameters.campaign instanceof PerformanceCampaign) {
-            const abGroup = parameters && parameters.campaign && parameters.campaign.getAbGroup();
-            if (abGroup === 16 || abGroup === 17) {
-                FLAM.measure(['webp', 'hevc', 'vp9'], nativeBridge);
-            }
             return this.createPerformanceAdUnit(nativeBridge, <IAdUnitParameters<PerformanceCampaign>>parameters);
         } else if (parameters.campaign instanceof DisplayInterstitialCampaign) {
             return this.createDisplayInterstitialAdUnit(nativeBridge, <IAdUnitParameters<DisplayInterstitialCampaign>>parameters);

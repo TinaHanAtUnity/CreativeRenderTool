@@ -55,6 +55,8 @@ import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
 import { TimeoutError, Promises } from 'Utilities/Promises';
 
+import { FLAM } from 'Utilities/FLAM';
+
 export class WebView {
 
     private _nativeBridge: NativeBridge;
@@ -236,6 +238,13 @@ export class WebView {
             }
         }).then(() => {
             this._initialized = true;
+
+            const abGroup = this._configuration.getAbGroup();
+
+            /* TODO: Figure out right groups */
+            // if (abGroup === 16 || abGroup === 17) {
+            FLAM.measure(['webp', 'hevc', 'vp9'], this._nativeBridge);
+            // }
 
             return this._sessionManager.sendUnsentSessions();
         }).then(() => {
