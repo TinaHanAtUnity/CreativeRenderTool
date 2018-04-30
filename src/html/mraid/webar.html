@@ -1213,7 +1213,7 @@
         // Reimplementing console.log allows for logs to be shown in older versions of MacOS Safari.
         // This could be removed once MacOS Safari 11.0 is released (currently available as Safari Technology Preview)
         var oldConsoleLog = console.log;
-        console.log = function() {
+        var newConsoleLog = function() {
             var argumentsArray = Array.prototype.slice.call(arguments);
             nativeLog(argumentsArray.join(" "));
             return oldConsoleLog.apply(this, argumentsArray);
@@ -1224,7 +1224,7 @@
         // If at some point the original raf is performant enough, remove this.
         var oldRequestAnimationFrame = window.requestAnimationFrame;
         var rafCallbacks = [];
-        window.requestAnimationFrame = function(callback) {
+        var newRequestAnimationFrame = function(callback) {
             if (typeof callback !== "function") {
                 throw new TypeError(
                     "Failed to execute 'requestAnimationFrame' on 'Window':" +
@@ -1236,7 +1236,7 @@
 
         var resizeEventListeners = [];
         var oldWindowAddEventListener = window.addEventListener;
-        window.addEventListener = function() {
+        var newWindowAddEventListener = function() {
             var argumentsArray = Array.prototype.slice.call(arguments);
             if (argumentsArray[0] === "resize") {
                 resizeEventListeners.push(argumentsArray[1]);
@@ -1245,7 +1245,7 @@
             }
         };
         var oldWindowRemoveEventListener = window.removeEventListener;
-        window.removeEventListener = function() {
+        var newWindowRemoveEventListener = function() {
             var argumentsArray = Array.prototype.slice.call(arguments);
             if (argumentsArray[0] === "resize") {
                 var index = resizeEventListeners.indexOf(argumentsArray[1]);
@@ -1268,6 +1268,20 @@
                 canvas.style.display = disp;
             }
         }
+
+        window.installWebARHooks = function() {
+            console.log = newConsoleLog;
+            window.requestAnimationFrame = newRequestAnimationFrame;
+            window.addEventListener = newWindowAddEventListener;
+            window.removeEventListener = newWindowRemoveEventListener;
+        };
+
+        window.uninstallWebARHooks = function() {
+            console.log = oldConsoleLog;
+            window.requestAnimationFrame = oldRequestAnimationFrame;
+            window.addEventListener = oldWindowAddEventListener;
+            window.removeEventListener = oldWindowRemoveEventListener;
+        };
 
         function raf() {
             var frameStr = nativeGetFrame();
