@@ -72,10 +72,11 @@ class FLAMSingleton {
                             nativeBridge.Storage.delete(StorageType.PRIVATE, `flam.${name}`);
                             nativeBridge.Storage.write(StorageType.PRIVATE);
                         }
-                        nativeBridge.Sdk.logDebug(`FLAM: Data already exists for ${name}: ${this.translateTestResult(pass)}`);
+                        nativeBridge.Sdk.logInfo(`FLAM: Data already exists for ${name}: ${this.translateTestResult(pass)}`);
                         resolve();
                     }).catch(() => {
                         /* No data about test has been written into device's memory => run test */
+                        nativeBridge.Sdk.logInfo(`FLAM: No data for ${name} exists`);
                         this.processFLAMTest(ft).then((pass) => {
                             this._FLAMTestResult[name] = pass;
                             resolve();
@@ -88,6 +89,7 @@ class FLAMSingleton {
             });
         });
 
+        /* TODO: Allow some of them to fail, but still write successful results */
         Promise.all(testsFinishedPromises).then(() => {
             this.storeData(nativeBridge);
         });
@@ -95,13 +97,23 @@ class FLAMSingleton {
 
     private processFLAMTest(ft: IFLAMTest): Promise<boolean> {
         return new Promise((resolve) => {
+
+            /* Forcefully resolve promise in 60 sec */
+            setTimeout(() => {
+                this.sendDiagnosticsError('Test has been forcefully resolved', {
+                    test: ft.name
+                });
+                resolve(false);
+            }, 60 * 1000);
+
             if (ft.type === 'video') {
                 const el = <HTMLVideoElement>document.createElement('video');
                 const MIMEType = ft.base64data.substring('data:video/'.length, ft.base64data.indexOf(';base64'));
                 const canPlayType = el.canPlayType(`video/${MIMEType}`);
 
-                el.onloadeddata = el.onerror = () => {
-                    const pass = el.readyState === 4 && el.videoHeight > 0 && el.videoWidth > 0;
+                el.onloadeddata = el.onprogress = el.onloadedmetadata = el.onerror = () => {
+                    /* readyState >= 1 = metadata is loaded AND not an error */
+                    const pass = el.readyState >= 1 && el.videoHeight > 0 && el.videoWidth > 0;
 
                     /* Let's test how much we can rely on canPlayType API */
                     if ((canPlayType === '' && pass) || (canPlayType === 'probably' && !pass)) {
@@ -139,7 +151,7 @@ class FLAMSingleton {
         for (const name in this._FLAMTestResult) {
             if (this._FLAMTestResult.hasOwnProperty(name)) {
                 const pass = this._FLAMTestResult[name];
-                nativeBridge.Sdk.logDebug(`FLAM: Test for ${name}: ${this.translateTestResult(pass)}`);
+                nativeBridge.Sdk.logInfo(`FLAM: Test for ${name}: ${this.translateTestResult(pass)}`);
                 nativeBridge.Storage.set(StorageType.PRIVATE, `flam.${name}`, pass);
             }
         }
