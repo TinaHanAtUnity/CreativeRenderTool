@@ -1,4 +1,5 @@
 import EndScreenTemplate from 'html/EndScreen.html';
+import SquareEndScreenTemplate from 'html/SquareEndScreen.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -10,6 +11,8 @@ import { Campaign } from 'Models/Campaign';
 import { IEndScreenDownloadParameters } from 'EventHandlers/EndScreenEventHandler';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { Platform } from 'Constants/Platform';
+import { SquareEndScreenUtilities } from 'Utilities/SquareEndScreenUtilities';
 
 export interface IEndScreenHandler {
     onEndScreenDownload(parameters: IEndScreenDownloadParameters): void;
@@ -20,7 +23,8 @@ export interface IEndScreenHandler {
 }
 
 const GDPR_OPT_OUT_BASE  = 'gdpr-pop-up-base';
-const GDPR_OPT_OUT_ALT  = 'gdpr-pop-up-alt';
+
+const SQUARE_END_SCREEN = 'square-end-screen';
 
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
 
@@ -33,8 +37,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     private _abGroup: number;
     private _showOptOutPopup: boolean;
     private _gdprPopupClicked = false;
+    private _campaignId: string | undefined;
+    private _osVersion: string | undefined;
 
-    constructor(nativeBridge: NativeBridge, coppaCompliant: boolean, language: string, gameId: string, gameName: string | undefined, abGroup: number, adUnitStyle?: AdUnitStyle, showOptOutPopup: boolean = false) {
+    constructor(nativeBridge: NativeBridge, coppaCompliant: boolean, language: string, gameId: string, gameName: string | undefined, abGroup: number, adUnitStyle?: AdUnitStyle, showOptOutPopup: boolean = false, campaignId?: string, osVersion?: string) {
         super(nativeBridge, 'end-screen');
         this._coppaCompliant = coppaCompliant;
         this._localization = new Localization(language, 'endscreen');
@@ -42,6 +48,8 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._gameName = gameName;
         this._adUnitStyle = adUnitStyle;
         this._showOptOutPopup = showOptOutPopup;
+        this._campaignId = campaignId;
+        this._osVersion = osVersion;
 
         this._template = new Template(this.getTemplate(), this._localization);
 
@@ -49,7 +57,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             {
                 event: 'click',
                 listener: (event: Event) => this.onDownloadEvent(event),
-                selector: '.game-background, .download-container, .game-icon'
+                selector: '.game-background, .download-container, .game-icon, .game-image'
             },
             {
                 event: 'click',
@@ -94,6 +102,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         const endScreenAlt = this.getEndscreenAlt();
         if (typeof endScreenAlt === 'string') {
             this._container.classList.add(endScreenAlt);
+            document.documentElement.classList.add(endScreenAlt);
         }
     }
 
@@ -121,6 +130,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     public hide(): void {
         super.hide();
 
+        if (this._showOptOutPopup) {
+            this._handlers.forEach(handler => handler.onOptOutPopupShown(this._gdprPopupClicked));
+        }
+
         if (this._privacy) {
             this._privacy.hide();
             this._privacy.container().parentElement!.removeChild(this._privacy.container());
@@ -143,12 +156,15 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
     protected getEndscreenAlt(campaign?: Campaign) {
         if (this._showOptOutPopup) {
-            if (this._abGroup === 16) {
+            if (this._abGroup === 18 || this._abGroup === 19) {
                 return GDPR_OPT_OUT_BASE;
             }
-            if (this._abGroup === 17) {
-                return GDPR_OPT_OUT_ALT;
-            }
+        }
+
+        const campaignId = campaign ? campaign.getId() : this._campaignId;
+        const platform = this._nativeBridge.getPlatform();
+        if (SquareEndScreenUtilities.useSquareEndScreenAlt(this._abGroup, platform, campaignId, this._osVersion)) {
+            return SQUARE_END_SCREEN;
         }
 
         return undefined;
@@ -158,9 +174,6 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
     private onCloseEvent(event: Event): void {
         event.preventDefault();
-        if (this._showOptOutPopup) {
-            this._handlers.forEach(handler => handler.onOptOutPopupShown(this._gdprPopupClicked));
-        }
         this._handlers.forEach(handler => handler.onEndScreenClose());
     }
 
@@ -184,6 +197,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     private getTemplate() {
+        if (this.getEndscreenAlt() === SQUARE_END_SCREEN) {
+            return SquareEndScreenTemplate;
+        }
+
         return EndScreenTemplate;
     }
 }

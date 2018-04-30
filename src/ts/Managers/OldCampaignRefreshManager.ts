@@ -19,6 +19,8 @@ import { StorageType } from 'Native/Api/Storage';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Cache } from 'Utilities/Cache';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { JaegerSpan } from 'Jaeger/JaegerSpan';
+import { UserCountData } from 'Utilities/UserCountData';
 
 export class OldCampaignRefreshManager extends RefreshManager {
     private _nativeBridge: NativeBridge;
@@ -126,11 +128,13 @@ export class OldCampaignRefreshManager extends RefreshManager {
         return Promise.resolve();
     }
 
-    public refreshFromCache(cachedResponse: INativeResponse): Promise<INativeResponse | void> {
+    public refreshFromCache(cachedResponse: INativeResponse, span: JaegerSpan): Promise<INativeResponse | void> {
         if(!this._refreshAllowed) {
+            span.addAnnotation('refresh not allowed');
             return Promise.resolve();
         }
         if(this.shouldRefill(this._refillTimestamp)) {
+            span.addAnnotation('should refill');
             this.setPlacementStates(PlacementState.WAITING, this._configuration.getPlacementIds());
             this._refillTimestamp = 0;
             this.invalidateCampaigns(false, this._configuration.getPlacementIds());
@@ -139,6 +143,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
                 return this._campaignManager.request();
            });
         } else if(this.checkForExpiredCampaigns()) {
+            span.addAnnotation('campaign expired');
             return this.onCampaignExpired();
         }
 
@@ -336,6 +341,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
                 if(placementState === PlacementState.READY) {
                     SdkStats.setReadyEventTimestamp(placementId);
                     SdkStats.sendReadyEvent(placementId);
+                    UserCountData.setPriorRequestToReadyTime(SdkStats.getRequestToReadyTime(placementId), this._nativeBridge);
                     this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + placementId + ' request to ready time took ' + SdkStats.getRequestToReadyTime(placementId));
                 }
             });
@@ -346,6 +352,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
             if(placementState === PlacementState.READY) {
                 SdkStats.setReadyEventTimestamp(placementId);
                 SdkStats.sendReadyEvent(placementId);
+                UserCountData.setPriorRequestToReadyTime(SdkStats.getRequestToReadyTime(placementId), this._nativeBridge);
                 this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + placementId + ' request to ready time took ' + SdkStats.getRequestToReadyTime(placementId));
             }
         }

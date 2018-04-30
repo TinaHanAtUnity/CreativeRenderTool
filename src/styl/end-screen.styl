@@ -1,5 +1,6 @@
 @import "vars.styl";
 @import "components.styl";
+@import "square-end-screen.styl";
 
 $end-screen-mixin($scale-size = $default-scale-size) {
 
@@ -41,17 +42,9 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       margin: 0 0 0 $default-size * $scale-size * .25;
     }
 
-    &.gdpr-pop-up-base,
-    &.gdpr-pop-up-alt {
+    &.gdpr-pop-up-base {
       .gdpr-pop-up {
         $gdpr-pop-up($scale-size);
-        will-change: opacity, left;
-      }
-
-      &.on-show .gdpr-pop-up {
-        bottom: -100%;
-        opacity: 0;
-        transition: opacity .25s ease-out 10s, bottom .25s linear 10.5s;
       }
 
       $gdpr-scale-size = $scale-size * .9;
@@ -82,7 +75,7 @@ $end-screen-mixin($scale-size = $default-scale-size) {
 
     }
 
-    &:not(.gdpr-pop-up-base):not(.gdpr-pop-up-alt) {
+    &:not(.gdpr-pop-up-base) {
       .gdpr-pop-up {
         display: none;
       }
@@ -162,6 +155,11 @@ body {
     .game-icon {
       align-self: center;
     }
+
+    .gdpr-pop-up {
+      top: 50%;
+      transform: translateY(-50%);
+    }
   }
 
   &.landscape #end-screen {
@@ -207,11 +205,10 @@ body {
       width: 50%;
     }
 
-    &.gdpr-pop-up-alt {
-      .gdpr-pop-up {
-        left: 50%;
-        width: 50%;
-      }
+    .gdpr-pop-up {
+      bottom: 0;
+      left: 0;
+      width: 50%;
     }
   }
 

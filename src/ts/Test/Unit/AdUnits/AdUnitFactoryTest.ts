@@ -70,7 +70,7 @@ describe('AdUnitFactoryTest', () => {
         sandbox.stub(container, 'open').returns(Promise.resolve());
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         config = new Configuration(JSON.parse(ConfigurationJson));
-        deviceInfo = <DeviceInfo>{getLanguage: () => 'en', getAdvertisingIdentifier: () => '000', getLimitAdTracking: () => false};
+        deviceInfo = <DeviceInfo>{getLanguage: () => 'en', getAdvertisingIdentifier: () => '000', getLimitAdTracking: () => false, getOsVersion: () => '8.0'};
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         sessionManager = new SessionManager(nativeBridge, request);
         const campaign = TestFixtures.getCampaign();

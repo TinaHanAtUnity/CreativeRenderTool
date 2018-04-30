@@ -37,9 +37,12 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { AdMobSignal } from 'Models/AdMobSignal';
+import { AdMobOptionalSignal } from 'Models/AdMobOptionalSignal';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
 import { OldCampaignRefreshManager } from 'Managers/OldCampaignRefreshManager';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
+import { JaegerManager } from 'Jaeger/JaegerManager';
+import { JaegerSpan } from 'Jaeger/JaegerSpan';
 
 describe('CampaignRefreshManager', () => {
     let deviceInfo: DeviceInfo;
@@ -63,6 +66,7 @@ describe('CampaignRefreshManager', () => {
     let comScoreService: ComScoreTrackingService;
     let cacheBookkeeping: CacheBookkeeping;
     let cache: Cache;
+    let jaegerManager: JaegerManager;
 
     beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo();
@@ -158,6 +162,7 @@ describe('CampaignRefreshManager', () => {
         });
         adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);
         (<sinon.SinonStub>adMobSignalFactory.getAdRequestSignal).returns(Promise.resolve(new AdMobSignal()));
+        (<sinon.SinonStub>adMobSignalFactory.getOptionalSignal).returns(Promise.resolve(new AdMobOptionalSignal()));
         comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         adUnitParams = {
@@ -177,12 +182,15 @@ describe('CampaignRefreshManager', () => {
         };
 
         RefreshManager.ParsingErrorRefillDelay = 0; // prevent tests from hanging due to long retry timeouts
+        jaegerManager = sinon.createStubInstance(JaegerManager);
+        jaegerManager.isJaegerTracingEnabled = sinon.stub().returns(false);
+        jaegerManager.startSpan = sinon.stub().returns(new JaegerSpan('test'));
     });
 
     describe('PLC campaigns', () => {
         beforeEach(() => {
             configuration = new Configuration(JSON.parse(ConfigurationAuctionPlc));
-            campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping);
+            campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
             campaignRefreshManager = new OldCampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration, focusManager, sessionManager, clientInfo, request, cache);
         });
 
