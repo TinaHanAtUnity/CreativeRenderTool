@@ -347,18 +347,18 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
             this._handlers.forEach(handler => handler.onMraidSkip());
         } else if(this._canClose) {
             this._handlers.forEach(handler => handler.onMraidClose());
-        }
 
-        if (this._arFrameUpdatedObserver) {
-            this._nativeBridge.AR.onFrameUpdated.unsubscribe(this._arFrameUpdatedObserver);
-            this._nativeBridge.AR.onPlanesAdded.unsubscribe(this._arPlanesAddedObserver);
-            this._nativeBridge.AR.onPlanesUpdated.unsubscribe(this._arPlanesUpdatedObserver);
-            this._nativeBridge.AR.onPlanesRemoved.unsubscribe(this._arPlanesRemovedObserver);
-            this._nativeBridge.AR.onAnchorsUpdated.unsubscribe(this._arAnchorsUpdatedObserver);
-            this._nativeBridge.AR.onWindowResized.unsubscribe(this._arWindowResizedObserver);
-            this._nativeBridge.AR.onError.unsubscribe(this._arErrorObserver);
-            this._nativeBridge.AR.onSessionInterrupted.unsubscribe(this._arSessionInterruptedObserver);
-            this._nativeBridge.AR.onSessionInterruptionEnded.unsubscribe(this._arSessionInterruptionEndedObserver);
+            if (this._arFrameUpdatedObserver) {
+                this._nativeBridge.AR.onFrameUpdated.unsubscribe(this._arFrameUpdatedObserver);
+                this._nativeBridge.AR.onPlanesAdded.unsubscribe(this._arPlanesAddedObserver);
+                this._nativeBridge.AR.onPlanesUpdated.unsubscribe(this._arPlanesUpdatedObserver);
+                this._nativeBridge.AR.onPlanesRemoved.unsubscribe(this._arPlanesRemovedObserver);
+                this._nativeBridge.AR.onAnchorsUpdated.unsubscribe(this._arAnchorsUpdatedObserver);
+                this._nativeBridge.AR.onWindowResized.unsubscribe(this._arWindowResizedObserver);
+                this._nativeBridge.AR.onError.unsubscribe(this._arErrorObserver);
+                this._nativeBridge.AR.onSessionInterrupted.unsubscribe(this._arSessionInterruptedObserver);
+                this._nativeBridge.AR.onSessionInterruptionEnded.unsubscribe(this._arSessionInterruptionEndedObserver);
+            }
         }
     }
 
