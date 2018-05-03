@@ -1,3 +1,8 @@
+# Pending
+
+* Fix for CSS image URL corner case issue
+* Fix getNetworkMetered API and DeviceInfo model
+
 # Wed May  2 20:31:05 UTC 2018
 
 * Square image abtest
