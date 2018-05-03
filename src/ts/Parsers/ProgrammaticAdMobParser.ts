@@ -55,9 +55,6 @@ export class ProgrammaticAdMobParser extends CampaignParser {
     }
 
     private getVideoFromMarkup(markup: string, request: Request, session: Session, platform: Platform): Promise<AdMobVideo> {
-        // if (platform === Platform.IOS) {
-        //     return Promise.reject(new Error('iOS precaching to file not supported for HTML5 video player'));
-        // }
         try {
             const dom = new DOMParser().parseFromString(markup, 'text/html');
             if (!dom) {
