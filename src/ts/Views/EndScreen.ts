@@ -27,7 +27,7 @@ const SQUARE_END_SCREEN = 'square-end-screen';
 
 const FANCY_END_SCREEN = 'fancy-end-screen';
 // TODO: Use actual group
-const FANCY_END_SCREEN_AB_GROUP = 5;
+const FANCY_END_SCREEN_AB_GROUP = 17;
 
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
 
