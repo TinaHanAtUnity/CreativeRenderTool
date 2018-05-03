@@ -113,9 +113,17 @@ export class ProgrammaticAdMobParser extends CampaignParser {
     private updateFileID(video: AdMobVideo) {
         const videoID = this.getVideoID(video.getMediaFileURL());
         const url = video.getVideo().getOriginalUrl();
-        // Url.getQueryParameter(url, '');
+        const mimeType = Url.getQueryParameter(url, 'mime');
+        let extension: string | null = null;
+        if (mimeType) {
+            extension = mimeType.split('/')[1];
+        }
         if (videoID && url) {
-            FileId.setFileID(url, videoID + '.mp4');
+            if (extension) {
+                FileId.setFileID(url, videoID + '.' + extension);
+            } else {
+                FileId.setFileID(url, videoID);
+            }
         }
     }
 
