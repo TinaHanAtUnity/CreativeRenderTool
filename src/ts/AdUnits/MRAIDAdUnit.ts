@@ -2,13 +2,11 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { FinishState } from 'Constants/FinishState';
-import { IObserver0 } from 'Utilities/IObserver';
 import { MRAIDView, IOrientationProperties, IMRAIDViewHandler } from 'Views/MRAIDView';
 import {
     AdUnitContainerSystemMessage, IAdUnitContainerListener,
     Orientation
 } from 'AdUnits/Containers/AdUnitContainer';
-import { HTML } from 'Models/Assets/HTML';
 import { EndScreen } from 'Views/EndScreen';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
@@ -33,12 +31,6 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _clientInfo: ClientInfo;
     private _placement: Placement;
     private _campaign: MRAIDCampaign;
-/*
-    private _onShowObserver: IObserver0;
-    private _onSystemKillObserver: IObserver0;
-    private _onSystemInterruptObserver: any;
-    private _onPauseObserver: any;
-    */
     private _additionalTrackingEvents: { [eventName: string]: string[] } | undefined;
 
     constructor(nativeBridge: NativeBridge, parameters: IMRAIDAdUnitParameters) {
@@ -80,12 +72,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
             this.onStartProcessed.trigger();
         });
         this.sendTrackingEvent('impression');
-/*
-        this._onShowObserver = this._container.onShow.subscribe(() => this.onShow());
-        this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
-        this._onSystemInterruptObserver = this._container.onSystemInterrupt.subscribe((interruptStarted) => this.onSystemInterrupt(interruptStarted));
-        this._onPauseObserver = this._container.onAndroidPause.subscribe(() => this.onSystemPause());
-*/
+
         this._container.addEventHandler(this);
 
         return this._container.open(this, ['webview'], this._orientationProperties.allowOrientationChange, this._orientationProperties.forceOrientation, true, false, true, false, this._options).then(() => {
@@ -99,12 +86,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         }
         this.setShowing(false);
         this.setShowingMRAID(false);
-/*
-        this._container.onShow.unsubscribe(this._onShowObserver);
-        this._container.onSystemKill.unsubscribe(this._onSystemKillObserver);
-        this._container.onSystemInterrupt.unsubscribe(this._onSystemInterruptObserver);
-        this._container.onAndroidPause.unsubscribe(this._onPauseObserver);
-*/
+
         this._mraid.hide();
         if(this._endScreen) {
             this._endScreen.hide();
@@ -175,8 +157,6 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         }
     }
 
-    // onContainerStart(): void;
-
     public onContainerDestroy(): void {
         if(this.isShowing()) {
             this.setFinishState(FinishState.SKIPPED);
@@ -199,41 +179,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     public onContainerSystemMessage(message: AdUnitContainerSystemMessage): void {
         // EMPTY
     }
-/*
-    private onShow() {
-        this._mraid.setViewableState(true);
 
-        if(AbstractAdUnit.getAutoClose()) {
-            setTimeout(() => {
-                this.setFinishState(FinishState.COMPLETED);
-                this.hide();
-            }, AbstractAdUnit.getAutoCloseDelay());
-        }
-    }
-
-    private onSystemKill() {
-        if(this.isShowing()) {
-            this.setFinishState(FinishState.SKIPPED);
-            this.hide();
-        }
-    }
-
-    private onSystemInterrupt(interruptStarted: boolean): void {
-        if(this.isShowing()) {
-            if(interruptStarted) {
-                this._mraid.setViewableState(false);
-            } else {
-                this._mraid.setViewableState(true);
-            }
-        }
-    }
-
-    private onSystemPause(): void {
-        if(this.isShowing()) {
-            this._mraid.setViewableState(false);
-        }
-    }
-*/
     private unsetReferences() {
         delete this._mraid;
         delete this._endScreen;
