@@ -75,8 +75,8 @@ export class Activity extends AdUnitContainer {
 
         this._nativeBridge.Sdk.logInfo('Opening ' + adUnit.description() + ' ad unit with orientation ' + Orientation[this._lockedOrientation] + ', hardware acceleration ' + (hardwareAccel ? 'enabled' : 'disabled'));
 
-        this._onFocusGainedObserver = this._nativeBridge.AndroidAdUnit.onFocusGained.subscribe(() => this.onSystemInterrupt.trigger(false));
-        this._onFocusLostObserver = this._nativeBridge.AndroidAdUnit.onFocusLost.subscribe(() => this.onSystemInterrupt.trigger(true));
+        this._onFocusGainedObserver = this._nativeBridge.AndroidAdUnit.onFocusGained.subscribe(() => this._handlers.forEach(handler => handler.onContainerForeground()));
+        this._onFocusLostObserver = this._nativeBridge.AndroidAdUnit.onFocusLost.subscribe(() => this._handlers.forEach(handler => handler.onContainerBackground()));
 
         return this._nativeBridge.AndroidAdUnit.open(this._activityId, nativeViews, this.getOrientation(allowRotation, this._lockedOrientation, options), keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel, isTransparent);
     }
@@ -179,16 +179,17 @@ export class Activity extends AdUnitContainer {
 
     private onResume(activityId: number): void {
         if(activityId === this._activityId) {
-            this.onShow.trigger();
+            this._handlers.forEach(handler => handler.onContainerShow());
+            this._handlers.forEach(handler => handler.onContainerForeground());
         }
     }
 
     private onPause(finishing: boolean, activityId: number): void {
-        this.onAndroidPause.trigger();
+        this._handlers.forEach(handler => handler.onContainerBackground());
         if(finishing && activityId === this._activityId) {
             if(!this._currentActivityFinished) {
                 this._currentActivityFinished = true;
-                this.onSystemKill.trigger();
+                this._handlers.forEach(handler => handler.onContainerDestroy());
             }
         }
     }
@@ -197,7 +198,7 @@ export class Activity extends AdUnitContainer {
         if(finishing && activityId === this._activityId) {
             if(!this._currentActivityFinished) {
                 this._currentActivityFinished = true;
-                this.onSystemKill.trigger();
+                this._handlers.forEach(handler => handler.onContainerDestroy());
             }
         }
     }

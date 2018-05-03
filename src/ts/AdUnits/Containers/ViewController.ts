@@ -2,7 +2,10 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 import { UIInterfaceOrientation } from 'Constants/iOS/UIInterfaceOrientation';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
-import { AdUnitContainer, Orientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
+import {
+    AdUnitContainer, AdUnitContainerSystemMessage, Orientation,
+    ViewConfiguration
+} from 'AdUnits/Containers/AdUnitContainer';
 import { Double } from 'Utilities/Double';
 import { FocusManager } from 'Managers/FocusManager';
 import { IosDeviceInfo } from 'Models/IosDeviceInfo';
@@ -28,6 +31,7 @@ export class ViewController extends AdUnitContainer {
     private _options: IIosOptions;
 
     private _onViewControllerDidAppearObserver: any;
+    private _onViewControllerDidDisappearObserver: any;
     private _onMemoryWarningObserver: any;
     private _onNotificationObserver: any;
     private _onAppBackgroundObserver: any;
@@ -40,6 +44,7 @@ export class ViewController extends AdUnitContainer {
         this._focusManager = focusManager;
         this._deviceInfo = deviceInfo;
 
+        this._onViewControllerDidDisappearObserver = this._nativeBridge.IosAdUnit.onViewControllerDidDisappear.subscribe(() => this.onViewDidDisappear());
         this._onViewControllerDidAppearObserver = this._nativeBridge.IosAdUnit.onViewControllerDidAppear.subscribe(() => this.onViewDidAppear());
         this._onMemoryWarningObserver = this._nativeBridge.IosAdUnit.onViewControllerDidReceiveMemoryWarning.subscribe(() => this.onMemoryWarning());
         this._onNotificationObserver = this._nativeBridge.Notification.onNotification.subscribe((event, parameters) => this.onNotification(event, parameters));
@@ -178,21 +183,25 @@ export class ViewController extends AdUnitContainer {
     }
 
     private onViewDidAppear(): void {
-        this.onShow.trigger();
+        this._handlers.forEach(handler => handler.onContainerShow());
+    }
+
+    private onViewDidDisappear(): void {
+        this._handlers.forEach(handler => handler.onContainerDestroy());
     }
 
     private onMemoryWarning(): void {
-        this.onLowMemoryWarning.trigger();
+        this._handlers.forEach(handler => handler.onContainerSystemMessage(AdUnitContainerSystemMessage.MEMORY_WARNING));
     }
 
     private onAppBackground(): void {
         this._paused = true;
-        this.onSystemInterrupt.trigger(true);
+        this._handlers.forEach(handler => handler.onContainerBackground());
     }
 
     private onAppForeground(): void {
         this._paused = false;
-        this.onSystemInterrupt.trigger(false);
+        this._handlers.forEach(handler => handler.onContainerForeground());
     }
 
     private onNotification(event: string, parameters: any): void {
@@ -207,17 +216,17 @@ export class ViewController extends AdUnitContainer {
 
                 if(interruptData.AVAudioSessionInterruptionTypeKey === 0) {
                     if(interruptData.AVAudioSessionInterruptionOptionKey === 1) {
-                        this.onSystemInterrupt.trigger(false);
+                        this._handlers.forEach(handler => handler.onContainerForeground());
                     }
                 } else if(interruptData.AVAudioSessionInterruptionTypeKey === 1) {
-                    this.onSystemInterrupt.trigger(true);
+                    this._handlers.forEach(handler => handler.onContainerBackground());
                 }
                 break;
 
             case ViewController._audioSessionRouteChange:
                 const routeChangeData: { AVAudioSessionRouteChangeReasonKey: number } = parameters;
                 if(routeChangeData.AVAudioSessionRouteChangeReasonKey !== 3) {
-                    this.onSystemInterrupt.trigger(false);
+                    this._handlers.forEach(handler => handler.onContainerForeground());
                 }
 
                 break;
