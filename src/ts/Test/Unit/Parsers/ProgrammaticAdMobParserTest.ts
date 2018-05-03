@@ -76,9 +76,9 @@ describe('ProgrammaticAdMobParser', () => {
                     return parse(JSON.parse(ValidAdMobCampaign));
                 });
 
-                it('should not have a video cached', () => {
+                it('should have a video cached from the AdMobAd', () => {
                     const assets = campaign.getOptionalAssets();
-                    assert.lengthOf(assets, 0, 'Video is contained within campaign');
+                    assert.lengthOf(assets, 1, 'Video is not contained within campaign');
                 });
 
                 it('should have valid data', validateCampaign);
