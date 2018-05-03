@@ -10,6 +10,7 @@ import { Vast } from 'Models/Vast/Vast';
 import { VastParser } from 'Utilities/VastParser';
 import { FileId } from 'Utilities/FileId';
 import { Platform } from 'Constants/Platform';
+import { Url } from 'Utilities/Url';
 
 export class ProgrammaticAdMobParser extends CampaignParser {
     public static ContentType = 'programmatic/admob-video';
@@ -54,9 +55,9 @@ export class ProgrammaticAdMobParser extends CampaignParser {
     }
 
     private getVideoFromMarkup(markup: string, request: Request, session: Session, platform: Platform): Promise<AdMobVideo> {
-        if (platform === Platform.IOS) {
-            return Promise.reject(new Error('iOS precaching to file not supported for HTML5 video player'));
-        }
+        // if (platform === Platform.IOS) {
+        //     return Promise.reject(new Error('iOS precaching to file not supported for HTML5 video player'));
+        // }
         try {
             const dom = new DOMParser().parseFromString(markup, 'text/html');
             if (!dom) {
@@ -112,8 +113,9 @@ export class ProgrammaticAdMobParser extends CampaignParser {
     private updateFileID(video: AdMobVideo) {
         const videoID = this.getVideoID(video.getMediaFileURL());
         const url = video.getVideo().getOriginalUrl();
+        // Url.getQueryParameter(url, '');
         if (videoID && url) {
-            FileId.setFileID(url, videoID);
+            FileId.setFileID(url, videoID + '.mp4');
         }
     }
 
