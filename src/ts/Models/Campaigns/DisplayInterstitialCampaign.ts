@@ -7,6 +7,7 @@ export interface IDisplayInterstitialCampaign extends IProgrammaticCampaign {
     dynamicMarkup: string;
     width: number | undefined;
     height: number | undefined;
+    contentType: string | undefined;
 }
 
 export class DisplayInterstitialCampaign extends ProgrammaticCampaign<IDisplayInterstitialCampaign> {
@@ -15,7 +16,8 @@ export class DisplayInterstitialCampaign extends ProgrammaticCampaign<IDisplayIn
             ... ProgrammaticCampaign.Schema,
             dynamicMarkup: ['string', 'undefined'],
             width: ['number', 'undefined'],
-            height: ['number', 'undefined']
+            height: ['number', 'undefined'],
+            contentType: ['string', 'undefined']
         }, campaign);
     }
 
@@ -41,5 +43,9 @@ export class DisplayInterstitialCampaign extends ProgrammaticCampaign<IDisplayIn
 
     public getHeight(): number | undefined {
         return this.get('height');
+    }
+
+    public getContentType(): string | undefined {
+        return this.get('contentType');
     }
 }

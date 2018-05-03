@@ -32,7 +32,8 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
             trackingUrls: response.getTrackingUrls(),
             useWebViewUserAgentForTracking: false,
             width: response.getWidth() || undefined,
-            height: response.getHeight() || undefined
+            height: response.getHeight() || undefined,
+            contentType: response.getContentType() || undefined
         };
 
         return Promise.resolve(new DisplayInterstitialCampaign(displayInterstitialParams));

@@ -280,7 +280,9 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
     private setWebPlayerContent(): Promise<void> {
         return this.setWebplayerSettings(true).then( () => {
             let markup = this._campaign.getDynamicMarkup();
-            markup = '<script>' + markup + '</script>';
+            if (this._campaign.getContentType() === 'display-interstitial-js') {
+                markup = '<script>' + markup + '</script>';
+            }
             return this.setWebPlayerData(markup, 'text/html', 'UTF-8').then(() => {
                 this._contentReady = true;
             });

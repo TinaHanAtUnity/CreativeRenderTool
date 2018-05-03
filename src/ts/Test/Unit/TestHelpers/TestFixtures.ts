@@ -286,7 +286,8 @@ export class TestFixtures {
             trackingUrls: json.display.tracking || undefined,
             useWebViewUserAgentForTracking: false,
             width: json.display.width || undefined,
-            height: json.display.height || undefined
+            height: json.display.height || undefined,
+            contentType: json.display.contentType || undefined
         };
     }
 
