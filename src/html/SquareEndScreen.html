@@ -2,16 +2,16 @@
     <span class="icon-close"></span>
 </div>
 <div class="campaign-container<%= data.endscreenAlt ? ' ' + data.endscreenAlt : '' %>">
-    <div class="game-background game-background-blurred" style="background-image: url(<%= data.endScreenPortrait && data.endScreenPortrait.replace("file://", "") %>)"></div>
+    <div class="game-background game-background-blurred" style="background-image: url('<%= data.endScreenPortrait && data.endScreenPortrait.replace("file://", "") %>')"></div>
     <div class="game-image-container">
-        <div class="game-image" style="background-image: url(<%= data.endScreenPortrait && data.endScreenPortrait.replace("file://", "") %>)"></div>
+        <div class="game-image" style="background-image: url('<%= data.endScreenPortrait && data.endScreenPortrait.replace("file://", "") %>')"></div>
     </div>
     <div class="end-screen-info-background">
         <!--TODO: Is it in use?-->
         <!--<div class="end-screen-stripe"></div>-->
         <div class="end-screen-info">
             <div class="row-container">
-                <div class="game-icon" style="background-image: url(<%= data.gameIcon && data.gameIcon.replace("file://", "") %>)"></div>
+                <div class="game-icon" style="background-image: url('<%= data.gameIcon && data.gameIcon.replace("file://", "") %>')"></div>
             <div class="column-container">
                 <div class="name-container"><%= data.gameName %></div>
                 <div class="store-container">
