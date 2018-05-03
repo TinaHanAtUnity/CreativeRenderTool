@@ -166,7 +166,6 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             return FANCY_END_SCREEN;
         }
 
-        // TODO return undefined
         return undefined;
     }
 
