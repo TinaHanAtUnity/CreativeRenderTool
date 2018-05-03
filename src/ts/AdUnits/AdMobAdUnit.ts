@@ -36,11 +36,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _foregroundTime: number = 0;
     private _startTime: number = 0;
     private _requestToViewTime: number = 0;
-/*
-    private _onSystemKillObserver: () => void;
-    private _onPauseObserver: () => void;
-    private _onResumeObserver: () => void;
-*/
+
     constructor(nativeBridge: NativeBridge, parameters: IAdMobAdUnitParameters) {
         super(nativeBridge, parameters);
         this._operativeEventManager = parameters.operativeEventManager;
@@ -68,7 +64,6 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         }
 
         this._container.addEventHandler(this);
-        // this.subscribeToLifecycle();
 
         return this._container.open(this, ['webview'], true, this._forceOrientation, true, false, true, false, this._options).then(() => {
             this.onStart.trigger();
@@ -84,7 +79,6 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this.onHide();
         this.hideView();
         this._container.removeEventHandler(this);
-        // this.unsubscribeFromLifecycle();
         return this._container.close();
     }
 
@@ -234,24 +228,4 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
             this._view.onBackPressed();
         }
     }
-/*
-    private subscribeToLifecycle() {
-        this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
-        if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            this._onResumeObserver = this._focusManager.onAppForeground.subscribe(() => this.onAppForeground());
-            this._onPauseObserver = this._focusManager.onAppBackground.subscribe(() => this.onAppBackground());
-        } else {
-            this._onResumeObserver = this._container.onShow.subscribe(() => this.onAppForeground());
-            this._onPauseObserver = this._container.onAndroidPause.subscribe(() => this.onAppBackground());
-        }
-    }
-
-    private unsubscribeFromLifecycle() {
-        this._container.onSystemKill.unsubscribe(this._onSystemKillObserver);
-        if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            this._focusManager.onAppBackground.unsubscribe(this._onPauseObserver);
-        } else {
-            this._container.onShow.unsubscribe(this._onResumeObserver);
-        }
-    }*/
 }
