@@ -1,3 +1,10 @@
+# Wed May  2 20:31:05 UTC 2018
+
+* Square image abtest
+* GDPR v2 pop up on group 18 and 19
+* Send opt-out event on end screen hide
+* Add optional signals to auction request body
+
 # Thu Apr 26 20:23:59 UTC 2018
 
 * Initial support for Jaeger tracing service

@@ -3,6 +3,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { RingerMode } from 'Constants/Android/RingerMode';
 import { ISensorInfo, StorageType } from 'Native/Api/AndroidDeviceInfo';
 import { StreamType } from 'Constants/Android/StreamType';
+import { Platform } from 'Constants/Platform';
 
 export interface IAndroidDeviceInfo extends IDeviceInfo {
     androidId: string;
@@ -32,6 +33,7 @@ export interface IAndroidDeviceInfo extends IDeviceInfo {
     upTime: number;
     elapsedRealtime: number;
     sensorList: ISensorInfo[];
+    networkMetered: boolean;
 }
 
 export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
@@ -70,7 +72,8 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
             usbConnected: ['boolean'],
             upTime: ['number'],
             elapsedRealtime: ['number'],
-            sensorList: ['array']
+            sensorList: ['array'],
+            networkMetered: ['boolean']
         }, nativeBridge);
     }
 
@@ -246,6 +249,13 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
 
     public getSensorList(): ISensorInfo[] {
         return this.get('sensorList');
+    }
+
+    public getNetworkMetered(): Promise<boolean> {
+        return this._nativeBridge.DeviceInfo.Android.getNetworkMetered().then(isNetworkMetered => {
+            this.set('networkMetered', isNetworkMetered);
+            return this.get('networkMetered');
+        });
     }
 
     public getDTO(): Promise<any> {

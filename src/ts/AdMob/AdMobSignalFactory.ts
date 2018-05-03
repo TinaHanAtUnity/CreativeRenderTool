@@ -52,11 +52,15 @@ export class AdMobSignalFactory {
             this.logFailure(this._nativeBridge, 'batteryStatus');
         }));
 
-        promises.push(this._deviceInfo.getNetworkMetered().then(isNetworkMetered => {
-            signal.setIsNetworkMetered(isNetworkMetered);
-        }).catch(() => {
-            this.logFailure(this._nativeBridge, 'networkMetered');
-        }));
+        if(this._deviceInfo instanceof AndroidDeviceInfo) {
+            promises.push(this._deviceInfo.getNetworkMetered().then(isNetworkMetered => {
+                signal.setIsNetworkMetered(isNetworkMetered);
+            }).catch(() => {
+                this.logFailure(this._nativeBridge, 'networkMetered');
+            }));
+        } else {
+            signal.setIsNetworkMetered(false);
+        }
 
         promises.push(UserCountData.getRequestCount(this._nativeBridge).then(requestCount => {
             if (typeof requestCount === 'number') {
