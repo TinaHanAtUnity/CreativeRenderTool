@@ -7,7 +7,10 @@ import { Platform } from 'Constants/Platform';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { TestAdUnit } from '../TestHelpers/TestAdUnit';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
-import { Orientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
+import {
+    AdUnitContainerSystemMessage, IAdUnitContainerListener, Orientation,
+    ViewConfiguration
+} from 'AdUnits/Containers/AdUnitContainer';
 import { ViewController } from 'AdUnits/Containers/ViewController';
 import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
@@ -134,7 +137,25 @@ describe('IosAdUnitTest', () => {
         sinon.stub(nativeBridge.IosAdUnit, 'open').returns(Promise.resolve());
 
         let onShowTriggered: boolean = false;
-        container.onShow.subscribe(() => { onShowTriggered = true; });
+        const listener: IAdUnitContainerListener = {
+            onContainerShow: function() {
+                onShowTriggered = true;
+            },
+            onContainerDestroy: function() {
+                // EMPTY
+            },
+            onContainerBackground: function() {
+                // EMPTY
+            },
+            onContainerForeground: function() {
+                // EMPTY
+            },
+            onContainerSystemMessage: function(message: AdUnitContainerSystemMessage) {
+                // EMPTY
+            },
+        };
+
+        container.addEventHandler(listener);
 
         return container.open(testAdUnit, ['videoplayer', 'webview'], true, Orientation.LANDSCAPE, true, false, true, false, defaultOptions).then(() => {
             nativeBridge.IosAdUnit.onViewControllerDidAppear.trigger();
@@ -147,10 +168,27 @@ describe('IosAdUnitTest', () => {
         let onSystemInterruptTriggered: boolean;
 
         beforeEach(() => {
+            const listener: IAdUnitContainerListener = {
+                onContainerShow: function() {
+                    // EMPTY
+                },
+                onContainerDestroy: function() {
+                    // EMPTY
+                },
+                onContainerBackground: function() {
+                    onSystemInterruptTriggered = true;
+                },
+                onContainerForeground: function() {
+                    onSystemInterruptTriggered = true;
+                },
+                onContainerSystemMessage: function(message: AdUnitContainerSystemMessage) {
+                    // EMPTY
+                },
+            };
             testAdUnit = new TestAdUnit(nativeBridge, adUnitParams);
             sinon.stub(nativeBridge.IosAdUnit, 'open').returns(Promise.resolve());
             onSystemInterruptTriggered = false;
-            container.onSystemInterrupt.subscribe(() => { onSystemInterruptTriggered = true; });
+            container.addEventHandler(listener);
         });
 
         it('with application did become active', () => {

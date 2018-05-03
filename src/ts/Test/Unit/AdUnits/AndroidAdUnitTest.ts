@@ -10,7 +10,10 @@ import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
 import { Activity } from 'AdUnits/Containers/Activity';
-import { Orientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
+import {
+    AdUnitContainerSystemMessage, IAdUnitContainerListener, Orientation,
+    ViewConfiguration
+} from 'AdUnits/Containers/AdUnitContainer';
 import { Rotation } from 'Constants/Android/Rotation';
 import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
@@ -138,7 +141,25 @@ describe('AndroidAdUnitTest', () => {
 
         it('with onResume', () => {
             let onShowTriggered: boolean = false;
-            container.onShow.subscribe(() => { onShowTriggered = true; });
+            const listener: IAdUnitContainerListener = {
+                onContainerShow: function() {
+                    onShowTriggered = true;
+                },
+                onContainerDestroy: function() {
+                    // EMPTY
+                },
+                onContainerBackground: function() {
+                    // EMPTY
+                },
+                onContainerForeground: function() {
+                    // EMPTY
+                },
+                onContainerSystemMessage: function(message: AdUnitContainerSystemMessage) {
+                    // EMPTY
+                },
+            };
+
+            container.addEventHandler(listener);
 
             return container.open(testAdUnit, ['videoplayer', 'webview'], true, Orientation.LANDSCAPE, true, false, true, false, options).then(() => {
                 nativeBridge.AndroidAdUnit.onResume.trigger(1);
@@ -149,7 +170,25 @@ describe('AndroidAdUnitTest', () => {
 
         it('with onPause', () => {
             let onSystemKillTriggered: boolean = false;
-            container.onSystemKill.subscribe(() => { onSystemKillTriggered = true; });
+            const listener: IAdUnitContainerListener = {
+                onContainerShow: function() {
+                    // EMPTY
+                },
+                onContainerDestroy: function() {
+                    onSystemKillTriggered = true;
+                },
+                onContainerBackground: function() {
+                    // EMPTY
+                },
+                onContainerForeground: function() {
+                    // EMPTY
+                },
+                onContainerSystemMessage: function(message: AdUnitContainerSystemMessage) {
+                    // EMPTY
+                },
+            };
+
+            container.addEventHandler(listener);
 
             return container.open(testAdUnit, ['videoplayer', 'webview'], true, Orientation.LANDSCAPE, true, false, true, false, options).then(() => {
                 nativeBridge.AndroidAdUnit.onPause.trigger(true, 1);
@@ -160,7 +199,26 @@ describe('AndroidAdUnitTest', () => {
 
         it('with onDestroy', () => {
             let onSystemKillTriggered: boolean = false;
-            container.onSystemKill.subscribe(() => { onSystemKillTriggered = true; });
+
+            const listener: IAdUnitContainerListener = {
+                onContainerShow: function() {
+                    // EMPTY
+                },
+                onContainerDestroy: function() {
+                    onSystemKillTriggered = true;
+                },
+                onContainerBackground: function() {
+                    // EMPTY
+                },
+                onContainerForeground: function() {
+                    // EMPTY
+                },
+                onContainerSystemMessage: function(message: AdUnitContainerSystemMessage) {
+                    // EMPTY
+                },
+            };
+
+            container.addEventHandler(listener);
 
             return container.open(testAdUnit, ['videoplayer', 'webview'], true, Orientation.LANDSCAPE, true, false, true, false, options).then(() => {
                 nativeBridge.AndroidAdUnit.onDestroy.trigger(true, 1);
