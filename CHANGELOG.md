@@ -1,4 +1,4 @@
-# Pending
+# Thu May  3 20:22:59 UTC 2018
 
 * Fix for CSS image URL corner case issue
 * Fix getNetworkMetered API and DeviceInfo model
