@@ -1209,6 +1209,8 @@
             return window.getVRDisplaysPromise;
         };
 
+        var windowHooksInstalled = false;
+
         // TODO: iOS 11 Safari requires MacOS Safari 11 or higher to debug a WKWebVew (or any iOS Safari page).
         // Reimplementing console.log allows for logs to be shown in older versions of MacOS Safari.
         // This could be removed once MacOS Safari 11.0 is released (currently available as Safari Technology Preview)
@@ -1236,7 +1238,7 @@
 
         var resizeEventListeners = [];
         var oldWindowAddEventListener = window.addEventListener;
-        var newWindowAddEventListener = function() {
+        window.addEventListener = function() {
             var argumentsArray = Array.prototype.slice.call(arguments);
             if (argumentsArray[0] === "resize") {
                 resizeEventListeners.push(argumentsArray[1]);
@@ -1245,7 +1247,7 @@
             }
         };
         var oldWindowRemoveEventListener = window.removeEventListener;
-        var newWindowRemoveEventListener = function() {
+        window.removeEventListener = function() {
             var argumentsArray = Array.prototype.slice.call(arguments);
             if (argumentsArray[0] === "resize") {
                 var index = resizeEventListeners.indexOf(argumentsArray[1]);
@@ -1270,17 +1272,21 @@
         }
 
         window.installWebARHooks = function() {
+            if (windowHooksInstalled) {
+                return;
+            }
             console.log = newConsoleLog;
             window.requestAnimationFrame = newRequestAnimationFrame;
-            window.addEventListener = newWindowAddEventListener;
-            window.removeEventListener = newWindowRemoveEventListener;
+            windowHooksInstalled = true;
         };
 
         window.uninstallWebARHooks = function() {
+            if (!windowHooksInstalled) {
+                return;
+            }
             console.log = oldConsoleLog;
             window.requestAnimationFrame = oldRequestAnimationFrame;
-            window.addEventListener = oldWindowAddEventListener;
-            window.removeEventListener = oldWindowRemoveEventListener;
+            windowHooksInstalled = false;
         };
 
         function raf() {
