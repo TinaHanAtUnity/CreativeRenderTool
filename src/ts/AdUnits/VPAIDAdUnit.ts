@@ -15,6 +15,7 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { Placement } from 'Models/Placement';
 import { IObserver2 } from 'Utilities/IObserver';
 import { WKAudiovisualMediaTypes } from 'Native/Api/WebPlayer';
+import { AdUnitContainerSystemMessage, IAdUnitContainerListener } from 'AdUnits/Containers/AdUnitContainer';
 
 export interface IVPAIDAdUnitParameters extends IAdUnitParameters<VPAIDCampaign> {
     vpaid: VPAID;
@@ -22,7 +23,7 @@ export interface IVPAIDAdUnitParameters extends IAdUnitParameters<VPAIDCampaign>
     endScreen?: VPAIDEndScreen;
 }
 
-export class VPAIDAdUnit extends AbstractAdUnit {
+export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListener {
 
     public static setAdLoadTimeout(timeout: number) {
         VPAIDAdUnit._adLoadTimeout = timeout;
@@ -38,10 +39,11 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     private _timer: Timer;
     private _options: any;
     private _deviceInfo: DeviceInfo;
-
+/*
     private _onAppForegroundHandler: any;
     private _onAppBackgroundHandler: any;
     private _onSystemInterruptHandler: any;
+    */
     private _urlLoadingObserver: IObserver2<string, string>;
 
     constructor(nativeBridge: NativeBridge, parameters: IVPAIDAdUnitParameters) {
@@ -56,10 +58,10 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         this._deviceInfo = parameters.deviceInfo;
         this._placement = parameters.placement;
         this._timer = new Timer(() => this.onAdUnitNotLoaded(), VPAIDAdUnit._adLoadTimeout);
-
+/*
         this._onAppBackgroundHandler = () => this.onAppBackground();
         this._onAppForegroundHandler = () => this.onAppForeground();
-
+*/
         this._closer.render();
     }
 
@@ -135,6 +137,31 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         this._view.showAd();
     }
 
+    public onContainerShow(): void {
+        this.setShowing(true);
+    }
+
+    public onContainerDestroy(): void {
+        // EMPTY
+    }
+
+    public onContainerBackground(): void {
+        this._view.pauseAd();
+    }
+
+    public onContainerForeground(): void {
+        this.showCloser();
+        if (this._view.isLoaded()) {
+            this._view.resumeAd();
+        } else {
+            this._view.loadWebPlayer();
+        }
+    }
+
+    public onContainerSystemMessage(message: AdUnitContainerSystemMessage): void {
+        // EMPTY
+    }
+
     private setupWebPlayer(): Promise<any> {
         if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
             return this.setupAndroidWebPlayer();
@@ -187,12 +214,14 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         // todo: is the timer needed at all?
         // this._timer.start();
 
+        this._container.addEventHandler(this);
+        /*
         this._container.onShow.subscribe(this._onAppForegroundHandler);
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
             this._onSystemInterruptHandler = this._container.onSystemInterrupt.subscribe((interruptStarted) => this.onSystemInterrupt(interruptStarted));
         } else {
             this._container.onAndroidPause.subscribe(this._onAppBackgroundHandler);
-        }
+        }*/
     }
 
     private onHide() {
@@ -205,13 +234,14 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
         this.onClose.trigger();
         this._nativeBridge.WebPlayer.shouldOverrideUrlLoading.unsubscribe(this._urlLoadingObserver);
-
+        this._container.removeEventHandler(this);
+/*
         this._container.onShow.unsubscribe(this._onAppForegroundHandler);
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
             this._container.onSystemInterrupt.unsubscribe(this._onSystemInterruptHandler);
         } else {
             this._container.onAndroidPause.unsubscribe(this._onAppBackgroundHandler);
-        }
+        }*/
     }
 
     private showView() {
@@ -221,7 +251,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
     private hideView() {
         this._view.hide();
     }
-
+/*
     private onAppForeground() {
         this.showCloser();
         if (this._view.isLoaded()) {
@@ -241,7 +271,7 @@ export class VPAIDAdUnit extends AbstractAdUnit {
         } else if (!interruptStarted && this._view.isLoaded()) {
             this._view.resumeAd();
         }
-    }
+    }*/
 
     private showCloser() {
         return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {

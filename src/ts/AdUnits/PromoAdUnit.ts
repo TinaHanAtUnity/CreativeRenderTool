@@ -1,10 +1,12 @@
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
-import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
+import {
+    AdUnitContainerSystemMessage, IAdUnitContainerListener,
+    Orientation
+} from 'AdUnits/Containers/AdUnitContainer';
 import { Placement } from 'Models/Placement';
 import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 import { Promo } from 'Views/Promo';
-import { IObserver0 } from 'Utilities/IObserver';
 import { FinishState } from 'Constants/FinishState';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { Platform } from 'Constants/Platform';
@@ -14,7 +16,7 @@ export interface IPromoAdUnitParameters extends IAdUnitParameters<PromoCampaign>
     view: Promo;
 }
 
-export class PromoAdUnit extends AbstractAdUnit {
+export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListener {
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _promoView: Promo;
     private _options: any;
@@ -22,7 +24,6 @@ export class PromoAdUnit extends AbstractAdUnit {
     private _campaign: PromoCampaign;
 
     private _keyDownListener: (kc: number) => void;
-    private _onSystemKillObserver: IObserver0;
     private _additionalTrackingEvents: { [eventName: string]: string[] } | undefined;
 
     constructor(nativeBridge: NativeBridge, parameters: IPromoAdUnitParameters) {
@@ -49,7 +50,7 @@ export class PromoAdUnit extends AbstractAdUnit {
             this._nativeBridge.AndroidAdUnit.onKeyDown.subscribe(this._keyDownListener);
         }
 
-        this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
+        this._container.addEventHandler(this);
 
         return this._container.open(this, ['webview'], false, Orientation.NONE, true, true, false, true, this._options).then(() => {
             this.onStart.trigger();
@@ -66,7 +67,7 @@ export class PromoAdUnit extends AbstractAdUnit {
             this._nativeBridge.AndroidAdUnit.onKeyDown.unsubscribe(this._keyDownListener);
         }
 
-        this._container.onSystemKill.unsubscribe(this._onSystemKillObserver);
+        this._container.removeEventHandler(this);
 
         this.sendTrackingEvent('complete');
         this._promoView.hide();
@@ -87,6 +88,29 @@ export class PromoAdUnit extends AbstractAdUnit {
 
     public description(): string {
         return 'promo';
+    }
+
+    public onContainerShow(): void {
+        // EMPTY
+    }
+
+    public onContainerDestroy(): void {
+        if(this.isShowing()) {
+            this.setFinishState(FinishState.SKIPPED);
+            this.hide();
+        }
+    }
+
+    public onContainerBackground(): void {
+        // EMPTY
+    }
+
+    public onContainerForeground(): void {
+        // EMPTY
+    }
+
+    public onContainerSystemMessage(message: AdUnitContainerSystemMessage): void {
+        // EMPTY
     }
 
     private onKeyDown(key: number) {
@@ -112,12 +136,5 @@ export class PromoAdUnit extends AbstractAdUnit {
 
     private unsetReferences() {
         delete this._promoView;
-    }
-
-    private onSystemKill() {
-        if(this.isShowing()) {
-            this.setFinishState(FinishState.SKIPPED);
-            this.hide();
-        }
     }
 }

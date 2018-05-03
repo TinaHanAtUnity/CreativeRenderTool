@@ -4,7 +4,10 @@ import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { FinishState } from 'Constants/FinishState';
 import { IObserver0 } from 'Utilities/IObserver';
 import { MRAIDView, IOrientationProperties, IMRAIDViewHandler } from 'Views/MRAIDView';
-import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
+import {
+    AdUnitContainerSystemMessage, IAdUnitContainerListener,
+    Orientation
+} from 'AdUnits/Containers/AdUnitContainer';
 import { HTML } from 'Models/Assets/HTML';
 import { EndScreen } from 'Views/EndScreen';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
@@ -18,7 +21,7 @@ export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign>
     endScreen?: EndScreen;
 }
 
-export class MRAIDAdUnit extends AbstractAdUnit {
+export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListener {
 
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
@@ -30,11 +33,12 @@ export class MRAIDAdUnit extends AbstractAdUnit {
     private _clientInfo: ClientInfo;
     private _placement: Placement;
     private _campaign: MRAIDCampaign;
-
+/*
     private _onShowObserver: IObserver0;
     private _onSystemKillObserver: IObserver0;
     private _onSystemInterruptObserver: any;
     private _onPauseObserver: any;
+    */
     private _additionalTrackingEvents: { [eventName: string]: string[] } | undefined;
 
     constructor(nativeBridge: NativeBridge, parameters: IMRAIDAdUnitParameters) {
@@ -76,11 +80,13 @@ export class MRAIDAdUnit extends AbstractAdUnit {
             this.onStartProcessed.trigger();
         });
         this.sendTrackingEvent('impression');
-
+/*
         this._onShowObserver = this._container.onShow.subscribe(() => this.onShow());
         this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
         this._onSystemInterruptObserver = this._container.onSystemInterrupt.subscribe((interruptStarted) => this.onSystemInterrupt(interruptStarted));
         this._onPauseObserver = this._container.onAndroidPause.subscribe(() => this.onSystemPause());
+*/
+        this._container.addEventHandler(this);
 
         return this._container.open(this, ['webview'], this._orientationProperties.allowOrientationChange, this._orientationProperties.forceOrientation, true, false, true, false, this._options).then(() => {
             this.onStart.trigger();
@@ -93,12 +99,12 @@ export class MRAIDAdUnit extends AbstractAdUnit {
         }
         this.setShowing(false);
         this.setShowingMRAID(false);
-
+/*
         this._container.onShow.unsubscribe(this._onShowObserver);
         this._container.onSystemKill.unsubscribe(this._onSystemKillObserver);
         this._container.onSystemInterrupt.unsubscribe(this._onSystemInterruptObserver);
         this._container.onAndroidPause.unsubscribe(this._onPauseObserver);
-
+*/
         this._mraid.hide();
         if(this._endScreen) {
             this._endScreen.hide();
@@ -123,6 +129,7 @@ export class MRAIDAdUnit extends AbstractAdUnit {
         this.unsetReferences();
 
         this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
+        this._container.removeEventHandler(this);
 
         return this._container.close().then(() => {
             this.onClose.trigger();
@@ -157,6 +164,42 @@ export class MRAIDAdUnit extends AbstractAdUnit {
         return this._showingMRAID;
     }
 
+    public onContainerShow(): void {
+        this._mraid.setViewableState(true);
+
+        if(AbstractAdUnit.getAutoClose()) {
+            setTimeout(() => {
+                this.setFinishState(FinishState.COMPLETED);
+                this.hide();
+            }, AbstractAdUnit.getAutoCloseDelay());
+        }
+    }
+
+    // onContainerStart(): void;
+
+    public onContainerDestroy(): void {
+        if(this.isShowing()) {
+            this.setFinishState(FinishState.SKIPPED);
+            this.hide();
+        }
+    }
+
+    public onContainerBackground(): void {
+        if(this.isShowing()) {
+            this._mraid.setViewableState(false);
+        }
+    }
+
+    public onContainerForeground(): void {
+        if(this.isShowing()) {
+            this._mraid.setViewableState(true);
+        }
+    }
+
+    public onContainerSystemMessage(message: AdUnitContainerSystemMessage): void {
+        // EMPTY
+    }
+/*
     private onShow() {
         this._mraid.setViewableState(true);
 
@@ -190,7 +233,7 @@ export class MRAIDAdUnit extends AbstractAdUnit {
             this._mraid.setViewableState(false);
         }
     }
-
+*/
     private unsetReferences() {
         delete this._mraid;
         delete this._endScreen;

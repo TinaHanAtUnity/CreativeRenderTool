@@ -11,7 +11,10 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { WebViewError } from 'Errors/WebViewError';
-import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
+import {
+    AdUnitContainerSystemMessage, IAdUnitContainerListener,
+    Orientation
+} from 'AdUnits/Containers/AdUnitContainer';
 import { Campaign } from 'Models/Campaign';
 import { Placement } from 'Models/Placement';
 import { CampaignAssetInfo, VideoType } from 'Utilities/CampaignAssetInfo';
@@ -22,14 +25,9 @@ export interface IVideoAdUnitParameters<T extends Campaign> extends IAdUnitParam
     overlay: AbstractVideoOverlay;
 }
 
-export abstract class VideoAdUnit<T extends Campaign = Campaign> extends AbstractAdUnit {
+export abstract class VideoAdUnit<T extends Campaign = Campaign> extends AbstractAdUnit implements IAdUnitContainerListener {
 
     private static _progressInterval: number = 250;
-
-    protected _onShowObserver: any;
-    protected _onSystemKillObserver: any;
-    protected _onSystemInterruptObserver: any;
-    protected _onLowMemoryWarningObserver: any;
 
     protected _options: any;
     private _video: Video;
@@ -64,10 +62,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         this.setShowing(true);
         this.setActive(true);
 
-        this._onShowObserver = this._container.onShow.subscribe(() => this.onShow());
-        this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
-        this._onSystemInterruptObserver = this._container.onSystemInterrupt.subscribe((interruptStarted) => this.onSystemInterrupt(interruptStarted));
-        this._onLowMemoryWarningObserver = this._container.onLowMemoryWarning.subscribe(() => this.onLowMemoryWarning());
+        this._container.addEventHandler(this);
 
         return this._container.open(this, ['videoplayer', 'webview'], true, this.getForceOrientation(), this._placement.disableBackButton(), false, true, false, this._options).then(() => {
             this.onStart.trigger();
@@ -84,6 +79,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         this.unsetReferences();
 
         this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
+        this._container.removeEventHandler(this);
 
         return this._container.close().then(() => {
             this.onClose.trigger();
@@ -142,6 +138,53 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         return this._lowMemory;
     }
 
+    public onContainerShow(): void {
+        if(this.isShowing() && this.isActive()) {
+            if(this._nativeBridge.getPlatform() === Platform.IOS && IosUtils.hasVideoStallingApi(this._deviceInfo.getOsVersion())) {
+                if(this.getVideo().isCached()) {
+                    this._nativeBridge.VideoPlayer.setAutomaticallyWaitsToMinimizeStalling(false);
+                } else {
+                    this._nativeBridge.VideoPlayer.setAutomaticallyWaitsToMinimizeStalling(true);
+                }
+            }
+        }
+    }
+
+    public onContainerDestroy(): void {
+        if(this.isShowing()) {
+            this.setFinishState(FinishState.SKIPPED);
+            this.hide();
+        }
+    }
+
+    public onContainerBackground(): void {
+        if(this.isShowing() && this.isActive()) {
+            this._nativeBridge.VideoPlayer.pause();
+        }
+    }
+
+    public onContainerForeground(): void {
+        if(this.isShowing() && this.isActive() && this.isVideoReady() && !this.getContainer().isPaused()) {
+            if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                this.getValidVideoUrl().then(url => {
+                    this._finalVideoUrl = url;
+                    this.setPrepareCalled(true);
+                    this._nativeBridge.VideoPlayer.prepare(url, new Double(this._placement.muteVideo() ? 0.0 : 1.0), 10000);
+                });
+            } else {
+                this._nativeBridge.VideoPlayer.play();
+            }
+        }
+    }
+
+    public onContainerSystemMessage(message: AdUnitContainerSystemMessage): void {
+        if(message === AdUnitContainerSystemMessage.MEMORY_WARNING) {
+            if(this.isShowing()) {
+                this._lowMemory = true;
+            }
+        }
+    }
+
     protected unsetReferences() {
         delete this._overlay;
     }
@@ -161,7 +204,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
             }
         }
     }
-
+/*
     protected onShow() {
         if(this.isShowing() && this.isActive()) {
             if(this._nativeBridge.getPlatform() === Platform.IOS && IosUtils.hasVideoStallingApi(this._deviceInfo.getOsVersion())) {
@@ -203,7 +246,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         if(this.isShowing()) {
             this._lowMemory = true;
         }
-    }
+    }*/
 
     protected hideChildren() {
         const overlay = this.getOverlay();

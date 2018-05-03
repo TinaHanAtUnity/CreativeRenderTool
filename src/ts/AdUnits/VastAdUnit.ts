@@ -27,8 +27,6 @@ export interface IVastAdUnitParameters extends IVideoAdUnitParameters<VastCampai
 }
 
 export class VastAdUnit extends VideoAdUnit<VastCampaign> {
-    protected _onPauseObserver: any;
-
     private _endScreen: VastEndScreen | null;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _moat?: MOAT;
@@ -40,7 +38,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
 
     constructor(nativeBridge: NativeBridge, parameters: IVastAdUnitParameters) {
         super(nativeBridge, parameters);
-        this._onPauseObserver = this._container.onAndroidPause.subscribe(() => this.onSystemPause());
 
         parameters.overlay.setSpinnerEnabled(!parameters.campaign.getVideo().isCached());
 
@@ -174,18 +171,16 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         }
     }
 
-    protected onSystemInterrupt(interruptStarted: boolean): void {
-        super.onSystemInterrupt(interruptStarted);
-        if (this._moat) {
-            if (!interruptStarted) {
-                this._moat.resume(this.getVolume());
-            }
+    public onContainerBackground(): void {
+        if (this._moat && !this._container.isPaused()) {
+            this._moat.pause(this.getVolume());
         }
     }
 
-    protected onSystemPause(): void {
-        if (this._moat && !this._container.isPaused()) {
-            this._moat.pause(this.getVolume());
+    public onContainerForeground(): void {
+        super.onContainerForeground();
+        if (this._moat) {
+            this._moat.resume(this.getVolume());
         }
     }
 
