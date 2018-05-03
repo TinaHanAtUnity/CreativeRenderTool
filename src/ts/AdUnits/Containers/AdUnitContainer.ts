@@ -1,4 +1,3 @@
-import { Observable0, Observable1 } from 'Utilities/Observable';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 
 export enum Orientation {
@@ -13,6 +12,18 @@ export const enum ViewConfiguration {
     WEB_PLAYER
 }
 
+export enum AdUnitContainerSystemMessage {
+    MEMORY_WARNING
+}
+
+export interface IAdUnitContainerListener {
+    onContainerShow(): void;
+    onContainerDestroy(): void;
+    onContainerBackground(): void;
+    onContainerForeground(): void;
+    onContainerSystemMessage(message: AdUnitContainerSystemMessage): void;
+}
+
 export abstract class AdUnitContainer {
 
     public static setForcedOrientation(orientation: Orientation) {
@@ -25,13 +36,8 @@ export abstract class AdUnitContainer {
 
     private static _forcedOrientation: Orientation | undefined;
 
-    public readonly onShow = new Observable0(); // ad unit becomes visible
-    public readonly onSystemKill = new Observable0(); // ad unit killed by the system (Android only)
-    public readonly onAndroidPause = new Observable0(); // ad unit paused (Android only)
-    public readonly onSystemInterrupt = new Observable1<boolean>(); // ad unit has been interrupted and video has been paused (iOS only)
-    public readonly onLowMemoryWarning = new Observable0(); // ad unit has received low memory warning (iOS only)
-
     protected _lockedOrientation: Orientation;
+    protected _handlers: IAdUnitContainerListener[] = [];
 
     public abstract open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: any): Promise<void>;
     public abstract close(): Promise<void>;
@@ -43,5 +49,20 @@ export abstract class AdUnitContainer {
 
     public getLockedOrientation() {
         return this._lockedOrientation;
+    }
+
+    public addEventHandler(handler: IAdUnitContainerListener): IAdUnitContainerListener {
+        this._handlers.push(handler);
+        return handler;
+    }
+
+    public removeEventHandler(handler: IAdUnitContainerListener): void {
+        if(this._handlers.length) {
+            if(typeof handler !== 'undefined') {
+                this._handlers = this._handlers.filter(storedHandler => storedHandler !== handler);
+            } else {
+                this._handlers = [];
+            }
+        }
     }
 }
