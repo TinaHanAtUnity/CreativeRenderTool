@@ -172,6 +172,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     }
 
     public onContainerBackground(): void {
+        super.onContainerBackground();
         if (this._moat && !this._container.isPaused()) {
             this._moat.pause(this.getVolume());
         }
