@@ -186,6 +186,9 @@ export class OperativeEventManager {
             delete infoJson.networkType;
             delete infoJson.connectionType;
 
+            // drop game session counters from skip event payload
+            delete infoJson.gameSessionCounters;
+
             infoJson.id = id;
             infoJson.ts = (new Date()).toISOString();
 
