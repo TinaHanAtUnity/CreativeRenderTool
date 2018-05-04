@@ -306,6 +306,12 @@
       "required": "all",
       "queryString": false,
       "body": true
+    },
+    {
+      "parameter": "organizationId",
+      "required": "all",
+      "queryString": false,
+      "body": true
     }
   ]
 }

@@ -79,6 +79,8 @@
 | realtimeData | object | If the placement contains data to show a realtime placement | Server | all |
 | projectId | string | Unity project ID | Server | all |
 | gameSessionCounters | object | Game session based counts of starts, views and ad requests | SDK | all |
+| ext | object | JSON string for optional signals for admob | SDK | all |
+| organizationId | string | Previously knows as 'developerID' | Server | all |
 
 
 
@@ -160,6 +162,8 @@
 | token | all | False | True | string | Signed JSON Web Token (JWT) with orthogonal (statistically independent) A/B groups for each Unity Monetization component | Server | all |
 | projectId | all | False | True | string | Unity project ID | Server | all |
 | gameSessionCounters | all | False | True | object | Game session based counts of starts, views and ad requests | SDK | all |
+| ext | all | False | True | object | JSON string for optional signals for admob | SDK | all |
+| organizationId | all | False | True | string | Previously knows as 'developerID' | Server | all |
 
 
 
