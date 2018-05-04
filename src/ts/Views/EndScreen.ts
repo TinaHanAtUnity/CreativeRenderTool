@@ -5,6 +5,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
 import { IPrivacyHandler, Privacy } from 'Views/Privacy';
+import { GDPRPrivacy } from 'Views/GDPR-privacy';
 import { Localization } from 'Utilities/Localization';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { Campaign } from 'Models/Campaign';
@@ -167,7 +168,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             return SQUARE_END_SCREEN;
         }
 
-        return undefined;
+        return GDPR_OPT_OUT_BASE;
     }
 
     protected abstract onDownloadEvent(event: Event): void;
@@ -179,7 +180,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
     private onPrivacyEvent(event: Event): void {
         event.preventDefault();
-        this._privacy = new Privacy(this._nativeBridge, this._coppaCompliant);
+        // this._privacy = new Privacy(this._nativeBridge, this._coppaCompliant);
+
+        this._privacy = new GDPRPrivacy(this._nativeBridge, this._coppaCompliant);
+
         this._privacy.render();
         document.body.appendChild(this._privacy.container());
         this._privacy.addEventHandler(this);
@@ -190,7 +194,12 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
         this._gdprPopupClicked = true;
 
-        this._privacy = new Privacy(this._nativeBridge, this._coppaCompliant);
+        // this._privacy = new Privacy(this._nativeBridge, this._coppaCompliant);
+
+        // this._privacy = new GDPRPrivacy(this._nativeBridge, this._coppaCompliant);
+
+        this._privacy = new GDPRPrivacy(this._nativeBridge, this._coppaCompliant);
+
         this._privacy.render();
         document.body.appendChild(this._privacy.container());
         this._privacy.addEventHandler(this);

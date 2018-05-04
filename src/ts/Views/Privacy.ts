@@ -44,10 +44,14 @@ export class Privacy extends View<IPrivacyHandler> {
 
     private static buildInformation: IBuildInformation;
 
-    constructor(nativeBridge: NativeBridge, isCoppaCompliant: boolean) {
-        super(nativeBridge, 'privacy');
+    constructor(nativeBridge: NativeBridge, isCoppaCompliant: boolean, altTemplate?: string, altId?: string) {
+        super(nativeBridge, altId || 'privacy');
 
-        this._template = new Template(PrivacyTemplate);
+        if (typeof altTemplate === 'string') {
+            this._template = new Template(altTemplate);
+        } else {
+            this._template = new Template(PrivacyTemplate);
+        }
 
         this._templateData = {
             'isCoppaCompliant': isCoppaCompliant,

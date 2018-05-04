@@ -1,0 +1,19 @@
+@import "vars.styl";
+@import "components.styl";
+
+#gdpr-privacy {
+  $full-screen-pop-up-view($default-scale-size, 1000);
+}
+
+body.portrait {
+  #privacy .build-information-container {
+    max-height: 20rem;
+  }
+}
+
+body.landscape {
+  #privacy .build-information-container {
+    max-height: 11rem;
+  }
+}
+
