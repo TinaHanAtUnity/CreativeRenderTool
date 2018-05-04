@@ -246,25 +246,17 @@ export class WebView {
 
             SdkStats.initialize(this._nativeBridge, this._request, this._configuration, this._sessionManager, this._campaignManager, this._metadataManager, this._clientInfo);
 
-            const enableCachedResponse = this._configuration.getAbGroup() === 7 || this._configuration.getAbGroup() === 8;
             const refreshSpan = this._jaegerManager.startSpan('Refresh', jaegerInitSpan.id, jaegerInitSpan.traceId);
             refreshSpan.addTag(JaegerTags.DeviceType, Platform[this._nativeBridge.getPlatform()]);
-            let refreshPromise;
-            if (this._cachedCampaignResponse !== undefined && enableCachedResponse) {
-                refreshPromise = this._refreshManager.refreshFromCache(this._cachedCampaignResponse, refreshSpan);
-            } else {
-                refreshPromise = this._refreshManager.refresh();
-            }
-            refreshPromise.then((resp) => {
+            return this._refreshManager.refresh().then((resp) => {
                 this._jaegerManager.stop(refreshSpan);
                 return resp;
             }).catch((error) => {
                 refreshSpan.addTag(JaegerTags.Error, 'true');
                 refreshSpan.addTag(JaegerTags.ErrorMessage, error.message);
                 this._jaegerManager.stop(refreshSpan);
-                throw new Error(error);
+                throw error;
             });
-            return refreshPromise;
         }).then(() => {
             this._initialized = true;
             this._jaegerManager.stop(jaegerInitSpan);
