@@ -245,10 +245,11 @@ export class WebView {
             this._refreshManager = new OldCampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration, this._focusManager, this._sessionManager, this._clientInfo, this._request, this._cache);
 
             SdkStats.initialize(this._nativeBridge, this._request, this._configuration, this._sessionManager, this._campaignManager, this._metadataManager, this._clientInfo);
-
-            const enableCachedResponse = this._configuration.getAbGroup() === 5 || this._configuration.getAbGroup() === 6;
+            
+            const enableCachedResponse = this._configuration.getAbGroup() === 11 || this._configuration.getAbGroup() === 12;
             const refreshSpan = this._jaegerManager.startSpan('Refresh', jaegerInitSpan.id, jaegerInitSpan.traceId);
             refreshSpan.addTag(JaegerTags.DeviceType, Platform[this._nativeBridge.getPlatform()]);
+
             let refreshPromise;
             if (this._cachedCampaignResponse !== undefined && enableCachedResponse) {
                 refreshPromise = this._refreshManager.refreshFromCache(this._cachedCampaignResponse, refreshSpan);
