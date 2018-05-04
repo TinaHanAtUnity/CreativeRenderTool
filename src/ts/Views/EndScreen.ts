@@ -195,11 +195,11 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     private canShowFancyEndScreen() {
-        if (!this._osVersion || this._nativeBridge.getPlatform() === Platform.IOS) {
+        if (this._nativeBridge.getPlatform() === Platform.IOS) {
             return true;
         }
 
-        return !!!this._osVersion.match(/^4/);
+        return this._osVersion && !!!this._osVersion.match(/^4/);
     }
 
     private getTemplate() {
