@@ -172,47 +172,25 @@ $radio-group-container($scale-size = $default-scale-size, $with-styles = false) 
     display: inline-block;
   }
 
-  $radio-button-size = $radio-group-default-size * .75;
-  $radio-border-size = $radio-group-default-size * .01;
-
-  /* Radio button */
   [type="radio"]:checked + label:before,
   [type="radio"]:not(:checked) + label:before {
     content: '';
     position: absolute;
     left: 0;
     top: 0;
-    width: $radio-button-size;
-    height: $radio-button-size;
-    border: $radio-border-size solid $privacy-green;
-    border-radius: 100%;
+    width: $radio-group-default-size * .75;
+    height: @width;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
   }
 
-  /* Radio content */
-  [type="radio"]:checked + label:after,
-  [type="radio"]:not(:checked) + label:after {
-    content: '';
-    width: $radio-button-size * .575;
-    height: $radio-button-size * .575;
-    background: $privacy-green;
-    position: absolute;
-    top: $radio-button-size * .5 - @width * .5 - $radio-border-size * .5;
-    left: $radio-button-size * .5 - @height * .5 - $radio-border-size * .5;
-    border-radius: 100%;
-    -webkit-transition: all 0.2s ease;
-    transition: all 0.2s ease;
+  [type="radio"]:checked + label:before {
+    background-image: url('./../img/radio_on.png');
   }
 
-  [type="radio"]:not(:checked) + label:after {
-    opacity: 0;
-    -webkit-transform: scale(0);
-    transform: scale(0);
-  }
-
-  [type="radio"]:checked + label:after {
-    opacity: 1;
-    -webkit-transform: scale(1);
-    transform: scale(1);
+  [type="radio"]:not(:checked) + label:before {
+    background-image: url('./../img/radio_off.png');
   }
 
   [type="radio"]:checked + label {
@@ -254,24 +232,31 @@ $full-screen-pop-up-view($scale-size, z-index = auto, $with-styles = true) {
       padding-right: $pop-up-size * 1.5;
       height: $pop-up-content-height;
 
-      &:-webkit-scrollbar {
-        -webkit-appearance: none;
-        width: 7px;
+      ::-webkit-scrollbar {
+        width: 40px;
+        background-color: $gray;
       }
 
-      &:-webkit-scrollbar-thumb {
-        border-radius: 4px;
-        background-color: rgba(0, 0, 0, .5);
-        -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+      ::-webkit-scrollbar-button:vertical:increment {
+        height: 40px;
+        background-size: 39px 30px;
+        background-repeat: no-repeat;
+      }
+
+      ::-webkit-scrollbar-button:vertical:decrement {
+        height: 40px;
+        background-size: 39px 30px;
+        background-repeat: no-repeat;
       }
 
       .header,
       .highlight {
-        font-weight: 500;
+        font-weight: 400;
       }
 
       .title {
         margin-bottom: $pop-up-size;
+        font-weight: 500;
         font-size: $pop-up-font-size * 1.5;
       }
 
