@@ -13,7 +13,6 @@ import {
 } from 'AdUnits/Containers/AdUnitContainer';
 import { ViewController } from 'AdUnits/Containers/ViewController';
 import { FocusManager } from 'Managers/FocusManager';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { SessionManager } from 'Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
@@ -194,7 +193,7 @@ describe('IosAdUnitTest', () => {
         it('with application did become active', () => {
             return container.open(testAdUnit, ['videoplayer', 'webview'], true, Orientation.LANDSCAPE, true, false, true, false, defaultOptions).then(() => {
                 nativeBridge.Notification.onNotification.trigger('UIApplicationDidBecomeActiveNotification', {});
-                assert.isTrue(onSystemInterruptTriggered, 'onSystemInterrupt was not triggered with UIApplicationDidBecomeActiveNotification');
+                assert.isTrue(onSystemInterruptTriggered, 'onContainerBackground or onContainerForeground was not triggered with UIApplicationDidBecomeActiveNotification');
                 return;
             });
         });
@@ -202,7 +201,7 @@ describe('IosAdUnitTest', () => {
         it('with audio session interrupt', () => {
             return container.open(testAdUnit, ['videoplayer', 'webview'], true, Orientation.LANDSCAPE, true, false, true, false, defaultOptions).then(() => {
                 nativeBridge.Notification.onNotification.trigger('AVAudioSessionInterruptionNotification', { AVAudioSessionInterruptionTypeKey: 0, AVAudioSessionInterruptionOptionKey: 1 });
-                assert.isTrue(onSystemInterruptTriggered, 'onSystemInterrupt was not triggered with AVAudioSessionInterruptionNotification');
+                assert.isTrue(onSystemInterruptTriggered, 'onContainerBackground or onContainerForeground was not triggered with AVAudioSessionInterruptionNotification');
                 return;
             });
         });
@@ -210,7 +209,7 @@ describe('IosAdUnitTest', () => {
         it('with audio session route change', () => {
             return container.open(testAdUnit, ['videoplayer', 'webview'], true, Orientation.LANDSCAPE, true, false, true, false, defaultOptions).then(() => {
                 nativeBridge.Notification.onNotification.trigger('AVAudioSessionRouteChangeNotification', {});
-                assert.isTrue(onSystemInterruptTriggered, 'onSystemInterrupt was not triggered with AVAudioSessionRouteChangeNotification');
+                assert.isTrue(onSystemInterruptTriggered, 'onContainerBackground or onContainerForeground was not triggered with AVAudioSessionRouteChangeNotification');
                 return;
             });
         });

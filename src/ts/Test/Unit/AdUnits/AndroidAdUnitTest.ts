@@ -140,10 +140,10 @@ describe('AndroidAdUnitTest', () => {
         });
 
         it('with onResume', () => {
-            let onShowTriggered: boolean = false;
+            let onContainerForegroundTriggered: boolean = false;
             const listener: IAdUnitContainerListener = {
                 onContainerShow: function() {
-                    onShowTriggered = true;
+                    // EMPTY
                 },
                 onContainerDestroy: function() {
                     // EMPTY
@@ -152,7 +152,7 @@ describe('AndroidAdUnitTest', () => {
                     // EMPTY
                 },
                 onContainerForeground: function() {
-                    // EMPTY
+                    onContainerForegroundTriggered = true;
                 },
                 onContainerSystemMessage: function(message: AdUnitContainerSystemMessage) {
                     // EMPTY
@@ -163,19 +163,19 @@ describe('AndroidAdUnitTest', () => {
 
             return container.open(testAdUnit, ['videoplayer', 'webview'], true, Orientation.LANDSCAPE, true, false, true, false, options).then(() => {
                 nativeBridge.AndroidAdUnit.onResume.trigger(1);
-                assert.isTrue(onShowTriggered, 'onShow was not triggered when invoking onResume');
+                assert.isTrue(onContainerForegroundTriggered, 'onContainerForeground was not triggered when invoking onResume');
                 return;
             });
         });
 
         it('with onPause', () => {
-            let onSystemKillTriggered: boolean = false;
+            let onContainerDestroyTriggered: boolean = false;
             const listener: IAdUnitContainerListener = {
                 onContainerShow: function() {
                     // EMPTY
                 },
                 onContainerDestroy: function() {
-                    onSystemKillTriggered = true;
+                    onContainerDestroyTriggered = true;
                 },
                 onContainerBackground: function() {
                     // EMPTY
@@ -192,20 +192,20 @@ describe('AndroidAdUnitTest', () => {
 
             return container.open(testAdUnit, ['videoplayer', 'webview'], true, Orientation.LANDSCAPE, true, false, true, false, options).then(() => {
                 nativeBridge.AndroidAdUnit.onPause.trigger(true, 1);
-                assert.isTrue(onSystemKillTriggered, 'onSystemKill was not triggered when invoking onPause with finishing true');
+                assert.isTrue(onContainerDestroyTriggered, 'onContainerDestroy was not triggered when invoking onPause with finishing true');
                 return;
             });
         });
 
         it('with onDestroy', () => {
-            let onSystemKillTriggered: boolean = false;
+            let onContainerDestroyTriggered: boolean = false;
 
             const listener: IAdUnitContainerListener = {
                 onContainerShow: function() {
                     // EMPTY
                 },
                 onContainerDestroy: function() {
-                    onSystemKillTriggered = true;
+                    onContainerDestroyTriggered = true;
                 },
                 onContainerBackground: function() {
                     // EMPTY
@@ -222,7 +222,7 @@ describe('AndroidAdUnitTest', () => {
 
             return container.open(testAdUnit, ['videoplayer', 'webview'], true, Orientation.LANDSCAPE, true, false, true, false, options).then(() => {
                 nativeBridge.AndroidAdUnit.onDestroy.trigger(true, 1);
-                assert.isTrue(onSystemKillTriggered, 'onSystemKill was not triggered when invoking onDestroy with finishing true');
+                assert.isTrue(onContainerDestroyTriggered, 'onContainerDestroy was not triggered when invoking onDestroy with finishing true');
                 return;
             });
         });
