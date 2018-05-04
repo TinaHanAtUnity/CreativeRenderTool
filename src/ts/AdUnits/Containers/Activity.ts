@@ -29,6 +29,8 @@ export class Activity extends AdUnitContainer {
     private _onResumeObserver: any;
     private _onPauseObserver: any;
     private _onDestroyObserver: any;
+    private _onCreateObserver: any;
+    private _onRestoreObserver: any;
 
     private _onFocusGainedObserver: any;
     private _onFocusLostObserver: any;
@@ -47,6 +49,8 @@ export class Activity extends AdUnitContainer {
         this._onResumeObserver = this._nativeBridge.AndroidAdUnit.onResume.subscribe((activityId) => this.onResume(activityId));
         this._onPauseObserver = this._nativeBridge.AndroidAdUnit.onPause.subscribe((finishing, activityId) => this.onPause(finishing, activityId));
         this._onDestroyObserver = this._nativeBridge.AndroidAdUnit.onDestroy.subscribe((finishing, activityId) => this.onDestroy(finishing, activityId));
+        this._onCreateObserver = this._nativeBridge.AndroidAdUnit.onCreate.subscribe((activityId) => this.onCreate(activityId));
+        this._onRestoreObserver = this._nativeBridge.AndroidAdUnit.onRestore.subscribe((activityId) => this.onRestore(activityId));
     }
 
     public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: IAndroidOptions): Promise<void> {
@@ -177,9 +181,20 @@ export class Activity extends AdUnitContainer {
         return orientation;
     }
 
-    private onResume(activityId: number): void {
+    private onCreate(activityId: number): void {
         if(activityId === this._activityId) {
             this._handlers.forEach(handler => handler.onContainerShow());
+        }
+    }
+
+    private onRestore(activityId: number): void {
+        if(activityId === this._activityId) {
+            this._handlers.forEach(handler => handler.onContainerShow());
+        }
+    }
+
+    private onResume(activityId: number): void {
+        if(activityId === this._activityId) {
             this._handlers.forEach(handler => handler.onContainerForeground());
         }
     }
