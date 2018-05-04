@@ -82,7 +82,7 @@ describe('EndScreenEventHandlerTest', () => {
             sinon.spy(nativeBridge.Intent, 'launch');
 
             const video = new Video('', TestFixtures.getSession());
-            endScreen = new PerformanceEndScreen(nativeBridge, TestFixtures.getCampaign(), configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId(), deviceInfo.getOsVersion());
+            endScreen = new PerformanceEndScreen(nativeBridge, TestFixtures.getCampaign(), configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
             placement = TestFixtures.getPlacement();
 
@@ -243,7 +243,7 @@ describe('EndScreenEventHandlerTest', () => {
             });
 
             sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
-            endScreen = new PerformanceEndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId(), deviceInfo.getOsVersion());
+            endScreen = new PerformanceEndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
 
             performanceAdUnitParameters = {
