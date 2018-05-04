@@ -147,6 +147,8 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
                     this._nativeBridge.VideoPlayer.setAutomaticallyWaitsToMinimizeStalling(true);
                 }
             }
+
+            this.prepareVideo();
         }
     }
 
@@ -159,20 +161,24 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
 
     public onContainerBackground(): void {
         if(this.isShowing() && this.isActive()) {
-            this._nativeBridge.VideoPlayer.pause();
+            if(this._nativeBridge.getPlatform() === Platform.IOS) {
+                this._nativeBridge.VideoPlayer.pause();
+            } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                this._nativeBridge.VideoPlayer.pause().catch((error) => {
+                    if(error === 'VIDEOVIEW_NULL') {
+                        this.setVideoReady(false);
+                    }
+                });
+            }
         }
     }
 
     public onContainerForeground(): void {
-        if(this.isShowing() && this.isActive() && this.isVideoReady() && !this.getContainer().isPaused()) {
-            if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                this.getValidVideoUrl().then(url => {
-                    this._finalVideoUrl = url;
-                    this.setPrepareCalled(true);
-                    this._nativeBridge.VideoPlayer.prepare(url, new Double(this._placement.muteVideo() ? 0.0 : 1.0), 10000);
-                });
-            } else {
+        if(this.isShowing() && this.isActive() && !this.getContainer().isPaused()) {
+            if(this.isVideoReady()) {
                 this._nativeBridge.VideoPlayer.play();
+            } else if(this._nativeBridge.getPlatform() === Platform.ANDROID && !this.isPrepareCalled() && !this.isVideoReady()) {
+                this.prepareVideo();
             }
         }
     }
@@ -204,49 +210,6 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
             }
         }
     }
-/*
-    protected onShow() {
-        if(this.isShowing() && this.isActive()) {
-            if(this._nativeBridge.getPlatform() === Platform.IOS && IosUtils.hasVideoStallingApi(this._deviceInfo.getOsVersion())) {
-                if(this.getVideo().isCached()) {
-                    this._nativeBridge.VideoPlayer.setAutomaticallyWaitsToMinimizeStalling(false);
-                } else {
-                    this._nativeBridge.VideoPlayer.setAutomaticallyWaitsToMinimizeStalling(true);
-                }
-            }
-
-            this.getValidVideoUrl().then(url => {
-                this._finalVideoUrl = url;
-                this.setPrepareCalled(true);
-                this._nativeBridge.VideoPlayer.prepare(url, new Double(this._placement.muteVideo() ? 0.0 : 1.0), 10000);
-            });
-        }
-    }
-
-    protected onSystemKill() {
-        if(this.isShowing()) {
-            this.setFinishState(FinishState.SKIPPED);
-            this.hide();
-        }
-    }
-
-    protected onSystemInterrupt(interruptStarted: boolean): void {
-        if(this.isShowing() && this.isActive()) {
-            if(interruptStarted) {
-                this._nativeBridge.Sdk.logDebug('Pausing Unity Ads video playback due to interrupt');
-                this._nativeBridge.VideoPlayer.pause();
-            } else if (!interruptStarted && this.isVideoReady() && !this.getContainer().isPaused()) {
-                this._nativeBridge.Sdk.logDebug('Continuing Unity Ads video playback after interrupt');
-                this._nativeBridge.VideoPlayer.play();
-            }
-        }
-    }
-
-    protected onLowMemoryWarning(): void {
-        if(this.isShowing()) {
-            this._lowMemory = true;
-        }
-    }*/
 
     protected hideChildren() {
         const overlay = this.getOverlay();
@@ -254,6 +217,14 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         if(overlay) {
             overlay.container().parentElement!.removeChild(overlay.container());
         }
+    }
+
+    private prepareVideo() {
+        this.setPrepareCalled(true);
+        this.getValidVideoUrl().then(url => {
+            this._finalVideoUrl = url;
+            this._nativeBridge.VideoPlayer.prepare(url, new Double(this._placement.muteVideo() ? 0.0 : 1.0), 10000);
+        });
     }
 
     // todo: this is first attempt to get rid of around 1% of failed starts
