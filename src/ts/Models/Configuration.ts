@@ -23,6 +23,8 @@ interface IConfiguration {
     projectId: string;
     token: string;
     jaegerTracing: boolean;
+    optOutRecorded?: boolean; // todo: mandatory field
+    optOutEnabled?: boolean; // todo: mandatory field
 }
 
 export class Configuration extends Model<IConfiguration> {
@@ -41,7 +43,9 @@ export class Configuration extends Model<IConfiguration> {
             test: ['boolean'],
             projectId: ['string'],
             token: ['string'],
-            jaegerTracing: ['boolean']
+            jaegerTracing: ['boolean'],
+            optOutRecorded: ['boolean', 'undefined'], // todo: mandatory field
+            optOutEnabled: ['boolean', 'undefined'] // todo: mandatory field
         });
 
         this.set('enabled', configJson.enabled);
@@ -55,6 +59,9 @@ export class Configuration extends Model<IConfiguration> {
 
         this.set('analytics', configJson.analytics ? true : false);
         this.set('jaegerTracing', configJson.jaegerTracing ? true : false);
+
+        this.set('optOutRecorded', configJson.optOutRecorded);
+        this.set('optOutEnabled', configJson.optOutEnabled);
 
         this.set('test', configJson.test ? true : false);
 
@@ -173,6 +180,14 @@ export class Configuration extends Model<IConfiguration> {
 
     public getUnityProjectId(): string {
         return this.get('projectId');
+    }
+
+    public isOptOutRecorded(): boolean | undefined { // todo
+        return this.get('optOutRecorded');
+    }
+
+    public isOptOutEnabled(): boolean | undefined { // todo
+        return this.get('optOutEnabled');
     }
 
     public getDTO(): { [key: string]: any } {
