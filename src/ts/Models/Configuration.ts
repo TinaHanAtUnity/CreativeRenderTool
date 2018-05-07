@@ -23,8 +23,9 @@ interface IConfiguration {
     projectId: string;
     token: string;
     jaegerTracing: boolean;
-    optOutRecorded?: boolean; // todo: mandatory field
-    optOutEnabled?: boolean; // todo: mandatory field
+    gdpr: boolean;
+    optOutRecorded?: boolean; // todo: mandatory field?
+    optOutEnabled?: boolean; // todo: mandatory field?
 }
 
 export class Configuration extends Model<IConfiguration> {
@@ -44,8 +45,9 @@ export class Configuration extends Model<IConfiguration> {
             projectId: ['string'],
             token: ['string'],
             jaegerTracing: ['boolean'],
-            optOutRecorded: ['boolean', 'undefined'], // todo: mandatory field
-            optOutEnabled: ['boolean', 'undefined'] // todo: mandatory field
+            gdpr: ['boolean'],
+            optOutRecorded: ['boolean', 'undefined'], // todo: mandatory field?
+            optOutEnabled: ['boolean', 'undefined'] // todo: mandatory field?
         });
 
         this.set('enabled', configJson.enabled);
@@ -60,6 +62,7 @@ export class Configuration extends Model<IConfiguration> {
         this.set('analytics', configJson.analytics ? true : false);
         this.set('jaegerTracing', configJson.jaegerTracing ? true : false);
 
+        this.set('gdpr', configJson.gdpr);
         this.set('optOutRecorded', configJson.optOutRecorded);
         this.set('optOutEnabled', configJson.optOutEnabled);
 
@@ -180,6 +183,10 @@ export class Configuration extends Model<IConfiguration> {
 
     public getUnityProjectId(): string {
         return this.get('projectId');
+    }
+
+    public isGDPR(): boolean {
+        return this.get('gdpr');
     }
 
     public isOptOutRecorded(): boolean | undefined { // todo
