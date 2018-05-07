@@ -22,6 +22,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private _closeElement: HTMLElement;
     private _loadingScreen: HTMLElement;
+    private _loadingScreenAR: HTMLElement;
     private _iframe: HTMLIFrameElement;
     private _iframeLoaded = false;
 
@@ -51,6 +52,8 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _arErrorObserver: IObserver1<number>;
     private _arSessionInterruptedObserver: IObserver0;
     private _arSessionInterruptionEndedObserver: IObserver0;
+
+    private _isMRAIDAR: boolean = false;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string, coppaCompliant: boolean) {
         super(nativeBridge, 'playable-mraid', placement, campaign, coppaCompliant);
@@ -99,6 +102,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
         this._loadingScreen = <HTMLElement>this._container.querySelector('.loading-screen');
+        this._loadingScreenAR = <HTMLElement>this._container.querySelector('.loading-screen-ar');
 
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
 
@@ -119,18 +123,19 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         // TODO: Remove /ar/ folder check once we have MRAID-AR type support on the server side
         const resourceUrl = this._campaign.getResourceUrl();
-        const isARURL = resourceUrl && resourceUrl.getOriginalUrl().match(/\/ar\//);
-        const isMRAIDAR = this._campaign.getAdType() === 'MRAID-AR' || isARURL;
-        if (isMRAIDAR) {
+        const isARURL = Boolean(resourceUrl && resourceUrl.getOriginalUrl().match(/\/ar\//));
+        this._isMRAIDAR = this._campaign.getAdType() === 'MRAID-AR' || isARURL;
+        if (this._isMRAIDAR) {
             container = container.replace('<script id=\"webar\"></script>', WebARScript);
             iframe.classList.add('fullscreen');
+            this._loadingScreenAR.style.display = 'block';
         }
         this.createMRAID(container).then(mraid => {
             iframe.onload = () => this.onIframeLoaded();
             SdkStats.setFrameSetStartTimestamp(this._placement.getId());
             this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' set iframe.src started ' + SdkStats.getFrameSetStartTimestamp(this._placement.getId()));
             iframe.srcdoc = mraid;
-            if (isMRAIDAR) {
+            if (this._isMRAIDAR) {
                 this._arFrameUpdatedObserver = this._nativeBridge.AR.onFrameUpdated.subscribe(parameters => this.handleAREvent('frameupdate', parameters));
                 this._arPlanesAddedObserver = this._nativeBridge.AR.onPlanesAdded.subscribe(parameters => this.handleAREvent('planesadded', parameters));
                 this._arPlanesUpdatedObserver = this._nativeBridge.AR.onPlanesUpdated.subscribe(parameters => this.handleAREvent('planesupdated', parameters));
@@ -154,7 +159,11 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     public show(): void {
         super.show();
         this._showTimestamp = Date.now();
-        this.showLoadingScreen();
+        if (this._isMRAIDAR) {
+            this.showLoadingScreenAR();
+        } else {
+            this.showLoadingScreen();
+        }
     }
 
     public hide() {
@@ -255,6 +264,17 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         }, 2500);
     }
 
+    private showLoadingScreenAR() {
+        this._loadingScreenAR.style.display = 'block';
+        if (this._iframeLoaded) {
+            this.showMRAIDAd();
+        }
+
+        this._closeElement.style.opacity = '1';
+        this._closeElement.style.display = 'block';
+        this.updateProgressCircle(this._closeElement, 1);
+    }
+
     private showMRAIDAd() {
         if(this._placement.allowSkip()) {
             const skipLength = this._placement.allowSkipInSeconds();
@@ -321,6 +341,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         });
 
         this._loadingScreen.classList.add('hidden');
+        this._loadingScreenAR.classList.add('hidden');
     }
 
     private updateProgressCircle(container: HTMLElement, value: number) {
