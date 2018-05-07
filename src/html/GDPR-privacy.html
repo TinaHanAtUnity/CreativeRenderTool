@@ -68,8 +68,14 @@
             settings.
         </p>
     </div>
+    <div class="pop-up-content back-side">
+        <% for (var k in data.buildInformation) { %>
+        <span class="build-information-key"><%= k %>:</span> <span class="build-information-value"> <%= (data.buildInformation[k] === null || typeof data.buildInformation[k] === "undefined") ? "N/A" : data.buildInformation[k] %></span>;
+        <% } %>
+    </div>
+    <div class="fade-out-gradient-separator"></div>
     <div class="pop-up-footer">
-        <div class="left-side-link">Build info</div>
+        <div class="left-side-link"></div>
         <div class="close-button">Close</div>
     </div>
 </div>

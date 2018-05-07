@@ -153,8 +153,11 @@ $iframe-close-region-default($with-styles = true) {
   }
 }
 
-$radio-group-container($scale-size = $default-scale-size, $with-styles = false) {
+$radio-group-container($scale-size = $default-scale-size, $context-font-size = 1rem) {
   $radio-group-default-size = $scale-size * $default-size;
+
+  padding: $radio-group-default-size * .5;
+  font-size: $context-font-size;
 
   [type="radio"]:checked,
   [type="radio"]:not(:checked) {
@@ -168,7 +171,7 @@ $radio-group-container($scale-size = $default-scale-size, $with-styles = false) 
     position: relative;
     padding-left: $radio-group-default-size * 1.5;
     cursor: pointer;
-    line-height: $radio-group-default-size * .7;
+    line-height: $context-font-size * 1.5;
     display: inline-block;
   }
 
@@ -201,12 +204,13 @@ $radio-group-container($scale-size = $default-scale-size, $with-styles = false) 
 
 $full-screen-pop-up-view($scale-size, z-index = auto, $with-styles = true) {
   $pop-up-size = $scale-size * $default-size;
-  $pop-up-font-size = $scale-size * $default-font-size * .5;
+  $pop-up-font-size = $scale-size * $default-font-size * .65;
 
   position: absolute;
   top: 0;
   left: 0;
   z-index: 1000;
+  overflow: hidden;
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, .5);
@@ -227,27 +231,21 @@ $full-screen-pop-up-view($scale-size, z-index = auto, $with-styles = true) {
     border-radius: $pop-up-size * .25;
     background: $end-screen-background-color;
 
+    $fade-out-gradient-height = $pop-up-size * 3;
+
+    .fade-out-gradient-separator {
+      position: absolute;
+      bottom: 10%;
+      left: 0;
+      width: 100%;
+      height: $fade-out-gradient-height;
+      background: linear-gradient(to top, $end-screen-background-color 0, $end-screen-background-color 50%, rgba(250, 250, 250, 0) 100%);
+    }
+
     .pop-up-content {
       overflow: auto;
-      padding-right: $pop-up-size * 1.5;
+      padding-right: $pop-up-size * .5;
       height: $pop-up-content-height;
-
-      ::-webkit-scrollbar {
-        width: 40px;
-        background-color: $gray;
-      }
-
-      ::-webkit-scrollbar-button:vertical:increment {
-        height: 40px;
-        background-size: 39px 30px;
-        background-repeat: no-repeat;
-      }
-
-      ::-webkit-scrollbar-button:vertical:decrement {
-        height: 40px;
-        background-size: 39px 30px;
-        background-repeat: no-repeat;
-      }
 
       .header,
       .highlight {
@@ -257,26 +255,30 @@ $full-screen-pop-up-view($scale-size, z-index = auto, $with-styles = true) {
       .title {
         margin-bottom: $pop-up-size;
         font-weight: 500;
-        font-size: $pop-up-font-size * 1.5;
+        font-size: $pop-up-font-size * 1.25;
       }
 
       .header {
         display: block;
         margin: $pop-up-size 0 $pop-up-size * .5 0;
-        font-size: $pop-up-font-size * 1.25;
+        font-size: $pop-up-font-size * 1.15;
       }
 
       p {
-        line-height: $pop-up-size * .7;
+        line-height: $pop-up-font-size * 1.5;
+
+        &:last-of-type {
+          min-height: $fade-out-gradient-height * 2;
+        }
       }
 
       .radio-group-container {
-        $radio-group-container($scale-size);
+        $radio-group-container($scale-size, $pop-up-font-size);
 
         .radio-item-container {
           margin: 0 auto;
           padding: $pop-up-size * .25;
-          width: 70%;
+          width: 85%;
         }
       }
     }

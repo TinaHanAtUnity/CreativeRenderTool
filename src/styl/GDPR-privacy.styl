@@ -3,17 +3,25 @@
 
 #gdpr-privacy {
   $full-screen-pop-up-view($default-scale-size, 1000);
-}
 
-body.portrait {
-  #privacy .build-information-container {
-    max-height: 20rem;
+  .back-side {
+    display: none;
+    font-size: $default-size * $default-font-size * .75;
   }
-}
 
-body.landscape {
-  #privacy .build-information-container {
-    max-height: 11rem;
+  &.flip {
+    .back-side {
+      display: block;
+      word-wrap: break-word;
+
+      .build-information-key {
+        font-weight: 800;
+      }
+    }
+
+    .pop-up-content:not(.back-side) {
+      display: none;
+    }
   }
 }
 

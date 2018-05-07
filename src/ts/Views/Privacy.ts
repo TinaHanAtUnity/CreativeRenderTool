@@ -10,6 +10,7 @@ import { Platform } from 'Constants/Platform';
 
 export interface IPrivacyHandler {
     onPrivacy(url: string): void;
+
     onPrivacyClose(): void;
 }
 
@@ -77,14 +78,14 @@ export class Privacy extends View<IPrivacyHandler> {
         ];
     }
 
+    protected onOkEvent(event: Event): void {
+        event.preventDefault();
+        this._handlers.forEach(handler => handler.onPrivacyClose());
+    }
+
     private onPrivacyEvent(event: Event): void {
         event.preventDefault();
         this._handlers.forEach(handler => handler.onPrivacy((<HTMLLinkElement>event.target).href));
-    }
-
-    private onOkEvent(event: Event): void {
-        event.preventDefault();
-        this._handlers.forEach(handler => handler.onPrivacyClose());
     }
 
     private onBuildInformationEvent(event: Event): void {
