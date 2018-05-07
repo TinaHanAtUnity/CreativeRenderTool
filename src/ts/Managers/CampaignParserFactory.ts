@@ -22,7 +22,9 @@ export class CampaignParserFactory {
                 return new ProgrammaticMraidUrlParser();
             case ProgrammaticMraidParser.ContentType:
                 return new ProgrammaticMraidParser();
-            case ProgrammaticStaticInterstitialParser.ContentType:
+            case ProgrammaticStaticInterstitialParser.ContentTypeHtml:
+                return new ProgrammaticStaticInterstitialParser();
+            case ProgrammaticStaticInterstitialParser.ContentTypeJs:
                 return new ProgrammaticStaticInterstitialParser();
             case ProgrammaticAdMobParser.ContentType:
                 return new ProgrammaticAdMobParser();
