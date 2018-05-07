@@ -10,12 +10,12 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
     public static ContentTypeHtml = 'programmatic/static-interstitial-html';
     public static ContentTypeJs = 'programmatic/static-interstitial-js';
     private _wrapWithScriptTag: boolean;
-    
+
     constructor(wrapWithScriptTag: boolean) {
         super();
         this._wrapWithScriptTag = wrapWithScriptTag;
     }
-    
+
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
         let dynamicMarkup = decodeURIComponent(response.getContent());
         if (this._wrapWithScriptTag) {
