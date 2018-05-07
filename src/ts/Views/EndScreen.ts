@@ -24,8 +24,8 @@ export interface IEndScreenHandler {
 
 export interface IGDPRParams {
     gdpr: boolean;
-    optOutRecorded: boolean;
-    optOutEnabled: boolean;
+    optOutRecorded?: boolean;
+    optOutEnabled?: boolean;
 }
 
 const GDPR_OPT_OUT_BASE  = 'gdpr-pop-up-base';
@@ -189,7 +189,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         event.preventDefault();
 
         if (this._gdprParamas.gdpr) {
-            this._privacy = new GDPRPrivacy(this._nativeBridge, this._coppaCompliant, this._gdprParamas.optOutEnabled);
+            this._privacy = new GDPRPrivacy(this._nativeBridge, this._coppaCompliant, this._gdprParamas.optOutEnabled ? this._gdprParamas.optOutEnabled : false);
         } else {
             this._privacy = new Privacy(this._nativeBridge, this._coppaCompliant);
         }
@@ -204,7 +204,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
         this._gdprPopupClicked = true;
 
-        this._privacy = new GDPRPrivacy(this._nativeBridge, this._coppaCompliant, this._gdprParamas.optOutEnabled);
+        this._privacy = new GDPRPrivacy(this._nativeBridge, this._coppaCompliant, this._gdprParamas.optOutEnabled ? this._gdprParamas.optOutEnabled : false);
 
         this._privacy.render();
         document.body.appendChild(this._privacy.container());

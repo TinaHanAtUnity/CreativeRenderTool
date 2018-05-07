@@ -85,7 +85,12 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             sinon.spy(nativeBridge.Intent, 'launch');
 
             const video = new Video('', TestFixtures.getSession());
-            endScreen = new XPromoEndScreen(nativeBridge, TestFixtures.getXPromoCampaign(), configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
+            const gdprParams = {
+                gdpr: false,
+                optOutRecorded: false,
+                optOutEnabled: false,
+            };
+            endScreen = new XPromoEndScreen(nativeBridge, TestFixtures.getXPromoCampaign(), configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId(), gdprParams);
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
             placement = TestFixtures.getPlacement();
 
@@ -166,7 +171,12 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             sinon.stub(deviceInfo, 'getOsVersion').returns('9.0');
             const video = new Video('', TestFixtures.getSession());
 
-            endScreen = new XPromoEndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
+            const gdprParams = {
+                gdpr: false,
+                optOutRecorded: false,
+                optOutEnabled: false,
+            };
+            endScreen = new XPromoEndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId(), gdprParams);
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
 
             xPromoAdUnitParameters = {

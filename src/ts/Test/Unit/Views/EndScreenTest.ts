@@ -13,6 +13,11 @@ describe('EndScreen', () => {
     let handleInvocation: sinon.SinonSpy;
     let handleCallback: sinon.SinonSpy;
     let nativeBridge: NativeBridge;
+    const gdprParams = {
+        gdpr: false,
+        optOutRecorded: false,
+        optOutEnabled: false,
+    };
 
     beforeEach(() => {
         handleInvocation = sinon.spy();
@@ -27,13 +32,13 @@ describe('EndScreen', () => {
     });
 
     xit('should render', () => {
-        const endScreen = new PerformanceEndScreen(nativeBridge, TestFixtures.getCampaign(), true, 'en', 'testGameId');
+        const endScreen = new PerformanceEndScreen(nativeBridge, TestFixtures.getCampaign(), true, 'en', 'testGameId', gdprParams);
         endScreen.render();
         assert.equal(endScreen.container().innerHTML, EndScreenFixture);
     });
 
     it('should render with translations', () => {
-        const endScreen = new PerformanceEndScreen(nativeBridge, TestFixtures.getCampaign(), true, 'fi', 'testGameId');
+        const endScreen = new PerformanceEndScreen(nativeBridge, TestFixtures.getCampaign(), true, 'fi', 'testGameId', gdprParams);
         endScreen.render();
         const downloadElement = endScreen.container().querySelectorAll('.download-text')[0];
         assert.equal(downloadElement.innerHTML, 'Lataa ilmaiseksi');

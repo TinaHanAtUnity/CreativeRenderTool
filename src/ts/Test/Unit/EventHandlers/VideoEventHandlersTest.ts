@@ -111,7 +111,12 @@ describe('VideoEventHandlersTest', () => {
 
         placement = TestFixtures.getPlacement();
         overlay = new Overlay(nativeBridge, false, 'en', configuration.getGamerId(), configuration.getAbGroup());
-        endScreen = new PerformanceEndScreen(nativeBridge, performanceCampaign, true, 'en', '12345');
+        const gdprParams = {
+            gdpr: false,
+            optOutRecorded: false,
+            optOutEnabled: false,
+        };
+        endScreen = new PerformanceEndScreen(nativeBridge, performanceCampaign, true, 'en', '12345', gdprParams);
 
         vastAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,
@@ -152,7 +157,7 @@ describe('VideoEventHandlersTest', () => {
         };
 
         xPromoCampaign = TestFixtures.getXPromoCampaign();
-        xPromoEndScreen = new XPromoEndScreen(nativeBridge, xPromoCampaign, true, 'en', '12345');
+        xPromoEndScreen = new XPromoEndScreen(nativeBridge, xPromoCampaign, true, 'en', '12345', gdprParams);
         xPromoAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
