@@ -18,7 +18,7 @@ export class ProgrammaticAdMobParser extends CampaignParser {
         const markup = response.getContent();
         const cacheTTL = response.getCacheTTL();
         const platform = nativeBridge.getPlatform();
-        const videoPromise = this.getVideoFromMarkup(markup, request, session, platform).catch((e) => {
+        const videoPromise = this.getVideoFromMarkup(markup, request, session, platform, abGroup).catch((e) => {
             nativeBridge.Sdk.logError(`Unable to parse video from markup due to: ${e.message}`);
             return null;
         });
@@ -54,7 +54,10 @@ export class ProgrammaticAdMobParser extends CampaignParser {
 
     }
 
-    private getVideoFromMarkup(markup: string, request: Request, session: Session, platform: Platform): Promise<AdMobVideo> {
+    private getVideoFromMarkup(markup: string, request: Request, session: Session, platform: Platform, abGroup: number): Promise<AdMobVideo> {
+        if (!(abGroup === 14 || abGroup === 15) && platform === Platform.IOS) {
+            return Promise.reject(new Error('iOS precaching to file not supported for HTML5 video player'));
+        }
         try {
             const dom = new DOMParser().parseFromString(markup, 'text/html');
             if (!dom) {
