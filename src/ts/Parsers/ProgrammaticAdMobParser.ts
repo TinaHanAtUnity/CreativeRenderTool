@@ -66,10 +66,30 @@ export class ProgrammaticAdMobParser extends CampaignParser {
             }
             const scriptSrc = scriptTag.textContent;
             const mediaFileURL = this.getVideoFromScriptSource(scriptSrc!);
+
             return this.getRealVideoURL(mediaFileURL, request).then((realVideoURL: string) => {
-                return new AdMobVideo({
-                    mediaFileURL: mediaFileURL,
-                    video: new Video(realVideoURL, session)
+                return new Promise<AdMobVideo>((resolve, reject) => {
+                    const mimeType = Url.getQueryParameter(realVideoURL, 'mime');
+                    let extension: string | null = null;
+                    if (mimeType) {
+                        extension = mimeType.split('/')[1];
+                    }
+                    if (platform === Platform.ANDROID) {
+                        resolve(new AdMobVideo({
+                            mediaFileURL: mediaFileURL,
+                            video: new Video(realVideoURL, session),
+                            extension: null
+                        }));
+                    } else if (extension && platform === Platform.IOS) {
+                        resolve(new AdMobVideo({
+                            mediaFileURL: mediaFileURL,
+                            video: new Video(realVideoURL, session),
+                            extension: extension
+                        }));
+                    } else {
+                        // do not cache as we are on iOS and do not have a mime type so we should play streamed video
+                        reject(new Error('iOS precaching to file not supported for HTML5 video player'));
+                    }
                 });
             });
         } catch (e) {
@@ -110,13 +130,9 @@ export class ProgrammaticAdMobParser extends CampaignParser {
     private updateFileID(video: AdMobVideo) {
         const videoID = this.getVideoID(video.getMediaFileURL());
         const url = video.getVideo().getOriginalUrl();
-        const mimeType = Url.getQueryParameter(url, 'mime');
-        let extension: string | null = null;
-        if (mimeType) {
-            extension = mimeType.split('/')[1];
-        }
+        const extension = video.getExtension();
         if (videoID && url) {
-            if (extension) {
+            if (extension) { // should only be enabled for iOS
                 FileId.setFileID(url, videoID + '.' + extension);
             } else {
                 FileId.setFileID(url, videoID);
