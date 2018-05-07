@@ -218,7 +218,15 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private handleDeviceOrientation(event: DeviceOrientationEvent) {
         if (this._iframeLoaded) {
-            this._iframe.contentWindow!.postMessage({type: 'deviceorientation', event: event}, '*');
+            this._iframe.contentWindow!.postMessage({
+                type: 'deviceorientation',
+                event: {
+                    alpha: event.alpha,
+                    beta: event.beta,
+                    gamma: event.gamma,
+                    absolute: event.absolute,
+                },
+            }, '*');
         }
     }
 
