@@ -10,6 +10,7 @@ import { Platform } from 'Constants/Platform';
 
 export interface IPrivacyHandler {
     onPrivacy(url: string): void;
+
     onPrivacyClose(): void;
 }
 
@@ -44,10 +45,14 @@ export class Privacy extends View<IPrivacyHandler> {
 
     private static buildInformation: IBuildInformation;
 
-    constructor(nativeBridge: NativeBridge, isCoppaCompliant: boolean) {
-        super(nativeBridge, 'privacy');
+    constructor(nativeBridge: NativeBridge, isCoppaCompliant: boolean, altTemplate?: string, altId?: string) {
+        super(nativeBridge, altId || 'privacy');
 
-        this._template = new Template(PrivacyTemplate);
+        if (typeof altTemplate === 'string') {
+            this._template = new Template(altTemplate);
+        } else {
+            this._template = new Template(PrivacyTemplate);
+        }
 
         this._templateData = {
             'isCoppaCompliant': isCoppaCompliant,
@@ -73,14 +78,14 @@ export class Privacy extends View<IPrivacyHandler> {
         ];
     }
 
+    protected onOkEvent(event: Event): void {
+        event.preventDefault();
+        this._handlers.forEach(handler => handler.onPrivacyClose());
+    }
+
     private onPrivacyEvent(event: Event): void {
         event.preventDefault();
         this._handlers.forEach(handler => handler.onPrivacy((<HTMLLinkElement>event.target).href));
-    }
-
-    private onOkEvent(event: Event): void {
-        event.preventDefault();
-        this._handlers.forEach(handler => handler.onPrivacyClose());
     }
 
     private onBuildInformationEvent(event: Event): void {
