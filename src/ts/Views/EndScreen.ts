@@ -12,7 +12,6 @@ import { Campaign } from 'Models/Campaign';
 import { IEndScreenDownloadParameters } from 'EventHandlers/EndScreenEventHandler';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
-import { Platform } from 'Constants/Platform';
 import { SquareEndScreenUtilities } from 'Utilities/SquareEndScreenUtilities';
 
 export interface IEndScreenHandler {
@@ -21,6 +20,12 @@ export interface IEndScreenHandler {
     onEndScreenClose(): void;
     onKeyEvent(keyCode: number): void;
     onOptOutPopupShown(clicked: boolean): void;
+}
+
+export interface IGDPRParams {
+    gdpr: boolean;
+    optOutRecorded: boolean;
+    optOutEnabled: boolean;
 }
 
 const GDPR_OPT_OUT_BASE  = 'gdpr-pop-up-base';
@@ -40,9 +45,11 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     private _gdprPopupClicked = false;
     private _campaignId: string | undefined;
     private _osVersion: string | undefined;
+    private _gdprParamas: IGDPRParams;
 
-    constructor(nativeBridge: NativeBridge, coppaCompliant: boolean, language: string, gameId: string, gameName: string | undefined, abGroup: number, adUnitStyle?: AdUnitStyle, showOptOutPopup: boolean = false, campaignId?: string, osVersion?: string) {
+    constructor(nativeBridge: NativeBridge, gdprParams: IGDPRParams, coppaCompliant: boolean, language: string, gameId: string, gameName: string | undefined, abGroup: number, adUnitStyle?: AdUnitStyle, showOptOutPopup: boolean = false, campaignId?: string, osVersion?: string) {
         super(nativeBridge, 'end-screen');
+        this._gdprParamas = gdprParams;
         this._coppaCompliant = coppaCompliant;
         this._localization = new Localization(language, 'endscreen');
         this._abGroup = abGroup;
@@ -180,9 +187,12 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
     private onPrivacyEvent(event: Event): void {
         event.preventDefault();
-        // this._privacy = new Privacy(this._nativeBridge, this._coppaCompliant);
 
-        this._privacy = new GDPRPrivacy(this._nativeBridge, this._coppaCompliant);
+        if (this._gdprParamas.gdpr) {
+            this._privacy = new GDPRPrivacy(this._nativeBridge, this._coppaCompliant, this._gdprParamas.optOutEnabled);
+        } else {
+            this._privacy = new Privacy(this._nativeBridge, this._coppaCompliant);
+        }
 
         this._privacy.render();
         document.body.appendChild(this._privacy.container());
@@ -194,11 +204,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
         this._gdprPopupClicked = true;
 
-        // this._privacy = new Privacy(this._nativeBridge, this._coppaCompliant);
-
-        // this._privacy = new GDPRPrivacy(this._nativeBridge, this._coppaCompliant);
-
-        this._privacy = new GDPRPrivacy(this._nativeBridge, this._coppaCompliant);
+        this._privacy = new GDPRPrivacy(this._nativeBridge, this._coppaCompliant, this._gdprParamas.optOutEnabled);
 
         this._privacy.render();
         document.body.appendChild(this._privacy.container());

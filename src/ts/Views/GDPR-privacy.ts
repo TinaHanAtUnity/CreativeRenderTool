@@ -4,8 +4,13 @@ import { NativeBridge } from 'Native/NativeBridge';
 import Template from 'html/GDPR-privacy.html';
 
 export class GDPRPrivacy extends Privacy {
-    constructor(nativeBridge: NativeBridge, isCoppaCompliant: boolean) {
+
+    private _optOutEnabled: boolean;
+
+    constructor(nativeBridge: NativeBridge, isCoppaCompliant: boolean, optOutEnabled: boolean) {
         super(nativeBridge, isCoppaCompliant, Template, 'gdpr-privacy');
+
+        this._optOutEnabled = optOutEnabled;
 
         this._bindings.push({
                 event: 'click',
@@ -14,16 +19,15 @@ export class GDPRPrivacy extends Privacy {
             },
             {
                 event: 'click',
-                listener: (event: Event) => this.onOkEvent(event),
+                listener: (event: Event) => this.onCloseEvent(event),
                 selector: '.close-button'
             });
     }
 
     public render(): void {
         super.render();
-        // TODO: Get this data from backend
-        const isGDPRAgree = true;
-        const elId = isGDPRAgree ? 'gdpr-agree-radio' : 'gdpr-refuse-radio';
+
+        const elId = this._optOutEnabled ? 'gdpr-refuse-radio' : 'gdpr-agree-radio';
 
         const activeRadioButton = <HTMLInputElement>this._container.querySelector(`#${elId}`);
         activeRadioButton.checked = true;
@@ -46,5 +50,11 @@ export class GDPRPrivacy extends Privacy {
             linkEL.innerText = 'Build info';
             this._container.classList.remove('flip');
         }
+    }
+
+    private onCloseEvent(event: Event) {
+        event.preventDefault();
+        const gdprRefuceRadioButton = <HTMLInputElement>this._container.querySelector('#gdpr-refuse-radio');
+        this._handlers.forEach(handler => handler.onPrivacyClose(gdprRefuceRadioButton.checked));
     }
 }

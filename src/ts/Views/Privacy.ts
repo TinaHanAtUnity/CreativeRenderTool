@@ -10,8 +10,7 @@ import { Platform } from 'Constants/Platform';
 
 export interface IPrivacyHandler {
     onPrivacy(url: string): void;
-
-    onPrivacyClose(): void;
+    onPrivacyClose(optOutEnabled: boolean | undefined): void;
 }
 
 export interface IBuildInformation {
@@ -78,9 +77,9 @@ export class Privacy extends View<IPrivacyHandler> {
         ];
     }
 
-    protected onOkEvent(event: Event): void {
+    private onOkEvent(event: Event): void {
         event.preventDefault();
-        this._handlers.forEach(handler => handler.onPrivacyClose());
+        this._handlers.forEach(handler => handler.onPrivacyClose(undefined));
     }
 
     private onPrivacyEvent(event: Event): void {
