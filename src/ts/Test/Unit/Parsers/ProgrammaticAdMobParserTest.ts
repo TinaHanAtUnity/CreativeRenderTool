@@ -48,6 +48,7 @@ describe('ProgrammaticAdMobParser', () => {
 
             parser = new ProgrammaticAdMobParser();
             setFileIdSpy = sinon.spy(FileId, 'setFileID');
+            (<sinon.SinonStub>request.followRedirectChain).returns(Promise.resolve(url));
         });
 
         afterEach(() => {
@@ -58,7 +59,6 @@ describe('ProgrammaticAdMobParser', () => {
 
             beforeEach(() => {
                 (<sinon.SinonStub>nativeBridge.getPlatform).returns(Platform.ANDROID);
-                setFileIdSpy.resetHistory();
             });
 
             describe('without a mime type in url', () => {
@@ -69,8 +69,7 @@ describe('ProgrammaticAdMobParser', () => {
                 });
 
                 it('should FileId.setFileId without a mp4 mime type', () => {
-                    assert.equal(setFileIdSpy.firstCall.args[0], urlNoMime);
-                    assert.equal(setFileIdSpy.firstCall.args[1], 'G2KkvNWTNuU'); // videoID
+                    sinon.assert.calledWith(setFileIdSpy, urlNoMime, 'G2KkvNWTNuU');
                 });
             });
 
@@ -81,8 +80,7 @@ describe('ProgrammaticAdMobParser', () => {
                 });
 
                 it('should FileId.setFileId without a mp4 mime type', () => {
-                    assert.equal(setFileIdSpy.firstCall.args[0], url);
-                    assert.equal(setFileIdSpy.firstCall.args[1], 'G2KkvNWTNuU'); // videoID
+                    sinon.assert.calledWith(setFileIdSpy, url, 'G2KkvNWTNuU');
                 });
             });
 
@@ -92,7 +90,6 @@ describe('ProgrammaticAdMobParser', () => {
 
             beforeEach(() => {
                 (<sinon.SinonStub>nativeBridge.getPlatform).returns(Platform.IOS);
-                setFileIdSpy.resetHistory();
             });
 
             describe('without a mime type in url', () => {
@@ -115,17 +112,12 @@ describe('ProgrammaticAdMobParser', () => {
                 });
 
                 it('should FileId.setFileId with a mp4 mime type', () => {
-                    assert.equal(setFileIdSpy.firstCall.args[0], url);
-                    assert.equal(setFileIdSpy.firstCall.args[1], 'G2KkvNWTNuU.mp4'); // videoID
+                    sinon.assert.calledWith(setFileIdSpy, url, 'G2KkvNWTNuU.mp4');
                 });
             });
         });
 
         describe('with a proper JSON payload', () => {
-
-            beforeEach(() => {
-                (<sinon.SinonStub>request.followRedirectChain).returns(Promise.resolve(url));
-            });
 
             const validateCampaign = () => {
                 const json = JSON.parse(ValidAdMobCampaign);
