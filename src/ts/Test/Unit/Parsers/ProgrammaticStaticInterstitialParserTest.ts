@@ -41,7 +41,7 @@ describe('ProgrammaticVPAIDParser', () => {
         request = sinon.createStubInstance(Request);
         session = TestFixtures.getSession();
 
-        parser = new ProgrammaticStaticInterstitialParser();
+        parser = new ProgrammaticStaticInterstitialParser(false);
     });
 
     describe('parsing a campaign', () => {
