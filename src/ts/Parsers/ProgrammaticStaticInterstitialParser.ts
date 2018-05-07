@@ -9,8 +9,18 @@ import { Session } from 'Models/Session';
 export class ProgrammaticStaticInterstitialParser extends CampaignParser {
     public static ContentTypeHtml = 'programmatic/static-interstitial-html';
     public static ContentTypeJs = 'programmatic/static-interstitial-js';
+    private _wrapWithScriptTag: boolean;
+    
+    constructor(wrapWithScriptTag: boolean) {
+        super();
+        this._wrapWithScriptTag = wrapWithScriptTag;
+    }
+    
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
-        const dynamicMarkup = decodeURIComponent(response.getContent());
+        let dynamicMarkup = decodeURIComponent(response.getContent());
+        if (this._wrapWithScriptTag) {
+            dynamicMarkup = '<script>' + dynamicMarkup + '</script>';
+        }
         const cacheTTL = response.getCacheTTL();
 
         const baseCampaignParams: ICampaign = {
@@ -33,8 +43,7 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
             trackingUrls: response.getTrackingUrls(),
             useWebViewUserAgentForTracking: false,
             width: response.getWidth() || undefined,
-            height: response.getHeight() || undefined,
-            contentType: response.getContentType() || undefined
+            height: response.getHeight() || undefined
         };
 
         return Promise.resolve(new DisplayInterstitialCampaign(displayInterstitialParams));
