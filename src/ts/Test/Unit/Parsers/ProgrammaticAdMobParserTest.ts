@@ -11,30 +11,22 @@ import ValidAdMobCampaign from 'json/campaigns/admob/ValidAdMobCampaign.json';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
+import { FileId } from 'Utilities/FileId';
 
 describe('ProgrammaticAdMobParser', () => {
     const placements = ['TestPlacement'];
     const gamerId = 'TestGamerId';
     const mediaId = 'o2YMT0Cmps6xHiOwNMeCrH';
     const correlationId = '583dfda0d933a3630a53249c';
-    const abGroup = 0;
+    const url = 'https://r2---sn-n4v7knll.googlevideo.com/videoplayback?id=a6e915b5b0f41a1c&itag=22&source=youtube&requiressl=yes&mm=31&mn=sn-n4v7knll&ms=au&mv=m&pl=19&ei=eo3rWuGXD8-KuAL6oLvQAQ&susc=yti&mime=video/mp4&lmt=1518153041357987&mt=1525386488&ip=4.14.109.2&ipbits=0&expire=1525415418&sparams=ip,ipbits,expire,id,itag,source,requiressl,mm,mn,ms,mv,pl,ei,susc,mime,lmt&signature=4834094C1C09F34DE9D6473658D0B1EE75DB3E10.830B2F45714128B27549A3B15E8BE3CB8EFCBE19&key=ck2';
+    const urlNoMime = 'https://r2---sn-n4v7knll.googlevideo.com/videoplayback?id=a6e915b5b0f41a1c&itag=22&source=youtube&requiressl=yes&mm=31&mn=sn-n4v7knll&ms=au&mv=m&pl=19&ei=eo3rWuGXD8-KuAL6oLvQAQ&susc=yti&lmt=1518153041357987&mt=1525386488&ip=4.14.109.2&ipbits=0&expire=1525415418&sparams=ip,ipbits,expire,id,itag,source,requiressl,mm,mn,ms,mv,pl,ei,susc,mime,lmt&signature=4834094C1C09F34DE9D6473658D0B1EE75DB3E10.830B2F45714128B27549A3B15E8BE3CB8EFCBE19&key=ck2';
 
     let parser: ProgrammaticAdMobParser;
     let nativeBridge: NativeBridge;
     let request: Request;
     let session: Session;
-
-    beforeEach(() => {
-        nativeBridge = sinon.createStubInstance(NativeBridge);
-        (<any>nativeBridge.Sdk) = sinon.createStubInstance(SdkApi);
-
-        request = sinon.createStubInstance(Request);
-        (<sinon.SinonStub>request.followRedirectChain).returns(Promise.resolve('http://s3-us-west-1.amazonaws.com/ads-load-testing/AssetPack1/b30-400.mp4'));
-
-        session = TestFixtures.getSession();
-
-        parser = new ProgrammaticAdMobParser();
-    });
+    let setFileIdSpy: sinon.SinonSpy;
+    let abGroup = 0;
 
     describe('parsing a campaign', () => {
         let campaign: AdMobCampaign;
@@ -45,6 +37,186 @@ describe('ProgrammaticAdMobParser', () => {
                 campaign = <AdMobCampaign>parsedCampaign;
             });
         };
+
+        beforeEach(() => {
+            nativeBridge = sinon.createStubInstance(NativeBridge);
+            (<any>nativeBridge.Sdk) = sinon.createStubInstance(SdkApi);
+
+            request = sinon.createStubInstance(Request);
+
+            session = TestFixtures.getSession();
+
+            parser = new ProgrammaticAdMobParser();
+            setFileIdSpy = sinon.spy(FileId, 'setFileID');
+            (<sinon.SinonStub>request.followRedirectChain).returns(Promise.resolve(url));
+        });
+
+        afterEach(() => {
+            setFileIdSpy.restore();
+        });
+
+        describe('on Android', () => {
+
+            beforeEach(() => {
+                (<sinon.SinonStub>nativeBridge.getPlatform).returns(Platform.ANDROID);
+            });
+
+            describe('without a mime type in url', () => {
+
+                beforeEach(() => {
+                    (<sinon.SinonStub>request.followRedirectChain).returns(Promise.resolve(urlNoMime));
+                    return parse(JSON.parse(ValidAdMobCampaign));
+                });
+
+                it('should FileId.setFileId without a mp4 mime type', () => {
+                    sinon.assert.calledWith(setFileIdSpy, urlNoMime, 'G2KkvNWTNuU');
+                });
+            });
+
+            describe('with a mime type in url', () => {
+                beforeEach(() => {
+                    (<sinon.SinonStub>request.followRedirectChain).returns(Promise.resolve(url));
+                    return parse(JSON.parse(ValidAdMobCampaign));
+                });
+
+                it('should FileId.setFileId without a mp4 mime type', () => {
+                    sinon.assert.calledWith(setFileIdSpy, url, 'G2KkvNWTNuU');
+                });
+            });
+
+            describe('should cache', () => {
+
+                afterEach(() => {
+                    abGroup = 0;
+                    setFileIdSpy.resetHistory();
+                });
+
+                describe('with group 0', () => {
+                    beforeEach(() => {
+                        abGroup = 0;
+                        (<sinon.SinonStub>request.followRedirectChain).returns(Promise.resolve(url));
+                        return parse(JSON.parse(ValidAdMobCampaign));
+                    });
+
+                    it('should FileId.setFileId', () => {
+                        sinon.assert.calledOnce(setFileIdSpy);
+                        sinon.assert.calledWith(setFileIdSpy, url, 'G2KkvNWTNuU');
+                    });
+                });
+
+                describe('with group 14', () => {
+                    beforeEach(() => {
+                        abGroup = 14;
+                        (<sinon.SinonStub>request.followRedirectChain).returns(Promise.resolve(url));
+                        return parse(JSON.parse(ValidAdMobCampaign));
+                    });
+
+                    it('should FileId.setFileId', () => {
+                        sinon.assert.calledOnce(setFileIdSpy);
+                        sinon.assert.calledWith(setFileIdSpy, url, 'G2KkvNWTNuU');
+                    });
+                });
+
+                describe('with group 15', () => {
+                    beforeEach(() => {
+                        abGroup = 15;
+                        (<sinon.SinonStub>request.followRedirectChain).returns(Promise.resolve(url));
+                        return parse(JSON.parse(ValidAdMobCampaign));
+                    });
+
+                    it('should FileId.setFileId', () => {
+                        sinon.assert.calledOnce(setFileIdSpy);
+                        sinon.assert.calledWith(setFileIdSpy, url, 'G2KkvNWTNuU');
+                    });
+                });
+            });
+
+        });
+
+        describe('on iOS', () => {
+
+            beforeEach(() => {
+                (<sinon.SinonStub>nativeBridge.getPlatform).returns(Platform.IOS);
+            });
+
+            describe('without a mime type in url', () => {
+
+                beforeEach(() => {
+                    (<sinon.SinonStub>request.followRedirectChain).returns(Promise.resolve(urlNoMime));
+                    return parse(JSON.parse(ValidAdMobCampaign));
+                });
+
+                it('should not call FileId.setFileId', () => { // when no mime type should default to streaming
+                    sinon.assert.notCalled(setFileIdSpy);
+                });
+            });
+
+            describe('with a mime type in url', () => {
+                beforeEach(() => {
+                    abGroup = 14;
+                    (<sinon.SinonStub>request.followRedirectChain).returns(Promise.resolve(url));
+                    return parse(JSON.parse(ValidAdMobCampaign));
+                });
+
+                afterEach(() => {
+                    abGroup = 0;
+                });
+
+                it('should FileId.setFileId with a mp4 mime type', () => {
+                    sinon.assert.calledWith(setFileIdSpy, url, 'G2KkvNWTNuU.mp4');
+                });
+            });
+
+            describe('should', () => {
+
+                beforeEach(() => {
+                    setFileIdSpy.resetHistory();
+                });
+
+                afterEach(() => {
+                    abGroup = 0;
+                    setFileIdSpy.resetHistory();
+                });
+
+                describe('not cache with group 0', () => {
+                    beforeEach(() => {
+                        abGroup = 0;
+                        (<sinon.SinonStub>request.followRedirectChain).returns(Promise.resolve(url));
+                        return parse(JSON.parse(ValidAdMobCampaign));
+                    });
+
+                    it('should not FileId.setFileId', () => {
+                        sinon.assert.notCalled(setFileIdSpy);
+                    });
+                });
+
+                describe('cache with group 14', () => {
+                    beforeEach(() => {
+                        abGroup = 14;
+                        (<sinon.SinonStub>request.followRedirectChain).returns(Promise.resolve(url));
+                        return parse(JSON.parse(ValidAdMobCampaign));
+                    });
+
+                    it('should FileId.setFileId', () => {
+                        sinon.assert.calledOnce(setFileIdSpy);
+                        sinon.assert.calledWith(setFileIdSpy, url, 'G2KkvNWTNuU.mp4');
+                    });
+                });
+
+                describe('cache with group 15', () => {
+                    beforeEach(() => {
+                        abGroup = 15;
+                        (<sinon.SinonStub>request.followRedirectChain).returns(Promise.resolve(url));
+                        return parse(JSON.parse(ValidAdMobCampaign));
+                    });
+
+                    it('should FileId.setFileId', () => {
+                        sinon.assert.calledOnce(setFileIdSpy);
+                        sinon.assert.calledWith(setFileIdSpy, url, 'G2KkvNWTNuU.mp4');
+                    });
+                });
+            });
+        });
 
         describe('with a proper JSON payload', () => {
 
@@ -59,6 +231,7 @@ describe('ProgrammaticAdMobParser', () => {
             describe('on Android', () => {
                 beforeEach(() => {
                     (<sinon.SinonStub>nativeBridge.getPlatform).returns(Platform.ANDROID);
+                    setFileIdSpy.resetHistory();
                     return parse(JSON.parse(ValidAdMobCampaign));
                 });
 
@@ -68,20 +241,28 @@ describe('ProgrammaticAdMobParser', () => {
                 });
 
                 it('should have valid data', validateCampaign);
+
             });
 
             describe('on iOS', () => {
                 beforeEach(() => {
+                    abGroup = 14;
                     (<sinon.SinonStub>nativeBridge.getPlatform).returns(Platform.IOS);
+                    setFileIdSpy.resetHistory();
                     return parse(JSON.parse(ValidAdMobCampaign));
                 });
 
-                it('should not have a video cached', () => {
+                afterEach(() => {
+                    abGroup = 0;
+                });
+
+                it('should have a video cached from the AdMobAd', () => {
                     const assets = campaign.getOptionalAssets();
-                    assert.lengthOf(assets, 0, 'Video is contained within campaign');
+                    assert.lengthOf(assets, 1, 'Video is not contained within campaign');
                 });
 
                 it('should have valid data', validateCampaign);
+
             });
         });
     });
