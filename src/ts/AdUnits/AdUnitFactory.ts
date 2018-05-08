@@ -71,7 +71,7 @@ import { IosVideoEventHandler } from 'EventHandlers/IosVideoEventHandler';
 import { XPromoOperativeEventManager } from 'Managers/XPromoOperativeEventManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
-import { GDPRPrivacy } from 'Views/GDPR-privacy';
+import { GDPRPrivacy } from 'Views/GDPRPrivacy';
 import { PrivacyEventHandler } from 'EventHandlers/PrivacyEventHandler';
 
 export class AdUnitFactory {
