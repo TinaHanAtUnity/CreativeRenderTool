@@ -38,6 +38,7 @@ export abstract class AdUnitContainer {
 
     protected _lockedOrientation: Orientation;
     protected _handlers: IAdUnitContainerListener[] = [];
+    protected _paused = false;
 
     public abstract open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: any): Promise<void>;
     public abstract close(): Promise<void>;
