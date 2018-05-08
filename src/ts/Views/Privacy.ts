@@ -1,67 +1,20 @@
 import PrivacyTemplate from 'html/Privacy.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
-import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
+import { AbstractPrivacy } from 'Views/AbstractPrivacy';
 
-import { ClientInfo } from 'Models/ClientInfo';
-import { Campaign } from 'Models/Campaign';
-import { Platform } from 'Constants/Platform';
+export class Privacy extends AbstractPrivacy {
 
-export interface IPrivacyHandler {
-    onPrivacy(url: string): void;
-    onPrivacyClose(optOutEnabled: boolean | undefined): void;
-}
+    constructor(nativeBridge: NativeBridge, isCoppaCompliant: boolean) {
+        super(nativeBridge, isCoppaCompliant, 'privacy');
 
-export interface IBuildInformation {
-    userAgent: string;
-    platform: string;
-    campaign: string;
-    apiLevel: number;
-    group: number;
-    sdk: string;
-    webview: string | null;
-    webviewHash: string | null;
-    app: string;
-    appVersion: string;
-}
-
-export class Privacy extends View<IPrivacyHandler> {
-    public static createBuildInformation(clientInfo: ClientInfo, campaign: Campaign, nativeBridge: NativeBridge) {
-        Privacy.buildInformation = {
-            userAgent: window.navigator.userAgent,
-            platform: clientInfo.getPlatform() === Platform.IOS ? 'iOS' : 'Android',
-            campaign: campaign.getId(),
-            apiLevel: nativeBridge.getApiLevel(),
-            group: campaign.getAbGroup(),
-            sdk: clientInfo.getSdkVersionName(),
-            webview: clientInfo.getWebviewVersion(),
-            webviewHash: clientInfo.getWebviewHash(),
-            app: clientInfo.getApplicationName(),
-            appVersion: clientInfo.getApplicationVersion()
-        };
-    }
-
-    private static buildInformation: IBuildInformation;
-
-    constructor(nativeBridge: NativeBridge, isCoppaCompliant: boolean, altTemplate?: string, altId?: string) {
-        super(nativeBridge, altId || 'privacy');
-
-        if (typeof altTemplate === 'string') {
-            this._template = new Template(altTemplate);
-        } else {
-            this._template = new Template(PrivacyTemplate);
-        }
-
-        this._templateData = {
-            'isCoppaCompliant': isCoppaCompliant,
-            'buildInformation': Privacy.buildInformation
-        };
+        this._template = new Template(PrivacyTemplate);
 
         this._bindings = [
             {
                 event: 'click',
-                listener: (event: Event) => this.onOkEvent(event),
+                listener: (event: Event) => this.onCloseEvent(event),
                 selector: '.ok-button'
             },
             {
@@ -77,12 +30,12 @@ export class Privacy extends View<IPrivacyHandler> {
         ];
     }
 
-    private onOkEvent(event: Event): void {
+    protected onCloseEvent(event: Event): void {
         event.preventDefault();
         this._handlers.forEach(handler => handler.onPrivacyClose(undefined));
     }
 
-    private onPrivacyEvent(event: Event): void {
+    protected onPrivacyEvent(event: Event): void {
         event.preventDefault();
         this._handlers.forEach(handler => handler.onPrivacy((<HTMLLinkElement>event.target).href));
     }

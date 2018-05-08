@@ -4,7 +4,7 @@ import SquareEndScreenTemplate from 'html/SquareEndScreen.html';
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
-import { IPrivacyHandler, Privacy } from 'Views/Privacy';
+import { IPrivacyHandler, AbstractPrivacy } from 'Views/AbstractPrivacy';
 import { GDPRPrivacy } from 'Views/GDPR-privacy';
 import { Localization } from 'Utilities/Localization';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
@@ -13,6 +13,7 @@ import { IEndScreenDownloadParameters } from 'EventHandlers/EndScreenEventHandle
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { SquareEndScreenUtilities } from 'Utilities/SquareEndScreenUtilities';
+import { Privacy } from 'Views/Privacy';
 
 export interface IEndScreenHandler {
     onEndScreenDownload(parameters: IEndScreenDownloadParameters): void;
@@ -38,7 +39,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     protected _adUnitStyle?: AdUnitStyle;
     private _coppaCompliant: boolean;
     private _gameName: string | undefined;
-    private _privacy: Privacy;
+    private _privacy: AbstractPrivacy;
     private _isSwipeToCloseEnabled: boolean = false;
     private _abGroup: number;
     private _showOptOutPopup: boolean;

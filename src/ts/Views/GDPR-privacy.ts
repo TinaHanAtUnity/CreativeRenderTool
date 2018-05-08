@@ -1,18 +1,22 @@
-import { Privacy } from 'Views/Privacy';
 import { NativeBridge } from 'Native/NativeBridge';
 
-import Template from 'html/GDPR-privacy.html';
+import GDPRPrivacyTemplate from 'html/GDPR-privacy.html';
+import { AbstractPrivacy } from 'Views/AbstractPrivacy';
+import { Template } from 'Utilities/Template';
 
-export class GDPRPrivacy extends Privacy {
+export class GDPRPrivacy extends AbstractPrivacy {
 
     private _optOutEnabled: boolean;
 
     constructor(nativeBridge: NativeBridge, isCoppaCompliant: boolean, optOutEnabled: boolean) {
-        super(nativeBridge, isCoppaCompliant, Template, 'gdpr-privacy');
+        super(nativeBridge, isCoppaCompliant, 'gdpr-privacy');
+
+        this._template = new Template(GDPRPrivacyTemplate);
 
         this._optOutEnabled = optOutEnabled;
 
-        this._bindings.push({
+        this._bindings = [
+            {
                 event: 'click',
                 listener: (event: Event) => this.onLeftSideClick(event),
                 selector: '.left-side-link'
@@ -21,7 +25,8 @@ export class GDPRPrivacy extends Privacy {
                 event: 'click',
                 listener: (event: Event) => this.onCloseEvent(event),
                 selector: '.close-button'
-            });
+            }
+        ];
     }
 
     public render(): void {
@@ -33,6 +38,17 @@ export class GDPRPrivacy extends Privacy {
         activeRadioButton.checked = true;
 
         this.setCardState();
+    }
+
+    protected onCloseEvent(event: Event): void {
+        event.preventDefault();
+        const gdprRefuceRadioButton = <HTMLInputElement>this._container.querySelector('#gdpr-refuse-radio');
+        this._handlers.forEach(handler => handler.onPrivacyClose(gdprRefuceRadioButton.checked));
+    }
+
+    protected onPrivacyEvent(event: Event): void {
+        event.preventDefault();
+        this._handlers.forEach(handler => handler.onPrivacy((<HTMLLinkElement>event.target).href));
     }
 
     private onLeftSideClick(event: Event): void {
@@ -50,11 +66,5 @@ export class GDPRPrivacy extends Privacy {
             linkEL.innerText = 'Build info';
             this._container.classList.remove('flip');
         }
-    }
-
-    private onCloseEvent(event: Event) {
-        event.preventDefault();
-        const gdprRefuceRadioButton = <HTMLInputElement>this._container.querySelector('#gdpr-refuse-radio');
-        this._handlers.forEach(handler => handler.onPrivacyClose(gdprRefuceRadioButton.checked));
     }
 }

@@ -5,7 +5,8 @@ import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { WebViewError } from 'Errors/WebViewError';
 import { Platform } from 'Constants/Platform';
 import { NativeBridge } from 'Native/NativeBridge';
-import { IPrivacyHandler, Privacy } from 'Views/Privacy';
+import { IPrivacyHandler, AbstractPrivacy } from 'Views/AbstractPrivacy';
+import { Privacy } from 'Views/Privacy';
 import { platform } from 'os';
 import { DOMUtils } from 'Utilities/DOMUtils';
 
@@ -32,7 +33,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     private _coppaCompliant: boolean;
 
-    private _privacy: Privacy;
+    private _privacy: AbstractPrivacy;
 
     constructor(nativeBridge: NativeBridge, id: string, placement: Placement, campaign: MRAIDCampaign, coppaCompliant: boolean) {
         super(nativeBridge, id);
@@ -86,6 +87,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     protected onPrivacyEvent(event: Event): void {
         event.preventDefault();
+        // todo: gdpr privacy
         this._privacy = new Privacy(this._nativeBridge, this._coppaCompliant);
         this._privacy.render();
         document.body.appendChild(this._privacy.container());
