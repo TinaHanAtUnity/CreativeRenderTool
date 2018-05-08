@@ -80,21 +80,8 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         this._adUnit.hide();
     }
 
-    public onOptOutPopupShown(popupClicked: boolean): void {
-        const kafkaObject: any = {};
-        kafkaObject.timestamp = Date.now();
-        kafkaObject.popupShown = true;
-        kafkaObject.popupClicked = popupClicked;
-        kafkaObject.gamerId = this._configuration.getGamerId();
-
-        HttpKafka.sendEvent('ads.sdk2.events.gdprtest.json', kafkaObject);
-
-        Promise.all([
-            this._nativeBridge.Storage.set(StorageType.PRIVATE, 'gdpr.popupshown.value', true),
-            this._nativeBridge.Storage.write(StorageType.PRIVATE)
-        ]).catch(err => {
-            //
-        });
+    public onGDPRPopupSkipped(): void {
+        // todo: send gdpr operative event with action 'skip'
     }
 
     public abstract onKeyEvent(keyCode: number): void;

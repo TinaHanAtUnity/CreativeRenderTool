@@ -19,7 +19,7 @@ export interface IEndScreenHandler {
     onEndScreenPrivacy(url: string): void;
     onEndScreenClose(): void;
     onKeyEvent(keyCode: number): void;
-    onOptOutPopupShown(clicked: boolean): void;
+    onGDPRPopupSkipped(): void;
 }
 
 export interface IGDPRParams {
@@ -79,7 +79,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             },
             {
                 event: 'click',
-                listener: (event: Event) => this.onOptOutPopupEvent(event),
+                listener: (event: Event) => this.onGDPRPopupEvent(event),
                 selector: '.gdpr-link'
             }
         ];
@@ -138,8 +138,8 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     public hide(): void {
         super.hide();
 
-        if (this._showOptOutPopup) {
-            this._handlers.forEach(handler => handler.onOptOutPopupShown(this._gdprPopupClicked));
+        if (!this._gdprPopupClicked) {
+            this._handlers.forEach(handler => handler.onGDPRPopupSkipped());
         }
 
         if (this._privacy) {
@@ -163,10 +163,8 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     protected getEndscreenAlt(campaign?: Campaign) {
-        if (this._showOptOutPopup) {
-            if (this._abGroup === 18 || this._abGroup === 19) {
-                return GDPR_OPT_OUT_BASE;
-            }
+        if (this._gdprParamas.gdpr && !this._gdprParamas.optOutRecorded) {
+            return GDPR_OPT_OUT_BASE;
         }
 
         const campaignId = campaign ? campaign.getId() : this._campaignId;
@@ -175,7 +173,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             return SQUARE_END_SCREEN;
         }
 
-        return GDPR_OPT_OUT_BASE;
+        return undefined;
     }
 
     protected abstract onDownloadEvent(event: Event): void;
@@ -199,7 +197,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._privacy.addEventHandler(this);
     }
 
-    private onOptOutPopupEvent(event: Event) {
+    private onGDPRPopupEvent(event: Event) {
         event.preventDefault();
 
         this._gdprPopupClicked = true;
