@@ -146,14 +146,6 @@ describe('OverlayEventHandlerTest', () => {
         it('should hide overlay', () => {
             sinon.assert.called(<sinon.SinonSpy>overlay.hide);
         });
-
-        it('should send comscore end event', () => {
-            const positionAtSkip = performanceAdUnit.getVideo().getPosition();
-            const comScoreDuration = (performanceAdUnit.getVideo().getDuration()).toString(10);
-            const sessionId = campaign.getSession().getId();
-            const creativeId = campaign.getCreativeId();
-            sinon.assert.calledWith(<sinon.SinonSpy>comScoreService.sendEvent, 'end', sessionId, comScoreDuration, positionAtSkip, creativeId, undefined, undefined);
-        });
     });
 
     describe('When calling onMute', () => {

@@ -114,9 +114,6 @@ describe('VPAIDEventHandlerTest', () => {
             it('should send the view operative event', () => {
                 sinon.assert.called(<sinon.SinonSpy>parameters.operativeEventManager.sendView);
             });
-            it('should send the comscore end event', () => {
-                sinon.assert.called(<sinon.SinonSpy>parameters.comScoreTrackingService.sendEvent);
-            });
             it('should set the finish state to COMPLETE', () => {
                 sinon.assert.calledWith(<sinon.SinonSpy>adUnit.setFinishState, FinishState.COMPLETED);
             });

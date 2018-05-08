@@ -234,18 +234,6 @@ describe('VideoEventHandlersTest', () => {
 
             sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Listener.sendStartEvent, placement.getId());
         });
-
-        it('should send comscore play event', () => {
-            performanceVideoEventHandler.onProgress(1);
-
-            const positionAtSkip = performanceAdUnit.getVideo().getPosition();
-            const comScoreDuration = (performanceAdUnit.getVideo().getDuration()).toString(10);
-            const sessionId = performanceCampaign.getSession().getId();
-            const creativeId = performanceCampaign.getCreativeId();
-            const category = undefined;
-            const subCategory = undefined;
-            sinon.assert.calledWith(<sinon.SinonSpy>comScoreService.sendEvent, 'play', sessionId, comScoreDuration, positionAtSkip, creativeId, category, subCategory);
-        });
     });
 
     describe('with onVideoProgress', () => {
@@ -335,17 +323,6 @@ describe('VideoEventHandlersTest', () => {
             if(adUnitOverlay) {
                 sinon.assert.called(<sinon.SinonSpy>adUnitOverlay.hide);
             }
-        });
-
-        it('should send comscore end event', () => {
-            performanceVideoEventHandler.onCompleted(video.getUrl());
-            const positionAtSkip = performanceAdUnit.getVideo().getPosition();
-            const comScoreDuration = (performanceAdUnit.getVideo().getDuration()).toString(10);
-            const sessionId = performanceCampaign.getSession().getId();
-            const creativeId = performanceCampaign.getCreativeId();
-            const category = undefined;
-            const subCategory = undefined;
-            sinon.assert.calledWith(<sinon.SinonSpy>comScoreService.sendEvent, 'end', sessionId, comScoreDuration, positionAtSkip, creativeId, category, subCategory);
         });
 
         it('should send view event to HttpKafka on XPromos', () => {

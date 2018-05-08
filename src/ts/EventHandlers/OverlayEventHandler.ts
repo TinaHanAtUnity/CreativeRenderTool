@@ -39,7 +39,6 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
         this._adUnit.setActive(false);
         this._adUnit.setFinishState(FinishState.SKIPPED);
         this._operativeEventManager.sendSkip(this._placement, this._adUnit.getVideo().getPosition(), this.getVideoOrientation(), this._adUnitStyle);
-        this.sendComscoreEvent();
 
         this._adUnit.getContainer().reconfigure(ViewConfiguration.ENDSCREEN);
 
@@ -89,10 +88,12 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
         const creativeId = this._campaign.getCreativeId();
         let category;
         let subCategory;
+
         if (this._campaign instanceof VastCampaign) {
             category = this._campaign.getCategory();
             subCategory = this._campaign.getSubcategory();
         }
+
         this._comScoreTrackingService.sendEvent('end', sessionId, comScoreDuration, positionAtSkip, creativeId, category, subCategory);
     }
 }

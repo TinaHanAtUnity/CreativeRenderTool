@@ -231,14 +231,13 @@ describe('VastVideoEventHandler tests', () => {
             // when the session manager is told that the video has completed
             // then the VAST complete callback URL should be requested by the event manager
             const mockEventManager = sinon.mock(thirdPartyEventManager);
-            const expectation = mockEventManager.expects('sendEvent').twice();
+            const expectation = mockEventManager.expects('sendEvent').once();
             vastVideoEventHandler.onCompleted('https://test.com');
             mockEventManager.verify();
-            assert.equal(expectation.getCall(0).args[0], 'end', 'First event sent should be \'end\'');
-            assert.equal(expectation.getCall(0).args[1], '12345', 'First event session id should be 12345');
-            assert.equal(expectation.getCall(1).args[0], 'vast complete', 'Second event sent should be \'vast complete\'');
-            assert.equal(expectation.getCall(1).args[1], '12345', 'Second event session id should be 12345');
-            assert.equal(expectation.getCall(1).args[2], 'http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123', 'Incorrect second event URL');
+
+            assert.equal(expectation.getCall(0).args[0], 'vast complete', 'Second event sent should be \'vast complete\'');
+            assert.equal(expectation.getCall(0).args[1], '12345', 'Second event session id should be 12345');
+            assert.equal(expectation.getCall(0).args[2], 'http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123', 'Incorrect second event URL');
         });
 
         it('should hide ad unit', () => {

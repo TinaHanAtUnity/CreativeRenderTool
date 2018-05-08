@@ -141,7 +141,6 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         this._operativeEventManager.sendStart(this._placement).then(() => {
             this._adUnit.onStartProcessed.trigger();
         });
-        this.sendComscoreEvent('play', 0);
     }
 
     private onAdImpression() {
@@ -172,7 +171,6 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         this._adUnit.sendTrackingEvent('complete');
         this._adUnit.setFinishState(FinishState.COMPLETED);
         this._operativeEventManager.sendView(this._placement);
-        this.sendComscoreEvent('end', (this._adDuration - this._adRemainingTime) * 1000);
     }
 
     private onAdPaused() {
