@@ -38,7 +38,7 @@ BUILD_DIR = build
 # For platform specific operations
 OS := $(shell uname)
 
-.PHONY: build-browser build-dev build-release build-test build-dir build-ts build-js build-css build-static clean lint test test-unit test-integration test-coverage watch setup deploy build-dev-no-ts watch-fast
+.PHONY: build-browser build-dev build-release build-test build-dir build-ts build-js build-css build-static clean lint test test-unit test-integration test-coverage test-filter watch setup deploy build-dev-no-ts watch-fast
 
 build-browser: BUILD_DIR = build/browser
 build-browser: MODULE = system
@@ -315,6 +315,24 @@ test-browser: build-browser
 	@echo Running browser build tests
 	@echo
 	node test-utils/headless.js
+
+test-filter: MODULE = system
+test-filter: TARGET = es5
+ifeq ($(TEST_FILTER),)
+test-filter: TEST_FILTER = Test/Unit
+endif
+test-filter: build-proto
+	@echo
+	@echo Transpiling .ts to .js for local tests
+	@echo
+
+	$(TYPESCRIPT) --project . --module $(MODULE) --target $(TARGET)
+
+	@echo
+	@echo Running unit tests with filter: $(TEST_FILTER)
+	@echo
+
+	node --trace-warnings test-utils/node_runner.js
 
 ifeq ($(TRAVIS_PULL_REQUEST), false)
 travis-browser-test:

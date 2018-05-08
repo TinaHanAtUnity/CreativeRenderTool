@@ -172,6 +172,10 @@ export class AndroidDeviceInfoApi extends NativeApi {
         return this._nativeBridge.invoke<string>(this._apiClass, 'getBuildVersionIncremental');
     }
 
+    public getNetworkMetered(): Promise<boolean> {
+        return this._nativeBridge.invoke<boolean>(this._apiClass, 'getNetworkMetered');
+    }
+
     public handleEvent(event: string, parameters: any[]): void {
         switch (event) {
             case DeviceInfoEvent[DeviceInfoEvent.VOLUME_CHANGED]:
