@@ -34,6 +34,9 @@ export class PrivacyEventHandler implements IPrivacyHandler {
     }
 
     public onGDPROptOut(optOutEnabled: boolean): void {
+        if (!this._configuration.isOptOutRecorded()) {
+            this._configuration.setOptOutRecorded(true);
+        }
         if (optOutEnabled !== this._configuration.isOptOutEnabled()) {
             this._configuration.setOptOutEnabled(optOutEnabled);
             // todo: send operative event

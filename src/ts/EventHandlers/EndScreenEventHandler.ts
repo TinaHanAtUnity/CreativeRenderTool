@@ -68,6 +68,10 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     }
 
     public onGDPRPopupSkipped(): void {
+        if (!this._configuration.isOptOutRecorded()) {
+            this._configuration.setOptOutRecorded(true);
+        }
+
         // todo: send gdpr operative event with action 'skip'
     }
 
