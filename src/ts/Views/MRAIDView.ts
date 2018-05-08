@@ -85,6 +85,10 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         this._handlers.forEach(handler => handler.onMraidPrivacy(url));
     }
 
+    public onGDPROptOut(optOutEnabled: boolean) {
+        // do nothing
+    }
+
     protected onPrivacyEvent(event: Event): void {
         event.preventDefault();
         // todo: gdpr privacy

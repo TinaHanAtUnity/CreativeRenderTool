@@ -4,15 +4,18 @@ import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { CampaignAssetInfo } from 'Utilities/CampaignAssetInfo';
+import { AbstractPrivacy } from 'Views/AbstractPrivacy';
 
 export interface IPerformanceAdUnitParameters extends IVideoAdUnitParameters<PerformanceCampaign> {
     endScreen: PerformanceEndScreen;
     adUnitStyle?: AdUnitStyle;
+    privacy: AbstractPrivacy;
 }
 
 export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
 
     private _endScreen: PerformanceEndScreen;
+    private _privacy: AbstractPrivacy;
 
     constructor(nativeBridge: NativeBridge, parameters: IPerformanceAdUnitParameters) {
         super(nativeBridge, parameters);
@@ -23,6 +26,8 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
         this._endScreen.render();
         this._endScreen.hide();
         document.body.appendChild(this._endScreen.container());
+
+        this._privacy = parameters.privacy;
     }
 
     public hide(): Promise<void> {
@@ -31,6 +36,8 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
             endScreen.hide();
             endScreen.container().parentElement!.removeChild(endScreen.container());
         }
+        this._privacy.hide();
+        this._privacy.container().parentElement!.removeChild(this._privacy.container());
 
         return super.hide();
     }
@@ -46,5 +53,6 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
     protected unsetReferences() {
         super.unsetReferences();
         delete this._endScreen;
+        delete this._privacy;
     }
 }

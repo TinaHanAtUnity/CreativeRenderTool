@@ -24,8 +24,8 @@ interface IConfiguration {
     token: string;
     jaegerTracing: boolean;
     gdpr: boolean;
-    optOutRecorded?: boolean; // todo: mandatory field?
-    optOutEnabled?: boolean; // todo: mandatory field?
+    optOutRecorded: boolean;
+    optOutEnabled: boolean;
 }
 
 export class Configuration extends Model<IConfiguration> {
@@ -46,8 +46,8 @@ export class Configuration extends Model<IConfiguration> {
             token: ['string'],
             jaegerTracing: ['boolean'],
             gdpr: ['boolean'],
-            optOutRecorded: ['boolean', 'undefined'], // todo: mandatory field?
-            optOutEnabled: ['boolean', 'undefined'] // todo: mandatory field?
+            optOutRecorded: ['boolean'],
+            optOutEnabled: ['boolean']
         });
 
         this.set('enabled', configJson.enabled);
@@ -189,12 +189,20 @@ export class Configuration extends Model<IConfiguration> {
         return this.get('gdpr');
     }
 
-    public isOptOutRecorded(): boolean | undefined { // todo
+    public isOptOutRecorded(): boolean {
         return this.get('optOutRecorded');
     }
 
-    public isOptOutEnabled(): boolean | undefined { // todo
+    public setOptOutRecorded(recorded: boolean) {
+        this.set('optOutRecorded', recorded);
+    }
+
+    public isOptOutEnabled(): boolean {
         return this.get('optOutEnabled');
+    }
+
+    public setOptOutEnabled(optOutEnabled: boolean) {
+        this.set('optOutEnabled', optOutEnabled);
     }
 
     public getDTO(): { [key: string]: any } {

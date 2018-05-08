@@ -27,6 +27,7 @@ import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 import { Placement } from 'Models/Placement';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { Configuration } from 'Models/Configuration';
+import { Privacy } from 'Views/Privacy';
 
 describe('EndScreenEventHandlerTest', () => {
 
@@ -90,7 +91,8 @@ describe('EndScreenEventHandlerTest', () => {
                 optOutRecorded: false,
                 optOutEnabled: false,
             };
-            endScreen = new PerformanceEndScreen(nativeBridge, TestFixtures.getCampaign(), configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId(), gdprParams);
+            const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+            endScreen = new PerformanceEndScreen(nativeBridge, TestFixtures.getCampaign(), deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, gdprParams);
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
             placement = TestFixtures.getPlacement();
 
@@ -110,7 +112,8 @@ describe('EndScreenEventHandlerTest', () => {
                 options: {},
                 endScreen: endScreen,
                 overlay: overlay,
-                video: video
+                video: video,
+                privacy: privacy
             };
 
             performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
@@ -257,7 +260,8 @@ describe('EndScreenEventHandlerTest', () => {
                 optOutRecorded: false,
                 optOutEnabled: false,
             };
-            endScreen = new PerformanceEndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId(), gdprParams);
+            const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+            endScreen = new PerformanceEndScreen(nativeBridge, campaign, deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, gdprParams);
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
 
             performanceAdUnitParameters = {
@@ -276,7 +280,8 @@ describe('EndScreenEventHandlerTest', () => {
                 options: {},
                 endScreen: endScreen,
                 overlay: overlay,
-                video: video
+                video: video,
+                privacy: privacy
             };
 
             performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);

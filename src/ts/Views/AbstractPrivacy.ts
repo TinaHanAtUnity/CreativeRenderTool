@@ -7,7 +7,8 @@ import { Platform } from 'Constants/Platform';
 
 export interface IPrivacyHandler {
     onPrivacy(url: string): void;
-    onPrivacyClose(optOutEnabled: boolean | undefined): void;
+    onPrivacyClose(): void;
+    onGDPROptOut(optOutEnabled: boolean): void;
 }
 
 export interface IBuildInformation {

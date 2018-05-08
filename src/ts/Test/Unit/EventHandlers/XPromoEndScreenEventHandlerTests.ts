@@ -26,6 +26,7 @@ import { IXPromoAdUnitParameters, XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { XPromoOperativeEventManager } from 'Managers/XPromoOperativeEventManager';
+import { Privacy } from 'Views/Privacy';
 
 describe('XPromoEndScreenEventHandlerTest', () => {
 
@@ -90,7 +91,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 optOutRecorded: false,
                 optOutEnabled: false,
             };
-            endScreen = new XPromoEndScreen(nativeBridge, TestFixtures.getXPromoCampaign(), configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId(), gdprParams);
+            const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+            endScreen = new XPromoEndScreen(nativeBridge, TestFixtures.getXPromoCampaign(), deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, gdprParams);
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
             placement = TestFixtures.getPlacement();
 
@@ -110,7 +112,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 options: {},
                 endScreen: endScreen,
                 overlay: overlay,
-                video: video
+                video: video,
+                privacy: privacy
             };
 
             xPromoAdUnit = new XPromoAdUnit(nativeBridge, xPromoAdUnitParameters);
@@ -176,7 +179,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 optOutRecorded: false,
                 optOutEnabled: false,
             };
-            endScreen = new XPromoEndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId(), gdprParams);
+            const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+            endScreen = new XPromoEndScreen(nativeBridge, campaign, deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, gdprParams);
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
 
             xPromoAdUnitParameters = {
@@ -195,7 +199,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 options: {},
                 endScreen: endScreen,
                 overlay: overlay,
-                video: video
+                video: video,
+                privacy: privacy
             };
 
             xPromoAdUnit = new XPromoAdUnit(nativeBridge, xPromoAdUnitParameters);

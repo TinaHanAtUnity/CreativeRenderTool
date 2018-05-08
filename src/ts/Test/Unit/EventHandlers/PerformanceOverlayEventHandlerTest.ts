@@ -18,11 +18,11 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { SessionManager } from 'Managers/SessionManager';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
+import { Privacy } from 'Views/Privacy';
 
 describe('PerformanceOverlayEventHandlerTest', () => {
 
@@ -75,7 +75,8 @@ describe('PerformanceOverlayEventHandlerTest', () => {
             optOutRecorded: false,
             optOutEnabled: false,
         };
-        endScreen = new PerformanceEndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId(), gdprParams);
+        const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+        endScreen = new PerformanceEndScreen(nativeBridge, campaign, deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, gdprParams);
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
         comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
@@ -95,7 +96,8 @@ describe('PerformanceOverlayEventHandlerTest', () => {
             options: {},
             endScreen: endScreen,
             overlay: overlay,
-            video: video
+            video: video,
+            privacy: privacy
         };
 
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);

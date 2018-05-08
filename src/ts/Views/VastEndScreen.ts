@@ -115,6 +115,10 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
         this._handlers.forEach(handler => handler.onEndScreenPrivacy(url));
     }
 
+    public onGDPROptOut(optOutEnabled: boolean) {
+        // do nothing
+    }
+
     private onCloseEvent(event: Event): void {
         event.preventDefault();
         this._handlers.forEach(handler => handler.onVastEndScreenClose());

@@ -18,6 +18,11 @@ export class GDPRPrivacy extends AbstractPrivacy {
         this._bindings = [
             {
                 event: 'click',
+                listener: (event: Event) => this.onPrivacyEvent(event),
+                selector: 'a'
+            },
+            {
+                event: 'click',
                 listener: (event: Event) => this.onLeftSideClick(event),
                 selector: '.left-side-link'
             },
@@ -27,6 +32,12 @@ export class GDPRPrivacy extends AbstractPrivacy {
                 selector: '.close-button'
             }
         ];
+    }
+
+    public show(): void {
+        super.show();
+
+        this.setCardState();
     }
 
     public render(): void {
@@ -43,7 +54,8 @@ export class GDPRPrivacy extends AbstractPrivacy {
     protected onCloseEvent(event: Event): void {
         event.preventDefault();
         const gdprRefuceRadioButton = <HTMLInputElement>this._container.querySelector('#gdpr-refuse-radio');
-        this._handlers.forEach(handler => handler.onPrivacyClose(gdprRefuceRadioButton.checked));
+        this._handlers.forEach(handler => handler.onGDPROptOut(gdprRefuceRadioButton.checked));
+        this._handlers.forEach(handler => handler.onPrivacyClose());
     }
 
     protected onPrivacyEvent(event: Event): void {

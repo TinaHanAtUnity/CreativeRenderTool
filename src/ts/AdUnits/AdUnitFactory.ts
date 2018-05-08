@@ -71,6 +71,9 @@ import { IosVideoEventHandler } from 'EventHandlers/IosVideoEventHandler';
 import { XPromoOperativeEventManager } from 'Managers/XPromoOperativeEventManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { IGDPRParams } from 'Views/EndScreen';
+import { AbstractPrivacy } from 'Views/AbstractPrivacy';
+import { GDPRPrivacy } from 'Views/GDPR-privacy';
+import { PrivacyEventHandler } from 'EventHandlers/PrivacyEventHandler';
 
 export class AdUnitFactory {
 
@@ -110,7 +113,9 @@ export class AdUnitFactory {
             optOutEnabled: parameters.configuration.isOptOutEnabled(),
         };
 
-        const endScreen = new PerformanceEndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), gdprParams, parameters.deviceInfo.getOsVersion(), adUnitStyle, parameters.showGDPRPopup);
+        const privacy = this.createPrivacy(nativeBridge, parameters);
+
+        const endScreen = new PerformanceEndScreen(nativeBridge, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, gdprParams, parameters.deviceInfo.getOsVersion(), adUnitStyle, parameters.showGDPRPopup);
         const video = this.getVideo(parameters.campaign, parameters.forceOrientation);
 
         const performanceAdUnitParameters: IPerformanceAdUnitParameters = {
@@ -118,7 +123,8 @@ export class AdUnitFactory {
             video: video,
             overlay: overlay,
             endScreen: endScreen,
-            adUnitStyle: adUnitStyle
+            adUnitStyle: adUnitStyle,
+            privacy: privacy
         };
 
         const performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
@@ -149,14 +155,16 @@ export class AdUnitFactory {
             optOutRecorded: parameters.configuration.isOptOutRecorded(),
             optOutEnabled: parameters.configuration.isOptOutEnabled(),
         };
-        const endScreen = new XPromoEndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), gdprParams);
+        const privacy = this.createPrivacy(nativeBridge, parameters);
+        const endScreen = new XPromoEndScreen(nativeBridge, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, gdprParams);
         const video = this.getVideo(parameters.campaign, parameters.forceOrientation);
 
         const xPromoAdUnitParameters: IXPromoAdUnitParameters = {
             ... parameters,
             video: video,
             overlay: overlay,
-            endScreen: endScreen
+            endScreen: endScreen,
+            privacy: privacy
         };
 
         const xPromoAdUnit = new XPromoAdUnit(nativeBridge, xPromoAdUnitParameters);
@@ -257,7 +265,8 @@ export class AdUnitFactory {
                 optOutRecorded: parameters.configuration.isOptOutRecorded(),
                 optOutEnabled: parameters.configuration.isOptOutEnabled(),
             };
-            endScreen = new MRAIDEndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), gdprParams);
+            const privacy = this.createPrivacy(nativeBridge, parameters);
+            endScreen = new MRAIDEndScreen(nativeBridge, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, gdprParams);
         } else {
             mraid = new MRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.configuration.isCoppaCompliant());
         }
@@ -462,5 +471,17 @@ export class AdUnitFactory {
         }
 
         return video;
+    }
+
+    private static createPrivacy(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractPrivacy {
+        let privacy: AbstractPrivacy;
+        if (parameters.configuration.isGDPR()) {
+            privacy = new GDPRPrivacy(nativeBridge, parameters.configuration.isCoppaCompliant(), parameters.configuration.isOptOutEnabled());
+        } else {
+            privacy = new Privacy(nativeBridge, parameters.configuration.isCoppaCompliant());
+        }
+        const privacyEventHandler = new PrivacyEventHandler(nativeBridge, parameters);
+        privacy.addEventHandler(privacyEventHandler);
+        return privacy;
     }
 }

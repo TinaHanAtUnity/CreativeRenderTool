@@ -20,8 +20,6 @@ import { XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { XPromoOperativeEventManager } from 'Managers/XPromoOperativeEventManager';
-import { StorageType } from 'Native/Api/Storage';
-import { HttpKafka } from 'Utilities/HttpKafka';
 import { Configuration } from 'Models/Configuration';
 
 export interface IEndScreenDownloadParameters {
@@ -62,17 +60,6 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
             this.onDownloadIos(parameters);
         } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
             this.onDownloadAndroid(parameters);
-        }
-    }
-
-    public onEndScreenPrivacy(url: string): void {
-        if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            this._nativeBridge.UrlScheme.open(url);
-        } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            this._nativeBridge.Intent.launch({
-                'action': 'android.intent.action.VIEW',
-                'uri': url
-            });
         }
     }
 

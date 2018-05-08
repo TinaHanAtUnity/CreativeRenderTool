@@ -28,6 +28,7 @@ import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { Placement } from 'Models/Placement';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { Configuration } from 'Models/Configuration';
+import { Privacy } from 'Views/Privacy';
 
 describe('OverlayEventHandlerTest', () => {
 
@@ -87,7 +88,8 @@ describe('OverlayEventHandlerTest', () => {
             optOutRecorded: false,
             optOutEnabled: false,
         };
-        endScreen = new PerformanceEndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId(), gdprParams);
+        const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+        endScreen = new PerformanceEndScreen(nativeBridge, campaign, deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, gdprParams);
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
         comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
         placement = TestFixtures.getPlacement();
@@ -108,7 +110,8 @@ describe('OverlayEventHandlerTest', () => {
             options: {},
             endScreen: endScreen,
             overlay: overlay,
-            video: video
+            video: video,
+            privacy: privacy
         };
         sinon.stub(performanceAdUnitParameters.campaign, 'getAbGroup').returns(5);
 

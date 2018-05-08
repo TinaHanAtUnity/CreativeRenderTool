@@ -1,12 +1,13 @@
 import { EndScreen, IGDPRParams } from 'Views/EndScreen';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { NativeBridge } from 'Native/NativeBridge';
+import { AbstractPrivacy } from 'Views/AbstractPrivacy';
 
 export class XPromoEndScreen extends EndScreen {
     private _campaign: XPromoCampaign;
 
-    constructor(nativeBridge: NativeBridge, campaign: XPromoCampaign, coppaCompliant: boolean, language: string, gameId: string, gdprParams: IGDPRParams) {
-        super(nativeBridge, gdprParams, coppaCompliant, language, gameId, campaign.getGameName(), campaign.getAbGroup());
+    constructor(nativeBridge: NativeBridge, campaign: XPromoCampaign, language: string, gameId: string, privacy: AbstractPrivacy, gdprParams: IGDPRParams) {
+        super(nativeBridge, gdprParams, language, gameId, campaign.getGameName(), campaign.getAbGroup(), privacy);
 
         const adjustedRating: number = campaign.getRating() * 20;
         this._templateData = {

@@ -32,7 +32,7 @@ export class Privacy extends AbstractPrivacy {
 
     protected onCloseEvent(event: Event): void {
         event.preventDefault();
-        this._handlers.forEach(handler => handler.onPrivacyClose(undefined));
+        this._handlers.forEach(handler => handler.onPrivacyClose());
     }
 
     protected onPrivacyEvent(event: Event): void {

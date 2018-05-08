@@ -1,12 +1,13 @@
 import { EndScreen, IGDPRParams } from 'Views/EndScreen';
 import { NativeBridge } from 'Native/NativeBridge';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
+import { AbstractPrivacy } from 'Views/AbstractPrivacy';
 
 export class MRAIDEndScreen extends EndScreen {
     private _campaign: MRAIDCampaign;
 
-    constructor(nativeBridge: NativeBridge, campaign: MRAIDCampaign, coppaCompliant: boolean, language: string, gameId: string, gdprParams: IGDPRParams) {
-        super(nativeBridge, gdprParams, coppaCompliant, language, gameId, campaign.getGameName(), campaign.getAbGroup());
+    constructor(nativeBridge: NativeBridge, campaign: MRAIDCampaign, language: string, gameId: string, privacy: AbstractPrivacy, gdprParams: IGDPRParams) {
+        super(nativeBridge, gdprParams, language, gameId, campaign.getGameName(), campaign.getAbGroup(), privacy);
 
         this._campaign = campaign;
 
