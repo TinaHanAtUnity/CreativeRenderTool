@@ -8,11 +8,7 @@ import { StorageError } from 'Native/Api/Storage';
 export class CustomFeatures {
 
     public static isIosVideoCachingEnabled(abGroup: number): boolean {
-        if (abGroup === 14 || abGroup === 15) {
-            return true;
-        } else {
-            return false;
-        }
+        return abGroup === 14 || abGroup === 15;
     }
 
     public static isExampleGameId(gameId: string): boolean {
