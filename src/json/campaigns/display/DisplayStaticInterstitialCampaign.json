@@ -1,6 +1,6 @@
 {
     "buyerId": "7353",
-    "contentType": "programmatic/static-interstitial",
+    "contentType": "programmatic/static-interstitial-js",
     "adType": "DISPLAY",
     "seatId": 9000,
     "advDomain": "appnexus.com",
