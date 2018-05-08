@@ -164,6 +164,7 @@ class FLAMSingleton {
     }
 
     private sendDiagnosticsError(message: string, data: IFLAMErrorData) {
+        message = message || 'Undefined error';
         Diagnostics.trigger('flam_measure_test_error', {
             message,
             ...data
