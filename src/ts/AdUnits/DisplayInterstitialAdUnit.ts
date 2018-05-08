@@ -287,8 +287,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
 
     private setWebPlayerContent(): Promise<void> {
         return this.setWebplayerSettings(true).then( () => {
-            let markup = this._campaign.getDynamicMarkup();
-            markup = '<script>' + markup + '</script>';
+            const markup = this._campaign.getDynamicMarkup();
             return this.setWebPlayerData(markup, 'text/html', 'UTF-8').then(() => {
                 this._contentReady = true;
             });

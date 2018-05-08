@@ -66,7 +66,8 @@ import OnProgrammaticVastPlcCampaignTooMuchWrapping from 'json/OnProgrammaticVas
 import OnProgrammaticVastPlcCampaignMissingErrorUrls from 'json/OnProgrammaticVastPlcCampaignMissingErrorUrls.json';
 import OnProgrammaticVastPlcCampaignAdLevelErrorUrls from 'json/OnProgrammaticVastPlcCampaignAdLevelErrorUrls.json';
 import OnProgrammaticVastPlcCampaignCustomTracking from 'json/OnProgrammaticVastPlcCampaignCustomTracking.json';
-import OnStaticInterstitialDisplayCampaign from 'json/OnStaticInterstitialDisplayCampaign.json';
+import OnStaticInterstitialDisplayHtmlCampaign from 'json/OnStaticInterstitialDisplayCampaign.json';
+import OnStaticInterstitialDisplayJsCampaign from 'json/OnStaticInterstitialDisplayJsCampaign.json';
 import { JaegerManager } from 'Jaeger/JaegerManager';
 import { JaegerSpan } from 'Jaeger/JaegerSpan';
 import { AdMobOptionalSignal } from 'Models/AdMobOptionalSignal';
@@ -893,11 +894,11 @@ describe('CampaignManager', () => {
         });
     });
 
-    describe('static interstitial display', () => {
-        it('should process the programmatic/static-interstitial content-type', () => {
+    describe('static interstitial display html', () => {
+        it('should process the programmatic/static-interstitial-html', () => {
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve({
-                response: OnStaticInterstitialDisplayCampaign
+                response: OnStaticInterstitialDisplayHtmlCampaign
             }));
 
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
@@ -913,6 +914,38 @@ describe('CampaignManager', () => {
 
             return campaignManager.request().then(() => {
                 if(triggeredError) {
+                    throw triggeredError;
+                }
+
+                mockRequest.verify();
+
+                assert.equal(triggeredCampaign.getAbGroup(), configuration.getAbGroup());
+                assert.equal(triggeredCampaign.getGamerId(), configuration.getGamerId());
+                assert.deepEqual(triggeredCampaign.getOptionalAssets(), []);
+            });
+        });
+    });
+
+    describe('static interstitial display js', () => {
+        it('should process the programmatic/static-interstitial-js', () => {
+            const mockRequest = sinon.mock(request);
+            mockRequest.expects('post').returns(Promise.resolve({
+                response: OnStaticInterstitialDisplayJsCampaign
+            }));
+
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
+            let triggeredCampaign: DisplayInterstitialCampaign;
+            let triggeredError: any;
+            campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
+                triggeredCampaign = <DisplayInterstitialCampaign>campaign;
+            });
+            campaignManager.onError.subscribe(error => {
+                triggeredError = error;
+            });
+
+            return campaignManager.request().then(() => {
+                if (triggeredError) {
                     throw triggeredError;
                 }
 
@@ -1300,6 +1333,35 @@ describe('CampaignManager', () => {
             assert.isFalse(noFill, 'onNoFill was triggered');
             assert.isFalse(onError, 'onError was triggered');
             assert.isFalse(onAdPlanReceived, 'onAdPlanReceived was triggered');
+        });
+    });
+
+    describe('the organizationId-property', () => {
+        let requestData: string = '{}';
+        let assetManager: AssetManager;
+        let campaignManager: CampaignManager;
+
+        beforeEach( () => {
+            sinon.stub(request, 'post').callsFake((url: string, data: string = '', headers: Array<[string, string]> = [], options?: any) => {
+                requestData = data;
+                return Promise.resolve();
+            });
+            assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+            campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
+        });
+        it('should be in request body when defined in config response', () => {
+            return campaignManager.request().then(() => {
+                const requestBody = JSON.parse(requestData);
+                assert.equal(5552368, requestBody.organizationId, 'organizationId should be in ad request body when it was defined in the config response');
+            });
+        });
+
+        it('should not be in request body when not defined in config response', () => {
+            sinon.stub(configuration, 'getOrganizationId').returns(undefined);
+            return campaignManager.request().then(() => {
+                const requestBody = JSON.parse(requestData);
+                assert.isUndefined(requestBody.organizationId, 'organizationId should NOT be in ad request body when it was NOT defined in the config response');
+            });
         });
     });
 });

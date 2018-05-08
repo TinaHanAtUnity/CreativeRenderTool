@@ -1,4 +1,4 @@
-# Pending
+# Fri May  4 13:36:21 UTC 2018
 
 * Stop A/B test from groups 7 and 8 that was accidentally restarted on Apr 26 deployment
 * Fix init promise chain
