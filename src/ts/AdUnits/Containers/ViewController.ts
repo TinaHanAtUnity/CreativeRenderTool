@@ -27,7 +27,6 @@ export class ViewController extends AdUnitContainer {
     private _focusManager: FocusManager;
     private _deviceInfo: IosDeviceInfo;
     private _showing: boolean;
-    private _paused = false;
     private _options: IIosOptions;
 
     private _onViewControllerDidAppearObserver: any;
