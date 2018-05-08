@@ -45,5 +45,4 @@ export class PrivacyEventHandler implements IPrivacyHandler {
 
     }
 
-
 }
