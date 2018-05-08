@@ -164,7 +164,8 @@ describe('IosAdUnitTest', () => {
     });
 
     describe('should handle iOS notifications', () => {
-        let onSystemInterruptTriggered: boolean;
+        let onContainerSystemMessage: boolean;
+        let onContainerVisibilityChanged: boolean;
 
         beforeEach(() => {
             const listener: IAdUnitContainerListener = {
@@ -175,25 +176,26 @@ describe('IosAdUnitTest', () => {
                     // EMPTY
                 },
                 onContainerBackground: function() {
-                    onSystemInterruptTriggered = true;
+                    onContainerVisibilityChanged = true;
                 },
                 onContainerForeground: function() {
-                    onSystemInterruptTriggered = true;
+                    onContainerVisibilityChanged = true;
                 },
                 onContainerSystemMessage: function(message: AdUnitContainerSystemMessage) {
-                    // EMPTY
+                    onContainerSystemMessage = true;
                 },
             };
             testAdUnit = new TestAdUnit(nativeBridge, adUnitParams);
             sinon.stub(nativeBridge.IosAdUnit, 'open').returns(Promise.resolve());
-            onSystemInterruptTriggered = false;
+            onContainerSystemMessage = false;
+            onContainerVisibilityChanged = false;
             container.addEventHandler(listener);
         });
 
         it('with application did become active', () => {
             return container.open(testAdUnit, ['videoplayer', 'webview'], true, Orientation.LANDSCAPE, true, false, true, false, defaultOptions).then(() => {
                 nativeBridge.Notification.onNotification.trigger('UIApplicationDidBecomeActiveNotification', {});
-                assert.isTrue(onSystemInterruptTriggered, 'onContainerBackground or onContainerForeground was not triggered with UIApplicationDidBecomeActiveNotification');
+                assert.isTrue(onContainerVisibilityChanged, 'onContainerBackground or onContainerForeground was not triggered with UIApplicationDidBecomeActiveNotification');
                 return;
             });
         });
@@ -201,7 +203,7 @@ describe('IosAdUnitTest', () => {
         it('with audio session interrupt', () => {
             return container.open(testAdUnit, ['videoplayer', 'webview'], true, Orientation.LANDSCAPE, true, false, true, false, defaultOptions).then(() => {
                 nativeBridge.Notification.onNotification.trigger('AVAudioSessionInterruptionNotification', { AVAudioSessionInterruptionTypeKey: 0, AVAudioSessionInterruptionOptionKey: 1 });
-                assert.isTrue(onSystemInterruptTriggered, 'onContainerBackground or onContainerForeground was not triggered with AVAudioSessionInterruptionNotification');
+                assert.isTrue(onContainerSystemMessage, 'onContainerSystemMessage was not triggered with AVAudioSessionInterruptionNotification');
                 return;
             });
         });
@@ -209,7 +211,7 @@ describe('IosAdUnitTest', () => {
         it('with audio session route change', () => {
             return container.open(testAdUnit, ['videoplayer', 'webview'], true, Orientation.LANDSCAPE, true, false, true, false, defaultOptions).then(() => {
                 nativeBridge.Notification.onNotification.trigger('AVAudioSessionRouteChangeNotification', {});
-                assert.isTrue(onSystemInterruptTriggered, 'onContainerBackground or onContainerForeground was not triggered with AVAudioSessionRouteChangeNotification');
+                assert.isTrue(onContainerSystemMessage, 'onContainerSystemMessage was not triggered with AVAudioSessionRouteChangeNotification');
                 return;
             });
         });
