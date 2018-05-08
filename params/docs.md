@@ -163,7 +163,7 @@
 | projectId | all | False | True | string | Unity project ID | Server | all |
 | gameSessionCounters | all | False | True | object | Game session based counts of starts, views and ad requests | SDK | all |
 | ext | all | False | True | object | JSON string for optional signals for admob | SDK | all |
-| organizationId | all | False | True | string | Previously knows as 'developerID' | Server | all |
+| organizationId | no | False | True | string | Previously knows as 'developerID' | Server | all |
 
 
 

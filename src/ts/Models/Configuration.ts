@@ -23,7 +23,7 @@ interface IConfiguration {
     projectId: string;
     token: string;
     jaegerTracing: boolean;
-    organizationId: string;
+    organizationId: string | undefined;
 }
 
 export class Configuration extends Model<IConfiguration> {
@@ -43,7 +43,7 @@ export class Configuration extends Model<IConfiguration> {
             projectId: ['string'],
             token: ['string'],
             jaegerTracing: ['boolean'],
-            organizationId: ['string']
+            organizationId: ['string', 'undefined']
         });
 
         this.set('enabled', configJson.enabled);
@@ -208,7 +208,7 @@ export class Configuration extends Model<IConfiguration> {
        return this.get('test');
     }
 
-    public getOrganizationId(): string {
+    public getOrganizationId(): string | undefined {
         return this.get('organizationId');
     }
 }

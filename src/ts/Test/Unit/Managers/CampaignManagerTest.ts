@@ -1335,4 +1335,33 @@ describe('CampaignManager', () => {
             assert.isFalse(onAdPlanReceived, 'onAdPlanReceived was triggered');
         });
     });
+
+    describe('the organizationId-property', () => {
+        let requestData: string = '{}';
+        let assetManager: AssetManager;
+        let campaignManager: CampaignManager;
+
+        beforeEach( () => {
+            sinon.stub(request, 'post').callsFake((url: string, data: string = '', headers: Array<[string, string]> = [], options?: any) => {
+                requestData = data;
+                return Promise.resolve();
+            });
+            assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+            campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
+        });
+        it('should be in request body when defined in config response', () => {
+            return campaignManager.request().then(() => {
+                const requestBody = JSON.parse(requestData);
+                assert.equal(5552368, requestBody.organizationId, 'organizationId should be in ad request body when it was defined in the config response');
+            });
+        });
+
+        it('should not be in request body when not defined in config response', () => {
+            sinon.stub(configuration, 'getOrganizationId').returns(undefined);
+            return campaignManager.request().then(() => {
+                const requestBody = JSON.parse(requestData);
+                assert.isUndefined(requestBody.organizationId, 'organizationId should NOT be in ad request body when it was NOT defined in the config response');
+            });
+        });
+    });
 });

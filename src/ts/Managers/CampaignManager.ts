@@ -665,7 +665,11 @@ export class CampaignManager {
                 body.sessionDepth = SdkStats.getAdRequestOrdinal();
                 body.projectId = this._configuration.getUnityProjectId();
                 body.gameSessionCounters = GameSessionCounters.getDTO();
-                body.organizationId = this._configuration.getOrganizationId();
+
+                const organizationId = this._configuration.getOrganizationId();
+                if(organizationId) {
+                    body.organizationId = organizationId;
+                }
                 this._realtimeBody = body;
                 return body;
             });

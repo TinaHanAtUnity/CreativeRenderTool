@@ -309,7 +309,7 @@
     },
     {
       "parameter": "organizationId",
-      "required": "all",
+      "required": "no",
       "queryString": false,
       "body": true
     }
