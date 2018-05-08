@@ -50,7 +50,9 @@ class FLAMSingleton {
         * some specific devices could be expected.
         * */
         try {
-            this.runTests.apply(this, arguments);
+            if (typeof window !== 'undefined' && typeof process === 'undefined') {
+                this.runTests.apply(this, arguments);
+            }
         } catch (error) {
             this.sendDiagnosticsError('FLAM runtime error', {
                 test: String(testsNames),
@@ -146,7 +148,7 @@ class FLAMSingleton {
     }
 
     private storeData(nativeBridge: NativeBridge) {
-        Diagnostics.trigger('flam_measure_test', this._FLAMTestResult);
+        // Diagnostics.trigger('flam_measure_test', this._FLAMTestResult);
 
         for (const name in this._FLAMTestResult) {
             if (this._FLAMTestResult.hasOwnProperty(name)) {
@@ -157,6 +159,8 @@ class FLAMSingleton {
         }
 
         nativeBridge.Storage.write(StorageType.PRIVATE);
+
+        console.log(this._FLAMTestResult)
 
         this._FLAMTestResult = {};
     }
