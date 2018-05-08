@@ -20,7 +20,6 @@ import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer
 import { Activity } from 'AdUnits/Containers/Activity';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { FocusManager } from 'Managers/FocusManager';
-import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { MOAT } from 'Views/MOAT';
 import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
@@ -99,7 +98,6 @@ describe('VastVideoEventHandler tests', () => {
             configuration: configuration,
             campaign: campaign
         });
-        const comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         vastAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,
@@ -109,7 +107,6 @@ describe('VastVideoEventHandler tests', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
-            comScoreTrackingService: comScoreService,
             placement: placement,
             campaign: campaign,
             configuration: configuration,
@@ -132,7 +129,6 @@ describe('VastVideoEventHandler tests', () => {
             campaign: campaign,
             operativeEventManager: operativeEventManager,
             thirdPartyEventManager: thirdPartyEventManager,
-            comScoreTrackingService: comScoreService,
             configuration: configuration,
             placement: placement,
             video: campaign.getVideo(),

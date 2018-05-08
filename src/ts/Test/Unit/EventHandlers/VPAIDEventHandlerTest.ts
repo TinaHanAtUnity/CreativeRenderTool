@@ -11,7 +11,6 @@ import { Platform } from 'Constants/Platform';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { FocusManager } from 'Managers/FocusManager';
 import { Request } from 'Utilities/Request';
 import { VPAIDEventHandler } from 'EventHandlers/VPAIDEventHandler';
@@ -42,7 +41,6 @@ describe('VPAIDEventHandlerTest', () => {
             clientInfo: sinon.createStubInstance(ClientInfo),
             thirdPartyEventManager: sinon.createStubInstance(ThirdPartyEventManager),
             operativeEventManager: sinon.createStubInstance(OperativeEventManager),
-            comScoreTrackingService: sinon.createStubInstance(ComScoreTrackingService),
             placement: TestFixtures.getPlacement(),
             container: sinon.createStubInstance(Activity),
             configuration: sinon.createStubInstance(Configuration),

@@ -22,7 +22,6 @@ import { HttpKafka } from 'Utilities/HttpKafka';
 import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
-import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 
 describe('MRAIDEventHandlersTest', () => {
 
@@ -42,7 +41,6 @@ describe('MRAIDEventHandlersTest', () => {
     let thirdPartyEventManager: ThirdPartyEventManager;
     let mraidAdUnitParameters: IMRAIDAdUnitParameters;
     let mraidEventHandler: MRAIDEventHandler;
-    let comScoreService: ComScoreTrackingService;
     let mraidCampaign: MRAIDCampaign;
 
     describe('with onClick', () => {
@@ -73,7 +71,6 @@ describe('MRAIDEventHandlersTest', () => {
             thirdPartyEventManager = sinon.createStubInstance(ThirdPartyEventManager);
             sessionManager = sinon.createStubInstance(SessionManager);
             operativeEventManager = sinon.createStubInstance(OperativeEventManager);
-            comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 
@@ -90,7 +87,6 @@ describe('MRAIDEventHandlersTest', () => {
                 clientInfo: clientInfo,
                 thirdPartyEventManager: thirdPartyEventManager,
                 operativeEventManager: operativeEventManager,
-                comScoreTrackingService: comScoreService,
                 placement: TestFixtures.getPlacement(),
                 campaign: mraidCampaign,
                 configuration: TestFixtures.getConfiguration(),

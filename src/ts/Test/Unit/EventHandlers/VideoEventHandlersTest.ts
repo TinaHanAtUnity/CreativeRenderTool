@@ -27,7 +27,6 @@ import { FocusManager } from 'Managers/FocusManager';
 import { IOperativeEventManagerParams, OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
-import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { Placement } from 'Models/Placement';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
@@ -61,8 +60,6 @@ describe('VideoEventHandlersTest', () => {
     let performanceAdUnitParameters: IPerformanceAdUnitParameters;
     let vastAdUnitParameters: IVastAdUnitParameters;
     let operativeEventManagerParams: IOperativeEventManagerParams<Campaign>;
-    let comScoreService: ComScoreTrackingService;
-    let spyComScore: sinon.SinonSpy;
     let placement: Placement;
     let performanceCampaign: PerformanceCampaign;
     let vastCampaign: VastCampaign;
@@ -106,7 +103,6 @@ describe('VideoEventHandlersTest', () => {
 
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
 
-        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
         video = new Video('', TestFixtures.getSession());
 
         placement = TestFixtures.getPlacement();
@@ -121,7 +117,6 @@ describe('VideoEventHandlersTest', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
-            comScoreTrackingService: comScoreService,
             placement: placement,
             campaign: vastCampaign,
             configuration: configuration,
@@ -140,7 +135,6 @@ describe('VideoEventHandlersTest', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
-            comScoreTrackingService: comScoreService,
             placement: TestFixtures.getPlacement(),
             campaign: performanceCampaign,
             configuration: configuration,
@@ -161,7 +155,6 @@ describe('VideoEventHandlersTest', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
-            comScoreTrackingService: comScoreService,
             placement: TestFixtures.getPlacement(),
             campaign: xPromoCampaign,
             configuration: configuration,
@@ -180,7 +173,6 @@ describe('VideoEventHandlersTest', () => {
             campaign: performanceCampaign,
             operativeEventManager: operativeEventManager,
             thirdPartyEventManager: thirdPartyEventManager,
-            comScoreTrackingService: comScoreService,
             configuration: configuration,
             placement: TestFixtures.getPlacement(),
             video: video,
@@ -192,11 +184,6 @@ describe('VideoEventHandlersTest', () => {
 
         sinon.stub(performanceAdUnit, 'isPrepareCalled').returns(true);
         sinon.stub(performanceAdUnitParameters.campaign, 'getAbGroup').returns(5);
-        spyComScore = sinon.spy(comScoreService, 'sendEvent');
-    });
-
-    afterEach(() => {
-        spyComScore.restore();
     });
 
     describe('with onVideoPlay', () => {
@@ -339,7 +326,6 @@ describe('VideoEventHandlersTest', () => {
 
             xPromoVideoEventHandler.onCompleted('https://test.com');
 
-            sinon.assert.notCalled(<sinon.SinonSpy>comScoreService.sendEvent);
             sinon.assert.notCalled(<sinon.SinonSpy>xPromoOperativeEventManager.sendView);
             sinon.assert.called(<sinon.SinonSpy>xPromoOperativeEventManager.sendViewEvent);
             sinon.assert.calledWith(<sinon.SinonSpy>xPromoOperativeEventManager.sendHttpKafkaEvent, 'ads.xpromo.operative.videoview.v1.json', 'view', placement, xPromoAdUnit.getVideoOrientation());

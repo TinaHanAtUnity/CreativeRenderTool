@@ -4,7 +4,6 @@ import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'AdUnits/VPAIDAdUnit';
 import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
@@ -16,7 +15,6 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     private _nativeBridge: NativeBridge;
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
-    private _comScoreTrackingService: ComScoreTrackingService;
     private _adUnit: VPAIDAdUnit;
     private _vpaidEventHandlers: { [key: string]: () => void; } = {};
     private _vpaidCampaign: VPAIDCampaign;
@@ -32,7 +30,6 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         this._nativeBridge = nativeBridge;
         this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
-        this._comScoreTrackingService = parameters.comScoreTrackingService;
         this._adUnit = adUnit;
         this._vpaidCampaign = parameters.campaign;
         this._placement = parameters.placement;
@@ -213,19 +210,5 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         for (const url of urls) {
             this._adUnit.sendThirdPartyEvent('vpaid video click', url);
         }
-    }
-
-    private sendComscoreEvent(eventName: string, position: number) {
-        const sessionId = this._vpaidCampaign.getSession().getId();
-        const creativeId = this._vpaidCampaign.getCreativeId();
-        const category = this._vpaidCampaign.getCategory();
-        const subCategory = this._vpaidCampaign.getSubcategory();
-        let adDuration = (this._adDuration * 1000);
-
-        if (adDuration < 0 || typeof adDuration === 'undefined') {
-            adDuration = 0;
-        }
-
-        this._comScoreTrackingService.sendEvent(eventName, sessionId, adDuration.toString(10), position, creativeId, category, subCategory);
     }
 }
