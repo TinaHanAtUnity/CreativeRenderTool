@@ -32,7 +32,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     private _privacy: AbstractPrivacy;
     private _isSwipeToCloseEnabled: boolean = false;
     private _abGroup: number;
-    private _showGDPRBanner: boolean;
+    private _showGDPRBanner: boolean = false;
     private _gdprPopupClicked = false;
     private _campaignId: string | undefined;
     private _osVersion: string | undefined;
@@ -132,7 +132,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     public hide(): void {
         super.hide();
 
-        if (!this._gdprPopupClicked) {
+        if (this._showGDPRBanner && !this._gdprPopupClicked) {
             this._handlers.forEach(handler => handler.onGDPRPopupSkipped());
         }
 
