@@ -88,7 +88,7 @@ describe('ProgrammaticAdMobParser', () => {
 
                 afterEach(() => {
                     abGroup = 0;
-                    setFileIdSpy.restore();
+                    setFileIdSpy.resetHistory();
                 });
 
                 describe('with group 0', () => {
@@ -99,7 +99,8 @@ describe('ProgrammaticAdMobParser', () => {
                     });
 
                     it('should FileId.setFileId', () => {
-                        assert.equal(setFileIdSpy.callCount, 1);
+                        sinon.assert.calledOnce(setFileIdSpy);
+                        sinon.assert.calledWith(setFileIdSpy, url, 'G2KkvNWTNuU');
                     });
                 });
 
@@ -111,7 +112,8 @@ describe('ProgrammaticAdMobParser', () => {
                     });
 
                     it('should FileId.setFileId', () => {
-                        assert.equal(setFileIdSpy.callCount, 1);
+                        sinon.assert.calledOnce(setFileIdSpy);
+                        sinon.assert.calledWith(setFileIdSpy, url, 'G2KkvNWTNuU');
                     });
                 });
 
@@ -123,7 +125,8 @@ describe('ProgrammaticAdMobParser', () => {
                     });
 
                     it('should FileId.setFileId', () => {
-                        assert.equal(setFileIdSpy.callCount, 1);
+                        sinon.assert.calledOnce(setFileIdSpy);
+                        sinon.assert.calledWith(setFileIdSpy, url, 'G2KkvNWTNuU');
                     });
                 });
             });
@@ -144,8 +147,7 @@ describe('ProgrammaticAdMobParser', () => {
                 });
 
                 it('should not call FileId.setFileId', () => { // when no mime type should default to streaming
-                    assert.isNull(setFileIdSpy.firstCall);
-                    assert.equal(setFileIdSpy.callCount, 0);
+                    sinon.assert.notCalled(setFileIdSpy);
                 });
             });
 
@@ -165,26 +167,30 @@ describe('ProgrammaticAdMobParser', () => {
                 });
             });
 
-            describe('should cache', () => {
+            describe('should', () => {
+
+                beforeEach(() => {
+                    setFileIdSpy.resetHistory();
+                });
 
                 afterEach(() => {
                     abGroup = 0;
-                    setFileIdSpy.restore();
+                    setFileIdSpy.resetHistory();
                 });
 
-                describe('with group 0', () => {
+                describe('not cache with group 0', () => {
                     beforeEach(() => {
                         abGroup = 0;
                         (<sinon.SinonStub>request.followRedirectChain).returns(Promise.resolve(url));
                         return parse(JSON.parse(ValidAdMobCampaign));
                     });
 
-                    it('should FileId.setFileId', () => {
-                        assert.equal(setFileIdSpy.callCount, 0);
+                    it('should not FileId.setFileId', () => {
+                        sinon.assert.notCalled(setFileIdSpy);
                     });
                 });
 
-                describe('with group 14', () => {
+                describe('cache with group 14', () => {
                     beforeEach(() => {
                         abGroup = 14;
                         (<sinon.SinonStub>request.followRedirectChain).returns(Promise.resolve(url));
@@ -192,11 +198,12 @@ describe('ProgrammaticAdMobParser', () => {
                     });
 
                     it('should FileId.setFileId', () => {
-                        assert.equal(setFileIdSpy.callCount, 1);
+                        sinon.assert.calledOnce(setFileIdSpy);
+                        sinon.assert.calledWith(setFileIdSpy, url, 'G2KkvNWTNuU.mp4');
                     });
                 });
 
-                describe('with group 15', () => {
+                describe('cache with group 15', () => {
                     beforeEach(() => {
                         abGroup = 15;
                         (<sinon.SinonStub>request.followRedirectChain).returns(Promise.resolve(url));
@@ -204,7 +211,8 @@ describe('ProgrammaticAdMobParser', () => {
                     });
 
                     it('should FileId.setFileId', () => {
-                        assert.equal(setFileIdSpy.callCount, 1);
+                        sinon.assert.calledOnce(setFileIdSpy);
+                        sinon.assert.calledWith(setFileIdSpy, url, 'G2KkvNWTNuU.mp4');
                     });
                 });
             });

@@ -11,6 +11,7 @@ import { VastParser } from 'Utilities/VastParser';
 import { FileId } from 'Utilities/FileId';
 import { Platform } from 'Constants/Platform';
 import { Url } from 'Utilities/Url';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
 
 export class ProgrammaticAdMobParser extends CampaignParser {
     public static ContentType = 'programmatic/admob-video';
@@ -55,7 +56,7 @@ export class ProgrammaticAdMobParser extends CampaignParser {
     }
 
     private getVideoFromMarkup(markup: string, request: Request, session: Session, platform: Platform, abGroup: number): Promise<AdMobVideo> {
-        if (!(abGroup === 14 || abGroup === 15) && platform === Platform.IOS) {
+        if (!CustomFeatures.isIosVideoCachingEnabled(abGroup) && platform === Platform.IOS) {
             return Promise.reject(new Error('iOS precaching to file not supported for HTML5 video player'));
         }
         try {
