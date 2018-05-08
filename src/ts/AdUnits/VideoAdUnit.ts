@@ -25,6 +25,17 @@ export interface IVideoAdUnitParameters<T extends Campaign> extends IAdUnitParam
     overlay: AbstractVideoOverlay;
 }
 
+export enum VideoState {
+    NOT_READY,
+    PREPARING,
+    READY,
+    PLAYING,
+    PAUSED,
+    COMPLETED,
+    SKIPPED,
+    ERRORED
+}
+
 export abstract class VideoAdUnit<T extends Campaign = Campaign> extends AbstractAdUnit implements IAdUnitContainerListener {
 
     private static _progressInterval: number = 250;
@@ -40,6 +51,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     private _placement: Placement;
     private _campaign: T;
     private _finalVideoUrl: string;
+    private _videoState: VideoState = VideoState.NOT_READY;
 
     constructor(nativeBridge: NativeBridge, parameters: IVideoAdUnitParameters<T>) {
         super(nativeBridge, parameters);
@@ -73,8 +85,8 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         if(!this.isShowing()) {
             return Promise.resolve();
         }
-        this.setShowing(false);
 
+        this.setShowing(false);
         this.hideChildren();
         this.unsetReferences();
 
@@ -86,20 +98,20 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         });
     }
 
-    public isVideoReady(): boolean {
-        return this._videoReady;
+    public setVideoState(videoState: VideoState): void {
+        this._videoState = videoState;
     }
 
-    public setVideoReady(ready: boolean): void {
-        this._videoReady = ready;
+    public getVideoState(): VideoState {
+        return this._videoState;
     }
 
-    public isPrepareCalled(): boolean {
-        return this._prepareCalled;
+    public canShowVideo(): boolean {
+        return this.getVideoState() !== VideoState.ERRORED && this.getVideoState() !== VideoState.COMPLETED && this.getVideoState() !== VideoState.SKIPPED;
     }
 
-    public setPrepareCalled(prepareCalled: boolean): void {
-        this._prepareCalled = prepareCalled;
+    public canPrepareVideo(): boolean {
+        return this.canShowVideo() && this.getVideoState() === VideoState.NOT_READY;
     }
 
     public getOverlay(): AbstractVideoOverlay | undefined {
@@ -154,19 +166,26 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
 
     public onContainerDestroy(): void {
         if(this.isShowing()) {
+            this.setActive(false);
             this.setFinishState(FinishState.SKIPPED);
             this.hide();
         }
     }
 
     public onContainerBackground(): void {
-        if(this.isShowing() && this.isActive()) {
-            if(this._nativeBridge.getPlatform() === Platform.IOS) {
-                this._nativeBridge.VideoPlayer.pause();
-            } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+        if(this.isShowing() && this.isActive() && this.getContainer().isPaused()) {
+            this.setActive(false);
+            if(this.canShowVideo() && this.getVideoState() === VideoState.PLAYING) {
+                this.setVideoState(VideoState.PAUSED);
+                /*
+                    We try pause the video-player and if we get a VIDEOVIEW_NULL error
+                    we'll know that the video-player has been destroyed. In this case
+                    set the video not ready so that the onContainerForeground can
+                    re-prepare the video.
+                */
                 this._nativeBridge.VideoPlayer.pause().catch((error) => {
                     if(error === 'VIDEOVIEW_NULL') {
-                        this.setVideoReady(false);
+                        this.setVideoState(VideoState.NOT_READY);
                     }
                 });
             }
@@ -174,10 +193,18 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     }
 
     public onContainerForeground(): void {
-        if(this.isShowing() && this.isActive() && !this.getContainer().isPaused()) {
-            if(this.isVideoReady()) {
+        if(this.isShowing() && !this.isActive() && !this.getContainer().isPaused()) {
+            this.setActive(true);
+            /*
+                Check if we can show the video and if the video is paused.
+                In that case call video-player play to continue playing the video.
+                If not, check if we are allowed to prepare it. In that case prepare the
+                video again. When the video-prepared event is received by the video-event-handler
+                it will seek the video to correct position and call play.
+            */
+            if(this.canShowVideo() && this.getVideoState() === VideoState.PAUSED) {
                 this._nativeBridge.VideoPlayer.play();
-            } else if(this._nativeBridge.getPlatform() === Platform.ANDROID && !this.isPrepareCalled() && !this.isVideoReady()) {
+            } else if(this.canPrepareVideo()) {
                 this.prepareVideo();
             }
         }
@@ -220,7 +247,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     }
 
     private prepareVideo() {
-        this.setPrepareCalled(true);
+        this.setVideoState(VideoState.PREPARING);
         this.getValidVideoUrl().then(url => {
             this._finalVideoUrl = url;
             this._nativeBridge.VideoPlayer.prepare(url, new Double(this._placement.muteVideo() ? 0.0 : 1.0), 10000);
