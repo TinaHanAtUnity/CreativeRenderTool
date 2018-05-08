@@ -161,7 +161,7 @@ if(isolated) {
         }
     });
 } else {
-    Promise.all(sourcePaths.concat(testPaths).map((testPath) => {
+    Promise.all(testPaths.map((testPath) => {
         return System.import(testPath);
     })).then(() => {
         return new Promise((resolve, reject) => {

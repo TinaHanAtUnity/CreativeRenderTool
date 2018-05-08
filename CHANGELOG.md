@@ -1,3 +1,10 @@
+# Pending
+
+* Add organizationId to ad requests
+* Split display interstitial content type to programmatic/static-interstitial-html and programmatic/static-interstitial-js
+* Drop gameSessionCounters from skip event payload
+* Restart backup campaign A/B test on groups 11 and 12
+
 # Fri May  4 13:36:21 UTC 2018
 
 * Stop A/B test from groups 7 and 8 that was accidentally restarted on Apr 26 deployment
