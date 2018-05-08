@@ -211,10 +211,27 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     }
 
     public onContainerSystemMessage(message: AdUnitContainerSystemMessage): void {
-        if(message === AdUnitContainerSystemMessage.MEMORY_WARNING) {
-            if(this.isShowing()) {
-                this._lowMemory = true;
-            }
+        switch(message) {
+            case AdUnitContainerSystemMessage.MEMORY_WARNING:
+                if(this.isShowing()) {
+                    this._lowMemory = true;
+                }
+                break;
+
+            case AdUnitContainerSystemMessage.AUDIO_SESSION_INTERRUPT_BEGAN:
+                if(this.isShowing() && this.isActive() && this.getVideoState() === VideoState.PLAYING) {
+                    this._nativeBridge.VideoPlayer.pause();
+                }
+                break;
+
+            case AdUnitContainerSystemMessage.AUDIO_SESSION_INTERRUPT_ENDED || AdUnitContainerSystemMessage.AUDIO_SESSION_ROUTE_CHANGED:
+                if(this.isShowing() && this.isActive() && this.canShowVideo() && (this.getVideoState() === VideoState.READY || this.getVideoState() === VideoState.PLAYING)) {
+                    this._nativeBridge.VideoPlayer.play();
+                }
+                break;
+
+            default:
+                break;
         }
     }
 
