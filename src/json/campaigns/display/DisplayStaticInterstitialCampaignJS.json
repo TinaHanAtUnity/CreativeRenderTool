@@ -1,0 +1,13 @@
+{
+    "buyerId": "7353",
+    "contentType": "programmatic/static-interstitial-js",
+    "adType": "DISPLAY",
+    "seatId": 9000,
+    "advDomain": "appnexus.com",
+    "trackingUrls": {
+    },
+    "content": "console.log('hello!');",
+    "campaignId": "000000000000000000000001",
+    "cacheTTL": 123,
+    "creativeId": "not-defined-in-fab"
+}
