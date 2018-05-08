@@ -481,5 +481,12 @@
     "description": "JSON string for optional signals for admob",
     "provider": "SDK",
     "platforms": "all"
+  },
+  {
+    "key": "organizationId",
+    "type": "string",
+    "description": "Previously knows as 'developerID'",
+    "provider": "Server",
+    "platforms": "all"
   }
 ]
