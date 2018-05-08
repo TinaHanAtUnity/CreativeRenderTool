@@ -49,5 +49,7 @@
   "properties": "abcdefgh12345678",
   "projectId": "abcd-1234",
   "token": "abcd.1234.5678",
-  "gdpr": false
+  "gdpr": false,
+  "optOutRecorded": false,
+  "optOutEnabled": false
 }

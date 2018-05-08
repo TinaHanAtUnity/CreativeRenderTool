@@ -20,12 +20,6 @@ export interface IEndScreenHandler {
     onGDPRPopupSkipped(): void;
 }
 
-export interface IGDPRParams {
-    gdpr: boolean;
-    optOutRecorded?: boolean;
-    optOutEnabled?: boolean;
-}
-
 const GDPR_OPT_OUT_BASE  = 'gdpr-pop-up-base';
 
 const SQUARE_END_SCREEN = 'square-end-screen';
@@ -38,21 +32,19 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     private _privacy: AbstractPrivacy;
     private _isSwipeToCloseEnabled: boolean = false;
     private _abGroup: number;
-    private _showOptOutPopup: boolean;
+    private _showGDPRBanner: boolean;
     private _gdprPopupClicked = false;
     private _campaignId: string | undefined;
     private _osVersion: string | undefined;
-    private _gdprParamas: IGDPRParams;
 
-    constructor(nativeBridge: NativeBridge, gdprParams: IGDPRParams, language: string, gameId: string, gameName: string | undefined, abGroup: number, privacy: AbstractPrivacy, adUnitStyle?: AdUnitStyle, showOptOutPopup: boolean = false, campaignId?: string, osVersion?: string) {
+    constructor(nativeBridge: NativeBridge, language: string, gameId: string, gameName: string | undefined, abGroup: number, privacy: AbstractPrivacy, showGDPRBanner: boolean, adUnitStyle?: AdUnitStyle, campaignId?: string, osVersion?: string) {
         super(nativeBridge, 'end-screen');
-        this._gdprParamas = gdprParams;
         this._localization = new Localization(language, 'endscreen');
         this._abGroup = abGroup;
         this._gameName = gameName;
         this._privacy = privacy;
         this._adUnitStyle = adUnitStyle;
-        this._showOptOutPopup = showOptOutPopup;
+        this._showGDPRBanner = showGDPRBanner;
         this._campaignId = campaignId;
         this._osVersion = osVersion;
 
@@ -162,7 +154,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     protected getEndscreenAlt(campaign?: Campaign) {
-        if (this._gdprParamas.gdpr && !this._gdprParamas.optOutRecorded) {
+        if (this._showGDPRBanner) {
             return GDPR_OPT_OUT_BASE;
         }
 
