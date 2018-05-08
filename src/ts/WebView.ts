@@ -274,9 +274,9 @@ export class WebView {
             const abGroup = this._configuration.getAbGroup();
 
             /* TODO: Figure out right groups */
-            // if (abGroup === 16 || abGroup === 17) {
-            FLAM.measure(['webp', 'hevc', 'vp9'], this._nativeBridge);
-            // }
+            if (abGroup === 16 || abGroup === 17) {
+                FLAM.measure(['webp', 'hevc', 'vp9'], this._nativeBridge);
+            }
 
             return this._sessionManager.sendUnsentSessions();
         }).catch(error => {
