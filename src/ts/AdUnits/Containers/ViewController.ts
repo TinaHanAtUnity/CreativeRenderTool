@@ -215,17 +215,19 @@ export class ViewController extends AdUnitContainer {
 
                 if(interruptData.AVAudioSessionInterruptionTypeKey === 0) {
                     if(interruptData.AVAudioSessionInterruptionOptionKey === 1) {
-                        this._handlers.forEach(handler => handler.onContainerForeground());
+                        this._handlers.forEach(handler => handler.onContainerSystemMessage(AdUnitContainerSystemMessage.AUDIO_SESSION_INTERRUPT_ENDED));
                     }
                 } else if(interruptData.AVAudioSessionInterruptionTypeKey === 1) {
-                    this._handlers.forEach(handler => handler.onContainerBackground());
+                    this._handlers.forEach(handler => handler.onContainerSystemMessage(AdUnitContainerSystemMessage.AUDIO_SESSION_INTERRUPT_BEGAN));
                 }
                 break;
 
             case ViewController._audioSessionRouteChange:
                 const routeChangeData: { AVAudioSessionRouteChangeReasonKey: number } = parameters;
                 if(routeChangeData.AVAudioSessionRouteChangeReasonKey !== 3) {
-                    this._handlers.forEach(handler => handler.onContainerForeground());
+                    this._handlers.forEach(handler => handler.onContainerSystemMessage(AdUnitContainerSystemMessage.AUDIO_SESSION_ROUTE_CHANGED));
+                } else {
+                    this._handlers.forEach(handler => handler.onContainerSystemMessage(AdUnitContainerSystemMessage.AUDIO_SESSION_CATEGORY_CHANGED));
                 }
 
                 break;
