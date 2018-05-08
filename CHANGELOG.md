@@ -1,3 +1,8 @@
+# Fri May  4 13:36:21 UTC 2018
+
+* Stop A/B test from groups 7 and 8 that was accidentally restarted on Apr 26 deployment
+* Fix init promise chain
+
 # Thu May  3 20:22:59 UTC 2018
 
 * Fix for CSS image URL corner case issue
