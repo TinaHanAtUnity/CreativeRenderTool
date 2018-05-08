@@ -13,7 +13,11 @@ export const enum ViewConfiguration {
 }
 
 export enum AdUnitContainerSystemMessage {
-    MEMORY_WARNING
+    MEMORY_WARNING,
+    AUDIO_SESSION_INTERRUPT_BEGAN,
+    AUDIO_SESSION_INTERRUPT_ENDED,
+    AUDIO_SESSION_ROUTE_CHANGED,
+    AUDIO_SESSION_CATEGORY_CHANGED
 }
 
 export interface IAdUnitContainerListener {
