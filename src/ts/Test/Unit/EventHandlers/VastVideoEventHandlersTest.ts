@@ -29,6 +29,7 @@ import { IVideoEventHandlerParams } from 'EventHandlers/BaseVideoEventHandler';
 
 import EventTestVast from 'xml/EventTestVast.xml';
 import { Vast } from 'Models/Vast/Vast';
+import { VideoState } from 'AdUnits/VideoAdUnit';
 
 describe('VastVideoEventHandler tests', () => {
     const handleInvocation = sinon.spy();
@@ -294,7 +295,7 @@ describe('VastVideoEventHandler tests', () => {
     describe('onVideoError', () => {
         it('should hide ad unit', () => {
             // Cause an error by giving too large duration
-            testAdUnit.setPrepareCalled(true);
+            testAdUnit.setVideoState(VideoState.PREPARING);
             vastVideoEventHandler.onPrepared('https://test.com', 50000, 1024, 768);
             sinon.assert.called(<sinon.SinonSpy>testAdUnit.hide);
         });
@@ -321,8 +322,7 @@ describe('VastVideoEventHandler tests', () => {
 
         it('should show end screen when onVideoError', () => {
             // Cause an error by giving too large duration
-            vastAdUnit.setPrepareCalled(true);
-
+            vastAdUnit.setVideoState(VideoState.PREPARING);
             vastVideoEventHandler.onPrepared('https://test.com', 50000, 1024, 768);
 
             sinon.assert.called(<sinon.SinonSpy>vastEndScreen.show);
