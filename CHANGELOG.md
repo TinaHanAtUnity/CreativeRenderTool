@@ -1,4 +1,4 @@
-# Pending
+# Tue May  8 20:21:44 UTC 2018
 
 * Add organizationId to ad requests
 * Split display interstitial content type to programmatic/static-interstitial-html and programmatic/static-interstitial-js
