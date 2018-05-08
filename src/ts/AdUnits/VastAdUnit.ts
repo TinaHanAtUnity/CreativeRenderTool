@@ -172,17 +172,19 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     }
 
     public onContainerBackground(): void {
-        super.onContainerBackground();
-        if (this._moat && !this._container.isPaused()) {
+        if (this.isShowing() && this.isActive() && this.canShowVideo() && this._moat) {
             this._moat.pause(this.getVolume());
         }
+
+        super.onContainerBackground();
     }
 
     public onContainerForeground(): void {
-        super.onContainerForeground();
-        if (this._moat) {
+        if (this.isShowing() && !this.isActive() && this.canShowVideo() && this._moat) {
             this._moat.resume(this.getVolume());
         }
+
+        super.onContainerForeground();
     }
 
     private getCompanionForOrientation(): VastCreativeCompanionAd | null {
