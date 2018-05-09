@@ -483,6 +483,13 @@
     "platforms": "all"
   },
   {
+    "key": "organizationId",
+    "type": "string",
+    "description": "Previously knows as 'developerID'",
+    "provider": "Server",
+    "platforms": "all"
+  },
+  {
     "key": "gdprEnabled",
     "type": "boolean",
     "description": "If GDPR is enabled",

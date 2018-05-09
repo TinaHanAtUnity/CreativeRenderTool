@@ -23,6 +23,7 @@ interface IConfiguration {
     projectId: string;
     token: string;
     jaegerTracing: boolean;
+    organizationId: string | undefined;
     gdprEnabled: boolean;
     optOutRecorded: boolean;
     optOutEnabled: boolean;
@@ -45,6 +46,7 @@ export class Configuration extends Model<IConfiguration> {
             projectId: ['string'],
             token: ['string'],
             jaegerTracing: ['boolean'],
+            organizationId: ['string', 'undefined'],
             gdprEnabled: ['boolean'],
             optOutRecorded: ['boolean'],
             optOutEnabled: ['boolean']
@@ -58,6 +60,7 @@ export class Configuration extends Model<IConfiguration> {
         this.set('gamerId', configJson.gamerId);
         this.set('properties', configJson.properties);
         this.set('token', configJson.token);
+        this.set('organizationId', configJson.organizationId);
 
         this.set('analytics', configJson.analytics ? true : false);
         this.set('jaegerTracing', configJson.jaegerTracing ? true : false);
@@ -233,5 +236,9 @@ export class Configuration extends Model<IConfiguration> {
 
     public getTestMode(): boolean {
        return this.get('test');
+    }
+
+    public getOrganizationId(): string | undefined {
+        return this.get('organizationId');
     }
 }

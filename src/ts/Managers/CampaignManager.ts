@@ -668,6 +668,11 @@ export class CampaignManager {
                 body.gdprEnabled = this._configuration.isGDPREnabled();
                 body.optOutEnabled = this._configuration.isOptOutEnabled();
                 body.optOutRecorded = this._configuration.isOptOutRecorded();
+
+                const organizationId = this._configuration.getOrganizationId();
+                if(organizationId) {
+                    body.organizationId = organizationId;
+                }
                 this._realtimeBody = body;
                 return body;
             });

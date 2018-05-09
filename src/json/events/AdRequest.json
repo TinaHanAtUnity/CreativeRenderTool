@@ -308,6 +308,12 @@
       "body": true
     },
     {
+      "parameter": "organizationId",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
       "parameter": "gdprEnabled",
       "required": "all",
       "queryString": false,
