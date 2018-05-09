@@ -1,3 +1,7 @@
+# Wed May  9 08:41:13 UTC 2018
+
+* Adds iOS AdMob video precaching for AB Groups 14 and 15.
+
 # Tue May  8 20:21:44 UTC 2018
 
 * Add organizationId to ad requests
