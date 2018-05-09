@@ -154,49 +154,50 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         const platform = this._nativeBridge.getPlatform();
 
         if(parameters.clickAttributionUrlFollowsRedirects && parameters.clickAttributionUrl) {
-            this._thirdPartyEventManager.clickAttributionEvent(parameters.clickAttributionUrl, true).then(response => {
-                const location = Request.getHeader(response.headers, 'location');
-                if(location) {
-                    if(platform === Platform.ANDROID) {
-                        const parsedLocation = Url.parse(location);
-                        if(parsedLocation.pathname.match(/\.apk$/i) && this._nativeBridge.getApiLevel() >= 21) {
-                            // Using WEB_SEARCH bypasses some security check for directly downloading .apk files
-                            this._nativeBridge.Intent.launch({
-                                'action': 'android.intent.action.WEB_SEARCH',
-                                'extras': [
-                                    {
-                                        'key': 'query',
-                                        'value': location
-                                    }
-                                ]
-                            });
-                        } else {
+            const apkDownloadLink = Url.getQueryParameter(parameters.clickAttributionUrl, 'apk_download_link');
+            if(apkDownloadLink && platform === Platform.ANDROID && this._nativeBridge.getApiLevel() >= 21) {
+                this._thirdPartyEventManager.clickAttributionEvent(parameters.clickAttributionUrl, false);
+                // Using WEB_SEARCH bypasses some security check for directly downloading .apk files
+                this._nativeBridge.Intent.launch({
+                    'action': 'android.intent.action.WEB_SEARCH',
+                    'extras': [
+                        {
+                            'key': 'query',
+                            'value': apkDownloadLink
+                        }
+                    ]
+                });
+            } else {
+                this._thirdPartyEventManager.clickAttributionEvent(parameters.clickAttributionUrl, true).then(response => {
+                    const location = Request.getHeader(response.headers, 'location');
+                    if (location) {
+                        if (platform === Platform.ANDROID) {
                             this._nativeBridge.Intent.launch({
                                 'action': 'android.intent.action.VIEW',
                                 'uri': location
                             });
+                        } else if (platform === Platform.IOS) {
+                            this._nativeBridge.UrlScheme.open(location);
                         }
-                    } else if(platform === Platform.IOS) {
-                        this._nativeBridge.UrlScheme.open(location);
+                    } else {
+                        Diagnostics.trigger('click_attribution_misconfigured', {
+                            url: parameters.clickAttributionUrl,
+                            followsRedirects: parameters.clickAttributionUrlFollowsRedirects,
+                            response: response
+                        });
                     }
-                } else {
-                    Diagnostics.trigger('click_attribution_misconfigured', {
-                        url: parameters.clickAttributionUrl,
-                        followsRedirects: parameters.clickAttributionUrlFollowsRedirects,
-                        response: response
-                    });
-                }
-            }).catch(error => {
-                if(error instanceof RequestError) {
-                    error = new DiagnosticError(new Error(error.message), {
-                        request: (<RequestError>error).nativeRequest,
-                        auctionId: currentSession.getId(),
-                        url: parameters.clickAttributionUrl,
-                        response: (<RequestError>error).nativeResponse
-                    });
-                }
-                Diagnostics.trigger('click_attribution_failed', error);
-            });
+                }).catch(error => {
+                    if (error instanceof RequestError) {
+                        error = new DiagnosticError(new Error(error.message), {
+                            request: (<RequestError>error).nativeRequest,
+                            auctionId: currentSession.getId(),
+                            url: parameters.clickAttributionUrl,
+                            response: (<RequestError>error).nativeResponse
+                        });
+                    }
+                    Diagnostics.trigger('click_attribution_failed', error);
+                });
+            }
         } else {
             if (parameters.clickAttributionUrl) {
                 this._thirdPartyEventManager.clickAttributionEvent(parameters.clickAttributionUrl, false);
