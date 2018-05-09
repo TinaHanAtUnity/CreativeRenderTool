@@ -665,7 +665,7 @@ export class CampaignManager {
                 body.sessionDepth = SdkStats.getAdRequestOrdinal();
                 body.projectId = this._configuration.getUnityProjectId();
                 body.gameSessionCounters = GameSessionCounters.getDTO();
-                // body.gdpr = this._configuration.isGDPR(); // todo: is needed?
+                body.gdprEnabled = this._configuration.isGDPREnabled();
                 body.optOutEnabled = this._configuration.isOptOutEnabled();
                 body.optOutRecorded = this._configuration.isOptOutRecorded();
                 this._realtimeBody = body;

@@ -23,7 +23,7 @@ interface IConfiguration {
     projectId: string;
     token: string;
     jaegerTracing: boolean;
-    gdpr: boolean;
+    gdprEnabled: boolean;
     optOutRecorded: boolean;
     optOutEnabled: boolean;
 }
@@ -45,7 +45,7 @@ export class Configuration extends Model<IConfiguration> {
             projectId: ['string'],
             token: ['string'],
             jaegerTracing: ['boolean'],
-            gdpr: ['boolean'],
+            gdprEnabled: ['boolean'],
             optOutRecorded: ['boolean'],
             optOutEnabled: ['boolean']
         });
@@ -62,7 +62,7 @@ export class Configuration extends Model<IConfiguration> {
         this.set('analytics', configJson.analytics ? true : false);
         this.set('jaegerTracing', configJson.jaegerTracing ? true : false);
 
-        this.set('gdpr', configJson.gdpr);
+        this.set('gdprEnabled', configJson.gdprEnabled);
         this.set('optOutRecorded', configJson.optOutRecorded);
         this.set('optOutEnabled', configJson.optOutEnabled);
 
@@ -185,8 +185,8 @@ export class Configuration extends Model<IConfiguration> {
         return this.get('projectId');
     }
 
-    public isGDPR(): boolean {
-        return this.get('gdpr');
+    public isGDPREnabled(): boolean {
+        return this.get('gdprEnabled');
     }
 
     public isOptOutRecorded(): boolean {

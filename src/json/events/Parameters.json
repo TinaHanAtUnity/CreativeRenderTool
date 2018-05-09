@@ -483,6 +483,13 @@
     "platforms": "all"
   },
   {
+    "key": "gdprEnabled",
+    "type": "boolean",
+    "description": "If GDPR is enabled",
+    "provider": "Server",
+    "platforms": "all"
+  },
+  {
     "key": "optOutRecorded",
     "type": "boolean",
     "description": "Whether the user has seen the opt-out banner or not",
