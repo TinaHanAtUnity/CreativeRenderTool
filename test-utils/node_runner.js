@@ -37,6 +37,7 @@ global.navigator = {
 const coverageDir = process.env.COVERAGE_DIR;
 const testFilter = process.env.TEST_FILTER;
 const isolated = process.env.ISOLATED;
+const outputFolder = process.env.OUTPUT_FOLDER || 'src/ts';
 
 let getSourcePaths = (root) => {
     let paths = [];
@@ -45,7 +46,7 @@ let getSourcePaths = (root) => {
         if (fs.statSync(fullPath).isDirectory() && fullPath.indexOf('Test') === -1) {
             paths = paths.concat(getSourcePaths(fullPath));
         } else if(fullPath.indexOf('.js') !== -1) {
-            paths.push(fullPath.replace('src/ts/', '').replace('.js', ''));
+            paths.push(fullPath.replace(outputFolder + '/', '').replace('.js', ''));
         }
     });
     return paths;
@@ -58,14 +59,14 @@ let getTestPaths = (root, filter) => {
         if (fs.statSync(fullPath).isDirectory()) {
             paths = paths.concat(getTestPaths(fullPath, filter));
         } else if(fullPath.match(filter) && fullPath.indexOf('.js') !== -1) {
-            paths.push(fullPath.replace('src/ts/', '').replace('.js', ''));
+            paths.push(fullPath.replace(outputFolder + '/', '').replace('.js', ''));
         }
     });
     return paths;
 };
 
 System.config({
-    baseURL: 'src/ts',
+    baseURL: outputFolder,
     map: {
         'mocha': './node_modules/mocha/mocha.js',
         'sinon': './node_modules/sinon/pkg/sinon.js',
@@ -128,7 +129,7 @@ if(coverageDir) {
             if(load.address.match(/src\/ts\/Native\/Backend/)) {
                 return source;
             }
-            return instrumenter.instrumentSync(source, 'src/ts/' + load.address.substr(System.baseURL.length));
+            return instrumenter.instrumentSync(source, outputFolder + '/' + load.address.substr(System.baseURL.length));
         });
     };
 }
@@ -138,8 +139,8 @@ process.on('unhandledRejection', (error, promise) => {
     process.exit(1);
 });
 
-const sourcePaths = getSourcePaths('src/ts');
-const testPaths = getTestPaths('src/ts/Test', testFilter);
+const sourcePaths = getSourcePaths(outputFolder);
+const testPaths = getTestPaths(outputFolder + '/Test', testFilter);
 
 if(isolated) {
     testPaths.forEach((testPath) => {
