@@ -11,7 +11,6 @@ import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 import { FocusManager } from 'Managers/FocusManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { Request } from 'Utilities/Request';
 import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { DisplayInterstitialAdUnit, IDisplayInterstitialAdUnitParameters } from 'AdUnits/DisplayInterstitialAdUnit';
@@ -28,7 +27,6 @@ describe('DisplayInterstitialEventHandler', () => {
     let displayInterstitialAdUnit: DisplayInterstitialAdUnit;
     let displayInterstitialEventHandler: DisplayInterstitialEventHandler;
     let operativeEventManager: OperativeEventManager;
-    let comScoreService: ComScoreTrackingService;
 
     describe('on Display Interstitial Markup Campaign', () => {
         eventHandlerTests();
@@ -62,7 +60,6 @@ describe('DisplayInterstitialEventHandler', () => {
             const deviceInfo = TestFixtures.getAndroidDeviceInfo();
             const thirdPartyEventManager = sinon.createStubInstance(ThirdPartyEventManager);
             operativeEventManager = sinon.createStubInstance(OperativeEventManager);
-            comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
             displayInterstitialAdUnitParameters = {
                 forceOrientation: Orientation.LANDSCAPE,
@@ -72,7 +69,6 @@ describe('DisplayInterstitialEventHandler', () => {
                 clientInfo: clientInfo,
                 thirdPartyEventManager: thirdPartyEventManager,
                 operativeEventManager: operativeEventManager,
-                comScoreTrackingService: comScoreService,
                 placement: placement,
                 campaign: campaign,
                 configuration: TestFixtures.getConfiguration(),

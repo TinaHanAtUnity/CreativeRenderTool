@@ -23,7 +23,6 @@ import { XPromoEndScreen } from 'Views/XPromoEndScreen';
 import { Placement } from 'Models/Placement';
 import { XPromoEndScreenEventHandler } from 'EventHandlers/XPromoEndScreenEventHandler';
 import { IXPromoAdUnitParameters, XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
-import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { XPromoOperativeEventManager } from 'Managers/XPromoOperativeEventManager';
 import { Privacy } from 'Views/Privacy';
@@ -45,7 +44,6 @@ describe('XPromoEndScreenEventHandlerTest', () => {
     let endScreenEventHandler: XPromoEndScreenEventHandler;
     let campaign: XPromoCampaign;
     let placement: Placement;
-    let comScoreService: ComScoreTrackingService;
 
     describe('with onDownloadAndroid', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -78,7 +76,6 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 campaign: campaign
             });
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
-            comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
             sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
             sinon.stub(operativeEventManager, 'sendHttpKafkaEvent').returns(resolvedPromise);
@@ -99,7 +96,6 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 clientInfo: clientInfo,
                 thirdPartyEventManager: thirdPartyEventManager,
                 operativeEventManager: operativeEventManager,
-                comScoreTrackingService: comScoreService,
                 placement: placement,
                 campaign: campaign,
                 configuration: configuration,
@@ -181,7 +177,6 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 clientInfo: clientInfo,
                 thirdPartyEventManager: thirdPartyEventManager,
                 operativeEventManager: operativeEventManager,
-                comScoreTrackingService: comScoreService,
                 placement: TestFixtures.getPlacement(),
                 campaign: campaign,
                 configuration: configuration,

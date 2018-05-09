@@ -12,7 +12,6 @@ import { ViewController } from 'AdUnits/Containers/ViewController';
 import { Video } from 'Models/Assets/Video';
 import { FocusManager } from 'Managers/FocusManager';
 import { ClientInfo } from 'Models/ClientInfo';
-import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
@@ -42,7 +41,6 @@ describe('PrivacyEventHandlerTest', () => {
             clientInfo: sinon.createStubInstance(ClientInfo),
             thirdPartyEventManager: sinon.createStubInstance(ThirdPartyEventManager),
             operativeEventManager: sinon.createStubInstance(OperativeEventManager),
-            comScoreTrackingService: sinon.createStubInstance(ComScoreTrackingService),
             placement: sinon.createStubInstance(Placement),
             campaign: sinon.createStubInstance(PerformanceCampaign),
             configuration: sinon.createStubInstance(Configuration),
@@ -54,7 +52,7 @@ describe('PrivacyEventHandlerTest', () => {
             privacy: sinon.createStubInstance(GDPRPrivacy)
         };
 
-        adUnit = sinon.createStubInstance(PerformanceAdUnit);        // (<sinon.SinonStub>parameters.campaign.getSession).returns(TestFixtures.getSession());
+        adUnit = sinon.createStubInstance(PerformanceAdUnit);
 
         nativeBridge = sinon.createStubInstance(NativeBridge);
         (<any>nativeBridge).UrlScheme = sinon.createStubInstance(UrlSchemeApi);
