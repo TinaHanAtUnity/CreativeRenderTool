@@ -21,6 +21,8 @@ import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { GdprConsentManager } from 'Managers/GdprConsentManager';
+import { Privacy } from 'Views/Privacy';
+import { PrivacyEventHandler } from 'EventHandlers/PrivacyEventHandler';
 
 describe('DisplayInterstitialAdUnit', () => {
     let adUnit: DisplayInterstitialAdUnit;
@@ -75,7 +77,9 @@ describe('DisplayInterstitialAdUnit', () => {
                 campaign: campaign
             });
 
-            view = new DisplayInterstitial(nativeBridge, placement, campaign);
+            const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+
+            view = new DisplayInterstitial(nativeBridge, placement, campaign, privacy, false);
             view.render();
             document.body.appendChild(view.container());
             sandbox.stub(view, 'show');

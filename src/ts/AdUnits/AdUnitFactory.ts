@@ -330,8 +330,10 @@ export class AdUnitFactory {
     }
 
     private static createDisplayInterstitialAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<DisplayInterstitialCampaign>): DisplayInterstitialAdUnit {
-        const view = new DisplayInterstitial(nativeBridge, parameters.placement, <DisplayInterstitialCampaign>parameters.campaign);
 
+        const privacy = this.createPrivacy(nativeBridge, parameters);
+
+        const view = new DisplayInterstitial(nativeBridge, parameters.placement, <DisplayInterstitialCampaign>parameters.campaign, privacy, parameters.showGDPRPopup ? parameters.showGDPRPopup : false);
         const displayInterstitialParameters: IDisplayInterstitialAdUnitParameters = {
             ... parameters,
             view: view,
