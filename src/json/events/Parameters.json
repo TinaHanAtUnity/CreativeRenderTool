@@ -481,5 +481,19 @@
     "description": "JSON string for optional signals for admob",
     "provider": "SDK",
     "platforms": "all"
+  },
+  {
+    "key": "optOutRecorded",
+    "type": "boolean",
+    "description": "Whether the user has seen the opt-out banner or not",
+    "provider": "Server",
+    "platforms": "all"
+  },
+  {
+    "key": "optOutEnabled",
+    "type": "boolean",
+    "description": "If the opt-out is enabled",
+    "provider": "Server",
+    "platforms": "all"
   }
 ]
