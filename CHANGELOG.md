@@ -1,4 +1,4 @@
-# Pending
+# Wed May  9 20:37:15 UTC 2018
 
 * Disable ComScore integration
 * Add make watch-fast target
