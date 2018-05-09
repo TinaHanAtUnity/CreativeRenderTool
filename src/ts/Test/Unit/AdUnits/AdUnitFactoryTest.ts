@@ -29,7 +29,6 @@ import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { Campaign } from 'Models/Campaign';
 
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
-import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 import { XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
@@ -53,7 +52,6 @@ describe('AdUnitFactoryTest', () => {
     let thirdPartyEventManager: ThirdPartyEventManager;
     let request: Request;
     let adUnitParameters: IAdUnitParameters<Campaign>;
-    let comScoreService: ComScoreTrackingService;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -86,7 +84,6 @@ describe('AdUnitFactoryTest', () => {
             campaign: campaign
         });
 
-        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
         sandbox.stub(MoatViewabilityService, 'initMoat');
 
         adUnitParameters = {
@@ -97,7 +94,6 @@ describe('AdUnitFactoryTest', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
-            comScoreTrackingService: comScoreService,
             placement: TestFixtures.getPlacement(),
             campaign: campaign,
             configuration: config,

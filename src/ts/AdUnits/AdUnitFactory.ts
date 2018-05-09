@@ -428,7 +428,6 @@ export class AdUnitFactory {
             campaign: params.campaign,
             operativeEventManager: params.operativeEventManager,
             thirdPartyEventManager: params.thirdPartyEventManager,
-            comScoreTrackingService: params.comScoreTrackingService,
             configuration: params.configuration,
             placement: params.placement,
             video: video,

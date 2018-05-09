@@ -22,7 +22,6 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { FocusManager } from 'Managers/FocusManager';
 import { Request } from 'Utilities/Request';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { MOAT } from 'Views/MOAT';
 import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 import { SinonSandbox } from 'sinon';
@@ -47,7 +46,6 @@ describe('VastOverlayEventHandlersTest', () => {
     let request: Request;
     let vastAdUnitParameters: IVastAdUnitParameters;
     let vastOverlayEventHandler: VastOverlayEventHandler;
-    let comScoreService: ComScoreTrackingService;
     let moat: MOAT;
     let sandbox: sinon.SinonSandbox;
 
@@ -102,8 +100,6 @@ describe('VastOverlayEventHandlersTest', () => {
             campaign: campaign
         });
 
-        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
-
         vastAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
@@ -112,7 +108,6 @@ describe('VastOverlayEventHandlersTest', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
-            comScoreTrackingService: comScoreService,
             placement: TestFixtures.getPlacement(),
             campaign: campaign,
             configuration: configuration,
