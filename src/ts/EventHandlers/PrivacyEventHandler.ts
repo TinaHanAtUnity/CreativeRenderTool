@@ -5,17 +5,20 @@ import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { Configuration } from 'Models/Configuration';
 import { Campaign } from 'Models/Campaign';
 import { Platform } from 'Constants/Platform';
+import { Placement } from 'Models/Placement';
 
 export class PrivacyEventHandler implements IPrivacyHandler {
 
     private _nativeBridge: NativeBridge;
     private _operativeEventManager: OperativeEventManager;
     private _configuration: Configuration;
+    private _placement: Placement;
 
     constructor(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>) {
         this._nativeBridge = nativeBridge;
         this._operativeEventManager = parameters.operativeEventManager;
         this._configuration = parameters.configuration;
+        this._placement = parameters.placement;
     }
 
     public onPrivacy(url: string): void {
@@ -39,10 +42,10 @@ export class PrivacyEventHandler implements IPrivacyHandler {
         }
         if (optOutEnabled !== this._configuration.isOptOutEnabled()) {
             this._configuration.setOptOutEnabled(optOutEnabled);
-            // todo: send operative event
+            const action: string = optOutEnabled ? 'optout' : 'optin';
 
+            this._operativeEventManager.sendGDPREvent(this._placement, action);
         }
 
     }
-
 }

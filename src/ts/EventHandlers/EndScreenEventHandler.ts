@@ -72,7 +72,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
             this._configuration.setOptOutRecorded(true);
         }
 
-        // todo: send gdpr operative event with action 'skip'
+        this._operativeEventManager.sendGDPREvent(this._placement, 'skip');
     }
 
     public abstract onKeyEvent(keyCode: number): void;
