@@ -46,12 +46,7 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
             {
                 event: 'click',
                 listener: (event: Event) => this.onCloseEvent(event),
-                selector: '.close-region'
-            },
-            {
-                event: 'click',
-                listener: (event: Event) => this.onCloseEvent(event),
-                selector: '.gdpr-pop-up'
+                selector: '.close'
             },
             {
                 event: 'click',
@@ -81,10 +76,6 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
         window.addEventListener('message', this._messageListener);
         this._closeElement.style.opacity = '1';
         this.updateProgressCircle(this._closeElement, 1);
-
-        if (this._showGDPRBanner && !this._gdprPopupClicked) {
-            this._handlers.forEach(handler => handler.onGDPRPopupSkipped());
-        }
     }
 
     public hide() {
@@ -95,6 +86,10 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
             window.clearInterval(timer);
         }
         this._timers = [];
+
+        if (this._showGDPRBanner && !this._gdprPopupClicked) {
+            this._handlers.forEach(handler => handler.onGDPRPopupSkipped());
+        }
     }
 
     public onPrivacy(url: string): void {
