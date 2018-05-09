@@ -7,7 +7,6 @@ import { Configuration } from 'Models/Configuration';
 import { FileInfo } from 'Utilities/FileInfo';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { Placement } from 'Models/Placement';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
@@ -19,7 +18,6 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
 
     protected _operativeEventManager: OperativeEventManager;
     protected _thirdPartyEventManager: ThirdPartyEventManager;
-    protected _comScoreTrackingService: ComScoreTrackingService;
     protected _configuration: Configuration;
     protected _placement: Placement;
     protected _adUnitStyle: AdUnitStyle | undefined;
@@ -30,7 +28,6 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
 
         this._operativeEventManager = params.operativeEventManager;
         this._thirdPartyEventManager = params.thirdPartyEventManager;
-        this._comScoreTrackingService = params.comScoreTrackingService;
         this._configuration = params.configuration;
         this._placement = params.placement;
         this._adUnitStyle = params.adUnitStyle;
@@ -240,16 +237,6 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
             this._adUnit.onStartProcessed.trigger();
         });
 
-        const comScoreDuration = (this._video.getDuration()).toString(10);
-        const sessionId = this._campaign.getSession().getId();
-        const creativeId = this._campaign.getCreativeId();
-        let category;
-        let subCategory;
-        if (this._campaign instanceof VastCampaign) {
-            category = this._campaign.getCategory();
-            subCategory = this._campaign.getSubcategory();
-        }
-        this._comScoreTrackingService.sendEvent('play', sessionId, comScoreDuration, progress, creativeId, category, subCategory);
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
     }
 
@@ -267,11 +254,5 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
 
     protected handleCompleteEvent(url: string): void {
         this._operativeEventManager.sendView(this._placement, this.getVideoOrientation(), this._adUnitStyle);
-
-        const comScorePlayedTime = this._video.getPosition();
-        const comScoreDuration = (this._video.getDuration()).toString(10);
-        const sessionId = this._campaign.getSession().getId();
-        const creativeId = this._campaign.getCreativeId();
-        this._comScoreTrackingService.sendEvent('end', sessionId, comScoreDuration, comScorePlayedTime, creativeId, undefined, undefined);
     }
 }

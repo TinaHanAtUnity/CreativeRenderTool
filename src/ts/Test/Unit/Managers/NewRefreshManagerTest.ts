@@ -23,7 +23,6 @@ import { TestAdUnit } from 'Test/Unit/TestHelpers/TestAdUnit';
 import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
@@ -52,7 +51,6 @@ describe('NewRefreshManagerTest', () => {
     let thirdPartyEventManager: ThirdPartyEventManager;
     let campaign: PerformanceCampaign;
     let operativeEventManager: OperativeEventManager;
-    let comScoreTrackingService: ComScoreTrackingService;
     let container: Activity;
     let adUnit: TestAdUnit;
     let jaegerManager: JaegerManager;
@@ -88,7 +86,6 @@ describe('NewRefreshManagerTest', () => {
             configuration: configuration,
             campaign: campaign
         });
-        comScoreTrackingService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
         container = new Activity(nativeBridge, deviceInfo);
         adUnit = new TestAdUnit(nativeBridge, {
             forceOrientation: Orientation.NONE,
@@ -98,7 +95,6 @@ describe('NewRefreshManagerTest', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
-            comScoreTrackingService: comScoreTrackingService,
             placement: TestFixtures.getPlacement(),
             campaign: TestFixtures.getCampaign(),
             configuration: configuration,

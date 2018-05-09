@@ -13,7 +13,6 @@ import { Video } from 'Models/Assets/Video';
 import { Request } from 'Utilities/Request';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { SessionManager } from 'Managers/SessionManager';
-import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { FocusManager } from 'Managers/FocusManager';
 import { WakeUpManager } from 'Managers/WakeUpManager';
@@ -31,7 +30,6 @@ describe('PerformanceVideoEventHandlersTest', () => {
     let performanceAdUnit: PerformanceAdUnit;
     let video: Video;
     let performanceAdUnitParameters: IPerformanceAdUnitParameters;
-    let comScoreService: ComScoreTrackingService;
     let performanceVideoEventHandler: PerformanceVideoEventHandler;
 
     beforeEach(() => {
@@ -64,7 +62,6 @@ describe('PerformanceVideoEventHandlersTest', () => {
             campaign: campaign
         });
 
-        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
         endScreen = new PerformanceEndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
 
@@ -76,7 +73,6 @@ describe('PerformanceVideoEventHandlersTest', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
-            comScoreTrackingService: comScoreService,
             placement: TestFixtures.getPlacement(),
             campaign: campaign,
             configuration: configuration,
@@ -95,7 +91,6 @@ describe('PerformanceVideoEventHandlersTest', () => {
             campaign: campaign,
             operativeEventManager: operativeEventManager,
             thirdPartyEventManager: thirdPartyEventManager,
-            comScoreTrackingService: comScoreService,
             configuration: configuration,
             placement: TestFixtures.getPlacement(),
             video: video,

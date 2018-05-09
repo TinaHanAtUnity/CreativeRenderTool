@@ -20,7 +20,6 @@ import { Cache, CacheStatus } from 'Utilities/Cache';
 import { Placement, PlacementState } from 'Models/Placement';
 import { SessionManager } from 'Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { AdUnitContainer, Orientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
@@ -63,7 +62,6 @@ describe('CampaignRefreshManager', () => {
     let adUnitParams: IAdUnitParameters<Campaign>;
     let operativeEventManager: OperativeEventManager;
     let adMobSignalFactory: AdMobSignalFactory;
-    let comScoreService: ComScoreTrackingService;
     let cacheBookkeeping: CacheBookkeeping;
     let cache: Cache;
     let jaegerManager: JaegerManager;
@@ -163,7 +161,6 @@ describe('CampaignRefreshManager', () => {
         adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);
         (<sinon.SinonStub>adMobSignalFactory.getAdRequestSignal).returns(Promise.resolve(new AdMobSignal()));
         (<sinon.SinonStub>adMobSignalFactory.getOptionalSignal).returns(Promise.resolve(new AdMobOptionalSignal()));
-        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         adUnitParams = {
             forceOrientation: Orientation.NONE,
@@ -173,7 +170,6 @@ describe('CampaignRefreshManager', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
-            comScoreTrackingService: comScoreService,
             placement: TestFixtures.getPlacement(),
             campaign: campaign,
             configuration: configuration,
