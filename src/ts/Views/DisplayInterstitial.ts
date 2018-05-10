@@ -81,7 +81,6 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
     public show(): void {
         super.show();
 
-        this._showGDPRBanner = false;
         this.choosePrivacyShown();
 
         window.addEventListener('message', this._messageListener);
