@@ -8,6 +8,8 @@ import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitia
 import { Platform } from 'Constants/Platform';
 import { Template } from 'Utilities/Template';
 import { IPrivacyHandler, AbstractPrivacy } from './AbstractPrivacy';
+import { ENGINE_METHOD_DIGESTS } from 'constants';
+import { GDPRPrivacy } from './GDPRPrivacy';
 
 export interface IDisplayInterstitialHandler {
     onDisplayInterstitialClose(): void;
@@ -20,8 +22,8 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
     private _campaign: DisplayInterstitialCampaign;
 
     private _closeElement: HTMLElement;
-    private _GDPROptOutElement: HTMLElement;
     private _GDPRPopupElement: HTMLElement;
+    private _privacyButtonElement: HTMLElement;
     private _privacy: AbstractPrivacy;
     private _gdprPopupClicked: boolean = false;
 
@@ -52,7 +54,12 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
                 event: 'click',
                 listener: (event: Event) => this.onGDPRPopupEvent(event),
                 selector: '.gdpr-link'
-            }
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onPrivacyEvent(event),
+                selector: '.icon-info'
+            },
         ];
 
         this._privacy.render();
@@ -66,12 +73,24 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
 
         this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
         this._GDPRPopupElement = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
+        this._privacyButtonElement = <HTMLElement>this._container.querySelector('.privacy-button');
+
         document.documentElement.classList.add('gdpr-pop-up-base');
     }
 
     public show(): void {
         super.show();
-        this._GDPRPopupElement.style.opacity = '1';
+
+        // this._showGDPRBanner = false;
+        if (this._showGDPRBanner && this._privacy instanceof GDPRPrivacy) {
+            this._GDPRPopupElement.style.opacity = '1';
+            this._privacyButtonElement.style.pointerEvents = '1';
+            this._privacyButtonElement.style.visibility = 'hidden';
+        } else {
+            this._privacyButtonElement.style.opacity = '.5';
+            this._GDPRPopupElement.style.pointerEvents = '1';
+            this._GDPRPopupElement.style.visibility = 'hidden';
+        }
 
         window.addEventListener('message', this._messageListener);
         this._closeElement.style.opacity = '1';
@@ -149,6 +168,12 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
         event.preventDefault();
 
         this._gdprPopupClicked = true;
+        this._privacy.show();
+    }
+
+    private onPrivacyEvent(event: Event) {
+        event.preventDefault();
+
         this._privacy.show();
     }
 

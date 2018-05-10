@@ -1,4 +1,6 @@
 @import "components.styl";
+@import "vars.styl";
+@import "icons.styl";
 
 #display-interstitial {
   position: absolute;
@@ -100,6 +102,16 @@
         .gdpr-link {
           color: $blue;
         }
-      }
+    }
+  }
+
+  .privacy-button {
+    position: absolute;
+    top: 0;
+    width: 100%;
+
+    .icon-info {
+      color: gray;
+    }
   }
 }
