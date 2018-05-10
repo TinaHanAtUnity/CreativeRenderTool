@@ -81,16 +81,8 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
     public show(): void {
         super.show();
 
-        // this._showGDPRBanner = false;
-        if (this._showGDPRBanner && this._privacy instanceof GDPRPrivacy) {
-            this._GDPRPopupElement.style.opacity = '1';
-            this._privacyButtonElement.style.pointerEvents = '1';
-            this._privacyButtonElement.style.visibility = 'hidden';
-        } else {
-            this._privacyButtonElement.style.opacity = '.5';
-            this._GDPRPopupElement.style.pointerEvents = '1';
-            this._GDPRPopupElement.style.visibility = 'hidden';
-        }
+        this._showGDPRBanner = false;
+        this.choosePrivacyShown();
 
         window.addEventListener('message', this._messageListener);
         this._closeElement.style.opacity = '1';
@@ -123,6 +115,18 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
 
     public onGDPROptOut(optOutEnabled: boolean): void {
         // do nothing
+    }
+
+    private choosePrivacyShown(): void {
+        if (this._showGDPRBanner && this._privacy instanceof GDPRPrivacy) {
+            this._GDPRPopupElement.style.opacity = '1';
+            this._privacyButtonElement.style.pointerEvents = '1';
+            this._privacyButtonElement.style.visibility = 'hidden';
+        } else {
+            this._privacyButtonElement.style.opacity = '1';
+            this._GDPRPopupElement.style.pointerEvents = '1';
+            this._GDPRPopupElement.style.visibility = 'hidden';
+        }
     }
 
     private clearTimer(handle: number) {
