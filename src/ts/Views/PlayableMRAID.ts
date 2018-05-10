@@ -10,8 +10,8 @@ import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
-import { JsonParser } from 'Utilities/JsonParser';
 import { SdkStats } from 'Utilities/SdkStats';
+import { AbstractPrivacy } from 'Views/AbstractPrivacy';
 
 export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -41,8 +41,8 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private _configuration: any;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string, coppaCompliant: boolean) {
-        super(nativeBridge, 'playable-mraid', placement, campaign, coppaCompliant);
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string, privacy: AbstractPrivacy) {
+        super(nativeBridge, 'playable-mraid', placement, campaign, privacy);
 
         this._placement = placement;
         this._campaign = campaign;
