@@ -203,6 +203,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
                 it will seek the video to correct position and call play.
             */
             if(this.canShowVideo() && this.getVideoState() === VideoState.PAUSED) {
+                this.setVideoState(VideoState.PLAYING);
                 this._nativeBridge.VideoPlayer.play();
             } else if(this.canPrepareVideo()) {
                 this.prepareVideo();
