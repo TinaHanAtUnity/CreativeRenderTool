@@ -11,7 +11,6 @@ import { Campaign } from 'Models/Campaign';
 import { IEndScreenDownloadParameters } from 'EventHandlers/EndScreenEventHandler';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
-import { Platform } from 'Constants/Platform';
 import { SquareEndScreenUtilities } from 'Utilities/SquareEndScreenUtilities';
 
 export interface IEndScreenHandler {
@@ -19,7 +18,6 @@ export interface IEndScreenHandler {
     onEndScreenPrivacy(url: string): void;
     onEndScreenClose(): void;
     onKeyEvent(keyCode: number): void;
-    onOptOutPopupShown(clicked: boolean): void;
 }
 
 const GDPR_OPT_OUT_BASE  = 'gdpr-pop-up-base';
@@ -130,10 +128,6 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     public hide(): void {
         super.hide();
 
-        if (this._showOptOutPopup) {
-            this._handlers.forEach(handler => handler.onOptOutPopupShown(this._gdprPopupClicked));
-        }
-
         if (this._privacy) {
             this._privacy.hide();
             this._privacy.container().parentElement!.removeChild(this._privacy.container());
@@ -155,12 +149,6 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     protected getEndscreenAlt(campaign?: Campaign) {
-        if (this._showOptOutPopup) {
-            if (this._abGroup === 18 || this._abGroup === 19) {
-                return GDPR_OPT_OUT_BASE;
-            }
-        }
-
         const campaignId = campaign ? campaign.getId() : this._campaignId;
         const platform = this._nativeBridge.getPlatform();
         if (SquareEndScreenUtilities.useSquareEndScreenAlt(this._abGroup, platform, campaignId, this._osVersion)) {
