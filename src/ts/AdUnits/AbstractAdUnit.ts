@@ -28,7 +28,6 @@ export interface IAdUnitParameters<T extends Campaign> {
     request: Request;
     options: any;
     adMobSignalFactory?: AdMobSignalFactory;
-    showGDPRPopup?: boolean;
 }
 
 export abstract class AbstractAdUnit {
