@@ -10,6 +10,7 @@ import { DiagnosticError } from 'Errors/DiagnosticError';
 import { FinishState } from 'Constants/FinishState';
 import { Placement } from 'Models/Placement';
 import { Closer } from 'Views/Closer';
+import { Configuration } from 'Models/Configuration';
 
 export class VPAIDEventHandler implements IVPAIDHandler {
     private _nativeBridge: NativeBridge;
@@ -25,6 +26,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     private _adRemainingTime: number = -2;
     private _abGroup: number;
     private _campaign: VPAIDCampaign;
+    private _configuration: Configuration;
 
     constructor(nativeBridge: NativeBridge, adUnit: VPAIDAdUnit, parameters: IVPAIDAdUnitParameters) {
         this._nativeBridge = nativeBridge;
@@ -37,6 +39,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         this._vpaidEndScreen = parameters.endScreen;
         this._abGroup = parameters.campaign.getAbGroup();
         this._campaign = parameters.campaign;
+        this._configuration = parameters.configuration;
 
         this._vpaidEventHandlers.AdError = this.onAdError;
         this._vpaidEventHandlers.AdLoaded = this.onAdLoaded;
@@ -61,6 +64,14 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         if (handler) {
             handler.apply(this, args);
         }
+    }
+
+    public onGDPRPopupSkipped(): void {
+        if (!this._configuration.isOptOutRecorded()) {
+            this._configuration.setOptOutRecorded(true);
+        }
+
+        // todo: send gdpr operative event with action 'skip'
     }
 
     public onVPAIDCompanionClick() {

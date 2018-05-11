@@ -277,14 +277,17 @@ export class AdUnitFactory {
     }
 
     private static createVPAIDAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<VPAIDCampaign>): AbstractAdUnit {
-        const closer = new Closer(nativeBridge, parameters.placement);
-        const vpaid = new VPAID(nativeBridge, <VPAIDCampaign>parameters.campaign, parameters.placement);
+        const privacy = this.createPrivacy(nativeBridge, parameters);
+        const showGDPRBanner = this.showGDPRBanner(parameters);
+        const closer = new Closer(nativeBridge, parameters.placement, privacy, showGDPRBanner);
+        const vpaid = new VPAID(nativeBridge, <VPAIDCampaign>parameters.campaign, parameters.placement, showGDPRBanner);
         let endScreen: VPAIDEndScreen | undefined;
 
         const vpaidAdUnitParameters: IVPAIDAdUnitParameters = {
             ... parameters,
             vpaid: vpaid,
             closer: closer,
+            privacy: privacy
         };
 
         if(parameters.campaign.hasEndScreen()) {
@@ -333,7 +336,7 @@ export class AdUnitFactory {
 
         const privacy = this.createPrivacy(nativeBridge, parameters);
 
-        const view = new DisplayInterstitial(nativeBridge, parameters.placement, <DisplayInterstitialCampaign>parameters.campaign, privacy, parameters.showGDPRPopup ? parameters.showGDPRPopup : false);
+        const view = new DisplayInterstitial(nativeBridge, parameters.placement, <DisplayInterstitialCampaign>parameters.campaign, privacy, this.showGDPRBanner(parameters));
         const displayInterstitialParameters: IDisplayInterstitialAdUnitParameters = {
             ... parameters,
             view: view,

@@ -50,19 +50,21 @@ export class VPAID extends View<IVPAIDHandler> {
     private _isLoaded = false;
     private _webplayerEventObserver: IObserver1<string>;
     private _isCoppaCompliant: boolean;
+    private _showGDPRBanner: boolean = false;
 
-    constructor(nativeBridge: NativeBridge, campaign: VPAIDCampaign, placement: Placement) {
+    constructor(nativeBridge: NativeBridge, campaign: VPAIDCampaign, placement: Placement, showGDPRBanner: boolean) {
         super(nativeBridge, 'vpaid');
 
         this._template = new Template(VPAIDTemplate);
         this._campaign = campaign;
         this._placement = placement;
+        this._showGDPRBanner = showGDPRBanner;
         this._stuckTimer = new Timer(() => this._handlers.forEach(handler => handler.onVPAIDStuck()), VPAID.stuckDelay);
         this._bindings = [];
     }
 
     public loadWebPlayer(): Promise<void> {
-        this._isLoaded = true;
+
         const adParameters = <IVPAIDAdParameters>{
             skipEnabled: this._placement.allowSkip(),
             skipDuration: this._placement.allowSkipInSeconds(),
@@ -74,7 +76,12 @@ export class VPAID extends View<IVPAIDHandler> {
             isCoppaCompliant: this._isCoppaCompliant
         };
 
-        let iframeSrcDoc = VPAIDContainerTemplate.replace('{COMPILED_CSS}', VPAIDCss);
+        let iframeSrcDoc;
+        if (this._showGDPRBanner) {
+            iframeSrcDoc = VPAIDContainerTemplate.replace('{COMPILED_CSS}', VPAIDCss.replace('height:100vh', 'height:90vh'));
+        } else {
+            iframeSrcDoc = VPAIDContainerTemplate.replace('{COMPILED_CSS}', VPAIDCss);
+        }
         iframeSrcDoc = new Template(iframeSrcDoc).render(templateData);
 
         this._webplayerEventObserver = this._nativeBridge.WebPlayer.onWebPlayerEvent.subscribe((args: string) => this.onWebPlayerEvent(JSON.parse(args)));

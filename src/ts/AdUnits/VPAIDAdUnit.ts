@@ -16,11 +16,13 @@ import { Placement } from 'Models/Placement';
 import { IObserver2 } from 'Utilities/IObserver';
 import { WKAudiovisualMediaTypes } from 'Native/Api/WebPlayer';
 import { AdUnitContainerSystemMessage, IAdUnitContainerListener } from 'AdUnits/Containers/AdUnitContainer';
+import { AbstractPrivacy } from 'Views/AbstractPrivacy';
 
 export interface IVPAIDAdUnitParameters extends IAdUnitParameters<VPAIDCampaign> {
     vpaid: VPAID;
     closer: Closer;
     endScreen?: VPAIDEndScreen;
+    privacy: AbstractPrivacy;
 }
 
 export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListener {
@@ -55,6 +57,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._timer = new Timer(() => this.onAdUnitNotLoaded(), VPAIDAdUnit._adLoadTimeout);
 
         this._closer.render();
+        this._closer.choosePrivacyShown();
     }
 
     public show(): Promise<void> {
@@ -232,11 +235,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     private showCloser() {
         return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
-            const left = Math.floor(width * 0.85);
-            const top = 0;
-            const viewWidth = Math.floor(width * 0.15);
-            const viewHeight = viewWidth;
-            return this._container.setViewFrame('webview', left, top, viewWidth, viewHeight).then(() => {
+            return this._container.setViewFrame('webview', 0, 0, width, height).then(() => {
                 if (!this._closer.container().parentNode) {
                     document.body.appendChild(this._closer.container());
                 }
