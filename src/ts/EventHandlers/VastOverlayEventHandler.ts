@@ -44,14 +44,12 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         super.onOverlayMute(isMuted);
         if (isMuted) {
             if (this._moat) {
-                this._moat.triggerVideoEvent('AdVolumeChange', 0);
-                this._moat.triggerViewabilityEvent('volume', 0.0);
+                this._moat.volumeChange(0);
             }
             this._vastAdUnit.sendTrackingEvent('mute', this._vastCampaign.getSession().getId(), this._clientInfo.getSdkVersion());
         } else {
             if (this._moat) {
-                this._moat.triggerVideoEvent('AdPlaying', this._vastAdUnit.getVolume());
-                this._moat.triggerViewabilityEvent('exposure', true);
+                this._moat.play(this._vastAdUnit.getVolume());
             }
             this._vastAdUnit.sendTrackingEvent('unmute', this._vastCampaign.getSession().getId(), this._clientInfo.getSdkVersion());
         }
