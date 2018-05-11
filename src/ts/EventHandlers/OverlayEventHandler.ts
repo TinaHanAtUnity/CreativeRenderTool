@@ -66,6 +66,7 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
     public onOverlayClose(): void {
         this._nativeBridge.VideoPlayer.pause();
         this._adUnit.setActive(false);
+        this._adUnit.setVideoState(VideoState.SKIPPED);
         this._adUnit.setFinishState(FinishState.SKIPPED);
         this._operativeEventManager.sendSkip(this._placement, this._adUnit.getVideo().getPosition(), this.getVideoOrientation());
 
