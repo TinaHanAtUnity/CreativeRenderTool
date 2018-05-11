@@ -239,6 +239,7 @@ export class OperativeEventManager {
             'gameId': this._clientInfo.getGameId()
         };
 
+        // todo: remove kafka common object from the payload
         // todo: do not send events yet!!!
         return Promise.resolve();
         // return HttpKafka.sendEvent('ads.events.optout.v1.json', infoJson);
