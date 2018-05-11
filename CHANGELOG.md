@@ -1,3 +1,7 @@
+# Pending
+
+* Remove GDPR popup A/B test from groups 18 & 19
+
 # Wed May  9 20:37:15 UTC 2018
 
 * Disable ComScore integration
