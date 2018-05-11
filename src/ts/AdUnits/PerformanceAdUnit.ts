@@ -36,8 +36,10 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
             endScreen.hide();
             endScreen.container().parentElement!.removeChild(endScreen.container());
         }
-        this._privacy.hide();
-        this._privacy.container().parentElement!.removeChild(this._privacy.container());
+        if (this._privacy) {
+            this._privacy.hide();
+            this._privacy.container().parentElement!.removeChild(this._privacy.container());
+        }
 
         return super.hide();
     }

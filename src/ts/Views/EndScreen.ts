@@ -136,7 +136,9 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             this._handlers.forEach(handler => handler.onGDPRPopupSkipped());
         }
 
-        this._privacy.hide();
+        if (this._privacy) {
+            this._privacy.hide();
+        }
     }
 
     public onPrivacyClose(): void {
