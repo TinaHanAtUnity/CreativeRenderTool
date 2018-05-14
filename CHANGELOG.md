@@ -1,3 +1,9 @@
+# Pending
+
+* Initial GDPR support for performance ads
+* Update square endscreen image target campaign IDs
+* Change IAP promo finish states to skip on close and finished on purchase
+
 # Mon May 14 09:12:28 UTC 2018
 
 * Remove GDPR popup A/B test from groups 18 & 19
