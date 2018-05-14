@@ -132,6 +132,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         this._adUnit.sendTrackingEvent('skip');
         this._operativeEventManager.sendSkip(this._placement);
         this._adUnit.setFinishState(FinishState.SKIPPED);
+        this._adUnit.mute();
         this._adUnit.hide();
     }
 

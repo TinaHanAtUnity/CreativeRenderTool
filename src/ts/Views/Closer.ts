@@ -65,6 +65,18 @@ export class Closer extends View<ICloseHandler> implements IPrivacyHandler {
         }
     }
 
+    public hide(): void {
+        super.hide();
+
+        if (this._privacy) {
+            document.body.removeChild(this._privacy.container());
+        }
+    }
+
+    public show() {
+        super.show();
+    }
+
     public onGDPROptOut(optOutEnabled: boolean): void {
         // do nothing
     }

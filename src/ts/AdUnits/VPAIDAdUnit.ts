@@ -230,6 +230,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     private hideView() {
+        this._closer.hide();
         this._view.hide();
     }
 
