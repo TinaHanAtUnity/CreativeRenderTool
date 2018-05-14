@@ -128,7 +128,6 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         if (this._isMRAIDAR) {
             container = container.replace('<script id=\"webar\"></script>', WebARScript);
             iframe.classList.add('fullscreen');
-            this._loadingScreenAR.style.display = 'block';
         }
         this.createMRAID(container).then(mraid => {
             iframe.onload = () => this.onIframeLoaded();
@@ -324,7 +323,9 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 return;
             }
 
-            this._loadingScreen.addEventListener(e, () => {
+            const loadingScreen = this._isMRAIDAR ? this._loadingScreenAR : this._loadingScreen;
+
+            loadingScreen.addEventListener(e, () => {
                 this._closeElement.style.display = 'block';
 
                 this._playableStartTimestamp = Date.now();
