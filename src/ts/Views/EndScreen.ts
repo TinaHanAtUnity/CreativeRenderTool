@@ -13,6 +13,7 @@ import { IEndScreenDownloadParameters } from 'EventHandlers/EndScreenEventHandle
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { SquareEndScreenUtilities } from 'Utilities/SquareEndScreenUtilities';
+import { Platform } from 'Constants/Platform';
 
 export interface IEndScreenHandler {
     onEndScreenDownload(parameters: IEndScreenDownloadParameters): void;
@@ -26,8 +27,6 @@ const GDPR_OPT_OUT_BASE  = 'gdpr-pop-up-base';
 const SQUARE_END_SCREEN = 'square-end-screen';
 
 const FANCY_END_SCREEN = 'fancy-end-screen';
-// TODO: Use actual group
-const FANCY_END_SCREEN_AB_GROUP = 17;
 
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
 
@@ -162,7 +161,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             return SQUARE_END_SCREEN;
         }
 
-        if (this._abGroup === FANCY_END_SCREEN_AB_GROUP && this.canShowFancyEndScreen()) {
+        if (CustomFeatures.isFancyEndScreenEnabled(this._abGroup) && this.canShowFancyEndScreen()) {
             return FANCY_END_SCREEN;
         }
 

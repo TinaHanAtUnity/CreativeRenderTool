@@ -27,4 +27,8 @@ export class CustomFeatures {
         return new AdUnitStyle({ctaButtonColor: '#167dfb'});
     }
 
+    public static isFancyEndScreenEnabled(abGroup: number): boolean {
+        // TODO: Use actual group(s) when we know them
+        return abGroup === 17;
+    }
 }
