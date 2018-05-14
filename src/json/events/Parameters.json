@@ -488,5 +488,26 @@
     "description": "Previously knows as 'developerID'",
     "provider": "Server",
     "platforms": "all"
+  },
+  {
+    "key": "gdprEnabled",
+    "type": "boolean",
+    "description": "If GDPR is enabled",
+    "provider": "Server",
+    "platforms": "all"
+  },
+  {
+    "key": "optOutRecorded",
+    "type": "boolean",
+    "description": "Whether the user has seen the opt-out banner or not",
+    "provider": "Server",
+    "platforms": "all"
+  },
+  {
+    "key": "optOutEnabled",
+    "type": "boolean",
+    "description": "If the opt-out is enabled",
+    "provider": "Server",
+    "platforms": "all"
   }
 ]

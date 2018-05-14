@@ -23,9 +23,9 @@ import { XPromoEndScreen } from 'Views/XPromoEndScreen';
 import { Placement } from 'Models/Placement';
 import { XPromoEndScreenEventHandler } from 'EventHandlers/XPromoEndScreenEventHandler';
 import { IXPromoAdUnitParameters, XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
-import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { XPromoOperativeEventManager } from 'Managers/XPromoOperativeEventManager';
+import { Privacy } from 'Views/Privacy';
 
 describe('XPromoEndScreenEventHandlerTest', () => {
 
@@ -44,7 +44,6 @@ describe('XPromoEndScreenEventHandlerTest', () => {
     let endScreenEventHandler: XPromoEndScreenEventHandler;
     let campaign: XPromoCampaign;
     let placement: Placement;
-    let comScoreService: ComScoreTrackingService;
 
     describe('with onDownloadAndroid', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -77,7 +76,6 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 campaign: campaign
             });
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
-            comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
             sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
             sinon.stub(operativeEventManager, 'sendHttpKafkaEvent').returns(resolvedPromise);
@@ -85,7 +83,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             sinon.spy(nativeBridge.Intent, 'launch');
 
             const video = new Video('', TestFixtures.getSession());
-            endScreen = new XPromoEndScreen(nativeBridge, TestFixtures.getXPromoCampaign(), configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
+            const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+            endScreen = new XPromoEndScreen(nativeBridge, TestFixtures.getXPromoCampaign(), deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, false);
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
             placement = TestFixtures.getPlacement();
 
@@ -97,7 +96,6 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 clientInfo: clientInfo,
                 thirdPartyEventManager: thirdPartyEventManager,
                 operativeEventManager: operativeEventManager,
-                comScoreTrackingService: comScoreService,
                 placement: placement,
                 campaign: campaign,
                 configuration: configuration,
@@ -105,7 +103,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 options: {},
                 endScreen: endScreen,
                 overlay: overlay,
-                video: video
+                video: video,
+                privacy: privacy
             };
 
             xPromoAdUnit = new XPromoAdUnit(nativeBridge, xPromoAdUnitParameters);
@@ -166,7 +165,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             sinon.stub(deviceInfo, 'getOsVersion').returns('9.0');
             const video = new Video('', TestFixtures.getSession());
 
-            endScreen = new XPromoEndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
+            const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+            endScreen = new XPromoEndScreen(nativeBridge, campaign, deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, false);
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
 
             xPromoAdUnitParameters = {
@@ -177,7 +177,6 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 clientInfo: clientInfo,
                 thirdPartyEventManager: thirdPartyEventManager,
                 operativeEventManager: operativeEventManager,
-                comScoreTrackingService: comScoreService,
                 placement: TestFixtures.getPlacement(),
                 campaign: campaign,
                 configuration: configuration,
@@ -185,7 +184,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 options: {},
                 endScreen: endScreen,
                 overlay: overlay,
-                video: video
+                video: video,
+                privacy: privacy
             };
 
             xPromoAdUnit = new XPromoAdUnit(nativeBridge, xPromoAdUnitParameters);

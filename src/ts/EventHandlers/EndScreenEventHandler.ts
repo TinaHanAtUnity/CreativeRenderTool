@@ -20,8 +20,6 @@ import { XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { XPromoOperativeEventManager } from 'Managers/XPromoOperativeEventManager';
-import { StorageType } from 'Native/Api/Storage';
-import { HttpKafka } from 'Utilities/HttpKafka';
 import { Configuration } from 'Models/Configuration';
 
 export interface IEndScreenDownloadParameters {
@@ -65,36 +63,16 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         }
     }
 
-    public onEndScreenPrivacy(url: string): void {
-        if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            this._nativeBridge.UrlScheme.open(url);
-        } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            this._nativeBridge.Intent.launch({
-                'action': 'android.intent.action.VIEW',
-                'uri': url
-            });
-        }
-    }
-
     public onEndScreenClose(): void {
         this._adUnit.hide();
     }
 
-    public onOptOutPopupShown(popupClicked: boolean): void {
-        const kafkaObject: any = {};
-        kafkaObject.timestamp = Date.now();
-        kafkaObject.popupShown = true;
-        kafkaObject.popupClicked = popupClicked;
-        kafkaObject.gamerId = this._configuration.getGamerId();
+    public onGDPRPopupSkipped(): void {
+        if (!this._configuration.isOptOutRecorded()) {
+            this._configuration.setOptOutRecorded(true);
+        }
 
-        HttpKafka.sendEvent('ads.sdk2.events.gdprtest.json', kafkaObject);
-
-        Promise.all([
-            this._nativeBridge.Storage.set(StorageType.PRIVATE, 'gdpr.popupshown.value', true),
-            this._nativeBridge.Storage.write(StorageType.PRIVATE)
-        ]).catch(err => {
-            //
-        });
+        this._operativeEventManager.sendGDPREvent(this._placement, 'skip');
     }
 
     public abstract onKeyEvent(keyCode: number): void;

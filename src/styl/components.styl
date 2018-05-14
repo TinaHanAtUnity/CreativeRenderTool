@@ -153,4 +153,163 @@ $iframe-close-region-default($with-styles = true) {
   }
 }
 
+$radio-group-container($scale-size = $default-scale-size, $context-font-size = 1rem) {
+  $radio-group-default-size = $scale-size * $default-size;
+
+  padding: $radio-group-default-size * .5;
+  font-size: $context-font-size;
+
+  [type="radio"]:checked,
+  [type="radio"]:not(:checked) {
+    position: absolute;
+    visibility: hidden;
+  }
+
+  /* label text*/
+  [type="radio"]:checked + label,
+  [type="radio"]:not(:checked) + label {
+    position: relative;
+    padding-left: $radio-group-default-size * 1.5;
+    cursor: pointer;
+    line-height: $context-font-size * 1.5;
+    display: inline-block;
+  }
+
+  [type="radio"]:checked + label:before,
+  [type="radio"]:not(:checked) + label:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: $radio-group-default-size * .75;
+    height: @width;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+
+  [type="radio"]:checked + label:before {
+    background-image: url('./../img/radio_on.png');
+  }
+
+  [type="radio"]:not(:checked) + label:before {
+    background-image: url('./../img/radio_off.png');
+  }
+
+  [type="radio"]:checked + label {
+    font-weight: 500;
+  }
+
+}
+
+$full-screen-pop-up-view($scale-size, z-index = auto, $with-styles = true) {
+  $pop-up-size = $scale-size * $default-size;
+  $pop-up-font-size = $scale-size * $default-font-size * .65;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, .5);
+  color: $privacy-text-color;
+  font-weight: 300;
+  font-size: $pop-up-font-size;
+
+  $pop-up-height = 70%;
+  $pop-up-content-height = $pop-up-height + 20%;
+  $pop-up-footer-height = 100% - $pop-up-content-height;
+
+  .pop-up {
+    position: relative;
+    margin: 5%;
+    padding: $pop-up-size;
+    width: 80%;
+    height: $pop-up-height;
+    border-radius: $pop-up-size * .25;
+    background: $end-screen-background-color;
+
+    $fade-out-gradient-height = $pop-up-size * 3;
+
+    .fade-out-gradient-separator {
+      position: absolute;
+      bottom: 10%;
+      left: 0;
+      width: 100%;
+      height: $fade-out-gradient-height;
+      background: linear-gradient(to top, $end-screen-background-color 0, $end-screen-background-color 50%, rgba(250, 250, 250, 0) 100%);
+    }
+
+    .pop-up-content {
+      overflow: auto;
+      padding-right: $pop-up-size * .5;
+      height: $pop-up-content-height;
+
+      .header,
+      .highlight {
+        font-weight: 400;
+      }
+
+      .title {
+        margin-bottom: $pop-up-size;
+        font-weight: 500;
+        font-size: $pop-up-font-size * 1.25;
+      }
+
+      .header {
+        display: block;
+        margin: $pop-up-size 0 $pop-up-size * .5 0;
+        font-size: $pop-up-font-size * 1.15;
+      }
+
+      p {
+        line-height: $pop-up-font-size * 1.5;
+
+        &:last-of-type {
+          min-height: $fade-out-gradient-height * 2;
+        }
+      }
+
+      .radio-group-container {
+        $radio-group-container($scale-size, $pop-up-font-size);
+
+        .radio-item-container {
+          margin: 0 auto;
+          padding: $pop-up-size * .25;
+          width: 85%;
+        }
+      }
+    }
+
+    .pop-up-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+
+      .close-button {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        display: inline-block;
+        margin: $pop-up-size * .5;
+        padding: $pop-up-size * .75 $pop-up-size * 1.5;
+        border-radius: $pop-up-size * .25;
+        background: $blue;
+        color: $white;
+        font-size: $pop-up-font-size * 1.25;
+      }
+
+      .left-side-link {
+        position: absolute;
+        bottom: 0;
+        display: inline-block;
+        margin: $pop-up-size * .5;
+        color: darken($end-screen-info-gray, 40%);
+      }
+    }
+  }
+}
 

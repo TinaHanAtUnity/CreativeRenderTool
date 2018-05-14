@@ -19,7 +19,6 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
-import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 
 describe('DisplayInterstitialAdUnit', () => {
@@ -36,7 +35,6 @@ describe('DisplayInterstitialAdUnit', () => {
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
     let displayInterstitialAdUnitParameters: IDisplayInterstitialAdUnitParameters;
-    let comScoreService: ComScoreTrackingService;
 
     describe('On static-interstial campaign', () => {
         adUnitTests();
@@ -74,7 +72,6 @@ describe('DisplayInterstitialAdUnit', () => {
                 configuration: configuration,
                 campaign: campaign
             });
-            comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
             view = new DisplayInterstitial(nativeBridge, placement, campaign);
             view.render();
@@ -90,7 +87,6 @@ describe('DisplayInterstitialAdUnit', () => {
                 clientInfo: clientInfo,
                 thirdPartyEventManager: thirdPartyEventManager,
                 operativeEventManager: operativeEventManager,
-                comScoreTrackingService: comScoreService,
                 placement: TestFixtures.getPlacement(),
                 campaign: campaign,
                 configuration: configuration,

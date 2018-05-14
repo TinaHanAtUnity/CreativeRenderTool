@@ -21,7 +21,6 @@ import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { SessionManager } from 'Managers/SessionManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { Request } from 'Utilities/Request';
-import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 
 describe('AndroidAdUnitTest', () => {
@@ -57,7 +56,6 @@ describe('AndroidAdUnitTest', () => {
             configuration: configuration,
             campaign: TestFixtures.getCampaign()
         });
-        const comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         adUnitParams = {
             forceOrientation: Orientation.NONE,
@@ -67,7 +65,6 @@ describe('AndroidAdUnitTest', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
-            comScoreTrackingService: comScoreService,
             placement: TestFixtures.getPlacement(),
             campaign: TestFixtures.getCampaign(),
             configuration: configuration,

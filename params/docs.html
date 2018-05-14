@@ -79,6 +79,9 @@
 <tr><td>gameSessionCounters</td><td>object</td><td>Game session based counts of starts, views and ad requests</td><td>SDK</td><td>all</td></tr>
 <tr><td>ext</td><td>object</td><td>JSON string for optional signals for admob</td><td>SDK</td><td>all</td></tr>
 <tr><td>organizationId</td><td>string</td><td>Previously knows as 'developerID'</td><td>Server</td><td>all</td></tr>
+<tr><td>gdprEnabled</td><td>boolean</td><td>If GDPR is enabled</td><td>Server</td><td>all</td></tr>
+<tr><td>optOutRecorded</td><td>boolean</td><td>Whether the user has seen the opt-out banner or not</td><td>Server</td><td>all</td></tr>
+<tr><td>optOutEnabled</td><td>boolean</td><td>If the opt-out is enabled</td><td>Server</td><td>all</td></tr>
  </table><br><br></h3> <a name="configuration-request"></a> <h3> Configuration request </h3> 
  <table> <tr><th>key</th><th>required</th><th>queryString</th><th>body</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
 <tr><td>bundleId</td><td>all</td><td>True</td><td>False</td><td>string</td><td>Bundle identifier for the app</td><td>SDK</td><td>all</td></tr>
@@ -154,6 +157,9 @@
 <tr><td>gameSessionCounters</td><td>all</td><td>False</td><td>True</td><td>object</td><td>Game session based counts of starts, views and ad requests</td><td>SDK</td><td>all</td></tr>
 <tr><td>ext</td><td>all</td><td>False</td><td>True</td><td>object</td><td>JSON string for optional signals for admob</td><td>SDK</td><td>all</td></tr>
 <tr><td>organizationId</td><td>no</td><td>False</td><td>True</td><td>string</td><td>Previously knows as 'developerID'</td><td>Server</td><td>all</td></tr>
+<tr><td>gdprEnabled</td><td>all</td><td>False</td><td>True</td><td>boolean</td><td>If GDPR is enabled</td><td>Server</td><td>all</td></tr>
+<tr><td>optOutRecorded</td><td>all</td><td>False</td><td>True</td><td>boolean</td><td>Whether the user has seen the opt-out banner or not</td><td>Server</td><td>all</td></tr>
+<tr><td>optOutEnabled</td><td>all</td><td>False</td><td>True</td><td>boolean</td><td>If the opt-out is enabled</td><td>Server</td><td>all</td></tr>
  </table><br><br></h3> <a name="video-events"></a> <h3> Video events </h3> 
  <table> <tr><th>key</th><th>required</th><th>queryString</th><th>body</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
 <tr><td>eventId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Unique event identifier</td><td>SDK</td><td>all</td></tr>

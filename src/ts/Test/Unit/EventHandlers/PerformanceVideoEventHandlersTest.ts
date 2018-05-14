@@ -13,7 +13,6 @@ import { Video } from 'Models/Assets/Video';
 import { Request } from 'Utilities/Request';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { SessionManager } from 'Managers/SessionManager';
-import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { FocusManager } from 'Managers/FocusManager';
 import { WakeUpManager } from 'Managers/WakeUpManager';
@@ -21,6 +20,7 @@ import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { IVideoEventHandlerParams } from 'EventHandlers/BaseVideoEventHandler';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
+import { Privacy } from 'Views/Privacy';
 
 describe('PerformanceVideoEventHandlersTest', () => {
 
@@ -31,7 +31,6 @@ describe('PerformanceVideoEventHandlersTest', () => {
     let performanceAdUnit: PerformanceAdUnit;
     let video: Video;
     let performanceAdUnitParameters: IPerformanceAdUnitParameters;
-    let comScoreService: ComScoreTrackingService;
     let performanceVideoEventHandler: PerformanceVideoEventHandler;
 
     beforeEach(() => {
@@ -64,8 +63,8 @@ describe('PerformanceVideoEventHandlersTest', () => {
             campaign: campaign
         });
 
-        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
-        endScreen = new PerformanceEndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
+        const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+        endScreen = new PerformanceEndScreen(nativeBridge, campaign, deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, false);
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
 
         performanceAdUnitParameters = {
@@ -76,7 +75,6 @@ describe('PerformanceVideoEventHandlersTest', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
-            comScoreTrackingService: comScoreService,
             placement: TestFixtures.getPlacement(),
             campaign: campaign,
             configuration: configuration,
@@ -84,7 +82,8 @@ describe('PerformanceVideoEventHandlersTest', () => {
             options: {},
             endScreen: endScreen,
             overlay: overlay,
-            video: video
+            video: video,
+            privacy: privacy
         };
 
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
@@ -95,7 +94,6 @@ describe('PerformanceVideoEventHandlersTest', () => {
             campaign: campaign,
             operativeEventManager: operativeEventManager,
             thirdPartyEventManager: thirdPartyEventManager,
-            comScoreTrackingService: comScoreService,
             configuration: configuration,
             placement: TestFixtures.getPlacement(),
             video: video,
