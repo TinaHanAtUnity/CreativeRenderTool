@@ -63,19 +63,16 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         }
     }
 
-    public onEndScreenPrivacy(url: string): void {
-        if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            this._nativeBridge.UrlScheme.open(url);
-        } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            this._nativeBridge.Intent.launch({
-                'action': 'android.intent.action.VIEW',
-                'uri': url
-            });
-        }
-    }
-
     public onEndScreenClose(): void {
         this._adUnit.hide();
+    }
+
+    public onGDPRPopupSkipped(): void {
+        if (!this._configuration.isOptOutRecorded()) {
+            this._configuration.setOptOutRecorded(true);
+        }
+
+        this._operativeEventManager.sendGDPREvent(this._placement, 'skip');
     }
 
     public abstract onKeyEvent(keyCode: number): void;

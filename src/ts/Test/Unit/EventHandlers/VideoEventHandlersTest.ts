@@ -40,6 +40,7 @@ import { PerformanceVideoEventHandler } from 'EventHandlers/PerformanceVideoEven
 import { XPromoVideoEventHandler } from 'EventHandlers/XPromoVideoEventHandler';
 import { VastVideoEventHandler } from 'EventHandlers/VastVideoEventHandler';
 import { AndroidVideoEventHandler } from 'EventHandlers/AndroidVideoEventHandler';
+import { Privacy } from 'Views/Privacy';
 
 describe('VideoEventHandlersTest', () => {
 
@@ -107,7 +108,9 @@ describe('VideoEventHandlersTest', () => {
 
         placement = TestFixtures.getPlacement();
         overlay = new Overlay(nativeBridge, false, 'en', configuration.getGamerId(), configuration.getAbGroup());
-        endScreen = new PerformanceEndScreen(nativeBridge, performanceCampaign, true, 'en', '12345');
+
+        const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+        endScreen = new PerformanceEndScreen(nativeBridge, performanceCampaign, 'en', '12345', privacy, false);
 
         vastAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,
@@ -142,11 +145,13 @@ describe('VideoEventHandlersTest', () => {
             options: {},
             endScreen: endScreen,
             overlay: overlay,
-            video: video
+            video: video,
+            privacy: privacy
         };
 
+        const xpromoPrivacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
         xPromoCampaign = TestFixtures.getXPromoCampaign();
-        xPromoEndScreen = new XPromoEndScreen(nativeBridge, xPromoCampaign, true, 'en', '12345');
+        xPromoEndScreen = new XPromoEndScreen(nativeBridge, xPromoCampaign, 'en', '12345', xpromoPrivacy, false);
         xPromoAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
@@ -162,7 +167,8 @@ describe('VideoEventHandlersTest', () => {
             options: {},
             endScreen: xPromoEndScreen,
             overlay: overlay,
-            video: video
+            video: video,
+            privacy: privacy
         };
 
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);

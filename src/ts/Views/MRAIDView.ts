@@ -5,7 +5,7 @@ import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { WebViewError } from 'Errors/WebViewError';
 import { Platform } from 'Constants/Platform';
 import { NativeBridge } from 'Native/NativeBridge';
-import { IPrivacyHandler, Privacy } from 'Views/Privacy';
+import { IPrivacyHandler, AbstractPrivacy } from 'Views/AbstractPrivacy';
 import { platform } from 'os';
 import { DOMUtils } from 'Utilities/DOMUtils';
 
@@ -22,7 +22,6 @@ export interface IMRAIDViewHandler {
     onMraidOrientationProperties(orientationProperties: IOrientationProperties): void;
     onMraidAnalyticsEvent(timeFromShow: number|undefined, timeFromPlayableStart: number|undefined, backgroundTime: number|undefined, event: string, eventData: any): void;
     onMraidShowEndScreen(): void;
-    onMraidPrivacy(url: string): void;
 }
 
 export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> implements IPrivacyHandler {
@@ -30,17 +29,19 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     protected _placement: Placement;
     protected _campaign: MRAIDCampaign;
 
-    private _coppaCompliant: boolean;
+    private _privacy: AbstractPrivacy;
 
-    private _privacy: Privacy;
-
-    constructor(nativeBridge: NativeBridge, id: string, placement: Placement, campaign: MRAIDCampaign, coppaCompliant: boolean) {
+    constructor(nativeBridge: NativeBridge, id: string, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy) {
         super(nativeBridge, id);
 
         this._placement = placement;
         this._campaign = campaign;
-        this._coppaCompliant = coppaCompliant;
+        this._privacy = privacy;
 
+        this._privacy.render();
+        this._privacy.hide();
+        document.body.appendChild(this._privacy.container());
+        this._privacy.addEventHandler(this);
     }
 
     public abstract setViewableState(viewable: boolean): void;
@@ -49,9 +50,8 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         super.hide();
 
         if(this._privacy) {
+            this._privacy.removeEventHandler(this);
             this._privacy.hide();
-            this._privacy.container().parentElement!.removeChild(this._privacy.container());
-            delete this._privacy;
         }
     }
 
@@ -73,23 +73,22 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     public onPrivacyClose(): void {
         if(this._privacy) {
-            this._privacy.removeEventHandler(this);
             this._privacy.hide();
-            this._privacy.container().parentElement!.removeChild(this._privacy.container());
-            delete this._privacy;
         }
     }
 
     public onPrivacy(url: string): void {
-        this._handlers.forEach(handler => handler.onMraidPrivacy(url));
+        // do nothing
+    }
+
+    public onGDPROptOut(optOutEnabled: boolean) {
+        // do nothing
     }
 
     protected onPrivacyEvent(event: Event): void {
         event.preventDefault();
-        this._privacy = new Privacy(this._nativeBridge, this._coppaCompliant);
-        this._privacy.render();
-        document.body.appendChild(this._privacy.container());
-        this._privacy.addEventHandler(this);
+
+        this._privacy.show();
     }
 
     private replaceMraidSources(mraid: string): string {

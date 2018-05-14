@@ -22,6 +22,7 @@ import { HttpKafka } from 'Utilities/HttpKafka';
 import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
+import { GDPRPrivacy } from 'Views/GDPRPrivacy';
 
 describe('MRAIDEventHandlersTest', () => {
 
@@ -93,7 +94,8 @@ describe('MRAIDEventHandlersTest', () => {
                 request: request,
                 options: {},
                 mraid: mraidView,
-                endScreen: undefined
+                endScreen: undefined,
+                privacy: new GDPRPrivacy(nativeBridge, false, true)
             };
 
             mraidAdUnit = new MRAIDAdUnit(nativeBridge, mraidAdUnitParameters);
@@ -132,7 +134,7 @@ describe('MRAIDEventHandlersTest', () => {
                     headers: [['location', 'market://foobar.com']]
                 }));
 
-                mraidView = new MRAID(nativeBridge, placement, mraidCampaign, false);
+                mraidView = new MRAID(nativeBridge, placement, mraidCampaign, mraidAdUnitParameters.privacy);
                 sinon.stub(mraidView, 'createMRAID').callsFake(() => {
                     return Promise.resolve();
                 });
