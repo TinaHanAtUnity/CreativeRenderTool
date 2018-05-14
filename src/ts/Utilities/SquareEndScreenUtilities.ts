@@ -20,14 +20,18 @@ export const SQUARE_CAMPAIGNS = [
     {
         customImage: 'https://cdn.unityads.unity3d.com/abtests/800_images/angrybirds2.jpg',
         campaignIds: [
-            '5abb8462149ff500300f0748',
-            '5abb8462149ff500300f0749',
-            '5abb8462149ff500300f074b',
-            '5abb8462149ff500300f074d',
-            '5abb8462149ff500300f074c',
-            '5abb8462149ff500300f074e',
-            '5abb8462149ff500300f0746',
-            '5abb8462149ff500300f074a'
+            '5a86c548ed250d00c4f7ce49',
+            '5a86c548ed250d00c4f7ce4a',
+            '5a86c548ed250d00c4f7ce4e',
+            '5a86ca17f5e9cd00d835180b',
+            '5a9928043eaac50036de6c09',
+            '5abca79c69091201643238fa',
+            '5abca79c69091201643238ff',
+            '5abca79c6909120164323904',
+            '5abca79c690912016432393e',
+            '5ad5d1ff6e9f6602b7ca3b4c',
+            '5ae2ff325a84d70036a58e1a',
+            '5ae2ff325a84d70036a58e1d'
         ],
     },
     {
