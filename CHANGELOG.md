@@ -1,4 +1,4 @@
-# Pending
+# Mon May 14 09:12:28 UTC 2018
 
 * Remove GDPR popup A/B test from groups 18 & 19
 
