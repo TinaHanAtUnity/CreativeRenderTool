@@ -212,10 +212,9 @@ describe('VastVideoEventHandler tests', () => {
             mockEventManager.verify();
         });
 
-        it('tiggers moat viewability and video events', () => {
+        it('tiggers moat play event', () => {
             vastVideoEventHandler.onPlay('https://test.com');
-            sinon.assert.called(<sinon.SinonStub>moat.triggerViewabilityEvent);
-            sinon.assert.called(<sinon.SinonStub>moat.triggerVideoEvent);
+            sinon.assert.called(<sinon.SinonStub>moat.play);
         });
     });
 
@@ -247,9 +246,9 @@ describe('VastVideoEventHandler tests', () => {
             sinon.assert.called(<sinon.SinonSpy>testAdUnit.hide);
         });
 
-        it ('should trigger moat video event', () => {
+        it ('should trigger moat completed event', () => {
             vastVideoEventHandler.onCompleted('https://test.com');
-            sinon.assert.called(<sinon.SinonStub>moat.triggerVideoEvent);
+            sinon.assert.called(<sinon.SinonStub>moat.completed);
         });
     });
 
@@ -258,8 +257,8 @@ describe('VastVideoEventHandler tests', () => {
             vastVideoEventHandler.onStop('https://test.com');
         });
 
-        it ('should send moat video event', () => {
-            sinon.assert.called(<sinon.SinonStub>moat.triggerVideoEvent);
+        it ('should send moat stop event', () => {
+            sinon.assert.called(<sinon.SinonStub>moat.stop);
         });
     });
 
@@ -269,12 +268,8 @@ describe('VastVideoEventHandler tests', () => {
             vastVideoEventHandler.onPause('https://test.com');
         });
 
-        it ('should send moat video event', () => {
-            sinon.assert.calledWith(<sinon.SinonStub>moat.triggerVideoEvent, 'AdPaused', 4);
-        });
-
-        it ('should trigger moat viewability event', () => {
-            sinon.assert.called(<sinon.SinonStub>moat.triggerViewabilityEvent);
+        it ('should send moat pause event', () => {
+            sinon.assert.calledWith(<sinon.SinonStub>moat.pause, 4);
         });
     });
 
@@ -283,12 +278,8 @@ describe('VastVideoEventHandler tests', () => {
             vastVideoEventHandler.onVolumeChange(1, 10);
         });
 
-        it ('should send moat video event', () => {
-            sinon.assert.calledWith(<sinon.SinonStub>moat.triggerVideoEvent, 'AdVolumeChange', 0.1);
-        });
-
-        it ('should trigger moat viewability event', () => {
-            sinon.assert.calledWith(<sinon.SinonStub>moat.triggerViewabilityEvent, 'volume', 10);
+        it ('should call moat volumeChange event', () => {
+            sinon.assert.calledWith(<sinon.SinonStub>moat.volumeChange, 0.1);
         });
     });
 
