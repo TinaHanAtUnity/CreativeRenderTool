@@ -49,7 +49,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
             this._vastAdUnit.sendTrackingEvent('mute', this._vastCampaign.getSession().getId(), this._clientInfo.getSdkVersion());
         } else {
             if (this._moat) {
-                this._moat.play(this._vastAdUnit.getVolume());
+                this._moat.volumeChange(this._vastAdUnit.getVolume());
             }
             this._vastAdUnit.sendTrackingEvent('unmute', this._vastCampaign.getSession().getId(), this._clientInfo.getSdkVersion());
         }
