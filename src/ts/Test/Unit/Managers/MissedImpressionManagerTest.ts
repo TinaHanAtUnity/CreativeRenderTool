@@ -2,7 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
 
-import { HttpKafka } from 'Utilities/HttpKafka';
+import { HttpKafka, KafkaCommonObject } from 'Utilities/HttpKafka';
 import { MissedImpressionManager } from 'Managers/MissedImpressionManager';
 import { NativeBridge } from 'Native/NativeBridge';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
@@ -28,7 +28,7 @@ describe('MissedImpressionManagerTest', () => {
         nativeBridge.Storage.onSet.trigger(StorageType[StorageType.PUBLIC], {'mediation': { 'missedImpressionOrdinal': {'value': 1, 'ts': 123456789 }}});
 
         assert.isTrue(kafkaSpy.calledOnce, 'missed impression event was not sent to httpkafka');
-        assert.isTrue(kafkaSpy.calledWith('ads.sdk2.events.missedimpression.json', { ordinal: 1 }), 'missed impression event arguments incorrect');
+        assert.isTrue(kafkaSpy.calledWith('ads.sdk2.events.missedimpression.json', KafkaCommonObject.ANONYMOUS, { ordinal: 1 }), 'missed impression event arguments incorrect');
     });
 
     it('should not send events when other metadata is set', () => {

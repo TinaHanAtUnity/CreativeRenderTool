@@ -18,7 +18,7 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { MRAID } from 'Views/MRAID';
 import { Placement } from 'Models/Placement';
-import { HttpKafka } from 'Utilities/HttpKafka';
+import { HttpKafka, KafkaCommonObject } from 'Utilities/HttpKafka';
 import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
@@ -217,7 +217,7 @@ describe('MRAIDEventHandlersTest', () => {
                 if(resourceUrl) {
                     kafkaObject.url = resourceUrl.getOriginalUrl();
                 }
-                sinon.assert.calledWith(<sinon.SinonStub>HttpKafka.sendEvent, 'ads.sdk2.events.playable.json', kafkaObject);
+                sinon.assert.calledWith(<sinon.SinonStub>HttpKafka.sendEvent, 'ads.sdk2.events.playable.json', KafkaCommonObject.ANONYMOUS, kafkaObject);
             });
 
             it('should send a analytics event without extra event data', () => {
@@ -238,7 +238,7 @@ describe('MRAIDEventHandlersTest', () => {
                 if(resourceUrl) {
                     kafkaObject.url = resourceUrl.getOriginalUrl();
                 }
-                sinon.assert.calledWith(<sinon.SinonStub>HttpKafka.sendEvent, 'ads.sdk2.events.playable.json', kafkaObject);
+                sinon.assert.calledWith(<sinon.SinonStub>HttpKafka.sendEvent, 'ads.sdk2.events.playable.json', KafkaCommonObject.ANONYMOUS, kafkaObject);
             });
         });
     });

@@ -1,5 +1,5 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { HttpKafka } from 'Utilities/HttpKafka';
+import { HttpKafka, KafkaCommonObject } from 'Utilities/HttpKafka';
 import { StorageType } from 'Native/Api/Storage';
 
 export class MissedImpressionManager {
@@ -13,7 +13,7 @@ export class MissedImpressionManager {
 
     private onStorageSet(eventType: string, data: any) {
         if(data && data.mediation && data.mediation.missedImpressionOrdinal && data.mediation.missedImpressionOrdinal.value) {
-            HttpKafka.sendEvent('ads.sdk2.events.missedimpression.json', {
+            HttpKafka.sendEvent('ads.sdk2.events.missedimpression.json', KafkaCommonObject.ANONYMOUS, {
                 ordinal: data.mediation.missedImpressionOrdinal.value
             });
             this._nativeBridge.Storage.delete(StorageType.PUBLIC, 'mediation.missedImpressionOrdinal');

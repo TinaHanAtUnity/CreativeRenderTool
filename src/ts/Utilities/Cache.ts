@@ -5,7 +5,7 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Request } from 'Utilities/Request';
-import { HttpKafka } from 'Utilities/HttpKafka';
+import { HttpKafka, KafkaCommonObject } from 'Utilities/HttpKafka';
 import { Observable0 } from 'Utilities/Observable';
 import { FileInfo } from 'Utilities/FileInfo';
 import { Campaign } from 'Models/Campaign';
@@ -550,7 +550,7 @@ export class Cache {
                 targetGameId: callback.diagnostics.targetGameId,
                 targetCampaignId: callback.diagnostics.targetCampaignId
             };
-            HttpKafka.sendEvent('ads.sdk2.events.creativedownload.json', msg);
+            HttpKafka.sendEvent('ads.sdk2.events.creativedownload.json', KafkaCommonObject.ANONYMOUS, msg);
         }
     }
 }

@@ -1,7 +1,7 @@
 import { IOperativeEventManagerParams, OperativeEventManager } from 'Managers/OperativeEventManager';
 import { Placement } from 'Models/Placement';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
-import { HttpKafka } from 'Utilities/HttpKafka';
+import { HttpKafka, KafkaCommonObject } from 'Utilities/HttpKafka';
 import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
 import { EventType } from 'Models/Session';
 import { INativeResponse } from 'Utilities/Request';
@@ -90,7 +90,7 @@ export class XPromoOperativeEventManager extends OperativeEventManager {
             infoJson.sourceGameId = this._clientInfo.getGameId();
             infoJson.targetGameId = this._xPromoCampaign.getGameId().toString();
 
-            return HttpKafka.sendEvent(kafkaType, infoJson);
+            return HttpKafka.sendEvent(kafkaType, KafkaCommonObject.PERSONAL, infoJson);
         };
 
         return this.createUniqueEventMetadata(placement, this._sessionManager.getGameSessionId(), this._gamerServerId, OperativeEventManager.getPreviousPlacementId(), videoOrientation).then(fulfilled);
