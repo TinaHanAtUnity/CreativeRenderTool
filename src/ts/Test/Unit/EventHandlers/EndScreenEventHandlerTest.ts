@@ -154,7 +154,7 @@ describe('EndScreenEventHandlerTest', () => {
                 });
             });
 
-            it('with APK download link and API >= 21, it should launch web search intent', () => {
+            it('with APK download link and API is greater than or equal to 21, it should launch web search intent', () => {
                 performanceAdUnitParameters.campaign = TestFixtures.getCampaignFollowsRedirects();
                 performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
 
@@ -183,7 +183,7 @@ describe('EndScreenEventHandlerTest', () => {
                 });
             });
 
-            it('with APK download link and API < 21, it should launch view intent', () => {
+            it('with APK download link and API is less than 21, it should launch view intent', () => {
                 performanceAdUnitParameters.campaign = TestFixtures.getCampaignFollowsRedirects();
                 performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
 
