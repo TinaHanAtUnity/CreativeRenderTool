@@ -1,3 +1,7 @@
+# Tue May 15 08:39:57 UTC 2018
+
+* Send GDPR opt-out events to test topic
+
 # Mon May 14 20:36:21 UTC 2018
 
 * Initial GDPR support for performance ads
