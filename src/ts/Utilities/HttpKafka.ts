@@ -34,7 +34,9 @@ export class HttpKafka {
         });
 
         return HttpKafka.createCommonObject(objectType, this._clientInfo, this._deviceInfo, this._configuration).then(commonObject => {
-            messages.unshift(commonObject);
+            if(commonObject) {
+                messages.unshift(commonObject);
+            }
 
             const rawData: string = messages.map(message => JSON.stringify(message)).join('\n');
             if(HttpKafka._request) {
@@ -61,7 +63,7 @@ export class HttpKafka {
 
     private static createCommonObject(objectType: KafkaCommonObject, clientInfo?: ClientInfo, deviceInfo?: DeviceInfo, configuration?: Configuration): Promise<any> {
         if(objectType === KafkaCommonObject.EMPTY) {
-            return Promise.resolve({});
+            return Promise.resolve();
         }
 
         const common: any = {

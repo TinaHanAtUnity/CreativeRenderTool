@@ -36,7 +36,6 @@ export interface ICacheOptions {
 
 export interface ICacheDiagnostics {
     creativeType: string;
-    gamerId: string;
     targetGameId: number;
     targetCampaignId: string;
 }
@@ -546,7 +545,6 @@ export class Cache {
                 creativeType: callback.diagnostics.creativeType,
                 size: callback.contentLength,
                 downloadStartTimestamp: callback.startTimestamp,
-                gamerId: callback.diagnostics.gamerId,
                 targetGameId: callback.diagnostics.targetGameId,
                 targetCampaignId: callback.diagnostics.targetCampaignId
             };
