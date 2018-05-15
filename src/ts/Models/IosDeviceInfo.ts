@@ -79,22 +79,30 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
     }
 
     public getDTO(): Promise<any> {
+        return this.getAnonymousDTO();
+    }
+
+    public getAnonymousDTO(): Promise<any> {
         return super.getDTO().then((commonDTO) => {
             return {
                 ...commonDTO,
                 'screenScale': this.getScreenScale(),
                 'userInterfaceIdiom': this.getUserInterfaceIdiom(),
-                'simulator': this.isSimulator(),
+                'simulator': this.isSimulator()
             };
         });
     }
 
     public getStaticDTO(): any {
+        return this.getAnonymousStaticDTO();
+    }
+
+    public getAnonymousStaticDTO(): any {
         return {
             ... super.getStaticDTO(),
             'screenScale': this.getScreenScale(),
             'userInterfaceIdiom': this.getUserInterfaceIdiom(),
-            'simulator': this.isSimulator(),
+            'simulator': this.isSimulator()
         };
     }
 }

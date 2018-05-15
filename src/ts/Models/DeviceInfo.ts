@@ -314,8 +314,19 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
         });
     }
 
+    public getStaticDTO(): any {
+        const dto: any = this.getAnonymousStaticDTO();
+
+        if(this.getAdvertisingIdentifier()) {
+            dto.advertisingTrackingId = this.getAdvertisingIdentifier();
+            dto.limitAdTracking = this.getLimitAdTracking();
+        }
+
+        return dto;
+    }
+
     public getAnonymousStaticDTO(): any {
-        const dto: any = {
+        return {
             'osVersion': this.getOsVersion(),
             'deviceModel': this.getModel(),
             'timeZone': this.getTimeZone(),
@@ -324,12 +335,6 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
             'totalMemory': this.getTotalMemory(),
             'rooted': this.isRooted(),
         };
-
-        if(this.getAdvertisingIdentifier()) {
-            dto.advertisingTrackingId = this.getAdvertisingIdentifier();
-            dto.limitAdTracking = this.getLimitAdTracking();
-        }
-        return dto;
     }
 
     protected handleDeviceInfoError(error: any) {

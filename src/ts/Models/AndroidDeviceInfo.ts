@@ -259,7 +259,17 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
     }
 
     public getDTO(): Promise<any> {
-        return super.getDTO().then((commonDTO) => {
+        return this.getAnonymousDTO().then(dto => {
+            if(!this.getAdvertisingIdentifier()) {
+                dto.androidId = this.getAndroidId();
+            }
+
+            return dto;
+        });
+    }
+
+    public getAnonymousDTO(): Promise<any> {
+        return super.getAnonymousDTO().then((commonDTO) => {
             const dto: any = {
                 ... commonDTO,
                 'apiLevel': this.getApiLevel(),
@@ -268,10 +278,6 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
                 'screenDensity': this.getScreenDensity(),
                 'totalSpaceExternal': this.getTotalSpaceExternal(),
             };
-
-            if(!this.getAdvertisingIdentifier()) {
-                dto.androidId = this.getAndroidId();
-            }
 
             return Promise.all([
                 this.getFreeSpaceExternal().catch(err => this.handleDeviceInfoError(err)),
@@ -289,7 +295,17 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
     }
 
     public getStaticDTO(): any {
-        const dto: any = {
+        const dto: any = this.getAnonymousStaticDTO();
+
+        if(!this.getAdvertisingIdentifier()) {
+            dto.androidId = this.getAndroidId();
+        }
+
+        return dto;
+    }
+
+    public getAnonymousStaticDTO(): any {
+        return {
             ... super.getDTO(),
             'apiLevel': this.getApiLevel(),
             'deviceMake': this.getManufacturer(),
@@ -297,11 +313,5 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
             'screenDensity': this.getScreenDensity(),
             'totalSpaceExternal': this.getTotalSpaceExternal(),
         };
-
-        if(!this.getAdvertisingIdentifier()) {
-            dto.androidId = this.getAndroidId();
-        }
-
-        return dto;
     }
 }
