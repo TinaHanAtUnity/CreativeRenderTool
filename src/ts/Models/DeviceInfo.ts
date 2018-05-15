@@ -249,6 +249,17 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
     }
 
     public getDTO(): Promise<any> {
+        return this.getAnonymousDTO().then(dto => {
+            if(this.getAdvertisingIdentifier()) {
+                dto.advertisingTrackingId = this.getAdvertisingIdentifier();
+                dto.limitAdTracking = this.getLimitAdTracking();
+            }
+
+            return dto;
+        });
+    }
+
+    public getAnonymousDTO(): Promise<any> {
         return Promise.all<any>([
             this.getConnectionType().catch(err => this.handleDeviceInfoError(err)),
             this.getNetworkType().catch(err => this.handleDeviceInfoError(err)),
@@ -278,7 +289,7 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
             batteryStatus,
             freeMemory
         ]) => {
-            const dto: any = {
+            return {
                 'osVersion': this.getOsVersion(),
                 'deviceModel': this.getModel(),
                 'connectionType': connectionType,
@@ -300,17 +311,10 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
                 'totalMemory': this.getTotalMemory(),
                 'rooted': this.isRooted(),
             };
-
-            if(this.getAdvertisingIdentifier()) {
-                dto.advertisingTrackingId = this.getAdvertisingIdentifier();
-                dto.limitAdTracking = this.getLimitAdTracking();
-            }
-
-            return dto;
         });
     }
 
-    public getStaticDTO(): any {
+    public getAnonymousStaticDTO(): any {
         const dto: any = {
             'osVersion': this.getOsVersion(),
             'deviceModel': this.getModel(),
