@@ -128,16 +128,14 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     }
 
     private handleClickAttribution(parameters: IEndScreenDownloadParameters) {
-        const currentSession = this._campaign.getSession();
         const platform = this._nativeBridge.getPlatform();
-        const auctionId = currentSession.getId();
 
         if (parameters.clickAttributionUrlFollowsRedirects && parameters.clickAttributionUrl) {
             const apkDownloadLink = Url.getQueryParameter(parameters.clickAttributionUrl, 'apk_download_link');
             if (apkDownloadLink && platform === Platform.ANDROID) {
-                this.handleAPKDownloadLink(apkDownloadLink, parameters.clickAttributionUrl, auctionId);
+                this.handleAPKDownloadLink(apkDownloadLink, parameters.clickAttributionUrl);
             } else {
-                this.handleClickAttributionWithRedirects(parameters.clickAttributionUrl, parameters.clickAttributionUrlFollowsRedirects, auctionId);
+                this.handleClickAttributionWithRedirects(parameters.clickAttributionUrl, parameters.clickAttributionUrlFollowsRedirects);
             }
         } else {
             if (parameters.clickAttributionUrl) {
@@ -146,7 +144,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         }
     }
 
-    private handleClickAttributionWithRedirects(clickAttributionUrl: string, clickAttributionUrlFollowsRedirects: boolean, auctionId: string) {
+    private handleClickAttributionWithRedirects(clickAttributionUrl: string, clickAttributionUrlFollowsRedirects: boolean) {
         const platform = this._nativeBridge.getPlatform();
 
         this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, true).then(response => {
@@ -168,13 +166,13 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
                 });
             }
         }).catch(error => {
-            this.triggerDiagnosticsError(error, clickAttributionUrl, auctionId);
+            this.triggerDiagnosticsError(error, clickAttributionUrl);
         });
     }
 
-    private handleAPKDownloadLink(apkDownloadLink: string, clickAttributionUrl: string, auctionId: string) {
+    private handleAPKDownloadLink(apkDownloadLink: string, clickAttributionUrl: string) {
         this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, false).catch(error => {
-            this.triggerDiagnosticsError(error, clickAttributionUrl, auctionId);
+            this.triggerDiagnosticsError(error, clickAttributionUrl);
         });
 
         if (this._nativeBridge.getApiLevel() >= 21) {
@@ -196,16 +194,18 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         }
     }
 
-    private triggerDiagnosticsError(error: any, clickAttributionUrl: string, auctionId: string) {
+    private triggerDiagnosticsError(error: any, clickAttributionUrl: string) {
+        const currentSession = this._campaign.getSession();
+
         if (error instanceof RequestError) {
             error = new DiagnosticError(new Error(error.message), {
                 request: (<RequestError>error).nativeRequest,
-                auctionId: auctionId,
+                auctionId: currentSession.getId(),
                 url: clickAttributionUrl,
                 response: (<RequestError>error).nativeResponse
             });
         }
-        Diagnostics.trigger('click_attribution_failed', error);
+        Diagnostics.trigger('click_attribution_failed', error, currentSession);
     }
 
     private openAppStore(parameters: IEndScreenDownloadParameters, isAppSheetBroken?: boolean) {
