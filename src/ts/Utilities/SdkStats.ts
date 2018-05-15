@@ -29,7 +29,6 @@ interface ISdkStatsEvent {
 }
 
 interface IUserInfo {
-    gamerId: string;
     abGroup: number;
 }
 
@@ -200,7 +199,6 @@ export class SdkStats {
             SdkStats.getAssetSize(campaign),
             SdkStats._metaDataManager.fetch(MediationMetaData)]).then(([cachedCampaigns, assetSize, mediationMetaData]: [string[], number, MediationMetaData | undefined]) => {
             const userInfo: IUserInfo = {
-                gamerId: SdkStats._configuration.getGamerId(),
                 abGroup: SdkStats._configuration.getAbGroup()
             };
 
