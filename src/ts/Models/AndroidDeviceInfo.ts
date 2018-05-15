@@ -259,12 +259,32 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
     }
 
     public getDTO(): Promise<any> {
-        return this.getAnonymousDTO().then(dto => {
+        return super.getDTO().then(commonDTO => {
+            const dto: any = {
+                ... commonDTO,
+                'apiLevel': this.getApiLevel(),
+                'deviceMake': this.getManufacturer(),
+                'screenLayout': this.getScreenLayout(),
+                'screenDensity': this.getScreenDensity(),
+                'totalSpaceExternal': this.getTotalSpaceExternal(),
+            };
+
             if(!this.getAdvertisingIdentifier()) {
                 dto.androidId = this.getAndroidId();
             }
 
-            return dto;
+            return Promise.all([
+                this.getFreeSpaceExternal().catch(err => this.handleDeviceInfoError(err)),
+                this.getRingerMode().catch(err => this.handleDeviceInfoError(err))
+            ]).then(([
+                freeSpaceExternal,
+                ringerMode
+            ]) => {
+                dto.freeSpaceExternal = freeSpaceExternal;
+                dto.ringerMode = ringerMode;
+
+                return dto;
+            });
         });
     }
 
@@ -295,7 +315,14 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
     }
 
     public getStaticDTO(): any {
-        const dto: any = this.getAnonymousStaticDTO();
+        const dto: any = {
+            ... super.getStaticDTO(),
+            'apiLevel': this.getApiLevel(),
+            'deviceMake': this.getManufacturer(),
+            'screenLayout': this.getScreenLayout(),
+            'screenDensity': this.getScreenDensity(),
+            'totalSpaceExternal': this.getTotalSpaceExternal(),
+        };
 
         if(!this.getAdvertisingIdentifier()) {
             dto.androidId = this.getAndroidId();
@@ -306,7 +333,7 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
 
     public getAnonymousStaticDTO(): any {
         return {
-            ... super.getDTO(),
+            ... super.getAnonymousStaticDTO(),
             'apiLevel': this.getApiLevel(),
             'deviceMake': this.getManufacturer(),
             'screenLayout': this.getScreenLayout(),
