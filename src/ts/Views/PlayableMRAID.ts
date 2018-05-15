@@ -12,6 +12,7 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
 import { SdkStats } from 'Utilities/SdkStats';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
 
 export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -43,7 +44,6 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string, privacy: AbstractPrivacy) {
         super(nativeBridge, 'playable-mraid', placement, campaign, privacy);
-
         this._placement = placement;
         this._campaign = campaign;
         this._localization = new Localization(language, 'loadingscreen');
@@ -257,7 +257,6 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
             this._loadingScreen.addEventListener(e, () => {
                 this._closeElement.style.display = 'block';
-
                 this._playableStartTimestamp = Date.now();
                 const timeFromShow = this.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
                 const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
@@ -270,6 +269,10 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 this._loadingScreen.style.display = 'none';
             }, false);
         });
+
+        if (CustomFeatures.isPlayableEndScreenHideDelayDisabled(this._campaign.getAbGroup())) {
+            this._loadingScreen.classList.add('disable-delay');
+        }
 
         this._loadingScreen.classList.add('hidden');
     }
