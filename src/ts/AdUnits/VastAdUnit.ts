@@ -11,6 +11,8 @@ import { StreamType } from 'Constants/Android/StreamType';
 import { Platform } from 'Constants/Platform';
 import { Placement } from 'Models/Placement';
 import { DeviceInfo } from 'Native/Backend/Api/DeviceInfo';
+import { Closer } from 'Views/Closer';
+import { Overlay } from 'Views/Overlay';
 
 class DeviceOrientation {
     public static getDeviceOrientation(): Orientation {
@@ -74,7 +76,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
 
     public show() {
         return super.show().then(() => {
-            // Resize for large landscape videos - portrait has enough space already
+            (<Overlay>this._overlay)!.choosePrivacyShown();
             if (this._showGDPRBanner && this._forceOrientation === Orientation.LANDSCAPE) {
                 return Promise.all([
                     this._deviceInfo.getScreenWidth(),
@@ -83,7 +85,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
                     this._screenWidth = screenWidth;
                     this._screenHeight = screenHeight;
                     if (this._forceOrientation === Orientation.LANDSCAPE) {
-                        this._container.setViewFrame('videoplayer', 0, 0, screenWidth, Math.floor(screenHeight * .7));
+                        this._container.setViewFrame('videoplayer', 0, 0, screenWidth, Math.floor(screenHeight * .8));
                     }
                 });
             }

@@ -99,7 +99,7 @@ export class Closer extends View<ICloseHandler> implements IPrivacyHandler {
     public choosePrivacyShown(): void {
         this._GDPRPopupElement = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
         this._privacyButtonElement = <HTMLElement>this._container.querySelector('.privacy-button');
-        if (this._showGDPRBanner && this._privacy instanceof GDPRPrivacy) {
+        if (this._showGDPRBanner) {
             this._GDPRPopupElement.style.opacity = '1';
             this._privacyButtonElement.style.pointerEvents = '1';
             this._privacyButtonElement.style.visibility = 'hidden';

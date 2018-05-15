@@ -3,6 +3,7 @@
 @import "icons.styl";
 
 #overlay {
+  position: fixed;
   width: 100%;
   height: 100%;
   background-color: transparent;
@@ -93,7 +94,7 @@
   .call-button {
     position: fixed;
     right: 10px;
-    bottom: 10px;
+    bottom: 0;
     display: none;
     font-weight: bold;
     transform: translate(0, -50%);
@@ -207,21 +208,20 @@
   }
 
   .gdpr-pop-up {
-    .gdpr-text {
-      padding: $default-scale-size * $default-font-size * .5;
-      color: $white;
-      font-size: $default-scale-size * $default-font-size * .5;
-    }
 
-      position: absolute;
+      position: fixed;
       bottom: 50px;
       width: 100%;
       background-color: $vast-gdpr-banner;
       box-shadow: 0 0 15px 0 rgba(0, 0, 0, .1);
+      pointer-events: auto;
 
       .gdpr-text {
         z-index: 110;
+        padding: $default-scale-size * $default-font-size * .5;
+        color: $white;
         text-align: center;
+        font-size: $default-scale-size * $default-font-size * .5;
 
         .gdpr-link {
           color: $blue;
@@ -230,9 +230,11 @@
   }
 
   .privacy-button {
-    position: absolute;
-    top: 0;
+    position: fixed;
+    bottom: 4px;
+    left: 50%;
     width: 100%;
+    pointer-events: auto;
 
     .icon-info {
       color: white;

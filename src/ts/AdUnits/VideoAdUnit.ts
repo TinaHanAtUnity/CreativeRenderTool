@@ -42,9 +42,9 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
 
     protected _options: any;
     protected _deviceInfo: DeviceInfo;
+    protected _overlay: AbstractVideoOverlay | undefined;
     private _video: Video;
     private _active: boolean;
-    private _overlay: AbstractVideoOverlay | undefined;
     private _lowMemory: boolean;
     private _prepareCalled: boolean;
     private _videoReady: boolean;
