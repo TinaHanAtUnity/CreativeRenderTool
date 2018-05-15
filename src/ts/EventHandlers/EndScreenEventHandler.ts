@@ -172,7 +172,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         });
     }
 
-    private handleAPKDownloadLink(apkDownloadLink: string, clickAttributionUrl: string, auctionId: string,) {
+    private handleAPKDownloadLink(apkDownloadLink: string, clickAttributionUrl: string, auctionId: string) {
         this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, false).catch(error => {
             this.handleClickAttributionError(error, clickAttributionUrl, auctionId);
         });
@@ -196,7 +196,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         }
     }
 
-    private handleClickAttributionError(error: any, clickAttributionUrl: string | undefined, auctionId: string) {
+    private handleClickAttributionError(error: any, clickAttributionUrl: string, auctionId: string) {
         if (error instanceof RequestError) {
             error = new DiagnosticError(new Error(error.message), {
                 request: (<RequestError>error).nativeRequest,
