@@ -1,4 +1,4 @@
-# Pending
+# Mon May 14 20:36:21 UTC 2018
 
 * Initial GDPR support for performance ads
 * Update square endscreen image target campaign IDs
