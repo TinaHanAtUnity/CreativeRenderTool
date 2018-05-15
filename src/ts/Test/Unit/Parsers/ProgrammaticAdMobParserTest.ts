@@ -86,48 +86,18 @@ describe('ProgrammaticAdMobParser', () => {
 
             describe('should cache', () => {
 
+                beforeEach(() => {
+                    (<sinon.SinonStub>request.followRedirectChain).returns(Promise.resolve(url));
+                    return parse(JSON.parse(ValidAdMobCampaign));
+                });
+
                 afterEach(() => {
-                    abGroup = 0;
                     setFileIdSpy.resetHistory();
                 });
 
-                describe('with group 0', () => {
-                    beforeEach(() => {
-                        abGroup = 0;
-                        (<sinon.SinonStub>request.followRedirectChain).returns(Promise.resolve(url));
-                        return parse(JSON.parse(ValidAdMobCampaign));
-                    });
-
-                    it('should FileId.setFileId', () => {
-                        sinon.assert.calledOnce(setFileIdSpy);
-                        sinon.assert.calledWith(setFileIdSpy, url, 'G2KkvNWTNuU');
-                    });
-                });
-
-                describe('with group 14', () => {
-                    beforeEach(() => {
-                        abGroup = 14;
-                        (<sinon.SinonStub>request.followRedirectChain).returns(Promise.resolve(url));
-                        return parse(JSON.parse(ValidAdMobCampaign));
-                    });
-
-                    it('should FileId.setFileId', () => {
-                        sinon.assert.calledOnce(setFileIdSpy);
-                        sinon.assert.calledWith(setFileIdSpy, url, 'G2KkvNWTNuU');
-                    });
-                });
-
-                describe('with group 15', () => {
-                    beforeEach(() => {
-                        abGroup = 15;
-                        (<sinon.SinonStub>request.followRedirectChain).returns(Promise.resolve(url));
-                        return parse(JSON.parse(ValidAdMobCampaign));
-                    });
-
-                    it('should FileId.setFileId', () => {
-                        sinon.assert.calledOnce(setFileIdSpy);
-                        sinon.assert.calledWith(setFileIdSpy, url, 'G2KkvNWTNuU');
-                    });
+                it('and call FileId.setFileId', () => {
+                    sinon.assert.calledOnce(setFileIdSpy);
+                    sinon.assert.calledWith(setFileIdSpy, url, 'G2KkvNWTNuU');
                 });
             });
 
@@ -167,53 +137,20 @@ describe('ProgrammaticAdMobParser', () => {
                 });
             });
 
-            describe('should', () => {
+            describe('should cache', () => {
 
                 beforeEach(() => {
-                    setFileIdSpy.resetHistory();
+                    (<sinon.SinonStub>request.followRedirectChain).returns(Promise.resolve(url));
+                    return parse(JSON.parse(ValidAdMobCampaign));
                 });
 
                 afterEach(() => {
-                    abGroup = 0;
                     setFileIdSpy.resetHistory();
                 });
 
-                describe('not cache with group 0', () => {
-                    beforeEach(() => {
-                        abGroup = 0;
-                        (<sinon.SinonStub>request.followRedirectChain).returns(Promise.resolve(url));
-                        return parse(JSON.parse(ValidAdMobCampaign));
-                    });
-
-                    it('should not FileId.setFileId', () => {
-                        sinon.assert.notCalled(setFileIdSpy);
-                    });
-                });
-
-                describe('cache with group 14', () => {
-                    beforeEach(() => {
-                        abGroup = 14;
-                        (<sinon.SinonStub>request.followRedirectChain).returns(Promise.resolve(url));
-                        return parse(JSON.parse(ValidAdMobCampaign));
-                    });
-
-                    it('should FileId.setFileId', () => {
-                        sinon.assert.calledOnce(setFileIdSpy);
-                        sinon.assert.calledWith(setFileIdSpy, url, 'G2KkvNWTNuU.mp4');
-                    });
-                });
-
-                describe('cache with group 15', () => {
-                    beforeEach(() => {
-                        abGroup = 15;
-                        (<sinon.SinonStub>request.followRedirectChain).returns(Promise.resolve(url));
-                        return parse(JSON.parse(ValidAdMobCampaign));
-                    });
-
-                    it('should FileId.setFileId', () => {
-                        sinon.assert.calledOnce(setFileIdSpy);
-                        sinon.assert.calledWith(setFileIdSpy, url, 'G2KkvNWTNuU.mp4');
-                    });
+                it('and call FileId.setFileId', () => {
+                    sinon.assert.calledOnce(setFileIdSpy);
+                    sinon.assert.calledWith(setFileIdSpy, url, 'G2KkvNWTNuU.mp4');
                 });
             });
         });
