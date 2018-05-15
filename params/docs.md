@@ -82,8 +82,8 @@
 | ext | object | JSON string for optional signals for admob | SDK | all |
 | organizationId | string | Previously knows as 'developerID' | Server | all |
 | gdprEnabled | boolean | If GDPR is enabled | Server | all |
-| optOutRecorded | boolean | Whether the user has seen the opt-out banner or not | Server | all |
-| optOutEnabled | boolean | If the opt-out is enabled | Server | all |
+| optOutRecorded | boolean | Whether the user has seen the opt-out banner in current game | Server | all |
+| optOutEnabled | boolean | Whether the user has opted out from behavioral ads targeting in current game | Server | all |
 
 
 
