@@ -23,6 +23,7 @@ import { SessionManager } from 'Managers/SessionManager';
 import EventTestVast from 'xml/EventTestVast.xml';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { GdprConsentManager } from 'Managers/GdprConsentManager';
+import { Privacy } from 'Views/Privacy';
 
 describe('VastEndScreenEventHandlersTest', () => {
     const handleInvocation = sinon.spy();
@@ -65,8 +66,8 @@ describe('VastEndScreenEventHandlersTest', () => {
         });
 
         const video = new Video('', TestFixtures.getSession());
-        const overlay = new Overlay(nativeBridge, true, 'en', 'testGameId');
-        const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
+        const privacy = new Privacy(nativeBridge, false);
+        const overlay = new Overlay(nativeBridge, true, 'en', 'testGameId', privacy, false);
         const gdprManager = sinon.createStubInstance(GdprConsentManager);
 
         vastAdUnitParameters = {
@@ -93,7 +94,7 @@ describe('VastEndScreenEventHandlersTest', () => {
         it('should hide endcard', () => {
             const vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.configuration.isCoppaCompliant(), vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
             vastAdUnitParameters.endScreen = vastEndScreen;
-            const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
+            const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters, false);
             sinon.stub(vastAdUnit, 'hide').returns(sinon.spy());
             const vastEndScreenEventHandler = new VastEndScreenEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
 
@@ -121,7 +122,7 @@ describe('VastEndScreenEventHandlersTest', () => {
             vastAdUnitParameters.placement = TestFixtures.getPlacement();
             const vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.configuration.isCoppaCompliant(), vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
             vastAdUnitParameters.endScreen = vastEndScreen;
-            vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
+            vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters, false);
             vastEndScreenEventHandler = new VastEndScreenEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
         });
 

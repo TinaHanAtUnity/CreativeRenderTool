@@ -6,6 +6,7 @@ import { Localization } from 'Utilities/Localization';
 import { Platform } from 'Constants/Platform';
 import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { AbstractPrivacy } from 'Views/AbstractPrivacy';
 
 export class Overlay extends AbstractVideoOverlay {
 
@@ -33,14 +34,19 @@ export class Overlay extends AbstractVideoOverlay {
     private _callButtonElement: HTMLElement;
 
     private _progressElement: HTMLElement;
+    private _privacyElement: HTMLElement;
 
     private _fadeTimer: any;
     private _fadeStatus: boolean = true;
+    private _privacy: AbstractPrivacy;
+    private _gdprPopupClicked: boolean = false;
+    private _showGDPRBanner: boolean = false;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, abGroup: number = 0) {
+    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: number = 0) {
         super(nativeBridge, 'overlay', muted, abGroup);
 
         this._localization = new Localization(language, 'overlay');
+        this._privacy = privacy;
 
         this._templateData = {
             muted
@@ -72,7 +78,17 @@ export class Overlay extends AbstractVideoOverlay {
             {
                 event: 'click',
                 listener: (event: Event) => this.onClick(event)
-            }
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onGDPRPopupEvent(event),
+                selector: '.gdpr-link'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onPrivacyEvent(event),
+                selector: '.icon-info'
+            },
         ];
 
         if(CustomFeatures.isTimehopApp(gameId)) {
@@ -91,6 +107,7 @@ export class Overlay extends AbstractVideoOverlay {
         this._debugMessageElement = <HTMLElement>this._container.querySelector('.debug-message-text');
         this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
         this._progressElement = <HTMLElement>this._container.querySelector('.progress');
+        // this._privacyElement = this._showGDPRBanner ? <HTMLElement>this._container.querySelector('gdpr-pop-up') : <HTMLElement>this._container.querySelector('privacy-button');
     }
 
     public setSpinnerEnabled(value: boolean): void {
@@ -171,6 +188,19 @@ export class Overlay extends AbstractVideoOverlay {
 
     public isMuted(): boolean {
         return this._muted;
+    }
+
+    private onGDPRPopupEvent(event: Event) {
+        event.preventDefault();
+
+        this._gdprPopupClicked = true;
+        this._privacy.show();
+    }
+
+    private onPrivacyEvent(event: Event) {
+        event.preventDefault();
+
+        this._privacy.show();
     }
 
     private onSkipEvent(event: Event): void {
