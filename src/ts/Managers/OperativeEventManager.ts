@@ -1,7 +1,7 @@
 import { EventType } from 'Models/Session';
 import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
 import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
-import { HttpKafka, KafkaCommonObject } from 'Utilities/HttpKafka';
+import { HttpKafka, KafkaCommonObjectType } from 'Utilities/HttpKafka';
 import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 import { Platform } from 'Constants/Platform';
 import { NativeBridge } from 'Native/NativeBridge';
@@ -192,7 +192,7 @@ export class OperativeEventManager {
             infoJson.id = id;
             infoJson.ts = (new Date()).toISOString();
 
-            HttpKafka.sendEvent('ads.sdk2.events.skip.json', KafkaCommonObject.ANONYMOUS, infoJson);
+            HttpKafka.sendEvent('ads.sdk2.events.skip.json', KafkaCommonObjectType.ANONYMOUS, infoJson);
         };
 
         return this.createUniqueEventMetadata(placement, this._sessionManager.getGameSessionId(), this._gamerServerId, OperativeEventManager.getPreviousPlacementId(), videoOrientation, adUnitStyle).then(fulfilled);
@@ -240,7 +240,7 @@ export class OperativeEventManager {
         };
 
         // todo: remove .test from the topic
-        HttpKafka.sendEvent('ads.events.optout.v1.json.test', KafkaCommonObject.EMPTY, infoJson);
+        HttpKafka.sendEvent('ads.events.optout.v1.json.test', KafkaCommonObjectType.EMPTY, infoJson);
         return Promise.resolve();
     }
 

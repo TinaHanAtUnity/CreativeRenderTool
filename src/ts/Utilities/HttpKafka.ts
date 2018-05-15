@@ -3,7 +3,7 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { INativeResponse, Request } from 'Utilities/Request';
 import { Configuration } from 'Models/Configuration';
 
-export enum KafkaCommonObject {
+export enum KafkaCommonObjectType {
     EMPTY,
     ANONYMOUS,
     PERSONAL
@@ -26,7 +26,7 @@ export class HttpKafka {
         HttpKafka._configuration = configuration;
     }
 
-    public static sendEvent(type: string, objectType: KafkaCommonObject, data: any): Promise<INativeResponse> {
+    public static sendEvent(type: string, objectType: KafkaCommonObjectType, data: any): Promise<INativeResponse> {
         const messages: any[] = [];
         messages.push({
             'type': type,
@@ -61,8 +61,8 @@ export class HttpKafka {
     private static _configuration: Configuration | undefined;
     private static _deviceInfoUpdating: boolean = false;
 
-    private static createCommonObject(objectType: KafkaCommonObject, clientInfo?: ClientInfo, deviceInfo?: DeviceInfo, configuration?: Configuration): Promise<any> {
-        if(objectType === KafkaCommonObject.EMPTY) {
+    private static createCommonObject(objectType: KafkaCommonObjectType, clientInfo?: ClientInfo, deviceInfo?: DeviceInfo, configuration?: Configuration): Promise<any> {
+        if(objectType === KafkaCommonObjectType.EMPTY) {
             return Promise.resolve();
         }
 
@@ -74,9 +74,9 @@ export class HttpKafka {
             }
         };
 
-        if (deviceInfo && !HttpKafka._deviceInfoUpdating) {
+        if(deviceInfo && !HttpKafka._deviceInfoUpdating) {
             HttpKafka._deviceInfoUpdating = true;
-            if(objectType === KafkaCommonObject.PERSONAL) {
+            if(objectType === KafkaCommonObjectType.PERSONAL) {
                 return deviceInfo.getDTO().then(deviceInfoDTO => {
                     if(typeof navigator !== 'undefined' && navigator.userAgent) {
                         deviceInfoDTO.userAgent = navigator.userAgent;
@@ -105,7 +105,7 @@ export class HttpKafka {
             }
         } else {
             if(deviceInfo) {
-                if(objectType === KafkaCommonObject.PERSONAL) {
+                if(objectType === KafkaCommonObjectType.PERSONAL) {
                     common.common.device = deviceInfo.getStaticDTO();
                 } else {
                     common.common.device = deviceInfo.getAnonymousStaticDTO();

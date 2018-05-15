@@ -1,5 +1,5 @@
 import { Request } from 'Utilities/Request';
-import { HttpKafka, KafkaCommonObject } from 'Utilities/HttpKafka';
+import { HttpKafka, KafkaCommonObjectType } from 'Utilities/HttpKafka';
 import { Configuration, CacheMode } from 'Models/Configuration';
 import { Placement } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
@@ -89,7 +89,7 @@ export class SdkStats {
     public static sendReadyEvent(placementId: string): void {
         if(SdkStats._initialized && SdkStats.isTestActive()) {
             SdkStats.getSdkStatsEvent('ready', placementId).then(event => {
-                HttpKafka.sendEvent(SdkStats._topic, KafkaCommonObject.ANONYMOUS, event);
+                HttpKafka.sendEvent(SdkStats._topic, KafkaCommonObjectType.ANONYMOUS, event);
             });
         }
     }
@@ -97,7 +97,7 @@ export class SdkStats {
     public static sendShowEvent(placementId: string): void {
         if(SdkStats._initialized && SdkStats.isTestActive()) {
             SdkStats.getSdkStatsEvent('show', placementId).then(event => {
-                HttpKafka.sendEvent(SdkStats._topic, KafkaCommonObject.ANONYMOUS, event);
+                HttpKafka.sendEvent(SdkStats._topic, KafkaCommonObjectType.ANONYMOUS, event);
             });
         }
     }
