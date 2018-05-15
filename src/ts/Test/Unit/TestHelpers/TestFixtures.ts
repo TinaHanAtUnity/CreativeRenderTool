@@ -470,7 +470,6 @@ export class TestFixtures {
     public static getCacheDiagnostics(): ICacheDiagnostics {
         return {
             creativeType: 'TEST',
-            gamerId: '1234abcd',
             targetGameId: 5678,
             targetCampaignId: '123456abcdef'
         };

@@ -5,7 +5,7 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Request } from 'Utilities/Request';
-import { HttpKafka } from 'Utilities/HttpKafka';
+import { HttpKafka, KafkaCommonObjectType } from 'Utilities/HttpKafka';
 import { Observable0 } from 'Utilities/Observable';
 import { FileInfo } from 'Utilities/FileInfo';
 import { Campaign } from 'Models/Campaign';
@@ -36,7 +36,6 @@ export interface ICacheOptions {
 
 export interface ICacheDiagnostics {
     creativeType: string;
-    gamerId: string;
     targetGameId: number;
     targetCampaignId: string;
 }
@@ -546,11 +545,10 @@ export class Cache {
                 creativeType: callback.diagnostics.creativeType,
                 size: callback.contentLength,
                 downloadStartTimestamp: callback.startTimestamp,
-                gamerId: callback.diagnostics.gamerId,
                 targetGameId: callback.diagnostics.targetGameId,
                 targetCampaignId: callback.diagnostics.targetCampaignId
             };
-            HttpKafka.sendEvent('ads.sdk2.events.creativedownload.json', msg);
+            HttpKafka.sendEvent('ads.sdk2.events.creativedownload.json', KafkaCommonObjectType.ANONYMOUS, msg);
         }
     }
 }
