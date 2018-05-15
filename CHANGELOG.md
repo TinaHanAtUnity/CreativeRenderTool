@@ -1,3 +1,8 @@
+# Pending
+
+* Anonymize non-operational events
+* Fix configuration for creative test apps
+
 # Tue May 15 08:39:57 UTC 2018
 
 * Send GDPR opt-out events to test topic
