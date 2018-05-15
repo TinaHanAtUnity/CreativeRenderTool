@@ -312,6 +312,24 @@
       "required": "no",
       "queryString": false,
       "body": true
+    },
+    {
+      "parameter": "gdprEnabled",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "optOutRecorded",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "optOutEnabled",
+      "required": "all",
+      "queryString": false,
+      "body": true
     }
   ]
 }

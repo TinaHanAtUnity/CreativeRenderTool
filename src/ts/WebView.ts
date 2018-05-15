@@ -38,7 +38,6 @@ import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { SdkStats } from 'Utilities/SdkStats';
 import { Campaign } from 'Models/Campaign';
-import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
@@ -80,7 +79,6 @@ export class WebView {
 
     private _sessionManager: SessionManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
-    private _comScoreTrackingService: ComScoreTrackingService;
     private _wakeUpManager: WakeUpManager;
     private _focusManager: FocusManager;
     private _analyticsManager: AnalyticsManager;
@@ -378,9 +376,8 @@ export class WebView {
         Promise.all([
             this._deviceInfo.getScreenWidth(),
             this._deviceInfo.getScreenHeight(),
-            this._deviceInfo.getConnectionType(),
-            CustomFeatures.showGDPRPopup(this._nativeBridge, this._configuration, campaign.getAbGroup())
-        ]).then(([screenWidth, screenHeight, connectionType, showGDPRPopup]) => {
+            this._deviceInfo.getConnectionType()
+        ]).then(([screenWidth, screenHeight, connectionType]) => {
             if(campaign.isConnectionNeeded() && connectionType === 'none') {
                 this._showing = false;
                 this.showError(true, placement.getId(), 'No connection');
@@ -393,7 +390,6 @@ export class WebView {
             }
 
             const orientation = screenWidth >= screenHeight ? Orientation.LANDSCAPE : Orientation.PORTRAIT;
-            this._comScoreTrackingService = new ComScoreTrackingService(this._thirdPartyEventManager, this._nativeBridge, this._deviceInfo);
             this._currentAdUnit = AdUnitFactory.createAdUnit(this._nativeBridge, {
                 forceOrientation: orientation,
                 focusManager: this._focusManager,
@@ -411,14 +407,12 @@ export class WebView {
                     configuration: this._configuration,
                     campaign: campaign
                 }),
-                comScoreTrackingService: this._comScoreTrackingService,
                 placement: placement,
                 campaign: campaign,
                 configuration: this._configuration,
                 request: this._request,
                 options: options,
-                adMobSignalFactory: this._adMobSignalFactory,
-                showGDPRPopup: showGDPRPopup
+                adMobSignalFactory: this._adMobSignalFactory
             });
             this._refreshManager.setCurrentAdUnit(this._currentAdUnit);
             this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());

@@ -1,3 +1,29 @@
+# Mon May 14 20:36:21 UTC 2018
+
+* Initial GDPR support for performance ads
+* Update square endscreen image target campaign IDs
+* Change IAP promo finish states to skip on close and finished on purchase
+
+# Mon May 14 09:12:28 UTC 2018
+
+* Remove GDPR popup A/B test from groups 18 & 19
+
+# Wed May  9 20:37:15 UTC 2018
+
+* Disable ComScore integration
+* Add make watch-fast target
+
+# Wed May  9 08:41:13 UTC 2018
+
+* Adds iOS AdMob video precaching for AB Groups 14 and 15.
+
+# Tue May  8 20:21:44 UTC 2018
+
+* Add organizationId to ad requests
+* Split display interstitial content type to programmatic/static-interstitial-html and programmatic/static-interstitial-js
+* Drop gameSessionCounters from skip event payload
+* Restart backup campaign A/B test on groups 11 and 12
+
 # Fri May  4 13:36:21 UTC 2018
 
 * Stop A/B test from groups 7 and 8 that was accidentally restarted on Apr 26 deployment

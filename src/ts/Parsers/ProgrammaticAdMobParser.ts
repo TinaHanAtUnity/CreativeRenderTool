@@ -10,6 +10,8 @@ import { Vast } from 'Models/Vast/Vast';
 import { VastParser } from 'Utilities/VastParser';
 import { FileId } from 'Utilities/FileId';
 import { Platform } from 'Constants/Platform';
+import { Url } from 'Utilities/Url';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
 
 export class ProgrammaticAdMobParser extends CampaignParser {
     public static ContentType = 'programmatic/admob-video';
@@ -17,7 +19,7 @@ export class ProgrammaticAdMobParser extends CampaignParser {
         const markup = response.getContent();
         const cacheTTL = response.getCacheTTL();
         const platform = nativeBridge.getPlatform();
-        const videoPromise = this.getVideoFromMarkup(markup, request, session, platform).catch((e) => {
+        const videoPromise = this.getVideoFromMarkup(markup, request, session, platform, abGroup).catch((e) => {
             nativeBridge.Sdk.logError(`Unable to parse video from markup due to: ${e.message}`);
             return null;
         });
@@ -53,8 +55,8 @@ export class ProgrammaticAdMobParser extends CampaignParser {
 
     }
 
-    private getVideoFromMarkup(markup: string, request: Request, session: Session, platform: Platform): Promise<AdMobVideo> {
-        if (platform === Platform.IOS) {
+    private getVideoFromMarkup(markup: string, request: Request, session: Session, platform: Platform, abGroup: number): Promise<AdMobVideo> {
+        if (!CustomFeatures.isIosVideoCachingEnabled(abGroup) && platform === Platform.IOS) {
             return Promise.reject(new Error('iOS precaching to file not supported for HTML5 video player'));
         }
         try {
@@ -68,10 +70,30 @@ export class ProgrammaticAdMobParser extends CampaignParser {
             }
             const scriptSrc = scriptTag.textContent;
             const mediaFileURL = this.getVideoFromScriptSource(scriptSrc!);
+
             return this.getRealVideoURL(mediaFileURL, request).then((realVideoURL: string) => {
-                return new AdMobVideo({
-                    mediaFileURL: mediaFileURL,
-                    video: new Video(realVideoURL, session)
+                return new Promise<AdMobVideo>((resolve, reject) => {
+                    const mimeType = Url.getQueryParameter(realVideoURL, 'mime');
+                    let extension: string | null = null;
+                    if (mimeType) {
+                        extension = mimeType.split('/')[1];
+                    }
+                    if (platform === Platform.ANDROID) {
+                        resolve(new AdMobVideo({
+                            mediaFileURL: mediaFileURL,
+                            video: new Video(realVideoURL, session),
+                            extension: null
+                        }));
+                    } else if (extension && platform === Platform.IOS) {
+                        resolve(new AdMobVideo({
+                            mediaFileURL: mediaFileURL,
+                            video: new Video(realVideoURL, session),
+                            extension: extension
+                        }));
+                    } else {
+                        // do not cache as we are on iOS and do not have a mime type so we should play streamed video
+                        reject(new Error('iOS precaching to file not supported for HTML5 video player'));
+                    }
                 });
             });
         } catch (e) {
@@ -112,8 +134,13 @@ export class ProgrammaticAdMobParser extends CampaignParser {
     private updateFileID(video: AdMobVideo) {
         const videoID = this.getVideoID(video.getMediaFileURL());
         const url = video.getVideo().getOriginalUrl();
+        const extension = video.getExtension();
         if (videoID && url) {
-            FileId.setFileID(url, videoID);
+            if (extension) { // should only be enabled for iOS
+                FileId.setFileID(url, videoID + '.' + extension);
+            } else {
+                FileId.setFileID(url, videoID);
+            }
         }
     }
 

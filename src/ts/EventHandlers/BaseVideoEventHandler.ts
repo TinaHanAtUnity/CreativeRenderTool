@@ -10,7 +10,6 @@ import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { Configuration } from 'Models/Configuration';
 import { Video } from 'Models/Assets/Video';
-import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 
@@ -20,7 +19,6 @@ export interface IVideoEventHandlerParams<T extends VideoAdUnit = VideoAdUnit, T
     campaign: T2;
     operativeEventManager: T3;
     thirdPartyEventManager: ThirdPartyEventManager;
-    comScoreTrackingService: ComScoreTrackingService;
     configuration: Configuration;
     placement: Placement;
     video: Video;

@@ -13,10 +13,12 @@ import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { EventType } from 'Models/Session';
 import { Placement } from 'Models/Placement';
+import { AbstractPrivacy } from 'Views/AbstractPrivacy';
 
 export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign> {
     mraid: MRAIDView<IMRAIDViewHandler>;
     endScreen?: EndScreen;
+    privacy: AbstractPrivacy;
 }
 
 export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListener {
@@ -31,6 +33,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _clientInfo: ClientInfo;
     private _placement: Placement;
     private _campaign: MRAIDCampaign;
+    private _privacy: AbstractPrivacy;
     private _additionalTrackingEvents: { [eventName: string]: string[] } | undefined;
 
     constructor(nativeBridge: NativeBridge, parameters: IMRAIDAdUnitParameters) {
@@ -44,6 +47,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._clientInfo = parameters.clientInfo;
         this._placement = parameters.placement;
         this._campaign = parameters.campaign;
+        this._privacy = parameters.privacy;
 
         this._mraid.render();
         document.body.appendChild(this._mraid.container());
@@ -91,6 +95,11 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         if(this._endScreen) {
             this._endScreen.hide();
             this._endScreen.container().parentElement!.removeChild(this._endScreen.container());
+        }
+
+        if(this._privacy) {
+            this._privacy.hide();
+            this._privacy.container().parentElement!.removeChild(this._privacy.container());
         }
 
         const finishState = this.getFinishState();
@@ -183,6 +192,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private unsetReferences() {
         delete this._mraid;
         delete this._endScreen;
+        delete this._privacy;
     }
 
     private sendTrackingEvent(eventName: string): void {

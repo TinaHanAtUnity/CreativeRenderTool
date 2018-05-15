@@ -81,6 +81,9 @@
 | gameSessionCounters | object | Game session based counts of starts, views and ad requests | SDK | all |
 | ext | object | JSON string for optional signals for admob | SDK | all |
 | organizationId | string | Previously knows as 'developerID' | Server | all |
+| gdprEnabled | boolean | If GDPR is enabled | Server | all |
+| optOutRecorded | boolean | Whether the user has seen the opt-out banner in current game | Server | all |
+| optOutEnabled | boolean | Whether the user has opted out from behavioral ads targeting in current game | Server | all |
 
 
 
@@ -164,6 +167,9 @@
 | gameSessionCounters | all | False | True | object | Game session based counts of starts, views and ad requests | SDK | all |
 | ext | all | False | True | object | JSON string for optional signals for admob | SDK | all |
 | organizationId | no | False | True | string | Previously knows as 'developerID' | Server | all |
+| gdprEnabled | all | False | True | boolean | If GDPR is enabled | Server | all |
+| optOutRecorded | all | False | True | boolean | Whether the user has seen the opt-out banner in current game | Server | all |
+| optOutEnabled | all | False | True | boolean | Whether the user has opted out from behavioral ads targeting in current game | Server | all |
 
 
 

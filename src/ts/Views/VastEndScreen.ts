@@ -5,7 +5,8 @@ import { View } from 'Views/View';
 import { Template } from 'Utilities/Template';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
-import { IPrivacyHandler, Privacy } from 'Views/Privacy';
+import { IPrivacyHandler, AbstractPrivacy } from 'Views/AbstractPrivacy';
+import { Privacy } from 'Views/Privacy';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 
 export interface IVastEndScreenHandler {
@@ -114,6 +115,10 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
         this._handlers.forEach(handler => handler.onEndScreenPrivacy(url));
     }
 
+    public onGDPROptOut(optOutEnabled: boolean) {
+        // do nothing
+    }
+
     private onCloseEvent(event: Event): void {
         event.preventDefault();
         this._handlers.forEach(handler => handler.onVastEndScreenClose());
@@ -126,6 +131,7 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
 
     private onPrivacyEvent(event: Event): void {
         event.preventDefault();
+        // todo: gdpr privacy
         this._privacy = new Privacy(this._nativeBridge, this._coppaCompliant);
         this._privacy.render();
         document.body.appendChild(this._privacy.container());

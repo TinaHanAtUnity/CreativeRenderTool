@@ -39,8 +39,6 @@ export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public show(): Promise<void> {
-        // Always set to complete to avoid errors.
-        this.setFinishState(FinishState.COMPLETED);
         this.setShowing(true);
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
         this._promoView.show();
@@ -115,7 +113,7 @@ export class PromoAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     private onKeyDown(key: number) {
         if (key === KeyCode.BACK) {
-            this.hide();
+            this._promoView.onClose.trigger();
         }
     }
 

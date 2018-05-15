@@ -8,7 +8,6 @@ import { SessionManager } from 'Managers/SessionManager';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { Request, INativeResponse } from 'Utilities/Request';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
@@ -27,6 +26,7 @@ import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 import { Placement } from 'Models/Placement';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { Configuration } from 'Models/Configuration';
+import { Privacy } from 'Views/Privacy';
 
 describe('EndScreenEventHandlerTest', () => {
 
@@ -43,7 +43,6 @@ describe('EndScreenEventHandlerTest', () => {
     let thirdPartyEventManager: ThirdPartyEventManager;
     let performanceAdUnitParameters: IPerformanceAdUnitParameters;
     let endScreenEventHandler: PerformanceEndScreenEventHandler;
-    let comScoreService: ComScoreTrackingService;
     let campaign: PerformanceCampaign;
     let placement: Placement;
     let configuration: Configuration;
@@ -79,13 +78,14 @@ describe('EndScreenEventHandlerTest', () => {
                 campaign: campaign
             });
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
-            comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
             sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
             sinon.spy(nativeBridge.Intent, 'launch');
 
             const video = new Video('', TestFixtures.getSession());
-            endScreen = new PerformanceEndScreen(nativeBridge, TestFixtures.getCampaign(), configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
+
+            const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+            endScreen = new PerformanceEndScreen(nativeBridge, TestFixtures.getCampaign(), deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, false);
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
             placement = TestFixtures.getPlacement();
 
@@ -97,7 +97,6 @@ describe('EndScreenEventHandlerTest', () => {
                 clientInfo: clientInfo,
                 thirdPartyEventManager: thirdPartyEventManager,
                 operativeEventManager: operativeEventManager,
-                comScoreTrackingService: comScoreService,
                 placement: placement,
                 campaign: campaign,
                 configuration: configuration,
@@ -105,7 +104,8 @@ describe('EndScreenEventHandlerTest', () => {
                 options: {},
                 endScreen: endScreen,
                 overlay: overlay,
-                video: video
+                video: video,
+                privacy: privacy
             };
 
             performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
@@ -247,7 +247,9 @@ describe('EndScreenEventHandlerTest', () => {
             });
 
             sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
-            endScreen = new PerformanceEndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
+
+            const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+            endScreen = new PerformanceEndScreen(nativeBridge, campaign, deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, false);
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
 
             performanceAdUnitParameters = {
@@ -258,7 +260,6 @@ describe('EndScreenEventHandlerTest', () => {
                 clientInfo: clientInfo,
                 thirdPartyEventManager: thirdPartyEventManager,
                 operativeEventManager: operativeEventManager,
-                comScoreTrackingService: comScoreService,
                 placement: TestFixtures.getPlacement(),
                 campaign: campaign,
                 configuration: configuration,
@@ -266,7 +267,8 @@ describe('EndScreenEventHandlerTest', () => {
                 options: {},
                 endScreen: endScreen,
                 overlay: overlay,
-                video: video
+                video: video,
+                privacy: privacy
             };
 
             performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);

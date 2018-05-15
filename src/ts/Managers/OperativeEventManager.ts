@@ -230,6 +230,21 @@ export class OperativeEventManager {
         return this.createUniqueEventMetadata(placement, this._sessionManager.getGameSessionId(), this._gamerServerId, OperativeEventManager.getPreviousPlacementId(), videoOrientation, adUnitStyle).then(fulfilled);
     }
 
+    public sendGDPREvent(placement: Placement, action: string): Promise<void> {
+        const infoJson: any = {
+            'adid': this._deviceInfo.getAdvertisingIdentifier(),
+            'action': action,
+            'projectId': this._configuration.getUnityProjectId(),
+            'platform': Platform[this._clientInfo.getPlatform()].toLowerCase(),
+            'gameId': this._clientInfo.getGameId()
+        };
+
+        // todo: remove kafka common object from the payload
+        // todo: do not send events yet!!!
+        return Promise.resolve();
+        // return HttpKafka.sendEvent('ads.events.optout.v1.json', infoJson);
+    }
+
     public setGamerServerId(serverId: string | undefined): void {
         this._gamerServerId = serverId;
     }
