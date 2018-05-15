@@ -74,8 +74,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
 
     public show() {
         return super.show().then(() => {
-            // TODO: Remove this
-            this._showGDPRBanner = true;
             // Resize for large landscape videos - portrait has enough space already
             if (this._showGDPRBanner && this._forceOrientation === Orientation.LANDSCAPE) {
                 return Promise.all([

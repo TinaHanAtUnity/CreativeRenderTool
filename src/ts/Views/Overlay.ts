@@ -6,9 +6,10 @@ import { Localization } from 'Utilities/Localization';
 import { Platform } from 'Constants/Platform';
 import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
-import { AbstractPrivacy } from 'Views/AbstractPrivacy';
+import { AbstractPrivacy, IPrivacyHandler } from 'Views/AbstractPrivacy';
+import { GDPRPrivacy } from 'Views/GDPRPrivacy';
 
-export class Overlay extends AbstractVideoOverlay {
+export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
 
     private _localization: Localization;
 
@@ -34,7 +35,8 @@ export class Overlay extends AbstractVideoOverlay {
     private _callButtonElement: HTMLElement;
 
     private _progressElement: HTMLElement;
-    private _privacyElement: HTMLElement;
+    private _privacyButtonElement: HTMLElement;
+    private _GDPRPopupElement: HTMLElement;
 
     private _fadeTimer: any;
     private _fadeStatus: boolean = true;
@@ -97,6 +99,16 @@ export class Overlay extends AbstractVideoOverlay {
                 listener: (event: Event) => this.onSkipEvent(event)
             });
         }
+
+        this._privacy.render();
+        this._privacy.hide();
+        document.body.appendChild(this._privacy.container());
+        this._privacy.addEventHandler(this);
+    }
+
+    public show() {
+        super.show();
+        this.choosePrivacyShown();
     }
 
     public render(): void {
@@ -107,7 +119,8 @@ export class Overlay extends AbstractVideoOverlay {
         this._debugMessageElement = <HTMLElement>this._container.querySelector('.debug-message-text');
         this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
         this._progressElement = <HTMLElement>this._container.querySelector('.progress');
-        // this._privacyElement = this._showGDPRBanner ? <HTMLElement>this._container.querySelector('gdpr-pop-up') : <HTMLElement>this._container.querySelector('privacy-button');
+        this._GDPRPopupElement = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
+        this._privacyButtonElement = <HTMLElement>this._container.querySelector('.privacy-button');
     }
 
     public setSpinnerEnabled(value: boolean): void {
@@ -188,6 +201,32 @@ export class Overlay extends AbstractVideoOverlay {
 
     public isMuted(): boolean {
         return this._muted;
+    }
+
+    public onPrivacy(url: string): void {
+        // do nothing
+    }
+
+    public onPrivacyClose(): void {
+        if (this._privacy) {
+            this._privacy.hide();
+        }
+    }
+
+    public onGDPROptOut(optOutEnabled: boolean): void {
+        // do nothing
+    }
+
+    private choosePrivacyShown(): void {
+        if (this._showGDPRBanner && this._privacy instanceof GDPRPrivacy) {
+            this._GDPRPopupElement.style.opacity = '1';
+            this._privacyButtonElement.style.pointerEvents = '1';
+            this._privacyButtonElement.style.visibility = 'hidden';
+        } else {
+            this._privacyButtonElement.style.opacity = '1';
+            this._GDPRPopupElement.style.pointerEvents = '1';
+            this._GDPRPopupElement.style.visibility = 'hidden';
+        }
     }
 
     private onGDPRPopupEvent(event: Event) {
