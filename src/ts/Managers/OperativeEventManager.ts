@@ -240,9 +240,9 @@ export class OperativeEventManager {
         };
 
         // todo: remove kafka common object from the payload
-        // todo: do not send events yet!!!
+        // todo: remove .test from the topic
+        HttpKafka.sendEvent('ads.events.optout.v1.json.test', infoJson);
         return Promise.resolve();
-        // return HttpKafka.sendEvent('ads.events.optout.v1.json', infoJson);
     }
 
     public setGamerServerId(serverId: string | undefined): void {
