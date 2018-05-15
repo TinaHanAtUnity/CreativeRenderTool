@@ -154,7 +154,7 @@ describe('EndScreenEventHandlerTest', () => {
                 });
             });
 
-            it('with apk download link, it should launch web search intent', () => {
+            it('with APK download link and API >= 21, it should launch web search intent', () => {
                 performanceAdUnitParameters.campaign = TestFixtures.getCampaignFollowsRedirects();
                 performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
 
@@ -179,6 +179,35 @@ describe('EndScreenEventHandlerTest', () => {
                     sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
                         'action': 'android.intent.action.WEB_SEARCH',
                         'extras': [{ key: 'query', value: 'https://cdn.apk.com' }]
+                    });
+                });
+            });
+
+            it('with APK download link and API < 21, it should launch view intent', () => {
+                performanceAdUnitParameters.campaign = TestFixtures.getCampaignFollowsRedirects();
+                performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
+
+                sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').returns(Promise.resolve({
+                    url: 'http://foo.url.com',
+                    response: 'foo response',
+                    responseCode: 200
+                }));
+
+                sinon.stub(nativeBridge, 'getApiLevel').returns(20);
+
+                endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
+                    appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
+                    bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
+                    gamerId: performanceAdUnitParameters.campaign.getGamerId(),
+                    store: performanceAdUnitParameters.campaign.getStore(),
+                    clickAttributionUrlFollowsRedirects: true,
+                    clickAttributionUrl: 'https://blah.com?apk_download_link=https://cdn.apk.com'
+                });
+
+                return resolvedPromise.then(() => {
+                    sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
+                        'action': 'android.intent.action.VIEW',
+                        'uri': 'https://cdn.apk.com'
                     });
                 });
             });
