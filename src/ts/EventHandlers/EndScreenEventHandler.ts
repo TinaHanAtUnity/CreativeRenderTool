@@ -168,13 +168,13 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
                 });
             }
         }).catch(error => {
-            this.handleClickAttributionError(error, clickAttributionUrl, auctionId);
+            this.triggerDiagnosticsError(error, clickAttributionUrl, auctionId);
         });
     }
 
     private handleAPKDownloadLink(apkDownloadLink: string, clickAttributionUrl: string, auctionId: string) {
         this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, false).catch(error => {
-            this.handleClickAttributionError(error, clickAttributionUrl, auctionId);
+            this.triggerDiagnosticsError(error, clickAttributionUrl, auctionId);
         });
 
         if (this._nativeBridge.getApiLevel() >= 21) {
@@ -196,7 +196,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         }
     }
 
-    private handleClickAttributionError(error: any, clickAttributionUrl: string, auctionId: string) {
+    private triggerDiagnosticsError(error: any, clickAttributionUrl: string, auctionId: string) {
         if (error instanceof RequestError) {
             error = new DiagnosticError(new Error(error.message), {
                 request: (<RequestError>error).nativeRequest,
