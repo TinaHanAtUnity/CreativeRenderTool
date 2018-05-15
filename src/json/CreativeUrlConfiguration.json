@@ -3,6 +3,9 @@
   "coppaCompliant": false,
   "assetCaching": "disabled",
   "projectId": "0a379f5a-c4fa-4f7f-a5c1-e49fd3dd63d4",
+  "gdprEnabled": false,
+  "optOutEnabled": false,
+  "optOutRecorded": false,
   "placements": [{
     "id": "defaultVideoAndPictureZone",
     "name": "Placement",
