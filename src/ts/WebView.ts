@@ -56,6 +56,7 @@ import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
 import { TimeoutError, Promises } from 'Utilities/Promises';
 import { JaegerSpan, JaegerTags } from 'Jaeger/JaegerSpan';
 import { JaegerManager } from 'Jaeger/JaegerManager';
+import { GdprConsentManager } from 'Managers/GdprConsentManager';
 
 export class WebView {
 
@@ -84,6 +85,7 @@ export class WebView {
     private _analyticsManager: AnalyticsManager;
     private _adMobSignalFactory: AdMobSignalFactory;
     private _missedImpressionManager: MissedImpressionManager;
+    private _gdprConsentManager: GdprConsentManager;
     private _jaegerManager: JaegerManager;
 
     private _showing: boolean = false;
@@ -200,6 +202,7 @@ export class WebView {
 
             return Promise.all([configPromise, cachedCampaignResponsePromise, cachePromise]);
         }).then(([configuration, cachedCampaignResponse]) => {
+            this._gdprConsentManager = new GdprConsentManager(this._nativeBridge, this._deviceInfo, this._clientInfo, configuration);
             this._configuration = configuration;
             this._cachedCampaignResponse = cachedCampaignResponse;
             HttpKafka.setConfiguration(this._configuration);
