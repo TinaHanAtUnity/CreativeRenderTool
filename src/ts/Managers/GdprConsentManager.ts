@@ -25,6 +25,9 @@ export class GdprConsentManager {
             if (typeof(data) === 'boolean') {
                 this.setConsent(data);
             }
+        }).catch((error) => {
+            // do nothing
+            // error happens when value not found
         });
     }
 
