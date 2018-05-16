@@ -9,6 +9,11 @@
     font-size: $default-size * $default-font-size * .75;
   }
 
+  .gdpr-text-android,
+  .gdpr-text-ios {
+    display: none;
+  }
+
   &.flip {
     .back-side {
       display: block;
@@ -23,5 +28,11 @@
       display: none;
     }
   }
+}
+
+body.android #gdpr-privacy .gdpr-text-android,
+body.iphone #gdpr-privacy .gdpr-text-ios,
+body.ipad #gdpr-privacy .gdpr-text-ios {
+  display: initial;
 }
 
