@@ -85,7 +85,7 @@ export class MRAIDAdUnit extends AbstractAdUnit {
         const views: string[] = ['webview'];
         // TODO: Remove /ar/ folder check once we have MRAID-AR type support on the server side
         const resourceUrl = this._campaign.getResourceUrl();
-        const isARURL = resourceUrl && resourceUrl.getOriginalUrl().match(/\/ar\//);
+        const isARURL = resourceUrl && resourceUrl.getOriginalUrl().match(/ducktales-ar/);
         if (this._campaign.getAdType() === 'MRAID-AR' || isARURL) {
             views.unshift('arview');
         }
