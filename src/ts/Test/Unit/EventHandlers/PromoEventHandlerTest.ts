@@ -22,6 +22,9 @@ import { FocusManager } from 'Managers/FocusManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
+import { Configuration } from 'Models/Configuration';
+import { SinonStub } from 'sinon';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
 
 describe('PromoEventHandlersTest', () => {
     const handleInvocation = sinon.spy();
