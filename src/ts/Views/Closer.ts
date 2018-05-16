@@ -76,6 +76,9 @@ export class Closer extends View<ICloseHandler> implements IPrivacyHandler {
         if (this._privacy) {
             document.body.removeChild(this._privacy.container());
         }
+
+        this.onPrivacyClosed.unsubscribe();
+        this.onPrivacyOpened.unsubscribe();
     }
 
     public show() {
