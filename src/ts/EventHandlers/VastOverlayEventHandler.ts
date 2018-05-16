@@ -47,13 +47,13 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
                 this._moat.triggerVideoEvent('AdVolumeChange', 0);
                 this._moat.triggerViewabilityEvent('volume', 0.0);
             }
-            this._vastAdUnit.sendTrackingEvent('mute', this._vastCampaign.getSession().getId(), this._clientInfo.getSdkVersion());
+            this._vastAdUnit.sendTrackingEvent('mute', this._vastCampaign.getSession().getId());
         } else {
             if (this._moat) {
                 this._moat.triggerVideoEvent('AdPlaying', this._vastAdUnit.getVolume());
                 this._moat.triggerViewabilityEvent('exposure', true);
             }
-            this._vastAdUnit.sendTrackingEvent('unmute', this._vastCampaign.getSession().getId(), this._clientInfo.getSdkVersion());
+            this._vastAdUnit.sendTrackingEvent('unmute', this._vastCampaign.getSession().getId());
         }
 
     }
@@ -62,7 +62,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         super.onOverlayCallButton();
 
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
-        this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId(), this._clientInfo.getSdkVersion());
+        this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId());
 
         const clickThroughURL = this._vastAdUnit.getVideoClickThroughURL();
         if(clickThroughURL) {
