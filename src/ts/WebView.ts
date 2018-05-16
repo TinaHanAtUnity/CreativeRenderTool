@@ -78,7 +78,6 @@ export class WebView {
     private _currentAdUnit: AbstractAdUnit;
 
     private _sessionManager: SessionManager;
-    private _thirdPartyEventManager: ThirdPartyEventManager;
     private _wakeUpManager: WakeUpManager;
     private _focusManager: FocusManager;
     private _analyticsManager: AnalyticsManager;
@@ -132,7 +131,6 @@ export class WebView {
             this._cacheBookkeeping = new CacheBookkeeping(this._nativeBridge);
             this._cache = new Cache(this._nativeBridge, this._wakeUpManager, this._request, this._cacheBookkeeping);
             this._resolve = new Resolve(this._nativeBridge);
-            this._thirdPartyEventManager = new ThirdPartyEventManager(this._nativeBridge, this._request);
             this._metadataManager = new MetaDataManager(this._nativeBridge);
             this._adMobSignalFactory = new AdMobSignalFactory(this._nativeBridge, this._clientInfo, this._deviceInfo, this._focusManager);
             this._jaegerManager = new JaegerManager(this._request);
@@ -396,7 +394,7 @@ export class WebView {
                 container: this._container,
                 deviceInfo: this._deviceInfo,
                 clientInfo: this._clientInfo,
-                thirdPartyEventManager: this._thirdPartyEventManager,
+                thirdPartyEventManager: new ThirdPartyEventManager(this._nativeBridge, this._request),
                 operativeEventManager: OperativeEventManagerFactory.createOperativeEventManager({
                     nativeBridge: this._nativeBridge,
                     request: this._request,
