@@ -1,4 +1,4 @@
-# Staged
+# Wed May 16 08:39:25 UTC 2018
 
 * iOS AdMob Precache for all groups.
 * Uses full screen width and height for Display when not set in the campaign.
