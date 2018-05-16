@@ -123,7 +123,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         // TODO: Remove /ar/ folder check once we have MRAID-AR type support on the server side
         const resourceUrl = this._campaign.getResourceUrl();
-        const isARURL = Boolean(resourceUrl && resourceUrl.getOriginalUrl().match(/ducktales-ar/));
+        const isARURL = Boolean(resourceUrl && resourceUrl.getOriginalUrl().match(/\/ar\/|ducktales-ar/));
         this._isMRAIDAR = this._campaign.getAdType() === 'MRAID-AR' || isARURL;
         if (this._isMRAIDAR) {
             container = container.replace('<script id=\"webar\"></script>', WebARScript);
