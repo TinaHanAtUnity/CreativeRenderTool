@@ -16,6 +16,7 @@ describe('PurchasingUtilitiesTest', () => {
     let sdk: SdkApi;
     const promoCatalog = '[\n  {\n    \"localizedPriceString\" : \"$0.00\",\n    \"localizedTitle\" : \"Sword of Minimal Value\",\n    \"productId\" : \"myPromo\"\n  },\n  {\n    \"localizedPriceString\" : \"$0.99\",\n    \"localizedTitle\" : \"100 in-game Gold Coins\",\n    \"productId\" : \"100.gold.coins\"\n  }\n]';
     const iapPayload: IPromoPayload = {
+        trackingOptOut: false,
         gamerId: '111',
         iapPromo: true,
         gameId: '222',

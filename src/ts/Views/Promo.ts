@@ -7,20 +7,32 @@ import { Observable0, Observable1 } from 'Utilities/Observable';
 import { Localization } from 'Utilities/Localization';
 import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
+import { IPrivacyHandler, AbstractPrivacy } from 'Views/AbstractPrivacy';
+import { GDPRPrivacy } from 'Views/GDPRPrivacy';
 
-export class Promo extends View<{}> {
+export class Promo extends View<{}> implements IPrivacyHandler {
 
     public readonly onPromo = new Observable1<string>();
     public readonly onClose = new Observable0();
+    public readonly onGDPRPopupSkipped = new Observable0();
 
     private _promoCampaign: PromoCampaign;
     private _localization: Localization;
     private _iframe: HTMLIFrameElement | null;
     private _messageHandler: (e: Event) => void;
 
-    constructor(nativeBridge: NativeBridge, campaign: PromoCampaign, language: string) {
+    private _GDPRPopupElement: HTMLElement;
+    private _privacyButtonElement: HTMLElement;
+    private _privacy: AbstractPrivacy;
+    private _showGDPRBanner: boolean = false;
+    private _gdprPopupClicked: boolean = false;
+
+    constructor(nativeBridge: NativeBridge, campaign: PromoCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
         super(nativeBridge, 'promo');
         this._localization = new Localization(language, 'promo');
+
+        this._privacy = privacy;
+        this._showGDPRBanner = showGDPRBanner;
 
         this._template = new Template(PromoTpl);
         this._promoCampaign = campaign;
@@ -33,7 +45,28 @@ export class Promo extends View<{}> {
             };
         }
 
-        this._bindings = [];
+        this._bindings = [
+            {
+                event: 'click',
+                listener: (event: Event) => this.onCloseEvent(event),
+                selector: '.close'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onGDPRPopupEvent(event),
+                selector: '.gdpr-link'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onPrivacyEvent(event),
+                selector: '.icon-info'
+            }
+        ];
+
+        this._privacy.render();
+        this._privacy.hide();
+        document.body.appendChild(this._privacy.container());
+        this._privacy.addEventHandler(this);
     }
 
     public render() {
@@ -45,16 +78,46 @@ export class Promo extends View<{}> {
             const tpl = new Template(markup, this._localization);
             this._iframe!.setAttribute('srcdoc', tpl.render(this._templateData ? this._templateData : {}));
         });
+        this._GDPRPopupElement = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
+        this._privacyButtonElement = <HTMLElement>this._container.querySelector('.privacy-button');
     }
 
     public show(): void {
         super.show();
         window.addEventListener('message', this._messageHandler);
+
+        if (this._showGDPRBanner && this._privacy instanceof GDPRPrivacy) {
+            this._GDPRPopupElement.style.opacity = '1';
+            this._privacyButtonElement.style.pointerEvents = '1';
+            this._privacyButtonElement.style.visibility = 'hidden';
+        } else {
+            this._GDPRPopupElement.style.pointerEvents = '1';
+            this._GDPRPopupElement.style.visibility = 'hidden';
+            this._iframe!.style.height = '100vh';
+        }
     }
 
     public hide(): void {
         super.hide();
         window.removeEventListener('message', this._messageHandler);
+
+        if (this._showGDPRBanner && !this._gdprPopupClicked) {
+            this.onGDPRPopupSkipped.trigger();
+        }
+    }
+
+    public onPrivacy(url: string): void {
+        // do nothing
+    }
+
+    public onPrivacyClose(): void {
+        if (this._privacy) {
+            this._privacy.hide();
+        }
+    }
+
+    public onGDPROptOut(optOutEnabled: boolean): void {
+        // do nothing
     }
 
     private onMessage(e: MessageEvent): void {
@@ -77,6 +140,18 @@ export class Promo extends View<{}> {
     private onCloseEvent(event: Event): void {
         event.preventDefault();
         this.onClose.trigger();
+    }
+
+    private onGDPRPopupEvent(event: Event) {
+        event.preventDefault();
+
+        this._gdprPopupClicked = true;
+        this._privacy.show();
+    }
+
+    private onPrivacyEvent(event: Event) {
+        event.preventDefault();
+        this._privacy.show();
     }
 
     private getPromoMarkup(): Promise<string> {

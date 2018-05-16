@@ -308,7 +308,10 @@ export class AdUnitFactory {
     }
 
     private static createPromoAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PromoCampaign>): AbstractAdUnit {
-        const promoView = new Promo(nativeBridge, parameters.campaign, parameters.deviceInfo.getLanguage());
+        const privacy = this.createPrivacy(nativeBridge, parameters);
+        const showGDPRBanner = this.showGDPRBanner(parameters);
+
+        const promoView = new Promo(nativeBridge, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner);
         const promoAdUnit = new PromoAdUnit(nativeBridge, {
             ...parameters,
             view: promoView
@@ -317,7 +320,8 @@ export class AdUnitFactory {
         promoView.render();
         document.body.appendChild(promoView.container());
 
-        promoView.onClose.subscribe(() => PromoEventHandler.onClose(nativeBridge, promoAdUnit, parameters.campaign.getGamerId(), parameters.clientInfo.getGameId() + '|' + parameters.configuration.getToken(), parameters.campaign.getAbGroup(), parameters.campaign.getTrackingUrlsForEvent('purchase')));
+        promoView.onGDPRPopupSkipped.subscribe(() => PromoEventHandler.onGDPRPopupSkipped(parameters.configuration, parameters.placement, parameters.operativeEventManager));
+        promoView.onClose.subscribe(() => PromoEventHandler.onClose(nativeBridge, promoAdUnit, parameters.configuration.getToken(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup(), parameters.campaign.getTrackingUrlsForEvent('purchase'), parameters.configuration.isOptOutEnabled()));
         promoView.onPromo.subscribe((productId) => PromoEventHandler.onPromo(nativeBridge, promoAdUnit, productId, parameters.campaign.getTrackingUrlsForEvent('purchase')));
         nativeBridge.Purchasing.onIAPSendEvent.subscribe((iapPayload) => PurchasingUtilities.handleSendIAPEvent(nativeBridge, iapPayload));
 
