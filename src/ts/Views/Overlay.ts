@@ -42,7 +42,6 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     private _fadeStatus: boolean = true;
     private _privacy: AbstractPrivacy;
     private _gdprPopupClicked: boolean = false;
-    private _showGDPRBanner: boolean = false;
 
     constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: number = 0) {
         super(nativeBridge, 'overlay', muted, abGroup);
@@ -108,8 +107,9 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
 
     public hide() {
         super.hide();
-        if (this._privacy.container().parentElement) {
-            document.body.removeChild(this._privacy.container());
+        // Workaround check for other ad units that use this overlay
+        if (document.getElementById('.gdpr-pop-up') || document.getElementById('.privacy-button')) {
+            document.body!.removeChild(this._privacy.container());
         }
     }
 
@@ -213,14 +213,15 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
         if (this._privacy) {
             this._privacy.hide();
         }
+        this._nativeBridge.VideoPlayer.play();
     }
 
     public onGDPROptOut(optOutEnabled: boolean): void {
         // do nothing
     }
 
-    public choosePrivacyShown(): void {
-        if (this._showGDPRBanner) {
+    public choosePrivacyShown(showGDPRBanner: boolean): void {
+        if (showGDPRBanner) {
             this._GDPRPopupElement.style.opacity = '1';
             this._privacyButtonElement.style.pointerEvents = '1';
             this._privacyButtonElement.style.visibility = 'hidden';
@@ -235,12 +236,13 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
         event.preventDefault();
 
         this._gdprPopupClicked = true;
+        this._nativeBridge.VideoPlayer.pause();
         this._privacy.show();
     }
 
     private onPrivacyEvent(event: Event) {
         event.preventDefault();
-
+        this._nativeBridge.VideoPlayer.pause();
         this._privacy.show();
     }
 

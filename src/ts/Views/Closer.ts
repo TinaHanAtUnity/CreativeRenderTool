@@ -21,7 +21,7 @@ export class Closer extends View<ICloseHandler> implements IPrivacyHandler {
     private _progressElement: HTMLElement;
     private _GDPRPopupElement: HTMLElement;
     private _privacyButtonElement: HTMLElement;
-    private _showGDPRBanner: boolean = false;
+    private _showGDPRBanner: boolean;
     private _gdprPopupClicked: boolean = false;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
@@ -119,7 +119,6 @@ export class Closer extends View<ICloseHandler> implements IPrivacyHandler {
 
     private onPrivacyEvent(event: Event) {
         event.preventDefault();
-
         this._privacy.show();
     }
 

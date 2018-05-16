@@ -50,7 +50,7 @@ export class VPAID extends View<IVPAIDHandler> {
     private _isLoaded = false;
     private _webplayerEventObserver: IObserver1<string>;
     private _isCoppaCompliant: boolean;
-    private _showGDPRBanner: boolean = false;
+    private _showGDPRBanner: boolean;
 
     constructor(nativeBridge: NativeBridge, campaign: VPAIDCampaign, placement: Placement, showGDPRBanner: boolean) {
         super(nativeBridge, 'vpaid');

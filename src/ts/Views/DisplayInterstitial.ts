@@ -31,7 +31,7 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
 
     private _messageListener: EventListener;
     private _timers: number[] = [];
-    private _showGDPRBanner: boolean = false;
+    private _showGDPRBanner: boolean;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: DisplayInterstitialCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
         super(nativeBridge, 'display-interstitial');

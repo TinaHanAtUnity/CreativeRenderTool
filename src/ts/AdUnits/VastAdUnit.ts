@@ -38,7 +38,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     private _events: Array<[number, string]> = [[0.0, 'AdVideoStart'], [0.25, 'AdVideoFirstQuartile'], [0.5, 'AdVideoMidpoint'], [0.75, 'AdVideoThirdQuartile']];
     private _vastCampaign: VastCampaign;
     private _vastPlacement: Placement;
-    private _showGDPRBanner: boolean = false;
+    private _showGDPRBanner: boolean;
     private _screenWidth: number;
     private _screenHeight: number;
 
@@ -76,7 +76,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
 
     public show() {
         return super.show().then(() => {
-            (<Overlay>this._overlay)!.choosePrivacyShown();
+            (<Overlay>this._overlay)!.choosePrivacyShown(this._showGDPRBanner);
             if (this._showGDPRBanner && this._forceOrientation === Orientation.LANDSCAPE) {
                 return Promise.all([
                     this._deviceInfo.getScreenWidth(),
