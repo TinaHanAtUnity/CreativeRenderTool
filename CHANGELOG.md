@@ -1,4 +1,9 @@
-# Pending
+# Staged
+
+* iOS AdMob Precache for all groups.
+* Uses full screen width and height for Display when not set in the campaign.
+
+# Tue May 15 20:36:34 UTC 2018
 
 * Anonymize non-operational events
 * Fix configuration for creative test apps
