@@ -217,16 +217,26 @@ export class OldCampaignRefreshManager extends RefreshManager {
     private onCampaign(placementId: string, campaign: Campaign) {
         this._parsingErrorCount = 0;
 
-        this.setCampaignForPlacement(placementId, campaign);
-        this.handlePlacementState(placementId, PlacementState.READY);
+        // suffix can also be empty if placement is not 'mixed'
+        const suffix = this.createMixedPlacementSuffix(placementId, campaign);
+
+        this.setCampaignForPlacement(placementId + suffix, campaign);
+        this.handlePlacementState(placementId + suffix, PlacementState.READY);
     }
 
     private onNoFill(placementId: string) {
         this._parsingErrorCount = 0;
 
-        this._nativeBridge.Sdk.logDebug('Unity Ads server returned no fill, no ads to show, for placement: ' + placementId);
-        this.setCampaignForPlacement(placementId, undefined);
-        this.handlePlacementState(placementId, PlacementState.NO_FILL);
+        const mixedList = ['', '-promo', '-rewarded'];
+        let shouldUpdatePlacementState = true;
+        for(let i = 0; shouldUpdatePlacementState && i < mixedList.length; i++) {
+            const mix = mixedList[i];
+            this._configuration.getPlacements()[placementId + mix] = this._configuration.getPlacements()[placementId];
+            this._nativeBridge.Sdk.logDebug('Unity Ads server returned no fill, no ads to show, for placement: ' + placementId + mix);
+            this.setCampaignForPlacement(placementId + mix, undefined);
+            this.handlePlacementState(placementId + mix, PlacementState.NO_FILL);
+            shouldUpdatePlacementState = this.isRewardedMixedPlacement(placementId);
+        }
     }
 
     private onError(error: WebViewError | Error, placementIds: string[], diagnosticsType: string, session?: Session) {
@@ -458,5 +468,22 @@ export class OldCampaignRefreshManager extends RefreshManager {
                 this._sessionManager.sendUnsentSessions();
             }
         });
+    }
+
+    private isRewardedMixedPlacement(placementId: string) {
+        const ifMoreThanOneAdType: boolean = this._configuration.getPlacement(placementId).getAdTypes()!.length > 1;
+        const containsIAP: boolean = this._configuration.getPlacement(placementId).getAdTypes()!.indexOf('IAP') > -1;
+        const notAllowsSkip: boolean = !this._configuration.getPlacement(placementId).allowSkip();
+
+        return ifMoreThanOneAdType && containsIAP && notAllowsSkip;
+    }
+
+    private createMixedPlacementSuffix(placementId: string, campaign: Campaign) {
+        let str = '';
+        if (this.isRewardedMixedPlacement(placementId)) {
+            str = (campaign.getAdType() === 'purchasing/iap') ? '-promo' : '-rewarded';
+            this._configuration.getPlacements()[placementId + str] = this._configuration.getPlacements()[placementId];
+        }
+        return str;
     }
 }
