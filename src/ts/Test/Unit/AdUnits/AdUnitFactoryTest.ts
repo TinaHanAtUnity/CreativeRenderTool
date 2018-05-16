@@ -219,7 +219,6 @@ describe('AdUnitFactoryTest', () => {
                 adUnit.show();
                 (<sinon.SinonSpy>thirdPartyEventManager.sendEvent).restore();
                 assert.equal('http://test.impression.com/fooId/blah?sdkVersion=2000', (<sinon.SinonSpy>request.get).getCall(2).args[0], 'should have replaced template values in the url');
-                // sinon.assert.calledWith(<sinon.SinonSpy>request.get, 'mraid impression', '12345', 'http://test.impression.com/fooId/blah?sdkVersion=2000');
                 adUnit.hide();
             });
         });
