@@ -13,7 +13,7 @@ import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
 import { Closer } from 'Views/Closer';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Placement } from 'Models/Placement';
-import { IObserver2 } from 'Utilities/IObserver';
+import { IObserver2, IObserver0 } from 'Utilities/IObserver';
 import { WKAudiovisualMediaTypes } from 'Native/Api/WebPlayer';
 import { AdUnitContainerSystemMessage, IAdUnitContainerListener } from 'AdUnits/Containers/AdUnitContainer';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
@@ -65,6 +65,8 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
         return this.setupWebPlayer().then(() => {
             this._urlLoadingObserver = this._nativeBridge.WebPlayer.shouldOverrideUrlLoading.subscribe((url, method) => this.onUrlLoad(url));
+            this.onPrivacyClosed = this._closer.onPrivacyClosed.subscribe(() => this._view.resumeAd());
+            this.onPrivacyOpened = this._closer.onPrivacyOpened.subscribe(() => this._view.pauseAd());
             return this._container.open(this, ['webplayer', 'webview'], false, this._forceOrientation, false, false, true, false, this._options).then(() => {
                 this.onStart.trigger();
             });

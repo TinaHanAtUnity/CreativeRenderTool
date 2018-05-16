@@ -6,12 +6,16 @@ import CloserTemplate from 'html/closer.html';
 import { Template } from 'Utilities/Template';
 import { IPrivacyHandler, AbstractPrivacy } from './AbstractPrivacy';
 import { GDPRPrivacy } from 'Views/GDPRPrivacy';
+import { Observable0 } from 'Utilities/Observable';
 
 export interface ICloseHandler {
     onClose(skipped: boolean): void;
 }
 
 export class Closer extends View<ICloseHandler> implements IPrivacyHandler {
+
+    public readonly onPrivacyOpened: Observable0 = new Observable0();
+    public readonly onPrivacyClosed: Observable0 = new Observable0();
 
     private _placement: Placement;
     private _allowClose: boolean;
@@ -63,6 +67,7 @@ export class Closer extends View<ICloseHandler> implements IPrivacyHandler {
         if (this._privacy) {
             this._privacy.hide();
         }
+        this.onPrivacyClosed.trigger();
     }
 
     public hide(): void {
@@ -114,11 +119,13 @@ export class Closer extends View<ICloseHandler> implements IPrivacyHandler {
         event.preventDefault();
 
         this._gdprPopupClicked = true;
+        this.onPrivacyOpened.trigger();
         this._privacy.show();
     }
 
     private onPrivacyEvent(event: Event) {
         event.preventDefault();
+        this.onPrivacyOpened.trigger();
         this._privacy.show();
     }
 
