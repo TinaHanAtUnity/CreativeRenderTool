@@ -9,6 +9,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { FocusManager } from 'Managers/FocusManager';
 import { MetaDataManager } from 'Managers/MetaDataManager';
+import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 
 class TestRequestApi extends RequestApi {
 
@@ -104,5 +105,24 @@ describe('ThirdPartyEventManagerTest', () => {
             }
             assert.isTrue(userAgentHeaderExists, 'User-Agent header should exist in headers');
         });
+    });
+
+    it('should replace "%ZONE%" in the url with the placement id', () => {
+        const requestSpy = sinon.spy(request, 'get');
+        const urlTemplate = 'http://foo.biz/%ZONE%/123';
+        const placement = TestFixtures.getPlacement();
+        thirdPartyEventManager.setTemplateValues({ '%ZONE%': placement.getId() });
+        thirdPartyEventManager.sendEvent('eventName', 'sessionId', urlTemplate);
+        assert(requestSpy.calledOnce, 'request get should\'ve been called');
+        assert.equal(requestSpy.getCall(0).args[0], 'http://foo.biz/' + placement.getId() + '/123', 'Should have replaced %ZONE% from the url');
+    });
+
+    it('should replace "%SDK_VERSION%" in the url with the SDK version as a query parameter', () => {
+        const requestSpy = sinon.spy(request, 'get');
+        const urlTemplate = 'http://foo.biz/%SDK_VERSION%/123';
+        thirdPartyEventManager.setTemplateValues({ '%SDK_VERSION%': '12345' });
+        thirdPartyEventManager.sendEvent('eventName', 'sessionId', urlTemplate);
+        assert(requestSpy.calledOnce, 'request get should\'ve been called');
+        assert.equal(requestSpy.getCall(0).args[0], 'http://foo.biz/12345/123', 'Should have replaced %SDK_VERSION% from the url');
     });
 });
