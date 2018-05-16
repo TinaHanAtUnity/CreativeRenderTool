@@ -1,3 +1,9 @@
+# Pending
+
+* Set gameId = gameId | gamerToken for IAP promo
+* Grab APK download link from the click attribution URL
+* Platform specific GDPR privacy text functionality
+
 # Wed May 16 08:39:25 UTC 2018
 
 * iOS AdMob Precache for all groups.
