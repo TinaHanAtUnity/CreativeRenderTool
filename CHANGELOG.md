@@ -1,4 +1,4 @@
-# Pending
+# Wed May 16 21:23:14 UTC 2018
 
 * Set gameId = gameId | gamerToken for IAP promo
 * Grab APK download link from the click attribution URL
