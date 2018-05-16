@@ -83,10 +83,6 @@
   }
 
   .gdpr-pop-up {
-    .gdpr-text {
-      padding: $default-scale-size * $default-font-size * .5;
-      font-size: $default-scale-size * $default-font-size * .5;
-    }
 
       position: absolute;
       bottom: 0;
@@ -97,7 +93,10 @@
 
       .gdpr-text {
         z-index: 110;
+        padding: $default-scale-size * $default-font-size * .5;
+        color: $white;
         text-align: center;
+        font-size: $default-scale-size * $default-font-size * .5;
 
         .gdpr-link {
           color: $blue;
