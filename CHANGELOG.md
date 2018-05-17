@@ -1,3 +1,23 @@
+# Thu May 17 10:44:24 UTC 2018
+
+* Send GDPR opt-out messages to production topic
+
+# Wed May 16 21:23:14 UTC 2018
+
+* Set gameId = gameId | gamerToken for IAP promo
+* Grab APK download link from the click attribution URL
+* Platform specific GDPR privacy text functionality
+
+# Wed May 16 08:39:25 UTC 2018
+
+* iOS AdMob Precache for all groups.
+* Uses full screen width and height for Display when not set in the campaign.
+
+# Tue May 15 20:36:34 UTC 2018
+
+* Anonymize non-operational events
+* Fix configuration for creative test apps
+
 # Tue May 15 08:39:57 UTC 2018
 
 * Send GDPR opt-out events to test topic

@@ -259,7 +259,7 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
     }
 
     public getDTO(): Promise<any> {
-        return super.getDTO().then((commonDTO) => {
+        return super.getDTO().then(commonDTO => {
             const dto: any = {
                 ... commonDTO,
                 'apiLevel': this.getApiLevel(),
@@ -288,9 +288,35 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
         });
     }
 
+    public getAnonymousDTO(): Promise<any> {
+        return super.getAnonymousDTO().then((commonDTO) => {
+            const dto: any = {
+                ... commonDTO,
+                'apiLevel': this.getApiLevel(),
+                'deviceMake': this.getManufacturer(),
+                'screenLayout': this.getScreenLayout(),
+                'screenDensity': this.getScreenDensity(),
+                'totalSpaceExternal': this.getTotalSpaceExternal(),
+            };
+
+            return Promise.all([
+                this.getFreeSpaceExternal().catch(err => this.handleDeviceInfoError(err)),
+                this.getRingerMode().catch(err => this.handleDeviceInfoError(err))
+            ]).then(([
+                freeSpaceExternal,
+                ringerMode
+            ]) => {
+                dto.freeSpaceExternal = freeSpaceExternal;
+                dto.ringerMode = ringerMode;
+
+                return dto;
+            });
+        });
+    }
+
     public getStaticDTO(): any {
         const dto: any = {
-            ... super.getDTO(),
+            ... super.getStaticDTO(),
             'apiLevel': this.getApiLevel(),
             'deviceMake': this.getManufacturer(),
             'screenLayout': this.getScreenLayout(),
@@ -303,5 +329,16 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
         }
 
         return dto;
+    }
+
+    public getAnonymousStaticDTO(): any {
+        return {
+            ... super.getAnonymousStaticDTO(),
+            'apiLevel': this.getApiLevel(),
+            'deviceMake': this.getManufacturer(),
+            'screenLayout': this.getScreenLayout(),
+            'screenDensity': this.getScreenDensity(),
+            'totalSpaceExternal': this.getTotalSpaceExternal(),
+        };
     }
 }
