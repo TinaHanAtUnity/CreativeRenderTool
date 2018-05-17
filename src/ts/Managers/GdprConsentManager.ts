@@ -8,7 +8,7 @@ import { OperativeEventManager } from './OperativeEventManager';
 
 export class GdprConsentManager {
 
-    private static GDPR_LAST_VALUE_STORAGE_KEY = 'gdpr.consentLastSentToKafka.value';
+    private static GDPR_LAST_VALUE_STORAGE_KEY = 'gdpr.consentlastsent';
 
     private _nativeBridge: NativeBridge;
     private _deviceInfo: DeviceInfo;
