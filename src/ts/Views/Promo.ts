@@ -102,6 +102,7 @@ export class Promo extends View<{}> implements IPrivacyHandler {
         window.removeEventListener('message', this._messageHandler);
 
         if (this._privacy) {
+            this._privacy.removeEventHandler(this);
             this._privacy.hide();
             this._privacy.container().parentElement!.removeChild(this._privacy.container());
         }
