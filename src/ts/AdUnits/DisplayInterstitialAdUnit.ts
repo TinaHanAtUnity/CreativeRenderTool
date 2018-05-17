@@ -122,9 +122,8 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
             this._deviceInfo.getScreenHeight()
         ];
         Promise.all(promises).then(([screenWidth, screenHeight]) => {
-            const screenDensity = this.getScreenDensity();
-            return this.setWebPlayerViewFrame(screenWidth, screenHeight, screenDensity)
-                .then(() => this.setWebViewViewFrame(screenWidth, screenHeight, screenDensity))
+            return this.setWebPlayerViewFrame(screenWidth, screenHeight)
+                .then(() => this.setWebViewViewFrame(screenWidth, screenHeight))
                 .then(() => this.setWebPlayerContent());
         });
     }
@@ -136,21 +135,29 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
         return 0;
     }
 
-    private setWebPlayerViewFrame(screenWidth: number, screenHeight: number, screenDensity: number): Promise<void> {
-        let creativeWidth = this._campaign.getWidth() || screenWidth;
-        let creativeHeight = this._campaign.getHeight() || screenHeight;
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            creativeWidth = Math.floor(this.getAndroidViewSize(creativeWidth, screenDensity));
-            creativeHeight = Math.floor(this.getAndroidViewSize(creativeHeight, screenDensity));
+    private hasCreativeSize(): boolean {
+        return this._campaign.getWidth() !== undefined && this._campaign.getHeight() !== undefined;
+    }
+
+    private setWebPlayerViewFrame(screenWidth: number, screenHeight: number): Promise<void> {
+        let creativeWidth = screenWidth;
+        let creativeHeight = screenHeight;
+
+        if(this._nativeBridge.getPlatform() === Platform.ANDROID && this.hasCreativeSize()) {
+            const screenDensity = this.getScreenDensity();
+            creativeWidth = Math.floor(this.getAndroidViewSize(this._campaign.getWidth() || screenWidth, screenDensity));
+            creativeHeight = Math.floor(this.getAndroidViewSize(this._campaign.getHeight() || screenHeight, screenDensity));
         }
+
         const xPos = Math.floor((screenWidth / 2) - (creativeWidth / 2));
         const yPos = Math.floor((screenHeight / 2) - (creativeHeight / 2));
         return this._container.setViewFrame('webplayer', xPos, yPos, creativeWidth, creativeHeight);
     }
 
-    private setWebViewViewFrame(screenWidth: number, screenHeight: number, screenDensity: number): Promise<void> {
+    private setWebViewViewFrame(screenWidth: number, screenHeight: number): Promise<void> {
         let webviewAreaSize = Math.max( Math.min(screenWidth, screenHeight) * this._closeAreaMinRatio, this._closeAreaMinPixels );
         if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            const screenDensity = this.getScreenDensity();
             webviewAreaSize = this.getAndroidViewSize(webviewAreaSize, screenDensity);
         }
         const webviewXPos = screenWidth - webviewAreaSize;

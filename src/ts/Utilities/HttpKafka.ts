@@ -3,6 +3,12 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { INativeResponse, Request } from 'Utilities/Request';
 import { Configuration } from 'Models/Configuration';
 
+export enum KafkaCommonObjectType {
+    EMPTY,
+    ANONYMOUS,
+    PERSONAL
+}
+
 export class HttpKafka {
     public static setRequest(request?: Request) {
         HttpKafka._request = request;
@@ -20,15 +26,17 @@ export class HttpKafka {
         HttpKafka._configuration = configuration;
     }
 
-    public static sendEvent(type: string, data: any): Promise<INativeResponse> {
+    public static sendEvent(type: string, objectType: KafkaCommonObjectType, data: any): Promise<INativeResponse> {
         const messages: any[] = [];
         messages.push({
             'type': type,
             'msg': data
         });
 
-        return HttpKafka.createCommonObject(this._clientInfo, this._deviceInfo, this._configuration).then(commonObject => {
-            messages.unshift(commonObject);
+        return HttpKafka.createCommonObject(objectType, this._clientInfo, this._deviceInfo, this._configuration).then(commonObject => {
+            if(commonObject) {
+                messages.unshift(commonObject);
+            }
 
             const rawData: string = messages.map(message => JSON.stringify(message)).join('\n');
             if(HttpKafka._request) {
@@ -53,7 +61,11 @@ export class HttpKafka {
     private static _configuration: Configuration | undefined;
     private static _deviceInfoUpdating: boolean = false;
 
-    private static createCommonObject(clientInfo?: ClientInfo, deviceInfo?: DeviceInfo, configuration?: Configuration): Promise<any> {
+    private static createCommonObject(objectType: KafkaCommonObjectType, clientInfo?: ClientInfo, deviceInfo?: DeviceInfo, configuration?: Configuration): Promise<any> {
+        if(objectType === KafkaCommonObjectType.EMPTY) {
+            return Promise.resolve();
+        }
+
         const common: any = {
             'common': {
                 'client': clientInfo ? clientInfo.getDTO() : null,
@@ -62,23 +74,42 @@ export class HttpKafka {
             }
         };
 
-        if (deviceInfo && !HttpKafka._deviceInfoUpdating) {
+        if(deviceInfo && !HttpKafka._deviceInfoUpdating) {
             HttpKafka._deviceInfoUpdating = true;
-            return deviceInfo.getDTO().then(deviceInfoDTO => {
-                if(typeof navigator !== 'undefined' && navigator.userAgent) {
-                    deviceInfoDTO.userAgent = navigator.userAgent;
-                }
-                HttpKafka._deviceInfoUpdating = false;
-                common.common.device = deviceInfoDTO;
-                return common;
-            }).catch(err => {
-                HttpKafka._deviceInfoUpdating = false;
-                common.common.device = deviceInfo.getStaticDTO();
-                return common;
-            });
+            if(objectType === KafkaCommonObjectType.PERSONAL) {
+                return deviceInfo.getDTO().then(deviceInfoDTO => {
+                    if(typeof navigator !== 'undefined' && navigator.userAgent) {
+                        deviceInfoDTO.userAgent = navigator.userAgent;
+                    }
+                    HttpKafka._deviceInfoUpdating = false;
+                    common.common.device = deviceInfoDTO;
+                    return common;
+                }).catch(err => {
+                    HttpKafka._deviceInfoUpdating = false;
+                    common.common.device = deviceInfo.getStaticDTO();
+                    return common;
+                });
+            } else {
+                return deviceInfo.getAnonymousDTO().then(deviceInfoDTO => {
+                    if(typeof navigator !== 'undefined' && navigator.userAgent) {
+                        deviceInfoDTO.userAgent = navigator.userAgent;
+                    }
+                    HttpKafka._deviceInfoUpdating = false;
+                    common.common.device = deviceInfoDTO;
+                    return common;
+                }).catch(err => {
+                    HttpKafka._deviceInfoUpdating = false;
+                    common.common.device = deviceInfo.getAnonymousStaticDTO();
+                    return common;
+                });
+            }
         } else {
-            if (deviceInfo) {
-                common.common.device = deviceInfo.getStaticDTO();
+            if(deviceInfo) {
+                if(objectType === KafkaCommonObjectType.PERSONAL) {
+                    common.common.device = deviceInfo.getStaticDTO();
+                } else {
+                    common.common.device = deviceInfo.getAnonymousStaticDTO();
+                }
             }
             return Promise.resolve(common);
         }
