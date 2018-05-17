@@ -1,3 +1,7 @@
+# Thu May 17 10:44:24 UTC 2018
+
+* Send GDPR opt-out messages to production topic
+
 # Wed May 16 21:23:14 UTC 2018
 
 * Set gameId = gameId | gamerToken for IAP promo
