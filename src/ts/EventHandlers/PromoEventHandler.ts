@@ -8,14 +8,14 @@ import { OperativeEventManager } from 'Managers/OperativeEventManager';
 
 export class PromoEventHandler {
 
-    public static onClose(nativeBridge: NativeBridge, adUnit: PromoAdUnit, gamerId: string, gameId: string, abGroup: number, purchaseTrackingUrls: string[], isOptOutEnabled: boolean): void {
+    public static onClose(nativeBridge: NativeBridge, adUnit: PromoAdUnit, gamerToken: string, gameId: string, abGroup: number, purchaseTrackingUrls: string[], isOptOutEnabled: boolean): void {
         adUnit.setFinishState(FinishState.SKIPPED);
         adUnit.hide();
         const iapPayload: IPromoPayload = {
-            gamerId: gamerId,
-            trackingOptOut: isOptOutEnabled,
+            gamerToken: gamerToken,
+      trackingOptOut: isOptOutEnabled,
             iapPromo: true,
-            gameId: gameId,
+            gameId: gameId + '|' + gamerToken,
             abGroup: abGroup,
             request: IPromoRequest.CLOSE,
             purchaseTrackingUrls: purchaseTrackingUrls,
