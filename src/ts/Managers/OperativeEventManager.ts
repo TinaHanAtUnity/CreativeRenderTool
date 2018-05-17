@@ -331,6 +331,9 @@ export class OperativeEventManager {
             'cached': CampaignAssetInfo.isCached(this._campaign),
             'cachedOrientation': CampaignAssetInfo.getCachedVideoOrientation(this._campaign),
             'token': this._configuration.getToken(),
+            'gdprEnabled': this._configuration.isGDPREnabled(),
+            'optOutEnabled': this._configuration.isOptOutEnabled(),
+            'optOutRecorded': this._configuration.isOptOutRecorded(),
             'gameSessionCounters': GameSessionCounters.getDTO()
         };
 
