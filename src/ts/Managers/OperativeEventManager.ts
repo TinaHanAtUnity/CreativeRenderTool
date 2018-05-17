@@ -239,8 +239,7 @@ export class OperativeEventManager {
             'gameId': this._clientInfo.getGameId()
         };
 
-        // todo: remove .test from the topic
-        HttpKafka.sendEvent('ads.events.optout.v1.json.test', KafkaCommonObjectType.EMPTY, infoJson);
+        HttpKafka.sendEvent('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, infoJson);
         return Promise.resolve();
     }
 
