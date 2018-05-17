@@ -1,10 +1,9 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { StorageApi, StorageType } from 'Native/Api/Storage';
+import { StorageType } from 'Native/Api/Storage';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Configuration } from 'Models/Configuration';
-import { Platform } from 'Constants/Platform';
-import { OperativeEventManager } from './OperativeEventManager';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
 
 export class GdprConsentManager {
 
@@ -63,6 +62,7 @@ export class GdprConsentManager {
         const action: string = consent ? 'consent' : 'optout';
         OperativeEventManager.sendGDPREvent(action, this._deviceInfo, this._clientInfo, this._configuration).then(() => {
             this._nativeBridge.Storage.set(StorageType.PRIVATE, GdprConsentManager.GDPR_LAST_VALUE_STORAGE_KEY, consent);
+            this._nativeBridge.Storage.write(StorageType.PRIVATE);
         });
     }
 }
