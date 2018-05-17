@@ -49,7 +49,7 @@ export class MoatViewabilityService {
 
             this._moatData = {
                 SDK: 'UnityAds',
-                Version: '1.0',
+                Version: '1.1',
                 SDKVersion: clientInfo.getSdkVersionName(),
                 LimitAdTracking: deviceInfo.getLimitAdTracking(),
                 COPPA: configuration.isCoppaCompliant(),
