@@ -8,6 +8,8 @@ import { OperativeEventManager } from './OperativeEventManager';
 
 export class GdprConsentManager {
 
+    private static GDPR_LAST_VALUE_STORAGE_KEY = 'gdpr.consentLastSentToKafka.value';
+
     private _nativeBridge: NativeBridge;
     private _deviceInfo: DeviceInfo;
     private _clientInfo: ClientInfo;
@@ -40,11 +42,19 @@ export class GdprConsentManager {
         this._configuration.setGDPREnabled(true);
         this._configuration.setOptOutEnabled(!consent); // update opt out to reflect the consent choice
         this._configuration.setOptOutRecorded(true); // prevent banner from showing in the future
-        this.sendGdprEvent(consent);
+        this._nativeBridge.Storage.get(StorageType.PRIVATE, GdprConsentManager.GDPR_LAST_VALUE_STORAGE_KEY).then((consentLastSentToKafka) => {
+            if (consentLastSentToKafka !== consent) {
+                this.sendGdprEvent(consent);
+            }
+        }).catch((error) => {
+            this.sendGdprEvent(consent);
+        });
     }
 
     private sendGdprEvent(consent: boolean) {
-        const action: string = consent ? 'consent' : 'optout'; // May not be final
-        OperativeEventManager.sendGDPREvent(action, this._deviceInfo, this._clientInfo, this._configuration);
+        const action: string = consent ? 'consent' : 'optout';
+        OperativeEventManager.sendGDPREvent(action, this._deviceInfo, this._clientInfo, this._configuration).then(() => {
+            this._nativeBridge.Storage.set(StorageType.PRIVATE, GdprConsentManager.GDPR_LAST_VALUE_STORAGE_KEY, consent);
+        });
     }
 }
