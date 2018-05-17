@@ -13,7 +13,7 @@ export class PromoEventHandler {
         adUnit.hide();
         const iapPayload: IPromoPayload = {
             gamerToken: gamerToken,
-      trackingOptOut: isOptOutEnabled,
+            trackingOptOut: isOptOutEnabled,
             iapPromo: true,
             gameId: gameId + '|' + gamerToken,
             abGroup: abGroup,
