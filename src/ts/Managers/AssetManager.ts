@@ -338,7 +338,6 @@ export class AssetManager {
     private getCacheDiagnostics(asset: Asset, campaign: Campaign): ICacheDiagnostics {
         return {
             creativeType: asset.getDescription(),
-            gamerId: campaign.getGamerId(),
             targetGameId: campaign instanceof PerformanceCampaign ? (<PerformanceCampaign>campaign).getGameId() : 0,
             targetCampaignId: campaign.getId()
         };

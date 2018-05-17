@@ -1,5 +1,5 @@
 import { INativeResponse } from 'Utilities/Request';
-import { HttpKafka } from 'Utilities/HttpKafka';
+import { HttpKafka, KafkaCommonObjectType } from 'Utilities/HttpKafka';
 import { Session } from 'Models/Session';
 
 export class Diagnostics {
@@ -19,6 +19,6 @@ export class Diagnostics {
             kafkaObject.adPlan = session.getAdPlan();
         }
 
-        return HttpKafka.sendEvent('ads.sdk2.diagnostics', kafkaObject);
+        return HttpKafka.sendEvent('ads.sdk2.diagnostics', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
     }
 }
