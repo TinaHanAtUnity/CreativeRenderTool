@@ -44,7 +44,7 @@ export class PrivacyEventHandler implements IPrivacyHandler {
             this._configuration.setOptOutEnabled(optOutEnabled);
             const action: string = optOutEnabled ? 'optout' : 'optin';
 
-            this._operativeEventManager.sendGDPREvent(this._placement, action);
+            this._operativeEventManager.sendGDPREvent(action);
         }
 
     }

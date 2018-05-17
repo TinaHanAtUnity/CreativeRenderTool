@@ -192,6 +192,10 @@ export class Configuration extends Model<IConfiguration> {
         return this.get('gdprEnabled');
     }
 
+    public setGDPREnabled(enabled: boolean) {
+        this.set('gdprEnabled', enabled);
+    }
+
     public isOptOutRecorded(): boolean {
         return this.get('optOutRecorded');
     }

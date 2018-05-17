@@ -15,7 +15,6 @@ import { Platform } from 'Constants/Platform';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { JaegerSpan, JaegerTags } from 'Jaeger/JaegerSpan';
-import { GdprMetaData } from 'Models/MetaData/GdprMetaData';
 
 export class ConfigManager {
 
@@ -23,9 +22,8 @@ export class ConfigManager {
         return Promise.all([
             metaDataManager.fetch(FrameworkMetaData),
             metaDataManager.fetch(AdapterMetaData),
-            metaDataManager.fetch(GdprMetaData),
             ConfigManager.fetchGamerId(nativeBridge)
-        ]).then(([framework, adapter, gdprConsent, storedGamerId]) => {
+        ]).then(([framework, adapter, storedGamerId]) => {
             let gamerId: string | undefined;
 
             if(storedGamerId) {
@@ -38,7 +36,7 @@ export class ConfigManager {
                 }
             }
 
-            const url: string = ConfigManager.createConfigUrl(clientInfo, deviceInfo, framework, adapter, gdprConsent, gamerId);
+            const url: string = ConfigManager.createConfigUrl(clientInfo, deviceInfo, framework, adapter, gamerId);
             jaegerSpan.addTag(JaegerTags.DeviceType, Platform[nativeBridge.getPlatform()]);
             nativeBridge.Sdk.logInfo('Requesting configuration from ' + url);
             return request.get(url, [], {
@@ -109,7 +107,7 @@ export class ConfigManager {
     private static ConfigBaseUrl: string = 'https://publisher-config.unityads.unity3d.com/games';
     private static AbGroup: number | undefined;
 
-    private static createConfigUrl(clientInfo: ClientInfo, deviceInfo: DeviceInfo, framework?: FrameworkMetaData, adapter?: AdapterMetaData, gdprConsent?: GdprMetaData, gamerId?: string): string {
+    private static createConfigUrl(clientInfo: ClientInfo, deviceInfo: DeviceInfo, framework?: FrameworkMetaData, adapter?: AdapterMetaData, gamerId?: string): string {
         let url: string = [
             ConfigManager.ConfigBaseUrl,
             clientInfo.getGameId(),
@@ -153,10 +151,6 @@ export class ConfigManager {
 
         if(adapter) {
             url = Url.addParameters(url, adapter.getDTO());
-        }
-
-        if(gdprConsent) {
-            url = Url.addParameters(url, gdprConsent.getDTO());
         }
 
         return url;

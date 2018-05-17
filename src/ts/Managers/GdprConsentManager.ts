@@ -1,11 +1,10 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { HttpKafka, KafkaCommonObjectType } from 'Utilities/HttpKafka';
 import { StorageApi, StorageType } from 'Native/Api/Storage';
-import { STATUS_CODES } from 'http';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Configuration } from 'Models/Configuration';
 import { Platform } from 'Constants/Platform';
+import { OperativeEventManager } from './OperativeEventManager';
 
 export class GdprConsentManager {
 
@@ -38,20 +37,14 @@ export class GdprConsentManager {
     }
 
     private setConsent(consent: boolean) {
+        this._configuration.setGDPREnabled(true);
         this._configuration.setOptOutEnabled(!consent); // update opt out to reflect the consent choice
         this._configuration.setOptOutRecorded(true); // prevent banner from showing in the future
         this.sendGdprEvent(consent);
     }
 
     private sendGdprEvent(consent: boolean) {
-        const action: string = consent ? 'consent: true' : 'consent: false'; // May not be final
-        const infoJson: any = {
-            'adid': this._deviceInfo.getAdvertisingIdentifier(),
-            'action': action,
-            'projectId': this._configuration.getUnityProjectId(),
-            'platform': Platform[this._clientInfo.getPlatform()].toLowerCase(),
-            'gameId': this._clientInfo.getGameId()
-        };
-        HttpKafka.sendEvent('ads.events.optout.v1.json.test', KafkaCommonObjectType.EMPTY, infoJson);
+        const action: string = consent ? 'consent' : 'optout'; // May not be final
+        OperativeEventManager.sendGDPREvent(action, this._deviceInfo, this._clientInfo, this._configuration);
     }
 }
