@@ -42,11 +42,16 @@ export class GdprConsentManager {
         this._configuration.setGDPREnabled(true);
         this._configuration.setOptOutEnabled(!consent); // update opt out to reflect the consent choice
         this._configuration.setOptOutRecorded(true); // prevent banner from showing in the future
+        // get last state of gdpr consent
         this._nativeBridge.Storage.get(StorageType.PRIVATE, GdprConsentManager.GDPR_LAST_VALUE_STORAGE_KEY).then((consentLastSentToKafka) => {
+            // only if consent has changed push to kafka
             if (consentLastSentToKafka !== consent) {
                 this.sendGdprEvent(consent);
             }
         }).catch((error) => {
+            // there has not been last state of consent
+            // IE this is the first consent value we have seen
+            // and should push this to kafka
             this.sendGdprEvent(consent);
         });
     }
