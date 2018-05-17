@@ -222,14 +222,14 @@ export class WebView {
                 this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo, this._configuration, this._focusManager);
                 return this._analyticsManager.init().then(() => {
                     this._sessionManager.setGameSessionId(this._analyticsManager.getGameSessionId());
-                    return Promise.resolve();
+                    return this._gdprConsentManager.fetch();
                 });
             } else {
                 const analyticsStorage: AnalyticsStorage = new AnalyticsStorage(this._nativeBridge);
                 return analyticsStorage.getSessionId(this._clientInfo.isReinitialized()).then(gameSessionId => {
                     analyticsStorage.setSessionId(gameSessionId);
                     this._sessionManager.setGameSessionId(gameSessionId);
-                    return Promise.resolve();
+                    return this._gdprConsentManager.fetch();
                 });
             }
         }).then(() => {

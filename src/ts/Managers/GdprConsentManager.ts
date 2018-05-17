@@ -22,7 +22,10 @@ export class GdprConsentManager {
         this._configuration = configuration;
 
         this._nativeBridge.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, data));
-        this._nativeBridge.Storage.get(StorageType.PUBLIC, 'gdpr.consent.value').then((data: any) => {
+    }
+
+    public fetch(): Promise<void> {
+        return this._nativeBridge.Storage.get(StorageType.PUBLIC, 'gdpr.consent.value').then((data: any) => {
             if (typeof(data) === 'boolean') {
                 this.setConsent(data);
             }
