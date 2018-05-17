@@ -75,20 +75,18 @@ describe('PromoEventHandlersTest', () => {
 
         it ('should set the optOutRecorded flag in the configuration', () => {
             const config = sinon.createStubInstance(Configuration);
-            const placement = sinon.createStubInstance(Placement);
 
             (<sinon.SinonStub>config.isOptOutRecorded).returns(false);
 
-            PromoEventHandler.onGDPRPopupSkipped(config, placement, operativeEventManager);
+            PromoEventHandler.onGDPRPopupSkipped(config, operativeEventManager);
             sinon.assert.called(<sinon.SinonSpy>config.setOptOutRecorded);
         });
 
         it('should send GDPR operative Event with skip', () => {
             const config = sinon.createStubInstance(Configuration);
-            const placement = sinon.createStubInstance(Placement);
 
-            PromoEventHandler.onGDPRPopupSkipped(config, placement, operativeEventManager);
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendGDPREvent, placement, 'skip');
+            PromoEventHandler.onGDPRPopupSkipped(config, operativeEventManager);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendGDPREvent, 'skip');
         });
     });
 });

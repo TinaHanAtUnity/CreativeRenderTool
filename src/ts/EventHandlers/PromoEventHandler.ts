@@ -36,10 +36,10 @@ export class PromoEventHandler {
         PurchasingUtilities.beginPurchaseEvent(nativeBridge, JSON.stringify(iapPayload));
     }
 
-    public static onGDPRPopupSkipped(configuration: Configuration, placement: Placement, operativeEventManager: OperativeEventManager): void {
+    public static onGDPRPopupSkipped(configuration: Configuration, operativeEventManager: OperativeEventManager): void {
         if (!configuration.isOptOutRecorded()) {
             configuration.setOptOutRecorded(true);
         }
-        operativeEventManager.sendGDPREvent(placement, 'skip');
+        operativeEventManager.sendGDPREvent('skip');
     }
 }
