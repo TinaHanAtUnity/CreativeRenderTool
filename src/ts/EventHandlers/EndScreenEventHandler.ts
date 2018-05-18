@@ -72,7 +72,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
             this._configuration.setOptOutRecorded(true);
         }
 
-        this._operativeEventManager.sendGDPREvent(this._placement, 'skip');
+        this._operativeEventManager.sendGDPREvent('skip');
     }
 
     public abstract onKeyEvent(keyCode: number): void;
