@@ -71,7 +71,6 @@ export class PromoAdUnit extends AbstractAdUnit {
         this._container.onSystemKill.unsubscribe(this._onSystemKillObserver);
 
         if (this._privacy) {
-            this._privacy.removeEventHandler(this._promoView);
             this._privacy.hide();
             this._privacy.container().parentElement!.removeChild(this._privacy.container());
         }
