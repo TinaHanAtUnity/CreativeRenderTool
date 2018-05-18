@@ -1,4 +1,4 @@
-# Pending
+# Fri May 18 09:26:31 UTC 2018
 
 * Support for GDPR consent metadata
 * Add GDPR parameters to operative events
