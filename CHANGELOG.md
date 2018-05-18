@@ -1,3 +1,8 @@
+# Pending
+
+* Support for GDPR consent metadata
+* Add GDPR parameters to operative events
+
 # Thu May 17 10:44:24 UTC 2018
 
 * Send GDPR opt-out messages to production topic
