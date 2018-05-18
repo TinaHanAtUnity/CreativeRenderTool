@@ -101,12 +101,6 @@ export class Promo extends View<{}> implements IPrivacyHandler {
         super.hide();
         window.removeEventListener('message', this._messageHandler);
 
-        if (this._privacy) {
-            this._privacy.removeEventHandler(this);
-            this._privacy.hide();
-            this._privacy.container().parentElement!.removeChild(this._privacy.container());
-        }
-
         if (this._showGDPRBanner && !this._gdprPopupClicked) {
             this.onGDPRPopupSkipped.trigger();
         }

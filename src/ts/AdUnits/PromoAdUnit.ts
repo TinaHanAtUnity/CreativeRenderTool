@@ -9,9 +9,11 @@ import { FinishState } from 'Constants/FinishState';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { Platform } from 'Constants/Platform';
 import { KeyCode } from 'Constants/Android/KeyCode';
+import { AbstractPrivacy } from 'Views/AbstractPrivacy';
 
 export interface IPromoAdUnitParameters extends IAdUnitParameters<PromoCampaign> {
     view: Promo;
+    privacy: AbstractPrivacy;
 }
 
 export class PromoAdUnit extends AbstractAdUnit {
@@ -20,6 +22,7 @@ export class PromoAdUnit extends AbstractAdUnit {
     private _options: any;
     private _placement: Placement;
     private _campaign: PromoCampaign;
+    private _privacy: AbstractPrivacy;
 
     private _keyDownListener: (kc: number) => void;
     private _onSystemKillObserver: IObserver0;
@@ -35,6 +38,7 @@ export class PromoAdUnit extends AbstractAdUnit {
         this._placement = parameters.placement;
         this._campaign = parameters.campaign;
         this._keyDownListener = (kc: number) => this.onKeyDown(kc);
+        this._privacy = parameters.privacy;
     }
 
     public show(): Promise<void> {
@@ -65,6 +69,12 @@ export class PromoAdUnit extends AbstractAdUnit {
         }
 
         this._container.onSystemKill.unsubscribe(this._onSystemKillObserver);
+
+        if (this._privacy) {
+            this._privacy.removeEventHandler(this._promoView);
+            this._privacy.hide();
+            this._privacy.container().parentElement!.removeChild(this._privacy.container());
+        }
 
         this.sendTrackingEvent('complete');
         this._promoView.hide();
@@ -110,6 +120,7 @@ export class PromoAdUnit extends AbstractAdUnit {
 
     private unsetReferences() {
         delete this._promoView;
+        delete this._privacy;
     }
 
     private onSystemKill() {

@@ -314,7 +314,8 @@ export class AdUnitFactory {
         const promoView = new Promo(nativeBridge, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner);
         const promoAdUnit = new PromoAdUnit(nativeBridge, {
             ...parameters,
-            view: promoView
+            view: promoView,
+            privacy: privacy
         });
 
         promoView.render();
