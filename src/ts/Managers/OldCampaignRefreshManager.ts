@@ -471,8 +471,8 @@ export class OldCampaignRefreshManager extends RefreshManager {
     }
 
     private isRewardedMixedPlacement(placementId: string) {
-        const ifMoreThanOneAdType: boolean = this._configuration.getPlacement(placementId).getAdTypes()!.length > 1;
-        const containsIAP: boolean = this._configuration.getPlacement(placementId).getAdTypes()!.indexOf('IAP') > -1;
+        const ifMoreThanOneAdType: boolean = this._configuration.getPlacement(placementId).getAdTypes() === undefined ? false : this._configuration.getPlacement(placementId).getAdTypes()!.length > 1;
+        const containsIAP: boolean = this._configuration.getPlacement(placementId).getAdTypes() === undefined ? false : this._configuration.getPlacement(placementId).getAdTypes()!.indexOf('IAP') > -1;
         const notAllowsSkip: boolean = !this._configuration.getPlacement(placementId).allowSkip();
 
         return ifMoreThanOneAdType && containsIAP && notAllowsSkip;
