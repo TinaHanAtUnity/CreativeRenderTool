@@ -22,7 +22,7 @@ export class PromoCampaignParser extends CampaignParser {
                         gamerId: gamerId,
                         abGroup: abGroup,
                         willExpireAt: promoJson.expiry ? parseInt(promoJson.expiry, 10) * 1000 : undefined,
-                        adType: response.getContentType() || undefined,
+                        adType: promoJson.contentType || response.getContentType() || undefined,
                         correlationId: undefined,
                         creativeId: undefined,
                         seatId: undefined,

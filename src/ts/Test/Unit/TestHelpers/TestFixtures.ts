@@ -58,13 +58,13 @@ export class TestFixtures {
         });
     }
 
-    public static getCometCampaignBaseParams(session: Session, campaignId: string, gamerId: string, abGroup: number, meta: string | undefined): ICampaign {
+    public static getCometCampaignBaseParams(session: Session, campaignId: string, gamerId: string, abGroup: number, meta: string | undefined, adType?: string): ICampaign {
         return {
             id: campaignId,
             gamerId: gamerId,
             abGroup: abGroup,
             willExpireAt: undefined,
-            adType: undefined,
+            adType: adType || undefined,
             correlationId: undefined,
             creativeId: undefined,
             seatId: undefined,
@@ -323,10 +323,10 @@ export class TestFixtures {
         };
     }
 
-    public static getPromoCampaignParams(json: any): IPromoCampaign {
+    public static getPromoCampaignParams(json: any, adType?: string): IPromoCampaign {
         const session = this.getSession();
         return {
-            ... this.getCometCampaignBaseParams(session, json.promo.id, json.gamerId, json.abGroup, json.meta),
+            ... this.getCometCampaignBaseParams(session, json.promo.id, json.gamerId, json.abGroup, json.meta, adType),
             iapProductId: json.promo.iapProductId,
             additionalTrackingEvents: json.promo.tracking ? json.promo.tracking : undefined,
             dynamicMarkup: json.promo.dynamicMarkup,
@@ -334,9 +334,9 @@ export class TestFixtures {
         };
     }
 
-    public static getPromoCampaign(): PromoCampaign {
+    public static getPromoCampaign(adType?: string): PromoCampaign {
         const json = JSON.parse(DummyPromoCampaign);
-        return new PromoCampaign(this.getPromoCampaignParams(json));
+        return new PromoCampaign(this.getPromoCampaignParams(json, adType));
     }
 
     public static getCampaignFollowsRedirects(): PerformanceCampaign {

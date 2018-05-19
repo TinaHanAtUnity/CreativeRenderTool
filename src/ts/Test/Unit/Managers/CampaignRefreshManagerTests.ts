@@ -30,6 +30,7 @@ import { FocusManager } from 'Managers/FocusManager';
 import { Campaign } from 'Models/Campaign';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
+import ConfigurationMixedPlacements from 'json/ConfigurationMixedPlacements.json';
 import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
 
 import { Diagnostics } from 'Utilities/Diagnostics';
@@ -42,6 +43,7 @@ import { OldCampaignRefreshManager } from 'Managers/OldCampaignRefreshManager';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { JaegerManager } from 'Jaeger/JaegerManager';
 import { JaegerSpan } from 'Jaeger/JaegerSpan';
+import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 
 describe('CampaignRefreshManager', () => {
     let deviceInfo: DeviceInfo;
@@ -576,6 +578,57 @@ describe('CampaignRefreshManager', () => {
                 diagnosticsStub.restore();
                 assert.equal(receivedErrorType, 'error_creating_handle_campaign_chain', 'Incorrect error type');
                 assert.equal(receivedError.error.message, 'model: AuctionResponse key: contentType with value: 1: integer is not in: string', 'Incorrect error message');
+            });
+        });
+    });
+
+    describe('On Mixed Placement campaigns', () => {
+        beforeEach(() => {
+            configuration = new Configuration(JSON.parse(ConfigurationMixedPlacements));
+            campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
+            campaignRefreshManager = new OldCampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration, focusManager, sessionManager, clientInfo, request, cache);
+        });
+
+        it('should create a new placement with a suffix for a promo mixed placement campaign', () => {
+            sinon.stub(campaignManager, 'request').callsFake(() => {
+                campaignManager.onCampaign.trigger('mixedPlacement', TestFixtures.getPromoCampaign('purchasing/iap'));
+                return Promise.resolve();
+            });
+
+            return campaignRefreshManager.refresh().then(() => {
+                assert.isDefined(campaignRefreshManager.getCampaign('mixedPlacement'));
+                assert.isTrue(campaignRefreshManager.getCampaign('mixedPlacement') instanceof PromoCampaign);
+
+                const tmpCampaign = campaignRefreshManager.getCampaign('mixedPlacement');
+                assert.isDefined(tmpCampaign);
+                if (tmpCampaign) {
+                    assert.equal(tmpCampaign.getId(), '000000000000000000000123');
+                    assert.equal(tmpCampaign.getAdType(), 'purchasing/iap');
+                }
+
+                assert.equal(configuration.getPlacement('mixedPlacement').getState(), PlacementState.READY);
+                assert.equal(configuration.getPlacement('mixedPlacement-promo').getState(), PlacementState.READY);
+            });
+        });
+
+        it('should create a new placement with a suffix for a rewarded mixed placement campaign', () => {
+            sinon.stub(campaignManager, 'request').callsFake(() => {
+                campaignManager.onCampaign.trigger('mixedPlacement', TestFixtures.getPromoCampaign());
+                return Promise.resolve();
+            });
+
+            return campaignRefreshManager.refresh().then(() => {
+                assert.isDefined(campaignRefreshManager.getCampaign('mixedPlacement'));
+                assert.isTrue(campaignRefreshManager.getCampaign('mixedPlacement') instanceof PromoCampaign);
+
+                const tmpCampaign = campaignRefreshManager.getCampaign('mixedPlacement');
+                assert.isDefined(tmpCampaign);
+                if (tmpCampaign) {
+                    assert.equal(tmpCampaign.getId(), '000000000000000000000123');
+                }
+
+                assert.equal(configuration.getPlacement('mixedPlacement').getState(), PlacementState.READY);
+                assert.equal(configuration.getPlacement('mixedPlacement-rewarded').getState(), PlacementState.READY);
             });
         });
     });
