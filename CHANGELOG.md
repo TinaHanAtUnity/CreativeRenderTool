@@ -1,4 +1,4 @@
-# Pending
+# Mon May 21 21:33:51 UTC 2018
 
 * Remove advertising identifier from MOAT integration for GDPR compliance
 * Stop square endscreen image A/B test from groups 5 and 6
