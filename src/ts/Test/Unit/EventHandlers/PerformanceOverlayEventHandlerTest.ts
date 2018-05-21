@@ -22,6 +22,7 @@ import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
+import { Privacy } from 'Views/Privacy';
 
 describe('PerformanceOverlayEventHandlerTest', () => {
 
@@ -67,7 +68,9 @@ describe('PerformanceOverlayEventHandlerTest', () => {
             configuration: configuration,
             campaign: campaign
         });
-        endScreen = new PerformanceEndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
+
+        const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+        endScreen = new PerformanceEndScreen(nativeBridge, campaign, deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, true);
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
 
         performanceAdUnitParameters = {
@@ -85,7 +88,8 @@ describe('PerformanceOverlayEventHandlerTest', () => {
             options: {},
             endScreen: endScreen,
             overlay: overlay,
-            video: video
+            video: video,
+            privacy: privacy
         };
 
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);

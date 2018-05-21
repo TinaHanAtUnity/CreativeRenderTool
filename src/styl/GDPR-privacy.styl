@@ -1,0 +1,38 @@
+@import "vars.styl";
+@import "components.styl";
+
+#gdpr-privacy {
+  $full-screen-pop-up-view($default-scale-size, 1000);
+
+  .back-side {
+    display: none;
+    font-size: $default-size * $default-font-size * .75;
+  }
+
+  .gdpr-text-android,
+  .gdpr-text-ios {
+    display: none;
+  }
+
+  &.flip {
+    .back-side {
+      display: block;
+      word-wrap: break-word;
+
+      .build-information-key {
+        font-weight: 800;
+      }
+    }
+
+    .pop-up-content:not(.back-side) {
+      display: none;
+    }
+  }
+}
+
+body.android #gdpr-privacy .gdpr-text-android,
+body.iphone #gdpr-privacy .gdpr-text-ios,
+body.ipad #gdpr-privacy .gdpr-text-ios {
+  display: initial;
+}
+

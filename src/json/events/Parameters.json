@@ -488,5 +488,26 @@
     "description": "Previously knows as 'developerID'",
     "provider": "Server",
     "platforms": "all"
+  },
+  {
+    "key": "gdprEnabled",
+    "type": "boolean",
+    "description": "If GDPR is enabled",
+    "provider": "Server",
+    "platforms": "all"
+  },
+  {
+    "key": "optOutRecorded",
+    "type": "boolean",
+    "description": "Whether the user has seen the opt-out banner in current game",
+    "provider": "Server",
+    "platforms": "all"
+  },
+  {
+    "key": "optOutEnabled",
+    "type": "boolean",
+    "description": "Whether the user has opted out from behavioral ads targeting in current game",
+    "provider": "Server",
+    "platforms": "all"
   }
 ]

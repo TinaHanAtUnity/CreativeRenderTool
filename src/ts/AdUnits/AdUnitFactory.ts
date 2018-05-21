@@ -70,6 +70,9 @@ import { AndroidVideoEventHandler } from 'EventHandlers/AndroidVideoEventHandler
 import { IosVideoEventHandler } from 'EventHandlers/IosVideoEventHandler';
 import { XPromoOperativeEventManager } from 'Managers/XPromoOperativeEventManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { AbstractPrivacy } from 'Views/AbstractPrivacy';
+import { GDPRPrivacy } from 'Views/GDPRPrivacy';
+import { PrivacyEventHandler } from 'EventHandlers/PrivacyEventHandler';
 
 export class AdUnitFactory {
 
@@ -102,7 +105,10 @@ export class AdUnitFactory {
     private static createPerformanceAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PerformanceCampaign>): PerformanceAdUnit {
         const overlay = this.createOverlay(nativeBridge, parameters);
         const adUnitStyle = CustomFeatures.getAdUnitStyle(parameters.campaign.getAbGroup());
-        const endScreen = new PerformanceEndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.deviceInfo.getOsVersion(), adUnitStyle);
+
+        const showGDPRBanner = this.showGDPRBanner(parameters);
+        const privacy = this.createPrivacy(nativeBridge, parameters);
+        const endScreen = new PerformanceEndScreen(nativeBridge, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, parameters.deviceInfo.getOsVersion(), adUnitStyle);
         const video = this.getVideo(parameters.campaign, parameters.forceOrientation);
 
         const performanceAdUnitParameters: IPerformanceAdUnitParameters = {
@@ -110,7 +116,8 @@ export class AdUnitFactory {
             video: video,
             overlay: overlay,
             endScreen: endScreen,
-            adUnitStyle: adUnitStyle
+            adUnitStyle: adUnitStyle,
+            privacy: privacy
         };
 
         const performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
@@ -136,14 +143,18 @@ export class AdUnitFactory {
 
     private static createXPromoAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<XPromoCampaign>): XPromoAdUnit {
         const overlay = this.createOverlay(nativeBridge, parameters);
-        const endScreen = new XPromoEndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+
+        const showGDPRBanner = this.showGDPRBanner(parameters);
+        const privacy = this.createPrivacy(nativeBridge, parameters);
+        const endScreen = new XPromoEndScreen(nativeBridge, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner);
         const video = this.getVideo(parameters.campaign, parameters.forceOrientation);
 
         const xPromoAdUnitParameters: IXPromoAdUnitParameters = {
             ... parameters,
             video: video,
             overlay: overlay,
-            endScreen: endScreen
+            endScreen: endScreen,
+            privacy: privacy
         };
 
         const xPromoAdUnit = new XPromoAdUnit(nativeBridge, xPromoAdUnitParameters);
@@ -237,17 +248,20 @@ export class AdUnitFactory {
         let endScreen: MRAIDEndScreen | undefined;
 
         let mraid: MRAIDView<IMRAIDViewHandler>;
+        const showGDPRBanner = this.showGDPRBanner(parameters);
+        const privacy = this.createPrivacy(nativeBridge, parameters);
         if(resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) {
-            mraid = new PlayableMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.configuration.isCoppaCompliant());
-            endScreen = new MRAIDEndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+            mraid = new PlayableMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy);
+            endScreen = new MRAIDEndScreen(nativeBridge, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner);
         } else {
-            mraid = new MRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.configuration.isCoppaCompliant());
+            mraid = new MRAID(nativeBridge, parameters.placement, parameters.campaign, privacy);
         }
 
         const mraidAdUnitParameters: IMRAIDAdUnitParameters = {
             ... parameters,
             mraid: mraid,
-            endScreen: endScreen
+            endScreen: endScreen,
+            privacy: privacy
         };
 
         const mraidAdUnit = new MRAIDAdUnit(nativeBridge, mraidAdUnitParameters);
@@ -443,5 +457,21 @@ export class AdUnitFactory {
         }
 
         return video;
+    }
+
+    private static createPrivacy(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractPrivacy {
+        let privacy: AbstractPrivacy;
+        if (parameters.configuration.isGDPREnabled()) {
+            privacy = new GDPRPrivacy(nativeBridge, parameters.configuration.isCoppaCompliant(), parameters.configuration.isOptOutEnabled());
+        } else {
+            privacy = new Privacy(nativeBridge, parameters.configuration.isCoppaCompliant());
+        }
+        const privacyEventHandler = new PrivacyEventHandler(nativeBridge, parameters);
+        privacy.addEventHandler(privacyEventHandler);
+        return privacy;
+    }
+
+    private static showGDPRBanner(parameters: IAdUnitParameters<Campaign>): boolean {
+        return parameters.configuration.isGDPREnabled() ? !parameters.configuration.isOptOutRecorded() : false;
     }
 }

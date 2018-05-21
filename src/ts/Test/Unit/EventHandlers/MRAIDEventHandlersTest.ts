@@ -18,10 +18,11 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { MRAID } from 'Views/MRAID';
 import { Placement } from 'Models/Placement';
-import { HttpKafka } from 'Utilities/HttpKafka';
+import { HttpKafka, KafkaCommonObjectType } from 'Utilities/HttpKafka';
 import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
+import { GDPRPrivacy } from 'Views/GDPRPrivacy';
 
 describe('MRAIDEventHandlersTest', () => {
 
@@ -93,7 +94,8 @@ describe('MRAIDEventHandlersTest', () => {
                 request: request,
                 options: {},
                 mraid: mraidView,
-                endScreen: undefined
+                endScreen: undefined,
+                privacy: new GDPRPrivacy(nativeBridge, false, true)
             };
 
             mraidAdUnit = new MRAIDAdUnit(nativeBridge, mraidAdUnitParameters);
@@ -132,7 +134,7 @@ describe('MRAIDEventHandlersTest', () => {
                     headers: [['location', 'market://foobar.com']]
                 }));
 
-                mraidView = new MRAID(nativeBridge, placement, mraidCampaign, false);
+                mraidView = new MRAID(nativeBridge, placement, mraidCampaign, mraidAdUnitParameters.privacy);
                 sinon.stub(mraidView, 'createMRAID').callsFake(() => {
                     return Promise.resolve();
                 });
@@ -215,7 +217,7 @@ describe('MRAIDEventHandlersTest', () => {
                 if(resourceUrl) {
                     kafkaObject.url = resourceUrl.getOriginalUrl();
                 }
-                sinon.assert.calledWith(<sinon.SinonStub>HttpKafka.sendEvent, 'ads.sdk2.events.playable.json', kafkaObject);
+                sinon.assert.calledWith(<sinon.SinonStub>HttpKafka.sendEvent, 'ads.sdk2.events.playable.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
             });
 
             it('should send a analytics event without extra event data', () => {
@@ -236,7 +238,7 @@ describe('MRAIDEventHandlersTest', () => {
                 if(resourceUrl) {
                     kafkaObject.url = resourceUrl.getOriginalUrl();
                 }
-                sinon.assert.calledWith(<sinon.SinonStub>HttpKafka.sendEvent, 'ads.sdk2.events.playable.json', kafkaObject);
+                sinon.assert.calledWith(<sinon.SinonStub>HttpKafka.sendEvent, 'ads.sdk2.events.playable.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
             });
         });
     });

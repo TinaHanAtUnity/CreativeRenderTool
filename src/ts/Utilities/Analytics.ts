@@ -1,5 +1,5 @@
 import { INativeResponse } from 'Utilities/Request';
-import { HttpKafka } from 'Utilities/HttpKafka';
+import { HttpKafka, KafkaCommonObjectType } from 'Utilities/HttpKafka';
 
 export class Analytics {
     public static trigger(type: string, data: {}): Promise<INativeResponse> {
@@ -9,6 +9,6 @@ export class Analytics {
                 value: data
             };
         }
-        return HttpKafka.sendEvent('ads.sdk2.analytics', data);
+        return HttpKafka.sendEvent('ads.sdk2.analytics', KafkaCommonObjectType.ANONYMOUS, data);
     }
 }
