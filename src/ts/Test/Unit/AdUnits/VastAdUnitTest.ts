@@ -115,7 +115,7 @@ describe('VastAdUnit', () => {
 
     afterEach(() => sandbox.restore());
 
-    describe('sendTrackingEvent', () => {
+    xdescribe('sendTrackingEvent', () => {
         it('should replace "%ZONE%" in the url with the placement id', () => {
             const vast = vastCampaign.getVast();
             const urlTemplate = 'http://foo.biz/%ZONE%/123';
@@ -139,7 +139,7 @@ describe('VastAdUnit', () => {
         });
     });
 
-    describe('with click through url', () => {
+    xdescribe('with click through url', () => {
         beforeEach(() => {
             const video = new Video('', TestFixtures.getSession());
             vastCampaign = TestFixtures.getEventVastCampaign();
@@ -191,7 +191,7 @@ describe('VastAdUnit', () => {
         });
     });
 
-    describe('VastAdUnit progress event test', () => {
+    xdescribe('VastAdUnit progress event test', () => {
         it('sends video click through tracking event from VAST', () => {
             const mockEventManager = sinon.mock(thirdPartyEventManager);
             mockEventManager.expects('sendEvent').withArgs('vast video click', '123', 'http://myTrackingURL.com/click');
@@ -201,7 +201,7 @@ describe('VastAdUnit', () => {
         });
     });
 
-    describe('with companion ad', () => {
+    xdescribe('with companion ad', () => {
         let vastEndScreen: VastEndScreen;
 
         beforeEach(() => {
