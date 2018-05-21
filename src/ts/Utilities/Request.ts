@@ -165,26 +165,24 @@ export class Request {
                     // market:// or itunes:// urls can be opened directly
                     resolve(requestUrl);
                 } else {
-                    const xhr = new XMLHttpRequest();
-                    xhr.onreadystatechange = () => {
-                        if (xhr.readyState === 4) {
-                            if (xhr.status >= 300 && xhr.status <= 399) {
-                                const location = xhr.getResponseHeader('Location');
-                                if (location) {
-                                    makeRequest(location);
-                                } else {
-                                    reject(new Error(`Response did not have a "Location" header`));
-                                }
+                    this.head(requestUrl).then((response: INativeResponse) => {
+                        if (Request.is3xxRedirect(response.responseCode)) {
+                            const location = Request.getHeader(response.headers, 'location');
+                            if (location) {
+                                makeRequest(location);
                             } else {
+                                reject(new Error(`${response.responseCode} response did not have a "Location" header`));
+                            }
+                        } else if (Request.is2xxSuccessful(response.responseCode)) {
+                            resolve(requestUrl);
+                        } else {
+                            if (resolveOnHttpError) {
                                 resolve(requestUrl);
+                            } else {
+                                reject(new Error(`Request to ${requestUrl} failed with status ${response.responseCode}`));
                             }
                         }
-                    };
-                    xhr.onerror = () => {
-                        reject(new Error(`An error occurred with the request.`));
-                    };
-                    xhr.open('HEAD', requestUrl, true);
-                    xhr.send();
+                    }).catch(reject);
                 }
             };
             makeRequest(url);
