@@ -499,14 +499,14 @@
   {
     "key": "optOutRecorded",
     "type": "boolean",
-    "description": "Whether the user has seen the opt-out banner or not",
+    "description": "Whether the user has seen the opt-out banner in current game",
     "provider": "Server",
     "platforms": "all"
   },
   {
     "key": "optOutEnabled",
     "type": "boolean",
-    "description": "If the opt-out is enabled",
+    "description": "Whether the user has opted out from behavioral ads targeting in current game",
     "provider": "Server",
     "platforms": "all"
   }

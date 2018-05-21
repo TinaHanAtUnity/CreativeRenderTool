@@ -1,5 +1,4 @@
 import EndScreenTemplate from 'html/EndScreen.html';
-import SquareEndScreenTemplate from 'html/SquareEndScreen.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -11,7 +10,6 @@ import { Campaign } from 'Models/Campaign';
 import { IEndScreenDownloadParameters } from 'EventHandlers/EndScreenEventHandler';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
-import { SquareEndScreenUtilities } from 'Utilities/SquareEndScreenUtilities';
 
 export interface IEndScreenHandler {
     onEndScreenDownload(parameters: IEndScreenDownloadParameters): void;
@@ -21,8 +19,6 @@ export interface IEndScreenHandler {
 }
 
 const GDPR_OPT_OUT_BASE  = 'gdpr-pop-up-base';
-
-const SQUARE_END_SCREEN = 'square-end-screen';
 
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
 
@@ -54,7 +50,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             {
                 event: 'click',
                 listener: (event: Event) => this.onDownloadEvent(event),
-                selector: '.game-background, .download-container, .game-icon, .game-image'
+                selector: '.game-background, .download-container, .game-icon'
             },
             {
                 event: 'click',
@@ -104,7 +100,6 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         const endScreenAlt = this.getEndscreenAlt();
         if (typeof endScreenAlt === 'string') {
             this._container.classList.add(endScreenAlt);
-            document.documentElement.classList.add(endScreenAlt);
         }
     }
 
@@ -160,12 +155,6 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             return GDPR_OPT_OUT_BASE;
         }
 
-        const campaignId = campaign ? campaign.getId() : this._campaignId;
-        const platform = this._nativeBridge.getPlatform();
-        if (SquareEndScreenUtilities.useSquareEndScreenAlt(this._abGroup, platform, campaignId, this._osVersion)) {
-            return SQUARE_END_SCREEN;
-        }
-
         return undefined;
     }
 
@@ -190,10 +179,6 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     private getTemplate() {
-        if (this.getEndscreenAlt() === SQUARE_END_SCREEN) {
-            return SquareEndScreenTemplate;
-        }
-
         return EndScreenTemplate;
     }
 }
