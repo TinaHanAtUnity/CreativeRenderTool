@@ -164,14 +164,8 @@ export class Overlay extends AbstractVideoOverlay {
     }
 
     public setCallButtonEnable(value: boolean) {
-        this._nativeBridge.Sdk.logInfo('setCallButtonEnable -- ' + value);
         if(this._callButtonEnable !== value) {
             this._callButtonEnable = value;
-            if(this._callButtonEnable) {
-                this._callButtonElement.classList.remove('clicked');
-            } else {
-                this._callButtonElement.classList.add('clicked');
-            }
         }
     }
 

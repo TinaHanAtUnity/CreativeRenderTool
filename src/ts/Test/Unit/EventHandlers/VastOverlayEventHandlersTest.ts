@@ -154,7 +154,7 @@ describe('VastOverlayEventHandlersTest', () => {
         });
     });
 
-    xdescribe('When calling onMute', () => {
+    describe('When calling onMute', () => {
 
         beforeEach(() => {
             vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
@@ -203,14 +203,14 @@ describe('VastOverlayEventHandlersTest', () => {
             vastOverlayEventHandler = new VastOverlayEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
             sinon.spy(nativeBridge.VideoPlayer, 'pause');
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('http://foo.com');
-            sinon.stub(vastAdUnit, 'addStoredEvent').returns(sinon.spy());
+            sinon.stub(vastAdUnit, 'sendVideoClickTrackingEvent').returns(sinon.spy());
         });
 
         it('should call video click through tracking url', () => {
             sinon.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
             sinon.stub(nativeBridge.UrlScheme, 'open');
             vastOverlayEventHandler.onOverlayCallButton().then(() => {
-                sinon.assert.calledOnce(<sinon.SinonSpy>vastAdUnit.addStoredEvent);
+                sinon.assert.calledOnce(<sinon.SinonSpy>vastAdUnit.sendVideoClickTrackingEvent);
             });
         });
 

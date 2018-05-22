@@ -154,7 +154,7 @@ describe('VastVideoEventHandler tests', () => {
         });
     });
 
-    xdescribe('onVideoStart', () => {
+    describe('onVideoStart', () => {
 
         it('sends start events from VAST', () => {
             // given a VAST placement
@@ -221,7 +221,7 @@ describe('VastVideoEventHandler tests', () => {
         });
     });
 
-    xdescribe('onVideoCompleted', () => {
+    describe('onVideoCompleted', () => {
         it('sends complete events from VAST', () => {
             // given a VAST placement
             // when the session manager is told that the video has completed
@@ -325,7 +325,7 @@ describe('VastVideoEventHandler tests', () => {
         });
     });
 
-    xdescribe('sendImpressionEvent', () => {
+    describe('sendImpressionEvent', () => {
         let vast: Vast;
 
         beforeEach(() => {
