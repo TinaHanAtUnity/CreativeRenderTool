@@ -1,0 +1,196 @@
+@import "vars.styl";
+@import "components.styl";
+@import "mixins.styl";
+
+$iphone-button-right = calc(env(safe-area-inset-right) - 1rem);
+
+$end-screen-mixin($scale-size = $default-scale-size) {
+
+  $common-margin = $default-size * $scale-size * .25;
+
+  /* Override media-queries.styl styles */
+  html {
+    #end-screen.iphone-x-styles {
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+    }
+  }
+
+  body {
+    &.portrait #end-screen.iphone-x-styles {
+      .game-background-portrait-blurred {
+        display: block;
+      }
+      .game-background-landscape-blurred {
+        display: none;
+      }
+      .game-background-container {
+        width: 100%;
+        height: 50%;
+      }
+      .game-background {
+        height: 100%;
+      }
+    }
+
+    &.landscape #end-screen.iphone-x-styles {
+      .game-background-portrait-blurred {
+        display: none;
+      }
+      .game-background-landscape-blurred {
+        display: block;
+      }
+      .game-background-container {
+        width: 50%;
+        height: 100%;
+      }
+      .game-background {
+        width: 100%;
+      }
+    }
+  }
+
+  body {
+    #end-screen.iphone-x-styles {
+      .campaign-container {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .game-background-blurred {
+        position: absolute;
+        display: block;
+        margin: 0;
+        width: 100%;
+        height: calc(50% + env(safe-area-inset-top));
+        // @stylint off
+        height: calc(50% + constant(safe-area-inset-top));
+        // @stylint on
+        filter: blur(5px) brightness(.8) opacity(.68);
+        transform: scale(1.4);
+        background-color: transparent;
+        background-size: cover;
+      }
+
+      .game-background-container {
+        position: relative;
+        z-index: 6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+
+    &.landscape #end-screen.iphone-x-styles,
+    &.portrait #end-screen.iphone-x-styles {
+      .game-background {
+        width: 80%;
+        height: 80%;
+      }
+      .end-screen-info-background {
+        position: relative;
+        z-index: 7;
+      }
+    }
+
+    &.portrait #end-screen.iphone-x-styles {
+      .game-background-container {
+        height: calc(50% + env(safe-area-inset-top));
+        // @stylint off
+        height: calc(50% + constant(safe-area-inset-top));
+        // @stylint on
+      }
+
+      .end-screen-info-background {
+        height: calc(50% - env(safe-area-inset-top));
+        // @stylint off
+        height: calc(50% - constant(safe-area-inset-top));
+        // @stylint on
+      }
+
+      .game-background {
+        position: absolute;
+        margin-top: 9vw;
+        width: 90vw;
+        height: 90vw;
+      }
+
+      .btn-close-region {
+        top: constant(safe-area-inset-top);
+        // @stylint off
+        top: env(safe-area-inset-top);
+        // @stylint on
+        padding-top: 0;
+        padding-bottom: 1rem;
+        line-height: 1rem;
+      }
+
+      .unityads-logo {
+        margin-bottom: .15rem;
+      }
+
+      .privacy-button {
+        left: 0;
+        margin-left: 1rem;
+      }
+    }
+
+    &.landscape #end-screen.iphone-x-styles {
+      .game-background-blurred {
+        width: calc(100vh + env(safe-area-inset-left));
+        // @stylint off
+        width: calc(100vh + constant(safe-area-inset-left));
+        // @stylint on
+        height: 100%;
+      }
+
+      .game-background-container {
+        width: calc(100vh + env(safe-area-inset-left));
+        // @stylint off
+        width: calc(100vh + constant(safe-area-inset-left));
+        // @stylint on
+      }
+
+      .game-background {
+        margin-left: calc(env(safe-area-inset-left) / 2);
+        // @stylint off
+        margin-left: calc(constant(safe-area-inset-left) / 2);
+        // @stylint on
+        width: 85vh;
+        height: 85vh;
+      }
+
+      .end-screen-info-background {
+        flex-grow: 1;
+        width: auto;
+      }
+
+      .btn-close-region {
+        right: env(safe-area-inset-right);
+        // @stylint off
+        right: constant(safe-area-inset-right);
+        // @stylint on
+        padding-right: .1rem;
+        padding-left: 1.2rem;
+        width: auto;
+      }
+
+      .privacy-button {
+        right: env(safe-area-inset-right);
+        // @stylint off
+        right: constant(safe-area-inset-right);
+        // @stylint on
+        left: auto;
+        padding-right: .3rem;
+        line-height: 1rem;
+      }
+
+      .unityads-logo {
+        margin-bottom: .13rem;
+      }
+    }
+  }
+}
+
+$end-screen-mixin();

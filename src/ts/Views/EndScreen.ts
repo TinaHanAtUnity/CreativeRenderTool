@@ -1,4 +1,5 @@
 import EndScreenTemplate from 'html/EndScreen.html';
+import IPhoneXEndScreenTemplate from 'html/IPhoneXEndScreen.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -18,6 +19,9 @@ export interface IEndScreenHandler extends IGDPREventHandler {
     onEndScreenClose(): void;
     onKeyEvent(keyCode: number): void;
 }
+
+const IPHONE_X_STYLES_AB_GROUPS = [18, 19];
+const IPHONE_X_STYLES_ID = 'iphone-x-styles';
 
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
 
@@ -100,7 +104,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
         const endScreenAlt = this.getEndscreenAlt();
         if (typeof endScreenAlt === 'string') {
-            this._container.classList.add(endScreenAlt);
+            this._container.classList.add(...endScreenAlt.split(' '));
         }
 
         if (this._showGDPRBanner) {
@@ -156,6 +160,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     protected getEndscreenAlt(campaign?: Campaign) {
+        if (this.useIPhoneXStyle()) {
+            return IPHONE_X_STYLES_ID;
+        }
+
         return undefined;
     }
 
@@ -175,7 +183,31 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._privacy.show();
     }
 
+    private isIPhoneX(): boolean {
+        const isIPhone: boolean = /iPhone/.test(navigator.userAgent);
+
+        if (!isIPhone) {
+            return false;
+        }
+
+        const ratio: number = window.devicePixelRatio;
+        const screenSize = {
+            height: window.screen.height * ratio,
+            width: window.screen.width * ratio,
+        };
+
+        return (screenSize.height === 1125 && screenSize.width === 2436) || (screenSize.height === 2436 && screenSize.width === 1125);
+    }
+
+    private useIPhoneXStyle(): boolean {
+        return IPHONE_X_STYLES_AB_GROUPS.indexOf(this._abGroup) > -1 && this.isIPhoneX();
+    }
+
     private getTemplate() {
+        if (this.useIPhoneXStyle()) {
+            return IPhoneXEndScreenTemplate;
+        }
+
         return EndScreenTemplate;
     }
 }
