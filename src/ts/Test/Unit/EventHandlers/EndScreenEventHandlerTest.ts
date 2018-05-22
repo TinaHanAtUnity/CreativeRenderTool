@@ -89,7 +89,7 @@ describe('EndScreenEventHandlerTest', () => {
             endScreen = new PerformanceEndScreen(nativeBridge, TestFixtures.getCampaign(), deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, false);
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
             placement = TestFixtures.getPlacement();
-            const gdprManager = new GdprConsentManager(nativeBridge, deviceInfo, clientInfo, configuration, wakeUpManager);
+            const gdprManager = sinon.createStubInstance(GdprConsentManager);
 
             performanceAdUnitParameters = {
                 forceOrientation: Orientation.LANDSCAPE,
@@ -312,7 +312,7 @@ describe('EndScreenEventHandlerTest', () => {
             const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
             endScreen = new PerformanceEndScreen(nativeBridge, campaign, deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, false);
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
-            const gdprManager = new GdprConsentManager(nativeBridge, deviceInfo, clientInfo, configuration, wakeUpManager);
+            const gdprManager = sinon.createStubInstance(GdprConsentManager);
 
             performanceAdUnitParameters = {
                 forceOrientation: Orientation.LANDSCAPE,

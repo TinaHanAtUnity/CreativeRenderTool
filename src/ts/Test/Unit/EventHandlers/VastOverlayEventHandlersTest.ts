@@ -101,7 +101,7 @@ describe('VastOverlayEventHandlersTest', () => {
             campaign: campaign
         });
 
-        const gdprManager = new GdprConsentManager(nativeBridge, deviceInfo, clientInfo, configuration, wakeUpManager);
+        const gdprManager = sinon.createStubInstance(GdprConsentManager);
 
         vastAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,

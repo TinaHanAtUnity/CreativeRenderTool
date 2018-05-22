@@ -92,7 +92,7 @@ describe('VastAdUnit', () => {
         });
 
         const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
-        const gdprManager = new GdprConsentManager(nativeBridge, deviceInfo, clientInfo, configuration, wakeUpManager);
+        const gdprManager = sinon.createStubInstance(GdprConsentManager);
 
         vastAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,

@@ -202,7 +202,7 @@ export class WebView {
 
             return Promise.all([configPromise, cachedCampaignResponsePromise, cachePromise]);
         }).then(([configuration, cachedCampaignResponse]) => {
-            this._gdprConsentManager = new GdprConsentManager(this._nativeBridge, this._deviceInfo, this._clientInfo, configuration, this._wakeUpManager);
+            this._gdprConsentManager = new GdprConsentManager(this._nativeBridge, this._deviceInfo, this._clientInfo, configuration, this._request);
             this._configuration = configuration;
             this._cachedCampaignResponse = cachedCampaignResponse;
             HttpKafka.setConfiguration(this._configuration);

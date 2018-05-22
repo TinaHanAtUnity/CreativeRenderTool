@@ -73,7 +73,7 @@ describe('AdUnitFactoryTest', () => {
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         sessionManager = new SessionManager(nativeBridge, request);
         const campaign = TestFixtures.getCampaign();
-        const gdprManager = new GdprConsentManager(nativeBridge, deviceInfo, clientInfo, config, wakeUpManager);
+        const gdprManager = sinon.createStubInstance(GdprConsentManager);
 
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             nativeBridge: nativeBridge,

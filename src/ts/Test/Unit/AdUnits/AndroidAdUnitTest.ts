@@ -47,7 +47,7 @@ describe('AndroidAdUnitTest', () => {
         const deviceInfo = TestFixtures.getAndroidDeviceInfo();
         const configuration = TestFixtures.getConfiguration();
         container = new Activity(nativeBridge, deviceInfo);
-        const gdprManager = new GdprConsentManager(nativeBridge, deviceInfo, clientInfo, configuration, wakeUpManager);
+        const gdprManager = sinon.createStubInstance(GdprConsentManager);
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             nativeBridge: nativeBridge,
             request: request,

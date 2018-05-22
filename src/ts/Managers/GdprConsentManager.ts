@@ -1,15 +1,19 @@
-import { NativeBridge } from 'Native/NativeBridge';
-import { StorageType } from 'Native/Api/Storage';
-import { DeviceInfo } from 'Models/DeviceInfo';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Configuration } from 'Models/Configuration';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { Request, INativeResponse } from 'Utilities/Request';
-import { WakeUpManager } from './WakeUpManager';
-
+import { DeviceInfo } from 'Models/DeviceInfo';
+import { StorageType } from 'Native/Api/Storage';
+import { NativeBridge } from 'Native/NativeBridge';
+import { Diagnostics } from 'Utilities/Diagnostics';
+import { JsonParser } from 'Utilities/JsonParser';
+import { Request } from 'Utilities/Request';
 
 export interface IGdprPersonalProperties {
-    // TODO: add personal fields for everything required
+    device: string;
+    country: string;
+    gamePlaysThisWeek: number;
+    adsSeenInGameThisWeek: number;
+    installsFromAds: number;
 }
 export class GdprConsentManager {
 
@@ -19,14 +23,14 @@ export class GdprConsentManager {
     private _deviceInfo: DeviceInfo;
     private _clientInfo: ClientInfo;
     private _configuration: Configuration;
-    private _wakeUpManager: WakeUpManager;
+    private _request: Request;
 
-    constructor(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, clientInfo: ClientInfo, configuration: Configuration, wakeUpManager: WakeUpManager) {
+    constructor(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, clientInfo: ClientInfo, configuration: Configuration, request: Request) {
         this._nativeBridge = nativeBridge;
         this._deviceInfo = deviceInfo;
         this._clientInfo = clientInfo;
         this._configuration = configuration;
-        this._wakeUpManager = wakeUpManager;
+        this._request = request;
 
         this._nativeBridge.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, data));
     }
@@ -44,14 +48,24 @@ export class GdprConsentManager {
     }
 
     public retrievePersonalInformation(): Promise<IGdprPersonalProperties> {
-        const request = new Request(this._nativeBridge, this._wakeUpManager);
-        // Add storeID
         const url = `https://tracking.adsx.unityads.unity3d.com/user-summary?gamerId=${this._configuration.getGamerId()}&gameId=${this._clientInfo.getGameId()}&projectId=${this._configuration.getUnityProjectId()}&storeId=${this._deviceInfo.getStores()}`;
-        return Promise.resolve({});
-        // return request.get(url).then((response) => {
-        //     // populate iGDPRPersonalProperties
-        //     return response.response;
-        // });
+        const personalPayload = {
+            device: this._deviceInfo.getModel(),
+            country: this._configuration.getCountry()
+        };
+
+        return this._request.get(url).then((response) => {
+            return {
+                ... JsonParser.parse(response.response),
+                ... personalPayload
+            };
+        }).catch(error => {
+            Diagnostics.trigger('gdpr_request_failed', {
+                url: url
+            });
+            this._nativeBridge.Sdk.logError('Gdpr request failed' + error);
+            throw error;
+        });
     }
 
     private onStorageSet(eventType: string, data: any) {

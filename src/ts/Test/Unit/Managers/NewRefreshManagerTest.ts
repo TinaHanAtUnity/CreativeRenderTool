@@ -89,7 +89,7 @@ describe('NewRefreshManagerTest', () => {
             campaign: campaign
         });
         container = new Activity(nativeBridge, deviceInfo);
-        gdprManager = new GdprConsentManager(nativeBridge, deviceInfo, clientInfo, configuration, wakeUpManager);
+        gdprManager = sinon.createStubInstance(GdprConsentManager);
 
         adUnit = new TestAdUnit(nativeBridge, {
             forceOrientation: Orientation.NONE,

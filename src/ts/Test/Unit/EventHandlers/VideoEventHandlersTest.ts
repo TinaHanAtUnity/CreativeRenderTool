@@ -112,7 +112,7 @@ describe('VideoEventHandlersTest', () => {
 
         const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
         endScreen = new PerformanceEndScreen(nativeBridge, performanceCampaign, 'en', '12345', privacy, false);
-        const gdprManager = new GdprConsentManager(nativeBridge, deviceInfo, clientInfo, configuration, wakeUpManager);
+        const gdprManager = sinon.createStubInstance(GdprConsentManager);
 
 
         vastAdUnitParameters = {

@@ -49,7 +49,7 @@ describe('IosAdUnitTest', () => {
         container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager);
         const campaign = TestFixtures.getCampaign();
         const configuration = TestFixtures.getConfiguration();
-        const gdprManager = new GdprConsentManager(nativeBridge, deviceInfo, clientInfo, configuration, wakeUpManager);
+        const gdprManager = sinon.createStubInstance(GdprConsentManager);
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             nativeBridge: nativeBridge,
             request: request,

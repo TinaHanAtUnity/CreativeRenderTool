@@ -164,7 +164,7 @@ describe('CampaignRefreshManager', () => {
         (<sinon.SinonStub>adMobSignalFactory.getAdRequestSignal).returns(Promise.resolve(new AdMobSignal()));
         (<sinon.SinonStub>adMobSignalFactory.getOptionalSignal).returns(Promise.resolve(new AdMobOptionalSignal()));
 
-        gdprManager = new GdprConsentManager(nativeBridge, deviceInfo, clientInfo, configuration, wakeUpManager);
+        gdprManager = sinon.createStubInstance(GdprConsentManager);
 
         adUnitParams = {
             forceOrientation: Orientation.NONE,

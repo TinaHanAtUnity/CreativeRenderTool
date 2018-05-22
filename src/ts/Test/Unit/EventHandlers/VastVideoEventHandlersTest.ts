@@ -101,7 +101,7 @@ describe('VastVideoEventHandler tests', () => {
             campaign: campaign
         });
 
-        gdprManager = new GdprConsentManager(nativeBridge, deviceInfo, clientInfo, configuration, wakeUpManager);
+        gdprManager = sinon.createStubInstance(GdprConsentManager);
 
         vastAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,

@@ -73,7 +73,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
         const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
         endScreen = new PerformanceEndScreen(nativeBridge, campaign, deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, true);
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
-        const gdprManager = new GdprConsentManager(nativeBridge, deviceInfo, clientInfo, configuration, wakeUpManager);
+        const gdprManager = sinon.createStubInstance(GdprConsentManager);
 
         performanceAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,

@@ -88,7 +88,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             endScreen = new XPromoEndScreen(nativeBridge, TestFixtures.getXPromoCampaign(), deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, false);
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
             placement = TestFixtures.getPlacement();
-            const gdprManager = new GdprConsentManager(nativeBridge, deviceInfo, clientInfo, configuration, wakeUpManager);
+            const gdprManager = sinon.createStubInstance(GdprConsentManager);
 
             xPromoAdUnitParameters = {
                 forceOrientation: Orientation.LANDSCAPE,
@@ -171,7 +171,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
             endScreen = new XPromoEndScreen(nativeBridge, campaign, deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, false);
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
-            const gdprManager = new GdprConsentManager(nativeBridge, deviceInfo, clientInfo, configuration, wakeUpManager);
+            const gdprManager = sinon.createStubInstance(GdprConsentManager);
 
             xPromoAdUnitParameters = {
                 forceOrientation: Orientation.LANDSCAPE,

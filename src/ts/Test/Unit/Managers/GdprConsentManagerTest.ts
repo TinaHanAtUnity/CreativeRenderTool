@@ -10,6 +10,7 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { GdprConsentManager } from 'Managers/GdprConsentManager';
 import { StorageType } from 'Native/Api/Storage';
 import { WakeUpManager } from 'Managers/WakeUpManager';
+import { Request } from 'Utilities/Request';
 
 describe('GdprConsentManagerTest', () => {
     let nativeBridge: NativeBridge;
@@ -17,14 +18,14 @@ describe('GdprConsentManagerTest', () => {
     let clientInfo: ClientInfo;
     let configuration: Configuration;
     let gdprConsentManager: GdprConsentManager;
-    let wakeUpManager: WakeUpManager;
+    let request: Request;
 
     beforeEach(() => {
         nativeBridge = TestFixtures.getNativeBridge();
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
         clientInfo = TestFixtures.getClientInfo();
         configuration = TestFixtures.getConfiguration();
-        wakeUpManager = sinon.createStubInstance(WakeUpManager);
+        request = sinon.createStubInstance(Request);
 
         configuration.setGDPREnabled(false);
         configuration.setOptOutEnabled(false);
@@ -34,7 +35,7 @@ describe('GdprConsentManagerTest', () => {
     it('should accept boolean true for metadata value', () => {
         sinon.stub(nativeBridge.Storage, 'get').withArgs(StorageType.PUBLIC, 'gdpr.consent.value').returns(Promise.resolve(true));
 
-        gdprConsentManager = new GdprConsentManager(nativeBridge, deviceInfo, clientInfo, configuration, wakeUpManager);
+        gdprConsentManager = new GdprConsentManager(nativeBridge, deviceInfo, clientInfo, configuration, request);
 
         return gdprConsentManager.fetch().then(() => {
             assert.isTrue(configuration.isGDPREnabled(), 'GDPR was not enabled when consent metadata was set to boolean true');
@@ -46,7 +47,7 @@ describe('GdprConsentManagerTest', () => {
     it('should accept boolean false for metadata value', () => {
         sinon.stub(nativeBridge.Storage, 'get').withArgs(StorageType.PUBLIC, 'gdpr.consent.value').returns(Promise.resolve(false));
 
-        gdprConsentManager = new GdprConsentManager(nativeBridge, deviceInfo, clientInfo, configuration, wakeUpManager);
+        gdprConsentManager = new GdprConsentManager(nativeBridge, deviceInfo, clientInfo, configuration, request);
 
         return gdprConsentManager.fetch().then(() => {
             assert.isTrue(configuration.isGDPREnabled(), 'GDPR was not enabled when consent metadata was set to boolean false');
@@ -58,7 +59,7 @@ describe('GdprConsentManagerTest', () => {
     it('should accept string true for metadata value', () => {
         sinon.stub(nativeBridge.Storage, 'get').withArgs(StorageType.PUBLIC, 'gdpr.consent.value').returns(Promise.resolve('true'));
 
-        gdprConsentManager = new GdprConsentManager(nativeBridge, deviceInfo, clientInfo, configuration, wakeUpManager);
+        gdprConsentManager = new GdprConsentManager(nativeBridge, deviceInfo, clientInfo, configuration, request);
 
         return gdprConsentManager.fetch().then(() => {
             assert.isTrue(configuration.isGDPREnabled(), 'GDPR was not enabled when consent metadata was set to string true');
@@ -70,7 +71,7 @@ describe('GdprConsentManagerTest', () => {
     it('should accept string false for metadata value', () => {
         sinon.stub(nativeBridge.Storage, 'get').withArgs(StorageType.PUBLIC, 'gdpr.consent.value').returns(Promise.resolve('false'));
 
-        gdprConsentManager = new GdprConsentManager(nativeBridge, deviceInfo, clientInfo, configuration, wakeUpManager);
+        gdprConsentManager = new GdprConsentManager(nativeBridge, deviceInfo, clientInfo, configuration, request);
 
         return gdprConsentManager.fetch().then(() => {
             assert.isTrue(configuration.isGDPREnabled(), 'GDPR was not enabled when consent metadata was set to string false');
@@ -82,7 +83,7 @@ describe('GdprConsentManagerTest', () => {
     it('should not accept random string for metadata value', () => {
         sinon.stub(nativeBridge.Storage, 'get').withArgs(StorageType.PUBLIC, 'gdpr.consent.value').returns(Promise.resolve('test'));
 
-        gdprConsentManager = new GdprConsentManager(nativeBridge, deviceInfo, clientInfo, configuration, wakeUpManager);
+        gdprConsentManager = new GdprConsentManager(nativeBridge, deviceInfo, clientInfo, configuration, request);
 
         return gdprConsentManager.fetch().then(() => {
             assert.isFalse(configuration.isGDPREnabled(), 'GDPR was enabled when consent metadata was set to random string');
