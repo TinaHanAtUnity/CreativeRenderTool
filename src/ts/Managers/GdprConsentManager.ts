@@ -4,7 +4,13 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Configuration } from 'Models/Configuration';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { Request, INativeResponse } from 'Utilities/Request';
+import { WakeUpManager } from './WakeUpManager';
 
+
+export interface IGdprPersonalProperties {
+    // TODO: add personal fields for everything required
+}
 export class GdprConsentManager {
 
     private static GDPR_LAST_VALUE_STORAGE_KEY = 'gdpr.consentlastsent';
@@ -13,12 +19,14 @@ export class GdprConsentManager {
     private _deviceInfo: DeviceInfo;
     private _clientInfo: ClientInfo;
     private _configuration: Configuration;
+    private _wakeUpManager: WakeUpManager;
 
-    constructor(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, clientInfo: ClientInfo, configuration: Configuration) {
+    constructor(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, clientInfo: ClientInfo, configuration: Configuration, wakeUpManager: WakeUpManager) {
         this._nativeBridge = nativeBridge;
         this._deviceInfo = deviceInfo;
         this._clientInfo = clientInfo;
         this._configuration = configuration;
+        this._wakeUpManager = wakeUpManager;
 
         this._nativeBridge.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, data));
     }
@@ -33,6 +41,17 @@ export class GdprConsentManager {
             // do nothing
             // error happens when value not found
         });
+    }
+
+    public retrievePersonalInformation(): Promise<IGdprPersonalProperties> {
+        const request = new Request(this._nativeBridge, this._wakeUpManager);
+        // Add storeID
+        const url = `https://tracking.adsx.unityads.unity3d.com/user-summary?gamerId=${this._configuration.getGamerId()}&gameId=${this._clientInfo.getGameId()}&projectId=${this._configuration.getUnityProjectId()}&storeId=${this._deviceInfo.getStores()}`;
+        return Promise.resolve({});
+        // return request.get(url).then((response) => {
+        //     // populate iGDPRPersonalProperties
+        //     return response.response;
+        // });
     }
 
     private onStorageSet(eventType: string, data: any) {

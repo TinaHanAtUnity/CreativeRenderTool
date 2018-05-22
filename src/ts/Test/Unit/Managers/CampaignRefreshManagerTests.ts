@@ -42,6 +42,7 @@ import { OldCampaignRefreshManager } from 'Managers/OldCampaignRefreshManager';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { JaegerManager } from 'Jaeger/JaegerManager';
 import { JaegerSpan } from 'Jaeger/JaegerSpan';
+import { GdprConsentManager } from 'Managers/GdprConsentManager';
 
 describe('CampaignRefreshManager', () => {
     let deviceInfo: DeviceInfo;
@@ -65,6 +66,7 @@ describe('CampaignRefreshManager', () => {
     let cacheBookkeeping: CacheBookkeeping;
     let cache: Cache;
     let jaegerManager: JaegerManager;
+    let gdprManager: GdprConsentManager;
 
     beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo();
@@ -162,6 +164,8 @@ describe('CampaignRefreshManager', () => {
         (<sinon.SinonStub>adMobSignalFactory.getAdRequestSignal).returns(Promise.resolve(new AdMobSignal()));
         (<sinon.SinonStub>adMobSignalFactory.getOptionalSignal).returns(Promise.resolve(new AdMobOptionalSignal()));
 
+        gdprManager = new GdprConsentManager(nativeBridge, deviceInfo, clientInfo, configuration, wakeUpManager);
+
         adUnitParams = {
             forceOrientation: Orientation.NONE,
             focusManager: focusManager,
@@ -174,7 +178,8 @@ describe('CampaignRefreshManager', () => {
             campaign: campaign,
             configuration: configuration,
             request: request,
-            options: {}
+            options: {},
+            gdprManager: gdprManager
         };
 
         RefreshManager.ParsingErrorRefillDelay = 0; // prevent tests from hanging due to long retry timeouts

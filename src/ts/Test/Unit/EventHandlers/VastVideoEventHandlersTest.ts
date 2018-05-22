@@ -28,6 +28,7 @@ import { IVideoEventHandlerParams } from 'EventHandlers/BaseVideoEventHandler';
 
 import EventTestVast from 'xml/EventTestVast.xml';
 import { Vast } from 'Models/Vast/Vast';
+import { GdprConsentManager } from 'Managers/GdprConsentManager';
 
 describe('VastVideoEventHandler tests', () => {
     const handleInvocation = sinon.spy();
@@ -52,6 +53,7 @@ describe('VastVideoEventHandler tests', () => {
     let sandbox: sinon.SinonSandbox;
     let vastVideoEventHandler: VastVideoEventHandler;
     let videoEventHandlerParams: IVideoEventHandlerParams;
+    let gdprManager: GdprConsentManager;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -99,6 +101,8 @@ describe('VastVideoEventHandler tests', () => {
             campaign: campaign
         });
 
+        gdprManager = new GdprConsentManager(nativeBridge, deviceInfo, clientInfo, configuration, wakeUpManager);
+
         vastAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
@@ -114,7 +118,8 @@ describe('VastVideoEventHandler tests', () => {
             options: {},
             endScreen: undefined,
             overlay: overlay,
-            video: campaign.getVideo()
+            video: campaign.getVideo(),
+            gdprManager: gdprManager
         };
 
         testAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);

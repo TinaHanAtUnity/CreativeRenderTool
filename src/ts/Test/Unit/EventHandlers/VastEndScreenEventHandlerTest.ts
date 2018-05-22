@@ -22,6 +22,7 @@ import { SessionManager } from 'Managers/SessionManager';
 
 import EventTestVast from 'xml/EventTestVast.xml';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
+import { GdprConsentManager } from 'Managers/GdprConsentManager';
 
 describe('VastEndScreenEventHandlersTest', () => {
     const handleInvocation = sinon.spy();
@@ -65,6 +66,8 @@ describe('VastEndScreenEventHandlersTest', () => {
 
         const video = new Video('', TestFixtures.getSession());
         const overlay = new Overlay(nativeBridge, true, 'en', 'testGameId');
+        const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
+        const gdprManager = new GdprConsentManager(nativeBridge, deviceInfo, clientInfo, configuration, wakeUpManager);
 
         vastAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,
@@ -81,7 +84,8 @@ describe('VastEndScreenEventHandlersTest', () => {
             options: {},
             endScreen: undefined,
             overlay: overlay,
-            video: video
+            video: video,
+            gdprManager: gdprManager
         };
     });
 
