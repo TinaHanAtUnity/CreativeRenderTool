@@ -38,6 +38,7 @@ export class ThirdPartyEventManager {
         }
 
         this._nativeBridge.Sdk.logDebug('Unity Ads third party event: sending ' + event + ' event to ' + url + ' with headers ' + headers + ' (session ' + sessionId + ')');
+
         return this._request.get(url, headers, {
             retries: 0,
             retryDelay: 0,
