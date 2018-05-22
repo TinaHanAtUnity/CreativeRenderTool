@@ -1,4 +1,8 @@
-# Pending
+# Tue May 22 11:48:50 UTC 2018
+
+* Support string values in GDPR consent metadata
+
+# Mon May 21 21:33:51 UTC 2018
 
 * Remove advertising identifier from MOAT integration for GDPR compliance
 * Stop square endscreen image A/B test from groups 5 and 6

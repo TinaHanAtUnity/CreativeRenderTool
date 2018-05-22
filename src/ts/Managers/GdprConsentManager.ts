@@ -25,8 +25,9 @@ export class GdprConsentManager {
 
     public fetch(): Promise<void> {
         return this._nativeBridge.Storage.get(StorageType.PUBLIC, 'gdpr.consent.value').then((data: any) => {
-            if (typeof(data) === 'boolean') {
-                this.setConsent(data);
+            const value: boolean | undefined = this.getConsentTypeHack(data);
+            if(typeof(value) !== 'undefined') {
+                this.setConsent(value);
             }
         }).catch((error) => {
             // do nothing
@@ -35,9 +36,30 @@ export class GdprConsentManager {
     }
 
     private onStorageSet(eventType: string, data: any) {
-        if(data && data.gdpr && data.gdpr.consent && typeof(data.gdpr.consent.value) === 'boolean') {
-            this.setConsent(data.gdpr.consent.value);
+        if(data && data.gdpr && data.gdpr.consent) {
+            const value: boolean | undefined = this.getConsentTypeHack(data.gdpr.consent.value);
+
+            if(typeof(value) !== 'undefined') {
+                this.setConsent(value);
+            }
         }
+    }
+
+    // Android C# layer will map boolean values to Java primitive boolean types and causes reflection failure
+    // with Android Java native layer method that takes Object as value
+    // this hack allows anyone use both booleans and string "true" and "false" values
+    private getConsentTypeHack(value: any): boolean | undefined {
+        if(typeof(value) === 'boolean') {
+            return value;
+        } else if(typeof(value) === 'string') {
+            if(value === 'true') {
+                return true;
+            } else if(value === 'false') {
+                return false;
+            }
+        }
+
+        return undefined;
     }
 
     private setConsent(consent: boolean) {
