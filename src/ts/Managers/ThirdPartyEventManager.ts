@@ -5,9 +5,6 @@ import { Analytics } from 'Utilities/Analytics';
 import { RequestError } from 'Errors/RequestError';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { Url } from 'Utilities/Url';
-import { Promises } from 'Utilities/Promises';
-
-const DefaultTrackingTimeout = 2000;
 
 export class ThirdPartyEventManager {
 
@@ -42,27 +39,12 @@ export class ThirdPartyEventManager {
 
         this._nativeBridge.Sdk.logDebug('Unity Ads third party event: sending ' + event + ' event to ' + url + ' with headers ' + headers + ' (session ' + sessionId + ')');
 
-        return Promises.withTimeout(new Promise<INativeResponse>((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = () => {
-                if (xhr.readyState === 4) {
-                    const response: INativeResponse = {
-                        url: url,
-                        responseCode: xhr.status,
-                        response: xhr.responseText,
-                        headers: []
-                    };
-                    if (xhr.status >= 200 && xhr.status <= 399) {
-                        resolve(response);
-                    } else {
-                        const error = new RequestError(`Request to ${url} returned response code ${xhr.status}`, {}, response);
-                        reject(error);
-                    }
-                }
-            };
-            xhr.open('GET', url, true);
-            xhr.send();
-        }), DefaultTrackingTimeout).catch((error) => {
+        return this._request.get(url, headers, {
+            retries: 0,
+            retryDelay: 0,
+            followRedirects: true,
+            retryWithConnectionEvents: false
+        }).catch(error => {
             const urlParts = Url.parse(url);
             if(error instanceof RequestError) {
                 error = new DiagnosticError(new Error(error.message), {
