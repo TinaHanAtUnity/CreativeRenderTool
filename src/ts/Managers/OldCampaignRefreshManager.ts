@@ -22,6 +22,12 @@ import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { JaegerSpan } from 'Jaeger/JaegerSpan';
 import { UserCountData } from 'Utilities/UserCountData';
 
+const enum MixedPlacementTypes {
+    PROMO = '-promo',
+    REWARDED = '-rewarded',
+    REWARDED_PROMO = '-rewardedpromo'
+}
+
 export class OldCampaignRefreshManager extends RefreshManager {
     private _nativeBridge: NativeBridge;
     private _wakeUpManager: WakeUpManager;
@@ -227,7 +233,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
     private onNoFill(placementId: string) {
         this._parsingErrorCount = 0;
 
-        const mixedList = ['', '-promo', '-rewarded'];
+        const mixedList = ['', MixedPlacementTypes.PROMO, MixedPlacementTypes.REWARDED];
         let shouldUpdatePlacementState = true;
         for(let i = 0; shouldUpdatePlacementState && i < mixedList.length; i++) {
             const mix = mixedList[i];
@@ -481,7 +487,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
     private createMixedPlacementSuffix(placementId: string, campaign: Campaign) {
         let str = '';
         if (this.isRewardedMixedPlacement(placementId)) {
-            str = (campaign.getAdType() === 'purchasing/iap') ? '-promo' : '-rewarded';
+            str = (campaign.getAdType() === 'purchasing/iap') ? MixedPlacementTypes.PROMO : MixedPlacementTypes.REWARDED;
             this._configuration.getPlacements()[placementId + str] = this._configuration.getPlacements()[placementId];
         }
         return str;
