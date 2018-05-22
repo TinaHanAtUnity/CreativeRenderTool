@@ -24,6 +24,7 @@ export class Overlay extends AbstractVideoOverlay {
     private _debugMessageVisible: boolean = false;
 
     private _callButtonVisible: boolean = false;
+    private _callButtonEnable: boolean = true;
 
     private _skipElement: HTMLElement;
     private _spinnerElement: HTMLElement;
@@ -162,6 +163,18 @@ export class Overlay extends AbstractVideoOverlay {
         }
     }
 
+    public setCallButtonEnable(value: boolean) {
+        this._nativeBridge.Sdk.logInfo('setCallButtonEnable -- ' + value);
+        if(this._callButtonEnable !== value) {
+            this._callButtonEnable = value;
+            if(this._callButtonEnable) {
+                this._callButtonElement.classList.remove('clicked');
+            } else {
+                this._callButtonElement.classList.add('clicked');
+            }
+        }
+    }
+
     public isMuted(): boolean {
         return this._muted;
     }
@@ -189,6 +202,9 @@ export class Overlay extends AbstractVideoOverlay {
     }
 
     private onCallButtonEvent(event: Event): void {
+        if(!this._callButtonEnable) {
+            return;
+        }
         event.preventDefault();
         event.stopPropagation();
         this.resetFadeTimer();

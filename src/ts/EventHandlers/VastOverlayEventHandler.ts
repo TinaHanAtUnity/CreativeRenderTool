@@ -8,6 +8,7 @@ import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { OverlayEventHandler } from 'EventHandlers/OverlayEventHandler';
 import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 import { MOAT } from 'Views/MOAT';
+import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
 
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _vastAdUnit: VastAdUnit;
@@ -16,6 +17,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _vastCampaign: VastCampaign;
     private _paused: boolean = false;
     private _moat?: MOAT;
+    private _vastOverlay?: AbstractVideoOverlay;
 
     constructor(nativeBridge: NativeBridge, adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
         super(nativeBridge, adUnit, parameters);
@@ -26,6 +28,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         this._vastCampaign = parameters.campaign;
         this._placement = parameters.placement;
         this._moat = MoatViewabilityService.getMoat();
+        this._vastOverlay = this._vastAdUnit.getOverlay();
     }
 
     public onOverlaySkip(position: number): void {
@@ -60,7 +63,9 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
 
     public onOverlayCallButton(): Promise<void> {
         super.onOverlayCallButton();
-
+        if(this._vastOverlay) {
+            this._vastOverlay.setCallButtonEnable(false);
+        }
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
         this._vastAdUnit.addStoredEvent(() => {
             this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId(), this._clientInfo.getSdkVersion());

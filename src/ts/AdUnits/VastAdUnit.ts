@@ -10,6 +10,7 @@ import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 import { StreamType } from 'Constants/Android/StreamType';
 import { Platform } from 'Constants/Platform';
 import { Placement } from 'Models/Placement';
+import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
 
 class DeviceOrientation {
     public static getDeviceOrientation(): Orientation {
@@ -37,6 +38,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     private _events: Array<[number, string]> = [[0.0, 'AdVideoStart'], [0.25, 'AdVideoFirstQuartile'], [0.5, 'AdVideoMidpoint'], [0.75, 'AdVideoThirdQuartile']];
     private _vastCampaign: VastCampaign;
     private _vastPlacement: Placement;
+    private _vastOverlay?: AbstractVideoOverlay;
 
     private _storedEvents: Array<() => void> = [];
 
@@ -50,6 +52,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._vastCampaign = parameters.campaign;
         this._vastPlacement = parameters.placement;
+        this._vastOverlay = parameters.overlay;
         this._moat = MoatViewabilityService.getMoat();
 
         if(this._endScreen) {
@@ -189,6 +192,11 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
                 this._moat.resume(this.getVolume());
             }
         }
+
+        if (this._vastOverlay) {
+            this._vastOverlay.setCallButtonEnable(!interruptStarted);
+        }
+
     }
 
     protected onSystemPause(): void {
