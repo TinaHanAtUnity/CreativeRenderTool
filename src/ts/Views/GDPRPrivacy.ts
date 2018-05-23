@@ -79,14 +79,15 @@ export class GDPRPrivacy extends AbstractPrivacy {
         }
 
         this._gdprConsentManager.retrievePersonalInformation().then((personalProperties) => {
-            document.getElementById('phoneType')!.innerHTML = `Using ${personalProperties.device}`;
-            document.getElementById('currentCountry')!.innerHTML = `Playing in ${personalProperties.device}`;
-            document.getElementById('gamePlaysThisWeek')!.innerHTML = `Played this game ${personalProperties.device} times this week`;
-            document.getElementById('adsSeenInGame')!.innerHTML = `Seen ${personalProperties.device} ads in this game`;
-            document.getElementById('gamesInstalledFromAds')!.innerHTML = `Installed ${personalProperties.device} games based on those ads`;
+            document.getElementById('phone-type')!.innerHTML = ` - Using ${personalProperties.device}.`;
+            document.getElementById('country')!.innerHTML = ` - Playing in ${personalProperties.country}.`;
+            document.getElementById('game-plays-this-week')!.innerHTML = ` - Played this game ${personalProperties.gamePlaysThisWeek} times this week.`;
+            document.getElementById('ads-seen-in-game')!.innerHTML = ` - Seen ${personalProperties.adsSeenInGameThisWeek} ads in this game.`;
+            document.getElementById('games-installed-from-ads')!.innerHTML = ` - Installed ${personalProperties.installsFromAds} games based on those ads.`;
         }).catch(error => {
             Diagnostics.trigger('gdpr_personal_info_failed', {});
-            document.getElementById('phoneType')!.innerHTML = `Sorry. We were unable to provide our collected information at this time.`;
+            // Reuse phoneType div for message
+            document.getElementById('sorry-message')!.innerHTML = `Sorry. We were unable to provide this rest of our collected information at this time.`;
         });
     }
 
