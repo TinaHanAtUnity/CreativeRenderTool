@@ -125,4 +125,13 @@ xdescribe('ThirdPartyEventManagerTest', () => {
         assert(requestSpy.calledOnce, 'request get should\'ve been called');
         assert.equal(requestSpy.getCall(0).args[0], 'http://foo.biz/12345/123', 'Should have replaced %SDK_VERSION% from the url');
     });
+
+    it('should replace template values given in constructor', () => {
+        const requestSpy = sinon.spy(request, 'get');
+        const urlTemplate = 'http://foo.biz/%SDK_VERSION%/123';
+        thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request, { '%SDK_VERSION%': '12345' });
+        thirdPartyEventManager.sendEvent('eventName', 'sessionId', urlTemplate);
+        assert(requestSpy.calledOnce, 'request get should\'ve been called');
+        assert.equal(requestSpy.getCall(0).args[0], 'http://foo.biz/12345/123', 'Should have replaced %SDK_VERSION% from the url');
+    });
 });
