@@ -1,3 +1,9 @@
+# Pending
+
+* GDPR popup update to match latest legal and product requirements
+* Send GDPR skip event when someone opens GDPR popup but does not change default selection
+* Prevent nulls from AdMob signals to native Storage API
+
 # Tue May 22 11:48:50 UTC 2018
 
 * Support string values in GDPR consent metadata
