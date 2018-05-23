@@ -114,7 +114,6 @@ describe('VideoEventHandlersTest', () => {
         endScreen = new PerformanceEndScreen(nativeBridge, performanceCampaign, 'en', '12345', privacy, false);
         const gdprManager = sinon.createStubInstance(GdprConsentManager);
 
-
         vastAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
