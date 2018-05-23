@@ -186,7 +186,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         }
 
         if (this._vastOverlay) {
-            this._vastOverlay.setCallButtonEnable(!interruptStarted);
+            this._vastOverlay.setCallButtonEnabled(!interruptStarted);
         }
 
     }

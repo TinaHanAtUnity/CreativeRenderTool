@@ -163,7 +163,7 @@ export class Overlay extends AbstractVideoOverlay {
         }
     }
 
-    public setCallButtonEnable(value: boolean) {
+    public setCallButtonEnabled(value: boolean) {
         if(this._callButtonEnable !== value) {
             this._callButtonEnable = value;
         }

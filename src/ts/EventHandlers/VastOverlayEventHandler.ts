@@ -64,7 +64,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     public onOverlayCallButton(): Promise<void> {
         super.onOverlayCallButton();
         if(this._vastOverlay) {
-            this._vastOverlay.setCallButtonEnable(false);
+            this._vastOverlay.setCallButtonEnabled(false);
         }
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
         this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId(), this._clientInfo.getSdkVersion());

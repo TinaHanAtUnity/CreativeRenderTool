@@ -136,7 +136,7 @@ export class ClosableVideoOverlay extends AbstractVideoOverlay {
         }
     }
 
-    public setCallButtonEnable(value: boolean) {
+    public setCallButtonEnabled(value: boolean) {
         // EMPTY
     }
 
