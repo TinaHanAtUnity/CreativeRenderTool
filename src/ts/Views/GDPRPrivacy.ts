@@ -9,16 +9,16 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 export class GDPRPrivacy extends AbstractPrivacy {
 
     private _optOutEnabled: boolean;
-    private _GdprManager: GdprManager;
+    private _gdprManager: GdprManager;
     private _isCoppaCompliant: boolean;
 
     private _dataDeletionConfirmation: boolean = false;
 
-    constructor(nativeBridge: NativeBridge, GdprManager: GdprManager, isCoppaCompliant: boolean, optOutEnabled: boolean) {
+    constructor(nativeBridge: NativeBridge, gdprManager: GdprManager, isCoppaCompliant: boolean, optOutEnabled: boolean) {
         super(nativeBridge, isCoppaCompliant, 'gdpr-privacy');
 
         this._template = new Template(GDPRPrivacyTemplate);
-        this._GdprManager = GdprManager;
+        this._gdprManager = gdprManager;
         this._isCoppaCompliant = isCoppaCompliant;
 
         this._optOutEnabled = optOutEnabled;
@@ -126,7 +126,7 @@ export class GDPRPrivacy extends AbstractPrivacy {
             document.getElementById('coppaTag2')!.innerHTML = 'These partners may collect information about your advertising ID from sources other than Unity to further personalize the ads you see. Please visit the privacy policies of these third parties to review the compiled data they may have.';
         }
 
-        this._GdprManager.retrievePersonalInformation().then((personalProperties) => {
+        this._gdprManager.retrievePersonalInformation().then((personalProperties) => {
             document.getElementById('phone-type')!.innerHTML = ` - Using ${personalProperties.deviceModel}.`;
             document.getElementById('country')!.innerHTML = ` - Playing in ${personalProperties.country}.`;
             document.getElementById('game-plays-this-week')!.innerHTML = ` - Played this game ${personalProperties.gamePlaysThisWeek} times this week.`;
