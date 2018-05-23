@@ -127,6 +127,7 @@ export class GDPRPrivacy extends AbstractPrivacy {
         }
 
         this._gdprConsentManager.retrievePersonalInformation().then((personalProperties) => {
+            document.getElementById('sorry-message')!.innerHTML = ''; // Clear sorry message on previous failed request
             document.getElementById('phone-type')!.innerHTML = ` - Using ${personalProperties.device}.`;
             document.getElementById('country')!.innerHTML = ` - Playing in ${personalProperties.country}.`;
             document.getElementById('game-plays-this-week')!.innerHTML = ` - Played this game ${personalProperties.gamePlaysThisWeek} times this week.`;
