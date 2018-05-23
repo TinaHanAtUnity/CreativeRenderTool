@@ -24,6 +24,7 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 
 import EventTestVast from 'xml/EventTestVast.xml';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
+import { GdprConsentManager } from 'Managers/GdprConsentManager';
 
 describe('VastAdUnit', () => {
 
@@ -91,6 +92,7 @@ describe('VastAdUnit', () => {
         });
 
         const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
+        const gdprManager = sinon.createStubInstance(GdprConsentManager);
 
         vastAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,
@@ -107,7 +109,8 @@ describe('VastAdUnit', () => {
             options: {},
             endScreen: undefined,
             overlay: overlay,
-            video: video
+            video: video,
+            gdprManager: gdprManager
         };
 
         vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);

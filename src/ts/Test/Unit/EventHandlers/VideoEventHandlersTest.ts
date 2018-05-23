@@ -41,6 +41,7 @@ import { XPromoVideoEventHandler } from 'EventHandlers/XPromoVideoEventHandler';
 import { VastVideoEventHandler } from 'EventHandlers/VastVideoEventHandler';
 import { AndroidVideoEventHandler } from 'EventHandlers/AndroidVideoEventHandler';
 import { Privacy } from 'Views/Privacy';
+import { GdprConsentManager } from 'Managers/GdprConsentManager';
 
 describe('VideoEventHandlersTest', () => {
 
@@ -111,6 +112,7 @@ describe('VideoEventHandlersTest', () => {
 
         const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
         endScreen = new PerformanceEndScreen(nativeBridge, performanceCampaign, 'en', '12345', privacy, false);
+        const gdprManager = sinon.createStubInstance(GdprConsentManager);
 
         vastAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,
@@ -127,7 +129,8 @@ describe('VideoEventHandlersTest', () => {
             options: {},
             endScreen: undefined,
             overlay: overlay,
-            video: video
+            video: video,
+            gdprManager: gdprManager
         };
 
         performanceAdUnitParameters = {
@@ -146,7 +149,8 @@ describe('VideoEventHandlersTest', () => {
             endScreen: endScreen,
             overlay: overlay,
             video: video,
-            privacy: privacy
+            privacy: privacy,
+            gdprManager: gdprManager
         };
 
         const xpromoPrivacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
@@ -168,7 +172,8 @@ describe('VideoEventHandlersTest', () => {
             endScreen: xPromoEndScreen,
             overlay: overlay,
             video: video,
-            privacy: privacy
+            privacy: privacy,
+            gdprManager: gdprManager
         };
 
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
