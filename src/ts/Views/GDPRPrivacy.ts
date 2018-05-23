@@ -11,7 +11,7 @@ export class GDPRPrivacy extends AbstractPrivacy {
     private _optOutEnabled: boolean;
     private _gdprConsentManager: GdprConsentManager;
     private _isCoppaCompliant: boolean;
-
+    private _personalInfoObtained: boolean = false;
     private _dataDeletionConfirmation: boolean = false;
 
     constructor(nativeBridge: NativeBridge, gdprConsentManager: GdprConsentManager, isCoppaCompliant: boolean, optOutEnabled: boolean) {
@@ -126,17 +126,20 @@ export class GDPRPrivacy extends AbstractPrivacy {
             document.getElementById('coppaTag2')!.innerHTML = 'These partners may collect information about your advertising ID from sources other than Unity to further personalize the ads you see. Please visit the privacy policies of these third parties to review the compiled data they may have.';
         }
 
-        this._gdprConsentManager.retrievePersonalInformation().then((personalProperties) => {
-            document.getElementById('sorry-message')!.innerHTML = ''; // Clear sorry message on previous failed request
-            document.getElementById('phone-type')!.innerHTML = ` - Using ${personalProperties.device}.`;
-            document.getElementById('country')!.innerHTML = ` - Playing in ${personalProperties.country}.`;
-            document.getElementById('game-plays-this-week')!.innerHTML = ` - Played this game ${personalProperties.gamePlaysThisWeek} times this week.`;
-            document.getElementById('ads-seen-in-game')!.innerHTML = ` - Seen ${personalProperties.adsSeenInGameThisWeek} ads in this game.`;
-            document.getElementById('games-installed-from-ads')!.innerHTML = ` - Installed ${personalProperties.installsFromAds} games based on those ads.`;
-        }).catch(error => {
-            Diagnostics.trigger('gdpr_personal_info_failed', error);
-            document.getElementById('sorry-message')!.innerHTML = `Sorry. We were unable to deliver our collected information at this time.`;
-        });
+        if (!this._personalInfoObtained) {
+            this._gdprConsentManager.retrievePersonalInformation().then((personalProperties) => {
+                this._personalInfoObtained = true;
+                document.getElementById('sorry-message')!.innerHTML = ''; // Clear sorry message on previous failed request
+                document.getElementById('phone-type')!.innerHTML = ` - Using ${personalProperties.device}.`;
+                document.getElementById('country')!.innerHTML = ` - Playing in ${personalProperties.country}.`;
+                document.getElementById('game-plays-this-week')!.innerHTML = ` - Played this game ${personalProperties.gamePlaysThisWeek} times this week.`;
+                document.getElementById('ads-seen-in-game')!.innerHTML = ` - Seen ${personalProperties.adsSeenInGameThisWeek} ads in this game.`;
+                document.getElementById('games-installed-from-ads')!.innerHTML = ` - Installed ${personalProperties.installsFromAds} games based on those ads.`;
+            }).catch(error => {
+                Diagnostics.trigger('gdpr_personal_info_failed', error);
+                document.getElementById('sorry-message')!.innerHTML = `Sorry. We were unable to deliver our collected information at this time.`;
+            });
+        }
     }
 
     private onLeftSideClick(event: Event): void {
