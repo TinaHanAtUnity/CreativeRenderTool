@@ -86,7 +86,7 @@ export class GDPRPrivacy extends AbstractPrivacy {
             document.getElementById('games-installed-from-ads')!.innerHTML = ` - Installed ${personalProperties.installsFromAds} games based on those ads.`;
         }).catch(error => {
             Diagnostics.trigger('gdpr_personal_info_failed', error);
-            document.getElementById('sorry-message')!.innerHTML = `Sorry. We were unable to provide this rest of our collected information at this time.`;
+            document.getElementById('sorry-message')!.innerHTML = `Sorry. We were unable to deliver our collected information at this time.`;
         });
     }
 
