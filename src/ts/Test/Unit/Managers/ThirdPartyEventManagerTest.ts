@@ -40,7 +40,7 @@ class TestRequestApi extends RequestApi {
 
 }
 
-xdescribe('ThirdPartyEventManagerTest', () => {
+describe('ThirdPartyEventManagerTest', () => {
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;

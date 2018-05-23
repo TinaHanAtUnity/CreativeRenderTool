@@ -38,8 +38,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     private _vastCampaign: VastCampaign;
     private _vastPlacement: Placement;
 
-    private _storedEvents: Array<() => void> = [];
-
     constructor(nativeBridge: NativeBridge, parameters: IVastAdUnitParameters) {
         super(nativeBridge, parameters);
         this._onPauseObserver = this._container.onAndroidPause.subscribe(() => this.onSystemPause());
@@ -77,8 +75,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         return new Promise((resolve, reject) => {
             setTimeout(resolve, 500);
         }).then(() => {
-            this._storedEvents.forEach((e) => e());
-
             const endScreen = this.getEndScreen();
             if (endScreen) {
                 endScreen.hide();
@@ -178,10 +174,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         }
     }
 
-    public addStoredEvent(e: () => void) {
-        this._storedEvents.push(e);
-    }
-
     protected onSystemInterrupt(interruptStarted: boolean): void {
         super.onSystemInterrupt(interruptStarted);
         if (this._moat) {
@@ -215,9 +207,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     private sendThirdPartyEvent(event: string, sessionId: string, sdkVersion: number, url: string): void {
         url = url.replace(/%ZONE%/, this._vastPlacement.getId());
         url = url.replace(/%SDK_VERSION%/, sdkVersion.toString());
-        this._storedEvents.push(() => {
-            this._thirdPartyEventManager.sendEvent(event, sessionId, url, this._vastCampaign.getUseWebViewUserAgentForTracking());
-        });
+        this._thirdPartyEventManager.sendEvent(event, sessionId, url, this._vastCampaign.getUseWebViewUserAgentForTracking());
     }
 
     private isValidURL(url: string | null): boolean {
