@@ -99,10 +99,20 @@ describe('PrivacyEventHandlerTest', () => {
 
         it('should send operative event with action `optin`', () => {
             (<sinon.SinonStub>adUnitParameters.configuration.isOptOutEnabled).returns(true);
+            (<sinon.SinonStub>adUnitParameters.configuration.isOptOutRecorded).returns(true);
 
             privacyEventHandler.onGDPROptOut(false);
 
             sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.operativeEventManager.sendGDPREvent, 'optin');
+        });
+
+        it('should send operative event with action `skip`', () => {
+            (<sinon.SinonStub>adUnitParameters.configuration.isOptOutEnabled).returns(true);
+            (<sinon.SinonStub>adUnitParameters.configuration.isOptOutRecorded).returns(false);
+
+            privacyEventHandler.onGDPROptOut(false);
+
+            sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.operativeEventManager.sendGDPREvent, 'skip');
         });
     });
 });

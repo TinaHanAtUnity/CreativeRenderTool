@@ -4,18 +4,24 @@ import { StorageType } from 'Native/Api/Storage';
 export class UserCountData {
 
     public static setRequestCount(requestCount: number, nativeBridge: NativeBridge): void {
-        nativeBridge.Storage.set<number>(StorageType.PRIVATE, 'user.requestCount', requestCount);
-        nativeBridge.Storage.write(StorageType.PRIVATE);
+        if (requestCount) {
+            nativeBridge.Storage.set<number>(StorageType.PRIVATE, 'user.requestCount', requestCount);
+            nativeBridge.Storage.write(StorageType.PRIVATE);
+        }
     }
 
     public static setClickCount(clickCount: number, nativeBridge: NativeBridge): void {
-        nativeBridge.Storage.set<number>(StorageType.PRIVATE, 'user.clickCount', clickCount);
-        nativeBridge.Storage.write(StorageType.PRIVATE);
+        if (clickCount) {
+            nativeBridge.Storage.set<number>(StorageType.PRIVATE, 'user.clickCount', clickCount);
+            nativeBridge.Storage.write(StorageType.PRIVATE);
+        }
     }
 
     public static setPriorRequestToReadyTime(requestToReadyTime: number, nativeBridge: NativeBridge): void {
-        nativeBridge.Storage.set<number>(StorageType.PRIVATE, 'user.requestToReadyTime', requestToReadyTime);
-        nativeBridge.Storage.write(StorageType.PRIVATE);
+        if (requestToReadyTime) {
+            nativeBridge.Storage.set<number>(StorageType.PRIVATE, 'user.requestToReadyTime', requestToReadyTime);
+            nativeBridge.Storage.write(StorageType.PRIVATE);
+        }
     }
 
     public static getRequestCount(nativeBridge: NativeBridge): Promise<number | void> {
