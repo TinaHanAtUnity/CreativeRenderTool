@@ -1,6 +1,5 @@
 import { BaseVideoEventHandler, IVideoEventHandlerParams } from 'EventHandlers/BaseVideoEventHandler';
 import { IIosVideoEventHandler } from 'Native/Api/IosVideoPlayer';
-import { VideoState } from 'AdUnits/VideoAdUnit';
 
 export class IosVideoEventHandler extends BaseVideoEventHandler implements IIosVideoEventHandler {
 
@@ -10,7 +9,7 @@ export class IosVideoEventHandler extends BaseVideoEventHandler implements IIosV
 
     public onLikelyToKeepUp(url: string, likelyToKeepUp: boolean): void {
         const container = this._adUnit.getContainer();
-        if(!container.isPaused() && (this._adUnit.getVideoState() === VideoState.PLAYING || this._adUnit.getVideoState() === VideoState.PAUSED) && likelyToKeepUp) {
+        if(!container.isPaused() && this._adUnit.canPlayVideo() && likelyToKeepUp) {
             this._nativeBridge.VideoPlayer.play();
         }
     }

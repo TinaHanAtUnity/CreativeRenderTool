@@ -110,6 +110,10 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         return this.getVideoState() !== VideoState.ERRORED && this.getVideoState() !== VideoState.COMPLETED && this.getVideoState() !== VideoState.SKIPPED;
     }
 
+    public canPlayVideo(): boolean {
+        return (this.getVideoState() === VideoState.READY || this.getVideoState() === VideoState.PLAYING || this.getVideoState() === VideoState.PAUSED);
+    }
+
     public canPrepareVideo(): boolean {
         return this.canShowVideo() && this.getVideoState() === VideoState.NOT_READY;
     }
@@ -221,12 +225,14 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
 
             case AdUnitContainerSystemMessage.AUDIO_SESSION_INTERRUPT_BEGAN:
                 if(this.isShowing() && this.isActive() && this.getVideoState() === VideoState.PLAYING) {
+                    this.setVideoState(VideoState.PAUSED);
                     this._nativeBridge.VideoPlayer.pause();
                 }
                 break;
 
             case AdUnitContainerSystemMessage.AUDIO_SESSION_INTERRUPT_ENDED || AdUnitContainerSystemMessage.AUDIO_SESSION_ROUTE_CHANGED:
-                if(this.isShowing() && this.isActive() && this.canShowVideo() && (this.getVideoState() === VideoState.READY || this.getVideoState() === VideoState.PLAYING)) {
+                if(this.isShowing() && this.isActive() && this.canPlayVideo()) {
+                    this.setVideoState(VideoState.PLAYING);
                     this._nativeBridge.VideoPlayer.play();
                 }
                 break;
