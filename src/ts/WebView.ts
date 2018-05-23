@@ -396,7 +396,10 @@ export class WebView {
                 container: this._container,
                 deviceInfo: this._deviceInfo,
                 clientInfo: this._clientInfo,
-                thirdPartyEventManager: new ThirdPartyEventManager(this._nativeBridge, this._request),
+                thirdPartyEventManager: new ThirdPartyEventManager(this._nativeBridge, this._request, {
+                    '%ZONE%': placement.getId(),
+                    '%SDK_VERSION%': this._clientInfo.getSdkVersion().toString(),
+                }),
                 operativeEventManager: OperativeEventManagerFactory.createOperativeEventManager({
                     nativeBridge: this._nativeBridge,
                     request: this._request,

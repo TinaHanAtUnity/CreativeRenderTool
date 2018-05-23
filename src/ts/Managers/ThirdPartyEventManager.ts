@@ -11,9 +11,13 @@ export class ThirdPartyEventManager {
     private _request: Request;
     private _templateValues: { [id: string]: string } = {};
 
-    constructor(nativeBridge: NativeBridge, request: Request) {
+    constructor(nativeBridge: NativeBridge, request: Request, templateValues?: { [id: string]: string }) {
         this._nativeBridge = nativeBridge;
         this._request = request;
+
+        if(templateValues) {
+            this.setTemplateValues(templateValues);
+        }
     }
 
     public clickAttributionEvent(url: string, redirects: boolean, useWebViewUA?: boolean): Promise<INativeResponse> {

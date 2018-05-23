@@ -188,8 +188,6 @@ export class AdUnitFactory {
             overlay: overlay,
         };
 
-        parameters.thirdPartyEventManager.setTemplateValues(this.getStandardThirdPartyTemplateParams(parameters));
-
         if(parameters.campaign.hasEndscreen()) {
             vastEndScreen = new VastEndScreen(nativeBridge, parameters.configuration.isCoppaCompliant(), parameters.campaign, parameters.clientInfo.getGameId());
             vastAdUnitParameters.endScreen = vastEndScreen;
@@ -259,8 +257,6 @@ export class AdUnitFactory {
             mraid = new MRAID(nativeBridge, parameters.placement, parameters.campaign, privacy);
         }
 
-        parameters.thirdPartyEventManager.setTemplateValues(this.getStandardThirdPartyTemplateParams(parameters));
-
         const mraidAdUnitParameters: IMRAIDAdUnitParameters = {
             ... parameters,
             mraid: mraid,
@@ -291,8 +287,6 @@ export class AdUnitFactory {
             closer: closer,
         };
 
-        parameters.thirdPartyEventManager.setTemplateValues(this.getStandardThirdPartyTemplateParams(parameters));
-
         if(parameters.campaign.hasEndScreen()) {
             endScreen = new VPAIDEndScreen(nativeBridge, parameters.campaign, parameters.clientInfo.getGameId());
             vpaidAdUnitParameters.endScreen = endScreen;
@@ -320,8 +314,6 @@ export class AdUnitFactory {
             view: promoView
         });
 
-        parameters.thirdPartyEventManager.setTemplateValues(this.getStandardThirdPartyTemplateParams(parameters));
-
         promoView.render();
         document.body.appendChild(promoView.container());
 
@@ -334,8 +326,6 @@ export class AdUnitFactory {
 
     private static createDisplayInterstitialAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<DisplayInterstitialCampaign>): DisplayInterstitialAdUnit {
         const view = new DisplayInterstitial(nativeBridge, parameters.placement, <DisplayInterstitialCampaign>parameters.campaign);
-
-        parameters.thirdPartyEventManager.setTemplateValues(this.getStandardThirdPartyTemplateParams(parameters));
 
         const displayInterstitialParameters: IDisplayInterstitialAdUnitParameters = {
             ... parameters,
@@ -401,8 +391,6 @@ export class AdUnitFactory {
         const view = new AdMobView(nativeBridge, parameters.adMobSignalFactory, parameters.container, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup());
         view.render();
 
-        parameters.thirdPartyEventManager.setTemplateValues(this.getStandardThirdPartyTemplateParams(parameters));
-
         const adUnitParameters: IAdMobAdUnitParameters = {
             ... parameters,
             view: view
@@ -459,13 +447,6 @@ export class AdUnitFactory {
             video: video,
             adUnitStyle: adUnitStyle,
             clientInfo: params.clientInfo
-        };
-    }
-
-    private static getStandardThirdPartyTemplateParams(parameters: IAdUnitParameters<Campaign>): { [id: string]: string } {
-        return {
-            '%ZONE%': parameters.placement.getId(),
-            '%SDK_VERSION%': parameters.clientInfo.getSdkVersion().toString(),
         };
     }
 
