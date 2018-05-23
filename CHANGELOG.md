@@ -1,4 +1,4 @@
-# Pending
+# Wed May 23 16:12:46 UTC 2018
 
 * GDPR popup update to match latest legal and product requirements
 * Send GDPR skip event when someone opens GDPR popup but does not change default selection
