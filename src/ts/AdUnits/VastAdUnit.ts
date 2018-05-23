@@ -10,7 +10,6 @@ import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 import { StreamType } from 'Constants/Android/StreamType';
 import { Platform } from 'Constants/Platform';
 import { Placement } from 'Models/Placement';
-import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
 
 class DeviceOrientation {
     public static getDeviceOrientation(): Orientation {
