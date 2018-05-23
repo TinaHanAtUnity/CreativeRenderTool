@@ -70,25 +70,28 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
 
         const clickThroughURL = this._vastAdUnit.getVideoClickThroughURL();
         if(clickThroughURL) {
-            return this._request.followRedirectChain(clickThroughURL).then((url: string) => {
-                this.openUrl(url);
-            });
+            return this._request.followRedirectChain(clickThroughURL).then(
+                (url: string) => {
+                    this.setCallButtonEnabled(true);
+                    return this.openUrl(url);
+                }
+            );
         }
         return Promise.reject(new Error('No clickThroughURL was defined'));
     }
 
-    private openUrl(url: string) {
+    private openUrl(url: string): Promise<void> {
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            this._nativeBridge.UrlScheme.open(url).then(() => this.setCallButtonEnabled(true));
+            return this._nativeBridge.UrlScheme.open(url);
         } else {
-            this._nativeBridge.Intent.launch({
+            return this._nativeBridge.Intent.launch({
                 'action': 'android.intent.action.VIEW',
                 'uri': url
-            }).then(() => this.setCallButtonEnabled(true));
+            });
         }
     }
 
-    private setCallButtonEnabled(enabled: boolean) {
+    private setCallButtonEnabled(enabled: boolean): void {
         if (this._vastOverlay) {
             this._vastOverlay.setCallButtonEnabled(enabled);
         }
