@@ -4,6 +4,7 @@ import GDPRPrivacyTemplate from 'html/GDPR-privacy.html';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
 import { Template } from 'Utilities/Template';
 import { GdprConsentManager, IGdprPersonalProperties } from 'Managers/GdprConsentManager';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class GDPRPrivacy extends AbstractPrivacy {
 
@@ -78,12 +79,15 @@ export class GDPRPrivacy extends AbstractPrivacy {
         }
 
         this._gdprConsentManager.retrievePersonalInformation().then((personalProperties) => {
-            document.getElementById('personalText')!.innerHTML = this.constructPersonalText(personalProperties);
+            document.getElementById('phoneType')!.innerHTML = `Using ${personalProperties.device}`;
+            document.getElementById('currentCountry')!.innerHTML = `Playing in ${personalProperties.device}`;
+            document.getElementById('gamePlaysThisWeek')!.innerHTML = `Played this game ${personalProperties.device} times this week`;
+            document.getElementById('adsSeenInGame')!.innerHTML = `Seen ${personalProperties.device} ads in this game`;
+            document.getElementById('gamesInstalledFromAds')!.innerHTML = `Installed ${personalProperties.device} games based on those ads`;
+        }).catch(error => {
+            Diagnostics.trigger('gdpr_personal_info_failed', {});
+            document.getElementById('phoneType')!.innerHTML = `Sorry. We were unable to provide our collected information at this time.`;
         });
-    }
-
-    private constructPersonalText(personalProperties: IGdprPersonalProperties): string {
-        return ''; // TODO format
     }
 
     private onLeftSideClick(event: Event): void {
