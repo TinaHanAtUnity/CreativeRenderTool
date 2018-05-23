@@ -26,6 +26,7 @@ import { MOAT } from 'Views/MOAT';
 import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 import { SinonSandbox } from 'sinon';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
+import { GdprConsentManager } from 'Managers/GdprConsentManager';
 
 describe('VastOverlayEventHandlersTest', () => {
     let campaign: VastCampaign;
@@ -100,6 +101,8 @@ describe('VastOverlayEventHandlersTest', () => {
             campaign: campaign
         });
 
+        const gdprManager = sinon.createStubInstance(GdprConsentManager);
+
         vastAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
@@ -115,7 +118,8 @@ describe('VastOverlayEventHandlersTest', () => {
             options: {},
             endScreen: undefined,
             overlay: overlay,
-            video: campaign.getVideo()
+            video: campaign.getVideo(),
+            gdprManager: gdprManager
         };
 
         vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
