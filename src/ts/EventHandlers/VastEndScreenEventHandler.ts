@@ -54,7 +54,7 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     }
 
     public onVastEndScreenShow(): void {
-        this._adUnit.sendCompanionTrackingEvent(this._campaign.getSession().getId(), this._clientInfo.getSdkVersion());
+        this._adUnit.sendCompanionTrackingEvent(this._campaign.getSession().getId());
     }
 
     public onEndScreenPrivacy(url: string): void {

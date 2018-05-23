@@ -14,7 +14,6 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _clientInfo: ClientInfo;
     private _request: Request;
     private _vastCampaign: VastCampaign;
-    private _paused: boolean = false;
     private _moat?: MOAT;
 
     constructor(nativeBridge: NativeBridge, adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
@@ -62,7 +61,9 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         super.onOverlayCallButton();
 
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
-        this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId());
+        this._vastAdUnit.addStoredEvent(() => {
+            this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId());
+        });
 
         const clickThroughURL = this._vastAdUnit.getVideoClickThroughURL();
         if(clickThroughURL) {

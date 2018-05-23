@@ -1,17 +1,20 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
 import { PurchasingUtilities, IPromoPayload, IPromoRequest } from 'Utilities/PurchasingUtilities';
+import { Configuration } from 'Models/Configuration';
 import { FinishState } from 'Constants/FinishState';
+import { Placement } from 'Models/Placement';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
 
 export class PromoEventHandler {
 
-    public static onClose(nativeBridge: NativeBridge, adUnit: PromoAdUnit, gamerId: string, gameId: string, abGroup: number, purchaseTrackingUrls: string[]): void {
+    public static onClose(nativeBridge: NativeBridge, adUnit: PromoAdUnit, gamerToken: string, gameId: string, abGroup: number, purchaseTrackingUrls: string[]): void {
         adUnit.setFinishState(FinishState.SKIPPED);
         adUnit.hide();
         const iapPayload: IPromoPayload = {
-            gamerId: gamerId,
+            gamerToken: gamerToken,
             iapPromo: true,
-            gameId: gameId,
+            gameId: gameId + '|' + gamerToken,
             abGroup: abGroup,
             request: IPromoRequest.CLOSE,
             purchaseTrackingUrls: purchaseTrackingUrls,

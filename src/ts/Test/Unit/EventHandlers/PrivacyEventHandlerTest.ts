@@ -92,7 +92,7 @@ describe('PrivacyEventHandlerTest', () => {
 
             privacyEventHandler.onGDPROptOut(true);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.operativeEventManager.sendGDPREvent, adUnitParameters.placement, 'optout');
+            sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.operativeEventManager.sendGDPREvent, 'optout');
         });
 
         it('should send operative event with action `optin`', () => {
@@ -100,7 +100,7 @@ describe('PrivacyEventHandlerTest', () => {
 
             privacyEventHandler.onGDPROptOut(false);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.operativeEventManager.sendGDPREvent, adUnitParameters.placement, 'optin');
+            sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.operativeEventManager.sendGDPREvent, 'optin');
         });
     });
 });

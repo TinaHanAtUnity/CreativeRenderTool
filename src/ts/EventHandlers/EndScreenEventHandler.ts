@@ -72,7 +72,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
             this._configuration.setOptOutRecorded(true);
         }
 
-        this._operativeEventManager.sendGDPREvent(this._placement, 'skip');
+        this._operativeEventManager.sendGDPREvent('skip');
     }
 
     public abstract onKeyEvent(keyCode: number): void;
@@ -128,58 +128,84 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     }
 
     private handleClickAttribution(parameters: IEndScreenDownloadParameters) {
-        const currentSession = this._campaign.getSession();
         const platform = this._nativeBridge.getPlatform();
 
-        if(parameters.clickAttributionUrlFollowsRedirects && parameters.clickAttributionUrl) {
-            this._thirdPartyEventManager.clickAttributionEvent(parameters.clickAttributionUrl, true).then(response => {
-                const location = Request.getHeader(response.headers, 'location');
-                if(location) {
-                    if(platform === Platform.ANDROID) {
-                        const parsedLocation = Url.parse(location);
-                        if(parsedLocation.pathname.match(/\.apk$/i) && this._nativeBridge.getApiLevel() >= 21) {
-                            // Using WEB_SEARCH bypasses some security check for directly downloading .apk files
-                            this._nativeBridge.Intent.launch({
-                                'action': 'android.intent.action.WEB_SEARCH',
-                                'extras': [
-                                    {
-                                        'key': 'query',
-                                        'value': location
-                                    }
-                                ]
-                            });
-                        } else {
-                            this._nativeBridge.Intent.launch({
-                                'action': 'android.intent.action.VIEW',
-                                'uri': location
-                            });
-                        }
-                    } else if(platform === Platform.IOS) {
-                        this._nativeBridge.UrlScheme.open(location);
-                    }
-                } else {
-                    Diagnostics.trigger('click_attribution_misconfigured', {
-                        url: parameters.clickAttributionUrl,
-                        followsRedirects: parameters.clickAttributionUrlFollowsRedirects,
-                        response: response
-                    });
-                }
-            }).catch(error => {
-                if(error instanceof RequestError) {
-                    error = new DiagnosticError(new Error(error.message), {
-                        request: (<RequestError>error).nativeRequest,
-                        auctionId: currentSession.getId(),
-                        url: parameters.clickAttributionUrl,
-                        response: (<RequestError>error).nativeResponse
-                    });
-                }
-                Diagnostics.trigger('click_attribution_failed', error);
-            });
+        if (parameters.clickAttributionUrlFollowsRedirects && parameters.clickAttributionUrl) {
+            const apkDownloadLink = Url.getQueryParameter(parameters.clickAttributionUrl, 'apk_download_link');
+            if (apkDownloadLink && platform === Platform.ANDROID) {
+                this.handleAPKDownloadLink(apkDownloadLink, parameters.clickAttributionUrl);
+            } else {
+                this.handleClickAttributionWithRedirects(parameters.clickAttributionUrl, parameters.clickAttributionUrlFollowsRedirects);
+            }
         } else {
             if (parameters.clickAttributionUrl) {
                 this._thirdPartyEventManager.clickAttributionEvent(parameters.clickAttributionUrl, false);
             }
         }
+    }
+
+    private handleClickAttributionWithRedirects(clickAttributionUrl: string, clickAttributionUrlFollowsRedirects: boolean) {
+        const platform = this._nativeBridge.getPlatform();
+
+        this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, true).then(response => {
+            const location = Request.getHeader(response.headers, 'location');
+            if (location) {
+                if (platform === Platform.ANDROID) {
+                    this._nativeBridge.Intent.launch({
+                        'action': 'android.intent.action.VIEW',
+                        'uri': location
+                    });
+                } else if (platform === Platform.IOS) {
+                    this._nativeBridge.UrlScheme.open(location);
+                }
+            } else {
+                Diagnostics.trigger('click_attribution_misconfigured', {
+                    url: clickAttributionUrl,
+                    followsRedirects: clickAttributionUrlFollowsRedirects,
+                    response: response
+                });
+            }
+        }).catch(error => {
+            this.triggerDiagnosticsError(error, clickAttributionUrl);
+        });
+    }
+
+    private handleAPKDownloadLink(apkDownloadLink: string, clickAttributionUrl: string) {
+        this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, false).catch(error => {
+            this.triggerDiagnosticsError(error, clickAttributionUrl);
+        });
+
+        if (this._nativeBridge.getApiLevel() >= 21) {
+            // Using WEB_SEARCH bypasses some security check for directly downloading .apk files
+            this._nativeBridge.Intent.launch({
+                'action': 'android.intent.action.WEB_SEARCH',
+                'extras': [
+                    {
+                        'key': 'query',
+                        'value': apkDownloadLink
+                    }
+                ]
+            });
+        } else {
+            this._nativeBridge.Intent.launch({
+                'action': 'android.intent.action.VIEW',
+                'uri': apkDownloadLink
+            });
+        }
+    }
+
+    private triggerDiagnosticsError(error: any, clickAttributionUrl: string) {
+        const currentSession = this._campaign.getSession();
+
+        if (error instanceof RequestError) {
+            error = new DiagnosticError(new Error(error.message), {
+                request: (<RequestError>error).nativeRequest,
+                auctionId: currentSession.getId(),
+                url: clickAttributionUrl,
+                response: (<RequestError>error).nativeResponse
+            });
+        }
+        Diagnostics.trigger('click_attribution_failed', error, currentSession);
     }
 
     private openAppStore(parameters: IEndScreenDownloadParameters, isAppSheetBroken?: boolean) {

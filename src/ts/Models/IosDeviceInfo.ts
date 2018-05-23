@@ -84,7 +84,18 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
                 ...commonDTO,
                 'screenScale': this.getScreenScale(),
                 'userInterfaceIdiom': this.getUserInterfaceIdiom(),
-                'simulator': this.isSimulator(),
+                'simulator': this.isSimulator()
+            };
+        });
+    }
+
+    public getAnonymousDTO(): Promise<any> {
+        return super.getAnonymousDTO().then((commonDTO) => {
+            return {
+                ...commonDTO,
+                'screenScale': this.getScreenScale(),
+                'userInterfaceIdiom': this.getUserInterfaceIdiom(),
+                'simulator': this.isSimulator()
             };
         });
     }
@@ -94,7 +105,16 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
             ... super.getStaticDTO(),
             'screenScale': this.getScreenScale(),
             'userInterfaceIdiom': this.getUserInterfaceIdiom(),
-            'simulator': this.isSimulator(),
+            'simulator': this.isSimulator()
+        };
+    }
+
+    public getAnonymousStaticDTO(): any {
+        return {
+            ... super.getAnonymousStaticDTO(),
+            'screenScale': this.getScreenScale(),
+            'userInterfaceIdiom': this.getUserInterfaceIdiom(),
+            'simulator': this.isSimulator()
         };
     }
 }

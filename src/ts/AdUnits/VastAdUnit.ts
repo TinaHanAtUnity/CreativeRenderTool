@@ -38,6 +38,8 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     private _vastCampaign: VastCampaign;
     private _vastPlacement: Placement;
 
+    private _storedEvents: Array<() => void> = [];
+
     constructor(nativeBridge: NativeBridge, parameters: IVastAdUnitParameters) {
         super(nativeBridge, parameters);
         this._onPauseObserver = this._container.onAndroidPause.subscribe(() => this.onSystemPause());
@@ -75,6 +77,8 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         return new Promise((resolve, reject) => {
             setTimeout(resolve, 500);
         }).then(() => {
+            this._storedEvents.forEach((e) => e());
+
             const endScreen = this.getEndScreen();
             if (endScreen) {
                 endScreen.hide();
@@ -125,7 +129,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         const trackingEventUrls = this._vastCampaign.getVast().getTrackingEventUrls(eventName);
         if (trackingEventUrls) {
             for (const url of trackingEventUrls) {
-                this._thirdPartyEventManager.sendEvent(`vast ${eventName}`, sessionId, url);
+                this.sendThirdPartyEvent(`vast ${eventName}`, sessionId, url);
             }
         }
     }
@@ -155,7 +159,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
 
         if (clickTrackingEventUrls) {
             for (const clickTrackingEventUrl of clickTrackingEventUrls) {
-                this._thirdPartyEventManager.sendEvent('vast video click', sessionId, clickTrackingEventUrl, this._vastCampaign.getUseWebViewUserAgentForTracking());
+                this.sendThirdPartyEvent('vast video click', sessionId, clickTrackingEventUrl);
             }
         }
     }
@@ -164,14 +168,18 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         return this._endScreen;
     }
 
-    public sendCompanionTrackingEvent(sessionId: string, sdkVersion: number): void {
+    public sendCompanionTrackingEvent(sessionId: string): void {
         const companion = this.getCompanionForOrientation();
         if (companion) {
             const urls = companion.getEventTrackingUrls('creativeView');
             for (const url of urls) {
-                this._thirdPartyEventManager.sendEvent('companion', sessionId, url);
+                this.sendThirdPartyEvent('companion', sessionId, url);
             }
         }
+    }
+
+    public addStoredEvent(e: () => void) {
+        this._storedEvents.push(e);
     }
 
     protected onSystemInterrupt(interruptStarted: boolean): void {
@@ -202,6 +210,12 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         } else {
             return this._vastCampaign.getVast().getPortraitOrientedCompanionAd();
         }
+    }
+
+    private sendThirdPartyEvent(event: string, sessionId: string, url: string): void {
+        this._storedEvents.push(() => {
+            this._thirdPartyEventManager.sendEvent(event, sessionId, url, this._vastCampaign.getUseWebViewUserAgentForTracking());
+        });
     }
 
     private isValidURL(url: string | null): boolean {
