@@ -38,7 +38,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     private _events: Array<[number, string]> = [[0.0, 'AdVideoStart'], [0.25, 'AdVideoFirstQuartile'], [0.5, 'AdVideoMidpoint'], [0.75, 'AdVideoThirdQuartile']];
     private _vastCampaign: VastCampaign;
     private _vastPlacement: Placement;
-    private _vastOverlay?: AbstractVideoOverlay;
 
     constructor(nativeBridge: NativeBridge, parameters: IVastAdUnitParameters) {
         super(nativeBridge, parameters);
@@ -50,7 +49,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._vastCampaign = parameters.campaign;
         this._vastPlacement = parameters.placement;
-        this._vastOverlay = parameters.overlay;
         this._moat = MoatViewabilityService.getMoat();
 
         if(this._endScreen) {
@@ -184,11 +182,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
                 this._moat.resume(this.getVolume());
             }
         }
-
-        if (this._vastOverlay) {
-            this._vastOverlay.setCallButtonEnabled(!interruptStarted);
-        }
-
     }
 
     protected onSystemPause(): void {

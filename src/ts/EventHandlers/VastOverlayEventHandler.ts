@@ -63,25 +63,34 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
 
     public onOverlayCallButton(): Promise<void> {
         super.onOverlayCallButton();
-        if(this._vastOverlay) {
-            this._vastOverlay.setCallButtonEnabled(false);
-        }
+
+        this.setCallButtonEnabled(false);
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
         this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId(), this._clientInfo.getSdkVersion());
 
         const clickThroughURL = this._vastAdUnit.getVideoClickThroughURL();
         if(clickThroughURL) {
             return this._request.followRedirectChain(clickThroughURL).then((url: string) => {
-                if(this._nativeBridge.getPlatform() === Platform.IOS) {
-                    this._nativeBridge.UrlScheme.open(url);
-                } else {
-                    this._nativeBridge.Intent.launch({
-                        'action': 'android.intent.action.VIEW',
-                        'uri': url
-                    });
-                }
+                this.openUrl(url);
             });
         }
         return Promise.reject(new Error('No clickThroughURL was defined'));
+    }
+
+    private openUrl(url: string) {
+        if (this._nativeBridge.getPlatform() === Platform.IOS) {
+            this._nativeBridge.UrlScheme.open(url).then(() => this.setCallButtonEnabled(true));
+        } else {
+            this._nativeBridge.Intent.launch({
+                'action': 'android.intent.action.VIEW',
+                'uri': url
+            }).then(() => this.setCallButtonEnabled(true));
+        }
+    }
+
+    private setCallButtonEnabled(enabled: boolean) {
+        if (this._vastOverlay) {
+            this._vastOverlay.setCallButtonEnabled(enabled);
+        }
     }
 }
