@@ -16,6 +16,14 @@
 
   #data-deletion-container {
     padding: $default-size * $default-scale-size * .75 0;
+    .page-link {
+      pointer-events: none;
+    }
+    &.active {
+      .page-link {
+        pointer-events: auto;
+      }
+    }
   }
 
   #data-deletion-container,
