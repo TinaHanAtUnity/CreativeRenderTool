@@ -56,6 +56,17 @@ export class GDPRPrivacy extends AbstractPrivacy {
         super.show();
         this.editPopupPerUser();
         this.setCardState();
+
+        const agreeRadioButton = <HTMLInputElement>this._container.querySelector('#gdpr-agree-radio');
+        agreeRadioButton.onclick = () => {
+            const confirmationContainer = <HTMLSpanElement>document.getElementById('data-deletion-container');
+            confirmationContainer.classList.remove('active');
+
+            const requestContainer = <HTMLSpanElement>document.getElementById('data-deletion-request-container');
+            requestContainer.classList.remove('active');
+
+            this._dataDeletionConfirmation = false;
+        };
     }
 
     public render(): void {
@@ -95,6 +106,9 @@ export class GDPRPrivacy extends AbstractPrivacy {
     protected onDataDeletionConfirmation(event: Event): void {
         event.preventDefault();
         this._dataDeletionConfirmation = true;
+
+        const confirmationContainer = <HTMLSpanElement>document.getElementById('data-deletion-container');
+        confirmationContainer.classList.toggle('active');
 
         const requestContainer = <HTMLSpanElement>document.getElementById('data-deletion-request-container');
         requestContainer.classList.add('active');
