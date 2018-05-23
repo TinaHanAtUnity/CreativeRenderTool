@@ -20,7 +20,6 @@ export interface IEndScreenHandler extends IGDPREventHandler {
     onKeyEvent(keyCode: number): void;
 }
 
-const IPHONE_X_STYLES_AB_GROUPS = [18, 19];
 const IPHONE_X_STYLES_ID = 'iphone-x-styles';
 
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
@@ -104,7 +103,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
         const endScreenAlt = this.getEndscreenAlt();
         if (typeof endScreenAlt === 'string') {
-            this._container.classList.add(...endScreenAlt.split(' '));
+            this._container.classList.add(endScreenAlt);
         }
 
         if (this._showGDPRBanner) {
@@ -200,7 +199,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     private useIPhoneXStyle(): boolean {
-        return IPHONE_X_STYLES_AB_GROUPS.indexOf(this._abGroup) > -1 && this.isIPhoneX();
+        return CustomFeatures.isIPhoneXStylesEnabled(this._abGroup) && this.isIPhoneX();
     }
 
     private getTemplate() {

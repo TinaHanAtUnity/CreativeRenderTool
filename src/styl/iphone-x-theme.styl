@@ -18,76 +18,8 @@ $end-screen-mixin($scale-size = $default-scale-size) {
   }
 
   body {
-    &.portrait #end-screen.iphone-x-styles {
-      .game-background-portrait-blurred {
-        display: block;
-      }
-      .game-background-landscape-blurred {
-        display: none;
-      }
-      .game-background-container {
-        width: 100%;
-        height: 50%;
-      }
-      .game-background {
-        height: 100%;
-      }
-    }
-
-    &.landscape #end-screen.iphone-x-styles {
-      .game-background-portrait-blurred {
-        display: none;
-      }
-      .game-background-landscape-blurred {
-        display: block;
-      }
-      .game-background-container {
-        width: 50%;
-        height: 100%;
-      }
-      .game-background {
-        width: 100%;
-      }
-    }
-  }
-
-  body {
-    #end-screen.iphone-x-styles {
-      .campaign-container {
-        position: relative;
-        overflow: hidden;
-      }
-
-      .game-background-blurred {
-        position: absolute;
-        display: block;
-        margin: 0;
-        width: 100%;
-        height: calc(50% + env(safe-area-inset-top));
-        // @stylint off
-        height: calc(50% + constant(safe-area-inset-top));
-        // @stylint on
-        filter: blur(5px) brightness(.8) opacity(.68);
-        transform: scale(1.4);
-        background-color: transparent;
-        background-size: cover;
-      }
-
-      .game-background-container {
-        position: relative;
-        z-index: 6;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-    }
-
     &.landscape #end-screen.iphone-x-styles,
     &.portrait #end-screen.iphone-x-styles {
-      .game-background {
-        width: 80%;
-        height: 80%;
-      }
       .end-screen-info-background {
         position: relative;
         z-index: 7;
@@ -95,33 +27,20 @@ $end-screen-mixin($scale-size = $default-scale-size) {
     }
 
     &.portrait #end-screen.iphone-x-styles {
-      .game-background-container {
-        height: calc(50% + env(safe-area-inset-top));
-        // @stylint off
-        height: calc(50% + constant(safe-area-inset-top));
-        // @stylint on
-      }
+      padding-top: constant(safe-area-inset-top);
+      // @stylint off
+      padding-top: env(safe-area-inset-top);
+      // @stylint on
+      width: 100vw;
+      height: calc(100vh - env(safe-area-inset-top));
 
+      .game-background,
       .end-screen-info-background {
-        height: calc(50% - env(safe-area-inset-top));
-        // @stylint off
-        height: calc(50% - constant(safe-area-inset-top));
-        // @stylint on
-      }
-
-      .game-background {
-        position: absolute;
-        margin-top: 9vw;
-        width: 90vw;
-        height: 90vw;
+        height: 50%;
       }
 
       .btn-close-region {
-        top: constant(safe-area-inset-top);
-        // @stylint off
-        top: env(safe-area-inset-top);
-        // @stylint on
-        padding-top: 0;
+        padding-top: 1rem;
         padding-bottom: 1rem;
         line-height: 1rem;
       }
@@ -137,42 +56,15 @@ $end-screen-mixin($scale-size = $default-scale-size) {
     }
 
     &.landscape #end-screen.iphone-x-styles {
-      .game-background-blurred {
-        width: calc(100vh + env(safe-area-inset-left));
-        // @stylint off
-        width: calc(100vh + constant(safe-area-inset-left));
-        // @stylint on
-        height: 100%;
-      }
-
-      .game-background-container {
-        width: calc(100vh + env(safe-area-inset-left));
-        // @stylint off
-        width: calc(100vh + constant(safe-area-inset-left));
-        // @stylint on
-      }
-
-      .game-background {
-        margin-left: calc(env(safe-area-inset-left) / 2);
-        // @stylint off
-        margin-left: calc(constant(safe-area-inset-left) / 2);
-        // @stylint on
-        width: 85vh;
-        height: 85vh;
-      }
+      height: 100vh;
 
       .end-screen-info-background {
         flex-grow: 1;
-        width: auto;
       }
 
       .btn-close-region {
-        right: env(safe-area-inset-right);
-        // @stylint off
-        right: constant(safe-area-inset-right);
-        // @stylint on
-        padding-right: .1rem;
-        padding-left: 1.2rem;
+        padding-right: 1rem;
+        padding-left: 1rem;
         width: auto;
       }
 
@@ -188,6 +80,32 @@ $end-screen-mixin($scale-size = $default-scale-size) {
 
       .unityads-logo {
         margin-bottom: .13rem;
+      }
+    }
+
+    &.ios-landscape-right #end-screen.iphone-x-styles {
+      padding-right: env(safe-area-inset-right);
+      width: calc(100vw - env(safe-area-inset-right));
+      // @stylint off
+      padding-right: constant(safe-area-inset-right);
+      width: calc(100vw - constant(safe-area-inset-right));
+      // @stylint on
+
+      .btn-close-region {
+        padding-right: 2rem;
+      }
+    }
+
+    &.ios-landscape-left #end-screen.iphone-x-styles {
+      padding-left: env(safe-area-inset-left);
+      width: calc(100vw - env(safe-area-inset-left));
+      // @stylint off
+      padding-left: constant(safe-area-inset-left);
+      width: calc(100vw - constant(safe-area-inset-left));
+      // @stylint on
+
+      .btn-close-region {
+        padding-right: .1rem;
       }
     }
   }
