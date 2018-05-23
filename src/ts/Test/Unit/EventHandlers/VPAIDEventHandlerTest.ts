@@ -23,6 +23,7 @@ import { UrlSchemeApi } from 'Native/Api/UrlScheme';
 import { IntentApi } from 'Native/Api/Intent';
 import { SdkApi } from 'Native/Api/Sdk';
 import { Closer } from 'Views/Closer';
+import { GdprManager } from 'Managers/GdprManager';
 
 describe('VPAIDEventHandlerTest', () => {
     let eventHandler: VPAIDEventHandler;
@@ -46,7 +47,8 @@ describe('VPAIDEventHandlerTest', () => {
             configuration: sinon.createStubInstance(Configuration),
             request: sinon.createStubInstance(Request),
             forceOrientation: Orientation.NONE,
-            options: {}
+            options: {},
+            gdprManager: sinon.createStubInstance(GdprManager)
         };
         adUnit = sinon.createStubInstance(VPAIDAdUnit);
         (<sinon.SinonStub>parameters.campaign.getSession).returns(TestFixtures.getSession());

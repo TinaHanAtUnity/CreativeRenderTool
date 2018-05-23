@@ -16,6 +16,7 @@ import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { DisplayInterstitialAdUnit, IDisplayInterstitialAdUnitParameters } from 'AdUnits/DisplayInterstitialAdUnit';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { DisplayInterstitialEventHandler } from 'EventHandlers/DisplayInterstitialEventHandler';
+import { GdprManager } from 'Managers/GdprManager';
 
 describe('DisplayInterstitialEventHandler', () => {
     let view: DisplayInterstitial;
@@ -60,6 +61,7 @@ describe('DisplayInterstitialEventHandler', () => {
             const deviceInfo = TestFixtures.getAndroidDeviceInfo();
             const thirdPartyEventManager = sinon.createStubInstance(ThirdPartyEventManager);
             operativeEventManager = sinon.createStubInstance(OperativeEventManager);
+            const gdprManager = sinon.createStubInstance(GdprManager);
 
             displayInterstitialAdUnitParameters = {
                 forceOrientation: Orientation.LANDSCAPE,
@@ -74,7 +76,8 @@ describe('DisplayInterstitialEventHandler', () => {
                 configuration: TestFixtures.getConfiguration(),
                 request: request,
                 options: {},
-                view: view
+                view: view,
+                gdprManager: gdprManager
             };
 
             displayInterstitialAdUnit = new DisplayInterstitialAdUnit(nativeBridge, displayInterstitialAdUnitParameters);

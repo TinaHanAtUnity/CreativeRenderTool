@@ -23,6 +23,7 @@ import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { GDPRPrivacy } from 'Views/GDPRPrivacy';
+import { GdprManager } from 'Managers/GdprManager';
 
 describe('MRAIDEventHandlersTest', () => {
 
@@ -43,6 +44,7 @@ describe('MRAIDEventHandlersTest', () => {
     let mraidAdUnitParameters: IMRAIDAdUnitParameters;
     let mraidEventHandler: MRAIDEventHandler;
     let mraidCampaign: MRAIDCampaign;
+    let gdprManager: GdprManager;
 
     describe('with onClick', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -79,6 +81,7 @@ describe('MRAIDEventHandlersTest', () => {
             mraidView = sinon.createStubInstance(MRAID);
             (<sinon.SinonSpy>mraidView.container).restore();
             sinon.stub(mraidView, 'container').returns(document.createElement('div'));
+            gdprManager = sinon.createStubInstance(GdprManager);
 
             mraidAdUnitParameters = {
                 forceOrientation: Orientation.LANDSCAPE,
@@ -95,7 +98,8 @@ describe('MRAIDEventHandlersTest', () => {
                 options: {},
                 mraid: mraidView,
                 endScreen: undefined,
-                privacy: new GDPRPrivacy(nativeBridge, false, true)
+                privacy: new GDPRPrivacy(nativeBridge, gdprManager, false, true),
+                gdprManager: gdprManager
             };
 
             mraidAdUnit = new MRAIDAdUnit(nativeBridge, mraidAdUnitParameters);

@@ -268,7 +268,7 @@ $full-screen-pop-up-view($scale-size, z-index = auto, $with-styles = true) {
         line-height: $pop-up-font-size * 1.5;
 
         &:last-of-type {
-          min-height: $fade-out-gradient-height * 2;
+          min-height: $fade-out-gradient-height * 3.25;
         }
       }
 
@@ -309,6 +309,11 @@ $full-screen-pop-up-view($scale-size, z-index = auto, $with-styles = true) {
         margin: $pop-up-size * .5;
         color: darken($end-screen-info-gray, 40%);
       }
+    }
+
+    .page-link {
+      color: $blue;
+      cursor: pointer;
     }
   }
 }
