@@ -14,6 +14,22 @@
     display: none;
   }
 
+  #data-deletion-container {
+    padding: $default-size * $default-scale-size * .75 0;
+  }
+
+  #data-deletion-container,
+  #data-deletion-request-container {
+    display: block;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 250ms ease-in;
+
+    &.active {
+      opacity: 1;
+    }
+  }
+
   &.flip {
     .back-side {
       display: block;
