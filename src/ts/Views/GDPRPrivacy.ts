@@ -12,6 +12,8 @@ export class GDPRPrivacy extends AbstractPrivacy {
     private _gdprConsentManager: GdprConsentManager;
     private _isCoppaCompliant: boolean;
 
+    private _dataDeletionConfirmation: boolean = false;
+
     constructor(nativeBridge: NativeBridge, gdprConsentManager: GdprConsentManager, isCoppaCompliant: boolean, optOutEnabled: boolean) {
         super(nativeBridge, isCoppaCompliant, 'gdpr-privacy');
 
@@ -36,6 +38,16 @@ export class GDPRPrivacy extends AbstractPrivacy {
                 event: 'click',
                 listener: (event: Event) => this.onCloseEvent(event),
                 selector: '.close-button'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onDataDeletion(event),
+                selector: '.data-deletion-link, .data-deletion-reject'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onDataDeletionConfirmation(event),
+                selector: '#data-deletion-confirm'
             }
         ];
     }
@@ -59,14 +71,36 @@ export class GDPRPrivacy extends AbstractPrivacy {
 
     protected onCloseEvent(event: Event): void {
         event.preventDefault();
-        const gdprRefuceRadioButton = <HTMLInputElement>this._container.querySelector('#gdpr-refuse-radio');
-        this._handlers.forEach(handler => handler.onGDPROptOut(gdprRefuceRadioButton.checked));
+        const gdprReduceRadioButton = <HTMLInputElement>this._container.querySelector('#gdpr-refuse-radio');
+        this._handlers.forEach(handler => handler.onGDPROptOut(gdprReduceRadioButton.checked || this._dataDeletionConfirmation));
         this._handlers.forEach(handler => handler.onPrivacyClose());
     }
 
     protected onPrivacyEvent(event: Event): void {
         event.preventDefault();
         this._handlers.forEach(handler => handler.onPrivacy((<HTMLLinkElement>event.target).href));
+    }
+
+    protected onDataDeletion(event: Event): void {
+        event.preventDefault();
+
+        if (this._dataDeletionConfirmation) {
+            return;
+        }
+
+        const confirmationContainer = <HTMLSpanElement>document.getElementById('data-deletion-container');
+        confirmationContainer.classList.toggle('active');
+    }
+
+    protected onDataDeletionConfirmation(event: Event): void {
+        event.preventDefault();
+        this._dataDeletionConfirmation = true;
+
+        const requestContainer = <HTMLSpanElement>document.getElementById('data-deletion-request-container');
+        requestContainer.classList.add('active');
+
+        const activeRadioButton = <HTMLInputElement>this._container.querySelector('#gdpr-refuse-radio');
+        activeRadioButton.checked = true;
     }
 
     private editPopupPerUser() {

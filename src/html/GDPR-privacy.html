@@ -31,23 +31,23 @@
         <p>
             <span id='phone-type'></span>
         </p>
-        
+
         <p>
             <span id='country'></span>
         </p>
-        
+
         <p>
             <span id='game-plays-this-week'></span>
         </p>
-        
+
         <p>
             <span id='ads-seen-in-game'></span>
         </p>
-        
+
         <p>
             <span id='games-installed-from-ads'></span>
         </p>
-        
+
         <p>
             <span id='sorry-message'></span>
         </p>
@@ -73,6 +73,18 @@
 
             You can access these options at any time by tapping the “i” icon after an ad appears.
         </p>
+
+        <p>
+            <span class="header">Data Management</span>
+
+            You can delete any data Unity has about your device by clicking <span class="data-deletion-link page-link">here</span>.
+
+            <span id="data-deletion-container">Are you sure?  <span id="data-deletion-confirm" class="page-link">Yes</span> / <span class="data-deletion-reject">No</span></span>
+            <span id="data-deletion-request-container">We have received your request and your data will be deleted in 30 days. We have also
+opted you out from personalized ads
+</span>
+        </p>
+
     </div>
     <div class="pop-up-content back-side">
         <% for (var k in data.buildInformation) { %>
@@ -82,6 +94,6 @@
     <div class="fade-out-gradient-separator"></div>
     <div class="pop-up-footer">
         <div class="left-side-link"></div>
-        <div class="close-button">Close</div>
+        <div class="close-button">Confirm</div>
     </div>
 </div>
