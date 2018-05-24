@@ -61,7 +61,7 @@ export class ConfigManager {
                             configResponse: response.response
                         });
 
-                        throw new Error('gamerId missing in PLC config');
+                        throw new Error('gamer token missing in PLC config');
                     }
                     if(!config.getDefaultPlacement()) {
                         Diagnostics.trigger('missing_default_placement', {
@@ -186,10 +186,6 @@ export class ConfigManager {
 
     private static fetchGamerToken(nativeBridge: NativeBridge): Promise<string | undefined> {
         return this.fetchValue(nativeBridge, 'gamerToken');
-    }
-
-    private static storeGamerId(nativeBridge: NativeBridge, gamerId: string): Promise<void[]> {
-        return this.storeValue(nativeBridge, 'gamerId', gamerId);
     }
 
     private static storeGamerToken(nativeBridge: NativeBridge, gamerToken: string): Promise<void[]> {
