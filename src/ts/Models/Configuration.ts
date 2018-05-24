@@ -179,7 +179,7 @@ export class Configuration extends Model<IConfiguration> {
             'country': this.getCountry(),
             'coppaCompliant': this.isCoppaCompliant(),
             'abGroup': this.getAbGroup(),
-            'gamerId': this.getGamerId(),
+            'gamerToken': this.getToken(),
             'cacheMode': CacheMode[this.getCacheMode()].toLowerCase(),
             'placements': placements,
             'defaultPlacement': defaultPlacementId,
