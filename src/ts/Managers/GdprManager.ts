@@ -17,7 +17,8 @@ export interface IGdprPersonalProperties {
 }
 export class GdprManager {
 
-    private static GDPR_LAST_VALUE_STORAGE_KEY = 'gdpr.consentlastsent';
+    private static GdprLastConsentValueStorageKey = 'gdpr.consentlastsent';
+    private static GdprConsentStorageKey = 'gdpr.consent.value';
 
     private _nativeBridge: NativeBridge;
     private _deviceInfo: DeviceInfo;
@@ -36,7 +37,7 @@ export class GdprManager {
     }
 
     public getConsent(): Promise<boolean> {
-        return this._nativeBridge.Storage.get(StorageType.PUBLIC, 'gdpr.consent.value').then((data: any) => {
+        return this._nativeBridge.Storage.get(StorageType.PUBLIC, GdprManager.GdprConsentStorageKey).then((data: any) => {
             const value: boolean | undefined = this.getConsentTypeHack(data);
             if(typeof(value) !== 'undefined') {
                 return Promise.resolve(value);
@@ -48,7 +49,7 @@ export class GdprManager {
 
     public setConsent(consent: boolean): Promise<void> {
         // get last state of gdpr consent
-        return this._nativeBridge.Storage.get(StorageType.PRIVATE, GdprManager.GDPR_LAST_VALUE_STORAGE_KEY).then((consentLastSentToKafka) => {
+        return this._nativeBridge.Storage.get(StorageType.PRIVATE, GdprManager.GdprLastConsentValueStorageKey).then((consentLastSentToKafka) => {
             // only if consent has changed push to kafka
             if (consentLastSentToKafka !== consent) {
                 return this.sendGdprEvent(consent);
@@ -115,7 +116,7 @@ export class GdprManager {
     private sendGdprEvent(consent: boolean): Promise<void> {
         const action: string = consent ? 'consent' : 'optout';
         return OperativeEventManager.sendGDPREvent(action, this._deviceInfo, this._clientInfo, this._configuration).then(() => {
-            return this._nativeBridge.Storage.set(StorageType.PRIVATE, GdprManager.GDPR_LAST_VALUE_STORAGE_KEY, consent).then(() => {
+            return this._nativeBridge.Storage.set(StorageType.PRIVATE, GdprManager.GdprLastConsentValueStorageKey, consent).then(() => {
                 return this._nativeBridge.Storage.write(StorageType.PRIVATE);
             });
         });

@@ -260,7 +260,7 @@ describe('GdprManagerTest', () => {
 
         it('should call request.get', () => {
             gdprManager.retrievePersonalInformation();
-            sinon.assert.calledWith(getRequestStub, 'https://tracking.adsx.unityads.unity3d.com/user-summary?gamerId=57a35671bb58271e002d93c9&gameId=12345&projectId=abcd-1234&storeId=xiaomi,google');
+            sinon.assert.calledWith(getRequestStub, 'https://tracking.adsx.unityads.unity3d.com/user-summary?gameId=12345&adid=12345678-9ABC-DEF0-1234-56789ABCDEF0&projectId=abcd-1234&storeId=xiaomi,google');
         });
 
         it('verify response has personal payload', () => {
@@ -277,7 +277,7 @@ describe('GdprManagerTest', () => {
                 assert.fail('Should throw error');
             }).catch((error) => {
                 assert.equal(error, 'Test Error');
-                sinon.assert.calledWith(diagnosticTriggerStub, 'gdpr_request_failed', {url: 'https://tracking.adsx.unityads.unity3d.com/user-summary?gamerId=57a35671bb58271e002d93c9&gameId=12345&projectId=abcd-1234&storeId=xiaomi,google'});
+                sinon.assert.calledWith(diagnosticTriggerStub, 'gdpr_request_failed', {url: 'https://tracking.adsx.unityads.unity3d.com/user-summary?gameId=12345&adid=12345678-9ABC-DEF0-1234-56789ABCDEF0&projectId=abcd-1234&storeId=xiaomi,google'});
             });
         });
 
