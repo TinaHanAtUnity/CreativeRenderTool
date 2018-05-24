@@ -37,15 +37,22 @@ export class PrivacyEventHandler implements IPrivacyHandler {
     }
 
     public onGDPROptOut(optOutEnabled: boolean): void {
-        if (!this._configuration.isOptOutRecorded()) {
+        if(this._configuration.isOptOutRecorded()) {
+            if(optOutEnabled !== this._configuration.isOptOutEnabled()) {
+                this._configuration.setOptOutEnabled(optOutEnabled);
+                const action: string = optOutEnabled ? 'optout' : 'optin';
+
+                this._operativeEventManager.sendGDPREvent(action);
+            }
+        } else {
             this._configuration.setOptOutRecorded(true);
-        }
-        if (optOutEnabled !== this._configuration.isOptOutEnabled()) {
             this._configuration.setOptOutEnabled(optOutEnabled);
-            const action: string = optOutEnabled ? 'optout' : 'optin';
+
+            // if default choice was not changed and no previous answer has been recorded, we must treat this event
+            // as skip because user has not pressed any button and opening the privacy dialog might have been just a misclick
+            const action: string = optOutEnabled ? 'optout' : 'skip';
 
             this._operativeEventManager.sendGDPREvent(action);
         }
-
     }
 }

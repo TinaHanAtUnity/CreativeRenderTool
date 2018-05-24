@@ -18,7 +18,8 @@ export interface IEndScreenHandler {
     onGDPRPopupSkipped(): void;
 }
 
-const GDPR_OPT_OUT_BASE  = 'gdpr-pop-up-base';
+const GDPR_OPT_OUT_BASE = 'gdpr-pop-up-base';
+const GDPR_OPT_OUT_ICON = 'gdpr-pop-up-icon';
 
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
 
@@ -64,7 +65,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             },
             {
                 event: 'click',
-                listener: (event: Event) => this.onGDPRPopupEvent(event),
+                listener: (event: Event) => this.onPrivacyEvent(event),
                 selector: '.gdpr-link'
             }
         ];
@@ -100,6 +101,16 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         const endScreenAlt = this.getEndscreenAlt();
         if (typeof endScreenAlt === 'string') {
             this._container.classList.add(endScreenAlt);
+
+            /* If pop up is visible, hide privacy button */
+            if (endScreenAlt === GDPR_OPT_OUT_BASE || endScreenAlt === GDPR_OPT_OUT_ICON) {
+                (<HTMLElement>this._container.querySelector('.privacy-button')).style.display = 'none';
+            }
+        }
+
+        /* TODO: Should go away once we finish with a/b test */
+        if (!CustomFeatures.isGDPRBaseTest(this._abGroup)) {
+            this._container.classList.add('use-gdpr-privacy-icon');
         }
     }
 
@@ -152,7 +163,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
     protected getEndscreenAlt(campaign?: Campaign) {
         if (this._showGDPRBanner) {
-            return GDPR_OPT_OUT_BASE;
+            return CustomFeatures.isGDPRBaseTest(this._abGroup) ? GDPR_OPT_OUT_BASE : GDPR_OPT_OUT_ICON;
         }
 
         return undefined;
@@ -168,13 +179,9 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     private onPrivacyEvent(event: Event): void {
         event.preventDefault();
 
-        this._privacy.show();
-    }
-
-    private onGDPRPopupEvent(event: Event) {
-        event.preventDefault();
-
-        this._gdprPopupClicked = true;
+        if (this._showGDPRBanner) {
+            this._gdprPopupClicked = true;
+        }
         this._privacy.show();
     }
 
