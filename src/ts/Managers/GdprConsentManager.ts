@@ -48,10 +48,7 @@ export class GdprConsentManager {
     }
 
     public retrievePersonalInformation(): Promise<IGdprPersonalProperties> {
-        const url = `https://tracking.adsx.unityads.unity3d.com/user-summary?gamerId=${this._configuration.getGamerId()}&gameId=${this._clientInfo.getGameId()}&projectId=${this._configuration.getUnityProjectId()}&storeId=${this._deviceInfo.getStores()}`;
-
-        // Test URL with values 10, 10 , and 8.
-        // const url = 'https://tracking.adsx.unityads.unity3d.com/user-summary?gameId=1468809&gamerId=5803c822936c882311570f92&projectId=567&storeId=google';
+        const url = `https://tracking.adsx.unityads.unity3d.com/user-summary?gameId=${this._clientInfo.getGameId()}&adid=${this._deviceInfo.getAdvertisingIdentifier()}&projectId=${this._configuration.getUnityProjectId()}&storeId=${this._deviceInfo.getStores()}`;
 
         const personalPayload = {
             device: this._deviceInfo.getModel(),
