@@ -29,6 +29,7 @@ import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { Campaign } from 'Models/Campaign';
 
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
+import { ConfigurationParser } from 'Parsers/ConfigurationParser';
 import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 import { XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
@@ -67,7 +68,7 @@ describe('AdUnitFactoryTest', () => {
         sandbox.stub(container, 'close').returns(Promise.resolve());
         sandbox.stub(container, 'open').returns(Promise.resolve());
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        config = new Configuration(JSON.parse(ConfigurationJson));
+        config = ConfigurationParser.parse(JSON.parse(ConfigurationJson));
         deviceInfo = <DeviceInfo>{getLanguage: () => 'en', getAdvertisingIdentifier: () => '000', getLimitAdTracking: () => false, getOsVersion: () => '8.0'};
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         sessionManager = new SessionManager(nativeBridge, request);

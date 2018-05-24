@@ -28,6 +28,7 @@ import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { FocusManager } from 'Managers/FocusManager';
 import { Campaign } from 'Models/Campaign';
+import { ConfigurationParser } from 'Parsers/ConfigurationParser';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
@@ -185,7 +186,7 @@ describe('CampaignRefreshManager', () => {
 
     describe('PLC campaigns', () => {
         beforeEach(() => {
-            configuration = new Configuration(JSON.parse(ConfigurationAuctionPlc));
+            configuration = ConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
             campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
             campaignRefreshManager = new OldCampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration, focusManager, sessionManager, clientInfo, request, cache);
         });
