@@ -20,6 +20,7 @@ import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
+import { GdprConsentManager } from 'Managers/GdprConsentManager';
 
 describe('DisplayInterstitialAdUnit', () => {
     let adUnit: DisplayInterstitialAdUnit;
@@ -62,6 +63,7 @@ describe('DisplayInterstitialAdUnit', () => {
             deviceInfo = TestFixtures.getAndroidDeviceInfo();
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
             sessionManager = new SessionManager(nativeBridge, request);
+            const gdprManager = sinon.createStubInstance(GdprConsentManager);
             operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
                 nativeBridge: nativeBridge,
                 request: request,
@@ -92,7 +94,8 @@ describe('DisplayInterstitialAdUnit', () => {
                 configuration: configuration,
                 request: request,
                 options: {},
-                view: view
+                view: view,
+                gdprManager: gdprManager
             };
 
             adUnit = new DisplayInterstitialAdUnit(nativeBridge, displayInterstitialAdUnitParameters);
