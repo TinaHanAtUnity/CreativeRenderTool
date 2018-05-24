@@ -1,3 +1,11 @@
+# Staged
+
+* Delete gamerId from local storage and use gamer token in config request for iOS limit ad tracking devices
+* Update GDPR flow, privacy icon and dialog
+* Fix GDPR sorry message issue
+* Fix duplicate GDPR skip event if user reviews privacy policy accessed with info button
+* Fix GDPR data deletion display bug
+
 # Wed May 23 16:12:46 UTC 2018
 
 * GDPR popup update to match latest legal and product requirements
