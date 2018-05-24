@@ -72,8 +72,9 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         if(clickThroughURL) {
             return this._request.followRedirectChain(clickThroughURL).then(
                 (url: string) => {
-                    this.setCallButtonEnabled(true);
-                    return this.openUrl(url);
+                    return this.openUrl(url).then(() => {
+                        this.setCallButtonEnabled(true);
+                    });
                 }
             );
         }
