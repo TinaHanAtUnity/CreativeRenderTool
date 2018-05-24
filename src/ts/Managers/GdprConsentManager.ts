@@ -48,11 +48,10 @@ export class GdprConsentManager {
     }
 
     public retrievePersonalInformation(): Promise<IGdprPersonalProperties> {
-        const url = `https://tracking.adsx.unityads.unity3d.com/user-summary?gamerId=${this._configuration.getGamerId()}&gameId=${this._clientInfo.getGameId()}&projectId=${this._configuration.getUnityProjectId()}&storeId=${this._deviceInfo.getStores()}`;
+        const url = `https://tracking.adsx.unityads.unity3d.com/user-summary?gameId=${this._clientInfo.getGameId()}&adid=${this._deviceInfo.getAdvertisingIdentifier()}&projectId=${this._configuration.getUnityProjectId()}&storeId=${this._deviceInfo.getStores()}`;
 
-        // Test URL with values 10, 10 , and 8.
-        // const url = 'https://tracking.adsx.unityads.unity3d.com/user-summary?gameId=1468809&gamerId=5803c822936c882311570f92&projectId=567&storeId=google';
-
+        // Test url which should respond with : {"adsSeenInGameThisWeek":27,"gamePlaysThisWeek":39,"installsFromAds":0}
+        // const url = `https://tracking.adsx.unityads.unity3d.com/user-summary?gameId=1501434&adid=BC5BAF66-713E-44A5-BE8E-56497B6B6E0A&projectId=567&storeId=google`;
         const personalPayload = {
             device: this._deviceInfo.getModel(),
             country: this._configuration.getCountry()
