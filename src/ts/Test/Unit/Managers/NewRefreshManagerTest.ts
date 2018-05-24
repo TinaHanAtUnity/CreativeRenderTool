@@ -152,7 +152,7 @@ describe('NewRefreshManagerTest', () => {
         const twoHoursInMilliseconds: number = 7200000;
         const refreshManager: NewRefreshManager = new NewRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration, focusManager, reinitManager, placementManager);
 
-        campaignManager.onAdPlanReceived.trigger(oneHourInSeconds, 1);
+        campaignManager.onAdPlanReceived.trigger(oneHourInSeconds, 1, 'test-auction-id');
 
         assert.isFalse(refreshManager.getRefillState(Date.now()).shouldRefill, 'tried to refill when valid ad plan was received');
         assert.isTrue(refreshManager.getRefillState(Date.now() + twoHoursInMilliseconds).shouldRefill, 'did not refill after ad plan expired');
@@ -165,7 +165,7 @@ describe('NewRefreshManagerTest', () => {
 
         sinon.stub(campaign, 'isExpired').returns(true);
 
-        campaignManager.onAdPlanReceived.trigger(oneHourInSeconds, 1);
+        campaignManager.onAdPlanReceived.trigger(oneHourInSeconds, 1, 'test-auction-id');
         campaignManager.onCampaign.trigger('video', campaign);
 
         assert.isTrue(refreshManager.getRefillState(Date.now()).shouldRefill, 'did not refill when there was one expired campaign');
@@ -201,7 +201,7 @@ describe('NewRefreshManagerTest', () => {
 
         const refreshManager: NewRefreshManager = new NewRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration, focusManager, reinitManager, placementManager);
 
-        campaignManager.onAdPlanReceived.trigger(oneHourInSeconds, 1);
+        campaignManager.onAdPlanReceived.trigger(oneHourInSeconds, 1, 'test-auction-id');
 
         const requestSpy = sinon.spy(campaignManager, 'request');
         const reinitSpy = sinon.spy(reinitManager, 'shouldReinitialize');
@@ -220,7 +220,7 @@ describe('NewRefreshManagerTest', () => {
         nativeBridge.Listener = new ListenerApi(nativeBridge);
         const listenerSpy = sinon.spy(nativeBridge.Listener, 'sendReadyEvent');
 
-        campaignManager.onAdPlanReceived.trigger(oneHourInSeconds, 1);
+        campaignManager.onAdPlanReceived.trigger(oneHourInSeconds, 1, 'test-auction-id');
         campaignManager.onCampaign.trigger('video', campaign);
 
         assert.isDefined(placementManager.getCampaign('video'), 'campaign was not set for correct placement');

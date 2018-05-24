@@ -12,7 +12,7 @@ import { Session } from 'Models/Session';
 import { FocusManager } from 'Managers/FocusManager';
 import { SdkStats } from 'Utilities/SdkStats';
 import { Platform } from 'Constants/Platform';
-import { RefreshManager } from 'Managers/RefreshManager';
+import { RefreshManager, INoFillRetry } from 'Managers/RefreshManager';
 import { SessionManager } from 'Managers/SessionManager';
 import { JsonParser } from 'Utilities/JsonParser';
 import { StorageType } from 'Native/Api/Storage';
@@ -71,7 +71,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
         this._campaignManager.onNoFill.subscribe((placementId) => this.onNoFill(placementId));
         this._campaignManager.onError.subscribe((error, placementIds, diagnosticsType, session) => this.onError(error, placementIds, diagnosticsType, session));
         this._campaignManager.onConnectivityError.subscribe((placementIds) => this.onConnectivityError(placementIds));
-        this._campaignManager.onAdPlanReceived.subscribe((refreshDelay, campaignCount) => this.onAdPlanReceived(refreshDelay, campaignCount));
+        this._campaignManager.onAdPlanReceived.subscribe((refreshDelay, campaignCount, auctionId) => this.onAdPlanReceived(refreshDelay, campaignCount, auctionId));
         this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
             this._focusManager.onAppForeground.subscribe(() => this.onAppForeground());
@@ -111,7 +111,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
         this._refreshAllowed = bool;
     }
 
-    public refresh(nofillRetry?: boolean): Promise<INativeResponse | void> {
+    public refresh(nofillRetry?: INoFillRetry): Promise<INativeResponse | void> {
         if(!this._refreshAllowed) {
             return Promise.resolve();
         }
@@ -289,7 +289,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
         }
     }
 
-    private onAdPlanReceived(refreshDelay: number, campaignCount: number) {
+    private onAdPlanReceived(refreshDelay: number, campaignCount: number, auctionId: string) {
         this._campaignCount = campaignCount;
 
         if(campaignCount === 0) {
@@ -310,7 +310,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
                 delay = delay + Math.random() * 10; // add 0-10 second random delay
                 this._nativeBridge.Sdk.logDebug('Unity Ads ad plan will be refreshed in ' + delay + ' seconds');
                 setTimeout(() => {
-                    this.refresh(true);
+                    this.refresh({auctionId: auctionId});
                 }, delay * 1000);
                 return;
             }
