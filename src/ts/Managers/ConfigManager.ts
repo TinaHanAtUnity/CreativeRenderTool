@@ -32,7 +32,11 @@ export class ConfigManager {
                 // only use stored gamerId for iOS when ad tracking is limited
                 gamerToken = storedGamerToken;
                 gamerId = storedGamerId;
+            } else if(storedGamerToken) {
+                // delete saved token from all other devices, for example when user has toggled limit ad tracking flag to false
+                ConfigManager.deleteGamerToken(nativeBridge);
             }
+
             if(storedGamerId) {
                 ConfigManager.deleteGamerId(nativeBridge);
             }
@@ -194,5 +198,9 @@ export class ConfigManager {
 
     private static deleteGamerId(nativeBridge: NativeBridge): Promise<void[]> {
         return this.deleteValue(nativeBridge, 'gamerId');
+    }
+
+    private static deleteGamerToken(nativeBridge: NativeBridge): Promise<void[]> {
+        return this.deleteValue(nativeBridge, 'gamerToken');
     }
 }
