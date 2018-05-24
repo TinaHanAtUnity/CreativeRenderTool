@@ -22,6 +22,17 @@ describe('GdprManagerTest', () => {
     let gdprManager: GdprManager;
     let request: Request;
 
+    let onSetStub: sinon.SinonStub;
+    let getStub: sinon.SinonStub;
+    let setStub: sinon.SinonStub;
+    let writeStub: sinon.SinonStub;
+    let sendGDPREventStub: sinon.SinonStub;
+    let setConsentSpy: sinon.SinonSpy;
+
+    let consentlastsent: boolean = false;
+    let consent: any = false;
+    let storageTrigger: (eventType: string, data: any) => void;
+
     beforeEach(() => {
         nativeBridge = TestFixtures.getNativeBridge();
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
@@ -29,334 +40,230 @@ describe('GdprManagerTest', () => {
         configuration = TestFixtures.getConfiguration();
         request = sinon.createStubInstance(Request);
 
-        configuration.setGDPREnabled(false);
-        configuration.setOptOutEnabled(false);
-        configuration.setOptOutRecorded(false);
-    });
+        onSetStub = sinon.stub(nativeBridge.Storage.onSet, 'subscribe');
+        getStub = sinon.stub(nativeBridge.Storage, 'get');
+        setStub = sinon.stub(nativeBridge.Storage, 'set').resolves();
+        writeStub = sinon.stub(nativeBridge.Storage, 'write').resolves();
+        sendGDPREventStub = sinon.stub(OperativeEventManager, 'sendGDPREvent').resolves();
 
-    it('should accept boolean true for metadata value', () => {
-        sinon.stub(nativeBridge.Storage, 'get').withArgs(StorageType.PUBLIC, 'gdpr.consent.value').returns(Promise.resolve(true));
-
+        getStub.withArgs(StorageType.PRIVATE, 'gdpr.consentlastsent').callsFake(() => {
+            return Promise.resolve(consentlastsent);
+        });
+        getStub.withArgs(StorageType.PUBLIC, 'gdpr.consent.value').callsFake(() => {
+            return Promise.resolve(consent);
+        });
+        onSetStub.callsFake((fun) => {
+            storageTrigger = fun;
+        });
         gdprManager = new GdprManager(nativeBridge, deviceInfo, clientInfo, configuration, request);
-
-        return gdprManager.fetch().then(() => {
-            assert.isTrue(configuration.isGDPREnabled(), 'GDPR was not enabled when consent metadata was set to boolean true');
-            assert.isFalse(configuration.isOptOutEnabled(), 'GDPR opt-out was set to true when consent metadata was set to boolean true');
-            assert.isTrue(configuration.isOptOutRecorded(), 'GDPR opt-out recorded was set to false when consent metadata was set to boolean true');
-        });
+        setConsentSpy = sinon.spy(gdprManager, 'setConsent');
     });
 
-    it('should accept boolean false for metadata value', () => {
-        sinon.stub(nativeBridge.Storage, 'get').withArgs(StorageType.PUBLIC, 'gdpr.consent.value').returns(Promise.resolve(false));
-
-        gdprManager = new GdprManager(nativeBridge, deviceInfo, clientInfo, configuration, request);
-
-        return gdprManager.fetch().then(() => {
-            assert.isTrue(configuration.isGDPREnabled(), 'GDPR was not enabled when consent metadata was set to boolean false');
-            assert.isTrue(configuration.isOptOutEnabled(), 'GDPR opt-out was set to false when consent metadata was set to boolean false');
-            assert.isTrue(configuration.isOptOutRecorded(), 'GDPR opt-out recorded was set to false when consent metadata was set to boolean false');
-        });
+    afterEach(() => {
+        onSetStub.restore();
+        getStub.restore();
+        setStub.restore();
+        writeStub.restore();
+        sendGDPREventStub.restore();
+        setConsentSpy.restore();
+        consentlastsent = false;
+        consent = false;
     });
 
-    it('should accept string true for metadata value', () => {
-        sinon.stub(nativeBridge.Storage, 'get').withArgs(StorageType.PUBLIC, 'gdpr.consent.value').returns(Promise.resolve('true'));
-
-        gdprManager = new GdprManager(nativeBridge, deviceInfo, clientInfo, configuration, request);
-
-        return gdprManager.fetch().then(() => {
-            assert.isTrue(configuration.isGDPREnabled(), 'GDPR was not enabled when consent metadata was set to string true');
-            assert.isFalse(configuration.isOptOutEnabled(), 'GDPR opt-out was set to true when consent metadata was set to string true');
-            assert.isTrue(configuration.isOptOutRecorded(), 'GDPR opt-out recorded was set to false when consent metadata was set to string true');
-        });
+    it('should subscribe to Storage.onSet', () => {
+        sinon.assert.calledOnce(onSetStub);
     });
 
-    it('should accept string false for metadata value', () => {
-        sinon.stub(nativeBridge.Storage, 'get').withArgs(StorageType.PUBLIC, 'gdpr.consent.value').returns(Promise.resolve('false'));
-
-        gdprManager = new GdprManager(nativeBridge, deviceInfo, clientInfo, configuration, request);
-
-        return gdprManager.fetch().then(() => {
-            assert.isTrue(configuration.isGDPREnabled(), 'GDPR was not enabled when consent metadata was set to string false');
-            assert.isTrue(configuration.isOptOutEnabled(), 'GDPR opt-out was set to false when consent metadata was set to string false');
-            assert.isTrue(configuration.isOptOutRecorded(), 'GDPR opt-out recorded was set to false when consent metadata was set to string false');
-        });
-    });
-
-    it('should not accept random string for metadata value', () => {
-        sinon.stub(nativeBridge.Storage, 'get').withArgs(StorageType.PUBLIC, 'gdpr.consent.value').returns(Promise.resolve('test'));
-
-        gdprManager = new GdprManager(nativeBridge, deviceInfo, clientInfo, configuration, request);
-
-        return gdprManager.fetch().then(() => {
-            assert.isFalse(configuration.isGDPREnabled(), 'GDPR was enabled when consent metadata was set to random string');
-            assert.isFalse(configuration.isOptOutEnabled(), 'GDPR opt-out was set to true when consent metadata was set to random string');
-            assert.isFalse(configuration.isOptOutRecorded(), 'GDPR opt-out recorded was set to true when consent metadata was set to random string');
-        });
-    });
-
-    describe('initialization', () => {
-        let onSetStub: sinon.SinonStub;
-        let getStub: sinon.SinonStub;
-        let setStub: sinon.SinonStub;
-        let writeStub: sinon.SinonStub;
-        let sendGDPREventStub: sinon.SinonStub;
-
-        let consentlastsent: boolean = false;
-        let consent: boolean | undefined = false;
-        let finishedPromise: Promise<void>;
-
-        beforeEach(() => {
-            onSetStub = sinon.stub(nativeBridge.Storage.onSet, 'subscribe');
-            getStub = sinon.stub(nativeBridge.Storage, 'get');
-            setStub = sinon.stub(nativeBridge.Storage, 'set');
-            writeStub = sinon.stub(nativeBridge.Storage, 'write');
-            sendGDPREventStub = sinon.stub(OperativeEventManager, 'sendGDPREvent').resolves();
-
-            getStub.withArgs(StorageType.PRIVATE, 'gdpr.consentlastsent').callsFake(() => {
-                return Promise.resolve(consentlastsent);
-            });
-            getStub.withArgs(StorageType.PUBLIC, 'gdpr.consent.value').callsFake(() => {
-                return Promise.resolve(consent);
-            });
-            finishedPromise = new Promise((resolve, reject) => {
-                onSetStub.callsFake((fun) => {
-                    const funPromise = fun('', {gdpr: {consent: {value: consent}}});
-                    resolve(funPromise);
-                });
-            });
-        });
-
-        afterEach(() => {
-            onSetStub.restore();
-            getStub.restore();
-            setStub.restore();
-            writeStub.restore();
-            sendGDPREventStub.restore();
-            consentlastsent = false;
-            consent = false;
-        });
-
-        it('should subscribe to Storage.onSet', () => {
-            gdprManager = new GdprManager(nativeBridge, deviceInfo, clientInfo, configuration, request);
-
+    it('subscribe should send gdpr action consent when true', () => {
+        consentlastsent = false;
+        storageTrigger('', {gdpr: {consent: {value: true}}});
+        const setConsentPromise = <Promise<void>>setConsentSpy.firstCall.returnValue;
+        return setConsentPromise.then(() => {
             sinon.assert.calledOnce(onSetStub);
+            sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
+            sinon.assert.calledWith(sendGDPREventStub, 'consent');
+            sinon.assert.calledWith(setStub, StorageType.PRIVATE, 'gdpr.consentlastsent', true);
+            sinon.assert.calledWith(writeStub, StorageType.PRIVATE);
         });
+    });
 
-        it('should send gdpr action consent when true', () => {
-            consent = true;
-
-            gdprManager = new GdprManager(nativeBridge, deviceInfo, clientInfo, configuration, request);
-
-            if (finishedPromise) {
-                return finishedPromise.then(() => {
-                    sinon.assert.calledOnce(onSetStub);
-                    sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
-                    sinon.assert.calledWith(sendGDPREventStub, 'consent');
-                    sinon.assert.calledWith(setStub, StorageType.PRIVATE, 'gdpr.consentlastsent', true);
-                    sinon.assert.calledWith(writeStub, StorageType.PRIVATE);
-                });
-            } else {
-                assert.fail();
-            }
+    it('subscribe should send gdpr action optout when false', () => {
+        consentlastsent = true;
+        storageTrigger('', {gdpr: {consent: {value: false}}});
+        const setConsentPromise = <Promise<void>>setConsentSpy.firstCall.returnValue;
+        return setConsentPromise.then(() => {
+            sinon.assert.calledOnce(onSetStub);
+            sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
+            sinon.assert.calledWith(sendGDPREventStub, 'optout');
+            sinon.assert.calledWith(setStub, StorageType.PRIVATE, 'gdpr.consentlastsent', false);
+            sinon.assert.calledWith(writeStub, StorageType.PRIVATE);
         });
+    });
 
-        it('should send gdpr action optout when false', () => {
-            consent = false;
-            consentlastsent = true;
+    it('subscribe should not send gdpr action consent when consent is undefined', () => {
+        storageTrigger('', {});
+        sinon.assert.calledOnce(onSetStub);
+        sinon.assert.notCalled(setConsentSpy);
+        sinon.assert.notCalled(getStub);
+        sinon.assert.notCalled(sendGDPREventStub);
+        sinon.assert.notCalled(setStub);
+        sinon.assert.notCalled(writeStub);
+    });
 
-            gdprManager = new GdprManager(nativeBridge, deviceInfo, clientInfo, configuration, request);
-
-            if (finishedPromise) {
-                return finishedPromise.then(() => {
-                    sinon.assert.calledOnce(onSetStub);
-                    sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
-                    sinon.assert.calledWith(sendGDPREventStub, 'optout');
-                    sinon.assert.calledWith(setStub, StorageType.PRIVATE, 'gdpr.consentlastsent', false);
-                    sinon.assert.calledWith(writeStub, StorageType.PRIVATE);
-                });
-            } else {
-                assert.fail();
-            }
+    it('subscribe should not send gdpr action when consent has not changed and is false', () => {
+        consentlastsent = false;
+        storageTrigger('', {gdpr: {consent: {value: false}}});
+        const setConsentPromise = <Promise<void>>setConsentSpy.firstCall.returnValue;
+        return setConsentPromise.then(() => {
+            sinon.assert.calledOnce(onSetStub);
+            sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
+            sinon.assert.notCalled(sendGDPREventStub);
+            sinon.assert.notCalled(setStub);
+            sinon.assert.notCalled(writeStub);
         });
+    });
 
-        it('should not send gdpr action consent when consent is undefined', () => {
-            consent = undefined;
-
-            gdprManager = new GdprManager(nativeBridge, deviceInfo, clientInfo, configuration, request);
-
-            if (finishedPromise) {
-                return finishedPromise.then(() => {
-                    sinon.assert.calledOnce(onSetStub);
-                    sinon.assert.notCalled(getStub);
-                    sinon.assert.notCalled(sendGDPREventStub);
-                    sinon.assert.notCalled(setStub);
-                    sinon.assert.notCalled(writeStub);
-                });
-            } else {
-                assert.fail();
-            }
+    it('subscribe should not send gdpr action when consent has not changed and is true', () => {
+        consentlastsent = true;
+        storageTrigger('', {gdpr: {consent: {value: true}}});
+        const setConsentPromise = <Promise<void>> setConsentSpy.firstCall.returnValue;
+        return setConsentPromise.then(() => {
+            sinon.assert.calledOnce(onSetStub);
+            sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
+            sinon.assert.notCalled(sendGDPREventStub);
+            sinon.assert.notCalled(setStub);
+            sinon.assert.notCalled(writeStub);
         });
+    });
 
-        it('should not send gdpr action when consent has not changed and is false', () => {
-            consent = false;
-            consentlastsent = false;
-            gdprManager = new GdprManager(nativeBridge, deviceInfo, clientInfo, configuration, request);
-
-            if (finishedPromise) {
-                return finishedPromise.then(() => {
-                    sinon.assert.calledOnce(onSetStub);
-                    sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
-                    sinon.assert.notCalled(sendGDPREventStub);
-                    sinon.assert.notCalled(setStub);
-                    sinon.assert.notCalled(writeStub);
-                });
-            } else {
-                assert.fail();
-            }
+    it('getConsent should call storage get with true', () => {
+        consent = true;
+        return gdprManager.getConsent().then((consentValue) => {
+            sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'gdpr.consent.value');
+            assert.equal(consentValue, consent);
         });
+    });
 
-        it('should not send gdpr action when consent has not changed and is true', () => {
-            consent = true;
-            consentlastsent = true;
-            gdprManager = new GdprManager(nativeBridge, deviceInfo, clientInfo, configuration, request);
-
-            if (finishedPromise) {
-                return finishedPromise.then(() => {
-                    sinon.assert.calledOnce(onSetStub);
-                    sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
-                    sinon.assert.notCalled(sendGDPREventStub);
-                    sinon.assert.notCalled(setStub);
-                    sinon.assert.notCalled(writeStub);
-                });
-            } else {
-                assert.fail();
-            }
+    it('getConsent should call storage get with false', () => {
+        consent = false;
+        return gdprManager.getConsent().then((consentValue) => {
+            sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'gdpr.consent.value');
+            assert.equal(consentValue, consent);
         });
+    });
 
-        it('should call setConsent when fetch is called with consent true', () => {
-            consent = true;
-            consentlastsent = false;
-            onSetStub.restore(); // prevent onSet
-            gdprManager = new GdprManager(nativeBridge, deviceInfo, clientInfo, configuration, request);
-            const setConsentSpy = sinon.spy((<any>gdprManager), 'setConsent');
-            return gdprManager.fetch().then(() => {
-                const setConsentPromise: Promise<any> = setConsentSpy.returnValues[0];
-                return setConsentPromise;
-            }).then(() => {
-                sinon.assert.notCalled(onSetStub);
-                sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'gdpr.consent.value');
-                sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
-                sinon.assert.calledWith(sendGDPREventStub, 'consent');
-                sinon.assert.calledWith(setStub, StorageType.PRIVATE, 'gdpr.consentlastsent', true);
-                sinon.assert.calledWith(writeStub, StorageType.PRIVATE);
-            });
+    it('getConsent should call storage get with "true"', () => {
+        consent = 'true';
+        return gdprManager.getConsent().then((consentValue) => {
+            sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'gdpr.consent.value');
+            assert.equal(consentValue, true);
         });
+    });
 
-        it('should call setConsent when fetch is called with consent false', () => {
-            consent = false;
-            consentlastsent = true;
-            onSetStub.restore(); // prevent onSet
-
-            gdprManager = new GdprManager(nativeBridge, deviceInfo, clientInfo, configuration, request);
-            const setConsentSpy = sinon.spy((<any>gdprManager), 'setConsent');
-            return gdprManager.fetch().then(() => {
-                const setConsentPromise: Promise<any> = setConsentSpy.returnValues[0];
-                return setConsentPromise;
-            }).then(() => {
-                sinon.assert.notCalled(onSetStub);
-                sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'gdpr.consent.value');
-                sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
-                sinon.assert.calledWith(sendGDPREventStub, 'optout');
-                sinon.assert.calledWith(setStub, StorageType.PRIVATE, 'gdpr.consentlastsent', false);
-                sinon.assert.calledWith(writeStub, StorageType.PRIVATE);
-            });
+    it('getConsent should call storage get with "false"', () => {
+        consent = 'false';
+        return gdprManager.getConsent().then((consentValue) => {
+            sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'gdpr.consent.value');
+            assert.equal(consentValue, false);
         });
+    });
 
-        it('fetch should not send gdpr action when consent has not changed and is true', () => {
-            consent = true;
-            consentlastsent = true;
-            onSetStub.restore(); // prevent onSet
-            gdprManager = new GdprManager(nativeBridge, deviceInfo, clientInfo, configuration, request);
-            const setConsentSpy = sinon.spy((<any>gdprManager), 'setConsent');
-            return gdprManager.fetch().then(() => {
-                const setConsentPromise: Promise<any> = setConsentSpy.returnValues[0];
-                return setConsentPromise;
-            }).then(() => {
-                sinon.assert.notCalled(onSetStub);
-                sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'gdpr.consent.value');
-                sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
-                sinon.assert.notCalled(sendGDPREventStub);
-                sinon.assert.notCalled(setStub);
-                sinon.assert.notCalled(writeStub);
-            });
+    it('getConsent should call storage get with undefined', () => {
+        consent = undefined;
+        return gdprManager.getConsent().then(() => {
+            assert.fail('Should throw');
+        }).catch((error) => {
+            sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'gdpr.consent.value');
         });
+    });
 
-        it('fetch should not send gdpr action when consent has not changed and is false', () => {
-            consent = false;
-            consentlastsent = false;
-            onSetStub.restore(); // prevent onSet
-            gdprManager = new GdprManager(nativeBridge, deviceInfo, clientInfo, configuration, request);
-            const setConsentSpy = sinon.spy((<any>gdprManager), 'setConsent');
-            return gdprManager.fetch().then(() => {
-                const setConsentPromise: Promise<any> = setConsentSpy.returnValues[0];
-                return setConsentPromise;
-            }).then(() => {
-                sinon.assert.notCalled(onSetStub);
-                sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'gdpr.consent.value');
-                sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
-                sinon.assert.notCalled(sendGDPREventStub);
-                sinon.assert.notCalled(setStub);
-                sinon.assert.notCalled(writeStub);
-            });
+    it('setConsent with consent true', () => {
+        consentlastsent = false;
+        return gdprManager.setConsent(true).then(() => {
+            sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
+            sinon.assert.calledWith(sendGDPREventStub, 'consent');
+            sinon.assert.calledWith(setStub, StorageType.PRIVATE, 'gdpr.consentlastsent', true);
+            sinon.assert.calledWith(writeStub, StorageType.PRIVATE);
         });
+    });
 
-        it('fetch should not send gdpr action when consent is undefined', () => {
-            consent = undefined;
-            onSetStub.restore(); // prevent onSet
-            gdprManager = new GdprManager(nativeBridge, deviceInfo, clientInfo, configuration, request);
-            const setConsentSpy = sinon.spy((<any>gdprManager), 'setConsent');
-            return gdprManager.fetch().then(() => {
-                const setConsentPromise: Promise<any> = setConsentSpy.returnValues[0];
-                return setConsentPromise;
-            }).then(() => {
-                sinon.assert.notCalled(onSetStub);
-                sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'gdpr.consent.value');
-                sinon.assert.calledOnce(getStub);
-                sinon.assert.notCalled(sendGDPREventStub);
-                sinon.assert.notCalled(setStub);
-                sinon.assert.notCalled(writeStub);
-            });
+    it('setConsent with consent false', () => {
+        consentlastsent = true;
+        return gdprManager.setConsent(false).then(() => {
+            sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
+            sinon.assert.calledWith(sendGDPREventStub, 'optout');
+            sinon.assert.calledWith(setStub, StorageType.PRIVATE, 'gdpr.consentlastsent', false);
+            sinon.assert.calledWith(writeStub, StorageType.PRIVATE);
         });
+    });
 
+    it('setConsent with consent true and last consent true', () => {
+        consentlastsent = true;
+        return gdprManager.setConsent(true).then(() => {
+            sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
+            sinon.assert.notCalled(sendGDPREventStub);
+            sinon.assert.notCalled(setStub);
+            sinon.assert.notCalled(writeStub);
+        });
+    });
+
+    it('setConsent with consent false and last consent false', () => {
+        consentlastsent = false;
+        return gdprManager.setConsent(false).then(() => {
+            sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
+            sinon.assert.notCalled(sendGDPREventStub);
+            sinon.assert.notCalled(setStub);
+            sinon.assert.notCalled(writeStub);
+        });
+    });
+
+    it('setConsent with consent true and no last consent', () => {
+        getStub.withArgs(StorageType.PRIVATE, 'gdpr.consentlastsent').reset();
+        getStub.withArgs(StorageType.PRIVATE, 'gdpr.consentlastsent').rejects('test error');
+        return gdprManager.setConsent(true).then(() => {
+            sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
+            sinon.assert.calledWith(sendGDPREventStub, 'consent');
+            sinon.assert.calledWith(setStub, StorageType.PRIVATE, 'gdpr.consentlastsent', true);
+            sinon.assert.calledWith(writeStub, StorageType.PRIVATE);
+        });
+    });
+
+    it('setConsent with consent false and no last consent', () => {
+        getStub.withArgs(StorageType.PRIVATE, 'gdpr.consentlastsent').reset();
+        getStub.withArgs(StorageType.PRIVATE, 'gdpr.consentlastsent').rejects('test error');
+        return gdprManager.setConsent(false).then(() => {
+            sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
+            sinon.assert.calledWith(sendGDPREventStub, 'optout');
+            sinon.assert.calledWith(setStub, StorageType.PRIVATE, 'gdpr.consentlastsent', false);
+            sinon.assert.calledWith(writeStub, StorageType.PRIVATE);
+        });
     });
 
     describe('Fetch personal information', () => {
 
-        let getStub: sinon.SinonStub;
+        let getRequestStub: sinon.SinonStub;
         let diagnosticTriggerStub: sinon.SinonStub;
         let logErrorStub: sinon.SinonStub;
 
         beforeEach(() => {
-            getStub = <sinon.SinonStub>request.get;
-            getStub.resolves({response: '{}'});
+            getRequestStub = <sinon.SinonStub>request.get;
+            getRequestStub.resolves({response: '{}'});
             diagnosticTriggerStub = sinon.stub(Diagnostics, 'trigger');
             logErrorStub = sinon.stub(nativeBridge.Sdk, 'logError');
         });
 
         afterEach(() => {
-            getStub.reset();
+            getRequestStub.reset();
             diagnosticTriggerStub.restore();
             logErrorStub.restore();
         });
 
         it('should call request.get', () => {
-            gdprManager = new GdprManager(nativeBridge, deviceInfo, clientInfo, configuration, request);
             gdprManager.retrievePersonalInformation();
-            sinon.assert.calledWith(getStub, 'https://tracking.adsx.unityads.unity3d.com/user-summary?gamerId=57a35671bb58271e002d93c9&gameId=12345&projectId=abcd-1234&storeId=xiaomi,google');
+            sinon.assert.calledWith(getRequestStub, 'https://tracking.adsx.unityads.unity3d.com/user-summary?gamerId=57a35671bb58271e002d93c9&gameId=12345&projectId=abcd-1234&storeId=xiaomi,google');
         });
 
         it('verify response has personal payload', () => {
-            gdprManager = new GdprManager(nativeBridge, deviceInfo, clientInfo, configuration, request);
             return gdprManager.retrievePersonalInformation().then((response) => {
                 assert.equal(response.deviceModel, 'TestModel');
                 assert.equal(response.country, 'FI');
@@ -364,9 +271,8 @@ describe('GdprManagerTest', () => {
         });
 
         it('should call diagnostics on error', () => {
-            getStub.reset();
-            getStub.rejects('Test Error');
-            gdprManager = new GdprManager(nativeBridge, deviceInfo, clientInfo, configuration, request);
+            getRequestStub.reset();
+            getRequestStub.rejects('Test Error');
             return gdprManager.retrievePersonalInformation().then(() => {
                 assert.fail('Should throw error');
             }).catch((error) => {
@@ -376,9 +282,8 @@ describe('GdprManagerTest', () => {
         });
 
         it('should call logError on error', () => {
-            getStub.reset();
-            getStub.rejects('Test Error');
-            gdprManager = new GdprManager(nativeBridge, deviceInfo, clientInfo, configuration, request);
+            getRequestStub.reset();
+            getRequestStub.rejects('Test Error');
             return gdprManager.retrievePersonalInformation().then(() => {
                 assert.fail('Should throw error');
             }).catch((error) => {

@@ -32,23 +32,32 @@ export class GdprManager {
         this._configuration = configuration;
         this._request = request;
 
-        this._nativeBridge.Storage.onSet.subscribe((eventType, data) => {
-            return this.onStorageSet(eventType, data).catch((error) => {
-                // do nothing
-            });
-        });
+        this._nativeBridge.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, data));
     }
 
-    public fetch(): Promise<void> {
+    public getConsent(): Promise<boolean> {
         return this._nativeBridge.Storage.get(StorageType.PUBLIC, 'gdpr.consent.value').then((data: any) => {
             const value: boolean | undefined = this.getConsentTypeHack(data);
             if(typeof(value) !== 'undefined') {
-                // don't want to return promise because that will add time to init
-                this.setConsent(value);
+                return Promise.resolve(value);
+            } else {
+                throw new Error('gdpr.consent.value is undefined');
+            }
+        });
+    }
+
+    public setConsent(consent: boolean): Promise<void> {
+        // get last state of gdpr consent
+        return this._nativeBridge.Storage.get(StorageType.PRIVATE, GdprManager.GDPR_LAST_VALUE_STORAGE_KEY).then((consentLastSentToKafka) => {
+            // only if consent has changed push to kafka
+            if (consentLastSentToKafka !== consent) {
+                return this.sendGdprEvent(consent);
             }
         }).catch((error) => {
-            // do nothing
-            // error happens when value not found
+            // there has not been last state of consent
+            // IE this is the first consent value we have seen
+            // and should push this to kafka
+            return this.sendGdprEvent(consent);
         });
     }
 
@@ -77,15 +86,14 @@ export class GdprManager {
         });
     }
 
-    private onStorageSet(eventType: string, data: any): Promise<any> {
+    private onStorageSet(eventType: string, data: any) {
         if(data && data.gdpr && data.gdpr.consent) {
             const value: boolean | undefined = this.getConsentTypeHack(data.gdpr.consent.value);
 
             if(typeof(value) !== 'undefined') {
-                return this.setConsent(value);
+                this.setConsent(value);
             }
         }
-        return Promise.resolve();
     }
 
     // Android C# layer will map boolean values to Java primitive boolean types and causes reflection failure
@@ -105,30 +113,12 @@ export class GdprManager {
         return undefined;
     }
 
-    private setConsent(consent: boolean): Promise<any> {
-        this._configuration.setGDPREnabled(true);
-        this._configuration.setOptOutEnabled(!consent); // update opt out to reflect the consent choice
-        this._configuration.setOptOutRecorded(true); // prevent banner from showing in the future
-        // get last state of gdpr consent
-        return this._nativeBridge.Storage.get(StorageType.PRIVATE, GdprManager.GDPR_LAST_VALUE_STORAGE_KEY).then((consentLastSentToKafka) => {
-            // only if consent has changed push to kafka
-            if (consentLastSentToKafka !== consent) {
-                return this.sendGdprEvent(consent);
-            }
-        }).catch((error) => {
-            // there has not been last state of consent
-            // IE this is the first consent value we have seen
-            // and should push this to kafka
-            return this.sendGdprEvent(consent);
-        });
-    }
-
-    private sendGdprEvent(consent: boolean): Promise<any> {
+    private sendGdprEvent(consent: boolean): Promise<void> {
         const action: string = consent ? 'consent' : 'optout';
         return OperativeEventManager.sendGDPREvent(action, this._deviceInfo, this._clientInfo, this._configuration).then(() => {
-            const setPromise = this._nativeBridge.Storage.set(StorageType.PRIVATE, GdprManager.GDPR_LAST_VALUE_STORAGE_KEY, consent);
-            const writePromise = this._nativeBridge.Storage.write(StorageType.PRIVATE);
-            return Promise.all([setPromise, writePromise]);
+            return this._nativeBridge.Storage.set(StorageType.PRIVATE, GdprManager.GDPR_LAST_VALUE_STORAGE_KEY, consent).then(() => {
+                return this._nativeBridge.Storage.write(StorageType.PRIVATE);
+            });
         });
     }
 }

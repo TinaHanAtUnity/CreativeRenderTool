@@ -85,7 +85,7 @@ export class WebView {
     private _analyticsManager: AnalyticsManager;
     private _adMobSignalFactory: AdMobSignalFactory;
     private _missedImpressionManager: MissedImpressionManager;
-    private _GdprManager: GdprManager;
+    private _gdprManager: GdprManager;
     private _jaegerManager: JaegerManager;
 
     private _showing: boolean = false;
@@ -202,7 +202,7 @@ export class WebView {
 
             return Promise.all([configPromise, cachedCampaignResponsePromise, cachePromise]);
         }).then(([configuration, cachedCampaignResponse]) => {
-            this._GdprManager = new GdprManager(this._nativeBridge, this._deviceInfo, this._clientInfo, configuration, this._request);
+            this._gdprManager = new GdprManager(this._nativeBridge, this._deviceInfo, this._clientInfo, configuration, this._request);
             this._configuration = configuration;
             this._cachedCampaignResponse = cachedCampaignResponse;
             HttpKafka.setConfiguration(this._configuration);
@@ -218,20 +218,29 @@ export class WebView {
                 throw error;
             }
 
+            let analyticsPromise;
             if(this._configuration.isAnalyticsEnabled() || CustomFeatures.isExampleGameId(this._clientInfo.getGameId())) {
                 this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo, this._configuration, this._focusManager);
-                return this._analyticsManager.init().then(() => {
+                analyticsPromise = this._analyticsManager.init().then(() => {
                     this._sessionManager.setGameSessionId(this._analyticsManager.getGameSessionId());
-                    return this._GdprManager.fetch();
                 });
             } else {
                 const analyticsStorage: AnalyticsStorage = new AnalyticsStorage(this._nativeBridge);
-                return analyticsStorage.getSessionId(this._clientInfo.isReinitialized()).then(gameSessionId => {
+                analyticsPromise = analyticsStorage.getSessionId(this._clientInfo.isReinitialized()).then(gameSessionId => {
                     analyticsStorage.setSessionId(gameSessionId);
                     this._sessionManager.setGameSessionId(gameSessionId);
-                    return this._GdprManager.fetch();
                 });
             }
+            const gdprConsentPromise =  this._gdprManager.getConsent().then((consent: boolean) => {
+                this._configuration.setGDPREnabled(true);
+                this._configuration.setOptOutEnabled(!consent);
+                this._configuration.setOptOutRecorded(true);
+                this._gdprManager.setConsent(consent);
+            }).catch((error) => {
+                // do nothing
+                // error happens when consent value is undefined
+            });
+            return Promise.all([analyticsPromise, gdprConsentPromise]);
         }).then(() => {
             if(this._sessionManager.getGameSessionId() % 10000 === 0) {
                 this._cache.setDiagnostics(true);
@@ -414,7 +423,7 @@ export class WebView {
                 configuration: this._configuration,
                 request: this._request,
                 options: options,
-                gdprManager: this._GdprManager,
+                gdprManager: this._gdprManager,
                 adMobSignalFactory: this._adMobSignalFactory
             });
             this._refreshManager.setCurrentAdUnit(this._currentAdUnit);
