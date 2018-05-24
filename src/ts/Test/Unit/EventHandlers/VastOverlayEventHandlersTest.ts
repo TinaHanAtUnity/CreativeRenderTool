@@ -212,7 +212,7 @@ describe('VastOverlayEventHandlersTest', () => {
 
         it('should call video click through tracking url', () => {
             sinon.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
-            sinon.stub(nativeBridge.UrlScheme, 'open');
+            sinon.stub(nativeBridge.UrlScheme, 'open').resolves();
             vastOverlayEventHandler.onOverlayCallButton().then(() => {
                 sinon.assert.calledOnce(<sinon.SinonSpy>vastAdUnit.sendVideoClickTrackingEvent);
             });
@@ -220,7 +220,7 @@ describe('VastOverlayEventHandlersTest', () => {
 
         it('should open click trough link in iOS web browser when call button is clicked', () => {
             sinon.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
-            sinon.stub(nativeBridge.UrlScheme, 'open');
+            sinon.stub(nativeBridge.UrlScheme, 'open').resolves();
             vastOverlayEventHandler.onOverlayCallButton().then(() => {
                 sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.UrlScheme.open, 'http://foo.com');
             });
@@ -228,7 +228,7 @@ describe('VastOverlayEventHandlersTest', () => {
 
         it('should open click trough link in Android web browser when call button is clicked', () => {
             sinon.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
-            sinon.stub(nativeBridge.Intent, 'launch');
+            sinon.stub(nativeBridge.Intent, 'launch').resolves();
             vastOverlayEventHandler.onOverlayCallButton().then(() => {
                 sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
                     'action': 'android.intent.action.VIEW',
