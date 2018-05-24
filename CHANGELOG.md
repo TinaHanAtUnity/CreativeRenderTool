@@ -1,4 +1,4 @@
-# Staged
+# Thu May 24 15:37:24 UTC 2018
 
 * Delete gamerId from local storage and use gamer token in config request for iOS limit ad tracking devices
 * Update GDPR flow, privacy icon and dialog
