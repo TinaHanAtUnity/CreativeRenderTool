@@ -39,7 +39,7 @@ export class PromoEventHandler {
     public static onGDPRPopupSkipped(configuration: Configuration, operativeEventManager: OperativeEventManager): void {
         if (!configuration.isOptOutRecorded()) {
             configuration.setOptOutRecorded(true);
+            operativeEventManager.sendGDPREvent('skip');
         }
-        operativeEventManager.sendGDPREvent('skip');
     }
 }

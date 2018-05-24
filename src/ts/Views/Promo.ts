@@ -53,7 +53,7 @@ export class Promo extends View<{}> implements IPrivacyHandler {
             },
             {
                 event: 'click',
-                listener: (event: Event) => this.onGDPRPopupEvent(event),
+                listener: (event: Event) => this.onPrivacyEvent(event),
                 selector: '.gdpr-link'
             },
             {
@@ -146,15 +146,13 @@ export class Promo extends View<{}> implements IPrivacyHandler {
         this.onClose.trigger();
     }
 
-    private onGDPRPopupEvent(event: Event) {
-        event.preventDefault();
-
-        this._gdprPopupClicked = true;
-        this._privacy.show();
-    }
-
     private onPrivacyEvent(event: Event) {
         event.preventDefault();
+
+        if (this._showGDPRBanner) {
+            this._gdprPopupClicked = true;
+        }
+
         this._privacy.show();
     }
 
