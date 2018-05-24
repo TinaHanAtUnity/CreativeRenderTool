@@ -1,7 +1,8 @@
-# Staged
+# Thu May 24 22:17:19 UTC 2018
 
 * Add Promo GDPR Banner Functionality
 * Remove gamerID from GDPR user personal data collecting URL
+* Prevent sending multiple CTA click events in vast
 
 # Thu May 24 15:37:24 UTC 2018
 
