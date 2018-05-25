@@ -1,4 +1,4 @@
-# Fri May 25 12:56:40 UTC 2018
+# Pending
 
 * Update Unity logo
 * Update GDPR icon position on endscreen
