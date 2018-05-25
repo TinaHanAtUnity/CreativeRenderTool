@@ -128,9 +128,13 @@ $end-screen-mixin($scale-size = $default-scale-size) {
 
       /* TODO: Should go away once we finish with a/b test */
       &.use-gdpr-privacy-icon {
+        .unityads-logo {
+          bottom: $scale-size * $default-size * .5;
+        }
+
         .privacy-button {
           margin: 0;
-          padding: $scale-size * $default-size * .125 $scale-size * $default-size * .25;
+          padding: $scale-size * $default-size * .35 $scale-size * $default-size * .5;
 
           .icon-info {
             $icon-size = $scale-size * $default-size;
