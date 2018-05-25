@@ -9,6 +9,7 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Platform } from 'Constants/Platform';
 import { HttpKafka } from 'Utilities/HttpKafka';
 import { Configuration } from 'Models/Configuration';
+import { ConfigurationParser } from 'Parsers/ConfigurationParser';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { FocusManager } from 'Managers/FocusManager';
 
@@ -104,7 +105,7 @@ describe('DiagnosticsTest', () => {
             false
         ]);
 
-        const configuration = new Configuration(JSON.parse(ConfigurationAuctionPlc));
+        const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
 
         HttpKafka.setRequest(request);
         HttpKafka.setClientInfo(clientInfo);
