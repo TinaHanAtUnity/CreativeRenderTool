@@ -2,6 +2,7 @@ import { NativeBridge, INativeCallback, CallbackStatus } from 'Native/NativeBrid
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ConfigManager } from 'Managers/ConfigManager';
 import { Configuration, CacheMode } from 'Models/Configuration';
+import { ConfigurationParser } from 'Parsers/ConfigurationParser';
 import { CampaignManager } from 'Managers/CampaignManager';
 import { Cache } from 'Utilities/Cache';
 import { Placement } from 'Models/Placement';
@@ -180,7 +181,7 @@ export class WebView {
             const configSpan = this._jaegerManager.startSpan('FetchConfiguration', jaegerInitSpan.id, jaegerInitSpan.traceId);
             let configPromise;
             if(this._creativeUrl) {
-                configPromise = Promise.resolve(new Configuration(JsonParser.parse(CreativeUrlConfiguration)));
+                configPromise = Promise.resolve(ConfigurationParser.parse(JsonParser.parse(CreativeUrlConfiguration)));
             } else {
                 configPromise = ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, this._metadataManager, configSpan);
             }
