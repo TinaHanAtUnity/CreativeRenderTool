@@ -171,6 +171,11 @@
         bottom: constant(safe-area-inset-bottom);
         bottom: env(safe-area-inset-bottom);
       }
+
+      &.user-gdpr-privacy-icon {
+        bottom: calc(constant(safe-area-inset-bottom) + .5rem);
+        bottom: calc(env(safe-area-inset-bottom) + .5rem);
+      }
     }
 
     #privacy {
