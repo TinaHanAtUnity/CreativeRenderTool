@@ -127,13 +127,20 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       }
 
       /* TODO: Should go away once we finish with a/b test */
-      &.use-gdpr-privacy-icon .icon-info {
-        $icon-size = $scale-size * $default-size;
-        $set-image($icon-size, $icon-size * 1.2, 0, "../img/gdpr-icon.png", contain);
-        display: block;
+      &.use-gdpr-privacy-icon {
+        .privacy-button {
+          margin: 0;
+          padding: $scale-size * $default-size * .125 $scale-size * $default-size * .25;
 
-        &:before {
-          content: "";
+          .icon-info {
+            $icon-size = $scale-size * $default-size;
+            $set-image($icon-size, $icon-size * 1.2, 0, "../img/gdpr-icon.png", contain);
+            display: block;
+
+            &:before {
+              content: "";
+            }
+          }
         }
       }
 
