@@ -1027,7 +1027,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             window.addEventListener('message', function(message) {
                 if (message.data.type === 'AREvent') {
-                    const parameters = JSON.parse(message.data.data.parameters);
+                    const parameters = JSON.parse(message.data.data.parameters || '{}');
                     switch (message.data.data.event) {
                         case 'frameupdate':
                             window.WebARonARKitSetData(parameters);
