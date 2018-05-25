@@ -41,7 +41,7 @@ export class AdMobSignalFactory {
 
         const promises = [];
         promises.push(this._deviceInfo.getBatteryLevel().then(batteryLevel => {
-            signal.setDeviceBatteryLevel(this.getBatteryLevel(batteryLevel));
+            signal.setDeviceBatteryLevel(batteryLevel);
         }).catch(() => {
             this.logFailure(this._nativeBridge, 'batteryLevel');
         }));
@@ -221,7 +221,7 @@ export class AdMobSignalFactory {
         const promises = [];
 
         promises.push(this._deviceInfo.getBatteryLevel().then(batteryLevel => {
-            signal.setBatteryLevel(this.getBatteryLevel(batteryLevel));
+            signal.setBatteryLevel(batteryLevel);
         }).catch(() => {
             this.logFailure(nativeBridge, 'batteryLevel');
         }));
@@ -342,14 +342,6 @@ export class AdMobSignalFactory {
             return 'unity-ios-v' + this._clientInfo.getSdkVersionName();
         } else {
             return 'unity-android-v' + this._clientInfo.getSdkVersionName();
-        }
-    }
-
-    private getBatteryLevel(level: number): number {
-        if(level === -1) {
-            return -1;
-        } else {
-            return Math.round(level * 100);
         }
     }
 
