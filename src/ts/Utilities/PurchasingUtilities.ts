@@ -15,6 +15,7 @@ export interface IPromoPayload {
     gameId?: string;
     abGroup?: number;
     productId?: string;
+    trackingOptOut?: boolean;
     iapPromo: boolean;
     request: IPromoRequest;
     purchaseTrackingUrls: string[];
@@ -182,6 +183,7 @@ export class PurchasingUtilities {
             iapPayload.iapPromo = true;
             iapPayload.abGroup = PurchasingUtilities._configuration.getAbGroup();
             iapPayload.gameId = PurchasingUtilities._clientInfo.getGameId() + '|' + PurchasingUtilities._configuration.getToken();
+            iapPayload.trackingOptOut = PurchasingUtilities._configuration.isOptOutEnabled(),
             iapPayload.gamerToken = PurchasingUtilities._configuration.getToken();
             iapPayload.request = IPromoRequest.SETIDS;
         }

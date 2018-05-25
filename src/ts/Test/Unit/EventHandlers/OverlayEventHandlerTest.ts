@@ -28,6 +28,7 @@ import { Placement } from 'Models/Placement';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { Configuration } from 'Models/Configuration';
 import { Privacy } from 'Views/Privacy';
+import { GdprConsentManager } from 'Managers/GdprConsentManager';
 
 describe('OverlayEventHandlerTest', () => {
 
@@ -86,6 +87,7 @@ describe('OverlayEventHandlerTest', () => {
         endScreen = new PerformanceEndScreen(nativeBridge, campaign, deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, false);
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
         placement = TestFixtures.getPlacement();
+        const gdprManager = sinon.createStubInstance(GdprConsentManager);
 
         performanceAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,
@@ -103,7 +105,8 @@ describe('OverlayEventHandlerTest', () => {
             endScreen: endScreen,
             overlay: overlay,
             video: video,
-            privacy: privacy
+            privacy: privacy,
+            gdprManager: gdprManager
         };
         sinon.stub(performanceAdUnitParameters.campaign, 'getAbGroup').returns(5);
 

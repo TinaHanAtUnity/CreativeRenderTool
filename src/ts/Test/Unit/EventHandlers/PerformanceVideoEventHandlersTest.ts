@@ -22,6 +22,7 @@ import { IVideoEventHandlerParams } from 'EventHandlers/BaseVideoEventHandler';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { VideoState } from 'AdUnits/VideoAdUnit';
 import { Privacy } from 'Views/Privacy';
+import { GdprConsentManager } from 'Managers/GdprConsentManager';
 
 describe('PerformanceVideoEventHandlersTest', () => {
 
@@ -67,6 +68,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
         const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
         endScreen = new PerformanceEndScreen(nativeBridge, campaign, deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, false);
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
+        const gdprManager = sinon.createStubInstance(GdprConsentManager);
 
         performanceAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,
@@ -84,7 +86,8 @@ describe('PerformanceVideoEventHandlersTest', () => {
             endScreen: endScreen,
             overlay: overlay,
             video: video,
-            privacy: privacy
+            privacy: privacy,
+            gdprManager: gdprManager
         };
 
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);

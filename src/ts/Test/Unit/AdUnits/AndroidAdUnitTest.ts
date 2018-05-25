@@ -25,6 +25,7 @@ import { SessionManager } from 'Managers/SessionManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { Request } from 'Utilities/Request';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
+import { GdprConsentManager } from 'Managers/GdprConsentManager';
 
 describe('AndroidAdUnitTest', () => {
     let nativeBridge: NativeBridge;
@@ -49,6 +50,7 @@ describe('AndroidAdUnitTest', () => {
         const deviceInfo = TestFixtures.getAndroidDeviceInfo();
         const configuration = TestFixtures.getConfiguration();
         container = new Activity(nativeBridge, deviceInfo);
+        const gdprManager = sinon.createStubInstance(GdprConsentManager);
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             nativeBridge: nativeBridge,
             request: request,
@@ -72,7 +74,8 @@ describe('AndroidAdUnitTest', () => {
             campaign: TestFixtures.getCampaign(),
             configuration: configuration,
             request: request,
-            options: {}
+            options: {},
+            gdprManager: gdprManager
         };
     });
 

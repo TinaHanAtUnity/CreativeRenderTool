@@ -1,3 +1,38 @@
+# Thu May 24 22:17:19 UTC 2018
+
+* Add Promo GDPR Banner Functionality
+* Remove gamerID from GDPR user personal data collecting URL
+* Prevent sending multiple CTA click events in vast
+
+# Thu May 24 15:37:24 UTC 2018
+
+* Delete gamerId from local storage and use gamer token in config request for iOS limit ad tracking devices
+* Update GDPR flow, privacy icon and dialog
+* Fix GDPR sorry message issue
+* Fix duplicate GDPR skip event if user reviews privacy policy accessed with info button
+* Fix GDPR data deletion display bug
+
+# Wed May 23 16:12:46 UTC 2018
+
+* GDPR popup update to match latest legal and product requirements
+* Send GDPR skip event when someone opens GDPR popup but does not change default selection
+* Prevent nulls from AdMob signals to native Storage API
+
+# Tue May 22 11:48:50 UTC 2018
+
+* Support string values in GDPR consent metadata
+
+# Mon May 21 21:33:51 UTC 2018
+
+* Remove advertising identifier from MOAT integration for GDPR compliance
+* Stop square endscreen image A/B test from groups 5 and 6
+* Enable cached campaign response for all users
+
+# Fri May 18 09:26:31 UTC 2018
+
+* Support for GDPR consent metadata
+* Add GDPR parameters to operative events
+
 # Thu May 17 10:44:24 UTC 2018
 
 * Send GDPR opt-out messages to production topic
