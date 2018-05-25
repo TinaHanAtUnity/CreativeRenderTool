@@ -29,7 +29,7 @@ export class Promo extends View<{}> {
 
         if(campaign) {
             this._templateData = {
-                'localizedPrice': PurchasingUtilities.productPrice(campaign.getIapProductId())
+                'localizedPrice': PurchasingUtilities.getProductPrice(campaign.getIapProductId())
             };
         }
 

@@ -15,7 +15,7 @@ export class PromoCampaignParser extends CampaignParser {
         const promoJson = JsonParser.parse(response.getContent());
         if (promoJson && promoJson.iapProductId) {
             return PurchasingUtilities.refreshCatalog(nativeBridge).then(() => {
-                if (PurchasingUtilities.productAvailable(promoJson.iapProductId)) {
+                if (PurchasingUtilities.isProductAvailable(promoJson.iapProductId)) {
 
                     const baseCampaignParams: ICampaign = {
                         id: promoJson.id,

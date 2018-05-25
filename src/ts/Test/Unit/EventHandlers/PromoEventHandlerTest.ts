@@ -63,10 +63,10 @@ describe('PromoEventHandlersTest', () => {
                 hide: sinon.spy()
             };
             promoAdUnit = sinon.createStubInstance(PromoAdUnit);
-            sinon.stub(PurchasingUtilities, 'beginPurchaseEvent');
+            sinon.stub(PurchasingUtilities, 'sendPromoPayload');
 
             PromoEventHandler.onPromo(nativeBridge, promoAdUnit, 'com.unit.test.iapproductid', [purchaseTrackingUrls]);
-            sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.beginPurchaseEvent);
+            sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPromoPayload);
         });
     });
 });

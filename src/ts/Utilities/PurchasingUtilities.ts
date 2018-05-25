@@ -29,24 +29,6 @@ export class PurchasingUtilities {
         PurchasingUtilities._configuration = configuration;
     }
 
-    public static checkPromoVersion(nativeBridge: NativeBridge): Promise<boolean> {
-        return this.isPromoReady(nativeBridge).then((ready) => {
-            if (!ready) {
-                return Promise.reject(this.logIssue(nativeBridge, 'promo_not_ready', 'Promo was not ready'));
-            }
-            return new Promise<boolean>((resolve, reject) => {
-                const promoVersionObserver = nativeBridge.Purchasing.onGetPromoVersion.subscribe((promoVersion) => {
-                    nativeBridge.Purchasing.onGetPromoVersion.unsubscribe(promoVersionObserver);
-                    resolve(PurchasingUtilities.supportsVersion(promoVersion));
-                });
-                nativeBridge.Purchasing.getPromoVersion().catch(() => {
-                    nativeBridge.Purchasing.onGetPromoVersion.unsubscribe(promoVersionObserver);
-                    reject(this.logIssue(nativeBridge, 'promo_version_check_failed', 'Promo version check failed'));
-                });
-            });
-        });
-    }
-
     public static refreshCatalog(nativeBridge: NativeBridge): Promise<void | {}> {
         return new Promise((resolve, reject) => {
             const observer = nativeBridge.Purchasing.onGetPromoCatalog.subscribe((promoCatalogJSON) => {
@@ -58,29 +40,15 @@ export class PurchasingUtilities {
                 }
                 resolve();
             });
-            nativeBridge.Purchasing.getPromoCatalog().catch(reject);
-        }).catch((reject) => {
-            reject(this.logIssue(nativeBridge, 'catalog_refresh_failed', 'Purchasing Catalog failed to refresh'));
+            nativeBridge.Purchasing.getPromoCatalog().catch((e) => {
+                reject(this.logIssue(nativeBridge, 'catalog_refresh_failed', 'Purchasing Catalog failed to refresh'));
+            });
+        }).catch((e) => {
+            throw e;
         });
     }
 
-    public static isPromoReady(nativeBridge: NativeBridge): Promise<boolean> {
-        return new Promise<boolean>((resolve, reject) => {
-            const observer = nativeBridge.Purchasing.onInitialize.subscribe((isReady) => {
-                nativeBridge.Purchasing.onInitialize.unsubscribe(observer);
-                if (isReady !== 'True') {
-                    reject(this.logIssue(nativeBridge, 'promo_not_ready', 'Promo was not ready'));
-                }
-                resolve(isReady === 'True');
-            });
-            nativeBridge.Purchasing.initializePurchasing().catch(() => {
-                nativeBridge.Purchasing.onInitialize.unsubscribe(observer);
-                reject(this.logIssue(nativeBridge, 'purchase_initilization_failed', 'Purchase initialization failed'));
-            });
-        });
-    }
-
-    public static beginPurchaseEvent(nativeBridge: NativeBridge, iapPayload: string): Promise<void> {
+    public static sendPromoPayload(nativeBridge: NativeBridge, iapPayload: string): Promise<void> {
         if (!PurchasingUtilities._didSuccessfullyInitiatePurchaseEvent) {
             this.logIssue(nativeBridge, 'purchase_never_intitialized', 'IAP Promo initialization never happened.');
             return PurchasingUtilities.sendPurchaseInitializationEvent(nativeBridge).then(() => {
@@ -120,22 +88,22 @@ export class PurchasingUtilities {
         // TODO: Handle IAPPayload/send event/do something with the payload
     }
 
-    public static productAvailable(productId: string): boolean {
+    public static isProductAvailable(productId: string): boolean {
         if (this.purchasesAvailable()) {
             return (productId in this._catalog.getProducts());
         }
         return false;
     }
 
-    public static productPrice(productId: string): string {
-        if (this.productAvailable(productId)) {
+    public static getProductPrice(productId: string): string {
+        if (this.isProductAvailable(productId)) {
             return this._catalog.getProducts()[productId]!.getPrice();
         }
         throw new Error('Attempting to get price of invalid product: ' + productId);
     }
 
-    public static productDescription(productId: string): string {
-        if (this.productAvailable(productId)) {
+    public static getPrroductDescription(productId: string): string {
+        if (this.isProductAvailable(productId)) {
             return this._catalog.getProducts()[productId]!.getDescription();
         }
         throw new Error('Attempting to get description of invalid product: ' + productId);
@@ -205,6 +173,40 @@ export class PurchasingUtilities {
                     nativeBridge.Purchasing.onCommandResult.unsubscribe(observer);
                     reject(this.logIssue(nativeBridge, 'send_purchase_event_failed', 'Purchase event failed to send'));
                 });
+            });
+        });
+    }
+
+    private static checkPromoVersion(nativeBridge: NativeBridge): Promise<boolean> {
+        return this.isPromoReady(nativeBridge).then((ready) => {
+            if (!ready) {
+                return Promise.reject(this.logIssue(nativeBridge, 'promo_not_ready', 'Promo was not ready'));
+            }
+            return new Promise<boolean>((resolve, reject) => {
+                const promoVersionObserver = nativeBridge.Purchasing.onGetPromoVersion.subscribe((promoVersion) => {
+                    nativeBridge.Purchasing.onGetPromoVersion.unsubscribe(promoVersionObserver);
+                    resolve(PurchasingUtilities.supportsVersion(promoVersion));
+                });
+                nativeBridge.Purchasing.getPromoVersion().catch(() => {
+                    nativeBridge.Purchasing.onGetPromoVersion.unsubscribe(promoVersionObserver);
+                    reject(this.logIssue(nativeBridge, 'promo_version_check_failed', 'Promo version check failed'));
+                });
+            });
+        });
+    }
+
+    private static isPromoReady(nativeBridge: NativeBridge): Promise<boolean> {
+        return new Promise<boolean>((resolve, reject) => {
+            const observer = nativeBridge.Purchasing.onInitialize.subscribe((isReady) => {
+                nativeBridge.Purchasing.onInitialize.unsubscribe(observer);
+                if (isReady !== 'True') {
+                    reject(this.logIssue(nativeBridge, 'promo_not_ready', 'Promo was not ready'));
+                }
+                resolve(isReady === 'True');
+            });
+            nativeBridge.Purchasing.initializePurchasing().catch(() => {
+                nativeBridge.Purchasing.onInitialize.unsubscribe(observer);
+                reject(this.logIssue(nativeBridge, 'purchase_initilization_failed', 'Purchase initialization failed'));
             });
         });
     }
