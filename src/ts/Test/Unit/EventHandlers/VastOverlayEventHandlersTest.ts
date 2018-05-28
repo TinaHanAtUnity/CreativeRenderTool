@@ -26,6 +26,7 @@ import { MOAT } from 'Views/MOAT';
 import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 import { SinonSandbox } from 'sinon';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
+import { GdprConsentManager } from 'Managers/GdprConsentManager';
 
 describe('VastOverlayEventHandlersTest', () => {
     let campaign: VastCampaign;
@@ -100,6 +101,8 @@ describe('VastOverlayEventHandlersTest', () => {
             campaign: campaign
         });
 
+        const gdprManager = sinon.createStubInstance(GdprConsentManager);
+
         vastAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
@@ -115,7 +118,8 @@ describe('VastOverlayEventHandlersTest', () => {
             options: {},
             endScreen: undefined,
             overlay: overlay,
-            video: campaign.getVideo()
+            video: campaign.getVideo(),
+            gdprManager: gdprManager
         };
 
         vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
@@ -154,7 +158,7 @@ describe('VastOverlayEventHandlersTest', () => {
         });
     });
 
-    xdescribe('When calling onMute', () => {
+    describe('When calling onMute', () => {
 
         beforeEach(() => {
             vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
@@ -203,20 +207,20 @@ describe('VastOverlayEventHandlersTest', () => {
             vastOverlayEventHandler = new VastOverlayEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
             sinon.spy(nativeBridge.VideoPlayer, 'pause');
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('http://foo.com');
-            sinon.stub(vastAdUnit, 'addStoredEvent').returns(sinon.spy());
+            sinon.stub(vastAdUnit, 'sendVideoClickTrackingEvent').returns(sinon.spy());
         });
 
         it('should call video click through tracking url', () => {
             sinon.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
-            sinon.stub(nativeBridge.UrlScheme, 'open');
+            sinon.stub(nativeBridge.UrlScheme, 'open').resolves();
             vastOverlayEventHandler.onOverlayCallButton().then(() => {
-                sinon.assert.calledOnce(<sinon.SinonSpy>vastAdUnit.addStoredEvent);
+                sinon.assert.calledOnce(<sinon.SinonSpy>vastAdUnit.sendVideoClickTrackingEvent);
             });
         });
 
         it('should open click trough link in iOS web browser when call button is clicked', () => {
             sinon.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
-            sinon.stub(nativeBridge.UrlScheme, 'open');
+            sinon.stub(nativeBridge.UrlScheme, 'open').resolves();
             vastOverlayEventHandler.onOverlayCallButton().then(() => {
                 sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.UrlScheme.open, 'http://foo.com');
             });
@@ -224,7 +228,7 @@ describe('VastOverlayEventHandlersTest', () => {
 
         it('should open click trough link in Android web browser when call button is clicked', () => {
             sinon.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
-            sinon.stub(nativeBridge.Intent, 'launch');
+            sinon.stub(nativeBridge.Intent, 'launch').resolves();
             vastOverlayEventHandler.onOverlayCallButton().then(() => {
                 sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
                     'action': 'android.intent.action.VIEW',

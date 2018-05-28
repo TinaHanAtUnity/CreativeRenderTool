@@ -136,23 +136,17 @@ export class VastVideoEventHandler extends VideoEventHandler {
     }
 
     protected handleFirstQuartileEvent(progress: number): void {
-        this._vastAdUnit.addStoredEvent(() => {
-            super.handleFirstQuartileEvent(progress);
-        });
+        super.handleFirstQuartileEvent(progress);
         this.sendThirdPartyTrackingEvent('firstQuartile');
     }
 
     protected handleMidPointEvent(progress: number): void {
-        this._vastAdUnit.addStoredEvent(() => {
-            super.handleMidPointEvent(progress);
-        });
+        super.handleMidPointEvent(progress);
         this.sendThirdPartyTrackingEvent('midpoint');
     }
 
     protected handleThirdQuartileEvent(progress: number): void {
-        this._vastAdUnit.addStoredEvent(() => {
-            super.handleThirdQuartileEvent(progress);
-        });
+        super.handleThirdQuartileEvent(progress);
         this.sendThirdPartyTrackingEvent('thirdQuartile');
     }
 
@@ -193,8 +187,6 @@ export class VastVideoEventHandler extends VideoEventHandler {
     private sendThirdPartyEvent(event: string, url: string): void {
         url = url.replace(/%ZONE%/, this._placement.getId());
         url = url.replace(/%SDK_VERSION%/, this._clientInfo.getSdkVersion().toString());
-        this._vastAdUnit.addStoredEvent(() => {
-            this._thirdPartyEventManager.sendEvent(event, this._campaign.getSession().getId(), url, this._vastCampaign.getUseWebViewUserAgentForTracking());
-        });
+        this._thirdPartyEventManager.sendEvent(event, this._campaign.getSession().getId(), url, this._vastCampaign.getUseWebViewUserAgentForTracking());
     }
 }

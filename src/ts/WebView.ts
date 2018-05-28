@@ -2,6 +2,7 @@ import { NativeBridge, INativeCallback, CallbackStatus } from 'Native/NativeBrid
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ConfigManager } from 'Managers/ConfigManager';
 import { Configuration, CacheMode } from 'Models/Configuration';
+import { ConfigurationParser } from 'Parsers/ConfigurationParser';
 import { CampaignManager } from 'Managers/CampaignManager';
 import { Cache } from 'Utilities/Cache';
 import { Placement } from 'Models/Placement';
@@ -178,7 +179,7 @@ export class WebView {
             const configSpan = this._jaegerManager.startSpan('FetchConfiguration', jaegerInitSpan.id, jaegerInitSpan.traceId);
             let configPromise;
             if(this._creativeUrl) {
-                configPromise = Promise.resolve(new Configuration(JsonParser.parse(CreativeUrlConfiguration)));
+                configPromise = Promise.resolve(ConfigurationParser.parse(JsonParser.parse(CreativeUrlConfiguration)));
             } else {
                 configPromise = ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, this._metadataManager, configSpan);
             }
@@ -200,7 +201,7 @@ export class WebView {
 
             return Promise.all([configPromise, cachedCampaignResponsePromise, cachePromise]);
         }).then(([configuration, cachedCampaignResponse]) => {
-            this._gdprConsentManager = new GdprConsentManager(this._nativeBridge, this._deviceInfo, this._clientInfo, configuration);
+            this._gdprConsentManager = new GdprConsentManager(this._nativeBridge, this._deviceInfo, this._clientInfo, configuration, this._request);
             this._configuration = configuration;
             this._cachedCampaignResponse = cachedCampaignResponse;
             HttpKafka.setConfiguration(this._configuration);
@@ -415,6 +416,7 @@ export class WebView {
                 configuration: this._configuration,
                 request: this._request,
                 options: options,
+                gdprManager: this._gdprConsentManager,
                 adMobSignalFactory: this._adMobSignalFactory
             });
             this._refreshManager.setCurrentAdUnit(this._currentAdUnit);
