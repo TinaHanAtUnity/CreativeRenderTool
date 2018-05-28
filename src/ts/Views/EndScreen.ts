@@ -106,10 +106,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
         const endScreenAlt = this.getEndscreenAlt();
         if (typeof endScreenAlt === 'string') {
-            this._container.classList.add(endScreenAlt);
+            this._container.classList.add(...endScreenAlt.split(' '));
 
             /* If pop up is visible, hide privacy button */
-            if (endScreenAlt === GDPR_OPT_OUT_BASE || endScreenAlt === GDPR_OPT_OUT_ICON) {
+            if (this.hasEndScreenAlt(GDPR_OPT_OUT_BASE) || this.hasEndScreenAlt(GDPR_OPT_OUT_ICON)) {
                 (<HTMLElement>this._container.querySelector('.privacy-button')).style.display = 'none';
             }
         }
@@ -168,18 +168,26 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     protected getEndscreenAlt(campaign?: Campaign) {
+        const endScreenAlts: string[] = [];
+
         if (this._showGDPRBanner) {
-            return CustomFeatures.isGDPRBaseTest(this._abGroup) ? GDPR_OPT_OUT_BASE : GDPR_OPT_OUT_ICON;
+            const gdprAlt: string = CustomFeatures.isGDPRBaseTest(this._abGroup) ? GDPR_OPT_OUT_BASE : GDPR_OPT_OUT_ICON;
+            endScreenAlts.push(gdprAlt);
         }
 
         if (CustomFeatures.isFancyEndScreenEnabled(this._abGroup) && this.canShowFancyEndScreen()) {
-            return FANCY_END_SCREEN;
+            endScreenAlts.push(FANCY_END_SCREEN);
         }
 
-        return undefined;
+        return endScreenAlts.length > 0 ? endScreenAlts.join(' ') : undefined;
     }
 
     protected abstract onDownloadEvent(event: Event): void;
+
+    private hasEndScreenAlt(altName: string): boolean {
+        const endScreenAlts = this.getEndscreenAlt();
+        return !!endScreenAlts && endScreenAlts.split(' ').indexOf(altName) > -1;
+    }
 
     private onCloseEvent(event: Event): void {
         event.preventDefault();
@@ -204,7 +212,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     private getTemplate() {
-        if (this.getEndscreenAlt() === FANCY_END_SCREEN) {
+        if (this.hasEndScreenAlt(FANCY_END_SCREEN)) {
             return FancyEndScreenTemplate;
         }
 
