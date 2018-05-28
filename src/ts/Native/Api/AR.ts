@@ -1,7 +1,7 @@
 import { NativeApi } from 'Native/NativeApi';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Observable0, Observable1, Observable2 } from 'Utilities/Observable';
-import { ARUtil, IARFrameInfo, IARFrameScale, IARPoint, IARRect } from 'Utilities/ARUtil';
+import { ARUtil, IARFrameInfo, IARFrameScale, IARPoint, IARRect, IARSize } from 'Utilities/ARUtil';
 
 enum AREvent {
     AR_PLANES_ADDED,
@@ -25,6 +25,11 @@ export interface IARConfigurationProperties {
 export interface IARRunProperties {
     runOptions?: number;
     configuration?: IARConfigurationProperties;
+}
+
+export interface IARVideoFormat {
+    imageResolution: IARSize;
+    framesPerSecond: number;
 }
 
 export class ARApi extends NativeApi {
@@ -109,6 +114,10 @@ export class ARApi extends NativeApi {
 
     public setFrameScaling(scale: IARFrameScale): Promise<void> {
         return this._nativeBridge.invoke<void>(this._apiClass, 'setFrameScaling', [scale]);
+    }
+
+    public getSupportedVideoFormats(): Promise<IARVideoFormat[]> {
+        return this._nativeBridge.invoke<IARVideoFormat[]>(this._apiClass, 'getSupportedVideoFormats');
     }
 
     public handleEvent(event: string, parameters: any[]): void {
