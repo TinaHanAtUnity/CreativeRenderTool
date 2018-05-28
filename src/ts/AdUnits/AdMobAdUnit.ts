@@ -153,7 +153,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public onContainerShow(): void {
-        this.onContainerForeground();
+        // EMPTY
     }
 
     public onContainerForeground(): void {
