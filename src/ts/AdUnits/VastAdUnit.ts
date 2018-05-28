@@ -162,6 +162,18 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         }
     }
 
+    public sendVideoClickTrackingEvent(sessionId: string): void {
+        this.sendTrackingEvent('click', sessionId);
+
+        const clickTrackingEventUrls = this._vastCampaign.getVast().getVideoClickTrackingURLs();
+
+        if (clickTrackingEventUrls) {
+            for (const clickTrackingEventUrl of clickTrackingEventUrls) {
+                this._thirdPartyEventManager.sendEvent('vast video click', sessionId, clickTrackingEventUrl);
+            }
+        }
+    }
+
     protected onSystemInterrupt(interruptStarted: boolean): void {
         super.onSystemInterrupt(interruptStarted);
         if (this._moat) {

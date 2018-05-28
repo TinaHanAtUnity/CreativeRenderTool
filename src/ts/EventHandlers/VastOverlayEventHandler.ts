@@ -60,7 +60,6 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
             }
             this._vastAdUnit.sendTrackingEvent('unmute', this._vastCampaign.getSession().getId());
         }
-
     }
 
     public onOverlayCallButton(): Promise<void> {
@@ -68,7 +67,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
 
         this.setCallButtonEnabled(false);
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
-        this.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId());
+        this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId());
 
         const clickThroughURL = this._vastAdUnit.getVideoClickThroughURL();
         if(clickThroughURL) {
@@ -81,18 +80,6 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
             );
         }
         return Promise.reject(new Error('No clickThroughURL was defined'));
-    }
-
-    private sendVideoClickTrackingEvent(sessionId: string): void {
-        this._vastAdUnit.sendTrackingEvent('click', sessionId);
-
-        const clickTrackingEventUrls = this._vastCampaign.getVast().getVideoClickTrackingURLs();
-
-        if (clickTrackingEventUrls) {
-            for (const clickTrackingEventUrl of clickTrackingEventUrls) {
-                this._thirdPartyEventManager.sendEvent('vast video click', sessionId, clickTrackingEventUrl);
-            }
-        }
     }
 
     private openUrl(url: string): Promise<void> {
