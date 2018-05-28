@@ -23,6 +23,18 @@ describe('UrlTest', () => {
         assert.equal(url, 'http://www.google.fi?test=true');
     });
 
+    [
+        ['http://www.google.fi?&param1=125&param2=test', 'param2', 'http://www.google.fi?&param1=125'],
+        ['http://www.google.fi?&param1=125&param2=test', 'param1', 'http://www.google.fi?&param2=test'],
+        ['http://www.google.fi?&param1=125&param2=test&param3=true', 'param2', 'http://www.google.fi?&param1=125&param3=true'],
+        ['http://www.google.fi?&param1=125', 'param1', 'http://www.google.fi?'],
+    ].forEach(([originalUrl, parameter, expected]) => {
+        it(`should remove URL parameter ${parameter} from ${originalUrl} correctly`, () => {
+            const url: string = Url.removeQueryParameter(originalUrl, parameter);
+            assert.equal(url, expected);
+        });
+    });
+
     describe('validation', () => {
         it('should validate legal URLs', () => {
             assert.equal(true, Url.isValid('https://www.unity3d.com'), 'valid url was not accepted');

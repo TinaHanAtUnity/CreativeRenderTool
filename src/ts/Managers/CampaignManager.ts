@@ -110,8 +110,25 @@ export class CampaignManager {
         this._jaegerManager = jaegerManager;
     }
 
-    public requestFromCache(cachedResponse: INativeResponse): Promise<void[] | void> {
+    public cleanCachedUrl(url: string): string {
+        url = Url.removeQueryParameter(url, 'connectionType');
+        url = Url.removeQueryParameter(url, 'networkType');
+        return url;
+    }
+
+    public async requestFromCache(cachedResponse: INativeResponse): Promise<void[] | void> {
         if(this._requesting) {
+            return Promise.resolve();
+        }
+
+        let cachedUrl = cachedResponse.url;
+        let currentUrl = await this.createRequestUrl(false);
+
+        cachedUrl = this.cleanCachedUrl(cachedUrl);
+        currentUrl = this.cleanCachedUrl(currentUrl);
+
+        if (cachedUrl !== currentUrl) {
+            this._nativeBridge.Sdk.logInfo('Failed to use cached campaign response due to URL mismatch ' + cachedUrl + ' (cached) and ' + currentUrl + ' (current)');
             return Promise.resolve();
         }
 
@@ -124,6 +141,8 @@ export class CampaignManager {
         this.resetRealtimeDataForPlacements();
 
         this._nativeBridge.Sdk.logInfo('Requesting ad plan from cache ' + cachedResponse.url);
+
+        SdkStats.setAdRequestTimestamp();
 
         return this.parseCampaigns(cachedResponse).then(() => {
                 this._ignoreEvents = false;
