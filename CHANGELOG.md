@@ -1,3 +1,10 @@
+# Fri May 25 15:33:04 UTC 2018
+
+* Update Unity logo
+* Update GDPR icon position on endscreen
+* Change battery level scaling from 0..100 to 0..1 in AdMob signals
+* Add ConfigurationParser to parse configuration response
+
 # Thu May 24 22:17:19 UTC 2018
 
 * Add Promo GDPR Banner Functionality
