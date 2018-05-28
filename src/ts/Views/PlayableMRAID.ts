@@ -44,6 +44,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string, privacy: AbstractPrivacy) {
         super(nativeBridge, 'playable-mraid', placement, campaign, privacy);
+
         this._placement = placement;
         this._campaign = campaign;
         this._localization = new Localization(language, 'loadingscreen');
@@ -257,6 +258,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
             this._loadingScreen.addEventListener(e, () => {
                 this._closeElement.style.display = 'block';
+
                 this._playableStartTimestamp = Date.now();
                 const timeFromShow = this.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
                 const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
