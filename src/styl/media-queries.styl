@@ -171,6 +171,11 @@
         bottom: constant(safe-area-inset-bottom);
         bottom: env(safe-area-inset-bottom);
       }
+
+      &.use-gdpr-privacy-icon .unityads-logo {
+        bottom: calc(constant(safe-area-inset-bottom) + .5rem);
+        bottom: calc(env(safe-area-inset-bottom) + .5rem);
+      }
     }
 
     #privacy {
@@ -264,7 +269,8 @@
   }
 
   body {
-    &.landscape #end-screen.gdpr-pop-up-base .gdpr-pop-up {
+    &.landscape #end-screen.gdpr-pop-up-base .gdpr-pop-up,
+    &.landscape #end-screen.gdpr-pop-up-icon .gdpr-pop-up {
       width: calc(50% - constant(safe-area-inset-right));
       width: calc(50% - env(safe-area-inset-right));
 

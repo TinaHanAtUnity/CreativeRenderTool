@@ -70,9 +70,8 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     public onGDPRPopupSkipped(): void {
         if (!this._configuration.isOptOutRecorded()) {
             this._configuration.setOptOutRecorded(true);
+            this._operativeEventManager.sendGDPREvent('skip');
         }
-
-        this._operativeEventManager.sendGDPREvent('skip');
     }
 
     public abstract onKeyEvent(keyCode: number): void;

@@ -19,6 +19,7 @@ import { Request } from 'Utilities/Request';
 import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
+import { GdprConsentManager } from 'Managers/GdprConsentManager';
 
 describe('IosAdUnitTest', () => {
     let nativeBridge: NativeBridge;
@@ -48,6 +49,7 @@ describe('IosAdUnitTest', () => {
         container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager);
         const campaign = TestFixtures.getCampaign();
         const configuration = TestFixtures.getConfiguration();
+        const gdprManager = sinon.createStubInstance(GdprConsentManager);
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             nativeBridge: nativeBridge,
             request: request,
@@ -71,7 +73,8 @@ describe('IosAdUnitTest', () => {
             campaign: campaign,
             configuration: configuration,
             request: request,
-            options: {}
+            options: {},
+            gdprManager: gdprManager
         };
     });
 
