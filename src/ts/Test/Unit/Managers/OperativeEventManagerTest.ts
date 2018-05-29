@@ -23,6 +23,8 @@ import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
+import { XPromoOperativeEventManager } from 'Managers/XPromoOperativeEventManager';
+import { HttpKafka } from 'Utilities/HttpKafka';
 
 class TestStorageApi extends StorageApi {
 
@@ -364,15 +366,14 @@ describe('OperativeEventManagerTest', () => {
                     campaign: campaign
                 };
 
-                operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(params);
-                return operativeEventManager.sendClick(placement).then(() => {
+                const xPromoOperativeEventManager = <XPromoOperativeEventManager>OperativeEventManagerFactory.createOperativeEventManager(params);
+                HttpKafka.setRequest(request);
+                return xPromoOperativeEventManager.sendClickEvent(placement, 'landscape').then(() => {
                     assert(requestSpy.calledOnce, 'Operative event did not send POST request');
-                    const data = JSON.parse(requestSpy.getCall(0).args[1]);
+
                     const url = requestSpy.getCall(0).args[0];
 
-                    assert.equal(url, 'https://adserver.unityads.unity3d.com/mobile/campaigns/' + campaign.getId() + '/click/' + campaign.getGamerId() + '?gameId=' + clientInfo.getGameId() + '&redirect=false', 'URL not what was expected');
-                    assert.isDefined(data.cached, 'cached -value should be defined');
-                    assert.isFalse(data.cached, 'cached -value should be false');
+                    assert.equal(url, 'https://httpkafka.unityads.unity3d.com/v1/events', 'URL not what was expected');
                 });
             });
 
