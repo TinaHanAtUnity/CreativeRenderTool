@@ -11,6 +11,7 @@ import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { ConfigManager } from 'Managers/ConfigManager';
 import { CampaignManager } from 'Managers/CampaignManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ProgrammaticOperativeEventManager } from 'Managers/ProgrammaticOperativeEventManager';
 
 describe('EventsTest', () => {
 
@@ -123,7 +124,7 @@ describe('EventsTest', () => {
 
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
         CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
-        OperativeEventManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
 
         UnityAds.initialize(Platform.ANDROID, currentGameId.toString(), listener, true);
     });
