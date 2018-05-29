@@ -538,7 +538,7 @@ export class CampaignManager {
                 screenWidth: screenWidth,
                 screenHeight: screenHeight,
                 connectionType: connectionType,
-                networkType: networkType,
+                networkType: networkType
             });
             this._realtimeUrl = url;
             return url;
