@@ -3,7 +3,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
-import { VideoAdUnit } from 'AdUnits/VideoAdUnit';
+import { VideoAdUnit, VideoState } from 'AdUnits/VideoAdUnit';
 import { FinishState } from 'Constants/FinishState';
 import { Double } from 'Utilities/Double';
 import { Campaign } from 'Models/Campaign';
@@ -33,7 +33,7 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
 
     public onOverlaySkip(position: number): void {
         this._nativeBridge.VideoPlayer.pause();
-        this._adUnit.setActive(false);
+        this._adUnit.setVideoState(VideoState.SKIPPED);
         this._adUnit.setFinishState(FinishState.SKIPPED);
         this._operativeEventManager.sendSkip(this._placement, this._adUnit.getVideo().getPosition(), this.getVideoOrientation(), this._adUnitStyle);
 
@@ -62,11 +62,11 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
     public onOverlayClose(): void {
         this._nativeBridge.VideoPlayer.pause();
         this._adUnit.setActive(false);
+        this._adUnit.setVideoState(VideoState.SKIPPED);
         this._adUnit.setFinishState(FinishState.SKIPPED);
         this._operativeEventManager.sendSkip(this._placement, this._adUnit.getVideo().getPosition(), this.getVideoOrientation());
 
         this._adUnit.onFinish.trigger();
-
         this._adUnit.hide();
     }
 
