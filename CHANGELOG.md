@@ -1,4 +1,4 @@
-# Pending
+# Tue May 29 20:56:59 UTC 2018
 
 * Refactor ad unit lifecycle handling
 
