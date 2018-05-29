@@ -16,6 +16,7 @@ import { SensorDelay } from 'Constants/Android/SensorDelay';
 import { IClickSignalResponse } from 'Views/AFMABridge';
 import { SdkStats } from 'Utilities/SdkStats';
 import { UserCountData } from 'Utilities/UserCountData';
+import { AdUnitContainerSystemMessage, IAdUnitContainerListener } from 'AdUnits/Containers/AdUnitContainer';
 
 export interface IAdMobAdUnitParameters extends IAdUnitParameters<AdMobCampaign> {
     view: AdMobView;
@@ -23,7 +24,7 @@ export interface IAdMobAdUnitParameters extends IAdUnitParameters<AdMobCampaign>
 
 const AdUnitActivities = ['com.unity3d.ads.adunit.AdUnitActivity', 'com.unity3d.ads.adunit.AdUnitTransparentActivity', 'com.unity3d.ads.adunit.AdUnitTransparentSoftwareActivity', 'com.unity3d.ads.adunit.AdUnitSoftwareActivity'];
 
-export class AdMobAdUnit extends AbstractAdUnit {
+export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListener {
     private _operativeEventManager: OperativeEventManager;
     private _view: AdMobView;
     private _thirdPartyEventManager: ThirdPartyEventManager;
@@ -35,10 +36,6 @@ export class AdMobAdUnit extends AbstractAdUnit {
     private _foregroundTime: number = 0;
     private _startTime: number = 0;
     private _requestToViewTime: number = 0;
-
-    private _onSystemKillObserver: () => void;
-    private _onPauseObserver: () => void;
-    private _onResumeObserver: () => void;
 
     constructor(nativeBridge: NativeBridge, parameters: IAdMobAdUnitParameters) {
         super(nativeBridge, parameters);
@@ -65,7 +62,8 @@ export class AdMobAdUnit extends AbstractAdUnit {
         if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
             this._nativeBridge.AndroidAdUnit.onKeyDown.subscribe(this._keyDownListener);
         }
-        this.subscribeToLifecycle();
+
+        this._container.addEventHandler(this);
 
         return this._container.open(this, ['webview'], true, this._forceOrientation, true, false, true, false, this._options).then(() => {
             this.onStart.trigger();
@@ -80,7 +78,7 @@ export class AdMobAdUnit extends AbstractAdUnit {
     public hide(): Promise<void> {
         this.onHide();
         this.hideView();
-        this.unsubscribeFromLifecycle();
+        this._container.removeEventHandler(this);
         return this._container.close();
     }
 
@@ -154,6 +152,38 @@ export class AdMobAdUnit extends AbstractAdUnit {
         return this._requestToViewTime;
     }
 
+    public onContainerShow(): void {
+        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            this._nativeBridge.SensorInfo.Ios.startAccelerometerUpdates(new Double(0.01));
+        }
+    }
+
+    public onContainerForeground(): void {
+        this._foregroundTime = Date.now();
+
+        if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            this._nativeBridge.SensorInfo.Android.startAccelerometerUpdates(SensorDelay.SENSOR_DELAY_FASTEST);
+            this._nativeBridge.AndroidAdUnit.startMotionEventCapture(10000);
+        } else {
+            this._nativeBridge.SensorInfo.Ios.startAccelerometerUpdates(new Double(0.01));
+        }
+    }
+
+    public onContainerBackground(): void {
+        this._nativeBridge.SensorInfo.stopAccelerometerUpdates();
+    }
+
+    public onContainerDestroy(): void {
+        if(this.isShowing()) {
+            this.setFinishState(FinishState.SKIPPED);
+            this.hide();
+        }
+    }
+
+    public onContainerSystemMessage(message: AdUnitContainerSystemMessage): void {
+        // EMPTY
+    }
+
     private showView() {
         this._view.show();
         document.body.appendChild(this._view.container());
@@ -195,51 +225,9 @@ export class AdMobAdUnit extends AbstractAdUnit {
         document.body.removeChild(this._view.container());
     }
 
-    private onSystemKill() {
-        if(this.isShowing()) {
-            this.setFinishState(FinishState.SKIPPED);
-            this.hide();
-        }
-    }
-
     private onKeyDown(key: number) {
         if (key === KeyCode.BACK) {
             this._view.onBackPressed();
         }
-    }
-
-    private subscribeToLifecycle() {
-        this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
-        if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            this._onResumeObserver = this._focusManager.onAppForeground.subscribe(() => this.onAppForeground());
-            this._onPauseObserver = this._focusManager.onAppBackground.subscribe(() => this.onAppBackground());
-        } else {
-            this._onResumeObserver = this._container.onShow.subscribe(() => this.onAppForeground());
-            this._onPauseObserver = this._container.onAndroidPause.subscribe(() => this.onAppBackground());
-        }
-    }
-
-    private unsubscribeFromLifecycle() {
-        this._container.onSystemKill.unsubscribe(this._onSystemKillObserver);
-        if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            this._focusManager.onAppBackground.unsubscribe(this._onPauseObserver);
-        } else {
-            this._container.onShow.unsubscribe(this._onResumeObserver);
-        }
-    }
-
-    private onAppForeground() {
-        this._foregroundTime = Date.now();
-
-        if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            this._nativeBridge.SensorInfo.Android.startAccelerometerUpdates(SensorDelay.SENSOR_DELAY_FASTEST);
-            this._nativeBridge.AndroidAdUnit.startMotionEventCapture(10000);
-        } else {
-            this._nativeBridge.SensorInfo.Ios.startAccelerometerUpdates(new Double(0.01));
-        }
-    }
-
-    private onAppBackground() {
-        this._nativeBridge.SensorInfo.stopAccelerometerUpdates();
     }
 }

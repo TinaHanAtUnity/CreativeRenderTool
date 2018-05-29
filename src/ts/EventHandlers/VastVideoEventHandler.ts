@@ -43,16 +43,16 @@ export class VastVideoEventHandler extends VideoEventHandler {
 
         const session = this._vastCampaign.getSession();
 
+        const moat = MoatViewabilityService.getMoat();
+        if(moat) {
+            moat.completed(this._vastAdUnit.getVolume());
+        }
+
         if(session) {
             if(session.getEventSent(EventType.VAST_COMPLETE)) {
                 return;
             }
             session.setEventSent(EventType.VAST_COMPLETE);
-        }
-
-        const moat = MoatViewabilityService.getMoat();
-        if(moat) {
-            moat.triggerVideoEvent('AdVideoComplete', this._vastAdUnit.getVolume());
         }
 
         const endScreen = this._vastAdUnit.getEndScreen();
@@ -88,6 +88,11 @@ export class VastVideoEventHandler extends VideoEventHandler {
         // was onVideoStart
         const session = this._vastCampaign.getSession();
 
+        const moat = MoatViewabilityService.getMoat();
+        if(moat) {
+            moat.play(this._vastAdUnit.getVolume());
+        }
+
         if(session) {
             if(session.getEventSent(EventType.IMPRESSION)) {
                 return;
@@ -99,12 +104,6 @@ export class VastVideoEventHandler extends VideoEventHandler {
         this.sendThirdPartyTrackingEvent('creativeView');
         this.sendThirdPartyTrackingEvent('start');
         this.sendThirdPartyTrackingEvent('impression');
-
-        const moat = MoatViewabilityService.getMoat();
-        if(moat) {
-            moat.triggerViewabilityEvent('exposure', true);
-            moat.triggerVideoEvent('AdPlaying', this._vastAdUnit.getVolume());
-        }
     }
 
     public onPause(url: string): void {
@@ -112,8 +111,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
 
         const moat = MoatViewabilityService.getMoat();
         if(moat) {
-            moat.triggerVideoEvent('AdPaused', this._vastAdUnit.getVolume());
-            moat.triggerViewabilityEvent('exposure', false);
+            moat.pause(this._vastAdUnit.getVolume());
         }
     }
 
@@ -122,7 +120,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
 
         const moat = MoatViewabilityService.getMoat();
         if(moat) {
-            moat.triggerVideoEvent('AdStopped', this._vastAdUnit.getVolume());
+            moat.stop(this._vastAdUnit.getVolume());
         }
     }
 
@@ -130,8 +128,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
         const moat = MoatViewabilityService.getMoat();
         if(moat) {
             this._vastAdUnit.setVolume(volume / maxVolume);
-            moat.triggerVideoEvent('AdVolumeChange', this._vastAdUnit.getVolume());
-            moat.triggerViewabilityEvent('volume', this._vastAdUnit.getVolume() * 100);
+            moat.volumeChange(this._vastAdUnit.getVolume());
         }
     }
 
