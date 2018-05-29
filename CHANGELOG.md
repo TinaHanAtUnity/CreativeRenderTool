@@ -1,3 +1,7 @@
+# Pending
+
+* Refactor ad unit lifecycle handling
+
 # Fri May 25 15:33:04 UTC 2018
 
 * Update Unity logo
