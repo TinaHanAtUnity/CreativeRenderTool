@@ -176,6 +176,15 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       font-size: .8rem;
       line-height: 1.2rem;
     }
+
+    /* TODO: Should go away once we finish with gdpr icon a/b test */
+    &.use-gdpr-privacy-icon {
+      .privacy-button {
+        .icon-info {
+          color: $white;
+        }
+      }
+    }
   }
 
   body {
