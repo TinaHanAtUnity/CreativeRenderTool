@@ -1,8 +1,11 @@
 import 'mocha';
+import * as sinon from 'sinon';
 import { assert } from 'chai';
 
 import { Configuration, CacheMode } from 'Models/Configuration';
 import { ConfigurationParser } from 'Parsers/ConfigurationParser';
+import { AdUnitStyle } from 'Models/AdUnitStyle';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
 
@@ -93,5 +96,54 @@ describe('configurationParserTest', () => {
             });
         });
 
+        describe('parsing AdUnitStyle', () => {
+            let adUnitStyle: AdUnitStyle | undefined;
+            beforeEach( () => {
+                adUnitStyle = configuration.getAdUnitStyle();
+            });
+
+            it('should have ctaButtonColor in style object', () => {
+                if (!adUnitStyle) {
+                    throw new Error('no AdUnitStyle object parsed from configuration');
+                }
+                assert.equal(adUnitStyle.getCTAButtonColor(), '#167dfb');
+            });
+        });
+    });
+
+    describe('Parsing json to configuration leaves adUnitStyle undefined when AdUnitStyle', () => {
+        let sandbox: sinon.SinonSandbox;
+        let adUnitConfigurationJson: any;
+
+        beforeEach( () => {
+            adUnitConfigurationJson = JSON.parse(ConfigurationJson);
+            sandbox = sinon.sandbox.create();
+            sandbox.stub(Diagnostics, 'trigger');
+        });
+
+        afterEach(() => {
+            sandbox.restore();
+        });
+
+        it('is undefined', () => {
+            adUnitConfigurationJson.adUnitStyle = undefined;
+            configuration = ConfigurationParser.parse(adUnitConfigurationJson);
+            assert.isUndefined(JSON.stringify(configuration.getAdUnitStyle()));
+            sinon.assert.calledWith(<sinon.SinonSpy>Diagnostics.trigger, 'configuration_ad_unit_style_parse_error');
+        });
+
+        it('is missing', () => {
+            delete adUnitConfigurationJson.adUnitStyle;
+            configuration = ConfigurationParser.parse(adUnitConfigurationJson);
+            assert.isUndefined(JSON.stringify(configuration.getAdUnitStyle()));
+            sinon.assert.calledWith(<sinon.SinonSpy>Diagnostics.trigger, 'configuration_ad_unit_style_parse_error');
+        });
+
+        it('is malformed', () => {
+            adUnitConfigurationJson.adUnitStyle = { 'thisIsNot': 'A Proper stylesheet' };
+            configuration = ConfigurationParser.parse(adUnitConfigurationJson);
+            assert.isUndefined(configuration.getAdUnitStyle());
+            sinon.assert.calledWith(<sinon.SinonSpy>Diagnostics.trigger, 'configuration_ad_unit_style_parse_error');
+        });
     });
 });

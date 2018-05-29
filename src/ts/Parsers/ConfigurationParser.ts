@@ -1,5 +1,7 @@
 import { IConfiguration, Configuration, CacheMode } from 'Models/Configuration';
 import { Placement } from 'Models/Placement';
+import { AdUnitStyle } from 'Models/AdUnitStyle';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class ConfigurationParser {
     public static parse(configJson: any): Configuration {
@@ -41,7 +43,8 @@ export class ConfigurationParser {
             organizationId: configJson.organizationId,
             gdprEnabled: configJson.gdprEnabled,
             optOutRecorded: configJson.optOutRecorded,
-            optOutEnabled: configJson.optOutEnabled
+            optOutEnabled: configJson.optOutEnabled,
+            adUnitStyle: this.parseAdUnitStyle(configJson.adUnitStyle)
         };
         return new Configuration(configurationParams);
     }
@@ -59,5 +62,21 @@ export class ConfigurationParser {
             default:
                 throw new Error('Unknown assetCaching value "' + configJson.assetCaching + '"');
         }
+    }
+
+    private static parseAdUnitStyle(adUnitStyleJson: any): AdUnitStyle | undefined {
+        let adUnitStyle: AdUnitStyle | undefined;
+        try {
+            if (!adUnitStyleJson) {
+                throw new Error('No adUnitStyle was provided in configuration');
+            }
+            adUnitStyle = new AdUnitStyle(adUnitStyleJson);
+        } catch(error) {
+            Diagnostics.trigger('configuration_ad_unit_style_parse_error', {
+                response: adUnitStyleJson,
+                error: error
+            });
+        }
+        return adUnitStyle;
     }
 }
