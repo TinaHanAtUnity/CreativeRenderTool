@@ -58,6 +58,7 @@ import { TimeoutError, Promises } from 'Utilities/Promises';
 import { JaegerSpan, JaegerTags } from 'Jaeger/JaegerSpan';
 import { JaegerManager } from 'Jaeger/JaegerManager';
 import { GdprConsentManager } from 'Managers/GdprConsentManager';
+import { ProgrammaticOperativeEventManager } from 'Managers/ProgrammaticOperativeEventManager';
 
 export class WebView {
 
@@ -498,7 +499,7 @@ export class WebView {
         return TestEnvironment.setup(new MetaData(this._nativeBridge)).then(() => {
             if(TestEnvironment.get('serverUrl')) {
                 ConfigManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
-                OperativeEventManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
+                ProgrammaticOperativeEventManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
                 CampaignManager.setBaseUrl(TestEnvironment.get('serverUrl'));
             }
 
