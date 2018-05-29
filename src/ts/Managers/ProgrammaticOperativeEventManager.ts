@@ -3,19 +3,18 @@ import { Campaign } from 'Models/Campaign';
 import { Url } from 'Utilities/Url';
 
 export class ProgrammaticOperativeEventManager extends OperativeEventManager {
-    /*
     public static setTestBaseUrl(baseUrl: string): void {
         ProgrammaticOperativeEventManager.VideoEventBaseUrl = baseUrl + '/mobile/gamers';
         ProgrammaticOperativeEventManager.ClickEventBaseUrl = baseUrl + '/mobile/campaigns';
     }
 
     private static VideoEventBaseUrl: string = 'https://adserver.unityads.unity3d.com/events/v2/brand/video';
-    private static ClickEventBaseUrl: string = 'https://adserver.unityads.unity3d.com/mobile/campaigns';*/
-/*
+    private static ClickEventBaseUrl: string = 'https://adserver.unityads.unity3d.com/mobile/campaigns';
+
     constructor(params: IOperativeEventManagerParams<Campaign>) {
         super(params);
-    }*/
-/*
+    }
+
     protected createVideoEventUrl(type: string): string {
         return [
             ProgrammaticOperativeEventManager.VideoEventBaseUrl,
@@ -41,5 +40,5 @@ export class ProgrammaticOperativeEventManager extends OperativeEventManager {
         };
 
         return Url.addParameters(url, parameters);
-    }*/
+    }
 }
