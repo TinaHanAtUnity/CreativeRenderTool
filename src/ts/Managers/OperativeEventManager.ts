@@ -18,7 +18,7 @@ import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { CampaignAssetInfo } from 'Utilities/CampaignAssetInfo';
 import { Configuration } from 'Models/Configuration';
 import { GameSessionCounters } from 'Utilities/GameSessionCounters';
-import { ProgrammaticOperativeEventManager } from 'Managers/ProgrammaticOperativeEventManager';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {
     nativeBridge: NativeBridge;
@@ -32,10 +32,6 @@ export interface IOperativeEventManagerParams<T extends Campaign> {
 }
 
 export class OperativeEventManager {
-
-    public static setTestBaseUrl(baseUrl: string): void {
-        ProgrammaticOperativeEventManager.setTestBaseUrl(baseUrl);
-    }
 
     public static getEventKey(sessionId: string, eventId: string): string {
         return SessionManager.getSessionKey(sessionId) + '.operative.' + eventId;
@@ -268,13 +264,19 @@ export class OperativeEventManager {
     }
 
     protected createVideoEventUrl(type: string): string {
+        Diagnostics.trigger('operative_event_manager_url_error', {
+            message: 'Trying to use video-event url generation from base operative event manager'
+        });
+
         return '';
-        // throw new Error('Trying to use video-event url generation from base operative event manager');
     }
 
     protected createClickEventUrl(): string {
+        Diagnostics.trigger('operative_event_manager_url_error', {
+            message: 'Trying to use click-event url generation from base operative event manager'
+        });
+
         return '';
-        // throw new Error('Trying to use click-event url generation from base operative event manager');
     }
 
     protected createUniqueEventMetadata(placement: Placement, gameSession: number, gamerSid?: string, previousPlacementId?: string, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<[string, any]> {
