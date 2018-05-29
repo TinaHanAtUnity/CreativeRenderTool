@@ -63,36 +63,6 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       .download-container {
         margin: $default-size * $scale-size * .75 auto;
       }
-
-      &.gdpr-pop-up-base,
-      &.gdpr-pop-up-icon {
-
-        $gdpr-scale-size = $scale-size * .9;
-
-        .name-container {
-          $name-container-default($gdpr-scale-size);
-        }
-
-        .download-container {
-          $download-container-default($gdpr-scale-size);
-        }
-
-        .game-rating {
-          $game-rating-default($gdpr-scale-size);
-        }
-
-        .game-rating-mask {
-          $game-rating-mask-default($gdpr-scale-size);
-        }
-
-        .game-rating-count {
-          $game-rating-count-default($gdpr-scale-size);
-        }
-
-        .game-icon {
-          $game-icon-default($gdpr-scale-size);
-        }
-      }
     }
 
     &.landscape #end-screen {
