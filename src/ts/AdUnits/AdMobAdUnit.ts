@@ -153,7 +153,9 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public onContainerShow(): void {
-        // EMPTY
+        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            this._nativeBridge.SensorInfo.Ios.startAccelerometerUpdates(new Double(0.01));
+        }
     }
 
     public onContainerForeground(): void {
