@@ -232,10 +232,7 @@ export class WebView {
                     this._sessionManager.setGameSessionId(gameSessionId);
                 });
             }
-            const gdprConsentPromise =  this._gdprManager.getConsent().then((consent: boolean) => {
-                this._configuration.setGDPREnabled(true);
-                this._configuration.setOptOutEnabled(!consent);
-                this._configuration.setOptOutRecorded(true);
+            const gdprConsentPromise = this._gdprManager.getConsentAndUpdateConfiguration().then((consent: boolean) => {
                 this._gdprManager.setConsent(consent);
             }).catch((error) => {
                 // do nothing

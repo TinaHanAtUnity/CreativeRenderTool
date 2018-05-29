@@ -84,6 +84,9 @@ describe('GdprManagerTest', () => {
             sinon.assert.calledWith(sendGDPREventStub, 'consent');
             sinon.assert.calledWith(setStub, StorageType.PRIVATE, 'gdpr.consentlastsent', true);
             sinon.assert.calledWith(writeStub, StorageType.PRIVATE);
+            assert.isTrue(configuration.isGDPREnabled());
+            assert.isFalse(configuration.isOptOutEnabled());
+            assert.isTrue(configuration.isOptOutRecorded());
         });
     });
 
@@ -97,6 +100,9 @@ describe('GdprManagerTest', () => {
             sinon.assert.calledWith(sendGDPREventStub, 'optout');
             sinon.assert.calledWith(setStub, StorageType.PRIVATE, 'gdpr.consentlastsent', false);
             sinon.assert.calledWith(writeStub, StorageType.PRIVATE);
+            assert.isTrue(configuration.isGDPREnabled());
+            assert.isTrue(configuration.isOptOutEnabled());
+            assert.isTrue(configuration.isOptOutRecorded());
         });
     });
 
@@ -108,6 +114,9 @@ describe('GdprManagerTest', () => {
         sinon.assert.notCalled(sendGDPREventStub);
         sinon.assert.notCalled(setStub);
         sinon.assert.notCalled(writeStub);
+        assert.isFalse(configuration.isGDPREnabled());
+        assert.isFalse(configuration.isOptOutEnabled());
+        assert.isFalse(configuration.isOptOutRecorded());
     });
 
     it('subscribe should not send gdpr action when consent has not changed and is false', () => {
@@ -120,6 +129,9 @@ describe('GdprManagerTest', () => {
             sinon.assert.notCalled(sendGDPREventStub);
             sinon.assert.notCalled(setStub);
             sinon.assert.notCalled(writeStub);
+            assert.isTrue(configuration.isGDPREnabled());
+            assert.isTrue(configuration.isOptOutEnabled());
+            assert.isTrue(configuration.isOptOutRecorded());
         });
     });
 
@@ -133,44 +145,80 @@ describe('GdprManagerTest', () => {
             sinon.assert.notCalled(sendGDPREventStub);
             sinon.assert.notCalled(setStub);
             sinon.assert.notCalled(writeStub);
+            assert.isTrue(configuration.isGDPREnabled());
+            assert.isFalse(configuration.isOptOutEnabled());
+            assert.isTrue(configuration.isOptOutRecorded());
         });
     });
 
-    it('getConsent should call storage get with true', () => {
+    it('getConsentAndUpdateConfiguration should not update configuration with undefined', () => {
+        consent = undefined;
+        return gdprManager.getConsentAndUpdateConfiguration().then(() => {
+            assert.fail('should throw');
+        }).catch(() => {
+            assert.isFalse(configuration.isGDPREnabled());
+            assert.isFalse(configuration.isOptOutEnabled());
+            assert.isFalse(configuration.isOptOutRecorded());
+        });
+    });
+
+    it('getConsentAndUpdateConfiguration should update configuration with true', () => {
         consent = true;
-        return gdprManager.getConsent().then((consentValue) => {
+        return gdprManager.getConsentAndUpdateConfiguration().then((consentValue) => {
             sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'gdpr.consent.value');
             assert.equal(consentValue, consent);
+            assert.isTrue(configuration.isGDPREnabled());
+            assert.isFalse(configuration.isOptOutEnabled());
+            assert.isTrue(configuration.isOptOutRecorded());
         });
     });
 
-    it('getConsent should call storage get with false', () => {
+    it('getConsentAndUpdateConfiguration should update configuration with false', () => {
         consent = false;
-        return gdprManager.getConsent().then((consentValue) => {
+        return gdprManager.getConsentAndUpdateConfiguration().then((consentValue) => {
+            sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'gdpr.consent.value');
+            assert.equal(consentValue, consent);
+            assert.isTrue(configuration.isGDPREnabled());
+            assert.isTrue(configuration.isOptOutEnabled());
+            assert.isTrue(configuration.isOptOutRecorded());
+        });
+    });
+
+    it('getConsentAndUpdateConfiguration should call storage get with true', () => {
+        consent = true;
+        return gdprManager.getConsentAndUpdateConfiguration().then((consentValue) => {
             sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'gdpr.consent.value');
             assert.equal(consentValue, consent);
         });
     });
 
-    it('getConsent should call storage get with "true"', () => {
+    it('getConsentAndUpdateConfiguration should call storage get with false', () => {
+        consent = false;
+        return gdprManager.getConsentAndUpdateConfiguration().then((consentValue) => {
+            sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'gdpr.consent.value');
+            assert.equal(consentValue, consent);
+        });
+    });
+
+    it('getConsentAndUpdateConfiguration should call storage get with "true"', () => {
         consent = 'true';
-        return gdprManager.getConsent().then((consentValue) => {
+        return gdprManager.getConsentAndUpdateConfiguration().then((consentValue) => {
             sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'gdpr.consent.value');
             assert.equal(consentValue, true);
         });
     });
 
-    it('getConsent should call storage get with "false"', () => {
+    it('getConsentAndUpdateConfiguration should call storage get with "false"', () => {
         consent = 'false';
-        return gdprManager.getConsent().then((consentValue) => {
+        return gdprManager.getConsentAndUpdateConfiguration().then((consentValue) => {
             sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'gdpr.consent.value');
             assert.equal(consentValue, false);
         });
     });
 
-    it('getConsent should call storage get with undefined', () => {
+    it('getConsentAndUpdateConfiguration should call storage get with undefined', () => {
         consent = undefined;
-        return gdprManager.getConsent().then(() => {
+        return gdprManager.getConsentAndUpdateConfiguration().then(() => {
             assert.fail('Should throw');
         }).catch((error) => {
             sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'gdpr.consent.value');

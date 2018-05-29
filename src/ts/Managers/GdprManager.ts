@@ -36,14 +36,10 @@ export class GdprManager {
         this._nativeBridge.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, data));
     }
 
-    public getConsent(): Promise<boolean> {
-        return this._nativeBridge.Storage.get(StorageType.PUBLIC, GdprManager.GdprConsentStorageKey).then((data: any) => {
-            const value: boolean | undefined = this.getConsentTypeHack(data);
-            if(typeof(value) !== 'undefined') {
-                return Promise.resolve(value);
-            } else {
-                throw new Error('gdpr.consent.value is undefined');
-            }
+    public getConsentAndUpdateConfiguration(): Promise<boolean> {
+        return this.getConsent().then((consent: boolean) => {
+            this.updateConfigurationWithConsent(consent);
+            return consent;
         });
     }
 
@@ -86,11 +82,29 @@ export class GdprManager {
         });
     }
 
+    private getConsent(): Promise<boolean> {
+        return this._nativeBridge.Storage.get(StorageType.PUBLIC, GdprManager.GdprConsentStorageKey).then((data: any) => {
+            const value: boolean | undefined = this.getConsentTypeHack(data);
+            if(typeof(value) !== 'undefined') {
+                return Promise.resolve(value);
+            } else {
+                throw new Error('gdpr.consent.value is undefined');
+            }
+        });
+    }
+
+    private updateConfigurationWithConsent(consent: boolean) {
+        this._configuration.setGDPREnabled(true);
+        this._configuration.setOptOutEnabled(!consent);
+        this._configuration.setOptOutRecorded(true);
+    }
+
     private onStorageSet(eventType: string, data: any) {
         if(data && data.gdpr && data.gdpr.consent) {
             const value: boolean | undefined = this.getConsentTypeHack(data.gdpr.consent.value);
 
             if(typeof(value) !== 'undefined') {
+                this.updateConfigurationWithConsent(value);
                 this.setConsent(value);
             }
         }
