@@ -1,11 +1,9 @@
-import { IOperativeEventManagerParams, OperativeEventManager } from 'Managers/OperativeEventManager';
-import { Session } from 'Models/Session';
-import { AdUnitStyle } from 'Models/AdUnitStyle';
-import { Placement } from 'Models/Placement';
+import { IOperativeEventManagerParams } from 'Managers/OperativeEventManager';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Url } from 'Utilities/Url';
+import { ProgrammaticOperativeEventManager } from 'Managers/ProgrammaticOperativeEventManager';
 
-export class MRAIDOperativeEventManager extends OperativeEventManager {
+export class MRAIDOperativeEventManager extends ProgrammaticOperativeEventManager {
     private _mraidCampaign: MRAIDCampaign;
 
     constructor(params: IOperativeEventManagerParams<MRAIDCampaign>) {
