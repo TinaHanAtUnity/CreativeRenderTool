@@ -1,4 +1,4 @@
-import { Observable1, Observable2, Observable4, Observable3 } from 'Utilities/Observable';
+import { Observable1, Observable2, Observable4 } from 'Utilities/Observable';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Url } from 'Utilities/Url';
 import { Request, INativeResponse } from 'Utilities/Request';
@@ -15,7 +15,7 @@ import { MediationMetaData } from 'Models/MetaData/MediationMetaData';
 import { FrameworkMetaData } from 'Models/MetaData/FrameworkMetaData';
 import { SessionManager } from 'Managers/SessionManager';
 import { JsonParser } from 'Utilities/JsonParser';
-import { RefreshManager, INoFillRetry } from 'Managers/RefreshManager';
+import { RefreshManager } from 'Managers/RefreshManager';
 import { CacheStatus } from 'Utilities/Cache';
 import { AuctionResponse } from 'Models/AuctionResponse';
 import { Session } from 'Models/Session';
@@ -75,7 +75,7 @@ export class CampaignManager {
     public readonly onNoFill = new Observable1<string>();
     public readonly onError = new Observable4<WebViewError, string[], string, Session | undefined>();
     public readonly onConnectivityError = new Observable1<string[]>();
-    public readonly onAdPlanReceived = new Observable3<number, number, string>();
+    public readonly onAdPlanReceived = new Observable2<number, number>();
 
     protected _nativeBridge: NativeBridge;
     protected _requesting: boolean;
@@ -134,7 +134,7 @@ export class CampaignManager {
             });
     }
 
-    public request(nofillRetry?: INoFillRetry): Promise<INativeResponse | void> {
+    public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
         // prevent having more then one ad request in flight
         if(this._requesting) {
             return Promise.resolve();
@@ -150,7 +150,7 @@ export class CampaignManager {
         this.resetRealtimeDataForPlacements();
         const jaegerSpan = this._jaegerManager.startSpan('CampaignManagerRequest');
         jaegerSpan.addTag(JaegerTags.DeviceType, Platform[this._nativeBridge.getPlatform()]);
-        return Promise.all([this.createRequestUrl(false, nofillRetry), this.createRequestBody(nofillRetry)]).then(([requestUrl, requestBody]) => {
+        return Promise.all([this.createRequestUrl(false), this.createRequestBody(nofillRetry)]).then(([requestUrl, requestBody]) => {
             this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
             const body = JSON.stringify(requestBody);
 
@@ -213,7 +213,7 @@ export class CampaignManager {
     }
 
     public requestRealtime(placement: Placement, session: Session): Promise<Campaign | void> {
-        return Promise.all([this.createRequestUrl(true, undefined, session), this.createRequestBody(undefined, placement)]).then(([requestUrl, requestBody]) => {
+        return Promise.all([this.createRequestUrl(true, session), this.createRequestBody(false, placement)]).then(([requestUrl, requestBody]) => {
             this._nativeBridge.Sdk.logInfo('Requesting realtime ad plan from ' + requestUrl);
             const body = JSON.stringify(requestBody);
             return this._request.post(requestUrl, body, [], {
@@ -320,7 +320,7 @@ export class CampaignManager {
 
             if (!this._ignoreEvents) {
                 this._nativeBridge.Sdk.logInfo('AdPlan received with ' + campaigns + ' campaigns and refreshDelay ' + refreshDelay);
-                this.onAdPlanReceived.trigger(refreshDelay, campaigns, json.auctionId);
+                this.onAdPlanReceived.trigger(refreshDelay, campaigns);
             }
 
             for(const mediaId in fill) {
@@ -453,7 +453,7 @@ export class CampaignManager {
         return CampaignManager.AbGroup ? CampaignManager.AbGroup : this._configuration.getAbGroup();
     }
 
-    private createRequestUrl(realtime: boolean, noFillRetry?: INoFillRetry, session?: Session): Promise<string> {
+    private createRequestUrl(realtime: boolean, session?: Session): Promise<string> {
 
         if (realtime && this._realtimeUrl) {
             if (session) {
@@ -484,12 +484,6 @@ export class CampaignManager {
             sdkVersion: this._clientInfo.getSdkVersion(),
             stores: this._deviceInfo.getStores()
         });
-
-        if (noFillRetry) {
-            url = Url.addParameters(url, {
-                auctionId: noFillRetry.auctionId
-            });
-        }
 
         if(this._clientInfo.getPlatform() === Platform.IOS && this._deviceInfo instanceof IosDeviceInfo) {
             url = Url.addParameters(url, {
@@ -552,7 +546,7 @@ export class CampaignManager {
         });
     }
 
-    private createRequestBody(nofillRetry?: INoFillRetry, realtimePlacement?: Placement): Promise<any> {
+    private createRequestBody(nofillRetry?: boolean, realtimePlacement?: Placement): Promise<any> {
         const placementRequest: any = {};
 
         if(realtimePlacement && this._realtimeBody) {

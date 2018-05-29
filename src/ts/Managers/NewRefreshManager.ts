@@ -1,4 +1,4 @@
-import { RefreshManager, INoFillRetry } from 'Managers/RefreshManager';
+import { RefreshManager } from 'Managers/RefreshManager';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { PlacementState } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
@@ -28,6 +28,7 @@ enum FillState {
 
 export interface IRefillFlags {
     shouldRefill: boolean;
+    noFillRetry?: boolean;
 }
 
 export class NewRefreshManager extends RefreshManager {
@@ -73,7 +74,7 @@ export class NewRefreshManager extends RefreshManager {
         this._campaignManager.onNoFill.subscribe(placementId => this.onNoFill(placementId));
         this._campaignManager.onError.subscribe((error, placementIds, diagnosticsType, session) => this.onError(error, placementIds, diagnosticsType, session));
         this._campaignManager.onConnectivityError.subscribe((placementIds) => this.onConnectivityError(placementIds));
-        this._campaignManager.onAdPlanReceived.subscribe((refreshDelay, campaignCount, auctionId) => this.onAdPlanReceived(refreshDelay, campaignCount, auctionId));
+        this._campaignManager.onAdPlanReceived.subscribe((refreshDelay, campaignCount) => this.onAdPlanReceived(refreshDelay, campaignCount));
         this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
             this._focusManager.onAppForeground.subscribe(() => this.onAppForeground());
@@ -123,7 +124,7 @@ export class NewRefreshManager extends RefreshManager {
                     span.addAnnotation('invalidating fill');
                     this.invalidateFill();
                     this._campaignManager.requestFromCache(cachedResponse).then(() => {
-                        this._campaignManager.request();
+                        this._campaignManager.request(refillFlags.noFillRetry);
                    });
                 }
             });
@@ -133,7 +134,7 @@ export class NewRefreshManager extends RefreshManager {
     }
 
     // todo: remove noFillRetry from parameters
-    public refresh(nofillRetry?: INoFillRetry): Promise<INativeResponse | void> {
+    public refresh(nofillRetry?: boolean): Promise<INativeResponse | void> {
         const refillFlags: IRefillFlags = this.getRefillState(Date.now());
 
         if(refillFlags.shouldRefill) {
@@ -148,7 +149,7 @@ export class NewRefreshManager extends RefreshManager {
                     }
                 } else {
                     this.invalidateFill();
-                    this._campaignManager.request(nofillRetry);
+                    this._campaignManager.request(refillFlags.noFillRetry);
                 }
             });
         } else {
@@ -206,7 +207,8 @@ export class NewRefreshManager extends RefreshManager {
 
         if(this._fillState === FillState.NOFILL_RETRY && this._noFillRetryTimestamp !== 0 && timestamp > this._noFillRetryTimestamp) {
             return {
-                shouldRefill: true
+                shouldRefill: true,
+                noFillRetry: true
             };
         }
 
@@ -293,7 +295,7 @@ export class NewRefreshManager extends RefreshManager {
         }
     }
 
-    private onAdPlanReceived(refreshDelay: number, campaignCount: number, auctionId: string) {
+    private onAdPlanReceived(refreshDelay: number, campaignCount: number) {
         this._fillState = FillState.FILL_RECEIVED;
 
         this._campaignCount = campaignCount;
@@ -325,7 +327,7 @@ export class NewRefreshManager extends RefreshManager {
                 delay = delay + Math.random() * 10; // add 0-10 second random delay
                 this._nativeBridge.Sdk.logDebug('Unity Ads ad plan will be refreshed in ' + delay + ' seconds');
                 setTimeout(() => {
-                    this.refresh({auctionId: auctionId});
+                    this.refresh();
                 }, delay * 1000);
                 return;
             }
