@@ -1,6 +1,5 @@
 import { Placement } from 'Models/Placement';
 import { ISchema, Model } from 'Models/Model';
-import { AdUnitStyle } from 'Models/AdUnitStyle';
 
 export enum CacheMode {
     FORCED,
@@ -28,7 +27,6 @@ export interface IConfiguration {
     gdprEnabled: boolean;
     optOutRecorded: boolean;
     optOutEnabled: boolean;
-    adUnitStyle: AdUnitStyle | undefined;
 }
 
 export class Configuration extends Model<IConfiguration> {
@@ -50,8 +48,7 @@ export class Configuration extends Model<IConfiguration> {
         organizationId: ['string', 'undefined'],
         gdprEnabled: ['boolean'],
         optOutRecorded: ['boolean'],
-        optOutEnabled: ['boolean'],
-        adUnitStyle: ['object', 'undefined']
+        optOutEnabled: ['boolean']
     };
 
     constructor(data: IConfiguration) {
@@ -196,9 +193,5 @@ export class Configuration extends Model<IConfiguration> {
 
     public getOrganizationId(): string | undefined {
         return this.get('organizationId');
-    }
-
-    public getAdUnitStyle(): AdUnitStyle | undefined {
-        return this.get('adUnitStyle');
     }
 }

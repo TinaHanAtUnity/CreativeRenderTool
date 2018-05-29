@@ -52,8 +52,5 @@
   "organizationId": "5552368",
   "gdprEnabled": false,
   "optOutRecorded": false,
-  "optOutEnabled": false,
-  "adUnitStyle": {
-    "ctaButtonColor": "#167dfb"
-  }
+  "optOutEnabled": false
 }

@@ -8,9 +8,11 @@ import { SdkApi } from 'Native/Api/Sdk';
 import { Request } from 'Utilities/Request';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
+import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { PerformanceCampaign, StoreName } from 'Models/Campaigns/PerformanceCampaign';
 import { AuctionResponse } from 'Models/AuctionResponse';
 import { Url } from 'Utilities/Url';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 import OnCometMraidPlcCampaign from 'json/campaigns/performance/CometMraidUrlCampaign.json';
 import OnCometVideoPlcCampaign from 'json/campaigns/performance/CometVideoCampaign.json';
@@ -126,6 +128,59 @@ describe('CometCampaignParser', () => {
                 assertBaseCampaign(content);
                 assert.equal(perfCampaign.getVideo()!.getUrl(), Url.encode(content.trailerDownloadable), 'Downloadable Trailer URL is not equal');
                 assert.equal(perfCampaign.getStreamingVideo()!.getUrl(), Url.encode(content.trailerStreaming), 'Downloadable Trailer URL is not equal');
+            });
+
+            it('should have a AdUnitStyle object with ctaButtonColor-property', () => {
+                const perfCampaign = <PerformanceCampaign>campaign;
+                const adUnitStyle: AdUnitStyle | undefined = perfCampaign.getAdUnitStyle();
+
+                if (!adUnitStyle) {
+                    throw new Error('no AdUnitStyle object parsed from configuration');
+                }
+                assert.equal(adUnitStyle.getCTAButtonColor(), '#167dfb');
+            });
+
+            describe('Parsing json to campaign leaves adUnitStyle undefined when AdUnitStyle in JSON', () => {
+                let sandbox: sinon.SinonSandbox;
+                let campaignJSON: any;
+
+                beforeEach(() => {
+                    sandbox = sinon.sandbox.create();
+                    sandbox.stub(Diagnostics, 'trigger');
+                    campaignJSON = JSON.parse(OnCometVideoPlcCampaign);
+                    campaignJSON.content = JSON.parse(campaignJSON.content);
+                });
+
+                afterEach(() => {
+                    sandbox.restore();
+                });
+
+                it('is undefined', () => {
+                    campaignJSON.content.adUnitStyle = undefined;
+                    campaignJSON.content = JSON.stringify(campaignJSON.content);
+                    return parse(campaignJSON).then( () => {
+                        assert.isUndefined( (<PerformanceCampaign>campaign).getAdUnitStyle() );
+                        sinon.assert.calledWith(<sinon.SinonSpy>Diagnostics.trigger, 'configuration_ad_unit_style_parse_error');
+                    });
+                });
+
+                it('is missing', () => {
+                    delete campaignJSON.content.adUnitStyle;
+                    campaignJSON.content = JSON.stringify(campaignJSON.content);
+                    return parse(campaignJSON).then( () => {
+                        assert.isUndefined( (<PerformanceCampaign>campaign).getAdUnitStyle() );
+                        sinon.assert.calledWith(<sinon.SinonSpy>Diagnostics.trigger, 'configuration_ad_unit_style_parse_error');
+                    });
+                });
+
+                it('is malformed', () => {
+                    campaignJSON.content.adUnitStyle = { 'thisIsNot': 'A Proper stylesheet' };
+                    campaignJSON.content = JSON.stringify(campaignJSON.content);
+                    return parse(campaignJSON).then( () => {
+                        assert.isUndefined( (<PerformanceCampaign>campaign).getAdUnitStyle() );
+                        sinon.assert.calledWith(<sinon.SinonSpy>Diagnostics.trigger, 'configuration_ad_unit_style_parse_error');
+                    });
+                });
             });
         });
     });
