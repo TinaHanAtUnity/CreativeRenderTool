@@ -25,6 +25,7 @@ import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 import { Closer } from 'Views/Closer';
 import { Platform } from 'Constants/Platform';
 import { GdprConsentManager } from 'Managers/GdprConsentManager';
+import { ProgrammaticOperativeEventManager } from 'Managers/ProgrammaticOperativeEventManager';
 
 describe('VPAIDAdUnit', () => {
     let nativeBridge: NativeBridge;
@@ -43,7 +44,7 @@ describe('VPAIDAdUnit', () => {
             deviceInfo: sinon.createStubInstance(DeviceInfo),
             clientInfo: sinon.createStubInstance(ClientInfo),
             thirdPartyEventManager: sinon.createStubInstance(ThirdPartyEventManager),
-            operativeEventManager: sinon.createStubInstance(OperativeEventManager),
+            operativeEventManager: sinon.createStubInstance(ProgrammaticOperativeEventManager),
             placement: TestFixtures.getPlacement(),
             container: sinon.createStubInstance(Activity),
             configuration: sinon.createStubInstance(Configuration),
