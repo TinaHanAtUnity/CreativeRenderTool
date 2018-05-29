@@ -125,7 +125,7 @@ export class AdUnitFactory {
         const endScreenEventHandler = new PerformanceEndScreenEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
         endScreen.addEventHandler(endScreenEventHandler);
 
-        const videoEventHandlerParams = this.getVideoEventHandlerParams(nativeBridge, performanceAdUnit, video, performanceAdUnitParameters.adUnitStyle, performanceAdUnitParameters);
+        const videoEventHandlerParams = this.getVideoEventHandlerParams(nativeBridge, performanceAdUnit, video, performanceAdUnitParameters);
         this.prepareVideoPlayer(PerformanceVideoEventHandler, <IVideoEventHandlerParams<PerformanceAdUnit>>videoEventHandlerParams);
 
         if (nativeBridge.getPlatform() === Platform.ANDROID) {
@@ -162,7 +162,7 @@ export class AdUnitFactory {
         const endScreenEventHandler = new XPromoEndScreenEventHandler(nativeBridge, xPromoAdUnit, xPromoAdUnitParameters);
         endScreen.addEventHandler(endScreenEventHandler);
 
-        const videoEventHandlerParams = this.getVideoEventHandlerParams(nativeBridge, xPromoAdUnit, video, undefined, xPromoAdUnitParameters);
+        const videoEventHandlerParams = this.getVideoEventHandlerParams(nativeBridge, xPromoAdUnit, video, xPromoAdUnitParameters);
         this.prepareVideoPlayer(XPromoVideoEventHandler, <IVideoEventHandlerParams<XPromoAdUnit, XPromoCampaign, XPromoOperativeEventManager>>videoEventHandlerParams);
 
         if (nativeBridge.getPlatform() === Platform.ANDROID) {
@@ -214,7 +214,7 @@ export class AdUnitFactory {
         const vastOverlayHandler = new VastOverlayEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
         overlay.addEventHandler(vastOverlayHandler);
 
-        const videoEventHandlerParams = this.getVideoEventHandlerParams(nativeBridge, vastAdUnit, parameters.campaign.getVideo(), undefined, vastAdUnitParameters);
+        const videoEventHandlerParams = this.getVideoEventHandlerParams(nativeBridge, vastAdUnit, parameters.campaign.getVideo(), vastAdUnitParameters);
         const vastVideoEventHandler = this.prepareVideoPlayer(VastVideoEventHandler, <IVideoEventHandlerParams<VastAdUnit, VastCampaign>>videoEventHandlerParams);
 
         let onVolumeChangeObserverAndroid: IObserver3<number, number, number>;
@@ -439,7 +439,7 @@ export class AdUnitFactory {
         }
     }
 
-    private static getVideoEventHandlerParams(nativeBridge: NativeBridge, adUnit: VideoAdUnit, video: Video, adUnitStyle: AdUnitStyle | undefined, params: IAdUnitParameters<Campaign>): IVideoEventHandlerParams {
+    private static getVideoEventHandlerParams(nativeBridge: NativeBridge, adUnit: VideoAdUnit, video: Video, params: IAdUnitParameters<Campaign>): IVideoEventHandlerParams {
         return {
             nativeBrige: nativeBridge,
             adUnit: adUnit,
@@ -449,7 +449,7 @@ export class AdUnitFactory {
             configuration: params.configuration,
             placement: params.placement,
             video: video,
-            adUnitStyle: adUnitStyle,
+            adUnitStyle: params.configuration.getAdUnitStyle(),
             clientInfo: params.clientInfo
         };
     }
