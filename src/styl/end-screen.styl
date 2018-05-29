@@ -2,6 +2,8 @@
 @import "components.styl";
 @import "fancy-end-screen.styl";
 
+$dark-icon-color = rgba(0, 0, 0, .25);
+
 $end-screen-mixin($scale-size = $default-scale-size) {
 
   #end-screen {
@@ -121,8 +123,9 @@ $end-screen-mixin($scale-size = $default-scale-size) {
             width: 80%;
           }
 
-          .gdpr-icon {
-            $set-image(10%, $scale-size * $default-size, 0, "../img/gdpr-icon.png", contain);
+          .icon-gdpr {
+            margin: 0 .5rem;
+            color: $dark-icon-color;
           }
         }
       }
@@ -138,12 +141,11 @@ $end-screen-mixin($scale-size = $default-scale-size) {
           padding: $scale-size * $default-size * .35 $scale-size * $default-size * .5;
 
           .icon-info {
-            $icon-size = $scale-size * $default-size;
-            $set-image($icon-size, $icon-size * 1.2, 0, "../img/gdpr-icon.png", contain);
-            display: block;
+            color: $dark-icon-color;
 
+            /* overriding content with the icon-gdpr. */
             &:before {
-              content: "";
+              content: "\e010";
             }
           }
         }
