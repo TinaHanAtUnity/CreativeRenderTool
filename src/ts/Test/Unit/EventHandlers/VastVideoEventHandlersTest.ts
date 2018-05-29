@@ -25,10 +25,11 @@ import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { IVideoEventHandlerParams } from 'EventHandlers/BaseVideoEventHandler';
+import { Vast } from 'Models/Vast/Vast';
+import { VideoState } from 'AdUnits/VideoAdUnit';
+import { GdprManager } from 'Managers/GdprManager';
 
 import EventTestVast from 'xml/EventTestVast.xml';
-import { Vast } from 'Models/Vast/Vast';
-import { GdprManager } from 'Managers/GdprManager';
 
 describe('VastVideoEventHandler tests', () => {
     const handleInvocation = sinon.spy();
@@ -212,10 +213,9 @@ describe('VastVideoEventHandler tests', () => {
             mockEventManager.verify();
         });
 
-        it('tiggers moat viewability and video events', () => {
+        it('tiggers moat play event', () => {
             vastVideoEventHandler.onPlay('https://test.com');
-            sinon.assert.called(<sinon.SinonStub>moat.triggerViewabilityEvent);
-            sinon.assert.called(<sinon.SinonStub>moat.triggerVideoEvent);
+            sinon.assert.called(<sinon.SinonStub>moat.play);
         });
     });
 
@@ -246,9 +246,9 @@ describe('VastVideoEventHandler tests', () => {
             sinon.assert.called(<sinon.SinonSpy>testAdUnit.hide);
         });
 
-        it ('should trigger moat video event', () => {
+        it ('should trigger moat completed event', () => {
             vastVideoEventHandler.onCompleted('https://test.com');
-            sinon.assert.called(<sinon.SinonStub>moat.triggerVideoEvent);
+            sinon.assert.called(<sinon.SinonStub>moat.completed);
         });
     });
 
@@ -257,8 +257,8 @@ describe('VastVideoEventHandler tests', () => {
             vastVideoEventHandler.onStop('https://test.com');
         });
 
-        it ('should send moat video event', () => {
-            sinon.assert.called(<sinon.SinonStub>moat.triggerVideoEvent);
+        it ('should send moat stop event', () => {
+            sinon.assert.called(<sinon.SinonStub>moat.stop);
         });
     });
 
@@ -268,12 +268,8 @@ describe('VastVideoEventHandler tests', () => {
             vastVideoEventHandler.onPause('https://test.com');
         });
 
-        it ('should send moat video event', () => {
-            sinon.assert.calledWith(<sinon.SinonStub>moat.triggerVideoEvent, 'AdPaused', 4);
-        });
-
-        it ('should trigger moat viewability event', () => {
-            sinon.assert.called(<sinon.SinonStub>moat.triggerViewabilityEvent);
+        it ('should send moat pause event', () => {
+            sinon.assert.calledWith(<sinon.SinonStub>moat.pause, 4);
         });
     });
 
@@ -282,19 +278,15 @@ describe('VastVideoEventHandler tests', () => {
             vastVideoEventHandler.onVolumeChange(1, 10);
         });
 
-        it ('should send moat video event', () => {
-            sinon.assert.calledWith(<sinon.SinonStub>moat.triggerVideoEvent, 'AdVolumeChange', 0.1);
-        });
-
-        it ('should trigger moat viewability event', () => {
-            sinon.assert.calledWith(<sinon.SinonStub>moat.triggerViewabilityEvent, 'volume', 10);
+        it ('should call moat volumeChange event', () => {
+            sinon.assert.calledWith(<sinon.SinonStub>moat.volumeChange, 0.1);
         });
     });
 
     describe('onVideoError', () => {
         it('should hide ad unit', () => {
             // Cause an error by giving too large duration
-            testAdUnit.setPrepareCalled(true);
+            testAdUnit.setVideoState(VideoState.PREPARING);
             vastVideoEventHandler.onPrepared('https://test.com', 50000, 1024, 768);
             sinon.assert.called(<sinon.SinonSpy>testAdUnit.hide);
         });
@@ -321,8 +313,7 @@ describe('VastVideoEventHandler tests', () => {
 
         it('should show end screen when onVideoError', () => {
             // Cause an error by giving too large duration
-            vastAdUnit.setPrepareCalled(true);
-
+            vastAdUnit.setVideoState(VideoState.PREPARING);
             vastVideoEventHandler.onPrepared('https://test.com', 50000, 1024, 768);
 
             sinon.assert.called(<sinon.SinonSpy>vastEndScreen.show);

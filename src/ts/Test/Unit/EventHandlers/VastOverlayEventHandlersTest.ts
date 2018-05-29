@@ -21,10 +21,8 @@ import { VastEndScreen } from 'Views/VastEndScreen';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { FocusManager } from 'Managers/FocusManager';
 import { Request } from 'Utilities/Request';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { MOAT } from 'Views/MOAT';
 import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
-import { SinonSandbox } from 'sinon';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { GdprManager } from 'Managers/GdprManager';
 
@@ -188,16 +186,14 @@ describe('VastOverlayEventHandlersTest', () => {
             testMuteEvent(false);
         });
 
-        it('sends moat video and viewability events when mute is true', () => {
+        it('should call volumeChange when mute is true', () => {
             vastOverlayEventHandler.onOverlayMute(true);
-            sinon.assert.called(<sinon.SinonStub>moat.triggerVideoEvent);
-            sinon.assert.called(<sinon.SinonStub>moat.triggerViewabilityEvent);
+            sinon.assert.called(<sinon.SinonStub>moat.volumeChange);
         });
 
-        it('sends moat video and viewability events when mute is false', () => {
+        it('should call play when mute is false', () => {
             vastOverlayEventHandler.onOverlayMute(false);
-            sinon.assert.called(<sinon.SinonStub>moat.triggerVideoEvent);
-            sinon.assert.called(<sinon.SinonStub>moat.triggerViewabilityEvent);
+            sinon.assert.called(<sinon.SinonStub>moat.volumeChange);
         });
     });
 
