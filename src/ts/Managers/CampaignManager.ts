@@ -539,7 +539,6 @@ export class CampaignManager {
                 screenHeight: screenHeight,
                 connectionType: connectionType,
                 networkType: networkType,
-                gamerId: this._configuration.getGamerId()
             });
             this._realtimeUrl = url;
             return url;
