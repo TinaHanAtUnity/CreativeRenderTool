@@ -248,7 +248,11 @@ export class OperativeEventManager {
         return this._clientInfo;
     }
 
-    public sendEvent(event: string, eventId: string, sessionId: string, url: string, data: string): Promise<INativeResponse | void> {
+    public sendEvent(event: string, eventId: string, sessionId: string, url: string | undefined, data: string): Promise<INativeResponse | void> {
+        if(!url) {
+            return Promise.resolve();
+        }
+
         this._nativeBridge.Sdk.logInfo('Unity Ads event: sending ' + event + ' event to ' + url);
 
         return this._request.post(url, data, [], {
@@ -263,20 +267,21 @@ export class OperativeEventManager {
         });
     }
 
-    protected createVideoEventUrl(type: string): string {
+    protected createVideoEventUrl(type: string): string | undefined {
         Diagnostics.trigger('operative_event_manager_url_error', {
-            message: 'Trying to use video-event url generation from base operative event manager'
+            message: 'Trying to use video-event url generation from base operative event manager',
+            eventType: type
         });
 
-        return '';
+        return undefined;
     }
 
-    protected createClickEventUrl(): string {
+    protected createClickEventUrl(): string | undefined {
         Diagnostics.trigger('operative_event_manager_url_error', {
             message: 'Trying to use click-event url generation from base operative event manager'
         });
 
-        return '';
+        return undefined;
     }
 
     protected createUniqueEventMetadata(placement: Placement, gameSession: number, gamerSid?: string, previousPlacementId?: string, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<[string, any]> {
@@ -290,7 +295,6 @@ export class OperativeEventManager {
             'eventId': eventId,
             'auctionId': this._campaign.getSession().getId(),
             'gameSessionId': gameSession,
-            'gamerId': this._campaign.getGamerId(),
             'campaignId': this._campaign.getId(),
             'adType': this._campaign.getAdType(),
             'correlationId': this._campaign.getCorrelationId(),
