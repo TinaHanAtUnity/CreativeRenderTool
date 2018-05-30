@@ -93,6 +93,7 @@ export class CampaignManager {
     private _realtimeBody: any = {};
     private _ignoreEvents: boolean;
     private _jaegerManager: JaegerManager;
+    private _lastAuctionId: string | undefined;
 
     constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeeping, jaegerManager: JaegerManager) {
         this._nativeBridge = nativeBridge;
@@ -172,7 +173,7 @@ export class CampaignManager {
         this.resetRealtimeDataForPlacements();
         const jaegerSpan = this._jaegerManager.startSpan('CampaignManagerRequest');
         jaegerSpan.addTag(JaegerTags.DeviceType, Platform[this._nativeBridge.getPlatform()]);
-        return Promise.all([this.createRequestUrl(false), this.createRequestBody(nofillRetry)]).then(([requestUrl, requestBody]) => {
+        return Promise.all([this.createRequestUrl(false, nofillRetry), this.createRequestBody(nofillRetry)]).then(([requestUrl, requestBody]) => {
             this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
             const body = JSON.stringify(requestBody);
 
@@ -235,7 +236,7 @@ export class CampaignManager {
     }
 
     public requestRealtime(placement: Placement, session: Session): Promise<Campaign | void> {
-        return Promise.all([this.createRequestUrl(true, session), this.createRequestBody(false, placement)]).then(([requestUrl, requestBody]) => {
+        return Promise.all([this.createRequestUrl(true, undefined, session), this.createRequestBody(false, placement)]).then(([requestUrl, requestBody]) => {
             this._nativeBridge.Sdk.logInfo('Requesting realtime ad plan from ' + requestUrl);
             const body = JSON.stringify(requestBody);
             return this._request.post(requestUrl, body, [], {
@@ -289,6 +290,8 @@ export class CampaignManager {
 
         if(!json.auctionId) {
             throw new Error('No auction ID found');
+        } else {
+            this._lastAuctionId = json.auctionId;
         }
 
         const session: Session = this._sessionManager.create(json.auctionId);
@@ -475,7 +478,7 @@ export class CampaignManager {
         return CampaignManager.AbGroup ? CampaignManager.AbGroup : this._configuration.getAbGroup();
     }
 
-    private createRequestUrl(realtime: boolean, session?: Session): Promise<string> {
+    private createRequestUrl(realtime: boolean, nofillRetry?: boolean, session?: Session): Promise<string> {
 
         if (realtime && this._realtimeUrl) {
             if (session) {
@@ -497,6 +500,12 @@ export class CampaignManager {
         } else if(this._clientInfo.getPlatform() === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
             url = Url.addParameters(url, {
                 androidId: this._deviceInfo.getAndroidId()
+            });
+        }
+
+        if (nofillRetry && this._lastAuctionId) {
+            url = Url.addParameters(url, {
+                auctionId: this._lastAuctionId
             });
         }
 
