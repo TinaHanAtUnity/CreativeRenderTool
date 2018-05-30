@@ -110,12 +110,6 @@
       "body": false
     },
     {
-      "parameter": "gamerId",
-      "required": "yes",
-      "queryString": true,
-      "body": false
-    },
-    {
       "parameter": "bundleVersion",
       "required": "all",
       "queryString": false,
