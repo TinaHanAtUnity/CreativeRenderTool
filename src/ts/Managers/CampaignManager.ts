@@ -110,28 +110,50 @@ export class CampaignManager {
         this._jaegerManager = jaegerManager;
     }
 
+    public cleanCachedUrl(url: string): string {
+        url = Url.removeQueryParameter(url, 'connectionType');
+        url = Url.removeQueryParameter(url, 'networkType');
+        return url;
+    }
+
     public requestFromCache(cachedResponse: INativeResponse): Promise<void[] | void> {
         if(this._requesting) {
             return Promise.resolve();
         }
 
-        this._assetManager.enableCaching();
-        this._assetManager.checkFreeSpace();
-
         this._ignoreEvents = true;
         this._requesting = true;
 
-        this.resetRealtimeDataForPlacements();
+        return this.createRequestUrl(false).then((currentUrl: string) => {
+            let cachedUrl = cachedResponse.url;
 
-        this._nativeBridge.Sdk.logInfo('Requesting ad plan from cache ' + cachedResponse.url);
+            cachedUrl = this.cleanCachedUrl(cachedUrl);
+            currentUrl = this.cleanCachedUrl(currentUrl);
 
-        return this.parseCampaigns(cachedResponse).then(() => {
-                this._ignoreEvents = false;
-                this._requesting = false;
-            }).catch((error) => {
-                this._ignoreEvents = false;
-                this._requesting = false;
-            });
+            if (cachedUrl !== currentUrl) {
+                this._nativeBridge.Sdk.logInfo('Failed to use cached campaign response due to URL mismatch ' + cachedUrl + ' (cached) and ' + currentUrl + ' (current)');
+                return Promise.reject(new Error('invalidate cache'));
+            }
+
+            return Promise.resolve();
+        }).then(() => {
+            this._assetManager.enableCaching();
+            this._assetManager.checkFreeSpace();
+
+            this.resetRealtimeDataForPlacements();
+
+            this._nativeBridge.Sdk.logInfo('Requesting ad plan from cache ' + cachedResponse.url);
+
+            SdkStats.setAdRequestTimestamp();
+        }).then(() => {
+            return this.parseCampaigns(cachedResponse);
+        }).then(() => {
+            this._ignoreEvents = false;
+            this._requesting = false;
+        }).catch((error) => {
+            this._ignoreEvents = false;
+            this._requesting = false;
+        });
     }
 
     public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
