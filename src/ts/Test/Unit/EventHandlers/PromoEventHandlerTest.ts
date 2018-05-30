@@ -23,7 +23,7 @@ import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 import { Configuration } from 'Models/Configuration';
-import { SinonStub } from 'sinon';
+import { SinonStub, SinonSandbox } from 'sinon';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 
 describe('PromoEventHandlersTest', () => {
@@ -32,13 +32,19 @@ describe('PromoEventHandlersTest', () => {
     const json = JSON.parse(DummyPromo);
     let nativeBridge: NativeBridge;
     let promoAdUnit: PromoAdUnit;
+    let sandbox: sinon.SinonSandbox;
     const purchaseTrackingUrls = 'https://events.iap.unity3d.com/events/v1/purchase?co=USA&creid=5a57d399d7482b0945616f35&gid=1019712&pjid=c4b860aa-e0a8-4a58-9f6c-95d419461f1e&plid=placementA&pmid=5a57d3a206a1590006a1d28e&prdid=com.product.2&stky=0&store=google&txid=UX-47c9ac4c-39c5-4e0e-685kl%3Bkl%3Be-66d4619dcc81&uid=567f09ab1ae7f2fc01402d9e&val=4.99';
 
     beforeEach(() => {
+        sandbox = sinon.sandbox.create();
         nativeBridge = new NativeBridge({
             handleInvocation,
             handleCallback
         });
+    });
+
+    afterEach(() => {
+        sandbox.restore();
     });
 
     describe('when calling onClose', () => {
@@ -63,7 +69,7 @@ describe('PromoEventHandlersTest', () => {
                 hide: sinon.spy()
             };
             promoAdUnit = sinon.createStubInstance(PromoAdUnit);
-            sinon.stub(PurchasingUtilities, 'sendPromoPayload');
+            sandbox.stub(PurchasingUtilities, 'sendPromoPayload');
 
             PromoEventHandler.onPromo(nativeBridge, promoAdUnit, 'com.unit.test.iapproductid', [purchaseTrackingUrls]);
             sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPromoPayload);

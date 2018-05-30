@@ -22,11 +22,36 @@ export interface IPromoPayload {
 
 export class PurchasingUtilities {
     public static setClientInfo(clientInfo?: ClientInfo) {
-        PurchasingUtilities._clientInfo = clientInfo;
+        this._clientInfo = clientInfo;
     }
 
     public static setConfiguration(configuration?: Configuration) {
-        PurchasingUtilities._configuration = configuration;
+        this._configuration = configuration;
+    }
+
+    public static setInitializationPayloadSentValue(val: boolean) {
+        this._initializationPayloadsAlreadySent = val;
+    }
+
+    public static sendPurchaseInitializationEvent(nativeBridge: NativeBridge): Promise<void> {
+        if (this.configurationIncludesPromoPlacement()) {
+            return this.isPromoReady(nativeBridge).then(() => {
+                return this.checkPromoVersion(nativeBridge).then(() => {
+                    return this.sendPurchasingCommand(nativeBridge, JSON.stringify(this.loadInitializationPayloads()));
+                });
+            });
+        }
+        return Promise.resolve();
+    }
+
+    public static sendPromoPayload(nativeBridge: NativeBridge, iapPayload: string): Promise<void | {}> {
+        if (!this._initializationPayloadsAlreadySent) {
+            return this.sendPurchaseInitializationEvent(nativeBridge).then(() => {
+                return this.sendPurchasingCommand(nativeBridge, iapPayload);
+            });
+        } else {
+            return this.sendPurchasingCommand(nativeBridge, iapPayload);
+        }
     }
 
     public static refreshCatalog(nativeBridge: NativeBridge): Promise<void | {}> {
@@ -48,53 +73,6 @@ export class PurchasingUtilities {
         });
     }
 
-    public static sendPromoPayload(nativeBridge: NativeBridge, iapPayload: string): Promise<void> {
-        if (!PurchasingUtilities._didSuccessfullyInitiatePurchaseEvent) {
-            this.logIssue(nativeBridge, 'purchase_never_intitialized', 'IAP Promo initialization never happened.');
-            return PurchasingUtilities.sendPurchaseInitializationEvent(nativeBridge).then(() => {
-                return this.sendPurchasingCommandIfReady(nativeBridge, iapPayload);
-            });
-        } else {
-            return this.sendPurchasingCommandIfReady(nativeBridge, iapPayload);
-        }
-    }
-
-    public static sendPurchaseInitializationEvent(nativeBridge: NativeBridge): Promise<void> {
-        if (!this.configurationIncludesPromoPlacement()) {
-            return Promise.resolve();
-        }
-        return this.checkPromoVersion(nativeBridge).then((isValid) => {
-            if (!isValid) {
-                return Promise.reject(this.logIssue(nativeBridge, 'purchasing_version_invalid', 'Purchasing version is invalid'));
-            }
-            return new Promise<void>((resolve, reject) => {
-                const observer = nativeBridge.Purchasing.onCommandResult.subscribe((isCommandSuccessful) => {
-                    if (isCommandSuccessful === 'False') {
-                        reject(this.logIssue(nativeBridge, 'purchase_command_result_false', 'Purchase command result was false'));
-                    } else if (isCommandSuccessful === 'True') {
-                        PurchasingUtilities._didSuccessfullyInitiatePurchaseEvent = true;
-                        resolve();
-                    }
-                });
-                nativeBridge.Purchasing.initiatePurchasingCommand(JSON.stringify(this.loadInitializationPayloads())).catch(() => {
-                    nativeBridge.Purchasing.onCommandResult.unsubscribe(observer);
-                    reject(this.logIssue(nativeBridge, 'send_purchase_event_failed', 'Purchase event failed to send'));
-                });
-            });
-        });
-    }
-
-    public static handleSendIAPEvent(nativeBridge: NativeBridge, iapPayload: string): void {
-        // TODO: Handle IAPPayload/send event/do something with the payload
-    }
-
-    public static isProductAvailable(productId: string): boolean {
-        if (this.purchasesAvailable()) {
-            return (productId in this._catalog.getProducts());
-        }
-        return false;
-    }
-
     public static getProductPrice(productId: string): string {
         if (this.isProductAvailable(productId)) {
             return this._catalog.getProducts()[productId]!.getPrice();
@@ -102,38 +80,30 @@ export class PurchasingUtilities {
         throw new Error('Attempting to get price of invalid product: ' + productId);
     }
 
-    public static getPrroductDescription(productId: string): string {
-        if (this.isProductAvailable(productId)) {
-            return this._catalog.getProducts()[productId]!.getDescription();
+    public static isProductAvailable(productId: string): boolean {
+        if (this.isProductInCatalog()) {
+            return (productId in this._catalog.getProducts());
         }
-        throw new Error('Attempting to get description of invalid product: ' + productId);
+        return false;
     }
 
-    public static purchasesAvailable(): boolean {
-        return (this._catalog !== undefined && this._catalog.getProducts() !== undefined && this._catalog.getSize() !== 0);
+    public static handleSendIAPEvent(nativeBridge: NativeBridge, iapPayload: string): void {
+        // TODO: Handle IAPPayload/send event/do something with the payload
     }
 
     private static _catalog: PurchasingCatalog = new PurchasingCatalog([]);
     private static _clientInfo: ClientInfo | undefined;
     private static _configuration: Configuration | undefined;
-    private static _didSuccessfullyInitiatePurchaseEvent: boolean = false;
+    private static _initializationPayloadsAlreadySent: boolean = false;
 
-    // Returns true if version is 1.16.0 or newer
-    private static supportsVersion(version: string): boolean {
-        const promoVersionSplit: string[] = version.split('.', 2);
-        return (parseInt(promoVersionSplit[0], 10) >= 2 || (parseInt(promoVersionSplit[0], 10) >= 1 && parseInt(promoVersionSplit[1], 10) >= 16));
-    }
-
-    private static logIssue(nativeBridge: NativeBridge, errorType: string, errorMessage: string): Error {
-        nativeBridge.Sdk.logError(errorMessage);
-        Diagnostics.trigger(errorType, { message: errorMessage });
-        return new Error(errorMessage);
+    private static isProductInCatalog(): boolean {
+        return (this._catalog !== undefined && this._catalog.getProducts() !== undefined && this._catalog.getSize() !== 0);
     }
 
     private static configurationIncludesPromoPlacement(): boolean {
-        if (PurchasingUtilities._configuration) {
-            const placements = PurchasingUtilities._configuration.getPlacements();
-            const placementIds = PurchasingUtilities._configuration.getPlacementIds();
+        if (this._configuration) {
+            const placements = this._configuration.getPlacements();
+            const placementIds = this._configuration.getPlacementIds();
             for (const placementId of placementIds) {
                 const adTypes = placements[placementId].getAdTypes();
                 if (adTypes && adTypes.indexOf('IAP') > -1) {
@@ -144,70 +114,77 @@ export class PurchasingUtilities {
         return false;
     }
 
-    private static loadInitializationPayloads(): IPromoPayload {
-        const iapPayload = <IPromoPayload>{};
-        if (PurchasingUtilities._configuration && PurchasingUtilities._clientInfo) {
-            iapPayload.iapPromo = true;
-            iapPayload.abGroup = PurchasingUtilities._configuration.getAbGroup();
-            iapPayload.gameId = PurchasingUtilities._clientInfo.getGameId() + '|' + PurchasingUtilities._configuration.getToken();
-            iapPayload.gamerToken = PurchasingUtilities._configuration.getToken();
-            iapPayload.request = IPromoRequest.SETIDS;
-        }
-        return iapPayload;
-    }
-
-    private static sendPurchasingCommandIfReady(nativeBridge: NativeBridge, iapPayload: string): Promise<void> {
-        return this.isPromoReady(nativeBridge).then((ready) => {
-            if (!ready) {
-                return Promise.reject(this.logIssue(nativeBridge, 'purchasing_command_not_ready', 'Purchasing command was not ready'));
-            }
-            return new Promise<void>((resolve, reject) => {
-                const observer = nativeBridge.Purchasing.onCommandResult.subscribe((isCommandSuccessful) => {
-                    if (isCommandSuccessful === 'False') {
-                        reject(this.logIssue(nativeBridge, 'purchase_command_attempt_failed', 'Purchase command attempt failed'));
-                    } else if (isCommandSuccessful === 'True') {
-                        resolve();
-                    }
-                });
-                nativeBridge.Purchasing.initiatePurchasingCommand(iapPayload).catch(() => {
-                    nativeBridge.Purchasing.onCommandResult.unsubscribe(observer);
-                    reject(this.logIssue(nativeBridge, 'send_purchase_event_failed', 'Purchase event failed to send'));
-                });
-            });
-        });
-    }
-
-    private static checkPromoVersion(nativeBridge: NativeBridge): Promise<boolean> {
-        return this.isPromoReady(nativeBridge).then((ready) => {
-            if (!ready) {
-                return Promise.reject(this.logIssue(nativeBridge, 'promo_not_ready', 'Promo was not ready'));
-            }
-            return new Promise<boolean>((resolve, reject) => {
-                const promoVersionObserver = nativeBridge.Purchasing.onGetPromoVersion.subscribe((promoVersion) => {
-                    nativeBridge.Purchasing.onGetPromoVersion.unsubscribe(promoVersionObserver);
-                    resolve(PurchasingUtilities.supportsVersion(promoVersion));
-                });
-                nativeBridge.Purchasing.getPromoVersion().catch(() => {
-                    nativeBridge.Purchasing.onGetPromoVersion.unsubscribe(promoVersionObserver);
-                    reject(this.logIssue(nativeBridge, 'promo_version_check_failed', 'Promo version check failed'));
-                });
-            });
-        });
-    }
-
-    private static isPromoReady(nativeBridge: NativeBridge): Promise<boolean> {
-        return new Promise<boolean>((resolve, reject) => {
+    private static isPromoReady(nativeBridge: NativeBridge): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
             const observer = nativeBridge.Purchasing.onInitialize.subscribe((isReady) => {
                 nativeBridge.Purchasing.onInitialize.unsubscribe(observer);
                 if (isReady !== 'True') {
                     reject(this.logIssue(nativeBridge, 'promo_not_ready', 'Promo was not ready'));
                 }
-                resolve(isReady === 'True');
+                resolve();
             });
             nativeBridge.Purchasing.initializePurchasing().catch(() => {
                 nativeBridge.Purchasing.onInitialize.unsubscribe(observer);
                 reject(this.logIssue(nativeBridge, 'purchase_initilization_failed', 'Purchase initialization failed'));
             });
         });
+    }
+
+    private static checkPromoVersion(nativeBridge: NativeBridge): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            const promoVersionObserver = nativeBridge.Purchasing.onGetPromoVersion.subscribe((promoVersion) => {
+                nativeBridge.Purchasing.onGetPromoVersion.unsubscribe(promoVersionObserver);
+                if(!this.isPromoVersionSupported(promoVersion)) {
+                    reject(this.logIssue(nativeBridge, 'promo_version_not_supported', 'Promo version not supported'));
+                }
+                resolve();
+            });
+            nativeBridge.Purchasing.getPromoVersion().catch(() => {
+                nativeBridge.Purchasing.onGetPromoVersion.unsubscribe(promoVersionObserver);
+                reject(this.logIssue(nativeBridge, 'promo_version_check_failed', 'Promo version check failed'));
+            });
+        });
+    }
+
+    private static sendPurchasingCommand(nativeBridge: NativeBridge, iapPayload: string): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            const observer = nativeBridge.Purchasing.onCommandResult.subscribe((isCommandSuccessful) => {
+                if (isCommandSuccessful === 'True') {
+                    if (iapPayload.indexOf('SETIDS') !== -1) {
+                        this._initializationPayloadsAlreadySent = true;
+                    }
+                    resolve();
+                }
+                reject(this.logIssue(nativeBridge, 'purchase_command_attempt_failed', 'Purchase command attempt failed'));
+            });
+            nativeBridge.Purchasing.initiatePurchasingCommand(iapPayload).catch(() => {
+                nativeBridge.Purchasing.onCommandResult.unsubscribe(observer);
+                reject(this.logIssue(nativeBridge, 'send_purchase_event_failed', 'Purchase event failed to send'));
+            });
+        });
+    }
+
+    // Returns true if version is 1.16.0 or newer
+    private static isPromoVersionSupported(version: string): boolean {
+        const promoVersionSplit: string[] = version.split('.', 2);
+        return (parseInt(promoVersionSplit[0], 10) >= 2 || (parseInt(promoVersionSplit[0], 10) >= 1 && parseInt(promoVersionSplit[1], 10) >= 16));
+    }
+
+    private static loadInitializationPayloads(): IPromoPayload {
+        const iapPayload = <IPromoPayload>{};
+        if (this._configuration && this._clientInfo) {
+            iapPayload.iapPromo = true;
+            iapPayload.abGroup = this._configuration.getAbGroup();
+            iapPayload.gameId = this._clientInfo.getGameId() + '|' + this._configuration.getToken();
+            iapPayload.gamerToken = this._configuration.getToken();
+            iapPayload.request = IPromoRequest.SETIDS;
+        }
+        return iapPayload;
+    }
+
+    private static logIssue(nativeBridge: NativeBridge, errorType: string, errorMessage: string): Error {
+        nativeBridge.Sdk.logError(errorMessage);
+        Diagnostics.trigger(errorType, { message: errorMessage });
+        return new Error(errorMessage);
     }
 }
