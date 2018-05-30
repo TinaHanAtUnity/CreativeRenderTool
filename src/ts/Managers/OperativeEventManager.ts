@@ -19,6 +19,7 @@ import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { CampaignAssetInfo } from 'Utilities/CampaignAssetInfo';
 import { Configuration } from 'Models/Configuration';
 import { GameSessionCounters } from 'Utilities/GameSessionCounters';
+import { Enum } from 'protobufjs';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {
     nativeBridge: NativeBridge;
@@ -29,6 +30,11 @@ export interface IOperativeEventManagerParams<T extends Campaign> {
     deviceInfo: DeviceInfo;
     configuration: Configuration;
     campaign: T;
+}
+
+export enum GDPREventSource {
+    METADATA = 'metadata',
+    USER = 'user'
 }
 
 export class OperativeEventManager {
@@ -58,13 +64,14 @@ export class OperativeEventManager {
         return OperativeEventManager.PreviousPlacementId;
     }
 
-    public static sendGDPREvent(action: string, deviceInfo: DeviceInfo, clientInfo: ClientInfo, configuration: Configuration): Promise<void> {
+    public static sendGDPREvent(action: string, source: GDPREventSource, deviceInfo: DeviceInfo, clientInfo: ClientInfo, configuration: Configuration): Promise<void> {
         const infoJson: any = {
             'adid': deviceInfo.getAdvertisingIdentifier(),
             'action': action,
             'projectId': configuration.getUnityProjectId(),
             'platform': Platform[clientInfo.getPlatform()].toLowerCase(),
-            'gameId': clientInfo.getGameId()
+            'gameId': clientInfo.getGameId(),
+            'source': source
         };
 
         HttpKafka.sendEvent('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, infoJson);
@@ -244,7 +251,7 @@ export class OperativeEventManager {
     }
 
     public sendGDPREvent(action: string): Promise<void> {
-        return OperativeEventManager.sendGDPREvent(action, this._deviceInfo, this._clientInfo, this._configuration);
+        return OperativeEventManager.sendGDPREvent(action, GDPREventSource.USER, this._deviceInfo, this._clientInfo, this._configuration);
     }
 
     public setGamerServerId(serverId: string | undefined): void {

@@ -1,4 +1,4 @@
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { OperativeEventManager, GDPREventSource } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Configuration } from 'Models/Configuration';
 import { DeviceInfo } from 'Models/DeviceInfo';
@@ -118,7 +118,7 @@ export class GdprConsentManager {
 
     private sendGdprEvent(consent: boolean) {
         const action: string = consent ? 'consent' : 'optout';
-        OperativeEventManager.sendGDPREvent(action, this._deviceInfo, this._clientInfo, this._configuration).then(() => {
+        OperativeEventManager.sendGDPREvent(action, GDPREventSource.METADATA, this._deviceInfo, this._clientInfo, this._configuration).then(() => {
             this._nativeBridge.Storage.set(StorageType.PRIVATE, GdprConsentManager.GDPR_LAST_VALUE_STORAGE_KEY, consent);
             this._nativeBridge.Storage.write(StorageType.PRIVATE);
         });
