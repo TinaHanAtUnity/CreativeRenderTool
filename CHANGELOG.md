@@ -1,4 +1,4 @@
-# Staged
+# Wed May 30 11:20:00 UTC 2018
 
 * Remove delay for closing playable MRAID on groups 18 and 19. 
 * Reject cache promise with CacheStatus.STOPPED when stopped. 
