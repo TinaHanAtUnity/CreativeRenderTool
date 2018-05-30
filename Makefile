@@ -87,6 +87,12 @@ build-release: clean build-dir build-static build-css build-proto build-ts build
 		fs.writeFileSync('$(BUILD_DIR)/index.html', i.replace('{COMPILED_CSS}', s).replace('{COMPILED_JS}', j).replace('{PROTOBUF_JS}', b), o);"
 
 	@echo
+	@echo Minifying HTML
+	@echo
+
+	# node_modules/.bin/html-minifier --collapse-whitespace --minify-js -o $(BUILD_DIR)/index.html $(BUILD_DIR)/index.html
+
+	@echo
 	@echo Cleaning release build
 	@echo
 
@@ -195,7 +201,7 @@ build-ts:
 	@echo Transpiling .ts to .js
 	@echo
 
-	$(TYPESCRIPT) --project . --module $(MODULE) --target $(TARGET) --outDir $(BUILD_DIR)/js
+	$(TYPESCRIPT) --importHelpers true --project . --module $(MODULE) --target $(TARGET) --outDir $(BUILD_DIR)/js
 
 build-js:
 	@echo
