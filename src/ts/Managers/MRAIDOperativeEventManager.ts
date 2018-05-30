@@ -12,7 +12,7 @@ export class MRAIDOperativeEventManager extends ProgrammaticOperativeEventManage
         this._mraidCampaign = params.campaign;
     }
 
-    protected createVideoEventUrl(type: string): string {
+    protected createVideoEventUrl(type: string): string | undefined {
         const url = this._mraidCampaign.getVideoEventUrl(type);
         if(url) {
             return url;
@@ -21,7 +21,7 @@ export class MRAIDOperativeEventManager extends ProgrammaticOperativeEventManage
         return super.createVideoEventUrl(type);
     }
 
-    protected createClickEventUrl(): string {
+    protected createClickEventUrl(): string | undefined {
         const clickUrl = this._mraidCampaign.getClickUrl();
         if(clickUrl) {
             return Url.addParameters(clickUrl, { redirect: false });
