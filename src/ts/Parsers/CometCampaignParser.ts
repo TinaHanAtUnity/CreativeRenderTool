@@ -11,10 +11,11 @@ import { Image } from 'Models/Assets/Image';
 import { HTML } from 'Models/Assets/HTML';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { Diagnostics } from 'Utilities/Diagnostics';
+import { IABGroup } from 'Models/ABGroup';
 
 export class CometCampaignParser extends CampaignParser {
     public static ContentType = 'comet/campaign';
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: IABGroup): Promise<Campaign> {
         const json = response.getJsonContent();
 
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';

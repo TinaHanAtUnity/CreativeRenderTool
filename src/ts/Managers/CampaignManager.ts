@@ -34,10 +34,11 @@ import { UserCountData } from 'Utilities/UserCountData';
 import { JaegerManager } from 'Jaeger/JaegerManager';
 import { JaegerTags, JaegerSpan } from 'Jaeger/JaegerSpan';
 import { GameSessionCounters } from 'Utilities/GameSessionCounters';
+import { IABGroup } from 'Models/ABGroup';
 
 export class CampaignManager {
 
-    public static setAbGroup(abGroup: number) {
+    public static setAbGroup(abGroup: IABGroup) {
         CampaignManager.AbGroup = abGroup;
     }
 
@@ -63,7 +64,7 @@ export class CampaignManager {
 
     protected static CampaignResponse: string | undefined;
 
-    protected static AbGroup: number | undefined;
+    protected static AbGroup: IABGroup | undefined;
 
     private static BaseUrl: string = 'https://auction.unityads.unity3d.com/v4/games';
 
@@ -474,7 +475,7 @@ export class CampaignManager {
         ].join('/');
     }
 
-    private getAbGroup(): number {
+    private getAbGroup(): IABGroup {
         return CampaignManager.AbGroup ? CampaignManager.AbGroup : this._configuration.getAbGroup();
     }
 

@@ -5,10 +5,11 @@ import { Configuration } from 'Models/Configuration';
 import { FinishState } from 'Constants/FinishState';
 import { Placement } from 'Models/Placement';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { IABGroup } from 'Models/ABGroup';
 
 export class PromoEventHandler {
 
-    public static onClose(nativeBridge: NativeBridge, adUnit: PromoAdUnit, gamerToken: string, gameId: string, abGroup: number, purchaseTrackingUrls: string[], isOptOutEnabled: boolean): void {
+    public static onClose(nativeBridge: NativeBridge, adUnit: PromoAdUnit, gamerToken: string, gameId: string, abGroup: IABGroup, purchaseTrackingUrls: string[], isOptOutEnabled: boolean): void {
         adUnit.setFinishState(FinishState.SKIPPED);
         adUnit.hide();
         const iapPayload: IPromoPayload = {
@@ -16,7 +17,7 @@ export class PromoEventHandler {
             trackingOptOut: isOptOutEnabled,
             iapPromo: true,
             gameId: gameId + '|' + gamerToken,
-            abGroup: abGroup,
+            abGroup: abGroup.toNumber(),
             request: IPromoRequest.CLOSE,
             purchaseTrackingUrls: purchaseTrackingUrls,
         };

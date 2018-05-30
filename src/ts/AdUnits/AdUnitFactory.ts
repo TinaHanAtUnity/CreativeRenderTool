@@ -104,7 +104,7 @@ export class AdUnitFactory {
 
     private static createPerformanceAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PerformanceCampaign>): PerformanceAdUnit {
         const overlay = this.createOverlay(nativeBridge, parameters);
-        const adUnitStyle = CustomFeatures.getAdUnitStyle(parameters.campaign.getAbGroup());
+        const adUnitStyle = CustomFeatures.getAdUnitStyle();
 
         const showGDPRBanner = this.showGDPRBanner(parameters);
         const privacy = this.createPrivacy(nativeBridge, parameters);
@@ -393,7 +393,7 @@ export class AdUnitFactory {
         if (!parameters.adMobSignalFactory) {
             throw new Error('AdMobSignalFactory is undefined, should not get here.');
         }
-        const view = new AdMobView(nativeBridge, parameters.adMobSignalFactory, parameters.container, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup());
+        const view = new AdMobView(nativeBridge, parameters.adMobSignalFactory, parameters.container, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         view.render();
 
         const adUnitParameters: IAdMobAdUnitParameters = {
@@ -419,7 +419,7 @@ export class AdUnitFactory {
 
     private static createOverlay(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractVideoOverlay {
         if (!parameters.placement.allowSkip()) {
-            const overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup());
+            const overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
             if (parameters.placement.disableVideoControlsFade()) {
                 overlay.setFadeEnabled(false);
             }
@@ -430,7 +430,7 @@ export class AdUnitFactory {
             if (parameters.placement.skipEndCardOnClose()) {
                 overlay = new ClosableVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
             } else {
-                overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup());
+                overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
             }
 
             if (parameters.placement.disableVideoControlsFade()) {

@@ -43,6 +43,7 @@ import EventTestVast from 'xml/EventTestVast.xml';
 import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xml';
 
 import * as sinon from 'sinon';
+import { IABGroup, getAbGroup } from 'Models/ABGroup';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -59,7 +60,7 @@ export class TestFixtures {
         });
     }
 
-    public static getCometCampaignBaseParams(session: Session, campaignId: string, gamerId: string, abGroup: number, meta: string | undefined): ICampaign {
+    public static getCometCampaignBaseParams(session: Session, campaignId: string, gamerId: string, abGroup: IABGroup, meta: string | undefined): ICampaign {
         return {
             id: campaignId,
             gamerId: gamerId,
@@ -168,7 +169,7 @@ export class TestFixtures {
         };
     }
 
-    public static getProgrammaticMRAIDCampaignBaseParams(session: Session, campaignId: string, gamerId: string, abGroup: number, json: any): ICampaign {
+    public static getProgrammaticMRAIDCampaignBaseParams(session: Session, campaignId: string, gamerId: string, abGroup: IABGroup, json: any): ICampaign {
         const mraidJson = json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'];
         return {
             id: campaignId,
@@ -215,7 +216,7 @@ export class TestFixtures {
         };
     }
 
-    public static getVASTCampaignBaseParams(session: Session, campaignId: string, gamerId: string, abGroup: number): ICampaign {
+    public static getVASTCampaignBaseParams(session: Session, campaignId: string, gamerId: string, abGroup: IABGroup): ICampaign {
         return {
             id: campaignId,
             gamerId: gamerId,
@@ -327,7 +328,7 @@ export class TestFixtures {
     public static getPromoCampaignParams(json: any): IPromoCampaign {
         const session = this.getSession();
         return {
-            ... this.getCometCampaignBaseParams(session, json.promo.id, json.gamerId, json.abGroup, json.meta),
+            ... this.getCometCampaignBaseParams(session, json.promo.id, json.gamerId, getAbGroup(json.abGroup), json.meta),
             iapProductId: json.promo.iapProductId,
             additionalTrackingEvents: json.promo.tracking ? json.promo.tracking : undefined,
             dynamicMarkup: json.promo.dynamicMarkup,

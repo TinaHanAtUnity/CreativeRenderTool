@@ -37,8 +37,8 @@ export class Overlay extends AbstractVideoOverlay {
     private _fadeTimer: any;
     private _fadeStatus: boolean = true;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, abGroup: number = 0) {
-        super(nativeBridge, 'overlay', muted, abGroup);
+    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string) {
+        super(nativeBridge, 'overlay', muted);
 
         this._localization = new Localization(language, 'overlay');
 

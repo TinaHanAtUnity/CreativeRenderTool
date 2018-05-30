@@ -25,6 +25,7 @@ import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 import { Configuration } from 'Models/Configuration';
 import { SinonStub } from 'sinon';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { getAbGroup } from 'Models/ABGroup';
 
 describe('PromoEventHandlersTest', () => {
     const handleInvocation = sinon.spy();
@@ -45,7 +46,7 @@ describe('PromoEventHandlersTest', () => {
         it('should hide adunit', () => {
             promoAdUnit = sinon.createStubInstance(PromoAdUnit);
 
-            PromoEventHandler.onClose(nativeBridge, promoAdUnit, '111', '111', 1, [purchaseTrackingUrls], false);
+            PromoEventHandler.onClose(nativeBridge, promoAdUnit, '111', '111', getAbGroup(1), [purchaseTrackingUrls], false);
             sinon.assert.called(<sinon.SinonSpy>promoAdUnit.hide);
         });
     });
@@ -54,7 +55,7 @@ describe('PromoEventHandlersTest', () => {
         it('should hide adunit', () => {
             promoAdUnit = sinon.createStubInstance(PromoAdUnit);
 
-            PromoEventHandler.onClose(nativeBridge, promoAdUnit, '111', '111', 1, [purchaseTrackingUrls], false);
+            PromoEventHandler.onClose(nativeBridge, promoAdUnit, '111', '111', getAbGroup(1), [purchaseTrackingUrls], false);
             sinon.assert.called(<sinon.SinonSpy>promoAdUnit.hide);
         });
 

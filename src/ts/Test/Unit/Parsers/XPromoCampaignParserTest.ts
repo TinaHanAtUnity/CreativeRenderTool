@@ -17,13 +17,14 @@ import XPromoCampaignJSON from 'json/campaigns/xpromo/XPromoCampaign.json';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { Url } from 'Utilities/Url';
 import { StoreName } from 'Models/Campaigns/PerformanceCampaign';
+import { getAbGroup } from 'Models/ABGroup';
 
 describe('XPromoCampaignParser', () => {
     const placements = ['TestPlacement'];
     const gamerId = 'TestGamerId';
     const mediaId = 'o2YMT0Cmps6xHiOwNMeCrH';
     const correlationId = '583dfda0d933a3630a53249c';
-    const abGroup = 0;
+    const abGroup = getAbGroup(0);
 
     let parser: XPromoCampaignParser;
     let nativeBridge: NativeBridge;

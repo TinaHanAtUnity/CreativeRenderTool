@@ -23,7 +23,6 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     private _closer: Closer;
     private _adDuration: number = -2;
     private _adRemainingTime: number = -2;
-    private _abGroup: number;
     private _campaign: VPAIDCampaign;
 
     constructor(nativeBridge: NativeBridge, adUnit: VPAIDAdUnit, parameters: IVPAIDAdUnitParameters) {
@@ -35,7 +34,6 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         this._placement = parameters.placement;
         this._closer = parameters.closer;
         this._vpaidEndScreen = parameters.endScreen;
-        this._abGroup = parameters.campaign.getAbGroup();
         this._campaign = parameters.campaign;
 
         this._vpaidEventHandlers.AdError = this.onAdError;

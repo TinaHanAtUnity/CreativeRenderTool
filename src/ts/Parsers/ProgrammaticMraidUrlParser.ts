@@ -8,10 +8,11 @@ import { AuctionResponse } from 'Models/AuctionResponse';
 import { Session } from 'Models/Session';
 import { Image } from 'Models/Assets/Image';
 import { HTML } from 'Models/Assets/HTML';
+import { IABGroup } from 'Models/ABGroup';
 
 export class ProgrammaticMraidUrlParser extends CampaignParser {
     public static ContentType = 'programmatic/mraid-url';
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: IABGroup): Promise<Campaign> {
         const jsonMraidUrl = response.getJsonContent();
 
         if(!jsonMraidUrl) {

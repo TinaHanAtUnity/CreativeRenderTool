@@ -12,6 +12,7 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { FileId } from 'Utilities/FileId';
+import { getAbGroup } from 'Models/ABGroup';
 
 describe('ProgrammaticAdMobParser', () => {
     const placements = ['TestPlacement'];
@@ -26,7 +27,7 @@ describe('ProgrammaticAdMobParser', () => {
     let request: Request;
     let session: Session;
     let setFileIdSpy: sinon.SinonSpy;
-    let abGroup = 0;
+    let abGroup = getAbGroup(0);
 
     describe('parsing a campaign', () => {
         let campaign: AdMobCampaign;
@@ -123,13 +124,8 @@ describe('ProgrammaticAdMobParser', () => {
 
             describe('with a mime type in url', () => {
                 beforeEach(() => {
-                    abGroup = 14;
                     (<sinon.SinonStub>request.followRedirectChain).returns(Promise.resolve(url));
                     return parse(JSON.parse(ValidAdMobCampaign));
-                });
-
-                afterEach(() => {
-                    abGroup = 0;
                 });
 
                 it('should FileId.setFileId with a mp4 mime type', () => {
@@ -183,14 +179,9 @@ describe('ProgrammaticAdMobParser', () => {
 
             describe('on iOS', () => {
                 beforeEach(() => {
-                    abGroup = 14;
                     (<sinon.SinonStub>nativeBridge.getPlatform).returns(Platform.IOS);
                     setFileIdSpy.resetHistory();
                     return parse(JSON.parse(ValidAdMobCampaign));
-                });
-
-                afterEach(() => {
-                    abGroup = 0;
                 });
 
                 it('should have a video cached from the AdMobAd', () => {

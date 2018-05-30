@@ -4,6 +4,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
 import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
+import { IABGroup } from 'Models/ABGroup';
 
 export class ClosableVideoOverlay extends AbstractVideoOverlay {
 
@@ -26,8 +27,8 @@ export class ClosableVideoOverlay extends AbstractVideoOverlay {
     private _fadeTimer: any;
     private _fadeStatus: boolean = true;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, abGroup: number = 0) {
-        super(nativeBridge, 'closable-video-overlay', muted, abGroup);
+    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string) {
+        super(nativeBridge, 'closable-video-overlay', muted);
 
         const localization = new Localization(language, 'overlay');
         this._template = new Template(InterstitialOverlayTemplate, localization);

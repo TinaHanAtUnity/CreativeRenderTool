@@ -181,7 +181,7 @@ export class PurchasingUtilities {
         const iapPayload = <IPromoPayload>{};
         if (PurchasingUtilities._configuration && PurchasingUtilities._clientInfo) {
             iapPayload.iapPromo = true;
-            iapPayload.abGroup = PurchasingUtilities._configuration.getAbGroup();
+            iapPayload.abGroup = PurchasingUtilities._configuration.getAbGroup().toNumber();
             iapPayload.gameId = PurchasingUtilities._clientInfo.getGameId() + '|' + PurchasingUtilities._configuration.getToken();
             iapPayload.trackingOptOut = PurchasingUtilities._configuration.isOptOutEnabled(),
             iapPayload.gamerToken = PurchasingUtilities._configuration.getToken();

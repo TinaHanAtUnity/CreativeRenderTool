@@ -17,7 +17,6 @@ export abstract class AbstractVideoOverlay extends View<IOverlayHandler> {
 
     protected static AutoSkip: boolean = false;
 
-    protected _abGroup: number;
     protected _skipDuration: number;
     protected _skipRemaining: number;
 
@@ -27,9 +26,8 @@ export abstract class AbstractVideoOverlay extends View<IOverlayHandler> {
 
     protected _fadeEnabled: boolean = true;
 
-    constructor(nativeBridge: NativeBridge, containerId: string, muted: boolean, abGroup: number = 0) {
+    constructor(nativeBridge: NativeBridge, containerId: string, muted: boolean) {
         super(nativeBridge, containerId);
-        this._abGroup = abGroup;
         this._muted = muted;
     }
 

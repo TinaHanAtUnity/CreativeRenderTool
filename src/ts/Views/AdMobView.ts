@@ -13,6 +13,7 @@ import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { ClientInfo } from 'Models/ClientInfo';
 import { MRAIDBridge } from 'Views/MRAIDBridge';
 import { SdkStats } from 'Utilities/SdkStats';
+import { IABGroup } from 'Models/ABGroup';
 
 export interface IAdMobEventHandler {
     onClose(): void;
@@ -39,7 +40,7 @@ export class AdMobView extends View<IAdMobEventHandler> {
     private _afmaBridge: AFMABridge;
     private _mraidBridge: MRAIDBridge;
 
-    constructor(nativeBridge: NativeBridge, adMobSignalFactory: AdMobSignalFactory, container: AdUnitContainer, placement: Placement, campaign: AdMobCampaign, language: string, gameId: string, abGroup: number) {
+    constructor(nativeBridge: NativeBridge, adMobSignalFactory: AdMobSignalFactory, container: AdUnitContainer, placement: Placement, campaign: AdMobCampaign, language: string, gameId: string) {
         super(nativeBridge, 'admob');
 
         this._placement = placement;

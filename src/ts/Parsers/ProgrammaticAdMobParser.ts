@@ -12,14 +12,15 @@ import { FileId } from 'Utilities/FileId';
 import { Platform } from 'Constants/Platform';
 import { Url } from 'Utilities/Url';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { IABGroup } from 'Models/ABGroup';
 
 export class ProgrammaticAdMobParser extends CampaignParser {
     public static ContentType = 'programmatic/admob-video';
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: IABGroup): Promise<Campaign> {
         const markup = response.getContent();
         const cacheTTL = response.getCacheTTL();
         const platform = nativeBridge.getPlatform();
-        const videoPromise = this.getVideoFromMarkup(markup, request, session, platform, abGroup).catch((e) => {
+        const videoPromise = this.getVideoFromMarkup(markup, request, session, platform).catch((e) => {
             nativeBridge.Sdk.logError(`Unable to parse video from markup due to: ${e.message}`);
             return null;
         });
@@ -55,7 +56,7 @@ export class ProgrammaticAdMobParser extends CampaignParser {
 
     }
 
-    private getVideoFromMarkup(markup: string, request: Request, session: Session, platform: Platform, abGroup: number): Promise<AdMobVideo> {
+    private getVideoFromMarkup(markup: string, request: Request, session: Session, platform: Platform): Promise<AdMobVideo> {
         try {
             const dom = new DOMParser().parseFromString(markup, 'text/html');
             if (!dom) {

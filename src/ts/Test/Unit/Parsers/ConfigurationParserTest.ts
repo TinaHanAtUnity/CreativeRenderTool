@@ -5,6 +5,7 @@ import { Configuration, CacheMode } from 'Models/Configuration';
 import { ConfigurationParser } from 'Parsers/ConfigurationParser';
 
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
+import { getAbGroup } from 'Models/ABGroup';
 
 describe('configurationParserTest', () => {
 
@@ -28,7 +29,7 @@ describe('configurationParserTest', () => {
         });
 
         it('should have abGroup parameter from configuration', () => {
-            assert.equal(configuration.getAbGroup(), 99);
+            assert.equal(configuration.getAbGroup(), getAbGroup(99));
         });
 
         it('should have gamerId parameter from configuration', () => {

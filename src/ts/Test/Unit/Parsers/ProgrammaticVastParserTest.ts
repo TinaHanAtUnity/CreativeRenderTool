@@ -18,13 +18,14 @@ import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Url } from 'Utilities/Url';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { VastParser } from 'Utilities/VastParser';
+import { getAbGroup } from 'Models/ABGroup';
 
 describe('ProgrammaticVastParser', () => {
     const placements = ['TestPlacement'];
     const gamerId = 'TestGamerId';
     const mediaId = 'o2YMT0Cmps6xHiOwNMeCrH';
     const correlationId = '583dfda0d933a3630a53249c';
-    const abGroup = 0;
+    const abGroup = getAbGroup(0);
 
     let parser: ProgrammaticVastParser;
     let nativeBridge: NativeBridge;

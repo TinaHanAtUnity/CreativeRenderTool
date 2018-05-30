@@ -8,10 +8,11 @@ import { AuctionResponse } from 'Models/AuctionResponse';
 import { Session } from 'Models/Session';
 import { Video } from 'Models/Assets/Video';
 import { Image } from 'Models/Assets/Image';
+import { IABGroup } from 'Models/ABGroup';
 
 export class XPromoCampaignParser extends CampaignParser {
     public static ContentType = 'xpromo/video';
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: IABGroup): Promise<Campaign> {
         const json = response.getJsonContent();
 
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';
