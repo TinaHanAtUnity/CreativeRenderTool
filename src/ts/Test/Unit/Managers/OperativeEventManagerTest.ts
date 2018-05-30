@@ -322,7 +322,6 @@ describe('OperativeEventManagerTest', () => {
 
                     assert.equal(data.auctionId, session.getId());
                     assert.equal(data.gameSessionId, sessionManager.getGameSessionId());
-                    assert.equal(data.gamerId, campaign.getGamerId());
                     assert.equal(data.campaignId, campaign.getId());
                     assert.equal(data.adType, campaign.getAdType());
                     assert.equal(data.correlationId, campaign.getCorrelationId());
@@ -386,13 +385,7 @@ describe('OperativeEventManagerTest', () => {
 
                 operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(params);
                 return operativeEventManager.sendClick(placement).then(() => {
-                    assert(requestSpy.calledOnce, 'Operative event did not send POST request');
-                    const data = JSON.parse(requestSpy.getCall(0).args[1]);
-                    const url = requestSpy.getCall(0).args[0];
-
-                    assert.equal(url, 'https://adserver.unityads.unity3d.com/mobile/campaigns/' + campaign.getId() + '/click/' + campaign.getGamerId() + '?gameId=' + clientInfo.getGameId() + '&redirect=false', 'URL not what was expected');
-                    assert.isDefined(data.cached, 'cached -value should be defined');
-                    assert.isFalse(data.cached, 'cached -value should be false');
+                    assert(requestSpy.notCalled, 'Operative event did send POST request');
                 });
             });
 
@@ -424,13 +417,7 @@ describe('OperativeEventManagerTest', () => {
 
                 operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(params);
                 return operativeEventManager.sendClick(placement).then(() => {
-                    assert(requestSpy.calledOnce, 'Operative event did not send POST request');
-                    const data = JSON.parse(requestSpy.getCall(0).args[1]);
-                    const url = requestSpy.getCall(0).args[0];
-
-                    assert.equal(url, 'https://adserver.unityads.unity3d.com/mobile/campaigns/' + campaign.getId() + '/click/' + campaign.getGamerId() + '?gameId=' + clientInfo.getGameId() + '&redirect=false', 'URL not what was expected');
-                    assert.isDefined(data.cached, 'cached -value should be defined');
-                    assert.isFalse(data.cached, 'cached -value should be false');
+                    assert(requestSpy.notCalled, 'Operative event did send POST request');
                 });
             });
         });

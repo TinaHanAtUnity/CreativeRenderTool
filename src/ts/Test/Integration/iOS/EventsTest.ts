@@ -73,7 +73,7 @@ describe('EventsTest', () => {
 
     it('should include all operational events on iOS', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
         this.timeout(60000);
-        const validationRegexps = ['/ack/{GAME_ID}\\?campaignId=000000000000000000000000&event={EVENT_NAME}', '/mobile/gamers/[0-9a-f]+/video/{EVENT_NAME}/00005472656d6f7220694f53/{GAME_ID}'];
+        const validationRegexps = ['/ack/{GAME_ID}\\?campaignId=000000000000000000000000&event={EVENT_NAME}', '/events/v2/brand/video/{EVENT_NAME}/{GAME_ID}/00005472656d6f7220694f53'];
         let readyCount = 0;
         let startCount = 0;
         const listener: IUnityAdsListener = {
