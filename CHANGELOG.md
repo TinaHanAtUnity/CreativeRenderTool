@@ -1,3 +1,9 @@
+# Pending
+
+* Reuse previous auctionId for no fill retries
+* Invalidate cached ad response if request url has changed
+* Remove gamerId from auction request
+
 # Wed May 30 11:20:00 UTC 2018
 
 * Remove delay for closing playable MRAID on groups 18 and 19. 
