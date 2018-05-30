@@ -1,5 +1,4 @@
 import 'mocha';
-
 import { assert } from 'chai';
 
 import { Configuration, CacheMode } from 'Models/Configuration';
