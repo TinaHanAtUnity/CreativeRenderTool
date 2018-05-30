@@ -1263,7 +1263,7 @@ describe('CampaignManager', () => {
 
         return campaignManager.requestFromCache({
             response: OnProgrammaticMraidUrlPlcCampaignJson,
-            url: 'https://auction.unityads.unity3d.com/v4/games/12345/requests?&platform=android&sdkVersion=2000&stores=none&&screenWidth=800&screenHeight=1200&connectionType=wifi&networkType=0&gamerId=57a35671bb58271e002d93c9'
+            url: 'https://auction.unityads.unity3d.com/v4/games/12345/requests?&platform=android&sdkVersion=2000&stores=none&&screenWidth=800&screenHeight=1200&connectionType=wifi&networkType=0'
         } as INativeResponse).then(() => {
             assert.equal(triggeredCampaign.getAbGroup(), 99);
             assert.isFalse(onAdPlanReceived, 'onAdPlanReceived was triggered');
@@ -1286,7 +1286,7 @@ describe('CampaignManager', () => {
 
         return campaignManager.requestFromCache({
             response: OnProgrammaticMraidUrlPlcCampaignJson,
-            url: 'https://auction.unityads.unity3d.com/v4/games/500/requests?&platform=android&sdkVersion=2000&stores=none&&screenWidth=800&screenHeight=1200&connectionType=wifi&networkType=0&gamerId=57a35671bb58271e002d93c9'
+            url: 'https://auction.unityads.unity3d.com/v4/games/500/requests?&platform=android&sdkVersion=2000&stores=none&&screenWidth=800&screenHeight=1200&connectionType=wifi&networkType=0'
         } as INativeResponse).then(() => {
             assert.isUndefined(triggeredCampaign);
             assert.isFalse(onAdPlanReceived, 'onAdPlanReceived was triggered');
@@ -1309,7 +1309,7 @@ describe('CampaignManager', () => {
 
         return campaignManager.requestFromCache({
             response: OnProgrammaticMraidUrlPlcCampaignJson,
-            url: 'https://auction.unityads.unity3d.com/v4/games/12345/requests?&platform=android&sdkVersion=2000&stores=none&&screenWidth=800&screenHeight=1200&connectionType=test&networkType=1&gamerId=57a35671bb58271e002d93c9'
+            url: 'https://auction.unityads.unity3d.com/v4/games/12345/requests?&platform=android&sdkVersion=2000&stores=none&&screenWidth=800&screenHeight=1200&connectionType=test&networkType=1'
         } as INativeResponse).then(() => {
             assert.equal(triggeredCampaign.getAbGroup(), 99);
             assert.isFalse(onAdPlanReceived, 'onAdPlanReceived was triggered');
@@ -1342,7 +1342,7 @@ describe('CampaignManager', () => {
 
         return campaignManager.requestFromCache({
             response: OnProgrammaticVastPlcCampaignNullData,
-            url: 'https://auction.unityads.unity3d.com/v4/games/500/requests?&platform=android&sdkVersion=2000&stores=none&&screenWidth=800&screenHeight=1200&connectionType=wifi&networkType=0&gamerId=57a35671bb58271e002d93c9'
+            url: 'https://auction.unityads.unity3d.com/v4/games/500/requests?&platform=android&sdkVersion=2000&stores=none&&screenWidth=800&screenHeight=1200&connectionType=wifi&networkType=0'
         } as INativeResponse).then(() => {
             assert.isUndefined(triggeredCampaign);
             assert.isFalse(noFill, 'onNoFill was triggered');
@@ -1377,7 +1377,7 @@ describe('CampaignManager', () => {
 
         return campaignManager.requestFromCache({
             response: OnProgrammaticVastPlcCampaignNullData,
-            url: 'https://auction.unityads.unity3d.com/v4/games/500/requests?&platform=android&sdkVersion=2000&stores=none&&screenWidth=800&screenHeight=1200&connectionType=wifi&networkType=0&gamerId=57a35671bb58271e002d93c9'
+            url: 'https://auction.unityads.unity3d.com/v4/games/500/requests?&platform=android&sdkVersion=2000&stores=none&&screenWidth=800&screenHeight=1200&connectionType=wifi&networkType=0'
         } as INativeResponse).then(() => {
             assert.isUndefined(triggeredCampaign);
             assert.isFalse(noFill, 'onNoFill was triggered');
