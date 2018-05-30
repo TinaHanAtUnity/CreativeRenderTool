@@ -1,11 +1,9 @@
 import 'mocha';
-import * as sinon from 'sinon';
+
 import { assert } from 'chai';
 
 import { Configuration, CacheMode } from 'Models/Configuration';
 import { ConfigurationParser } from 'Parsers/ConfigurationParser';
-import { AdUnitStyle } from 'Models/AdUnitStyle';
-import { Diagnostics } from 'Utilities/Diagnostics';
 
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
 
