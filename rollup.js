@@ -9,7 +9,8 @@ export default {
         format: 'iife',
         file: 'build/release/bundle.js',
         globals: {
-            'protobufjs/minimal': 'protobuf'
+            'protobufjs/minimal': 'protobuf',
+            'tslib': 'tslib'
         }
     },
     plugins: [
