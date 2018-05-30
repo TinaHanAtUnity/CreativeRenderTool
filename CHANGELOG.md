@@ -1,3 +1,9 @@
+# Staged
+
+* Remove delay for closing playable MRAID on groups 18 and 19. 
+* Reject cache promise with CacheStatus.STOPPED when stopped. 
+* Disable auto batch after init on Android. 
+
 # Tue May 29 20:56:59 UTC 2018
 
 * Refactor ad unit lifecycle handling
