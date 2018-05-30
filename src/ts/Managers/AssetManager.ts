@@ -201,7 +201,7 @@ export class AssetManager {
         for(const asset of assets) {
             chain = chain.then(() => {
                 if(this._stopped) {
-                    throw new Error('Caching stopped');
+                    return Promise.reject(CacheStatus.STOPPED);
                 }
 
                 const promise = this.queueAsset(asset.getOriginalUrl(), this.getCacheDiagnostics(asset, campaign), cacheType).then(([fileId, fileUrl]) => {
