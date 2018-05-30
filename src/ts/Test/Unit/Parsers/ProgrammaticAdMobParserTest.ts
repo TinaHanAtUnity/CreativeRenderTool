@@ -27,7 +27,7 @@ describe('ProgrammaticAdMobParser', () => {
     let request: Request;
     let session: Session;
     let setFileIdSpy: sinon.SinonSpy;
-    let abGroup = getAbGroup(0);
+    const abGroup = getAbGroup(0);
 
     describe('parsing a campaign', () => {
         let campaign: AdMobCampaign;
