@@ -9,6 +9,12 @@ export class AdUnitStyle extends Model<IAdUnitStyle> {
         ctaButtonColor: ['string', 'undefined']
     };
 
+    public static getDefaultAdUnitStyle(): AdUnitStyle {
+        return new AdUnitStyle({
+            ctaButtonColor: '#167dfb'
+        });
+    }
+
     constructor(adUnitStyle: IAdUnitStyle) {
         super('AdUnitStyle', AdUnitStyle.Schema, adUnitStyle);
     }
