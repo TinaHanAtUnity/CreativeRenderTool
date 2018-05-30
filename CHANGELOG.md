@@ -1,4 +1,4 @@
-# Pending
+# Wed May 30 21:00:10 UTC 2018
 
 * Reuse previous auctionId for no fill retries
 * Invalidate cached ad response if request url has changed
@@ -6,9 +6,9 @@
 
 # Wed May 30 11:20:00 UTC 2018
 
-* Remove delay for closing playable MRAID on groups 18 and 19. 
-* Reject cache promise with CacheStatus.STOPPED when stopped. 
-* Disable auto batch after init on Android. 
+* Remove delay for closing playable MRAID on groups 18 and 19.
+* Reject cache promise with CacheStatus.STOPPED when stopped.
+* Disable auto batch after init on Android.
 
 # Tue May 29 20:56:59 UTC 2018
 
