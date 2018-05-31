@@ -39,11 +39,12 @@ export class GdprManager {
     public getConsentAndUpdateConfiguration(): Promise<boolean> {
         return this.getConsent().then((consent: boolean) => {
             this.updateConfigurationWithConsent(consent);
+            this.pushConsent(consent);
             return consent;
         });
     }
 
-    public setConsent(consent: boolean): Promise<void> {
+    public pushConsent(consent: boolean): Promise<void> {
         // get last state of gdpr consent
         return this._nativeBridge.Storage.get(StorageType.PRIVATE, GdprManager.GdprLastConsentValueStorageKey).then((consentLastSentToKafka) => {
             // only if consent has changed push to kafka
@@ -105,7 +106,7 @@ export class GdprManager {
 
             if(typeof(value) !== 'undefined') {
                 this.updateConfigurationWithConsent(value);
-                this.setConsent(value);
+                this.pushConsent(value);
             }
         }
     }

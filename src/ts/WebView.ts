@@ -232,9 +232,7 @@ export class WebView {
                     this._sessionManager.setGameSessionId(gameSessionId);
                 });
             }
-            const gdprConsentPromise = this._gdprManager.getConsentAndUpdateConfiguration().then((consent: boolean) => {
-                this._gdprManager.setConsent(consent);
-            }).catch((error) => {
+            const gdprConsentPromise = this._gdprManager.getConsentAndUpdateConfiguration().catch((error) => {
                 // do nothing
                 // error happens when consent value is undefined
             });
