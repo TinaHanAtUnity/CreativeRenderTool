@@ -140,7 +140,10 @@ describe('CometCampaignParser', () => {
                 assert.equal(adUnitStyle.getCTAButtonColor(), '#167dfb');
             });
 
-            describe('Parsing json to campaign leaves adUnitStyle undefined when AdUnitStyle in JSON', () => {
+            describe('Parsing json to campaign when AdUnitStyle in JSON', () => {
+                const fuchsia = '#ff00ff';
+                const fafafa = '#FAFAFA';
+
                 let sandbox: sinon.SinonSandbox;
                 let campaignJSON: any;
 
@@ -155,7 +158,7 @@ describe('CometCampaignParser', () => {
                     sandbox.restore();
                 });
 
-                it('is undefined', () => {
+                it('is undefined, leaves adUnitStyle undefined', () => {
                     campaignJSON.content.adUnitStyle = undefined;
                     campaignJSON.content = JSON.stringify(campaignJSON.content);
                     return parse(campaignJSON).then( () => {
@@ -164,7 +167,7 @@ describe('CometCampaignParser', () => {
                     });
                 });
 
-                it('is missing', () => {
+                it('is missing, leaves adUnitStyle undefined ', () => {
                     delete campaignJSON.content.adUnitStyle;
                     campaignJSON.content = JSON.stringify(campaignJSON.content);
                     return parse(campaignJSON).then( () => {
@@ -173,12 +176,62 @@ describe('CometCampaignParser', () => {
                     });
                 });
 
-                it('is malformed', () => {
+                it('is malformed, leaves adUnitStyle undefined ', () => {
                     campaignJSON.content.adUnitStyle = { 'thisIsNot': 'A Proper stylesheet' };
                     campaignJSON.content = JSON.stringify(campaignJSON.content);
                     return parse(campaignJSON).then( () => {
                         assert.isUndefined( (<PerformanceCampaign>campaign).getAdUnitStyle() );
                         sinon.assert.calledWith(<sinon.SinonSpy>Diagnostics.trigger, 'configuration_ad_unit_style_parse_error');
+                    });
+                });
+
+                it('has a blank string, returns undefined ctaButtonColor', () => {
+                    campaignJSON.content.adUnitStyle.ctaButtonColor = '';
+                    campaignJSON.content = JSON.stringify(campaignJSON.content);
+                    return parse(campaignJSON).then( () => {
+                        const returnedAdUnitStyle = (<PerformanceCampaign>campaign).getAdUnitStyle();
+                        assert.isUndefined( (<AdUnitStyle>returnedAdUnitStyle).getCTAButtonColor() );
+                        sinon.assert.notCalled(<sinon.SinonSpy>Diagnostics.trigger);
+                    });
+                });
+
+                it('has a undefined value, returns undefined ctaButtonColor', () => {
+                    campaignJSON.content.adUnitStyle.ctaButtonColor = undefined;
+                    campaignJSON.content = JSON.stringify(campaignJSON.content);
+                    return parse(campaignJSON).then( () => {
+                        const returnedAdUnitStyle = (<PerformanceCampaign>campaign).getAdUnitStyle();
+                        assert.isUndefined( (<AdUnitStyle>returnedAdUnitStyle).getCTAButtonColor() );
+                        sinon.assert.notCalled(<sinon.SinonSpy>Diagnostics.trigger);
+                    });
+                });
+
+                it('has a non-color value, returns undefined ctaButtonColor', () => {
+                    campaignJSON.content.adUnitStyle.ctaButtonColor = '#blue12';
+                    campaignJSON.content = JSON.stringify(campaignJSON.content);
+                    return parse(campaignJSON).then( () => {
+                        const returnedAdUnitStyle = (<PerformanceCampaign>campaign).getAdUnitStyle();
+                        assert.isUndefined( (<AdUnitStyle>returnedAdUnitStyle).getCTAButtonColor() );
+                        sinon.assert.notCalled(<sinon.SinonSpy>Diagnostics.trigger);
+                    });
+                });
+
+                it('has a lower case color, returns proper ctaButtonColor', () => {
+                    campaignJSON.content.adUnitStyle.ctaButtonColor = fuchsia;
+                    campaignJSON.content = JSON.stringify(campaignJSON.content);
+                    return parse(campaignJSON).then( () => {
+                        const returnedAdUnitStyle = (<PerformanceCampaign>campaign).getAdUnitStyle();
+                        assert.equal( (<AdUnitStyle>returnedAdUnitStyle).getCTAButtonColor(), fuchsia );
+                        sinon.assert.notCalled(<sinon.SinonSpy>Diagnostics.trigger);
+                    });
+                });
+
+                it('has a upper case color, returns proper ctaButtonColor', () => {
+                    campaignJSON.content.adUnitStyle.ctaButtonColor = fafafa;
+                    campaignJSON.content = JSON.stringify(campaignJSON.content);
+                    return parse(campaignJSON).then( () => {
+                        const returnedAdUnitStyle = (<PerformanceCampaign>campaign).getAdUnitStyle();
+                        assert.equal( (<AdUnitStyle>returnedAdUnitStyle).getCTAButtonColor(), fafafa );
+                        sinon.assert.notCalled(<sinon.SinonSpy>Diagnostics.trigger);
                     });
                 });
             });

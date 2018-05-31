@@ -15,8 +15,18 @@ export class AdUnitStyle extends Model<IAdUnitStyle> {
         });
     }
 
+    private static validateIAdUnitStyle(adUnitStyle: IAdUnitStyle) {
+        const validatedAdUnitStyle: IAdUnitStyle = {...adUnitStyle};
+        // ctaButtonColor needs to a proper html color code string or undefined
+        if ( (!adUnitStyle.ctaButtonColor) || !adUnitStyle.ctaButtonColor.match(/#[0-F]{6}/i)) {
+            validatedAdUnitStyle.ctaButtonColor = undefined;
+        }
+        return validatedAdUnitStyle;
+    }
+
     constructor(adUnitStyle: IAdUnitStyle) {
-        super('AdUnitStyle', AdUnitStyle.Schema, adUnitStyle);
+        const validatedIAdUnitStyle = AdUnitStyle.validateIAdUnitStyle(adUnitStyle);
+        super('AdUnitStyle', AdUnitStyle.Schema, validatedIAdUnitStyle);
     }
 
     public getCTAButtonColor(): string | undefined {
