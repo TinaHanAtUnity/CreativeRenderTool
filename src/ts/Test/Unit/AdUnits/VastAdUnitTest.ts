@@ -19,12 +19,12 @@ import { Video } from 'Models/Assets/Video';
 import { FocusManager } from 'Managers/FocusManager';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
-import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { SessionManager } from 'Managers/SessionManager';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 
 import EventTestVast from 'xml/EventTestVast.xml';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
+import { GdprConsentManager } from 'Managers/GdprConsentManager';
 
 describe('VastAdUnit', () => {
 
@@ -35,7 +35,6 @@ describe('VastAdUnit', () => {
     let vastAdUnitParameters: IVastAdUnitParameters;
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
-    let comScoreService: ComScoreTrackingService;
     let placement: Placement;
     let vastCampaign: VastCampaign;
 
@@ -93,7 +92,7 @@ describe('VastAdUnit', () => {
         });
 
         const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
-        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
+        const gdprManager = sinon.createStubInstance(GdprConsentManager);
 
         vastAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,
@@ -103,7 +102,6 @@ describe('VastAdUnit', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
-            comScoreTrackingService: comScoreService,
             placement: placement,
             campaign: vastCampaign,
             configuration: configuration,
@@ -111,7 +109,8 @@ describe('VastAdUnit', () => {
             options: {},
             endScreen: undefined,
             overlay: overlay,
-            video: video
+            video: video,
+            gdprManager: gdprManager
         };
 
         vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);

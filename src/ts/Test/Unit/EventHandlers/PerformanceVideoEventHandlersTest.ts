@@ -13,7 +13,6 @@ import { Video } from 'Models/Assets/Video';
 import { Request } from 'Utilities/Request';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { SessionManager } from 'Managers/SessionManager';
-import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { FocusManager } from 'Managers/FocusManager';
 import { WakeUpManager } from 'Managers/WakeUpManager';
@@ -21,6 +20,9 @@ import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { IVideoEventHandlerParams } from 'EventHandlers/BaseVideoEventHandler';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
+import { VideoState } from 'AdUnits/VideoAdUnit';
+import { Privacy } from 'Views/Privacy';
+import { GdprConsentManager } from 'Managers/GdprConsentManager';
 
 describe('PerformanceVideoEventHandlersTest', () => {
 
@@ -31,7 +33,6 @@ describe('PerformanceVideoEventHandlersTest', () => {
     let performanceAdUnit: PerformanceAdUnit;
     let video: Video;
     let performanceAdUnitParameters: IPerformanceAdUnitParameters;
-    let comScoreService: ComScoreTrackingService;
     let performanceVideoEventHandler: PerformanceVideoEventHandler;
 
     beforeEach(() => {
@@ -64,9 +65,10 @@ describe('PerformanceVideoEventHandlersTest', () => {
             campaign: campaign
         });
 
-        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
-        endScreen = new PerformanceEndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
+        const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+        endScreen = new PerformanceEndScreen(nativeBridge, campaign, deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, false);
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
+        const gdprManager = sinon.createStubInstance(GdprConsentManager);
 
         performanceAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,
@@ -76,7 +78,6 @@ describe('PerformanceVideoEventHandlersTest', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
-            comScoreTrackingService: comScoreService,
             placement: TestFixtures.getPlacement(),
             campaign: campaign,
             configuration: configuration,
@@ -84,7 +85,9 @@ describe('PerformanceVideoEventHandlersTest', () => {
             options: {},
             endScreen: endScreen,
             overlay: overlay,
-            video: video
+            video: video,
+            privacy: privacy,
+            gdprManager: gdprManager
         };
 
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
@@ -95,7 +98,6 @@ describe('PerformanceVideoEventHandlersTest', () => {
             campaign: campaign,
             operativeEventManager: operativeEventManager,
             thirdPartyEventManager: thirdPartyEventManager,
-            comScoreTrackingService: comScoreService,
             configuration: configuration,
             placement: TestFixtures.getPlacement(),
             video: video,
@@ -118,7 +120,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
         it('should show end screen', () => {
             sinon.spy(endScreen, 'show');
             // Set prepare called so that error will trigger
-            performanceAdUnit.setPrepareCalled(true);
+            performanceAdUnit.setVideoState(VideoState.PREPARING);
             // Cause an error by giving too large duration
             performanceVideoEventHandler.onPrepared(video.getUrl(), 50000, 1024, 768);
             sinon.assert.called(<sinon.SinonSpy>endScreen.show);

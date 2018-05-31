@@ -1,5 +1,5 @@
 import { IMRAIDViewHandler, IOrientationProperties } from 'Views/MRAIDView';
-import { HttpKafka } from 'Utilities/HttpKafka';
+import { HttpKafka, KafkaCommonObjectType } from 'Utilities/HttpKafka';
 import { NativeBridge } from 'Native/NativeBridge';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
@@ -107,7 +107,7 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
         if(resourceUrl) {
             kafkaObject.url = resourceUrl.getOriginalUrl();
         }
-        HttpKafka.sendEvent('ads.sdk2.events.playable.json', kafkaObject);
+        HttpKafka.sendEvent('ads.sdk2.events.playable.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
     }
 
     public onMraidShowEndScreen(): void {
@@ -116,17 +116,6 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
             this._adUnit.setShowingMRAID(false);
             this._adUnit.getMRAIDView().hide();
             endScreen.show();
-        }
-    }
-
-    public onMraidPrivacy(url: string): void {
-        if(this._nativeBridge.getPlatform() === Platform.IOS) {
-            this._nativeBridge.UrlScheme.open(url);
-        } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            this._nativeBridge.Intent.launch({
-                'action': 'android.intent.action.VIEW',
-                'uri': url
-            });
         }
     }
 

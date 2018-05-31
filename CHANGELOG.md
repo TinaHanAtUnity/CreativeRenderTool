@@ -1,3 +1,128 @@
+# Wed May 30 21:00:10 UTC 2018
+
+* Reuse previous auctionId for no fill retries
+* Invalidate cached ad response if request url has changed
+* Remove gamerId from auction request
+
+# Wed May 30 11:20:00 UTC 2018
+
+* Remove delay for closing playable MRAID on groups 18 and 19.
+* Reject cache promise with CacheStatus.STOPPED when stopped.
+* Disable auto batch after init on Android.
+
+# Tue May 29 20:56:59 UTC 2018
+
+* Refactor ad unit lifecycle handling
+
+# Fri May 25 15:33:04 UTC 2018
+
+* Update Unity logo
+* Update GDPR icon position on endscreen
+* Change battery level scaling from 0..100 to 0..1 in AdMob signals
+* Add ConfigurationParser to parse configuration response
+
+# Thu May 24 22:17:19 UTC 2018
+
+* Add Promo GDPR Banner Functionality
+* Remove gamerID from GDPR user personal data collecting URL
+* Prevent sending multiple CTA click events in vast
+
+# Thu May 24 15:37:24 UTC 2018
+
+* Delete gamerId from local storage and use gamer token in config request for iOS limit ad tracking devices
+* Update GDPR flow, privacy icon and dialog
+* Fix GDPR sorry message issue
+* Fix duplicate GDPR skip event if user reviews privacy policy accessed with info button
+* Fix GDPR data deletion display bug
+
+# Wed May 23 16:12:46 UTC 2018
+
+* GDPR popup update to match latest legal and product requirements
+* Send GDPR skip event when someone opens GDPR popup but does not change default selection
+* Prevent nulls from AdMob signals to native Storage API
+
+# Tue May 22 11:48:50 UTC 2018
+
+* Support string values in GDPR consent metadata
+
+# Mon May 21 21:33:51 UTC 2018
+
+* Remove advertising identifier from MOAT integration for GDPR compliance
+* Stop square endscreen image A/B test from groups 5 and 6
+* Enable cached campaign response for all users
+
+# Fri May 18 09:26:31 UTC 2018
+
+* Support for GDPR consent metadata
+* Add GDPR parameters to operative events
+
+# Thu May 17 10:44:24 UTC 2018
+
+* Send GDPR opt-out messages to production topic
+
+# Wed May 16 21:23:14 UTC 2018
+
+* Set gameId = gameId | gamerToken for IAP promo
+* Grab APK download link from the click attribution URL
+* Platform specific GDPR privacy text functionality
+
+# Wed May 16 08:39:25 UTC 2018
+
+* iOS AdMob Precache for all groups.
+* Uses full screen width and height for Display when not set in the campaign.
+
+# Tue May 15 20:36:34 UTC 2018
+
+* Anonymize non-operational events
+* Fix configuration for creative test apps
+
+# Tue May 15 08:39:57 UTC 2018
+
+* Send GDPR opt-out events to test topic
+
+# Mon May 14 20:36:21 UTC 2018
+
+* Initial GDPR support for performance ads
+* Update square endscreen image target campaign IDs
+* Change IAP promo finish states to skip on close and finished on purchase
+
+# Mon May 14 09:12:28 UTC 2018
+
+* Remove GDPR popup A/B test from groups 18 & 19
+
+# Wed May  9 20:37:15 UTC 2018
+
+* Disable ComScore integration
+* Add make watch-fast target
+
+# Wed May  9 08:41:13 UTC 2018
+
+* Adds iOS AdMob video precaching for AB Groups 14 and 15.
+
+# Tue May  8 20:21:44 UTC 2018
+
+* Add organizationId to ad requests
+* Split display interstitial content type to programmatic/static-interstitial-html and programmatic/static-interstitial-js
+* Drop gameSessionCounters from skip event payload
+* Restart backup campaign A/B test on groups 11 and 12
+
+# Fri May  4 13:36:21 UTC 2018
+
+* Stop A/B test from groups 7 and 8 that was accidentally restarted on Apr 26 deployment
+* Fix init promise chain
+
+# Thu May  3 20:22:59 UTC 2018
+
+* Fix for CSS image URL corner case issue
+* Fix getNetworkMetered API and DeviceInfo model
+
+# Wed May  2 20:31:05 UTC 2018
+
+* Square image abtest
+* GDPR v2 pop up on group 18 and 19
+* Send opt-out event on end screen hide
+* Add optional signals to auction request body
+
 # Thu Apr 26 20:23:59 UTC 2018
 
 * Initial support for Jaeger tracing service

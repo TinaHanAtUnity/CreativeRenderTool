@@ -13,7 +13,8 @@ import { Platform } from 'Constants/Platform';
 import { SdkApi } from 'Native/Api/Sdk';
 import { ProgrammaticVPAIDParser } from 'Parsers/ProgrammaticVPAIDParser';
 
-import DisplayStaticInterstitialCampaign from 'json/campaigns/display/DisplayStaticInterstitialCampaign.json';
+import DisplayStaticInterstitialCampaignHTML from 'json/campaigns/display/DisplayStaticInterstitialCampaignHTML.json';
+import DisplayStaticInterstitialCampaignJS from 'json/campaigns/display/DisplayStaticInterstitialCampaignJS.json';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Url } from 'Utilities/Url';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
@@ -40,12 +41,15 @@ describe('ProgrammaticVPAIDParser', () => {
 
         request = sinon.createStubInstance(Request);
         session = TestFixtures.getSession();
-
-        parser = new ProgrammaticStaticInterstitialParser();
     });
 
-    describe('parsing a campaign', () => {
-        describe('with proper XML payload', () => {
+    describe('parsing an HTML campaign', () => {
+
+        beforeEach(() => {
+            parser = new ProgrammaticStaticInterstitialParser(false);
+        });
+
+        describe('with proper HTML payload', () => {
             let campaign: DisplayInterstitialCampaign;
             const parse = (data: any) => {
                 const response = new AuctionResponse(placements, data, mediaId, correlationId);
@@ -55,20 +59,53 @@ describe('ProgrammaticVPAIDParser', () => {
             };
 
             beforeEach(() => {
-                return parse(JSON.parse(DisplayStaticInterstitialCampaign));
+                return parse(JSON.parse(DisplayStaticInterstitialCampaignHTML));
             });
 
             it('should have valid data', () => {
                 assert.isNotNull(campaign, 'Campaign is null');
                 assert.isTrue(campaign instanceof DisplayInterstitialCampaign, 'Campaign was not an DisplayInterstitialCampaign');
 
-                const json = JSON.parse(DisplayStaticInterstitialCampaign);
+                const json = JSON.parse(DisplayStaticInterstitialCampaignHTML);
 
                 assert.equal(campaign.getGamerId(), gamerId, 'GamerID is not equal');
                 assert.equal(campaign.getAbGroup(), abGroup, 'ABGroup is not equal');
                 assert.equal(campaign.getSession(), session, 'Session is not equal');
                 assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not equal');
                 assert.equal(campaign.getDynamicMarkup(), decodeURIComponent(json.content), 'Dynamic Markup is not equal');
+            });
+        });
+    });
+
+    describe('parsing a JS campaign', () => {
+        beforeEach(() => {
+            parser = new ProgrammaticStaticInterstitialParser(true);
+        });
+
+        describe('with proper JS payload', () => {
+            let campaign: DisplayInterstitialCampaign;
+            const parse = (data: any) => {
+                const response = new AuctionResponse(placements, data, mediaId, correlationId);
+                return parser.parse(nativeBridge, request, response, session, gamerId, abGroup).then((parsedCampaign) => {
+                    campaign = <DisplayInterstitialCampaign>parsedCampaign;
+                });
+            };
+
+            beforeEach(() => {
+                return parse(JSON.parse(DisplayStaticInterstitialCampaignJS));
+            });
+
+            it('should have valid data', () => {
+                assert.isNotNull(campaign, 'Campaign is null');
+                assert.isTrue(campaign instanceof DisplayInterstitialCampaign, 'Campaign was not an DisplayInterstitialCampaign');
+
+                const json = JSON.parse(DisplayStaticInterstitialCampaignJS);
+
+                assert.equal(campaign.getGamerId(), gamerId, 'GamerID is not equal');
+                assert.equal(campaign.getAbGroup(), abGroup, 'ABGroup is not equal');
+                assert.equal(campaign.getSession(), session, 'Session is not equal');
+                assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not equal');
+                assert.equal(campaign.getDynamicMarkup(), '<script>' + decodeURIComponent(json.content) + '</script>', 'Dynamic Markup is not equal');
             });
         });
     });

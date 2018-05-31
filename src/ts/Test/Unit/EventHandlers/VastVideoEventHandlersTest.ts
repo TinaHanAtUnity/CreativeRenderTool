@@ -20,15 +20,16 @@ import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer
 import { Activity } from 'AdUnits/Containers/Activity';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { FocusManager } from 'Managers/FocusManager';
-import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { MOAT } from 'Views/MOAT';
 import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { IVideoEventHandlerParams } from 'EventHandlers/BaseVideoEventHandler';
+import { Vast } from 'Models/Vast/Vast';
+import { VideoState } from 'AdUnits/VideoAdUnit';
+import { GdprConsentManager } from 'Managers/GdprConsentManager';
 
 import EventTestVast from 'xml/EventTestVast.xml';
-import { Vast } from 'Models/Vast/Vast';
 
 describe('VastVideoEventHandler tests', () => {
     const handleInvocation = sinon.spy();
@@ -53,6 +54,7 @@ describe('VastVideoEventHandler tests', () => {
     let sandbox: sinon.SinonSandbox;
     let vastVideoEventHandler: VastVideoEventHandler;
     let videoEventHandlerParams: IVideoEventHandlerParams;
+    let gdprManager: GdprConsentManager;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -99,7 +101,8 @@ describe('VastVideoEventHandler tests', () => {
             configuration: configuration,
             campaign: campaign
         });
-        const comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
+
+        gdprManager = sinon.createStubInstance(GdprConsentManager);
 
         vastAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,
@@ -109,7 +112,6 @@ describe('VastVideoEventHandler tests', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
-            comScoreTrackingService: comScoreService,
             placement: placement,
             campaign: campaign,
             configuration: configuration,
@@ -117,7 +119,8 @@ describe('VastVideoEventHandler tests', () => {
             options: {},
             endScreen: undefined,
             overlay: overlay,
-            video: campaign.getVideo()
+            video: campaign.getVideo(),
+            gdprManager: gdprManager
         };
 
         testAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
@@ -132,7 +135,6 @@ describe('VastVideoEventHandler tests', () => {
             campaign: campaign,
             operativeEventManager: operativeEventManager,
             thirdPartyEventManager: thirdPartyEventManager,
-            comScoreTrackingService: comScoreService,
             configuration: configuration,
             placement: placement,
             video: campaign.getVideo(),
@@ -211,10 +213,9 @@ describe('VastVideoEventHandler tests', () => {
             mockEventManager.verify();
         });
 
-        it('tiggers moat viewability and video events', () => {
+        it('tiggers moat play event', () => {
             vastVideoEventHandler.onPlay('https://test.com');
-            sinon.assert.called(<sinon.SinonStub>moat.triggerViewabilityEvent);
-            sinon.assert.called(<sinon.SinonStub>moat.triggerVideoEvent);
+            sinon.assert.called(<sinon.SinonStub>moat.play);
         });
     });
 
@@ -231,14 +232,13 @@ describe('VastVideoEventHandler tests', () => {
             // when the session manager is told that the video has completed
             // then the VAST complete callback URL should be requested by the event manager
             const mockEventManager = sinon.mock(thirdPartyEventManager);
-            const expectation = mockEventManager.expects('sendEvent').twice();
+            const expectation = mockEventManager.expects('sendEvent').once();
             vastVideoEventHandler.onCompleted('https://test.com');
             mockEventManager.verify();
-            assert.equal(expectation.getCall(0).args[0], 'end', 'First event sent should be \'end\'');
-            assert.equal(expectation.getCall(0).args[1], '12345', 'First event session id should be 12345');
-            assert.equal(expectation.getCall(1).args[0], 'vast complete', 'Second event sent should be \'vast complete\'');
-            assert.equal(expectation.getCall(1).args[1], '12345', 'Second event session id should be 12345');
-            assert.equal(expectation.getCall(1).args[2], 'http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123', 'Incorrect second event URL');
+
+            assert.equal(expectation.getCall(0).args[0], 'vast complete', 'Second event sent should be \'vast complete\'');
+            assert.equal(expectation.getCall(0).args[1], '12345', 'Second event session id should be 12345');
+            assert.equal(expectation.getCall(0).args[2], 'http://localhost:3500/brands/14851/start?advertisingTrackingId=123456&androidId=aae7974a89efbcfd&creativeId=CrEaTiVeId1&demandSource=tremor&gameId=14851&ip=192.168.69.69&token=9690f425-294c-51e1-7e92-c23eea942b47&ts=2016-04-21T20%3A46%3A36Z&value=13.1&zone=123', 'Incorrect second event URL');
         });
 
         it('should hide ad unit', () => {
@@ -246,9 +246,9 @@ describe('VastVideoEventHandler tests', () => {
             sinon.assert.called(<sinon.SinonSpy>testAdUnit.hide);
         });
 
-        it ('should trigger moat video event', () => {
+        it ('should trigger moat completed event', () => {
             vastVideoEventHandler.onCompleted('https://test.com');
-            sinon.assert.called(<sinon.SinonStub>moat.triggerVideoEvent);
+            sinon.assert.called(<sinon.SinonStub>moat.completed);
         });
     });
 
@@ -257,8 +257,8 @@ describe('VastVideoEventHandler tests', () => {
             vastVideoEventHandler.onStop('https://test.com');
         });
 
-        it ('should send moat video event', () => {
-            sinon.assert.called(<sinon.SinonStub>moat.triggerVideoEvent);
+        it ('should send moat stop event', () => {
+            sinon.assert.called(<sinon.SinonStub>moat.stop);
         });
     });
 
@@ -268,12 +268,8 @@ describe('VastVideoEventHandler tests', () => {
             vastVideoEventHandler.onPause('https://test.com');
         });
 
-        it ('should send moat video event', () => {
-            sinon.assert.calledWith(<sinon.SinonStub>moat.triggerVideoEvent, 'AdPaused', 4);
-        });
-
-        it ('should trigger moat viewability event', () => {
-            sinon.assert.called(<sinon.SinonStub>moat.triggerViewabilityEvent);
+        it ('should send moat pause event', () => {
+            sinon.assert.calledWith(<sinon.SinonStub>moat.pause, 4);
         });
     });
 
@@ -282,19 +278,15 @@ describe('VastVideoEventHandler tests', () => {
             vastVideoEventHandler.onVolumeChange(1, 10);
         });
 
-        it ('should send moat video event', () => {
-            sinon.assert.calledWith(<sinon.SinonStub>moat.triggerVideoEvent, 'AdVolumeChange', 0.1);
-        });
-
-        it ('should trigger moat viewability event', () => {
-            sinon.assert.calledWith(<sinon.SinonStub>moat.triggerViewabilityEvent, 'volume', 10);
+        it ('should call moat volumeChange event', () => {
+            sinon.assert.calledWith(<sinon.SinonStub>moat.volumeChange, 0.1);
         });
     });
 
     describe('onVideoError', () => {
         it('should hide ad unit', () => {
             // Cause an error by giving too large duration
-            testAdUnit.setPrepareCalled(true);
+            testAdUnit.setVideoState(VideoState.PREPARING);
             vastVideoEventHandler.onPrepared('https://test.com', 50000, 1024, 768);
             sinon.assert.called(<sinon.SinonSpy>testAdUnit.hide);
         });
@@ -321,8 +313,7 @@ describe('VastVideoEventHandler tests', () => {
 
         it('should show end screen when onVideoError', () => {
             // Cause an error by giving too large duration
-            vastAdUnit.setPrepareCalled(true);
-
+            vastAdUnit.setVideoState(VideoState.PREPARING);
             vastVideoEventHandler.onPrepared('https://test.com', 50000, 1024, 768);
 
             sinon.assert.called(<sinon.SinonSpy>vastEndScreen.show);

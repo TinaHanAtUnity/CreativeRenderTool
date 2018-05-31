@@ -1,5 +1,5 @@
 import { Request } from 'Utilities/Request';
-import { HttpKafka } from 'Utilities/HttpKafka';
+import { HttpKafka, KafkaCommonObjectType } from 'Utilities/HttpKafka';
 import { Configuration, CacheMode } from 'Models/Configuration';
 import { Placement } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
@@ -29,7 +29,6 @@ interface ISdkStatsEvent {
 }
 
 interface IUserInfo {
-    gamerId: string;
     abGroup: number;
 }
 
@@ -90,7 +89,7 @@ export class SdkStats {
     public static sendReadyEvent(placementId: string): void {
         if(SdkStats._initialized && SdkStats.isTestActive()) {
             SdkStats.getSdkStatsEvent('ready', placementId).then(event => {
-                HttpKafka.sendEvent(SdkStats._topic, event);
+                HttpKafka.sendEvent(SdkStats._topic, KafkaCommonObjectType.ANONYMOUS, event);
             });
         }
     }
@@ -98,7 +97,7 @@ export class SdkStats {
     public static sendShowEvent(placementId: string): void {
         if(SdkStats._initialized && SdkStats.isTestActive()) {
             SdkStats.getSdkStatsEvent('show', placementId).then(event => {
-                HttpKafka.sendEvent(SdkStats._topic, event);
+                HttpKafka.sendEvent(SdkStats._topic, KafkaCommonObjectType.ANONYMOUS, event);
             });
         }
     }
@@ -200,7 +199,6 @@ export class SdkStats {
             SdkStats.getAssetSize(campaign),
             SdkStats._metaDataManager.fetch(MediationMetaData)]).then(([cachedCampaigns, assetSize, mediationMetaData]: [string[], number, MediationMetaData | undefined]) => {
             const userInfo: IUserInfo = {
-                gamerId: SdkStats._configuration.getGamerId(),
                 abGroup: SdkStats._configuration.getAbGroup()
             };
 

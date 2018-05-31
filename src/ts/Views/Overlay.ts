@@ -24,6 +24,7 @@ export class Overlay extends AbstractVideoOverlay {
     private _debugMessageVisible: boolean = false;
 
     private _callButtonVisible: boolean = false;
+    private _callButtonEnabled: boolean = true;
 
     private _skipElement: HTMLElement;
     private _spinnerElement: HTMLElement;
@@ -162,6 +163,12 @@ export class Overlay extends AbstractVideoOverlay {
         }
     }
 
+    public setCallButtonEnabled(value: boolean) {
+        if(this._callButtonEnabled !== value) {
+            this._callButtonEnabled = value;
+        }
+    }
+
     public isMuted(): boolean {
         return this._muted;
     }
@@ -189,6 +196,9 @@ export class Overlay extends AbstractVideoOverlay {
     }
 
     private onCallButtonEvent(event: Event): void {
+        if(!this._callButtonEnabled) {
+            return;
+        }
         event.preventDefault();
         event.stopPropagation();
         this.resetFadeTimer();

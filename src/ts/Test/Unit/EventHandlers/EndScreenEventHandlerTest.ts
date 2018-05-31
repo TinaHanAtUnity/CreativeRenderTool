@@ -8,7 +8,6 @@ import { SessionManager } from 'Managers/SessionManager';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { Request, INativeResponse } from 'Utilities/Request';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
@@ -27,6 +26,8 @@ import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 import { Placement } from 'Models/Placement';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { Configuration } from 'Models/Configuration';
+import { Privacy } from 'Views/Privacy';
+import { GdprConsentManager } from 'Managers/GdprConsentManager';
 
 describe('EndScreenEventHandlerTest', () => {
 
@@ -43,7 +44,6 @@ describe('EndScreenEventHandlerTest', () => {
     let thirdPartyEventManager: ThirdPartyEventManager;
     let performanceAdUnitParameters: IPerformanceAdUnitParameters;
     let endScreenEventHandler: PerformanceEndScreenEventHandler;
-    let comScoreService: ComScoreTrackingService;
     let campaign: PerformanceCampaign;
     let placement: Placement;
     let configuration: Configuration;
@@ -79,15 +79,17 @@ describe('EndScreenEventHandlerTest', () => {
                 campaign: campaign
             });
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
-            comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
             sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
             sinon.spy(nativeBridge.Intent, 'launch');
 
             const video = new Video('', TestFixtures.getSession());
-            endScreen = new PerformanceEndScreen(nativeBridge, TestFixtures.getCampaign(), configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
+
+            const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+            endScreen = new PerformanceEndScreen(nativeBridge, TestFixtures.getCampaign(), deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, false);
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
             placement = TestFixtures.getPlacement();
+            const gdprManager = sinon.createStubInstance(GdprConsentManager);
 
             performanceAdUnitParameters = {
                 forceOrientation: Orientation.LANDSCAPE,
@@ -97,7 +99,6 @@ describe('EndScreenEventHandlerTest', () => {
                 clientInfo: clientInfo,
                 thirdPartyEventManager: thirdPartyEventManager,
                 operativeEventManager: operativeEventManager,
-                comScoreTrackingService: comScoreService,
                 placement: placement,
                 campaign: campaign,
                 configuration: configuration,
@@ -105,7 +106,9 @@ describe('EndScreenEventHandlerTest', () => {
                 options: {},
                 endScreen: endScreen,
                 overlay: overlay,
-                video: video
+                video: video,
+                privacy: privacy,
+                gdprManager: gdprManager
             };
 
             performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
@@ -150,6 +153,64 @@ describe('EndScreenEventHandlerTest', () => {
                     sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
                         'action': 'android.intent.action.VIEW',
                         'uri': 'market://foobar.com'
+                    });
+                });
+            });
+
+            it('with APK download link and API is greater than or equal to 21, it should launch web search intent', () => {
+                performanceAdUnitParameters.campaign = TestFixtures.getCampaignFollowsRedirects();
+                performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
+
+                sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').returns(Promise.resolve({
+                    url: 'http://foo.url.com',
+                    response: 'foo response',
+                    responseCode: 200
+                }));
+
+                sinon.stub(nativeBridge, 'getApiLevel').returns(21);
+
+                endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
+                    appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
+                    bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
+                    gamerId: performanceAdUnitParameters.campaign.getGamerId(),
+                    store: performanceAdUnitParameters.campaign.getStore(),
+                    clickAttributionUrlFollowsRedirects: true,
+                    clickAttributionUrl: 'https://blah.com?apk_download_link=https://cdn.apk.com'
+                });
+
+                return resolvedPromise.then(() => {
+                    sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
+                        'action': 'android.intent.action.WEB_SEARCH',
+                        'extras': [{ key: 'query', value: 'https://cdn.apk.com' }]
+                    });
+                });
+            });
+
+            it('with APK download link and API is less than 21, it should launch view intent', () => {
+                performanceAdUnitParameters.campaign = TestFixtures.getCampaignFollowsRedirects();
+                performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
+
+                sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').returns(Promise.resolve({
+                    url: 'http://foo.url.com',
+                    response: 'foo response',
+                    responseCode: 200
+                }));
+
+                sinon.stub(nativeBridge, 'getApiLevel').returns(20);
+
+                endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
+                    appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
+                    bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
+                    gamerId: performanceAdUnitParameters.campaign.getGamerId(),
+                    store: performanceAdUnitParameters.campaign.getStore(),
+                    clickAttributionUrlFollowsRedirects: true,
+                    clickAttributionUrl: 'https://blah.com?apk_download_link=https://cdn.apk.com'
+                });
+
+                return resolvedPromise.then(() => {
+                    sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
+                        'action': 'android.intent.action.VIEW',
+                        'uri': 'https://cdn.apk.com'
                     });
                 });
             });
@@ -247,8 +308,11 @@ describe('EndScreenEventHandlerTest', () => {
             });
 
             sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
-            endScreen = new PerformanceEndScreen(nativeBridge, campaign, configuration.isCoppaCompliant(), deviceInfo.getLanguage(), clientInfo.getGameId());
+
+            const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+            endScreen = new PerformanceEndScreen(nativeBridge, campaign, deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, false);
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
+            const gdprManager = sinon.createStubInstance(GdprConsentManager);
 
             performanceAdUnitParameters = {
                 forceOrientation: Orientation.LANDSCAPE,
@@ -258,7 +322,6 @@ describe('EndScreenEventHandlerTest', () => {
                 clientInfo: clientInfo,
                 thirdPartyEventManager: thirdPartyEventManager,
                 operativeEventManager: operativeEventManager,
-                comScoreTrackingService: comScoreService,
                 placement: TestFixtures.getPlacement(),
                 campaign: campaign,
                 configuration: configuration,
@@ -266,7 +329,9 @@ describe('EndScreenEventHandlerTest', () => {
                 options: {},
                 endScreen: endScreen,
                 overlay: overlay,
-                video: video
+                video: video,
+                privacy: privacy,
+                gdprManager: gdprManager
             };
 
             performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);

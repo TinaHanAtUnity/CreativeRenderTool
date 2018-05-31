@@ -18,11 +18,12 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { MRAID } from 'Views/MRAID';
 import { Placement } from 'Models/Placement';
-import { HttpKafka } from 'Utilities/HttpKafka';
+import { HttpKafka, KafkaCommonObjectType } from 'Utilities/HttpKafka';
 import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
-import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
+import { GDPRPrivacy } from 'Views/GDPRPrivacy';
+import { GdprConsentManager } from 'Managers/GdprConsentManager';
 
 describe('MRAIDEventHandlersTest', () => {
 
@@ -42,8 +43,8 @@ describe('MRAIDEventHandlersTest', () => {
     let thirdPartyEventManager: ThirdPartyEventManager;
     let mraidAdUnitParameters: IMRAIDAdUnitParameters;
     let mraidEventHandler: MRAIDEventHandler;
-    let comScoreService: ComScoreTrackingService;
     let mraidCampaign: MRAIDCampaign;
+    let gdprManager: GdprConsentManager;
 
     describe('with onClick', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -73,7 +74,6 @@ describe('MRAIDEventHandlersTest', () => {
             thirdPartyEventManager = sinon.createStubInstance(ThirdPartyEventManager);
             sessionManager = sinon.createStubInstance(SessionManager);
             operativeEventManager = sinon.createStubInstance(OperativeEventManager);
-            comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 
@@ -81,6 +81,7 @@ describe('MRAIDEventHandlersTest', () => {
             mraidView = sinon.createStubInstance(MRAID);
             (<sinon.SinonSpy>mraidView.container).restore();
             sinon.stub(mraidView, 'container').returns(document.createElement('div'));
+            gdprManager = sinon.createStubInstance(GdprConsentManager);
 
             mraidAdUnitParameters = {
                 forceOrientation: Orientation.LANDSCAPE,
@@ -90,14 +91,15 @@ describe('MRAIDEventHandlersTest', () => {
                 clientInfo: clientInfo,
                 thirdPartyEventManager: thirdPartyEventManager,
                 operativeEventManager: operativeEventManager,
-                comScoreTrackingService: comScoreService,
                 placement: TestFixtures.getPlacement(),
                 campaign: mraidCampaign,
                 configuration: TestFixtures.getConfiguration(),
                 request: request,
                 options: {},
                 mraid: mraidView,
-                endScreen: undefined
+                endScreen: undefined,
+                privacy: new GDPRPrivacy(nativeBridge, gdprManager, false, true),
+                gdprManager: gdprManager
             };
 
             mraidAdUnit = new MRAIDAdUnit(nativeBridge, mraidAdUnitParameters);
@@ -136,7 +138,7 @@ describe('MRAIDEventHandlersTest', () => {
                     headers: [['location', 'market://foobar.com']]
                 }));
 
-                mraidView = new MRAID(nativeBridge, placement, mraidCampaign, false);
+                mraidView = new MRAID(nativeBridge, placement, mraidCampaign, mraidAdUnitParameters.privacy);
                 sinon.stub(mraidView, 'createMRAID').callsFake(() => {
                     return Promise.resolve();
                 });
@@ -219,7 +221,7 @@ describe('MRAIDEventHandlersTest', () => {
                 if(resourceUrl) {
                     kafkaObject.url = resourceUrl.getOriginalUrl();
                 }
-                sinon.assert.calledWith(<sinon.SinonStub>HttpKafka.sendEvent, 'ads.sdk2.events.playable.json', kafkaObject);
+                sinon.assert.calledWith(<sinon.SinonStub>HttpKafka.sendEvent, 'ads.sdk2.events.playable.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
             });
 
             it('should send a analytics event without extra event data', () => {
@@ -240,7 +242,7 @@ describe('MRAIDEventHandlersTest', () => {
                 if(resourceUrl) {
                     kafkaObject.url = resourceUrl.getOriginalUrl();
                 }
-                sinon.assert.calledWith(<sinon.SinonStub>HttpKafka.sendEvent, 'ads.sdk2.events.playable.json', kafkaObject);
+                sinon.assert.calledWith(<sinon.SinonStub>HttpKafka.sendEvent, 'ads.sdk2.events.playable.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
             });
         });
     });

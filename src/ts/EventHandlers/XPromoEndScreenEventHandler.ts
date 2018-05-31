@@ -10,7 +10,7 @@ export class XPromoEndScreenEventHandler extends EndScreenEventHandler<XPromoCam
     }
 
     public onKeyEvent(keyCode: number): void {
-        if (keyCode === KeyCode.BACK && this._adUnit.isShowing() && !this._adUnit.isActive()) {
+        if (keyCode === KeyCode.BACK && this._adUnit.isShowing() && !this._adUnit.canShowVideo()) {
             this._adUnit.hide();
         }
     }

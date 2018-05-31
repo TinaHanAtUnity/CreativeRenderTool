@@ -11,7 +11,6 @@ import { Platform } from 'Constants/Platform';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { FocusManager } from 'Managers/FocusManager';
 import { Request } from 'Utilities/Request';
 import { VPAIDEventHandler } from 'EventHandlers/VPAIDEventHandler';
@@ -24,6 +23,7 @@ import { UrlSchemeApi } from 'Native/Api/UrlScheme';
 import { IntentApi } from 'Native/Api/Intent';
 import { SdkApi } from 'Native/Api/Sdk';
 import { Closer } from 'Views/Closer';
+import { GdprConsentManager } from 'Managers/GdprConsentManager';
 
 describe('VPAIDEventHandlerTest', () => {
     let eventHandler: VPAIDEventHandler;
@@ -42,13 +42,13 @@ describe('VPAIDEventHandlerTest', () => {
             clientInfo: sinon.createStubInstance(ClientInfo),
             thirdPartyEventManager: sinon.createStubInstance(ThirdPartyEventManager),
             operativeEventManager: sinon.createStubInstance(OperativeEventManager),
-            comScoreTrackingService: sinon.createStubInstance(ComScoreTrackingService),
             placement: TestFixtures.getPlacement(),
             container: sinon.createStubInstance(Activity),
             configuration: sinon.createStubInstance(Configuration),
             request: sinon.createStubInstance(Request),
             forceOrientation: Orientation.NONE,
-            options: {}
+            options: {},
+            gdprManager: sinon.createStubInstance(GdprConsentManager)
         };
         adUnit = sinon.createStubInstance(VPAIDAdUnit);
         (<sinon.SinonStub>parameters.campaign.getSession).returns(TestFixtures.getSession());
@@ -113,9 +113,6 @@ describe('VPAIDEventHandlerTest', () => {
             it('should trigger complete tracking', verifyTrackingEvent('complete'));
             it('should send the view operative event', () => {
                 sinon.assert.called(<sinon.SinonSpy>parameters.operativeEventManager.sendView);
-            });
-            it('should send the comscore end event', () => {
-                sinon.assert.called(<sinon.SinonSpy>parameters.comScoreTrackingService.sendEvent);
             });
             it('should set the finish state to COMPLETE', () => {
                 sinon.assert.calledWith(<sinon.SinonSpy>adUnit.setFinishState, FinishState.COMPLETED);
