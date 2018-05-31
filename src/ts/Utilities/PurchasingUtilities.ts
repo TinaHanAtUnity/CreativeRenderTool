@@ -21,11 +21,11 @@ export interface IPromoPayload {
 }
 
 export class PurchasingUtilities {
-    public static setClientInfo(clientInfo?: ClientInfo) {
+    public static setClientInfo(clientInfo: ClientInfo) {
         this._clientInfo = clientInfo;
     }
 
-    public static setConfiguration(configuration?: Configuration) {
+    public static setConfiguration(configuration: Configuration) {
         this._configuration = configuration;
     }
 

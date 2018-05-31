@@ -83,7 +83,7 @@ describe('PurchasingUtilitiesTest', () => {
                 const configuration = new Configuration(JSON.parse(ConfigurationPromoPlacements));
                 // const clientInfo = new ClientInfo();
                 PurchasingUtilities.setConfiguration(configuration);
-                PurchasingUtilities.setClientInfo();
+                // PurchasingUtilities.setClientInfo();
                 sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('True'));
                 sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.17'));
                 sandbox.stub(purchasing.onCommandResult, 'subscribe').callsFake((resolve) => resolve('True'));
