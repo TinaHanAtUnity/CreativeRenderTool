@@ -12,6 +12,7 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
 import { SdkStats } from 'Utilities/SdkStats';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
 
 export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -270,6 +271,10 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 this._loadingScreen.style.display = 'none';
             }, false);
         });
+
+        if (CustomFeatures.isPlayableEndScreenHideDelayDisabled(this._campaign.getAbGroup())) {
+            this._loadingScreen.classList.add('disable-delay');
+        }
 
         this._loadingScreen.classList.add('hidden');
     }
