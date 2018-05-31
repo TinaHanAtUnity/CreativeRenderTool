@@ -76,7 +76,7 @@ export class PurchasingUtilities {
         if (this.isProductAvailable(productId)) {
             return this._catalog.getProducts()[productId]!.getPrice();
         }
-        throw new Error('Attempting to get price of invalid product: ' + productId);
+        throw new Error('Attempted to get price of invalid product: ' + productId);
     }
 
     public static isProductAvailable(productId: string): boolean {
