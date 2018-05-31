@@ -94,7 +94,7 @@ describe('PrivacyEventHandlerTest', () => {
 
             privacyEventHandler.onGDPROptOut(true);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.operativeEventManager.sendGDPREvent, 'optout');
+            sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.operativeEventManager.sendGDPREventWithSource, 'optout');
         });
 
         it('should send operative event with action `optin`', () => {

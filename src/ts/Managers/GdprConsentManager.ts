@@ -117,10 +117,17 @@ export class GdprConsentManager {
     }
 
     private sendGdprEvent(consent: boolean) {
-        const action: string = consent ? 'consent' : 'optout';
-        OperativeEventManager.sendGDPREvent(action, GDPREventSource.METADATA, this._deviceInfo, this._clientInfo, this._configuration).then(() => {
-            this._nativeBridge.Storage.set(StorageType.PRIVATE, GdprConsentManager.GDPR_LAST_VALUE_STORAGE_KEY, consent);
-            this._nativeBridge.Storage.write(StorageType.PRIVATE);
+        let sendEvent;
+        if (consent) {
+            sendEvent = OperativeEventManager.sendGDPREvent('consent', this._deviceInfo, this._clientInfo, this._configuration);
+        } else {
+            // optout needs to send the source because we need to tell if it came from consent metadata or gdpr banner
+            sendEvent = OperativeEventManager.sendGDPREventWithSource('optout', GDPREventSource.METADATA, this._deviceInfo, this._clientInfo, this._configuration);
+        }
+        sendEvent.then(() => {
+            this._nativeBridge.Storage.set(StorageType.PRIVATE, GdprConsentManager.GDPR_LAST_VALUE_STORAGE_KEY, consent).then(() => {
+                this._nativeBridge.Storage.write(StorageType.PRIVATE);
+            });
         });
     }
 }
