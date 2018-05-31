@@ -121,7 +121,7 @@ export class GdprConsentManager {
         if (consent) {
             sendEvent = OperativeEventManager.sendGDPREvent('consent', this._deviceInfo, this._clientInfo, this._configuration);
         } else {
-            // optout needs to send the source because we need to tell if it came from consent metadata or gdpr banner
+            // optout needs to send the source because we need to tell if it came from consent metadata or gdpr  banner
             sendEvent = OperativeEventManager.sendGDPREventWithSource('optout', GDPREventSource.METADATA, this._deviceInfo, this._clientInfo, this._configuration);
         }
         sendEvent.then(() => {
