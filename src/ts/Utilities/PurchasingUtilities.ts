@@ -12,6 +12,7 @@ export enum IPromoRequest {
 
 export interface IPromoPayload {
     gamerToken?: string;
+    trackingOptOut?: boolean;
     gameId?: string;
     abGroup?: number;
     productId?: string;
@@ -175,6 +176,7 @@ export class PurchasingUtilities {
             iapPayload.iapPromo = true;
             iapPayload.abGroup = this._configuration.getAbGroup();
             iapPayload.gameId = this._clientInfo.getGameId() + '|' + this._configuration.getToken();
+            iapPayload.trackingOptOut = this._configuration.isOptOutEnabled();
             iapPayload.gamerToken = this._configuration.getToken();
             iapPayload.request = IPromoRequest.SETIDS;
         }

@@ -1,4 +1,3 @@
-
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { StorageType } from 'Native/Api/Storage';
 import { NativeBridge } from 'Native/NativeBridge';
@@ -22,4 +21,11 @@ export class CustomFeatures {
         return new AdUnitStyle({ctaButtonColor: '#167dfb'});
     }
 
+    public static isGDPRBaseTest(abGroup: number): boolean {
+        return abGroup === 16 || abGroup === 17;
+    }
+
+    public static isPlayableEndScreenHideDelayDisabled(abGroup: number): boolean {
+        return abGroup === 18 || abGroup === 19;
+    }
 }

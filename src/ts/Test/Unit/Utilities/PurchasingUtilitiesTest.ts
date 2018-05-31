@@ -12,6 +12,7 @@ import { SdkApi } from 'Native/Api/Sdk';
 import { SinonSandbox, SinonStub } from 'sinon';
 import { setTimeout } from 'timers';
 import { Configuration } from 'Models/Configuration';
+import { ConfigurationParser } from 'Parsers/ConfigurationParser';
 import { ClientInfo } from 'Models/ClientInfo';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
@@ -25,6 +26,8 @@ describe('PurchasingUtilitiesTest', () => {
     const promoCatalogBad = '[\n  \n    \"localizedPriceString\" : \"$0.00\",\n    \"localizedTitle\" : \"Sword of Minimal Value\",\n    \"productId\" : \"myPromo\"\n  },\n  {\n    \"localizedPriceString\" : \"$0.99\",\n    \"localizedTitle\" : \"100 in-game Gold Coins\",\n    \"productId\" : \"100.gold.coins\"\n  }\n]';
     const iapPayloadPurchase: IPromoPayload = {
         productId: 'myPromo',
+        trackingOptOut: false,
+        gamerToken: '111',
         iapPromo: true,
         gameId: '222',
         abGroup: 1,
@@ -65,7 +68,7 @@ describe('PurchasingUtilitiesTest', () => {
 
     describe('sendPurchaseInitializationEvent', () => {
         beforeEach(() => {
-            const configuration = new Configuration(JSON.parse(ConfigurationAuctionPlc));
+            const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
             PurchasingUtilities.setConfiguration(configuration);
         });
         it('should resolve without calling sendPurchasingCommand if configuration does not include promo', (done) => {
@@ -80,10 +83,8 @@ describe('PurchasingUtilitiesTest', () => {
 
         describe('on successful trigger of all underlying promises', () => {
             beforeEach(() => {
-                const configuration = new Configuration(JSON.parse(ConfigurationPromoPlacements));
-                // const clientInfo = new ClientInfo();
+                const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
                 PurchasingUtilities.setConfiguration(configuration);
-                // PurchasingUtilities.setClientInfo();
                 sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('True'));
                 sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.17'));
                 sandbox.stub(purchasing.onCommandResult, 'subscribe').callsFake((resolve) => resolve('True'));
@@ -92,14 +93,13 @@ describe('PurchasingUtilitiesTest', () => {
             });
 
             it('should call SendPurchasingCommand', () => {
-                // sinon.assert.calledWith(<psinon.SinonStub>urchasing.initiatePurchasingCommand, iapPayloadSetIDs);
                 sinon.assert.called(<sinon.SinonStub>purchasing.initiatePurchasingCommand);
             });
         });
 
         describe('If promo is not ready', () => {
             beforeEach(() => {
-                const configuration = new Configuration(JSON.parse(ConfigurationPromoPlacements));
+                const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
                 PurchasingUtilities.setConfiguration(configuration);
                 sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('False'));
                 sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.17'));
@@ -119,7 +119,7 @@ describe('PurchasingUtilitiesTest', () => {
 
         describe('If promo version is not 1.16 or above', () => {
             beforeEach(() => {
-                const configuration = new Configuration(JSON.parse(ConfigurationPromoPlacements));
+                const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
                 PurchasingUtilities.setConfiguration(configuration);
                 sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('True'));
                 sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.14'));
