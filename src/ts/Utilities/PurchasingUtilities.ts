@@ -44,7 +44,7 @@ export class PurchasingUtilities {
         return Promise.resolve();
     }
 
-    public static sendPromoPayload(nativeBridge: NativeBridge, iapPayload: string): Promise<void | {}> {
+    public static sendPromoPayload(nativeBridge: NativeBridge, iapPayload: string): Promise<void> {
         if (!this._initializationPayloadsAlreadySent) {
             return this.sendPurchaseInitializationEvent(nativeBridge).then(() => {
                 return this.sendPurchasingCommand(nativeBridge, iapPayload);
@@ -54,7 +54,7 @@ export class PurchasingUtilities {
         }
     }
 
-    public static refreshCatalog(nativeBridge: NativeBridge): Promise<void | {}> {
+    public static refreshCatalog(nativeBridge: NativeBridge): Promise<void> {
         return new Promise((resolve, reject) => {
             const observer = nativeBridge.Purchasing.onGetPromoCatalog.subscribe((promoCatalogJSON) => {
                 nativeBridge.Purchasing.onGetPromoCatalog.unsubscribe(observer);
@@ -66,10 +66,9 @@ export class PurchasingUtilities {
                 resolve();
             });
             nativeBridge.Purchasing.getPromoCatalog().catch((e) => {
+                nativeBridge.Purchasing.onGetPromoCatalog.unsubscribe(observer);
                 reject(this.logIssue(nativeBridge, 'catalog_refresh_failed', 'Purchasing Catalog failed to refresh'));
             });
-        }).catch((e) => {
-            throw e;
         });
     }
 
