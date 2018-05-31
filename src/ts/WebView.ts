@@ -268,6 +268,10 @@ export class WebView {
             this._jaegerManager.stop(jaegerInitSpan);
 
             return this._sessionManager.sendUnsentSessions();
+        }).then(() => {
+            if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                this._nativeBridge.setAutoBatchEnabled(false);
+            }
         }).catch(error => {
             jaegerInitSpan.addAnnotation(error.message);
             jaegerInitSpan.addTag(JaegerTags.Error, 'true');
@@ -457,7 +461,11 @@ export class WebView {
             }
             this._wasRealtimePlacement = false;
 
-            this._currentAdUnit.show();
+            this._currentAdUnit.show().then(() => {
+                if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                    this._nativeBridge.setAutoBatchEnabled(true);
+                }
+            });
         });
     }
 
@@ -471,6 +479,10 @@ export class WebView {
 
     private onAdUnitClose(): void {
         this._showing = false;
+
+        if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            this._nativeBridge.setAutoBatchEnabled(false);
+        }
     }
 
     private isShowing(): boolean {

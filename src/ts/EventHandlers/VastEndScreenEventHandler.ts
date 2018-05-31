@@ -48,7 +48,7 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     }
 
     public onKeyEvent(keyCode: number): void {
-        if (keyCode === KeyCode.BACK && this._adUnit.isShowing() && !this._adUnit.isActive()) {
+        if (keyCode === KeyCode.BACK && this._adUnit.isShowing() && !this._adUnit.canShowVideo()) {
             this._adUnit.hide();
         }
     }

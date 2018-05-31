@@ -40,6 +40,7 @@ import { PerformanceVideoEventHandler } from 'EventHandlers/PerformanceVideoEven
 import { XPromoVideoEventHandler } from 'EventHandlers/XPromoVideoEventHandler';
 import { VastVideoEventHandler } from 'EventHandlers/VastVideoEventHandler';
 import { AndroidVideoEventHandler } from 'EventHandlers/AndroidVideoEventHandler';
+import { VideoState } from 'AdUnits/VideoAdUnit';
 import { Privacy } from 'Views/Privacy';
 import { GdprConsentManager } from 'Managers/GdprConsentManager';
 
@@ -104,12 +105,9 @@ describe('VideoEventHandlersTest', () => {
         };
 
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
-
         video = new Video('', TestFixtures.getSession());
-
         placement = TestFixtures.getPlacement();
         overlay = new Overlay(nativeBridge, false, 'en', configuration.getGamerId(), configuration.getAbGroup());
-
         const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
         endScreen = new PerformanceEndScreen(nativeBridge, performanceCampaign, 'en', '12345', privacy, false);
         const gdprManager = sinon.createStubInstance(GdprConsentManager);
@@ -192,8 +190,7 @@ describe('VideoEventHandlersTest', () => {
         };
 
         performanceVideoEventHandler = new PerformanceVideoEventHandler(<IVideoEventHandlerParams<PerformanceAdUnit, PerformanceCampaign>>videoEventHandlerParams);
-
-        sinon.stub(performanceAdUnit, 'isPrepareCalled').returns(true);
+        performanceAdUnit.setVideoState(VideoState.PREPARING);
         sinon.stub(performanceAdUnitParameters.campaign, 'getAbGroup').returns(5);
     });
 
@@ -209,12 +206,15 @@ describe('VideoEventHandlersTest', () => {
         beforeEach(() => {
             video = new Video('', TestFixtures.getSession());
             performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
+            performanceAdUnit.setVideoState(VideoState.READY);
+            videoEventHandlerParams.adUnit = performanceAdUnit;
+            performanceVideoEventHandler = new PerformanceVideoEventHandler(<IVideoEventHandlerParams<PerformanceAdUnit, PerformanceCampaign>>videoEventHandlerParams);
         });
 
         it('should set video started', () => {
             performanceVideoEventHandler.onProgress(1);
 
-            assert.isTrue(performanceAdUnit.getVideo().hasStarted());
+            assert.isTrue(performanceAdUnit.getVideoState() === VideoState.PLAYING);
         });
 
         it('should send start event to backend', () => {
@@ -426,7 +426,7 @@ describe('VideoEventHandlersTest', () => {
             operativeEventManagerParams.campaign = vastCampaign;
             vastAdUnitParameters.operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
             const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
-            sinon.stub(vastAdUnit, 'isPrepareCalled').returns(true);
+            performanceAdUnit.setVideoState(VideoState.PREPARING);
             videoEventHandlerParams.campaign = vastCampaign;
             videoEventHandlerParams.adUnit = vastAdUnit;
             videoEventHandlerParams.operativeEventManager = vastAdUnitParameters.operativeEventManager;
@@ -458,7 +458,7 @@ describe('VideoEventHandlersTest', () => {
             operativeEventManagerParams.campaign = vastCampaign;
             vastAdUnitParameters.operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
             const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
-            sinon.stub(vastAdUnit, 'isPrepareCalled').returns(true);
+            performanceAdUnit.setVideoState(VideoState.PREPARING);
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('http://foo.com');
             videoEventHandlerParams.campaign = vastCampaign;
             videoEventHandlerParams.adUnit = vastAdUnit;
@@ -479,7 +479,7 @@ describe('VideoEventHandlersTest', () => {
             operativeEventManagerParams.campaign = vastCampaign;
             vastAdUnitParameters.operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
             const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
-            sinon.stub(vastAdUnit, 'isPrepareCalled').returns(true);
+            performanceAdUnit.setVideoState(VideoState.PREPARING);
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns(null);
             videoEventHandlerParams.campaign = vastCampaign;
             videoEventHandlerParams.adUnit = vastAdUnit;
@@ -500,7 +500,7 @@ describe('VideoEventHandlersTest', () => {
             operativeEventManagerParams.campaign = vastCampaign;
             vastAdUnitParameters.operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
             const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
-            sinon.stub(vastAdUnit, 'isPrepareCalled').returns(true);
+            performanceAdUnit.setVideoState(VideoState.PREPARING);
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('http://foo.com');
             videoEventHandlerParams.campaign = vastCampaign;
             videoEventHandlerParams.adUnit = vastAdUnit;
@@ -521,7 +521,7 @@ describe('VideoEventHandlersTest', () => {
             operativeEventManagerParams.campaign = vastCampaign;
             vastAdUnitParameters.operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
             const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
-            sinon.stub(vastAdUnit, 'isPrepareCalled').returns(true);
+            performanceAdUnit.setVideoState(VideoState.PREPARING);
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns(null);
             videoEventHandlerParams.campaign = vastCampaign;
             videoEventHandlerParams.adUnit = vastAdUnit;
@@ -537,7 +537,7 @@ describe('VideoEventHandlersTest', () => {
             const stub = sinon.stub(TestEnvironment, 'get').returns(true);
 
             const xPromoAdUnit = new XPromoAdUnit(nativeBridge, xPromoAdUnitParameters);
-            xPromoAdUnit.setPrepareCalled(true);
+            xPromoAdUnit.setVideoState(VideoState.PREPARING);
             videoEventHandlerParams.campaign = operativeEventManagerParams.campaign;
             const xPromoVideoEventHandler = new XPromoVideoEventHandler(<IVideoEventHandlerParams<XPromoAdUnit, XPromoCampaign, XPromoOperativeEventManager>>videoEventHandlerParams);
 
@@ -566,6 +566,7 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('should set video to inactive and video to finish state to error', () => {
+            videoEventHandlerParams.adUnit = performanceAdUnit;
             const androidVideoEventHandler = new AndroidVideoEventHandler(videoEventHandlerParams);
             androidVideoEventHandler.onPrepareError('http://test.video.url');
 
@@ -598,8 +599,9 @@ describe('VideoEventHandlersTest', () => {
         });
 
         it('should set video to inactive and video to finish state to error, video started', () => {
+            performanceAdUnit.setVideoState(VideoState.PLAYING);
+            videoEventHandlerParams.adUnit = performanceAdUnit;
             const androidVideoEventHandler = new AndroidVideoEventHandler(videoEventHandlerParams);
-            performanceAdUnit.getVideo().setStarted(true);
             androidVideoEventHandler.onGenericError('http://test.video.url', 1, 0);
 
             assert.isFalse(performanceAdUnit.isActive());
@@ -646,6 +648,7 @@ describe('VideoEventHandlersTest', () => {
             xPromoAdUnitParameters.operativeEventManager = xPromoOperativeEventManager;
 
             const xPromoAdUnit = new XPromoAdUnit(nativeBridge, xPromoAdUnitParameters);
+            xPromoAdUnit.setVideoState(VideoState.READY);
             videoEventHandlerParams.campaign = operativeEventManagerParams.campaign;
             videoEventHandlerParams.adUnit = xPromoAdUnit;
             videoEventHandlerParams.operativeEventManager = xPromoOperativeEventManager;

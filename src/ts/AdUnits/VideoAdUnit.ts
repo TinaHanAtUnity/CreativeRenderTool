@@ -11,7 +11,10 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { WebViewError } from 'Errors/WebViewError';
-import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
+import {
+    AdUnitContainerSystemMessage, IAdUnitContainerListener,
+    Orientation
+} from 'AdUnits/Containers/AdUnitContainer';
 import { Campaign } from 'Models/Campaign';
 import { Placement } from 'Models/Placement';
 import { CampaignAssetInfo, VideoType } from 'Utilities/CampaignAssetInfo';
@@ -22,14 +25,20 @@ export interface IVideoAdUnitParameters<T extends Campaign> extends IAdUnitParam
     overlay: AbstractVideoOverlay;
 }
 
-export abstract class VideoAdUnit<T extends Campaign = Campaign> extends AbstractAdUnit {
+export enum VideoState {
+    NOT_READY,
+    PREPARING,
+    READY,
+    PLAYING,
+    PAUSED,
+    COMPLETED,
+    SKIPPED,
+    ERRORED
+}
+
+export abstract class VideoAdUnit<T extends Campaign = Campaign> extends AbstractAdUnit implements IAdUnitContainerListener {
 
     private static _progressInterval: number = 250;
-
-    protected _onShowObserver: any;
-    protected _onSystemKillObserver: any;
-    protected _onSystemInterruptObserver: any;
-    protected _onLowMemoryWarningObserver: any;
 
     protected _options: any;
     private _video: Video;
@@ -42,6 +51,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     private _placement: Placement;
     private _campaign: T;
     private _finalVideoUrl: string;
+    private _videoState: VideoState = VideoState.NOT_READY;
 
     constructor(nativeBridge: NativeBridge, parameters: IVideoAdUnitParameters<T>) {
         super(nativeBridge, parameters);
@@ -64,10 +74,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         this.setShowing(true);
         this.setActive(true);
 
-        this._onShowObserver = this._container.onShow.subscribe(() => this.onShow());
-        this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
-        this._onSystemInterruptObserver = this._container.onSystemInterrupt.subscribe((interruptStarted) => this.onSystemInterrupt(interruptStarted));
-        this._onLowMemoryWarningObserver = this._container.onLowMemoryWarning.subscribe(() => this.onLowMemoryWarning());
+        this._container.addEventHandler(this);
 
         return this._container.open(this, ['videoplayer', 'webview'], true, this.getForceOrientation(), this._placement.disableBackButton(), false, true, false, this._options).then(() => {
             this.onStart.trigger();
@@ -78,32 +85,37 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         if(!this.isShowing()) {
             return Promise.resolve();
         }
-        this.setShowing(false);
 
+        this.setShowing(false);
         this.hideChildren();
         this.unsetReferences();
 
         this._nativeBridge.Listener.sendFinishEvent(this._placement.getId(), this.getFinishState());
+        this._container.removeEventHandler(this);
 
         return this._container.close().then(() => {
             this.onClose.trigger();
         });
     }
 
-    public isVideoReady(): boolean {
-        return this._videoReady;
+    public setVideoState(videoState: VideoState): void {
+        this._videoState = videoState;
     }
 
-    public setVideoReady(ready: boolean): void {
-        this._videoReady = ready;
+    public getVideoState(): VideoState {
+        return this._videoState;
     }
 
-    public isPrepareCalled(): boolean {
-        return this._prepareCalled;
+    public canShowVideo(): boolean {
+        return this.getVideoState() !== VideoState.ERRORED && this.getVideoState() !== VideoState.COMPLETED && this.getVideoState() !== VideoState.SKIPPED;
     }
 
-    public setPrepareCalled(prepareCalled: boolean): void {
-        this._prepareCalled = prepareCalled;
+    public canPlayVideo(): boolean {
+        return (this.getVideoState() === VideoState.READY || this.getVideoState() === VideoState.PLAYING || this.getVideoState() === VideoState.PAUSED);
+    }
+
+    public canPrepareVideo(): boolean {
+        return this.canShowVideo() && this.getVideoState() === VideoState.NOT_READY;
     }
 
     public getOverlay(): AbstractVideoOverlay | undefined {
@@ -142,6 +154,94 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         return this._lowMemory;
     }
 
+    public onContainerShow(): void {
+        if(this.isShowing() && this.isActive()) {
+            if(this._nativeBridge.getPlatform() === Platform.IOS && IosUtils.hasVideoStallingApi(this._deviceInfo.getOsVersion())) {
+                if(this.getVideo().isCached()) {
+                    this._nativeBridge.VideoPlayer.setAutomaticallyWaitsToMinimizeStalling(false);
+                } else {
+                    this._nativeBridge.VideoPlayer.setAutomaticallyWaitsToMinimizeStalling(true);
+                }
+            }
+
+            this.prepareVideo();
+        }
+    }
+
+    public onContainerDestroy(): void {
+        if(this.isShowing()) {
+            this.setActive(false);
+            this.setFinishState(FinishState.SKIPPED);
+            this.hide();
+        }
+    }
+
+    public onContainerBackground(): void {
+        if(this.isShowing() && this.isActive() && this.getContainer().isPaused()) {
+            this.setActive(false);
+            if(this.canShowVideo() && this.getVideoState() === VideoState.PLAYING) {
+                this.setVideoState(VideoState.PAUSED);
+                /*
+                    We try pause the video-player and if we get a VIDEOVIEW_NULL error
+                    we'll know that the video-player has been destroyed. In this case
+                    set the video not ready so that the onContainerForeground can
+                    re-prepare the video.
+                */
+                this._nativeBridge.VideoPlayer.pause().catch((error) => {
+                    if(error === 'VIDEOVIEW_NULL') {
+                        this.setVideoState(VideoState.NOT_READY);
+                    }
+                });
+            }
+        }
+    }
+
+    public onContainerForeground(): void {
+        if(this.isShowing() && !this.isActive() && !this.getContainer().isPaused()) {
+            this.setActive(true);
+            /*
+                Check if we can show the video and if the video is paused.
+                In that case call video-player play to continue playing the video.
+                If not, check if we are allowed to prepare it. In that case prepare the
+                video again. When the video-prepared event is received by the video-event-handler
+                it will seek the video to correct position and call play.
+            */
+            if(this.canShowVideo() && this.getVideoState() === VideoState.PAUSED) {
+                this.setVideoState(VideoState.PLAYING);
+                this._nativeBridge.VideoPlayer.play();
+            } else if(this.canPrepareVideo()) {
+                this.prepareVideo();
+            }
+        }
+    }
+
+    public onContainerSystemMessage(message: AdUnitContainerSystemMessage): void {
+        switch(message) {
+            case AdUnitContainerSystemMessage.MEMORY_WARNING:
+                if(this.isShowing()) {
+                    this._lowMemory = true;
+                }
+                break;
+
+            case AdUnitContainerSystemMessage.AUDIO_SESSION_INTERRUPT_BEGAN:
+                if(this.isShowing() && this.isActive() && this.getVideoState() === VideoState.PLAYING) {
+                    this.setVideoState(VideoState.PAUSED);
+                    this._nativeBridge.VideoPlayer.pause();
+                }
+                break;
+
+            case AdUnitContainerSystemMessage.AUDIO_SESSION_INTERRUPT_ENDED || AdUnitContainerSystemMessage.AUDIO_SESSION_ROUTE_CHANGED:
+                if(this.isShowing() && this.isActive() && this.canPlayVideo()) {
+                    this.setVideoState(VideoState.PLAYING);
+                    this._nativeBridge.VideoPlayer.play();
+                }
+                break;
+
+            default:
+                break;
+        }
+    }
+
     protected unsetReferences() {
         delete this._overlay;
     }
@@ -162,55 +262,20 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         }
     }
 
-    protected onShow() {
-        if(this.isShowing() && this.isActive()) {
-            if(this._nativeBridge.getPlatform() === Platform.IOS && IosUtils.hasVideoStallingApi(this._deviceInfo.getOsVersion())) {
-                if(this.getVideo().isCached()) {
-                    this._nativeBridge.VideoPlayer.setAutomaticallyWaitsToMinimizeStalling(false);
-                } else {
-                    this._nativeBridge.VideoPlayer.setAutomaticallyWaitsToMinimizeStalling(true);
-                }
-            }
-
-            this.getValidVideoUrl().then(url => {
-                this._finalVideoUrl = url;
-                this.setPrepareCalled(true);
-                this._nativeBridge.VideoPlayer.prepare(url, new Double(this._placement.muteVideo() ? 0.0 : 1.0), 10000);
-            });
-        }
-    }
-
-    protected onSystemKill() {
-        if(this.isShowing()) {
-            this.setFinishState(FinishState.SKIPPED);
-            this.hide();
-        }
-    }
-
-    protected onSystemInterrupt(interruptStarted: boolean): void {
-        if(this.isShowing() && this.isActive()) {
-            if(interruptStarted) {
-                this._nativeBridge.Sdk.logDebug('Pausing Unity Ads video playback due to interrupt');
-                this._nativeBridge.VideoPlayer.pause();
-            } else if (!interruptStarted && this.isVideoReady() && !this.getContainer().isPaused()) {
-                this._nativeBridge.Sdk.logDebug('Continuing Unity Ads video playback after interrupt');
-                this._nativeBridge.VideoPlayer.play();
-            }
-        }
-    }
-
-    protected onLowMemoryWarning(): void {
-        if(this.isShowing()) {
-            this._lowMemory = true;
-        }
-    }
-
     protected hideChildren() {
         const overlay = this.getOverlay();
 
         if(overlay) {
             overlay.container().parentElement!.removeChild(overlay.container());
         }
+    }
+
+    private prepareVideo() {
+        this.setVideoState(VideoState.PREPARING);
+        this.getValidVideoUrl().then(url => {
+            this._finalVideoUrl = url;
+            this._nativeBridge.VideoPlayer.prepare(url, new Double(this._placement.muteVideo() ? 0.0 : 1.0), 10000);
+        });
     }
 
     // todo: this is first attempt to get rid of around 1% of failed starts
