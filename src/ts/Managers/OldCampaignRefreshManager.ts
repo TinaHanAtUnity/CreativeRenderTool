@@ -476,12 +476,22 @@ export class OldCampaignRefreshManager extends RefreshManager {
         });
     }
 
-    private isRewardedMixedPlacement(placementId: string) {
-        const ifMoreThanOneAdType: boolean = this._configuration.getPlacement(placementId).getAdTypes() === undefined ? false : this._configuration.getPlacement(placementId).getAdTypes()!.length > 1;
-        const containsIAP: boolean = this._configuration.getPlacement(placementId).getAdTypes() === undefined ? false : this._configuration.getPlacement(placementId).getAdTypes()!.indexOf('IAP') > -1;
+    private isRewardedMixedPlacement(placementId: string): boolean {
         const notAllowsSkip: boolean = !this._configuration.getPlacement(placementId).allowSkip();
 
-        return ifMoreThanOneAdType && containsIAP && notAllowsSkip;
+        return this.isMixedIAP(placementId) && notAllowsSkip;
+    }
+
+    private isRewardedPromo(placementId: string): boolean {
+        const allowsSkip: boolean = this._configuration.getPlacement(placementId).allowSkip();
+
+        return this.isMixedIAP(placementId) && allowsSkip;
+    }
+
+    private isMixedIAP(placementId: string): boolean {
+        const ifMoreThanOneAdType: boolean = this._configuration.getPlacement(placementId).getAdTypes() === undefined ? false : this._configuration.getPlacement(placementId).getAdTypes()!.length > 1;
+        const containsIAP: boolean = this._configuration.getPlacement(placementId).getAdTypes() === undefined ? false : this._configuration.getPlacement(placementId).getAdTypes()!.indexOf('IAP') > -1;
+        return ifMoreThanOneAdType && containsIAP;
     }
 
     private createMixedPlacementSuffix(placementId: string, campaign: Campaign) {
@@ -490,6 +500,12 @@ export class OldCampaignRefreshManager extends RefreshManager {
             str = (campaign.getAdType() === 'purchasing/iap') ? MixedPlacementTypes.PROMO : MixedPlacementTypes.REWARDED;
             this._configuration.getPlacements()[placementId + str] = this._configuration.getPlacements()[placementId];
         }
+
+        if (this.isRewardedPromo(placementId)) {
+            str = (campaign.getAdType() === 'purchasing/iap') ? MixedPlacementTypes.REWARDED_PROMO : '';
+            this._configuration.getPlacements()[placementId + str] = this._configuration.getPlacements()[placementId];
+        }
+
         return str;
     }
 }
