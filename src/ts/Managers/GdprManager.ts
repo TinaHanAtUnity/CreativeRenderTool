@@ -44,21 +44,6 @@ export class GdprManager {
         });
     }
 
-    public pushConsent(consent: boolean): Promise<void> {
-        // get last state of gdpr consent
-        return this._nativeBridge.Storage.get(StorageType.PRIVATE, GdprManager.GdprLastConsentValueStorageKey).then((consentLastSentToKafka) => {
-            // only if consent has changed push to kafka
-            if (consentLastSentToKafka !== consent) {
-                return this.sendGdprEvent(consent);
-            }
-        }).catch((error) => {
-            // there has not been last state of consent
-            // IE this is the first consent value we have seen
-            // and should push this to kafka
-            return this.sendGdprEvent(consent);
-        });
-    }
-
     public retrievePersonalInformation(): Promise<IGdprPersonalProperties> {
         const url = `https://tracking.adsx.unityads.unity3d.com/user-summary?gameId=${this._clientInfo.getGameId()}&adid=${this._deviceInfo.getAdvertisingIdentifier()}&projectId=${this._configuration.getUnityProjectId()}&storeId=${this._deviceInfo.getStores()}`;
 
@@ -80,6 +65,21 @@ export class GdprManager {
             });
             this._nativeBridge.Sdk.logError('Gdpr request failed' + error);
             throw error;
+        });
+    }
+
+    private pushConsent(consent: boolean): Promise<void> {
+        // get last state of gdpr consent
+        return this._nativeBridge.Storage.get(StorageType.PRIVATE, GdprManager.GdprLastConsentValueStorageKey).then((consentLastSentToKafka) => {
+            // only if consent has changed push to kafka
+            if (consentLastSentToKafka !== consent) {
+                return this.sendGdprEvent(consent);
+            }
+        }).catch((error) => {
+            // there has not been last state of consent
+            // IE this is the first consent value we have seen
+            // and should push this to kafka
+            return this.sendGdprEvent(consent);
         });
     }
 
