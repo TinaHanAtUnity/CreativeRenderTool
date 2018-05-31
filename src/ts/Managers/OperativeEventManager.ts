@@ -263,7 +263,6 @@ export class OperativeEventManager {
         return this.createUniqueEventMetadata(placement, this._sessionManager.getGameSessionId(), this._gamerServerId, OperativeEventManager.getPreviousPlacementId(), videoOrientation, adUnitStyle).then(fulfilled);
     }
 
-
     public sendGDPREventWithSource(action: string, source: GDPREventSource): Promise<void> {
         return OperativeEventManager.sendGDPREventWithSource(action, source, this._deviceInfo, this._clientInfo, this._configuration);
     }
