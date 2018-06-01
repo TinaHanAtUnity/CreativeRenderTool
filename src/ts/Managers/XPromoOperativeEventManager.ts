@@ -6,6 +6,7 @@ import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
 import { EventType } from 'Models/Session';
 import { INativeResponse } from 'Utilities/Request';
 import { GameSessionCounters } from 'Utilities/GameSessionCounters';
+import { AdUnitStyle } from 'Models/AdUnitStyle';
 
 export class XPromoOperativeEventManager extends OperativeEventManager {
     private _xPromoCampaign: XPromoCampaign;
@@ -16,7 +17,7 @@ export class XPromoOperativeEventManager extends OperativeEventManager {
         this._xPromoCampaign = params.campaign;
     }
 
-    public sendStartEvent(placement: Placement, videoOrientation?: string): Promise<void> {
+    public sendStart(placement: Placement, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<void> {
         const session = this._campaign.getSession();
 
         if(session.getEventSent(EventType.START)) {
@@ -24,9 +25,7 @@ export class XPromoOperativeEventManager extends OperativeEventManager {
         }
 
         session.setEventSent(EventType.START);
-
         GameSessionCounters.addStart(this._xPromoCampaign);
-
         return this._metaDataManager.fetch(PlayerMetaData, false).then(player => {
             if(player) {
                 this.setGamerServerId(player.getServerId());
@@ -39,7 +38,7 @@ export class XPromoOperativeEventManager extends OperativeEventManager {
         });
     }
 
-    public sendViewEvent(placement: Placement, videoOrientation?: string): Promise<void> {
+    public sendView(placement: Placement, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<void> {
         const session = this._campaign.getSession();
 
         if(session.getEventSent(EventType.VIEW)) {
@@ -54,14 +53,13 @@ export class XPromoOperativeEventManager extends OperativeEventManager {
         });
     }
 
-    public sendClickEvent(placement: Placement, videoOrientation?: string): Promise<void> {
+    public sendClick(placement: Placement, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<void> {
         const session = this._campaign.getSession();
 
         if(session.getEventSent(EventType.CLICK)) {
             return Promise.resolve(void(0));
         }
         session.setEventSent(EventType.CLICK);
-
         return this.sendHttpKafkaEvent('ads.xpromo.operative.videoclick.v1.json', 'click', placement, videoOrientation).then(() => {
             return;
         });
