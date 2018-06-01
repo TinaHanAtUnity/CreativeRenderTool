@@ -31,7 +31,7 @@ export class PurchasingUtilities {
     }
 
     public static setInitializationPayloadSentValue(val: boolean) {
-        this._initializationPayloadsAlreadySent = val;
+        this._isInitialized = val;
     }
 
     public static sendPurchaseInitializationEvent(nativeBridge: NativeBridge): Promise<void> {
@@ -46,7 +46,7 @@ export class PurchasingUtilities {
     }
 
     public static sendPromoPayload(nativeBridge: NativeBridge, iapPayload: string): Promise<void> {
-        if (!this._initializationPayloadsAlreadySent) {
+        if (!this._isInitialized) {
             return this.sendPurchaseInitializationEvent(nativeBridge).then(() => {
                 return this.sendPurchasingCommand(nativeBridge, iapPayload);
             });
@@ -81,7 +81,7 @@ export class PurchasingUtilities {
     }
 
     public static isProductAvailable(productId: string): boolean {
-        if (this.isProductInCatalog()) {
+        if (this.isCatalogValid()) {
             return (productId in this._catalog.getProducts());
         }
         return false;
@@ -94,9 +94,9 @@ export class PurchasingUtilities {
     private static _catalog: PurchasingCatalog = new PurchasingCatalog([]);
     private static _clientInfo: ClientInfo | undefined;
     private static _configuration: Configuration | undefined;
-    private static _initializationPayloadsAlreadySent: boolean = false;
+    private static _isInitialized = false;
 
-    private static isProductInCatalog(): boolean {
+    private static isCatalogValid(): boolean {
         return (this._catalog !== undefined && this._catalog.getProducts() !== undefined && this._catalog.getSize() !== 0);
     }
 
@@ -151,7 +151,7 @@ export class PurchasingUtilities {
             const observer = nativeBridge.Purchasing.onCommandResult.subscribe((isCommandSuccessful) => {
                 if (isCommandSuccessful === 'True') {
                     if (iapPayload.indexOf('SETIDS') !== -1) {
-                        this._initializationPayloadsAlreadySent = true;
+                        this._isInitialized = true;
                     }
                     resolve();
                 }
@@ -166,8 +166,11 @@ export class PurchasingUtilities {
 
     // Returns true if version is 1.16.0 or newer
     private static isPromoVersionSupported(version: string): boolean {
-        const promoVersionSplit: string[] = version.split('.', 2);
-        return (parseInt(promoVersionSplit[0], 10) >= 2 || (parseInt(promoVersionSplit[0], 10) >= 1 && parseInt(promoVersionSplit[1], 10) >= 16));
+        const promoVersionSplit = version.split('.', 2);
+        if (promoVersionSplit[0].length > 0 && promoVersionSplit[0].length > 0) {
+            return ((parseInt(promoVersionSplit[0], 10) >= 2) || ((parseInt(promoVersionSplit[0], 10) >= 1 && parseInt(promoVersionSplit[1], 10) >= 16)));
+        }
+        return false;
     }
 
     private static loadInitializationPayloads(): IPromoPayload {
