@@ -19,7 +19,7 @@ export class PerformanceEndScreenEventHandler extends EndScreenEventHandler<Perf
     }
 
     public onKeyEvent(keyCode: number): void {
-        if (keyCode === KeyCode.BACK && this._adUnit.isShowing() && !this._adUnit.isActive()) {
+        if (keyCode === KeyCode.BACK && this._adUnit.isShowing() && !this._adUnit.canShowVideo()) {
             this._adUnit.hide();
         }
     }

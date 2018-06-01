@@ -1,13 +1,15 @@
 <div class="btn-close-region<%= data.endscreenAlt ? ' ' + data.endscreenAlt : '' %>">
   <span class="icon-close"></span>
 </div>
-<div class="gdpr-pop-up">
-  <div class="icon-gdpr"></div>
-  <div class="gdpr-text">Unity is personalizing your ads experience in this application. <span class="gdpr-link">Tap here</span> to learn more about Unity and your privacy choices.</div>
-</div>
 <div class="campaign-container<%= data.endscreenAlt ? ' ' + data.endscreenAlt : '' %>">
-  <div class="game-background game-background-landscape" style="background-image: url('<%= data.endScreenLandscape && data.endScreenLandscape.replace("file://", "") %>')"></div>
-  <div class="game-background game-background-portrait" style="background-image: url('<%= data.endScreenPortrait && data.endScreenPortrait.replace("file://", "") %>')"></div>
+  <div class="game-background-container">
+    <div class="game-background game-background-landscape" style="background-image: url('<%= data.endScreenLandscape && data.endScreenLandscape.replace("file://", "") %>')"></div>
+    <div class="game-background game-background-portrait" style="background-image: url('<%= data.endScreenPortrait && data.endScreenPortrait.replace("file://", "") %>')"></div>
+    <div class="gdpr-pop-up">
+      <div class="gdpr-icon"></div>
+      <div class="gdpr-text">Unity is personalizing your ads experience in this application. <span class="gdpr-link">Tap here</span> to learn more about Unity and your privacy choices.</div>
+    </div>
+  </div>
   <div class="end-screen-info-background">
     <!--TODO: Is it in use?-->
     <!--<div class="end-screen-stripe"></div>-->
