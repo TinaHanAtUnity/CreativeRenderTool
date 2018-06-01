@@ -1,3 +1,8 @@
+# Staged
+
+* Moved GDPR banner on top of the game background image in portrait mode
+* Added support for adUnitStyle and ctaButtonColour
+
 # Wed May 30 21:00:10 UTC 2018
 
 * Reuse previous auctionId for no fill retries
