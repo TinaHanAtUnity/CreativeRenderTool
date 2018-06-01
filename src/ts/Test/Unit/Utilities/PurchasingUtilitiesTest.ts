@@ -21,6 +21,7 @@ describe('PurchasingUtilitiesTest', () => {
     let nativeBridge: NativeBridge;
     let purchasing: PurchasingApi;
     let sdk: SdkApi;
+    let clientInfo: ClientInfo;
     let sandbox: sinon.SinonSandbox;
     const promoCatalog = '[\n  {\n    \"localizedPriceString\" : \"$0.00\",\n    \"localizedTitle\" : \"Sword of Minimal Value\",\n    \"productId\" : \"myPromo\"\n  },\n  {\n    \"localizedPriceString\" : \"$0.99\",\n    \"localizedTitle\" : \"100 in-game Gold Coins\",\n    \"productId\" : \"100.gold.coins\"\n  }\n]';
     const promoCatalogBad = '[\n    {\"pn}]';
@@ -49,6 +50,7 @@ describe('PurchasingUtilitiesTest', () => {
         nativeBridge = sinon.createStubInstance(NativeBridge);
         purchasing = sinon.createStubInstance(PurchasingApi);
         sdk = sinon.createStubInstance(SdkApi);
+        clientInfo = sinon.createStubInstance(ClientInfo);
         sandbox = sinon.sandbox.create();
         nativeBridge.Sdk = sdk;
         (<any>purchasing).onInitialize = new Observable1<string>();
@@ -69,7 +71,7 @@ describe('PurchasingUtilitiesTest', () => {
     describe('sendPurchaseInitializationEvent', () => {
         beforeEach(() => {
             const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
-            PurchasingUtilities.setConfiguration(configuration);
+            PurchasingUtilities.initialize(clientInfo, configuration);
         });
         it('should resolve without calling sendPurchasingCommand if configuration does not include promo', () => {
             return PurchasingUtilities.sendPurchaseInitializationEvent(nativeBridge).then(() => {
@@ -82,7 +84,7 @@ describe('PurchasingUtilitiesTest', () => {
         describe('on successful trigger of all underlying promises', () => {
             beforeEach(() => {
                 const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-                PurchasingUtilities.setConfiguration(configuration);
+                PurchasingUtilities.initialize(clientInfo, configuration);
                 sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('True'));
                 sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.17'));
                 sandbox.stub(purchasing.onCommandResult, 'subscribe').callsFake((resolve) => resolve('True'));
@@ -97,7 +99,7 @@ describe('PurchasingUtilitiesTest', () => {
         describe('If promo is not ready', () => {
             beforeEach(() => {
                 const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-                PurchasingUtilities.setConfiguration(configuration);
+                PurchasingUtilities.initialize(clientInfo, configuration);
                 sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('False'));
                 sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.17'));
                 sandbox.stub(purchasing.onCommandResult, 'subscribe').callsFake((resolve) => resolve('True'));
@@ -117,7 +119,7 @@ describe('PurchasingUtilitiesTest', () => {
         describe('If promo version is not 1.16 or above', () => {
             beforeEach(() => {
                 const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-                PurchasingUtilities.setConfiguration(configuration);
+                PurchasingUtilities.initialize(clientInfo, configuration);
                 sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('True'));
                 sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.14'));
                 sandbox.stub(purchasing.onCommandResult, 'subscribe').callsFake((resolve) => resolve('True'));

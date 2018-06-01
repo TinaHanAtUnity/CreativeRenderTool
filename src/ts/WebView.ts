@@ -209,8 +209,7 @@ export class WebView {
             HttpKafka.setConfiguration(this._configuration);
             this._jaegerManager.setJaegerTracingEnabled(this._configuration.isJaegerTracingEnabled());
 
-            PurchasingUtilities.setConfiguration(this._configuration);
-            PurchasingUtilities.setClientInfo(this._clientInfo);
+            PurchasingUtilities.initialize(this._clientInfo, this._configuration);
             PurchasingUtilities.sendPurchaseInitializationEvent(this._nativeBridge);
 
             if (!this._configuration.isEnabled()) {

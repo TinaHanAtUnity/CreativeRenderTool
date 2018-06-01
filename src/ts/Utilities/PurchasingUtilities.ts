@@ -22,11 +22,9 @@ export interface IPromoPayload {
 }
 
 export class PurchasingUtilities {
-    public static setClientInfo(clientInfo: ClientInfo) {
-        this._clientInfo = clientInfo;
-    }
 
-    public static setConfiguration(configuration: Configuration) {
+    public static initialize(clientInfo: ClientInfo, configuration: Configuration) {
+        this._clientInfo = clientInfo;
         this._configuration = configuration;
     }
 
@@ -92,8 +90,8 @@ export class PurchasingUtilities {
     }
 
     private static _catalog: PurchasingCatalog = new PurchasingCatalog([]);
-    private static _clientInfo: ClientInfo | undefined;
-    private static _configuration: Configuration | undefined;
+    private static _clientInfo: ClientInfo;
+    private static _configuration: Configuration;
     private static _isInitialized = false;
 
     private static isCatalogValid(): boolean {
@@ -174,16 +172,14 @@ export class PurchasingUtilities {
     }
 
     private static loadInitializationPayloads(): IPromoPayload {
-        const iapPayload = <IPromoPayload>{};
-        if (this._configuration && this._clientInfo) {
-            iapPayload.iapPromo = true;
-            iapPayload.abGroup = this._configuration.getAbGroup();
-            iapPayload.gameId = this._clientInfo.getGameId() + '|' + this._configuration.getToken();
-            iapPayload.trackingOptOut = this._configuration.isOptOutEnabled();
-            iapPayload.gamerToken = this._configuration.getToken();
-            iapPayload.request = IPromoRequest.SETIDS;
-        }
-        return iapPayload;
+        return <IPromoPayload>{
+            iapPromo: true,
+            abGroup: this._configuration.getAbGroup(),
+            gameId: this._clientInfo.getGameId() + '|' + this._configuration.getToken(),
+            trackingOptOut: this._configuration.isOptOutEnabled(),
+            gamerToken: this._configuration.getToken(),
+            request: IPromoRequest.SETIDS
+        };
     }
 
     private static logIssue(nativeBridge: NativeBridge, errorType: string, errorMessage: string): Error {
