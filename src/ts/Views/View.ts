@@ -4,7 +4,7 @@ import { Tap } from 'Utilities/Tap';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Platform } from 'Constants/Platform';
 import { Swipe } from 'Utilities/Swipe';
-import { IBuildInformation } from 'Views/Privacy';
+import { IBuildInformation } from 'Views/AbstractPrivacy';
 
 export abstract class View<T extends object> {
 

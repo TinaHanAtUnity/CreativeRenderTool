@@ -1,7 +1,7 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { FinishState } from 'Constants/FinishState';
-import { IObserver0, IObserver2, IObserver1 } from 'Utilities/IObserver';
+import { IObserver2, IObserver1 } from 'Utilities/IObserver';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { DisplayInterstitial } from 'Views/DisplayInterstitial';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
@@ -14,12 +14,13 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { IWebPlayerWebSettingsAndroid, IWebPlayerWebSettingsIos } from 'Native/Api/WebPlayer';
 import { Url } from 'Utilities/Url';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
+import { AdUnitContainerSystemMessage, IAdUnitContainerListener } from 'AdUnits/Containers/AdUnitContainer';
 
 export interface IDisplayInterstitialAdUnitParameters extends IAdUnitParameters<DisplayInterstitialCampaign> {
     view: DisplayInterstitial;
 }
 
-export class DisplayInterstitialAdUnit extends AbstractAdUnit {
+export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnitContainerListener {
 
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
@@ -33,8 +34,6 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
     private _handlingShouldOverrideUrlLoading: boolean = false;
     private _contentReady: boolean = false;
 
-    private _onShowObserver: IObserver0;
-    private _onSystemKillObserver: IObserver0;
     private _shouldOverrideUrlLoadingObserver: IObserver2<string, string>;
     private _onPageStartedObserver: IObserver1<string>;
 
@@ -67,9 +66,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
             this.onStart.trigger();
             this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
             this.sendStartEvents();
-
-            this._onShowObserver = this._container.onShow.subscribe(() => this.onShow());
-            this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
+            this._container.addEventHandler(this);
 
             // Display ads are always completed.
             this.setFinishState(FinishState.COMPLETED);
@@ -81,10 +78,9 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
         if(!this.isShowing()) {
             return Promise.resolve();
         }
-        this.setShowing(false);
 
-        this._container.onShow.unsubscribe(this._onShowObserver);
-        this._container.onSystemKill.unsubscribe(this._onSystemKillObserver);
+        this.setShowing(false);
+        this._container.removeEventHandler(this);
 
         this._nativeBridge.WebPlayer.onPageStarted.unsubscribe(this._onPageStartedObserver);
         this._nativeBridge.WebPlayer.shouldOverrideUrlLoading.unsubscribe(this._shouldOverrideUrlLoadingObserver);
@@ -107,7 +103,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
         return 'programmaticImage';
     }
 
-    private onShow(): void {
+    public onContainerShow(): void {
         if (this._contentReady) {
             return;
         }
@@ -122,11 +118,28 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
             this._deviceInfo.getScreenHeight()
         ];
         Promise.all(promises).then(([screenWidth, screenHeight]) => {
-            const screenDensity = this.getScreenDensity();
-            return this.setWebPlayerViewFrame(screenWidth, screenHeight, screenDensity)
-                .then(() => this.setWebViewViewFrame(screenWidth, screenHeight, screenDensity))
+            return this.setWebPlayerViewFrame(screenWidth, screenHeight)
+                .then(() => this.setWebViewViewFrame(screenWidth, screenHeight))
                 .then(() => this.setWebPlayerContent());
         });
+    }
+
+    public onContainerDestroy(): void {
+        if(this.isShowing()) {
+            this.onClose.trigger();
+        }
+    }
+
+    public onContainerBackground(): void {
+        // EMPTY
+    }
+
+    public onContainerForeground(): void {
+        // EMPTY
+    }
+
+    public onContainerSystemMessage(message: AdUnitContainerSystemMessage): void {
+        // EMPTY
     }
 
     private getScreenDensity(): number {
@@ -136,32 +149,34 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
         return 0;
     }
 
-    private setWebPlayerViewFrame(screenWidth: number, screenHeight: number, screenDensity: number): Promise<void> {
-        let creativeWidth = this._campaign.getWidth() || screenWidth;
-        let creativeHeight = this._campaign.getHeight() || screenHeight;
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            creativeWidth = Math.floor(this.getAndroidViewSize(creativeWidth, screenDensity));
-            creativeHeight = Math.floor(this.getAndroidViewSize(creativeHeight, screenDensity));
+    private hasCreativeSize(): boolean {
+        return this._campaign.getWidth() !== undefined && this._campaign.getHeight() !== undefined;
+    }
+
+    private setWebPlayerViewFrame(screenWidth: number, screenHeight: number): Promise<void> {
+        let creativeWidth = screenWidth;
+        let creativeHeight = screenHeight;
+
+        if(this._nativeBridge.getPlatform() === Platform.ANDROID && this.hasCreativeSize()) {
+            const screenDensity = this.getScreenDensity();
+            creativeWidth = Math.floor(this.getAndroidViewSize(this._campaign.getWidth() || screenWidth, screenDensity));
+            creativeHeight = Math.floor(this.getAndroidViewSize(this._campaign.getHeight() || screenHeight, screenDensity));
         }
+
         const xPos = Math.floor((screenWidth / 2) - (creativeWidth / 2));
         const yPos = Math.floor((screenHeight / 2) - (creativeHeight / 2));
         return this._container.setViewFrame('webplayer', xPos, yPos, creativeWidth, creativeHeight);
     }
 
-    private setWebViewViewFrame(screenWidth: number, screenHeight: number, screenDensity: number): Promise<void> {
+    private setWebViewViewFrame(screenWidth: number, screenHeight: number): Promise<void> {
         let webviewAreaSize = Math.max( Math.min(screenWidth, screenHeight) * this._closeAreaMinRatio, this._closeAreaMinPixels );
         if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            const screenDensity = this.getScreenDensity();
             webviewAreaSize = this.getAndroidViewSize(webviewAreaSize, screenDensity);
         }
         const webviewXPos = screenWidth - webviewAreaSize;
         const webviewYPos = 0;
         return this._container.setViewFrame('webview', Math.floor(webviewXPos), Math.floor(webviewYPos), Math.floor(webviewAreaSize), Math.floor(webviewAreaSize));
-    }
-
-    private onSystemKill(): void {
-        if(this.isShowing()) {
-            this.onClose.trigger();
-        }
     }
 
     private onPageStarted(url: string): void {
@@ -279,8 +294,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
 
     private setWebPlayerContent(): Promise<void> {
         return this.setWebplayerSettings(true).then( () => {
-            let markup = this._campaign.getDynamicMarkup();
-            markup = '<script>' + markup + '</script>';
+            const markup = this._campaign.getDynamicMarkup();
             return this.setWebPlayerData(markup, 'text/html', 'UTF-8').then(() => {
                 this._contentReady = true;
             });

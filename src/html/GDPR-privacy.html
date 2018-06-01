@@ -1,0 +1,100 @@
+<div class="pop-up">
+    <div class="pop-up-content">
+        <span class="title">A message from Unity</span>
+
+        <p>
+            Ads allow game makers to offer great games for free. We try to show the games and products that will be
+            most interesting to you based on the games you play, the device you use, and the country you are in.
+        </p>
+
+        <p>
+            <span class="highlight">Most of the information we use to do this targeting is about your device: <span
+                    class="gdpr-text-ios">Apple’s Advertising Identifier</span>
+                <span class="gdpr-text-android">Google Ad Identifier</span> and your IP address.</span>
+            <span id="coppaTag1"></span>
+        </p>
+
+        <p>
+            Our <a href="https://unity3d.com/legal/privacy-policy">Privacy Policy</a> explains how we manage your
+            data and how we work with partners who server ads. <span id="coppaTag2"></span>
+        </p>
+
+        <p>
+            From your interaction with this app, we use the following information to predict games that might interest
+            you:
+        </p>
+
+        <p>
+            <span id='phone-type'></span>
+        </p>
+
+        <p>
+            <span id='country'></span>
+        </p>
+
+        <p>
+            <span id='game-plays-this-week'></span>
+        </p>
+
+        <p>
+            <span id='ads-seen-in-game'></span>
+        </p>
+
+        <p>
+            <span id='games-installed-from-ads'></span>
+        </p>
+
+        <p>
+            <span id='sorry-message'></span>
+        </p>
+
+
+        <p><span class="header">Selection</span></p>
+        <p>
+            You can choose to continue to see a personalized experience, or to see a more generic one.
+            This will apply to both advertising that comes from Unity directly as well as from advertising partners.
+        </p>
+
+        <div class="radio-group-container">
+            <div class="radio-item-container">
+                <input id="gdpr-agree-radio" name="gdpr-radio-group" type="radio">
+                <label for="gdpr-agree-radio">Yes, I agree to a personalized experience.</label>
+            </div>
+            <div class="radio-item-container">
+                <input id="gdpr-refuse-radio" name="gdpr-radio-group" type="radio">
+                <label for="gdpr-refuse-radio">
+                    No, I do not want personalized experience.
+                </label>
+            </div>
+        </div>
+
+        <p>
+            <span class="header">Changing your privacy choice</span>
+            You can access these options at any time by tapping the privacy icon after an ad appears.
+        </p>
+
+        <p>
+            <span class="header">Data Management</span>
+
+            You can delete any data Unity has about your device by clicking <span class="data-deletion-link page-link">here</span>.
+
+            <span id="data-deletion-container">Are you sure?  <span id="data-deletion-confirm"
+                                                                    class="page-link">Yes</span> / <span
+                    class="data-deletion-reject page-link">No</span></span>
+            <span id="data-deletion-request-container">We will process your request and your data will be deleted in 30 days. We will also
+opt you out from personalized ads.
+</span>
+        </p>
+
+    </div>
+    <div class="pop-up-content back-side">
+        <% for (var k in data.buildInformation) { %>
+        <span class="build-information-key"><%= k %>:</span> <span class="build-information-value"> <%= (data.buildInformation[k] === null || typeof data.buildInformation[k] === "undefined") ? "N/A" : data.buildInformation[k] %></span>;
+        <% } %>
+    </div>
+    <div class="fade-out-gradient-separator"></div>
+    <div class="pop-up-footer">
+        <div class="left-side-link"></div>
+        <div class="close-button">Confirm</div>
+    </div>
+</div>

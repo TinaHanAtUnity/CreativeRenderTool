@@ -22,6 +22,9 @@ import { FocusManager } from 'Managers/FocusManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
+import { Configuration } from 'Models/Configuration';
+import { SinonStub } from 'sinon';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
 
 describe('PromoEventHandlersTest', () => {
     const handleInvocation = sinon.spy();
@@ -42,7 +45,7 @@ describe('PromoEventHandlersTest', () => {
         it('should hide adunit', () => {
             promoAdUnit = sinon.createStubInstance(PromoAdUnit);
 
-            PromoEventHandler.onClose(nativeBridge, promoAdUnit, '111', '111', 1, [purchaseTrackingUrls]);
+            PromoEventHandler.onClose(nativeBridge, promoAdUnit, '111', '111', 1, [purchaseTrackingUrls], false);
             sinon.assert.called(<sinon.SinonSpy>promoAdUnit.hide);
         });
     });
@@ -51,7 +54,7 @@ describe('PromoEventHandlersTest', () => {
         it('should hide adunit', () => {
             promoAdUnit = sinon.createStubInstance(PromoAdUnit);
 
-            PromoEventHandler.onClose(nativeBridge, promoAdUnit, '111', '111', 1, [purchaseTrackingUrls]);
+            PromoEventHandler.onClose(nativeBridge, promoAdUnit, '111', '111', 1, [purchaseTrackingUrls], false);
             sinon.assert.called(<sinon.SinonSpy>promoAdUnit.hide);
         });
 
@@ -64,6 +67,26 @@ describe('PromoEventHandlersTest', () => {
 
             PromoEventHandler.onPromo(nativeBridge, promoAdUnit, 'com.unit.test.iapproductid', [purchaseTrackingUrls]);
             sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.beginPurchaseEvent);
+        });
+    });
+
+    describe('when calling onGDPRPopupSkipped', () => {
+        const operativeEventManager = sinon.createStubInstance(OperativeEventManager);
+
+        it ('should set the optOutRecorded flag in the configuration', () => {
+            const config = sinon.createStubInstance(Configuration);
+
+            (<sinon.SinonStub>config.isOptOutRecorded).returns(false);
+
+            PromoEventHandler.onGDPRPopupSkipped(config, operativeEventManager);
+            sinon.assert.called(<sinon.SinonSpy>config.setOptOutRecorded);
+        });
+
+        it('should send GDPR operative Event with skip', () => {
+            const config = sinon.createStubInstance(Configuration);
+
+            PromoEventHandler.onGDPRPopupSkipped(config, operativeEventManager);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendGDPREvent, 'skip');
         });
     });
 });

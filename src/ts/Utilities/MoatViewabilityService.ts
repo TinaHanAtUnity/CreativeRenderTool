@@ -23,7 +23,6 @@ export interface IMoatData {
     SDK: string;
     Version: string;
     SDKVersion: string;
-    IFA: string | undefined | null;
     LimitAdTracking: boolean | undefined;
     COPPA: boolean;
     bundle: string;
@@ -50,9 +49,8 @@ export class MoatViewabilityService {
 
             this._moatData = {
                 SDK: 'UnityAds',
-                Version: '1.0',
+                Version: '1.1',
                 SDKVersion: clientInfo.getSdkVersionName(),
-                IFA: deviceInfo.getAdvertisingIdentifier(),
                 LimitAdTracking: deviceInfo.getLimitAdTracking(),
                 COPPA: configuration.isCoppaCompliant(),
                 bundle: clientInfo.getApplicationName()

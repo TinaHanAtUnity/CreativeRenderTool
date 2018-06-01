@@ -70,7 +70,11 @@
             document.addEventListener('DOMContentLoaded', function() {
                 var videoEl = document.querySelector('video');
                 if (videoEl === null) {
-                    // TODO, warn?
+                    var error = 'videoEl for admob is not found';
+                    self.postMessage('tracking', {
+                        event: 'error',
+                        data: JSON.stringify(error)
+                    });
                     return;
                 }
 

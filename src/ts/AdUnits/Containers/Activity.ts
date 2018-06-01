@@ -29,6 +29,8 @@ export class Activity extends AdUnitContainer {
     private _onResumeObserver: any;
     private _onPauseObserver: any;
     private _onDestroyObserver: any;
+    private _onCreateObserver: any;
+    private _onRestoreObserver: any;
 
     private _onFocusGainedObserver: any;
     private _onFocusLostObserver: any;
@@ -47,6 +49,8 @@ export class Activity extends AdUnitContainer {
         this._onResumeObserver = this._nativeBridge.AndroidAdUnit.onResume.subscribe((activityId) => this.onResume(activityId));
         this._onPauseObserver = this._nativeBridge.AndroidAdUnit.onPause.subscribe((finishing, activityId) => this.onPause(finishing, activityId));
         this._onDestroyObserver = this._nativeBridge.AndroidAdUnit.onDestroy.subscribe((finishing, activityId) => this.onDestroy(finishing, activityId));
+        this._onCreateObserver = this._nativeBridge.AndroidAdUnit.onCreate.subscribe((activityId) => this.onCreate(activityId));
+        this._onRestoreObserver = this._nativeBridge.AndroidAdUnit.onRestore.subscribe((activityId) => this.onRestore(activityId));
     }
 
     public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: IAndroidOptions): Promise<void> {
@@ -75,8 +79,8 @@ export class Activity extends AdUnitContainer {
 
         this._nativeBridge.Sdk.logInfo('Opening ' + adUnit.description() + ' ad unit with orientation ' + Orientation[this._lockedOrientation] + ', hardware acceleration ' + (hardwareAccel ? 'enabled' : 'disabled'));
 
-        this._onFocusGainedObserver = this._nativeBridge.AndroidAdUnit.onFocusGained.subscribe(() => this.onSystemInterrupt.trigger(false));
-        this._onFocusLostObserver = this._nativeBridge.AndroidAdUnit.onFocusLost.subscribe(() => this.onSystemInterrupt.trigger(true));
+        this._onFocusGainedObserver = this._nativeBridge.AndroidAdUnit.onFocusGained.subscribe(() => this.onFocusGained());
+        this._onFocusLostObserver = this._nativeBridge.AndroidAdUnit.onFocusLost.subscribe(() => this.onFocusLost());
 
         return this._nativeBridge.AndroidAdUnit.open(this._activityId, nativeViews, this.getOrientation(allowRotation, this._lockedOrientation, options), keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel, isTransparent);
     }
@@ -126,7 +130,7 @@ export class Activity extends AdUnitContainer {
     }
 
     public isPaused() {
-        return false;
+        return this._paused;
     }
 
     public setViewFrame(view: string, x: number, y: number, width: number, height: number): Promise<void> {
@@ -177,18 +181,34 @@ export class Activity extends AdUnitContainer {
         return orientation;
     }
 
-    private onResume(activityId: number): void {
+    private onCreate(activityId: number): void {
+        this._paused = false;
         if(activityId === this._activityId) {
-            this.onShow.trigger();
+            this._handlers.forEach(handler => handler.onContainerShow());
+        }
+    }
+
+    private onRestore(activityId: number): void {
+        this._paused = false;
+        if(activityId === this._activityId) {
+            this._handlers.forEach(handler => handler.onContainerShow());
+        }
+    }
+
+    private onResume(activityId: number): void {
+        this._paused = false;
+        if(activityId === this._activityId) {
+            this._handlers.forEach(handler => handler.onContainerForeground());
         }
     }
 
     private onPause(finishing: boolean, activityId: number): void {
-        this.onAndroidPause.trigger();
+        this._paused = true;
+        this._handlers.forEach(handler => handler.onContainerBackground());
         if(finishing && activityId === this._activityId) {
             if(!this._currentActivityFinished) {
                 this._currentActivityFinished = true;
-                this.onSystemKill.trigger();
+                this._handlers.forEach(handler => handler.onContainerDestroy());
             }
         }
     }
@@ -197,9 +217,19 @@ export class Activity extends AdUnitContainer {
         if(finishing && activityId === this._activityId) {
             if(!this._currentActivityFinished) {
                 this._currentActivityFinished = true;
-                this.onSystemKill.trigger();
+                this._handlers.forEach(handler => handler.onContainerDestroy());
             }
         }
+    }
+
+    private onFocusGained(): void {
+        this._paused = false;
+        this._handlers.forEach(handler => handler.onContainerForeground());
+    }
+
+    private onFocusLost(): void {
+        this._paused = true;
+        this._handlers.forEach(handler => handler.onContainerBackground());
     }
 
     private isHardwareAccelerationAllowed(): boolean {

@@ -53,7 +53,6 @@ import { XPromoVideoEventHandler } from 'EventHandlers/XPromoVideoEventHandler';
 import { AdMobEventHandler } from 'EventHandlers/AdmobEventHandler';
 import { ClosableVideoOverlay } from 'Views/ClosableVideoOverlay';
 import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
-import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { Closer } from 'Views/Closer';
 import { Privacy } from 'Views/Privacy';
 import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
@@ -70,6 +69,9 @@ import { AndroidVideoEventHandler } from 'EventHandlers/AndroidVideoEventHandler
 import { IosVideoEventHandler } from 'EventHandlers/IosVideoEventHandler';
 import { XPromoOperativeEventManager } from 'Managers/XPromoOperativeEventManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { AbstractPrivacy } from 'Views/AbstractPrivacy';
+import { GDPRPrivacy } from 'Views/GDPRPrivacy';
+import { PrivacyEventHandler } from 'EventHandlers/PrivacyEventHandler';
 
 export class AdUnitFactory {
 
@@ -101,8 +103,11 @@ export class AdUnitFactory {
 
     private static createPerformanceAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PerformanceCampaign>): PerformanceAdUnit {
         const overlay = this.createOverlay(nativeBridge, parameters);
-        const adUnitStyle = CustomFeatures.getAdUnitStyle(parameters.campaign.getAbGroup());
-        const endScreen = new PerformanceEndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), adUnitStyle, parameters.showGDPRPopup);
+        const adUnitStyle: AdUnitStyle = parameters.campaign.getAdUnitStyle() || AdUnitStyle.getDefaultAdUnitStyle();
+
+        const showGDPRBanner = this.showGDPRBanner(parameters);
+        const privacy = this.createPrivacy(nativeBridge, parameters);
+        const endScreen = new PerformanceEndScreen(nativeBridge, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, parameters.deviceInfo.getOsVersion(), adUnitStyle);
         const video = this.getVideo(parameters.campaign, parameters.forceOrientation);
 
         const performanceAdUnitParameters: IPerformanceAdUnitParameters = {
@@ -110,7 +115,8 @@ export class AdUnitFactory {
             video: video,
             overlay: overlay,
             endScreen: endScreen,
-            adUnitStyle: adUnitStyle
+            adUnitStyle: adUnitStyle,
+            privacy: privacy
         };
 
         const performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
@@ -136,14 +142,18 @@ export class AdUnitFactory {
 
     private static createXPromoAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<XPromoCampaign>): XPromoAdUnit {
         const overlay = this.createOverlay(nativeBridge, parameters);
-        const endScreen = new XPromoEndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+
+        const showGDPRBanner = this.showGDPRBanner(parameters);
+        const privacy = this.createPrivacy(nativeBridge, parameters);
+        const endScreen = new XPromoEndScreen(nativeBridge, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner);
         const video = this.getVideo(parameters.campaign, parameters.forceOrientation);
 
         const xPromoAdUnitParameters: IXPromoAdUnitParameters = {
             ... parameters,
             video: video,
             overlay: overlay,
-            endScreen: endScreen
+            endScreen: endScreen,
+            privacy: privacy
         };
 
         const xPromoAdUnit = new XPromoAdUnit(nativeBridge, xPromoAdUnitParameters);
@@ -237,20 +247,23 @@ export class AdUnitFactory {
         let endScreen: MRAIDEndScreen | undefined;
 
         let mraid: MRAIDView<IMRAIDViewHandler>;
+        const showGDPRBanner = this.showGDPRBanner(parameters);
+        const privacy = this.createPrivacy(nativeBridge, parameters);
         const isMRAIDAR = parameters.campaign.getAdType() === 'MRAID-AR';
         // TODO: Remove /ar/ folder check once we have MRAID-AR type support on the server side
         const isPlayable = (resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity|\/ar\/|ducktales-ar/)) || isMRAIDAR;
-        if (isPlayable) {
-            mraid = new PlayableMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.configuration.isCoppaCompliant());
-            endScreen = new MRAIDEndScreen(nativeBridge, parameters.campaign, parameters.configuration.isCoppaCompliant(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+        if(isPlayable) {
+            mraid = new PlayableMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy);
+            endScreen = new MRAIDEndScreen(nativeBridge, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner);
         } else {
-            mraid = new MRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.configuration.isCoppaCompliant());
+            mraid = new MRAID(nativeBridge, parameters.placement, parameters.campaign, privacy);
         }
 
         const mraidAdUnitParameters: IMRAIDAdUnitParameters = {
             ... parameters,
             mraid: mraid,
-            endScreen: endScreen
+            endScreen: endScreen,
+            privacy: privacy
         };
 
         const mraidAdUnit = new MRAIDAdUnit(nativeBridge, mraidAdUnitParameters);
@@ -297,16 +310,21 @@ export class AdUnitFactory {
     }
 
     private static createPromoAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PromoCampaign>): AbstractAdUnit {
-        const promoView = new Promo(nativeBridge, parameters.campaign, parameters.deviceInfo.getLanguage());
+        const privacy = this.createPrivacy(nativeBridge, parameters);
+        const showGDPRBanner = this.showGDPRBanner(parameters);
+
+        const promoView = new Promo(nativeBridge, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner);
         const promoAdUnit = new PromoAdUnit(nativeBridge, {
             ...parameters,
-            view: promoView
+            view: promoView,
+            privacy: privacy
         });
 
         promoView.render();
         document.body.appendChild(promoView.container());
 
-        promoView.onClose.subscribe(() => PromoEventHandler.onClose(nativeBridge, promoAdUnit, parameters.campaign.getGamerId(), parameters.clientInfo.getGameId() + '|' + parameters.configuration.getToken(), parameters.campaign.getAbGroup(), parameters.campaign.getTrackingUrlsForEvent('purchase')));
+        promoView.onGDPRPopupSkipped.subscribe(() => PromoEventHandler.onGDPRPopupSkipped(parameters.configuration, parameters.operativeEventManager));
+        promoView.onClose.subscribe(() => PromoEventHandler.onClose(nativeBridge, promoAdUnit, parameters.configuration.getToken(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup(), parameters.campaign.getTrackingUrlsForEvent('purchase'), parameters.configuration.isOptOutEnabled()));
         promoView.onPromo.subscribe((productId) => PromoEventHandler.onPromo(nativeBridge, promoAdUnit, productId, parameters.campaign.getTrackingUrlsForEvent('purchase')));
         nativeBridge.Purchasing.onIAPSendEvent.subscribe((iapPayload) => PurchasingUtilities.handleSendIAPEvent(nativeBridge, iapPayload));
 
@@ -431,7 +449,6 @@ export class AdUnitFactory {
             campaign: params.campaign,
             operativeEventManager: params.operativeEventManager,
             thirdPartyEventManager: params.thirdPartyEventManager,
-            comScoreTrackingService: params.comScoreTrackingService,
             configuration: params.configuration,
             placement: params.placement,
             video: video,
@@ -447,5 +464,21 @@ export class AdUnitFactory {
         }
 
         return video;
+    }
+
+    private static createPrivacy(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractPrivacy {
+        let privacy: AbstractPrivacy;
+        if (parameters.configuration.isGDPREnabled()) {
+            privacy = new GDPRPrivacy(nativeBridge, parameters.gdprManager, parameters.configuration.isCoppaCompliant(), parameters.configuration.isOptOutEnabled());
+        } else {
+            privacy = new Privacy(nativeBridge, parameters.configuration.isCoppaCompliant());
+        }
+        const privacyEventHandler = new PrivacyEventHandler(nativeBridge, parameters);
+        privacy.addEventHandler(privacyEventHandler);
+        return privacy;
+    }
+
+    private static showGDPRBanner(parameters: IAdUnitParameters<Campaign>): boolean {
+        return parameters.configuration.isGDPREnabled() ? !parameters.configuration.isOptOutRecorded() : false;
     }
 }

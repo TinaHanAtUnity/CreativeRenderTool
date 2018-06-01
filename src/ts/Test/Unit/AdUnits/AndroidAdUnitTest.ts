@@ -10,7 +10,10 @@ import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
 import { Activity } from 'AdUnits/Containers/Activity';
-import { Orientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
+import {
+    AdUnitContainerSystemMessage, IAdUnitContainerListener, Orientation,
+    ViewConfiguration
+} from 'AdUnits/Containers/AdUnitContainer';
 import { Rotation } from 'Constants/Android/Rotation';
 import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
@@ -21,8 +24,8 @@ import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { SessionManager } from 'Managers/SessionManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { Request } from 'Utilities/Request';
-import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
+import { GdprConsentManager } from 'Managers/GdprConsentManager';
 
 describe('AndroidAdUnitTest', () => {
     let nativeBridge: NativeBridge;
@@ -47,6 +50,7 @@ describe('AndroidAdUnitTest', () => {
         const deviceInfo = TestFixtures.getAndroidDeviceInfo();
         const configuration = TestFixtures.getConfiguration();
         container = new Activity(nativeBridge, deviceInfo);
+        const gdprManager = sinon.createStubInstance(GdprConsentManager);
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             nativeBridge: nativeBridge,
             request: request,
@@ -57,7 +61,6 @@ describe('AndroidAdUnitTest', () => {
             configuration: configuration,
             campaign: TestFixtures.getCampaign()
         });
-        const comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
 
         adUnitParams = {
             forceOrientation: Orientation.NONE,
@@ -67,12 +70,12 @@ describe('AndroidAdUnitTest', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
-            comScoreTrackingService: comScoreService,
             placement: TestFixtures.getPlacement(),
             campaign: TestFixtures.getCampaign(),
             configuration: configuration,
             request: request,
-            options: {}
+            options: {},
+            gdprManager: gdprManager
         };
     });
 
@@ -137,34 +140,89 @@ describe('AndroidAdUnitTest', () => {
         });
 
         it('with onResume', () => {
-            let onShowTriggered: boolean = false;
-            container.onShow.subscribe(() => { onShowTriggered = true; });
+            let onContainerForegroundTriggered: boolean = false;
+            const listener: IAdUnitContainerListener = {
+                onContainerShow: function() {
+                    // EMPTY
+                },
+                onContainerDestroy: function() {
+                    // EMPTY
+                },
+                onContainerBackground: function() {
+                    // EMPTY
+                },
+                onContainerForeground: function() {
+                    onContainerForegroundTriggered = true;
+                },
+                onContainerSystemMessage: function(message: AdUnitContainerSystemMessage) {
+                    // EMPTY
+                },
+            };
+
+            container.addEventHandler(listener);
 
             return container.open(testAdUnit, ['videoplayer', 'webview'], true, Orientation.LANDSCAPE, true, false, true, false, options).then(() => {
                 nativeBridge.AndroidAdUnit.onResume.trigger(1);
-                assert.isTrue(onShowTriggered, 'onShow was not triggered when invoking onResume');
+                assert.isTrue(onContainerForegroundTriggered, 'onContainerForeground was not triggered when invoking onResume');
                 return;
             });
         });
 
         it('with onPause', () => {
-            let onSystemKillTriggered: boolean = false;
-            container.onSystemKill.subscribe(() => { onSystemKillTriggered = true; });
+            let onContainerDestroyTriggered: boolean = false;
+            const listener: IAdUnitContainerListener = {
+                onContainerShow: function() {
+                    // EMPTY
+                },
+                onContainerDestroy: function() {
+                    onContainerDestroyTriggered = true;
+                },
+                onContainerBackground: function() {
+                    // EMPTY
+                },
+                onContainerForeground: function() {
+                    // EMPTY
+                },
+                onContainerSystemMessage: function(message: AdUnitContainerSystemMessage) {
+                    // EMPTY
+                },
+            };
+
+            container.addEventHandler(listener);
 
             return container.open(testAdUnit, ['videoplayer', 'webview'], true, Orientation.LANDSCAPE, true, false, true, false, options).then(() => {
                 nativeBridge.AndroidAdUnit.onPause.trigger(true, 1);
-                assert.isTrue(onSystemKillTriggered, 'onSystemKill was not triggered when invoking onPause with finishing true');
+                assert.isTrue(onContainerDestroyTriggered, 'onContainerDestroy was not triggered when invoking onPause with finishing true');
                 return;
             });
         });
 
         it('with onDestroy', () => {
-            let onSystemKillTriggered: boolean = false;
-            container.onSystemKill.subscribe(() => { onSystemKillTriggered = true; });
+            let onContainerDestroyTriggered: boolean = false;
+
+            const listener: IAdUnitContainerListener = {
+                onContainerShow: function() {
+                    // EMPTY
+                },
+                onContainerDestroy: function() {
+                    onContainerDestroyTriggered = true;
+                },
+                onContainerBackground: function() {
+                    // EMPTY
+                },
+                onContainerForeground: function() {
+                    // EMPTY
+                },
+                onContainerSystemMessage: function(message: AdUnitContainerSystemMessage) {
+                    // EMPTY
+                },
+            };
+
+            container.addEventHandler(listener);
 
             return container.open(testAdUnit, ['videoplayer', 'webview'], true, Orientation.LANDSCAPE, true, false, true, false, options).then(() => {
                 nativeBridge.AndroidAdUnit.onDestroy.trigger(true, 1);
-                assert.isTrue(onSystemKillTriggered, 'onSystemKill was not triggered when invoking onDestroy with finishing true');
+                assert.isTrue(onContainerDestroyTriggered, 'onContainerDestroy was not triggered when invoking onDestroy with finishing true');
                 return;
             });
         });

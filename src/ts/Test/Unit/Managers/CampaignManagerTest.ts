@@ -19,6 +19,7 @@ import { Platform } from 'Constants/Platform';
 import { AssetManager } from 'Managers/AssetManager';
 import { Cache } from 'Utilities/Cache';
 import { CacheMode, Configuration } from 'Models/Configuration';
+import { ConfigurationParser } from 'Parsers/ConfigurationParser';
 import { WebViewError } from 'Errors/WebViewError';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
@@ -66,7 +67,8 @@ import OnProgrammaticVastPlcCampaignTooMuchWrapping from 'json/OnProgrammaticVas
 import OnProgrammaticVastPlcCampaignMissingErrorUrls from 'json/OnProgrammaticVastPlcCampaignMissingErrorUrls.json';
 import OnProgrammaticVastPlcCampaignAdLevelErrorUrls from 'json/OnProgrammaticVastPlcCampaignAdLevelErrorUrls.json';
 import OnProgrammaticVastPlcCampaignCustomTracking from 'json/OnProgrammaticVastPlcCampaignCustomTracking.json';
-import OnStaticInterstitialDisplayCampaign from 'json/OnStaticInterstitialDisplayCampaign.json';
+import OnStaticInterstitialDisplayHtmlCampaign from 'json/OnStaticInterstitialDisplayCampaign.json';
+import OnStaticInterstitialDisplayJsCampaign from 'json/OnStaticInterstitialDisplayJsCampaign.json';
 import { JaegerManager } from 'Jaeger/JaegerManager';
 import { JaegerSpan } from 'Jaeger/JaegerSpan';
 import { AdMobOptionalSignal } from 'Models/AdMobOptionalSignal';
@@ -89,7 +91,7 @@ describe('CampaignManager', () => {
     let jaegerManager: JaegerManager;
 
     beforeEach(() => {
-        configuration = new Configuration(JSON.parse(ConfigurationAuctionPlc));
+        configuration = ConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
 
         clientInfo = TestFixtures.getClientInfo();
         vastParser = TestFixtures.getVastParser();
@@ -893,11 +895,11 @@ describe('CampaignManager', () => {
         });
     });
 
-    describe('static interstitial display', () => {
-        it('should process the programmatic/static-interstitial content-type', () => {
+    describe('static interstitial display html', () => {
+        it('should process the programmatic/static-interstitial-html', () => {
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve({
-                response: OnStaticInterstitialDisplayCampaign
+                response: OnStaticInterstitialDisplayHtmlCampaign
             }));
 
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
@@ -925,6 +927,38 @@ describe('CampaignManager', () => {
         });
     });
 
+    describe('static interstitial display js', () => {
+        it('should process the programmatic/static-interstitial-js', () => {
+            const mockRequest = sinon.mock(request);
+            mockRequest.expects('post').returns(Promise.resolve({
+                response: OnStaticInterstitialDisplayJsCampaign
+            }));
+
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+            const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
+            let triggeredCampaign: DisplayInterstitialCampaign;
+            let triggeredError: any;
+            campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
+                triggeredCampaign = <DisplayInterstitialCampaign>campaign;
+            });
+            campaignManager.onError.subscribe(error => {
+                triggeredError = error;
+            });
+
+            return campaignManager.request().then(() => {
+                if (triggeredError) {
+                    throw triggeredError;
+                }
+
+                mockRequest.verify();
+
+                assert.equal(triggeredCampaign.getAbGroup(), configuration.getAbGroup());
+                assert.equal(triggeredCampaign.getGamerId(), configuration.getGamerId());
+                assert.deepEqual(triggeredCampaign.getOptionalAssets(), []);
+            });
+        });
+    });
+
     describe('on PLC', () => {
         let assetManager;
         let campaignManager: any;
@@ -936,7 +970,7 @@ describe('CampaignManager', () => {
 
         beforeEach(() => {
             assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
-            campaignManager = new CampaignManager(nativeBridge, new Configuration(ConfigurationAuctionPlcJson), assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
+            campaignManager = new CampaignManager(nativeBridge, ConfigurationParser.parse(ConfigurationAuctionPlcJson), assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
 
             campaignManager.onCampaign.subscribe((placement: string, campaign: Campaign) => {
                 triggeredCampaign = campaign;
@@ -1102,7 +1136,7 @@ describe('CampaignManager', () => {
                 };
 
                 assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
-                campaignManager = new CampaignManager(nativeBridge, new Configuration(ConfigurationAuctionPlcJson), assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
+                campaignManager = new CampaignManager(nativeBridge, ConfigurationParser.parse(ConfigurationAuctionPlcJson), assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
 
                 campaignManager.onCampaign.subscribe((placement: string, campaign: Campaign) => {
                     triggeredCampaign = campaign;
@@ -1132,7 +1166,7 @@ describe('CampaignManager', () => {
                 };
 
                 assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
-                campaignManager = new CampaignManager(nativeBridge, new Configuration(ConfigurationAuctionPlcJson), assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
+                campaignManager = new CampaignManager(nativeBridge, ConfigurationParser.parse(ConfigurationAuctionPlcJson), assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
 
                 campaignManager.onCampaign.subscribe((placement: string, campaign: Campaign) => {
                     triggeredCampaign = campaign;
@@ -1228,7 +1262,54 @@ describe('CampaignManager', () => {
         });
 
         return campaignManager.requestFromCache({
-            response: OnProgrammaticMraidUrlPlcCampaignJson
+            response: OnProgrammaticMraidUrlPlcCampaignJson,
+            url: 'https://auction.unityads.unity3d.com/v4/games/12345/requests?&platform=android&sdkVersion=2000&stores=none&&screenWidth=800&screenHeight=1200&connectionType=wifi&networkType=0'
+        } as INativeResponse).then(() => {
+            assert.equal(triggeredCampaign.getAbGroup(), 99);
+            assert.isFalse(onAdPlanReceived, 'onAdPlanReceived was triggered');
+        });
+    });
+
+    it('should ignore cached response if game id mismatch', () => {
+        const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
+
+        let triggeredCampaign: MRAIDCampaign;
+        campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
+            triggeredCampaign = <MRAIDCampaign>campaign;
+        });
+
+        let onAdPlanReceived = false;
+        campaignManager.onAdPlanReceived.subscribe(() => {
+            onAdPlanReceived = true;
+        });
+
+        return campaignManager.requestFromCache({
+            response: OnProgrammaticMraidUrlPlcCampaignJson,
+            url: 'https://auction.unityads.unity3d.com/v4/games/500/requests?&platform=android&sdkVersion=2000&stores=none&&screenWidth=800&screenHeight=1200&connectionType=wifi&networkType=0'
+        } as INativeResponse).then(() => {
+            assert.isUndefined(triggeredCampaign);
+            assert.isFalse(onAdPlanReceived, 'onAdPlanReceived was triggered');
+        });
+    });
+
+    it('should request from cached response even with different connection type and network', () => {
+        const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+        const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
+
+        let triggeredCampaign: MRAIDCampaign;
+        campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
+            triggeredCampaign = <MRAIDCampaign>campaign;
+        });
+
+        let onAdPlanReceived = false;
+        campaignManager.onAdPlanReceived.subscribe(() => {
+            onAdPlanReceived = true;
+        });
+
+        return campaignManager.requestFromCache({
+            response: OnProgrammaticMraidUrlPlcCampaignJson,
+            url: 'https://auction.unityads.unity3d.com/v4/games/12345/requests?&platform=android&sdkVersion=2000&stores=none&&screenWidth=800&screenHeight=1200&connectionType=test&networkType=1'
         } as INativeResponse).then(() => {
             assert.equal(triggeredCampaign.getAbGroup(), 99);
             assert.isFalse(onAdPlanReceived, 'onAdPlanReceived was triggered');
@@ -1260,7 +1341,8 @@ describe('CampaignManager', () => {
         });
 
         return campaignManager.requestFromCache({
-            response: OnProgrammaticVastPlcCampaignNullData
+            response: OnProgrammaticVastPlcCampaignNullData,
+            url: 'https://auction.unityads.unity3d.com/v4/games/500/requests?&platform=android&sdkVersion=2000&stores=none&&screenWidth=800&screenHeight=1200&connectionType=wifi&networkType=0'
         } as INativeResponse).then(() => {
             assert.isUndefined(triggeredCampaign);
             assert.isFalse(noFill, 'onNoFill was triggered');
@@ -1294,12 +1376,42 @@ describe('CampaignManager', () => {
         });
 
         return campaignManager.requestFromCache({
-            response: OnProgrammaticVastPlcCampaignNullData
+            response: OnProgrammaticVastPlcCampaignNullData,
+            url: 'https://auction.unityads.unity3d.com/v4/games/500/requests?&platform=android&sdkVersion=2000&stores=none&&screenWidth=800&screenHeight=1200&connectionType=wifi&networkType=0'
         } as INativeResponse).then(() => {
             assert.isUndefined(triggeredCampaign);
             assert.isFalse(noFill, 'onNoFill was triggered');
             assert.isFalse(onError, 'onError was triggered');
             assert.isFalse(onAdPlanReceived, 'onAdPlanReceived was triggered');
+        });
+    });
+
+    describe('the organizationId-property', () => {
+        let requestData: string = '{}';
+        let assetManager: AssetManager;
+        let campaignManager: CampaignManager;
+
+        beforeEach( () => {
+            sinon.stub(request, 'post').callsFake((url: string, data: string = '', headers: Array<[string, string]> = [], options?: any) => {
+                requestData = data;
+                return Promise.resolve();
+            });
+            assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+            campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
+        });
+        it('should be in request body when defined in config response', () => {
+            return campaignManager.request().then(() => {
+                const requestBody = JSON.parse(requestData);
+                assert.equal(5552368, requestBody.organizationId, 'organizationId should be in ad request body when it was defined in the config response');
+            });
+        });
+
+        it('should not be in request body when not defined in config response', () => {
+            sinon.stub(configuration, 'getOrganizationId').returns(undefined);
+            return campaignManager.request().then(() => {
+                const requestBody = JSON.parse(requestData);
+                assert.isUndefined(requestBody.organizationId, 'organizationId should NOT be in ad request body when it was NOT defined in the config response');
+            });
         });
     });
 });

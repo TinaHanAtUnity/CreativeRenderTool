@@ -29,7 +29,7 @@ import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { Campaign } from 'Models/Campaign';
 
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
-import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
+import { ConfigurationParser } from 'Parsers/ConfigurationParser';
 import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 import { XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
@@ -37,6 +37,7 @@ import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
 import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
+import { GdprConsentManager } from 'Managers/GdprConsentManager';
 
 describe('AdUnitFactoryTest', () => {
 
@@ -53,7 +54,6 @@ describe('AdUnitFactoryTest', () => {
     let thirdPartyEventManager: ThirdPartyEventManager;
     let request: Request;
     let adUnitParameters: IAdUnitParameters<Campaign>;
-    let comScoreService: ComScoreTrackingService;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -69,11 +69,12 @@ describe('AdUnitFactoryTest', () => {
         sandbox.stub(container, 'close').returns(Promise.resolve());
         sandbox.stub(container, 'open').returns(Promise.resolve());
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
-        config = new Configuration(JSON.parse(ConfigurationJson));
-        deviceInfo = <DeviceInfo>{getLanguage: () => 'en', getAdvertisingIdentifier: () => '000', getLimitAdTracking: () => false};
+        config = ConfigurationParser.parse(JSON.parse(ConfigurationJson));
+        deviceInfo = <DeviceInfo>{getLanguage: () => 'en', getAdvertisingIdentifier: () => '000', getLimitAdTracking: () => false, getOsVersion: () => '8.0'};
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         sessionManager = new SessionManager(nativeBridge, request);
         const campaign = TestFixtures.getCampaign();
+        const gdprManager = sinon.createStubInstance(GdprConsentManager);
 
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             nativeBridge: nativeBridge,
@@ -86,7 +87,6 @@ describe('AdUnitFactoryTest', () => {
             campaign: campaign
         });
 
-        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
         sandbox.stub(MoatViewabilityService, 'initMoat');
 
         adUnitParameters = {
@@ -97,12 +97,12 @@ describe('AdUnitFactoryTest', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
-            comScoreTrackingService: comScoreService,
             placement: TestFixtures.getPlacement(),
             campaign: campaign,
             configuration: config,
             request: request,
-            options: {}
+            options: {},
+            gdprManager: gdprManager
         };
 
         sandbox.spy(thirdPartyEventManager, 'sendEvent');

@@ -41,7 +41,7 @@ export class AdMobSignalFactory {
 
         const promises = [];
         promises.push(this._deviceInfo.getBatteryLevel().then(batteryLevel => {
-            signal.setDeviceBatteryLevel(this.getBatteryLevel(batteryLevel));
+            signal.setDeviceBatteryLevel(batteryLevel);
         }).catch(() => {
             this.logFailure(this._nativeBridge, 'batteryLevel');
         }));
@@ -52,11 +52,15 @@ export class AdMobSignalFactory {
             this.logFailure(this._nativeBridge, 'batteryStatus');
         }));
 
-        promises.push(this._deviceInfo.getNetworkMetered().then(isNetworkMetered => {
-            signal.setIsNetworkMetered(isNetworkMetered);
-        }).catch(() => {
-            this.logFailure(this._nativeBridge, 'networkMetered');
-        }));
+        if(this._deviceInfo instanceof AndroidDeviceInfo) {
+            promises.push(this._deviceInfo.getNetworkMetered().then(isNetworkMetered => {
+                signal.setIsNetworkMetered(isNetworkMetered);
+            }).catch(() => {
+                this.logFailure(this._nativeBridge, 'networkMetered');
+            }));
+        } else {
+            signal.setIsNetworkMetered(false);
+        }
 
         promises.push(UserCountData.getRequestCount(this._nativeBridge).then(requestCount => {
             if (typeof requestCount === 'number') {
@@ -217,7 +221,7 @@ export class AdMobSignalFactory {
         const promises = [];
 
         promises.push(this._deviceInfo.getBatteryLevel().then(batteryLevel => {
-            signal.setBatteryLevel(this.getBatteryLevel(batteryLevel));
+            signal.setBatteryLevel(batteryLevel);
         }).catch(() => {
             this.logFailure(nativeBridge, 'batteryLevel');
         }));
@@ -338,14 +342,6 @@ export class AdMobSignalFactory {
             return 'unity-ios-v' + this._clientInfo.getSdkVersionName();
         } else {
             return 'unity-android-v' + this._clientInfo.getSdkVersionName();
-        }
-    }
-
-    private getBatteryLevel(level: number): number {
-        if(level === -1) {
-            return -1;
-        } else {
-            return Math.round(level * 100);
         }
     }
 

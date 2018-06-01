@@ -10,6 +10,7 @@ import { Platform } from 'Constants/Platform';
 import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Template } from 'Utilities/Template';
 import { SdkStats } from 'Utilities/SdkStats';
+import { AbstractPrivacy } from 'Views/AbstractPrivacy';
 
 export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -31,8 +32,8 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
     private _showTimestamp: number;
     private _updateInterval: any;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, coppaCompliant: boolean) {
-        super(nativeBridge, 'mraid', placement, campaign, coppaCompliant);
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy) {
+        super(nativeBridge, 'mraid', placement, campaign, privacy);
 
         this._placement = placement;
         this._campaign = campaign;
