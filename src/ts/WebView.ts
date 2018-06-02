@@ -209,8 +209,8 @@ export class WebView {
             HttpKafka.setConfiguration(this._configuration);
             this._jaegerManager.setJaegerTracingEnabled(this._configuration.isJaegerTracingEnabled());
 
-            PurchasingUtilities.initialize(this._clientInfo, this._configuration);
-            PurchasingUtilities.sendPurchaseInitializationEvent(this._nativeBridge);
+            PurchasingUtilities.initialize(this._clientInfo, this._configuration, this._nativeBridge);
+            PurchasingUtilities.sendPurchaseInitializationEvent();
 
             if (!this._configuration.isEnabled()) {
                 const error = new Error('Game with ID ' + this._clientInfo.getGameId() +  ' is not enabled');

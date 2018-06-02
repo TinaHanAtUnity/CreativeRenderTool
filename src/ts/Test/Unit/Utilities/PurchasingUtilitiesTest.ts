@@ -62,6 +62,8 @@ describe('PurchasingUtilitiesTest', () => {
         (<sinon.SinonStub>purchasing.initiatePurchasingCommand).returns(Promise.resolve());
         (<sinon.SinonStub>purchasing.initializePurchasing).returns(Promise.resolve());
         (<any>nativeBridge).Purchasing = purchasing;
+        const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
+        PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge);
     });
 
     afterEach(() => {
@@ -71,10 +73,10 @@ describe('PurchasingUtilitiesTest', () => {
     describe('sendPurchaseInitializationEvent', () => {
         beforeEach(() => {
             const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
-            PurchasingUtilities.initialize(clientInfo, configuration);
+            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge);
         });
         it('should resolve without calling sendPurchasingCommand if configuration does not include promo', () => {
-            return PurchasingUtilities.sendPurchaseInitializationEvent(nativeBridge).then(() => {
+            return PurchasingUtilities.sendPurchaseInitializationEvent().then(() => {
                 sinon.assert.notCalled(<sinon.SinonSpy>purchasing.initializePurchasing);
                 sinon.assert.notCalled(<sinon.SinonSpy>purchasing.getPromoVersion);
                 sinon.assert.notCalled(<sinon.SinonSpy>purchasing.initiatePurchasingCommand);
@@ -84,11 +86,11 @@ describe('PurchasingUtilitiesTest', () => {
         describe('on successful trigger of all underlying promises', () => {
             beforeEach(() => {
                 const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-                PurchasingUtilities.initialize(clientInfo, configuration);
+                PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge);
                 sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('True'));
                 sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.17'));
                 sandbox.stub(purchasing.onCommandResult, 'subscribe').callsFake((resolve) => resolve('True'));
-                return PurchasingUtilities.sendPurchaseInitializationEvent(nativeBridge);
+                return PurchasingUtilities.sendPurchaseInitializationEvent();
             });
 
             it('should call SendPurchasingCommand', () => {
@@ -99,14 +101,14 @@ describe('PurchasingUtilitiesTest', () => {
         describe('If promo is not ready', () => {
             beforeEach(() => {
                 const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-                PurchasingUtilities.initialize(clientInfo, configuration);
+                PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge);
                 sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('False'));
                 sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.17'));
                 sandbox.stub(purchasing.onCommandResult, 'subscribe').callsFake((resolve) => resolve('True'));
             });
 
             it('should fail with Promo was not ready', () => {
-                PurchasingUtilities.sendPurchaseInitializationEvent(nativeBridge).then(() => {
+                PurchasingUtilities.sendPurchaseInitializationEvent().then(() => {
                     assert.fail('should not resolve');
                 })
                 .catch((e) => {
@@ -119,14 +121,14 @@ describe('PurchasingUtilitiesTest', () => {
         describe('If promo version is not 1.16 or above', () => {
             beforeEach(() => {
                 const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-                PurchasingUtilities.initialize(clientInfo, configuration);
+                PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge);
                 sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('True'));
                 sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.14'));
                 sandbox.stub(purchasing.onCommandResult, 'subscribe').callsFake((resolve) => resolve('True'));
             });
 
             it('should fail with Promo version not supported', () => {
-                PurchasingUtilities.sendPurchaseInitializationEvent(nativeBridge).then(() => {
+                PurchasingUtilities.sendPurchaseInitializationEvent().then(() => {
                     assert.fail('should not resolve');
                 })
                 .catch((e) => {
@@ -145,7 +147,7 @@ describe('PurchasingUtilitiesTest', () => {
                     sinon.stub(purchasing.onCommandResult, 'subscribe').callsFake((resolve) => resolve('True'));
                     sendPurchaseInitializationEventStub = sandbox.stub(PurchasingUtilities, 'sendPurchaseInitializationEvent').resolves();
 
-                    return PurchasingUtilities.sendPromoPayload(nativeBridge, JSON.stringify(iapPayloadPurchase));
+                    return PurchasingUtilities.sendPromoPayload(JSON.stringify(iapPayloadPurchase));
                 });
                 it('should call initialization event and call send purchasing command', function(this: Mocha.ITestCallbackContext) {
                     sinon.assert.called(sendPurchaseInitializationEventStub);
@@ -156,7 +158,7 @@ describe('PurchasingUtilitiesTest', () => {
             describe('when initialization Payloads are set', () => {
                 beforeEach(() => {
                     PurchasingUtilities.setInitializationPayloadSentValue(true);
-                    const promise = PurchasingUtilities.sendPromoPayload(nativeBridge, JSON.stringify(iapPayloadPurchase));
+                    const promise = PurchasingUtilities.sendPromoPayload(JSON.stringify(iapPayloadPurchase));
                     purchasing.onCommandResult.trigger('True');
                     return promise;
                 });
@@ -171,7 +173,7 @@ describe('PurchasingUtilitiesTest', () => {
                 PurchasingUtilities.setInitializationPayloadSentValue(false);
             });
             it('should fail when onCommandResult triggered with false', () => {
-                PurchasingUtilities.sendPromoPayload(nativeBridge, JSON.stringify(iapPayloadPurchase)).then(() => {
+                PurchasingUtilities.sendPromoPayload(JSON.stringify(iapPayloadPurchase)).then(() => {
                     assert.fail('should not resolve');
                 }).catch((e) => {
                     assert.equal(e.message, 'Purchase command attempt failed');
@@ -184,7 +186,7 @@ describe('PurchasingUtilitiesTest', () => {
     describe('refreshCatalog', () => {
         describe('onSuccess', () => {
             beforeEach(() => {
-                const promise = PurchasingUtilities.refreshCatalog(nativeBridge);
+                const promise = PurchasingUtilities.refreshCatalog();
                 purchasing.onGetPromoCatalog.trigger(promoCatalog);
                 return promise;
             });
@@ -202,7 +204,7 @@ describe('PurchasingUtilitiesTest', () => {
 
         describe('onFail', () => {
             it('should fail when json is bad', () => {
-                PurchasingUtilities.refreshCatalog(nativeBridge).then(() => {
+                PurchasingUtilities.refreshCatalog().then(() => {
                     assert.fail('should not resolve');
                 }).catch((e) => {
                     assert.equal(e.message, 'Promo catalog JSON failed to parse');
@@ -211,7 +213,7 @@ describe('PurchasingUtilitiesTest', () => {
             });
 
             it('should fail when blank string catalog is returned from promo', () => {
-                PurchasingUtilities.refreshCatalog(nativeBridge).then(() => {
+                PurchasingUtilities.refreshCatalog().then(() => {
                     assert.fail('should not resolve');
                 }).catch((e) => {
                     assert.equal(e.message, 'Promo catalog JSON failed to parse');
@@ -221,7 +223,7 @@ describe('PurchasingUtilitiesTest', () => {
 
             it('should fail when get promo catalog fetch over api fails', () => {
                 (<sinon.SinonStub>purchasing.getPromoCatalog).returns(Promise.reject('fail'));
-                PurchasingUtilities.refreshCatalog(nativeBridge).then(() => {
+                PurchasingUtilities.refreshCatalog().then(() => {
                     assert.fail('should not resolve');
                 }).catch((e) => {
                     assert.equal(e.message, 'Purchasing Catalog failed to refresh');
@@ -232,7 +234,7 @@ describe('PurchasingUtilitiesTest', () => {
 
     describe('getProductPrice', () => {
         beforeEach(() => {
-            const promise = PurchasingUtilities.refreshCatalog(nativeBridge);
+            const promise = PurchasingUtilities.refreshCatalog();
             purchasing.onGetPromoCatalog.trigger(promoCatalog);
             return promise;
         });
@@ -259,7 +261,7 @@ describe('PurchasingUtilitiesTest', () => {
 
     describe('isProductAvailable', () => {
         beforeEach(() => {
-            const promise = PurchasingUtilities.refreshCatalog(nativeBridge);
+            const promise = PurchasingUtilities.refreshCatalog();
             purchasing.onGetPromoCatalog.trigger(promoCatalog);
             return promise;
         });
@@ -274,7 +276,7 @@ describe('PurchasingUtilitiesTest', () => {
 
         describe('If promo catalog is invalid', () => {
             beforeEach(() => {
-                const promise = PurchasingUtilities.refreshCatalog(nativeBridge);
+                const promise = PurchasingUtilities.refreshCatalog();
                 purchasing.onGetPromoCatalog.trigger(promoCatalogEmpty);
                 return promise;
             });
