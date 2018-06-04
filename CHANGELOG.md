@@ -1,3 +1,10 @@
+# Pending
+
+* Include event source in GDPR optout events
+* Refactor GdprConsentManager to GdprManager
+* IAP promo Android loading optimization
+* Add stored_gamer_id diagnostic event to track stored gamer IDs in config request
+
 # Mon Jun  4 16:02:48 UTC 2018
 
 * Switch GDPR image to a font icon
