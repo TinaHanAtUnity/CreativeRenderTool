@@ -23,7 +23,7 @@ import { UrlSchemeApi } from 'Native/Api/UrlScheme';
 import { IntentApi } from 'Native/Api/Intent';
 import { GDPRPrivacy } from 'Views/GDPRPrivacy';
 import { Placement } from 'Models/Placement';
-import { GdprConsentManager } from 'Managers/GdprConsentManager';
+import { GdprManager } from 'Managers/GdprManager';
 
 describe('PrivacyEventHandlerTest', () => {
 
@@ -51,7 +51,7 @@ describe('PrivacyEventHandlerTest', () => {
             overlay: sinon.createStubInstance(Overlay),
             video: sinon.createStubInstance(Video),
             privacy: sinon.createStubInstance(GDPRPrivacy),
-            gdprManager: sinon.createStubInstance(GdprConsentManager)
+            gdprManager: sinon.createStubInstance(GdprManager)
         };
 
         adUnit = sinon.createStubInstance(PerformanceAdUnit);

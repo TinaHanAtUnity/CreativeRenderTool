@@ -43,7 +43,7 @@ import { OldCampaignRefreshManager } from 'Managers/OldCampaignRefreshManager';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { JaegerManager } from 'Jaeger/JaegerManager';
 import { JaegerSpan } from 'Jaeger/JaegerSpan';
-import { GdprConsentManager } from 'Managers/GdprConsentManager';
+import { GdprManager } from 'Managers/GdprManager';
 
 describe('CampaignRefreshManager', () => {
     let deviceInfo: DeviceInfo;
@@ -67,7 +67,7 @@ describe('CampaignRefreshManager', () => {
     let cacheBookkeeping: CacheBookkeeping;
     let cache: Cache;
     let jaegerManager: JaegerManager;
-    let gdprManager: GdprConsentManager;
+    let gdprManager: GdprManager;
 
     beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo();
@@ -165,7 +165,7 @@ describe('CampaignRefreshManager', () => {
         (<sinon.SinonStub>adMobSignalFactory.getAdRequestSignal).returns(Promise.resolve(new AdMobSignal()));
         (<sinon.SinonStub>adMobSignalFactory.getOptionalSignal).returns(Promise.resolve(new AdMobOptionalSignal()));
 
-        gdprManager = sinon.createStubInstance(GdprConsentManager);
+        gdprManager = sinon.createStubInstance(GdprManager);
 
         adUnitParams = {
             forceOrientation: Orientation.NONE,

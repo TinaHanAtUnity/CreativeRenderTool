@@ -24,7 +24,7 @@ import { Request } from 'Utilities/Request';
 import { MOAT } from 'Views/MOAT';
 import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
-import { GdprConsentManager } from 'Managers/GdprConsentManager';
+import { GdprManager } from 'Managers/GdprManager';
 
 describe('VastOverlayEventHandlersTest', () => {
     let campaign: VastCampaign;
@@ -99,7 +99,7 @@ describe('VastOverlayEventHandlersTest', () => {
             campaign: campaign
         });
 
-        const gdprManager = sinon.createStubInstance(GdprConsentManager);
+        const gdprManager = sinon.createStubInstance(GdprManager);
 
         vastAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,

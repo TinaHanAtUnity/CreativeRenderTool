@@ -24,7 +24,7 @@ import { FinishState } from 'Constants/FinishState';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 import { Closer } from 'Views/Closer';
 import { Platform } from 'Constants/Platform';
-import { GdprConsentManager } from 'Managers/GdprConsentManager';
+import { GdprManager } from 'Managers/GdprManager';
 
 describe('VPAIDAdUnit', () => {
     let nativeBridge: NativeBridge;
@@ -50,7 +50,7 @@ describe('VPAIDAdUnit', () => {
             request: sinon.createStubInstance(Request),
             forceOrientation: Orientation.NONE,
             options: {},
-            gdprManager: sinon.createStubInstance(GdprConsentManager)
+            gdprManager: sinon.createStubInstance(GdprManager)
         };
 
         const webPlayer = sinon.createStubInstance(WebPlayerApi);
