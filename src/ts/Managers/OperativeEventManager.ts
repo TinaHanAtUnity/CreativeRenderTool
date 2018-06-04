@@ -19,7 +19,6 @@ import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { CampaignAssetInfo } from 'Utilities/CampaignAssetInfo';
 import { Configuration } from 'Models/Configuration';
 import { GameSessionCounters } from 'Utilities/GameSessionCounters';
-import { Enum } from 'protobufjs';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {
     nativeBridge: NativeBridge;
