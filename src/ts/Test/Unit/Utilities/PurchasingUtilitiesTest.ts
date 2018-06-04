@@ -108,10 +108,7 @@ describe('PurchasingUtilitiesTest', () => {
             });
 
             it('should fail with Promo was not ready', () => {
-                PurchasingUtilities.sendPurchaseInitializationEvent().then(() => {
-                    assert.fail('should not resolve');
-                })
-                .catch((e) => {
+                PurchasingUtilities.sendPurchaseInitializationEvent().catch((e) => {
                     assert.equal(e.message, 'Promo was not ready');
                 });
                 sinon.assert.notCalled(<sinon.SinonSpy>purchasing.initiatePurchasingCommand);
@@ -128,10 +125,7 @@ describe('PurchasingUtilitiesTest', () => {
             });
 
             it('should fail with Promo version not supported', () => {
-                PurchasingUtilities.sendPurchaseInitializationEvent().then(() => {
-                    assert.fail('should not resolve');
-                })
-                .catch((e) => {
+                PurchasingUtilities.sendPurchaseInitializationEvent().catch((e) => {
                     assert.equal(e.message, 'Promo version not supported');
                 });
                 sinon.assert.notCalled(<sinon.SinonSpy>purchasing.initiatePurchasingCommand);
@@ -173,9 +167,7 @@ describe('PurchasingUtilitiesTest', () => {
                 PurchasingUtilities.setInitializationPayloadSentValue(false);
             });
             it('should fail when onCommandResult triggered with false', () => {
-                PurchasingUtilities.sendPromoPayload(JSON.stringify(iapPayloadPurchase)).then(() => {
-                    assert.fail('should not resolve');
-                }).catch((e) => {
+                PurchasingUtilities.sendPromoPayload(JSON.stringify(iapPayloadPurchase)).catch((e) => {
                     assert.equal(e.message, 'Purchase command attempt failed');
                 });
                 purchasing.onCommandResult.trigger('False');
@@ -204,18 +196,14 @@ describe('PurchasingUtilitiesTest', () => {
 
         describe('onFail', () => {
             it('should fail when json is bad', () => {
-                PurchasingUtilities.refreshCatalog().then(() => {
-                    assert.fail('should not resolve');
-                }).catch((e) => {
+                PurchasingUtilities.refreshCatalog().catch((e) => {
                     assert.equal(e.message, 'Promo catalog JSON failed to parse');
                 });
                 purchasing.onGetPromoCatalog.trigger(promoCatalogBad);
             });
 
             it('should fail when blank string catalog is returned from promo', () => {
-                PurchasingUtilities.refreshCatalog().then(() => {
-                    assert.fail('should not resolve');
-                }).catch((e) => {
+                PurchasingUtilities.refreshCatalog().catch((e) => {
                     assert.equal(e.message, 'Promo catalog JSON failed to parse');
                 });
                 purchasing.onGetPromoCatalog.trigger('');
@@ -223,9 +211,7 @@ describe('PurchasingUtilitiesTest', () => {
 
             it('should fail when get promo catalog fetch over api fails', () => {
                 (<sinon.SinonStub>purchasing.getPromoCatalog).returns(Promise.reject('fail'));
-                PurchasingUtilities.refreshCatalog().then(() => {
-                    assert.fail('should not resolve');
-                }).catch((e) => {
+                PurchasingUtilities.refreshCatalog().catch((e) => {
                     assert.equal(e.message, 'Purchasing Catalog failed to refresh');
                 });
             });
