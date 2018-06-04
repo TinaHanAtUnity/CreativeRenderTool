@@ -107,9 +107,9 @@ describe('PurchasingUtilitiesTest', () => {
                 sandbox.stub(purchasing.onCommandResult, 'subscribe').callsFake((resolve) => resolve('True'));
             });
 
-            it('should fail with Promo was not ready', () => {
+            it('should fail with IAP Promo was not ready', () => {
                 PurchasingUtilities.sendPurchaseInitializationEvent().catch((e) => {
-                    assert.equal(e.message, 'Promo was not ready');
+                    assert.equal(e.message, 'IAP Promo was not ready');
                 });
                 sinon.assert.notCalled(<sinon.SinonSpy>purchasing.initiatePurchasingCommand);
             });

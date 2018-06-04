@@ -35,9 +35,11 @@ export class PurchasingUtilities {
 
     public static sendPurchaseInitializationEvent(): Promise<void> {
         if (this.configurationIncludesPromoPlacement()) {
-            return this.isPromoReady()
+            return this.initializeIAPPromo()
             .then(() => this.checkPromoVersion())
-            .then(() => this.sendPurchasingCommand(JSON.stringify(this.loadInitializationPayloads())));
+            .then(() => {
+                return this.sendPurchasingCommand(JSON.stringify(this.loadInitializationPayloads()));
+            });
         }
         return Promise.resolve();
     }
@@ -112,12 +114,12 @@ export class PurchasingUtilities {
         return false;
     }
 
-    private static isPromoReady(): Promise<void> {
+    private static initializeIAPPromo(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             const observer = this._nativeBridge.Purchasing.onInitialize.subscribe((isReady) => {
                 this._nativeBridge.Purchasing.onInitialize.unsubscribe(observer);
                 if (isReady !== 'True') {
-                    reject(this.logIssue('promo_not_ready', 'Promo was not ready'));
+                    reject(this.logIssue('promo_not_ready', 'IAP Promo was not ready'));
                 }
                 resolve();
             });
