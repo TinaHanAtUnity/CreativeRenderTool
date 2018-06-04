@@ -1,7 +1,7 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { IPrivacyHandler } from 'Views/AbstractPrivacy';
 import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { OperativeEventManager, GDPREventSource } from 'Managers/OperativeEventManager';
 import { Configuration } from 'Models/Configuration';
 import { Campaign } from 'Models/Campaign';
 import { Platform } from 'Constants/Platform';
@@ -50,9 +50,12 @@ export class PrivacyEventHandler implements IPrivacyHandler {
 
             // if default choice was not changed and no previous answer has been recorded, we must treat this event
             // as skip because user has not pressed any button and opening the privacy dialog might have been just a misclick
-            const action: string = optOutEnabled ? 'optout' : 'skip';
-
-            this._operativeEventManager.sendGDPREvent(action);
+            if (optOutEnabled) {
+                // optout needs to send the source because we need to tell if it came from consent metadata or gdpr banner
+                this._operativeEventManager.sendGDPREvent('optout', GDPREventSource.USER);
+            } else {
+                this._operativeEventManager.sendGDPREvent('skip');
+            }
         }
     }
 }

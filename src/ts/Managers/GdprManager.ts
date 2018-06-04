@@ -1,4 +1,4 @@
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { OperativeEventManager, GDPREventSource } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Configuration } from 'Models/Configuration';
 import { DeviceInfo } from 'Models/DeviceInfo';
@@ -129,8 +129,14 @@ export class GdprManager {
     }
 
     private sendGdprEvent(consent: boolean): Promise<void> {
-        const action: string = consent ? 'consent' : 'optout';
-        return OperativeEventManager.sendGDPREvent(action, this._deviceInfo, this._clientInfo, this._configuration).then(() => {
+        let sendEvent;
+        if (consent) {
+            sendEvent = OperativeEventManager.sendGDPREvent('consent', this._deviceInfo, this._clientInfo, this._configuration);
+        } else {
+            // optout needs to send the source because we need to tell if it came from consent metadata or gdpr  banner
+            sendEvent = OperativeEventManager.sendGDPREvent('optout', this._deviceInfo, this._clientInfo, this._configuration, GDPREventSource.METADATA);
+        }
+        return sendEvent.then(() => {
             return this._nativeBridge.Storage.set(StorageType.PRIVATE, GdprManager.GdprLastConsentValueStorageKey, consent).then(() => {
                 return this._nativeBridge.Storage.write(StorageType.PRIVATE);
             });
