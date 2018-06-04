@@ -9,7 +9,7 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
 import { GdprManager } from 'Managers/GdprManager';
 import { StorageType, StorageApi } from 'Native/Api/Storage';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { OperativeEventManager, GDPREventSource } from 'Managers/OperativeEventManager';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Request } from 'Utilities/Request';
 import { Diagnostics } from 'Utilities/Diagnostics';
@@ -114,7 +114,11 @@ describe('GdprManagerTest', () => {
                     return writePromise.then(() => {
                         sinon.assert.calledOnce(onSetStub);
                         sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
-                        sinon.assert.calledWith(sendGDPREventStub, t.event);
+                        if (t.event === 'optout') {
+                            sinon.assert.calledWith(sendGDPREventStub, t.event, sinon.match.any, sinon.match.any, sinon.match.any, GDPREventSource.METADATA);
+                        } else {
+                            sinon.assert.calledWith(sendGDPREventStub, t.event);
+                        }
                         sinon.assert.calledWith(setStub, StorageType.PRIVATE, 'gdpr.consentlastsent', t.storedConsent);
                         sinon.assert.calledWith(writeStub, StorageType.PRIVATE);
                         sinon.assert.calledWith(<sinon.SinonStub>configuration.setGDPREnabled, t.gdprEnabled);
@@ -224,7 +228,11 @@ describe('GdprManagerTest', () => {
                         return writePromise.then(() => {
                             sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'gdpr.consent.value');
                             sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
-                            sinon.assert.calledWith(sendGDPREventStub, t.event);
+                            if (t.event === 'optout') {
+                                sinon.assert.calledWith(sendGDPREventStub, t.event, sinon.match.any, sinon.match.any, sinon.match.any, GDPREventSource.METADATA);
+                            } else {
+                                sinon.assert.calledWith(sendGDPREventStub, t.event);
+                            }
                             sinon.assert.calledWith(setStub, StorageType.PRIVATE, 'gdpr.consentlastsent', t.storedConsent);
                             sinon.assert.calledWith(writeStub, StorageType.PRIVATE);
                             sinon.assert.calledWith(<sinon.SinonStub>configuration.setGDPREnabled, t.gdprEnabled);
@@ -251,7 +259,11 @@ describe('GdprManagerTest', () => {
                         return gdprManager.getConsentAndUpdateConfiguration().then(() => {
                             return writePromise.then(() => {
                                 sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
-                                sinon.assert.calledWith(sendGDPREventStub, event);
+                                if (event === 'optout') {
+                                    sinon.assert.calledWith(sendGDPREventStub, event, sinon.match.any, sinon.match.any, sinon.match.any, GDPREventSource.METADATA);
+                                } else {
+                                    sinon.assert.calledWith(sendGDPREventStub, event);
+                                }
                                 sinon.assert.calledWith(setStub, StorageType.PRIVATE, 'gdpr.consentlastsent', userConsents);
                                 sinon.assert.calledWith(writeStub, StorageType.PRIVATE);
                             });

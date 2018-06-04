@@ -12,7 +12,7 @@ import { ViewController } from 'AdUnits/Containers/ViewController';
 import { Video } from 'Models/Assets/Video';
 import { FocusManager } from 'Managers/FocusManager';
 import { ClientInfo } from 'Models/ClientInfo';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { OperativeEventManager, GDPREventSource } from 'Managers/OperativeEventManager';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
@@ -94,7 +94,7 @@ describe('PrivacyEventHandlerTest', () => {
 
             privacyEventHandler.onGDPROptOut(true);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.operativeEventManager.sendGDPREvent, 'optout');
+            sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.operativeEventManager.sendGDPREvent, 'optout', GDPREventSource.USER);
         });
 
         it('should send operative event with action `optin`', () => {
