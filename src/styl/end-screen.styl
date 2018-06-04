@@ -52,6 +52,16 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       }
     }
 
+    .game-background-container {
+      position: relative;
+      width: 100%;
+      height: 50%;
+    }
+
+    .game-background {
+      width: 100%;
+      height: 100%;
+    }
   }
 
   body {
@@ -62,36 +72,6 @@ $end-screen-mixin($scale-size = $default-scale-size) {
 
       .download-container {
         margin: $default-size * $scale-size * .75 auto;
-      }
-
-      &.gdpr-pop-up-base,
-      &.gdpr-pop-up-icon {
-
-        $gdpr-scale-size = $scale-size * .9;
-
-        .name-container {
-          $name-container-default($gdpr-scale-size);
-        }
-
-        .download-container {
-          $download-container-default($gdpr-scale-size);
-        }
-
-        .game-rating {
-          $game-rating-default($gdpr-scale-size);
-        }
-
-        .game-rating-mask {
-          $game-rating-mask-default($gdpr-scale-size);
-        }
-
-        .game-rating-count {
-          $game-rating-count-default($gdpr-scale-size);
-        }
-
-        .game-icon {
-          $game-icon-default($gdpr-scale-size);
-        }
       }
     }
 
@@ -120,8 +100,10 @@ $end-screen-mixin($scale-size = $default-scale-size) {
             width: 80%;
           }
 
-          .gdpr-icon {
-            $set-image(10%, $scale-size * $default-size, 0, "../img/gdpr-icon.png", contain);
+          .icon-gdpr {
+            margin: 0 .5rem;
+            color: $black;
+            opacity: .25;
           }
         }
       }
@@ -137,12 +119,12 @@ $end-screen-mixin($scale-size = $default-scale-size) {
           padding: $scale-size * $default-size * .35 $scale-size * $default-size * .5;
 
           .icon-info {
-            $icon-size = $scale-size * $default-size;
-            $set-image($icon-size, $icon-size * 1.2, 0, "../img/gdpr-icon.png", contain);
-            display: block;
+            color: $black;
+            opacity: .25;
 
+            /* overriding content with the icon-gdpr. */
             &:before {
-              content: "";
+              content: "\e010";
             }
           }
         }
@@ -175,11 +157,6 @@ body {
       align-items: flex-start;
     }
 
-    .game-background {
-      width: 100%;
-      height: 50%;
-    }
-
     .end-screen-info-background {
       width: 100%;
       height: 50%;
@@ -192,14 +169,14 @@ body {
     .game-icon {
       align-self: center;
     }
-
-    .gdpr-pop-up {
-      top: 50%;
-      transform: translateY(-50%);
-    }
   }
 
   &.landscape #end-screen {
+    .game-background-container {
+      width: 50%;
+      height: 100%;
+    }
+
     .game-background-portrait {
       display: none;
     }
@@ -217,11 +194,6 @@ body {
         margin: 0 auto;
       }
 
-    }
-
-    .game-background {
-      width: 50%;
-      height: 100%;
     }
 
     .campaign-container {
@@ -243,9 +215,7 @@ body {
     }
 
     .gdpr-pop-up {
-      bottom: 0;
       left: 0;
-      width: 50%;
     }
   }
 

@@ -1,3 +1,14 @@
+# Mon Jun  4 16:02:48 UTC 2018
+
+* Switch GDPR image to a font icon
+* Fix videoplayer regressions
+* Remove gamer ID from analytics core stats events
+
+# Mon Jun  4 11:15:18 UTC 2018
+
+* Moved GDPR banner on top of the game background image in portrait mode
+* Added support for adUnitStyle and ctaButtonColour
+
 # Wed May 30 21:00:10 UTC 2018
 
 * Reuse previous auctionId for no fill retries
