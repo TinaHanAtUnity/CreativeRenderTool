@@ -1,4 +1,4 @@
-# Staged
+# Mon Jun  4 11:15:18 UTC 2018
 
 * Moved GDPR banner on top of the game background image in portrait mode
 * Added support for adUnitStyle and ctaButtonColour
