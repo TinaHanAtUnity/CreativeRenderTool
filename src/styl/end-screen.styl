@@ -100,8 +100,10 @@ $end-screen-mixin($scale-size = $default-scale-size) {
             width: 80%;
           }
 
-          .gdpr-icon {
-            $set-image(10%, $scale-size * $default-size, 0, "../img/gdpr-icon.png", contain);
+          .icon-gdpr {
+            margin: 0 .5rem;
+            color: $black;
+            opacity: .25;
           }
         }
       }
@@ -117,12 +119,12 @@ $end-screen-mixin($scale-size = $default-scale-size) {
           padding: $scale-size * $default-size * .35 $scale-size * $default-size * .5;
 
           .icon-info {
-            $icon-size = $scale-size * $default-size;
-            $set-image($icon-size, $icon-size * 1.2, 0, "../img/gdpr-icon.png", contain);
-            display: block;
+            color: $black;
+            opacity: .25;
 
+            /* overriding content with the icon-gdpr. */
             &:before {
-              content: "";
+              content: "\e010";
             }
           }
         }
