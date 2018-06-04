@@ -590,7 +590,7 @@ describe('CampaignRefreshManager', () => {
 
     describe('With mixed placement campaigns', () => {
         beforeEach(() => {
-            configuration = new Configuration(JSON.parse(ConfigurationMixedPlacements));
+            configuration = ConfigurationParser.parse(JSON.parse(ConfigurationMixedPlacements));
             campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
             campaignRefreshManager = new OldCampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration, focusManager, sessionManager, clientInfo, request, cache);
         });
