@@ -149,7 +149,7 @@ describe('PurchasingUtilitiesTest', () => {
 
                     return PurchasingUtilities.sendPromoPayload(JSON.stringify(iapPayloadPurchase));
                 });
-                it('should call initialization event and call send purchasing command', function(this: Mocha.ITestCallbackContext) {
+                it('should call initialization event and initiate purchasing command', function(this: Mocha.ITestCallbackContext) {
                     sinon.assert.called(sendPurchaseInitializationEventStub);
                     sinon.assert.calledWith(<sinon.SinonStub>purchasing.initiatePurchasingCommand, JSON.stringify(iapPayloadPurchase));
                 });
@@ -162,7 +162,7 @@ describe('PurchasingUtilitiesTest', () => {
                     purchasing.onCommandResult.trigger('True');
                     return promise;
                 });
-                it ('should call send purchasing command', () => {
+                it ('should call initiate purchasing command', () => {
                     sinon.assert.calledWith(<sinon.SinonStub>purchasing.initiatePurchasingCommand, JSON.stringify(iapPayloadPurchase));
                 });
             });
