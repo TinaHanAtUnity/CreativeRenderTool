@@ -58,22 +58,31 @@ describe('PromoEventHandlersTest', () => {
             PromoEventHandler.onClose(promoAdUnit, '111', '111', 1, [purchaseTrackingUrls], false);
             sinon.assert.called(<sinon.SinonSpy>promoAdUnit.hide);
         });
+
+        it('should call sendPromoPayload', () => {
+            const promoView = <Promo><any> {
+                hide: sinon.spy()
+            };
+            promoAdUnit = sinon.createStubInstance(PromoAdUnit);
+
+            PromoEventHandler.onClose(promoAdUnit, '111', '111', 1, [purchaseTrackingUrls], false);
+            sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPromoPayload);
+        });
     });
 
     describe('when calling onPromo', () => {
         it('should hide adunit', () => {
             promoAdUnit = sinon.createStubInstance(PromoAdUnit);
 
-            PromoEventHandler.onClose(promoAdUnit, '111', '111', 1, [purchaseTrackingUrls], false);
+            PromoEventHandler.onPromo(promoAdUnit, 'com.unit.test.iapproductid', [purchaseTrackingUrls]);
             sinon.assert.called(<sinon.SinonSpy>promoAdUnit.hide);
         });
 
-        it('should call startPurchaseEvent', () => {
+        it('should call sendPromoPayload', () => {
             const promoView = <Promo><any> {
                 hide: sinon.spy()
             };
             promoAdUnit = sinon.createStubInstance(PromoAdUnit);
-            // sandbox.stub(PurchasingUtilities, 'sendPromoPayload');
 
             PromoEventHandler.onPromo(promoAdUnit, 'com.unit.test.iapproductid', [purchaseTrackingUrls]);
             sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPromoPayload);
