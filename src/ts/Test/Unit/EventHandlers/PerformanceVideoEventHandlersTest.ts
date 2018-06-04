@@ -20,7 +20,9 @@ import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { IVideoEventHandlerParams } from 'EventHandlers/BaseVideoEventHandler';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
+import { VideoState } from 'AdUnits/VideoAdUnit';
 import { Privacy } from 'Views/Privacy';
+import { GdprManager } from 'Managers/GdprManager';
 
 describe('PerformanceVideoEventHandlersTest', () => {
 
@@ -66,6 +68,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
         const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
         endScreen = new PerformanceEndScreen(nativeBridge, campaign, deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, false);
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
+        const gdprManager = sinon.createStubInstance(GdprManager);
 
         performanceAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,
@@ -83,7 +86,8 @@ describe('PerformanceVideoEventHandlersTest', () => {
             endScreen: endScreen,
             overlay: overlay,
             video: video,
-            privacy: privacy
+            privacy: privacy,
+            gdprManager: gdprManager
         };
 
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
@@ -116,7 +120,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
         it('should show end screen', () => {
             sinon.spy(endScreen, 'show');
             // Set prepare called so that error will trigger
-            performanceAdUnit.setPrepareCalled(true);
+            performanceAdUnit.setVideoState(VideoState.PREPARING);
             // Cause an error by giving too large duration
             performanceVideoEventHandler.onPrepared(video.getUrl(), 50000, 1024, 768);
             sinon.assert.called(<sinon.SinonSpy>endScreen.show);

@@ -2,6 +2,7 @@ import { NativeBridge, INativeCallback, CallbackStatus } from 'Native/NativeBrid
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ConfigManager } from 'Managers/ConfigManager';
 import { Configuration, CacheMode } from 'Models/Configuration';
+import { ConfigurationParser } from 'Parsers/ConfigurationParser';
 import { CampaignManager } from 'Managers/CampaignManager';
 import { Cache } from 'Utilities/Cache';
 import { Placement } from 'Models/Placement';
@@ -56,6 +57,7 @@ import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
 import { TimeoutError, Promises } from 'Utilities/Promises';
 import { JaegerSpan, JaegerTags } from 'Jaeger/JaegerSpan';
 import { JaegerManager } from 'Jaeger/JaegerManager';
+import { GdprManager } from 'Managers/GdprManager';
 
 export class WebView {
 
@@ -84,6 +86,7 @@ export class WebView {
     private _analyticsManager: AnalyticsManager;
     private _adMobSignalFactory: AdMobSignalFactory;
     private _missedImpressionManager: MissedImpressionManager;
+    private _gdprManager: GdprManager;
     private _jaegerManager: JaegerManager;
 
     private _showing: boolean = false;
@@ -178,7 +181,7 @@ export class WebView {
             const configSpan = this._jaegerManager.startSpan('FetchConfiguration', jaegerInitSpan.id, jaegerInitSpan.traceId);
             let configPromise;
             if(this._creativeUrl) {
-                configPromise = Promise.resolve(new Configuration(JsonParser.parse(CreativeUrlConfiguration)));
+                configPromise = Promise.resolve(ConfigurationParser.parse(JsonParser.parse(CreativeUrlConfiguration)));
             } else {
                 configPromise = ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, this._metadataManager, configSpan);
             }
@@ -200,6 +203,7 @@ export class WebView {
 
             return Promise.all([configPromise, cachedCampaignResponsePromise, cachePromise]);
         }).then(([configuration, cachedCampaignResponse]) => {
+            this._gdprManager = new GdprManager(this._nativeBridge, this._deviceInfo, this._clientInfo, configuration, this._request);
             this._configuration = configuration;
             this._cachedCampaignResponse = cachedCampaignResponse;
             HttpKafka.setConfiguration(this._configuration);
@@ -215,20 +219,24 @@ export class WebView {
                 throw error;
             }
 
+            let analyticsPromise;
             if(this._configuration.isAnalyticsEnabled() || CustomFeatures.isExampleGameId(this._clientInfo.getGameId())) {
                 this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo, this._configuration, this._focusManager);
-                return this._analyticsManager.init().then(() => {
+                analyticsPromise = this._analyticsManager.init().then(() => {
                     this._sessionManager.setGameSessionId(this._analyticsManager.getGameSessionId());
-                    return Promise.resolve();
                 });
             } else {
                 const analyticsStorage: AnalyticsStorage = new AnalyticsStorage(this._nativeBridge);
-                return analyticsStorage.getSessionId(this._clientInfo.isReinitialized()).then(gameSessionId => {
+                analyticsPromise = analyticsStorage.getSessionId(this._clientInfo.isReinitialized()).then(gameSessionId => {
                     analyticsStorage.setSessionId(gameSessionId);
                     this._sessionManager.setGameSessionId(gameSessionId);
-                    return Promise.resolve();
                 });
             }
+            const gdprConsentPromise = this._gdprManager.getConsentAndUpdateConfiguration().catch((error) => {
+                // do nothing
+                // error happens when consent value is undefined
+            });
+            return Promise.all([analyticsPromise, gdprConsentPromise]);
         }).then(() => {
             if(this._sessionManager.getGameSessionId() % 10000 === 0) {
                 this._cache.setDiagnostics(true);
@@ -244,11 +252,10 @@ export class WebView {
 
             SdkStats.initialize(this._nativeBridge, this._request, this._configuration, this._sessionManager, this._campaignManager, this._metadataManager, this._clientInfo);
 
-            const enableCachedResponse = this._configuration.getAbGroup() === 11 || this._configuration.getAbGroup() === 12;
             const refreshSpan = this._jaegerManager.startSpan('Refresh', jaegerInitSpan.id, jaegerInitSpan.traceId);
             refreshSpan.addTag(JaegerTags.DeviceType, Platform[this._nativeBridge.getPlatform()]);
             let refreshPromise;
-            if (this._cachedCampaignResponse !== undefined && enableCachedResponse) {
+            if (this._cachedCampaignResponse !== undefined) {
                 refreshPromise = this._refreshManager.refreshFromCache(this._cachedCampaignResponse, refreshSpan);
             } else {
                 refreshPromise = this._refreshManager.refresh();
@@ -267,6 +274,10 @@ export class WebView {
             this._jaegerManager.stop(jaegerInitSpan);
 
             return this._sessionManager.sendUnsentSessions();
+        }).then(() => {
+            if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                this._nativeBridge.setAutoBatchEnabled(false);
+            }
         }).catch(error => {
             jaegerInitSpan.addAnnotation(error.message);
             jaegerInitSpan.addTag(JaegerTags.Error, 'true');
@@ -412,6 +423,7 @@ export class WebView {
                 configuration: this._configuration,
                 request: this._request,
                 options: options,
+                gdprManager: this._gdprManager,
                 adMobSignalFactory: this._adMobSignalFactory
             });
             this._refreshManager.setCurrentAdUnit(this._currentAdUnit);
@@ -452,7 +464,11 @@ export class WebView {
             }
             this._wasRealtimePlacement = false;
 
-            this._currentAdUnit.show();
+            this._currentAdUnit.show().then(() => {
+                if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                    this._nativeBridge.setAutoBatchEnabled(true);
+                }
+            });
         });
     }
 
@@ -466,6 +482,10 @@ export class WebView {
 
     private onAdUnitClose(): void {
         this._showing = false;
+
+        if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            this._nativeBridge.setAutoBatchEnabled(false);
+        }
     }
 
     private isShowing(): boolean {

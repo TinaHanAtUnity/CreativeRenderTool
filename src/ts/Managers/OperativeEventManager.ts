@@ -31,6 +31,11 @@ export interface IOperativeEventManagerParams<T extends Campaign> {
     campaign: T;
 }
 
+export enum GDPREventSource {
+    METADATA = 'metadata',
+    USER = 'user'
+}
+
 export class OperativeEventManager {
 
     public static setTestBaseUrl(baseUrl: string): void {
@@ -56,6 +61,25 @@ export class OperativeEventManager {
 
     public static getPreviousPlacementId(): string | undefined {
         return OperativeEventManager.PreviousPlacementId;
+    }
+
+    public static sendGDPREvent(action: string, deviceInfo: DeviceInfo, clientInfo: ClientInfo, configuration: Configuration, source?: GDPREventSource): Promise<void> {
+        let infoJson: any = {
+            'adid': deviceInfo.getAdvertisingIdentifier(),
+            'action': action,
+            'projectId': configuration.getUnityProjectId(),
+            'platform': Platform[clientInfo.getPlatform()].toLowerCase(),
+            'gameId': clientInfo.getGameId()
+        };
+        if (source) {
+            infoJson = {
+                ... infoJson,
+                'source': source
+            };
+        }
+
+        HttpKafka.sendEvent('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, infoJson);
+        return Promise.resolve();
     }
 
     private static VideoEventBaseUrl: string = 'https://adserver.unityads.unity3d.com/mobile/gamers';
@@ -230,18 +254,8 @@ export class OperativeEventManager {
         return this.createUniqueEventMetadata(placement, this._sessionManager.getGameSessionId(), this._gamerServerId, OperativeEventManager.getPreviousPlacementId(), videoOrientation, adUnitStyle).then(fulfilled);
     }
 
-    public sendGDPREvent(placement: Placement, action: string): Promise<void> {
-        const infoJson: any = {
-            'adid': this._deviceInfo.getAdvertisingIdentifier(),
-            'action': action,
-            'projectId': this._configuration.getUnityProjectId(),
-            'platform': Platform[this._clientInfo.getPlatform()].toLowerCase(),
-            'gameId': this._clientInfo.getGameId()
-        };
-
-        // todo: remove .test from the topic
-        HttpKafka.sendEvent('ads.events.optout.v1.json.test', KafkaCommonObjectType.EMPTY, infoJson);
-        return Promise.resolve();
+    public sendGDPREvent(action: string, source?: GDPREventSource): Promise<void> {
+        return OperativeEventManager.sendGDPREvent(action, this._deviceInfo, this._clientInfo, this._configuration, source);
     }
 
     public setGamerServerId(serverId: string | undefined): void {
@@ -328,6 +342,9 @@ export class OperativeEventManager {
             'cached': CampaignAssetInfo.isCached(this._campaign),
             'cachedOrientation': CampaignAssetInfo.getCachedVideoOrientation(this._campaign),
             'token': this._configuration.getToken(),
+            'gdprEnabled': this._configuration.isGDPREnabled(),
+            'optOutEnabled': this._configuration.isOptOutEnabled(),
+            'optOutRecorded': this._configuration.isOptOutRecorded(),
             'gameSessionCounters': GameSessionCounters.getDTO()
         };
 

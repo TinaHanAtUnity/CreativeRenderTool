@@ -1,5 +1,4 @@
 import EndScreenTemplate from 'html/EndScreen.html';
-import SquareEndScreenTemplate from 'html/SquareEndScreen.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -11,7 +10,6 @@ import { Campaign } from 'Models/Campaign';
 import { IEndScreenDownloadParameters } from 'EventHandlers/EndScreenEventHandler';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
-import { SquareEndScreenUtilities } from 'Utilities/SquareEndScreenUtilities';
 
 export interface IEndScreenHandler {
     onEndScreenDownload(parameters: IEndScreenDownloadParameters): void;
@@ -20,9 +18,8 @@ export interface IEndScreenHandler {
     onGDPRPopupSkipped(): void;
 }
 
-const GDPR_OPT_OUT_BASE  = 'gdpr-pop-up-base';
-
-const SQUARE_END_SCREEN = 'square-end-screen';
+const GDPR_OPT_OUT_BASE = 'gdpr-pop-up-base';
+const GDPR_OPT_OUT_ICON = 'gdpr-pop-up-icon';
 
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
 
@@ -54,7 +51,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             {
                 event: 'click',
                 listener: (event: Event) => this.onDownloadEvent(event),
-                selector: '.game-background, .download-container, .game-icon, .game-image'
+                selector: '.game-background, .download-container, .game-icon'
             },
             {
                 event: 'click',
@@ -68,7 +65,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             },
             {
                 event: 'click',
-                listener: (event: Event) => this.onGDPRPopupEvent(event),
+                listener: (event: Event) => this.onPrivacyEvent(event),
                 selector: '.gdpr-link'
             }
         ];
@@ -97,14 +94,23 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         }
 
         const ctaButtonColor = this._adUnitStyle && this._adUnitStyle.getCTAButtonColor() ? this._adUnitStyle.getCTAButtonColor() : undefined;
-        if (ctaButtonColor && !this.getEndscreenAlt()) {
+        if (ctaButtonColor) {
             (<HTMLElement>this._container.querySelector('.download-container')).style.background = ctaButtonColor;
         }
 
         const endScreenAlt = this.getEndscreenAlt();
         if (typeof endScreenAlt === 'string') {
             this._container.classList.add(endScreenAlt);
-            document.documentElement.classList.add(endScreenAlt);
+
+            /* If pop up is visible, hide privacy button */
+            if (endScreenAlt === GDPR_OPT_OUT_BASE || endScreenAlt === GDPR_OPT_OUT_ICON) {
+                (<HTMLElement>this._container.querySelector('.privacy-button')).style.display = 'none';
+            }
+        }
+
+        /* TODO: Should go away once we finish with a/b test */
+        if (!CustomFeatures.isGDPRBaseTest(this._abGroup)) {
+            this._container.classList.add('use-gdpr-privacy-icon');
         }
     }
 
@@ -157,13 +163,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
     protected getEndscreenAlt(campaign?: Campaign) {
         if (this._showGDPRBanner) {
-            return GDPR_OPT_OUT_BASE;
-        }
-
-        const campaignId = campaign ? campaign.getId() : this._campaignId;
-        const platform = this._nativeBridge.getPlatform();
-        if (SquareEndScreenUtilities.useSquareEndScreenAlt(this._abGroup, platform, campaignId, this._osVersion)) {
-            return SQUARE_END_SCREEN;
+            return CustomFeatures.isGDPRBaseTest(this._abGroup) ? GDPR_OPT_OUT_BASE : GDPR_OPT_OUT_ICON;
         }
 
         return undefined;
@@ -179,21 +179,13 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     private onPrivacyEvent(event: Event): void {
         event.preventDefault();
 
-        this._privacy.show();
-    }
-
-    private onGDPRPopupEvent(event: Event) {
-        event.preventDefault();
-
-        this._gdprPopupClicked = true;
+        if (this._showGDPRBanner) {
+            this._gdprPopupClicked = true;
+        }
         this._privacy.show();
     }
 
     private getTemplate() {
-        if (this.getEndscreenAlt() === SQUARE_END_SCREEN) {
-            return SquareEndScreenTemplate;
-        }
-
         return EndScreenTemplate;
     }
 }

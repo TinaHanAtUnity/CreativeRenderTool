@@ -2,6 +2,7 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { Request } from 'Utilities/Request';
 import { Url } from 'Utilities/Url';
 import { Configuration } from 'Models/Configuration';
+import { ConfigurationParser } from 'Parsers/ConfigurationParser';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { AdapterMetaData } from 'Models/MetaData/AdapterMetaData';
 import { NativeBridge } from 'Native/NativeBridge';
@@ -22,21 +23,27 @@ export class ConfigManager {
         return Promise.all([
             metaDataManager.fetch(FrameworkMetaData),
             metaDataManager.fetch(AdapterMetaData),
-            ConfigManager.fetchGamerId(nativeBridge)
-        ]).then(([framework, adapter, storedGamerId]) => {
+            ConfigManager.fetchGamerId(nativeBridge),
+            ConfigManager.fetchGamerToken(nativeBridge)
+        ]).then(([framework, adapter, storedGamerId, storedGamerToken]) => {
             let gamerId: string | undefined;
+            let gamerToken: string | undefined;
 
-            if(storedGamerId) {
-                if(nativeBridge.getPlatform() === Platform.IOS && deviceInfo.getLimitAdTracking()) {
-                    // only use stored gamerId for iOS when ad tracking is limited
-                    gamerId = storedGamerId;
-                } else {
-                    // delete previously stored gamerIds for all other devices because they should not be stored
-                    ConfigManager.deleteGamerId(nativeBridge);
-                }
+            if(nativeBridge.getPlatform() === Platform.IOS && deviceInfo.getLimitAdTracking()) {
+                // only use stored gamerId for iOS when ad tracking is limited
+                gamerToken = storedGamerToken;
+                gamerId = storedGamerId;
+            } else if(storedGamerToken) {
+                // delete saved token from all other devices, for example when user has toggled limit ad tracking flag to false
+                ConfigManager.deleteGamerToken(nativeBridge);
             }
 
-            const url: string = ConfigManager.createConfigUrl(clientInfo, deviceInfo, framework, adapter, gamerId);
+            if(storedGamerId) {
+                Diagnostics.trigger('stored_gamer_id', {});
+                ConfigManager.deleteGamerId(nativeBridge);
+            }
+
+            const url: string = ConfigManager.createConfigUrl(clientInfo, deviceInfo, framework, adapter, gamerId, gamerToken);
             jaegerSpan.addTag(JaegerTags.DeviceType, Platform[nativeBridge.getPlatform()]);
             nativeBridge.Sdk.logInfo('Requesting configuration from ' + url);
             return request.get(url, [], {
@@ -48,11 +55,11 @@ export class ConfigManager {
                 jaegerSpan.addTag(JaegerTags.StatusCode, response.responseCode.toString());
                 try {
                     const configJson = JsonParser.parse(response.response);
-                    const config: Configuration = new Configuration(configJson);
-                    nativeBridge.Sdk.logInfo('Received configuration with ' + config.getPlacementCount() + ' placements for gamer ' + config.getGamerId() + ' (A/B group ' + config.getAbGroup() + ')');
-                    if(config.getGamerId()) {
+                    const config: Configuration = ConfigurationParser.parse(configJson);
+                    nativeBridge.Sdk.logInfo('Received configuration with ' + config.getPlacementCount() + ' placements for token ' + config.getToken() + ' (A/B group ' + config.getAbGroup() + ')');
+                    if(config.getToken()) {
                         if(nativeBridge.getPlatform() === Platform.IOS && deviceInfo.getLimitAdTracking()) {
-                            ConfigManager.storeGamerId(nativeBridge, config.getGamerId());
+                            ConfigManager.storeGamerToken(nativeBridge, config.getToken());
                         }
                     } else {
                         Diagnostics.trigger('config_failure', {
@@ -60,7 +67,7 @@ export class ConfigManager {
                             configResponse: response.response
                         });
 
-                        throw new Error('gamerId missing in PLC config');
+                        throw new Error('gamer token missing in PLC config');
                     }
                     if(!config.getDefaultPlacement()) {
                         Diagnostics.trigger('missing_default_placement', {
@@ -107,7 +114,7 @@ export class ConfigManager {
     private static ConfigBaseUrl: string = 'https://publisher-config.unityads.unity3d.com/games';
     private static AbGroup: number | undefined;
 
-    private static createConfigUrl(clientInfo: ClientInfo, deviceInfo: DeviceInfo, framework?: FrameworkMetaData, adapter?: AdapterMetaData, gamerId?: string): string {
+    private static createConfigUrl(clientInfo: ClientInfo, deviceInfo: DeviceInfo, framework?: FrameworkMetaData, adapter?: AdapterMetaData, gamerId?: string, gamerToken?: string): string {
         let url: string = [
             ConfigManager.ConfigBaseUrl,
             clientInfo.getGameId(),
@@ -124,7 +131,8 @@ export class ConfigManager {
             deviceModel: deviceInfo.getModel(),
             language: deviceInfo.getLanguage(),
             test: clientInfo.getTestMode(),
-            gamerId: gamerId,
+            gamerId: gamerToken ? undefined : gamerId,
+            gamerToken: gamerToken,
             forceAbGroup: ConfigManager.AbGroup
         });
 
@@ -156,25 +164,45 @@ export class ConfigManager {
         return url;
     }
 
-    private static fetchGamerId(nativeBridge: NativeBridge): Promise<string | undefined> {
-        return nativeBridge.Storage.get<string>(StorageType.PRIVATE, 'gamerId').then(gamerId => {
+    private static fetchValue(nativeBridge: NativeBridge, key: string): Promise<string | undefined> {
+        return nativeBridge.Storage.get<string>(StorageType.PRIVATE, key).then(gamerId => {
             return gamerId;
         }).catch(error => {
             return undefined;
         });
     }
 
-    private static storeGamerId(nativeBridge: NativeBridge, gamerId: string): Promise<void[]> {
+    private static storeValue(nativeBridge: NativeBridge, key: string, value: string): Promise<void[]> {
         return Promise.all([
-            nativeBridge.Storage.set(StorageType.PRIVATE, 'gamerId', gamerId),
+            nativeBridge.Storage.set(StorageType.PRIVATE, key, value),
             nativeBridge.Storage.write(StorageType.PRIVATE)
         ]);
     }
 
-    private static deleteGamerId(nativeBridge: NativeBridge): Promise<void[]> {
+    private static deleteValue(nativeBridge: NativeBridge, key: string): Promise<void[]> {
         return Promise.all([
-            nativeBridge.Storage.delete(StorageType.PRIVATE, 'gamerId'),
+            nativeBridge.Storage.delete(StorageType.PRIVATE, key),
             nativeBridge.Storage.write(StorageType.PRIVATE)
         ]);
+    }
+
+    private static fetchGamerId(nativeBridge: NativeBridge): Promise<string | undefined> {
+        return this.fetchValue(nativeBridge, 'gamerId');
+    }
+
+    private static fetchGamerToken(nativeBridge: NativeBridge): Promise<string | undefined> {
+        return this.fetchValue(nativeBridge, 'gamerToken');
+    }
+
+    private static storeGamerToken(nativeBridge: NativeBridge, gamerToken: string): Promise<void[]> {
+        return this.storeValue(nativeBridge, 'gamerToken', gamerToken);
+    }
+
+    private static deleteGamerId(nativeBridge: NativeBridge): Promise<void[]> {
+        return this.deleteValue(nativeBridge, 'gamerId');
+    }
+
+    private static deleteGamerToken(nativeBridge: NativeBridge): Promise<void[]> {
+        return this.deleteValue(nativeBridge, 'gamerToken');
     }
 }

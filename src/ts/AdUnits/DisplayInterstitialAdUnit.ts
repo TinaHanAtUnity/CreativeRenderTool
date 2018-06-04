@@ -1,7 +1,7 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { FinishState } from 'Constants/FinishState';
-import { IObserver0, IObserver2, IObserver1 } from 'Utilities/IObserver';
+import { IObserver2, IObserver1 } from 'Utilities/IObserver';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { DisplayInterstitial } from 'Views/DisplayInterstitial';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
@@ -14,12 +14,13 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { IWebPlayerWebSettingsAndroid, IWebPlayerWebSettingsIos } from 'Native/Api/WebPlayer';
 import { Url } from 'Utilities/Url';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
+import { AdUnitContainerSystemMessage, IAdUnitContainerListener } from 'AdUnits/Containers/AdUnitContainer';
 
 export interface IDisplayInterstitialAdUnitParameters extends IAdUnitParameters<DisplayInterstitialCampaign> {
     view: DisplayInterstitial;
 }
 
-export class DisplayInterstitialAdUnit extends AbstractAdUnit {
+export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnitContainerListener {
 
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
@@ -33,8 +34,6 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
     private _handlingShouldOverrideUrlLoading: boolean = false;
     private _contentReady: boolean = false;
 
-    private _onShowObserver: IObserver0;
-    private _onSystemKillObserver: IObserver0;
     private _shouldOverrideUrlLoadingObserver: IObserver2<string, string>;
     private _onPageStartedObserver: IObserver1<string>;
 
@@ -67,9 +66,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
             this.onStart.trigger();
             this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
             this.sendStartEvents();
-
-            this._onShowObserver = this._container.onShow.subscribe(() => this.onShow());
-            this._onSystemKillObserver = this._container.onSystemKill.subscribe(() => this.onSystemKill());
+            this._container.addEventHandler(this);
 
             // Display ads are always completed.
             this.setFinishState(FinishState.COMPLETED);
@@ -81,10 +78,9 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
         if(!this.isShowing()) {
             return Promise.resolve();
         }
-        this.setShowing(false);
 
-        this._container.onShow.unsubscribe(this._onShowObserver);
-        this._container.onSystemKill.unsubscribe(this._onSystemKillObserver);
+        this.setShowing(false);
+        this._container.removeEventHandler(this);
 
         this._nativeBridge.WebPlayer.onPageStarted.unsubscribe(this._onPageStartedObserver);
         this._nativeBridge.WebPlayer.shouldOverrideUrlLoading.unsubscribe(this._shouldOverrideUrlLoadingObserver);
@@ -107,7 +103,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
         return 'programmaticImage';
     }
 
-    private onShow(): void {
+    public onContainerShow(): void {
         if (this._contentReady) {
             return;
         }
@@ -126,6 +122,24 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
                 .then(() => this.setWebViewViewFrame(screenWidth, screenHeight))
                 .then(() => this.setWebPlayerContent());
         });
+    }
+
+    public onContainerDestroy(): void {
+        if(this.isShowing()) {
+            this.onClose.trigger();
+        }
+    }
+
+    public onContainerBackground(): void {
+        // EMPTY
+    }
+
+    public onContainerForeground(): void {
+        // EMPTY
+    }
+
+    public onContainerSystemMessage(message: AdUnitContainerSystemMessage): void {
+        // EMPTY
     }
 
     private getScreenDensity(): number {
@@ -163,12 +177,6 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit {
         const webviewXPos = screenWidth - webviewAreaSize;
         const webviewYPos = 0;
         return this._container.setViewFrame('webview', Math.floor(webviewXPos), Math.floor(webviewYPos), Math.floor(webviewAreaSize), Math.floor(webviewAreaSize));
-    }
-
-    private onSystemKill(): void {
-        if(this.isShowing()) {
-            this.onClose.trigger();
-        }
     }
 
     private onPageStarted(url: string): void {

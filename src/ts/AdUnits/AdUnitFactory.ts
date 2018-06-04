@@ -53,7 +53,6 @@ import { XPromoVideoEventHandler } from 'EventHandlers/XPromoVideoEventHandler';
 import { AdMobEventHandler } from 'EventHandlers/AdmobEventHandler';
 import { ClosableVideoOverlay } from 'Views/ClosableVideoOverlay';
 import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
-import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { Closer } from 'Views/Closer';
 import { Privacy } from 'Views/Privacy';
 import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
@@ -104,7 +103,7 @@ export class AdUnitFactory {
 
     private static createPerformanceAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PerformanceCampaign>): PerformanceAdUnit {
         const overlay = this.createOverlay(nativeBridge, parameters);
-        const adUnitStyle = CustomFeatures.getAdUnitStyle(parameters.campaign.getAbGroup());
+        const adUnitStyle: AdUnitStyle = parameters.campaign.getAdUnitStyle() || AdUnitStyle.getDefaultAdUnitStyle();
 
         const showGDPRBanner = this.showGDPRBanner(parameters);
         const privacy = this.createPrivacy(nativeBridge, parameters);
@@ -308,16 +307,21 @@ export class AdUnitFactory {
     }
 
     private static createPromoAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PromoCampaign>): AbstractAdUnit {
-        const promoView = new Promo(nativeBridge, parameters.campaign, parameters.deviceInfo.getLanguage());
+        const privacy = this.createPrivacy(nativeBridge, parameters);
+        const showGDPRBanner = this.showGDPRBanner(parameters);
+
+        const promoView = new Promo(nativeBridge, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner);
         const promoAdUnit = new PromoAdUnit(nativeBridge, {
             ...parameters,
-            view: promoView
+            view: promoView,
+            privacy: privacy
         });
 
         promoView.render();
         document.body.appendChild(promoView.container());
 
-        promoView.onClose.subscribe(() => PromoEventHandler.onClose(nativeBridge, promoAdUnit, parameters.campaign.getGamerId(), parameters.clientInfo.getGameId() + '|' + parameters.configuration.getToken(), parameters.campaign.getAbGroup(), parameters.campaign.getTrackingUrlsForEvent('purchase')));
+        promoView.onGDPRPopupSkipped.subscribe(() => PromoEventHandler.onGDPRPopupSkipped(parameters.configuration, parameters.operativeEventManager));
+        promoView.onClose.subscribe(() => PromoEventHandler.onClose(nativeBridge, promoAdUnit, parameters.configuration.getToken(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup(), parameters.campaign.getTrackingUrlsForEvent('purchase'), parameters.configuration.isOptOutEnabled()));
         promoView.onPromo.subscribe((productId) => PromoEventHandler.onPromo(nativeBridge, promoAdUnit, productId, parameters.campaign.getTrackingUrlsForEvent('purchase')));
         nativeBridge.Purchasing.onIAPSendEvent.subscribe((iapPayload) => PurchasingUtilities.handleSendIAPEvent(nativeBridge, iapPayload));
 
@@ -462,7 +466,7 @@ export class AdUnitFactory {
     private static createPrivacy(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractPrivacy {
         let privacy: AbstractPrivacy;
         if (parameters.configuration.isGDPREnabled()) {
-            privacy = new GDPRPrivacy(nativeBridge, parameters.configuration.isCoppaCompliant(), parameters.configuration.isOptOutEnabled());
+            privacy = new GDPRPrivacy(nativeBridge, parameters.gdprManager, parameters.configuration.isCoppaCompliant(), parameters.configuration.isOptOutEnabled());
         } else {
             privacy = new Privacy(nativeBridge, parameters.configuration.isCoppaCompliant());
         }

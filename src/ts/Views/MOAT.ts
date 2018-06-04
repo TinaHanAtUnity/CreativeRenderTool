@@ -7,7 +7,14 @@ import { Template } from 'Utilities/Template';
 import { Platform } from 'Constants/Platform';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { Diagnostics } from 'Utilities/Diagnostics';
-import { MoatViewabilityService, IMoatIds, IMoatData } from 'Utilities/MoatViewabilityService';
+import { IMoatIds, IMoatData } from 'Utilities/MoatViewabilityService';
+
+export enum MoatState {
+    PLAYING,
+    PAUSED,
+    COMPLETED,
+    STOPPED
+}
 
 export class MOAT extends View<VastCampaign> {
     private _iframe: HTMLIFrameElement;
@@ -16,6 +23,7 @@ export class MOAT extends View<VastCampaign> {
     private _resizeTimeout: any;
     private _didInitMoat = false;
     private _messageListener: (e: MessageEvent) => void;
+    private _state: MoatState = MoatState.STOPPED;
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'moat');
@@ -30,16 +38,40 @@ export class MOAT extends View<VastCampaign> {
         iframe.srcdoc = MOATContainer;
     }
 
-    public resume(volume: number) {
-        this.triggerVideoEvent('AdPlaying', volume);
-        this.triggerViewabilityEvent('exposure', true);
-
+    public play(volume: number): void {
+        if(this.getState() === MoatState.STOPPED || this.getState() === MoatState.PAUSED) {
+            this.setState(MoatState.PLAYING);
+            this.triggerVideoEvent('AdPlaying', volume);
+            this.triggerViewabilityEvent('exposure', true);
+        }
     }
 
-    public pause(volume: number) {
-        if (this._iframe.contentWindow) {
+    public pause(volume: number): void {
+        if(this.getState() === MoatState.PLAYING && this._iframe.contentWindow) {
+            this.setState(MoatState.PAUSED);
             this.triggerVideoEvent('AdPaused', volume);
             this.triggerViewabilityEvent('exposure', false);
+        }
+    }
+
+    public stop(volume: number): void {
+        if(this.getState() === MoatState.PLAYING || this.getState() === MoatState.PAUSED) {
+            this.setState(MoatState.STOPPED);
+            this.triggerVideoEvent('AdStopped', volume);
+        }
+    }
+
+    public completed(volume: number): void {
+        if(this.getState() !== MoatState.COMPLETED) {
+            this.setState(MoatState.COMPLETED);
+            this.triggerVideoEvent('AdVideoComplete', volume);
+        }
+    }
+
+    public volumeChange(volume: number): void {
+        if(this.getState() !== MoatState.COMPLETED) {
+            this.triggerVideoEvent('AdVolumeChange', volume);
+            this.triggerViewabilityEvent('volume', volume * 100);
         }
     }
 
@@ -85,7 +117,7 @@ export class MOAT extends View<VastCampaign> {
             }, '*');
         } else {
             if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                this.resume(volume);
+                this.play(volume);
             }
         }
     }
@@ -119,6 +151,14 @@ export class MOAT extends View<VastCampaign> {
                 payload: payload
             }, '*');
         }
+    }
+
+    public getState(): MoatState {
+        return this._state;
+    }
+
+    private setState(state: MoatState): void {
+        this._state = state;
     }
 
     private onMessage(e: MessageEvent) {

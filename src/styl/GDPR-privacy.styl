@@ -9,6 +9,35 @@
     font-size: $default-size * $default-font-size * .75;
   }
 
+  .gdpr-text-android,
+  .gdpr-text-ios {
+    display: none;
+  }
+
+  #data-deletion-container {
+    padding: $default-size * $default-scale-size * .75 0;
+    .page-link {
+      pointer-events: none;
+    }
+    &.active {
+      .page-link {
+        pointer-events: auto;
+      }
+    }
+  }
+
+  #data-deletion-container,
+  #data-deletion-request-container {
+    display: block;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 250ms ease-in;
+
+    &.active {
+      opacity: 1;
+    }
+  }
+
   &.flip {
     .back-side {
       display: block;
@@ -23,5 +52,11 @@
       display: none;
     }
   }
+}
+
+body.android #gdpr-privacy .gdpr-text-android,
+body.iphone #gdpr-privacy .gdpr-text-ios,
+body.ipad #gdpr-privacy .gdpr-text-ios {
+  display: initial;
 }
 

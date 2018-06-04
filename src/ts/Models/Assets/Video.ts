@@ -3,12 +3,11 @@ import { Session } from 'Models/Session';
 
 export interface IVideo extends IAsset {
     size: number | undefined;
-    started: boolean;
-    errorStatus: boolean;
     duration: number;
     position: number;
     positionRepeats: number;
     quartile: number;
+    started: boolean;
 }
 
 export class Video extends Asset<IVideo> {
@@ -16,22 +15,20 @@ export class Video extends Asset<IVideo> {
         super('Video', session, {
             ... Asset.Schema,
             size: ['number', 'undefined'],
-            started: ['boolean'],
-            errorStatus: ['boolean'],
             duration: ['number'],
             position: ['number'],
             positionRepeats: ['number'],
-            quartile: ['number']
+            quartile: ['number'],
+            started: ['boolean']
         });
 
         this.set('url', url);
         this.set('size', size);
-        this.set('started', false);
-        this.set('errorStatus', false);
         this.set('duration', 0);
         this.set('position', 0);
         this.set('positionRepeats', 0);
         this.set('quartile', 0);
+        this.set('started', false);
     }
 
     public getDescription(): string {
@@ -48,14 +45,6 @@ export class Video extends Asset<IVideo> {
 
     public setStarted(started: boolean) {
         this.set('started', started);
-    }
-
-    public getErrorStatus() {
-        return this.get('errorStatus');
-    }
-
-    public setErrorStatus(status: boolean) {
-        this.set('errorStatus', status);
     }
 
     public getDuration() {
@@ -98,8 +87,6 @@ export class Video extends Asset<IVideo> {
         return {
             'asset': super.getDTO(),
             'size': this.getSize(),
-            'started': this.hasStarted(),
-            'errorStatus': this.getErrorStatus(),
             'duration': this.getDuration(),
             'position': this.getPosition(),
             'positionRepeats': this.getPositionRepeats(),

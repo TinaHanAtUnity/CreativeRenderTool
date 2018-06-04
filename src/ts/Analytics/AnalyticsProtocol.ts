@@ -1,7 +1,6 @@
 import { ClientInfo } from 'Models/ClientInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Platform } from 'Constants/Platform';
-import { IIAPInstrumentation } from 'Analytics/AnalyticsStorage';
 import { Configuration } from 'Models/Configuration';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { NativeBridge } from 'Native/NativeBridge';
@@ -26,7 +25,6 @@ interface IAnalyticsCommonObjectInternal {
     adsid: string | undefined | null;
     ads_tracking: boolean;
     ads_coppa: boolean;
-    ads_gamerid: string;
     ads_gameid: string;
     ads_sdk: boolean;
 }
@@ -77,7 +75,6 @@ export class AnalyticsProtocol {
             adsid: AnalyticsProtocol.getAdvertisingIdentifier(deviceInfo),
             ads_tracking: deviceInfo.getLimitAdTracking() ? false : true, // intentionally inverted value
             ads_coppa: configuration.isCoppaCompliant(),
-            ads_gamerid: configuration.getGamerId(),
             ads_gameid: clientInfo.getGameId(),
             ads_sdk: true
         };

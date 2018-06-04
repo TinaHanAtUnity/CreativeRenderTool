@@ -7,10 +7,12 @@ import { Platform } from 'Constants/Platform';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { TestAdUnit } from '../TestHelpers/TestAdUnit';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
-import { Orientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
+import {
+    AdUnitContainerSystemMessage, IAdUnitContainerListener, Orientation,
+    ViewConfiguration
+} from 'AdUnits/Containers/AdUnitContainer';
 import { ViewController } from 'AdUnits/Containers/ViewController';
 import { FocusManager } from 'Managers/FocusManager';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { SessionManager } from 'Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { WakeUpManager } from 'Managers/WakeUpManager';
@@ -19,6 +21,7 @@ import { Request } from 'Utilities/Request';
 import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
+import { GdprManager } from 'Managers/GdprManager';
 
 describe('IosAdUnitTest', () => {
     let nativeBridge: NativeBridge;
@@ -48,6 +51,7 @@ describe('IosAdUnitTest', () => {
         container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager);
         const campaign = TestFixtures.getCampaign();
         const configuration = TestFixtures.getConfiguration();
+        const gdprManager = sinon.createStubInstance(GdprManager);
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             nativeBridge: nativeBridge,
             request: request,
@@ -71,7 +75,8 @@ describe('IosAdUnitTest', () => {
             campaign: campaign,
             configuration: configuration,
             request: request,
-            options: {}
+            options: {},
+            gdprManager: gdprManager
         };
     });
 
@@ -131,7 +136,25 @@ describe('IosAdUnitTest', () => {
         sinon.stub(nativeBridge.IosAdUnit, 'open').returns(Promise.resolve());
 
         let onShowTriggered: boolean = false;
-        container.onShow.subscribe(() => { onShowTriggered = true; });
+        const listener: IAdUnitContainerListener = {
+            onContainerShow: function() {
+                onShowTriggered = true;
+            },
+            onContainerDestroy: function() {
+                // EMPTY
+            },
+            onContainerBackground: function() {
+                // EMPTY
+            },
+            onContainerForeground: function() {
+                // EMPTY
+            },
+            onContainerSystemMessage: function(message: AdUnitContainerSystemMessage) {
+                // EMPTY
+            },
+        };
+
+        container.addEventHandler(listener);
 
         return container.open(testAdUnit, ['videoplayer', 'webview'], true, Orientation.LANDSCAPE, true, false, true, false, defaultOptions).then(() => {
             nativeBridge.IosAdUnit.onViewControllerDidAppear.trigger();
@@ -141,19 +164,38 @@ describe('IosAdUnitTest', () => {
     });
 
     describe('should handle iOS notifications', () => {
-        let onSystemInterruptTriggered: boolean;
+        let onContainerSystemMessage: boolean;
+        let onContainerVisibilityChanged: boolean;
 
         beforeEach(() => {
+            const listener: IAdUnitContainerListener = {
+                onContainerShow: function() {
+                    // EMPTY
+                },
+                onContainerDestroy: function() {
+                    // EMPTY
+                },
+                onContainerBackground: function() {
+                    onContainerVisibilityChanged = true;
+                },
+                onContainerForeground: function() {
+                    onContainerVisibilityChanged = true;
+                },
+                onContainerSystemMessage: function(message: AdUnitContainerSystemMessage) {
+                    onContainerSystemMessage = true;
+                },
+            };
             testAdUnit = new TestAdUnit(nativeBridge, adUnitParams);
             sinon.stub(nativeBridge.IosAdUnit, 'open').returns(Promise.resolve());
-            onSystemInterruptTriggered = false;
-            container.onSystemInterrupt.subscribe(() => { onSystemInterruptTriggered = true; });
+            onContainerSystemMessage = false;
+            onContainerVisibilityChanged = false;
+            container.addEventHandler(listener);
         });
 
         it('with application did become active', () => {
             return container.open(testAdUnit, ['videoplayer', 'webview'], true, Orientation.LANDSCAPE, true, false, true, false, defaultOptions).then(() => {
                 nativeBridge.Notification.onNotification.trigger('UIApplicationDidBecomeActiveNotification', {});
-                assert.isTrue(onSystemInterruptTriggered, 'onSystemInterrupt was not triggered with UIApplicationDidBecomeActiveNotification');
+                assert.isTrue(onContainerVisibilityChanged, 'onContainerBackground or onContainerForeground was not triggered with UIApplicationDidBecomeActiveNotification');
                 return;
             });
         });
@@ -161,7 +203,7 @@ describe('IosAdUnitTest', () => {
         it('with audio session interrupt', () => {
             return container.open(testAdUnit, ['videoplayer', 'webview'], true, Orientation.LANDSCAPE, true, false, true, false, defaultOptions).then(() => {
                 nativeBridge.Notification.onNotification.trigger('AVAudioSessionInterruptionNotification', { AVAudioSessionInterruptionTypeKey: 0, AVAudioSessionInterruptionOptionKey: 1 });
-                assert.isTrue(onSystemInterruptTriggered, 'onSystemInterrupt was not triggered with AVAudioSessionInterruptionNotification');
+                assert.isTrue(onContainerSystemMessage, 'onContainerSystemMessage was not triggered with AVAudioSessionInterruptionNotification');
                 return;
             });
         });
@@ -169,7 +211,7 @@ describe('IosAdUnitTest', () => {
         it('with audio session route change', () => {
             return container.open(testAdUnit, ['videoplayer', 'webview'], true, Orientation.LANDSCAPE, true, false, true, false, defaultOptions).then(() => {
                 nativeBridge.Notification.onNotification.trigger('AVAudioSessionRouteChangeNotification', {});
-                assert.isTrue(onSystemInterruptTriggered, 'onSystemInterrupt was not triggered with AVAudioSessionRouteChangeNotification');
+                assert.isTrue(onContainerSystemMessage, 'onContainerSystemMessage was not triggered with AVAudioSessionRouteChangeNotification');
                 return;
             });
         });

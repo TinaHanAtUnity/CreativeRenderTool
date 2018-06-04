@@ -88,6 +88,16 @@ export class Url {
         return null;
     }
 
+    public static removeQueryParameter(locationString: string, parameter: string): string {
+        const parameterValue = Url.getQueryParameter(locationString, parameter);
+
+        if (parameterValue == null) {
+            return locationString;
+        }
+
+        return locationString.replace(new RegExp('&?' + parameter + '=' + parameterValue), '');
+    }
+
     public static isValid(url: string): boolean {
         // note: this is not an attempt for full URL validation, instead this just checks that protocol is http(s) and
         // all URL characters are legal following RFC3986, using ASCII character ranges &-; and ?-[ is intentional

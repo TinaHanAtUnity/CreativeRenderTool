@@ -28,6 +28,7 @@ import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { FocusManager } from 'Managers/FocusManager';
 import { Campaign } from 'Models/Campaign';
+import { ConfigurationParser } from 'Parsers/ConfigurationParser';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import ConfigurationMixedPlacements from 'json/ConfigurationMixedPlacements.json';
@@ -43,6 +44,7 @@ import { OldCampaignRefreshManager } from 'Managers/OldCampaignRefreshManager';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { JaegerManager } from 'Jaeger/JaegerManager';
 import { JaegerSpan } from 'Jaeger/JaegerSpan';
+import { GdprManager } from 'Managers/GdprManager';
 import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 
 describe('CampaignRefreshManager', () => {
@@ -67,6 +69,7 @@ describe('CampaignRefreshManager', () => {
     let cacheBookkeeping: CacheBookkeeping;
     let cache: Cache;
     let jaegerManager: JaegerManager;
+    let gdprManager: GdprManager;
 
     beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo();
@@ -164,6 +167,8 @@ describe('CampaignRefreshManager', () => {
         (<sinon.SinonStub>adMobSignalFactory.getAdRequestSignal).returns(Promise.resolve(new AdMobSignal()));
         (<sinon.SinonStub>adMobSignalFactory.getOptionalSignal).returns(Promise.resolve(new AdMobOptionalSignal()));
 
+        gdprManager = sinon.createStubInstance(GdprManager);
+
         adUnitParams = {
             forceOrientation: Orientation.NONE,
             focusManager: focusManager,
@@ -176,7 +181,8 @@ describe('CampaignRefreshManager', () => {
             campaign: campaign,
             configuration: configuration,
             request: request,
-            options: {}
+            options: {},
+            gdprManager: gdprManager
         };
 
         RefreshManager.ParsingErrorRefillDelay = 0; // prevent tests from hanging due to long retry timeouts
@@ -187,7 +193,7 @@ describe('CampaignRefreshManager', () => {
 
     describe('PLC campaigns', () => {
         beforeEach(() => {
-            configuration = new Configuration(JSON.parse(ConfigurationAuctionPlc));
+            configuration = ConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
             campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
             campaignRefreshManager = new OldCampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration, focusManager, sessionManager, clientInfo, request, cache);
         });

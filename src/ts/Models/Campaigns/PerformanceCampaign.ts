@@ -1,6 +1,7 @@
 import { Campaign, ICampaign } from 'Models/Campaign';
 import { Video } from 'Models/Assets/Video';
 import { Image } from 'Models/Assets/Image';
+import { AdUnitStyle } from 'Models/AdUnitStyle';
 
 export enum StoreName {
     APPLE,
@@ -27,6 +28,7 @@ export interface IPerformanceCampaign extends ICampaign {
     videoEventUrls: { [eventType: string]: string };
     bypassAppSheet: boolean;
     store: StoreName;
+    adUnitStyle: AdUnitStyle | undefined;
 }
 
 export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
@@ -50,7 +52,8 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             clickUrl: ['string'],
             videoEventUrls: ['object'],
             bypassAppSheet: ['boolean'],
-            store: ['number']
+            store: ['number'],
+            adUnitStyle: ['object', 'undefined']
         }, campaign);
     }
 
@@ -148,6 +151,10 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
 
     public isConnectionNeeded(): boolean {
         return false;
+    }
+
+    public getAdUnitStyle(): AdUnitStyle | undefined {
+        return this.get('adUnitStyle');
     }
 
     public getDTO(): { [key: string]: any } {

@@ -13,6 +13,7 @@ import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { IVideoEventHandler } from 'Native/Api/VideoPlayer';
 import { Video } from 'Models/Assets/Video';
 import { BaseVideoEventHandler, IVideoEventHandlerParams } from 'EventHandlers/BaseVideoEventHandler';
+import { VideoState } from 'AdUnits/VideoAdUnit';
 
 export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEventHandler {
 
@@ -37,14 +38,17 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
     public onProgress(progress: number): void {
         const overlay = this._adUnit.getOverlay();
 
-        if(progress > 0 && !this._video.hasStarted()) {
-            this._video.setStarted(true);
+        if(progress > 0 && this._adUnit.getVideoState() === VideoState.READY) {
+            this._adUnit.setVideoState(VideoState.PLAYING);
 
             if(overlay) {
                 overlay.setSpinnerEnabled(false);
             }
 
-            this.handleStartEvent(progress);
+            if (!this._video.hasStarted()) {
+                this._video.setStarted(true);
+                this.handleStartEvent(progress);
+            }
         }
 
         if(progress >= 0) {
@@ -121,7 +125,7 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
             }
 
             if(overlay) {
-                if(lastPosition > 0 && progress - lastPosition < 100) {
+                if(lastPosition > 0 && progress > lastPosition && progress - lastPosition < 100) {
                     overlay.setSpinnerEnabled(true);
                 } else {
                     overlay.setSpinnerEnabled(false);
@@ -146,7 +150,7 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
     }
 
     public onCompleted(url: string): void {
-        this._adUnit.setActive(false);
+        this._adUnit.setVideoState(VideoState.COMPLETED);
         this._adUnit.setFinishState(FinishState.COMPLETED);
 
         this.handleCompleteEvent(url);
@@ -154,13 +158,12 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
     }
 
     public onPrepared(url: string, duration: number, width: number, height: number): void {
-        if(this._video.getErrorStatus() || !this._adUnit.isPrepareCalled()) {
+        if(this._adUnit.getVideoState() === VideoState.ERRORED || this._adUnit.getVideoState() !== VideoState.PREPARING) {
             // there can be a small race condition window with prepare timeout and canceling video prepare
             return;
         }
 
-        this._adUnit.setPrepareCalled(false);
-        this._adUnit.setVideoReady(true);
+        this._adUnit.setVideoState(VideoState.READY);
 
         if(duration > 40000) {
             const originalUrl = this._video.getOriginalUrl();

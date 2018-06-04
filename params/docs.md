@@ -214,6 +214,9 @@
 | token | all | False | True | string | Signed JSON Web Token (JWT) with orthogonal (statistically independent) A/B groups for each Unity Monetization component | Server | all |
 | androidId | android | False | True | string | Android ID | SDK | android |
 | gameSessionCounters | all | False | True | object | Game session based counts of starts, views and ad requests | SDK | all |
+| gdprEnabled | all | False | True | boolean | If GDPR is enabled | Server | all |
+| optOutEnabled | all | False | True | boolean | Whether the user has opted out from behavioral ads targeting in current game | Server | all |
+| optOutRecorded | all | False | True | boolean | Whether the user has seen the opt-out banner in current game | Server | all |
 
 
 
@@ -257,4 +260,7 @@
 | token | all | False | True | string | Signed JSON Web Token (JWT) with orthogonal (statistically independent) A/B groups for each Unity Monetization component | Server | all |
 | androidId | android | False | True | string | Android ID | SDK | android |
 | gameSessionCounters | all | False | True | object | Game session based counts of starts, views and ad requests | SDK | all |
+| gdprEnabled | all | False | True | boolean | If GDPR is enabled | Server | all |
+| optOutEnabled | all | False | True | boolean | Whether the user has opted out from behavioral ads targeting in current game | Server | all |
+| optOutRecorded | all | False | True | boolean | Whether the user has seen the opt-out banner in current game | Server | all |
 

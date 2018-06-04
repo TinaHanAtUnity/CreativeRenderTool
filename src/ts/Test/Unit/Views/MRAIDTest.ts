@@ -13,6 +13,7 @@ import { GDPRPrivacy } from 'Views/GDPRPrivacy';
 import MRAIDContainer from 'html/mraid/container.html';
 
 import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCampaign.json';
+import { GdprManager } from 'Managers/GdprManager';
 
 describe('MRAID', () => {
     let handleInvocation: sinon.SinonSpy;
@@ -21,6 +22,7 @@ describe('MRAID', () => {
     let placement: Placement;
     let configuration: Configuration;
     let privacy: GDPRPrivacy;
+    let gdprManager: GdprManager;
 
     beforeEach(() => {
         handleInvocation = sinon.spy();
@@ -42,7 +44,8 @@ describe('MRAID', () => {
         });
 
         configuration = TestFixtures.getConfiguration();
-        privacy = new GDPRPrivacy(nativeBridge, true, true);
+        gdprManager = sinon.createStubInstance(GdprManager);
+        privacy = new GDPRPrivacy(nativeBridge, gdprManager, true, true);
     });
 
     it('should render', (done) => {

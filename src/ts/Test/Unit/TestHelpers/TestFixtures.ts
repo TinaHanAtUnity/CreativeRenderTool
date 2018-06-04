@@ -8,6 +8,7 @@ import { IPerformanceCampaign, PerformanceCampaign, StoreName } from 'Models/Cam
 import { IXPromoCampaign, XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { IMRAIDCampaign, MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Configuration } from 'Models/Configuration';
+import { ConfigurationParser } from 'Parsers/ConfigurationParser';
 import { ICacheDiagnostics } from 'Utilities/Cache';
 import { DisplayInterstitialCampaign, IDisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { Session } from 'Models/Session';
@@ -91,7 +92,8 @@ export class TestFixtures {
             clickUrl: json.clickUrl,
             videoEventUrls: json.videoEventUrls,
             bypassAppSheet: json.bypassAppSheet,
-            store: storeName
+            store: storeName,
+            adUnitStyle: json.adUnitStyle
         };
 
         if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
@@ -464,7 +466,7 @@ export class TestFixtures {
 
     public static getConfiguration(): Configuration {
         const json = JSON.parse(ConfigurationAuctionPlc);
-        return new Configuration(json);
+        return ConfigurationParser.parse(json);
     }
 
     public static getCacheDiagnostics(): ICacheDiagnostics {
