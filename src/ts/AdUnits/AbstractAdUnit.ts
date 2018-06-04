@@ -13,7 +13,7 @@ import { Request } from 'Utilities/Request';
 import { FocusManager } from 'Managers/FocusManager';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { CampaignAssetInfo } from 'Utilities/CampaignAssetInfo';
-import { GdprConsentManager } from 'Managers/GdprConsentManager';
+import { GdprManager } from 'Managers/GdprManager';
 
 export interface IAdUnitParameters<T extends Campaign> {
     forceOrientation: Orientation;
@@ -28,7 +28,7 @@ export interface IAdUnitParameters<T extends Campaign> {
     configuration: Configuration;
     request: Request;
     options: any;
-    gdprManager: GdprConsentManager;
+    gdprManager: GdprManager;
     adMobSignalFactory?: AdMobSignalFactory;
 }
 

@@ -12,7 +12,7 @@ import { ViewController } from 'AdUnits/Containers/ViewController';
 import { Video } from 'Models/Assets/Video';
 import { FocusManager } from 'Managers/FocusManager';
 import { ClientInfo } from 'Models/ClientInfo';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { OperativeEventManager, GDPREventSource } from 'Managers/OperativeEventManager';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
@@ -23,7 +23,7 @@ import { UrlSchemeApi } from 'Native/Api/UrlScheme';
 import { IntentApi } from 'Native/Api/Intent';
 import { GDPRPrivacy } from 'Views/GDPRPrivacy';
 import { Placement } from 'Models/Placement';
-import { GdprConsentManager } from 'Managers/GdprConsentManager';
+import { GdprManager } from 'Managers/GdprManager';
 
 describe('PrivacyEventHandlerTest', () => {
 
@@ -51,7 +51,7 @@ describe('PrivacyEventHandlerTest', () => {
             overlay: sinon.createStubInstance(Overlay),
             video: sinon.createStubInstance(Video),
             privacy: sinon.createStubInstance(GDPRPrivacy),
-            gdprManager: sinon.createStubInstance(GdprConsentManager)
+            gdprManager: sinon.createStubInstance(GdprManager)
         };
 
         adUnit = sinon.createStubInstance(PerformanceAdUnit);
@@ -94,7 +94,7 @@ describe('PrivacyEventHandlerTest', () => {
 
             privacyEventHandler.onGDPROptOut(true);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.operativeEventManager.sendGDPREventWithSource, 'optout');
+            sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.operativeEventManager.sendGDPREvent, 'optout', GDPREventSource.USER);
         });
 
         it('should send operative event with action `optin`', () => {

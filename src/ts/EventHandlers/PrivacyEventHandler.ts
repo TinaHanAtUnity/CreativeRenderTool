@@ -52,7 +52,7 @@ export class PrivacyEventHandler implements IPrivacyHandler {
             // as skip because user has not pressed any button and opening the privacy dialog might have been just a misclick
             if (optOutEnabled) {
                 // optout needs to send the source because we need to tell if it came from consent metadata or gdpr banner
-                this._operativeEventManager.sendGDPREventWithSource('optout', GDPREventSource.USER);
+                this._operativeEventManager.sendGDPREvent('optout', GDPREventSource.USER);
             } else {
                 this._operativeEventManager.sendGDPREvent('skip');
             }
