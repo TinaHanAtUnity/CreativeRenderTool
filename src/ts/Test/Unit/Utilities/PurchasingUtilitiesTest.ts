@@ -88,7 +88,7 @@ describe('PurchasingUtilitiesTest', () => {
                 const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
                 PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge);
                 sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('True'));
-                sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.17'));
+                sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.16'));
                 sandbox.stub(purchasing.onCommandResult, 'subscribe').callsFake((resolve) => resolve('True'));
                 return PurchasingUtilities.sendPurchaseInitializationEvent();
             });
@@ -103,7 +103,7 @@ describe('PurchasingUtilitiesTest', () => {
                 const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
                 PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge);
                 sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('False'));
-                sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.17'));
+                sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.16'));
                 sandbox.stub(purchasing.onCommandResult, 'subscribe').callsFake((resolve) => resolve('True'));
             });
 
@@ -123,7 +123,7 @@ describe('PurchasingUtilitiesTest', () => {
                 const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
                 PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge);
                 sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('True'));
-                sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.14'));
+                sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.15'));
                 sandbox.stub(purchasing.onCommandResult, 'subscribe').callsFake((resolve) => resolve('True'));
             });
 
@@ -239,23 +239,17 @@ describe('PurchasingUtilitiesTest', () => {
             return promise;
         });
 
-        describe('if product is not available', () => {
-            beforeEach(() => {
-                sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(false);
-            });
-            it('should throw error', () => {
-                assert.throws(() => PurchasingUtilities.getProductPrice('myPromo'));
-            });
+        it('should throw error if product is not available', () => {
+            sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(false);
+
+            assert.throws(() => PurchasingUtilities.getProductPrice('myPromo'));
         });
 
-        describe('if product is available', () => {
-            beforeEach(() => {
-                sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
-            });
-            it('should return the price of the product for the given productid', () => {
-                assert.equal(PurchasingUtilities.getProductPrice('myPromo'), '$0.00');
-                assert.equal(PurchasingUtilities.getProductPrice('100.gold.coins'), '$0.99');
-            });
+        it('should return the price of the product for the given productid if product is available', () => {
+            sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
+
+            assert.equal(PurchasingUtilities.getProductPrice('myPromo'), '$0.00');
+            assert.equal(PurchasingUtilities.getProductPrice('100.gold.coins'), '$0.99');
         });
     });
 

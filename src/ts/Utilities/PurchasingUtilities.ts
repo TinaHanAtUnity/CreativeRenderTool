@@ -35,11 +35,9 @@ export class PurchasingUtilities {
 
     public static sendPurchaseInitializationEvent(): Promise<void> {
         if (this.configurationIncludesPromoPlacement()) {
-            return this.isPromoReady().then(() => {
-                return this.checkPromoVersion().then(() => {
-                    return this.sendPurchasingCommand(JSON.stringify(this.loadInitializationPayloads()));
-                });
-            });
+            return this.isPromoReady()
+            .then(() => this.checkPromoVersion())
+            .then(() => this.sendPurchasingCommand(JSON.stringify(this.loadInitializationPayloads())));
         }
         return Promise.resolve();
     }
