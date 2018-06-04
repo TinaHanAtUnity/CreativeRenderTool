@@ -213,6 +213,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
         if (this._privacy) {
             this._privacy.hide();
         }
+        this._isPrivacyShowing = false;
         this._nativeBridge.VideoPlayer.play();
     }
 
@@ -234,13 +235,14 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
 
     private onGDPRPopupEvent(event: Event) {
         event.preventDefault();
-
+        this._isPrivacyShowing = true;
         this._gdprPopupClicked = true;
         this._nativeBridge.VideoPlayer.pause();
         this._privacy.show();
     }
 
     private onPrivacyEvent(event: Event) {
+        this._isPrivacyShowing = true;
         event.preventDefault();
         this._nativeBridge.VideoPlayer.pause();
         this._privacy.show();

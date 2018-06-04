@@ -76,7 +76,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
 
     public show() {
         return super.show().then(() => {
-            (<Overlay>this._overlay)!.choosePrivacyShown(this._showGDPRBanner);
+            (<Overlay>this._overlay).choosePrivacyShown(this._showGDPRBanner);
             if (this._showGDPRBanner && this._forceOrientation === Orientation.LANDSCAPE) {
                 return Promise.all([
                     this._deviceInfo.getScreenWidth(),
@@ -84,9 +84,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
                 ]).then(([screenWidth, screenHeight]) => {
                     this._screenWidth = screenWidth;
                     this._screenHeight = screenHeight;
-                    if (this._forceOrientation === Orientation.LANDSCAPE) {
-                        this._container.setViewFrame('videoplayer', 0, 0, screenWidth, Math.floor(screenHeight * .8));
-                    }
+                    this._container.setViewFrame('videoplayer', 0, 0, screenWidth, Math.floor(screenHeight * .8));
                 });
             }
         });
