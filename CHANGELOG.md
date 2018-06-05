@@ -1,3 +1,9 @@
+# Staged
+
+* Refactor third party event sending url template
+* Fix GDPR pop-up banner placement on iPhone X
+* Refactor XPROMO operative event manager
+
 # Tue Jun  5 09:09:50 UTC 2018
 
 * Include event source in GDPR optout events
