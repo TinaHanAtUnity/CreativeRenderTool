@@ -224,7 +224,6 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     public onGDPROptOut(optOutEnabled: boolean): void {
         if (!this._gdprPopupClicked) {
             this._gdprPopupClicked = true;
-            this._GDPRPopupElement
             this.choosePrivacyShown();
         }
     }
