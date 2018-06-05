@@ -93,27 +93,21 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public sendTrackingEvent(eventType: string) {
         const urls = this._vpaidCampaign.getTrackingUrlsForEvent(eventType);
+        const sessionId = this._vpaidCampaign.getSession().getId();
 
         for (const url of urls) {
-            this.sendThirdPartyEvent(`vpaid ${eventType}`, url);
+            this._thirdPartyEventManager.sendEvent(`vpaid ${eventType}`, sessionId, url);
         }
     }
 
     public sendImpressionTracking() {
         const impressionUrls = this._vpaidCampaign.getImpressionUrls();
+        const sessionId = this._vpaidCampaign.getSession().getId();
         if (impressionUrls) {
             for (const impressionUrl of impressionUrls) {
-                this.sendThirdPartyEvent('vpaid impression', impressionUrl);
+                this._thirdPartyEventManager.sendEvent('vpaid impression', sessionId, impressionUrl);
             }
         }
-    }
-
-    public sendThirdPartyEvent(eventType: string, url: string) {
-        const sessionId = this._vpaidCampaign.getSession().getId();
-        const sdkVersion = this._operativeEventManager.getClientInfo().getSdkVersion();
-        url = url.replace(/%ZONE%/, this._placement.getId());
-        url = url.replace(/%SDK_VERSION%/, sdkVersion.toString());
-        this._thirdPartyEventManager.sendEvent(eventType, sessionId, url, this._vpaidCampaign.getUseWebViewUserAgentForTracking());
     }
 
     public mute() {
@@ -203,8 +197,6 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     private onShow() {
         this.setShowing(true);
-        // todo: is the timer needed at all?
-        // this._timer.start();
 
         this._container.addEventHandler(this);
     }

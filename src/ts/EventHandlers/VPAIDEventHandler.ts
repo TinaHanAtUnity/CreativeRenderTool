@@ -70,10 +70,12 @@ export class VPAIDEventHandler implements IVPAIDHandler {
 
     public onVPAIDCompanionView() {
         const companion = this._vpaidCampaign.getCompanionAd();
+        const sessionId = this._vpaidCampaign.getSession().getId();
+
         if (companion) {
             const urls = companion.getEventTrackingUrls('creativeView');
             for (const url of urls) {
-                this._adUnit.sendThirdPartyEvent('vpaid companion creativeView', url);
+                this._thirdPartyEventManager.sendEvent('vpaid companion creativeView', sessionId, url);
             }
         }
     }
@@ -207,8 +209,10 @@ export class VPAIDEventHandler implements IVPAIDHandler {
 
     private sendClickTrackingEvents() {
         const urls = this._vpaidCampaign.getVideoClickTrackingURLs();
+        const sessionId = this._vpaidCampaign.getSession().getId();
+
         for (const url of urls) {
-            this._adUnit.sendThirdPartyEvent('vpaid video click', url);
+            this._thirdPartyEventManager.sendEvent('vpaid video click', sessionId, url);
         }
     }
 }

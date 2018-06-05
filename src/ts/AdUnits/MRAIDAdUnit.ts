@@ -196,17 +196,13 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     private sendTrackingEvent(eventName: string): void {
-        const sdkVersion = this._clientInfo.getSdkVersion();
-        const placementId = this._placement.getId();
         const sessionId = this._campaign.getSession().getId();
 
         if(this._additionalTrackingEvents && this._additionalTrackingEvents[eventName]) {
             const trackingEventUrls = this._additionalTrackingEvents[eventName];
 
             if(trackingEventUrls) {
-                for (let url of trackingEventUrls) {
-                    url = url.replace(/%ZONE%/, placementId);
-                    url = url.replace(/%SDK_VERSION%/, sdkVersion.toString());
+                for (const url of trackingEventUrls) {
                     this._thirdPartyEventManager.sendEvent(`mraid ${eventName}`, sessionId, url, this._campaign.getUseWebViewUserAgentForTracking());
                 }
             }

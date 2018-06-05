@@ -28,7 +28,6 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { Campaign } from 'Models/Campaign';
 
-import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
 import { ConfigurationParser } from 'Parsers/ConfigurationParser';
 import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 import { XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
@@ -38,6 +37,8 @@ import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
 import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { GdprManager } from 'Managers/GdprManager';
+
+import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
 
 describe('AdUnitFactoryTest', () => {
 
@@ -54,6 +55,7 @@ describe('AdUnitFactoryTest', () => {
     let thirdPartyEventManager: ThirdPartyEventManager;
     let request: Request;
     let adUnitParameters: IAdUnitParameters<Campaign>;
+    let wakeUpManager: WakeUpManager;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -63,15 +65,17 @@ describe('AdUnitFactoryTest', () => {
         nativeBridge = TestFixtures.getNativeBridge();
         metaDataManager = new MetaDataManager(nativeBridge);
         focusManager = new FocusManager(nativeBridge);
-        const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
+        wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
         container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
         sandbox.stub(container, 'close').returns(Promise.resolve());
         sandbox.stub(container, 'open').returns(Promise.resolve());
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
+        const placement = TestFixtures.getPlacement();
         config = ConfigurationParser.parse(JSON.parse(ConfigurationJson));
         deviceInfo = <DeviceInfo>{getLanguage: () => 'en', getAdvertisingIdentifier: () => '000', getLimitAdTracking: () => false, getOsVersion: () => '8.0'};
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
+        thirdPartyEventManager.setTemplateValues({ '%ZONE%': placement.getId(), '%SDK_VERSION%': clientInfo.getSdkVersion().toString() });
         sessionManager = new SessionManager(nativeBridge, request);
         const campaign = TestFixtures.getCampaign();
         const gdprManager = sinon.createStubInstance(GdprManager);
@@ -97,7 +101,7 @@ describe('AdUnitFactoryTest', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
-            placement: TestFixtures.getPlacement(),
+            placement: placement,
             campaign: campaign,
             configuration: config,
             request: request,
@@ -106,6 +110,7 @@ describe('AdUnitFactoryTest', () => {
         };
 
         sandbox.spy(thirdPartyEventManager, 'sendEvent');
+        sandbox.spy(request, 'get');
         sandbox.stub(nativeBridge.WebPlayer, 'setSettings').returns(Promise.resolve());
         sandbox.stub(nativeBridge.WebPlayer, 'clearSettings').returns(Promise.resolve());
     });
@@ -217,7 +222,8 @@ describe('AdUnitFactoryTest', () => {
 
             it('should replace macros in the postback impression url', () => {
                 adUnit.show();
-                sinon.assert.calledWith(<sinon.SinonSpy>thirdPartyEventManager.sendEvent, 'mraid impression', '12345', 'http://test.impression.com/fooId/blah?sdkVersion=2000');
+                (<sinon.SinonSpy>thirdPartyEventManager.sendEvent).restore();
+                assert.equal('http://test.impression.com/fooId/blah?sdkVersion=2000', (<sinon.SinonSpy>request.get).getCall(2).args[0], 'should have replaced template values in the url');
                 adUnit.hide();
             });
         });
