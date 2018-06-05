@@ -78,7 +78,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             });
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 
-            sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
+            sinon.spy(operativeEventManager, 'sendClick');
             sinon.stub(operativeEventManager, 'sendHttpKafkaEvent').returns(resolvedPromise);
 
             sinon.spy(nativeBridge.Intent, 'launch');
@@ -124,7 +124,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 clickAttributionUrl: xPromoAdUnitParameters.campaign.getClickAttributionUrl()
             });
 
-            sinon.assert.notCalled(<sinon.SinonSpy>operativeEventManager.sendClick);
+            sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendClick);
             sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendHttpKafkaEvent, 'ads.xpromo.operative.videoclick.v1.json', 'click', placement, xPromoAdUnit.getVideoOrientation());
         });
 
@@ -163,7 +163,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             });
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 
-            sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
+            sinon.spy(operativeEventManager, 'sendClick');
             sinon.stub(operativeEventManager, 'sendHttpKafkaEvent').returns(resolvedPromise);
             sinon.stub(deviceInfo, 'getOsVersion').returns('9.0');
             const video = new Video('', TestFixtures.getSession());
@@ -207,7 +207,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 clickAttributionUrl: xPromoAdUnitParameters.campaign.getClickAttributionUrl()
             });
 
-            sinon.assert.notCalled(<sinon.SinonSpy>operativeEventManager.sendClick);
+            sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendClick);
             sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendHttpKafkaEvent, 'ads.xpromo.operative.videoclick.v1.json', 'click', placement, xPromoAdUnit.getVideoOrientation());
         });
     });
