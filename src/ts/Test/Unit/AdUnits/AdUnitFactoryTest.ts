@@ -36,7 +36,7 @@ import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
 import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
-import { GdprConsentManager } from 'Managers/GdprConsentManager';
+import { GdprManager } from 'Managers/GdprManager';
 
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
 
@@ -78,7 +78,7 @@ describe('AdUnitFactoryTest', () => {
         thirdPartyEventManager.setTemplateValues({ '%ZONE%': placement.getId(), '%SDK_VERSION%': clientInfo.getSdkVersion().toString() });
         sessionManager = new SessionManager(nativeBridge, request);
         const campaign = TestFixtures.getCampaign();
-        const gdprManager = sinon.createStubInstance(GdprConsentManager);
+        const gdprManager = sinon.createStubInstance(GdprManager);
 
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             nativeBridge: nativeBridge,

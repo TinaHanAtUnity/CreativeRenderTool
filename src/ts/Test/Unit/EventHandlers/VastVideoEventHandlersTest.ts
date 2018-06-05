@@ -27,7 +27,7 @@ import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFact
 import { IVideoEventHandlerParams } from 'EventHandlers/BaseVideoEventHandler';
 import { Vast } from 'Models/Vast/Vast';
 import { VideoState } from 'AdUnits/VideoAdUnit';
-import { GdprConsentManager } from 'Managers/GdprConsentManager';
+import { GdprManager } from 'Managers/GdprManager';
 
 import EventTestVast from 'xml/EventTestVast.xml';
 
@@ -54,7 +54,7 @@ describe('VastVideoEventHandler tests', () => {
     let sandbox: sinon.SinonSandbox;
     let vastVideoEventHandler: VastVideoEventHandler;
     let videoEventHandlerParams: IVideoEventHandlerParams;
-    let gdprManager: GdprConsentManager;
+    let gdprManager: GdprManager;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -102,7 +102,7 @@ describe('VastVideoEventHandler tests', () => {
             campaign: campaign
         });
 
-        gdprManager = sinon.createStubInstance(GdprConsentManager);
+        gdprManager = sinon.createStubInstance(GdprManager);
 
         vastAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,
