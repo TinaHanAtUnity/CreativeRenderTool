@@ -1,4 +1,17 @@
-# Staged
+# Pending
+
+* Include event source in GDPR optout events
+* Refactor GdprConsentManager to GdprManager
+* IAP promo Android loading optimization
+* Add stored_gamer_id diagnostic event to track stored gamer IDs in config request
+
+# Mon Jun  4 16:02:48 UTC 2018
+
+* Switch GDPR image to a font icon
+* Fix videoplayer regressions
+* Remove gamer ID from analytics core stats events
+
+# Mon Jun  4 11:15:18 UTC 2018
 
 * Moved GDPR banner on top of the game background image in portrait mode
 * Added support for adUnitStyle and ctaButtonColour
