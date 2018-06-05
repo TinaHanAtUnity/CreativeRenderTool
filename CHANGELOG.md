@@ -1,4 +1,4 @@
-# Pending
+# Tue Jun  5 09:09:50 UTC 2018
 
 * Include event source in GDPR optout events
 * Refactor GdprConsentManager to GdprManager
@@ -213,7 +213,7 @@
 * Fixed a bug where streaming video was cached and shown by default
 * Rename ForceOrientation to Orientation
 
-# Wed Apr 4 20:10:07 UTC 2018 
+# Wed Apr 4 20:10:07 UTC 2018
 
 * Start new refresh manager A/B test in groups 9 & 10
 * Stop refresh manager A/B test in groups 9 & 11
@@ -380,7 +380,7 @@
 * VPAID container fixes
 * Fix hybrid tests & disable 2 broken PurchasingUtilities tests
 * Add iOS screenScale to ad request query parameters
-* Fix missing MOAT stylesheet 
+* Fix missing MOAT stylesheet
 
 # Thu Feb 22 08:57:26 UTC 2018
 
@@ -548,7 +548,7 @@
 * Fix failing hybrid test
 * Remove ComScore AB groups, enable on whole network
 * Fix display unit tests
-* Set xmas end screen by default except groups 10 & 11 
+* Set xmas end screen by default except groups 10 & 11
 * Remove dark end screen
 
 # Fri Dec 15 11:12:36 UTC 2017
@@ -659,7 +659,7 @@
 
 # Tue Nov 14 09:32:33 UTC 2017
 
-* Faster init by converting some promise chains to be parallel 
+* Faster init by converting some promise chains to be parallel
 
 # Mon Nov 13 09:23:05 UTC 2017
 
@@ -1220,7 +1220,7 @@
 
 # Fri Mar 10 11:27:36 UTC 2017
 
-* Converted current MZ playables to use MRAID 
+* Converted current MZ playables to use MRAID
 
 # Wed Mar  8 07:19:27 UTC 2017
 
@@ -1287,7 +1287,7 @@
 
 # Mon Jan 30 13:59:36 UTC 2017
 
-* Fixed several overlay UX issues 
+* Fixed several overlay UX issues
 
 # Wed Jan 25 09:58:18 UTC 201
 
@@ -1394,4 +1394,3 @@
 * If caching fails due to network error, retry five times with a 10 second delay between retries
 * Fix iOS cache retries, previously they never retried if downloading failed due to network error
 * Disable hardware acceleration on one Android 4.2 device (ABT-91)
-
