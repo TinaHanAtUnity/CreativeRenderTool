@@ -70,6 +70,30 @@
     -webkit-animation-duration: .01s;
   }
 
+  .gdpr-pop-up {
+
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: $dark-gdpr-banner;
+    box-shadow: 0 0 15px 0 rgba(0, 0, 0, .1);
+    z-index: 1;
+    pointer-events: auto;
+
+
+    .gdpr-text {
+      z-index: 2;
+      padding: $default-scale-size * $default-font-size * .5;
+      color: $white;
+      text-align: center;
+      font-size: $default-scale-size * $default-font-size * .5;
+
+      .gdpr-link {
+        color: $blue;
+      }
+    }
+  }
+
   .privacy-button {
     $privacy-button-default($default-scale-size);
     left: 0;

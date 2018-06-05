@@ -28,8 +28,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     protected _placement: Placement;
     protected _campaign: MRAIDCampaign;
-
-    private _privacy: AbstractPrivacy;
+    protected _privacy: AbstractPrivacy;
 
     constructor(nativeBridge: NativeBridge, id: string, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy) {
         super(nativeBridge, id);

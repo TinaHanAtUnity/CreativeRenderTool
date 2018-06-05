@@ -10,9 +10,9 @@ import { Platform } from 'Constants/Platform';
 import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Template } from 'Utilities/Template';
 import { SdkStats } from 'Utilities/SdkStats';
-import { AbstractPrivacy } from 'Views/AbstractPrivacy';
+import { AbstractPrivacy, IPrivacyHandler } from 'Views/AbstractPrivacy';
 
-export class MRAID extends MRAIDView<IMRAIDViewHandler> {
+export class MRAID extends MRAIDView<IMRAIDViewHandler> implements IPrivacyHandler {
 
     private static CloseLength = 30;
 
@@ -20,6 +20,10 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private _closeElement: HTMLElement;
     private _iframe: HTMLIFrameElement;
+    private _gdprBanner: HTMLElement;
+    private _privacyButton: HTMLElement;
+    private _showGDPRBanner = false;
+    private _gdprPopupClicked = false;
     private _loaded = false;
 
     private _messageListener: any;
@@ -50,6 +54,21 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
                 event: 'click',
                 listener: (event: Event) => this.onPrivacyEvent(event),
                 selector: '.privacy-button'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onGDPRPopupEvent(event),
+                selector: '.gdpr-link'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onPrivacyEvent(event),
+                selector: '.icon-info'
+            },
+            {
+                event: 'swipe',
+                listener: (event: Event) => this.onGDPROptOut(false),
+                selector: '.gdpr-pop-up'
             }
         ];
     }
@@ -60,6 +79,8 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
 
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
+        this._gdprBanner = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
+        this._privacyButton = <HTMLElement>this._container.querySelector('.privacy-button');
 
         this.createMRAID(MRAIDContainer).then(mraid => {
             this._nativeBridge.Sdk.logDebug('setting iframe srcdoc (' + mraid.length + ')');
@@ -74,6 +95,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
     public show(): void {
         super.show();
+        this.choosePrivacyShown();
         this._showTimestamp = Date.now();
 
         if(this._placement.allowSkip()) {
@@ -148,6 +170,33 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
                 type: 'viewable',
                 value: viewable
             }, '*');
+        }
+    }
+
+    public onGDPROptOut(optOutEnabled: boolean) {
+        // super.onGDPROptOut(optOutEnabled);
+        if (!this._gdprPopupClicked) {
+            this._gdprPopupClicked = true;
+            this.choosePrivacyShown();
+        }
+    }
+
+    private onGDPRPopupEvent(event: Event) {
+        event.preventDefault();
+        this._gdprPopupClicked = true;
+        this._nativeBridge.VideoPlayer.pause();
+        this._privacy.show();
+    }
+
+    private choosePrivacyShown(): void {
+        if (!this._gdprPopupClicked) {
+            this._gdprBanner.style.visibility = 'visible';
+            this._privacyButton.style.pointerEvents = '1';
+            this._privacyButton.style.visibility = 'hidden';
+        } else {
+            this._privacyButton.style.visibility = 'visible';
+            this._gdprBanner.style.pointerEvents = '1';
+            this._gdprBanner.style.visibility = 'hidden';
         }
     }
 
