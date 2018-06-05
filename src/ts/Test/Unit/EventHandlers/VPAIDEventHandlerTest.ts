@@ -151,7 +151,7 @@ describe('VPAIDEventHandlerTest', () => {
             const checkClickThroughTracking = () => {
                 const urls = parameters.campaign.getVideoClickTrackingURLs();
                 for (const url of urls) {
-                    sinon.assert.calledWith(<sinon.SinonSpy>adUnit.sendThirdPartyEvent, `vpaid video click`, url);
+                    sinon.assert.calledWith(<sinon.SinonSpy>parameters.thirdPartyEventManager.sendEvent, `vpaid video click`, TestFixtures.getSession().getId(), url);
                 }
             };
 
