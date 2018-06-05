@@ -8,6 +8,8 @@ import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Views/AbstractPrivacy';
 import { GDPRPrivacy } from 'Views/GDPRPrivacy';
+import { clearScreenDown } from 'readline';
+import { Swipe } from 'Utilities/Swipe';
 
 export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
 
@@ -90,6 +92,11 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
                 listener: (event: Event) => this.onPrivacyEvent(event),
                 selector: '.icon-info'
             },
+            {
+                event: 'swipe',
+                listener: (event: Event) => this.onGDPROptOut(false),
+                selector: '.gdpr-pop-up'
+            }
         ];
 
         if(CustomFeatures.isTimehopApp(gameId)) {
@@ -107,10 +114,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
 
     public hide() {
         super.hide();
-        // Workaround check for other ad units that use this overlay
-        if (document.getElementById('.gdpr-pop-up') || document.getElementById('.privacy-button')) {
-            document.body!.removeChild(this._privacy.container());
-        }
+        document.body.removeChild(this._privacy.container());
     }
 
     public render(): void {
@@ -218,16 +222,20 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     }
 
     public onGDPROptOut(optOutEnabled: boolean): void {
-        // do nothing
+        if (!this._gdprPopupClicked) {
+            this._gdprPopupClicked = true;
+            this._GDPRPopupElement
+            this.choosePrivacyShown();
+        }
     }
 
-    public choosePrivacyShown(showGDPRBanner: boolean): void {
-        if (showGDPRBanner) {
-            this._GDPRPopupElement.style.opacity = '1';
+    public choosePrivacyShown(): void {
+        if (!this._gdprPopupClicked) {
+            this._GDPRPopupElement.style.visibility = 'visible';
             this._privacyButtonElement.style.pointerEvents = '1';
             this._privacyButtonElement.style.visibility = 'hidden';
         } else {
-            this._privacyButtonElement.style.opacity = '1';
+            this._privacyButtonElement.style.visibility = 'visible';
             this._GDPRPopupElement.style.pointerEvents = '1';
             this._GDPRPopupElement.style.visibility = 'hidden';
         }

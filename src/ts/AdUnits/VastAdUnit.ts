@@ -76,7 +76,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
 
     public show() {
         return super.show().then(() => {
-            (<Overlay>this._overlay).choosePrivacyShown(this._showGDPRBanner);
+            (<Overlay>this._overlay).choosePrivacyShown();
             if (this._showGDPRBanner && this._forceOrientation === Orientation.LANDSCAPE) {
                 return Promise.all([
                     this._deviceInfo.getScreenWidth(),
