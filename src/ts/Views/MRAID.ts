@@ -55,20 +55,18 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
             },
             {
                 event: 'click',
-                listener: (event: Event) => this.onGDPRPopupEvent(event),
+                listener: (event: Event) => {
+                                                this.onGDPRPopupEvent(event);
+                                                this._gdprPopupClicked = true;
+                                                this.choosePrivacyShown();
+                                            },
                 selector: '.gdpr-link'
             },
             {
                 event: 'click',
                 listener: (event: Event) => this.onPrivacyEvent(event),
                 selector: '.icon-info'
-            },
-            // let's think about swipe later
-            // {
-            //     event: 'swipe',
-            //     listener: (event: Event) => this.onGDPROptOut(false), // swipe means skip event on this case
-            //     selector: '.gdpr-pop-up'
-            // }
+            }
         ];
     }
 

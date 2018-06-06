@@ -44,12 +44,14 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     private _fadeStatus: boolean = true;
     private _privacy: AbstractPrivacy;
     private _gdprPopupClicked: boolean = false;
+    private _showGDPRBanner: boolean = false;
 
     constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: number = 0) {
         super(nativeBridge, 'overlay', muted, abGroup);
 
         this._localization = new Localization(language, 'overlay');
         this._privacy = privacy;
+        this._showGDPRBanner = showGDPRBanner;
 
         this._templateData = {
             muted
@@ -91,11 +93,6 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
                 event: 'click',
                 listener: (event: Event) => this.onPrivacyEvent(event),
                 selector: '.icon-info'
-            },
-            {
-                event: 'swipe',
-                listener: (event: Event) => this.onGDPROptOut(false),
-                selector: '.gdpr-pop-up'
             }
         ];
 
@@ -127,6 +124,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
         this._progressElement = <HTMLElement>this._container.querySelector('.progress');
         this._GDPRPopupElement = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
         this._privacyButtonElement = <HTMLElement>this._container.querySelector('.privacy-button');
+        this.choosePrivacyShown();
     }
 
     public setSpinnerEnabled(value: boolean): void {
@@ -229,7 +227,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     }
 
     public choosePrivacyShown(): void {
-        if (!this._gdprPopupClicked) {
+        if (!this._gdprPopupClicked && this._showGDPRBanner) {
             this._GDPRPopupElement.style.visibility = 'visible';
             this._privacyButtonElement.style.pointerEvents = '1';
             this._privacyButtonElement.style.visibility = 'hidden';
