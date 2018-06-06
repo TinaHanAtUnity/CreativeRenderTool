@@ -7,17 +7,22 @@ import { Configuration } from 'Models/Configuration';
 import { NativeBridge } from 'Native/NativeBridge';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
-import { GdprManager } from 'Managers/GdprManager';
+import { GdprManager, GDPREventSource, GDPREventAction } from 'Managers/GdprManager';
 import { StorageType, StorageApi } from 'Native/Api/Storage';
-import { OperativeEventManager, GDPREventSource } from 'Managers/OperativeEventManager';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Request } from 'Utilities/Request';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { Observable2 } from 'Utilities/Observable';
 import { SdkApi } from 'Native/Api/Sdk';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
+import { HttpKafka, KafkaCommonObjectType } from 'Utilities/HttpKafka';
+import { Platform } from 'Constants/Platform';
 
 describe('GdprManagerTest', () => {
+    const testGameId = '12345';
+    const testAdvertisingId = '128970986778678';
+    const testUnityProjectId = 'game-1';
     let nativeBridge: NativeBridge;
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
@@ -29,7 +34,8 @@ describe('GdprManagerTest', () => {
     let getStub: sinon.SinonStub;
     let setStub: sinon.SinonStub;
     let writeStub: sinon.SinonStub;
-    let sendGDPREventStub: sinon.SinonStub;
+    let sendGDPREventStub: sinon.SinonSpy;
+    let httpKafkaStub: sinon.SinonSpy;
 
     let consentlastsent: boolean | string = false;
     let consent: any = false;
@@ -44,8 +50,8 @@ describe('GdprManagerTest', () => {
         nativeBridge.Storage = sinon.createStubInstance(StorageApi);
         (<any>nativeBridge.Storage).onSet = new Observable2<string, object>();
 
-        deviceInfo = sinon.createStubInstance(AndroidDeviceInfo);
         clientInfo = sinon.createStubInstance(ClientInfo);
+        deviceInfo = sinon.createStubInstance(AndroidDeviceInfo);
         configuration = sinon.createStubInstance(Configuration);
         request = sinon.createStubInstance(Request);
 
@@ -53,7 +59,13 @@ describe('GdprManagerTest', () => {
         getStub = <sinon.SinonStub>nativeBridge.Storage.get;
         setStub = (<sinon.SinonStub>nativeBridge.Storage.set).resolves();
         writeStub = (<sinon.SinonStub>nativeBridge.Storage.write).resolves();
-        sendGDPREventStub = sinon.stub(OperativeEventManager, 'sendGDPREvent').resolves();
+
+        (<sinon.SinonStub>clientInfo.getPlatform).returns(Platform.TEST);
+        (<sinon.SinonStub>clientInfo.getGameId).returns(testGameId);
+        (<sinon.SinonStub>deviceInfo.getAdvertisingIdentifier).returns(testAdvertisingId);
+        (<sinon.SinonStub>configuration.getUnityProjectId).returns(testUnityProjectId);
+
+        httpKafkaStub = sinon.stub(HttpKafka, 'sendEvent').resolves();
 
         getStub.withArgs(StorageType.PRIVATE, 'gdpr.consentlastsent').callsFake(() => {
             return Promise.resolve(consentlastsent);
@@ -65,10 +77,11 @@ describe('GdprManagerTest', () => {
             storageTrigger = fun;
         });
         gdprManager = new GdprManager(nativeBridge, deviceInfo, clientInfo, configuration, request);
+        sendGDPREventStub = sinon.spy(gdprManager, 'sendGDPREvent');
     });
 
     afterEach(() => {
-        sendGDPREventStub.restore();
+        httpKafkaStub.restore();
     });
 
     it('should subscribe to Storage.onSet', () => {
@@ -115,9 +128,9 @@ describe('GdprManagerTest', () => {
                         sinon.assert.calledOnce(onSetStub);
                         sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
                         if (t.event === 'optout') {
-                            sinon.assert.calledWith(sendGDPREventStub, t.event, sinon.match.any, sinon.match.any, sinon.match.any, GDPREventSource.METADATA);
+                            sinon.assert.calledWithExactly(sendGDPREventStub, t.event, GDPREventSource.METADATA);
                         } else {
-                            sinon.assert.calledWith(sendGDPREventStub, t.event);
+                            sinon.assert.calledWithExactly(sendGDPREventStub, t.event);
                         }
                         sinon.assert.calledWith(setStub, StorageType.PRIVATE, 'gdpr.consentlastsent', t.storedConsent);
                         sinon.assert.calledWith(writeStub, StorageType.PRIVATE);
@@ -229,9 +242,9 @@ describe('GdprManagerTest', () => {
                             sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'gdpr.consent.value');
                             sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
                             if (t.event === 'optout') {
-                                sinon.assert.calledWith(sendGDPREventStub, t.event, sinon.match.any, sinon.match.any, sinon.match.any, GDPREventSource.METADATA);
+                                sinon.assert.calledWithExactly(sendGDPREventStub, t.event, GDPREventSource.METADATA);
                             } else {
-                                sinon.assert.calledWith(sendGDPREventStub, t.event);
+                                sinon.assert.calledWithExactly(sendGDPREventStub, t.event);
                             }
                             sinon.assert.calledWith(setStub, StorageType.PRIVATE, 'gdpr.consentlastsent', t.storedConsent);
                             sinon.assert.calledWith(writeStub, StorageType.PRIVATE);
@@ -260,9 +273,9 @@ describe('GdprManagerTest', () => {
                             return writePromise.then(() => {
                                 sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
                                 if (event === 'optout') {
-                                    sinon.assert.calledWith(sendGDPREventStub, event, sinon.match.any, sinon.match.any, sinon.match.any, GDPREventSource.METADATA);
+                                    sinon.assert.calledWithExactly(sendGDPREventStub, event, GDPREventSource.METADATA);
                                 } else {
-                                    sinon.assert.calledWith(sendGDPREventStub, event);
+                                    sinon.assert.calledWithExactly(sendGDPREventStub, event);
                                 }
                                 sinon.assert.calledWith(setStub, StorageType.PRIVATE, 'gdpr.consentlastsent', userConsents);
                                 sinon.assert.calledWith(writeStub, StorageType.PRIVATE);
@@ -337,6 +350,109 @@ describe('GdprManagerTest', () => {
             }).catch((error) => {
                 assert.equal(error, 'Test Error');
                 sinon.assert.calledWith(logErrorStub, 'Gdpr request failedTest Error');
+            });
+        });
+    });
+
+    describe('Sending gdpr events', () => {
+        const tests: Array<{
+            action: GDPREventAction,
+            source: GDPREventSource | undefined,
+            infoJson: any
+        }> = [{
+            action: GDPREventAction.SKIP,
+            source: undefined,
+            infoJson: {
+                'adid': testAdvertisingId,
+                'action': 'skip',
+                'projectId': testUnityProjectId,
+                'platform': 'test',
+                'gameId': testGameId
+            }
+        }, {
+            action: GDPREventAction.CONSENT,
+            source: undefined,
+            infoJson: {
+                'adid': testAdvertisingId,
+                'action': 'consent',
+                'projectId': testUnityProjectId,
+                'platform': 'test',
+                'gameId': testGameId
+            }
+        }, {
+            action: GDPREventAction.OPTOUT,
+            source: undefined,
+            infoJson: {
+                'adid': testAdvertisingId,
+                'action': 'optout',
+                'projectId': testUnityProjectId,
+                'platform': 'test',
+                'gameId': testGameId
+            }
+        }, {
+            action: GDPREventAction.OPTOUT,
+            source: GDPREventSource.METADATA,
+            infoJson: {
+                'adid': testAdvertisingId,
+                'action': 'optout',
+                'projectId': testUnityProjectId,
+                'platform': 'test',
+                'gameId': testGameId,
+                'source': 'metadata'
+            }
+        }, {
+            action: GDPREventAction.OPTOUT,
+            source: GDPREventSource.USER,
+            infoJson: {
+                'adid': testAdvertisingId,
+                'action': 'optout',
+                'projectId': testUnityProjectId,
+                'platform': 'test',
+                'gameId': testGameId,
+                'source': 'user'
+            }
+        }, {
+            action: GDPREventAction.OPTIN,
+            source: undefined,
+            infoJson: {
+                'adid': testAdvertisingId,
+                'action': 'optin',
+                'projectId': testUnityProjectId,
+                'platform': 'test',
+                'gameId': testGameId
+            }
+        }];
+
+        tests.forEach((t) => {
+            it(`should send matching payload when action is "${t.action}"`, () => {
+                httpKafkaStub.resetHistory();
+                const comparison = (value: any): boolean => {
+                    if (Object.keys(value).length !== Object.keys(t.infoJson).length) {
+                        return false;
+                    }
+                    if (value.adid !== t.infoJson.adid) {
+                        return false;
+                    }
+                    if (value.action !== t.infoJson.action) {
+                        return false;
+                    }
+                    if (value.projectId !== t.infoJson.projectId) {
+                        return false;
+                    }
+                    if (value.platform !== t.infoJson.platform) {
+                        return false;
+                    }
+                    if (value.gameId !== t.infoJson.gameId) {
+                        return false;
+                    }
+                    if (value.source !== t.infoJson.source) {
+                        return false;
+                    }
+                    return true;
+                };
+                gdprManager.sendGDPREvent(t.action, t.source);
+                assert.isTrue(comparison(httpKafkaStub.firstCall.args[2]), `expected infoJson ${JSON.stringify(t.infoJson)}\nreceived infoJson ${JSON.stringify(httpKafkaStub.firstCall.args[2])}`);
+                httpKafkaStub.calledWithExactly('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, t.infoJson);
             });
         });
     });
