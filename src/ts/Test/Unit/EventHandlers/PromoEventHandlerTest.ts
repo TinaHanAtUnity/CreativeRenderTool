@@ -24,11 +24,11 @@ import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 import { Configuration } from 'Models/Configuration';
 import { SinonStub, SinonSandbox } from 'sinon';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { getAbGroup } from 'Models/ABGroup';
 import { PurchasingApi } from 'Native/Api/Purchasing';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Observable1 } from 'Utilities/Observable';
+import { GdprManager } from 'Managers/GdprManager';
 
 describe('PromoEventHandlersTest', () => {
     const handleInvocation = sinon.spy();
@@ -91,22 +91,37 @@ describe('PromoEventHandlersTest', () => {
     });
 
     describe('when calling onGDPRPopupSkipped', () => {
-        const operativeEventManager = sinon.createStubInstance(OperativeEventManager);
+        let gdprManager: GdprManager;
+
+        beforeEach(() => {
+            gdprManager = sinon.createStubInstance(GdprManager);
+        });
 
         it ('should set the optOutRecorded flag in the configuration', () => {
             const config = sinon.createStubInstance(Configuration);
 
             (<sinon.SinonStub>config.isOptOutRecorded).returns(false);
 
-            PromoEventHandler.onGDPRPopupSkipped(config, operativeEventManager);
-            sinon.assert.called(<sinon.SinonSpy>config.setOptOutRecorded);
+            PromoEventHandler.onGDPRPopupSkipped(config, gdprManager);
+            sinon.assert.calledWith(<sinon.SinonSpy>config.setOptOutRecorded, true);
         });
 
         it('should send GDPR operative Event with skip', () => {
             const config = sinon.createStubInstance(Configuration);
 
-            PromoEventHandler.onGDPRPopupSkipped(config, operativeEventManager);
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendGDPREvent, 'skip');
+            (<sinon.SinonStub>config.isOptOutRecorded).returns(false);
+
+            PromoEventHandler.onGDPRPopupSkipped(config, gdprManager);
+            sinon.assert.calledWithExactly(<sinon.SinonSpy>gdprManager.sendGDPREvent, 'skip');
+        });
+
+        it('should not call gdpr or set optOutRecorded when already recorded', () => {
+            const config = sinon.createStubInstance(Configuration);
+
+            (<sinon.SinonStub>config.isOptOutRecorded).returns(true);
+            PromoEventHandler.onGDPRPopupSkipped(config, gdprManager);
+            sinon.assert.notCalled(<sinon.SinonSpy>config.setOptOutRecorded);
+            sinon.assert.notCalled(<sinon.SinonSpy>gdprManager.sendGDPREvent);
         });
     });
 });

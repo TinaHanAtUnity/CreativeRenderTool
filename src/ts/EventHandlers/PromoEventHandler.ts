@@ -3,8 +3,8 @@ import { PurchasingUtilities, IPromoPayload, IPromoRequest } from 'Utilities/Pur
 import { Configuration } from 'Models/Configuration';
 import { FinishState } from 'Constants/FinishState';
 import { Placement } from 'Models/Placement';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { IABGroup } from 'Models/ABGroup';
+import { GdprManager, GDPREventAction } from 'Managers/GdprManager';
 
 export class PromoEventHandler {
 
@@ -36,10 +36,10 @@ export class PromoEventHandler {
         PurchasingUtilities.sendPromoPayload(JSON.stringify(iapPayload));
     }
 
-    public static onGDPRPopupSkipped(configuration: Configuration, operativeEventManager: OperativeEventManager): void {
+    public static onGDPRPopupSkipped(configuration: Configuration, gdprManager: GdprManager): void {
         if (!configuration.isOptOutRecorded()) {
             configuration.setOptOutRecorded(true);
-            operativeEventManager.sendGDPREvent('skip');
+            gdprManager.sendGDPREvent(GDPREventAction.SKIP);
         }
     }
 }

@@ -60,10 +60,10 @@ export class PurchasingUtilities {
                 this._nativeBridge.Purchasing.onGetPromoCatalog.unsubscribe(observer);
                 try {
                     this._catalog = new PurchasingCatalog(JSON.parse(promoCatalogJSON));
+                    resolve();
                 } catch(err) {
                     reject(this.logIssue('catalog_json_parse_failure', 'Promo catalog JSON failed to parse'));
                 }
-                resolve();
             });
             this._nativeBridge.Purchasing.getPromoCatalog().catch((e) => {
                 this._nativeBridge.Purchasing.onGetPromoCatalog.unsubscribe(observer);
@@ -120,12 +120,13 @@ export class PurchasingUtilities {
                 this._nativeBridge.Purchasing.onInitialize.unsubscribe(observer);
                 if (isReady !== 'True') {
                     reject(this.logIssue('promo_not_ready', 'IAP Promo was not ready'));
+                } else {
+                    resolve();
                 }
-                resolve();
             });
             this._nativeBridge.Purchasing.initializePurchasing().catch(() => {
                 this._nativeBridge.Purchasing.onInitialize.unsubscribe(observer);
-                reject(this.logIssue('purchase_initilization_failed', 'Purchase initialization failed'));
+                reject(this.logIssue('purchase_initialization_failed', 'Purchase initialization failed'));
             });
         });
     }
@@ -136,8 +137,9 @@ export class PurchasingUtilities {
                 this._nativeBridge.Purchasing.onGetPromoVersion.unsubscribe(promoVersionObserver);
                 if(!this.isPromoVersionSupported(promoVersion)) {
                     reject(this.logIssue('promo_version_not_supported', 'Promo version not supported'));
+                } else {
+                    resolve();
                 }
-                resolve();
             });
             this._nativeBridge.Purchasing.getPromoVersion().catch(() => {
                 this._nativeBridge.Purchasing.onGetPromoVersion.unsubscribe(promoVersionObserver);
@@ -154,8 +156,9 @@ export class PurchasingUtilities {
                         this._isInitialized = true;
                     }
                     resolve();
+                } else {
+                    reject(this.logIssue('purchase_command_attempt_failed', `Purchase command attempt failed with command ${isCommandSuccessful}`));
                 }
-                reject(this.logIssue('purchase_command_attempt_failed', 'Purchase command attempt failed'));
             });
             this._nativeBridge.Purchasing.initiatePurchasingCommand(iapPayload).catch(() => {
                 this._nativeBridge.Purchasing.onCommandResult.unsubscribe(observer);
@@ -167,7 +170,7 @@ export class PurchasingUtilities {
     // Returns true if version is 1.16.0 or newer
     private static isPromoVersionSupported(version: string): boolean {
         const promoVersionSplit = version.split('.', 2);
-        if (promoVersionSplit[0].length > 0 && promoVersionSplit[0].length > 0) {
+        if (promoVersionSplit.length > 1) {
             return ((parseInt(promoVersionSplit[0], 10) >= 2) || ((parseInt(promoVersionSplit[0], 10) >= 1 && parseInt(promoVersionSplit[1], 10) >= 16)));
         }
         return false;
