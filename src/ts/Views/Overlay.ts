@@ -45,13 +45,15 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     private _privacy: AbstractPrivacy;
     private _gdprPopupClicked: boolean = false;
     private _showGDPRBanner: boolean = false;
+    private _isPerformanceCampaignWithEndCard: boolean | undefined;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: number = 0) {
+    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, isPerformanceCampaignWithEndCard?: boolean, abGroup: number = 0) {
         super(nativeBridge, 'overlay', muted, abGroup);
 
         this._localization = new Localization(language, 'overlay');
         this._privacy = privacy;
         this._showGDPRBanner = showGDPRBanner;
+        this._isPerformanceCampaignWithEndCard = isPerformanceCampaignWithEndCard;
 
         this._templateData = {
             muted
@@ -227,7 +229,12 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     }
 
     public choosePrivacyShown(): void {
-        if (!this._gdprPopupClicked && this._showGDPRBanner) {
+        if (this._isPerformanceCampaignWithEndCard) {
+            this._privacyButtonElement.style.visibility = 'hidden';
+            this._GDPRPopupElement.style.visibility = 'hidden';
+            this._privacyButtonElement.style.pointerEvents = '1';
+            this._GDPRPopupElement.style.pointerEvents = '1';
+        } else if (!this._gdprPopupClicked && this._showGDPRBanner) {
             this._GDPRPopupElement.style.visibility = 'visible';
             this._privacyButtonElement.style.pointerEvents = '1';
             this._privacyButtonElement.style.visibility = 'hidden';
