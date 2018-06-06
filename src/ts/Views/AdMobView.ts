@@ -108,7 +108,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
         this._mraidBridge.connect(this._iframe);
         this._handlers.forEach((h) => h.onShow());
 
-        // this.choosePrivacyShown();
+        this.choosePrivacyShown();
     }
 
     public hide() {
@@ -154,7 +154,6 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     }
 
     private choosePrivacyShown(): void {
-        this._nativeBridge.Sdk.logInfo(`Konecny: ${this._showGDPRBanner} && ${!this._gdprPopupClicked}`);
         if (this._showGDPRBanner && !this._gdprPopupClicked) {
             this._gdprBanner.style.visibility = 'visible';
             this._privacyButton.style.pointerEvents = '1';
