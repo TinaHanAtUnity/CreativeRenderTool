@@ -42,6 +42,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _options: any;
     private _deviceInfo: DeviceInfo;
     private _urlLoadingObserver: IObserver2<string, string>;
+    private _privacyShowing = false;
 
     constructor(nativeBridge: NativeBridge, parameters: IVPAIDAdUnitParameters) {
         super(nativeBridge, parameters);
@@ -65,8 +66,18 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
         return this.setupWebPlayer().then(() => {
             this._urlLoadingObserver = this._nativeBridge.WebPlayer.shouldOverrideUrlLoading.subscribe((url, method) => this.onUrlLoad(url));
-            if (this._closer.onPrivacyClosed) { this._closer.onPrivacyClosed.subscribe(() => this._view.resumeAd()); }
-            if (this._closer.onPrivacyOpened) { this._closer.onPrivacyOpened.subscribe(() => this._view.pauseAd()); }
+            if (this._closer.onPrivacyClosed) {
+                this._closer.onPrivacyClosed.subscribe(() => {
+                    this._view.resumeAd();
+                    this._privacyShowing = false;
+                });
+            }
+            if (this._closer.onPrivacyOpened) {
+                this._closer.onPrivacyOpened.subscribe(() => {
+                    this._view.pauseAd();
+                    this._privacyShowing = true;
+                });
+            }
             return this._container.open(this, ['webplayer', 'webview'], false, this._forceOrientation, false, false, true, false, this._options).then(() => {
                 this.onStart.trigger();
             });
@@ -142,10 +153,12 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public onContainerForeground(): void {
         this.showCloser();
-        if (this._view.isLoaded()) {
+        if (this._view.isLoaded() && !this._privacyShowing) {
             this._view.resumeAd();
-        } else {
+        } else if (!this._view.isLoaded()) {
             this._view.loadWebPlayer();
+        } else {
+            // Popup will resume video
         }
     }
 

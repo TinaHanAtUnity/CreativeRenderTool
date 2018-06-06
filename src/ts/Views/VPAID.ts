@@ -86,6 +86,7 @@ export class VPAID extends View<IVPAIDHandler> {
 
         this._webplayerEventObserver = this._nativeBridge.WebPlayer.onWebPlayerEvent.subscribe((args: string) => this.onWebPlayerEvent(JSON.parse(args)));
         iframeSrcDoc = this._nativeBridge.getPlatform() === Platform.ANDROID ? encodeURIComponent(iframeSrcDoc) : iframeSrcDoc;
+        this._isLoaded = true;
         return this._nativeBridge.WebPlayer.setData(iframeSrcDoc, 'text/html', 'UTF-8');
     }
 
