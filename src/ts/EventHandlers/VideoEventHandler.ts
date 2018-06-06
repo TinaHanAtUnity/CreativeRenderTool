@@ -38,14 +38,17 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
     public onProgress(progress: number): void {
         const overlay = this._adUnit.getOverlay();
 
-        if(progress > 0 && this._adUnit.getVideoState() === VideoState.READY && this._adUnit.getVideoState() !== VideoState.PLAYING) {
+        if(progress > 0 && this._adUnit.getVideoState() === VideoState.READY) {
             this._adUnit.setVideoState(VideoState.PLAYING);
 
             if(overlay) {
                 overlay.setSpinnerEnabled(false);
             }
 
-            this.handleStartEvent(progress);
+            if (!this._video.hasStarted()) {
+                this._video.setStarted(true);
+                this.handleStartEvent(progress);
+            }
         }
 
         if(progress >= 0) {
@@ -122,7 +125,7 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
             }
 
             if(overlay) {
-                if(lastPosition > 0 && progress - lastPosition < 100) {
+                if(lastPosition > 0 && progress > lastPosition && progress - lastPosition < 100) {
                     overlay.setSpinnerEnabled(true);
                 } else {
                     overlay.setSpinnerEnabled(false);

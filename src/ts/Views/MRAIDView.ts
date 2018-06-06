@@ -8,6 +8,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { IPrivacyHandler, AbstractPrivacy } from 'Views/AbstractPrivacy';
 import { platform } from 'os';
 import { DOMUtils } from 'Utilities/DOMUtils';
+import { XHRequest } from 'Utilities/XHRequest';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
@@ -133,31 +134,16 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         const resourceUrl = this._campaign.getResourceUrl();
         if(resourceUrl) {
             if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                return this.requestMRaid(resourceUrl.getUrl());
+                return XHRequest.get(resourceUrl.getUrl());
             } else {
                 const fileId = resourceUrl.getFileId();
                 if(fileId) {
                     return this._nativeBridge.Cache.getFileContent(fileId, 'UTF-8');
                 } else {
-                    return this.requestMRaid(resourceUrl.getOriginalUrl());
+                    return XHRequest.get(resourceUrl.getOriginalUrl());
                 }
             }
         }
         return Promise.resolve(this._campaign.getResource());
-    }
-
-    private requestMRaid(url: string): Promise<string | undefined> {
-        return new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.addEventListener('load', () => {
-                if((xhr.status === 0 && url.indexOf('file://') === 0) || (xhr.status >= 200 && xhr.status <= 299)) {
-                    resolve(xhr.responseText);
-                } else {
-                    reject(new Error(`XHR returned with unknown status code ${xhr.status}`));
-                }
-            }, false);
-            xhr.open('GET', decodeURIComponent(url));
-            xhr.send();
-        });
     }
 }

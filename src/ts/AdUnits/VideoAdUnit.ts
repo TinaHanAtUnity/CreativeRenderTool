@@ -177,9 +177,9 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     }
 
     public onContainerBackground(): void {
-        if(this.isShowing() && this.isActive() && this.getContainer().isPaused()) {
+        if(this.isShowing() && this.getContainer().isPaused()) {
             this.setActive(false);
-            if(this.canShowVideo() && this.getVideoState() === VideoState.PLAYING) {
+            if(this.canShowVideo()) {
                 this.setVideoState(VideoState.PAUSED);
                 /*
                     We try pause the video-player and if we get a VIDEOVIEW_NULL error

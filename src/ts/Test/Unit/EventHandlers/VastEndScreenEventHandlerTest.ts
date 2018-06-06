@@ -22,7 +22,7 @@ import { SessionManager } from 'Managers/SessionManager';
 
 import EventTestVast from 'xml/EventTestVast.xml';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
-import { GdprConsentManager } from 'Managers/GdprConsentManager';
+import { GdprManager } from 'Managers/GdprManager';
 import { Privacy } from 'Views/Privacy';
 
 describe('VastEndScreenEventHandlersTest', () => {
@@ -65,10 +65,10 @@ describe('VastEndScreenEventHandlersTest', () => {
             campaign: campaign
         });
 
-        const video = new Video('', TestFixtures.getSession());
         const privacy = new Privacy(nativeBridge, false);
+        const video = new Video('', TestFixtures.getSession());
         const overlay = new Overlay(nativeBridge, true, 'en', 'testGameId', privacy, false);
-        const gdprManager = sinon.createStubInstance(GdprConsentManager);
+        const gdprManager = sinon.createStubInstance(GdprManager);
 
         vastAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,

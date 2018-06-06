@@ -16,7 +16,7 @@ import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { DisplayInterstitialAdUnit, IDisplayInterstitialAdUnitParameters } from 'AdUnits/DisplayInterstitialAdUnit';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { DisplayInterstitialEventHandler } from 'EventHandlers/DisplayInterstitialEventHandler';
-import { GdprConsentManager } from 'Managers/GdprConsentManager';
+import { GdprManager } from 'Managers/GdprManager';
 import { Privacy } from 'Views/Privacy';
 
 describe('DisplayInterstitialEventHandler', () => {
@@ -60,7 +60,7 @@ describe('DisplayInterstitialEventHandler', () => {
             const deviceInfo = TestFixtures.getAndroidDeviceInfo();
             const thirdPartyEventManager = sinon.createStubInstance(ThirdPartyEventManager);
             operativeEventManager = sinon.createStubInstance(OperativeEventManager);
-            const gdprManager = sinon.createStubInstance(GdprConsentManager);
+            const gdprManager = sinon.createStubInstance(GdprManager);
             const configuration = TestFixtures.getConfiguration();
 
             const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());

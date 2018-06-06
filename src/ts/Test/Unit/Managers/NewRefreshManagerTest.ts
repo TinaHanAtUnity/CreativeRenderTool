@@ -30,7 +30,7 @@ import { SdkApi } from 'Native/Api/Sdk';
 import { ListenerApi } from 'Native/Api/Listener';
 import { JaegerManager } from 'Jaeger/JaegerManager';
 import { JaegerSpan } from 'Jaeger/JaegerSpan';
-import { GdprConsentManager } from 'Managers/GdprConsentManager';
+import { GdprManager } from 'Managers/GdprManager';
 
 describe('NewRefreshManagerTest', () => {
     let nativeBridge: NativeBridge;
@@ -55,7 +55,7 @@ describe('NewRefreshManagerTest', () => {
     let container: Activity;
     let adUnit: TestAdUnit;
     let jaegerManager: JaegerManager;
-    let gdprManager: GdprConsentManager;
+    let gdprManager: GdprManager;
 
     beforeEach(() => {
         nativeBridge = TestFixtures.getNativeBridge();
@@ -89,7 +89,7 @@ describe('NewRefreshManagerTest', () => {
             campaign: campaign
         });
         container = new Activity(nativeBridge, deviceInfo);
-        gdprManager = sinon.createStubInstance(GdprConsentManager);
+        gdprManager = sinon.createStubInstance(GdprManager);
 
         adUnit = new TestAdUnit(nativeBridge, {
             forceOrientation: Orientation.NONE,
