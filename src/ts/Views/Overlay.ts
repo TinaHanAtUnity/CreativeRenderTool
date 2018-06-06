@@ -222,10 +222,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     }
 
     public onGDPROptOut(optOutEnabled: boolean): void {
-        if (!this._gdprPopupClicked) {
-            this._gdprPopupClicked = true;
-            this.choosePrivacyShown();
-        }
+        // do nothing
     }
 
     public choosePrivacyShown(): void {
@@ -248,7 +245,10 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     private onGDPRPopupEvent(event: Event) {
         event.preventDefault();
         this._isPrivacyShowing = true;
-        this._gdprPopupClicked = true;
+        if (!this._gdprPopupClicked) {
+            this._gdprPopupClicked = true;
+            this.choosePrivacyShown();
+        }
         this._nativeBridge.VideoPlayer.pause();
         this._privacy.show();
     }
