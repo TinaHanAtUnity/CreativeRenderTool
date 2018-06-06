@@ -22,6 +22,7 @@ export interface IMRAIDViewHandler {
     onMraidOrientationProperties(orientationProperties: IOrientationProperties): void;
     onMraidAnalyticsEvent(timeFromShow: number|undefined, timeFromPlayableStart: number|undefined, backgroundTime: number|undefined, event: string, eventData: any): void;
     onMraidShowEndScreen(): void;
+    onGDPRPopupSkipped(): void;
 }
 
 export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> implements IPrivacyHandler {
@@ -29,13 +30,16 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     protected _placement: Placement;
     protected _campaign: MRAIDCampaign;
     protected _privacy: AbstractPrivacy;
+    protected _showGDPRBanner = false;
+    protected _gdprPopupClicked = false;
 
-    constructor(nativeBridge: NativeBridge, id: string, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy) {
+    constructor(nativeBridge: NativeBridge, id: string, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
         super(nativeBridge, id);
 
         this._placement = placement;
         this._campaign = campaign;
         this._privacy = privacy;
+        this._showGDPRBanner = showGDPRBanner;
 
         this._privacy.render();
         this._privacy.hide();
@@ -51,6 +55,10 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         if(this._privacy) {
             this._privacy.removeEventHandler(this);
             this._privacy.hide();
+        }
+
+        if (this._showGDPRBanner && !this._gdprPopupClicked) {
+            this._handlers.forEach(handler => handler.onGDPRPopupSkipped());
         }
     }
 
@@ -87,6 +95,12 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     protected onPrivacyEvent(event: Event): void {
         event.preventDefault();
 
+        this._privacy.show();
+    }
+
+    protected onGDPRPopupEvent(event: Event) {
+        event.preventDefault();
+        this._gdprPopupClicked = true;
         this._privacy.show();
     }
 

@@ -10,9 +10,9 @@ import { Platform } from 'Constants/Platform';
 import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Template } from 'Utilities/Template';
 import { SdkStats } from 'Utilities/SdkStats';
-import { AbstractPrivacy, IPrivacyHandler } from 'Views/AbstractPrivacy';
+import { AbstractPrivacy } from 'Views/AbstractPrivacy';
 
-export class MRAID extends MRAIDView<IMRAIDViewHandler> implements IPrivacyHandler {
+export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private static CloseLength = 30;
 
@@ -22,8 +22,6 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> implements IPrivacyHandl
     private _iframe: HTMLIFrameElement;
     private _gdprBanner: HTMLElement;
     private _privacyButton: HTMLElement;
-    private _showGDPRBanner = false;
-    private _gdprPopupClicked = false;
     private _loaded = false;
 
     private _messageListener: any;
@@ -36,8 +34,8 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> implements IPrivacyHandl
     private _showTimestamp: number;
     private _updateInterval: any;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy) {
-        super(nativeBridge, 'mraid', placement, campaign, privacy);
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
+        super(nativeBridge, 'mraid', placement, campaign, privacy, showGDPRBanner);
 
         this._placement = placement;
         this._campaign = campaign;
@@ -65,11 +63,12 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> implements IPrivacyHandl
                 listener: (event: Event) => this.onPrivacyEvent(event),
                 selector: '.icon-info'
             },
-            {
-                event: 'swipe',
-                listener: (event: Event) => this.onGDPROptOut(false),
-                selector: '.gdpr-pop-up'
-            }
+            // let's think about swipe later
+            // {
+            //     event: 'swipe',
+            //     listener: (event: Event) => this.onGDPROptOut(false), // swipe means skip event on this case
+            //     selector: '.gdpr-pop-up'
+            // }
         ];
     }
 
@@ -173,23 +172,8 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> implements IPrivacyHandl
         }
     }
 
-    public onGDPROptOut(optOutEnabled: boolean) {
-        // super.onGDPROptOut(optOutEnabled); Do we need this?
-        if (!this._gdprPopupClicked) {
-            this._gdprPopupClicked = true;
-            this.choosePrivacyShown();
-        }
-    }
-
-    private onGDPRPopupEvent(event: Event) {
-        event.preventDefault();
-        this._gdprPopupClicked = true;
-        this._nativeBridge.VideoPlayer.pause();
-        this._privacy.show();
-    }
-
     private choosePrivacyShown(): void {
-        if (!this._gdprPopupClicked) {
+        if (this._showGDPRBanner && !this._gdprPopupClicked) {
             this._gdprBanner.style.visibility = 'visible';
             this._privacyButton.style.pointerEvents = '1';
             this._privacyButton.style.visibility = 'hidden';
