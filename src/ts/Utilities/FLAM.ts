@@ -74,11 +74,11 @@ class FLAMSingleton {
                             nativeBridge.Storage.delete(StorageType.PRIVATE, `flam.${name}`);
                             nativeBridge.Storage.write(StorageType.PRIVATE);
                         }
-                        nativeBridge.Sdk.logInfo(`FLAM: Data already exists for ${name}: ${this.translateTestResult(pass)}`);
+                        nativeBridge.Sdk.logDebug(`FLAM: Data already exists for ${name}: ${this.translateTestResult(pass)}`);
                         resolve();
                     }).catch(() => {
                         /* No data about test has been written into device's memory => run test */
-                        nativeBridge.Sdk.logInfo(`FLAM: No data for ${name} exists`);
+                        nativeBridge.Sdk.logDebug(`FLAM: No data for ${name} exists`);
                         this.processFLAMTest(ft).then((pass) => {
                             this._FLAMTestResult[name] = pass;
                             resolve();
@@ -153,7 +153,7 @@ class FLAMSingleton {
         for (const name in this._FLAMTestResult) {
             if (this._FLAMTestResult.hasOwnProperty(name)) {
                 const pass = this._FLAMTestResult[name];
-                nativeBridge.Sdk.logInfo(`FLAM: Test for ${name}: ${this.translateTestResult(pass)}`);
+                nativeBridge.Sdk.logDebug(`FLAM: Test for ${name}: ${this.translateTestResult(pass)}`);
                 nativeBridge.Storage.set(StorageType.PRIVATE, `flam.${name}`, pass);
             }
         }
