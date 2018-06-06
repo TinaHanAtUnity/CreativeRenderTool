@@ -167,7 +167,7 @@ export class PurchasingUtilities {
     // Returns true if version is 1.16.0 or newer
     private static isPromoVersionSupported(version: string): boolean {
         const promoVersionSplit = version.split('.', 2);
-        if (promoVersionSplit[0].length > 0 && promoVersionSplit[0].length > 0) {
+        if (promoVersionSplit.length > 1) {
             return ((parseInt(promoVersionSplit[0], 10) >= 2) || ((parseInt(promoVersionSplit[0], 10) >= 1 && parseInt(promoVersionSplit[1], 10) >= 16)));
         }
         return false;
