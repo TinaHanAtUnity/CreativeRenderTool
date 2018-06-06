@@ -34,6 +34,7 @@ import { UserCountData } from 'Utilities/UserCountData';
 import { JaegerManager } from 'Jaeger/JaegerManager';
 import { JaegerTags, JaegerSpan } from 'Jaeger/JaegerSpan';
 import { GameSessionCounters } from 'Utilities/GameSessionCounters';
+import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 
 export class CampaignManager {
 
@@ -254,6 +255,29 @@ export class CampaignManager {
         });
     }
 
+    public handleCampaign(response: AuctionResponse, session: Session): Promise<void> {
+        this._nativeBridge.Sdk.logDebug('Parsing campaign ' + response.getContentType() + ': ' + response.getContent());
+        let parser: CampaignParser;
+
+        try {
+            parser = this.getCampaignParser(response.getContentType());
+        } catch (e) {
+            return Promise.reject(e);
+        }
+
+        const parseTimestamp = Date.now();
+        return parser.parse(this._nativeBridge, this._request, response, session, this._configuration.getGamerId(), this.getAbGroup()).then((campaign) => {
+            const parseDuration = Date.now() - parseTimestamp;
+            for(const placement of response.getPlacements()) {
+                SdkStats.setParseDuration(placement, parseDuration);
+            }
+
+            campaign.setMediaId(response.getMediaId());
+
+            return this.setupCampaignAssets(response.getPlacements(), campaign);
+        });
+    }
+
     public setPreviousPlacementId(id: string | undefined) {
         this._previousPlacementId = id;
     }
@@ -331,6 +355,7 @@ export class CampaignManager {
             }
 
             let campaigns: number = 0;
+            let iapCampaignCount: number = 0;
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
                     campaigns++;
@@ -340,11 +365,16 @@ export class CampaignManager {
                     if(contentType && contentType !== 'comet/campaign' && cacheTTL > 0 && (cacheTTL < refreshDelay || refreshDelay === 0)) {
                         refreshDelay = cacheTTL;
                     }
+                    if(contentType && contentType === 'purchasing/iap') {
+                        iapCampaignCount++;
+                    }
                 }
             }
 
             if (!this._ignoreEvents) {
                 this._nativeBridge.Sdk.logInfo('AdPlan received with ' + campaigns + ' campaigns and refreshDelay ' + refreshDelay);
+                PurchasingUtilities.iapCampaignCount = iapCampaignCount;
+                this._nativeBridge.Sdk.logInfo(iapCampaignCount + ' are IAP promos');
                 this.onAdPlanReceived.trigger(refreshDelay, campaigns);
             }
 
@@ -400,29 +430,6 @@ export class CampaignManager {
             this._nativeBridge.Sdk.logError('No placements found in realtime campaign json.');
             return Promise.resolve();
         }
-    }
-
-    private handleCampaign(response: AuctionResponse, session: Session): Promise<void> {
-        this._nativeBridge.Sdk.logDebug('Parsing campaign ' + response.getContentType() + ': ' + response.getContent());
-        let parser: CampaignParser;
-
-        try {
-            parser = this.getCampaignParser(response.getContentType());
-        } catch (e) {
-            return Promise.reject(e);
-        }
-
-        const parseTimestamp = Date.now();
-        return parser.parse(this._nativeBridge, this._request, response, session, this._configuration.getGamerId(), this.getAbGroup()).then((campaign) => {
-            const parseDuration = Date.now() - parseTimestamp;
-            for(const placement of response.getPlacements()) {
-                SdkStats.setParseDuration(placement, parseDuration);
-            }
-
-            campaign.setMediaId(response.getMediaId());
-
-            return this.setupCampaignAssets(response.getPlacements(), campaign);
-        });
     }
 
     private setupCampaignAssets(placements: string[], campaign: Campaign): Promise<void> {

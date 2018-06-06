@@ -14,8 +14,11 @@ import { setTimeout } from 'timers';
 import { Configuration } from 'Models/Configuration';
 import { ConfigurationParser } from 'Parsers/ConfigurationParser';
 import { ClientInfo } from 'Models/ClientInfo';
+import { CampaignManager } from 'Managers/CampaignManager';
+import { AuctionResponse } from 'Models/AuctionResponse';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
+import PromoCampaign from 'json/campaigns/promo/PromoCampaign.json';
 
 describe('PurchasingUtilitiesTest', () => {
     let nativeBridge: NativeBridge;
@@ -248,6 +251,74 @@ describe('PurchasingUtilitiesTest', () => {
             it('should return false if catalog has has size of 0', () => {
                 assert.equal(false, PurchasingUtilities.isProductAvailable('myPromo'));
             });
+        });
+    });
+
+    describe('Handle Send Event', () => {
+        let campaignManager: CampaignManager;
+
+        const placements = ['TestPlacement'];
+        const mediaId = 'o2YMT0Cmps6xHiOwNMeCrH';
+        const correlationId = '583dfda0d933a3630a53249c';
+        const data = JSON.parse(PromoCampaign);
+        const response = new AuctionResponse(placements, data, mediaId, correlationId);
+        const session = TestFixtures.getSession();
+
+        beforeEach(() => {
+            sandbox.stub(PurchasingUtilities, 'sendPurchaseInitializationEvent');
+
+            campaignManager = sandbox.createStubInstance(CampaignManager);
+
+            PurchasingUtilities.campaignManager = campaignManager;
+            PurchasingUtilities.response[0] = response;
+            PurchasingUtilities.session[0] = session;
+        });
+
+        it('Should handle campaign when iap payload type is catalogupdated', () => {
+            PurchasingUtilities.iapCampaignCount = 1;
+            PurchasingUtilities.handleSendIAPEvent(nativeBridge, '{\"type\":\"CatalogUpdated\"}');
+            (<sinon.SinonStub>campaignManager.handleCampaign).returns(Promise.resolve());
+
+            sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
+            sinon.assert.called(<sinon.SinonStub>PurchasingUtilities.campaignManager.handleCampaign);
+        });
+
+        it('Should set up campaign with stored response and session', () => {
+            PurchasingUtilities.iapCampaignCount = 1;
+            PurchasingUtilities.handleSendIAPEvent(nativeBridge, '{\"type\":\"CatalogUpdated\"}');
+            (<sinon.SinonStub>campaignManager.handleCampaign).returns(Promise.resolve());
+
+            sinon.assert.calledWith(<sinon.SinonStub>PurchasingUtilities.campaignManager.handleCampaign, response, session);
+        });
+
+        it('Should not call when passed iap payload type is a random string', () => {
+            PurchasingUtilities.iapCampaignCount = 1;
+            PurchasingUtilities.handleSendIAPEvent(nativeBridge, '{"type":"sadfasdf"}');
+            (<sinon.SinonStub>campaignManager.handleCampaign).returns(Promise.resolve());
+
+            sinon.assert.notCalled(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
+            sinon.assert.notCalled(<sinon.SinonStub>PurchasingUtilities.campaignManager.handleCampaign);
+        });
+
+        it('Should not call when no value is included in given index in the array', () => {
+            PurchasingUtilities.iapCampaignCount = 2;
+            PurchasingUtilities.handleSendIAPEvent(nativeBridge, '{\"type\":\"CatalogUpdated\"}');
+
+            const handleCampaignSpy = (<sinon.SinonStub>campaignManager.handleCampaign).returns(Promise.resolve());
+            const handleCampaignCall = handleCampaignSpy.getCall(1);
+            assert.equal(handleCampaignCall, null);
+        });
+
+        it('Should handle campaign and be called twice when campaign count is 2', () => {
+            PurchasingUtilities.promoResponseIndex++;
+            PurchasingUtilities.response[1] = response;
+            PurchasingUtilities.session[1] = session;
+            PurchasingUtilities.iapCampaignCount = 2;
+
+            PurchasingUtilities.handleSendIAPEvent(nativeBridge, '{\"type\":\"CatalogUpdated\"}');
+            (<sinon.SinonStub>campaignManager.handleCampaign).returns(Promise.resolve());
+
+            sinon.assert.calledTwice(<sinon.SinonStub>PurchasingUtilities.campaignManager.handleCampaign);
         });
     });
 });

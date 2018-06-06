@@ -14,6 +14,11 @@ export class PromoCampaignParser extends CampaignParser {
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
         const promoJson = JsonParser.parse(response.getContent());
         if (promoJson && promoJson.iapProductId) {
+            if (PurchasingUtilities.promoResponseIndex < PurchasingUtilities.iapCampaignCount) {
+                PurchasingUtilities.session[PurchasingUtilities.promoResponseIndex] = session;
+                PurchasingUtilities.response[PurchasingUtilities.promoResponseIndex] = response;
+                PurchasingUtilities.promoResponseIndex++;
+            }
             return PurchasingUtilities.refreshCatalog().then(() => {
                 if (PurchasingUtilities.isProductAvailable(promoJson.iapProductId)) {
 

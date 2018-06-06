@@ -3,6 +3,9 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Diagnostics } from './Diagnostics';
 import { Configuration } from 'Models/Configuration';
 import { ClientInfo } from 'Models/ClientInfo';
+import { CampaignManager } from 'Managers/CampaignManager';
+import { AuctionResponse } from 'Models/AuctionResponse';
+import { Session } from 'Models/Session';
 
 export enum IPromoRequest {
     SETIDS = 'setids',
@@ -22,6 +25,12 @@ export interface IPromoPayload {
 }
 
 export class PurchasingUtilities {
+
+    public static session: Session[] = [];
+    public static response: AuctionResponse[] = [];
+    public static campaignManager: CampaignManager;
+    public static promoResponseIndex: number = 0;
+    public static iapCampaignCount: number = 0;
 
     public static initialize(clientInfo: ClientInfo, configuration: Configuration, nativeBridge: NativeBridge) {
         this._clientInfo = clientInfo;
@@ -87,7 +96,23 @@ export class PurchasingUtilities {
     }
 
     public static handleSendIAPEvent(nativeBridge: NativeBridge, iapPayload: string): void {
-        // TODO: Handle IAPPayload/send event/do something with the payload
+        const jsonPayload = JSON.parse(iapPayload);
+
+        if (jsonPayload.type === 'CatalogUpdated') {
+            this.sendPurchaseInitializationEvent();
+
+            const promises = [];
+            for (let i = 0; i < this.iapCampaignCount; i++) {
+                if (this.response[i] === undefined || this.session[i] === undefined) {
+                    this.logIssue('handle_send_event_failure', 'Auction Response or Session value is null');
+                } else {
+                    promises.push(this.campaignManager.handleCampaign(this.response[i], this.session[i]));
+                }
+            }
+            Promise.all(promises);
+        } else {
+            this.logIssue('handle_send_event_failure', 'IAP Payload is incorrect');
+        }
     }
 
     private static _catalog: PurchasingCatalog = new PurchasingCatalog([]);
