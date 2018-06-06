@@ -1,4 +1,3 @@
-import { NativeBridge } from 'Native/NativeBridge';
 import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
 import { PurchasingUtilities, IPromoPayload, IPromoRequest } from 'Utilities/PurchasingUtilities';
 import { Configuration } from 'Models/Configuration';
@@ -9,7 +8,7 @@ import { IABGroup } from 'Models/ABGroup';
 
 export class PromoEventHandler {
 
-    public static onClose(nativeBridge: NativeBridge, adUnit: PromoAdUnit, gamerToken: string, gameId: string, abGroup: IABGroup, purchaseTrackingUrls: string[], isOptOutEnabled: boolean): void {
+    public static onClose(adUnit: PromoAdUnit, gamerToken: string, gameId: string, abGroup: IABGroup, purchaseTrackingUrls: string[], isOptOutEnabled: boolean): void {
         adUnit.setFinishState(FinishState.SKIPPED);
         adUnit.hide();
         const iapPayload: IPromoPayload = {
@@ -21,10 +20,10 @@ export class PromoEventHandler {
             request: IPromoRequest.CLOSE,
             purchaseTrackingUrls: purchaseTrackingUrls,
         };
-        PurchasingUtilities.beginPurchaseEvent(nativeBridge, JSON.stringify(iapPayload));
+        PurchasingUtilities.sendPromoPayload(JSON.stringify(iapPayload));
     }
 
-    public static onPromo(nativeBridge: NativeBridge, adUnit: PromoAdUnit, iapProductId: string, purchaseTrackingUrls: string[]): void {
+    public static onPromo(adUnit: PromoAdUnit, iapProductId: string, purchaseTrackingUrls: string[]): void {
         adUnit.setFinishState(FinishState.COMPLETED);
         adUnit.hide();
         adUnit.sendClick();
@@ -34,7 +33,7 @@ export class PromoEventHandler {
             request: IPromoRequest.PURCHASE,
             purchaseTrackingUrls: purchaseTrackingUrls,
         };
-        PurchasingUtilities.beginPurchaseEvent(nativeBridge, JSON.stringify(iapPayload));
+        PurchasingUtilities.sendPromoPayload(JSON.stringify(iapPayload));
     }
 
     public static onGDPRPopupSkipped(configuration: Configuration, operativeEventManager: OperativeEventManager): void {

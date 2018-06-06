@@ -16,8 +16,4 @@ export class CustomFeatures {
     public static isPlayableConfigurationEnabled(originalResourceUrl: string) {
         return originalResourceUrl.match(/playables\/production\/unity/);
     }
-
-    public static getAdUnitStyle(): AdUnitStyle {
-        return new AdUnitStyle({ctaButtonColor: '#167dfb'});
-    }
 }

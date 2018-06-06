@@ -9,6 +9,7 @@ import { Session } from 'Models/Session';
 import { Video } from 'Models/Assets/Video';
 import { Image } from 'Models/Assets/Image';
 import { HTML } from 'Models/Assets/HTML';
+import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { IABGroup } from 'Models/ABGroup';
@@ -106,7 +107,8 @@ export class CometCampaignParser extends CampaignParser {
                 clickUrl: this.validateAndEncodeUrl(json.clickUrl, session),
                 videoEventUrls: this.validateAndEncodeVideoEventUrls(json.videoEventUrls, session),
                 bypassAppSheet: json.bypassAppSheet,
-                store: storeName
+                store: storeName,
+                adUnitStyle: this.parseAdUnitStyle(json.adUnitStyle)
             };
 
             if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
@@ -133,5 +135,21 @@ export class CometCampaignParser extends CampaignParser {
         }
 
         return urls;
+    }
+
+    private parseAdUnitStyle(adUnitStyleJson: any): AdUnitStyle | undefined {
+        let adUnitStyle: AdUnitStyle | undefined;
+        try {
+            if (!adUnitStyleJson) {
+                throw new Error('No adUnitStyle was provided in comet campaign');
+            }
+            adUnitStyle = new AdUnitStyle(adUnitStyleJson);
+        } catch(error) {
+            Diagnostics.trigger('configuration_ad_unit_style_parse_error', {
+                adUnitStyle: adUnitStyleJson,
+                error: error
+            });
+        }
+        return adUnitStyle;
     }
 }

@@ -93,6 +93,5 @@ describe('configurationParserTest', () => {
                 assert.equal(configuration.getPlacement('premium').getName(), 'Premium placement');
             });
         });
-
     });
 });

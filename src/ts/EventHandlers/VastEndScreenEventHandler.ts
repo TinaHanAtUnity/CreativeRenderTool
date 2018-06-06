@@ -26,7 +26,7 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     public onVastEndScreenClick(): Promise<void> {
         const platform = this._nativeBridge.getPlatform();
         const clickThroughURL = this._adUnit.getCompanionClickThroughUrl() || this._adUnit.getVideoClickThroughURL();
-        this._adUnit.sendTrackingEvent('videoEndCardClick', this._campaign.getSession().getId(), this._clientInfo.getSdkVersion());
+        this._adUnit.sendTrackingEvent('videoEndCardClick', this._campaign.getSession().getId());
 
         if (clickThroughURL) {
             return this._request.followRedirectChain(clickThroughURL).then((url: string) => {
@@ -54,7 +54,7 @@ export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     }
 
     public onVastEndScreenShow(): void {
-        this._adUnit.sendCompanionTrackingEvent(this._campaign.getSession().getId(), this._clientInfo.getSdkVersion());
+        this._adUnit.sendCompanionTrackingEvent(this._campaign.getSession().getId());
     }
 
     public onEndScreenPrivacy(url: string): void {

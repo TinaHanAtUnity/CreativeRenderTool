@@ -53,7 +53,6 @@ import { XPromoVideoEventHandler } from 'EventHandlers/XPromoVideoEventHandler';
 import { AdMobEventHandler } from 'EventHandlers/AdmobEventHandler';
 import { ClosableVideoOverlay } from 'Views/ClosableVideoOverlay';
 import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
-import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { Closer } from 'Views/Closer';
 import { Privacy } from 'Views/Privacy';
 import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
@@ -104,7 +103,8 @@ export class AdUnitFactory {
 
     private static createPerformanceAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PerformanceCampaign>): PerformanceAdUnit {
         const overlay = this.createOverlay(nativeBridge, parameters);
-        const adUnitStyle = CustomFeatures.getAdUnitStyle();
+
+        const adUnitStyle: AdUnitStyle = parameters.campaign.getAdUnitStyle() || AdUnitStyle.getDefaultAdUnitStyle();
 
         const showGDPRBanner = this.showGDPRBanner(parameters);
         const privacy = this.createPrivacy(nativeBridge, parameters);
@@ -322,8 +322,8 @@ export class AdUnitFactory {
         document.body.appendChild(promoView.container());
 
         promoView.onGDPRPopupSkipped.subscribe(() => PromoEventHandler.onGDPRPopupSkipped(parameters.configuration, parameters.operativeEventManager));
-        promoView.onClose.subscribe(() => PromoEventHandler.onClose(nativeBridge, promoAdUnit, parameters.configuration.getToken(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup(), parameters.campaign.getTrackingUrlsForEvent('purchase'), parameters.configuration.isOptOutEnabled()));
-        promoView.onPromo.subscribe((productId) => PromoEventHandler.onPromo(nativeBridge, promoAdUnit, productId, parameters.campaign.getTrackingUrlsForEvent('purchase')));
+        promoView.onClose.subscribe(() => PromoEventHandler.onClose(promoAdUnit, parameters.configuration.getToken(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup(), parameters.campaign.getTrackingUrlsForEvent('purchase'), parameters.configuration.isOptOutEnabled()));
+        promoView.onPromo.subscribe((productId) => PromoEventHandler.onPromo(promoAdUnit, productId, parameters.campaign.getTrackingUrlsForEvent('purchase')));
         nativeBridge.Purchasing.onIAPSendEvent.subscribe((iapPayload) => PurchasingUtilities.handleSendIAPEvent(nativeBridge, iapPayload));
 
         return promoAdUnit;
