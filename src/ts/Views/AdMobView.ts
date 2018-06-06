@@ -4,7 +4,6 @@ import AFMAContainer from 'html/admob/AFMAContainer.html';
 import MRAIDContainer from 'html/admob/MRAIDContainer.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
-import { Placement } from 'Models/Placement';
 import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
 import { Template } from 'Utilities/Template';
 import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
@@ -13,6 +12,8 @@ import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { ClientInfo } from 'Models/ClientInfo';
 import { MRAIDBridge } from 'Views/MRAIDBridge';
 import { SdkStats } from 'Utilities/SdkStats';
+import { IPrivacyHandler, AbstractPrivacy } from 'Views/AbstractPrivacy';
+import { GDPRPrivacy } from 'Views/GDPRPrivacy';
 
 export interface IAdMobEventHandler {
     onClose(): void;
@@ -25,13 +26,13 @@ export interface IAdMobEventHandler {
     onOpenableIntentsRequest(request: IOpenableIntentsRequest): void;
     onTrackingEvent(event: string, data?: any): void;
     onClickSignalRequest(touchInfo: ITouchInfo): void;
+    onGDPRPopupSkipped(): void;
 }
 
 const AFMAClickStringMacro = '{{AFMA_CLICK_SIGNALS_PLACEHOLDER}}';
 const AFMADelayMacro = '{{AFMA_RDVT_PLACEHOLDER}}';
 
-export class AdMobView extends View<IAdMobEventHandler> {
-    private _placement: Placement;
+export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandler {
     private _campaign: AdMobCampaign;
     private _iframe: HTMLIFrameElement;
     private _adMobSignalFactory: AdMobSignalFactory;
@@ -39,13 +40,21 @@ export class AdMobView extends View<IAdMobEventHandler> {
     private _afmaBridge: AFMABridge;
     private _mraidBridge: MRAIDBridge;
 
-    constructor(nativeBridge: NativeBridge, adMobSignalFactory: AdMobSignalFactory, container: AdUnitContainer, placement: Placement, campaign: AdMobCampaign, language: string, gameId: string, abGroup: number) {
+    private _gdprBanner: HTMLElement;
+    private _privacyButton: HTMLElement;
+    private _privacy: AbstractPrivacy;
+    private _showGDPRBanner: boolean = false;
+    private _gdprPopupClicked: boolean = false;
+
+    constructor(nativeBridge: NativeBridge, adMobSignalFactory: AdMobSignalFactory, container: AdUnitContainer, campaign: AdMobCampaign, language: string, gameId: string, abGroup: number, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
         super(nativeBridge, 'admob');
 
-        this._placement = placement;
         this._campaign = campaign;
         this._template = new Template(AdMobContainer);
         this._adMobSignalFactory = adMobSignalFactory;
+
+        this._privacy = privacy;
+        this._showGDPRBanner = showGDPRBanner;
 
         this._afmaBridge = new AFMABridge(nativeBridge, {
             onAFMAClose: () => this.onClose(),
@@ -66,12 +75,31 @@ export class AdMobView extends View<IAdMobEventHandler> {
             onSetOrientationProperties: (allowOrientation: boolean, forceOrientation: Orientation) => this.onSetOrientationProperties(allowOrientation, forceOrientation)
         });
 
-        this._bindings = [];
+        this._bindings = [
+            {
+                event: 'click',
+                listener: (event: Event) => this.onGDPRPopupEvent(event),
+                selector: '.gdpr-link'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onPrivacyEvent(event),
+                selector: '.icon-info'
+            }
+        ];
+
+        this._privacy.render();
+        this._privacy.hide();
+        document.body.appendChild(this._privacy.container());
+        this._privacy.addEventHandler(this);
     }
 
     public render() {
         super.render();
         this.setupIFrame();
+
+        this._gdprBanner = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
+        this._privacyButton = <HTMLElement>this._container.querySelector('.privacy-button');
     }
 
     public show(): void {
@@ -79,12 +107,38 @@ export class AdMobView extends View<IAdMobEventHandler> {
         this._afmaBridge.connect(this._iframe);
         this._mraidBridge.connect(this._iframe);
         this._handlers.forEach((h) => h.onShow());
+
+        // this.choosePrivacyShown();
     }
 
     public hide() {
         this._mraidBridge.disconnect();
         this._afmaBridge.disconnect();
         super.hide();
+
+        if(this._privacy) {
+            this._privacy.removeEventHandler(this);
+            this._privacy.hide();
+            this._privacy.container().parentElement!.removeChild(this._privacy.container());
+        }
+
+        if (this._showGDPRBanner && !this._gdprPopupClicked) {
+            this._handlers.forEach(h => h.onGDPRPopupSkipped());
+        }
+    }
+
+    public onPrivacy(url: string): void {
+        // do nothing
+    }
+
+    public onPrivacyClose(): void {
+        if (this._privacy) {
+            this._privacy.hide();
+        }
+    }
+
+    public onGDPROptOut(optOutEnabled: boolean): void {
+        // do nothing
     }
 
     public onBackPressed() {
@@ -97,6 +151,19 @@ export class AdMobView extends View<IAdMobEventHandler> {
 
     public sendClickSignalResponse(response: IClickSignalResponse) {
         this._afmaBridge.sendClickSignalResponse(response);
+    }
+
+    private choosePrivacyShown(): void {
+        this._nativeBridge.Sdk.logInfo(`Konecny: ${this._showGDPRBanner} && ${!this._gdprPopupClicked}`);
+        if (this._showGDPRBanner && !this._gdprPopupClicked) {
+            this._gdprBanner.style.visibility = 'visible';
+            this._privacyButton.style.pointerEvents = '1';
+            this._privacyButton.style.visibility = 'hidden';
+        } else {
+            this._privacyButton.style.visibility = 'visible';
+            this._gdprBanner.style.pointerEvents = '1';
+            this._gdprBanner.style.visibility = 'hidden';
+        }
     }
 
     private setupIFrame() {
@@ -198,5 +265,20 @@ export class AdMobView extends View<IAdMobEventHandler> {
 
     private onTrackingEvent(event: string, data?: any) {
         this._handlers.forEach((h) => h.onTrackingEvent(event, data));
+    }
+
+    private onGDPRPopupEvent(event: Event) {
+        event.preventDefault();
+
+        if (!this._gdprPopupClicked) {
+            this._gdprPopupClicked = true;
+            this.choosePrivacyShown();
+        }
+        this._privacy.show();
+    }
+
+    private onPrivacyEvent(event: Event) {
+        event.preventDefault();
+        this._privacy.show();
     }
 }

@@ -23,6 +23,8 @@ import { SdkStats } from 'Utilities/SdkStats';
 import { ITouchInfo } from 'Views/AFMABridge';
 import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
 import { ClientInfo } from 'Models/ClientInfo';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { Configuration } from 'Models/Configuration';
 
 const resolveAfter = (timeout: number): Promise<void> => {
     return new Promise((resolve, reject) => setTimeout(resolve, timeout));
@@ -39,6 +41,8 @@ describe('AdMobEventHandler', () => {
     let campaign: AdMobCampaign;
     let clientInfo: ClientInfo;
     const testTimeout = 250;
+    let configuration;
+    let operativeEventManager;
 
     beforeEach(() => {
         adUnit = sinon.createStubInstance(AdMobAdUnit);
@@ -51,6 +55,8 @@ describe('AdMobEventHandler', () => {
         nativeBridge.UrlScheme = sinon.createStubInstance(UrlSchemeApi);
         campaign = sinon.createStubInstance(AdMobCampaign);
         (<sinon.SinonStub>campaign.getSession).returns(TestFixtures.getSession());
+        configuration = sinon.createStubInstance(Configuration);
+        operativeEventManager = sinon.createStubInstance(OperativeEventManager);
 
         clientInfo = sinon.createStubInstance(ClientInfo);
 
@@ -63,7 +69,9 @@ describe('AdMobEventHandler', () => {
             session: session,
             adMobSignalFactory: adMobSignalFactory,
             campaign: campaign,
-            clientInfo: clientInfo
+            clientInfo: clientInfo,
+            configuration: configuration,
+            operativeEventManager: operativeEventManager
         });
     });
 

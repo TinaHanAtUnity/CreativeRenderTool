@@ -397,7 +397,9 @@ export class AdUnitFactory {
         if (!parameters.adMobSignalFactory) {
             throw new Error('AdMobSignalFactory is undefined, should not get here.');
         }
-        const view = new AdMobView(nativeBridge, parameters.adMobSignalFactory, parameters.container, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup());
+        const privacy = this.createPrivacy(nativeBridge, parameters);
+        const showGDPRBanner = this.showGDPRBanner(parameters);
+        const view = new AdMobView(nativeBridge, parameters.adMobSignalFactory, parameters.container, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup(), privacy, showGDPRBanner);
         view.render();
 
         const adUnitParameters: IAdMobAdUnitParameters = {
@@ -414,7 +416,9 @@ export class AdUnitFactory {
             session: parameters.campaign.getSession(),
             adMobSignalFactory: parameters.adMobSignalFactory,
             campaign: parameters.campaign,
-            clientInfo: parameters.clientInfo
+            clientInfo: parameters.clientInfo,
+            configuration: parameters.configuration,
+            operativeEventManager: parameters.operativeEventManager
         });
         view.addEventHandler(eventHandler);
 
