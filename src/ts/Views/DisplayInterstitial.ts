@@ -121,12 +121,12 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
     }
 
     private choosePrivacyShown(): void {
-        if (this._showGDPRBanner && this._privacy instanceof GDPRPrivacy) {
-            this._GDPRPopupElement.style.opacity = '1';
+        if (!this._gdprPopupClicked && this._showGDPRBanner) {
+            this._GDPRPopupElement.style.visibility = 'visible';
             this._privacyButtonElement.style.pointerEvents = '1';
             this._privacyButtonElement.style.visibility = 'hidden';
         } else {
-            this._privacyButtonElement.style.opacity = '1';
+            this._privacyButtonElement.style.visibility = 'visible';
             this._GDPRPopupElement.style.pointerEvents = '1';
             this._GDPRPopupElement.style.visibility = 'hidden';
         }
@@ -174,7 +174,10 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
     private onGDPRPopupEvent(event: Event) {
         event.preventDefault();
 
-        this._gdprPopupClicked = true;
+        if (!this._gdprPopupClicked) {
+            this._gdprPopupClicked = true;
+            this.choosePrivacyShown();
+        }
         this._privacy.show();
     }
 
