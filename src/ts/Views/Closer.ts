@@ -85,6 +85,12 @@ export class Closer extends View<ICloseHandler> implements IPrivacyHandler {
         super.show();
     }
 
+    public render() {
+        super.render();
+        this._GDPRPopupElement = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
+        this._privacyButtonElement = <HTMLElement>this._container.querySelector('.privacy-button');
+    }
+
     public onGDPROptOut(optOutEnabled: boolean): void {
         // do nothing
     }
@@ -105,14 +111,12 @@ export class Closer extends View<ICloseHandler> implements IPrivacyHandler {
     }
 
     public choosePrivacyShown(): void {
-        this._GDPRPopupElement = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
-        this._privacyButtonElement = <HTMLElement>this._container.querySelector('.privacy-button');
-        if (this._showGDPRBanner) {
-            this._GDPRPopupElement.style.opacity = '1';
+        if (this._showGDPRBanner && !this._gdprPopupClicked) {
+            this._GDPRPopupElement.style.visibility = 'visible';
             this._privacyButtonElement.style.pointerEvents = '1';
             this._privacyButtonElement.style.visibility = 'hidden';
         } else {
-            this._privacyButtonElement.style.opacity = '1';
+            this._privacyButtonElement.style.visibility = 'visible';
             this._GDPRPopupElement.style.pointerEvents = '1';
             this._GDPRPopupElement.style.visibility = 'hidden';
         }
@@ -121,7 +125,10 @@ export class Closer extends View<ICloseHandler> implements IPrivacyHandler {
     private onGDPRPopupEvent(event: Event) {
         event.preventDefault();
 
-        this._gdprPopupClicked = true;
+        if (!this._gdprPopupClicked) {
+            this._gdprPopupClicked = true;
+            this.choosePrivacyShown();
+        }
         this.onPrivacyOpened.trigger();
         this._privacy.show();
     }
