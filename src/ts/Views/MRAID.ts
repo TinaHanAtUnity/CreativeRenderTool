@@ -174,7 +174,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> implements IPrivacyHandl
     }
 
     public onGDPROptOut(optOutEnabled: boolean) {
-        // super.onGDPROptOut(optOutEnabled);
+        // super.onGDPROptOut(optOutEnabled); Do we need this?
         if (!this._gdprPopupClicked) {
             this._gdprPopupClicked = true;
             this.choosePrivacyShown();
