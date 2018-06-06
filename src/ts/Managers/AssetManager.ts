@@ -201,7 +201,7 @@ export class AssetManager {
         for(const asset of assets) {
             chain = chain.then(() => {
                 if(this._stopped) {
-                    throw new Error('Caching stopped');
+                    return Promise.reject(CacheStatus.STOPPED);
                 }
 
                 const promise = this.queueAsset(asset.getOriginalUrl(), this.getCacheDiagnostics(asset, campaign), cacheType).then(([fileId, fileUrl]) => {
@@ -338,7 +338,6 @@ export class AssetManager {
     private getCacheDiagnostics(asset: Asset, campaign: Campaign): ICacheDiagnostics {
         return {
             creativeType: asset.getDescription(),
-            gamerId: campaign.getGamerId(),
             targetGameId: campaign instanceof PerformanceCampaign ? (<PerformanceCampaign>campaign).getGameId() : 0,
             targetCampaignId: campaign.getId()
         };

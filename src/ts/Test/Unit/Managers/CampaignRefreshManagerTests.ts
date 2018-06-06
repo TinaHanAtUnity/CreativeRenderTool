@@ -20,7 +20,6 @@ import { Cache, CacheStatus } from 'Utilities/Cache';
 import { Placement, PlacementState } from 'Models/Placement';
 import { SessionManager } from 'Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { AdUnitContainer, Orientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
@@ -29,6 +28,7 @@ import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { FocusManager } from 'Managers/FocusManager';
 import { Campaign } from 'Models/Campaign';
+import { ConfigurationParser } from 'Parsers/ConfigurationParser';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
@@ -43,6 +43,7 @@ import { OldCampaignRefreshManager } from 'Managers/OldCampaignRefreshManager';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { JaegerManager } from 'Jaeger/JaegerManager';
 import { JaegerSpan } from 'Jaeger/JaegerSpan';
+import { GdprConsentManager } from 'Managers/GdprConsentManager';
 
 describe('CampaignRefreshManager', () => {
     let deviceInfo: DeviceInfo;
@@ -63,10 +64,10 @@ describe('CampaignRefreshManager', () => {
     let adUnitParams: IAdUnitParameters<Campaign>;
     let operativeEventManager: OperativeEventManager;
     let adMobSignalFactory: AdMobSignalFactory;
-    let comScoreService: ComScoreTrackingService;
     let cacheBookkeeping: CacheBookkeeping;
     let cache: Cache;
     let jaegerManager: JaegerManager;
+    let gdprManager: GdprConsentManager;
 
     beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo();
@@ -163,7 +164,8 @@ describe('CampaignRefreshManager', () => {
         adMobSignalFactory = sinon.createStubInstance(AdMobSignalFactory);
         (<sinon.SinonStub>adMobSignalFactory.getAdRequestSignal).returns(Promise.resolve(new AdMobSignal()));
         (<sinon.SinonStub>adMobSignalFactory.getOptionalSignal).returns(Promise.resolve(new AdMobOptionalSignal()));
-        comScoreService = new ComScoreTrackingService(thirdPartyEventManager, nativeBridge, deviceInfo);
+
+        gdprManager = sinon.createStubInstance(GdprConsentManager);
 
         adUnitParams = {
             forceOrientation: Orientation.NONE,
@@ -173,12 +175,12 @@ describe('CampaignRefreshManager', () => {
             clientInfo: clientInfo,
             thirdPartyEventManager: thirdPartyEventManager,
             operativeEventManager: operativeEventManager,
-            comScoreTrackingService: comScoreService,
             placement: TestFixtures.getPlacement(),
             campaign: campaign,
             configuration: configuration,
             request: request,
-            options: {}
+            options: {},
+            gdprManager: gdprManager
         };
 
         RefreshManager.ParsingErrorRefillDelay = 0; // prevent tests from hanging due to long retry timeouts
@@ -189,7 +191,7 @@ describe('CampaignRefreshManager', () => {
 
     describe('PLC campaigns', () => {
         beforeEach(() => {
-            configuration = new Configuration(JSON.parse(ConfigurationAuctionPlc));
+            configuration = ConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
             campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
             campaignRefreshManager = new OldCampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration, focusManager, sessionManager, clientInfo, request, cache);
         });

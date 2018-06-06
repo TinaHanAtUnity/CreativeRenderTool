@@ -13,7 +13,6 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { Configuration } from 'Models/Configuration';
 import { Observable0, Observable2 } from 'Utilities/Observable';
 import { IObserver0 } from 'Utilities/IObserver';
@@ -25,6 +24,7 @@ import { FinishState } from 'Constants/FinishState';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 import { Closer } from 'Views/Closer';
 import { Platform } from 'Constants/Platform';
+import { GdprConsentManager } from 'Managers/GdprConsentManager';
 
 describe('VPAIDAdUnit', () => {
     let nativeBridge: NativeBridge;
@@ -44,13 +44,13 @@ describe('VPAIDAdUnit', () => {
             clientInfo: sinon.createStubInstance(ClientInfo),
             thirdPartyEventManager: sinon.createStubInstance(ThirdPartyEventManager),
             operativeEventManager: sinon.createStubInstance(OperativeEventManager),
-            comScoreTrackingService: sinon.createStubInstance(ComScoreTrackingService),
             placement: TestFixtures.getPlacement(),
             container: sinon.createStubInstance(Activity),
             configuration: sinon.createStubInstance(Configuration),
             request: sinon.createStubInstance(Request),
             forceOrientation: Orientation.NONE,
-            options: {}
+            options: {},
+            gdprManager: sinon.createStubInstance(GdprConsentManager)
         };
 
         const webPlayer = sinon.createStubInstance(WebPlayerApi);

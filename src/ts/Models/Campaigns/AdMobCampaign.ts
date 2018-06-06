@@ -7,13 +7,15 @@ import { Model } from 'Models/Model';
 export interface IAdMobVideo {
     mediaFileURL: string;
     video: Video;
+    extension: string | null;
 }
 
 export class AdMobVideo extends Model<IAdMobVideo> {
     constructor(data: IAdMobVideo) {
         super('AdMobVideo', {
             mediaFileURL: ['string'],
-            video: ['object']
+            video: ['object'],
+            extension: ['string', 'null']
         }, data);
     }
 
@@ -23,6 +25,10 @@ export class AdMobVideo extends Model<IAdMobVideo> {
 
     public getVideo(): Video {
         return this.get('video');
+    }
+
+    public getExtension(): string | null {
+        return this.get('extension');
     }
 
     public getDTO() {

@@ -167,7 +167,11 @@ let purgeHighwinds = (urlRoot) => {
         body: JSON.stringify(body)
     }, 5, 5000).then(res => {
         if(res.status !== 200) {
-            throw new Error('Highwinds purge request failed');
+            console.log('Highwinds purge request failed, HTTP ' + res.status);
+            return res.text().then(body => {
+                console.dir(body);
+                throw new Error('Highwinds purge request failed ' + res.status + ': ' + body);
+            });
         }
         return res.text();
     }).then(body => {

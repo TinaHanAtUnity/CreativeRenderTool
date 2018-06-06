@@ -3,6 +3,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { RingerMode } from 'Constants/Android/RingerMode';
 import { ISensorInfo, StorageType } from 'Native/Api/AndroidDeviceInfo';
 import { StreamType } from 'Constants/Android/StreamType';
+import { Platform } from 'Constants/Platform';
 
 export interface IAndroidDeviceInfo extends IDeviceInfo {
     androidId: string;
@@ -32,6 +33,7 @@ export interface IAndroidDeviceInfo extends IDeviceInfo {
     upTime: number;
     elapsedRealtime: number;
     sensorList: ISensorInfo[];
+    networkMetered: boolean;
 }
 
 export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
@@ -70,7 +72,8 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
             usbConnected: ['boolean'],
             upTime: ['number'],
             elapsedRealtime: ['number'],
-            sensorList: ['array']
+            sensorList: ['array'],
+            networkMetered: ['boolean']
         }, nativeBridge);
     }
 
@@ -248,8 +251,15 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
         return this.get('sensorList');
     }
 
+    public getNetworkMetered(): Promise<boolean> {
+        return this._nativeBridge.DeviceInfo.Android.getNetworkMetered().then(isNetworkMetered => {
+            this.set('networkMetered', isNetworkMetered);
+            return this.get('networkMetered');
+        });
+    }
+
     public getDTO(): Promise<any> {
-        return super.getDTO().then((commonDTO) => {
+        return super.getDTO().then(commonDTO => {
             const dto: any = {
                 ... commonDTO,
                 'apiLevel': this.getApiLevel(),
@@ -278,9 +288,35 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
         });
     }
 
+    public getAnonymousDTO(): Promise<any> {
+        return super.getAnonymousDTO().then((commonDTO) => {
+            const dto: any = {
+                ... commonDTO,
+                'apiLevel': this.getApiLevel(),
+                'deviceMake': this.getManufacturer(),
+                'screenLayout': this.getScreenLayout(),
+                'screenDensity': this.getScreenDensity(),
+                'totalSpaceExternal': this.getTotalSpaceExternal(),
+            };
+
+            return Promise.all([
+                this.getFreeSpaceExternal().catch(err => this.handleDeviceInfoError(err)),
+                this.getRingerMode().catch(err => this.handleDeviceInfoError(err))
+            ]).then(([
+                freeSpaceExternal,
+                ringerMode
+            ]) => {
+                dto.freeSpaceExternal = freeSpaceExternal;
+                dto.ringerMode = ringerMode;
+
+                return dto;
+            });
+        });
+    }
+
     public getStaticDTO(): any {
         const dto: any = {
-            ... super.getDTO(),
+            ... super.getStaticDTO(),
             'apiLevel': this.getApiLevel(),
             'deviceMake': this.getManufacturer(),
             'screenLayout': this.getScreenLayout(),
@@ -293,5 +329,16 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
         }
 
         return dto;
+    }
+
+    public getAnonymousStaticDTO(): any {
+        return {
+            ... super.getAnonymousStaticDTO(),
+            'apiLevel': this.getApiLevel(),
+            'deviceMake': this.getManufacturer(),
+            'screenLayout': this.getScreenLayout(),
+            'screenDensity': this.getScreenDensity(),
+            'totalSpaceExternal': this.getTotalSpaceExternal(),
+        };
     }
 }

@@ -65,7 +65,6 @@ xdescribe('MOAT View', () => {
                 SDK: 'test',
                 Version: 'test',
                 SDKVersion: 'test',
-                IFA: 'test',
                 LimitAdTracking: false,
                 COPPA: true,
                 bundle: 'test'

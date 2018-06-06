@@ -12,8 +12,8 @@ import { Configuration } from 'Models/Configuration';
 import { Request } from 'Utilities/Request';
 import { FocusManager } from 'Managers/FocusManager';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
-import { ComScoreTrackingService } from 'Utilities/ComScoreTrackingService';
 import { CampaignAssetInfo } from 'Utilities/CampaignAssetInfo';
+import { GdprConsentManager } from 'Managers/GdprConsentManager';
 
 export interface IAdUnitParameters<T extends Campaign> {
     forceOrientation: Orientation;
@@ -23,14 +23,13 @@ export interface IAdUnitParameters<T extends Campaign> {
     clientInfo: ClientInfo;
     thirdPartyEventManager: ThirdPartyEventManager;
     operativeEventManager: OperativeEventManager;
-    comScoreTrackingService: ComScoreTrackingService;
     placement: Placement;
     campaign: T;
     configuration: Configuration;
     request: Request;
     options: any;
+    gdprManager: GdprConsentManager;
     adMobSignalFactory?: AdMobSignalFactory;
-    showGDPRPopup?: boolean;
 }
 
 export abstract class AbstractAdUnit {

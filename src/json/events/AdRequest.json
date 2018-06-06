@@ -110,12 +110,6 @@
       "body": false
     },
     {
-      "parameter": "gamerId",
-      "required": "yes",
-      "queryString": true,
-      "body": false
-    },
-    {
       "parameter": "bundleVersion",
       "required": "all",
       "queryString": false,
@@ -303,6 +297,30 @@
     },
     {
       "parameter": "ext",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "organizationId",
+      "required": "no",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "gdprEnabled",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "optOutRecorded",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "optOutEnabled",
       "required": "all",
       "queryString": false,
       "body": true

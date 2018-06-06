@@ -1,5 +1,5 @@
 import { Placement } from 'Models/Placement';
-import { Model } from 'Models/Model';
+import { ISchema, Model } from 'Models/Model';
 
 export enum CacheMode {
     FORCED,
@@ -8,7 +8,7 @@ export enum CacheMode {
     ADAPTIVE
 }
 
-interface IConfiguration {
+export interface IConfiguration {
     enabled: boolean;
     country: string;
     coppaCompliant: boolean;
@@ -23,74 +23,36 @@ interface IConfiguration {
     projectId: string;
     token: string;
     jaegerTracing: boolean;
+    organizationId: string | undefined;
+    gdprEnabled: boolean;
+    optOutRecorded: boolean;
+    optOutEnabled: boolean;
 }
 
 export class Configuration extends Model<IConfiguration> {
-    constructor(configJson: any) {
-        super('Configuration', {
-            enabled: ['boolean'],
-            country: ['string'],
-            coppaCompliant: ['boolean'],
-            abGroup: ['number'],
-            gamerId: ['string'],
-            properties: ['string'],
-            cacheMode: ['number'],
-            placements: ['object'],
-            defaultPlacement: ['object'],
-            analytics: ['boolean'],
-            test: ['boolean'],
-            projectId: ['string'],
-            token: ['string'],
-            jaegerTracing: ['boolean']
-        });
+    public static Schema: ISchema<IConfiguration> = {
+        enabled: ['boolean'],
+        country: ['string'],
+        coppaCompliant: ['boolean'],
+        abGroup: ['number'],
+        gamerId: ['string'],
+        properties: ['string'],
+        cacheMode: ['number'],
+        placements: ['object'],
+        defaultPlacement: ['object'],
+        analytics: ['boolean'],
+        test: ['boolean'],
+        projectId: ['string'],
+        token: ['string'],
+        jaegerTracing: ['boolean'],
+        organizationId: ['string', 'undefined'],
+        gdprEnabled: ['boolean'],
+        optOutRecorded: ['boolean'],
+        optOutEnabled: ['boolean']
+    };
 
-        this.set('enabled', configJson.enabled);
-        this.set('country', configJson.country);
-        this.set('coppaCompliant', configJson.coppaCompliant);
-        this.set('projectId', configJson.projectId);
-        this.set('abGroup', configJson.abGroup);
-        this.set('gamerId', configJson.gamerId);
-        this.set('properties', configJson.properties);
-        this.set('token', configJson.token);
-
-        this.set('analytics', configJson.analytics ? true : false);
-        this.set('jaegerTracing', configJson.jaegerTracing ? true : false);
-
-        this.set('test', configJson.test ? true : false);
-
-        switch(configJson.assetCaching) {
-            case 'forced':
-                this.set('cacheMode', CacheMode.FORCED);
-                break;
-
-            case 'allowed':
-                this.set('cacheMode', CacheMode.ALLOWED);
-                break;
-
-            case 'disabled':
-                this.set('cacheMode', CacheMode.DISABLED);
-                break;
-
-            case 'adaptive':
-                this.set('cacheMode', CacheMode.ADAPTIVE);
-                break;
-
-            default:
-                throw new Error('Unknown assetCaching value "' + configJson.assetCaching + '"');
-        }
-
-        const placements = configJson.placements;
-
-        if (placements) {
-            this.set('placements', {});
-            placements.forEach((rawPlacement: any): void => {
-                const placement: Placement = new Placement(rawPlacement);
-                this.getPlacements()[placement.getId()] = placement;
-                if(placement.isDefault()) {
-                    this.set('defaultPlacement', placement);
-                }
-            });
-        }
+    constructor(data: IConfiguration) {
+        super('Configuration', Configuration.Schema, data);
     }
 
     public isEnabled(): boolean {
@@ -175,6 +137,30 @@ export class Configuration extends Model<IConfiguration> {
         return this.get('projectId');
     }
 
+    public isGDPREnabled(): boolean {
+        return this.get('gdprEnabled');
+    }
+
+    public setGDPREnabled(enabled: boolean) {
+        this.set('gdprEnabled', enabled);
+    }
+
+    public isOptOutRecorded(): boolean {
+        return this.get('optOutRecorded');
+    }
+
+    public setOptOutRecorded(recorded: boolean) {
+        this.set('optOutRecorded', recorded);
+    }
+
+    public isOptOutEnabled(): boolean {
+        return this.get('optOutEnabled');
+    }
+
+    public setOptOutEnabled(optOutEnabled: boolean) {
+        this.set('optOutEnabled', optOutEnabled);
+    }
+
     public getDTO(): { [key: string]: any } {
         const placements = [];
         for(const placement in this.getPlacements()) {
@@ -193,7 +179,7 @@ export class Configuration extends Model<IConfiguration> {
             'country': this.getCountry(),
             'coppaCompliant': this.isCoppaCompliant(),
             'abGroup': this.getAbGroup(),
-            'gamerId': this.getGamerId(),
+            'gamerToken': this.getToken(),
             'cacheMode': CacheMode[this.getCacheMode()].toLowerCase(),
             'placements': placements,
             'defaultPlacement': defaultPlacementId,
@@ -203,5 +189,9 @@ export class Configuration extends Model<IConfiguration> {
 
     public getTestMode(): boolean {
        return this.get('test');
+    }
+
+    public getOrganizationId(): string | undefined {
+        return this.get('organizationId');
     }
 }

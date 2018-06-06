@@ -136,6 +136,10 @@ export class ClosableVideoOverlay extends AbstractVideoOverlay {
         }
     }
 
+    public setCallButtonEnabled(value: boolean) {
+        // EMPTY
+    }
+
     private onCloseEvent(event: Event): void {
         event.preventDefault();
         event.stopPropagation();

@@ -66,4 +66,6 @@ export abstract class AbstractVideoOverlay extends View<IOverlayHandler> {
     public abstract setDebugMessageVisible(value: boolean): void;
 
     public abstract setCallButtonVisible(value: boolean): void;
+
+    public abstract setCallButtonEnabled(value: boolean): void;
 }

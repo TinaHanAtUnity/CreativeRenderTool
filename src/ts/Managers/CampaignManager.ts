@@ -93,6 +93,7 @@ export class CampaignManager {
     private _realtimeBody: any = {};
     private _ignoreEvents: boolean;
     private _jaegerManager: JaegerManager;
+    private _lastAuctionId: string | undefined;
 
     constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, cacheBookkeeping: CacheBookkeeping, jaegerManager: JaegerManager) {
         this._nativeBridge = nativeBridge;
@@ -110,28 +111,50 @@ export class CampaignManager {
         this._jaegerManager = jaegerManager;
     }
 
+    public cleanCachedUrl(url: string): string {
+        url = Url.removeQueryParameter(url, 'connectionType');
+        url = Url.removeQueryParameter(url, 'networkType');
+        return url;
+    }
+
     public requestFromCache(cachedResponse: INativeResponse): Promise<void[] | void> {
         if(this._requesting) {
             return Promise.resolve();
         }
 
-        this._assetManager.enableCaching();
-        this._assetManager.checkFreeSpace();
-
         this._ignoreEvents = true;
         this._requesting = true;
 
-        this.resetRealtimeDataForPlacements();
+        return this.createRequestUrl(false).then((currentUrl: string) => {
+            let cachedUrl = cachedResponse.url;
 
-        this._nativeBridge.Sdk.logInfo('Requesting ad plan from cache ' + cachedResponse.url);
+            cachedUrl = this.cleanCachedUrl(cachedUrl);
+            currentUrl = this.cleanCachedUrl(currentUrl);
 
-        return this.parseCampaigns(cachedResponse).then(() => {
-                this._ignoreEvents = false;
-                this._requesting = false;
-            }).catch((error) => {
-                this._ignoreEvents = false;
-                this._requesting = false;
-            });
+            if (cachedUrl !== currentUrl) {
+                this._nativeBridge.Sdk.logInfo('Failed to use cached campaign response due to URL mismatch ' + cachedUrl + ' (cached) and ' + currentUrl + ' (current)');
+                return Promise.reject(new Error('invalidate cache'));
+            }
+
+            return Promise.resolve();
+        }).then(() => {
+            this._assetManager.enableCaching();
+            this._assetManager.checkFreeSpace();
+
+            this.resetRealtimeDataForPlacements();
+
+            this._nativeBridge.Sdk.logInfo('Requesting ad plan from cache ' + cachedResponse.url);
+
+            SdkStats.setAdRequestTimestamp();
+        }).then(() => {
+            return this.parseCampaigns(cachedResponse);
+        }).then(() => {
+            this._ignoreEvents = false;
+            this._requesting = false;
+        }).catch((error) => {
+            this._ignoreEvents = false;
+            this._requesting = false;
+        });
     }
 
     public request(nofillRetry?: boolean): Promise<INativeResponse | void> {
@@ -150,7 +173,7 @@ export class CampaignManager {
         this.resetRealtimeDataForPlacements();
         const jaegerSpan = this._jaegerManager.startSpan('CampaignManagerRequest');
         jaegerSpan.addTag(JaegerTags.DeviceType, Platform[this._nativeBridge.getPlatform()]);
-        return Promise.all([this.createRequestUrl(false), this.createRequestBody(nofillRetry)]).then(([requestUrl, requestBody]) => {
+        return Promise.all([this.createRequestUrl(false, nofillRetry), this.createRequestBody(nofillRetry)]).then(([requestUrl, requestBody]) => {
             this._nativeBridge.Sdk.logInfo('Requesting ad plan from ' + requestUrl);
             const body = JSON.stringify(requestBody);
 
@@ -213,7 +236,7 @@ export class CampaignManager {
     }
 
     public requestRealtime(placement: Placement, session: Session): Promise<Campaign | void> {
-        return Promise.all([this.createRequestUrl(true, session), this.createRequestBody(false, placement)]).then(([requestUrl, requestBody]) => {
+        return Promise.all([this.createRequestUrl(true, undefined, session), this.createRequestBody(false, placement)]).then(([requestUrl, requestBody]) => {
             this._nativeBridge.Sdk.logInfo('Requesting realtime ad plan from ' + requestUrl);
             const body = JSON.stringify(requestBody);
             return this._request.post(requestUrl, body, [], {
@@ -267,6 +290,8 @@ export class CampaignManager {
 
         if(!json.auctionId) {
             throw new Error('No auction ID found');
+        } else {
+            this._lastAuctionId = json.auctionId;
         }
 
         const session: Session = this._sessionManager.create(json.auctionId);
@@ -388,7 +413,7 @@ export class CampaignManager {
         }
 
         const parseTimestamp = Date.now();
-        return parser.parse(this._nativeBridge, this._request, response, session, this._configuration.getGamerId(), this.getAbGroup(), this._deviceInfo.getOsVersion()).then((campaign) => {
+        return parser.parse(this._nativeBridge, this._request, response, session, this._configuration.getGamerId(), this.getAbGroup()).then((campaign) => {
             const parseDuration = Date.now() - parseTimestamp;
             for(const placement of response.getPlacements()) {
                 SdkStats.setParseDuration(placement, parseDuration);
@@ -453,7 +478,7 @@ export class CampaignManager {
         return CampaignManager.AbGroup ? CampaignManager.AbGroup : this._configuration.getAbGroup();
     }
 
-    private createRequestUrl(realtime: boolean, session?: Session): Promise<string> {
+    private createRequestUrl(realtime: boolean, nofillRetry?: boolean, session?: Session): Promise<string> {
 
         if (realtime && this._realtimeUrl) {
             if (session) {
@@ -475,6 +500,12 @@ export class CampaignManager {
         } else if(this._clientInfo.getPlatform() === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
             url = Url.addParameters(url, {
                 androidId: this._deviceInfo.getAndroidId()
+            });
+        }
+
+        if (nofillRetry && this._lastAuctionId) {
+            url = Url.addParameters(url, {
+                auctionId: this._lastAuctionId
             });
         }
 
@@ -538,8 +569,7 @@ export class CampaignManager {
                 screenWidth: screenWidth,
                 screenHeight: screenHeight,
                 connectionType: connectionType,
-                networkType: networkType,
-                gamerId: this._configuration.getGamerId()
+                networkType: networkType
             });
             this._realtimeUrl = url;
             return url;
@@ -665,6 +695,14 @@ export class CampaignManager {
                 body.sessionDepth = SdkStats.getAdRequestOrdinal();
                 body.projectId = this._configuration.getUnityProjectId();
                 body.gameSessionCounters = GameSessionCounters.getDTO();
+                body.gdprEnabled = this._configuration.isGDPREnabled();
+                body.optOutEnabled = this._configuration.isOptOutEnabled();
+                body.optOutRecorded = this._configuration.isOptOutRecorded();
+
+                const organizationId = this._configuration.getOrganizationId();
+                if(organizationId) {
+                    body.organizationId = organizationId;
+                }
                 this._realtimeBody = body;
                 return body;
             });
