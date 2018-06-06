@@ -119,14 +119,14 @@ export class Promo extends View<{}> implements IPrivacyHandler {
     }
 
     private choosePrivacyShown() {
-        if (this._showGDPRBanner && !this._gdprPopupClicked) {
-            this._GDPRPopupElement.style.opacity = '1';
+        if (!this._gdprPopupClicked && this._showGDPRBanner) {
+            this._GDPRPopupElement.style.visibility = 'visible';
             this._privacyButtonElement.style.pointerEvents = '1';
             this._privacyButtonElement.style.visibility = 'hidden';
         } else {
+            this._privacyButtonElement.style.visibility = 'visible';
             this._GDPRPopupElement.style.pointerEvents = '1';
             this._GDPRPopupElement.style.visibility = 'hidden';
-            this._iframe!.style.height = '100vh';
         }
     }
 
