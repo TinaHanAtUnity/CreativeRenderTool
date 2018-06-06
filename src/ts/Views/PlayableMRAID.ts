@@ -41,8 +41,8 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private _configuration: any;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string, privacy: AbstractPrivacy) {
-        super(nativeBridge, 'playable-mraid', placement, campaign, privacy);
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
+        super(nativeBridge, 'playable-mraid', placement, campaign, privacy, showGDPRBanner);
 
         this._placement = placement;
         this._campaign = campaign;
@@ -79,6 +79,11 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 event: 'click',
                 listener: (event: Event) => this.onPrivacyEvent(event),
                 selector: '.privacy-button'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onGDPRPopupEvent(event),
+                selector: '.gdpr-link'
             }
         ];
     }
