@@ -95,7 +95,7 @@ export class PurchasingUtilities {
         return false;
     }
 
-    public static handleSendIAPEvent(nativeBridge: NativeBridge, iapPayload: string): void {
+    public static handleSendIAPEvent(iapPayload: string): void {
         const jsonPayload = JSON.parse(iapPayload);
 
         if (jsonPayload.type === 'CatalogUpdated') {

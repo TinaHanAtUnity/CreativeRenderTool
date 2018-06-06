@@ -276,7 +276,7 @@ describe('PurchasingUtilitiesTest', () => {
 
         it('Should handle campaign when iap payload type is catalogupdated', () => {
             PurchasingUtilities.iapCampaignCount = 1;
-            PurchasingUtilities.handleSendIAPEvent(nativeBridge, '{\"type\":\"CatalogUpdated\"}');
+            PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}');
             (<sinon.SinonStub>campaignManager.handleCampaign).returns(Promise.resolve());
 
             sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
@@ -285,7 +285,7 @@ describe('PurchasingUtilitiesTest', () => {
 
         it('Should set up campaign with stored response and session', () => {
             PurchasingUtilities.iapCampaignCount = 1;
-            PurchasingUtilities.handleSendIAPEvent(nativeBridge, '{\"type\":\"CatalogUpdated\"}');
+            PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}');
             (<sinon.SinonStub>campaignManager.handleCampaign).returns(Promise.resolve());
 
             sinon.assert.calledWith(<sinon.SinonStub>PurchasingUtilities.campaignManager.handleCampaign, response, session);
@@ -293,7 +293,7 @@ describe('PurchasingUtilitiesTest', () => {
 
         it('Should not call when passed iap payload type is a random string', () => {
             PurchasingUtilities.iapCampaignCount = 1;
-            PurchasingUtilities.handleSendIAPEvent(nativeBridge, '{"type":"sadfasdf"}');
+            PurchasingUtilities.handleSendIAPEvent('{"type":"sadfasdf"}');
             (<sinon.SinonStub>campaignManager.handleCampaign).returns(Promise.resolve());
 
             sinon.assert.notCalled(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
@@ -302,7 +302,7 @@ describe('PurchasingUtilitiesTest', () => {
 
         it('Should not call when no value is included in given index in the array', () => {
             PurchasingUtilities.iapCampaignCount = 2;
-            PurchasingUtilities.handleSendIAPEvent(nativeBridge, '{\"type\":\"CatalogUpdated\"}');
+            PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}');
 
             const handleCampaignSpy = (<sinon.SinonStub>campaignManager.handleCampaign).returns(Promise.resolve());
             const handleCampaignCall = handleCampaignSpy.getCall(1);
@@ -315,7 +315,7 @@ describe('PurchasingUtilitiesTest', () => {
             PurchasingUtilities.session[1] = session;
             PurchasingUtilities.iapCampaignCount = 2;
 
-            PurchasingUtilities.handleSendIAPEvent(nativeBridge, '{\"type\":\"CatalogUpdated\"}');
+            PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}');
             (<sinon.SinonStub>campaignManager.handleCampaign).returns(Promise.resolve());
 
             sinon.assert.calledTwice(<sinon.SinonStub>PurchasingUtilities.campaignManager.handleCampaign);
