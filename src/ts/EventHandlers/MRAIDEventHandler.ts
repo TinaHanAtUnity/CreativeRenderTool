@@ -16,6 +16,7 @@ import { DiagnosticError } from 'Errors/DiagnosticError';
 import { FinishState } from 'Constants/FinishState';
 import { Placement } from 'Models/Placement';
 import { Configuration } from 'Models/Configuration';
+import { GDPREventAction, GdprManager } from 'Managers/GdprManager';
 
 export class MRAIDEventHandler implements IMRAIDViewHandler {
 
@@ -29,6 +30,7 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
     private _request: Request;
     private _placement: Placement;
     private _configuration: Configuration;
+    private _gdprManager: GdprManager;
 
     constructor(nativeBridge: NativeBridge, adUnit: MRAIDAdUnit, parameters: IMRAIDAdUnitParameters) {
         this._nativeBridge = nativeBridge;
@@ -41,6 +43,7 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
         this._placement = parameters.placement;
         this._request = parameters.request;
         this._configuration = parameters.configuration;
+        this._gdprManager = parameters.gdprManager;
     }
 
     public onMraidClick(url: string): Promise<void> {
@@ -125,7 +128,7 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
     public onGDPRPopupSkipped(): void {
         if (!this._configuration.isOptOutRecorded()) {
             this._configuration.setOptOutRecorded(true);
-            this._operativeEventManager.sendGDPREvent('skip');
+            this._gdprManager.sendGDPREvent(GDPREventAction.SKIP);
         }
     }
 

@@ -418,7 +418,7 @@ export class AdUnitFactory {
             campaign: parameters.campaign,
             clientInfo: parameters.clientInfo,
             configuration: parameters.configuration,
-            operativeEventManager: parameters.operativeEventManager
+            gdprManager: parameters.gdprManager
         });
         view.addEventHandler(eventHandler);
 
