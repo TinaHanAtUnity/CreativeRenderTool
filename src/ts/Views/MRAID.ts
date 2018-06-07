@@ -65,7 +65,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
             {
                 event: 'click',
                 listener: (event: Event) => this.onPrivacyEvent(event),
-                selector: '.icon-info'
+                selector: '.icon-gdpr'
             }
         ];
     }

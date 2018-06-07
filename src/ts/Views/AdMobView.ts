@@ -84,7 +84,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
             {
                 event: 'click',
                 listener: (event: Event) => this.onPrivacyEvent(event),
-                selector: '.icon-info'
+                selector: '.icon-gdpr'
             }
         ];
 
