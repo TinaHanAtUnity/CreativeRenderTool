@@ -354,7 +354,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     }
 
     private fade(value: boolean) {
-        if (value) {
+        if (value && !this._isPrivacyShowing) {
             this._skipElement.classList.remove('slide-back-in-place');
             this._skipElement.classList.add('slide-up');
             this._progressElement.classList.remove('slide-back-in-place');
