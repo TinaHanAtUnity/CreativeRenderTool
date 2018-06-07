@@ -250,10 +250,10 @@ export class AdUnitFactory {
         const showGDPRBanner = this.showGDPRBanner(parameters);
         const privacy = this.createPrivacy(nativeBridge, parameters);
         if(resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) {
-            mraid = new PlayableMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy);
+            mraid = new PlayableMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner);
             endScreen = new MRAIDEndScreen(nativeBridge, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner);
         } else {
-            mraid = new MRAID(nativeBridge, parameters.placement, parameters.campaign, privacy);
+            mraid = new MRAID(nativeBridge, parameters.placement, parameters.campaign, privacy, showGDPRBanner);
         }
 
         const mraidAdUnitParameters: IMRAIDAdUnitParameters = {
