@@ -105,6 +105,11 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         this._privacy.show();
     }
 
+<<<<<<< HEAD
+=======
+    protected abstract choosePrivacyShown(): void;
+
+>>>>>>> feature/gdpr-mraid
     private replaceMraidSources(mraid: string): string {
         // Workaround for https://jira.hq.unity3d.com/browse/ABT-333
         // On certain versions of the webview on iOS (2.0.2 - 2.0.8) there seems

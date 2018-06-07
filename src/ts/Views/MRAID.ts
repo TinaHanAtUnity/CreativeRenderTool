@@ -65,7 +65,11 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
             {
                 event: 'click',
                 listener: (event: Event) => this.onPrivacyEvent(event),
+<<<<<<< HEAD
                 selector: '.icon-gdpr'
+=======
+                selector: '.icon-info'
+>>>>>>> feature/gdpr-mraid
             }
         ];
     }
@@ -170,7 +174,11 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         }
     }
 
+<<<<<<< HEAD
     private choosePrivacyShown(): void {
+=======
+    protected choosePrivacyShown(): void {
+>>>>>>> feature/gdpr-mraid
         if (this._showGDPRBanner && !this._gdprPopupClicked) {
             this._gdprBanner.style.visibility = 'visible';
             this._privacyButton.style.pointerEvents = '1';
