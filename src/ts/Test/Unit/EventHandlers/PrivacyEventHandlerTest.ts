@@ -23,7 +23,7 @@ import { UrlSchemeApi } from 'Native/Api/UrlScheme';
 import { IntentApi } from 'Native/Api/Intent';
 import { GDPRPrivacy } from 'Views/GDPRPrivacy';
 import { Placement } from 'Models/Placement';
-import { GdprConsentManager } from 'Managers/GdprConsentManager';
+import { GdprManager, GDPREventSource } from 'Managers/GdprManager';
 
 describe('PrivacyEventHandlerTest', () => {
 
@@ -51,7 +51,7 @@ describe('PrivacyEventHandlerTest', () => {
             overlay: sinon.createStubInstance(Overlay),
             video: sinon.createStubInstance(Video),
             privacy: sinon.createStubInstance(GDPRPrivacy),
-            gdprManager: sinon.createStubInstance(GdprConsentManager)
+            gdprManager: sinon.createStubInstance(GdprManager)
         };
 
         adUnit = sinon.createStubInstance(PerformanceAdUnit);
@@ -94,7 +94,7 @@ describe('PrivacyEventHandlerTest', () => {
 
             privacyEventHandler.onGDPROptOut(true);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.operativeEventManager.sendGDPREvent, 'optout');
+            sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.gdprManager.sendGDPREvent, 'optout', GDPREventSource.USER);
         });
 
         it('should send operative event with action `optin`', () => {
@@ -103,7 +103,7 @@ describe('PrivacyEventHandlerTest', () => {
 
             privacyEventHandler.onGDPROptOut(false);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.operativeEventManager.sendGDPREvent, 'optin');
+            sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.gdprManager.sendGDPREvent, 'optin');
         });
 
         it('should send operative event with action `skip`', () => {
@@ -112,7 +112,7 @@ describe('PrivacyEventHandlerTest', () => {
 
             privacyEventHandler.onGDPROptOut(false);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.operativeEventManager.sendGDPREvent, 'skip');
+            sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.gdprManager.sendGDPREvent, 'skip');
         });
     });
 });

@@ -26,7 +26,7 @@ import { IXPromoAdUnitParameters, XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { XPromoOperativeEventManager } from 'Managers/XPromoOperativeEventManager';
 import { Privacy } from 'Views/Privacy';
-import { GdprConsentManager } from 'Managers/GdprConsentManager';
+import { GdprManager } from 'Managers/GdprManager';
 
 describe('XPromoEndScreenEventHandlerTest', () => {
 
@@ -78,7 +78,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             });
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 
-            sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
+            sinon.spy(operativeEventManager, 'sendClick');
             sinon.stub(operativeEventManager, 'sendHttpKafkaEvent').returns(resolvedPromise);
 
             sinon.spy(nativeBridge.Intent, 'launch');
@@ -88,7 +88,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             endScreen = new XPromoEndScreen(nativeBridge, TestFixtures.getXPromoCampaign(), deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, false);
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
             placement = TestFixtures.getPlacement();
-            const gdprManager = sinon.createStubInstance(GdprConsentManager);
+            const gdprManager = sinon.createStubInstance(GdprManager);
 
             xPromoAdUnitParameters = {
                 forceOrientation: Orientation.LANDSCAPE,
@@ -124,7 +124,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 clickAttributionUrl: xPromoAdUnitParameters.campaign.getClickAttributionUrl()
             });
 
-            sinon.assert.notCalled(<sinon.SinonSpy>operativeEventManager.sendClick);
+            sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendClick);
             sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendHttpKafkaEvent, 'ads.xpromo.operative.videoclick.v1.json', 'click', placement, xPromoAdUnit.getVideoOrientation());
         });
 
@@ -163,7 +163,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             });
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 
-            sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
+            sinon.spy(operativeEventManager, 'sendClick');
             sinon.stub(operativeEventManager, 'sendHttpKafkaEvent').returns(resolvedPromise);
             sinon.stub(deviceInfo, 'getOsVersion').returns('9.0');
             const video = new Video('', TestFixtures.getSession());
@@ -171,7 +171,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
             endScreen = new XPromoEndScreen(nativeBridge, campaign, deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, false);
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
-            const gdprManager = sinon.createStubInstance(GdprConsentManager);
+            const gdprManager = sinon.createStubInstance(GdprManager);
 
             xPromoAdUnitParameters = {
                 forceOrientation: Orientation.LANDSCAPE,
@@ -207,7 +207,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 clickAttributionUrl: xPromoAdUnitParameters.campaign.getClickAttributionUrl()
             });
 
-            sinon.assert.notCalled(<sinon.SinonSpy>operativeEventManager.sendClick);
+            sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendClick);
             sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendHttpKafkaEvent, 'ads.xpromo.operative.videoclick.v1.json', 'click', placement, xPromoAdUnit.getVideoOrientation());
         });
     });
