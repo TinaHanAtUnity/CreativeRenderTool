@@ -76,12 +76,7 @@ export class VPAID extends View<IVPAIDHandler> {
             isCoppaCompliant: this._isCoppaCompliant
         };
 
-        let iframeSrcDoc;
-        if (this._showGDPRBanner) {
-            iframeSrcDoc = VPAIDContainerTemplate.replace('{COMPILED_CSS}', VPAIDCss.replace('height:100vh', 'height:90vh'));
-        } else {
-            iframeSrcDoc = VPAIDContainerTemplate.replace('{COMPILED_CSS}', VPAIDCss);
-        }
+        let iframeSrcDoc = VPAIDContainerTemplate.replace('{COMPILED_CSS}', VPAIDCss);
         iframeSrcDoc = new Template(iframeSrcDoc).render(templateData);
 
         this._webplayerEventObserver = this._nativeBridge.WebPlayer.onWebPlayerEvent.subscribe((args: string) => this.onWebPlayerEvent(JSON.parse(args)));
