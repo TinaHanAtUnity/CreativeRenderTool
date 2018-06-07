@@ -244,14 +244,12 @@ export class AdUnitFactory {
 
     private static createMRAIDAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<MRAIDCampaign>): MRAIDAdUnit {
         const resourceUrl = parameters.campaign.getResourceUrl();
-        let endScreen: MRAIDEndScreen | undefined;
 
         let mraid: MRAIDView<IMRAIDViewHandler>;
         const showGDPRBanner = this.showGDPRBanner(parameters);
         const privacy = this.createPrivacy(nativeBridge, parameters);
         if(resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) {
             mraid = new PlayableMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner);
-            endScreen = new MRAIDEndScreen(nativeBridge, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner);
         } else {
             mraid = new MRAID(nativeBridge, parameters.placement, parameters.campaign, privacy, showGDPRBanner);
         }
@@ -259,18 +257,12 @@ export class AdUnitFactory {
         const mraidAdUnitParameters: IMRAIDAdUnitParameters = {
             ... parameters,
             mraid: mraid,
-            endScreen: endScreen,
             privacy: privacy
         };
 
         const mraidAdUnit = new MRAIDAdUnit(nativeBridge, mraidAdUnitParameters);
         const mraidEventHandler = new MRAIDEventHandler(nativeBridge, mraidAdUnit, mraidAdUnitParameters);
         mraid.addEventHandler(mraidEventHandler);
-
-        if(endScreen) {
-            const endScreenEventHandler = new MRAIDEndScreenEventHandler(nativeBridge, mraidAdUnit, mraidAdUnitParameters);
-            endScreen.addEventHandler(endScreenEventHandler);
-        }
 
         return mraidAdUnit;
     }
