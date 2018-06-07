@@ -8,7 +8,6 @@ $end-screen-mixin($scale-size = $default-scale-size) {
 
   $common-margin = $default-size * $scale-size * .25;
 
-  /* Override media-queries.styl styles */
   html {
     #end-screen.iphone-x-styles {
       padding: 0;
@@ -69,6 +68,18 @@ $end-screen-mixin($scale-size = $default-scale-size) {
 
     &.landscape #end-screen.iphone-x-styles {
       height: 100vh;
+
+      .column-container {
+        margin: .5rem 0 0 0;
+      }
+
+      .name-container {
+        font-size: 1.2rem;
+      }
+
+      .game-rating {
+        font-size: 1.1rem;
+      }
 
       .end-screen-info-background {
         flex-grow: 1;
