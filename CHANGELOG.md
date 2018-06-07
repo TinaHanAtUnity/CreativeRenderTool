@@ -1,4 +1,4 @@
-# Pending
+# Thu Jun  7 17:15:45 UTC 2018
 
 * Fix Purchasing utilities diagnostics
 * Refactor GDPR event sending to GdprManager
