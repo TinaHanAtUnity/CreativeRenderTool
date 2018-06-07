@@ -4,9 +4,9 @@ import { Placement } from 'Models/Placement';
 
 import CloserTemplate from 'html/closer.html';
 import { Template } from 'Utilities/Template';
-import { IPrivacyHandler, AbstractPrivacy } from './AbstractPrivacy';
 import { GDPRPrivacy } from 'Views/GDPRPrivacy';
 import { Observable0 } from 'Utilities/Observable';
+import { IPrivacyHandler, AbstractPrivacy } from 'Views/AbstractPrivacy';
 
 export interface ICloseHandler {
     onClose(skipped: boolean): void;

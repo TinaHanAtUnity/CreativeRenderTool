@@ -7,9 +7,8 @@ import { Placement } from 'Models/Placement';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { Platform } from 'Constants/Platform';
 import { Template } from 'Utilities/Template';
-import { IPrivacyHandler, AbstractPrivacy } from './AbstractPrivacy';
 import { ENGINE_METHOD_DIGESTS } from 'constants';
-import { GDPRPrivacy } from './GDPRPrivacy';
+import { IPrivacyHandler, AbstractPrivacy } from 'Views/AbstractPrivacy';
 
 export interface IDisplayInterstitialHandler {
     onDisplayInterstitialClose(): void;
