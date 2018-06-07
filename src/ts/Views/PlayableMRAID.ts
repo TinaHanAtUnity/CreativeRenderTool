@@ -86,14 +86,10 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
             },
             {
                 event: 'click',
-<<<<<<< HEAD
-                listener: (event: Event) => this.onGDPRPopupEvent(event),
-=======
                 listener: (event: Event) => {
                     this.onGDPRPopupEvent(event);
                     this.choosePrivacyShown();
                 },
->>>>>>> feature/gdpr-mraid
                 selector: '.gdpr-link'
             }
         ];
