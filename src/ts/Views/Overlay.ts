@@ -361,6 +361,10 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
             this._progressElement.classList.add('slide-up');
             this._muteButtonElement.classList.remove('slide-back-in-place');
             this._muteButtonElement.classList.add('slide-down');
+            if (this._gdprPopupClicked) {
+                this._privacyButtonElement.classList.remove('slide-back-in-place');
+                this._privacyButtonElement.classList.add('slide-down');
+            }
             this._container.style.pointerEvents = 'auto';
             this._fadeStatus = false;
         } else {
@@ -371,6 +375,10 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
             this._progressElement.classList.add('slide-back-in-place');
             this._muteButtonElement.classList.remove('slide-down');
             this._muteButtonElement.classList.add('slide-back-in-place');
+            if (this._gdprPopupClicked) {
+                this._privacyButtonElement.classList.remove('slide-down');
+                this._privacyButtonElement.classList.add('slide-back-in-place');
+            }
             this._fadeStatus = true;
         }
     }
