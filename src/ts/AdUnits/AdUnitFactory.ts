@@ -72,6 +72,7 @@ import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
 import { GDPRPrivacy } from 'Views/GDPRPrivacy';
 import { PrivacyEventHandler } from 'EventHandlers/PrivacyEventHandler';
+import { ARUtil } from '../Utilities/ARUtil';
 
 export class AdUnitFactory {
 
@@ -248,9 +249,9 @@ export class AdUnitFactory {
         let mraid: MRAIDView<IMRAIDViewHandler>;
         const showGDPRBanner = this.showGDPRBanner(parameters);
         const privacy = this.createPrivacy(nativeBridge, parameters);
-        const isMRAIDAR = parameters.campaign.getAdType() === 'MRAID-AR';
+        const isMRAIDAR = parameters.campaign.getAdType() === 'MRAID-AR' || ARUtil.isARCreative(parameters.campaign);
         // TODO: Remove /ar/ folder check once we have MRAID-AR type support on the server side
-        const isPlayable = (resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity|\/ar\/|ducktales-ar/)) || isMRAIDAR;
+        const isPlayable = (resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) || isMRAIDAR;
         if(isPlayable) {
             mraid = new PlayableMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner);
         } else {

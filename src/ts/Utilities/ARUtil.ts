@@ -1,3 +1,5 @@
+import { MRAIDCampaign } from '../Models/Campaigns/MRAIDCampaign';
+
 export interface IARFrameTransform {
     a: number;
     b: number;
@@ -82,5 +84,23 @@ export class ARUtil {
         return {
             x: minX, y: minY, width: maxX - minX, height: maxY - minY
         };
+    }
+
+    // FIXME: hack for telling AR creatives from other playables. Remove when there's proper server side support
+    public static isARCreative(campaign: MRAIDCampaign): boolean {
+        const resourceUrl = campaign.getResourceUrl();
+        if (resourceUrl && resourceUrl.getOriginalUrl().match(/\/ar\/|ducktales-ar/)) {
+            return true;
+        }
+
+        const arCreatives = ['102044637'];
+        let isAR = false;
+        arCreatives.forEach(c => {
+            if (c === campaign.getCreativeId()) {
+                isAR = true;
+            }
+        });
+
+        return isAR;
     }
 }

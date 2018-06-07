@@ -15,6 +15,7 @@ import { IObserver0, IObserver1, IObserver2 } from 'Utilities/IObserver';
 import { SdkStats } from 'Utilities/SdkStats';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { ARUtil } from '../Utilities/ARUtil';
 
 export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -137,8 +138,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         }
 
         // TODO: Remove /ar/ folder check once we have MRAID-AR type support on the server side
-        const resourceUrl = this._campaign.getResourceUrl();
-        const isARURL = Boolean(resourceUrl && resourceUrl.getOriginalUrl().match(/\/ar\/|ducktales-ar/));
+        const isARURL = ARUtil.isARCreative(this._campaign);
         this._isMRAIDAR = this._campaign.getAdType() === 'MRAID-AR' || isARURL;
         if (this._isMRAIDAR) {
             container = container.replace('<script id=\"webar\"></script>', WebARScript);
