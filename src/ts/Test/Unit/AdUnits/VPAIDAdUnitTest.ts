@@ -25,6 +25,7 @@ import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 import { Closer } from 'Views/Closer';
 import { Platform } from 'Constants/Platform';
 import { GdprManager } from 'Managers/GdprManager';
+import { Privacy } from 'Views/Privacy';
 
 describe('VPAIDAdUnit', () => {
     let nativeBridge: NativeBridge;
@@ -48,6 +49,7 @@ describe('VPAIDAdUnit', () => {
             container: sinon.createStubInstance(Activity),
             configuration: sinon.createStubInstance(Configuration),
             request: sinon.createStubInstance(Request),
+            privacy: sinon.createStubInstance(Privacy),
             forceOrientation: Orientation.NONE,
             options: {},
             gdprManager: sinon.createStubInstance(GdprManager)
