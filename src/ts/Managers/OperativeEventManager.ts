@@ -9,7 +9,6 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Url } from 'Utilities/Url';
-import { StorageType } from 'Native/Api/Storage';
 import { INativeResponse, Request } from 'Utilities/Request';
 import { SessionManager } from 'Managers/SessionManager';
 import { Campaign } from 'Models/Campaign';
@@ -19,6 +18,7 @@ import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { CampaignAssetInfo } from 'Utilities/CampaignAssetInfo';
 import { Configuration } from 'Models/Configuration';
 import { GameSessionCounters } from 'Utilities/GameSessionCounters';
+import { FailedOperativeEventManager } from 'Managers/FailedOperativeEventManager';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {
     nativeBridge: NativeBridge;
@@ -91,7 +91,7 @@ export class OperativeEventManager {
     protected _clientInfo: ClientInfo;
     protected _campaign: Campaign;
     protected _metaDataManager: MetaDataManager;
-    private _nativeBridge: NativeBridge;
+    protected _nativeBridge: NativeBridge;
     private _deviceInfo: DeviceInfo;
     private _request: Request;
     private _configuration: Configuration;
@@ -275,9 +275,10 @@ export class OperativeEventManager {
             followRedirects: false,
             retryWithConnectionEvents: false
         }).catch(() => {
-            this._nativeBridge.Storage.set(StorageType.PRIVATE, OperativeEventManager.getUrlKey(sessionId, eventId), url);
-            this._nativeBridge.Storage.set(StorageType.PRIVATE, OperativeEventManager.getDataKey(sessionId, eventId), data);
-            this._nativeBridge.Storage.write(StorageType.PRIVATE);
+            new FailedOperativeEventManager(sessionId, eventId).storeFailedEvent(this._nativeBridge, {
+               url: url,
+               data: data
+            });
         });
     }
 
