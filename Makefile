@@ -210,7 +210,7 @@ build-js:
 	@echo
 
 	$(ROLLUP) -c rollup.js
-	$(CC) --js $(BUILD_DIR)/bundle.js --js_output_file $(BUILD_DIR)/bundle.min.js --formatting PRETTY_PRINT --assume_function_wrapper --rewrite_polyfills false
+	$(CC) --js $(BUILD_DIR)/bundle.js --js_output_file $(BUILD_DIR)/bundle.min.js --formatting PRINT_INPUT_DELIMITER --assume_function_wrapper --rewrite_polyfills false
 
 build-css:
 	@echo
