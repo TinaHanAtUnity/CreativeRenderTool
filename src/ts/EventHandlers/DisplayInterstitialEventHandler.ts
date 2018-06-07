@@ -5,6 +5,7 @@ import { DisplayInterstitialAdUnit, IDisplayInterstitialAdUnitParameters } from 
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { Placement } from 'Models/Placement';
 import { Configuration } from 'Models/Configuration';
+import { GDPREventAction, GdprManager } from 'Managers/GdprManager';
 
 export class DisplayInterstitialEventHandler implements IDisplayInterstitialHandler {
     private _nativeBridge: NativeBridge;
@@ -13,6 +14,7 @@ export class DisplayInterstitialEventHandler implements IDisplayInterstitialHand
     private _campaign: DisplayInterstitialCampaign;
     private _placement: Placement;
     private _configuration: Configuration;
+    private _gdprManager: GdprManager;
 
     constructor(nativeBridge: NativeBridge, adUnit: DisplayInterstitialAdUnit, parameters: IDisplayInterstitialAdUnitParameters) {
         this._nativeBridge = nativeBridge;
@@ -21,6 +23,7 @@ export class DisplayInterstitialEventHandler implements IDisplayInterstitialHand
         this._campaign = parameters.campaign;
         this._placement = parameters.placement;
         this._configuration = parameters.configuration;
+        this._gdprManager = parameters.gdprManager;
     }
 
     public onDisplayInterstitialClose(): void {
@@ -33,7 +36,6 @@ export class DisplayInterstitialEventHandler implements IDisplayInterstitialHand
         if (!this._configuration.isOptOutRecorded()) {
             this._configuration.setOptOutRecorded(true);
         }
-
-        // todo: send gdpr operative event with action 'skip'
+        this._gdprManager.sendGDPREvent(GDPREventAction.SKIP);
     }
 }

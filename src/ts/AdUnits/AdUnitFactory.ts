@@ -420,10 +420,10 @@ export class AdUnitFactory {
     private static createOverlay(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractVideoOverlay {
         const privacy = this.createPrivacy(nativeBridge, parameters);
         const showGDPRBanner = (parameters.campaign instanceof VastCampaign) ? this.showGDPRBanner(parameters) : false;
-        const isPerformanceCampaignWithEndCard = parameters.campaign instanceof PerformanceCampaign && !parameters.placement.skipEndCardOnClose();
+        const enablePrivacy = parameters.campaign instanceof PerformanceCampaign && !parameters.placement.skipEndCardOnClose();
 
         if (!parameters.placement.allowSkip()) {
-            const overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, isPerformanceCampaignWithEndCard);
+            const overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, enablePrivacy);
             if (parameters.placement.disableVideoControlsFade()) {
                 overlay.setFadeEnabled(false);
             }
@@ -434,7 +434,7 @@ export class AdUnitFactory {
             if (parameters.placement.skipEndCardOnClose()) {
                 overlay = new ClosableVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
             } else {
-                overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, isPerformanceCampaignWithEndCard);
+                overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, enablePrivacy);
             }
 
             if (parameters.placement.disableVideoControlsFade()) {

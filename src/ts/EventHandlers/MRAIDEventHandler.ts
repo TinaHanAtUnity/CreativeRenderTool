@@ -128,8 +128,8 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
     public onGDPRPopupSkipped(): void {
         if (!this._configuration.isOptOutRecorded()) {
             this._configuration.setOptOutRecorded(true);
-            this._gdprManager.sendGDPREvent(GDPREventAction.SKIP);
         }
+        this._gdprManager.sendGDPREvent(GDPREventAction.SKIP);
     }
 
     private handleClickAttribution() {
