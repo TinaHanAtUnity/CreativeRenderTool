@@ -12,7 +12,7 @@ import { ViewController } from 'AdUnits/Containers/ViewController';
 import { Video } from 'Models/Assets/Video';
 import { FocusManager } from 'Managers/FocusManager';
 import { ClientInfo } from 'Models/ClientInfo';
-import { OperativeEventManager, GDPREventSource } from 'Managers/OperativeEventManager';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
@@ -23,7 +23,7 @@ import { UrlSchemeApi } from 'Native/Api/UrlScheme';
 import { IntentApi } from 'Native/Api/Intent';
 import { GDPRPrivacy } from 'Views/GDPRPrivacy';
 import { Placement } from 'Models/Placement';
-import { GdprManager } from 'Managers/GdprManager';
+import { GdprManager, GDPREventSource } from 'Managers/GdprManager';
 
 describe('PrivacyEventHandlerTest', () => {
 
@@ -94,7 +94,7 @@ describe('PrivacyEventHandlerTest', () => {
 
             privacyEventHandler.onGDPROptOut(true);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.operativeEventManager.sendGDPREvent, 'optout', GDPREventSource.USER);
+            sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.gdprManager.sendGDPREvent, 'optout', GDPREventSource.USER);
         });
 
         it('should send operative event with action `optin`', () => {
@@ -103,7 +103,7 @@ describe('PrivacyEventHandlerTest', () => {
 
             privacyEventHandler.onGDPROptOut(false);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.operativeEventManager.sendGDPREvent, 'optin');
+            sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.gdprManager.sendGDPREvent, 'optin');
         });
 
         it('should send operative event with action `skip`', () => {
@@ -112,7 +112,7 @@ describe('PrivacyEventHandlerTest', () => {
 
             privacyEventHandler.onGDPROptOut(false);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.operativeEventManager.sendGDPREvent, 'skip');
+            sinon.assert.calledWith(<sinon.SinonSpy>adUnitParameters.gdprManager.sendGDPREvent, 'skip');
         });
     });
 });
