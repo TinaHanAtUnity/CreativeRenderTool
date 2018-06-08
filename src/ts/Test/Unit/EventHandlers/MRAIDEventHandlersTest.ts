@@ -23,7 +23,7 @@ import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { GDPRPrivacy } from 'Views/GDPRPrivacy';
-import { GdprConsentManager } from 'Managers/GdprConsentManager';
+import { GdprManager } from 'Managers/GdprManager';
 
 describe('MRAIDEventHandlersTest', () => {
 
@@ -44,7 +44,7 @@ describe('MRAIDEventHandlersTest', () => {
     let mraidAdUnitParameters: IMRAIDAdUnitParameters;
     let mraidEventHandler: MRAIDEventHandler;
     let mraidCampaign: MRAIDCampaign;
-    let gdprManager: GdprConsentManager;
+    let gdprManager: GdprManager;
 
     describe('with onClick', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -81,7 +81,7 @@ describe('MRAIDEventHandlersTest', () => {
             mraidView = sinon.createStubInstance(MRAID);
             (<sinon.SinonSpy>mraidView.container).restore();
             sinon.stub(mraidView, 'container').returns(document.createElement('div'));
-            gdprManager = sinon.createStubInstance(GdprConsentManager);
+            gdprManager = sinon.createStubInstance(GdprManager);
 
             mraidAdUnitParameters = {
                 forceOrientation: Orientation.LANDSCAPE,
@@ -138,7 +138,7 @@ describe('MRAIDEventHandlersTest', () => {
                     headers: [['location', 'market://foobar.com']]
                 }));
 
-                mraidView = new MRAID(nativeBridge, placement, mraidCampaign, mraidAdUnitParameters.privacy);
+                mraidView = new MRAID(nativeBridge, placement, mraidCampaign, mraidAdUnitParameters.privacy, true);
                 sinon.stub(mraidView, 'createMRAID').callsFake(() => {
                     return Promise.resolve();
                 });

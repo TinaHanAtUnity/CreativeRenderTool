@@ -140,7 +140,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     public sendTrackingEvent(event: string) {
         const urls = this._campaign.getTrackingUrlsForEvent(event);
         for (const url of urls) {
-            this.sendThirdPartyEvent(`admob ${event}`, url);
+            this._thirdPartyEventManager.sendEvent(`admob ${event}`, this._campaign.getSession().getId(), url);
         }
     }
 
@@ -153,7 +153,9 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public onContainerShow(): void {
-        // EMPTY
+        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+            this._nativeBridge.SensorInfo.Ios.startAccelerometerUpdates(new Double(0.01));
+        }
     }
 
     public onContainerForeground(): void {
@@ -185,14 +187,6 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private showView() {
         this._view.show();
         document.body.appendChild(this._view.container());
-    }
-
-    private sendThirdPartyEvent(eventType: string, url: string) {
-        const sessionId = this._campaign.getSession().getId();
-        const sdkVersion = this._operativeEventManager.getClientInfo().getSdkVersion();
-        url = url.replace(/%ZONE%/, this._placement.getId());
-        url = url.replace(/%SDK_VERSION%/, sdkVersion.toString());
-        this._thirdPartyEventManager.sendEvent(eventType, sessionId, url);
     }
 
     private onHide() {

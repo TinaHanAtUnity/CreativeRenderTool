@@ -12,7 +12,6 @@ import { FocusManager } from 'Managers/FocusManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { Configuration } from 'Models/Configuration';
 import { Observable0, Observable2 } from 'Utilities/Observable';
 import { IObserver0 } from 'Utilities/IObserver';
@@ -24,8 +23,9 @@ import { FinishState } from 'Constants/FinishState';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 import { Closer } from 'Views/Closer';
 import { Platform } from 'Constants/Platform';
-import { GdprConsentManager } from 'Managers/GdprConsentManager';
 import { ProgrammaticOperativeEventManager } from 'Managers/ProgrammaticOperativeEventManager';
+import { GdprManager } from 'Managers/GdprManager';
+import { Privacy } from 'Views/Privacy';
 
 describe('VPAIDAdUnit', () => {
     let nativeBridge: NativeBridge;
@@ -49,9 +49,10 @@ describe('VPAIDAdUnit', () => {
             container: sinon.createStubInstance(Activity),
             configuration: sinon.createStubInstance(Configuration),
             request: sinon.createStubInstance(Request),
+            privacy: sinon.createStubInstance(Privacy),
             forceOrientation: Orientation.NONE,
             options: {},
-            gdprManager: sinon.createStubInstance(GdprConsentManager)
+            gdprManager: sinon.createStubInstance(GdprManager)
         };
 
         const webPlayer = sinon.createStubInstance(WebPlayerApi);

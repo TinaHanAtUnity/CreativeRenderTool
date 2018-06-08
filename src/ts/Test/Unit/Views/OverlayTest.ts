@@ -4,11 +4,14 @@ import { assert } from 'chai';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { Overlay } from 'Views/Overlay';
+import { AbstractPrivacy } from 'Views/AbstractPrivacy';
+import { Privacy } from 'Views/Privacy';
 
 describe('Overlay', () => {
     let handleInvocation: sinon.SinonSpy;
     let handleCallback: sinon.SinonSpy;
     let nativeBridge: NativeBridge;
+    let privacy: AbstractPrivacy;
 
     beforeEach(() => {
         handleInvocation = sinon.spy();
@@ -17,10 +20,11 @@ describe('Overlay', () => {
             handleInvocation,
             handleCallback
         });
+        privacy = new Privacy(nativeBridge, true);
     });
 
     it('should render', () => {
-        const overlay = new Overlay(nativeBridge, true, 'en', 'testGameId');
+        const overlay = new Overlay(nativeBridge, true, 'en', 'testGameId', privacy, false);
         overlay.render();
         assert.isNotNull(overlay.container().innerHTML);
         assert.isNotNull(overlay.container().querySelector('.skip-icon'));

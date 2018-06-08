@@ -1,0 +1,71 @@
+{
+  "enabled": true,
+  "coppaCompliant": false,
+  "assetCaching": "forced",
+  "placements": [
+    {
+      "id": "premium",
+      "name": "Premium placement",
+      "default": false,
+      "allowSkip": false,
+      "disableBackButton": true,
+      "muteVideo": false,
+      "useDeviceOrientationForVideo": false
+    },
+    {
+      "id": "video",
+      "name": "Video",
+      "default": true,
+      "allowSkip": true,
+      "disableBackButton": true,
+      "muteVideo": false,
+      "useDeviceOrientationForVideo": false,
+      "skipInSeconds": 5
+    },
+    {
+      "id": "mraid",
+      "name": "Mraid",
+      "default": false,
+      "allowSkip": true,
+      "disableBackButton": true,
+      "muteVideo": false,
+      "useDeviceOrientationForVideo": false,
+      "skipInSeconds": 5
+    },
+    {
+        "id": "promoPlacement",
+        "name": "Promo Placement",
+        "default": false,
+        "allowSkip": false,
+        "skipEndCardOnClose": false,
+        "disableVideoControlsFade": false,
+        "disableBackButton": true,
+        "muteVideo": false,
+        "useDeviceOrientationForVideo": false,
+        "adTypes": [
+            "IAP"
+        ],
+        "skipInSeconds": 5
+    },
+    {
+      "id": "rewardedVideoZone",
+      "name": "Rewarded Video",
+      "default": false,
+      "allowSkip": false,
+      "disableBackButton": true,
+      "muteVideo": false,
+      "useDeviceOrientationForVideo": false
+    }
+  ],
+  "useAuction": true,
+  "country": "FI",
+  "gamerId": "57a35671bb58271e002d93c9",
+  "abGroup": 99,
+  "properties": "abcdefgh12345678",
+  "projectId": "abcd-1234",
+  "token": "abcd.1234.5678",
+  "organizationId": "5552368",
+  "gdprEnabled": false,
+  "optOutRecorded": false,
+  "optOutEnabled": false
+}

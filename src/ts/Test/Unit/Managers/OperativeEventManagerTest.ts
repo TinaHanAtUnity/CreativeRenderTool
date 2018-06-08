@@ -359,6 +359,7 @@ describe('OperativeEventManagerTest', () => {
             });
 
             it('XPromoCampaign specific', () => {
+                HttpKafka.setRequest(request);
                 campaign = TestFixtures.getXPromoCampaign();
                 const params = {
                     ... operativeEventManagerParams,
@@ -367,11 +368,9 @@ describe('OperativeEventManagerTest', () => {
 
                 const xPromoOperativeEventManager = <XPromoOperativeEventManager>OperativeEventManagerFactory.createOperativeEventManager(params);
                 HttpKafka.setRequest(request);
-                return xPromoOperativeEventManager.sendClickEvent(placement, 'landscape').then(() => {
+                return xPromoOperativeEventManager.sendClick(placement, 'landscape').then(() => {
                     assert(requestSpy.calledOnce, 'Operative event did not send POST request');
-
                     const url = requestSpy.getCall(0).args[0];
-
                     assert.equal(url, 'https://httpkafka.unityads.unity3d.com/v1/events', 'URL not what was expected');
                 });
             });

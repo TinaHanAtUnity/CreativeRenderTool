@@ -39,6 +39,7 @@ export class ConfigManager {
             }
 
             if(storedGamerId) {
+                Diagnostics.trigger('stored_gamer_id', {});
                 ConfigManager.deleteGamerId(nativeBridge);
             }
 

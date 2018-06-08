@@ -3,22 +3,22 @@ import { NativeBridge } from 'Native/NativeBridge';
 import GDPRPrivacyTemplate from 'html/GDPR-privacy.html';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
 import { Template } from 'Utilities/Template';
-import { GdprConsentManager, IGdprPersonalProperties } from 'Managers/GdprConsentManager';
+import { GdprManager } from 'Managers/GdprManager';
 import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class GDPRPrivacy extends AbstractPrivacy {
 
     private _optOutEnabled: boolean;
-    private _gdprConsentManager: GdprConsentManager;
+    private _gdprManager: GdprManager;
     private _isCoppaCompliant: boolean;
     private _personalInfoObtained: boolean = false;
     private _dataDeletionConfirmation: boolean = false;
 
-    constructor(nativeBridge: NativeBridge, gdprConsentManager: GdprConsentManager, isCoppaCompliant: boolean, optOutEnabled: boolean) {
+    constructor(nativeBridge: NativeBridge, gdprManager: GdprManager, isCoppaCompliant: boolean, optOutEnabled: boolean) {
         super(nativeBridge, isCoppaCompliant, 'gdpr-privacy');
 
         this._template = new Template(GDPRPrivacyTemplate);
-        this._gdprConsentManager = gdprConsentManager;
+        this._gdprManager = gdprManager;
         this._isCoppaCompliant = isCoppaCompliant;
 
         this._optOutEnabled = optOutEnabled;
@@ -127,10 +127,10 @@ export class GDPRPrivacy extends AbstractPrivacy {
         }
 
         if (!this._personalInfoObtained) {
-            this._gdprConsentManager.retrievePersonalInformation().then((personalProperties) => {
+            this._gdprManager.retrievePersonalInformation().then((personalProperties) => {
                 this._personalInfoObtained = true;
                 document.getElementById('sorry-message')!.innerHTML = ''; // Clear sorry message on previous failed request
-                document.getElementById('phone-type')!.innerHTML = ` - Using ${personalProperties.device}.`;
+                document.getElementById('phone-type')!.innerHTML = ` - Using ${personalProperties.deviceModel}.`;
                 document.getElementById('country')!.innerHTML = ` - Playing in ${personalProperties.country}.`;
                 document.getElementById('game-plays-this-week')!.innerHTML = ` - Played this game ${personalProperties.gamePlaysThisWeek} times this week.`;
                 document.getElementById('ads-seen-in-game')!.innerHTML = ` - Seen ${personalProperties.adsSeenInGameThisWeek} ads in this game.`;

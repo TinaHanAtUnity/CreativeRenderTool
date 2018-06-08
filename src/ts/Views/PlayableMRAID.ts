@@ -12,6 +12,7 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
 import { SdkStats } from 'Utilities/SdkStats';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
 
 export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -22,6 +23,9 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _closeElement: HTMLElement;
     private _loadingScreen: HTMLElement;
     private _iframe: HTMLIFrameElement;
+    private _gdprBanner: HTMLElement;
+    private _privacyButton: HTMLElement;
+
     private _iframeLoaded = false;
 
     private _messageListener: any;
@@ -41,8 +45,8 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private _configuration: any;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string, privacy: AbstractPrivacy) {
-        super(nativeBridge, 'playable-mraid', placement, campaign, privacy);
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
+        super(nativeBridge, 'playable-mraid', placement, campaign, privacy, showGDPRBanner);
 
         this._placement = placement;
         this._campaign = campaign;
@@ -79,6 +83,14 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 event: 'click',
                 listener: (event: Event) => this.onPrivacyEvent(event),
                 selector: '.privacy-button'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => {
+                    this.onGDPRPopupEvent(event);
+                    this.choosePrivacyShown();
+                },
+                selector: '.gdpr-link'
             }
         ];
     }
@@ -90,6 +102,8 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         this._loadingScreen = <HTMLElement>this._container.querySelector('.loading-screen');
 
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
+        this._gdprBanner = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
+        this._privacyButton = <HTMLElement>this._container.querySelector('.privacy-button');
 
         let container = MRAIDContainer;
         const playableConfiguration = this._campaign.getPlayableConfiguration();
@@ -114,6 +128,8 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         this._messageListener = (event: MessageEvent) => this.onMessage(event);
         window.addEventListener('message', this._messageListener, false);
+
+        this.choosePrivacyShown();
     }
 
     public show(): void {
@@ -164,6 +180,18 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                     this._backgroundTime += Date.now() - this._backgroundTimestamp;
                 }
             }
+        }
+    }
+
+    protected choosePrivacyShown(): void {
+        if (this._showGDPRBanner && !this._gdprPopupClicked) {
+            this._gdprBanner.style.visibility = 'visible';
+            this._privacyButton.style.pointerEvents = '1';
+            this._privacyButton.style.visibility = 'hidden';
+        } else {
+            this._privacyButton.style.visibility = 'visible';
+            this._gdprBanner.style.pointerEvents = '1';
+            this._gdprBanner.style.visibility = 'hidden';
         }
     }
 
@@ -270,6 +298,10 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 this._loadingScreen.style.display = 'none';
             }, false);
         });
+
+        if (CustomFeatures.isPlayableEndScreenHideDelayDisabled(this._campaign.getAbGroup())) {
+            this._loadingScreen.classList.add('disable-delay');
+        }
 
         this._loadingScreen.classList.add('hidden');
     }
