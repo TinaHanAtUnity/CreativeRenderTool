@@ -13,14 +13,16 @@ import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
 import { Closer } from 'Views/Closer';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Placement } from 'Models/Placement';
-import { IObserver2 } from 'Utilities/IObserver';
+import { IObserver2, IObserver0 } from 'Utilities/IObserver';
 import { WKAudiovisualMediaTypes } from 'Native/Api/WebPlayer';
 import { AdUnitContainerSystemMessage, IAdUnitContainerListener } from 'AdUnits/Containers/AdUnitContainer';
+import { AbstractPrivacy } from 'Views/AbstractPrivacy';
 
 export interface IVPAIDAdUnitParameters extends IAdUnitParameters<VPAIDCampaign> {
     vpaid: VPAID;
     closer: Closer;
     endScreen?: VPAIDEndScreen;
+    privacy: AbstractPrivacy;
 }
 
 export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListener {
@@ -40,6 +42,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _options: any;
     private _deviceInfo: DeviceInfo;
     private _urlLoadingObserver: IObserver2<string, string>;
+    private _privacyShowing = false;
 
     constructor(nativeBridge: NativeBridge, parameters: IVPAIDAdUnitParameters) {
         super(nativeBridge, parameters);
@@ -55,6 +58,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._timer = new Timer(() => this.onAdUnitNotLoaded(), VPAIDAdUnit._adLoadTimeout);
 
         this._closer.render();
+        this._closer.choosePrivacyShown();
     }
 
     public show(): Promise<void> {
@@ -62,6 +66,18 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
         return this.setupWebPlayer().then(() => {
             this._urlLoadingObserver = this._nativeBridge.WebPlayer.shouldOverrideUrlLoading.subscribe((url, method) => this.onUrlLoad(url));
+            if (this._closer.onPrivacyClosed) {
+                this._closer.onPrivacyClosed.subscribe(() => {
+                    this._view.resumeAd();
+                    this._privacyShowing = false;
+                });
+            }
+            if (this._closer.onPrivacyOpened) {
+                this._closer.onPrivacyOpened.subscribe(() => {
+                    this._view.pauseAd();
+                    this._privacyShowing = true;
+                });
+            }
             return this._container.open(this, ['webplayer', 'webview'], false, this._forceOrientation, false, false, true, false, this._options).then(() => {
                 this.onStart.trigger();
             });
@@ -137,10 +153,12 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public onContainerForeground(): void {
         this.showCloser();
-        if (this._view.isLoaded()) {
+        if (this._view.isLoaded() && !this._privacyShowing) {
             this._view.resumeAd();
-        } else {
+        } else if (!this._view.isLoaded()) {
             this._view.loadWebPlayer();
+        } else {
+            // Popup will resume video
         }
     }
 
@@ -219,16 +237,13 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     private hideView() {
+        this._closer.hide();
         this._view.hide();
     }
 
     private showCloser() {
         return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
-            const left = Math.floor(width * 0.85);
-            const top = 0;
-            const viewWidth = Math.floor(width * 0.15);
-            const viewHeight = viewWidth;
-            return this._container.setViewFrame('webview', left, top, viewWidth, viewHeight).then(() => {
+            return this._container.setViewFrame('webview', 0, 0, width, height).then(() => {
                 if (!this._closer.container().parentNode) {
                     document.body.appendChild(this._closer.container());
                 }

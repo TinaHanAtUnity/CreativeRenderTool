@@ -25,6 +25,9 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import EventTestVast from 'xml/EventTestVast.xml';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { GdprManager } from 'Managers/GdprManager';
+import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
+import { AbstractPrivacy } from 'Views/AbstractPrivacy';
+import { Privacy } from 'Views/Privacy';
 
 describe('VastAdUnit', () => {
 
@@ -91,7 +94,8 @@ describe('VastAdUnit', () => {
             campaign: vastCampaign
         });
 
-        const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
+        const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+        const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
         const gdprManager = sinon.createStubInstance(GdprManager);
 
         vastAdUnitParameters = {
@@ -113,7 +117,7 @@ describe('VastAdUnit', () => {
             gdprManager: gdprManager
         };
 
-        vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
+        vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters, false);
     });
 
     afterEach(() => sandbox.restore());
@@ -124,10 +128,11 @@ describe('VastAdUnit', () => {
             vastCampaign = TestFixtures.getEventVastCampaign();
             sinon.stub(vastCampaign, 'getVideo').returns(video);
             const nativeBridge = TestFixtures.getNativeBridge();
-            const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
+            const privacy = new Privacy(nativeBridge, false);
+            const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
             vastAdUnitParameters.overlay = overlay;
             vastAdUnitParameters.campaign = vastCampaign;
-            vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
+            vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters, false);
         });
 
         it('should return correct http:// url', () => {
@@ -188,12 +193,13 @@ describe('VastAdUnit', () => {
             vastCampaign = TestFixtures.getCompanionVastCampaign();
             sinon.stub(vastCampaign, 'getVideo').returns(video);
             const nativeBridge = TestFixtures.getNativeBridge();
-            const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
+            const privacy = new Privacy(nativeBridge, false);
+            const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
             vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.configuration.isCoppaCompliant(), vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
             vastAdUnitParameters.overlay = overlay;
             vastAdUnitParameters.campaign = vastCampaign;
             vastAdUnitParameters.endScreen = vastEndScreen;
-            vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
+            vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters, false);
         });
 
         it('should return correct companion click through url', () => {

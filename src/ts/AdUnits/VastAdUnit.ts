@@ -10,6 +10,9 @@ import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 import { StreamType } from 'Constants/Android/StreamType';
 import { Platform } from 'Constants/Platform';
 import { Placement } from 'Models/Placement';
+import { DeviceInfo } from 'Native/Backend/Api/DeviceInfo';
+import { Closer } from 'Views/Closer';
+import { Overlay } from 'Views/Overlay';
 
 class DeviceOrientation {
     public static getDeviceOrientation(): Orientation {
@@ -35,8 +38,11 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     private _events: Array<[number, string]> = [[0.0, 'AdVideoStart'], [0.25, 'AdVideoFirstQuartile'], [0.5, 'AdVideoMidpoint'], [0.75, 'AdVideoThirdQuartile']];
     private _vastCampaign: VastCampaign;
     private _vastPlacement: Placement;
+    private _showGDPRBanner: boolean;
+    private _screenWidth: number;
+    private _screenHeight: number;
 
-    constructor(nativeBridge: NativeBridge, parameters: IVastAdUnitParameters) {
+    constructor(nativeBridge: NativeBridge, parameters: IVastAdUnitParameters, showGDPRBanner: boolean) {
         super(nativeBridge, parameters);
 
         parameters.overlay.setSpinnerEnabled(!parameters.campaign.getVideo().isCached());
@@ -46,6 +52,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         this._vastCampaign = parameters.campaign;
         this._vastPlacement = parameters.placement;
         this._moat = MoatViewabilityService.getMoat();
+        this._showGDPRBanner = showGDPRBanner;
 
         if(this._endScreen) {
             this._endScreen.render();
@@ -65,6 +72,10 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
                 this.setVolume(volume);
             });
         }
+    }
+
+    public show() {
+        return super.show();
     }
 
     public hide(): Promise<void> {

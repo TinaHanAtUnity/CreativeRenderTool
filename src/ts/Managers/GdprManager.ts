@@ -1,4 +1,3 @@
-import { OperativeEventManager, GDPREventSource } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Configuration } from 'Models/Configuration';
 import { DeviceInfo } from 'Models/DeviceInfo';
@@ -7,6 +6,8 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { JsonParser } from 'Utilities/JsonParser';
 import { Request } from 'Utilities/Request';
+import { Platform } from 'Constants/Platform';
+import { HttpKafka, KafkaCommonObjectType } from 'Utilities/HttpKafka';
 
 export interface IGdprPersonalProperties {
     deviceModel: string;
@@ -15,6 +16,19 @@ export interface IGdprPersonalProperties {
     adsSeenInGameThisWeek: number;
     installsFromAds: number;
 }
+
+export enum GDPREventSource {
+    METADATA = 'metadata',
+    USER = 'user'
+}
+
+export enum GDPREventAction {
+    SKIP = 'skip',
+    CONSENT = 'consent',
+    OPTOUT = 'optout',
+    OPTIN = 'optin'
+}
+
 export class GdprManager {
 
     private static GdprLastConsentValueStorageKey = 'gdpr.consentlastsent';
@@ -34,6 +48,26 @@ export class GdprManager {
         this._request = request;
 
         this._nativeBridge.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, data));
+    }
+
+    public sendGDPREvent(action: GDPREventAction, source?: GDPREventSource): Promise<void> {
+        let infoJson: any = {
+            'adid': this._deviceInfo.getAdvertisingIdentifier(),
+            'action': action,
+            'projectId': this._configuration.getUnityProjectId(),
+            'platform': Platform[this._clientInfo.getPlatform()].toLowerCase(),
+            'gameId': this._clientInfo.getGameId()
+        };
+        if (source) {
+            infoJson = {
+                ... infoJson,
+                'source': source
+            };
+        }
+
+        return HttpKafka.sendEvent('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, infoJson).then(() => {
+            return Promise.resolve();
+        });
     }
 
     public getConsentAndUpdateConfiguration(): Promise<boolean> {
@@ -73,13 +107,13 @@ export class GdprManager {
         return this._nativeBridge.Storage.get(StorageType.PRIVATE, GdprManager.GdprLastConsentValueStorageKey).then((consentLastSentToKafka) => {
             // only if consent has changed push to kafka
             if (consentLastSentToKafka !== consent) {
-                return this.sendGdprEvent(consent);
+                return this.sendGdprConsentEvent(consent);
             }
         }).catch((error) => {
             // there has not been last state of consent
             // IE this is the first consent value we have seen
             // and should push this to kafka
-            return this.sendGdprEvent(consent);
+            return this.sendGdprConsentEvent(consent);
         });
     }
 
@@ -128,13 +162,13 @@ export class GdprManager {
         return undefined;
     }
 
-    private sendGdprEvent(consent: boolean): Promise<void> {
+    private sendGdprConsentEvent(consent: boolean): Promise<void> {
         let sendEvent;
         if (consent) {
-            sendEvent = OperativeEventManager.sendGDPREvent('consent', this._deviceInfo, this._clientInfo, this._configuration);
+            sendEvent = this.sendGDPREvent(GDPREventAction.CONSENT);
         } else {
             // optout needs to send the source because we need to tell if it came from consent metadata or gdpr  banner
-            sendEvent = OperativeEventManager.sendGDPREvent('optout', this._deviceInfo, this._clientInfo, this._configuration, GDPREventSource.METADATA);
+            sendEvent = this.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.METADATA);
         }
         return sendEvent.then(() => {
             return this._nativeBridge.Storage.set(StorageType.PRIVATE, GdprManager.GdprLastConsentValueStorageKey, consent).then(() => {
