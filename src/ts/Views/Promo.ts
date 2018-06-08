@@ -45,7 +45,7 @@ export class Promo extends View<{}> implements IPrivacyHandler {
 
         if(campaign) {
             this._templateData = {
-                'localizedPrice': PurchasingUtilities.productPrice(campaign.getIapProductId()),
+                'localizedPrice': PurchasingUtilities.getProductPrice(campaign.getIapProductId()),
                 'rewardedTimer': this._placement.allowSkipInSeconds()
             };
         }
@@ -64,7 +64,7 @@ export class Promo extends View<{}> implements IPrivacyHandler {
             {
                 event: 'click',
                 listener: (event: Event) => this.onPrivacyEvent(event),
-                selector: '.icon-info'
+                selector: '.icon-gdpr'
             }
         ];
 
@@ -92,16 +92,7 @@ export class Promo extends View<{}> implements IPrivacyHandler {
     public show(): void {
         super.show();
         window.addEventListener('message', this._messageHandler);
-
-        if (this._showGDPRBanner && this._privacy instanceof GDPRPrivacy) {
-            this._GDPRPopupElement.style.opacity = '1';
-            this._privacyButtonElement.style.pointerEvents = '1';
-            this._privacyButtonElement.style.visibility = 'hidden';
-        } else {
-            this._GDPRPopupElement.style.pointerEvents = '1';
-            this._GDPRPopupElement.style.visibility = 'hidden';
-            this._iframe!.style.height = '100vh';
-        }
+        this.choosePrivacyShown();
     }
 
     public hide(): void {
@@ -131,6 +122,18 @@ export class Promo extends View<{}> implements IPrivacyHandler {
         // do nothing
     }
 
+    private choosePrivacyShown() {
+        if (!this._gdprPopupClicked && this._showGDPRBanner) {
+            this._GDPRPopupElement.style.visibility = 'visible';
+            this._privacyButtonElement.style.pointerEvents = '1';
+            this._privacyButtonElement.style.visibility = 'hidden';
+        } else {
+            this._privacyButtonElement.style.visibility = 'visible';
+            this._GDPRPopupElement.style.pointerEvents = '1';
+            this._GDPRPopupElement.style.visibility = 'hidden';
+        }
+    }
+
     private onMessage(e: MessageEvent): void {
         const data: any = e.data;
         switch (data.type) {
@@ -158,6 +161,7 @@ export class Promo extends View<{}> implements IPrivacyHandler {
 
         if (this._showGDPRBanner) {
             this._gdprPopupClicked = true;
+            this.choosePrivacyShown();
         }
 
         this._privacy.show();

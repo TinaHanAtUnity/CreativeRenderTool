@@ -24,6 +24,7 @@ import { IntentApi } from 'Native/Api/Intent';
 import { SdkApi } from 'Native/Api/Sdk';
 import { Closer } from 'Views/Closer';
 import { GdprManager } from 'Managers/GdprManager';
+import { Privacy } from 'Views/Privacy';
 
 describe('VPAIDEventHandlerTest', () => {
     let eventHandler: VPAIDEventHandler;
@@ -46,6 +47,7 @@ describe('VPAIDEventHandlerTest', () => {
             container: sinon.createStubInstance(Activity),
             configuration: sinon.createStubInstance(Configuration),
             request: sinon.createStubInstance(Request),
+            privacy: sinon.createStubInstance(Privacy),
             forceOrientation: Orientation.NONE,
             options: {},
             gdprManager: sinon.createStubInstance(GdprManager)
@@ -151,7 +153,7 @@ describe('VPAIDEventHandlerTest', () => {
             const checkClickThroughTracking = () => {
                 const urls = parameters.campaign.getVideoClickTrackingURLs();
                 for (const url of urls) {
-                    sinon.assert.calledWith(<sinon.SinonSpy>adUnit.sendThirdPartyEvent, `vpaid video click`, url);
+                    sinon.assert.calledWith(<sinon.SinonSpy>parameters.thirdPartyEventManager.sendEvent, `vpaid video click`, TestFixtures.getSession().getId(), url);
                 }
             };
 
