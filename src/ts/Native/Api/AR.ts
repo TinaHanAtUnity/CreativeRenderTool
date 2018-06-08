@@ -37,19 +37,23 @@ export class ARApi extends NativeApi {
         let videoRect: IARRect = {x: 0, y: 0, width: frameInfo.videoSize.width, height: frameInfo.videoSize.height};
         videoRect = ARUtil.transformRect(videoRect, ARUtil.invertTransform(frameInfo.transform));
 
-        let bottomRight: IARPoint = {x: frameInfo.videoSize.width, y: frameInfo.videoSize.height};
-        bottomRight = ARUtil.transformPoint(bottomRight, frameInfo.transform);
-        const videoBounds: IARRect = {x: 0, y: 0, width: bottomRight.x, height: bottomRight.y};
-        const videoAspectRatio = videoBounds.width / videoBounds.height;
+        // Calculate scaling for aspect fill
+        const videoAspectRatio = videoRect.width / videoRect.height;
         const drawableAspectRatio = frameInfo.drawableSize.width / frameInfo.drawableSize.height;
 
-        const scaleX = frameInfo.drawableSize.width / videoRect.width;
-        const scaleY = frameInfo.drawableSize.height / videoRect.height;
-        if (videoAspectRatio < drawableAspectRatio) {
-            return {scaleX: Math.max(scaleX, scaleY), scaleY: Math.max(scaleX, scaleY)};
+        let dstWidth = frameInfo.drawableSize.width;
+        let dstHeight = frameInfo.drawableSize.height;
+
+        if(drawableAspectRatio > videoAspectRatio) {
+            dstHeight *= drawableAspectRatio * (1.0 / videoAspectRatio);
         } else {
-            return {scaleX: Math.min(scaleX, scaleY), scaleY: Math.min(scaleX, scaleY)};
+            dstWidth *= (1.0 / drawableAspectRatio) * videoAspectRatio;
         }
+
+        return {
+            scaleX: dstWidth / videoRect.width,
+            scaleY: dstHeight / videoRect.height
+        };
     }
 
     public readonly onPlanesAdded = new Observable1<string>();
