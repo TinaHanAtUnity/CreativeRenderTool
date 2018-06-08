@@ -224,7 +224,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
         this._parsingErrorCount = 0;
 
         // suffix can also be empty if placement is not 'mixed'
-        const suffix = this.createMixedPlacementSuffix(placementId, campaign);
+        const suffix = this.extractMixedPlacementSuffix(placementId, campaign);
 
         this.setCampaignForPlacement(placementId + suffix, campaign);
         this.handlePlacementState(placementId + suffix, PlacementState.READY);
@@ -233,15 +233,16 @@ export class OldCampaignRefreshManager extends RefreshManager {
     private onNoFill(placementId: string) {
         this._parsingErrorCount = 0;
 
-        const mixedList = ['', MixedPlacementTypes.PROMO, MixedPlacementTypes.REWARDED];
+        const mixedList = ['', MixedPlacementTypes.PROMO, MixedPlacementTypes.REWARDED, MixedPlacementTypes.REWARDED_PROMO];
         let shouldUpdatePlacementState = true;
         for(let i = 0; shouldUpdatePlacementState && i < mixedList.length; i++) {
-            const mix = mixedList[i];
-            this._configuration.getPlacements()[placementId + mix] = this._configuration.getPlacements()[placementId];
-            this._nativeBridge.Sdk.logDebug('Unity Ads server returned no fill, no ads to show, for placement: ' + placementId + mix);
-            this.setCampaignForPlacement(placementId + mix, undefined);
-            this.handlePlacementState(placementId + mix, PlacementState.NO_FILL);
-            shouldUpdatePlacementState = this.isRewardedMixedPlacement(placementId);
+            const suffix = mixedList[i];
+            const fullPlacementId = placementId + suffix;
+            this._configuration.getPlacements()[fullPlacementId] = this._configuration.getPlacements()[placementId];
+            this._nativeBridge.Sdk.logDebug('Unity Ads server returned no fill, no ads to show, for placement: ' + fullPlacementId);
+            this.setCampaignForPlacement(fullPlacementId, undefined);
+            this.handlePlacementState(fullPlacementId, PlacementState.NO_FILL);
+            shouldUpdatePlacementState = this.isRewardedMixedPlacement(placementId) || this.isRewardedPromo(placementId);
         }
     }
 
@@ -489,20 +490,26 @@ export class OldCampaignRefreshManager extends RefreshManager {
     }
 
     private isMixedIAP(placementId: string): boolean {
-        const ifMoreThanOneAdType: boolean = this._configuration.getPlacement(placementId).getAdTypes() === undefined ? false : this._configuration.getPlacement(placementId).getAdTypes()!.length > 1;
-        const containsIAP: boolean = this._configuration.getPlacement(placementId).getAdTypes() === undefined ? false : this._configuration.getPlacement(placementId).getAdTypes()!.indexOf('IAP') > -1;
-        return ifMoreThanOneAdType && containsIAP;
+        const adTypes = this._configuration.getPlacement(placementId).getAdTypes();
+        if (!adTypes) {
+            return false;
+        }
+        if (adTypes.length <= 1) {
+            return false;
+        }
+        if (adTypes.indexOf('IAP') === -1) {
+            return false;
+        }
+        return true;
     }
 
-    private createMixedPlacementSuffix(placementId: string, campaign: Campaign) {
+    private extractMixedPlacementSuffix(placementId: string, campaign: Campaign): string {
         let str = '';
         if (this.isRewardedMixedPlacement(placementId)) {
             str = (campaign.getAdType() === 'purchasing/iap') ? MixedPlacementTypes.PROMO : MixedPlacementTypes.REWARDED;
             this._configuration.getPlacements()[placementId + str] = this._configuration.getPlacements()[placementId];
-        }
-
-        if (this.isRewardedPromo(placementId)) {
-            str = (campaign.getAdType() === 'purchasing/iap') ? MixedPlacementTypes.REWARDED_PROMO : '';
+        } else if (this.isRewardedPromo(placementId)) {
+            str = (campaign.getAdType() === 'purchasing/iap') ? MixedPlacementTypes.REWARDED_PROMO : MixedPlacementTypes.REWARDED;
             this._configuration.getPlacements()[placementId + str] = this._configuration.getPlacements()[placementId];
         }
 

@@ -60,6 +60,22 @@
             "VIDEO",
             "IAP"
         ]
+    },
+    {
+        "id": "rewardedPromoPlacement",
+        "name": "rewardedPromoPlacement",
+        "default": false,
+        "allowSkip": true,
+        "skipEndCardOnClose": false,
+        "disableVideoControlsFade": false,
+        "disableBackButton": true,
+        "muteVideo": false,
+        "useDeviceOrientationForVideo": false,
+        "adTypes": [
+            "IAP",
+            "VIDEO"
+        ],
+        "skipInSeconds": 5
     }
   ],
   "useAuction": true,

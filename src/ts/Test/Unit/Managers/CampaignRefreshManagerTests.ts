@@ -638,6 +638,28 @@ describe('CampaignRefreshManager', () => {
             });
         });
 
+        it('should create a new placement with a suffix for a rewarded promo campaign', () => {
+            sinon.stub(campaignManager, 'request').callsFake(() => {
+                campaignManager.onCampaign.trigger('rewardedPromoPlacement', TestFixtures.getPromoCampaign('purchasing/iap'));
+                return Promise.resolve();
+            });
+
+            return campaignRefreshManager.refresh().then(() => {
+                assert.isDefined(campaignRefreshManager.getCampaign('rewardedPromoPlacement'));
+                assert.isTrue(campaignRefreshManager.getCampaign('rewardedPromoPlacement') instanceof PromoCampaign);
+
+                const tmpCampaign = campaignRefreshManager.getCampaign('rewardedPromoPlacement');
+                assert.isDefined(tmpCampaign);
+                if (tmpCampaign) {
+                    assert.equal(tmpCampaign.getId(), '000000000000000000000123');
+                }
+
+                assert.equal(configuration.getPlacement('rewardedPromoPlacement').getState(), PlacementState.READY);
+                assert.equal(configuration.getPlacement('rewardedPromoPlacement').allowSkip(), true);
+                assert.equal(configuration.getPlacement('rewardedPromoPlacement-rewardedpromo').getState(), PlacementState.READY);
+            });
+        });
+
         it('should invalidate mixed rewarded campaigns', () => {
             const campaign = TestFixtures.getPromoCampaign();
             const placement: Placement = configuration.getPlacement('premium');
@@ -688,10 +710,12 @@ describe('CampaignRefreshManager', () => {
                 assert.equal(campaignRefreshManager.getCampaign('mixedPlacement'), undefined);
                 assert.equal(campaignRefreshManager.getCampaign('mixedPlacement-promo'), undefined);
                 assert.equal(campaignRefreshManager.getCampaign('mixedPlacement-rewarded'), undefined);
+                assert.equal(campaignRefreshManager.getCampaign('mixedPlacement-rewardedpromo'), undefined);
 
                 assert.equal(configuration.getPlacement('mixedPlacement').getState(), PlacementState.NO_FILL);
                 assert.equal(configuration.getPlacement('mixedPlacement-promo').getState(), PlacementState.NO_FILL);
                 assert.equal(configuration.getPlacement('mixedPlacement-rewarded').getState(), PlacementState.NO_FILL);
+                assert.equal(configuration.getPlacement('mixedPlacement-rewardedpromo').getState(), PlacementState.NO_FILL);
 
                 assert.equal(configuration.getPlacement('video').getState(), PlacementState.WAITING);
 
