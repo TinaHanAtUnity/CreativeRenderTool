@@ -10,6 +10,8 @@ import { DiagnosticError } from 'Errors/DiagnosticError';
 import { FinishState } from 'Constants/FinishState';
 import { Placement } from 'Models/Placement';
 import { Closer } from 'Views/Closer';
+import { Configuration } from 'Models/Configuration';
+import { GDPREventAction, GdprManager } from 'Managers/GdprManager';
 
 export class VPAIDEventHandler implements IVPAIDHandler {
     private _nativeBridge: NativeBridge;
@@ -24,6 +26,8 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     private _adDuration: number = -2;
     private _adRemainingTime: number = -2;
     private _campaign: VPAIDCampaign;
+    private _configuration: Configuration;
+    private _gdprManager: GdprManager;
 
     constructor(nativeBridge: NativeBridge, adUnit: VPAIDAdUnit, parameters: IVPAIDAdUnitParameters) {
         this._nativeBridge = nativeBridge;
@@ -35,6 +39,8 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         this._closer = parameters.closer;
         this._vpaidEndScreen = parameters.endScreen;
         this._campaign = parameters.campaign;
+        this._configuration = parameters.configuration;
+        this._gdprManager = parameters.gdprManager;
 
         this._vpaidEventHandlers.AdError = this.onAdError;
         this._vpaidEventHandlers.AdLoaded = this.onAdLoaded;
@@ -59,6 +65,13 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         if (handler) {
             handler.apply(this, args);
         }
+    }
+
+    public onGDPRPopupSkipped(): void {
+        if (!this._configuration.isOptOutRecorded()) {
+            this._configuration.setOptOutRecorded(true);
+        }
+        this._gdprManager.sendGDPREvent(GDPREventAction.SKIP);
     }
 
     public onVPAIDCompanionClick() {
@@ -121,6 +134,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         this._adUnit.sendTrackingEvent('skip');
         this._operativeEventManager.sendSkip(this._placement);
         this._adUnit.setFinishState(FinishState.SKIPPED);
+        this._adUnit.mute();
         this._adUnit.hide();
     }
 

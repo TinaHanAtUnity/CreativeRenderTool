@@ -17,6 +17,7 @@ import { DisplayInterstitialAdUnit, IDisplayInterstitialAdUnitParameters } from 
 import { Activity } from 'AdUnits/Containers/Activity';
 import { DisplayInterstitialEventHandler } from 'EventHandlers/DisplayInterstitialEventHandler';
 import { GdprManager } from 'Managers/GdprManager';
+import { Privacy } from 'Views/Privacy';
 
 describe('DisplayInterstitialEventHandler', () => {
     let view: DisplayInterstitial;
@@ -50,8 +51,6 @@ describe('DisplayInterstitialEventHandler', () => {
 
             campaign = TestFixtures.getDisplayInterstitialCampaign();
 
-            view = new DisplayInterstitial(nativeBridge, placement, campaign);
-
             sandbox.stub(nativeBridge, 'getApiLevel').returns(16);
 
             const container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
@@ -62,6 +61,11 @@ describe('DisplayInterstitialEventHandler', () => {
             const thirdPartyEventManager = sinon.createStubInstance(ThirdPartyEventManager);
             operativeEventManager = sinon.createStubInstance(OperativeEventManager);
             const gdprManager = sinon.createStubInstance(GdprManager);
+            const configuration = TestFixtures.getConfiguration();
+
+            const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+
+            view = new DisplayInterstitial(nativeBridge, placement, campaign, privacy, false);
 
             displayInterstitialAdUnitParameters = {
                 forceOrientation: Orientation.LANDSCAPE,
