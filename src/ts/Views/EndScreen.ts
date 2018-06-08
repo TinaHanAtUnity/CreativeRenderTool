@@ -18,8 +18,7 @@ export interface IEndScreenHandler {
     onGDPRPopupSkipped(): void;
 }
 
-const GDPR_OPT_OUT_BASE = 'gdpr-pop-up-base';
-const GDPR_OPT_OUT_ICON = 'gdpr-pop-up-icon';
+export const SHOW_GDPR_BANNER = 'show-gdpr-banner';
 
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
 
@@ -103,14 +102,9 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             this._container.classList.add(endScreenAlt);
 
             /* If pop up is visible, hide privacy button */
-            if (endScreenAlt === GDPR_OPT_OUT_BASE || endScreenAlt === GDPR_OPT_OUT_ICON) {
+            if (endScreenAlt === SHOW_GDPR_BANNER) {
                 (<HTMLElement>this._container.querySelector('.privacy-button')).style.display = 'none';
             }
-        }
-
-        /* TODO: Should go away once we finish with a/b test */
-        if (!CustomFeatures.isGDPRBaseTest(this._abGroup)) {
-            this._container.classList.add('use-gdpr-privacy-icon');
         }
     }
 
@@ -163,7 +157,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
     protected getEndscreenAlt(campaign?: Campaign) {
         if (this._showGDPRBanner) {
-            return CustomFeatures.isGDPRBaseTest(this._abGroup) ? GDPR_OPT_OUT_BASE : GDPR_OPT_OUT_ICON;
+            return SHOW_GDPR_BANNER;
         }
 
         return undefined;
