@@ -16,14 +16,14 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 
 import OnCometMraidPlcCampaign from 'json/campaigns/performance/CometMraidUrlCampaign.json';
 import OnCometVideoPlcCampaign from 'json/campaigns/performance/CometVideoCampaign.json';
-import { getAbGroup } from 'Models/ABGroup';
+import { ABGroup } from 'Models/ABGroup';
 
 describe('CometCampaignParser', () => {
     const placements = ['TestPlacement'];
     const gamerId = 'TestGamerId';
     const mediaId = 'o2YMT0Cmps6xHiOwNMeCrH';
     const correlationId = '583dfda0d933a3630a53249c';
-    const abGroup = getAbGroup(0);
+    const abGroup = ABGroup.getAbGroup(0);
 
     let parser: CometCampaignParser;
     let nativeBridge: NativeBridge;

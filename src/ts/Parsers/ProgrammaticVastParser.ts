@@ -11,7 +11,7 @@ import { Session } from 'Models/Session';
 import { Vast } from 'Models/Vast/Vast';
 import { Video } from 'Models/Assets/Video';
 import { Image } from 'Models/Assets/Image';
-import { IABGroup } from 'Models/ABGroup';
+import { ABGroup } from 'Models/ABGroup';
 
 export class ProgrammaticVastParser extends CampaignParser {
     public static ContentType = 'programmatic/vast';
@@ -23,7 +23,7 @@ export class ProgrammaticVastParser extends CampaignParser {
 
     protected _vastParser: VastParser = new VastParser();
 
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: IABGroup): Promise<Campaign> {
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: ABGroup): Promise<Campaign> {
         const decodedVast = decodeURIComponent(response.getContent()).trim();
 
         if(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH !== undefined) {
@@ -36,7 +36,7 @@ export class ProgrammaticVastParser extends CampaignParser {
         });
     }
 
-    protected parseVastToCampaign(vast: Vast, nativeBridge: NativeBridge, campaignId: string, session: Session, gamerId: string, abGroup: IABGroup, response: AuctionResponse): Promise<Campaign> {
+    protected parseVastToCampaign(vast: Vast, nativeBridge: NativeBridge, campaignId: string, session: Session, gamerId: string, abGroup: ABGroup, response: AuctionResponse): Promise<Campaign> {
         const cacheTTL = response.getCacheTTL();
 
         const baseCampaignParams: ICampaign = {

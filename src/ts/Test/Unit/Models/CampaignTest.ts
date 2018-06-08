@@ -10,7 +10,7 @@ import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import SimpleVast from 'xml/SimpleVast.xml';
 import CacheSimpleVast from 'xml/CacheSimpleVast.xml';
-import { getAbGroup } from 'Models/ABGroup';
+import { ABGroup } from 'Models/ABGroup';
 
 describe('PerformanceCampaign', () => {
 
@@ -45,7 +45,7 @@ describe('VastCampaign', () => {
             const parsedVast = vastParser.parseVast(vastXml);
             const params = TestFixtures.getVastCampaignParams(parsedVast, 3600, '12345');
             const campaign = new VastCampaign(params);
-            assert.equal(campaign.getAbGroup(), getAbGroup(99));
+            assert.equal(campaign.getAbGroup(), ABGroup.getAbGroup(99));
             assert.equal(campaign.getGamerId(), '57a35671bb58271e002d93c9');
             assert.equal(campaign.getId(), '12345');
             const vast = campaign.getVast();

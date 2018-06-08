@@ -1,6 +1,6 @@
 import { IConfiguration, Configuration, CacheMode } from 'Models/Configuration';
 import { Placement } from 'Models/Placement';
-import { getAbGroup } from 'Models/ABGroup';
+import { ABGroup } from 'Models/ABGroup';
 
 export class ConfigurationParser {
     public static parse(configJson: any): Configuration {
@@ -28,7 +28,7 @@ export class ConfigurationParser {
             enabled: configJson.enabled,
             country: configJson.country,
             coppaCompliant: configJson.coppaCompliant,
-            abGroup: getAbGroup(configJson.abGroup),
+            abGroup: ABGroup.getAbGroup(configJson.abGroup),
             gamerId: configJson.gamerId,
             properties: configJson.properties,
             cacheMode: this.parseCacheMode(configJson),

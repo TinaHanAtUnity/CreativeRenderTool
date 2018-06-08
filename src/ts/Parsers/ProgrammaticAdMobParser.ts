@@ -12,11 +12,11 @@ import { FileId } from 'Utilities/FileId';
 import { Platform } from 'Constants/Platform';
 import { Url } from 'Utilities/Url';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
-import { IABGroup } from 'Models/ABGroup';
+import { ABGroup } from 'Models/ABGroup';
 
 export class ProgrammaticAdMobParser extends CampaignParser {
     public static ContentType = 'programmatic/admob-video';
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: IABGroup): Promise<Campaign> {
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: ABGroup): Promise<Campaign> {
         const markup = response.getContent();
         const cacheTTL = response.getCacheTTL();
         const platform = nativeBridge.getPlatform();

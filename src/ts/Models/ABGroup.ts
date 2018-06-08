@@ -1,13 +1,55 @@
 
-export interface IABGroup {
-    toNumber(): number;
-}
+export class ABGroup {
 
-export interface IABTest {
-    isValid(group: IABGroup): boolean;
-}
+    public static getAbGroup = (group: number) => {
+        switch (group) {
+            case 0:
+                return GroupZero;
+            case 1:
+                return GroupOne;
+            case 2:
+                return GroupTwo;
+            case 3:
+                return GroupThree;
+            case 4:
+                return GroupFour;
+            case 5:
+                return GroupFive;
+            case 6:
+                return GroupSix;
+            case 7:
+                return GroupSeven;
+            case 8:
+                return GroupEight;
+            case 9:
+                return GroupNine;
+            case 10:
+                return GroupTen;
+            case 11:
+                return GroupEleven;
+            case 12:
+                return GroupTwelve;
+            case 13:
+                return GroupThirteen;
+            case 14:
+                return GroupFourteen;
+            case 15:
+                return GroupFifteen;
+            case 16:
+                return GroupSixteen;
+            case 17:
+                return GroupSeventeen;
+            case 18:
+                return GroupEighteen;
+            case 19:
+                return GroupNineteen;
+            case 99:
+                return GroupTest;
+            default:
+                return GroupNone;
+        }
+    }
 
-class ABGroup implements IABGroup {
     private _abGroup: number;
 
     constructor(abGroup: number) {
@@ -19,14 +61,14 @@ class ABGroup implements IABGroup {
     }
 }
 
-class ABTest implements IABTest {
-    private _groups: IABGroup[];
+class ABTest implements ABTest {
+    private _groups: ABGroup[];
 
-    constructor(...groups: IABGroup[]) {
+    constructor(...groups: ABGroup[]) {
         this._groups = groups;
     }
 
-    public isValid(group: IABGroup): boolean {
+    public isValid(group: ABGroup): boolean {
         return this._groups.indexOf(group) !== -1;
     }
 }
@@ -53,55 +95,6 @@ const GroupSeventeen = new ABGroup(17);
 const GroupEighteen = new ABGroup(18);
 const GroupNineteen = new ABGroup(19);
 const GroupTest = new ABGroup(99);
-
-export const getAbGroup = (group: number) => {
-    switch (group) {
-        case 0:
-            return GroupZero;
-        case 1:
-            return GroupOne;
-        case 2:
-            return GroupTwo;
-        case 3:
-            return GroupThree;
-        case 4:
-            return GroupFour;
-        case 5:
-            return GroupFive;
-        case 6:
-            return GroupSix;
-        case 7:
-            return GroupSeven;
-        case 8:
-            return GroupEight;
-        case 9:
-            return GroupNine;
-        case 10:
-            return GroupTen;
-        case 11:
-            return GroupEleven;
-        case 12:
-            return GroupTwelve;
-        case 13:
-            return GroupThirteen;
-        case 14:
-            return GroupFourteen;
-        case 15:
-            return GroupFifteen;
-        case 16:
-            return GroupSixteen;
-        case 17:
-            return GroupSeventeen;
-        case 18:
-            return GroupEighteen;
-        case 19:
-            return GroupNineteen;
-        case 99:
-            return GroupTest;
-        default:
-            return GroupNone;
-    }
-};
 
 export const GdprBaseAbTest = new ABTest(GroupSixteen, GroupSeventeen);
 export const PlayableEndScreenHideDelayDisabledAbTest = new ABTest(GroupEighteen, GroupNineteen);

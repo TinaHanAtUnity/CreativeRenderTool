@@ -3,12 +3,12 @@ import { ISchema, Model } from 'Models/Model';
 import { Session } from 'Models/Session';
 import { WebViewError } from 'Errors/WebViewError';
 import { Diagnostics } from 'Utilities/Diagnostics';
-import { IABGroup } from './ABGroup';
+import { ABGroup } from './ABGroup';
 
 export interface ICampaign {
     id: string;
     gamerId: string;
-    abGroup: IABGroup;
+    abGroup: ABGroup;
     willExpireAt: number | undefined;
     adType: string | undefined;
     correlationId: string | undefined;
@@ -50,7 +50,7 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         return this.get('gamerId');
     }
 
-    public getAbGroup(): IABGroup {
+    public getAbGroup(): ABGroup {
         return this.get('abGroup');
     }
 

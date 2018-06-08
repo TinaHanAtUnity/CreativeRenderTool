@@ -7,11 +7,11 @@ import { DiagnosticError } from 'Errors/DiagnosticError';
 import { AuctionResponse } from 'Models/AuctionResponse';
 import { Session } from 'Models/Session';
 import { Image } from 'Models/Assets/Image';
-import { IABGroup } from 'Models/ABGroup';
+import { ABGroup } from 'Models/ABGroup';
 
 export class ProgrammaticMraidParser extends CampaignParser {
     public static ContentType = 'programmatic/mraid';
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: IABGroup): Promise<Campaign> {
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: ABGroup): Promise<Campaign> {
         const jsonMraid = response.getJsonContent();
 
         if(!jsonMraid) {

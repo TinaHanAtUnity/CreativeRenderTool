@@ -4,7 +4,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
 import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
-import { IABGroup } from 'Models/ABGroup';
+import { ABGroup } from 'Models/ABGroup';
 
 export class ClosableVideoOverlay extends AbstractVideoOverlay {
 

@@ -5,7 +5,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { DisplayInterstitialCampaign, IDisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { AuctionResponse } from 'Models/AuctionResponse';
 import { Session } from 'Models/Session';
-import { IABGroup } from 'Models/ABGroup';
+import { ABGroup } from 'Models/ABGroup';
 
 export class ProgrammaticStaticInterstitialParser extends CampaignParser {
     public static ContentTypeHtml = 'programmatic/static-interstitial-html';
@@ -17,7 +17,7 @@ export class ProgrammaticStaticInterstitialParser extends CampaignParser {
         this._wrapWithScriptTag = wrapWithScriptTag;
     }
 
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: IABGroup): Promise<Campaign> {
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: ABGroup): Promise<Campaign> {
         let dynamicMarkup = decodeURIComponent(response.getContent());
         if (this._wrapWithScriptTag) {
             dynamicMarkup = '<script>' + dynamicMarkup + '</script>';

@@ -1,6 +1,6 @@
 import { Placement } from 'Models/Placement';
 import { ISchema, Model } from 'Models/Model';
-import { IABGroup } from './ABGroup';
+import { ABGroup } from 'Models/ABGroup';
 
 export enum CacheMode {
     FORCED,
@@ -13,7 +13,7 @@ export interface IConfiguration {
     enabled: boolean;
     country: string;
     coppaCompliant: boolean;
-    abGroup: IABGroup;
+    abGroup: ABGroup;
     gamerId: string;
     properties: string;
     cacheMode: CacheMode;
@@ -76,7 +76,7 @@ export class Configuration extends Model<IConfiguration> {
         return this.get('jaegerTracing');
     }
 
-    public getAbGroup(): IABGroup {
+    public getAbGroup(): ABGroup {
         return this.get('abGroup');
     }
 
