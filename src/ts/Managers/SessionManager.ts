@@ -2,12 +2,7 @@ import { Session } from 'Models/Session';
 import { NativeBridge } from 'Native/NativeBridge';
 import { StorageType } from 'Native/Api/Storage';
 import { Diagnostics } from 'Utilities/Diagnostics';
-import { DiagnosticError } from 'Errors/DiagnosticError';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { SdkStats } from 'Utilities/SdkStats';
 import { Request } from 'Utilities/Request';
-import { XPromoOperativeEventManager } from 'Managers/XPromoOperativeEventManager';
-import { HttpKafka, KafkaCommonObjectType } from 'Utilities/HttpKafka';
 import { FailedOperativeEventManager } from 'Managers/FailedOperativeEventManager';
 import { FailedXpromoOperativeEventManager } from 'Managers/FailedXpromoOperativeEventManager';
 
