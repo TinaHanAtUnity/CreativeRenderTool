@@ -27,13 +27,24 @@ export class FailedOperativeEventManager {
         return Promise.resolve();
     }
 
+    public deleteFailedEvent(nativeBridge: NativeBridge): Promise<void> {
+        return Promise.all([
+            nativeBridge.Storage.delete(StorageType.PRIVATE, this.getEventStorageKey()),
+            nativeBridge.Storage.write(StorageType.PRIVATE)
+        ]).then(() => {
+            return Promise.resolve();
+        }).catch(() => {
+            // Ignore errors, if events fail to be sent, they will be retried later
+        });
+    }
+
     public sendFailedEvent(nativeBridge: NativeBridge, request: Request): Promise<void> {
         return nativeBridge.Storage.get<{ [key: string]: any }>(StorageType.PRIVATE, this.getEventStorageKey()).then((eventData) => {
             const url = eventData.url;
             const data = eventData.data;
-            return request.post(url, data).then(() => {
-                return Promise.resolve();
-            });
+            return request.post(url, data);
+        }).then(() => {
+            return this.deleteFailedEvent(nativeBridge);
         }).catch(() => {
             // Ignore errors, if events fail to be sent, they will be retried later
         });
