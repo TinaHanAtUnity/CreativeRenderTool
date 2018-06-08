@@ -114,6 +114,10 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     public hide() {
         super.hide();
         document.body.removeChild(this._privacy.container());
+
+        if (this._enablePrivacy && this._showGDPRBanner && !this._gdprPopupClicked) {
+            this._handlers.forEach(handler => handler.onGDPRPopupSkipped());
+        }
     }
 
     public render(): void {
