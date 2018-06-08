@@ -31,7 +31,7 @@ import { Campaign } from 'Models/Campaign';
 import { ConfigurationParser } from 'Parsers/ConfigurationParser';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
-import ConfigurationMixedPlacements from 'json/ConfigurationMixedPlacements.json';
+import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
 import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
 
 import { Diagnostics } from 'Utilities/Diagnostics';
@@ -590,7 +590,7 @@ describe('CampaignRefreshManager', () => {
 
     describe('With mixed placement campaigns', () => {
         beforeEach(() => {
-            configuration = ConfigurationParser.parse(JSON.parse(ConfigurationMixedPlacements));
+            configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
             campaignRefreshManager = new OldCampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration, focusManager, sessionManager, clientInfo, request, cache);
         });
