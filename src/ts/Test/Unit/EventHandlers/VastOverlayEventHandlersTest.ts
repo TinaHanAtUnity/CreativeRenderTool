@@ -25,6 +25,8 @@ import { MOAT } from 'Views/MOAT';
 import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { GdprManager } from 'Managers/GdprManager';
+import { AbstractPrivacy } from 'Views/AbstractPrivacy';
+import { Privacy } from 'Views/Privacy';
 
 describe('VastOverlayEventHandlersTest', () => {
     let campaign: VastCampaign;
@@ -47,6 +49,7 @@ describe('VastOverlayEventHandlersTest', () => {
     let vastOverlayEventHandler: VastOverlayEventHandler;
     let moat: MOAT;
     let sandbox: sinon.SinonSandbox;
+    let privacy: AbstractPrivacy;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -62,7 +65,8 @@ describe('VastOverlayEventHandlersTest', () => {
         metaDataManager = new MetaDataManager(nativeBridge);
         campaign = TestFixtures.getEventVastCampaign();
         clientInfo = TestFixtures.getClientInfo();
-        overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
+        privacy = new Privacy(nativeBridge, true);
+        overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
         container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
 
         placement = new Placement({
@@ -120,7 +124,7 @@ describe('VastOverlayEventHandlersTest', () => {
             gdprManager: gdprManager
         };
 
-        vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
+        vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters, false);
         vastOverlayEventHandler = new VastOverlayEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
 
         moat = sinon.createStubInstance(MOAT);
@@ -147,7 +151,7 @@ describe('VastOverlayEventHandlersTest', () => {
                 const vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.configuration.isCoppaCompliant(), vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
                 sinon.spy(vastEndScreen, 'show');
                 vastAdUnitParameters.endScreen = vastEndScreen;
-                vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
+                vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters, false);
                 sinon.spy(vastAdUnit, 'hide');
                 vastOverlayEventHandler = new VastOverlayEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
                 vastOverlayEventHandler.onOverlaySkip(1);
@@ -159,7 +163,7 @@ describe('VastOverlayEventHandlersTest', () => {
     describe('When calling onMute', () => {
 
         beforeEach(() => {
-            vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
+            vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters, false);
             vastOverlayEventHandler = new VastOverlayEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
         });
 
@@ -199,7 +203,7 @@ describe('VastOverlayEventHandlersTest', () => {
 
     describe('When calling onCallButton', () => {
         beforeEach(() => {
-            vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
+            vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters, false);
             vastOverlayEventHandler = new VastOverlayEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
             sinon.spy(nativeBridge.VideoPlayer, 'pause');
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('http://foo.com');

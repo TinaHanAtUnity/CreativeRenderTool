@@ -176,7 +176,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
         }
         const webviewXPos = screenWidth - webviewAreaSize;
         const webviewYPos = 0;
-        return this._container.setViewFrame('webview', Math.floor(webviewXPos), Math.floor(webviewYPos), Math.floor(webviewAreaSize), Math.floor(webviewAreaSize));
+        return this._container.setViewFrame('webview', 0, 0, screenWidth, screenHeight);
     }
 
     private onPageStarted(url: string): void {
