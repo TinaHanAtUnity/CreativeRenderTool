@@ -92,11 +92,7 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       }
 
       .privacy-button {
-        right: env(safe-area-inset-right);
-        // @stylint off
-        right: constant(safe-area-inset-right);
-        // @stylint on
-        left: auto;
+        left: 0;
         padding-right: .3rem;
         line-height: 1rem;
       }
