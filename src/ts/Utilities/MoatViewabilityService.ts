@@ -1,6 +1,5 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { Campaign } from 'Models/Campaign';
-import { Platform } from 'Constants/Platform';
 import { MOAT } from 'Views/MOAT';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Placement } from 'Models/Placement';

@@ -79,6 +79,7 @@ export class ProgrammaticVastParser extends CampaignParser {
             advertiserDomain: response.getAdvertiserDomain() || undefined,
             advertiserCampaignId: response.getAdvertiserCampaignId() || undefined,
             advertiserBundleId: response.getAdvertiserBundleId() || undefined,
+            isMoatEnabled: response.isMoatEnabled() || undefined
         };
 
         const campaign = new VastCampaign(vastCampaignParms);

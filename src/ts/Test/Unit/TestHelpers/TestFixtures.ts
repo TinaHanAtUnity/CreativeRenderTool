@@ -261,7 +261,8 @@ export class TestFixtures {
             advertiserBundleId: 'advertiserBundleId',
             useWebViewUserAgentForTracking: false,
             buyerId: 'buyerId',
-            trackingUrls: {}
+            trackingUrls: {},
+            isMoatEnabled: true
         };
     }
 
