@@ -1,7 +1,7 @@
 <script>
-    function getQueryParams(url) {
+    function getQP(u) {
         var a = document.createElement('a');
-        a.href = url;
+        a.href = u;
         var params = {};
         if (a.search) {
             var tuples = a.search.substring(1).split(/&/);
@@ -18,7 +18,7 @@
         }
         return params;
     }
-    function isObjectEmpty(obj) {
+    function isOE(obj) {
         for (var prop in obj) {
             if (obj.hasOwnProperty(prop)) {
                 return false;
@@ -123,19 +123,19 @@
                 });
             });
 
-            this.forceOrientation = function(orientation, override, animationDuration) {
+            this.forceOrientation = function(ot, ov, ad) {
                 this.postMessage('forceOrientation', {
-                    orientation: orientation,
-                    override: override,
-                    animationDuration: animationDuration
+                    orientation: ot,
+                    override: ov,
+                    animationDuration: ad
                 });
             };
 
-            this.click = function(url) {
-                var touchInfo = self.getTouchInfo();
+            this.click = function(u) {
+                var ti = self.getTouchInfo();
                 this.postMessage('click', {
-                    url: url,
-                    touch: touchInfo
+                    url: u,
+                    touch: ti
                 });
             };
 
@@ -143,36 +143,36 @@
                 return null;
             };
 
-            this.appendClickSignals = function(url, ss) {
-                return url;
+            this.appendClickSignals = function(ul, ss) {
+                return ul;
             };
 
             this.getClickSignalsAsync = function(cs) {
-                return new Promise(function(resolve, reject) {
-                    self.requestClickSignal(resolve);
+                return new Promise(function(rs, rj) {
+                    self.requestClickSignal(rs);
                 });
             }
 
-            this.appendClickSignalsAsync = function(url, ss) {
-                var signalPromise = ss ? Promise.resolve(ss) : this.getClickSignalsAsync(url);
+            this.appendClickSignalsAsync = function(ul, ss) {
+                var signalPromise = ss ? Promise.resolve(ss) : this.getClickSignalsAsync(ul);
                 return signalPromise.then(function(signalObject) {
                     var clickSignals = signalObject.encodedClickSignal;
-                    var query = getQueryParams(url);
+                    var query = getQP(ul);
                     if (!query.ms) {
-                        if (isObjectEmpty(query)) {
-                            url = url + '?ms=' + clickSignals;
+                        if (isOE(query)) {
+                            ul = ul + '?ms=' + clickSignals;
                         } else {
-                            url = url + '&ms=' + clickSignals;
+                            ul = ul + '&ms=' + clickSignals;
                         }
                     }
                     var rvdt = signalObject.rvdt;
-                    url = url + '&rvdt=' + rvdt;
-                    return url;
+                    ul = ul + '&rvdt=' + rvdt;
+                    return ul;
                 });
             };
 
-            this.requestClickSignal = function(resolve) {
-                clickSignalListeners.push(resolve);
+            this.requestClickSignal = function(rs) {
+                clickSignalListeners.push(rs);
                 var touchInfo = this.getTouchInfo();
                 this.postMessage('getClickSignal', touchInfo);
             };
@@ -205,9 +205,9 @@
                 return touchInfo;
             };
 
-            this.onReceiveClickSignal = function(signal) {
+            this.onReceiveClickSignal = function(sg) {
                 for (var i = 0, len = clickSignalListeners.length; i < len; i++) {
-                    clickSignalListeners[i](signal);
+                    clickSignalListeners[i](sg);
                 }
                 clickSignalListeners = [];
             };
@@ -220,76 +220,76 @@
                 this.postMessage('grantReward');
             };
 
-            this.close = function(notifyParent) {
+            this.close = function(np) {
                 this.postMessage('close');
             };
 
-            this.disableBackButton = function(disabled) {
+            this.disableBackButton = function(db) {
                 this.postMessage('disableBackButton', {
-                    disabled: disabled
+                    disabled: db
                 });
             };
 
-            this.openIntent = function(url, action, mimeType) {
+            this.openIntent = function(ul, at, mt) {
                 this.postMessage('openIntent', {
-                    url: url,
-                    action: action,
-                    mimeType: mimeType
+                    url: ul,
+                    action: at,
+                    mimeType: mt
                 });
                 return false;
             };
 
-            this.openIntentExtended = function(params) {
-                return this.openIntent(params.url, params.action, params.mimeType);
+            this.openIntentExtended = function(pr) {
+                return this.openIntent(pr.url, pr.action, pr.mimeType);
             };
 
-            this.openUrl = function(url) {
+            this.openUrl = function(ul) {
                 this.postMessage('openUrl', {
-                    url: url
+                    url: ul
                 });
             };
 
-            this.openDeepLinkUrl = function(url, callback, failIfUnsure, packageName) {
+            this.openDeepLinkUrl = function(ul, callback, failIfUnsure, packageName) {
                 this.postMessage('openUrl', {
-                    url: url
+                    url: ul
                 });
                 callback();
             };
 
-            this.openBrowser = function(url) {
+            this.openBrowser = function(ul) {
                 this.postMessage('openUrl', {
-                    url: url
+                    url: ul
                 });
             };
 
-            this.openNativeApp = function(url) {
+            this.openNativeApp = function(ul) {
                 this.postMessage('openUrl', {
-                    url: url
+                    url: ul
                 });
             };
 
-            this.openSystemBrowser = function(url, options) {
+            this.openSystemBrowser = function(ul, os) {
                 this.postMessage('openUrl', {
-                    url: url
+                    url: ul
                 });
             };
 
-            this.openStoreOverlay = function(url) {
+            this.openStoreOverlay = function(ul) {
                 this.postMessage('openStoreOverlay', {
-                    url: url
+                    url: ul
                 });
             };
 
-            this.openInAppStore = function(productId, url, waitForFetch) {
+            this.openInAppStore = function(pid, ul, wf) {
                 this.postMessage('openInAppStore', {
-                    productId: productId,
-                    url: url
+                    productId: pid,
+                    url: ul
                 });
             };
 
-            this.fetchAppStoreOverlay = function(productId) {
+            this.fetchAppStoreOverlay = function(pid) {
                 this.postMessage('fetchAppStoreOverlay', {
-                    productId: productId
+                    productId: pid
                 });
             };
 
@@ -305,10 +305,10 @@
                 callback('openableURLs', canDo);
             };
 
-            this.canOpenIntents = function(intents, callback, timeoutCallback, timeoutMillis) {
+            this.canOpenIntents = function(it, cb, timeoutCallback, timeoutMillis) {
                 var id = self.intentCallbackId++;
                 self.intentCallbacks[id] = {
-                    callback: callback,
+                    callback: cb,
                     timer: setTimeout(function() {
                         timeoutCallback();
                         delete self.intentCallbacks[id];
@@ -316,21 +316,21 @@
                 };
                 this.postMessage('openableIntents', {
                     id: id,
-                    intents: intents
+                    intents: it
                 });
             };
 
-            this.postMessage = function(event, data) {
+            this.postMessage = function(e, d) {
                 window.parent.postMessage({
                     type: 'afma',
-                    event: event,
-                    data: data
+                    event: e,
+                    data: d
                 }, '*');
             };
 
-            this.handleOpenableIntentResponse = function(response) {
-                var callbackId = response.id;
-                var resolutions = response.results;
+            this.handleOpenableIntentResponse = function(rp) {
+                var callbackId = rp.id;
+                var resolutions = rp.results;
                 if (callbackId in self.intentCallbacks) {
                     var callback = self.intentCallbacks[callbackId].callback;
                     callback('openableIntents', resolutions);
@@ -340,8 +340,8 @@
             }
 
             // MRAID proxy functions
-            this.setOrienationProperties = function(properties) {
-                window.mraid.setOrienationProperties(properties);
+            this.setOrienationProperties = function(pt) {
+                window.mraid.setOrienationProperties(pt);
             };
 
             this.useCustomClose = function(uses) {
