@@ -195,9 +195,9 @@
                     touchInfo.end = {
                         x: endTouch.clientX || 0.0,
                         y: endTouch.clientY || 0.0,
-                        diameter: endTouch ? endTouch.radiusX * 2 : 0.0,
-                        pressure: endTouch ? endTouch.force || 0.0 : 0.0,
                     };
+                    touchInfo.diameter = endTouch.radiusX * 2,
+                    touchInfo.pressure = endTouch.force || 0.0;
                 }
                 if (touchDuration) {
                     touchInfo.duration = touchDuration;
