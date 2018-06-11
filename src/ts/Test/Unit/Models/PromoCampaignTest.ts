@@ -13,7 +13,7 @@ describe('PromoCampaign', () => {
             const campaign = TestFixtures.getPromoCampaign();
 
             assert.equal(campaign.getId(), json.promo.id);
-            assert.equal(campaign.getAbGroup(), json.abGroup);
+            assert.equal(campaign.getAbGroup().toNumber(), json.abGroup);
             assert.equal(campaign.getGamerId(), json.gamerId);
         });
     });
