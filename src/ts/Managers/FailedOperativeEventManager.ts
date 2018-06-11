@@ -23,28 +23,27 @@ export class FailedOperativeEventManager {
 
     public storeFailedEvent(nativeBridge: NativeBridge, data: { [key: string]: any }): Promise<void> {
         nativeBridge.Storage.set(StorageType.PRIVATE, this.getEventStorageKey(), data);
-        nativeBridge.Storage.write(StorageType.PRIVATE);
+        this.writeStorage(nativeBridge);
         return Promise.resolve();
     }
 
     public deleteFailedEvent(nativeBridge: NativeBridge): Promise<void> {
-        return Promise.all([
-            nativeBridge.Storage.delete(StorageType.PRIVATE, this.getEventStorageKey()),
-            nativeBridge.Storage.write(StorageType.PRIVATE)
-        ]).then(() => {
-            return Promise.resolve();
-        }).catch(() => {
+        return nativeBridge.Storage.delete(StorageType.PRIVATE, this.getEventStorageKey()).catch(() => {
             // Ignore errors, if events fail to be sent, they will be retried later
         });
     }
 
-    public sendFailedEvent(nativeBridge: NativeBridge, request: Request): Promise<void> {
+    public sendFailedEvent(nativeBridge: NativeBridge, request: Request, writeStorage?: boolean): Promise<void> {
         return nativeBridge.Storage.get<{ [key: string]: any }>(StorageType.PRIVATE, this.getEventStorageKey()).then((eventData) => {
             const url = eventData.url;
             const data = eventData.data;
             return request.post(url, data);
         }).then(() => {
-            return this.deleteFailedEvent(nativeBridge);
+            return this.deleteFailedEvent(nativeBridge).then(() => {
+                if(writeStorage) {
+                    this.writeStorage(nativeBridge);
+                }
+            });
         }).catch(() => {
             // Ignore errors, if events fail to be sent, they will be retried later
         });
@@ -54,7 +53,7 @@ export class FailedOperativeEventManager {
         return nativeBridge.Storage.getKeys(StorageType.PRIVATE, this.getEventsStorageKey(), false).then(keys => {
             const promises = this.getPromisesForFailedEvents(nativeBridge, request, keys);
             return Promise.all(promises).then(() => {
-                return Promise.resolve();
+                return this.writeStorage(nativeBridge);
             });
         }).catch(() => {
             // Ignore errors, if events fail to be sent, they will be retried later
@@ -69,5 +68,9 @@ export class FailedOperativeEventManager {
         });
 
         return promises;
+    }
+
+    protected writeStorage(nativeBridge: NativeBridge): Promise<void> {
+        return nativeBridge.Storage.write(StorageType.PRIVATE);
     }
 }

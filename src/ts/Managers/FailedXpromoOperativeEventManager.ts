@@ -11,14 +11,18 @@ export class FailedXpromoOperativeEventManager extends FailedOperativeEventManag
         return SessionManager.getSessionKey(this._sessionId) + '.xpromooperative';
     }
 
-    public sendFailedEvent(nativeBridge: NativeBridge, request: Request): Promise<void> {
+    public sendFailedEvent(nativeBridge: NativeBridge, request: Request, writeStorage?: boolean): Promise<void> {
         return nativeBridge.Storage.get<{ [key: string]: any }>(StorageType.PRIVATE, this.getEventStorageKey()).then((eventData) => {
             const kafkaType = eventData.kafkaType;
             const data = eventData.data;
             return HttpKafka.sendEvent(kafkaType, KafkaCommonObjectType.PERSONAL, JSON.parse(data));
         }).then(() => {
-            return this.deleteFailedEvent(nativeBridge);
-        }).catch(() => {
+            return this.deleteFailedEvent(nativeBridge).then(() => {
+                if(writeStorage) {
+                    this.writeStorage(nativeBridge);
+                }
+            });
+        }).catch((error) => {
             // Ignore errors, if events fail to be sent, they will be retried later
         });
     }
