@@ -1,3 +1,10 @@
+# Staged
+
+* Refactor AB Groups to be their own class
+* Fix for Admob proto getting values set with undefined
+* Remove privacy banner/button during XPromo
+* Fix GDPR skip event for vast
+
 # Mon Jun 11 21:00:41 UTC 2018
 
 * Remove gamerId from operative events
