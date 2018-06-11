@@ -103,14 +103,14 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
         const endScreenAlt = this.getEndscreenAlt();
         if (typeof endScreenAlt === 'string') {
-            this._container.classList.add(...endScreenAlt.split(' '));
+            this._container.classList.add(endScreenAlt);
         }
 
-        /* If pop up is visible, hide privacy button */
         if (this._showGDPRBanner) {
-            (<HTMLElement>this._container.querySelector('.privacy-button')).style.display = 'none';
+            this._container.classList.add('show-gdpr-banner');
         }
     }
+
 
     public show(): void {
         super.show();
