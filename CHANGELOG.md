@@ -1,3 +1,8 @@
+# Pending
+
+* Remove gamerId from operative events
+* Removed the GDPR icon AB test and use the GDPR font icon. Test was running on AB groups 16 & 17
+
 # Fri Jun  8 20:24:13 UTC 2018
 
 * GDPR banners for all ad units
