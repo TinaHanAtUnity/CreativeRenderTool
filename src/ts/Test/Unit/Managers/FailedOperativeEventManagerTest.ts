@@ -119,7 +119,7 @@ describe('FailedOperativeEventManagerTest', () => {
         const manager = new FailedXpromoOperativeEventManager('12345', '12345');
         return manager.sendFailedEvent(nativeBridge, request, true).then(() => {
             sinon.assert.calledOnce(<sinon.SinonSpy>request.post);
-            sinon.assert.calledWith(<sinon.SinonSpy>request.post, 'https://httpkafka.unityads.unity3d.com/v1/events', '{\"common\":{\"client\":null,\"device\":null,\"country\":null}}\n{\"type\":\"test.kafka.type\",\"msg\":{\"testdata\":\"test\"}}');
+            sinon.assert.calledWith(<sinon.SinonSpy>request.post, 'https://httpkafka.unityads.unity3d.com/v1/events');
             sinon.assert.calledOnce(<sinon.SinonSpy>nativeBridge.Storage.get);
             sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Storage.get, StorageType.PRIVATE, 'session.12345.xpromooperative.12345');
             sinon.assert.calledOnce(<sinon.SinonSpy>nativeBridge.Storage.delete);
