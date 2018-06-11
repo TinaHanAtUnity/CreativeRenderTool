@@ -20,7 +20,9 @@ import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
-import { GdprConsentManager } from 'Managers/GdprConsentManager';
+import { GdprManager } from 'Managers/GdprManager';
+import { Privacy } from 'Views/Privacy';
+import { PrivacyEventHandler } from 'EventHandlers/PrivacyEventHandler';
 
 describe('DisplayInterstitialAdUnit', () => {
     let adUnit: DisplayInterstitialAdUnit;
@@ -63,7 +65,7 @@ describe('DisplayInterstitialAdUnit', () => {
             deviceInfo = TestFixtures.getAndroidDeviceInfo();
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
             sessionManager = new SessionManager(nativeBridge, request);
-            const gdprManager = sinon.createStubInstance(GdprConsentManager);
+            const gdprManager = sinon.createStubInstance(GdprManager);
             operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
                 nativeBridge: nativeBridge,
                 request: request,
@@ -75,7 +77,9 @@ describe('DisplayInterstitialAdUnit', () => {
                 campaign: campaign
             });
 
-            view = new DisplayInterstitial(nativeBridge, placement, campaign);
+            const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+
+            view = new DisplayInterstitial(nativeBridge, placement, campaign, privacy, false);
             view.render();
             document.body.appendChild(view.container());
             sandbox.stub(view, 'show');

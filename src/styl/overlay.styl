@@ -1,4 +1,9 @@
+@import "components.styl";
+@import "vars.styl";
+@import "icons.styl";
+
 #overlay {
+  position: fixed;
   width: 100%;
   height: 100%;
   background-color: transparent;
@@ -89,7 +94,7 @@
   .call-button {
     position: fixed;
     right: 10px;
-    bottom: 10px;
+    bottom: 0;
     display: none;
     font-weight: bold;
     transform: translate(0, -50%);
@@ -202,6 +207,39 @@
     animation-timing-function: linear;
   }
 
+  .gdpr-pop-up {
+
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: $dark-gdpr-banner;
+    box-shadow: 0 0 15px 0 rgba(0, 0, 0, .1);
+    pointer-events: auto;
+
+    .gdpr-text {
+      z-index: 110;
+      padding: $default-scale-size * $default-font-size * .5;
+      color: $white;
+      text-align: center;
+      font-size: $default-scale-size * $default-font-size * .5;
+
+      .gdpr-link {
+        color: $blue;
+      }
+    }
+  }
+
+  .privacy-button {
+    position: fixed;
+    bottom: 4px;
+    left: 50%;
+    margin: 0 0 0 -13px;
+    pointer-events: auto;
+
+    .icon-gdpr {
+      color: white;
+    }
+  }
 }
 
 .fade {
