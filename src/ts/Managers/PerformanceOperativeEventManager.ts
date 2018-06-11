@@ -1,7 +1,4 @@
 import { IOperativeEventManagerParams, OperativeEventManager } from 'Managers/OperativeEventManager';
-import { Session } from 'Models/Session';
-import { AdUnitStyle } from 'Models/AdUnitStyle';
-import { Placement } from 'Models/Placement';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { Url } from 'Utilities/Url';
 

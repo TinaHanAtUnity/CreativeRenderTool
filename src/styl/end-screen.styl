@@ -41,12 +41,16 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       margin: 0 0 0 $default-size * $scale-size * .25;
     }
 
-    &.gdpr-pop-up-base .gdpr-pop-up,
-    &.gdpr-pop-up-icon .gdpr-pop-up {
+    .icon-gdpr {
+      color: $black;
+      opacity: .25;
+    }
+
+    &.show-gdpr-banner .gdpr-pop-up {
       $gdpr-pop-up($scale-size);
     }
 
-    &:not(.gdpr-pop-up-base):not(.gdpr-pop-up-icon) {
+    &:not(.show-gdpr-banner) {
       .gdpr-pop-up {
         display: none;
       }
@@ -93,7 +97,7 @@ $end-screen-mixin($scale-size = $default-scale-size) {
         bottom: $default-size * $scale-size;
       }
 
-      &.gdpr-pop-up-icon {
+      &.show-gdpr-banner {
         .gdpr-pop-up {
           .gdpr-text {
             padding: $default-size * $scale-size * .5 $default-size * $scale-size * .5 $default-size * $scale-size * .5 0;
@@ -102,34 +106,9 @@ $end-screen-mixin($scale-size = $default-scale-size) {
 
           .icon-gdpr {
             margin: 0 .5rem;
-            color: $black;
-            opacity: .25;
           }
         }
       }
-
-      /* TODO: Should go away once we finish with a/b test */
-      &.use-gdpr-privacy-icon {
-        .unityads-logo {
-          bottom: $scale-size * $default-size * .5;
-        }
-
-        .privacy-button {
-          margin: 0;
-          padding: $scale-size * $default-size * .35 $scale-size * $default-size * .5;
-
-          .icon-info {
-            color: $black;
-            opacity: .25;
-
-            /* overriding content with the icon-gdpr. */
-            &:before {
-              content: "\e010";
-            }
-          }
-        }
-      }
-
     }
   }
 }
@@ -257,18 +236,12 @@ body {
     background-color: $end-screen-background-color;
   }
 
-  &.gdpr-pop-up-icon {
+  &.show-gdpr-banner {
     .gdpr-pop-up {
       display: flex;
       flex-direction: row;
       justify-content: center;
       align-items: center;
-    }
-
-    &.gdpr-pop-up-position-bottom .gdpr-pop-up {
-      top: initial;
-      bottom: 0;
-      transform: none;
     }
   }
 
