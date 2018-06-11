@@ -146,8 +146,6 @@ $end-screen-mixin($scale-size = $default-scale-size) {
     }
 
     .game-background {
-      width: 80%;
-      height: 80%;
       border-radius: $scale-size * $default-size * .3;
     }
 
@@ -177,13 +175,9 @@ $end-screen-mixin($scale-size = $default-scale-size) {
       line-height: 1.2rem;
     }
 
-    /* TODO: Should go away once we finish with gdpr icon a/b test */
-    &.use-gdpr-privacy-icon {
-      .privacy-button {
-        .icon-info {
-          color: $white;
-        }
-      }
+    .privacy-button .icon-gdpr {
+      color: $white;
+      opacity: 1;
     }
   }
 
