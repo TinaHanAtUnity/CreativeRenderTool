@@ -1,6 +1,6 @@
 import 'mocha';
 import { assert } from 'chai';
-import { ABGroup, GdprBaseAbTest, PlayableEndScreenHideDelayDisabledAbTest } from 'Models/ABGroup';
+import { ABGroup, PlayableEndScreenHideDelayDisabledAbTest } from 'Models/ABGroup';
 
 describe('ABGroup tests', () => {
 
@@ -25,26 +25,27 @@ describe('ABGroup tests', () => {
         });
     });
 
-    describe('GdprBaseAbTest.isValid', () => {
-        it('should return true for group 16', () => {
-            const abGroup = ABGroup.getAbGroup(16);
-            assert.isTrue(GdprBaseAbTest.isValid(abGroup));
-        });
+    // Example test of ABTest
+    // describe('GdprBaseAbTest.isValid', () => {
+    //     it('should return true for group 16', () => {
+    //         const abGroup = ABGroup.getAbGroup(16);
+    //         assert.isTrue(GdprBaseAbTest.isValid(abGroup));
+    //     });
 
-        it('should return true for group 17', () => {
-            const abGroup = ABGroup.getAbGroup(17);
-            assert.isTrue(GdprBaseAbTest.isValid(abGroup));
-        });
+    //     it('should return true for group 17', () => {
+    //         const abGroup = ABGroup.getAbGroup(17);
+    //         assert.isTrue(GdprBaseAbTest.isValid(abGroup));
+    //     });
 
-        it('should return false for all groups not 16 and 17', () => {
-            for (let i = -1; i < 100; i++) {
-                if (i !== 16 && i !== 17) {
-                    const abGroup = ABGroup.getAbGroup(i);
-                    assert.isFalse(GdprBaseAbTest.isValid(abGroup));
-                }
-            }
-        });
-    });
+    //     it('should return false for all groups not 16 and 17', () => {
+    //         for (let i = -1; i < 100; i++) {
+    //             if (i !== 16 && i !== 17) {
+    //                 const abGroup = ABGroup.getAbGroup(i);
+    //                 assert.isFalse(GdprBaseAbTest.isValid(abGroup));
+    //             }
+    //         }
+    //     });
+    // });
 
     describe('PlayableEndScreenHideDelayDisabledAbTest.isValid', () => {
         it('should return true for group 18', () => {

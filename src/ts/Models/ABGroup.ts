@@ -61,7 +61,7 @@ export class ABGroup {
     }
 }
 
-class ABTest implements ABTest {
+class ABTest {
     private _groups: ABGroup[];
 
     constructor(...groups: ABGroup[]) {
@@ -96,5 +96,6 @@ const GroupEighteen = new ABGroup(18);
 const GroupNineteen = new ABGroup(19);
 const GroupTest = new ABGroup(99);
 
-export const GdprBaseAbTest = new ABTest(GroupSixteen, GroupSeventeen);
+// Add ABTests below
+// Example : export const GdprBaseAbTest = new ABTest(GroupSixteen, GroupSeventeen);
 export const PlayableEndScreenHideDelayDisabledAbTest = new ABTest(GroupEighteen, GroupNineteen);

@@ -1,11 +1,9 @@
-import { IOperativeEventManagerParams, OperativeEventManager } from 'Managers/OperativeEventManager';
-import { Session } from 'Models/Session';
-import { AdUnitStyle } from 'Models/AdUnitStyle';
-import { Placement } from 'Models/Placement';
+import { IOperativeEventManagerParams } from 'Managers/OperativeEventManager';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Url } from 'Utilities/Url';
+import { ProgrammaticOperativeEventManager } from 'Managers/ProgrammaticOperativeEventManager';
 
-export class MRAIDOperativeEventManager extends OperativeEventManager {
+export class MRAIDOperativeEventManager extends ProgrammaticOperativeEventManager {
     private _mraidCampaign: MRAIDCampaign;
 
     constructor(params: IOperativeEventManagerParams<MRAIDCampaign>) {
@@ -14,7 +12,7 @@ export class MRAIDOperativeEventManager extends OperativeEventManager {
         this._mraidCampaign = params.campaign;
     }
 
-    protected createVideoEventUrl(type: string): string {
+    protected createVideoEventUrl(type: string): string | undefined {
         const url = this._mraidCampaign.getVideoEventUrl(type);
         if(url) {
             return url;
@@ -23,7 +21,7 @@ export class MRAIDOperativeEventManager extends OperativeEventManager {
         return super.createVideoEventUrl(type);
     }
 
-    protected createClickEventUrl(): string {
+    protected createClickEventUrl(): string | undefined {
         const clickUrl = this._mraidCampaign.getClickUrl();
         if(clickUrl) {
             return Url.addParameters(clickUrl, { redirect: false });
