@@ -8,13 +8,14 @@ import { Vast } from 'Models/Vast/Vast';
 import { IVPAIDCampaign, VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
 import { Campaign, ICampaign } from 'Models/Campaign';
 import { VastMediaFile } from 'Models/Vast/VastMediaFile';
+import { ABGroup } from 'Models/ABGroup';
 
 export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
     public static ContentType = 'programmatic/vast-vpaid';
 
     private _vpaidParser: VPAIDParser = new VPAIDParser();
 
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: ABGroup): Promise<Campaign> {
         const decodedVast = decodeURIComponent(response.getContent()).trim();
         return this._vastParser.retrieveVast(decodedVast, nativeBridge, request).then((vast): Promise<Campaign> => {
             const vpaidMediaFile = this.getVPAIDMediaFile(vast);

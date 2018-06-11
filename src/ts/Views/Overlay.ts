@@ -47,8 +47,8 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     private _showGDPRBanner: boolean = false;
     private _enablePrivacy: boolean | undefined;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, enablePrivacy?: boolean, abGroup: number = 0) {
-        super(nativeBridge, 'overlay', muted, abGroup);
+    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, enablePrivacy?: boolean) {
+        super(nativeBridge, 'overlay', muted);
 
         this._localization = new Localization(language, 'overlay');
         this._privacy = privacy;

@@ -19,7 +19,6 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
     protected _nativeBridge: NativeBridge;
     private _adUnit: VideoAdUnit<T>;
     private _operativeEventManager: OperativeEventManager;
-    private _abGroup: number;
     private _campaign: T;
     private _adUnitStyle?: AdUnitStyle;
     private _configuration: Configuration;
@@ -28,7 +27,6 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
     constructor(nativeBridge: NativeBridge, adUnit: VideoAdUnit<T>, parameters: IAdUnitParameters<T>, adUnitStyle?: AdUnitStyle) {
         this._nativeBridge = nativeBridge;
         this._operativeEventManager = parameters.operativeEventManager;
-        this._abGroup = parameters.campaign.getAbGroup();
         this._adUnit = adUnit;
         this._campaign = parameters.campaign;
         this._placement = parameters.placement;
