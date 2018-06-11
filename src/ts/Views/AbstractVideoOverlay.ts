@@ -7,6 +7,7 @@ export interface IOverlayHandler {
     onOverlayPauseForTesting(paused: boolean): void;
     onOverlayCallButton(): void;
     onOverlayClose(): void;
+    onGDPRPopupSkipped(): void;
 }
 
 export abstract class AbstractVideoOverlay extends View<IOverlayHandler> {

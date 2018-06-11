@@ -10,6 +10,7 @@ import { IPrivacyHandler, AbstractPrivacy } from 'Views/AbstractPrivacy';
 
 export interface ICloseHandler {
     onClose(skipped: boolean): void;
+    onGDPRPopupSkipped(): void;
 }
 
 export class Closer extends View<ICloseHandler> implements IPrivacyHandler {
@@ -75,6 +76,10 @@ export class Closer extends View<ICloseHandler> implements IPrivacyHandler {
 
         if (this._privacy) {
             document.body.removeChild(this._privacy.container());
+        }
+
+        if (this._showGDPRBanner && !this._gdprPopupClicked) {
+            this._handlers.forEach(handler => handler.onGDPRPopupSkipped());
         }
 
         this.onPrivacyClosed.unsubscribe();
