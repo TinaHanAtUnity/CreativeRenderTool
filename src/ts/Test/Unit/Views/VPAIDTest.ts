@@ -13,6 +13,7 @@ import { WebPlayerApi } from 'Native/Api/WebPlayer';
 import { Observable1 } from 'Utilities/Observable';
 import { DeviceInfoApi } from 'Native/Api/DeviceInfo';
 import { setTimeout } from 'timers';
+import { Privacy } from 'Views/Privacy';
 
 describe('VPAID View', () => {
     let nativeBridge: NativeBridge;
@@ -39,7 +40,8 @@ describe('VPAID View', () => {
         (<sinon.SinonStub>model.getCreativeParameters).returns('{}');
         (<sinon.SinonStub>campaign.getVPAID).returns(model);
 
-        view = new VPAID(nativeBridge, campaign, TestFixtures.getPlacement());
+        const privacy = new Privacy(nativeBridge, true);
+        view = new VPAID(nativeBridge, campaign, TestFixtures.getPlacement(), false);
 
         eventHandler = {
             onVPAIDCompanionClick: sinon.spy(),

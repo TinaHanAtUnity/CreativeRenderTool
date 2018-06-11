@@ -41,10 +41,10 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     private static _progressInterval: number = 250;
 
     protected _options: any;
+    protected _deviceInfo: DeviceInfo;
+    protected _overlay: AbstractVideoOverlay | undefined;
     private _video: Video;
     private _active: boolean;
-    private _overlay: AbstractVideoOverlay | undefined;
-    private _deviceInfo: DeviceInfo;
     private _lowMemory: boolean;
     private _prepareCalled: boolean;
     private _videoReady: boolean;
@@ -177,9 +177,9 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     }
 
     public onContainerBackground(): void {
-        if(this.isShowing() && this.isActive() && this.getContainer().isPaused()) {
+        if(this.isShowing() && this.getContainer().isPaused()) {
             this.setActive(false);
-            if(this.canShowVideo() && this.getVideoState() === VideoState.PLAYING) {
+            if(this.canShowVideo()) {
                 this.setVideoState(VideoState.PAUSED);
                 /*
                     We try pause the video-player and if we get a VIDEOVIEW_NULL error

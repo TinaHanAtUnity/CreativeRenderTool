@@ -9,15 +9,16 @@ import { OverlayEventHandler } from 'EventHandlers/OverlayEventHandler';
 import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 import { MOAT } from 'Views/MOAT';
 import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _vastAdUnit: VastAdUnit;
     private _clientInfo: ClientInfo;
     private _request: Request;
     private _vastCampaign: VastCampaign;
-    private _paused: boolean = false;
     private _moat?: MOAT;
     private _vastOverlay?: AbstractVideoOverlay;
+    private _thirdPartyEventManager: ThirdPartyEventManager;
 
     constructor(nativeBridge: NativeBridge, adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
         super(nativeBridge, adUnit, parameters);
@@ -29,6 +30,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         this._placement = parameters.placement;
         this._moat = MoatViewabilityService.getMoat();
         this._vastOverlay = this._vastAdUnit.getOverlay();
+        this._thirdPartyEventManager = parameters.thirdPartyEventManager;
     }
 
     public onOverlaySkip(position: number): void {
@@ -49,14 +51,13 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
             if (this._moat) {
                 this._moat.volumeChange(0);
             }
-            this._vastAdUnit.sendTrackingEvent('mute', this._vastCampaign.getSession().getId(), this._clientInfo.getSdkVersion());
+            this._vastAdUnit.sendTrackingEvent('mute', this._vastCampaign.getSession().getId());
         } else {
             if (this._moat) {
                 this._moat.volumeChange(this._vastAdUnit.getVolume());
             }
-            this._vastAdUnit.sendTrackingEvent('unmute', this._vastCampaign.getSession().getId(), this._clientInfo.getSdkVersion());
+            this._vastAdUnit.sendTrackingEvent('unmute', this._vastCampaign.getSession().getId());
         }
-
     }
 
     public onOverlayCallButton(): Promise<void> {
@@ -64,7 +65,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
 
         this.setCallButtonEnabled(false);
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
-        this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId(), this._clientInfo.getSdkVersion());
+        this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId());
 
         const clickThroughURL = this._vastAdUnit.getVideoClickThroughURL();
         if(clickThroughURL) {

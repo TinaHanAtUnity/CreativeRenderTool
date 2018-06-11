@@ -20,9 +20,6 @@ export interface IEndScreenHandler {
     onGDPRPopupSkipped(): void;
 }
 
-const GDPR_OPT_OUT_BASE = 'gdpr-pop-up-base';
-const GDPR_OPT_OUT_ICON = 'gdpr-pop-up-icon';
-
 const FANCY_END_SCREEN = 'fancy-end-screen';
 
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
@@ -107,16 +104,11 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         const endScreenAlt = this.getEndscreenAlt();
         if (typeof endScreenAlt === 'string') {
             this._container.classList.add(...endScreenAlt.split(' '));
-
-            /* If pop up is visible, hide privacy button */
-            if (this.hasEndScreenAlt(GDPR_OPT_OUT_BASE) || this.hasEndScreenAlt(GDPR_OPT_OUT_ICON)) {
-                (<HTMLElement>this._container.querySelector('.privacy-button')).style.display = 'none';
-            }
         }
 
-        /* TODO: Should go away once we finish with a/b test */
-        if (!CustomFeatures.isGDPRBaseTest(this._abGroup)) {
-            this._container.classList.add('use-gdpr-privacy-icon');
+        /* If pop up is visible, hide privacy button */
+        if (this._showGDPRBanner) {
+            (<HTMLElement>this._container.querySelector('.privacy-button')).style.display = 'none';
         }
     }
 
@@ -168,18 +160,11 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     protected getEndscreenAlt(campaign?: Campaign) {
-        const endScreenAlts: string[] = [];
-
-        if (this._showGDPRBanner) {
-            const gdprAlt: string = CustomFeatures.isGDPRBaseTest(this._abGroup) ? GDPR_OPT_OUT_BASE : GDPR_OPT_OUT_ICON;
-            endScreenAlts.push(gdprAlt);
-        }
-
         if (CustomFeatures.isFancyEndScreenEnabled(this._abGroup) && this.canShowFancyEndScreen()) {
-            endScreenAlts.push(FANCY_END_SCREEN);
+            return FANCY_END_SCREEN;
         }
 
-        return endScreenAlts.length > 0 ? endScreenAlts.join(' ') : undefined;
+        return undefined;
     }
 
     protected abstract onDownloadEvent(event: Event): void;

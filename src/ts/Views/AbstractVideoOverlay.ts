@@ -7,6 +7,7 @@ export interface IOverlayHandler {
     onOverlayPauseForTesting(paused: boolean): void;
     onOverlayCallButton(): void;
     onOverlayClose(): void;
+    onGDPRPopupSkipped(): void;
 }
 
 export abstract class AbstractVideoOverlay extends View<IOverlayHandler> {
@@ -26,6 +27,7 @@ export abstract class AbstractVideoOverlay extends View<IOverlayHandler> {
     protected _muted: boolean;
 
     protected _fadeEnabled: boolean = true;
+    protected _isPrivacyShowing: boolean = false;
 
     constructor(nativeBridge: NativeBridge, containerId: string, muted: boolean, abGroup: number = 0) {
         super(nativeBridge, containerId);
@@ -49,6 +51,10 @@ export abstract class AbstractVideoOverlay extends View<IOverlayHandler> {
         if(this._fadeEnabled !== value) {
             this._fadeEnabled = value;
         }
+    }
+
+    public isPrivacyShowing(): boolean {
+        return this._isPrivacyShowing;
     }
 
     public abstract setSpinnerEnabled(value: boolean): void;

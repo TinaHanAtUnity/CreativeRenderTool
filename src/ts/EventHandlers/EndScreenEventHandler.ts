@@ -21,6 +21,7 @@ import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { XPromoOperativeEventManager } from 'Managers/XPromoOperativeEventManager';
 import { Configuration } from 'Models/Configuration';
+import { GdprManager, GDPREventAction } from 'Managers/GdprManager';
 
 export interface IEndScreenDownloadParameters {
     clickAttributionUrl: string | undefined;
@@ -42,6 +43,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     private _placement: Placement;
     private _campaign: T;
     private _configuration: Configuration;
+    private _gdprManager: GdprManager;
 
     constructor(nativeBridge: NativeBridge, adUnit: T2, parameters: IAdUnitParameters<T>) {
         this._nativeBridge = nativeBridge;
@@ -53,6 +55,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         this._placement = parameters.placement;
         this._campaign = parameters.campaign;
         this._configuration = parameters.configuration;
+        this._gdprManager = parameters.gdprManager;
     }
 
     public onEndScreenDownload(parameters: IEndScreenDownloadParameters): void {
@@ -70,7 +73,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     public onGDPRPopupSkipped(): void {
         if (!this._configuration.isOptOutRecorded()) {
             this._configuration.setOptOutRecorded(true);
-            this._operativeEventManager.sendGDPREvent('skip');
+            this._gdprManager.sendGDPREvent(GDPREventAction.SKIP);
         }
     }
 
@@ -78,18 +81,14 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
 
     private onDownloadAndroid(parameters: IEndScreenDownloadParameters): void {
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
-
-        if(!(this._adUnit instanceof XPromoAdUnit)) {
-            this._operativeEventManager.sendClick(this._placement, this.getVideoOrientation(), parameters.adUnitStyle);
-        } else if(this._operativeEventManager instanceof XPromoOperativeEventManager) {
-            this._operativeEventManager.sendClickEvent(this._placement, this.getVideoOrientation());
-            if(this._campaign instanceof XPromoCampaign) {
-                const clickTrackingUrls = this._campaign.getTrackingUrlsForEvent('click');
-                for (const url of clickTrackingUrls) {
-                    this._thirdPartyEventManager.sendEvent('xpromo click', this._campaign.getSession().getId(), url);
-                }
+        this._operativeEventManager.sendClick(this._placement, this.getVideoOrientation(), parameters.adUnitStyle);
+        if(this._campaign instanceof XPromoCampaign) {
+            const clickTrackingUrls = this._campaign.getTrackingUrlsForEvent('click');
+            for (const url of clickTrackingUrls) {
+                this._thirdPartyEventManager.sendEvent('xpromo click', this._campaign.getSession().getId(), url);
             }
         }
+
         if(parameters.clickAttributionUrl) {
             this.handleClickAttribution(parameters);
 
@@ -104,17 +103,14 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     private onDownloadIos(parameters: IEndScreenDownloadParameters): void {
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
 
-        if(!(this._adUnit instanceof XPromoAdUnit)) {
-            this._operativeEventManager.sendClick(this._placement, this.getVideoOrientation(), parameters.adUnitStyle);
-        } else if(this._operativeEventManager instanceof XPromoOperativeEventManager) {
-            this._operativeEventManager.sendClickEvent(this._placement, this.getVideoOrientation());
-            if(this._campaign instanceof XPromoCampaign) {
-                const clickTrackingUrls = this._campaign.getTrackingUrlsForEvent('click');
-                for (const url of clickTrackingUrls) {
-                    this._thirdPartyEventManager.sendEvent('xpromo click', this._campaign.getSession().getId(), url);
-                }
+        this._operativeEventManager.sendClick(this._placement, this.getVideoOrientation(), parameters.adUnitStyle);
+        if(this._campaign instanceof XPromoCampaign) {
+            const clickTrackingUrls = this._campaign.getTrackingUrlsForEvent('click');
+            for (const url of clickTrackingUrls) {
+                this._thirdPartyEventManager.sendEvent('xpromo click', this._campaign.getSession().getId(), url);
             }
         }
+
         if(parameters.clickAttributionUrl) {
             this.handleClickAttribution(parameters);
 

@@ -18,11 +18,6 @@ export class CustomFeatures {
     }
 
     public static isFancyEndScreenEnabled(abGroup: number): boolean {
-        // TODO: Use actual group(s) when we know them
-        return abGroup === 5 || abGroup === 6;
-    }
-
-    public static isGDPRBaseTest(abGroup: number): boolean {
         return abGroup === 16 || abGroup === 17;
     }
 

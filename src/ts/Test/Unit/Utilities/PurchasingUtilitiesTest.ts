@@ -9,15 +9,27 @@ import { PurchasingApi } from 'Native/Api/Purchasing';
 import { Observable1 } from 'Utilities/Observable';
 import { PurchasingCatalog } from 'Models/PurchasingCatalog';
 import { SdkApi } from 'Native/Api/Sdk';
+import { SinonSandbox, SinonStub } from 'sinon';
+import { setTimeout } from 'timers';
+import { Configuration } from 'Models/Configuration';
+import { ConfigurationParser } from 'Parsers/ConfigurationParser';
+import { ClientInfo } from 'Models/ClientInfo';
+import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
+import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 
 describe('PurchasingUtilitiesTest', () => {
     let nativeBridge: NativeBridge;
     let purchasing: PurchasingApi;
     let sdk: SdkApi;
+    let clientInfo: ClientInfo;
+    let sandbox: sinon.SinonSandbox;
     const promoCatalog = '[\n  {\n    \"localizedPriceString\" : \"$0.00\",\n    \"localizedTitle\" : \"Sword of Minimal Value\",\n    \"productId\" : \"myPromo\"\n  },\n  {\n    \"localizedPriceString\" : \"$0.99\",\n    \"localizedTitle\" : \"100 in-game Gold Coins\",\n    \"productId\" : \"100.gold.coins\"\n  }\n]';
-    const iapPayload: IPromoPayload = {
+    const promoCatalogBad = '[\n    {\"pn}]';
+    const promoCatalogEmpty = '[]';
+    const iapPayloadPurchase: IPromoPayload = {
+        productId: 'myPromo',
         trackingOptOut: false,
-    gamerToken: '111',
+        gamerToken: '111',
         iapPromo: true,
         gameId: '222',
         abGroup: 1,
@@ -25,10 +37,21 @@ describe('PurchasingUtilitiesTest', () => {
         purchaseTrackingUrls: ['https://www.scooooooooter.com', 'https://www.scottyboy.com']
     };
 
+    const iapPayloadSetIDs: IPromoPayload = {
+        productId: 'myPromo',
+        iapPromo: true,
+        gameId: '222',
+        abGroup: 1,
+        request: IPromoRequest.SETIDS,
+        purchaseTrackingUrls: ['https://www.scooooooooter.com', 'https://www.scottyboy.com']
+    };
+
     beforeEach(() => {
         nativeBridge = sinon.createStubInstance(NativeBridge);
         purchasing = sinon.createStubInstance(PurchasingApi);
         sdk = sinon.createStubInstance(SdkApi);
+        clientInfo = sinon.createStubInstance(ClientInfo);
+        sandbox = sinon.sandbox.create();
         nativeBridge.Sdk = sdk;
         (<any>purchasing).onInitialize = new Observable1<string>();
         (<any>purchasing).onCommandResult = new Observable1<string>();
@@ -36,160 +59,194 @@ describe('PurchasingUtilitiesTest', () => {
         (<any>purchasing).onGetPromoCatalog = new Observable1<string>();
         (<sinon.SinonStub>purchasing.getPromoCatalog).returns(Promise.resolve());
         (<sinon.SinonStub>purchasing.getPromoVersion).returns(Promise.resolve());
+        (<sinon.SinonStub>purchasing.initiatePurchasingCommand).returns(Promise.resolve());
+        (<sinon.SinonStub>purchasing.initializePurchasing).returns(Promise.resolve());
         (<any>nativeBridge).Purchasing = purchasing;
-
+        const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
+        PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge);
     });
 
-    describe('Refreshing catalog', () => {
+    afterEach(() => {
+        sandbox.restore();
+    });
 
+    describe('sendPurchaseInitializationEvent', () => {
+        it('should resolve without calling sendPurchasingCommand if configuration does not include promo', () => {
+            const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
+            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge);
+            return PurchasingUtilities.sendPurchaseInitializationEvent().then(() => {
+                sinon.assert.notCalled(<sinon.SinonSpy>purchasing.initializePurchasing);
+                sinon.assert.notCalled(<sinon.SinonSpy>purchasing.getPromoVersion);
+                sinon.assert.notCalled(<sinon.SinonSpy>purchasing.initiatePurchasingCommand);
+            });
+        });
+
+        it('should call SendPurchasingCommand on successful trigger of all underlying promises', () => {
+            const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge);
+            sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('True'));
+            sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.16'));
+            sandbox.stub(purchasing.onCommandResult, 'subscribe').callsFake((resolve) => resolve('True'));
+
+            PurchasingUtilities.sendPurchaseInitializationEvent().then(() => {
+                sinon.assert.called(<sinon.SinonStub>purchasing.initiatePurchasingCommand);
+            });
+        });
+
+        it('should fail with IAP Promo was not ready if promo is not ready', () => {
+            const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge);
+            sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('False'));
+            sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.16'));
+            sandbox.stub(purchasing.onCommandResult, 'subscribe').callsFake((resolve) => resolve('True'));
+            PurchasingUtilities.sendPurchaseInitializationEvent().catch((e) => {
+                assert.equal(e.message, 'IAP Promo was not ready');
+            });
+            sinon.assert.notCalled(<sinon.SinonSpy>purchasing.initiatePurchasingCommand);
+        });
+
+        it('should fail with Promo version not supported if promo version is not 1.16 or above', () => {
+            const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge);
+            sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('True'));
+            sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.15'));
+            sandbox.stub(purchasing.onCommandResult, 'subscribe').callsFake((resolve) => resolve('True'));
+
+            PurchasingUtilities.sendPurchaseInitializationEvent().catch((e) => {
+                assert.equal(e.message, 'Promo version not supported');
+            });
+            sinon.assert.notCalled(<sinon.SinonSpy>purchasing.initiatePurchasingCommand);
+        });
+    });
+
+    describe('sendPromoPayload', () => {
+        describe('on Successful command trigger', () => {
+            let sendPurchaseInitializationEventStub: sinon.SinonStub;
+
+            beforeEach(() => {
+                sinon.stub(purchasing.onCommandResult, 'subscribe').callsFake((resolve) => resolve('True'));
+                sendPurchaseInitializationEventStub = sandbox.stub(PurchasingUtilities, 'sendPurchaseInitializationEvent').resolves();
+            });
+
+            it('should call initialization event and initiate purchasing command when initialization Payloads are not set', () => {
+
+                return PurchasingUtilities.sendPromoPayload(JSON.stringify(iapPayloadPurchase)).then(() => {
+                    sinon.assert.called(sendPurchaseInitializationEventStub);
+                    sinon.assert.calledWith(<sinon.SinonStub>purchasing.initiatePurchasingCommand, JSON.stringify(iapPayloadPurchase));
+                });
+            });
+
+            it ('should call initiate purchasing command when initialization Payloads are set', () => {
+                PurchasingUtilities.setInitializationPayloadSentValue(true);
+
+                return PurchasingUtilities.sendPromoPayload(JSON.stringify(iapPayloadPurchase)).then(() => {
+                    sinon.assert.notCalled(sendPurchaseInitializationEventStub);
+                    sinon.assert.calledWith(<sinon.SinonStub>purchasing.initiatePurchasingCommand, JSON.stringify(iapPayloadPurchase));
+                });
+
+            });
+        });
+
+        describe('on Failed command trigger', () => {
+
+            it('should fail when onCommandResult triggered with false', () => {
+                PurchasingUtilities.setInitializationPayloadSentValue(false);
+
+                PurchasingUtilities.sendPromoPayload(JSON.stringify(iapPayloadPurchase)).catch((e) => {
+                    assert.equal(e.message, 'Purchase command attempt failed');
+                });
+                purchasing.onCommandResult.trigger('False');
+            });
+        });
+    });
+
+    describe('refreshCatalog', () => {
+        describe('onSuccess', () => {
+            beforeEach(() => {
+                const promise = PurchasingUtilities.refreshCatalog();
+                purchasing.onGetPromoCatalog.trigger(promoCatalog);
+                return promise;
+            });
+
+            it('should set the catalog to the value returned by promo', () => {
+                sinon.assert.called(<sinon.SinonStub>purchasing.getPromoCatalog);
+                assert.isTrue(PurchasingUtilities.isProductAvailable('myPromo'));
+            });
+
+            it('should not store a product that is not returned by promo', () => {
+                sinon.assert.called(<sinon.SinonStub>purchasing.getPromoCatalog);
+                assert.isFalse(PurchasingUtilities.isProductAvailable('myScooter'));
+            });
+        });
+
+        describe('onFail', () => {
+            it('should fail when json is bad', () => {
+                PurchasingUtilities.refreshCatalog().catch((e) => {
+                    assert.equal(e.message, 'Promo catalog JSON failed to parse');
+                });
+                purchasing.onGetPromoCatalog.trigger(promoCatalogBad);
+            });
+
+            it('should fail when blank string catalog is returned from promo', () => {
+                PurchasingUtilities.refreshCatalog().catch((e) => {
+                    assert.equal(e.message, 'Promo catalog JSON failed to parse');
+                });
+                purchasing.onGetPromoCatalog.trigger('');
+            });
+
+            it('should fail when get promo catalog fetch over api fails', () => {
+                (<sinon.SinonStub>purchasing.getPromoCatalog).returns(Promise.reject('fail'));
+                PurchasingUtilities.refreshCatalog().catch((e) => {
+                    assert.equal(e.message, 'Purchasing Catalog failed to refresh');
+                });
+            });
+        });
+    });
+
+    describe('getProductPrice', () => {
         beforeEach(() => {
-            const promise = PurchasingUtilities.refreshCatalog(nativeBridge);
+            const promise = PurchasingUtilities.refreshCatalog();
             purchasing.onGetPromoCatalog.trigger(promoCatalog);
             return promise;
         });
 
-        it('should set the catalog to the value returned from promo', () => {
-            sinon.assert.called(<sinon.SinonStub>purchasing.getPromoCatalog);
-            assert.isTrue(PurchasingUtilities.productAvailable('myPromo'), 'Catalog does not contain myPromo');
+        it('should throw error if product is not available', () => {
+            sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(false);
+
+            assert.throws(() => PurchasingUtilities.getProductPrice('myPromo'));
         });
 
-        describe('Checking product information', () => {
+        it('should return the price of the product for the given productid if product is available', () => {
+            sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
 
-            it('should indicate that products are available', () => {
-                sinon.assert.called(<sinon.SinonStub>purchasing.getPromoCatalog);
-                assert.isTrue(PurchasingUtilities.productAvailable('myPromo'), 'Catalog does not contain myPromo');
-            });
-
-            it('should indicate that a particular product is available', () => {
-                sinon.assert.called(<sinon.SinonStub>purchasing.getPromoCatalog);
-                assert.equal(true, PurchasingUtilities.productAvailable('100.gold.coins'), 'product is unavailable');
-            });
-
-            it('should indicate that an unknown product is not available', () => {
-                sinon.assert.called(<sinon.SinonStub>purchasing.getPromoCatalog);
-                assert.equal(false, PurchasingUtilities.productAvailable('100.gold.noncoins'), 'unknown product is available');
-            });
-
-            it('should indicate the correct price for an available product', () => {
-                sinon.assert.called(<sinon.SinonStub>purchasing.getPromoCatalog);
-                assert.equal('$0.99', PurchasingUtilities.productPrice('100.gold.coins'), 'unexpected product price');
-            });
-
-            it('should indicate the correct description for an available product', () => {
-                sinon.assert.called(<sinon.SinonStub>purchasing.getPromoCatalog);
-                assert.equal('100 in-game Gold Coins', PurchasingUtilities.productDescription('100.gold.coins'), 'unexpected product description');
-            });
-        });
-
-    });
-
-    describe('Checking version', () => {
-        describe('with a correctly formatted string', () =>  {
-            it('should pass', () => {
-                (<sinon.SinonStub>purchasing.initializePurchasing).callsFake(() => {
-                    purchasing.onInitialize.trigger('True');
-                    return Promise.resolve(true);
-                });
-                (<sinon.SinonStub>purchasing.getPromoVersion).callsFake(() => {
-                    purchasing.onGetPromoVersion.trigger('1.17.0-foo');
-                    return Promise.resolve();
-                });
-                const promise = PurchasingUtilities.checkPromoVersion(nativeBridge);
-                return promise;
-            });
-
-            it('should fail', () => {
-                (<sinon.SinonStub>purchasing.initializePurchasing).callsFake(() => {
-                    purchasing.onInitialize.trigger('True');
-                    return Promise.resolve(true);
-                });
-                (<sinon.SinonStub>purchasing.getPromoVersion).callsFake(() => {
-                    purchasing.onGetPromoVersion.trigger('1.15.0-foo');
-                    return Promise.resolve(false);
-                });
-                const promise = PurchasingUtilities.checkPromoVersion(nativeBridge);
-                return promise;
-            });
-        });
-
-        describe('with an incorrectly formatted/empty string', () =>  {
-            it('should fail', () => {
-                (<sinon.SinonStub>purchasing.initializePurchasing).callsFake(() => {
-                    purchasing.onInitialize.trigger('True');
-                    return Promise.resolve(true);
-                });
-                (<sinon.SinonStub>purchasing.getPromoVersion).callsFake(() => {
-                    purchasing.onGetPromoVersion.trigger('a.a.a');
-                    return Promise.resolve(false);
-                });
-                const promise = PurchasingUtilities.checkPromoVersion(nativeBridge);
-                return promise;
-            });
-
-            it('should fail', () => {
-                (<sinon.SinonStub>purchasing.initializePurchasing).callsFake(() => {
-                    purchasing.onInitialize.trigger('True');
-                    return Promise.resolve(true);
-                });
-                (<sinon.SinonStub>purchasing.getPromoVersion).callsFake(() => {
-                    purchasing.onGetPromoVersion.trigger('');
-                    return Promise.resolve(false);
-                });
-                const promise = PurchasingUtilities.checkPromoVersion(nativeBridge);
-                return promise;
-            });
+            assert.equal(PurchasingUtilities.getProductPrice('myPromo'), '$0.00');
+            assert.equal(PurchasingUtilities.getProductPrice('100.gold.coins'), '$0.99');
         });
     });
 
-    describe('Checking initiate purchase', () => {
-        describe('Initiating a purchase', () => {
-            describe('And promo is ready', () => {
-                describe('With a good command request', () => {
+    describe('isProductAvailable', () => {
+        beforeEach(() => {
+            const promise = PurchasingUtilities.refreshCatalog();
+            purchasing.onGetPromoCatalog.trigger(promoCatalog);
+            return promise;
+        });
 
-                    it('should resolve', () => {
-                        (<sinon.SinonStub>purchasing.initializePurchasing).callsFake(() => {
-                            purchasing.onInitialize.trigger('True');
-                            return Promise.resolve(true);
-                        });
-                        (<sinon.SinonStub>purchasing.initiatePurchasingCommand).callsFake(() => {
-                            purchasing.onCommandResult.trigger('True');
-                            return Promise.resolve();
-                        });
-                        const promise = PurchasingUtilities.beginPurchaseEvent(nativeBridge, JSON.stringify(iapPayload));
-                        return promise;
-                    });
-                });
+        it('should return true if given product id is in the product catalog', () => {
+            assert.equal(true, PurchasingUtilities.isProductAvailable('myPromo'));
+        });
 
-                xdescribe('With a bad command request', () => {
-                    it('should fail', () => {
-                        (<sinon.SinonStub>purchasing.initializePurchasing).callsFake(() => {
-                            purchasing.onInitialize.trigger('True');
-                            return Promise.resolve(true);
-                        });
-                        (<sinon.SinonStub>purchasing.initiatePurchasingCommand).callsFake(() => {
-                            purchasing.onCommandResult.trigger('False');
-                            return Promise.reject('False');
-                        });
-                        const promise = PurchasingUtilities.beginPurchaseEvent(nativeBridge, JSON.stringify(iapPayload));
-                        return new Promise((resolve, reject) => {
-                            return promise.then(reject).catch(resolve);
-                        });
-                    });
-                });
+        it('should return false if given product is not in the catalog', () => {
+            assert.equal(false, PurchasingUtilities.isProductAvailable('booyah'));
+        });
+
+        describe('If promo catalog is invalid', () => {
+            beforeEach(() => {
+                const promise = PurchasingUtilities.refreshCatalog();
+                purchasing.onGetPromoCatalog.trigger(promoCatalogEmpty);
+                return promise;
             });
-
-            xdescribe('And promo is not ready', () => {
-                it('should fail', () => {
-                    (<sinon.SinonStub>purchasing.initializePurchasing).callsFake(() => {
-                        purchasing.onInitialize.trigger('False');
-                        return Promise.resolve();
-                    });
-                    const promise = PurchasingUtilities.beginPurchaseEvent(nativeBridge, JSON.stringify(iapPayload));
-                    purchasing.onCommandResult.trigger('True');
-                    return new Promise((resolve, reject) => {
-                        return promise.then(reject).catch(resolve);
-                    });
-                });
+            it('should return false if catalog has has size of 0', () => {
+                assert.equal(false, PurchasingUtilities.isProductAvailable('myPromo'));
             });
         });
     });

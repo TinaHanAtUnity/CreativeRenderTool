@@ -1,15 +1,16 @@
+@import "components.styl";
+@import "vars.styl";
+@import "icons.styl";
+
 #display-interstitial {
+  position: absolute;
   width: 100%;
   height: 100%;
 
   .close-region {
     position: absolute;
-    top: 2px;
-    right: 2px;
-    z-index: 9999;
-    width: 100%;
-    height: 100%;
-    opacity: .4;
+    top: 20px;
+    right: 46px;
   }
 
   .icon-close {
@@ -79,5 +80,37 @@
     animation-timing-function: linear;
     animation-iteration-count: 1;
     animation-fill-mode: forwards;
+  }
+
+  .gdpr-pop-up {
+
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      background-color: $dark-gdpr-banner;
+      box-shadow: 0 0 15px 0 rgba(0, 0, 0, .1);
+      opacity: 1;
+
+      .gdpr-text {
+        z-index: 110;
+        padding: $default-scale-size * $default-font-size * .5;
+        color: $white;
+        text-align: center;
+        font-size: $default-scale-size * $default-font-size * .5;
+
+        .gdpr-link {
+          color: $blue;
+        }
+    }
+  }
+
+  .privacy-button {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+
+    .icon-gdpr {
+      color: white;
+    }
   }
 }

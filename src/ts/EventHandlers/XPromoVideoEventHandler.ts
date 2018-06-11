@@ -37,7 +37,7 @@ export class XPromoVideoEventHandler extends VideoEventHandler {
     }
 
     protected handleStartEvent(progress: number): void {
-        this._xpromoOperativeEventManager.sendStartEvent(this._placement, this.getVideoOrientation());
+        this._xpromoOperativeEventManager.sendStart(this._placement, this.getVideoOrientation());
         const clickTrackingUrls = this._xpromoCampaign.getTrackingUrlsForEvent('start');
         for (const url of clickTrackingUrls) {
             this._thirdPartyEventManager.sendEvent('xpromo start', this._xpromoCampaign.getSession().getId(), url);
@@ -46,7 +46,7 @@ export class XPromoVideoEventHandler extends VideoEventHandler {
     }
 
     protected handleCompleteEvent(): void {
-        this._xpromoOperativeEventManager.sendViewEvent(this._placement, this.getVideoOrientation());
+        this._xpromoOperativeEventManager.sendView(this._placement, this.getVideoOrientation());
         const clickTrackingUrls = this._xpromoCampaign.getTrackingUrlsForEvent('view');
         for (const clickUrl of clickTrackingUrls) {
             this._thirdPartyEventManager.sendEvent('xpromo view', this._xpromoCampaign.getSession().getId(), clickUrl);

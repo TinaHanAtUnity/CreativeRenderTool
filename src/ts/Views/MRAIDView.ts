@@ -8,6 +8,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { IPrivacyHandler, AbstractPrivacy } from 'Views/AbstractPrivacy';
 import { platform } from 'os';
 import { DOMUtils } from 'Utilities/DOMUtils';
+import { XHRequest } from 'Utilities/XHRequest';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
@@ -22,21 +23,24 @@ export interface IMRAIDViewHandler {
     onMraidOrientationProperties(orientationProperties: IOrientationProperties): void;
     onMraidAnalyticsEvent(timeFromShow: number|undefined, timeFromPlayableStart: number|undefined, backgroundTime: number|undefined, event: string, eventData: any): void;
     onMraidShowEndScreen(): void;
+    onGDPRPopupSkipped(): void;
 }
 
 export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> implements IPrivacyHandler {
 
     protected _placement: Placement;
     protected _campaign: MRAIDCampaign;
+    protected _privacy: AbstractPrivacy;
+    protected _showGDPRBanner = false;
+    protected _gdprPopupClicked = false;
 
-    private _privacy: AbstractPrivacy;
-
-    constructor(nativeBridge: NativeBridge, id: string, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy) {
+    constructor(nativeBridge: NativeBridge, id: string, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
         super(nativeBridge, id);
 
         this._placement = placement;
         this._campaign = campaign;
         this._privacy = privacy;
+        this._showGDPRBanner = showGDPRBanner;
 
         this._privacy.render();
         this._privacy.hide();
@@ -52,6 +56,10 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         if(this._privacy) {
             this._privacy.removeEventHandler(this);
             this._privacy.hide();
+        }
+
+        if (this._showGDPRBanner && !this._gdprPopupClicked) {
+            this._handlers.forEach(handler => handler.onGDPRPopupSkipped());
         }
     }
 
@@ -91,6 +99,14 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         this._privacy.show();
     }
 
+    protected onGDPRPopupEvent(event: Event) {
+        event.preventDefault();
+        this._gdprPopupClicked = true;
+        this._privacy.show();
+    }
+
+    protected abstract choosePrivacyShown(): void;
+
     private replaceMraidSources(mraid: string): string {
         // Workaround for https://jira.hq.unity3d.com/browse/ABT-333
         // On certain versions of the webview on iOS (2.0.2 - 2.0.8) there seems
@@ -120,31 +136,16 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         const resourceUrl = this._campaign.getResourceUrl();
         if(resourceUrl) {
             if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                return this.requestMRaid(resourceUrl.getUrl());
+                return XHRequest.get(resourceUrl.getUrl());
             } else {
                 const fileId = resourceUrl.getFileId();
                 if(fileId) {
                     return this._nativeBridge.Cache.getFileContent(fileId, 'UTF-8');
                 } else {
-                    return this.requestMRaid(resourceUrl.getOriginalUrl());
+                    return XHRequest.get(resourceUrl.getOriginalUrl());
                 }
             }
         }
         return Promise.resolve(this._campaign.getResource());
-    }
-
-    private requestMRaid(url: string): Promise<string | undefined> {
-        return new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.addEventListener('load', () => {
-                if((xhr.status === 0 && url.indexOf('file://') === 0) || (xhr.status >= 200 && xhr.status <= 299)) {
-                    resolve(xhr.responseText);
-                } else {
-                    reject(new Error(`XHR returned with unknown status code ${xhr.status}`));
-                }
-            }, false);
-            xhr.open('GET', decodeURIComponent(url));
-            xhr.send();
-        });
     }
 }
