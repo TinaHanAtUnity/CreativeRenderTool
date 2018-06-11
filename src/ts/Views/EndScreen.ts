@@ -18,7 +18,7 @@ export interface IEndScreenHandler {
     onGDPRPopupSkipped(): void;
 }
 
-export const SHOW_GDPR_BANNER = 'show-gdpr-banner';
+const SHOW_GDPR_BANNER = 'show-gdpr-banner';
 
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
 
