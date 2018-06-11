@@ -1,4 +1,4 @@
-# Pending
+# Mon Jun 11 21:00:41 UTC 2018
 
 * Remove gamerId from operative events
 * Removed the GDPR icon AB test and use the GDPR font icon. Test was running on AB groups 16 & 17
