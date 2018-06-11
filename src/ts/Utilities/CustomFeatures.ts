@@ -1,9 +1,3 @@
-import { AdUnitStyle } from 'Models/AdUnitStyle';
-import { StorageType } from 'Native/Api/Storage';
-import { NativeBridge } from 'Native/NativeBridge';
-import { Configuration } from 'Models/Configuration';
-import { StorageError } from 'Native/Api/Storage';
-
 export class CustomFeatures {
     public static isExampleGameId(gameId: string): boolean {
         return gameId === '14850' || gameId === '14851';
@@ -23,5 +17,9 @@ export class CustomFeatures {
 
     public static isPlayableEndScreenHideDelayDisabled(abGroup: number): boolean {
         return abGroup === 18 || abGroup === 19;
+    }
+
+    public static isMixedPlacementExperiment(gameId: string): boolean {
+        return gameId === '1543512' || gameId === '1003628';
     }
 }

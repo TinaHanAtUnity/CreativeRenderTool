@@ -686,11 +686,16 @@ describe('CampaignRefreshManager', () => {
 
                 assert.equal(configuration.getPlacement('mixedPlacement-promo').getState(), PlacementState.READY);
                 assert.equal(configuration.getPlacement('video').getState(), PlacementState.READY);
+
+                assert.equal(campaignRefreshManager.getCampaign('mixedPlacement-rewarded'), undefined);
                 assert.notEqual(campaignRefreshManager.getCampaign('mixedPlacement-promo'), undefined);
+                assert.notEqual(campaignRefreshManager.getCampaign('mixedPlacement'), undefined);
+                assert.notEqual(campaignRefreshManager.getCampaign('video'), undefined);
 
                 campaignRefreshManager.setCurrentAdUnit(currentAdUnit);
                 currentAdUnit.onStart.trigger();
 
+                assert.equal(campaignRefreshManager.getCampaign('mixedPlacement'), undefined);
                 assert.equal(campaignRefreshManager.getCampaign('mixedPlacement-promo'), undefined);
                 assert.equal(campaignRefreshManager.getCampaign('video'), undefined);
             });
