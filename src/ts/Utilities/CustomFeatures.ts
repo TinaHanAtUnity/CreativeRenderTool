@@ -18,7 +18,7 @@ export class CustomFeatures {
     }
 
     public static isFancyEndScreenEnabled(abGroup: number): boolean {
-        return abGroup === 16 || abGroup === 17;
+        return true; // abGroup === 16 || abGroup === 17;
     }
 
     public static isPlayableEndScreenHideDelayDisabled(abGroup: number): boolean {

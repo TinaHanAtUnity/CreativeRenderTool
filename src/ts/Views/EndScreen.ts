@@ -111,7 +111,6 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         }
     }
 
-
     public show(): void {
         super.show();
 
@@ -169,11 +168,6 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
     protected abstract onDownloadEvent(event: Event): void;
 
-    private hasEndScreenAlt(altName: string): boolean {
-        const endScreenAlts = this.getEndscreenAlt();
-        return !!endScreenAlts && endScreenAlts.split(' ').indexOf(altName) > -1;
-    }
-
     private onCloseEvent(event: Event): void {
         event.preventDefault();
         this._handlers.forEach(handler => handler.onEndScreenClose());
@@ -197,7 +191,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     private getTemplate() {
-        if (this.hasEndScreenAlt(FANCY_END_SCREEN)) {
+        if (this.getEndscreenAlt() === FANCY_END_SCREEN) {
             return FancyEndScreenTemplate;
         }
 
