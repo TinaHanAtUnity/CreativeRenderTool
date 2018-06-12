@@ -66,18 +66,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
         return this.setupWebPlayer().then(() => {
             this._urlLoadingObserver = this._nativeBridge.WebPlayer.shouldOverrideUrlLoading.subscribe((url, method) => this.onUrlLoad(url));
-            if (this._closer.onPrivacyClosed) {
-                this._closer.onPrivacyClosed.subscribe(() => {
-                    this._view.resumeAd();
-                    this._privacyShowing = false;
-                });
-            }
-            if (this._closer.onPrivacyOpened) {
-                this._closer.onPrivacyOpened.subscribe(() => {
-                    this._view.pauseAd();
-                    this._privacyShowing = true;
-                });
-            }
+            this.setupPrivacyObservers();
             return this._container.open(this, ['webplayer', 'webview'], false, this._forceOrientation, false, false, true, false, this._options).then(() => {
                 this.onStart.trigger();
             });
@@ -141,6 +130,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public onContainerShow(): void {
         this.setShowing(true);
+        this.onContainerForeground();
     }
 
     public onContainerDestroy(): void {
@@ -164,6 +154,21 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public onContainerSystemMessage(message: AdUnitContainerSystemMessage): void {
         // EMPTY
+    }
+
+    private setupPrivacyObservers(): void {
+        if (this._closer.onPrivacyClosed) {
+            this._closer.onPrivacyClosed.subscribe(() => {
+                this._view.resumeAd();
+                this._privacyShowing = false;
+            });
+        }
+        if (this._closer.onPrivacyOpened) {
+            this._closer.onPrivacyOpened.subscribe(() => {
+                this._view.pauseAd();
+                this._privacyShowing = true;
+            });
+        }
     }
 
     private setupWebPlayer(): Promise<any> {
