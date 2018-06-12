@@ -1,4 +1,4 @@
-# Pending
+# Tue Jun 12 20:07:35 UTC 2018
 
 * Use isMoatEnabled flag from auction response
 * A/B for new endscreen design in groups 16 and 17
