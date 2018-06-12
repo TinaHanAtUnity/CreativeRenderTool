@@ -1,368 +1,209 @@
 <script>
-    function getQueryParams(url) {
-        var a = document.createElement('a');
-        a.href = url;
-        var params = {};
-        if (a.search) {
-            var tuples = a.search.substring(1).split(/&/);
-            for (var i = 0; i < tuples.length; i++) {
-                var parts = tuples[i].split(/=/);
-                var key = parts[0];
-                var value = parts[1];
-                if (params[key]) {
-                    params[key].push(value);
-                } else {
-                    params[key] = [value];
+    function getQueryParams(e) {
+            var d = document.createElement("a");
+            d.href = e;
+            e = {};
+            if (d.search) {
+                d = d.search.substring(1).split(/&/);
+                for (var g = 0; g < d.length; g++) {
+                    var h = d[g].split(/=/), k = h[0];
+                    h = h[1];
+                    e[k] ? e[k].push(h) : e[k] = [h];
                 }
             }
+            return e;
         }
-        return params;
-    }
-    function isObjectEmpty(obj) {
-        for (var prop in obj) {
-            if (obj.hasOwnProperty(prop)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    (function() {
-        var touches = [];
-
-        window.addEventListener('pageshow', function() {
-            AFMA_ReceiveMessage('onshow');
-        });
-
-        var startTouch;
-        var endTouch;
-        var touchStartTime;
-        var upCounts = 0;
-        var downCounts = 0;
-        var moveCounts = 0;
-        var cancelCounts = 0;
-        var touchDuration;
-
-        document.addEventListener('touchstart', function(e) {
-            touchStartTime = Date.now();
-            startTouch = e.touches[0];
-            downCounts++;
-        });
-        document.addEventListener('touchend', function(e) {
-            touchDuration = Date.now() - touchStartTime;
-            endTouch = e.changedTouches[0];
-            upCounts++;
-        });
-        document.addEventListener('touchmove', function(e) {
-            moveCounts++;
-        });
-        document.addEventListener('touchcancel', function(e) {
-            cancelCounts++;
-        });
-
-        var AFMA = function() {
-            var self = this;
-            this.intentCallbacks = {};
-            this.intentCallbackId = 0;
-            this.sentQuartiles = {};
-            var clickSignalListeners = [];
-
-            document.addEventListener('DOMContentLoaded', function() {
-                var videoEl = document.querySelector('video');
-                if (videoEl === null) {
-                    var error = 'videoEl for admob is not found';
-                    self.postMessage('tracking', {
-                        event: 'error',
-                        data: JSON.stringify(error)
-                    });
-                    return;
+        function isObjectEmpty(e) {
+            for (var d in e) {
+                if (e.hasOwnProperty(d)) {
+                    return !1;
                 }
-
-                videoEl.addEventListener('error', function() {
-                    var error = videoEl.error;
-                    self.postMessage('tracking', {
-                        event: 'error',
-                        data: JSON.stringify(error)
-                    });
-                });
-
-                videoEl.addEventListener('timeupdate', function() {
-                    var quartile = Math.floor((videoEl.currentTime / videoEl.duration) * 4);
-                    if (quartile !== 0 && !(quartile in self.sentQuartiles)) {
-                        self.sentQuartiles[quartile] = true;
-                        var adQuartile;
-                        switch (quartile) {
-                            case 1:
-                                adQuartile = 'firstQuartile';
-                                break;
-                            case 2:
-                                adQuartile = 'midpoint';
-                                break;
-                            case 3:
-                                adQuartile = 'thirdQuartile';
-                                break;
-                        }
-                        if (adQuartile) {
-                            self.postMessage('tracking', {
-                                event: adQuartile
-                            });
-                        }
-                    }
-                });
-
-                videoEl.addEventListener('stalled', function() {
-                    self.postMessage('tracking', {
-                        event: 'stalled'
-                    });
-                });
-
-                videoEl.addEventListener('canplay', function() {
-                    self.postMessage('tracking', {
-                        event: 'loaded'
-                    });
-                });
+            }
+            return !0;
+        }
+        (function () {
+            window.addEventListener("pageshow", function () {
+                AFMA_ReceiveMessage("onshow");
             });
-
-            this.forceOrientation = function(orientation, override, animationDuration) {
-                this.postMessage('forceOrientation', {
-                    orientation: orientation,
-                    override: override,
-                    animationDuration: animationDuration
-                });
-            };
-
-            this.click = function(url) {
-                var touchInfo = self.getTouchInfo();
-                this.postMessage('click', {
-                    url: url,
-                    touch: touchInfo
-                });
-            };
-
-            this.getClickSignals = function(cs) {
-                return null;
-            };
-
-            this.appendClickSignals = function(url, ss) {
-                return url;
-            };
-
-            this.getClickSignalsAsync = function(cs) {
-                return new Promise(function(resolve, reject) {
-                    self.requestClickSignal(resolve);
-                });
-            }
-
-            this.appendClickSignalsAsync = function(url, ss) {
-                var signalPromise = ss ? Promise.resolve(ss) : this.getClickSignalsAsync(url);
-                return signalPromise.then(function(signalObject) {
-                    var clickSignals = signalObject.encodedClickSignal;
-                    var query = getQueryParams(url);
-                    if (!query.ms) {
-                        if (isObjectEmpty(query)) {
-                            url = url + '?ms=' + clickSignals;
-                        } else {
-                            url = url + '&ms=' + clickSignals;
+            var e, d, g, h = 0, k = 0, m = 0, n = 0, l;
+            document.addEventListener("touchstart", function (b) {
+                g = Date.now();
+                e = b.touches[0];
+                k++;
+            });
+            document.addEventListener("touchend", function (b) {
+                l = Date.now() - g;
+                d = b.changedTouches[0];
+                h++;
+            });
+            document.addEventListener("touchmove", function (b) {
+                m++;
+            });
+            document.addEventListener("touchcancel", function (b) {
+                n++;
+            });
+            window.unity = window.unity || {};
+            window.unity.afma = new function () {
+                var b = this;
+                this.intentCallbacks = {};
+                this.intentCallbackId = 0;
+                this.sentQuartiles = {};
+                var g = [];
+                document.addEventListener("DOMContentLoaded", function () {
+                    var a = document.querySelector("video");
+                    null === a ? b.postMessage("tracking", { event: "error", data: JSON.stringify("videoEl for admob is not found") }) : (a.addEventListener("error", function () {
+                        b.postMessage("tracking", { event: "error", data: JSON.stringify(a.error) });
+                    }), a.addEventListener("timeupdate", function () {
+                        var c = Math.floor(a.currentTime / a.duration * 4);
+                        if (0 !== c && !(c in b.sentQuartiles)) {
+                            b.sentQuartiles[c] = !0;
+                            switch (c) {
+                                case 1:
+                                    var f = "firstQuartile";
+                                    break;
+                                case 2:
+                                    f = "midpoint";
+                                    break;
+                                case 3:
+                                    f = "thirdQuartile";
+                            }
+                            f && b.postMessage("tracking", { event: f });
                         }
-                    }
-                    var rvdt = signalObject.rvdt;
-                    url = url + '&rvdt=' + rvdt;
-                    return url;
+                    }), a.addEventListener("stalled", function () {
+                        b.postMessage("tracking", { event: "stalled" });
+                    }), a.addEventListener("canplay", function () {
+                        b.postMessage("tracking", { event: "loaded" });
+                    }));
                 });
-            };
-
-            this.requestClickSignal = function(resolve) {
-                clickSignalListeners.push(resolve);
-                var touchInfo = this.getTouchInfo();
-                this.postMessage('getClickSignal', touchInfo);
-            };
-            this.getTouchInfo = function() {
-                var touchInfo = {
-                    counts: {
-                        up: upCounts,
-                        down: downCounts,
-                        move: moveCounts,
-                        cancel: cancelCounts
+                this.forceOrientation = function (a, c, f) {
+                    this.postMessage("forceOrientation", { orientation: a, override: c, animationDuration: f });
+                };
+                this.click = function (a) {
+                    var c = b.getTouchInfo();
+                    this.postMessage("click", { url: a, touch: c });
+                };
+                this.getClickSignals = function (a) {
+                    return null;
+                };
+                this.appendClickSignals = function (a, c) {
+                    return a;
+                };
+                this.getClickSignalsAsync = function (a) {
+                    return new Promise(function (a, f) {
+                        b.requestClickSignal(a);
+                    });
+                };
+                this.appendClickSignalsAsync = function (a, c) {
+                    return (c ? Promise.resolve(c) : this.getClickSignalsAsync(a)).then(function (c) {
+                        var b = c.encodedClickSignal, f = getQueryParams(a);
+                        f.ms || (a = isObjectEmpty(f) ? a + "?ms=" + b : a + "&ms=" + b);
+                        return a = a + "&rvdt=" + c.rvdt;
+                    });
+                };
+                this.requestClickSignal = function (a) {
+                    g.push(a);
+                    a = this.getTouchInfo();
+                    this.postMessage("getClickSignal", a);
+                };
+                this.getTouchInfo = function () {
+                    var a = { counts: { up: h, down: k, move: m, cancel: n } };
+                    e && (a.start = { x: e.clientX || 0.0, y: e.clientY || 0.0 });
+                    d && (a.end = { x: d.clientX || 0.0, y: d.clientY || 0.0 }, a.diameter = 2 * d.radiusX, a.pressure = d.force || 0.0);
+                    l && (a.duration = l);
+                    return a;
+                };
+                this.onReceiveClickSignal = function (a) {
+                    for (var c = 0, b = g.length; c < b; c++) {
+                        g[c](a);
+                    }
+                    g = [];
+                };
+                this.notifyRewardedVideoStart = function () {
+                    this.postMessage("rewardedVideoStart");
+                };
+                this.grantReward = function () {
+                    this.postMessage("grantReward");
+                };
+                this.close = function (a) {
+                    this.postMessage("close");
+                };
+                this.disableBackButton = function (a) {
+                    this.postMessage("disableBackButton", { disabled: a });
+                };
+                this.openIntent = function (a, c, b) {
+                    this.postMessage("openIntent", { url: a, action: c, mimeType: b });
+                    return !1;
+                };
+                this.openIntentExtended = function (a) {
+                    return this.openIntent(a.url, a.action, a.mimeType);
+                };
+                this.openUrl = function (a) {
+                    this.postMessage("openUrl", { url: a });
+                };
+                this.openDeepLinkUrl = function (a, c, b, d) {
+                    this.postMessage("openUrl", { url: a });
+                    c();
+                };
+                this.openBrowser = function (a) {
+                    this.postMessage("openUrl", { url: a });
+                };
+                this.openNativeApp = function (a) {
+                    this.postMessage("openUrl", { url: a });
+                };
+                this.openSystemBrowser = function (a, c) {
+                    this.postMessage("openUrl", { url: a });
+                };
+                this.openStoreOverlay = function (a) {
+                    this.postMessage("openStoreOverlay", { url: a });
+                };
+                this.openInAppStore = function (a, c, b) {
+                    this.postMessage("openInAppStore", { productId: a, url: c });
+                };
+                this.fetchAppStoreOverlay = function (a) {
+                    this.postMessage("fetchAppStoreOverlay", { productId: a });
+                };
+                this.canOpenUrls = function (a, c, b, d) {
+                    b = {};
+                    if (a.length) {
+                        for (d = 0; d < a.length; d++) {
+                            b[a[d]] = !0;
+                        }
+                    } else {
+                        b[a] = !0;
+                    }
+                    c("openableURLs", b);
+                };
+                this.canOpenIntents = function (a, c, d, e) {
+                    var f = b.intentCallbackId++;
+                    b.intentCallbacks[f] = {
+                        callback: c, timer: setTimeout(function () {
+                            d();
+                            delete b.intentCallbacks[f];
+                        }, e)
+                    };
+                    this.postMessage("openableIntents", { id: f, intents: a });
+                };
+                this.postMessage = function (a, b) {
+                    window.parent.postMessage({ type: "afma", event: a, data: b }, "*");
+                };
+                this.handleOpenableIntentResponse = function (a) {
+                    var c = a.id;
+                    a = a.results;
+                    if (c in b.intentCallbacks) {
+                        var d = b.intentCallbacks[c].callback;
+                        d("openableIntents", a);
+                        clearTimeout(b.intentCallbacks[c].timer);
+                        delete b.intentCallbacks[c];
                     }
                 };
-                if (startTouch) {
-                    touchInfo.start = {
-                        x: startTouch.clientX || 0.0,
-                        y: startTouch.clientY || 0.0
-                    };
-                }
-                if (endTouch) {
-                    touchInfo.end = {
-                        x: endTouch.clientX || 0.0,
-                        y: endTouch.clientY || 0.0,
-                    };
-                    touchInfo.diameter = endTouch.radiusX * 2,
-                    touchInfo.pressure = endTouch.force || 0.0;
-                }
-                if (touchDuration) {
-                    touchInfo.duration = touchDuration;
-                }
-                return touchInfo;
-            };
-
-            this.onReceiveClickSignal = function(signal) {
-                for (var i = 0, len = clickSignalListeners.length; i < len; i++) {
-                    clickSignalListeners[i](signal);
-                }
-                clickSignalListeners = [];
-            };
-
-            this.notifyRewardedVideoStart = function() {
-                this.postMessage('rewardedVideoStart');
-            };
-
-            this.grantReward = function() {
-                this.postMessage('grantReward');
-            };
-
-            this.close = function(notifyParent) {
-                this.postMessage('close');
-            };
-
-            this.disableBackButton = function(disabled) {
-                this.postMessage('disableBackButton', {
-                    disabled: disabled
-                });
-            };
-
-            this.openIntent = function(url, action, mimeType) {
-                this.postMessage('openIntent', {
-                    url: url,
-                    action: action,
-                    mimeType: mimeType
-                });
-                return false;
-            };
-
-            this.openIntentExtended = function(params) {
-                return this.openIntent(params.url, params.action, params.mimeType);
-            };
-
-            this.openUrl = function(url) {
-                this.postMessage('openUrl', {
-                    url: url
-                });
-            };
-
-            this.openDeepLinkUrl = function(url, callback, failIfUnsure, packageName) {
-                this.postMessage('openUrl', {
-                    url: url
-                });
-                callback();
-            };
-
-            this.openBrowser = function(url) {
-                this.postMessage('openUrl', {
-                    url: url
-                });
-            };
-
-            this.openNativeApp = function(url) {
-                this.postMessage('openUrl', {
-                    url: url
-                });
-            };
-
-            this.openSystemBrowser = function(url, options) {
-                this.postMessage('openUrl', {
-                    url: url
-                });
-            };
-
-            this.openStoreOverlay = function(url) {
-                this.postMessage('openStoreOverlay', {
-                    url: url
-                });
-            };
-
-            this.openInAppStore = function(productId, url, waitForFetch) {
-                this.postMessage('openInAppStore', {
-                    productId: productId,
-                    url: url
-                });
-            };
-
-            this.fetchAppStoreOverlay = function(productId) {
-                this.postMessage('fetchAppStoreOverlay', {
-                    productId: productId
-                });
-            };
-
-            this.canOpenUrls = function(urls, callback, timeoutCallback, timeoutMillis) {
-                var canDo = {};
-                if (urls.length) {
-                    for (var i = 0; i < urls.length; i++) {
-                        canDo[urls[i]] = true;
-                    }
-                } else {
-                    canDo[urls] = true;
-                }
-                callback('openableURLs', canDo);
-            };
-
-            this.canOpenIntents = function(intents, callback, timeoutCallback, timeoutMillis) {
-                var id = self.intentCallbackId++;
-                self.intentCallbacks[id] = {
-                    callback: callback,
-                    timer: setTimeout(function() {
-                        timeoutCallback();
-                        delete self.intentCallbacks[id];
-                    }, timeoutMillis)
+                this.setOrienationProperties = function (a) {
+                    window.mraid.setOrienationProperties(a);
                 };
-                this.postMessage('openableIntents', {
-                    id: id,
-                    intents: intents
+                this.useCustomClose = function (a) {
+                };
+                window.addEventListener("message", function (a) {
+                    "afma" === a.data.type && ("back" === a.data.event ? (console.log("calling AFMA back function", a), AFMA_ReceiveMessage("onbackblocked")) : "openableIntentsResponse" === a.data.event ? b.handleOpenableIntentResponse(a.data.data) : "clickSignal" === a.data.event && (console.log("recieved click signal", a), b.onReceiveClickSignal(a.data.data)));
                 });
             };
-
-            this.postMessage = function(event, data) {
-                window.parent.postMessage({
-                    type: 'afma',
-                    event: event,
-                    data: data
-                }, '*');
-            };
-
-            this.handleOpenableIntentResponse = function(response) {
-                var callbackId = response.id;
-                var resolutions = response.results;
-                if (callbackId in self.intentCallbacks) {
-                    var callback = self.intentCallbacks[callbackId].callback;
-                    callback('openableIntents', resolutions);
-                    clearTimeout(self.intentCallbacks[callbackId].timer);
-                    delete self.intentCallbacks[callbackId];
-                }
-            }
-
-            // MRAID proxy functions
-            this.setOrienationProperties = function(properties) {
-                window.mraid.setOrienationProperties(properties);
-            };
-
-            this.useCustomClose = function(uses) {
-            };
-
-            window.addEventListener('message', function(e) {
-                if (e.data.type === 'afma') {
-                    if (e.data.event === 'back') {
-                        console.log('calling AFMA back function', e);
-                        AFMA_ReceiveMessage('onbackblocked');
-                    } else if (e.data.event === 'openableIntentsResponse') {
-                        self.handleOpenableIntentResponse(e.data.data);
-                    } else if (e.data.event === 'clickSignal') {
-                        console.log('recieved click signal', e);
-                        self.onReceiveClickSignal(e.data.data);
-                    }
-                }
-            });
-        };
-
-        window.unity = window.unity || {};
-        window.unity.afma = new AFMA();
-    })();
+        })();
 </script>
