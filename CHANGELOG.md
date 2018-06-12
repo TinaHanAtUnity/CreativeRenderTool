@@ -1,3 +1,9 @@
+# Staged
+
+* Fix Vpaid loading issue in iOS
+* ABGroup fix by casting TestEnvironment AbGroup to a number
+* Add helper functions to reduce casting complexity with tests
+
 # Tue Jun 12 20:30:09 UTC 2018
 
 * Use isMoatEnabled flag from auction response
