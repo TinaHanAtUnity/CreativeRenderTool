@@ -73,8 +73,6 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
         this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
         this._GDPRPopupElement = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
         this._privacyButtonElement = <HTMLElement>this._container.querySelector('.privacy-button');
-
-        document.documentElement.classList.add('gdpr-pop-up-base');
     }
 
     public show(): void {

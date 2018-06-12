@@ -43,6 +43,7 @@ import EventTestVast from 'xml/EventTestVast.xml';
 import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xml';
 
 import * as sinon from 'sinon';
+import { ABGroup } from 'Models/ABGroup';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -59,7 +60,7 @@ export class TestFixtures {
         });
     }
 
-    public static getCometCampaignBaseParams(session: Session, campaignId: string, gamerId: string, abGroup: number, meta: string | undefined, adType?: string): ICampaign {
+    public static getCometCampaignBaseParams(session: Session, campaignId: string, gamerId: string, abGroup: ABGroup, meta: string | undefined, adType?: string): ICampaign {
         return {
             id: campaignId,
             gamerId: gamerId,
@@ -169,7 +170,7 @@ export class TestFixtures {
         };
     }
 
-    public static getProgrammaticMRAIDCampaignBaseParams(session: Session, campaignId: string, gamerId: string, abGroup: number, json: any): ICampaign {
+    public static getProgrammaticMRAIDCampaignBaseParams(session: Session, campaignId: string, gamerId: string, abGroup: ABGroup, json: any): ICampaign {
         const mraidJson = json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'];
         return {
             id: campaignId,
@@ -216,7 +217,7 @@ export class TestFixtures {
         };
     }
 
-    public static getVASTCampaignBaseParams(session: Session, campaignId: string, gamerId: string, abGroup: number): ICampaign {
+    public static getVASTCampaignBaseParams(session: Session, campaignId: string, gamerId: string, abGroup: ABGroup): ICampaign {
         return {
             id: campaignId,
             gamerId: gamerId,
@@ -328,7 +329,7 @@ export class TestFixtures {
     public static getPromoCampaignParams(json: any, adType?: string): IPromoCampaign {
         const session = this.getSession();
         return {
-            ... this.getCometCampaignBaseParams(session, json.promo.id, json.gamerId, json.abGroup, json.meta, adType),
+            ... this.getCometCampaignBaseParams(session, json.promo.id, json.gamerId, ABGroup.getAbGroup(json.abGroup), json.meta, adType),
             iapProductId: json.promo.iapProductId,
             additionalTrackingEvents: json.promo.tracking ? json.promo.tracking : undefined,
             dynamicMarkup: json.promo.dynamicMarkup,
