@@ -1,3 +1,9 @@
+# Pending
+
+* Use isMoatEnabled flag from auction response
+* A/B for new endscreen design in groups 16 and 17
+* Add GDPR icon to MRAID gdpr banner and GDPR stylesheet cleanup
+
 # Tue Jun 12 07:57:06 UTC 2018
 
 * Refactor AB Groups to be their own class
