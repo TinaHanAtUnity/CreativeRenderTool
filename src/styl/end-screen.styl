@@ -1,5 +1,6 @@
 @import "vars.styl";
 @import "components.styl";
+@import "gdpr-pop-up.styl";
 @import "fancy-end-screen.styl";
 
 $dark-icon-color = rgba(0, 0, 0, .25);
@@ -98,19 +99,6 @@ $end-screen-mixin($scale-size = $default-scale-size) {
 
       .row-container {
         bottom: $default-size * $scale-size;
-      }
-
-      &.show-gdpr-banner {
-        .gdpr-pop-up {
-          .gdpr-text {
-            padding: $default-size * $scale-size * .5 $default-size * $scale-size * .5 $default-size * $scale-size * .5 0;
-            width: 80%;
-          }
-
-          .icon-gdpr {
-            margin: 0 .5rem;
-          }
-        }
       }
     }
   }
@@ -238,20 +226,6 @@ body {
     justify-content: center;
     background-color: $end-screen-background-color;
   }
-
-  &.show-gdpr-banner {
-    .gdpr-pop-up {
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .privacy-button {
-      display: none;
-    }
-  }
-
 }
 
 $end-screen-mixin();
