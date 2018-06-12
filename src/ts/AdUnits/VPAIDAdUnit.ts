@@ -1,22 +1,21 @@
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
-import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
-import { NativeBridge } from 'Native/NativeBridge';
-import { VPAID } from 'Views/VPAID';
+import { AdUnitContainerSystemMessage, IAdUnitContainerListener } from 'AdUnits/Containers/AdUnitContainer';
 import { FinishState } from 'Constants/FinishState';
 import { Platform } from 'Constants/Platform';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { Timer } from 'Utilities/Timer';
-import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
-import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
-import { Closer } from 'Views/Closer';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Placement } from 'Models/Placement';
-import { IObserver2, IObserver0 } from 'Utilities/IObserver';
+import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
 import { WKAudiovisualMediaTypes } from 'Native/Api/WebPlayer';
-import { AdUnitContainerSystemMessage, IAdUnitContainerListener } from 'AdUnits/Containers/AdUnitContainer';
+import { NativeBridge } from 'Native/NativeBridge';
+import { Diagnostics } from 'Utilities/Diagnostics';
+import { IObserver2 } from 'Utilities/IObserver';
+import { Timer } from 'Utilities/Timer';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
+import { Closer } from 'Views/Closer';
+import { VPAID } from 'Views/VPAID';
+import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
 
 export interface IVPAIDAdUnitParameters extends IAdUnitParameters<VPAIDCampaign> {
     vpaid: VPAID;
