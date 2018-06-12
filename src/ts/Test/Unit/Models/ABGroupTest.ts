@@ -92,42 +92,34 @@ describe('ABGroup tests', () => {
         tests.forEach((t) => {
             it(`expected group is ${t.expectedGroup} and the metadata group is ${t.metaDataGroup}`, () => {
                 const nativeBridge: NativeBridge = sinon.createStubInstance(NativeBridge);
-                const webview = new WebView(nativeBridge);
+                const webview: any = new WebView(nativeBridge);
                 const setupStub: sinon.SinonStub = sinon.stub(TestEnvironment, 'setup').resolves();
                 const getStub: sinon.SinonStub = sinon.stub(TestEnvironment, 'get');
                 getStub.withArgs('abGroup').returns(t.metaDataGroup);
-                // tslint:disable
-                const promise = webview['setupTestEnvironment']();
-                // tslint:enable
+                const promise = webview.setupTestEnvironment();
                 return promise.then(() => {
                     sinon.assert.calledWith(getStub, 'abGroup');
                     let configAbGroupNumber: number | undefined;
-                    // tslint:disable
-                    const maybeGroup = ConfigManager['AbGroup'];
-                    // tslint:enable
+                    const configManager = <any>ConfigManager;
+                    const campaignManager = <any>CampaignManager;
+                    const maybeGroup = configManager.AbGroup;
                     if (maybeGroup) {
                         configAbGroupNumber = maybeGroup.toNumber();
                     }
                     assert.equal(configAbGroupNumber, t.expectedGroup);
                     let campaignAbGroupNumber: number | undefined;
-                    // tslint:disable
-                    const maybeCampaignGroup = CampaignManager['AbGroup'];
-                    // tslint:enable
+                    const maybeCampaignGroup = campaignManager.AbGroup;
                     if (maybeCampaignGroup) {
                         campaignAbGroupNumber = maybeCampaignGroup.toNumber();
                     }
                     assert.equal(campaignAbGroupNumber, t.expectedGroup);
-                    // tslint:disable
-                    ConfigManager['AbGroup'] = undefined;
-                    CampaignManager['AbGroup'] = undefined;
-                    // tslint:enbale
+                    configManager.AbGroup = undefined;
+                    campaignManager.AbGroup = undefined;
                     getStub.restore();
                     setupStub.restore();
-                }).catch((error) => {
-                    // tslint:disable
-                    ConfigManager['AbGroup'] = undefined;
-                    CampaignManager['AbGroup'] = undefined;
-                    // tslint:enbale
+                }).catch((error: Error) => {
+                    (<any>ConfigManager).AbGroup = undefined;
+                    (<any>CampaignManager).AbGroup = undefined;
                     getStub.restore();
                     setupStub.restore();
                     throw error;
