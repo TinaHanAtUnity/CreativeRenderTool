@@ -530,10 +530,12 @@ export class WebView {
 
             if(TestEnvironment.get('abGroup')) {
                 // needed in both due to placement level control support
-                const abGroupNumber = Number(TestEnvironment.get('abGroup'));
-                const abGroup = ABGroup.getAbGroup(abGroupNumber);
-                ConfigManager.setAbGroup(abGroup);
-                CampaignManager.setAbGroup(abGroup);
+                const abGroupNumber: number = Number(TestEnvironment.get('abGroup'));
+                if (!isNaN(abGroupNumber)) { // if it is a number get the group
+                    const abGroup = ABGroup.getAbGroup(abGroupNumber);
+                    ConfigManager.setAbGroup(abGroup);
+                    CampaignManager.setAbGroup(abGroup);
+                }
             }
 
             if(TestEnvironment.get('campaignId')) {
