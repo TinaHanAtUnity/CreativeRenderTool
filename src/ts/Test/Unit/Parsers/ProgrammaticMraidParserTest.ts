@@ -16,13 +16,14 @@ import { ProgrammaticMraidParser } from 'Parsers/ProgrammaticMraidParser';
 import ProgrammaticMRAIDCampaign from 'json/campaigns/mraid/ProgrammaticMRAIDCampaign.json';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Url } from 'Utilities/Url';
+import { ABGroup } from 'Models/ABGroup';
 
 describe('ProgrammaticMraidParser', () => {
     const placements = ['TestPlacement'];
     const gamerId = 'TestGamerId';
     const mediaId = 'o2YMT0Cmps6xHiOwNMeCrH';
     const correlationId = '583dfda0d933a3630a53249c';
-    const abGroup = 0;
+    const abGroup = ABGroup.getAbGroup(0);
 
     let parser: ProgrammaticMraidParser;
     let nativeBridge: NativeBridge;
