@@ -18,15 +18,10 @@ import { JsonParser } from 'Utilities/JsonParser';
 import { StorageType } from 'Native/Api/Storage';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Cache } from 'Utilities/Cache';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { JaegerSpan } from 'Jaeger/JaegerSpan';
 import { UserCountData } from 'Utilities/UserCountData';
-
-const enum MixedPlacementTypes {
-    PROMO = '-promo',
-    REWARDED = '-rewarded',
-    REWARDED_PROMO = '-rewardedpromo'
-}
+import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { MixedPlacementUtility } from 'Utilities/MixedPlacementUtility';
 
 export class OldCampaignRefreshManager extends RefreshManager {
     private _nativeBridge: NativeBridge;
@@ -223,26 +218,36 @@ export class OldCampaignRefreshManager extends RefreshManager {
     private onCampaign(placementId: string, campaign: Campaign) {
         this._parsingErrorCount = 0;
 
-        // suffix can also be empty if placement is not 'mixed'
-        const suffix = this.extractMixedPlacementSuffix(placementId, campaign);
-
-        this.setCampaignForPlacement(placementId + suffix, campaign);
-        this.handlePlacementState(placementId + suffix, PlacementState.READY);
+        if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
+            // suffix can also be empty if placement is not 'mixed'
+            const suffix = MixedPlacementUtility.extractMixedPlacementSuffix(placementId, campaign, this._configuration);
+            this.setCampaignForPlacement(placementId + suffix, campaign);
+            this.handlePlacementState(placementId + suffix, PlacementState.READY);
+        } else {
+            this.setCampaignForPlacement(placementId, campaign);
+            this.handlePlacementState(placementId, PlacementState.READY);
+        }
     }
 
     private onNoFill(placementId: string) {
         this._parsingErrorCount = 0;
 
-        const mixedList = ['', MixedPlacementTypes.PROMO, MixedPlacementTypes.REWARDED, MixedPlacementTypes.REWARDED_PROMO];
-        let shouldUpdatePlacementState = true;
-        for(let i = 0; shouldUpdatePlacementState && i < mixedList.length; i++) {
-            const suffix = mixedList[i];
-            const fullPlacementId = placementId + suffix;
-            this._configuration.getPlacements()[fullPlacementId] = this._configuration.getPlacements()[placementId];
-            this._nativeBridge.Sdk.logDebug('Unity Ads server returned no fill, no ads to show, for placement: ' + fullPlacementId);
-            this.setCampaignForPlacement(fullPlacementId, undefined);
-            this.handlePlacementState(fullPlacementId, PlacementState.NO_FILL);
-            shouldUpdatePlacementState = this.isRewardedMixedPlacement(placementId) || this.isRewardedPromo(placementId);
+        if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
+            const mixedList = MixedPlacementUtility.getMixedPlacmentTypeList();
+            let shouldUpdatePlacementState = true;
+            for(let i = 0; shouldUpdatePlacementState && i < mixedList.length; i++) {
+                const suffix = mixedList[i];
+                const fullPlacementId = placementId + suffix;
+                this._configuration.getPlacements()[fullPlacementId] = this._configuration.getPlacements()[placementId];
+                this._nativeBridge.Sdk.logDebug('Unity Ads server returned no fill, no ads to show, for placement: ' + fullPlacementId);
+                this.setCampaignForPlacement(fullPlacementId, undefined);
+                this.handlePlacementState(fullPlacementId, PlacementState.NO_FILL);
+                shouldUpdatePlacementState = MixedPlacementUtility.isRewardedMixedPlacement(placementId, this._configuration) || MixedPlacementUtility.isRewardedPromo(placementId, this._configuration);
+            }
+        } else {
+            this._nativeBridge.Sdk.logDebug('Unity Ads server returned no fill, no ads to show, for placement: ' + placementId);
+            this.setCampaignForPlacement(placementId, undefined);
+            this.handlePlacementState(placementId, PlacementState.NO_FILL);
         }
     }
 
@@ -475,44 +480,5 @@ export class OldCampaignRefreshManager extends RefreshManager {
                 this._sessionManager.sendUnsentSessions();
             }
         });
-    }
-
-    private isRewardedMixedPlacement(placementId: string): boolean {
-        const notAllowsSkip: boolean = !this._configuration.getPlacement(placementId).allowSkip();
-
-        return this.isMixedIAP(placementId) && notAllowsSkip;
-    }
-
-    private isRewardedPromo(placementId: string): boolean {
-        const allowsSkip: boolean = this._configuration.getPlacement(placementId).allowSkip();
-
-        return this.isMixedIAP(placementId) && allowsSkip;
-    }
-
-    private isMixedIAP(placementId: string): boolean {
-        const adTypes = this._configuration.getPlacement(placementId).getAdTypes();
-        if (!adTypes) {
-            return false;
-        }
-        if (adTypes.length <= 1) {
-            return false;
-        }
-        if (adTypes.indexOf('IAP') === -1) {
-            return false;
-        }
-        return true;
-    }
-
-    private extractMixedPlacementSuffix(placementId: string, campaign: Campaign): string {
-        let str = '';
-        if (this.isRewardedMixedPlacement(placementId)) {
-            str = (campaign.getAdType() === 'purchasing/iap') ? MixedPlacementTypes.PROMO : MixedPlacementTypes.REWARDED;
-            this._configuration.getPlacements()[placementId + str] = this._configuration.getPlacements()[placementId];
-        } else if (this.isRewardedPromo(placementId)) {
-            str = (campaign.getAdType() === 'purchasing/iap') ? MixedPlacementTypes.REWARDED_PROMO : MixedPlacementTypes.REWARDED;
-            this._configuration.getPlacements()[placementId + str] = this._configuration.getPlacements()[placementId];
-        }
-
-        return str;
     }
 }

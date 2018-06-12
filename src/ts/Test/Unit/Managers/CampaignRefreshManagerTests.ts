@@ -590,9 +590,24 @@ describe('CampaignRefreshManager', () => {
 
     describe('With mixed placement campaigns', () => {
         beforeEach(() => {
+            const clientInfoPromoGame = new ClientInfo(Platform.ANDROID, [
+                '1003628',
+                false,
+                'com.unity3d.ads.example',
+                '2.0.0-test2',
+                2000,
+                '2.0.0-alpha2',
+                true,
+                'http://example.com/config.json',
+                'http://example.com/index.html',
+                null,
+                '2.0.0-webview',
+                123456,
+                false
+            ]);
             configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
-            campaignRefreshManager = new OldCampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration, focusManager, sessionManager, clientInfo, request, cache);
+            campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfoPromoGame, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
+            campaignRefreshManager = new OldCampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration, focusManager, sessionManager, clientInfoPromoGame, request, cache);
         });
 
         it('should create a new placement with a suffix for a promo mixed placement campaign', () => {

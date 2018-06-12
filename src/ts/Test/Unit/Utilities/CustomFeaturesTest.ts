@@ -38,4 +38,20 @@ describe('CustomFeatures', () => {
         });
     });
 
+    describe('isMixedPlacementExperiment', () => {
+        it('should return true if gameId is 1543512', () => {
+            const value = CustomFeatures.isMixedPlacementExperiment('1543512');
+            assert.isTrue(value);
+        });
+
+        it('should return true if gameId is 1003628', () => {
+            const value = CustomFeatures.isMixedPlacementExperiment('1003628');
+            assert.isTrue(value);
+        });
+
+        it('should return false if gameId is anything besides 1543512 and 1003628', () => {
+            const value = CustomFeatures.isMixedPlacementExperiment('asdfasdf');
+            assert.isFalse(value);
+        });
+    });
 });
