@@ -6,6 +6,7 @@ import { XPromoOperativeEventManager } from 'Managers/XPromoOperativeEventManage
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { MRAIDOperativeEventManager } from 'Managers/MRAIDOperativeEventManager';
 import { Campaign } from 'Models/Campaign';
+import { ProgrammaticOperativeEventManager } from 'Managers/ProgrammaticOperativeEventManager';
 
 export class OperativeEventManagerFactory {
     public static createOperativeEventManager(params: IOperativeEventManagerParams<Campaign>): OperativeEventManager {
@@ -16,7 +17,7 @@ export class OperativeEventManagerFactory {
         } else if(params.campaign instanceof MRAIDCampaign) {
             return new MRAIDOperativeEventManager(<IOperativeEventManagerParams<MRAIDCampaign>>params);
         } else {
-            return new OperativeEventManager(params);
+            return new ProgrammaticOperativeEventManager(params);
         }
     }
 }

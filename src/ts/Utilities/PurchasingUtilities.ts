@@ -179,7 +179,7 @@ export class PurchasingUtilities {
     private static loadInitializationPayloads(): IPromoPayload {
         return <IPromoPayload>{
             iapPromo: true,
-            abGroup: this._configuration.getAbGroup(),
+            abGroup: this._configuration.getAbGroup().toNumber(),
             gameId: this._clientInfo.getGameId() + '|' + this._configuration.getToken(),
             trackingOptOut: this._configuration.isOptOutEnabled(),
             gamerToken: this._configuration.getToken(),

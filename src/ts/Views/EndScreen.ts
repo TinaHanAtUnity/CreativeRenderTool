@@ -10,6 +10,7 @@ import { Campaign } from 'Models/Campaign';
 import { IEndScreenDownloadParameters } from 'EventHandlers/EndScreenEventHandler';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { ABGroup } from 'Models/ABGroup';
 
 export interface IEndScreenHandler {
     onEndScreenDownload(parameters: IEndScreenDownloadParameters): void;
@@ -27,13 +28,13 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     private _gameName: string | undefined;
     private _privacy: AbstractPrivacy;
     private _isSwipeToCloseEnabled: boolean = false;
-    private _abGroup: number;
+    private _abGroup: ABGroup;
     private _showGDPRBanner: boolean = false;
     private _gdprPopupClicked = false;
     private _campaignId: string | undefined;
     private _osVersion: string | undefined;
 
-    constructor(nativeBridge: NativeBridge, language: string, gameId: string, gameName: string | undefined, abGroup: number, privacy: AbstractPrivacy, showGDPRBanner: boolean, adUnitStyle?: AdUnitStyle, campaignId?: string, osVersion?: string) {
+    constructor(nativeBridge: NativeBridge, language: string, gameId: string, gameName: string | undefined, abGroup: ABGroup, privacy: AbstractPrivacy, showGDPRBanner: boolean, adUnitStyle?: AdUnitStyle, campaignId?: string, osVersion?: string) {
         super(nativeBridge, 'end-screen');
         this._localization = new Localization(language, 'endscreen');
         this._abGroup = abGroup;
