@@ -82,6 +82,8 @@ export class FailedOperativeEventManager {
     }
 
     protected writeStorage(nativeBridge: NativeBridge): Promise<void> {
-        return nativeBridge.Storage.write(StorageType.PRIVATE);
+        return nativeBridge.Storage.write(StorageType.PRIVATE).catch(() => {
+            // Ignore errors
+        });
     }
 }
