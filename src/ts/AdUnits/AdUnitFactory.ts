@@ -194,7 +194,7 @@ export class AdUnitFactory {
         }
 
         const hasAdvertiserDomain = parameters.campaign.getAdvertiserDomain() !== undefined;
-        if (hasAdvertiserDomain) {
+        if (hasAdvertiserDomain && parameters.campaign.isMoatEnabled()) {
             MoatViewabilityService.initMoat(nativeBridge, parameters.campaign, parameters.clientInfo, parameters.placement, parameters.deviceInfo, parameters.configuration);
         }
 
