@@ -30,7 +30,11 @@
       "disableBackButton": true,
       "muteVideo": false,
       "useDeviceOrientationForVideo": false,
-      "skipInSeconds": 5
+      "skipInSeconds": 5,
+      "adTypes": [
+        "MRAID",
+        "VIDEO"
+      ]
     },
     {
         "id": "promoPlacement",
