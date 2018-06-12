@@ -13,6 +13,7 @@ import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { Platform } from 'Constants/Platform';
 import { ABGroup } from 'Models/ABGroup';
+import { FancyEndScreenEnabledAbTest } from 'Models/ABGroup';
 
 export interface IEndScreenHandler {
     onEndScreenDownload(parameters: IEndScreenDownloadParameters): void;
@@ -160,7 +161,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     protected getEndscreenAlt(campaign?: Campaign) {
-        if (CustomFeatures.isFancyEndScreenEnabled(this._abGroup) && this.canShowFancyEndScreen()) {
+        if (FancyEndScreenEnabledAbTest.isValid(this._abGroup) && this.canShowFancyEndScreen()) {
             return FANCY_END_SCREEN;
         }
 
