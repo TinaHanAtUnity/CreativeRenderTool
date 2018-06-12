@@ -16,8 +16,4 @@ export class CustomFeatures {
     public static isPlayableConfigurationEnabled(originalResourceUrl: string) {
         return originalResourceUrl.match(/playables\/production\/unity/);
     }
-
-    public static isPlayableEndScreenHideDelayDisabled(abGroup: number): boolean {
-        return abGroup === 18 || abGroup === 19;
-    }
 }

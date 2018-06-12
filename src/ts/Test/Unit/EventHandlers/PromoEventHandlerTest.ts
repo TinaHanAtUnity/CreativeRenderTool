@@ -24,6 +24,7 @@ import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 import { Configuration } from 'Models/Configuration';
 import { SinonStub, SinonSandbox } from 'sinon';
+import { ABGroup } from 'Models/ABGroup';
 import { PurchasingApi } from 'Native/Api/Purchasing';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Observable1 } from 'Utilities/Observable';
@@ -55,7 +56,7 @@ describe('PromoEventHandlersTest', () => {
         it('should hide adunit', () => {
             promoAdUnit = sinon.createStubInstance(PromoAdUnit);
 
-            PromoEventHandler.onClose(promoAdUnit, '111', '111', 1, [purchaseTrackingUrls], false);
+            PromoEventHandler.onClose(promoAdUnit, '111', '111', ABGroup.getAbGroup(1), [purchaseTrackingUrls], false);
             sinon.assert.called(<sinon.SinonSpy>promoAdUnit.hide);
         });
 
@@ -65,7 +66,7 @@ describe('PromoEventHandlersTest', () => {
             };
             promoAdUnit = sinon.createStubInstance(PromoAdUnit);
 
-            PromoEventHandler.onClose(promoAdUnit, '111', '111', 1, [purchaseTrackingUrls], false);
+            PromoEventHandler.onClose(promoAdUnit, '111', '111', ABGroup.getAbGroup(1), [purchaseTrackingUrls], false);
             sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPromoPayload);
         });
     });

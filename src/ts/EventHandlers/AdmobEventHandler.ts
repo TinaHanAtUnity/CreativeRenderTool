@@ -161,18 +161,6 @@ export class AdMobEventHandler implements IAdMobEventHandler {
 
     private getClickSignal(touchInfo: ITouchInfo): Promise<AdMobSignal> {
         return this._adMobSignalFactory.getClickSignal(touchInfo, this._adUnit).then((signal) => {
-            signal.setTimeOnScreen(this._adUnit.getTimeOnScreen());
-            signal.setTouchDiameter(touchInfo.diameter);
-            signal.setTouchPressure(touchInfo.pressure);
-            signal.setTouchXDown(touchInfo.start.x);
-            signal.setTouchYDown(touchInfo.start.y);
-            signal.setTouchXUp(touchInfo.end.x);
-            signal.setTouchYUp(touchInfo.end.y);
-            signal.setTouchDownTotal(touchInfo.counts.down);
-            signal.setTouchUpTotal(touchInfo.counts.up);
-            signal.setTouchMoveTotal(touchInfo.counts.move);
-            signal.setTouchCancelTotal(touchInfo.counts.cancel);
-            signal.setTouchDuration(touchInfo.duration);
             return signal;
         });
     }

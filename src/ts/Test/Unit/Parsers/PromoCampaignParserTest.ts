@@ -23,13 +23,14 @@ import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitia
 import { PromoCampaignParser } from 'Parsers/PromoCampaignParser';
 import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
+import { ABGroup } from 'Models/ABGroup';
 
 describe('PromoCampaignParser', () => {
     const placements = ['TestPlacement'];
     const gamerId = 'TestGamerId';
     const mediaId = 'o2YMT0Cmps6xHiOwNMeCrH';
     const correlationId = '583dfda0d933a3630a53249c';
-    const abGroup = 0;
+    const abGroup = ABGroup.getAbGroup(0);
 
     let parser: PromoCampaignParser;
     let nativeBridge: NativeBridge;
