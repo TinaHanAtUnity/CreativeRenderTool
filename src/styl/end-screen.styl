@@ -1,6 +1,7 @@
 @import "vars.styl";
 @import "components.styl";
 @import "gdpr-pop-up.styl";
+@import "fancy-end-screen.styl";
 
 $end-screen-mixin($scale-size = $default-scale-size) {
 
@@ -224,6 +225,11 @@ body {
     background-color: $end-screen-background-color;
   }
 
+  &.show-gdpr-banner {
+    .privacy-button {
+      display: none;
+    }
+  }
 }
 
 $end-screen-mixin();
