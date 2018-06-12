@@ -134,13 +134,23 @@ export class AdMobSignalFactory {
         return this.getCommonSignal().then(signal => {
             // todo: touch duration
             // todo: touch distance
-
-            signal.setTouchDiameter(touchInfo.diameter);
-            signal.setTouchPressure(touchInfo.pressure);
-            signal.setTouchXDown(touchInfo.start.x);
-            signal.setTouchYDown(touchInfo.start.y);
-            signal.setTouchXUp(touchInfo.end.x);
-            signal.setTouchYUp(touchInfo.end.y);
+            if (touchInfo.diameter) {
+                signal.setTouchDiameter(touchInfo.diameter);
+            }
+            if (touchInfo.pressure) {
+                signal.setTouchPressure(touchInfo.pressure);
+            }
+            if (touchInfo.start) {
+                signal.setTouchXDown(touchInfo.start.x);
+                signal.setTouchYDown(touchInfo.start.y);
+            }
+            if (touchInfo.end) {
+                signal.setTouchXUp(touchInfo.end.x);
+                signal.setTouchYUp(touchInfo.end.y);
+            }
+            if (touchInfo.duration) {
+                signal.setTouchDuration(touchInfo.duration);
+            }
             signal.setTouchDownTotal(touchInfo.counts.down);
             signal.setTouchUpTotal(touchInfo.counts.up);
             signal.setTouchMoveTotal(touchInfo.counts.move);
