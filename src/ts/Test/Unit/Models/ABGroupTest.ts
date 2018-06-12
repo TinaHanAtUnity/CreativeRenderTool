@@ -1,6 +1,13 @@
 import 'mocha';
 import { assert } from 'chai';
+import * as sinon from 'sinon';
+
 import { ABGroup, PlayableEndScreenHideDelayDisabledAbTest } from 'Models/ABGroup';
+import { WebView } from 'WebView';
+import { NativeBridge } from 'Native/NativeBridge';
+import { TestEnvironment } from 'Utilities/TestEnvironment';
+import { ConfigManager } from 'Managers/ConfigManager';
+import { CampaignManager } from 'Managers/CampaignManager';
 
 describe('ABGroup tests', () => {
 
@@ -65,6 +72,52 @@ describe('ABGroup tests', () => {
                     assert.isFalse(PlayableEndScreenHideDelayDisabledAbTest.isValid(abGroup));
                 }
             }
+        });
+    });
+
+    describe('setupTestEnvironment in webview should set AbGroup on ConfigManager and CampaignManager', () => {
+        const nativeBridge: NativeBridge = sinon.createStubInstance(NativeBridge);
+        const webview = new WebView(nativeBridge);
+        const setupStub: sinon.SinonStub = sinon.stub(TestEnvironment, 'setup').resolves();
+        const getStub: sinon.SinonStub = sinon.stub(TestEnvironment, 'get');
+        getStub.withArgs('abGroup').returns('5');
+        // tslint:disable
+        const promise = webview['setupTestEnvironment']();
+        // tslint:enable
+        return promise.then(() => {
+            sinon.assert.calledWith(getStub, 'abGroup');
+            // tslint:disable
+            const maybeGroup = ConfigManager['AbGroup'];
+            // tslint:enable
+            if (maybeGroup) {
+                const abGroupNumber = maybeGroup.toNumber();
+                assert.equal(abGroupNumber, 5);
+            } else {
+                assert.fail('ConfigManager.AbGroup should not be undefined');
+            }
+            // tslint:disable
+            const maybeCampaignGroup = CampaignManager['AbGroup'];
+            // tslint:enable
+            if (maybeCampaignGroup) {
+                const abGroupNumber = maybeCampaignGroup.toNumber();
+                assert.equal(abGroupNumber, 5);
+            } else {
+                assert.fail('CampaignManager.AbGroup should not be undefined');
+            }
+            // tslint:disable
+            ConfigManager['AbGroup'] = undefined;
+            CampaignManager['AbGroup'] = undefined;
+            // tslint:enbale
+            getStub.restore();
+            setupStub.restore();
+        }).catch((error) => {
+            // tslint:disable
+            ConfigManager['AbGroup'] = undefined;
+            CampaignManager['AbGroup'] = undefined;
+            // tslint:enbale
+            getStub.restore();
+            setupStub.restore();
+            throw error;
         });
     });
 });

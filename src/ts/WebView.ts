@@ -59,6 +59,7 @@ import { GdprManager } from 'Managers/GdprManager';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
+import { ABGroup } from 'Models/ABGroup';
 
 export class WebView {
 
@@ -529,8 +530,10 @@ export class WebView {
 
             if(TestEnvironment.get('abGroup')) {
                 // needed in both due to placement level control support
-                ConfigManager.setAbGroup(TestEnvironment.get('abGroup'));
-                CampaignManager.setAbGroup(TestEnvironment.get('abGroup'));
+                const abGroupNumber = Number(TestEnvironment.get('abGroup'));
+                const abGroup = ABGroup.getAbGroup(abGroupNumber);
+                ConfigManager.setAbGroup(abGroup);
+                CampaignManager.setAbGroup(abGroup);
             }
 
             if(TestEnvironment.get('campaignId')) {
