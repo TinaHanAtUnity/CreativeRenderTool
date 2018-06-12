@@ -34,7 +34,6 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private static _adLoadTimeout: number = 10 * 1000;
     private _closer: Closer;
     private _placement: Placement;
-    private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _view: VPAID;
     private _vpaidCampaign: VPAIDCampaign;
@@ -48,7 +47,6 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         super(nativeBridge, parameters);
 
         this._vpaidCampaign = parameters.campaign;
-        this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._options = parameters.options;
         this._view = parameters.vpaid;
@@ -235,10 +233,6 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this.onClose.trigger();
         this._nativeBridge.WebPlayer.shouldOverrideUrlLoading.unsubscribe(this._urlLoadingObserver);
         this._container.removeEventHandler(this);
-    }
-
-    private showView() {
-        this._view.show();
     }
 
     private hideView() {
