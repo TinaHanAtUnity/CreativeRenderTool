@@ -38,6 +38,10 @@ export class MixedPlacementUtility {
         return str;
     }
 
+    public static checkIfPlacementExists(placementId: string, configuration: Configuration): boolean {
+        return !!configuration.getPlacements()[placementId];
+    }
+
     private static isMixedIAP(placementId: string, configuration: Configuration): boolean {
         const adTypes = configuration.getPlacement(placementId).getAdTypes();
         if (!adTypes) {

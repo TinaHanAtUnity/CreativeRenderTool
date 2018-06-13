@@ -218,7 +218,8 @@ export class OldCampaignRefreshManager extends RefreshManager {
     private onCampaign(placementId: string, campaign: Campaign) {
         this._parsingErrorCount = 0;
 
-        if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
+        if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId()) &&
+            MixedPlacementUtility.checkIfPlacementExists(placementId, this._configuration)) {
             // suffix can also be empty if placement is not 'mixed'
             const suffix = MixedPlacementUtility.extractMixedPlacementSuffix(placementId, campaign, this._configuration);
             this.setCampaignForPlacement(placementId + suffix, campaign);
