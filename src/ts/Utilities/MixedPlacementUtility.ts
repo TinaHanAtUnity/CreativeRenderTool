@@ -38,8 +38,14 @@ export class MixedPlacementUtility {
         return str;
     }
 
-    public static checkIfPlacementExists(placementId: string, configuration: Configuration): boolean {
-        return !!configuration.getPlacements()[placementId];
+    public static checkIfPlacementsExist(placementId: string, configuration: Configuration): boolean {
+        const mixedList = MixedPlacementUtility.getMixedPlacmentTypeList();
+        for (const mixedType of mixedList.slice(1)) {
+            if (!!configuration.getPlacements()[placementId + mixedType]) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static isMixedIAP(placementId: string, configuration: Configuration): boolean {
