@@ -71,6 +71,8 @@ import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
 import { GDPRPrivacy } from 'Views/GDPRPrivacy';
 import { PrivacyEventHandler } from 'EventHandlers/PrivacyEventHandler';
+import { NewVideoOverlayEnabledAbTest } from 'Models/ABGroup';
+import { NewVideoOverlay } from 'Views/NewVideoOverlay';
 
 export class AdUnitFactory {
 
@@ -424,7 +426,13 @@ export class AdUnitFactory {
         const disablePrivacyDuringVideo = (parameters.campaign instanceof PerformanceCampaign || parameters.campaign instanceof XPromoCampaign) && !parameters.placement.skipEndCardOnClose();
 
         if (!parameters.placement.allowSkip()) {
-            const overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, disablePrivacyDuringVideo);
+            let overlay: AbstractVideoOverlay;
+
+            if (NewVideoOverlayEnabledAbTest.isValid(parameters.campaign.getAbGroup())) {
+                overlay = new NewVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+            } else {
+                overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, disablePrivacyDuringVideo);
+            }
             if (parameters.placement.disableVideoControlsFade()) {
                 overlay.setFadeEnabled(false);
             }
@@ -435,7 +443,11 @@ export class AdUnitFactory {
             if (parameters.placement.skipEndCardOnClose()) {
                 overlay = new ClosableVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
             } else {
-                overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, disablePrivacyDuringVideo);
+                if (NewVideoOverlayEnabledAbTest.isValid(parameters.campaign.getAbGroup())) {
+                    overlay = new NewVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+                } else {
+                    overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, disablePrivacyDuringVideo);
+                }
             }
 
             if (parameters.placement.disableVideoControlsFade()) {
