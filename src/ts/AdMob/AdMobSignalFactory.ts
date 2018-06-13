@@ -296,6 +296,13 @@ export class AdMobSignalFactory {
                 this.logFailure(nativeBridge, 'usbConnected');
             }));
 
+            // this should only be added to 2.2.1 and above
+            promises.push(this._nativeBridge.DeviceInfo.Android.getApkDigest().then(apkdigest => {
+                signal.setApkHash(apkdigest);
+            }).catch(() => {
+                this.logFailure(nativeBridge, 'apkHash');
+            }));
+
             promises.push(this._nativeBridge.DeviceInfo.Android.getCertificateFingerprint().then(certificate => {
                 signal.setApkDeveloperSigningCertificateHash(certificate);
             }).catch(() => {
