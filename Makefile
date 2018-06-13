@@ -307,7 +307,7 @@ test-integration: build-proto
 test-coverage: BUILD_DIR = build/coverage
 test-coverage: MODULE = system
 test-coverage: TARGET = es5
-test-coverage: build-dir build-proto
+test-coverage: build-dir build-proto build-static
 	@echo
 	@echo Transpiling .ts to .js for local tests
 	@echo
