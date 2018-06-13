@@ -136,6 +136,7 @@ describe('IosAdUnitTest', () => {
         sinon.stub(nativeBridge.IosAdUnit, 'open').returns(Promise.resolve());
 
         let onShowTriggered: boolean = false;
+        let onForegroundTriggered: boolean = false;
         const listener: IAdUnitContainerListener = {
             onContainerShow: function() {
                 onShowTriggered = true;
@@ -147,7 +148,7 @@ describe('IosAdUnitTest', () => {
                 // EMPTY
             },
             onContainerForeground: function() {
-                // EMPTY
+                onForegroundTriggered = true;
             },
             onContainerSystemMessage: function(message: AdUnitContainerSystemMessage) {
                 // EMPTY
@@ -159,6 +160,7 @@ describe('IosAdUnitTest', () => {
         return container.open(testAdUnit, ['videoplayer', 'webview'], true, Orientation.LANDSCAPE, true, false, true, false, defaultOptions).then(() => {
             nativeBridge.IosAdUnit.onViewControllerDidAppear.trigger();
             assert.isTrue(onShowTriggered, 'onShow was not triggered with onViewControllerDidAppear');
+            assert.isTrue(onForegroundTriggered, 'onContainerForeground was not triggered with onViewControllerDidAppear');
             return;
         });
     });
