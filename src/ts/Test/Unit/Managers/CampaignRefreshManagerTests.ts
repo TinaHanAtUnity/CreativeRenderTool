@@ -744,6 +744,25 @@ describe('CampaignRefreshManager', () => {
                 assert.equal(configuration.getPlacement('video').getState(), PlacementState.NO_FILL);
             });
         });
+
+        it('should not create new placements from placements that already have suffixes appended to them', () => {
+            const test = sinon.stub(campaignManager, 'request');
+
+            test.callsFake(() => {
+                campaignManager.onCampaign.trigger('mixedPlacement', TestFixtures.getPromoCampaign('purchasing/iap'));
+                return Promise.resolve();
+            });
+
+            campaignRefreshManager.refresh().then(() => {
+
+                assert.equal(configuration.getPlacement('mixedPlacement-promo').getState(), PlacementState.READY);
+            });
+
+            campaignManager.onCampaign.trigger('mixedPlacement-promo', TestFixtures.getPromoCampaign('purchasing/iap'));
+
+            assert.isDefined(configuration.getPlacement('mixedPlacement-promo'));
+            assert.isUndefined(configuration.getPlacement('mixedPlacement-promo-promo'));
+        });
     });
 });
 

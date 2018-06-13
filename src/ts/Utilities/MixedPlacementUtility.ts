@@ -40,8 +40,15 @@ export class MixedPlacementUtility {
 
     public static checkIfPlacementsExist(placementId: string, configuration: Configuration): boolean {
         const mixedList = MixedPlacementUtility.getMixedPlacmentTypeList();
+
+        let fixedPlacementId;
+
         for (const mixedType of mixedList.slice(1)) {
-            if (!!configuration.getPlacements()[placementId + mixedType]) {
+            if (placementId.split('-').length > 1 && `-${placementId.split('-').pop()}` === mixedType) {
+                fixedPlacementId = placementId.split('-').slice(0, -1).join('-');
+            }
+
+            if (!!configuration.getPlacements()[fixedPlacementId + mixedType]) {
                 return true;
             }
         }
