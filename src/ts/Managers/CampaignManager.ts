@@ -549,7 +549,7 @@ export class CampaignManager {
 
         if(CampaignManager.AbGroup) {
             url = Url.addParameters(url, {
-                forceAbGroup: CampaignManager.AbGroup
+                forceAbGroup: CampaignManager.AbGroup.toNumber()
             });
         }
 

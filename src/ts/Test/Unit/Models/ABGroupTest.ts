@@ -1,6 +1,13 @@
 import 'mocha';
 import { assert } from 'chai';
+import * as sinon from 'sinon';
+
 import { ABGroup, PlayableEndScreenHideDelayDisabledAbTest } from 'Models/ABGroup';
+import { WebView } from 'WebView';
+import { NativeBridge } from 'Native/NativeBridge';
+import { TestEnvironment } from 'Utilities/TestEnvironment';
+import { ConfigManager } from 'Managers/ConfigManager';
+import { CampaignManager } from 'Managers/CampaignManager';
 
 describe('ABGroup tests', () => {
 
@@ -65,6 +72,59 @@ describe('ABGroup tests', () => {
                     assert.isFalse(PlayableEndScreenHideDelayDisabledAbTest.isValid(abGroup));
                 }
             }
+        });
+    });
+
+    describe('setupTestEnvironment in webview should set AbGroup on ConfigManager and CampaignManager', () => {
+        const tests: Array<{
+            metaDataGroup: any,
+            expectedGroup: number | undefined
+        }> = [{
+            metaDataGroup: '5',
+            expectedGroup: 5
+        }, {
+            metaDataGroup: 'garbage',
+            expectedGroup: undefined
+        }, {
+            metaDataGroup: undefined,
+            expectedGroup: undefined
+        }];
+        tests.forEach((t) => {
+            it(`expected group is ${t.expectedGroup} and the metadata group is ${t.metaDataGroup}`, () => {
+                const nativeBridge: NativeBridge = sinon.createStubInstance(NativeBridge);
+                const webview: any = new WebView(nativeBridge);
+                const setupStub: sinon.SinonStub = sinon.stub(TestEnvironment, 'setup').resolves();
+                const getStub: sinon.SinonStub = sinon.stub(TestEnvironment, 'get');
+                getStub.withArgs('abGroup').returns(t.metaDataGroup);
+                const promise = webview.setupTestEnvironment();
+                return promise.then(() => {
+                    sinon.assert.calledWith(getStub, 'abGroup');
+                    let configAbGroupNumber: number | undefined;
+                    const configManager = <any>ConfigManager;
+                    const campaignManager = <any>CampaignManager;
+                    const maybeGroup = configManager.AbGroup;
+                    if (maybeGroup) {
+                        configAbGroupNumber = maybeGroup.toNumber();
+                    }
+                    assert.equal(configAbGroupNumber, t.expectedGroup);
+                    let campaignAbGroupNumber: number | undefined;
+                    const maybeCampaignGroup = campaignManager.AbGroup;
+                    if (maybeCampaignGroup) {
+                        campaignAbGroupNumber = maybeCampaignGroup.toNumber();
+                    }
+                    assert.equal(campaignAbGroupNumber, t.expectedGroup);
+                    configManager.AbGroup = undefined;
+                    campaignManager.AbGroup = undefined;
+                    getStub.restore();
+                    setupStub.restore();
+                }).catch((error: Error) => {
+                    (<any>ConfigManager).AbGroup = undefined;
+                    (<any>CampaignManager).AbGroup = undefined;
+                    getStub.restore();
+                    setupStub.restore();
+                    throw error;
+                });
+            });
         });
     });
 });
