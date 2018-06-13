@@ -50,14 +50,16 @@ import { OldCampaignRefreshManager } from 'Managers/OldCampaignRefreshManager';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { MissedImpressionManager } from 'Managers/MissedImpressionManager';
 import { GameSessionCounters } from 'Utilities/GameSessionCounters';
+import { TimeoutError, Promises } from 'Utilities/Promises';
+import { JaegerSpan, JaegerTags } from 'Jaeger/JaegerSpan';
+import { JaegerManager } from 'Jaeger/JaegerManager';
+import { ProgrammaticOperativeEventManager } from 'Managers/ProgrammaticOperativeEventManager';
+import { GdprManager } from 'Managers/GdprManager';
 
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
-import { TimeoutError, Promises } from 'Utilities/Promises';
-import { JaegerSpan, JaegerTags } from 'Jaeger/JaegerSpan';
-import { JaegerManager } from 'Jaeger/JaegerManager';
-import { GdprManager } from 'Managers/GdprManager';
+import { ABGroup } from 'Models/ABGroup';
 
 export class WebView {
 
@@ -514,7 +516,7 @@ export class WebView {
         return TestEnvironment.setup(new MetaData(this._nativeBridge)).then(() => {
             if(TestEnvironment.get('serverUrl')) {
                 ConfigManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
-                OperativeEventManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
+                ProgrammaticOperativeEventManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
                 CampaignManager.setBaseUrl(TestEnvironment.get('serverUrl'));
             }
 
@@ -528,8 +530,12 @@ export class WebView {
 
             if(TestEnvironment.get('abGroup')) {
                 // needed in both due to placement level control support
-                ConfigManager.setAbGroup(TestEnvironment.get('abGroup'));
-                CampaignManager.setAbGroup(TestEnvironment.get('abGroup'));
+                const abGroupNumber: number = Number(TestEnvironment.get('abGroup'));
+                if (!isNaN(abGroupNumber)) { // if it is a number get the group
+                    const abGroup = ABGroup.getAbGroup(abGroupNumber);
+                    ConfigManager.setAbGroup(abGroup);
+                    CampaignManager.setAbGroup(abGroup);
+                }
             }
 
             if(TestEnvironment.get('campaignId')) {

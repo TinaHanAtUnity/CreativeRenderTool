@@ -32,12 +32,6 @@
       "body": true
     },
     {
-      "parameter": "gamerId",
-      "required": "all",
-      "queryString": false,
-      "body": true
-    },
-    {
       "parameter": "campaignId",
       "required": "all",
       "queryString": false,

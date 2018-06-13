@@ -1,5 +1,6 @@
 import { Placement } from 'Models/Placement';
 import { ISchema, Model } from 'Models/Model';
+import { ABGroup } from 'Models/ABGroup';
 
 export enum CacheMode {
     FORCED,
@@ -12,7 +13,7 @@ export interface IConfiguration {
     enabled: boolean;
     country: string;
     coppaCompliant: boolean;
-    abGroup: number;
+    abGroup: ABGroup;
     gamerId: string;
     properties: string;
     cacheMode: CacheMode;
@@ -34,7 +35,7 @@ export class Configuration extends Model<IConfiguration> {
         enabled: ['boolean'],
         country: ['string'],
         coppaCompliant: ['boolean'],
-        abGroup: ['number'],
+        abGroup: ['object'],
         gamerId: ['string'],
         properties: ['string'],
         cacheMode: ['number'],
@@ -75,7 +76,7 @@ export class Configuration extends Model<IConfiguration> {
         return this.get('jaegerTracing');
     }
 
-    public getAbGroup(): number {
+    public getAbGroup(): ABGroup {
         return this.get('abGroup');
     }
 
@@ -178,7 +179,7 @@ export class Configuration extends Model<IConfiguration> {
             'enabled': this.isEnabled(),
             'country': this.getCountry(),
             'coppaCompliant': this.isCoppaCompliant(),
-            'abGroup': this.getAbGroup(),
+            'abGroup': this.getAbGroup().toNumber(),
             'gamerToken': this.getToken(),
             'cacheMode': CacheMode[this.getCacheMode()].toLowerCase(),
             'placements': placements,
