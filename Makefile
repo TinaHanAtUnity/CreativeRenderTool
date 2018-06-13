@@ -259,7 +259,7 @@ test: test-unit test-integration
 
 test-unit: MODULE = system
 test-unit: TARGET = es5
-test-unit: build-proto
+test-unit: build-static build-proto
 	@echo
 	@echo Transpiling .ts to .js for local tests
 	@echo
