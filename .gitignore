@@ -12,6 +12,7 @@ build
 src/**/*.js
 src/**/*.js.map
 src/**/*.css
+src/html/admob/AFMAContainer.html
 
 # nginx
 nginx/access.log
