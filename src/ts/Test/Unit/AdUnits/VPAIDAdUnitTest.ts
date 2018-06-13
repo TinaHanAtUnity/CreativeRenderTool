@@ -117,7 +117,7 @@ describe('VPAIDAdUnit', () => {
             onShowTests();
         });
 
-        describe('on ios', () => {
+        xdescribe('on ios', () => {
             beforeEach(() => {
                 (<sinon.SinonStub>nativeBridge.getPlatform).returns(Platform.IOS);
             });
