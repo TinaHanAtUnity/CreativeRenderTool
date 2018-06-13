@@ -1,3 +1,40 @@
+# Fri Jun  8 20:24:13 UTC 2018
+
+* GDPR banners for all ad units
+
+# Thu Jun  7 17:15:45 UTC 2018
+
+* Fix Purchasing utilities diagnostics
+* Refactor GDPR event sending to GdprManager
+
+# Wed Jun  6 09:37:02 UTC 2018
+
+* Refactor promo purchasing utilities
+
+# Tue Jun  5 17:49:15 UTC 2018
+
+* Refactor third party event sending url template
+* Fix GDPR pop-up banner placement on iPhone X
+* Refactor XPROMO operative event manager
+
+# Tue Jun  5 09:09:50 UTC 2018
+
+* Include event source in GDPR optout events
+* Refactor GdprConsentManager to GdprManager
+* IAP promo Android loading optimization
+* Add stored_gamer_id diagnostic event to track stored gamer IDs in config request
+
+# Mon Jun  4 16:02:48 UTC 2018
+
+* Switch GDPR image to a font icon
+* Fix videoplayer regressions
+* Remove gamer ID from analytics core stats events
+
+# Mon Jun  4 11:15:18 UTC 2018
+
+* Moved GDPR banner on top of the game background image in portrait mode
+* Added support for adUnitStyle and ctaButtonColour
+
 # Wed May 30 21:00:10 UTC 2018
 
 * Reuse previous auctionId for no fill retries
@@ -195,7 +232,7 @@
 * Fixed a bug where streaming video was cached and shown by default
 * Rename ForceOrientation to Orientation
 
-# Wed Apr 4 20:10:07 UTC 2018 
+# Wed Apr 4 20:10:07 UTC 2018
 
 * Start new refresh manager A/B test in groups 9 & 10
 * Stop refresh manager A/B test in groups 9 & 11
@@ -362,7 +399,7 @@
 * VPAID container fixes
 * Fix hybrid tests & disable 2 broken PurchasingUtilities tests
 * Add iOS screenScale to ad request query parameters
-* Fix missing MOAT stylesheet 
+* Fix missing MOAT stylesheet
 
 # Thu Feb 22 08:57:26 UTC 2018
 
@@ -530,7 +567,7 @@
 * Fix failing hybrid test
 * Remove ComScore AB groups, enable on whole network
 * Fix display unit tests
-* Set xmas end screen by default except groups 10 & 11 
+* Set xmas end screen by default except groups 10 & 11
 * Remove dark end screen
 
 # Fri Dec 15 11:12:36 UTC 2017
@@ -641,7 +678,7 @@
 
 # Tue Nov 14 09:32:33 UTC 2017
 
-* Faster init by converting some promise chains to be parallel 
+* Faster init by converting some promise chains to be parallel
 
 # Mon Nov 13 09:23:05 UTC 2017
 
@@ -1202,7 +1239,7 @@
 
 # Fri Mar 10 11:27:36 UTC 2017
 
-* Converted current MZ playables to use MRAID 
+* Converted current MZ playables to use MRAID
 
 # Wed Mar  8 07:19:27 UTC 2017
 
@@ -1269,7 +1306,7 @@
 
 # Mon Jan 30 13:59:36 UTC 2017
 
-* Fixed several overlay UX issues 
+* Fixed several overlay UX issues
 
 # Wed Jan 25 09:58:18 UTC 201
 
@@ -1376,4 +1413,3 @@
 * If caching fails due to network error, retry five times with a 10 second delay between retries
 * Fix iOS cache retries, previously they never retried if downloading failed due to network error
 * Disable hardware acceleration on one Android 4.2 device (ABT-91)
-

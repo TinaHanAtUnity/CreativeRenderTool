@@ -14,6 +14,7 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { EventType } from 'Models/Session';
 import { Placement } from 'Models/Placement';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
+import { ARUtil } from '../Utilities/ARUtil';
 
 export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign> {
     mraid: MRAIDView<IMRAIDViewHandler>;
@@ -81,8 +82,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
         const views: string[] = ['webview'];
         // TODO: Remove /ar/ folder check once we have MRAID-AR type support on the server side
-        const resourceUrl = this._campaign.getResourceUrl();
-        const isARURL = resourceUrl && resourceUrl.getOriginalUrl().match(/\/ar\/|ducktales-ar/);
+        const isARURL = ARUtil.isARCreative(this._campaign);
         if (this._campaign.getAdType() === 'MRAID-AR' || isARURL) {
             views.unshift('arview');
         }
@@ -204,17 +204,13 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     private sendTrackingEvent(eventName: string): void {
-        const sdkVersion = this._clientInfo.getSdkVersion();
-        const placementId = this._placement.getId();
         const sessionId = this._campaign.getSession().getId();
 
         if(this._additionalTrackingEvents && this._additionalTrackingEvents[eventName]) {
             const trackingEventUrls = this._additionalTrackingEvents[eventName];
 
             if(trackingEventUrls) {
-                for (let url of trackingEventUrls) {
-                    url = url.replace(/%ZONE%/, placementId);
-                    url = url.replace(/%SDK_VERSION%/, sdkVersion.toString());
+                for (const url of trackingEventUrls) {
                     this._thirdPartyEventManager.sendEvent(`mraid ${eventName}`, sessionId, url, this._campaign.getUseWebViewUserAgentForTracking());
                 }
             }

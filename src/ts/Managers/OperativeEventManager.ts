@@ -58,19 +58,6 @@ export class OperativeEventManager {
         return OperativeEventManager.PreviousPlacementId;
     }
 
-    public static sendGDPREvent(action: string, deviceInfo: DeviceInfo, clientInfo: ClientInfo, configuration: Configuration): Promise<void> {
-        const infoJson: any = {
-            'adid': deviceInfo.getAdvertisingIdentifier(),
-            'action': action,
-            'projectId': configuration.getUnityProjectId(),
-            'platform': Platform[clientInfo.getPlatform()].toLowerCase(),
-            'gameId': clientInfo.getGameId()
-        };
-
-        HttpKafka.sendEvent('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, infoJson);
-        return Promise.resolve();
-    }
-
     private static VideoEventBaseUrl: string = 'https://adserver.unityads.unity3d.com/mobile/gamers';
     private static ClickEventBaseUrl: string = 'https://adserver.unityads.unity3d.com/mobile/campaigns';
     private static PreviousPlacementId: string | undefined;
@@ -241,10 +228,6 @@ export class OperativeEventManager {
         };
 
         return this.createUniqueEventMetadata(placement, this._sessionManager.getGameSessionId(), this._gamerServerId, OperativeEventManager.getPreviousPlacementId(), videoOrientation, adUnitStyle).then(fulfilled);
-    }
-
-    public sendGDPREvent(action: string): Promise<void> {
-        return OperativeEventManager.sendGDPREvent(action, this._deviceInfo, this._clientInfo, this._configuration);
     }
 
     public setGamerServerId(serverId: string | undefined): void {

@@ -13,7 +13,7 @@ import { GDPRPrivacy } from 'Views/GDPRPrivacy';
 import MRAIDContainer from 'html/mraid/container.html';
 
 import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCampaign.json';
-import { GdprConsentManager } from 'Managers/GdprConsentManager';
+import { GdprManager } from 'Managers/GdprManager';
 
 describe('MRAID', () => {
     let handleInvocation: sinon.SinonSpy;
@@ -22,7 +22,7 @@ describe('MRAID', () => {
     let placement: Placement;
     let configuration: Configuration;
     let privacy: GDPRPrivacy;
-    let gdprManager: GdprConsentManager;
+    let gdprManager: GdprManager;
 
     beforeEach(() => {
         handleInvocation = sinon.spy();
@@ -44,13 +44,13 @@ describe('MRAID', () => {
         });
 
         configuration = TestFixtures.getConfiguration();
-        gdprManager = sinon.createStubInstance(GdprConsentManager);
+        gdprManager = sinon.createStubInstance(GdprManager);
         privacy = new GDPRPrivacy(nativeBridge, gdprManager, true, true);
     });
 
     it('should render', (done) => {
         const campaign = TestFixtures.getProgrammaticMRAIDCampaign();
-        const mraid = new MRAID(nativeBridge, placement, campaign, privacy);
+        const mraid = new MRAID(nativeBridge, placement, campaign, privacy, false);
 
         mraid.render();
 
@@ -78,7 +78,7 @@ describe('MRAID', () => {
         params.dynamicMarkup = 'InjectMe';
         const campaign = new MRAIDCampaign(params);
 
-        const mraid = new MRAID(nativeBridge, placement, campaign, privacy);
+        const mraid = new MRAID(nativeBridge, placement, campaign, privacy, false);
         return mraid.createMRAID(MRAIDContainer).then((mraidSrc) => {
             assert.notEqual(mraidSrc.indexOf('InjectMe'), -1);
         });
@@ -92,7 +92,7 @@ describe('MRAID', () => {
         params.resource = markup;
         params.dynamicMarkup = 'InjectMe';
         const campaign = new MRAIDCampaign(params);
-        const mraid = new MRAID(nativeBridge, placement, campaign, privacy);
+        const mraid = new MRAID(nativeBridge, placement, campaign, privacy, false);
         return mraid.createMRAID(MRAIDContainer).then((src) => {
             const dom = new DOMParser().parseFromString(src, 'text/html');
             assert.isNotNull(dom);
@@ -107,7 +107,7 @@ describe('MRAID', () => {
         params.resource = `<script src="mraid.js"></script><script>{UNITY_DYNAMIC_MARKUP}</script><script>var test = "Hello $&"</script><div>Hello World</div>`;
         params.dynamicMarkup = 'InjectMe';
         const campaign = new MRAIDCampaign(params);
-        const mraid = new MRAID(nativeBridge, placement, campaign, privacy);
+        const mraid = new MRAID(nativeBridge, placement, campaign, privacy, false);
         return mraid.createMRAID(MRAIDContainer).then((mraidSrc) => {
             assert.notEqual(mraidSrc.indexOf('InjectMe'), -1);
             assert.notEqual(mraidSrc.indexOf(`<script>var test = "Hello $&"</script>`), -1);
