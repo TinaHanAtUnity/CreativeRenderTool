@@ -18,16 +18,12 @@ $end-screen-mixin($scale-size = $default-scale-size) {
 
   body {
 
-    &.landscape #end-screen.gdpr-pop-up-base.iphone-x-styles .gdpr-pop-up {
-      bottom: 0;
+    &.landscape #end-screen.show-gdpr-banner.iphone-x-styles .gdpr-pop-up {
       padding-bottom: env(safe-area-inset-bottom);
-      padding-left: env(safe-area-inset-left);
-      width: calc(50% - env(safe-area-inset-left) - env(safe-area-inset-right) / 2);
-    }
 
-    &.ios-landscape-right #end-screen.gdpr-pop-up-base.iphone-x-styles .gdpr-pop-up {
-      left: 0;
-      width: calc(50% - env(safe-area-inset-left) - env(safe-area-inset-right) / 2);
+      .gdpr-text {
+        padding-bottom: 0;
+      }
     }
 
     &.landscape #end-screen.iphone-x-styles,
