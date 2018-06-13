@@ -1,4 +1,5 @@
 import EndScreenTemplate from 'html/EndScreen.html';
+import FancyEndScreenTemplate from 'html/FancyEndScreen.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -10,7 +11,9 @@ import { Campaign } from 'Models/Campaign';
 import { IEndScreenDownloadParameters } from 'EventHandlers/EndScreenEventHandler';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { Platform } from 'Constants/Platform';
 import { ABGroup } from 'Models/ABGroup';
+import { FancyEndScreenEnabledAbTest } from 'Models/ABGroup';
 
 export interface IEndScreenHandler {
     onEndScreenDownload(parameters: IEndScreenDownloadParameters): void;
@@ -19,7 +22,7 @@ export interface IEndScreenHandler {
     onGDPRPopupSkipped(): void;
 }
 
-const SHOW_GDPR_BANNER = 'show-gdpr-banner';
+const FANCY_END_SCREEN = 'fancy-end-screen';
 
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
 
@@ -44,6 +47,8 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._showGDPRBanner = showGDPRBanner;
         this._campaignId = campaignId;
         this._osVersion = osVersion;
+
+        this._template = new Template(this.getTemplate(), this._localization);
 
         this._template = new Template(this.getTemplate(), this._localization);
 
@@ -101,11 +106,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         const endScreenAlt = this.getEndscreenAlt();
         if (typeof endScreenAlt === 'string') {
             this._container.classList.add(endScreenAlt);
+        }
 
-            /* If pop up is visible, hide privacy button */
-            if (endScreenAlt === SHOW_GDPR_BANNER) {
-                (<HTMLElement>this._container.querySelector('.privacy-button')).style.display = 'none';
-            }
+        if (this._showGDPRBanner) {
+            this._container.classList.add('show-gdpr-banner');
         }
     }
 
@@ -157,8 +161,8 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     protected getEndscreenAlt(campaign?: Campaign) {
-        if (this._showGDPRBanner) {
-            return SHOW_GDPR_BANNER;
+        if (FancyEndScreenEnabledAbTest.isValid(this._abGroup) && this.canShowFancyEndScreen()) {
+            return FANCY_END_SCREEN;
         }
 
         return undefined;
@@ -180,7 +184,19 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._privacy.show();
     }
 
+    private canShowFancyEndScreen(): boolean {
+        if (this._nativeBridge.getPlatform() === Platform.IOS) {
+            return true;
+        }
+
+        return !!this._osVersion && !this._osVersion.match(/^4/);
+    }
+
     private getTemplate() {
+        if (this.getEndscreenAlt() === FANCY_END_SCREEN) {
+            return FancyEndScreenTemplate;
+        }
+
         return EndScreenTemplate;
     }
 }
