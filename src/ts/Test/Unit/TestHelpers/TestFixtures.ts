@@ -334,7 +334,8 @@ export class TestFixtures {
             iapProductId: json.promo.iapProductId,
             additionalTrackingEvents: json.promo.tracking ? json.promo.tracking : undefined,
             dynamicMarkup: json.promo.dynamicMarkup,
-            creativeAsset: new HTML(json.promo.creativeUrl, session)
+            creativeAsset: new HTML(json.promo.creativeUrl, session),
+            allowSkip: true
         };
     }
 
