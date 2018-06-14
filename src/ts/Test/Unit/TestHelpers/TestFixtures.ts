@@ -94,7 +94,9 @@ export class TestFixtures {
             videoEventUrls: json.videoEventUrls,
             bypassAppSheet: json.bypassAppSheet,
             store: storeName,
-            adUnitStyle: json.adUnitStyle
+            adUnitStyle: json.adUnitStyle,
+            landscapeCreativeId: json.landscapeCreativeId,
+            portraitCreativeId: json.portraitCreativeId
         };
 
         if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
@@ -166,7 +168,8 @@ export class TestFixtures {
             bypassAppSheet: mraidContentJson.bypassAppSheet,
             store: storeName,
             appStoreId: mraidContentJson.appStoreId,
-            playableConfiguration: undefined
+            playableConfiguration: undefined,
+            mraidCreativeId: undefined
         };
     }
 
@@ -213,7 +216,8 @@ export class TestFixtures {
             store: undefined,
             appStoreId: mraidContentJson.appStoreId,
             useWebViewUserAgentForTracking: mraidJson.useWebViewUserAgentForTracking,
-            playableConfiguration: undefined
+            playableConfiguration: undefined,
+            mraidCreativeId: undefined
         };
     }
 

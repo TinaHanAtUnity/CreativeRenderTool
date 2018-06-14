@@ -8,10 +8,11 @@ export interface IVideo extends IAsset {
     positionRepeats: number;
     quartile: number;
     started: boolean;
+    creativeId: string | undefined;
 }
 
 export class Video extends Asset<IVideo> {
-    constructor(url: string, session: Session, size?: number) {
+    constructor(url: string, session: Session, size?: number, creativeId?: string) {
         super('Video', session, {
             ... Asset.Schema,
             size: ['number', 'undefined'],
@@ -19,7 +20,8 @@ export class Video extends Asset<IVideo> {
             position: ['number'],
             positionRepeats: ['number'],
             quartile: ['number'],
-            started: ['boolean']
+            started: ['boolean'],
+            creativeId: ['string', 'undefined']
         });
 
         this.set('url', url);
@@ -29,6 +31,7 @@ export class Video extends Asset<IVideo> {
         this.set('positionRepeats', 0);
         this.set('quartile', 0);
         this.set('started', false);
+        this.set('creativeId', creativeId);
     }
 
     public getDescription(): string {
@@ -81,6 +84,10 @@ export class Video extends Asset<IVideo> {
 
     public setQuartile(quartile: number) {
         this.set('quartile', quartile);
+    }
+
+    public getCreativeId(): string | undefined {
+        return this.get('creativeId');
     }
 
     public getDTO(): { [key: string]: any } {
