@@ -1,6 +1,5 @@
 # Staged
 
-* Fix calling onContainerForeground multiple times on Android
 * Add the GDPR icon to the Privacy model
 * Obfuscate Admob AFMA Container
 
