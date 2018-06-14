@@ -162,13 +162,18 @@ export class MOAT extends View<VastCampaign> {
     }
 
     private onMessage(e: MessageEvent) {
-        switch(e.data.type) {
-            case 'MOATVideoError':
-                Diagnostics.trigger('moat_video_error', e.data.error);
-                break;
-            default:
-                this._nativeBridge.Sdk.logWarning(`MOAT Unknown message type ${e.data.type}`);
-                break;
+        if (e && e.data && e.data.type) {
+            switch(e.data.type) {
+                case 'MOATVideoError':
+                    Diagnostics.trigger('moat_video_error', e.data.error);
+                    break;
+                case 'loaded':
+                    // not sure if something needs to be done here.
+                    break;
+                default:
+                    this._nativeBridge.Sdk.logWarning(`MOAT Unknown message type ${e.data.type}`);
+                    break;
+            }
         }
     }
 }
