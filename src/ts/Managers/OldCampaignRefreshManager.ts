@@ -218,10 +218,13 @@ export class OldCampaignRefreshManager extends RefreshManager {
     private onCampaign(placementId: string, campaign: Campaign) {
         this._parsingErrorCount = 0;
 
-        if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId()) &&
-            !MixedPlacementUtility.checkIfPlacementsExist(placementId, this._configuration)) {
+        if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
             // suffix can also be empty if placement is not 'mixed'
-            const suffix = MixedPlacementUtility.extractMixedPlacementSuffix(placementId, campaign, this._configuration);
+            let suffix = '';
+            if (!MixedPlacementUtility.checkIfPlacementsExist(placementId, this._configuration)) {
+                suffix = MixedPlacementUtility.extractMixedPlacementSuffix(placementId, campaign, this._configuration);
+            }
+
             this.setCampaignForPlacement(placementId + suffix, campaign);
             this.handlePlacementState(placementId + suffix, PlacementState.READY);
         } else {
@@ -238,8 +241,13 @@ export class OldCampaignRefreshManager extends RefreshManager {
             let shouldUpdatePlacementState = true;
             for(let i = 0; shouldUpdatePlacementState && i < mixedList.length; i++) {
                 const suffix = mixedList[i];
-                const fullPlacementId = placementId + suffix;
-                this._configuration.getPlacements()[fullPlacementId] = this._configuration.getPlacements()[placementId];
+                let fullPlacementId = placementId;
+
+                if (!MixedPlacementUtility.checkIfPlacementsExist(placementId, this._configuration)) {
+                    fullPlacementId = fullPlacementId + suffix;
+                    this._configuration.getPlacements()[fullPlacementId] = this._configuration.getPlacements()[placementId];
+                }
+
                 this._nativeBridge.Sdk.logDebug('Unity Ads server returned no fill, no ads to show, for placement: ' + fullPlacementId);
                 this.setCampaignForPlacement(fullPlacementId, undefined);
                 this.handlePlacementState(fullPlacementId, PlacementState.NO_FILL);

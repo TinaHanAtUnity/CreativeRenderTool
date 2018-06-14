@@ -746,9 +746,9 @@ describe('CampaignRefreshManager', () => {
         });
 
         it('should not create new placements from placements that already have suffixes appended to them', () => {
-            const test = sinon.stub(campaignManager, 'request');
+            const campaignManagerRequest = sinon.stub(campaignManager, 'request');
 
-            test.callsFake(() => {
+            campaignManagerRequest.callsFake(() => {
                 campaignManager.onCampaign.trigger('mixedPlacement', TestFixtures.getPromoCampaign('purchasing/iap'));
                 return Promise.resolve();
             });
