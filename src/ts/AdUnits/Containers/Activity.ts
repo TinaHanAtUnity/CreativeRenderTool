@@ -1,11 +1,11 @@
+import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
+import { KeyCode } from 'Constants/Android/KeyCode';
+import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
+import { NativeBridge } from 'Native/NativeBridge';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { AdUnitContainer, Orientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
-import { KeyCode } from 'Constants/Android/KeyCode';
 import { Rotation } from 'Constants/Android/Rotation';
-import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
-import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
-import { NativeBridge } from 'Native/NativeBridge';
 
 interface IAndroidOptions {
     requestedOrientation: ScreenOrientation;
@@ -26,6 +26,12 @@ export class Activity extends AdUnitContainer {
     private _activityId: number;
     private _currentActivityFinished: boolean;
 
+    private _onResumeObserver: any;
+    private _onPauseObserver: any;
+    private _onDestroyObserver: any;
+    private _onCreateObserver: any;
+    private _onRestoreObserver: any;
+
     private _onFocusGainedObserver: any;
     private _onFocusLostObserver: any;
 
@@ -40,11 +46,11 @@ export class Activity extends AdUnitContainer {
         this._activityId = 0;
         this._currentActivityFinished = false;
 
-        this._nativeBridge.AndroidAdUnit.onResume.subscribe((activityId) => this.onResume(activityId));
-        this._nativeBridge.AndroidAdUnit.onPause.subscribe((finishing, activityId) => this.onPause(finishing, activityId));
-        this._nativeBridge.AndroidAdUnit.onDestroy.subscribe((finishing, activityId) => this.onDestroy(finishing, activityId));
-        this._nativeBridge.AndroidAdUnit.onCreate.subscribe((activityId) => this.onCreate(activityId));
-        this._nativeBridge.AndroidAdUnit.onRestore.subscribe((activityId) => this.onRestore(activityId));
+        this._onResumeObserver = this._nativeBridge.AndroidAdUnit.onResume.subscribe((activityId) => this.onResume(activityId));
+        this._onPauseObserver = this._nativeBridge.AndroidAdUnit.onPause.subscribe((finishing, activityId) => this.onPause(finishing, activityId));
+        this._onDestroyObserver = this._nativeBridge.AndroidAdUnit.onDestroy.subscribe((finishing, activityId) => this.onDestroy(finishing, activityId));
+        this._onCreateObserver = this._nativeBridge.AndroidAdUnit.onCreate.subscribe((activityId) => this.onCreate(activityId));
+        this._onRestoreObserver = this._nativeBridge.AndroidAdUnit.onRestore.subscribe((activityId) => this.onRestore(activityId));
     }
 
     public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: IAndroidOptions): Promise<void> {
