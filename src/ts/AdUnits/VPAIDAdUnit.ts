@@ -1,22 +1,21 @@
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
-import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
-import { NativeBridge } from 'Native/NativeBridge';
-import { VPAID } from 'Views/VPAID';
+import { AdUnitContainerSystemMessage, IAdUnitContainerListener } from 'AdUnits/Containers/AdUnitContainer';
 import { FinishState } from 'Constants/FinishState';
 import { Platform } from 'Constants/Platform';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { Timer } from 'Utilities/Timer';
-import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
-import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
-import { Closer } from 'Views/Closer';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Placement } from 'Models/Placement';
-import { IObserver2, IObserver0 } from 'Utilities/IObserver';
+import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
 import { WKAudiovisualMediaTypes } from 'Native/Api/WebPlayer';
-import { AdUnitContainerSystemMessage, IAdUnitContainerListener } from 'AdUnits/Containers/AdUnitContainer';
+import { NativeBridge } from 'Native/NativeBridge';
+import { Diagnostics } from 'Utilities/Diagnostics';
+import { IObserver2 } from 'Utilities/IObserver';
+import { Timer } from 'Utilities/Timer';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
+import { Closer } from 'Views/Closer';
+import { VPAID } from 'Views/VPAID';
+import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
 
 export interface IVPAIDAdUnitParameters extends IAdUnitParameters<VPAIDCampaign> {
     vpaid: VPAID;
@@ -34,7 +33,6 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private static _adLoadTimeout: number = 10 * 1000;
     private _closer: Closer;
     private _placement: Placement;
-    private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _view: VPAID;
     private _vpaidCampaign: VPAIDCampaign;
@@ -48,7 +46,6 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         super(nativeBridge, parameters);
 
         this._vpaidCampaign = parameters.campaign;
-        this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._options = parameters.options;
         this._view = parameters.vpaid;
@@ -66,18 +63,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
         return this.setupWebPlayer().then(() => {
             this._urlLoadingObserver = this._nativeBridge.WebPlayer.shouldOverrideUrlLoading.subscribe((url, method) => this.onUrlLoad(url));
-            if (this._closer.onPrivacyClosed) {
-                this._closer.onPrivacyClosed.subscribe(() => {
-                    this._view.resumeAd();
-                    this._privacyShowing = false;
-                });
-            }
-            if (this._closer.onPrivacyOpened) {
-                this._closer.onPrivacyOpened.subscribe(() => {
-                    this._view.pauseAd();
-                    this._privacyShowing = true;
-                });
-            }
+            this.setupPrivacyObservers();
             return this._container.open(this, ['webplayer', 'webview'], false, this._forceOrientation, false, false, true, false, this._options).then(() => {
                 this.onStart.trigger();
             });
@@ -141,6 +127,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public onContainerShow(): void {
         this.setShowing(true);
+        this.onContainerForeground();
     }
 
     public onContainerDestroy(): void {
@@ -164,6 +151,21 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public onContainerSystemMessage(message: AdUnitContainerSystemMessage): void {
         // EMPTY
+    }
+
+    private setupPrivacyObservers(): void {
+        if (this._closer.onPrivacyClosed) {
+            this._closer.onPrivacyClosed.subscribe(() => {
+                this._view.resumeAd();
+                this._privacyShowing = false;
+            });
+        }
+        if (this._closer.onPrivacyOpened) {
+            this._closer.onPrivacyOpened.subscribe(() => {
+                this._view.pauseAd();
+                this._privacyShowing = true;
+            });
+        }
     }
 
     private setupWebPlayer(): Promise<any> {
@@ -230,10 +232,6 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this.onClose.trigger();
         this._nativeBridge.WebPlayer.shouldOverrideUrlLoading.unsubscribe(this._urlLoadingObserver);
         this._container.removeEventHandler(this);
-    }
-
-    private showView() {
-        this._view.show();
     }
 
     private hideView() {
