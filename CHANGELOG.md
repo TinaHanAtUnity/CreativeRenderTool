@@ -1,3 +1,9 @@
+# Staged
+
+* Fix calling onContainerForeground multiple times on Android
+* Add the GDPR icon to the Privacy model
+* Obfuscate Admob AFMA Container
+
 # Wed Jun 13 05:22:38 UTC 2018
 
 * Fix Vpaid loading issue in iOS
