@@ -221,7 +221,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
         if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
             // suffix can also be empty if placement is not 'mixed'
             let suffix = '';
-            if (!MixedPlacementUtility.checkIfPlacementsExist(placementId, this._configuration)) {
+            if (!MixedPlacementUtility.ifSuffixedPlacementsExist(placementId, this._configuration)) {
                 suffix = MixedPlacementUtility.extractMixedPlacementSuffix(placementId, campaign, this._configuration);
             }
 
@@ -243,7 +243,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
                 const suffix = mixedList[i];
                 let fullPlacementId = placementId;
 
-                if (!MixedPlacementUtility.checkIfPlacementsExist(placementId, this._configuration)) {
+                if (!MixedPlacementUtility.ifSuffixedPlacementsExist(placementId, this._configuration)) {
                     fullPlacementId = fullPlacementId + suffix;
                     this._configuration.getPlacements()[fullPlacementId] = this._configuration.getPlacements()[placementId];
                 }

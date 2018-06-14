@@ -90,4 +90,44 @@ describe('MixedPlacementUtilities', () => {
             assert.equal(result, '-rewarded');
         });
     });
+
+    describe('ifSuffixedPlacementsExist', () => {
+
+        it('should return false if there is no mixedType suffix at the end of the placementid', () => {
+            const result = MixedPlacementUtility.ifSuffixedPlacementsExist('mixedPlacement', configuration);
+            assert.isFalse(result);
+        });
+
+        it('should return false if there is a dash suffix but is not mixedType', () => {
+            const result = MixedPlacementUtility.ifSuffixedPlacementsExist('mixedPlacement-withdashes', configuration);
+            assert.isFalse(result);
+        });
+
+        it('should return false if there is multiple dash suffixes but is not mixedType', () => {
+            const result = MixedPlacementUtility.ifSuffixedPlacementsExist('promoPlacement-withdashes-booyah', configuration);
+            assert.isFalse(result);
+        });
+
+        it('should return false if there is a dash separated mixed type that is not at the end of the placementid', () => {
+            const result = MixedPlacementUtility.ifSuffixedPlacementsExist('testDashPlacement-promo-boo', configuration);
+            assert.isFalse(result);
+        });
+
+        it('should return false if placement has dash separated mixed type but base id does not exist in configuration placement map', () => {
+            const result = MixedPlacementUtility.ifSuffixedPlacementsExist('scooterPlacement-promo-promo', configuration);
+            assert.isFalse(result);
+        });
+
+        it('should return true if placement includes at least one of the mixed placement suffixes at the end', () => {
+
+            const result = MixedPlacementUtility.ifSuffixedPlacementsExist('testDashPlacement-rewarded', configuration);
+            assert.isTrue(result);
+        });
+
+        it('should return true if a placementid already includes a dash and at least one of the mixed placement suffixes at the end', () => {
+
+            const result = MixedPlacementUtility.ifSuffixedPlacementsExist('testDashPlacement-promo-promo', configuration);
+            assert.isTrue(result);
+        });
+    });
 });

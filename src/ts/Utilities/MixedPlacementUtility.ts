@@ -9,7 +9,7 @@ const enum MixedPlacementTypes {
 
 export class MixedPlacementUtility {
 
-    public static getMixedPlacmentTypeList() {
+    public static getMixedPlacmentTypeList(): string[] {
         return ['', MixedPlacementTypes.PROMO, MixedPlacementTypes.REWARDED, MixedPlacementTypes.REWARDED_PROMO];
     }
 
@@ -38,14 +38,14 @@ export class MixedPlacementUtility {
         return str;
     }
 
-    public static checkIfPlacementsExist(placementId: string, configuration: Configuration): boolean {
+    public static ifSuffixedPlacementsExist(placementId: string, configuration: Configuration): boolean {
         const mixedList = MixedPlacementUtility.getMixedPlacmentTypeList();
 
         let fixedPlacementId;
 
         for (const mixedType of mixedList.slice(1)) {
-            if (placementId.split('-').length > 1 && `-${placementId.split('-').pop()}` === mixedType) {
-                fixedPlacementId = placementId.split('-').slice(0, -1).join('-');
+            if (this.doesEndWithMixedPlacementSuffix(placementId, mixedType)) {
+                fixedPlacementId = this.removeEndingSuffix(placementId);
             }
 
             if (!!configuration.getPlacements()[fixedPlacementId + mixedType]) {
@@ -53,6 +53,14 @@ export class MixedPlacementUtility {
             }
         }
         return false;
+    }
+
+    private static doesEndWithMixedPlacementSuffix(placementId: string, mixedType: string): boolean {
+        return placementId.split('-').length > 1 && `-${placementId.split('-').pop()}` === mixedType;
+    }
+
+    private static removeEndingSuffix(placementId: string): string {
+        return placementId.split('-').slice(0, -1).join('-');
     }
 
     private static isMixedIAP(placementId: string, configuration: Configuration): boolean {

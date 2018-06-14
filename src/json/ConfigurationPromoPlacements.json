@@ -91,6 +91,54 @@
           "VIDEO"
       ],
       "skipInSeconds": 5
+    },
+    {
+      "id": "testDashPlacement-rewarded",
+      "name": "testDashPlacement-promo",
+      "default": false,
+      "allowSkip": true,
+      "skipEndCardOnClose": false,
+      "disableVideoControlsFade": false,
+      "disableBackButton": true,
+      "muteVideo": false,
+      "useDeviceOrientationForVideo": false,
+      "adTypes": [
+          "IAP",
+          "VIDEO"
+      ],
+      "skipInSeconds": 5
+    },
+    {
+      "id": "testDashPlacement-promo-promo",
+      "name": "testDashPlacement-promo-promo",
+      "default": false,
+      "allowSkip": true,
+      "skipEndCardOnClose": false,
+      "disableVideoControlsFade": false,
+      "disableBackButton": true,
+      "muteVideo": false,
+      "useDeviceOrientationForVideo": false,
+      "adTypes": [
+          "IAP",
+          "VIDEO"
+      ],
+      "skipInSeconds": 5
+    },
+    {
+      "id": "testDashPlacement-promo-boo",
+      "name": "testDashPlacement-promo-boo",
+      "default": false,
+      "allowSkip": true,
+      "skipEndCardOnClose": false,
+      "disableVideoControlsFade": false,
+      "disableBackButton": true,
+      "muteVideo": false,
+      "useDeviceOrientationForVideo": false,
+      "adTypes": [
+          "IAP",
+          "VIDEO"
+      ],
+      "skipInSeconds": 5
     }
   ],
   "useAuction": true,
