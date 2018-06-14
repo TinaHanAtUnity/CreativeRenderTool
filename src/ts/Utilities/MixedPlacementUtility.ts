@@ -1,5 +1,6 @@
 import { Configuration } from 'Models/Configuration';
 import { Campaign } from 'Models/Campaign';
+import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 
 const enum MixedPlacementTypes {
     PROMO = '-promo',
@@ -19,9 +20,8 @@ export class MixedPlacementUtility {
         return this.isMixedIAP(placementId, configuration) && notAllowsSkip;
     }
 
-    public static isRewardedPromo(placementId: string, configuration: Configuration): boolean {
-        const allowsSkip: boolean = configuration.getPlacement(placementId).allowSkip();
-
+    public static isRewardedPromo(placementId: string, configuration: Configuration, campaign: Campaign): boolean {
+        const allowsSkip = campaign instanceof PromoCampaign && campaign.getAllowSkip();
         return this.isMixedIAP(placementId, configuration) && allowsSkip;
     }
 
@@ -30,7 +30,7 @@ export class MixedPlacementUtility {
         if (this.isRewardedMixedPlacement(placementId, configuration)) {
             str = (campaign.getAdType() === 'purchasing/iap') ? MixedPlacementTypes.PROMO : MixedPlacementTypes.REWARDED;
             configuration.getPlacements()[placementId + str] = configuration.getPlacements()[placementId];
-        } else if (this.isRewardedPromo(placementId, configuration)) {
+        } else if (this.isRewardedPromo(placementId, configuration, campaign)) {
             str = (campaign.getAdType() === 'purchasing/iap') ? MixedPlacementTypes.REWARDED_PROMO : MixedPlacementTypes.REWARDED;
             configuration.getPlacements()[placementId + str] = configuration.getPlacements()[placementId];
         }

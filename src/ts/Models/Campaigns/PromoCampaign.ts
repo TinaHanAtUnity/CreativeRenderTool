@@ -6,6 +6,7 @@ export interface IPromoCampaign extends ICampaign {
     additionalTrackingEvents: { [eventName: string]: string[] } | undefined;
     dynamicMarkup: string | undefined;
     creativeAsset: HTML;
+    allowSkip: boolean;
 }
 
 export class PromoCampaign extends Campaign<IPromoCampaign> {
@@ -15,7 +16,8 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
             iapProductId: ['string'],
             additionalTrackingEvents: ['object', 'undefined'],
             dynamicMarkup: ['string', 'undefined'],
-            creativeAsset: ['object']
+            creativeAsset: ['object'],
+            allowSkip: ['boolean']
         }, campaign);
     }
 
@@ -56,5 +58,9 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
 
     public getOptionalAssets() {
         return [];
+    }
+
+    public getAllowSkip(): boolean {
+        return this.get('allowSkip');
     }
 }

@@ -251,7 +251,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
                 this._nativeBridge.Sdk.logDebug('Unity Ads server returned no fill, no ads to show, for placement: ' + fullPlacementId);
                 this.setCampaignForPlacement(fullPlacementId, undefined);
                 this.handlePlacementState(fullPlacementId, PlacementState.NO_FILL);
-                shouldUpdatePlacementState = MixedPlacementUtility.isRewardedMixedPlacement(placementId, this._configuration) || MixedPlacementUtility.isRewardedPromo(placementId, this._configuration);
+                shouldUpdatePlacementState = MixedPlacementUtility.isMixedIAP(fullPlacementId, this._configuration);
             }
         } else {
             this._nativeBridge.Sdk.logDebug('Unity Ads server returned no fill, no ads to show, for placement: ' + placementId);
