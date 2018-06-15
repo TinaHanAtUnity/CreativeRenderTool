@@ -56,7 +56,7 @@ export class ConfigManager {
                 jaegerSpan.addTag(JaegerTags.StatusCode, response.responseCode.toString());
                 try {
                     const configJson = JsonParser.parse(response.response);
-                    const config: Configuration = ConfigurationParser.parse(configJson);
+                    const config: Configuration = ConfigurationParser.parse(configJson, clientInfo);
                     nativeBridge.Sdk.logInfo('Received configuration with ' + config.getPlacementCount() + ' placements for token ' + config.getToken() + ' (A/B group ' + config.getAbGroup() + ')');
                     if(config.getToken()) {
                         if(nativeBridge.getPlatform() === Platform.IOS && deviceInfo.getLimitAdTracking()) {

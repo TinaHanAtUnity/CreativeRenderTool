@@ -22,6 +22,7 @@ import { JaegerSpan } from 'Jaeger/JaegerSpan';
 import { UserCountData } from 'Utilities/UserCountData';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { MixedPlacementUtility } from 'Utilities/MixedPlacementUtility';
+import { configure } from 'protobufjs';
 
 export class OldCampaignRefreshManager extends RefreshManager {
     private _nativeBridge: NativeBridge;
@@ -218,15 +219,17 @@ export class OldCampaignRefreshManager extends RefreshManager {
     private onCampaign(placementId: string, campaign: Campaign) {
         this._parsingErrorCount = 0;
 
+        this._nativeBridge.Sdk.logInfo('^_^');
+        this._nativeBridge.Sdk.logInfo(JSON.stringify(campaign.getDTO()));
+        this._nativeBridge.Sdk.logInfo(placementId);
+        this._nativeBridge.Sdk.logInfo('^_^');
         if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
-            // suffix can also be empty if placement is not 'mixed'
-            let suffix = '';
-            if (!MixedPlacementUtility.ifSuffixedPlacementsExist(placementId, this._configuration)) {
-                suffix = MixedPlacementUtility.extractMixedPlacementSuffix(placementId, campaign, this._configuration);
+            if (MixedPlacementUtility.doesCampaignAndConfigMatchMixedPlacement(placementId, this._configuration, campaign)) {
+                this.setCampaignForPlacement(placementId, campaign);
+                this.handlePlacementState(placementId, PlacementState.READY);
+            } else {
+                this.onNoFill(placementId);
             }
-
-            this.setCampaignForPlacement(placementId + suffix, campaign);
-            this.handlePlacementState(placementId + suffix, PlacementState.READY);
         } else {
             this.setCampaignForPlacement(placementId, campaign);
             this.handlePlacementState(placementId, PlacementState.READY);
@@ -236,28 +239,9 @@ export class OldCampaignRefreshManager extends RefreshManager {
     private onNoFill(placementId: string) {
         this._parsingErrorCount = 0;
 
-        if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
-            const mixedList = MixedPlacementUtility.getMixedPlacmentTypeList();
-            let shouldUpdatePlacementState = true;
-            for(let i = 0; shouldUpdatePlacementState && i < mixedList.length; i++) {
-                const suffix = mixedList[i];
-                let fullPlacementId = placementId;
-
-                if (!MixedPlacementUtility.ifSuffixedPlacementsExist(placementId, this._configuration)) {
-                    fullPlacementId = fullPlacementId + suffix;
-                    this._configuration.getPlacements()[fullPlacementId] = this._configuration.getPlacements()[placementId];
-                }
-
-                this._nativeBridge.Sdk.logDebug('Unity Ads server returned no fill, no ads to show, for placement: ' + fullPlacementId);
-                this.setCampaignForPlacement(fullPlacementId, undefined);
-                this.handlePlacementState(fullPlacementId, PlacementState.NO_FILL);
-                shouldUpdatePlacementState = MixedPlacementUtility.isMixedIAP(fullPlacementId, this._configuration);
-            }
-        } else {
-            this._nativeBridge.Sdk.logDebug('Unity Ads server returned no fill, no ads to show, for placement: ' + placementId);
-            this.setCampaignForPlacement(placementId, undefined);
-            this.handlePlacementState(placementId, PlacementState.NO_FILL);
-        }
+        this._nativeBridge.Sdk.logDebug('Unity Ads server returned no fill, no ads to show, for placement: ' + placementId);
+        this.setCampaignForPlacement(placementId, undefined);
+        this.handlePlacementState(placementId, PlacementState.NO_FILL);
     }
 
     private onError(error: WebViewError | Error, placementIds: string[], diagnosticsType: string, session?: Session) {

@@ -97,7 +97,8 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
             'gamerId': this.getGamerId(),
             'abGroup': this.getAbGroup().toNumber(),
             'willExpireAt': this.getWillExpireAt(),
-            'mediaId': this.getMediaId()
+            'mediaId': this.getMediaId(),
+            'adType': this.getAdType()
         };
     }
 

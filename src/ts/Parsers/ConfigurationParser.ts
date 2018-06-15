@@ -1,9 +1,12 @@
 import { IConfiguration, Configuration, CacheMode } from 'Models/Configuration';
 import { Placement } from 'Models/Placement';
 import { ABGroup } from 'Models/ABGroup';
+import { MixedPlacementUtility } from 'Utilities/MixedPlacementUtility';
+import { ClientInfo } from 'Models/ClientInfo';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
 
 export class ConfigurationParser {
-    public static parse(configJson: any): Configuration {
+    public static parse(configJson: any, clientInfo?: ClientInfo): Configuration {
         const configPlacements = configJson.placements;
         const placements: { [id: string]: Placement } = {};
         let defaultPlacement: Placement | undefined;
@@ -12,6 +15,13 @@ export class ConfigurationParser {
             configPlacements.forEach((rawPlacement: any): void => {
                 const placement: Placement = new Placement(rawPlacement);
                 placements[placement.getId()] = placement;
+                // clientInfo !== undefined && CustomFeatures.isMixedPlacementExperiment(clientInfo.getGameId()) &&
+                // if (MixedPlacementUtility.isMixedIAP2(placement.getAdTypes())) {
+                placements[placement.getId() + '-promo'] = placement;
+                placements[placement.getId() + '-rewarded'] = placement;
+                placements[placement.getId() + '-rewardedpromo'] = placement;
+                // MixedPlacementUtility.createMixedPlacements(placement, placements);
+                // }
                 if (placement.isDefault()) {
                     defaultPlacement = placement;
                 }

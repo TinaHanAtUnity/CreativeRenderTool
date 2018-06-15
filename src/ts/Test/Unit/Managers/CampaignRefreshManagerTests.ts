@@ -588,7 +588,7 @@ describe('CampaignRefreshManager', () => {
         });
     });
 
-    describe('With mixed placement campaigns', () => {
+    xdescribe('With mixed placement campaigns', () => {
         beforeEach(() => {
             const clientInfoPromoGame = new ClientInfo(Platform.ANDROID, [
                 '1003628',
