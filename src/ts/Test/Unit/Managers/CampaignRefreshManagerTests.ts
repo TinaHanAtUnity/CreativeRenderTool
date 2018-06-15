@@ -763,6 +763,22 @@ describe('CampaignRefreshManager', () => {
             assert.isDefined(configuration.getPlacement('mixedPlacement-promo'));
             assert.isUndefined(configuration.getPlacement('mixedPlacement-promo-promo'));
         });
+
+        xit('should set suffixed placement as ready the second time onCampaign is triggered after being invalidated', () => {
+            //
+        });
+
+        xit('should not add extra suffixes to NO_FILL placements already created from mixed placement suffixes', () => {
+            //
+        });
+
+        xit('campaign onError should set no fill for mixed placements', () => {
+            //
+        });
+
+        xit('campaign onConnectivityError should set nofill for mixed placements and invalidate campaigns', () => {
+            //
+        });
     });
 });
 
