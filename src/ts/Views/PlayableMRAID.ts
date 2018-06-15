@@ -407,18 +407,19 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private onCloseEvent(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
-        const timeFromShow = this.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
+        const timeFromShow = this.checkIsValid((Date.now() - this._showTimestamp) / 1000);
+        const timeFromPlayableStart = this.checkIsValid((Date.now() - this._playableStartTimestamp) / 1000);
         const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
 
         if(this._canSkip && !this._canClose) {
             this._handlers.forEach(handler => handler.onMraidSkip());
             if (this._isMRAIDAR) {
-                this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_skip', undefined));
+                this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, 'playable_skip', undefined));
             }
         } else if(this._canClose) {
             this._handlers.forEach(handler => handler.onMraidClose());
             if (this._isMRAIDAR) {
-                this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_close', undefined));
+                this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, 'playable_close', undefined));
             }
 
             if (this._arFrameUpdatedObserver) {
