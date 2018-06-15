@@ -297,7 +297,9 @@ export class AdMobSignalFactory {
             }));
 
             // this should only be added to 2.2.1 and above
-            signal.setApkHash(this._deviceInfo.getApkDigest());
+            if(this._deviceInfo instanceof AndroidDeviceInfo) {
+                signal.setApkHash((<AndroidDeviceInfo>this._deviceInfo).getApkDigest());
+            }
 
             promises.push(this._nativeBridge.DeviceInfo.Android.getCertificateFingerprint().then(certificate => {
                 signal.setApkDeveloperSigningCertificateHash(certificate);

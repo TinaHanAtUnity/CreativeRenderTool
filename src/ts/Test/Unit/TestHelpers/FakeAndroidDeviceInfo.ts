@@ -31,6 +31,10 @@ export class FakeAndroidDeviceInfo extends AndroidDeviceInfo {
         return this._fakeDevice.advertisingId;
     }
 
+    public getApkDigest(): string {
+        return this._fakeDevice.apkDigest;
+    }
+
     public getLimitAdTracking(): boolean {
         return this._fakeDevice.trackingEnabled;
     }
