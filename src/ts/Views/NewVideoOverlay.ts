@@ -35,16 +35,15 @@ export class NewVideoOverlay extends AbstractVideoOverlay {
     private _fadeTimer: any;
     private _fadeStatus: boolean = true;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, abGroup: number = 0) {
+    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string) {
         super(nativeBridge, 'new-video-overlay', muted);
 
         this._localization = new Localization(language, 'overlay');
+        this._template = new Template(NewVideoOverlayTemplate, this._localization);
 
         this._templateData = {
             muted
         };
-
-        this._template = new Template(NewVideoOverlayTemplate, this._localization);
 
         this._bindings = [
             {
@@ -72,14 +71,6 @@ export class NewVideoOverlay extends AbstractVideoOverlay {
                 listener: (event: Event) => this.onClick(event)
             }
         ];
-
-        if(gameId === '1300023' || gameId === '1300024') {
-            this._bindings.push({
-                event: 'swipe',
-                listener: (event: Event) => this.onSkipEvent(event)
-            });
-        }
-
     }
 
     public render(): void {
@@ -95,10 +86,6 @@ export class NewVideoOverlay extends AbstractVideoOverlay {
 
         this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
         this._callButtonElement.style.display = 'none';
-
-        this._progressElement = <HTMLElement>this._container.querySelector('.progress');
-        this.removeCssTransition();
-        this._progressElement.style.width = '0';
 
         this._timerElement = <HTMLElement>this._container.querySelector('.timer');
     }
@@ -120,7 +107,6 @@ export class NewVideoOverlay extends AbstractVideoOverlay {
     public setVideoDurationEnabled(value: boolean) {
         if(this._videoDurationEnabled !== value) {
             this._videoDurationEnabled = value;
-            this._progressElement.style.display  = value ? 'block' : 'none';
         }
     }
 
@@ -136,10 +122,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay {
             }, 3000);
         }
 
-        const delta = (value - this._videoProgress) || 0;
-
         this._videoProgress = value;
-
         this.setSkipElementVisible(this._skipEnabled);
 
         this._skipRemaining = this._skipDuration - this._videoProgress;
@@ -153,18 +136,6 @@ export class NewVideoOverlay extends AbstractVideoOverlay {
         }
 
         this._timerElement.innerText = this.formatTimer(Math.ceil((this._videoDuration - this._videoProgress) / 1000));
-
-        const progressInPercentages = Math.ceil(100 / this._videoDuration * this._videoProgress);
-
-        if (delta >= 0) {
-            if (this._progressElement.style.transition === '' && this._progressElement.style.webkitTransition === '') {
-                this.setCssTransition();
-            }
-            this._progressElement.style.width = '100%';
-        } else {
-            this.removeCssTransition();
-            this._progressElement.style.width = `${progressInPercentages}%`;
-        }
     }
 
     public setMuteEnabled(value: boolean) {
@@ -296,11 +267,6 @@ export class NewVideoOverlay extends AbstractVideoOverlay {
         const transitionRule = `width ${(this._videoDuration - this._videoProgress) / 1000}s linear`;
         this._progressElement.style.transition = transitionRule;
         this._progressElement.style.webkitTransition = transitionRule;
-    }
-
-    private removeCssTransition(): void {
-        this._progressElement.style.transition = '';
-        this._progressElement.style.webkitTransition = '';
     }
 
     public setCallButtonEnabled(value: boolean) {
