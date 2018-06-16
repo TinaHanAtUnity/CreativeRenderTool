@@ -1,7 +1,7 @@
 import { IConfiguration, Configuration, CacheMode } from 'Models/Configuration';
 import { Placement } from 'Models/Placement';
 import { ABGroup } from 'Models/ABGroup';
-import { MixedPlacementUtility } from 'Utilities/MixedPlacementUtility';
+import { MixedPlacementUtility, MixedPlacementTypes } from 'Utilities/MixedPlacementUtility';
 import { ClientInfo } from 'Models/ClientInfo';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 
@@ -14,17 +14,10 @@ export class ConfigurationParser {
         if (configPlacements) {
             configPlacements.forEach((rawPlacement: any): void => {
                 const placement: Placement = new Placement(rawPlacement);
-                placements[placement.getId()] = placement;
-                // clientInfo !== undefined && CustomFeatures.isMixedPlacementExperiment(clientInfo.getGameId()) &&
-                if (MixedPlacementUtility.isMixedIAP2(placement.getAdTypes())) {
-                    const placement1: Placement = new Placement(rawPlacement, rawPlacement.id + '-promo');
-                    const placement2: Placement = new Placement(rawPlacement, rawPlacement.id + '-rewarded');
-                    const placement3: Placement = new Placement(rawPlacement, rawPlacement.id + '-rewardedpromo');
-
-                    placements[placement1.getId()] = placement1;
-                    placements[placement2.getId()] = placement2;
-                    placements[placement3.getId()] = placement3;
-                // MixedPlacementUtility.createMixedPlacements(placement, placements);
+                if(clientInfo && CustomFeatures.isMixedPlacementExperiment(clientInfo.getGameId()) && MixedPlacementUtility.isMixedIAP2(placement.getAdTypes())) {
+                    MixedPlacementUtility.createMixedPlacements(rawPlacement, placements);
+                } else {
+                    placements[placement.getId()] = placement;
                 }
                 if (placement.isDefault()) {
                     defaultPlacement = placement;

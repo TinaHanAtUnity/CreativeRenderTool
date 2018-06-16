@@ -36,7 +36,7 @@ interface IPlacement {
 
 export class Placement extends Model<IPlacement> {
 
-    constructor(data: any, idSuffixed?: string) {
+    constructor(data: any) {
         super('Placement', {
             id: ['string'],
             name: ['string'],
@@ -55,12 +55,7 @@ export class Placement extends Model<IPlacement> {
             currentCampaign: ['object', 'undefined']
         });
 
-        if (idSuffixed) {
-            this.set('id', idSuffixed);
-        } else {
-            this.set('id', data.id);
-        }
-
+        this.set('id', data.id);
         this.set('name', data.name);
         this.set('default', data.default);
 

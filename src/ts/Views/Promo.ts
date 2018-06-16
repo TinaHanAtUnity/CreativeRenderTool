@@ -10,7 +10,6 @@ import { Platform } from 'Constants/Platform';
 import { XHRequest } from 'Utilities/XHRequest';
 import { IPrivacyHandler, AbstractPrivacy } from 'Views/AbstractPrivacy';
 import { GDPRPrivacy } from 'Views/GDPRPrivacy';
-import { Placement } from 'Models/Placement';
 
 export class Promo extends View<{}> implements IPrivacyHandler {
 
@@ -19,7 +18,6 @@ export class Promo extends View<{}> implements IPrivacyHandler {
     public readonly onGDPRPopupSkipped = new Observable0();
 
     private _promoCampaign: PromoCampaign;
-    private _placement: Placement;
     private _localization: Localization;
     private _iframe: HTMLIFrameElement | null;
     private _messageHandler: (e: Event) => void;
@@ -30,7 +28,7 @@ export class Promo extends View<{}> implements IPrivacyHandler {
     private _showGDPRBanner: boolean = false;
     private _gdprPopupClicked: boolean = false;
 
-    constructor(nativeBridge: NativeBridge, campaign: PromoCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, placement: Placement) {
+    constructor(nativeBridge: NativeBridge, campaign: PromoCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
         super(nativeBridge, 'promo');
         this._localization = new Localization(language, 'promo');
 
@@ -39,7 +37,6 @@ export class Promo extends View<{}> implements IPrivacyHandler {
 
         this._template = new Template(PromoTpl);
         this._promoCampaign = campaign;
-        this._placement = placement;
 
         this._messageHandler = (e: Event) => this.onMessage(<MessageEvent>e);
 

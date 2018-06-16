@@ -5,10 +5,10 @@ import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 import { NativeBridge } from 'Native/NativeBridge';
 
 export const enum MixedPlacementTypes {
+    NON_REWARDED = '',
     PROMO = '-promo',
     REWARDED = '-rewarded',
-    REWARDED_PROMO = '-rewardedpromo',
-    NON_REWARDED = ''
+    REWARDED_PROMO = '-rewardedpromo'
 }
 
 export class MixedPlacementUtility {
@@ -17,17 +17,6 @@ export class MixedPlacementUtility {
 
     public static getMixedPlacmentTypeList(): string[] {
         return [MixedPlacementTypes.NON_REWARDED, MixedPlacementTypes.PROMO, MixedPlacementTypes.REWARDED, MixedPlacementTypes.REWARDED_PROMO];
-    }
-
-    public static isRewardedMixedPlacement(placementId: string, configuration: Configuration): boolean {
-        const notAllowsSkip: boolean = !configuration.getPlacement(placementId).allowSkip();
-
-        return this.isMixedIAP(placementId, configuration) && notAllowsSkip;
-    }
-
-    public static isRewardedPromo(placementId: string, configuration: Configuration, campaign: Campaign): boolean {
-        const allowsSkip = campaign instanceof PromoCampaign && campaign.getAllowSkip();
-        return this.isMixedIAP(placementId, configuration) && allowsSkip;
     }
 
     public static extractMixedPlacementSuffix(placementId: string, campaign: Campaign, configuration: Configuration): MixedPlacementTypes {
@@ -94,6 +83,14 @@ export class MixedPlacementUtility {
             return false;
         }
         return true;
+    }
+
+    public static createMixedPlacements(rawPlacement: any, placements: { [id: string]: Placement }) {
+        const rawPlacementId: string = rawPlacement.id;
+        for (const mixedPlacementSuffix of this.getMixedPlacmentTypeList()) {
+            rawPlacement.id = rawPlacementId + mixedPlacementSuffix;
+            placements[rawPlacement.id] = new Placement(rawPlacement);
+        }
     }
 
     public static doesEndWithMixedPlacementSuffix(placementId: string, mixedType: string): boolean {

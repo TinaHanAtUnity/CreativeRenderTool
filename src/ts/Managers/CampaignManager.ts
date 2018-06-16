@@ -35,8 +35,6 @@ import { JaegerManager } from 'Jaeger/JaegerManager';
 import { JaegerTags, JaegerSpan } from 'Jaeger/JaegerSpan';
 import { GameSessionCounters } from 'Utilities/GameSessionCounters';
 import { ABGroup } from 'Models/ABGroup';
-import { Sdk } from '../Native/Backend/Api/Sdk';
-import { KeyCode } from 'Constants/Android/KeyCode';
 
 export class CampaignManager {
 
@@ -305,12 +303,8 @@ export class CampaignManager {
             const noFill: string[] = [];
 
             const placements = this._configuration.getPlacements();
-            this._nativeBridge.Sdk.logInfo('this is the number of placements we are looping over ^_^: ');
             for(const placement in placements) {
                 if(placements.hasOwnProperty(placement)) {
-                    this._nativeBridge.Sdk.logInfo(placement);
-                    this._nativeBridge.Sdk.logInfo('this is based on the placement we got ^_^');
-                    this._nativeBridge.Sdk.logInfo(json.placements[placement]);
                     const mediaId: string = json.placements[placement];
 
                     if(mediaId) {

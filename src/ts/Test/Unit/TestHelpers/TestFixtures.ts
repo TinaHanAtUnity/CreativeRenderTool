@@ -407,13 +407,13 @@ export class TestFixtures {
         return new DisplayInterstitialCampaign(displayInterstitialParams);
     }
 
-    public static getClientInfo(platform?: Platform): ClientInfo {
+    public static getClientInfo(platform?: Platform, gameId?: string): ClientInfo {
         if(typeof platform === 'undefined') {
             platform = Platform.ANDROID;
         }
 
         return new ClientInfo(platform, [
-            '12345',
+            gameId ? gameId : '12345',
             false,
             'com.unity3d.ads.example',
             '2.0.0-test2',

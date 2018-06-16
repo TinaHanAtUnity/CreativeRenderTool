@@ -222,9 +222,6 @@ export class OldCampaignRefreshManager extends RefreshManager {
 
         if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
             if (MixedPlacementUtility.doesCampaignAndConfigMatchMixedPlacement(placementId, this._configuration, campaign)) {
-                this._nativeBridge.Sdk.logInfo('^_^');
-                this._nativeBridge.Sdk.logInfo(JSON.stringify(campaign.getDTO()));
-                this._nativeBridge.Sdk.logInfo(placementId + ' is getting a fill inside doesCampaignAndConfigMatchMixedPlacement ^)^');
                 this.setCampaignForPlacement(placementId, campaign);
                 this.handlePlacementState(placementId, PlacementState.READY);
             } else {
@@ -342,12 +339,8 @@ export class OldCampaignRefreshManager extends RefreshManager {
 
     private setCampaignForPlacement(placementId: string, campaign: Campaign | undefined) {
         const placement = this._configuration.getPlacement(placementId);
-        this._nativeBridge.Sdk.logInfo('setCampaignForPlacement BETTER GET CALLED: ' + placement.getId() + ' placementID: ' + placementId);
         if(placement) {
             placement.setCurrentCampaign(campaign);
-            if (placement.getCurrentCampaign()) {
-                this._nativeBridge.Sdk.logInfo('setCampaignForPlacement: ' + placement.getId() + '--->' + placement.getCurrentCampaign()!.getAdType());
-            }
         }
     }
 

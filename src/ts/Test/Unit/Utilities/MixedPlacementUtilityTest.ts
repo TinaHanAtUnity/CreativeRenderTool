@@ -8,6 +8,9 @@ import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
+import { ClientInfo } from 'Models/ClientInfo';
+import { Platform } from 'Constants/Platform';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
 
 describe('MixedPlacementUtilities', () => {
 
@@ -15,64 +18,20 @@ describe('MixedPlacementUtilities', () => {
     let promoSkippableCampaign: PromoCampaign;
     let promoNonSkippableCampaign: PromoCampaign;
     let interstitialCampaign: DisplayInterstitialCampaign;
+    let clientInfo: ClientInfo;
 
     beforeEach(() => {
-        configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+        clientInfo = TestFixtures.getClientInfo(Platform.ANDROID, '1543512');
+        configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements), clientInfo);
         interstitialCampaign = TestFixtures.getDisplayInterstitialCampaign();
         promoSkippableCampaign = TestFixtures.getPromoCampaign('purchasing/iap', true);
         promoNonSkippableCampaign = TestFixtures.getPromoCampaign('purchasing/iap', false);
     });
 
     describe('getPlacementTypeList', () => {
-        it('should return an array of mixed placement strings', () => {
+        it('should return an array of mixed placements', () => {
             const mixedList = MixedPlacementUtility.getMixedPlacmentTypeList();
             assert.deepEqual(mixedList, ['', '-promo', '-rewarded', '-rewardedpromo']);
-        });
-    });
-
-    describe('isRewardedMixedPlacement', () => {
-        it('should return true if placement has multiple adtypes, contains iap, and does not allow skip', () => {
-            const placementBool = MixedPlacementUtility.isRewardedMixedPlacement(configuration.getPlacement('mixedPlacement').getId(), configuration);
-            assert.isTrue(placementBool);
-        });
-        it('should return false if no adtype is specified', () => {
-            const placementBool = MixedPlacementUtility.isRewardedMixedPlacement(configuration.getPlacement('video').getId(), configuration);
-            assert.isFalse(placementBool);
-        });
-        it('should return false if adtype length is equal to 1', () => {
-            const placementBool = MixedPlacementUtility.isRewardedMixedPlacement(configuration.getPlacement('promoPlacement').getId(), configuration);
-            assert.isFalse(placementBool);
-        });
-        it('should return false if adtype does not contain iap', () => {
-            const placementBool = MixedPlacementUtility.isRewardedMixedPlacement(configuration.getPlacement('mraid').getId(), configuration);
-            assert.isFalse(placementBool);
-        });
-        it('should return true if placement has multiple adtypes, contains iap, and does allowskip', () => {
-            const placementBool = MixedPlacementUtility.isRewardedMixedPlacement(configuration.getPlacement('rewardedPromoPlacement').getId(), configuration);
-            assert.isFalse(placementBool);
-        });
-    });
-
-    xdescribe('isRewardedPromo', () => {
-        it('should return true if placement has multiple adtypes, contains iap, and does not allow skip', () => {
-            const placementBool = MixedPlacementUtility.isRewardedPromo(configuration.getPlacement('rewardedPromoPlacement').getId(), configuration, promoSkippableCampaign);
-            assert.isTrue(placementBool);
-        });
-        it('should return false if no adtype is specified', () => {
-            const placementBool = MixedPlacementUtility.isRewardedPromo(configuration.getPlacement('video').getId(), configuration, promoSkippableCampaign);
-            assert.isFalse(placementBool);
-        });
-        it('should return false if adtype length is equal to 1', () => {
-            const placementBool = MixedPlacementUtility.isRewardedPromo(configuration.getPlacement('promoPlacement').getId(), configuration, promoSkippableCampaign);
-            assert.isFalse(placementBool);
-        });
-        it('should return false if adtype is not iap', () => {
-            const placementBool = MixedPlacementUtility.isRewardedPromo(configuration.getPlacement('mraid').getId(), configuration, promoSkippableCampaign);
-            assert.isFalse(placementBool);
-        });
-        it('should return true if placement has multiple adtypes, contains iap, and does allowskip', () => {
-            const placementBool = MixedPlacementUtility.isRewardedPromo(configuration.getPlacement('mixedPlacement').getId(), configuration, promoSkippableCampaign);
-            assert.isFalse(placementBool);
         });
     });
 
