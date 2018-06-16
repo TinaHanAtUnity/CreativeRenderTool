@@ -218,13 +218,13 @@ export class OldCampaignRefreshManager extends RefreshManager {
 
     private onCampaign(placementId: string, campaign: Campaign) {
         this._parsingErrorCount = 0;
+        MixedPlacementUtility.nativeBridge = this._nativeBridge;
 
-        this._nativeBridge.Sdk.logInfo('^_^');
-        this._nativeBridge.Sdk.logInfo(JSON.stringify(campaign.getDTO()));
-        this._nativeBridge.Sdk.logInfo(placementId);
-        this._nativeBridge.Sdk.logInfo('^_^');
         if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
             if (MixedPlacementUtility.doesCampaignAndConfigMatchMixedPlacement(placementId, this._configuration, campaign)) {
+                this._nativeBridge.Sdk.logInfo('^_^');
+                this._nativeBridge.Sdk.logInfo(JSON.stringify(campaign.getDTO()));
+                this._nativeBridge.Sdk.logInfo(placementId + ' is getting a fill inside doesCampaignAndConfigMatchMixedPlacement ^)^');
                 this.setCampaignForPlacement(placementId, campaign);
                 this.handlePlacementState(placementId, PlacementState.READY);
             } else {
@@ -238,6 +238,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
 
     private onNoFill(placementId: string) {
         this._parsingErrorCount = 0;
+        this._nativeBridge.Sdk.logInfo(placementId + ' is getting a nofill ^_^');
 
         this._nativeBridge.Sdk.logDebug('Unity Ads server returned no fill, no ads to show, for placement: ' + placementId);
         this.setCampaignForPlacement(placementId, undefined);
@@ -341,8 +342,12 @@ export class OldCampaignRefreshManager extends RefreshManager {
 
     private setCampaignForPlacement(placementId: string, campaign: Campaign | undefined) {
         const placement = this._configuration.getPlacement(placementId);
+        this._nativeBridge.Sdk.logInfo('setCampaignForPlacement BETTER GET CALLED: ' + placement.getId() + ' placementID: ' + placementId);
         if(placement) {
             placement.setCurrentCampaign(campaign);
+            if (placement.getCurrentCampaign()) {
+                this._nativeBridge.Sdk.logInfo('setCampaignForPlacement: ' + placement.getId() + '--->' + placement.getCurrentCampaign()!.getAdType());
+            }
         }
     }
 

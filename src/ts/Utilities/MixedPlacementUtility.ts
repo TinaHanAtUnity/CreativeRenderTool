@@ -2,6 +2,7 @@ import { Configuration } from 'Models/Configuration';
 import { Campaign } from 'Models/Campaign';
 import { Placement } from 'Models/Placement';
 import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
+import { NativeBridge } from 'Native/NativeBridge';
 
 export const enum MixedPlacementTypes {
     PROMO = '-promo',
@@ -10,6 +11,8 @@ export const enum MixedPlacementTypes {
 }
 
 export class MixedPlacementUtility {
+
+    public static nativeBridge: NativeBridge;
 
     public static getMixedPlacmentTypeList(): string[] {
         return ['', MixedPlacementTypes.PROMO, MixedPlacementTypes.REWARDED, MixedPlacementTypes.REWARDED_PROMO];
@@ -26,16 +29,26 @@ export class MixedPlacementUtility {
         return this.isMixedIAP(placementId, configuration) && allowsSkip;
     }
 
-    public static isValidMixedPlacement(placementId: string, configuration: Configuration, campaign: Campaign) {
-        return !configuration.getPlacement(placementId).allowSkip() || campaign instanceof PromoCampaign && campaign.getAllowSkip();
-    }
-
     public static extractMixedPlacementSuffix(placementId: string, campaign: Campaign, configuration: Configuration): string {
         let str = '';
-        if (this.isRewardedMixedPlacement(placementId, configuration)) {
-            str = (campaign.getAdType() === 'purchasing/iap') ? MixedPlacementTypes.PROMO : MixedPlacementTypes.REWARDED;
-        } else if (this.isRewardedPromo(placementId, configuration, campaign)) {
-            str = (campaign.getAdType() === 'purchasing/iap') ? MixedPlacementTypes.REWARDED_PROMO : MixedPlacementTypes.REWARDED;
+        // if (this.isRewardedMixedPlacement(placementId, configuration)) {
+        //     str = (campaign.getAdType() === 'purchasing/iap') ? MixedPlacementTypes.PROMO : MixedPlacementTypes.REWARDED;
+        // } else if (this.isRewardedPromo(placementId, configuration, campaign)) {
+        //     str = (campaign.getAdType() === 'purchasing/iap') ? MixedPlacementTypes.REWARDED_PROMO : MixedPlacementTypes.REWARDED;
+        // }
+
+        if (this.isMixedIAP(placementId, configuration)) {
+            if (campaign instanceof PromoCampaign) {
+                if (!campaign.getAllowSkip()) {
+                    str = MixedPlacementTypes.PROMO;
+                } else {
+                    str = MixedPlacementTypes.REWARDED_PROMO;
+                }
+            } else {
+                if (!configuration.getPlacement(placementId).allowSkip()) {
+                    str = MixedPlacementTypes.REWARDED;
+                }
+            }
         }
 
         return str;
@@ -98,10 +111,13 @@ export class MixedPlacementUtility {
     }
 
     public static doesCampaignAndConfigMatchMixedPlacement(placementId: string, configuration: Configuration, campaign: Campaign): boolean {
-        if (!this.isMixedIAP(placementId, configuration)) {
-            return false;
-        }
         const correctSuffix = this.extractMixedPlacementSuffix(placementId, campaign, configuration);
+
+        if (correctSuffix === '') {
+            return true;
+        }
+
+        // return true;
         return this.doesEndWithMixedPlacementSuffix(placementId, correctSuffix);
     }
 

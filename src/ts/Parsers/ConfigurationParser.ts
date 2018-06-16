@@ -16,12 +16,16 @@ export class ConfigurationParser {
                 const placement: Placement = new Placement(rawPlacement);
                 placements[placement.getId()] = placement;
                 // clientInfo !== undefined && CustomFeatures.isMixedPlacementExperiment(clientInfo.getGameId()) &&
-                // if (MixedPlacementUtility.isMixedIAP2(placement.getAdTypes())) {
-                placements[placement.getId() + '-promo'] = placement;
-                placements[placement.getId() + '-rewarded'] = placement;
-                placements[placement.getId() + '-rewardedpromo'] = placement;
+                if (MixedPlacementUtility.isMixedIAP2(placement.getAdTypes())) {
+                    const placement1: Placement = new Placement(rawPlacement, rawPlacement.id + '-promo');
+                    const placement2: Placement = new Placement(rawPlacement, rawPlacement.id + '-rewarded');
+                    const placement3: Placement = new Placement(rawPlacement, rawPlacement.id + '-rewardedpromo');
+
+                    placements[placement1.getId()] = placement1;
+                    placements[placement2.getId()] = placement2;
+                    placements[placement3.getId()] = placement3;
                 // MixedPlacementUtility.createMixedPlacements(placement, placements);
-                // }
+                }
                 if (placement.isDefault()) {
                     defaultPlacement = placement;
                 }

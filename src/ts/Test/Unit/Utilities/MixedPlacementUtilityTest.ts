@@ -8,7 +8,7 @@ import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 
-describe('MixedPlacementUtilities', () => {
+xdescribe('MixedPlacementUtilities', () => {
 
     let configuration: Configuration;
     let campaign: PromoCampaign;
