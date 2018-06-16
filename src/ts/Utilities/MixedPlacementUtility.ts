@@ -7,7 +7,8 @@ import { NativeBridge } from 'Native/NativeBridge';
 export const enum MixedPlacementTypes {
     PROMO = '-promo',
     REWARDED = '-rewarded',
-    REWARDED_PROMO = '-rewardedpromo'
+    REWARDED_PROMO = '-rewardedpromo',
+    NON_REWARDED = ''
 }
 
 export class MixedPlacementUtility {
@@ -15,7 +16,7 @@ export class MixedPlacementUtility {
     public static nativeBridge: NativeBridge;
 
     public static getMixedPlacmentTypeList(): string[] {
-        return ['', MixedPlacementTypes.PROMO, MixedPlacementTypes.REWARDED, MixedPlacementTypes.REWARDED_PROMO];
+        return [MixedPlacementTypes.NON_REWARDED, MixedPlacementTypes.PROMO, MixedPlacementTypes.REWARDED, MixedPlacementTypes.REWARDED_PROMO];
     }
 
     public static isRewardedMixedPlacement(placementId: string, configuration: Configuration): boolean {
@@ -29,22 +30,22 @@ export class MixedPlacementUtility {
         return this.isMixedIAP(placementId, configuration) && allowsSkip;
     }
 
-    public static extractMixedPlacementSuffix(placementId: string, campaign: Campaign, configuration: Configuration): string {
-        let str = '';
+    public static extractMixedPlacementSuffix(placementId: string, campaign: Campaign, configuration: Configuration): MixedPlacementTypes {
+        let str = MixedPlacementTypes.NON_REWARDED;
 
-        if (this.isMixedIAP(placementId, configuration)) {
-            if (campaign instanceof PromoCampaign) {
-                if (!campaign.getAllowSkip()) {
-                    str = MixedPlacementTypes.PROMO;
-                } else {
-                    str = MixedPlacementTypes.REWARDED_PROMO;
-                }
+        if (!this.isMixedIAP(placementId, configuration)) {
+            str = MixedPlacementTypes.NON_REWARDED;
+        } else if (campaign instanceof PromoCampaign) {
+            if (campaign.getAllowSkip()) {
+                str = MixedPlacementTypes.REWARDED_PROMO;
             } else {
-                if (!configuration.getPlacement(placementId).allowSkip()) {
-                    str = MixedPlacementTypes.REWARDED;
-                } else if (this.doesEndWithMixedPlacementSuffix(placementId, MixedPlacementTypes.REWARDED) ) {
-                    return 'BAD';
-                }
+                str = MixedPlacementTypes.PROMO;
+            }
+        } else {
+            if (configuration.getPlacement(placementId).allowSkip()) {
+                str = MixedPlacementTypes.NON_REWARDED;
+            } else {
+                str = MixedPlacementTypes.REWARDED;
             }
         }
 
@@ -101,15 +102,11 @@ export class MixedPlacementUtility {
 
     public static doesCampaignAndConfigMatchMixedPlacement(placementId: string, configuration: Configuration, campaign: Campaign): boolean {
         const correctSuffix = this.extractMixedPlacementSuffix(placementId, campaign, configuration);
-        this.nativeBridge.Sdk.logInfo('tinder: correctSuffix: ' + correctSuffix + ' for placementID: ' + placementId);
-        if (correctSuffix === '') {
-            return true;
-        }
-        if (correctSuffix === 'BAD') {
-            return false;
+
+        if (correctSuffix === MixedPlacementTypes.NON_REWARDED) {
+            return !this.ifSuffixedPlacementsExist(placementId, configuration);
         }
 
-        // return true;
         return this.doesEndWithMixedPlacementSuffix(placementId, correctSuffix);
     }
 
