@@ -31,11 +31,6 @@ export class MixedPlacementUtility {
 
     public static extractMixedPlacementSuffix(placementId: string, campaign: Campaign, configuration: Configuration): string {
         let str = '';
-        // if (this.isRewardedMixedPlacement(placementId, configuration)) {
-        //     str = (campaign.getAdType() === 'purchasing/iap') ? MixedPlacementTypes.PROMO : MixedPlacementTypes.REWARDED;
-        // } else if (this.isRewardedPromo(placementId, configuration, campaign)) {
-        //     str = (campaign.getAdType() === 'purchasing/iap') ? MixedPlacementTypes.REWARDED_PROMO : MixedPlacementTypes.REWARDED;
-        // }
 
         if (this.isMixedIAP(placementId, configuration)) {
             if (campaign instanceof PromoCampaign) {
@@ -98,14 +93,6 @@ export class MixedPlacementUtility {
             return false;
         }
         return true;
-    }
-
-    public static createMixedPlacements(placement: Placement, placements: { [id: string]: Placement }) {
-        const mixedList = MixedPlacementUtility.getMixedPlacmentTypeList();
-
-        for (const mixedType of mixedList.slice(1)) {
-            placements[placement.getId() + mixedType] = placement;
-        }
     }
 
     public static doesEndWithMixedPlacementSuffix(placementId: string, mixedType: string): boolean {
