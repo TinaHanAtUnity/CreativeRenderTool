@@ -47,6 +47,8 @@ export class MixedPlacementUtility {
             } else {
                 if (!configuration.getPlacement(placementId).allowSkip()) {
                     str = MixedPlacementTypes.REWARDED;
+                } else if (this.doesEndWithMixedPlacementSuffix(placementId, MixedPlacementTypes.REWARDED) ) {
+                    return 'BAD';
                 }
             }
         }
@@ -112,9 +114,12 @@ export class MixedPlacementUtility {
 
     public static doesCampaignAndConfigMatchMixedPlacement(placementId: string, configuration: Configuration, campaign: Campaign): boolean {
         const correctSuffix = this.extractMixedPlacementSuffix(placementId, campaign, configuration);
-
+        this.nativeBridge.Sdk.logInfo('tinder: correctSuffix: ' + correctSuffix + ' for placementID: ' + placementId);
         if (correctSuffix === '') {
             return true;
+        }
+        if (correctSuffix === 'BAD') {
+            return false;
         }
 
         // return true;
