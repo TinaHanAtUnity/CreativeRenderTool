@@ -93,6 +93,8 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
             promises.push(this._nativeBridge.DeviceInfo.Android.isAppInstalled(AndroidDeviceInfo.GoogleMapsPackageName).then(isGoogleMapsInstalled => this.set('isGoogleMapsInstalled', isGoogleMapsInstalled)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._nativeBridge.DeviceInfo.Android.isAppInstalled(AndroidDeviceInfo.TelephonyPackageName).then(isTelephonyInstalled => this.set('isTelephonyInstalled', isTelephonyInstalled)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._nativeBridge.DeviceInfo.Android.getDeviceMaxVolume(StreamType.STREAM_MUSIC).then(maxVolume => this.set('maxVolume', maxVolume)).catch(err => this.handleDeviceInfoError(err)));
+            // only add this to 2.2.1 and above
+            promises.push(this._nativeBridge.DeviceInfo.Android.getApkDigest().then(apkDigest => this.set('apkDigest', apkDigest)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._nativeBridge.DeviceInfo.Android.getCertificateFingerprint().then(certificateFingerPrint => this.set('certificateFingerPrint', certificateFingerPrint)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._nativeBridge.DeviceInfo.Android.getBoard().then(board => this.set('board', board)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._nativeBridge.DeviceInfo.Android.getBootloader().then(bootLoader => this.set('bootLoader', bootLoader)).catch(err => this.handleDeviceInfoError(err)));
