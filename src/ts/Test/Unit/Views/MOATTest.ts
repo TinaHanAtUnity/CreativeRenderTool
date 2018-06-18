@@ -1,5 +1,5 @@
 import 'mocha';
-import sinon from 'sinon';
+import * as sinon from 'sinon';
 import { assert } from 'chai';
 import { NativeBridge } from 'Native/NativeBridge';
 import { MOAT } from 'Views/MOAT';
