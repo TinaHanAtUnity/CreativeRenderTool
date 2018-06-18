@@ -168,7 +168,7 @@ export class MOAT extends View<VastCampaign> {
                     Diagnostics.trigger('moat_video_error', e.data.error);
                     break;
                 case 'loaded':
-                    // not sure if something needs to be done here.
+                    // do nothing
                     break;
                 default:
                     this._nativeBridge.Sdk.logWarning(`MOAT Unknown message type ${e.data.type}`);
