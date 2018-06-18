@@ -177,18 +177,7 @@
                 this.postMessage('getClickSignal', touchInfo);
             };
             this.getTouchInfo = function() {
-                return {
-                    start: {
-                        x: startTouch ? startTouch.clientX : 0,
-                        y: startTouch ? startTouch.clientY : 0
-                    },
-                    end: {
-                        x: endTouch ? endTouch.clientX : 0,
-                        y: endTouch ? endTouch.clientY : 0,
-                    },
-                    diameter: endTouch ? endTouch.radiusX * 2 : 0.0,
-                    pressure: endTouch ? endTouch.force || 0.0 : 0.0,
-                    duration: touchDuration,
+                var touchInfo = {
                     counts: {
                         up: upCounts,
                         down: downCounts,
@@ -196,6 +185,24 @@
                         cancel: cancelCounts
                     }
                 };
+                if (startTouch) {
+                    touchInfo.start = {
+                        x: startTouch.clientX || 0.0,
+                        y: startTouch.clientY || 0.0
+                    };
+                }
+                if (endTouch) {
+                    touchInfo.end = {
+                        x: endTouch.clientX || 0.0,
+                        y: endTouch.clientY || 0.0,
+                    };
+                    touchInfo.diameter = endTouch.radiusX * 2,
+                    touchInfo.pressure = endTouch.force || 0.0;
+                }
+                if (touchDuration) {
+                    touchInfo.duration = touchDuration;
+                }
+                return touchInfo;
             };
 
             this.onReceiveClickSignal = function(signal) {

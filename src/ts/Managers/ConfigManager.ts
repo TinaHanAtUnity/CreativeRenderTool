@@ -16,6 +16,7 @@ import { Platform } from 'Constants/Platform';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { JaegerSpan, JaegerTags } from 'Jaeger/JaegerSpan';
+import { ABGroup } from 'Models/ABGroup';
 
 export class ConfigManager {
 
@@ -107,12 +108,12 @@ export class ConfigManager {
         ConfigManager.ConfigBaseUrl = baseUrl + '/games';
     }
 
-    public static setAbGroup(abGroup: number) {
+    public static setAbGroup(abGroup: ABGroup) {
         ConfigManager.AbGroup = abGroup;
     }
 
     private static ConfigBaseUrl: string = 'https://publisher-config.unityads.unity3d.com/games';
-    private static AbGroup: number | undefined;
+    private static AbGroup: ABGroup | undefined;
 
     private static createConfigUrl(clientInfo: ClientInfo, deviceInfo: DeviceInfo, framework?: FrameworkMetaData, adapter?: AdapterMetaData, gamerId?: string, gamerToken?: string): string {
         let url: string = [
@@ -120,6 +121,11 @@ export class ConfigManager {
             clientInfo.getGameId(),
             'configuration'
         ].join('/');
+
+        let abGroup;
+        if (ConfigManager.AbGroup) {
+            abGroup = ConfigManager.AbGroup.toNumber();
+        }
 
         url = Url.addParameters(url, {
             bundleId: clientInfo.getApplicationName(),
@@ -133,7 +139,7 @@ export class ConfigManager {
             test: clientInfo.getTestMode(),
             gamerId: gamerToken ? undefined : gamerId,
             gamerToken: gamerToken,
-            forceAbGroup: ConfigManager.AbGroup
+            forceAbGroup: abGroup
         });
 
         if(clientInfo.getPlatform() === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {

@@ -22,6 +22,9 @@ PROD_INDEX_SRC = src/prod-index.html
 TEST_INDEX_SRC = src/test-index.html
 PROD_CONFIG_SRC = src/prod-config.json
 TEST_CONFIG_SRC = src/test-config.json
+ADMOB_CONTAINER_DIR = src/html/admob
+ADMOB_CONTAINER_SRC = $(ADMOB_CONTAINER_DIR)/AFMAContainer-no-obfuscation.html
+ADMOB_CONTAINER_GENERATED = $(ADMOB_CONTAINER_DIR)/AFMAContainer.html
 
 # Branch and commit id
 ifeq ($(TRAVIS), true)
@@ -191,6 +194,7 @@ build-proto:
 	cp src/proto/unity_proto.js $(BUILD_DIR)/proto/unity_proto.js
 
 build-ts:
+build-ts: lint
 	@echo
 	@echo Transpiling .ts to .js
 	@echo
@@ -220,6 +224,16 @@ build-css:
 
 build-static:
 	@echo
+	@echo Generating obfuscated container AdMob js
+	@echo
+
+	sed -e 's/<\/*script>//g' $(ADMOB_CONTAINER_SRC) > $(ADMOB_CONTAINER_DIR)/admob_temp.js
+	echo '<script>' > $(ADMOB_CONTAINER_GENERATED)
+	$(CC) --js $(ADMOB_CONTAINER_DIR)/admob_temp.js --formatting PRETTY_PRINT --rewrite_polyfills false >> $(ADMOB_CONTAINER_GENERATED)
+	echo '</script>' >> $(ADMOB_CONTAINER_GENERATED)
+	rm $(ADMOB_CONTAINER_DIR)/admob_temp.js
+
+	@echo
 	@echo Copying static files to build
 	@echo
 
@@ -246,7 +260,7 @@ test: test-unit test-integration
 
 test-unit: MODULE = system
 test-unit: TARGET = es5
-test-unit: build-proto
+test-unit: build-static build-proto
 	@echo
 	@echo Transpiling .ts to .js for local tests
 	@echo
@@ -294,7 +308,7 @@ test-integration: build-proto
 test-coverage: BUILD_DIR = build/coverage
 test-coverage: MODULE = system
 test-coverage: TARGET = es5
-test-coverage: build-dir build-proto
+test-coverage: build-dir build-proto build-static
 	@echo
 	@echo Transpiling .ts to .js for local tests
 	@echo

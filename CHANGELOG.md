@@ -1,3 +1,51 @@
+# Mon Jun 18 09:51:31 UTC 2018
+
+* Send xpromo third quartile event
+* Run tslint before compiling TypeScript
+* Enable apk hashing / apk digest for 2.2.1 and above
+
+# Thu Jun 14 20:14:43 UTC 2018
+
+* Add the GDPR icon to the Privacy model
+* Obfuscate Admob AFMA Container
+
+# Wed Jun 13 05:22:38 UTC 2018
+
+* Fix Vpaid loading issue in iOS
+* ABGroup fix by casting TestEnvironment AbGroup to a number
+* Add helper functions to reduce casting complexity with tests
+
+# Tue Jun 12 20:30:09 UTC 2018
+
+* Use isMoatEnabled flag from auction response
+* A/B for new endscreen design in groups 16 and 17
+* Add GDPR icon to MRAID gdpr banner and GDPR stylesheet cleanup
+
+# Tue Jun 12 07:57:06 UTC 2018
+
+* Refactor AB Groups to be their own class
+* Fix for Admob proto getting values set with undefined
+* Remove privacy banner/button during XPromo
+* Fix GDPR skip event for vast
+
+# Mon Jun 11 21:00:41 UTC 2018
+
+* Remove gamerId from operative events
+* Removed the GDPR icon AB test and use the GDPR font icon. Test was running on AB groups 16 & 17
+
+# Fri Jun  8 20:24:13 UTC 2018
+
+* GDPR banners for all ad units
+
+# Thu Jun  7 17:15:45 UTC 2018
+
+* Fix Purchasing utilities diagnostics
+* Refactor GDPR event sending to GdprManager
+
+# Wed Jun  6 09:37:02 UTC 2018
+
+* Refactor promo purchasing utilities
+
 # Tue Jun  5 17:49:15 UTC 2018
 
 * Refactor third party event sending url template

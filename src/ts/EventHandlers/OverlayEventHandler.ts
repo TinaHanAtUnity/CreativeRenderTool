@@ -11,24 +11,28 @@ import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { Placement } from 'Models/Placement';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
+import { GdprManager, GDPREventAction } from 'Managers/GdprManager';
+import { Configuration } from 'Models/Configuration';
 
 export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler {
     protected _placement: Placement;
     protected _nativeBridge: NativeBridge;
     private _adUnit: VideoAdUnit<T>;
     private _operativeEventManager: OperativeEventManager;
-    private _abGroup: number;
     private _campaign: T;
     private _adUnitStyle?: AdUnitStyle;
+    private _configuration: Configuration;
+    private _gdprManager: GdprManager;
 
     constructor(nativeBridge: NativeBridge, adUnit: VideoAdUnit<T>, parameters: IAdUnitParameters<T>, adUnitStyle?: AdUnitStyle) {
         this._nativeBridge = nativeBridge;
         this._operativeEventManager = parameters.operativeEventManager;
-        this._abGroup = parameters.campaign.getAbGroup();
         this._adUnit = adUnit;
         this._campaign = parameters.campaign;
         this._placement = parameters.placement;
         this._adUnitStyle = adUnitStyle;
+        this._configuration = parameters.configuration;
+        this._gdprManager = parameters.gdprManager;
     }
 
     public onOverlaySkip(position: number): void {
@@ -57,6 +61,13 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
 
     public onOverlayPauseForTesting(paused: boolean): void {
         // EMPTY
+    }
+
+    public onGDPRPopupSkipped(): void {
+        if (!this._configuration.isOptOutRecorded()) {
+            this._configuration.setOptOutRecorded(true);
+        }
+        this._gdprManager.sendGDPREvent(GDPREventAction.SKIP);
     }
 
     public onOverlayClose(): void {

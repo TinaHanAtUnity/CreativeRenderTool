@@ -8,7 +8,6 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
-import { Url } from 'Utilities/Url';
 import { StorageType } from 'Native/Api/Storage';
 import { INativeResponse, Request } from 'Utilities/Request';
 import { SessionManager } from 'Managers/SessionManager';
@@ -19,6 +18,7 @@ import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { CampaignAssetInfo } from 'Utilities/CampaignAssetInfo';
 import { Configuration } from 'Models/Configuration';
 import { GameSessionCounters } from 'Utilities/GameSessionCounters';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {
     nativeBridge: NativeBridge;
@@ -31,17 +31,7 @@ export interface IOperativeEventManagerParams<T extends Campaign> {
     campaign: T;
 }
 
-export enum GDPREventSource {
-    METADATA = 'metadata',
-    USER = 'user'
-}
-
 export class OperativeEventManager {
-
-    public static setTestBaseUrl(baseUrl: string): void {
-        OperativeEventManager.VideoEventBaseUrl = baseUrl + '/mobile/gamers';
-        OperativeEventManager.ClickEventBaseUrl = baseUrl + '/mobile/campaigns';
-    }
 
     public static getEventKey(sessionId: string, eventId: string): string {
         return SessionManager.getSessionKey(sessionId) + '.operative.' + eventId;
@@ -63,27 +53,6 @@ export class OperativeEventManager {
         return OperativeEventManager.PreviousPlacementId;
     }
 
-    public static sendGDPREvent(action: string, deviceInfo: DeviceInfo, clientInfo: ClientInfo, configuration: Configuration, source?: GDPREventSource): Promise<void> {
-        let infoJson: any = {
-            'adid': deviceInfo.getAdvertisingIdentifier(),
-            'action': action,
-            'projectId': configuration.getUnityProjectId(),
-            'platform': Platform[clientInfo.getPlatform()].toLowerCase(),
-            'gameId': clientInfo.getGameId()
-        };
-        if (source) {
-            infoJson = {
-                ... infoJson,
-                'source': source
-            };
-        }
-
-        HttpKafka.sendEvent('ads.events.optout.v1.json', KafkaCommonObjectType.EMPTY, infoJson);
-        return Promise.resolve();
-    }
-
-    private static VideoEventBaseUrl: string = 'https://adserver.unityads.unity3d.com/mobile/gamers';
-    private static ClickEventBaseUrl: string = 'https://adserver.unityads.unity3d.com/mobile/campaigns';
     private static PreviousPlacementId: string | undefined;
 
     protected _gamerServerId: string | undefined;
@@ -254,10 +223,6 @@ export class OperativeEventManager {
         return this.createUniqueEventMetadata(placement, this._sessionManager.getGameSessionId(), this._gamerServerId, OperativeEventManager.getPreviousPlacementId(), videoOrientation, adUnitStyle).then(fulfilled);
     }
 
-    public sendGDPREvent(action: string, source?: GDPREventSource): Promise<void> {
-        return OperativeEventManager.sendGDPREvent(action, this._deviceInfo, this._clientInfo, this._configuration, source);
-    }
-
     public setGamerServerId(serverId: string | undefined): void {
         this._gamerServerId = serverId;
     }
@@ -266,7 +231,11 @@ export class OperativeEventManager {
         return this._clientInfo;
     }
 
-    public sendEvent(event: string, eventId: string, sessionId: string, url: string, data: string): Promise<INativeResponse | void> {
+    public sendEvent(event: string, eventId: string, sessionId: string, url: string | undefined, data: string): Promise<INativeResponse | void> {
+        if(!url) {
+            return Promise.resolve();
+        }
+
         this._nativeBridge.Sdk.logInfo('Unity Ads event: sending ' + event + ' event to ' + url);
 
         return this._request.post(url, data, [], {
@@ -281,33 +250,21 @@ export class OperativeEventManager {
         });
     }
 
-    protected createVideoEventUrl(type: string): string {
-        return [
-            OperativeEventManager.VideoEventBaseUrl,
-            this._campaign.getGamerId(),
-            'video',
-            type,
-            this._campaign.getId(),
-            this._clientInfo.getGameId()
-        ].join('/');
+    protected createVideoEventUrl(type: string): string | undefined {
+        Diagnostics.trigger('operative_event_manager_url_error', {
+            message: 'Trying to use video-event url generation from base operative event manager',
+            eventType: type
+        });
+
+        return undefined;
     }
 
-    protected createClickEventUrl(): string {
-        let url: string | undefined;
-        let parameters: any;
+    protected createClickEventUrl(): string | undefined {
+        Diagnostics.trigger('operative_event_manager_url_error', {
+            message: 'Trying to use click-event url generation from base operative event manager'
+        });
 
-        url = [
-            OperativeEventManager.ClickEventBaseUrl,
-            this._campaign.getId(),
-            'click',
-            this._campaign.getGamerId(),
-        ].join('/');
-        parameters = {
-            gameId: this._clientInfo.getGameId(),
-            redirect: false
-        };
-
-        return Url.addParameters(url, parameters);
+        return undefined;
     }
 
     protected createUniqueEventMetadata(placement: Placement, gameSession: number, gamerSid?: string, previousPlacementId?: string, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<[string, any]> {
@@ -321,7 +278,6 @@ export class OperativeEventManager {
             'eventId': eventId,
             'auctionId': this._campaign.getSession().getId(),
             'gameSessionId': gameSession,
-            'gamerId': this._campaign.getGamerId(),
             'campaignId': this._campaign.getId(),
             'adType': this._campaign.getAdType(),
             'correlationId': this._campaign.getCorrelationId(),

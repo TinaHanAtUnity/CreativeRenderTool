@@ -28,6 +28,8 @@ import { IVideoEventHandlerParams } from 'EventHandlers/BaseVideoEventHandler';
 import { Vast } from 'Models/Vast/Vast';
 import { VideoState } from 'AdUnits/VideoAdUnit';
 import { GdprManager } from 'Managers/GdprManager';
+import { AbstractPrivacy } from 'Views/AbstractPrivacy';
+import { Privacy } from 'Views/Privacy';
 
 import EventTestVast from 'xml/EventTestVast.xml';
 
@@ -55,6 +57,7 @@ describe('VastVideoEventHandler tests', () => {
     let vastVideoEventHandler: VastVideoEventHandler;
     let videoEventHandlerParams: IVideoEventHandlerParams;
     let gdprManager: GdprManager;
+    let privacy: AbstractPrivacy;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -71,7 +74,8 @@ describe('VastVideoEventHandler tests', () => {
         campaign = TestFixtures.getEventVastCampaign();
         clientInfo = TestFixtures.getClientInfo();
         container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
-        overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
+        privacy = new Privacy(nativeBridge, true);
+        overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
 
         placement = new Placement({
             id: '123',
@@ -123,7 +127,7 @@ describe('VastVideoEventHandler tests', () => {
             gdprManager: gdprManager
         };
 
-        testAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
+        testAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters, false);
         sinon.spy(testAdUnit, 'hide');
 
         moat = sinon.createStubInstance(MOAT);
@@ -195,7 +199,7 @@ describe('VastVideoEventHandler tests', () => {
             campaignWithTrackers.getVast().set('additionalTrackingEvents', customTracking);
             vastAdUnitParameters.campaign = campaignWithTrackers;
 
-            const adUnitWithTrackers = new VastAdUnit(nativeBridge, vastAdUnitParameters);
+            const adUnitWithTrackers = new VastAdUnit(nativeBridge, vastAdUnitParameters, false);
             videoEventHandlerParams.adUnit = adUnitWithTrackers;
             videoEventHandlerParams.campaign = vastAdUnitParameters.campaign;
             vastVideoEventHandler = new VastVideoEventHandler(<IVideoEventHandlerParams<VastAdUnit, VastCampaign>>videoEventHandlerParams);
@@ -299,7 +303,7 @@ describe('VastVideoEventHandler tests', () => {
             vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.configuration.isCoppaCompliant(), vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
             sinon.spy(vastEndScreen, 'show');
             vastAdUnitParameters.endScreen = vastEndScreen;
-            vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
+            vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters, false);
             videoEventHandlerParams.adUnit = vastAdUnit;
             vastVideoEventHandler = new VastVideoEventHandler(<IVideoEventHandlerParams<VastAdUnit, VastCampaign>>videoEventHandlerParams);
         });

@@ -24,12 +24,12 @@ describe('UrlTest', () => {
     });
 
     [
-        ['remove last param2 from url', 'http://www.google.fi?&param1=125&param2=test', 'param2', 'http://www.google.fi?&param1=125'],
-        ['remove first param1 from url', 'http://www.google.fi?&param1=125&param2=test', 'param1', 'http://www.google.fi?&param2=test'],
-        ['remove middle param2 from url', 'http://www.google.fi?&param1=125&param2=test&param3=true', 'param2', 'http://www.google.fi?&param1=125&param3=true'],
-        ['remove only one param1 from url', 'http://www.google.fi?&param1=125', 'param1', 'http://www.google.fi?'],
-    ].forEach(([testName, originalUrl, parameter, expected]) => {
-        it(`should ${testName}`, () => {
+        ['http://www.google.fi?&param1=125&param2=test', 'param2', 'http://www.google.fi?&param1=125'],
+        ['http://www.google.fi?&param1=125&param2=test', 'param1', 'http://www.google.fi?&param2=test'],
+        ['http://www.google.fi?&param1=125&param2=test&param3=true', 'param2', 'http://www.google.fi?&param1=125&param3=true'],
+        ['http://www.google.fi?&param1=125', 'param1', 'http://www.google.fi?'],
+    ].forEach(([originalUrl, parameter, expected]) => {
+        it(`should remove ${parameter} from ${originalUrl}`, () => {
             const url: string = Url.removeQueryParameter(originalUrl, parameter);
             assert.equal(url, expected);
         });

@@ -8,10 +8,11 @@ import { IPromoCampaign, PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 import { AuctionResponse } from 'Models/AuctionResponse';
 import { Session } from 'Models/Session';
 import { HTML } from 'Models/Assets/HTML';
+import { ABGroup } from 'Models/ABGroup';
 
 export class PromoCampaignParser extends CampaignParser {
     public static ContentType = 'purchasing/iap';
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: ABGroup): Promise<Campaign> {
         const promoJson = JsonParser.parse(response.getContent());
         if (promoJson && promoJson.iapProductId) {
             if (PurchasingUtilities.promoResponseIndex < PurchasingUtilities.iapCampaignCount) {

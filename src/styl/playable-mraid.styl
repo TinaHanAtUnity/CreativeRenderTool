@@ -1,4 +1,5 @@
 @import "components.styl";
+@import "gdpr-pop-up.styl";
 
 $hiding-delay = 1.5s;
 $progress-bar-width = 60%;
@@ -135,6 +136,10 @@ $filling-bar-width = $progress-bar-width * .3;
     animation-iteration-count: 1;
     animation-fill-mode: forwards;
     animation-timing-function: linear;
+  }
+
+  .gdpr-pop-up {
+    $gdpr-pop-up($default-scale-size);
   }
 
   .privacy-button {
