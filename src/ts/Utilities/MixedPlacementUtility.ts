@@ -45,28 +45,7 @@ export class MixedPlacementUtility {
         return this.doesEndWithMixedPlacementSuffix(placementId, correctSuffix);
     }
 
-    // SHOULD BE PRIVATE METHOD but linter won't allow this private method to be tested via following way:
-    // https://stackoverflow.com/questions/35987055/how-to-write-unit-testing-for-angular-2-typescript-for-private-methods-with-ja
-    public static hasMixedPlacementSuffix(placementId: string, configuration: Configuration): boolean {
-        const mixedList = MixedPlacementUtility.getMixedPlacementTypeList();
-
-        let fixedPlacementId;
-
-        for (const mixedType of mixedList.slice(1)) {
-            if (this.doesEndWithMixedPlacementSuffix(placementId, mixedType)) {
-                fixedPlacementId = this.removeEndingSuffix(placementId);
-            }
-
-            if (!!configuration.getPlacements()[fixedPlacementId + mixedType]) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    // SHOULD BE PRIVATE METHOD but linter won't allow this private method to be tested via following way:
-    // https://stackoverflow.com/questions/35987055/how-to-write-unit-testing-for-angular-2-typescript-for-private-methods-with-ja
-    public static extractMixedPlacementSuffix(placementId: string, campaign: Campaign, configuration: Configuration): MixedPlacementTypes {
+    private static extractMixedPlacementSuffix(placementId: string, campaign: Campaign, configuration: Configuration): MixedPlacementTypes {
         let str = MixedPlacementTypes.NON_REWARDED;
         const placement = configuration.getPlacement(placementId);
 
@@ -87,6 +66,23 @@ export class MixedPlacementUtility {
         }
 
         return str;
+    }
+
+    private static hasMixedPlacementSuffix(placementId: string, configuration: Configuration): boolean {
+        const mixedList = MixedPlacementUtility.getMixedPlacementTypeList();
+
+        let fixedPlacementId;
+
+        for (const mixedType of mixedList.slice(1)) {
+            if (this.doesEndWithMixedPlacementSuffix(placementId, mixedType)) {
+                fixedPlacementId = this.removeEndingSuffix(placementId);
+            }
+
+            if (!!configuration.getPlacements()[fixedPlacementId + mixedType]) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static removeEndingSuffix(placementId: string): string {

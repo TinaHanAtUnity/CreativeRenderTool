@@ -42,72 +42,74 @@ describe('MixedPlacementUtilities', () => {
     });
 
     describe('extractMixedPlacementSuffix', () => {
+        const extractMixedPlacementSuffix = 'extractMixedPlacementSuffix';
+
         it('should return an empty string when placement is not mixed', () => {
-            const result = MixedPlacementUtility.extractMixedPlacementSuffix(configuration.getPlacement('video').getId(), TestFixtures.getCampaign(), configuration);
+            const result = MixedPlacementUtility[extractMixedPlacementSuffix](configuration.getPlacement('video').getId(), TestFixtures.getCampaign(), configuration);
             assert.equal(result, '');
         });
         it('should return empty string when placement is mixed, allows skip in configuration, and is not a promo campaign', () => {
-            const result = MixedPlacementUtility.extractMixedPlacementSuffix(configuration.getPlacement('rewardedPromoPlacement').getId(), TestFixtures.getCampaign(), configuration);
+            const result = MixedPlacementUtility[extractMixedPlacementSuffix](configuration.getPlacement('rewardedPromoPlacement').getId(), TestFixtures.getCampaign(), configuration);
             assert.equal(result, '');
         });
         it('should return -rewarded when placement is mixed, nonskippable in config, and campaign is not a promo', () => {
-            const result = MixedPlacementUtility.extractMixedPlacementSuffix(configuration.getPlacement('mixedPlacement').getId(), TestFixtures.getCampaign(), configuration);
+            const result = MixedPlacementUtility[extractMixedPlacementSuffix](configuration.getPlacement('mixedPlacement').getId(), TestFixtures.getCampaign(), configuration);
             assert.equal(result, '-rewarded');
         });
         it('should return -promo when placement is mixed, does not allow skip in campaign, and campaign is promo ', () => {
-            const result = MixedPlacementUtility.extractMixedPlacementSuffix(configuration.getPlacement('mixedPlacement').getId(), promoNonSkippableCampaign, configuration);
+            const result = MixedPlacementUtility[extractMixedPlacementSuffix](configuration.getPlacement('mixedPlacement').getId(), promoNonSkippableCampaign, configuration);
             assert.equal(result, '-promo');
         });
         it('should return -rewardedpromo when placement is mixed, allows skip in campaign, and is a promo campaign', () => {
-            const result = MixedPlacementUtility.extractMixedPlacementSuffix(configuration.getPlacement('rewardedPromoPlacement').getId(), promoSkippableCampaign, configuration);
+            const result = MixedPlacementUtility[extractMixedPlacementSuffix](configuration.getPlacement('rewardedPromoPlacement').getId(), promoSkippableCampaign, configuration);
             assert.equal(result, '-rewardedpromo');
         });
         it('should return -promo when placement is mixed, does not allow skip in campaign, and campaign is promo even if allows skip in config is true', () => {
-            const result = MixedPlacementUtility.extractMixedPlacementSuffix(configuration.getPlacement('skippableMixedPlacement').getId(), promoNonSkippableCampaign, configuration);
+            const result = MixedPlacementUtility[extractMixedPlacementSuffix](configuration.getPlacement('skippableMixedPlacement').getId(), promoNonSkippableCampaign, configuration);
             assert.equal(result, '-promo');
         });
         it('should return -rewardedpromo when placement is mixed, allows skip in campaign, and is a promo campaign, even if allows skip in config is false', () => {
-            const result = MixedPlacementUtility.extractMixedPlacementSuffix(configuration.getPlacement('mixedPlacement-promo').getId(), promoSkippableCampaign, configuration);
+            const result = MixedPlacementUtility[extractMixedPlacementSuffix](configuration.getPlacement('mixedPlacement-promo').getId(), promoSkippableCampaign, configuration);
             assert.equal(result, '-rewardedpromo');
         });
     });
 
     describe('hasMixedPlacementSuffix', () => {
+        const hasMixedPlacementSuffix = 'hasMixedPlacementSuffix';
 
         it('should return false if there is no mixedType suffix at the end of the placementid', () => {
-            const result = MixedPlacementUtility.hasMixedPlacementSuffix('mixedPlacement', configuration);
+            const result = MixedPlacementUtility[hasMixedPlacementSuffix]('mixedPlacement', configuration);
             assert.isFalse(result);
         });
 
         it('should return false if there is a dash suffix but is not mixedType', () => {
-            const result = MixedPlacementUtility.hasMixedPlacementSuffix('mixedPlacement-withdashes', configuration);
+            const result = MixedPlacementUtility[hasMixedPlacementSuffix]('mixedPlacement-withdashes', configuration);
             assert.isFalse(result);
         });
 
         it('should return false if there is multiple dash suffixes but is not mixedType', () => {
-            const result = MixedPlacementUtility.hasMixedPlacementSuffix('promoPlacement-withdashes-booyah', configuration);
+            const result = MixedPlacementUtility[hasMixedPlacementSuffix]('promoPlacement-withdashes-booyah', configuration);
             assert.isFalse(result);
         });
 
         it('should return false if there is a dash separated mixed type that is not at the end of the placementid', () => {
-            const result = MixedPlacementUtility.hasMixedPlacementSuffix('testDashPlacement-promo-boo', configuration);
+            const result = MixedPlacementUtility[hasMixedPlacementSuffix]('testDashPlacement-promo-boo', configuration);
             assert.isFalse(result);
         });
 
         it('should return false if placement has dash separated mixed type but base id does not exist in configuration placement map', () => {
-            const result = MixedPlacementUtility.hasMixedPlacementSuffix('scooterPlacement-promo-promo', configuration);
+            const result = MixedPlacementUtility[hasMixedPlacementSuffix]('scooterPlacement-promo-promo', configuration);
             assert.isFalse(result);
         });
 
         it('should return true if placement includes at least one of the mixed placement suffixes at the end', () => {
-
-            const result = MixedPlacementUtility.hasMixedPlacementSuffix('testDashPlacement-rewarded', configuration);
+            const result = MixedPlacementUtility[hasMixedPlacementSuffix]('testDashPlacement-rewarded', configuration);
             assert.isTrue(result);
         });
 
         it('should return true if a placementid already includes a dash and at least one of the mixed placement suffixes at the end', () => {
 
-            const result = MixedPlacementUtility.hasMixedPlacementSuffix('testDashPlacement-promo-promo', configuration);
+            const result = MixedPlacementUtility[hasMixedPlacementSuffix]('testDashPlacement-promo-promo', configuration);
             assert.isTrue(result);
         });
     });
