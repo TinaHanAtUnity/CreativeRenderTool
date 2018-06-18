@@ -182,6 +182,7 @@ export class ViewController extends AdUnitContainer {
     }
 
     private onViewDidAppear(): void {
+        this.onAppForeground();
         this._handlers.forEach(handler => handler.onContainerShow());
     }
 

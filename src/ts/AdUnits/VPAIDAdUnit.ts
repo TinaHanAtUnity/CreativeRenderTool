@@ -117,7 +117,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public unmute() {
-        this._view.unmute();
+    this._view.unmute();
     }
 
     public onAdLoaded() {
@@ -127,7 +127,6 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public onContainerShow(): void {
         this.setShowing(true);
-        this.onContainerForeground();
     }
 
     public onContainerDestroy(): void {
