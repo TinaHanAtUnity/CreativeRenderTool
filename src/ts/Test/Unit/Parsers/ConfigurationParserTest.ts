@@ -5,6 +5,7 @@ import { Configuration, CacheMode } from 'Models/Configuration';
 import { ConfigurationParser } from 'Parsers/ConfigurationParser';
 
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
+import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
 import { ABGroup } from 'Models/ABGroup';
 
 describe('configurationParserTest', () => {
@@ -92,6 +93,12 @@ describe('configurationParserTest', () => {
             it('should return placement by id', () => {
                 assert.equal(configuration.getPlacement('premium').getName(), 'Premium placement');
             });
+        });
+    });
+
+    describe('Parsing mixed placement json to configuration', () => {
+        beforeEach(() => {
+            configuration = ConfigurationParser.parse(JSON.parse(ConfigurationJson));
         });
     });
 });
