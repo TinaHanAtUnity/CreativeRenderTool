@@ -1,4 +1,10 @@
-# Staged
+# Mon Jun 18 09:51:31 UTC 2018
+
+* Send xpromo third quartile event
+* Run tslint before compiling TypeScript
+* Enable apk hashing / apk digest for 2.2.1 and above
+
+# Thu Jun 14 20:14:43 UTC 2018
 
 * Add the GDPR icon to the Privacy model
 * Obfuscate Admob AFMA Container
