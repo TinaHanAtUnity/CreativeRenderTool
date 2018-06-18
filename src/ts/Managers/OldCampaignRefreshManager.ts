@@ -22,7 +22,6 @@ import { JaegerSpan } from 'Jaeger/JaegerSpan';
 import { UserCountData } from 'Utilities/UserCountData';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { MixedPlacementUtility } from 'Utilities/MixedPlacementUtility';
-import { configure } from 'protobufjs';
 
 export class OldCampaignRefreshManager extends RefreshManager {
     private _nativeBridge: NativeBridge;
@@ -218,15 +217,9 @@ export class OldCampaignRefreshManager extends RefreshManager {
 
     private onCampaign(placementId: string, campaign: Campaign) {
         this._parsingErrorCount = 0;
-        MixedPlacementUtility.nativeBridge = this._nativeBridge;
 
-        if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
-            if (MixedPlacementUtility.doesCampaignAndConfigMatchMixedPlacement(placementId, this._configuration, campaign)) {
-                this.setCampaignForPlacement(placementId, campaign);
-                this.handlePlacementState(placementId, PlacementState.READY);
-            } else {
-                this.onNoFill(placementId);
-            }
+        if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId()) && !MixedPlacementUtility.shouldFillMixedPlacement(placementId, this._configuration, campaign)) {
+            this.onNoFill(placementId);
         } else {
             this.setCampaignForPlacement(placementId, campaign);
             this.handlePlacementState(placementId, PlacementState.READY);
@@ -235,7 +228,6 @@ export class OldCampaignRefreshManager extends RefreshManager {
 
     private onNoFill(placementId: string) {
         this._parsingErrorCount = 0;
-        this._nativeBridge.Sdk.logInfo(placementId + ' is getting a nofill ^_^');
 
         this._nativeBridge.Sdk.logDebug('Unity Ads server returned no fill, no ads to show, for placement: ' + placementId);
         this.setCampaignForPlacement(placementId, undefined);

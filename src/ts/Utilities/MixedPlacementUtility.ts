@@ -13,36 +13,42 @@ export const enum MixedPlacementTypes {
 
 export class MixedPlacementUtility {
 
-    public static nativeBridge: NativeBridge;
-
-    public static getMixedPlacmentTypeList(): string[] {
-        return [MixedPlacementTypes.NON_REWARDED, MixedPlacementTypes.PROMO, MixedPlacementTypes.REWARDED, MixedPlacementTypes.REWARDED_PROMO];
+    public static isMixedPlacement(placement: Placement): boolean {
+        const adTypes = placement.getAdTypes();
+        if (!adTypes) {
+            return false;
+        }
+        if (adTypes.length <= 1) {
+            return false;
+        }
+        if (adTypes.indexOf('IAP') === -1) {
+            return false;
+        }
+        return true;
     }
 
-    public static extractMixedPlacementSuffix(placementId: string, campaign: Campaign, configuration: Configuration): MixedPlacementTypes {
-        let str = MixedPlacementTypes.NON_REWARDED;
+    public static createMixedPlacements(rawPlacement: any, placements: { [id: string]: Placement }) {
+        const rawPlacementId: string = rawPlacement.id;
+        for (const mixedPlacementSuffix of this.getMixedPlacementTypeList()) {
+            rawPlacement.id = rawPlacementId + mixedPlacementSuffix;
+            placements[rawPlacement.id] = new Placement(rawPlacement);
+        }
+    }
 
-        if (!this.isMixedIAP(placementId, configuration)) {
-            str = MixedPlacementTypes.NON_REWARDED;
-        } else if (campaign instanceof PromoCampaign) {
-            if (campaign.getAllowSkip()) {
-                str = MixedPlacementTypes.REWARDED_PROMO;
-            } else {
-                str = MixedPlacementTypes.PROMO;
-            }
-        } else {
-            if (configuration.getPlacement(placementId).allowSkip()) {
-                str = MixedPlacementTypes.NON_REWARDED;
-            } else {
-                str = MixedPlacementTypes.REWARDED;
-            }
+    public static shouldFillMixedPlacement(placementId: string, configuration: Configuration, campaign: Campaign): boolean {
+        const correctSuffix = this.extractMixedPlacementSuffix(placementId, campaign, configuration);
+
+        if (correctSuffix === MixedPlacementTypes.NON_REWARDED) {
+            return !this.hasMixedPlacementSuffix(placementId, configuration);
         }
 
-        return str;
+        return this.doesEndWithMixedPlacementSuffix(placementId, correctSuffix);
     }
 
-    public static ifSuffixedPlacementsExist(placementId: string, configuration: Configuration): boolean {
-        const mixedList = MixedPlacementUtility.getMixedPlacmentTypeList();
+    // SHOULD BE PRIVATE METHOD but linter won't allow this private method to be tested via following way:
+    // https://stackoverflow.com/questions/35987055/how-to-write-unit-testing-for-angular-2-typescript-for-private-methods-with-ja
+    public static hasMixedPlacementSuffix(placementId: string, configuration: Configuration): boolean {
+        const mixedList = MixedPlacementUtility.getMixedPlacementTypeList();
 
         let fixedPlacementId;
 
@@ -58,56 +64,40 @@ export class MixedPlacementUtility {
         return false;
     }
 
-    public static isMixedIAP(placementId: string, configuration: Configuration): boolean {
-        const adTypes = configuration.getPlacement(placementId).getAdTypes();
-        if (!adTypes) {
-            return false;
-        }
-        if (adTypes.length <= 1) {
-            return false;
-        }
-        if (adTypes.indexOf('IAP') === -1) {
-            return false;
-        }
-        return true;
-    }
+    // SHOULD BE PRIVATE METHOD but linter won't allow this private method to be tested via following way:
+    // https://stackoverflow.com/questions/35987055/how-to-write-unit-testing-for-angular-2-typescript-for-private-methods-with-ja
+    public static extractMixedPlacementSuffix(placementId: string, campaign: Campaign, configuration: Configuration): MixedPlacementTypes {
+        let str = MixedPlacementTypes.NON_REWARDED;
+        const placement = configuration.getPlacement(placementId);
 
-    public static isMixedIAP2(adTypes: any): boolean {
-        if (!adTypes) {
-            return false;
-        }
-        if (adTypes.length <= 1) {
-            return false;
-        }
-        if (adTypes.indexOf('IAP') === -1) {
-            return false;
-        }
-        return true;
-    }
-
-    public static createMixedPlacements(rawPlacement: any, placements: { [id: string]: Placement }) {
-        const rawPlacementId: string = rawPlacement.id;
-        for (const mixedPlacementSuffix of this.getMixedPlacmentTypeList()) {
-            rawPlacement.id = rawPlacementId + mixedPlacementSuffix;
-            placements[rawPlacement.id] = new Placement(rawPlacement);
-        }
-    }
-
-    public static doesEndWithMixedPlacementSuffix(placementId: string, mixedType: string): boolean {
-        return placementId.split('-').length > 1 && `-${placementId.split('-').pop()}` === mixedType;
-    }
-
-    public static doesCampaignAndConfigMatchMixedPlacement(placementId: string, configuration: Configuration, campaign: Campaign): boolean {
-        const correctSuffix = this.extractMixedPlacementSuffix(placementId, campaign, configuration);
-
-        if (correctSuffix === MixedPlacementTypes.NON_REWARDED) {
-            return !this.ifSuffixedPlacementsExist(placementId, configuration);
+        if (!this.isMixedPlacement(placement)) {
+            str = MixedPlacementTypes.NON_REWARDED;
+        } else if (campaign instanceof PromoCampaign) {
+            if (campaign.getAllowSkip()) {
+                str = MixedPlacementTypes.REWARDED_PROMO;
+            } else {
+                str = MixedPlacementTypes.PROMO;
+            }
+        } else {
+            if (placement.allowSkip()) {
+                str = MixedPlacementTypes.NON_REWARDED;
+            } else {
+                str = MixedPlacementTypes.REWARDED;
+            }
         }
 
-        return this.doesEndWithMixedPlacementSuffix(placementId, correctSuffix);
+        return str;
     }
 
     private static removeEndingSuffix(placementId: string): string {
         return placementId.split('-').slice(0, -1).join('-');
+    }
+
+    private static getMixedPlacementTypeList(): string[] {
+        return [MixedPlacementTypes.NON_REWARDED, MixedPlacementTypes.PROMO, MixedPlacementTypes.REWARDED, MixedPlacementTypes.REWARDED_PROMO];
+    }
+
+    private static doesEndWithMixedPlacementSuffix(placementId: string, mixedType: string): boolean {
+        return placementId.split('-').length > 1 && `-${placementId.split('-').pop()}` === mixedType;
     }
 }

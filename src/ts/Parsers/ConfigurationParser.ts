@@ -14,7 +14,7 @@ export class ConfigurationParser {
         if (configPlacements) {
             configPlacements.forEach((rawPlacement: any): void => {
                 const placement: Placement = new Placement(rawPlacement);
-                if(clientInfo && CustomFeatures.isMixedPlacementExperiment(clientInfo.getGameId()) && MixedPlacementUtility.isMixedIAP2(placement.getAdTypes())) {
+                if(clientInfo && CustomFeatures.isMixedPlacementExperiment(clientInfo.getGameId()) && MixedPlacementUtility.isMixedPlacement(placement)) {
                     MixedPlacementUtility.createMixedPlacements(rawPlacement, placements);
                 } else {
                     placements[placement.getId()] = placement;

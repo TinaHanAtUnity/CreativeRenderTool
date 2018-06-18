@@ -10,7 +10,7 @@ import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Platform } from 'Constants/Platform';
-import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { Placement } from 'Models/Placement';
 
 describe('MixedPlacementUtilities', () => {
 
@@ -19,19 +19,25 @@ describe('MixedPlacementUtilities', () => {
     let promoNonSkippableCampaign: PromoCampaign;
     let interstitialCampaign: DisplayInterstitialCampaign;
     let clientInfo: ClientInfo;
+    let configurationPromoPlacementsJson: any;
 
     beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID, '1543512');
-        configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements), clientInfo);
+        configurationPromoPlacementsJson = JSON.parse(ConfigurationPromoPlacements);
+        configuration = ConfigurationParser.parse(configurationPromoPlacementsJson, clientInfo);
         interstitialCampaign = TestFixtures.getDisplayInterstitialCampaign();
         promoSkippableCampaign = TestFixtures.getPromoCampaign('purchasing/iap', true);
         promoNonSkippableCampaign = TestFixtures.getPromoCampaign('purchasing/iap', false);
     });
 
-    describe('getPlacementTypeList', () => {
-        it('should return an array of mixed placements', () => {
-            const mixedList = MixedPlacementUtility.getMixedPlacmentTypeList();
-            assert.deepEqual(mixedList, ['', '-promo', '-rewarded', '-rewardedpromo']);
+    describe('isMixedPlacement', () => {
+        it('should return true for a mixed placement', () => {
+            const placement = configuration.getPlacement('mixedPlacement');
+            assert.isTrue(MixedPlacementUtility.isMixedPlacement(placement));
+        });
+        it('should return false for a non-mixed placement', () => {
+            const placement = configuration.getPlacement('premium');
+            assert.isFalse(MixedPlacementUtility.isMixedPlacement(placement));
         });
     });
 
@@ -58,81 +64,81 @@ describe('MixedPlacementUtilities', () => {
         });
     });
 
-    describe('ifSuffixedPlacementsExist', () => {
+    describe('hasMixedPlacementSuffix', () => {
 
         it('should return false if there is no mixedType suffix at the end of the placementid', () => {
-            const result = MixedPlacementUtility.ifSuffixedPlacementsExist('mixedPlacement', configuration);
+            const result = MixedPlacementUtility.hasMixedPlacementSuffix('mixedPlacement', configuration);
             assert.isFalse(result);
         });
 
         it('should return false if there is a dash suffix but is not mixedType', () => {
-            const result = MixedPlacementUtility.ifSuffixedPlacementsExist('mixedPlacement-withdashes', configuration);
+            const result = MixedPlacementUtility.hasMixedPlacementSuffix('mixedPlacement-withdashes', configuration);
             assert.isFalse(result);
         });
 
         it('should return false if there is multiple dash suffixes but is not mixedType', () => {
-            const result = MixedPlacementUtility.ifSuffixedPlacementsExist('promoPlacement-withdashes-booyah', configuration);
+            const result = MixedPlacementUtility.hasMixedPlacementSuffix('promoPlacement-withdashes-booyah', configuration);
             assert.isFalse(result);
         });
 
         it('should return false if there is a dash separated mixed type that is not at the end of the placementid', () => {
-            const result = MixedPlacementUtility.ifSuffixedPlacementsExist('testDashPlacement-promo-boo', configuration);
+            const result = MixedPlacementUtility.hasMixedPlacementSuffix('testDashPlacement-promo-boo', configuration);
             assert.isFalse(result);
         });
 
         it('should return false if placement has dash separated mixed type but base id does not exist in configuration placement map', () => {
-            const result = MixedPlacementUtility.ifSuffixedPlacementsExist('scooterPlacement-promo-promo', configuration);
+            const result = MixedPlacementUtility.hasMixedPlacementSuffix('scooterPlacement-promo-promo', configuration);
             assert.isFalse(result);
         });
 
         it('should return true if placement includes at least one of the mixed placement suffixes at the end', () => {
 
-            const result = MixedPlacementUtility.ifSuffixedPlacementsExist('testDashPlacement-rewarded', configuration);
+            const result = MixedPlacementUtility.hasMixedPlacementSuffix('testDashPlacement-rewarded', configuration);
             assert.isTrue(result);
         });
 
         it('should return true if a placementid already includes a dash and at least one of the mixed placement suffixes at the end', () => {
 
-            const result = MixedPlacementUtility.ifSuffixedPlacementsExist('testDashPlacement-promo-promo', configuration);
+            const result = MixedPlacementUtility.hasMixedPlacementSuffix('testDashPlacement-promo-promo', configuration);
             assert.isTrue(result);
         });
     });
 
-    describe('doesCampaignAndConfigMatchMixedPlacement', () => {
+    describe('shouldFillMixedPlacement', () => {
         context('handle non promo campaign', () => {
             context('where the configuration is skippable', () => {
                 it('should return true for a non-rewarded placement', () => {
-                    const result = MixedPlacementUtility.doesCampaignAndConfigMatchMixedPlacement('skippableMixedPlacement', configuration, interstitialCampaign);
+                    const result = MixedPlacementUtility.shouldFillMixedPlacement('skippableMixedPlacement', configuration, interstitialCampaign);
                     assert.isTrue(result);
                 });
                 it('should return false for a placement with a promo suffix', () => {
-                    const result = MixedPlacementUtility.doesCampaignAndConfigMatchMixedPlacement('skippableMixedPlacement-promo', configuration, interstitialCampaign);
+                    const result = MixedPlacementUtility.shouldFillMixedPlacement('skippableMixedPlacement-promo', configuration, interstitialCampaign);
                     assert.isFalse(result);
                 });
                 it('should return false for a placement with a rewarded promo suffix', () => {
-                    const result = MixedPlacementUtility.doesCampaignAndConfigMatchMixedPlacement('skippableMixedPlacement-rewardedpromo', configuration, interstitialCampaign);
+                    const result = MixedPlacementUtility.shouldFillMixedPlacement('skippableMixedPlacement-rewardedpromo', configuration, interstitialCampaign);
                     assert.isFalse(result);
                 });
                 it('should return false for a placement with a rewarded suffix', () => {
-                    const result = MixedPlacementUtility.doesCampaignAndConfigMatchMixedPlacement('skippableMixedPlacement-rewarded', configuration, interstitialCampaign);
+                    const result = MixedPlacementUtility.shouldFillMixedPlacement('skippableMixedPlacement-rewarded', configuration, interstitialCampaign);
                     assert.isFalse(result);
                 });
             });
             context('where the configuration is non skippable', () => {
                 it('should return true for a placement with the rewarded suffix', () => {
-                    const result = MixedPlacementUtility.doesCampaignAndConfigMatchMixedPlacement('mixedPlacement-rewarded', configuration, interstitialCampaign);
+                    const result = MixedPlacementUtility.shouldFillMixedPlacement('mixedPlacement-rewarded', configuration, interstitialCampaign);
                     assert.isTrue(result);
                 });
                 it('should return false for a non rewarded placement', () => {
-                    const result = MixedPlacementUtility.doesCampaignAndConfigMatchMixedPlacement('mixedPlacement', configuration, interstitialCampaign);
+                    const result = MixedPlacementUtility.shouldFillMixedPlacement('mixedPlacement', configuration, interstitialCampaign);
                     assert.isFalse(result);
                 });
                 it('should return false for a placement with a rewarded promo suffix', () => {
-                    const result = MixedPlacementUtility.doesCampaignAndConfigMatchMixedPlacement('mixedPlacement-rewardedpromo', configuration, interstitialCampaign);
+                    const result = MixedPlacementUtility.shouldFillMixedPlacement('mixedPlacement-rewardedpromo', configuration, interstitialCampaign);
                     assert.isFalse(result);
                 });
                 it('should return false for a placement with a promo suffix', () => {
-                    const result = MixedPlacementUtility.doesCampaignAndConfigMatchMixedPlacement('mixedPlacement-promo', configuration, interstitialCampaign);
+                    const result = MixedPlacementUtility.shouldFillMixedPlacement('mixedPlacement-promo', configuration, interstitialCampaign);
                     assert.isFalse(result);
                 });
             });
@@ -141,37 +147,37 @@ describe('MixedPlacementUtilities', () => {
             context('where the auction is skippable', () => {
                 context('where the configuration is skippable', () => {
                     it('should return true for a placement with the rewarded promo suffix', () => {
-                        const result = MixedPlacementUtility.doesCampaignAndConfigMatchMixedPlacement('mixedPlacement-rewardedpromo', configuration, promoSkippableCampaign);
+                        const result = MixedPlacementUtility.shouldFillMixedPlacement('mixedPlacement-rewardedpromo', configuration, promoSkippableCampaign);
                         assert.isTrue(result);
                     });
                     it('should return false for a placement with a promo suffix', () => {
-                        const result = MixedPlacementUtility.doesCampaignAndConfigMatchMixedPlacement('mixedPlacement-promo', configuration, promoSkippableCampaign);
+                        const result = MixedPlacementUtility.shouldFillMixedPlacement('mixedPlacement-promo', configuration, promoSkippableCampaign);
                         assert.isFalse(result);
                     });
                     it('should return false for a placement with a rewarded suffix', () => {
-                        const result = MixedPlacementUtility.doesCampaignAndConfigMatchMixedPlacement('mixedPlacement-rewarded', configuration, promoSkippableCampaign);
+                        const result = MixedPlacementUtility.shouldFillMixedPlacement('mixedPlacement-rewarded', configuration, promoSkippableCampaign);
                         assert.isFalse(result);
                     });
                     it('should return false for a placement with a non rewarded promo suffix', () => {
-                        const result = MixedPlacementUtility.doesCampaignAndConfigMatchMixedPlacement('mixedPlacement', configuration, promoSkippableCampaign);
+                        const result = MixedPlacementUtility.shouldFillMixedPlacement('mixedPlacement', configuration, promoSkippableCampaign);
                         assert.isFalse(result);
                     });
                 });
                 context('where the configuration is non-skippable', () => {
                     it('should return true for a placement with the rewarded promo suffix', () => {
-                        const result = MixedPlacementUtility.doesCampaignAndConfigMatchMixedPlacement('mixedPlacement-rewardedpromo', configuration, promoSkippableCampaign);
+                        const result = MixedPlacementUtility.shouldFillMixedPlacement('mixedPlacement-rewardedpromo', configuration, promoSkippableCampaign);
                         assert.isTrue(result);
                     });
                     it('should return false for a placement with a promo suffix', () => {
-                        const result = MixedPlacementUtility.doesCampaignAndConfigMatchMixedPlacement('mixedPlacement-promo', configuration, promoSkippableCampaign);
+                        const result = MixedPlacementUtility.shouldFillMixedPlacement('mixedPlacement-promo', configuration, promoSkippableCampaign);
                         assert.isFalse(result);
                     });
                     it('should return false for a placement with a rewarded promo suffix', () => {
-                        const result = MixedPlacementUtility.doesCampaignAndConfigMatchMixedPlacement('mixedPlacement-rewarded', configuration, promoSkippableCampaign);
+                        const result = MixedPlacementUtility.shouldFillMixedPlacement('mixedPlacement-rewarded', configuration, promoSkippableCampaign);
                         assert.isFalse(result);
                     });
                     it('should return false for a placement with a non rewarded promo suffix', () => {
-                        const result = MixedPlacementUtility.doesCampaignAndConfigMatchMixedPlacement('mixedPlacement', configuration, promoSkippableCampaign);
+                        const result = MixedPlacementUtility.shouldFillMixedPlacement('mixedPlacement', configuration, promoSkippableCampaign);
                         assert.isFalse(result);
                     });
                 });
@@ -179,41 +185,66 @@ describe('MixedPlacementUtilities', () => {
             context('where the auction is non skippable', () => {
                 context('where the configuration is skippable', () => {
                     it('should return true for a placement with the promo suffix', () => {
-                        const result = MixedPlacementUtility.doesCampaignAndConfigMatchMixedPlacement('mixedPlacement-promo', configuration, promoNonSkippableCampaign);
+                        const result = MixedPlacementUtility.shouldFillMixedPlacement('mixedPlacement-promo', configuration, promoNonSkippableCampaign);
                         assert.isTrue(result);
                     });
                     it('should return false for a placement with a rewarded promo suffix', () => {
-                        const result = MixedPlacementUtility.doesCampaignAndConfigMatchMixedPlacement('mixedPlacement-rewardedpromo', configuration, promoNonSkippableCampaign);
+                        const result = MixedPlacementUtility.shouldFillMixedPlacement('mixedPlacement-rewardedpromo', configuration, promoNonSkippableCampaign);
                         assert.isFalse(result);
                     });
                     it('should return false for a placement with a non rewarded suffix', () => {
-                        const result = MixedPlacementUtility.doesCampaignAndConfigMatchMixedPlacement('mixedPlacement-rewarded', configuration, promoNonSkippableCampaign);
+                        const result = MixedPlacementUtility.shouldFillMixedPlacement('mixedPlacement-rewarded', configuration, promoNonSkippableCampaign);
                         assert.isFalse(result);
                     });
                     it('should return false for a placement with a non rewarded suffix', () => {
-                        const result = MixedPlacementUtility.doesCampaignAndConfigMatchMixedPlacement('mixedPlacement', configuration, promoNonSkippableCampaign);
+                        const result = MixedPlacementUtility.shouldFillMixedPlacement('mixedPlacement', configuration, promoNonSkippableCampaign);
                         assert.isFalse(result);
                     });
                 });
                 context('where the configuration is non-skippable', () => {
                     it('should return true for a placement with the promo suffix', () => {
-                        const result = MixedPlacementUtility.doesCampaignAndConfigMatchMixedPlacement('mixedPlacement-promo', configuration, promoNonSkippableCampaign);
+                        const result = MixedPlacementUtility.shouldFillMixedPlacement('mixedPlacement-promo', configuration, promoNonSkippableCampaign);
                         assert.isTrue(result);
                     });
                     it('should return false for a placement with a rewarded promo suffix', () => {
-                        const result = MixedPlacementUtility.doesCampaignAndConfigMatchMixedPlacement('mixedPlacement-rewarded', configuration, promoNonSkippableCampaign);
+                        const result = MixedPlacementUtility.shouldFillMixedPlacement('mixedPlacement-rewarded', configuration, promoNonSkippableCampaign);
                         assert.isFalse(result);
                     });
                     it('should return false for a placement with a rewarded suffix', () => {
-                        const result = MixedPlacementUtility.doesCampaignAndConfigMatchMixedPlacement('mixedPlacement-rewarded', configuration, promoNonSkippableCampaign);
+                        const result = MixedPlacementUtility.shouldFillMixedPlacement('mixedPlacement-rewarded', configuration, promoNonSkippableCampaign);
                         assert.isFalse(result);
                     });
                     it('should return false for a placement with a non rewarded promo suffix', () => {
-                        const result = MixedPlacementUtility.doesCampaignAndConfigMatchMixedPlacement('mixedPlacement', configuration, promoNonSkippableCampaign);
+                        const result = MixedPlacementUtility.shouldFillMixedPlacement('mixedPlacement', configuration, promoNonSkippableCampaign);
                         assert.isFalse(result);
                     });
                 });
             });
+        });
+    });
+
+    describe('createMixedPlacements', () => {
+        it('should update the placements map by adding in additional mixed placement', () => {
+            const placements: { [id: string]: Placement } = {};
+            const rawPlacement = configurationPromoPlacementsJson.placements[3];
+            MixedPlacementUtility.createMixedPlacements(rawPlacement, placements);
+
+            rawPlacement.id = 'promoPlacement';
+            const expectedPlacementNonRewarded: Placement = new Placement(rawPlacement);
+            rawPlacement.id = 'promoPlacement-rewarded';
+            const expectedPlacementRewarded: Placement = new Placement(rawPlacement);
+            rawPlacement.id = 'promoPlacement-promo';
+            const expectedPlacementPromo: Placement = new Placement(rawPlacement);
+            rawPlacement.id = 'promoPlacement-rewardedpromo';
+            const expectedPlacementRewardedPromo: Placement = new Placement(rawPlacement);
+
+            const expectedPlacements: { [id: string]: Placement } = {
+                'promoPlacement'               : expectedPlacementNonRewarded,
+                'promoPlacement-promo'         : expectedPlacementPromo,
+                'promoPlacement-rewarded'      : expectedPlacementRewarded,
+                'promoPlacement-rewardedpromo' : expectedPlacementRewardedPromo
+            };
+            assert.deepEqual(placements, expectedPlacements);
         });
     });
 });
