@@ -194,6 +194,7 @@ build-proto:
 	cp src/proto/unity_proto.js $(BUILD_DIR)/proto/unity_proto.js
 
 build-ts:
+build-ts: lint
 	@echo
 	@echo Transpiling .ts to .js
 	@echo

@@ -127,6 +127,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public onContainerShow(): void {
         this.setShowing(true);
+        this.onContainerForeground();
     }
 
     public onContainerDestroy(): void {

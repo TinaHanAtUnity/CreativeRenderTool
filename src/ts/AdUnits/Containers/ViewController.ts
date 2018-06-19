@@ -1,11 +1,14 @@
-import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
-import { AdUnitContainer, AdUnitContainerSystemMessage, Orientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
-import { UIInterfaceOrientation } from 'Constants/iOS/UIInterfaceOrientation';
+import { NativeBridge } from 'Native/NativeBridge';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
+import { UIInterfaceOrientation } from 'Constants/iOS/UIInterfaceOrientation';
+import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
+import {
+    AdUnitContainer, AdUnitContainerSystemMessage, Orientation,
+    ViewConfiguration
+} from 'AdUnits/Containers/AdUnitContainer';
+import { Double } from 'Utilities/Double';
 import { FocusManager } from 'Managers/FocusManager';
 import { IosDeviceInfo } from 'Models/IosDeviceInfo';
-import { NativeBridge } from 'Native/NativeBridge';
-import { Double } from 'Utilities/Double';
 
 interface IIosOptions {
     supportedOrientations: UIInterfaceOrientationMask;
@@ -26,6 +29,10 @@ export class ViewController extends AdUnitContainer {
     private _showing: boolean;
     private _options: IIosOptions;
 
+    private _onViewControllerDidAppearObserver: any;
+    private _onViewControllerDidDisappearObserver: any;
+    private _onMemoryWarningObserver: any;
+    private _onNotificationObserver: any;
     private _onAppBackgroundObserver: any;
     private _onAppForegroundObserver: any;
 
@@ -36,10 +43,10 @@ export class ViewController extends AdUnitContainer {
         this._focusManager = focusManager;
         this._deviceInfo = deviceInfo;
 
-        this._nativeBridge.IosAdUnit.onViewControllerDidDisappear.subscribe(() => this.onViewDidDisappear());
-        this._nativeBridge.IosAdUnit.onViewControllerDidAppear.subscribe(() => this.onViewDidAppear());
-        this._nativeBridge.IosAdUnit.onViewControllerDidReceiveMemoryWarning.subscribe(() => this.onMemoryWarning());
-        this._nativeBridge.Notification.onNotification.subscribe((event, parameters) => this.onNotification(event, parameters));
+        this._onViewControllerDidDisappearObserver = this._nativeBridge.IosAdUnit.onViewControllerDidDisappear.subscribe(() => this.onViewDidDisappear());
+        this._onViewControllerDidAppearObserver = this._nativeBridge.IosAdUnit.onViewControllerDidAppear.subscribe(() => this.onViewDidAppear());
+        this._onMemoryWarningObserver = this._nativeBridge.IosAdUnit.onViewControllerDidReceiveMemoryWarning.subscribe(() => this.onMemoryWarning());
+        this._onNotificationObserver = this._nativeBridge.Notification.onNotification.subscribe((event, parameters) => this.onNotification(event, parameters));
     }
 
     public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: IIosOptions): Promise<void> {
@@ -175,7 +182,6 @@ export class ViewController extends AdUnitContainer {
     }
 
     private onViewDidAppear(): void {
-        this.onAppForeground();
         this._handlers.forEach(handler => handler.onContainerShow());
     }
 
