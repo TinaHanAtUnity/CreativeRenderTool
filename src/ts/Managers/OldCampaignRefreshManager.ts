@@ -218,8 +218,13 @@ export class OldCampaignRefreshManager extends RefreshManager {
     private onCampaign(placementId: string, campaign: Campaign) {
         this._parsingErrorCount = 0;
 
-        if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId()) && !MixedPlacementUtility.shouldFillMixedPlacement(placementId, this._configuration, campaign)) {
-            this.onNoFill(placementId);
+        if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
+            if (MixedPlacementUtility.shouldFillMixedPlacement(placementId, this._configuration, campaign)) {
+                this.setCampaignForPlacement(placementId, campaign);
+                this.handlePlacementState(placementId, PlacementState.READY);
+            } else {
+                this.onNoFill(placementId);
+            }
         } else {
             this.setCampaignForPlacement(placementId, campaign);
             this.handlePlacementState(placementId, PlacementState.READY);

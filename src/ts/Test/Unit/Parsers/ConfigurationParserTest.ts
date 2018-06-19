@@ -8,9 +8,9 @@ import { ConfigurationParser } from 'Parsers/ConfigurationParser';
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
 import { ABGroup } from 'Models/ABGroup';
-import { ClientInfo } from 'Models/ClientInfo';
 import { Platform } from 'Constants/Platform';
 import { MixedPlacementUtility } from 'Utilities/MixedPlacementUtility';
+import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 
 describe('configurationParserTest', () => {
 
@@ -110,21 +110,7 @@ describe('configurationParserTest', () => {
         });
 
         it('should only call createMixedPlacements if created placement is mixed and gameid is in mixed placement experiment', () => {
-            const clientInfoPromoGame = new ClientInfo(Platform.ANDROID, [
-                '1003628',
-                false,
-                'com.unity3d.ads.example',
-                '2.0.0-test2',
-                2000,
-                '2.0.0-alpha2',
-                true,
-                'http://example.com/config.json',
-                'http://example.com/index.html',
-                null,
-                '2.0.0-webview',
-                123456,
-                false
-            ]);
+            const clientInfoPromoGame = TestFixtures.getClientInfo(Platform.ANDROID, '1003628');
             configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements), clientInfoPromoGame);
             sandbox.assert.called(<sinon.SinonStub>MixedPlacementUtility.createMixedPlacements);
             sandbox.assert.callCount(<sinon.SinonStub>MixedPlacementUtility.createMixedPlacements, 7);

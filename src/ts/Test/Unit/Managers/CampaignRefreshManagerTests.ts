@@ -590,27 +590,13 @@ describe('CampaignRefreshManager', () => {
 
     describe('With mixed placement campaigns', () => {
         beforeEach(() => {
-            const clientInfoPromoGame = new ClientInfo(Platform.ANDROID, [
-                '1003628',
-                false,
-                'com.unity3d.ads.example',
-                '2.0.0-test2',
-                2000,
-                '2.0.0-alpha2',
-                true,
-                'http://example.com/config.json',
-                'http://example.com/index.html',
-                null,
-                '2.0.0-webview',
-                123456,
-                false
-            ]);
+            const clientInfoPromoGame = TestFixtures.getClientInfo(Platform.ANDROID, '1003628');
             configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfoPromoGame, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
             campaignRefreshManager = new OldCampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration, focusManager, sessionManager, clientInfoPromoGame, request, cache);
         });
 
-        it('should mark a placement with a suffix for a promo mixed placement campaign as ready', () => {
+        it('should mark a placement for a mixed placement promo campaign as ready', () => {
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('mixedPlacement-promo', TestFixtures.getPromoCampaign('purchasing/iap'));
                 return Promise.resolve();
@@ -631,11 +617,72 @@ describe('CampaignRefreshManager', () => {
             });
         });
 
-        it('should mark a new placement with a suffix for a rewarded mixed placement campaign as ready', () => {
-            //
+        it('should mark a placement for a mixed placement with rewarded campaign as ready', () => {
+            sinon.stub(campaignManager, 'request').callsFake(() => {
+                campaignManager.onCampaign.trigger('testDashPlacement-rewarded', TestFixtures.getCampaign());
+                return Promise.resolve();
+            });
+
+            return campaignRefreshManager.refresh().then(() => {
+                assert.isDefined(campaignRefreshManager.getCampaign('testDashPlacement-rewarded'));
+                assert.isTrue(campaignRefreshManager.getCampaign('testDashPlacement-rewarded') instanceof PerformanceCampaign);
+
+                const tmpCampaign = campaignRefreshManager.getCampaign('testDashPlacement-rewarded');
+                assert.isDefined(tmpCampaign);
+                if (tmpCampaign) {
+                    assert.equal(tmpCampaign.getId(), '582bb5e352e4c4abd7fab850');
+                }
+
+                assert.equal(configuration.getPlacement('testDashPlacement-rewarded').getState(), PlacementState.READY);
+            });
         });
 
-        xit('should mark a new placement with a suffix for a rewardedpromo mixed placement campaign as ready', () => {
+        it('should mark a placement for a mixed placement with rewardedpromo campaign as ready', () => {
+            sinon.stub(campaignManager, 'request').callsFake(() => {
+                campaignManager.onCampaign.trigger('rewardedPromoPlacement-rewardedpromo', TestFixtures.getPromoCampaign('purchasing/iap', true));
+                return Promise.resolve();
+            });
+
+            return campaignRefreshManager.refresh().then(() => {
+                assert.isDefined(campaignRefreshManager.getCampaign('rewardedPromoPlacement-rewardedpromo'));
+                assert.isTrue(campaignRefreshManager.getCampaign('rewardedPromoPlacement-rewardedpromo') instanceof PromoCampaign);
+
+                const tmpCampaign = campaignRefreshManager.getCampaign('rewardedPromoPlacement-rewardedpromo');
+                assert.isDefined(tmpCampaign);
+                if (tmpCampaign) {
+                    assert.equal(tmpCampaign.getId(), '000000000000000000000123');
+                }
+
+                assert.equal(configuration.getPlacement('rewardedPromoPlacement-rewardedpromo').getState(), PlacementState.READY);
+            });
+        });
+
+        it('if mixed placement is already marked as ready then any other mixed placement should be marked as nofill', () => {
+            sinon.stub(campaignManager, 'request').callsFake(() => {
+                campaignManager.onCampaign.trigger('mixedPlacement-promo', TestFixtures.getPromoCampaign('purchasing/iap'));
+                campaignManager.onCampaign.trigger('testDashPlacement-rewarded', TestFixtures.getPromoCampaign('purchasing/iap'));
+                campaignManager.onCampaign.trigger('rewardedPromoPlacement-rewardedpromo', TestFixtures.getPromoCampaign('purchasing/iap'));
+                return Promise.resolve();
+            });
+
+            return campaignRefreshManager.refresh().then(() => {
+                assert.isDefined(campaignRefreshManager.getCampaign('mixedPlacement-promo'));
+                assert.isTrue(campaignRefreshManager.getCampaign('mixedPlacement-promo') instanceof PromoCampaign);
+
+                const tmpCampaign = campaignRefreshManager.getCampaign('mixedPlacement-promo');
+                assert.isDefined(tmpCampaign);
+                if (tmpCampaign) {
+                    assert.equal(tmpCampaign.getId(), '000000000000000000000123');
+                    assert.equal(tmpCampaign.getAdType(), 'purchasing/iap');
+                }
+
+                assert.equal(configuration.getPlacement('mixedPlacement-promo').getState(), PlacementState.READY);
+                assert.equal(configuration.getPlacement('testDashPlacement-rewarded').getState(), PlacementState.NO_FILL);
+                assert.equal(configuration.getPlacement('rewardedPromoPlacement-rewardedpromo').getState(), PlacementState.NO_FILL);
+            });
+        });
+
+        it('should mark placement as ready after it has been invalidated', () => {
             //
         });
 
@@ -679,7 +726,7 @@ describe('CampaignRefreshManager', () => {
             });
         });
 
-        it('placement states should end up with NO_FILL', () => {
+        it('placement states should end up with NO_FILL if mixed', () => {
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('mixedPlacement-promo', TestFixtures.getPromoCampaign('purchasing/iap'));
                 campaignManager.onNoFill.trigger('mixedPlacement-promo');
@@ -702,42 +749,15 @@ describe('CampaignRefreshManager', () => {
             });
         });
 
-        it('should not create new placements from placements that already have suffixes appended to them', () => {
-            const campaignManagerRequest = sinon.stub(campaignManager, 'request');
-
-            campaignManagerRequest.callsFake(() => {
-                campaignManager.onCampaign.trigger('mixedPlacement', TestFixtures.getPromoCampaign('purchasing/iap'));
-                return Promise.resolve();
-            });
-
-            campaignRefreshManager.refresh().then(() => {
-
-                assert.equal(configuration.getPlacement('mixedPlacement-promo').getState(), PlacementState.READY);
-            });
-
-            campaignManager.onCampaign.trigger('mixedPlacement-promo', TestFixtures.getPromoCampaign('purchasing/iap'));
-
-            assert.isDefined(configuration.getPlacement('mixedPlacement-promo'));
-            assert.isUndefined(configuration.getPlacement('mixedPlacement-promo-promo'));
-        });
-
-        xit('placement states should end up with NO_FILL if not a game in the mixed placement experiment', () => {
-            //
-        });
-
         xit('should set suffixed placement as ready the second time onCampaign is triggered after being invalidated', () => {
             //
         });
 
-        xit('should not add extra suffixes to NO_FILL placements already created from mixed placement suffixes', () => {
+        xit('campaign onError should set noFill for mixed placements', () => {
             //
         });
 
-        xit('campaign onError should set no fill for mixed placements', () => {
-            //
-        });
-
-        xit('campaign onConnectivityError should set nofill for mixed placements and invalidate campaigns', () => {
+        xit('campaign onConnectivityError should set noFill for mixed placements and invalidate campaigns', () => {
             //
         });
     });

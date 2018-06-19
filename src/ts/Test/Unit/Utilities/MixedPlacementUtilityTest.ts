@@ -49,7 +49,7 @@ describe('MixedPlacementUtilities', () => {
             assert.equal(result, '');
         });
         it('should return empty string when placement is mixed, allows skip in configuration, and is not a promo campaign', () => {
-            const result = MixedPlacementUtility[extractMixedPlacementSuffix](configuration.getPlacement('rewardedPromoPlacement').getId(), TestFixtures.getCampaign(), configuration);
+            const result = MixedPlacementUtility[extractMixedPlacementSuffix](configuration.getPlacement('rewardedPromoPlacement-rewardedpromo').getId(), TestFixtures.getCampaign(), configuration);
             assert.equal(result, '');
         });
         it('should return -rewarded when placement is mixed, nonskippable in config, and campaign is not a promo', () => {
@@ -61,7 +61,7 @@ describe('MixedPlacementUtilities', () => {
             assert.equal(result, '-promo');
         });
         it('should return -rewardedpromo when placement is mixed, allows skip in campaign, and is a promo campaign', () => {
-            const result = MixedPlacementUtility[extractMixedPlacementSuffix](configuration.getPlacement('rewardedPromoPlacement').getId(), promoSkippableCampaign, configuration);
+            const result = MixedPlacementUtility[extractMixedPlacementSuffix](configuration.getPlacement('rewardedPromoPlacement-rewardedpromo').getId(), promoSkippableCampaign, configuration);
             assert.equal(result, '-rewardedpromo');
         });
         it('should return -promo when placement is mixed, does not allow skip in campaign, and campaign is promo even if allows skip in config is true', () => {

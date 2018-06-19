@@ -109,8 +109,8 @@
       "skipInSeconds": 5
     },
     {
-      "id": "rewardedPromoPlacement",
-      "name": "rewardedPromoPlacement",
+      "id": "rewardedPromoPlacement-rewardedpromo",
+      "name": "rewardedPromoPlacement-rewardedpromo",
       "default": false,
       "allowSkip": true,
       "skipEndCardOnClose": false,
@@ -128,7 +128,7 @@
       "id": "testDashPlacement-rewarded",
       "name": "testDashPlacement-promo",
       "default": false,
-      "allowSkip": true,
+      "allowSkip": false,
       "skipEndCardOnClose": false,
       "disableVideoControlsFade": false,
       "disableBackButton": true,
