@@ -34,6 +34,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay {
 
     private _fadeTimer: any;
     private _fadeStatus: boolean = true;
+    private _areControlsVisible: boolean = false;
 
     constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string) {
         super(nativeBridge, 'new-video-overlay', muted);
@@ -49,7 +50,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay {
             {
                 event: 'click',
                 listener: (event: Event) => this.onSkipEvent(event),
-                selector: '.skip-hit-area'
+                selector: '.skip-button'
             },
             {
                 event: 'click',
@@ -71,71 +72,68 @@ export class NewVideoOverlay extends AbstractVideoOverlay {
                 listener: (event: Event) => this.onClick(event)
             }
         ];
+
+        setTimeout(() => {
+            this.fadeIn();
+        }, 1000);
     }
 
     public render(): void {
         super.render();
 
-        this._skipElement = <HTMLElement>this._container.querySelector('.skip-hit-area');
+        this._skipElement = <HTMLElement>this._container.querySelector('.skip-button');
         this._skipElement.style.display = 'none';
-        (<HTMLElement>this._skipElement.children[1]).style.display = 'none';
 
         this._spinnerElement = <HTMLElement>this._container.querySelector('.buffering-spinner');
         this._muteButtonElement = <HTMLElement>this._container.querySelector('.mute-button');
         this._debugMessageElement = <HTMLElement>this._container.querySelector('.debug-message-text');
 
         this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
-        this._callButtonElement.style.display = 'none';
+        this._callButtonElement.style.display = 'block';
 
         this._timerElement = <HTMLElement>this._container.querySelector('.timer');
     }
 
     public setSpinnerEnabled(value: boolean): void {
-        if(this._spinnerEnabled !== value) {
+        if (this._spinnerEnabled !== value) {
             this._spinnerEnabled = value;
             this._spinnerElement.style.display = value ? 'block' : 'none';
         }
     }
 
     public setSkipEnabled(value: boolean): void {
-        if(this._skipEnabled !== value) {
+        if (this._skipEnabled !== value) {
             this._skipEnabled = value;
             this._skipElement.style.display = value ? 'block' : 'none';
         }
     }
 
     public setVideoDurationEnabled(value: boolean) {
-        if(this._videoDurationEnabled !== value) {
+        if (this._videoDurationEnabled !== value) {
             this._videoDurationEnabled = value;
         }
     }
 
     public setVideoProgress(value: number): void {
-        if(NewVideoOverlay.AutoSkip) {
+        if (NewVideoOverlay.AutoSkip) {
             this._handlers.forEach(handler => handler.onOverlaySkip(value));
         }
 
-        if(this._fadeEnabled && !this._fadeTimer && (!this._skipEnabled || this._skipRemaining <= 0)) {
+        if (this._fadeEnabled && !this._fadeTimer && (!this._skipEnabled || this._skipRemaining <= 0)) {
             this._fadeTimer = setTimeout(() => {
-                this.fade(true);
+                this.fadeOut();
                 this._fadeTimer = undefined;
             }, 3000);
         }
 
         this._videoProgress = value;
         this.setSkipElementVisible(this._skipEnabled);
-
         this._skipRemaining = this._skipDuration - this._videoProgress;
+        this._timerElement.innerText = String(Math.ceil((this._videoDuration - this._videoProgress) / 1000));
 
         if (this._skipRemaining <= 0) {
-            (<HTMLElement>this._skipElement.children[0]).innerText = 'Skip';
-            (<HTMLElement>this._skipElement.children[1]).style.display = 'inline';
-        } else {
-            (<HTMLElement>this._skipElement.children[0]).innerText = `Skip in ${this.formatTimer(Math.ceil(this._skipRemaining / 1000))}`;
-            (<HTMLElement>this._skipElement.children[1]).style.display = 'none';
+            this._skipElement.classList.add('skip-button-enabled');
         }
-
-        this._timerElement.innerText = this.formatTimer(Math.ceil((this._videoDuration - this._videoProgress) / 1000));
     }
 
     public setMuteEnabled(value: boolean) {
@@ -150,15 +148,19 @@ export class NewVideoOverlay extends AbstractVideoOverlay {
     }
 
     public setDebugMessageVisible(value: boolean) {
-        if(this._debugMessageVisible !== value) {
+        if (this._debugMessageVisible !== value) {
             this._debugMessageElement.style.display = value ? 'block' : 'none';
         }
     }
 
     public setCallButtonVisible(value: boolean) {
-        if(this._callButtonVisible !== value) {
+        if (this._callButtonVisible !== value) {
             this._callButtonElement.style.display = value ? 'block' : 'none';
         }
+    }
+
+    public setCallButtonEnabled(value: boolean) {
+        // EMPTY
     }
 
     public isMuted(): boolean {
@@ -168,7 +170,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay {
     private onSkipEvent(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
-        if(this._skipEnabled && this._videoProgress > this._skipDuration) {
+        if (this._skipEnabled && this._videoProgress > this._skipDuration) {
             this._handlers.forEach(handler => handler.onOverlaySkip(this._videoProgress));
         }
     }
@@ -177,13 +179,8 @@ export class NewVideoOverlay extends AbstractVideoOverlay {
         event.preventDefault();
         event.stopPropagation();
         this.resetFadeTimer();
-
-        if(!this._fadeStatus) {
-            this.fade(false);
-            return;
-        }
-
-        if(this._muted) {
+        console.log("ON Mute: ", this._muted);
+        if (this._muted) {
             this._muteButtonElement.classList.remove('muted');
             this._muted = false;
         } else {
@@ -210,17 +207,17 @@ export class NewVideoOverlay extends AbstractVideoOverlay {
     private onClick(event: Event) {
         this.resetFadeTimer();
 
-        if(!this._fadeStatus) {
-            this.fade(false);
+        if (this._areControlsVisible) {
+            this.fadeOut();
         } else {
-            this.fade(true);
+            this.fadeIn();
         }
     }
 
     private setSkipElementVisible(value: boolean) {
-        if(this._skipVisible !== value) {
+        if (this._skipVisible !== value) {
             this._skipVisible = value;
-            if(value) {
+            if (value) {
                 this._skipElement.style.display = 'block';
             } else {
                 this._skipElement.style.display = 'none';
@@ -229,47 +226,39 @@ export class NewVideoOverlay extends AbstractVideoOverlay {
     }
 
     private resetFadeTimer() {
-        if(this._fadeTimer) {
+        if (this._fadeTimer) {
             clearTimeout(this._fadeTimer);
             this._fadeTimer = undefined;
         }
     }
 
-    private fade(value: boolean) {
-        if (value) {
-            this._container.classList.add('progress-fade');
-            this._fadeStatus = false;
-        } else {
-            this._container.classList.remove('progress-fade');
-            this._fadeStatus = true;
+    private showCallButton() {
+        if (!this._areControlsVisible) {
+            return;
         }
+        this._callButtonElement.classList.add('show-call-button');
     }
 
-    private formatTimer(ms: number): string {
-        const minutes = Math.floor(ms / 60);
-        const seconds = ms % 60;
-
-        let minutesStr = String(minutes);
-        let secondsStr = String(seconds);
-
-        if (minutes < 10) {
-            minutesStr = '0' + minutes;
+    private hideCallButton() {
+        if (this._areControlsVisible) {
+            return;
         }
-
-        if (seconds < 10) {
-            secondsStr = '0' + seconds;
-        }
-
-        return `${minutesStr}:${secondsStr}`;
+        this._callButtonElement.classList.remove('show-call-button');
     }
 
-    private setCssTransition(): void {
-        const transitionRule = `width ${(this._videoDuration - this._videoProgress) / 1000}s linear`;
-        this._progressElement.style.transition = transitionRule;
-        this._progressElement.style.webkitTransition = transitionRule;
+    private fadeIn() {
+        this._container.classList.add('fade-in');
+        this._areControlsVisible = true;
+        setTimeout(() => {
+            this.showCallButton();
+        }, 500);
     }
 
-    public setCallButtonEnabled(value: boolean) {
-        // EMPTY
+    private fadeOut() {
+        this._container.classList.remove('fade-in');
+        this._areControlsVisible = false;
+        setTimeout(() => {
+            this.hideCallButton();
+        }, 2000);
     }
 }

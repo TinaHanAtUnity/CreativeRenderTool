@@ -3,79 +3,126 @@
 $new-video-overlay-size = $default-scale-size * $default-size;
 $new-video-overlay-font-size = $new-video-overlay-size;
 
-$progress-bar-color = #05bbd3;
-
+$tab-font-color = "#f1f1f1";
 $fade-transition = opacity .45s ease-in;
 
+#end-screen {
+  visibility: hidden;
+}
 #new-video-overlay {
   width: 100%;
   height: 100%;
   background-color: transparent;
   color: $white;
-  opacity: 1;
   transition: $fade-transition;
 
-  &.progress-fade {
-    opacity: 0;
+  &.fade-in .button {
+    opacity: 1;
   }
 
-  .skip-hit-area {
-    position: absolute;
-    top: $new-video-overlay-size * .5;
-    right: 0;
-    padding: $new-video-overlay-size * .25 $new-video-overlay-size * .5;
-    font-size: $new-video-overlay-font-size;
-
-    .icon-skip {
-      position: relative;
-      top: $new-video-overlay-font-size * .2;
-    }
-  }
-
-  .mute-button {
+  .button {
     position: absolute;
     top: 0;
     left: 0;
-    width: $new-video-overlay-size * 3;
-    height: $new-video-overlay-size * 3;
+    width: $new-video-overlay-size * 2.5;
+    height: $new-video-overlay-size * 2;
+    opacity: 0;
+  }
 
-    .mute-icon,
-    .unmute-icon {
-      position: absolute;
-      top: $new-video-overlay-size * .5;
-      padding: $new-video-overlay-size * .25 $new-video-overlay-size * .5;
-      height: $new-video-overlay-size * 1.125;
-      font-size: $new-video-overlay-font-size;
-    }
+  .button-bottom {
+    top: auto;
+    bottom: 0;
 
-    .unmute-icon {
-      display: none;
-    }
-
-    &.muted {
-      .mute-icon {
-        display: none;
-      }
-
-      .unmute-icon {
-        display: block;
-      }
+    .tab {
+      top: auto;
+      bottom: $new-video-overlay-size * .3;
     }
   }
 
-  .icon-volume-mute,
-  .icon-volume {
-    vertical-align: sub;
+  .button-right {
+    right: 0;
+    left: auto;
+
+    .tab {
+      right: 0;
+      left: auto;
+      border-radius: .2rem 0 0 .2rem;
+    }
+  }
+
+  .tab {
+    position: absolute;
+    top: $new-video-overlay-size * .3;
+    left: 0;
+    width: $new-video-overlay-size * 2;
+    height: $new-video-overlay-size * 1.5;
+    border-radius: 0 .2rem .2rem 0;
+    background-color: rgba(0, 0, 0, .54);
+    color: $tab-font-color;
+    text-align: center;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, .8), 0 0 2px rgba(0, 0, 0, 1);
+    font-weight: 300;
+    font-size: $new-video-overlay-font-size * .55;
+  }
+  
+  .skip-button .icon {
+    opacity: .5;
+  }
+
+  .skip-button-enabled .icon {
+    opacity: 1;
   }
 
   .call-button {
-    position: absolute;
-    right: 0;
-    bottom: $new-video-overlay-size * 2;
-    padding: $new-video-overlay-size * .5;
-    text-align: center;
-    font-size: $new-video-overlay-font-size * .75;
+    opacity: 1;
+    transform: translateX(100%);
+    transition: transform .4s ease-in;
   }
+
+  .show-call-button {
+    transform: translateX(0%);
+  }
+
+  .call-button,
+  .call-button .tab {
+    width: 5.5rem;
+  }
+
+  .call-button .tab,
+  .icon {
+    line-height: $new-video-overlay-font-size * 1.58;
+  }
+
+  .icon-volume-mute {
+    display: none;
+  }
+
+  .icon-volume {
+    display: block;
+  }
+
+  .muted {
+    .icon-volume-mute {
+      display: block;
+    }
+
+    .icon-volume {
+      display: none;
+    }
+  }
+
+  .timer {
+    position: relative;
+    top: .2rem;
+    left: .5rem;
+    width: $new-video-overlay-size;
+    height: $new-video-overlay-size;
+    border: 2px solid $white;
+    border-radius: 50%;
+    font-size: $new-video-overlay-font-size * .45;
+    line-height: 1rem;
+  }
+  
 
   .buffering-spinner {
     position: absolute;
@@ -123,78 +170,13 @@ $fade-transition = opacity .45s ease-in;
     text-shadow: 1px 1px $black;
     font-weight: bold;
   }
-
-  .timer {
-    position: absolute;
-    bottom: $new-video-overlay-size * .25;
-    left: 0;
-    padding: $new-video-overlay-size * .25 $new-video-overlay-size * .5;
-    text-align: center;
-    font-size: $new-video-overlay-font-size * .75;
-  }
-
-  .timer,
-  .mute-icon,
-  .unmute-icon,
-  .skip-hit-area,
-  .call-button {
-    background-color: rgba(0, 0, 0, .3);
-    text-align: center;
-    text-shadow: 2px 2px 5px rgba(0, 0, 0, .8), 0 0 2px rgba(0, 0, 0, 1);
-  }
-
 }
 
-progress-slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
-  transform: translateY($translation);
-  transition: transform $duration $function;
-}
-
-progress-slide-animation($duration = .4s, $function = ease-in, $translation = 0, $right = false) {
-
+slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
   transform: translateX($translation);
-
-  if($right) {
-    transform: translateX($translation * -1);
-  }
-
   transition: transform $duration $function;
 }
 
-.slide-left {
-  progress-slide-animation(.4s, ease-in, -150%);
-}
-
-.slide-right {
-  progress-slide-animation(.4s, ease-in, 150%);
-}
-
-.slide-back-in-place {
-  progress-slide-animation(.2s, ease-in-out, 0);
-}
-
-@keyframes right-spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(180deg);
-  }
-}
-
-@keyframes left-spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes close-progress-wrapper {
-  to {
-    clip: rect(auto, auto, auto, auto);
-  }
+.slide-in-from-left {
+  slide-animation(.4s, ease-in, -100%);
 }
