@@ -83,7 +83,7 @@ describe('PromoCampaignParser', () => {
                 assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not equal');
                 assert.equal(campaign.getIapProductId(), content.iapProductId, 'IAP Product ID is not equal');
                 assert.equal(campaign.getDynamicMarkup(), content.dynamicMarkup, 'Dynamic Markup is not equal');
-                assert.equal(campaign.getAllowSkip(), content.allowSkip, 'Allow Skip is not equal');
+                assert.equal(campaign.allowSkip(), content.allowSkip, 'Allow Skip is not equal');
                 assert.equal(campaign.getCreativeResource().getUrl(), content.creativeUrl, 'Creative URL is not equal');
             });
         });

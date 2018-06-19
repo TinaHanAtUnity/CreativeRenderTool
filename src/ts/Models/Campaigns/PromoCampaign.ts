@@ -60,7 +60,7 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
         return [];
     }
 
-    public getAllowSkip(): boolean {
+    public allowSkip(): boolean {
         return this.get('allowSkip');
     }
 }

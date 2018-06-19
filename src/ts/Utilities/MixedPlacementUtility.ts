@@ -28,7 +28,7 @@ export class MixedPlacementUtility {
     }
 
     public static createMixedPlacements(rawPlacement: any, placements: { [id: string]: Placement }) {
-        const rawPlacementId: string = rawPlacement.id;
+        const rawPlacementId = rawPlacement.id;
         for (const mixedPlacementSuffix of this.getMixedPlacementTypeList()) {
             rawPlacement.id = rawPlacementId + mixedPlacementSuffix;
             placements[rawPlacement.id] = new Placement(rawPlacement);
@@ -52,7 +52,7 @@ export class MixedPlacementUtility {
         if (!this.isMixedPlacement(placement)) {
             str = MixedPlacementTypes.NON_REWARDED;
         } else if (campaign instanceof PromoCampaign) {
-            if (campaign.getAllowSkip()) {
+            if (campaign.allowSkip()) {
                 str = MixedPlacementTypes.REWARDED_PROMO;
             } else {
                 str = MixedPlacementTypes.PROMO;
