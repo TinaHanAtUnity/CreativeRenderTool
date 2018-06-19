@@ -182,9 +182,6 @@ export class ViewController extends AdUnitContainer {
     }
 
     private onViewDidAppear(): void {
-        // This call is to align iOS functionality with Android
-        this.onAppForeground();
-
         this._handlers.forEach(handler => handler.onContainerShow());
     }
 
