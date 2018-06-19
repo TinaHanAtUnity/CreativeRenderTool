@@ -11,6 +11,7 @@
     "totalMemory": 12345678,
     "androidId": "1234567890abcdef",
     "apiLevel": 20,
+    "apkDigest": "abcd-1234",
     "totalSpaceExternal": 123456789,
     "totalSpaceInternal": 12345678,
     "deviceMake": "Test manufacturer",

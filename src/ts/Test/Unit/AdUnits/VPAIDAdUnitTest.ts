@@ -12,7 +12,6 @@ import { FocusManager } from 'Managers/FocusManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { Configuration } from 'Models/Configuration';
 import { Observable0, Observable2 } from 'Utilities/Observable';
 import { IObserver0 } from 'Utilities/IObserver';
@@ -24,6 +23,7 @@ import { FinishState } from 'Constants/FinishState';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 import { Closer } from 'Views/Closer';
 import { Platform } from 'Constants/Platform';
+import { ProgrammaticOperativeEventManager } from 'Managers/ProgrammaticOperativeEventManager';
 import { GdprManager } from 'Managers/GdprManager';
 import { Privacy } from 'Views/Privacy';
 
@@ -44,7 +44,7 @@ describe('VPAIDAdUnit', () => {
             deviceInfo: sinon.createStubInstance(DeviceInfo),
             clientInfo: sinon.createStubInstance(ClientInfo),
             thirdPartyEventManager: sinon.createStubInstance(ThirdPartyEventManager),
-            operativeEventManager: sinon.createStubInstance(OperativeEventManager),
+            operativeEventManager: sinon.createStubInstance(ProgrammaticOperativeEventManager),
             placement: TestFixtures.getPlacement(),
             container: sinon.createStubInstance(Activity),
             configuration: sinon.createStubInstance(Configuration),

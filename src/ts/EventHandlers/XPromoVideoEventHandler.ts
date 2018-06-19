@@ -38,11 +38,26 @@ export class XPromoVideoEventHandler extends VideoEventHandler {
 
     protected handleStartEvent(progress: number): void {
         this._xpromoOperativeEventManager.sendStart(this._placement, this.getVideoOrientation());
-        const clickTrackingUrls = this._xpromoCampaign.getTrackingUrlsForEvent('start');
-        for (const url of clickTrackingUrls) {
+        const trackingUrls = this._xpromoCampaign.getTrackingUrlsForEvent('start');
+        for (const url of trackingUrls) {
             this._thirdPartyEventManager.sendEvent('xpromo start', this._xpromoCampaign.getSession().getId(), url);
         }
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
+    }
+
+    protected handleFirstQuartileEvent(progress: number): void {
+        // Not sent for Xpromos
+    }
+
+    protected handleMidPointEvent(progress: number): void {
+        // Not sent for Xpromos
+    }
+
+    protected handleThirdQuartileEvent(progress: number): void {
+        const trackingUrls = this._xpromoCampaign.getTrackingUrlsForEvent('third_quartile');
+        for (const url of trackingUrls) {
+            this._thirdPartyEventManager.sendEvent('xpromo third quartile', this._xpromoCampaign.getSession().getId(), url);
+        }
     }
 
     protected handleCompleteEvent(): void {

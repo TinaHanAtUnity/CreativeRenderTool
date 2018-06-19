@@ -3,11 +3,12 @@ import { ISchema, Model } from 'Models/Model';
 import { Session } from 'Models/Session';
 import { WebViewError } from 'Errors/WebViewError';
 import { Diagnostics } from 'Utilities/Diagnostics';
+import { ABGroup } from './ABGroup';
 
 export interface ICampaign {
     id: string;
     gamerId: string;
-    abGroup: number;
+    abGroup: ABGroup;
     willExpireAt: number | undefined;
     adType: string | undefined;
     correlationId: string | undefined;
@@ -22,7 +23,7 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
     public static Schema: ISchema<ICampaign> = {
         id: ['string'],
         gamerId: ['string'],
-        abGroup: ['number'],
+        abGroup: ['object'],
         willExpireAt: ['number', 'undefined'],
         adType: ['string', 'undefined'],
         correlationId: ['string', 'undefined'],
@@ -49,7 +50,7 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         return this.get('gamerId');
     }
 
-    public getAbGroup(): number {
+    public getAbGroup(): ABGroup {
         return this.get('abGroup');
     }
 
@@ -94,7 +95,7 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
         return {
             'id': this.getId(),
             'gamerId': this.getGamerId(),
-            'abGroup': this.getAbGroup(),
+            'abGroup': this.getAbGroup().toNumber(),
             'willExpireAt': this.getWillExpireAt(),
             'mediaId': this.getMediaId()
         };

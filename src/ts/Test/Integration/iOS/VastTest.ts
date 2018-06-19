@@ -7,6 +7,7 @@ import { DeviceInfo } from 'Native/Backend/Api/DeviceInfo';
 import { ConfigManager } from 'Managers/ConfigManager';
 import { CampaignManager } from 'Managers/CampaignManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ProgrammaticOperativeEventManager } from 'Managers/ProgrammaticOperativeEventManager';
 
 describe('VastTest', () => {
 
@@ -46,7 +47,7 @@ describe('VastTest', () => {
 
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
         CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
-        OperativeEventManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
+        ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
 
         UnityAds.initialize(Platform.IOS, '333', listener, true);
     });

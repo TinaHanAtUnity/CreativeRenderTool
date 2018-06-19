@@ -46,7 +46,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     private _showGDPRBanner: boolean = false;
     private _gdprPopupClicked: boolean = false;
 
-    constructor(nativeBridge: NativeBridge, adMobSignalFactory: AdMobSignalFactory, container: AdUnitContainer, campaign: AdMobCampaign, language: string, gameId: string, abGroup: number, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
+    constructor(nativeBridge: NativeBridge, adMobSignalFactory: AdMobSignalFactory, container: AdUnitContainer, campaign: AdMobCampaign, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
         super(nativeBridge, 'admob');
 
         this._campaign = campaign;
