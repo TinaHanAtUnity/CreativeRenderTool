@@ -87,12 +87,6 @@ build-release: clean build-dir build-static build-css build-proto build-ts build
 		fs.writeFileSync('$(BUILD_DIR)/index.html', i.replace('{COMPILED_CSS}', s).replace('{COMPILED_JS}', j).replace('{PROTOBUF_JS}', b), o);"
 
 	@echo
-	@echo Minifying HTML
-	@echo
-
-	# node_modules/.bin/html-minifier --collapse-whitespace --minify-js -o $(BUILD_DIR)/index.html $(BUILD_DIR)/index.html
-
-	@echo
 	@echo Cleaning release build
 	@echo
 
@@ -210,7 +204,7 @@ build-js:
 	@echo
 
 	$(ROLLUP) -c rollup.js
-	$(CC) --js $(BUILD_DIR)/bundle.js --js_output_file $(BUILD_DIR)/bundle.min.js --formatting PRINT_INPUT_DELIMITER --assume_function_wrapper --rewrite_polyfills false
+	$(CC) --js $(BUILD_DIR)/bundle.js --js_output_file $(BUILD_DIR)/bundle.min.js --formatting PRETTY_PRINT --assume_function_wrapper --rewrite_polyfills false
 
 build-css:
 	@echo
