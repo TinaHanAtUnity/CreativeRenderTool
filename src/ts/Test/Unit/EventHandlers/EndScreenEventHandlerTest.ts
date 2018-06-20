@@ -280,7 +280,7 @@ describe('EndScreenEventHandlerTest', () => {
                 handleCallback
             }, Platform.IOS);
 
-            container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager);
+            container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager, clientInfo);
             const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request = new Request(nativeBridge, wakeUpManager);
             clientInfo = TestFixtures.getClientInfo(Platform.IOS);
