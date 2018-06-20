@@ -107,13 +107,14 @@ describe('PurchasingUtilitiesTest', () => {
 
         it('should fail with Promo version not supported if promo version is not 1.16 or above', () => {
             const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            const promoVersion = '1.15';
             PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge);
             sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('True'));
-            sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.15'));
+            sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve(promoVersion));
             sandbox.stub(purchasing.onCommandResult, 'subscribe').callsFake((resolve) => resolve('True'));
 
             PurchasingUtilities.sendPurchaseInitializationEvent().catch((e) => {
-                assert.equal(e.message, 'Promo version not supported');
+                assert.equal(e.message, `Promo version: ${promoVersion} is not supported`);
             });
             sinon.assert.notCalled(<sinon.SinonSpy>purchasing.initiatePurchasingCommand);
         });
