@@ -1,34 +1,29 @@
-import { NativeBridge } from 'Native/NativeBridge';
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
-import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
-import { AdMobView } from 'Views/AdMobView';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { FinishState } from 'Constants/FinishState';
-import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { Diagnostics } from 'Utilities/Diagnostics';
-import { Platform } from 'Constants/Platform';
+import { AdUnitContainerSystemMessage, IAdUnitContainerListener } from 'AdUnits/Containers/AdUnitContainer';
 import { KeyCode } from 'Constants/Android/KeyCode';
-import { Placement } from 'Models/Placement';
-import { IOpenableIntentsResponse } from 'Views/AFMABridge';
-import { FocusManager } from 'Managers/FocusManager';
-import { Double } from 'Utilities/Double';
 import { SensorDelay } from 'Constants/Android/SensorDelay';
-import { IClickSignalResponse } from 'Views/AFMABridge';
+import { FinishState } from 'Constants/FinishState';
+import { Platform } from 'Constants/Platform';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
+import { Placement } from 'Models/Placement';
+import { NativeBridge } from 'Native/NativeBridge';
+import { Diagnostics } from 'Utilities/Diagnostics';
+import { Double } from 'Utilities/Double';
 import { SdkStats } from 'Utilities/SdkStats';
 import { UserCountData } from 'Utilities/UserCountData';
-import { AdUnitContainerSystemMessage, IAdUnitContainerListener } from 'AdUnits/Containers/AdUnitContainer';
+import { AdMobView } from 'Views/AdMobView';
+import { IClickSignalResponse, IOpenableIntentsResponse } from 'Views/AFMABridge';
 
 export interface IAdMobAdUnitParameters extends IAdUnitParameters<AdMobCampaign> {
     view: AdMobView;
 }
 
-const AdUnitActivities = ['com.unity3d.ads.adunit.AdUnitActivity', 'com.unity3d.ads.adunit.AdUnitTransparentActivity', 'com.unity3d.ads.adunit.AdUnitTransparentSoftwareActivity', 'com.unity3d.ads.adunit.AdUnitSoftwareActivity'];
-
 export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListener {
     private _operativeEventManager: OperativeEventManager;
     private _view: AdMobView;
     private _thirdPartyEventManager: ThirdPartyEventManager;
-    private _focusManager: FocusManager;
     private _options: any;
     private _keyDownListener: (kc: number) => void;
     private _campaign: AdMobCampaign;
@@ -44,7 +39,6 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._options = parameters.options;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._operativeEventManager = parameters.operativeEventManager;
-        this._focusManager = parameters.focusManager;
         this._keyDownListener = (kc: number) => this.onKeyDown(kc);
         this._campaign = parameters.campaign;
         this._placement = parameters.placement;
@@ -71,6 +65,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
                 this._startTime = Date.now();
             }
             this._foregroundTime = Date.now();
+            this.startAccelerometerUpdates();
             this.showView();
         });
     }
@@ -160,13 +155,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public onContainerForeground(): void {
         this._foregroundTime = Date.now();
-
-        if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            this._nativeBridge.SensorInfo.Android.startAccelerometerUpdates(SensorDelay.SENSOR_DELAY_FASTEST);
-            this._nativeBridge.AndroidAdUnit.startMotionEventCapture(10000);
-        } else {
-            this._nativeBridge.SensorInfo.Ios.startAccelerometerUpdates(new Double(0.01));
-        }
+        this.startAccelerometerUpdates();
     }
 
     public onContainerBackground(): void {
@@ -182,6 +171,15 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public onContainerSystemMessage(message: AdUnitContainerSystemMessage): void {
         // EMPTY
+    }
+
+    private startAccelerometerUpdates(): void {
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            this._nativeBridge.SensorInfo.Android.startAccelerometerUpdates(SensorDelay.SENSOR_DELAY_FASTEST);
+            this._nativeBridge.AndroidAdUnit.startMotionEventCapture(10000);
+        } else {
+            this._nativeBridge.SensorInfo.Ios.startAccelerometerUpdates(new Double(0.01));
+        }
     }
 
     private showView() {
