@@ -162,7 +162,7 @@ describe('JaegerManager', () => {
         it('should call request.post', () => {
             jaegerManager.stop(span);
             assert.equal(requestPostStub.callCount, 1);
-            assert.equal(requestPostStub.firstCall.args[0], 'http://tracing-collector-stg.internal.unity3d.com/api/v2/spans');
+            assert.equal(requestPostStub.firstCall.args[0], 'https://tracing-collector-stg.internal.unity3d.com/api/v2/spans');
             assert.equal(requestPostStub.firstCall.args[1], JSON.stringify([span]));
             assert.equal(JSON.stringify(requestPostStub.firstCall.args[2]), JSON.stringify([['Content-Type', 'application/json']]));
             assert.equal(requestPostStub.firstCall.args.length, 3);
@@ -178,7 +178,7 @@ describe('JaegerManager', () => {
             jaegerManager.stop(secondSpan);
             jaegerManager.stop(span);
             assert.equal(requestPostStub.callCount, 1);
-            assert.equal(requestPostStub.firstCall.args[0], 'http://tracing-collector-stg.internal.unity3d.com/api/v2/spans');
+            assert.equal(requestPostStub.firstCall.args[0], 'https://tracing-collector-stg.internal.unity3d.com/api/v2/spans');
             const postedSpans: IJaegerSpan[] = JSON.parse(requestPostStub.firstCall.args[1]);
             assert.equal(postedSpans.length, 2);
             assert.equal(JSON.stringify(requestPostStub.firstCall.args[2]), JSON.stringify([['Content-Type', 'application/json']]));

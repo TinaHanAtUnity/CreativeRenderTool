@@ -71,11 +71,19 @@ export class GdprManager {
     }
 
     public getConsentAndUpdateConfiguration(): Promise<boolean> {
-        return this.getConsent().then((consent: boolean) => {
-            this.updateConfigurationWithConsent(consent);
-            this.pushConsent(consent);
-            return consent;
-        });
+        if (this._configuration.isGDPREnabled()) {
+            // get consent only if gdpr is enabled
+            return this.getConsent().then((consent: boolean) => {
+                // check gdpr enabled again in case it has changed
+                if (this._configuration.isGDPREnabled()) {
+                    this.updateConfigurationWithConsent(consent);
+                    this.pushConsent(consent);
+                }
+                return consent; // always return consent value
+            });
+        } else {
+            return Promise.reject(new Error('Configuration gdpr is not enabled'));
+        }
     }
 
     public retrievePersonalInformation(): Promise<IGdprPersonalProperties> {
@@ -129,18 +137,20 @@ export class GdprManager {
     }
 
     private updateConfigurationWithConsent(consent: boolean) {
-        this._configuration.setGDPREnabled(true);
         this._configuration.setOptOutEnabled(!consent);
         this._configuration.setOptOutRecorded(true);
     }
 
     private onStorageSet(eventType: string, data: any) {
-        if(data && data.gdpr && data.gdpr.consent) {
-            const value: boolean | undefined = this.getConsentTypeHack(data.gdpr.consent.value);
+        // should only use consent when gdpr is enabled in configuration
+        if (this._configuration.isGDPREnabled()) {
+            if(data && data.gdpr && data.gdpr.consent) {
+                const value: boolean | undefined = this.getConsentTypeHack(data.gdpr.consent.value);
 
-            if(typeof(value) !== 'undefined') {
-                this.updateConfigurationWithConsent(value);
-                this.pushConsent(value);
+                if(typeof(value) !== 'undefined') {
+                    this.updateConfigurationWithConsent(value);
+                    this.pushConsent(value);
+                }
             }
         }
     }

@@ -1,3 +1,10 @@
+# Tue Jun 19 20:34:19 UTC 2018
+
+* Optimized unnecessarily large GDPR radio buttons
+* Refactor resending failed operative events
+* Use shared tslib
+* Initial support for multithreaded Request API
+
 # Mon Jun 18 09:51:31 UTC 2018
 
 * Send xpromo third quartile event
