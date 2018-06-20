@@ -28,7 +28,7 @@ export abstract class CampaignParser {
         }
 
         Diagnostics.trigger('invalid_url', {
-            url: url,
+            url: url
         }, session);
 
         throw new Error('Invalid url: ' + url);

@@ -181,7 +181,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         promises.push(this._nativeBridge.WebPlayer.setSettings({
             setSupportMultipleWindows: [false],
             setJavaScriptCanOpenWindowsAutomatically: [true],
-            setMediaPlaybackRequiresUserGesture: [false],
+            setMediaPlaybackRequiresUserGesture: [false]
         }, {}));
         const eventSettings = {
             'onPageStarted': { 'sendEvent': true },

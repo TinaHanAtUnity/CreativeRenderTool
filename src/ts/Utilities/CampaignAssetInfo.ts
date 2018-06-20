@@ -10,7 +10,7 @@ import { Asset } from 'Models/Assets/Asset';
 
 export enum VideoType {
     CACHE,
-    STREAM,
+    STREAM
 }
 
 export class CampaignAssetInfo {

@@ -151,7 +151,7 @@ describe('IosAdUnitTest', () => {
             },
             onContainerSystemMessage: function(message: AdUnitContainerSystemMessage) {
                 // EMPTY
-            },
+            }
         };
 
         container.addEventHandler(listener);
@@ -183,7 +183,7 @@ describe('IosAdUnitTest', () => {
                 },
                 onContainerSystemMessage: function(message: AdUnitContainerSystemMessage) {
                     onContainerSystemMessage = true;
-                },
+                }
             };
             testAdUnit = new TestAdUnit(nativeBridge, adUnitParams);
             sinon.stub(nativeBridge.IosAdUnit, 'open').returns(Promise.resolve());

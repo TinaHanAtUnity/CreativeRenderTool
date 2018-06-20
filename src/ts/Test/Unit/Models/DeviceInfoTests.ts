@@ -30,7 +30,7 @@ describe('DeviceInfoTest', () => {
                 Android: {
                     ... TestFixtures.getFakeNativeAndroidDeviceInfo()
                 }
-            },
+            }
 
         };
         deviceInfo = new AndroidDeviceInfo(nativeBridge);
@@ -107,7 +107,7 @@ describe('DeviceInfoTest Android', () => {
                 Android: {
                     ... TestFixtures.getFakeNativeAndroidDeviceInfo()
                 }
-            },
+            }
         };
         deviceInfo = new AndroidDeviceInfo(nativeBridge);
 
@@ -139,7 +139,7 @@ describe('DeviceInfoTest Android', () => {
                 Android: {
                     ... TestFixtures.getFakeNativeAndroidDeviceInfo()
                 }
-            },
+            }
 
         };
         deviceInfo = new AndroidDeviceInfo(nativeBridge);
@@ -168,7 +168,7 @@ describe('DeviceInfoTest Android', () => {
                 Android: {
                     ... TestFixtures.getFakeNativeAndroidDeviceInfo()
                 }
-            },
+            }
         };
         deviceInfo = new AndroidDeviceInfo(nativeBridge);
         deviceInfoApi = new DeviceInfoApi(nativeBridge);
@@ -221,7 +221,7 @@ describe('DeviceInfoTest iOS', () => {
                 Ios: {
                     ... TestFixtures.getFakeNativeIosDeviceInfo()
                 }
-            },
+            }
         };
         deviceInfo = new IosDeviceInfo(nativeBridge);
         deviceInfoApi = new DeviceInfoApi(nativeBridge);
@@ -273,7 +273,7 @@ describe('DeviceInfoTest catch random reject', () => {
                 return Platform.TEST;
             },
             Sdk: {
-                logWarning: (msg: string) => { return; },
+                logWarning: (msg: string) => { return; }
             },
             DeviceInfo: {
                 ... TestFixtures.getFakeNativeDeviceInfo(),
@@ -283,7 +283,7 @@ describe('DeviceInfoTest catch random reject', () => {
                 Android: {
                     ... TestFixtures.getFakeNativeAndroidDeviceInfo()
                 }
-            },
+            }
 
         };
 
@@ -326,7 +326,7 @@ describe('DeviceInfoTest reject promises', () => {
                 return Platform.TEST;
             },
             Sdk: {
-                logWarning: (msg: string) => { return; },
+                logWarning: (msg: string) => { return; }
             },
             DeviceInfo: {
                 getConnectionType: sinon.stub().returns(Promise.reject(new Error('testError'))),
@@ -345,8 +345,8 @@ describe('DeviceInfoTest reject promises', () => {
                 getScreenBrightness: sinon.stub().returns(Promise.reject(new Error('testError'))),
                 getBatteryLevel: sinon.stub().returns(Promise.reject(new Error('testError'))),
                 getBatteryStatus: sinon.stub().returns(Promise.reject(new Error('testError'))),
-                getFreeMemory: sinon.stub().returns(Promise.reject(new Error('testError'))),
-            },
+                getFreeMemory: sinon.stub().returns(Promise.reject(new Error('testError')))
+            }
 
         };
         deviceInfo = new AndroidDeviceInfo(nativeBridge);

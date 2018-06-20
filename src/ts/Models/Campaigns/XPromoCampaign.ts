@@ -48,7 +48,7 @@ export class XPromoCampaign extends Campaign<IXPromoCampaign> {
             clickAttributionUrlFollowsRedirects: ['boolean', 'undefined'],
             bypassAppSheet: ['boolean'],
             store: ['number'],
-            trackingUrls: ['object', 'undefined'],
+            trackingUrls: ['object', 'undefined']
         }, campaign);
     }
 
