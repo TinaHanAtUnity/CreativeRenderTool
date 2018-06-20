@@ -242,7 +242,6 @@ describe('CometCampaignParser', () => {
     });
 
     describe('square end screen image A/B test and parsing a campaign', () => {
-
         let campaign: PerformanceCampaign;
 
         const parse = (data: any, abGroupNumber: ABGroup) => {
@@ -258,7 +257,7 @@ describe('CometCampaignParser', () => {
         json.content = JSON.stringify(content);
 
         it('should return default images when not in A/B group', () => {
-            parse(json, new ABGroup(0)).then(() => {
+            parse(json, ABGroup.getAbGroup(0)).then(() => {
                 assert.equal(campaign.getLandscape()!.getOriginalUrl(), Url.encode(content.endScreenLandscape), 'Landscape URL is not equal');
                 assert.equal(campaign.getPortrait()!.getOriginalUrl(), Url.encode(content.endScreenPortrait), 'Portrait URL is not equal');
             });

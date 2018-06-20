@@ -70,7 +70,7 @@ export const SQUARE_CAMPAIGNS = [
 ];
 
 // Egor-TODO: Not really best practice to have these here after the ABGroup change, only used for testing tho.
-export const SQUARE_END_SCREEN_AB_GROUPS = [new ABGroup(18), new ABGroup(19)];
+export const SQUARE_END_SCREEN_AB_GROUPS = [ABGroup.getAbGroup(18), ABGroup.getAbGroup(19)];
 
 export class SquareEndScreenUtilities {
 

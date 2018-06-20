@@ -51,9 +51,9 @@ describe('SquareEndScreenUtilitiesTest', () => {
         });
 
         it('should return false when abGroup does not match', () => {
-            assert.isFalse(SquareEndScreenUtilities.useSquareEndScreenAlt(new ABGroup(1), Platform.IOS, CAMPAIGN_IDS[0], '4.0'), 'Should return false with abGroup 6 and iOS device');
-            assert.isFalse(SquareEndScreenUtilities.useSquareEndScreenAlt(new ABGroup(3), Platform.ANDROID, CAMPAIGN_IDS[1], '5.0'), 'Should return false with abGroup 3 and supported Android device');
-            assert.isFalse(SquareEndScreenUtilities.useSquareEndScreenAlt(new ABGroup(3), Platform.ANDROID, CAMPAIGN_IDS[1], '4.0'), 'Should return false with abGroup 3 and non-supported Android device');
+            assert.isFalse(SquareEndScreenUtilities.useSquareEndScreenAlt(ABGroup.getAbGroup(1), Platform.IOS, CAMPAIGN_IDS[0], '4.0'), 'Should return false with abGroup 6 and iOS device');
+            assert.isFalse(SquareEndScreenUtilities.useSquareEndScreenAlt(ABGroup.getAbGroup(3), Platform.ANDROID, CAMPAIGN_IDS[1], '5.0'), 'Should return false with abGroup 3 and supported Android device');
+            assert.isFalse(SquareEndScreenUtilities.useSquareEndScreenAlt(ABGroup.getAbGroup(3), Platform.ANDROID, CAMPAIGN_IDS[1], '4.0'), 'Should return false with abGroup 3 and non-supported Android device');
         });
 
         it('should return false when campaignId does not match', () => {
