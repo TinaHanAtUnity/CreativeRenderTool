@@ -1,7 +1,6 @@
 @import "components.styl";
 @import "gdpr-pop-up.styl";
 
-$hiding-delay = 1.5s;
 $progress-bar-width = 60%;
 $filling-bar-width = $progress-bar-width * .3;
 
@@ -160,15 +159,9 @@ $filling-bar-width = $progress-bar-width * .3;
     opacity: 1;
 
     &.hidden {
-      transition: opacity 200ms ease-out;
-      transition-delay: $hiding-delay;
-
       opacity: 0;
+      transition: opacity 200ms ease-out;
       pointer-events: none;
-
-      &.disable-delay {
-        transition-delay: 0;
-      }
     }
 
     .container {
