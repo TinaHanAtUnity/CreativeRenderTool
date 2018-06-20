@@ -17,7 +17,7 @@ import { SquareEndScreenUtilities } from 'Utilities/SquareEndScreenUtilities';
 
 export class CometCampaignParser extends CampaignParser {
     public static ContentType = 'comet/campaign';
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number, osVersion?: string): Promise<Campaign> {
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: ABGroup, osVersion?: string): Promise<Campaign> {
         const json = response.getJsonContent();
 
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';
@@ -125,7 +125,7 @@ export class CometCampaignParser extends CampaignParser {
         }
     }
 
-    private getImages(baseCampaignParams: ICampaign, abGroup: number, nativeBridge: NativeBridge, session: Session, json: any, osVersion?: string, ) {
+    private getImages(baseCampaignParams: ICampaign, abGroup: ABGroup, nativeBridge: NativeBridge, session: Session, json: any, osVersion?: string) {
         if(SquareEndScreenUtilities.useSquareEndScreenAlt(abGroup, nativeBridge.getPlatform(), baseCampaignParams.id, osVersion)) {
             const customImageUrl = SquareEndScreenUtilities.getCustomImage(baseCampaignParams.id);
             if(customImageUrl) {

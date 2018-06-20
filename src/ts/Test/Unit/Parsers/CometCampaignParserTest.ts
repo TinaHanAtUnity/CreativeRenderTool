@@ -245,7 +245,7 @@ describe('CometCampaignParser', () => {
 
         let campaign: PerformanceCampaign;
 
-        const parse = (data: any, abGroupNumber: number) => {
+        const parse = (data: any, abGroupNumber: ABGroup) => {
             const response = new AuctionResponse(placements, data, mediaId, correlationId);
             return parser.parse(nativeBridge, request, response, session, gamerId, abGroupNumber, '8.0').then((parsedCampaign) => {
                 campaign = <PerformanceCampaign>parsedCampaign;
@@ -258,7 +258,7 @@ describe('CometCampaignParser', () => {
         json.content = JSON.stringify(content);
 
         it('should return default images when not in A/B group', () => {
-            parse(json, 0).then(() => {
+            parse(json, new ABGroup(0)).then(() => {
                 assert.equal(campaign.getLandscape()!.getOriginalUrl(), Url.encode(content.endScreenLandscape), 'Landscape URL is not equal');
                 assert.equal(campaign.getPortrait()!.getOriginalUrl(), Url.encode(content.endScreenPortrait), 'Portrait URL is not equal');
             });

@@ -1,4 +1,6 @@
 import { Platform } from 'Constants/Platform';
+import { ABGroup } from 'Models/ABGroup';
+import { SquareEndScreenEnabledAbTest } from 'Models/ABGroup';
 
 export const SQUARE_CAMPAIGNS = [
     {
@@ -67,7 +69,8 @@ export const SQUARE_CAMPAIGNS = [
     }
 ];
 
-export const SQUARE_END_SCREEN_AB_GROUPS = [5, 6];
+// Egor-TODO: Not really best practice to have these here after the ABGroup change, only used for testing tho.
+export const SQUARE_END_SCREEN_AB_GROUPS = [new ABGroup(18), new ABGroup(19)];
 
 export class SquareEndScreenUtilities {
 
@@ -85,20 +88,20 @@ export class SquareEndScreenUtilities {
         return undefined;
     }
 
-    public static useSquareEndScreenAlt(abGroup: number, platform: Platform, campaignId?: string, osVersion?: string): boolean {
+    public static useSquareEndScreenAlt(abGroup: ABGroup, platform: Platform, campaignId?: string, osVersion?: string): boolean {
         if (!osVersion || !campaignId) {
             return false;
         }
 
-        if (this.isInCorrectABGroup(abGroup) && this.hasCustomImage(campaignId) && this.isDeviceSupported(osVersion, platform)) {
+        if (!SquareEndScreenEnabledAbTest.isValid(abGroup)) {
+            return false;
+        }
+
+        if (this.hasCustomImage(campaignId) && this.isDeviceSupported(osVersion, platform)) {
             return true;
         }
 
         return false;
-    }
-
-    public static isInCorrectABGroup(abGroup: number) {
-        return SQUARE_END_SCREEN_AB_GROUPS.indexOf(abGroup) > -1;
     }
 
     public static isDeviceSupported(osVersion: string, platform: Platform): boolean {
