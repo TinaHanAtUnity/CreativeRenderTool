@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import { MixedPlacementUtility } from 'Utilities/MixedPlacementUtility';
 import { Configuration } from 'Models/Configuration';
 import { ConfigurationParser } from 'Parsers/ConfigurationParser';
-
+import MixedPlacementAuctionResponse from 'json/MixedPlacementAuctionResponse.json';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
@@ -20,6 +20,7 @@ describe('MixedPlacementUtilities', () => {
     let interstitialCampaign: DisplayInterstitialCampaign;
     let clientInfo: ClientInfo;
     let configurationPromoPlacementsJson: any;
+    let campaignRawPlacements: { [placementName: string]: string };
 
     beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID, '1543512');
@@ -28,6 +29,7 @@ describe('MixedPlacementUtilities', () => {
         interstitialCampaign = TestFixtures.getDisplayInterstitialCampaign();
         promoSkippableCampaign = TestFixtures.getPromoCampaign('purchasing/iap', true);
         promoNonSkippableCampaign = TestFixtures.getPromoCampaign('purchasing/iap', false);
+        campaignRawPlacements = JSON.parse(MixedPlacementAuctionResponse).placements;
     });
 
     describe('isMixedPlacement', () => {
@@ -38,6 +40,19 @@ describe('MixedPlacementUtilities', () => {
         it('should return false for a non-mixed placement', () => {
             const placement = configuration.getPlacement('premium');
             assert.isFalse(MixedPlacementUtility.isMixedPlacement(placement));
+        });
+    });
+
+    describe('insertMediaIdsIntoJSON', () => {
+        it('should create additional placements within raw campaign json response associated with the correct media ids', () => {
+            const jsonMixedPlacements = MixedPlacementUtility.insertMediaIdsIntoJSON(configuration, campaignRawPlacements);
+            const getMixedPlacementTypeList = 'getMixedPlacementTypeList';
+            const suffixList = MixedPlacementUtility[getMixedPlacementTypeList]();
+            for (const suffix of suffixList) {
+                assert.equal(jsonMixedPlacements['mixedPlacement' + suffix], '1111111111111111111111');
+            }
+            assert.equal(jsonMixedPlacements['video' + ''], '000000000000000000000000');
+            assert.lengthOf(Object.keys(jsonMixedPlacements), 5);
         });
     });
 

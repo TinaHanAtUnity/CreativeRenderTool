@@ -48,9 +48,8 @@ export class MixedPlacementUtility {
         return this.doesEndWithMixedPlacementSuffix(placementId, correctSuffix);
     }
 
-    public static insertMediaIdsIntoJSON(configuration: Configuration, jsonPlacements: { [placementName: string]: string }) {
+    public static insertMediaIdsIntoJSON(configuration: Configuration, jsonPlacements: { [placementName: string]: string }): { [placementName: string]: string } {
         const result: { [placementName: string]: string } = {};
-        const poop = configuration.getPlacements();
         for(const placementId in jsonPlacements) {
             if (jsonPlacements.hasOwnProperty(placementId)) {
                 const placement = configuration.getPlacement(placementId);
