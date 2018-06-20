@@ -1,17 +1,12 @@
 import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
-import { MetaData } from 'Utilities/MetaData';
-import { TestFixtures } from '../TestHelpers/TestFixtures';
+
 import { PurchasingUtilities, IPromoPayload, IPromoRequest } from 'Utilities/PurchasingUtilities';
 import { NativeBridge } from 'Native/NativeBridge';
 import { PurchasingApi } from 'Native/Api/Purchasing';
 import { Observable1 } from 'Utilities/Observable';
-import { PurchasingCatalog } from 'Models/PurchasingCatalog';
 import { SdkApi } from 'Native/Api/Sdk';
-import { SinonSandbox, SinonStub } from 'sinon';
-import { setTimeout } from 'timers';
-import { Configuration } from 'Models/Configuration';
 import { ConfigurationParser } from 'Parsers/ConfigurationParser';
 import { ClientInfo } from 'Models/ClientInfo';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
@@ -34,15 +29,6 @@ describe('PurchasingUtilitiesTest', () => {
         gameId: '222',
         abGroup: 1,
         request: IPromoRequest.PURCHASE,
-        purchaseTrackingUrls: ['https://www.scooooooooter.com', 'https://www.scottyboy.com']
-    };
-
-    const iapPayloadSetIDs: IPromoPayload = {
-        productId: 'myPromo',
-        iapPromo: true,
-        gameId: '222',
-        abGroup: 1,
-        request: IPromoRequest.SETIDS,
         purchaseTrackingUrls: ['https://www.scooooooooter.com', 'https://www.scottyboy.com']
     };
 
