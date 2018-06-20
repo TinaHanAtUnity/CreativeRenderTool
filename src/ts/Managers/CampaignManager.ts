@@ -35,6 +35,8 @@ import { JaegerManager } from 'Jaeger/JaegerManager';
 import { JaegerTags, JaegerSpan } from 'Jaeger/JaegerSpan';
 import { GameSessionCounters } from 'Utilities/GameSessionCounters';
 import { ABGroup } from 'Models/ABGroup';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { MixedPlacementUtility } from 'Utilities/MixedPlacementUtility';
 
 export class CampaignManager {
 
@@ -110,6 +112,7 @@ export class CampaignManager {
         this._requesting = false;
         this._ignoreEvents = false;
         this._jaegerManager = jaegerManager;
+        MixedPlacementUtility.nativeBridge = this._nativeBridge;
     }
 
     public cleanCachedUrl(url: string): string {
@@ -302,23 +305,29 @@ export class CampaignManager {
             const fill: { [mediaId: string]: string[] } = {};
             const noFill: string[] = [];
 
+            if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
+                this._nativeBridge.Sdk.logInfo('TINDER: BEFORE json placements: ' + JSON.stringify(json.placements));
+                json.placements = MixedPlacementUtility.insertMediaIdsIntoJSON(this._configuration, json.placements);
+                this._nativeBridge.Sdk.logInfo('TINDER: AFTER json placements: ' + JSON.stringify(json.placements));
+            }
+
             const placements = this._configuration.getPlacements();
-            for(const placement in placements) {
-                if(placements.hasOwnProperty(placement)) {
-                    const mediaId: string = json.placements[placement];
+            for(const placementid in placements) {
+                if(placements.hasOwnProperty(placementid)) {
+                    const mediaId: string = json.placements[placementid];
 
                     if(mediaId) {
                         if(fill[mediaId]) {
-                            fill[mediaId].push(placement);
+                            fill[mediaId].push(placementid);
                         } else {
-                            fill[mediaId] = [placement];
+                            fill[mediaId] = [placementid];
                         }
                     } else {
-                        noFill.push(placement);
+                        noFill.push(placementid);
                     }
 
-                    if(json.realtimeData && json.realtimeData[placement]) {
-                        this._configuration.getPlacement(placement).setRealtimeData(json.realtimeData[placement]);
+                    if(json.realtimeData && json.realtimeData[placementid]) {
+                        this._configuration.getPlacement(placementid).setRealtimeData(json.realtimeData[placementid]);
                     }
                 }
             }
@@ -681,13 +690,25 @@ export class CampaignManager {
                     body.frameworkVersion = framework.getVersion();
                 }
 
-                const placements = this._configuration.getPlacements();
-                for(const placement in placements) {
-                    if(placements.hasOwnProperty(placement)) {
-                        placementRequest[placement] = {
-                            adTypes: placements[placement].getAdTypes(),
-                            allowSkip: placements[placement].allowSkip(),
-                        };
+                if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
+                    const placements = MixedPlacementUtility.originalPlacements;
+                    for(const placement in placements) {
+                        if(placements.hasOwnProperty(placement)) {
+                            placementRequest[placement] = {
+                                adTypes: placements[placement].getAdTypes(),
+                                allowSkip: placements[placement].allowSkip(),
+                            };
+                        }
+                    }
+                } else {
+                    const placements = this._configuration.getPlacements();
+                    for(const placement in placements) {
+                        if(placements.hasOwnProperty(placement)) {
+                            placementRequest[placement] = {
+                                adTypes: placements[placement].getAdTypes(),
+                                allowSkip: placements[placement].allowSkip(),
+                            };
+                        }
                     }
                 }
 

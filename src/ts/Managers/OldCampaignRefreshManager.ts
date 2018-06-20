@@ -220,6 +220,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
 
         if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
             if (MixedPlacementUtility.shouldFillMixedPlacement(placementId, this._configuration, campaign)) {
+                this._nativeBridge.Sdk.logInfo('TINDER: onCampaign: ' + placementId);
                 this.setCampaignForPlacement(placementId, campaign);
                 this.handlePlacementState(placementId, PlacementState.READY);
             } else {
@@ -234,6 +235,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
     private onNoFill(placementId: string) {
         this._parsingErrorCount = 0;
 
+        this._nativeBridge.Sdk.logInfo('TINDER: onNoFill: ' + placementId);
         this._nativeBridge.Sdk.logDebug('Unity Ads server returned no fill, no ads to show, for placement: ' + placementId);
         this.setCampaignForPlacement(placementId, undefined);
         this.handlePlacementState(placementId, PlacementState.NO_FILL);

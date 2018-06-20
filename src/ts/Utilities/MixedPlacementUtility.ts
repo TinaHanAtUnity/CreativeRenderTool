@@ -2,7 +2,7 @@ import { Configuration } from 'Models/Configuration';
 import { Campaign } from 'Models/Campaign';
 import { Placement } from 'Models/Placement';
 import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
-import { NativeBridge } from 'Native/NativeBridge';
+import { NativeBridge } from '../Native/NativeBridge';
 
 export const enum MixedPlacementTypes {
     NON_REWARDED = '',
@@ -12,6 +12,9 @@ export const enum MixedPlacementTypes {
 }
 
 export class MixedPlacementUtility {
+
+    public static originalPlacements: { [id: string]: Placement } = {};
+    public static nativeBridge: NativeBridge;
 
     public static isMixedPlacement(placement: Placement): boolean {
         const adTypes = placement.getAdTypes();
@@ -43,6 +46,23 @@ export class MixedPlacementUtility {
         }
 
         return this.doesEndWithMixedPlacementSuffix(placementId, correctSuffix);
+    }
+
+    public static insertMediaIdsIntoJSON(configuration: Configuration, jsonPlacements: { [placementName: string]: string }) {
+        const result: { [placementName: string]: string } = {};
+        const poop = configuration.getPlacements();
+        for(const placementId in jsonPlacements) {
+            if (jsonPlacements.hasOwnProperty(placementId)) {
+                const placement = configuration.getPlacement(placementId);
+                result[placementId] = jsonPlacements[placementId];
+                if (MixedPlacementUtility.isMixedPlacement(placement)) {
+                    result[placementId + MixedPlacementTypes.PROMO] = jsonPlacements[placementId];
+                    result[placementId + MixedPlacementTypes.REWARDED_PROMO] = jsonPlacements[placementId];
+                    result[placementId + MixedPlacementTypes.REWARDED] = jsonPlacements[placementId];
+                }
+            }
+        }
+        return result;
     }
 
     private static extractMixedPlacementSuffix(placementId: string, campaign: Campaign, configuration: Configuration): MixedPlacementTypes {
