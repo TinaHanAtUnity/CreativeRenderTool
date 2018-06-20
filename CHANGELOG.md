@@ -1,3 +1,10 @@
+# Pending
+
+* Pinpoint promo_version_not_supported errors
+* Custom fix for Baidu: Close ad units when going background on iOS
+* Address apparent regressions in MOAT Functionality
+* Fix iOS onAppForeGround discrepancy
+
 # Wed Jun 20 20:13:28 UTC 2018
 
 * Remove playable endscreen A/B test from groups 18 and 19
