@@ -1,10 +1,13 @@
 @import "vars.styl";
+@import "gdpr-pop-up.styl";
 
 $new-video-overlay-size = $default-scale-size * $default-size;
 $new-video-overlay-font-size = $new-video-overlay-size;
 
 $tab-font-color = "#f1f1f1";
 $fade-transition = opacity .45s ease-in;
+$touchable-area-height = $new-video-overlay-size * 2;
+$touchable-area-width = $new-video-overlay-size * 2.5;
 
 #end-screen {
   visibility: hidden;
@@ -20,16 +23,29 @@ $fade-transition = opacity .45s ease-in;
     opacity: 1;
   }
 
+  .left-corner {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50%;
+    height: $touchable-area-height;
+  }
+
   .button {
     position: absolute;
     top: 0;
     left: 0;
-    width: $new-video-overlay-size * 2.5;
-    height: $new-video-overlay-size * 2;
+    width: $touchable-area-width;
+    height: $touchable-area-height;
     opacity: 0;
   }
 
-  .button-bottom {
+  .top-container {
+    top: 0;
+    bottom: auto;
+  }
+
+  .bottom-container {
     top: auto;
     bottom: 0;
 
@@ -46,7 +62,7 @@ $fade-transition = opacity .45s ease-in;
     .tab {
       right: 0;
       left: auto;
-      border-radius: .2rem 0 0 .2rem;
+      border-radius: $new-video-overlay-size * .2 0 0 $new-video-overlay-size * .2;
     }
   }
 
@@ -56,13 +72,29 @@ $fade-transition = opacity .45s ease-in;
     left: 0;
     width: $new-video-overlay-size * 2;
     height: $new-video-overlay-size * 1.5;
-    border-radius: 0 .2rem .2rem 0;
+    border-radius: 0 $new-video-overlay-size * .2 $new-video-overlay-size * .2 0;
     background-color: rgba(0, 0, 0, .54);
     color: $tab-font-color;
     text-align: center;
     text-shadow: 2px 2px 5px rgba(0, 0, 0, .8), 0 0 2px rgba(0, 0, 0, 1);
     font-weight: 300;
     font-size: $new-video-overlay-font-size * .55;
+  }
+
+  .gdpr-button {
+    position: absolute;
+    left: $touchable-area-width;
+
+    .tab {
+      width: $new-video-overlay-size;
+      height: $new-video-overlay-size;
+      border-radius: $new-video-overlay-size * .2;
+      font-size: $new-video-overlay-size * .5;
+    }
+
+    .icon {
+      line-height: $new-video-overlay-font-size * .95;
+    }
   }
   
   .skip-button .icon {
@@ -120,7 +152,7 @@ $fade-transition = opacity .45s ease-in;
     border: 2px solid $white;
     border-radius: 50%;
     font-size: $new-video-overlay-font-size * .45;
-    line-height: 1rem;
+    line-height: $new-video-overlay-font-size;
   }
   
 
@@ -169,6 +201,29 @@ $fade-transition = opacity .45s ease-in;
     text-align: center;
     text-shadow: 1px 1px $black;
     font-weight: bold;
+  }
+
+  &:not(.show-gdpr-banner) {
+    .gdpr-pop-up {
+      display: none;
+    }
+  }
+
+  &.show-gdpr-banner {
+    .gdpr-pop-up {
+      // TODO: Is this correct scale-size to pass?
+      $gdpr-pop-up($new-video-overlay-font-size);
+      width: 60%;
+
+      .gdpr-text {
+        color: $black;
+        font-size: .5rem;
+      }
+    }
+
+    .gdpr-button {
+      display: none;
+    }
   }
 }
 

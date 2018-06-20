@@ -4,16 +4,15 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
 import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
+import { AbstractPrivacy, IPrivacyHandler } from 'Views/AbstractPrivacy';
 
-export class NewVideoOverlay extends AbstractVideoOverlay {
-
+export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHandler {
     private _localization: Localization;
 
     private _spinnerEnabled: boolean = false;
 
     private _skipVisible: boolean = false;
     private _skipEnabled: boolean;
-
     private _videoDurationEnabled: boolean = false;
     private _videoProgress: number;
 
@@ -29,17 +28,23 @@ export class NewVideoOverlay extends AbstractVideoOverlay {
     private _debugMessageElement: HTMLElement;
     private _callButtonElement: HTMLElement;
     private _timerElement: HTMLElement;
-
-    private _progressElement: HTMLElement;
+    private _privacyButtonElement: HTMLElement;
+    private _GDPRPopupElement: HTMLElement;
 
     private _fadeTimer: any;
-    private _fadeStatus: boolean = true;
     private _areControlsVisible: boolean = false;
+    private _privacy: AbstractPrivacy;
+    private _gdprPopupClicked: boolean = false;
+    private _showGDPRBanner: boolean = false;
+    private _disablePrivacyDuringVideo: boolean | undefined;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string) {
+    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, disablePrivacyDuringVideo?: boolean) {
         super(nativeBridge, 'new-video-overlay', muted);
 
         this._localization = new Localization(language, 'overlay');
+        this._privacy = privacy;
+        this._showGDPRBanner = showGDPRBanner;
+        this._disablePrivacyDuringVideo = disablePrivacyDuringVideo;
         this._template = new Template(NewVideoOverlayTemplate, this._localization);
 
         this._templateData = {
@@ -70,8 +75,23 @@ export class NewVideoOverlay extends AbstractVideoOverlay {
             {
                 event: 'click',
                 listener: (event: Event) => this.onClick(event)
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onGDPRPopupEvent(event),
+                selector: '.gdpr-link'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onPrivacyEvent(event),
+                selector: '.icon-gdpr'
             }
         ];
+
+        this._privacy.render();
+        this._privacy.hide();
+        document.body.appendChild(this._privacy.container());
+        this._privacy.addEventHandler(this);
 
         setTimeout(() => {
             this.fadeIn();
@@ -167,6 +187,57 @@ export class NewVideoOverlay extends AbstractVideoOverlay {
         return this._muted;
     }
 
+    public onPrivacy(url: string): void {
+        // do nothing
+    }
+
+    public onPrivacyClose(): void {
+        if (this._privacy) {
+            this._privacy.hide();
+        }
+        this._isPrivacyShowing = false;
+        this._nativeBridge.VideoPlayer.play();
+    }
+
+    public onGDPROptOut(optOutEnabled: boolean): void {
+        // do nothing
+    }
+
+    public choosePrivacyShown(): void {
+        if (this._disablePrivacyDuringVideo) {
+            this._privacyButtonElement.style.visibility = 'hidden';
+            this._GDPRPopupElement.style.visibility = 'hidden';
+            this._privacyButtonElement.style.pointerEvents = '1';
+            this._GDPRPopupElement.style.pointerEvents = '1';
+        } else if (!this._gdprPopupClicked && this._showGDPRBanner) {
+            this._GDPRPopupElement.style.visibility = 'visible';
+            this._privacyButtonElement.style.pointerEvents = '1';
+            this._privacyButtonElement.style.visibility = 'hidden';
+        } else {
+            this._privacyButtonElement.style.visibility = 'visible';
+            this._GDPRPopupElement.style.pointerEvents = '1';
+            this._GDPRPopupElement.style.visibility = 'hidden';
+        }
+    }
+
+    private onGDPRPopupEvent(event: Event) {
+        event.preventDefault();
+        this._isPrivacyShowing = true;
+        if (!this._gdprPopupClicked) {
+            this._gdprPopupClicked = true;
+            this.choosePrivacyShown();
+        }
+        this._nativeBridge.VideoPlayer.pause();
+        this._privacy.show();
+    }
+
+    private onPrivacyEvent(event: Event) {
+        this._isPrivacyShowing = true;
+        event.preventDefault();
+        this._nativeBridge.VideoPlayer.pause();
+        this._privacy.show();
+    }
+
     private onSkipEvent(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
@@ -179,7 +250,6 @@ export class NewVideoOverlay extends AbstractVideoOverlay {
         event.preventDefault();
         event.stopPropagation();
         this.resetFadeTimer();
-        console.log("ON Mute: ", this._muted);
         if (this._muted) {
             this._muteButtonElement.classList.remove('muted');
             this._muted = false;
