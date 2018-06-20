@@ -1,3 +1,8 @@
+# Pending
+
+* Remove playable endscreen A/B test from groups 18 and 19
+* Reduce JS errors
+
 # Wed Jun 20 10:38:12 UTC 2018
 
 * Check GDPR consent metadata only when GDPR is enabled in configuration
