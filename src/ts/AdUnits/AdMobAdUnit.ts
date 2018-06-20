@@ -7,8 +7,10 @@ import { Platform } from 'Constants/Platform';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
+import { ClientInfo } from 'Models/ClientInfo';
 import { Placement } from 'Models/Placement';
 import { NativeBridge } from 'Native/NativeBridge';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { Double } from 'Utilities/Double';
 import { SdkStats } from 'Utilities/SdkStats';
@@ -31,6 +33,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _foregroundTime: number = 0;
     private _startTime: number = 0;
     private _requestToViewTime: number = 0;
+    private _clientInfo: ClientInfo;
 
     constructor(nativeBridge: NativeBridge, parameters: IAdMobAdUnitParameters) {
         super(nativeBridge, parameters);
@@ -42,6 +45,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._keyDownListener = (kc: number) => this.onKeyDown(kc);
         this._campaign = parameters.campaign;
         this._placement = parameters.placement;
+        this._clientInfo = parameters.clientInfo;
 
         // TODO, we skip initial because the AFMA grantReward event tells us the video
         // has been completed. Is there a better way to do this with AFMA right now?
@@ -160,6 +164,11 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public onContainerBackground(): void {
         this._nativeBridge.SensorInfo.stopAccelerometerUpdates();
+
+        if(this.isShowing() && CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
+            this.setFinishState(FinishState.SKIPPED);
+            this.hide();
+        }
     }
 
     public onContainerDestroy(): void {

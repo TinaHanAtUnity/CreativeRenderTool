@@ -143,10 +143,10 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             campaign.set('store', StoreName.APPLE);
             campaign.set('appStoreId', '11111');
 
-            container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager);
+            clientInfo = TestFixtures.getClientInfo(Platform.IOS);
+            container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager, clientInfo);
             const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request = new Request(nativeBridge, wakeUpManager);
-            clientInfo = TestFixtures.getClientInfo(Platform.IOS);
             deviceInfo = TestFixtures.getIosDeviceInfo();
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
             sessionManager = new SessionManager(nativeBridge, request);

@@ -19,6 +19,8 @@ import { Campaign } from 'Models/Campaign';
 import { Placement } from 'Models/Placement';
 import { CampaignAssetInfo, VideoType } from 'Utilities/CampaignAssetInfo';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
+import { ClientInfo } from 'Models/ClientInfo';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
 
 export interface IVideoAdUnitParameters<T extends Campaign> extends IAdUnitParameters<T> {
     video: Video;
@@ -52,6 +54,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     private _campaign: T;
     private _finalVideoUrl: string;
     private _videoState: VideoState = VideoState.NOT_READY;
+    private _clientInfo: ClientInfo;
 
     constructor(nativeBridge: NativeBridge, parameters: IVideoAdUnitParameters<T>) {
         super(nativeBridge, parameters);
@@ -66,6 +69,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         this._lowMemory = false;
         this._placement = parameters.placement;
         this._campaign = parameters.campaign;
+        this._clientInfo = parameters.clientInfo;
 
         this.prepareOverlay();
     }
@@ -177,6 +181,14 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
     }
 
     public onContainerBackground(): void {
+        if(this.isShowing() && CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
+            this.setActive(false);
+            this.setFinishState(FinishState.SKIPPED);
+            this.setVideoState(VideoState.SKIPPED);
+            this.hide();
+            return;
+        }
+
         if(this.isShowing() && this.getContainer().isPaused()) {
             this.setActive(false);
             if(this.canShowVideo()) {
