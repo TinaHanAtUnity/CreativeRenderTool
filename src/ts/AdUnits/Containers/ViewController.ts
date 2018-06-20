@@ -83,6 +83,7 @@ export class ViewController extends AdUnitContainer {
 
     public close(): Promise<void> {
         this._showing = false;
+        this.unPause();
         this._focusManager.onAppBackground.unsubscribe(this._onAppBackgroundObserver);
         this._focusManager.onAppForeground.unsubscribe(this._onAppForegroundObserver);
         this._nativeBridge.Notification.removeAVNotificationObserver(ViewController._audioSessionInterrupt);

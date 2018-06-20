@@ -1,8 +1,3 @@
-import { AdUnitStyle } from 'Models/AdUnitStyle';
-import { StorageType } from 'Native/Api/Storage';
-import { NativeBridge } from 'Native/NativeBridge';
-import { Configuration } from 'Models/Configuration';
-import { StorageError } from 'Native/Api/Storage';
 
 export class CustomFeatures {
     public static isExampleGameId(gameId: string): boolean {
@@ -15,5 +10,11 @@ export class CustomFeatures {
 
     public static isPlayableConfigurationEnabled(originalResourceUrl: string) {
         return originalResourceUrl.match(/playables\/production\/unity/);
+    }
+
+    public static isSimejiJapaneseKeyboardApp(gameId: string): boolean {
+        // Baidu's Simeji Japanese Keyboard extension app
+        // Ad unit should be closed when going background on iOS
+        return gameId === '1795561';
     }
 }
