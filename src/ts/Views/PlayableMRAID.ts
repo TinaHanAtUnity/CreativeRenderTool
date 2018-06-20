@@ -13,7 +13,6 @@ import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
 import { SdkStats } from 'Utilities/SdkStats';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
-import { PlayableEndScreenHideDelayDisabledAbTest } from 'Models/ABGroup';
 
 export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -299,10 +298,6 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 this._loadingScreen.style.display = 'none';
             }, false);
         });
-
-        if (PlayableEndScreenHideDelayDisabledAbTest.isValid(this._campaign.getAbGroup())) {
-            this._loadingScreen.classList.add('disable-delay');
-        }
 
         this._loadingScreen.classList.add('hidden');
     }
