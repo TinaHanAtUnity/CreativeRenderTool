@@ -69,6 +69,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
                 this._startTime = Date.now();
             }
             this._foregroundTime = Date.now();
+            this.startAccelerometerUpdates();
             this.showView();
         });
     }
@@ -158,13 +159,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public onContainerForeground(): void {
         this._foregroundTime = Date.now();
-
-        if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            this._nativeBridge.SensorInfo.Android.startAccelerometerUpdates(SensorDelay.SENSOR_DELAY_FASTEST);
-            this._nativeBridge.AndroidAdUnit.startMotionEventCapture(10000);
-        } else {
-            this._nativeBridge.SensorInfo.Ios.startAccelerometerUpdates(new Double(0.01));
-        }
+        this.startAccelerometerUpdates();
     }
 
     public onContainerBackground(): void {
@@ -185,6 +180,15 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public onContainerSystemMessage(message: AdUnitContainerSystemMessage): void {
         // EMPTY
+    }
+
+    private startAccelerometerUpdates(): void {
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            this._nativeBridge.SensorInfo.Android.startAccelerometerUpdates(SensorDelay.SENSOR_DELAY_FASTEST);
+            this._nativeBridge.AndroidAdUnit.startMotionEventCapture(10000);
+        } else {
+            this._nativeBridge.SensorInfo.Ios.startAccelerometerUpdates(new Double(0.01));
+        }
     }
 
     private showView() {
