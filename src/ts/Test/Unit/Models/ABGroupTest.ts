@@ -2,7 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
 
-import { ABGroup, PlayableEndScreenHideDelayDisabledAbTest } from 'Models/ABGroup';
+import { ABGroup } from 'Models/ABGroup';
 import { WebView } from 'WebView';
 import { NativeBridge } from 'Native/NativeBridge';
 import { TestEnvironment } from 'Utilities/TestEnvironment';
@@ -53,27 +53,6 @@ describe('ABGroup tests', () => {
     //         }
     //     });
     // });
-
-    describe('PlayableEndScreenHideDelayDisabledAbTest.isValid', () => {
-        it('should return true for group 18', () => {
-            const abGroup = ABGroup.getAbGroup(18);
-            assert.isTrue(PlayableEndScreenHideDelayDisabledAbTest.isValid(abGroup));
-        });
-
-        it('should return true for group 19', () => {
-            const abGroup = ABGroup.getAbGroup(19);
-            assert.isTrue(PlayableEndScreenHideDelayDisabledAbTest.isValid(abGroup));
-        });
-
-        it('should return false for all groups not 18 and 19', () => {
-            for (let i = -1; i < 100; i++) {
-                if (i !== 18 && i !== 19) {
-                    const abGroup = ABGroup.getAbGroup(i);
-                    assert.isFalse(PlayableEndScreenHideDelayDisabledAbTest.isValid(abGroup));
-                }
-            }
-        });
-    });
 
     describe('setupTestEnvironment in webview should set AbGroup on ConfigManager and CampaignManager', () => {
         const tests: Array<{

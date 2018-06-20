@@ -1,4 +1,14 @@
-# Pending
+# Wed Jun 20 20:13:28 UTC 2018
+
+* Remove playable endscreen A/B test from groups 18 and 19
+* Reduce JS errors
+
+# Wed Jun 20 10:38:12 UTC 2018
+
+* Check GDPR consent metadata only when GDPR is enabled in configuration
+* Use ssl for jaeger tracing
+
+# Tue Jun 19 20:34:19 UTC 2018
 
 * Optimized unnecessarily large GDPR radio buttons
 * Refactor resending failed operative events
