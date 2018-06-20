@@ -1,4 +1,4 @@
-# Pending
+# Wed Jun 20 10:38:12 UTC 2018
 
 * Check GDPR consent metadata only when GDPR is enabled in configuration
 * Use ssl for jaeger tracing 
