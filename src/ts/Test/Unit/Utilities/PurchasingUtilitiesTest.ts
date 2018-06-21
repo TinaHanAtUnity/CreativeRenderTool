@@ -11,6 +11,7 @@ import { ConfigurationParser } from 'Parsers/ConfigurationParser';
 import { ClientInfo } from 'Models/ClientInfo';
 import { CampaignManager } from 'Managers/CampaignManager';
 import { AuctionResponse } from 'Models/AuctionResponse';
+import { TestFixtures } from '../TestHelpers/TestFixtures';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import PromoCampaign from 'json/campaigns/promo/PromoCampaign.json';

@@ -1,5 +1,3 @@
-import { ClientInfo } from 'Models/ClientInfo';
-import { Configuration } from 'Models/Configuration';
 import { PurchasingCatalog } from 'Models/PurchasingCatalog';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Diagnostics } from './Diagnostics';
