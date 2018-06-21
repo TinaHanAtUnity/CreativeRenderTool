@@ -15,6 +15,8 @@ import { IWebPlayerWebSettingsAndroid, IWebPlayerWebSettingsIos } from 'Native/A
 import { Url } from 'Utilities/Url';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { AdUnitContainerSystemMessage, IAdUnitContainerListener } from 'AdUnits/Containers/AdUnitContainer';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { ClientInfo } from 'Models/ClientInfo';
 
 export interface IDisplayInterstitialAdUnitParameters extends IAdUnitParameters<DisplayInterstitialCampaign> {
     view: DisplayInterstitial;
@@ -29,6 +31,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
     private _campaign: DisplayInterstitialCampaign;
     private _placement: Placement;
     private _deviceInfo: DeviceInfo;
+    private _clientInfo: ClientInfo;
     private _receivedOnPageStart: boolean = false;
     private _clickEventHasBeenSent: boolean = false;
     private _handlingShouldOverrideUrlLoading: boolean = false;
@@ -48,6 +51,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
         this._campaign = parameters.campaign;
         this._placement = parameters.placement;
         this._deviceInfo = parameters.deviceInfo;
+        this._clientInfo = parameters.clientInfo;
 
         this._view.render();
         document.body.appendChild(this._view.container());
@@ -131,6 +135,9 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
     }
 
     public onContainerBackground(): void {
+        if(this.isShowing() && CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
+            this.hide();
+        }
         // EMPTY
     }
 

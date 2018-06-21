@@ -14,6 +14,7 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { EventType } from 'Models/Session';
 import { Placement } from 'Models/Placement';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
 
 export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign> {
     mraid: MRAIDView<IMRAIDViewHandler>;
@@ -176,6 +177,11 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     public onContainerBackground(): void {
         if(this.isShowing()) {
             this._mraid.setViewableState(false);
+
+            if(CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
+                this.setFinishState(FinishState.SKIPPED);
+                this.hide();
+            }
         }
     }
 

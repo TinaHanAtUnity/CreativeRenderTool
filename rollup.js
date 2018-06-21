@@ -9,7 +9,8 @@ export default {
         format: 'iife',
         file: 'build/release/bundle.js',
         globals: {
-            'protobufjs/minimal': 'protobuf'
+            'protobufjs/minimal': 'protobuf',
+            'tslib': 'tslib'
         }
     },
     plugins: [
@@ -36,7 +37,8 @@ export default {
         }),
         alias({
             'es6-promise': 'node_modules/es6-promise/dist/es6-promise.auto.js',
-            '../../proto/unity_proto.js': 'build/release/js/Proto/unity_proto.js'
+            '../../proto/unity_proto.js': 'build/release/js/Proto/unity_proto.js',
+            'tslib': 'node_modules/tslib/tslib.es6.js',
         })
     ],
     context: 'window'
