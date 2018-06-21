@@ -44,6 +44,7 @@ import OnProgrammaticMraidPlcCampaignJson from 'json/OnProgrammaticMraidPlcCampa
 import OnCometMraidPlcCampaignJson from 'json/OnCometMraidPlcCampaign.json';
 import OnCometVideoPlcCampaignJson from 'json/OnCometVideoPlcCampaign.json';
 import OnXPromoPlcCampaignJson from 'json/OnXPromoPlcCampaign.json';
+import MixedPlacementAuctionResponse from 'json/MixedPlacementAuctionResponse.json';
 import VastInlineLinear from 'xml/VastInlineLinear.xml';
 import WrappedVast1 from 'xml/WrappedVast1.xml';
 import WrappedVast2 from 'xml/WrappedVast2.xml';
@@ -69,10 +70,14 @@ import OnProgrammaticVastPlcCampaignAdLevelErrorUrls from 'json/OnProgrammaticVa
 import OnProgrammaticVastPlcCampaignCustomTracking from 'json/OnProgrammaticVastPlcCampaignCustomTracking.json';
 import OnStaticInterstitialDisplayHtmlCampaign from 'json/OnStaticInterstitialDisplayCampaign.json';
 import OnStaticInterstitialDisplayJsCampaign from 'json/OnStaticInterstitialDisplayJsCampaign.json';
+import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
 import { JaegerManager } from 'Jaeger/JaegerManager';
 import { JaegerSpan } from 'Jaeger/JaegerSpan';
 import { AdMobOptionalSignal } from 'Models/AdMobOptionalSignal';
 import { ABGroup } from 'Models/ABGroup';
+import { MixedPlacementUtility } from 'Utilities/MixedPlacementUtility';
+import { IPlacementRequestMap } from 'Managers/CampaignManager';
+import { JsonParser } from '../../../Utilities/JsonParser';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -1392,7 +1397,7 @@ describe('CampaignManager', () => {
         let assetManager: AssetManager;
         let campaignManager: CampaignManager;
 
-        beforeEach( () => {
+        beforeEach(() => {
             sinon.stub(request, 'post').callsFake((url: string, data: string = '', headers: Array<[string, string]> = [], options?: any) => {
                 requestData = data;
                 return Promise.resolve();
@@ -1412,6 +1417,53 @@ describe('CampaignManager', () => {
             return campaignManager.request().then(() => {
                 const requestBody = JSON.parse(requestData);
                 assert.isUndefined(requestBody.organizationId, 'organizationId should NOT be in ad request body when it was NOT defined in the config response');
+            });
+        });
+    });
+
+    describe('on mixed placement request', () => {
+        let requestData: string = '{}';
+        let assetManager: AssetManager;
+        let campaignManager: CampaignManager;
+
+        const placements = MixedPlacementUtility.originalPlacements;
+        const placementRequestMap: { [id: string]: IPlacementRequestMap } = {};
+
+        beforeEach(() => {
+            sinon.stub(request, 'post').callsFake((url: string, data: string = '', headers: Array<[string, string]> = [], options?: any) => {
+                requestData = data;
+                return Promise.resolve();
+            });
+
+            const clientInfoMixedExperiment = TestFixtures.getClientInfo(Platform.ANDROID, '1003628');
+            configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements), clientInfoMixedExperiment);
+            assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+            campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfoMixedExperiment, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
+        });
+
+        afterEach(() => {
+            MixedPlacementUtility.originalPlacements = {};
+        });
+
+        it('should strip mixedPlacements from the placement request map in request body sent to auction when mixedplacment experiment is enabled', () => {
+            for (const placementid in placements) {
+                if(placements.hasOwnProperty(placementid)) {
+                    placementRequestMap[placementid] = {
+                        adTypes: placements[placementid].getAdTypes(),
+                        allowSkip: placements[placementid].allowSkip(),
+                    };
+
+                    if (placementRequestMap[placementid].adTypes === undefined) {
+                        delete placementRequestMap[placementid].adTypes;
+                    }
+                }
+            }
+
+            return campaignManager.request().then(() => {
+                const requestBody = JSON.parse(requestData);
+                assert.notEqual(MixedPlacementUtility.originalPlacements, configuration.getPlacements());
+                assert.notEqual(requestBody.placements, {});
+                assert.deepEqual(requestBody.placements, placementRequestMap);
             });
         });
     });

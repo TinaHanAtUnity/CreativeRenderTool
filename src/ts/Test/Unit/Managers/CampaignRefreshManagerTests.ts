@@ -682,11 +682,7 @@ describe('CampaignRefreshManager', () => {
             });
         });
 
-        it('should mark placement as ready after it has been invalidated', () => {
-            //
-        });
-
-        it('should invalidate mixed rewarded campaigns', () => {
+        it('should invalidate mixed rewarded campaigns and set suffixed placement as ready the second time onCampaign is triggered after being invalidated', () => {
             const campaign = TestFixtures.getPromoCampaign();
             const placement: Placement = configuration.getPlacement('premium');
             adUnitParams.campaign = campaign;
@@ -697,6 +693,8 @@ describe('CampaignRefreshManager', () => {
                 campaignManager.onCampaign.trigger('mixedPlacement-promo', TestFixtures.getPromoCampaign('purchasing/iap'));
                 return Promise.resolve();
             });
+
+            sinon.stub(campaignRefreshManager, 'shouldRefill').returns(true);
 
             return campaignRefreshManager.refresh().then(() => {
                 const tmpCampaign = campaignRefreshManager.getCampaign('mixedPlacement-promo');
@@ -723,6 +721,22 @@ describe('CampaignRefreshManager', () => {
                 assert.equal(campaignRefreshManager.getCampaign('mixedPlacement'), undefined);
                 assert.equal(campaignRefreshManager.getCampaign('mixedPlacement-promo'), undefined);
                 assert.equal(campaignRefreshManager.getCampaign('video'), undefined);
+
+                campaignRefreshManager.refresh().then(() => {
+                    const tmpCampaign2 = campaignRefreshManager.getCampaign('mixedPlacement-promo');
+                    assert.isDefined(tmpCampaign2);
+                    if (tmpCampaign2) {
+                        assert.equal(tmpCampaign2.getId(), '000000000000000000000123');
+                    }
+
+                    assert.equal(configuration.getPlacement('mixedPlacement-promo').getState(), PlacementState.WAITING);
+                    assert.equal(configuration.getPlacement('video').getState(), PlacementState.WAITING);
+
+                    currentAdUnit.onClose.trigger();
+
+                    assert.equal(configuration.getPlacement('mixedPlacement-promo').getState(), PlacementState.READY);
+                    assert.equal(configuration.getPlacement('video').getState(), PlacementState.WAITING);
+                });
             });
         });
 
@@ -747,18 +761,6 @@ describe('CampaignRefreshManager', () => {
 
                 assert.equal(configuration.getPlacement('video').getState(), PlacementState.NO_FILL);
             });
-        });
-
-        xit('should set suffixed placement as ready the second time onCampaign is triggered after being invalidated', () => {
-            //
-        });
-
-        xit('campaign onError should set noFill for mixed placements', () => {
-            //
-        });
-
-        xit('campaign onConnectivityError should set noFill for mixed placements and invalidate campaigns', () => {
-            //
         });
     });
 });

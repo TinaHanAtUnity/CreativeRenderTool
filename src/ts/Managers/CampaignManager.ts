@@ -6,7 +6,7 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { Platform } from 'Constants/Platform';
 import { NativeBridge } from 'Native/NativeBridge';
 import { MetaDataManager } from 'Managers/MetaDataManager';
-import { StorageType, StorageApi } from 'Native/Api/Storage';
+import { StorageType } from 'Native/Api/Storage';
 import { AssetManager } from 'Managers/AssetManager';
 import { WebViewError } from 'Errors/WebViewError';
 import { Configuration } from 'Models/Configuration';
@@ -32,7 +32,7 @@ import { CampaignParserFactory } from 'Managers/CampaignParserFactory';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
 import { UserCountData } from 'Utilities/UserCountData';
 import { JaegerManager } from 'Jaeger/JaegerManager';
-import { JaegerTags, JaegerSpan } from 'Jaeger/JaegerSpan';
+import { JaegerTags } from 'Jaeger/JaegerSpan';
 import { GameSessionCounters } from 'Utilities/GameSessionCounters';
 import { ABGroup } from 'Models/ABGroup';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
@@ -306,28 +306,26 @@ export class CampaignManager {
             const noFill: string[] = [];
 
             if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
-                this._nativeBridge.Sdk.logInfo('TINDER: BEFORE json placements: ' + JSON.stringify(json.placements));
                 json.placements = MixedPlacementUtility.insertMediaIdsIntoJSON(this._configuration, json.placements);
-                this._nativeBridge.Sdk.logInfo('TINDER: AFTER json placements: ' + JSON.stringify(json.placements));
             }
 
             const placements = this._configuration.getPlacements();
-            for(const placementid in placements) {
-                if(placements.hasOwnProperty(placementid)) {
-                    const mediaId: string = json.placements[placementid];
+            for(const placementId in placements) {
+                if(placements.hasOwnProperty(placementId)) {
+                    const mediaId: string = json.placements[placementId];
 
                     if(mediaId) {
                         if(fill[mediaId]) {
-                            fill[mediaId].push(placementid);
+                            fill[mediaId].push(placementId);
                         } else {
-                            fill[mediaId] = [placementid];
+                            fill[mediaId] = [placementId];
                         }
                     } else {
-                        noFill.push(placementid);
+                        noFill.push(placementId);
                     }
 
-                    if(json.realtimeData && json.realtimeData[placementid]) {
-                        this._configuration.getPlacement(placementid).setRealtimeData(json.realtimeData[placementid]);
+                    if(json.realtimeData && json.realtimeData[placementId]) {
+                        this._configuration.getPlacement(placementId).setRealtimeData(json.realtimeData[placementId]);
                     }
                 }
             }
@@ -587,7 +585,7 @@ export class CampaignManager {
     }
 
     private createRequestBody(nofillRetry?: boolean, realtimePlacement?: Placement): Promise<any> {
-        const placementRequest: any = {};
+        let placementRequest: any = {};
 
         if(realtimePlacement && this._realtimeBody) {
 
@@ -691,15 +689,7 @@ export class CampaignManager {
                 }
 
                 if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
-                    const placements = MixedPlacementUtility.originalPlacements;
-                    for(const placement in placements) {
-                        if(placements.hasOwnProperty(placement)) {
-                            placementRequest[placement] = {
-                                adTypes: placements[placement].getAdTypes(),
-                                allowSkip: placements[placement].allowSkip(),
-                            };
-                        }
-                    }
+                    placementRequest = this.createPlacementRequestMap();
                 } else {
                     const placements = this._configuration.getPlacements();
                     for(const placement in placements) {
@@ -761,4 +751,24 @@ export class CampaignManager {
             });
         });
     }
+
+    private createPlacementRequestMap(): { [id: string]: IPlacementRequestMap } {
+        const placements = MixedPlacementUtility.originalPlacements;
+        const placementRequest: { [id: string]: IPlacementRequestMap } = {};
+        for(const placement in placements) {
+            if(placements.hasOwnProperty(placement)) {
+                placementRequest[placement] = {
+                    adTypes: placements[placement].getAdTypes(),
+                    allowSkip: placements[placement].allowSkip(),
+                };
+            }
+        }
+
+        return placementRequest;
+    }
+}
+
+export interface IPlacementRequestMap {
+    adTypes: string[] | undefined;
+    allowSkip: boolean;
 }
