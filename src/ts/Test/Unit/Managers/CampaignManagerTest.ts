@@ -44,7 +44,6 @@ import OnProgrammaticMraidPlcCampaignJson from 'json/OnProgrammaticMraidPlcCampa
 import OnCometMraidPlcCampaignJson from 'json/OnCometMraidPlcCampaign.json';
 import OnCometVideoPlcCampaignJson from 'json/OnCometVideoPlcCampaign.json';
 import OnXPromoPlcCampaignJson from 'json/OnXPromoPlcCampaign.json';
-import MixedPlacementAuctionResponse from 'json/MixedPlacementAuctionResponse.json';
 import VastInlineLinear from 'xml/VastInlineLinear.xml';
 import WrappedVast1 from 'xml/WrappedVast1.xml';
 import WrappedVast2 from 'xml/WrappedVast2.xml';
@@ -75,9 +74,7 @@ import { JaegerManager } from 'Jaeger/JaegerManager';
 import { JaegerSpan } from 'Jaeger/JaegerSpan';
 import { AdMobOptionalSignal } from 'Models/AdMobOptionalSignal';
 import { ABGroup } from 'Models/ABGroup';
-import { MixedPlacementUtility } from 'Utilities/MixedPlacementUtility';
-import { IPlacementRequestMap } from 'Managers/CampaignManager';
-import { JsonParser } from '../../../Utilities/JsonParser';
+import { MixedPlacementUtility, IPlacementRequestMap } from 'Utilities/MixedPlacementUtility';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;

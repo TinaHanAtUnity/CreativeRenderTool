@@ -346,7 +346,7 @@ test-filter: build-proto
 	@echo Running unit tests with filter: $(TEST_FILTER)
 	@echo
 
-	TEST_FILTER=$(TEST_FILTER) node --trace-warnings test-utils/node_runner.js
+	node --trace-warnings test-utils/node_runner.js
 
 ifeq ($(TRAVIS_PULL_REQUEST), false)
 travis-browser-test:

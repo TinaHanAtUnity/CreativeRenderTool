@@ -112,7 +112,6 @@ export class CampaignManager {
         this._requesting = false;
         this._ignoreEvents = false;
         this._jaegerManager = jaegerManager;
-        MixedPlacementUtility.nativeBridge = this._nativeBridge;
     }
 
     public cleanCachedUrl(url: string): string {
@@ -689,7 +688,7 @@ export class CampaignManager {
                 }
 
                 if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
-                    placementRequest = this.createPlacementRequestMap();
+                    placementRequest = MixedPlacementUtility.createPlacementRequestMap();
                 } else {
                     const placements = this._configuration.getPlacements();
                     for(const placement in placements) {
@@ -751,24 +750,4 @@ export class CampaignManager {
             });
         });
     }
-
-    private createPlacementRequestMap(): { [id: string]: IPlacementRequestMap } {
-        const placements = MixedPlacementUtility.originalPlacements;
-        const placementRequest: { [id: string]: IPlacementRequestMap } = {};
-        for(const placement in placements) {
-            if(placements.hasOwnProperty(placement)) {
-                placementRequest[placement] = {
-                    adTypes: placements[placement].getAdTypes(),
-                    allowSkip: placements[placement].allowSkip(),
-                };
-            }
-        }
-
-        return placementRequest;
-    }
-}
-
-export interface IPlacementRequestMap {
-    adTypes: string[] | undefined;
-    allowSkip: boolean;
 }

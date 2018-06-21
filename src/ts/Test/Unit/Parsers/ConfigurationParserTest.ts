@@ -114,7 +114,6 @@ describe('configurationParserTest', () => {
             const clientInfoPromoGame = TestFixtures.getClientInfo(Platform.ANDROID, '1003628');
             configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements), clientInfoPromoGame);
             sandbox.assert.called(<sinon.SinonStub>MixedPlacementUtility.createMixedPlacements);
-            // sandbox.assert.callCount(<sinon.SinonStub>MixedPlacementUtility.createMixedPlacements, 7);
         });
     });
 });

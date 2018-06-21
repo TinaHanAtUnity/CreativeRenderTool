@@ -2,7 +2,6 @@ import { Configuration } from 'Models/Configuration';
 import { Campaign } from 'Models/Campaign';
 import { Placement } from 'Models/Placement';
 import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
-import { NativeBridge } from '../Native/NativeBridge';
 
 export const enum MixedPlacementTypes {
     NON_REWARDED = '',
@@ -11,10 +10,14 @@ export const enum MixedPlacementTypes {
     REWARDED_PROMO = '-rewardedpromo'
 }
 
+export interface IPlacementRequestMap {
+    adTypes: string[] | undefined;
+    allowSkip: boolean;
+}
+
 export class MixedPlacementUtility {
 
     public static originalPlacements: { [id: string]: Placement } = {};
-    public static nativeBridge: NativeBridge;
 
     public static isMixedPlacement(placement: Placement): boolean {
         const adTypes = placement.getAdTypes();
@@ -62,6 +65,21 @@ export class MixedPlacementUtility {
             }
         }
         return result;
+    }
+
+    public static createPlacementRequestMap(): { [id: string]: IPlacementRequestMap } {
+        const placements = MixedPlacementUtility.originalPlacements;
+        const placementRequest: { [id: string]: IPlacementRequestMap } = {};
+        for(const placement in placements) {
+            if(placements.hasOwnProperty(placement)) {
+                placementRequest[placement] = {
+                    adTypes: placements[placement].getAdTypes(),
+                    allowSkip: placements[placement].allowSkip(),
+                };
+            }
+        }
+
+        return placementRequest;
     }
 
     private static extractMixedPlacementSuffix(placementId: string, campaign: Campaign, configuration: Configuration): MixedPlacementTypes {
