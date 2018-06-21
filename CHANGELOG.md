@@ -1,4 +1,4 @@
-# Pending
+# Thu Jun 21 09:14:47 UTC 2018
 
 * Pinpoint promo_version_not_supported errors
 * Custom fix for Baidu: Close ad units when going background on iOS
