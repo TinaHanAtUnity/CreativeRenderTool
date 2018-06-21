@@ -11,7 +11,8 @@
     "rootDir": "src/ts",
     "baseUrl": "src/ts",
     "strict": true,
-    "strictPropertyInitialization": false
+    "strictPropertyInitialization": false,
+    "importHelpers": true
   },
   "include": [
     "src/ts/**/*.ts",

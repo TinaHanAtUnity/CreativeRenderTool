@@ -7,8 +7,10 @@ import { EventType } from 'Models/Session';
 import { INativeResponse } from 'Utilities/Request';
 import { GameSessionCounters } from 'Utilities/GameSessionCounters';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
+import { FailedXpromoOperativeEventManager } from 'Managers/FailedXpromoOperativeEventManager';
 
 export class XPromoOperativeEventManager extends OperativeEventManager {
+
     private _xPromoCampaign: XPromoCampaign;
 
     constructor(params: IOperativeEventManagerParams<XPromoCampaign>) {
@@ -88,7 +90,16 @@ export class XPromoOperativeEventManager extends OperativeEventManager {
             infoJson.sourceGameId = this._clientInfo.getGameId();
             infoJson.targetGameId = this._xPromoCampaign.getGameId().toString();
 
-            return HttpKafka.sendEvent(kafkaType, KafkaCommonObjectType.PERSONAL, infoJson);
+            return HttpKafka.sendEvent(kafkaType, KafkaCommonObjectType.PERSONAL, infoJson).catch(() => {
+                const sessionId = this._campaign.getSession().getId();
+                return this._nativeBridge.DeviceInfo.getUniqueEventId().then(eventId => {
+                    new FailedXpromoOperativeEventManager(sessionId, eventId).storeFailedEvent(this._nativeBridge, {
+                        kafkaType: kafkaType,
+                        data: JSON.stringify(infoJson)
+                    });
+                    return Promise.resolve(<INativeResponse>{});
+                });
+            });
         };
 
         return this.createUniqueEventMetadata(placement, this._sessionManager.getGameSessionId(), this._gamerServerId, OperativeEventManager.getPreviousPlacementId(), videoOrientation).then(fulfilled);

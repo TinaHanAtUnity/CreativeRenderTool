@@ -65,7 +65,7 @@ export class JaegerManager {
     private postToJaeger(spans: IJaegerSpan[]) {
         if (this._isJaegerTracingEnabled === true) {
             const headers: Array<[string, string]> = [];
-            const url: string = 'http://tracing-collector-stg.internal.unity3d.com/api/v2/spans';
+            const url: string = 'https://tracing-collector-stg.internal.unity3d.com/api/v2/spans';
             const data: string = JSON.stringify(spans);
 
             headers.push(['Content-Type', 'application/json']);

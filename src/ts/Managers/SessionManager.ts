@@ -2,10 +2,9 @@ import { Session } from 'Models/Session';
 import { NativeBridge } from 'Native/NativeBridge';
 import { StorageType } from 'Native/Api/Storage';
 import { Diagnostics } from 'Utilities/Diagnostics';
-import { DiagnosticError } from 'Errors/DiagnosticError';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { SdkStats } from 'Utilities/SdkStats';
 import { Request } from 'Utilities/Request';
+import { FailedOperativeEventManager } from 'Managers/FailedOperativeEventManager';
+import { FailedXpromoOperativeEventManager } from 'Managers/FailedXpromoOperativeEventManager';
 
 export class SessionManager {
     public static getSessionKey(sessionId: string): string {
@@ -91,35 +90,11 @@ export class SessionManager {
     }
 
     private sendUnsentEvents(sessionId: string): Promise<any[]> {
-        return this.getUnsentEvents(sessionId).then(events => {
-            return Promise.all(events.map(eventId => {
-                return this.resendEvent(sessionId, eventId);
-            }));
-        });
-    }
-
-    private getUnsentEvents(sessionId: string): Promise<string[]> {
-        return this._nativeBridge.Storage.getKeys(StorageType.PRIVATE, 'session.' + sessionId + '.operative', false);
-    }
-
-    private resendEvent(sessionId: string, eventId: string): Promise<void | void[]> {
-        return this.getStoredEvent(sessionId, eventId).then(([url, data]) => {
-            this._nativeBridge.Sdk.logDebug('Unity Ads operative event: resending operative event to ' + url + ' (session ' + sessionId + ', event ' + eventId + ')');
-            return this._request.post(url, data);
-        }).then(() => {
-            return Promise.all([
-                this._nativeBridge.Storage.delete(StorageType.PRIVATE, OperativeEventManager.getEventKey(sessionId, eventId)),
-                this._nativeBridge.Storage.write(StorageType.PRIVATE)
-            ]);
-        }).catch(() => {
-            // ignore failed resends, they will be retried later
-        });
-    }
-
-    private getStoredEvent(sessionId: string, eventId: string): Promise<string[]> {
-        return Promise.all([
-            this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, OperativeEventManager.getUrlKey(sessionId, eventId)),
-            this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, OperativeEventManager.getDataKey(sessionId, eventId))
-        ]);
+        const promises: Array<Promise<any>> = [];
+        const failedOperativeEventManager = new FailedOperativeEventManager(sessionId);
+        promises.push(failedOperativeEventManager.sendFailedEvents(this._nativeBridge, this._request));
+        const failedXpromoOperativeEventManager = new FailedXpromoOperativeEventManager(sessionId);
+        promises.push(failedXpromoOperativeEventManager.sendFailedEvents(this._nativeBridge, this._request));
+        return Promise.all(promises);
     }
 }

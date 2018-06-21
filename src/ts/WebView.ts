@@ -146,6 +146,13 @@ export class WebView {
             SdkStats.setInitTimestamp();
             GameSessionCounters.init();
 
+            if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                this._nativeBridge.Request.Android.setMaximumPoolSize(8);
+                this._nativeBridge.Request.Android.setKeepAliveTime(10000);
+            } else {
+                this._nativeBridge.Request.setConcurrentRequestCount(8);
+            }
+
             return Promise.all([this._deviceInfo.fetch(), this.setupTestEnvironment()]);
         }).then(() => {
             if(this._clientInfo.getPlatform() === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
@@ -159,7 +166,7 @@ export class WebView {
                 } else if(model.match(/ipad/i)) {
                     document.body.classList.add('ipad');
                 }
-                this._container = new ViewController(this._nativeBridge, this._deviceInfo, this._focusManager);
+                this._container = new ViewController(this._nativeBridge, this._deviceInfo, this._focusManager, this._clientInfo);
             }
             HttpKafka.setDeviceInfo(this._deviceInfo);
             this._sessionManager = new SessionManager(this._nativeBridge, this._request);
@@ -278,6 +285,9 @@ export class WebView {
         }).then(() => {
             if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
                 this._nativeBridge.setAutoBatchEnabled(false);
+                this._nativeBridge.Request.Android.setMaximumPoolSize(1);
+            } else {
+                this._nativeBridge.Request.setConcurrentRequestCount(1);
             }
         }).catch(error => {
             jaegerInitSpan.addAnnotation(error.message);
@@ -471,6 +481,9 @@ export class WebView {
             this._currentAdUnit.show().then(() => {
                 if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
                     this._nativeBridge.setAutoBatchEnabled(true);
+                    this._nativeBridge.Request.Android.setMaximumPoolSize(8);
+                } else {
+                    this._nativeBridge.Request.setConcurrentRequestCount(8);
                 }
             });
         });
@@ -489,6 +502,9 @@ export class WebView {
 
         if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
             this._nativeBridge.setAutoBatchEnabled(false);
+            this._nativeBridge.Request.Android.setMaximumPoolSize(1);
+        } else {
+            this._nativeBridge.Request.setConcurrentRequestCount(1);
         }
     }
 
