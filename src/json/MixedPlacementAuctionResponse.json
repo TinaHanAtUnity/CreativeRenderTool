@@ -13,7 +13,7 @@
             "adType": "IAP",
             "buyerId": "iap-promo",
             "cacheTTL": 7200,
-			"content": "{\"id\":\"59bab3d95d60bf6e8497a017\",\"iapProductId\":\"100.gold.coins\",\"allowSkip\":true,\"creativeUrl\":\"{{HOST}}{{DONT_CACHE:/creatives/rewardedPromo_wip.html}}\",\"dynamicMarkup\":\"\\u003cscript type=\\\"text/javascript\\\"\\u003e    HIDE_COUNTDOWN =  true ;    COUNTDOWN_SECONDS =  0 ;    IS_STICKY =  false ;\\u003c/script\\u003e\"}",            "contentType": "purchasing/iap",
+			"content": "{\"id\":\"59bab3d95d60bf6e8497a017\",\"iapProductId\":\"100.gold.coins\",\"allowSkip\":true,\"creativeUrl\":\"localhost:8000/creatives/rewardedPromo_wip.html}}\",\"dynamicMarkup\":\"\\u003cscript type=\\\"text/javascript\\\"\\u003e    HIDE_COUNTDOWN =  true ;    COUNTDOWN_SECONDS =  0 ;    IS_STICKY =  false ;\\u003c/script\\u003e\"}",            "contentType": "purchasing/iap",
             "creativeId": "5a7a390114eeae82fd71bcc6",
             "seatId": 9015,
             "trackingUrls": {
