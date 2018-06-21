@@ -98,6 +98,9 @@ export class PurchasingUtilities {
     public static handleSendIAPEvent(iapPayload: string): void {
         const jsonPayload = JSON.parse(iapPayload);
 
+        this._nativeBridge.Sdk.logInfo(iapPayload);
+        this._nativeBridge.Sdk.logInfo('handleSendEvent called in webview ^_^');
+
         if (jsonPayload.type === 'CatalogUpdated') {
             this.sendPurchaseInitializationEvent();
 
