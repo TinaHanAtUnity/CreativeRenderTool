@@ -99,6 +99,5 @@ const GroupTest = new ABGroup(99);
 // Add ABTests below
 // Example : export const GdprBaseAbTest = new ABTest(GroupSixteen, GroupSeventeen);
 
-// Egor-TODO: Use correct groups
 export const SquareEndScreenEnabledAbTest = new ABTest(GroupEighteen, GroupNineteen);
 export const FancyEndScreenEnabledAbTest = new ABTest(GroupSixteen, GroupSeventeen);
