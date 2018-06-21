@@ -67,21 +67,6 @@ export class MixedPlacementUtility {
         return result;
     }
 
-    public static createPlacementRequestMap(): { [id: string]: IPlacementRequestMap } {
-        const placements = MixedPlacementUtility.originalPlacements;
-        const placementRequest: { [id: string]: IPlacementRequestMap } = {};
-        for(const placement in placements) {
-            if(placements.hasOwnProperty(placement)) {
-                placementRequest[placement] = {
-                    adTypes: placements[placement].getAdTypes(),
-                    allowSkip: placements[placement].allowSkip(),
-                };
-            }
-        }
-
-        return placementRequest;
-    }
-
     private static extractMixedPlacementSuffix(placementId: string, campaign: Campaign, configuration: Configuration): MixedPlacementTypes {
         let str = MixedPlacementTypes.NON_REWARDED;
         const placement = configuration.getPlacement(placementId);

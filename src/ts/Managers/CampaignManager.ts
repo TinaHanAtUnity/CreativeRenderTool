@@ -687,19 +687,23 @@ export class CampaignManager {
                     body.frameworkVersion = framework.getVersion();
                 }
 
+                let placements: { [id: string]: Placement } = {};
+
                 if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
-                    placementRequest = MixedPlacementUtility.createPlacementRequestMap();
+                    placements = MixedPlacementUtility.originalPlacements;
                 } else {
-                    const placements = this._configuration.getPlacements();
-                    for(const placement in placements) {
-                        if(placements.hasOwnProperty(placement)) {
-                            placementRequest[placement] = {
-                                adTypes: placements[placement].getAdTypes(),
-                                allowSkip: placements[placement].allowSkip(),
-                            };
-                        }
+                    placements = this._configuration.getPlacements();
+                }
+
+                for(const placement in placements) {
+                    if(placements.hasOwnProperty(placement)) {
+                        placementRequest[placement] = {
+                            adTypes: placements[placement].getAdTypes(),
+                            allowSkip: placements[placement].allowSkip(),
+                        };
                     }
                 }
+
 
                 body.placements = placementRequest;
                 body.properties = this._configuration.getProperties();
