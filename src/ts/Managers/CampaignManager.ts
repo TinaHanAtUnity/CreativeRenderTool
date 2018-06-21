@@ -584,7 +584,7 @@ export class CampaignManager {
     }
 
     private createRequestBody(nofillRetry?: boolean, realtimePlacement?: Placement): Promise<any> {
-        let placementRequest: any = {};
+        const placementRequest: any = {};
 
         if(realtimePlacement && this._realtimeBody) {
 
@@ -703,7 +703,6 @@ export class CampaignManager {
                         };
                     }
                 }
-
 
                 body.placements = placementRequest;
                 body.properties = this._configuration.getProperties();
