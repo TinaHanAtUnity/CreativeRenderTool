@@ -16,7 +16,6 @@ export class PromoCampaignParser extends CampaignParser {
         const promoJson = JsonParser.parse(response.getContent());
         if (promoJson && promoJson.iapProductId) {
             if (PurchasingUtilities.promoResponseIndex < PurchasingUtilities.iapCampaignCount) {
-                PurchasingUtilities.session[PurchasingUtilities.promoResponseIndex] = session;
                 PurchasingUtilities.response[PurchasingUtilities.promoResponseIndex] = response;
                 PurchasingUtilities.promoResponseIndex++;
             }

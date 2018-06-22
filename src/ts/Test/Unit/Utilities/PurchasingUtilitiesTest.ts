@@ -259,7 +259,7 @@ describe('PurchasingUtilitiesTest', () => {
 
             PurchasingUtilities.campaignManager = campaignManager;
             PurchasingUtilities.response[0] = response;
-            PurchasingUtilities.session[0] = session;
+            PurchasingUtilities.session = session;
         });
 
         it('Should handle campaign when iap payload type is catalogupdated', () => {
@@ -300,7 +300,7 @@ describe('PurchasingUtilitiesTest', () => {
         it('Should handle campaign and be called twice when campaign count is 2', () => {
             PurchasingUtilities.promoResponseIndex++;
             PurchasingUtilities.response[1] = response;
-            PurchasingUtilities.session[1] = session;
+            PurchasingUtilities.session = session;
             PurchasingUtilities.iapCampaignCount = 2;
 
             PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}');

@@ -26,7 +26,7 @@ export interface IPromoPayload {
 
 export class PurchasingUtilities {
 
-    public static session: Session[] = [];
+    public static session: Session;
     public static response: AuctionResponse[] = [];
     public static campaignManager: CampaignManager;
     public static promoResponseIndex: number = 0;
@@ -103,10 +103,10 @@ export class PurchasingUtilities {
 
             const promises = [];
             for (let i = 0; i < this.iapCampaignCount; i++) {
-                if (this.response[i] === undefined || this.session[i] === undefined) {
+                if (this.response[i] === undefined || this.session === undefined) {
                     this.logIssue('handle_send_event_failure', 'Auction Response or Session value is null');
                 } else {
-                    promises.push(this.campaignManager.handleCampaign(this.response[i], this.session[i]));
+                    promises.push(this.campaignManager.handleCampaign(this.response[i], this.session));
                 }
             }
             Promise.all(promises);

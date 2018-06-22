@@ -321,6 +321,7 @@ export class CampaignManager {
 
         const session: Session = this._sessionManager.create(json.auctionId);
         session.setAdPlan(response.response);
+        PurchasingUtilities.session = session;
 
         if('placements' in json) {
             const fill: { [mediaId: string]: string[] } = {};
