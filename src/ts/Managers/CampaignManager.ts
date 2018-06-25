@@ -587,7 +587,7 @@ export class CampaignManager {
                 if (placements.hasOwnProperty(placement)) {
                     placementRequest[placement] = {
                         adTypes: placements[placement].getAdTypes(),
-                        allowSkip: placements[placement].allowSkip()
+                        allowSkip: placements[placement].allowSkip(),
                     };
                 }
             }
@@ -686,7 +686,7 @@ export class CampaignManager {
                     if(placements.hasOwnProperty(placement)) {
                         placementRequest[placement] = {
                             adTypes: placements[placement].getAdTypes(),
-                            allowSkip: placements[placement].allowSkip()
+                            allowSkip: placements[placement].allowSkip(),
                         };
                     }
                 }

@@ -268,7 +268,7 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
                 'deviceMake': this.getManufacturer(),
                 'screenLayout': this.getScreenLayout(),
                 'screenDensity': this.getScreenDensity(),
-                'totalSpaceExternal': this.getTotalSpaceExternal()
+                'totalSpaceExternal': this.getTotalSpaceExternal(),
             };
 
             if(!this.getAdvertisingIdentifier()) {
@@ -298,7 +298,7 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
                 'deviceMake': this.getManufacturer(),
                 'screenLayout': this.getScreenLayout(),
                 'screenDensity': this.getScreenDensity(),
-                'totalSpaceExternal': this.getTotalSpaceExternal()
+                'totalSpaceExternal': this.getTotalSpaceExternal(),
             };
 
             return Promise.all([
@@ -323,7 +323,7 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
             'deviceMake': this.getManufacturer(),
             'screenLayout': this.getScreenLayout(),
             'screenDensity': this.getScreenDensity(),
-            'totalSpaceExternal': this.getTotalSpaceExternal()
+            'totalSpaceExternal': this.getTotalSpaceExternal(),
         };
 
         if(!this.getAdvertisingIdentifier()) {
@@ -340,7 +340,7 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
             'deviceMake': this.getManufacturer(),
             'screenLayout': this.getScreenLayout(),
             'screenDensity': this.getScreenDensity(),
-            'totalSpaceExternal': this.getTotalSpaceExternal()
+            'totalSpaceExternal': this.getTotalSpaceExternal(),
         };
     }
 }

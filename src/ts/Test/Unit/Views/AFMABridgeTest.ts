@@ -109,7 +109,7 @@ describe('AFMABridge', () => {
         }, {
             event: AFMAEvents.FETCH_APP_STORE_OVERLAY,
             data: {
-                productId: 'com.unity3d.ads'
+                productId: 'com.unity3d.ads',
             },
             verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAFetchAppStoreOverlay, data.productId)
         }, {

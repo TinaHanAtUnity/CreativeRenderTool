@@ -185,7 +185,7 @@ export class AdUnitFactory {
         const vastAdUnitParameters: IVastAdUnitParameters = {
             ... parameters,
             video: parameters.campaign.getVideo(),
-            overlay: overlay
+            overlay: overlay,
         };
 
         if(parameters.campaign.hasEndscreen()) {
@@ -331,7 +331,7 @@ export class AdUnitFactory {
         const view = new DisplayInterstitial(nativeBridge, parameters.placement, <DisplayInterstitialCampaign>parameters.campaign, privacy, this.showGDPRBanner(parameters));
         const displayInterstitialParameters: IDisplayInterstitialAdUnitParameters = {
             ... parameters,
-            view: view
+            view: view,
         };
 
         const displayInterstitialAdUnit = new DisplayInterstitialAdUnit(nativeBridge, displayInterstitialParameters);

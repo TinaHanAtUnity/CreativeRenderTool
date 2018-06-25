@@ -73,6 +73,7 @@
     "export-name": false,
     "no-unnecessary-field-initialization": false,
     "insecure-random": false,
-    "use-default-type-parameter": false
+    "use-default-type-parameter": false,
+    "trailing-comma": false
   }
 }

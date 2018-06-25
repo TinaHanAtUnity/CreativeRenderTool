@@ -13,7 +13,7 @@ enum VideoPlayerEvent {
     PLAY,
     PAUSE,
     SEEKTO,
-    STOP
+    STOP,
 }
 
 export interface IVideoEventHandler {

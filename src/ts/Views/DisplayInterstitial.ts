@@ -58,7 +58,7 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
                 event: 'click',
                 listener: (event: Event) => this.onPrivacyEvent(event),
                 selector: '.icon-gdpr'
-            }
+            },
         ];
 
         this._privacy.render();

@@ -252,7 +252,7 @@ export class NewRefreshManager extends RefreshManager {
         }
 
         Diagnostics.trigger(diagnosticsType, {
-            error: error
+            error: error,
         }, session);
 
         this._nativeBridge.Sdk.logError('Unity Ads ad request error: ' + JSON.stringify(error));

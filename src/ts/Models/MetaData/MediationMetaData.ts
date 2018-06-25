@@ -13,7 +13,7 @@ export class MediationMetaData extends BaseMetaData<IMediationMetaData> {
             ... BaseMetaData.Schema,
             name: ['string', 'undefined'],
             version: ['string', 'undefined'],
-            ordinal: ['number', 'undefined']
+            ordinal: ['number', 'undefined'],
         });
 
         this.set('category', 'mediation');
@@ -40,7 +40,7 @@ export class MediationMetaData extends BaseMetaData<IMediationMetaData> {
         return {
             'mediationName': this.getName(),
             'mediationVersion': this.getVersion(),
-            'mediationOrdinal': this.getOrdinal()
+            'mediationOrdinal': this.getOrdinal(),
         };
     }
 }

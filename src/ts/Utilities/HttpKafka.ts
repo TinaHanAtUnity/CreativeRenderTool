@@ -67,7 +67,7 @@ export class HttpKafka {
                 'common': {
                     'client': null,
                     'device': null,
-                    'country': null
+                    'country': null,
                 }
             };
             return Promise.resolve(emptyCommon);
@@ -76,7 +76,7 @@ export class HttpKafka {
                 'common': {
                     'client': clientInfo ? clientInfo.getDTO() : null,
                     'device': null,
-                    'country': configuration ? configuration.getCountry() : null
+                    'country': configuration ? configuration.getCountry() : null,
                 }
             };
 

@@ -156,7 +156,7 @@ describe('AndroidAdUnitTest', () => {
                 },
                 onContainerSystemMessage: function(message: AdUnitContainerSystemMessage) {
                     // EMPTY
-                }
+                },
             };
 
             container.addEventHandler(listener);
@@ -185,7 +185,7 @@ describe('AndroidAdUnitTest', () => {
                 },
                 onContainerSystemMessage: function(message: AdUnitContainerSystemMessage) {
                     // EMPTY
-                }
+                },
             };
 
             container.addEventHandler(listener);
@@ -215,7 +215,7 @@ describe('AndroidAdUnitTest', () => {
                 },
                 onContainerSystemMessage: function(message: AdUnitContainerSystemMessage) {
                     // EMPTY
-                }
+                },
             };
 
             container.addEventHandler(listener);

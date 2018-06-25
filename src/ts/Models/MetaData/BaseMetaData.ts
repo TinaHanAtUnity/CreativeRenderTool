@@ -10,7 +10,7 @@ export interface IMetaData {
 export abstract class BaseMetaData<T extends IMetaData = IMetaData> extends Model<T> {
     public static Schema: ISchema<IMetaData> = {
         category: ['string'],
-        keys: ['array']
+        keys: ['array'],
     };
 
     constructor(name: string, schema: ISchema<T>) {

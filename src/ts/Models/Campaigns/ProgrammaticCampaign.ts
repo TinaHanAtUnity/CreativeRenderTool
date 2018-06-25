@@ -10,7 +10,7 @@ export abstract class ProgrammaticCampaign<T extends IProgrammaticCampaign> exte
     public static Schema: ISchema<IProgrammaticCampaign> = {
         ... Campaign.Schema,
         trackingUrls: ['object'],
-        useWebViewUserAgentForTracking: ['boolean']
+        useWebViewUserAgentForTracking: ['boolean'],
     };
 
     constructor(name: string, schema: ISchema<T>, data: T) {

@@ -49,7 +49,7 @@ export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
                     advertiserCampaignId: response.getAdvertiserCampaignId() || undefined,
                     advertiserBundleId: response.getAdvertiserBundleId() || undefined,
                     useWebViewUserAgentForTracking: response.getUseWebViewUserAgentForTracking(),
-                    buyerId: response.getBuyerId() || undefined
+                    buyerId: response.getBuyerId() || undefined,
                 };
 
                 return Promise.resolve(new VPAIDCampaign(vpaidCampaignParams));

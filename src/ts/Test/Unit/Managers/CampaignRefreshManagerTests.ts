@@ -107,7 +107,7 @@ describe('CampaignRefreshManager', () => {
                 onDownloadProgress: new Observable0(),
                 onDownloadEnd: new Observable0(),
                 onDownloadStopped: new Observable0(),
-                onDownloadError: new Observable0()
+                onDownloadError: new Observable0(),
             },
             Sdk: {
                 logWarning: sinon.spy(),
