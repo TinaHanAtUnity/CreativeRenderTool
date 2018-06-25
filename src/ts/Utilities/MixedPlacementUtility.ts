@@ -48,7 +48,7 @@ export class MixedPlacementUtility {
             return !this.hasMixedPlacementSuffix(placementId, configuration);
         }
 
-        return this.doesEndWithMixedPlacementSuffix(placementId, correctSuffix);
+        return this.endsWithSuffix(placementId, correctSuffix);
     }
 
     public static insertMediaIdsIntoJSON(configuration: Configuration, jsonPlacements: { [placementName: string]: string }): { [placementName: string]: string } {
@@ -96,7 +96,7 @@ export class MixedPlacementUtility {
         let fixedPlacementId;
 
         for (const mixedType of mixedList.slice(1)) {
-            if (this.doesEndWithMixedPlacementSuffix(placementId, mixedType)) {
+            if (this.endsWithSuffix(placementId, mixedType)) {
                 fixedPlacementId = this.removeEndingSuffix(placementId);
             }
 
@@ -115,7 +115,7 @@ export class MixedPlacementUtility {
         return [MixedPlacementTypes.NON_REWARDED, MixedPlacementTypes.PROMO, MixedPlacementTypes.REWARDED, MixedPlacementTypes.REWARDED_PROMO];
     }
 
-    private static doesEndWithMixedPlacementSuffix(placementId: string, mixedType: string): boolean {
+    private static endsWithSuffix(placementId: string, mixedType: string): boolean {
         return placementId.split('-').length > 1 && `-${placementId.split('-').pop()}` === mixedType;
     }
 }
