@@ -327,22 +327,22 @@ export class TestFixtures {
         };
     }
 
-    public static getPromoCampaignParams(json: any, adType?: string, allowSkip?: boolean): IPromoCampaign {
+    public static getPromoCampaignParams(json: any, adType?: string, rewardedPromo?: boolean): IPromoCampaign {
         const session = this.getSession();
-        const shouldSkip = (allowSkip !== undefined) ? allowSkip : false;
+        const isRewardedPromo = (rewardedPromo !== undefined) ? rewardedPromo : false;
         return {
             ... this.getCometCampaignBaseParams(session, json.promo.id, json.gamerId, ABGroup.getAbGroup(json.abGroup), json.meta, adType),
             iapProductId: json.promo.iapProductId,
             additionalTrackingEvents: json.promo.tracking ? json.promo.tracking : undefined,
             dynamicMarkup: json.promo.dynamicMarkup,
             creativeAsset: new HTML(json.promo.creativeUrl, session),
-            allowSkip: shouldSkip
+            rewardedPromo: isRewardedPromo,
         };
     }
 
-    public static getPromoCampaign(adType?: string, allowSkip?: boolean): PromoCampaign {
+    public static getPromoCampaign(adType?: string, rewardedPromo?: boolean): PromoCampaign {
         const json = JSON.parse(DummyPromoCampaign);
-        return new PromoCampaign(this.getPromoCampaignParams(json, adType, allowSkip));
+        return new PromoCampaign(this.getPromoCampaignParams(json, adType, rewardedPromo));
     }
 
     public static getCampaignFollowsRedirects(): PerformanceCampaign {

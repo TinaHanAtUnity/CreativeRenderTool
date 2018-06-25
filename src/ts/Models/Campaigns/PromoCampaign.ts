@@ -6,7 +6,7 @@ export interface IPromoCampaign extends ICampaign {
     additionalTrackingEvents: { [eventName: string]: string[] } | undefined;
     dynamicMarkup: string | undefined;
     creativeAsset: HTML;
-    allowSkip: boolean;
+    rewardedPromo: boolean;
 }
 
 export class PromoCampaign extends Campaign<IPromoCampaign> {
@@ -17,7 +17,7 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
             additionalTrackingEvents: ['object', 'undefined'],
             dynamicMarkup: ['string', 'undefined'],
             creativeAsset: ['object'],
-            allowSkip: ['boolean']
+            rewardedPromo: ['boolean']
         }, campaign);
     }
 
@@ -60,7 +60,7 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
         return [];
     }
 
-    public allowSkip(): boolean {
-        return this.get('allowSkip');
+    public getRewardedPromo(): boolean {
+        return this.get('rewardedPromo');
     }
 }

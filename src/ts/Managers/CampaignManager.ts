@@ -303,28 +303,27 @@ export class CampaignManager {
         if('placements' in json) {
             const fill: { [mediaId: string]: string[] } = {};
             const noFill: string[] = [];
-
             if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
                 json.placements = MixedPlacementUtility.insertMediaIdsIntoJSON(this._configuration, json.placements);
             }
 
             const placements = this._configuration.getPlacements();
-            for(const placementId in placements) {
-                if(placements.hasOwnProperty(placementId)) {
-                    const mediaId: string = json.placements[placementId];
+            for(const placement in placements) {
+                if(placements.hasOwnProperty(placement)) {
+                    const mediaId: string = json.placements[placement];
 
                     if(mediaId) {
                         if(fill[mediaId]) {
-                            fill[mediaId].push(placementId);
+                            fill[mediaId].push(placement);
                         } else {
-                            fill[mediaId] = [placementId];
+                            fill[mediaId] = [placement];
                         }
                     } else {
-                        noFill.push(placementId);
+                        noFill.push(placement);
                     }
 
-                    if(json.realtimeData && json.realtimeData[placementId]) {
-                        this._configuration.getPlacement(placementId).setRealtimeData(json.realtimeData[placementId]);
+                    if(json.realtimeData && json.realtimeData[placement]) {
+                        this._configuration.getPlacement(placement).setRealtimeData(json.realtimeData[placement]);
                     }
                 }
             }

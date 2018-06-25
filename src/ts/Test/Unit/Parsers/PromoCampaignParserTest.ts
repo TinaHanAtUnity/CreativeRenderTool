@@ -73,12 +73,12 @@ describe('PromoCampaignParser', () => {
                 assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not equal');
                 assert.equal(campaign.getIapProductId(), content.iapProductId, 'IAP Product ID is not equal');
                 assert.equal(campaign.getDynamicMarkup(), content.dynamicMarkup, 'Dynamic Markup is not equal');
-                assert.equal(campaign.allowSkip(), content.allowSkip, 'Allow Skip is not equal');
+                assert.equal(campaign.getRewardedPromo(), content.rewardedPromo, 'Allow Skip is not equal');
                 assert.equal(campaign.getCreativeResource().getUrl(), content.creativeUrl, 'Creative URL is not equal');
             });
         });
 
-        describe('With content that includes allowskip as false', () => {
+        describe('With content that includes rewardedPromo as false', () => {
             let campaign: PromoCampaign;
             let sandbox: sinon.SinonSandbox;
 
@@ -100,15 +100,15 @@ describe('PromoCampaignParser', () => {
                 sandbox.restore();
             });
 
-            it('should set allowskip to false in the campaign', () => {
+            it('should set rewardedPromo to false in the campaign', () => {
                 const json = JSON.parse(IAPPromoCampaign).campaign2;
                 const content = JSON.parse(json.content);
-                assert.equal(content.allowSkip, false);
-                assert.equal(campaign.allowSkip(), content.allowSkip);
+                assert.equal(content.rewardedPromo, false);
+                assert.equal(campaign.getRewardedPromo(), content.rewardedPromo);
             });
         });
 
-        describe('With content that includes no allowskip', () => {
+        describe('With content that includes no rewardedPromo', () => {
             let campaign: PromoCampaign;
             let sandbox: sinon.SinonSandbox;
 
@@ -130,11 +130,11 @@ describe('PromoCampaignParser', () => {
                 sandbox.restore();
             });
 
-            it('should set allowskip to false in the campaign', () => {
+            it('should set rewardedPromo to false in the campaign', () => {
                 const json = JSON.parse(IAPPromoCampaign).campaign3;
                 const content = JSON.parse(json.content);
-                assert.equal(content.allowSkip, undefined);
-                assert.equal(campaign.allowSkip(), false);
+                assert.equal(content.rewardedPromo, undefined);
+                assert.equal(campaign.getRewardedPromo(), false);
             });
         });
     });

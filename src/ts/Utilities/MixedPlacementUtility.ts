@@ -57,7 +57,7 @@ export class MixedPlacementUtility {
             if (jsonPlacements.hasOwnProperty(placementId)) {
                 const placement = configuration.getPlacement(placementId);
                 result[placementId] = jsonPlacements[placementId];
-                if (MixedPlacementUtility.isMixedPlacement(placement)) {
+                if (placement && MixedPlacementUtility.isMixedPlacement(placement)) {
                     result[placementId + MixedPlacementTypes.PROMO] = jsonPlacements[placementId];
                     result[placementId + MixedPlacementTypes.REWARDED_PROMO] = jsonPlacements[placementId];
                     result[placementId + MixedPlacementTypes.REWARDED] = jsonPlacements[placementId];
@@ -74,7 +74,7 @@ export class MixedPlacementUtility {
         if (!this.isMixedPlacement(placement)) {
             str = MixedPlacementTypes.NON_REWARDED;
         } else if (campaign instanceof PromoCampaign) {
-            if (campaign.allowSkip()) {
+            if (campaign.getRewardedPromo()) {
                 str = MixedPlacementTypes.REWARDED_PROMO;
             } else {
                 str = MixedPlacementTypes.PROMO;

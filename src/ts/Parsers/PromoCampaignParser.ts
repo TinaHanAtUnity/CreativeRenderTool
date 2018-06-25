@@ -38,7 +38,7 @@ export class PromoCampaignParser extends CampaignParser {
                         additionalTrackingEvents: response.getTrackingUrls() ? response.getTrackingUrls() : undefined,
                         dynamicMarkup: promoJson.dynamicMarkup,
                         creativeAsset: new HTML(promoJson.creativeUrl, session),
-                        allowSkip: promoJson.allowSkip ? promoJson.allowSkip : false,
+                        rewardedPromo: promoJson.rewardedPromo ? promoJson.rewardedPromo : false,
                     };
 
                     const promoCampaign = new PromoCampaign(promoCampaignParams);
