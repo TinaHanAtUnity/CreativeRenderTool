@@ -19,6 +19,7 @@ import { Configuration } from 'Models/Configuration';
 import { GameSessionCounters } from 'Utilities/GameSessionCounters';
 import { FailedOperativeEventManager } from 'Managers/FailedOperativeEventManager';
 import { Diagnostics } from 'Utilities/Diagnostics';
+import { SessionUtils } from 'Utilities/SessionUtils';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {
     nativeBridge: NativeBridge;
@@ -34,7 +35,7 @@ export interface IOperativeEventManagerParams<T extends Campaign> {
 export class OperativeEventManager {
 
     public static getEventKey(sessionId: string, eventId: string): string {
-        return SessionManager.getSessionKey(sessionId) + '.operative.' + eventId;
+        return SessionUtils.getSessionStorageKey(sessionId) + '.operative.' + eventId;
     }
 
     public static getUrlKey(sessionId: string, eventId: string): string {

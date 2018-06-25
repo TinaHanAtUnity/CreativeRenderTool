@@ -3,8 +3,6 @@ import { StreamType } from 'Constants/Android/StreamType';
 import { BatteryStatus } from 'Constants/Android/BatteryStatus';
 import { ISchema, Model } from 'Models/Model';
 import { Platform } from 'Constants/Platform';
-import { StorageType } from 'Native/Api/AndroidDeviceInfo';
-import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 
 export interface IDeviceInfo {
     advertisingIdentifier: string | undefined | null;
@@ -169,21 +167,7 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
         return this.get('timeZone');
     }
 
-    public getFreeSpace(): Promise<number> {
-        if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            return this._nativeBridge.DeviceInfo.Ios.getFreeSpace().then(freeInternalSpace => {
-                this.set('freeInternalSpace', freeInternalSpace);
-                return this.get('freeInternalSpace');
-            });
-        } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            return this._nativeBridge.DeviceInfo.Android.getFreeSpace(StorageType.INTERNAL).then(freeInternalSpace => {
-                this.set('freeInternalSpace', freeInternalSpace);
-                return this.get('freeInternalSpace');
-            });
-        } else {
-            return Promise.resolve(this.get('freeInternalSpace'));
-        }
-    }
+    public abstract getFreeSpace(): Promise<number>;
 
     public getTotalSpace(): number {
         return this.get('totalInternalSpace');
