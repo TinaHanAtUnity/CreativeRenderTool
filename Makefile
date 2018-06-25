@@ -153,6 +153,7 @@ build-test: clean build-dir build-css build-static build-proto build-ts
 		node_modules/systemjs-plugin-text/text.js \
 		node_modules/protobufjs/node_modules/long/dist/long.js \
 		node_modules/protobufjs/dist/minimal/protobuf.js \
+		node_modules/tslib/tslib.js \
 		test-utils/reporter.js \
 		$(BUILD_DIR)/vendor
 
@@ -194,6 +195,7 @@ build-proto:
 	cp src/proto/unity_proto.js $(BUILD_DIR)/proto/unity_proto.js
 
 build-ts:
+build-ts: lint
 	@echo
 	@echo Transpiling .ts to .js
 	@echo

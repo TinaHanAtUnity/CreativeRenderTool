@@ -1,17 +1,12 @@
 import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
-import { MetaData } from 'Utilities/MetaData';
-import { TestFixtures } from '../TestHelpers/TestFixtures';
+
 import { PurchasingUtilities, IPromoPayload, IPromoRequest } from 'Utilities/PurchasingUtilities';
 import { NativeBridge } from 'Native/NativeBridge';
 import { PurchasingApi } from 'Native/Api/Purchasing';
 import { Observable1 } from 'Utilities/Observable';
-import { PurchasingCatalog } from 'Models/PurchasingCatalog';
 import { SdkApi } from 'Native/Api/Sdk';
-import { SinonSandbox, SinonStub } from 'sinon';
-import { setTimeout } from 'timers';
-import { Configuration } from 'Models/Configuration';
 import { ConfigurationParser } from 'Parsers/ConfigurationParser';
 import { ClientInfo } from 'Models/ClientInfo';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
@@ -34,15 +29,6 @@ describe('PurchasingUtilitiesTest', () => {
         gameId: '222',
         abGroup: 1,
         request: IPromoRequest.PURCHASE,
-        purchaseTrackingUrls: ['https://www.scooooooooter.com', 'https://www.scottyboy.com']
-    };
-
-    const iapPayloadSetIDs: IPromoPayload = {
-        productId: 'myPromo',
-        iapPromo: true,
-        gameId: '222',
-        abGroup: 1,
-        request: IPromoRequest.SETIDS,
         purchaseTrackingUrls: ['https://www.scooooooooter.com', 'https://www.scottyboy.com']
     };
 
@@ -107,13 +93,14 @@ describe('PurchasingUtilitiesTest', () => {
 
         it('should fail with Promo version not supported if promo version is not 1.16 or above', () => {
             const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            const promoVersion = '1.15';
             PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge);
             sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('True'));
-            sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.15'));
+            sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve(promoVersion));
             sandbox.stub(purchasing.onCommandResult, 'subscribe').callsFake((resolve) => resolve('True'));
 
             PurchasingUtilities.sendPurchaseInitializationEvent().catch((e) => {
-                assert.equal(e.message, 'Promo version not supported');
+                assert.equal(e.message, `Promo version: ${promoVersion} is not supported`);
             });
             sinon.assert.notCalled(<sinon.SinonSpy>purchasing.initiatePurchasingCommand);
         });

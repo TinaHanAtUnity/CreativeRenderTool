@@ -1,6 +1,35 @@
-# Staged
+# Thu Jun 21 09:14:47 UTC 2018
 
-* Fix calling onContainerForeground multiple times on Android
+* Pinpoint promo_version_not_supported errors
+* Custom fix for Baidu: Close ad units when going background on iOS
+* Address apparent regressions in MOAT Functionality
+* Fix iOS onAppForeGround discrepancy
+
+# Wed Jun 20 20:13:28 UTC 2018
+
+* Remove playable endscreen A/B test from groups 18 and 19
+* Reduce JS errors
+
+# Wed Jun 20 10:38:12 UTC 2018
+
+* Check GDPR consent metadata only when GDPR is enabled in configuration
+* Use ssl for jaeger tracing
+
+# Tue Jun 19 20:34:19 UTC 2018
+
+* Optimized unnecessarily large GDPR radio buttons
+* Refactor resending failed operative events
+* Use shared tslib
+* Initial support for multithreaded Request API
+
+# Mon Jun 18 09:51:31 UTC 2018
+
+* Send xpromo third quartile event
+* Run tslint before compiling TypeScript
+* Enable apk hashing / apk digest for 2.2.1 and above
+
+# Thu Jun 14 20:14:43 UTC 2018
+
 * Add the GDPR icon to the Privacy model
 * Obfuscate Admob AFMA Container
 

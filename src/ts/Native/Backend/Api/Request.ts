@@ -40,6 +40,18 @@ export class Request {
         xhr.send(body);
     }
 
+    public static setConcurrentRequestCount(count: number) {
+        return;
+    }
+
+    public static setMaximumPoolSize(count: number) {
+        return;
+    }
+
+    public static setKeepAliveTime(keepAliveTime: number) {
+        return;
+    }
+
     private static _requestLog: string[] = [];
 
 }

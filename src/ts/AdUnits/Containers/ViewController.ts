@@ -1,11 +1,16 @@
-import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
-import { AdUnitContainer, AdUnitContainerSystemMessage, Orientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
-import { UIInterfaceOrientation } from 'Constants/iOS/UIInterfaceOrientation';
+import { NativeBridge } from 'Native/NativeBridge';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
+import { UIInterfaceOrientation } from 'Constants/iOS/UIInterfaceOrientation';
+import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
+import {
+    AdUnitContainer, AdUnitContainerSystemMessage, Orientation,
+    ViewConfiguration
+} from 'AdUnits/Containers/AdUnitContainer';
+import { Double } from 'Utilities/Double';
 import { FocusManager } from 'Managers/FocusManager';
 import { IosDeviceInfo } from 'Models/IosDeviceInfo';
-import { NativeBridge } from 'Native/NativeBridge';
-import { Double } from 'Utilities/Double';
+import { ClientInfo } from 'Models/ClientInfo';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
 
 interface IIosOptions {
     supportedOrientations: UIInterfaceOrientationMask;
@@ -25,21 +30,27 @@ export class ViewController extends AdUnitContainer {
     private _deviceInfo: IosDeviceInfo;
     private _showing: boolean;
     private _options: IIosOptions;
+    private _clientInfo: ClientInfo;
 
+    private _onViewControllerDidAppearObserver: any;
+    private _onViewControllerDidDisappearObserver: any;
+    private _onMemoryWarningObserver: any;
+    private _onNotificationObserver: any;
     private _onAppBackgroundObserver: any;
     private _onAppForegroundObserver: any;
 
-    constructor(nativeBridge: NativeBridge, deviceInfo: IosDeviceInfo, focusManager: FocusManager) {
+    constructor(nativeBridge: NativeBridge, deviceInfo: IosDeviceInfo, focusManager: FocusManager, clientInfo: ClientInfo) {
         super();
 
         this._nativeBridge = nativeBridge;
         this._focusManager = focusManager;
         this._deviceInfo = deviceInfo;
+        this._clientInfo = clientInfo;
 
-        this._nativeBridge.IosAdUnit.onViewControllerDidDisappear.subscribe(() => this.onViewDidDisappear());
-        this._nativeBridge.IosAdUnit.onViewControllerDidAppear.subscribe(() => this.onViewDidAppear());
-        this._nativeBridge.IosAdUnit.onViewControllerDidReceiveMemoryWarning.subscribe(() => this.onMemoryWarning());
-        this._nativeBridge.Notification.onNotification.subscribe((event, parameters) => this.onNotification(event, parameters));
+        this._onViewControllerDidDisappearObserver = this._nativeBridge.IosAdUnit.onViewControllerDidDisappear.subscribe(() => this.onViewDidDisappear());
+        this._onViewControllerDidAppearObserver = this._nativeBridge.IosAdUnit.onViewControllerDidAppear.subscribe(() => this.onViewDidAppear());
+        this._onMemoryWarningObserver = this._nativeBridge.IosAdUnit.onViewControllerDidReceiveMemoryWarning.subscribe(() => this.onMemoryWarning());
+        this._onNotificationObserver = this._nativeBridge.Notification.onNotification.subscribe((event, parameters) => this.onNotification(event, parameters));
     }
 
     public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, isTransparent: boolean, withAnimation: boolean, allowStatusBar: boolean, options: IIosOptions): Promise<void> {
@@ -76,6 +87,11 @@ export class ViewController extends AdUnitContainer {
 
     public close(): Promise<void> {
         this._showing = false;
+
+        if(CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
+            this.unPause();
+        }
+
         this._focusManager.onAppBackground.unsubscribe(this._onAppBackgroundObserver);
         this._focusManager.onAppForeground.unsubscribe(this._onAppForegroundObserver);
         this._nativeBridge.Notification.removeAVNotificationObserver(ViewController._audioSessionInterrupt);
@@ -175,7 +191,6 @@ export class ViewController extends AdUnitContainer {
     }
 
     private onViewDidAppear(): void {
-        this.onAppForeground();
         this._handlers.forEach(handler => handler.onContainerShow());
     }
 

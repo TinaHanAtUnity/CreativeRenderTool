@@ -39,6 +39,7 @@ describe('GdprManagerTest', () => {
 
     let consentlastsent: boolean | string = false;
     let consent: any = false;
+    let isGDPREnabled: boolean = false;
     let storageTrigger: (eventType: string, data: any) => void;
 
     beforeEach(() => {
@@ -64,6 +65,9 @@ describe('GdprManagerTest', () => {
         (<sinon.SinonStub>clientInfo.getGameId).returns(testGameId);
         (<sinon.SinonStub>deviceInfo.getAdvertisingIdentifier).returns(testAdvertisingId);
         (<sinon.SinonStub>configuration.getUnityProjectId).returns(testUnityProjectId);
+        (<sinon.SinonStub>configuration.isGDPREnabled).callsFake(() => {
+            return isGDPREnabled;
+        });
 
         httpKafkaStub = sinon.stub(HttpKafka, 'sendEvent').resolves();
 
@@ -82,6 +86,7 @@ describe('GdprManagerTest', () => {
 
     afterEach(() => {
         httpKafkaStub.restore();
+        isGDPREnabled = false;
     });
 
     it('should subscribe to Storage.onSet', () => {
@@ -94,27 +99,28 @@ describe('GdprManagerTest', () => {
                 lastConsent: boolean;
                 storedConsent: boolean;
                 event: string;
-                gdprEnabled: boolean;
                 optOutEnabled: boolean;
                 optOutRecorded: boolean;
+                isGdprEnabled: boolean;
             }> = [{
                 lastConsent: false,
                 storedConsent: true,
                 event: 'consent',
-                gdprEnabled: true,
                 optOutEnabled: false,
-                optOutRecorded: true
+                optOutRecorded: true,
+                isGdprEnabled: true
             }, {
                 lastConsent: true,
                 storedConsent: false,
                 event: 'optout',
-                gdprEnabled: true,
                 optOutEnabled: true,
-                optOutRecorded: true
+                optOutRecorded: true,
+                isGdprEnabled: true
             }];
 
             tests.forEach((t) => {
                 it(`subscribe should send "${t.event}" when "${t.storedConsent}"`, () => {
+                    isGDPREnabled = t.isGdprEnabled;
                     consentlastsent = t.lastConsent;
                     const writePromise = new Promise<void>((resolve) => {
                         writeStub.reset();
@@ -134,11 +140,26 @@ describe('GdprManagerTest', () => {
                         }
                         sinon.assert.calledWith(setStub, StorageType.PRIVATE, 'gdpr.consentlastsent', t.storedConsent);
                         sinon.assert.calledWith(writeStub, StorageType.PRIVATE);
-                        sinon.assert.calledWith(<sinon.SinonStub>configuration.setGDPREnabled, t.gdprEnabled);
                         sinon.assert.calledWith(<sinon.SinonStub>configuration.setOptOutEnabled, t.optOutEnabled);
                         sinon.assert.calledWith(<sinon.SinonStub>configuration.setOptOutRecorded, t.optOutRecorded);
                     });
                 });
+            });
+        });
+
+        describe('and configuration isGDPREnabled is false', () => {
+            it('should not do anything', () => {
+                isGDPREnabled = false;
+                consentlastsent = false;
+                storageTrigger('', { gdpr: { consent: { value: true } } });
+
+                sinon.assert.calledOnce(onSetStub);
+                sinon.assert.notCalled(getStub);
+                sinon.assert.notCalled(sendGDPREventStub);
+                sinon.assert.notCalled(setStub);
+                sinon.assert.notCalled(writeStub);
+                sinon.assert.notCalled(<sinon.SinonStub>configuration.setOptOutEnabled);
+                sinon.assert.notCalled(<sinon.SinonStub>configuration.setOptOutRecorded);
             });
         });
 
@@ -159,12 +180,13 @@ describe('GdprManagerTest', () => {
         describe('and the stored consent has not changed', () => {
             [true, false].forEach((b) => {
                 it(`should not send anything for value "${b}"`, () => {
+                    isGDPREnabled = true;
                     consentlastsent = b;
                     storageTrigger('', {gdpr: {consent: {value: b}}});
                     return Promise.resolve().then(() => {
                         sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
                         return (<Promise<void>>getStub.firstCall.returnValue).then(() => {
-                            sinon.assert.calledWith(<sinon.SinonStub>configuration.setGDPREnabled, true);
+                            sinon.assert.notCalled(sendGDPREventStub);
                             sinon.assert.calledWith(<sinon.SinonStub>configuration.setOptOutEnabled, !b);
                             sinon.assert.calledWith(<sinon.SinonStub>configuration.setOptOutRecorded, true);
                         });
@@ -193,41 +215,37 @@ describe('GdprManagerTest', () => {
                 lastConsent: boolean | string;
                 storedConsent: boolean;
                 event: string;
-                gdprEnabled: boolean;
                 optOutEnabled: boolean;
                 optOutRecorded: boolean;
             }> = [{
                 lastConsent: false,
                 storedConsent: true,
                 event: 'consent',
-                gdprEnabled: true,
                 optOutEnabled: false,
                 optOutRecorded: true
             }, {
                 lastConsent: true,
                 storedConsent: false,
                 event: 'optout',
-                gdprEnabled: true,
                 optOutEnabled: true,
                 optOutRecorded: true
             }, {
                 lastConsent: 'false',
                 storedConsent: true,
                 event: 'consent',
-                gdprEnabled: true,
                 optOutEnabled: false,
                 optOutRecorded: true
             }, {
                 lastConsent: 'true',
                 storedConsent: false,
                 event: 'optout',
-                gdprEnabled: true,
                 optOutEnabled: true,
                 optOutRecorded: true
             }];
 
             tests.forEach((t) => {
                 it(`should send "${t.event}" when "${t.storedConsent}"`, () => {
+                    isGDPREnabled = true;
                     consentlastsent = t.lastConsent;
                     consent = t.storedConsent;
                     const writePromise = new Promise<void>((resolve) => {
@@ -248,7 +266,6 @@ describe('GdprManagerTest', () => {
                             }
                             sinon.assert.calledWith(setStub, StorageType.PRIVATE, 'gdpr.consentlastsent', t.storedConsent);
                             sinon.assert.calledWith(writeStub, StorageType.PRIVATE);
-                            sinon.assert.calledWith(<sinon.SinonStub>configuration.setGDPREnabled, t.gdprEnabled);
                             sinon.assert.calledWith(<sinon.SinonStub>configuration.setOptOutEnabled, t.optOutEnabled);
                             sinon.assert.calledWith(<sinon.SinonStub>configuration.setOptOutRecorded, t.optOutRecorded);
                         });
@@ -256,9 +273,56 @@ describe('GdprManagerTest', () => {
                 });
             });
 
+            describe('and configuration isGDPREnabled is set to false during getConsentAndUpdateConfiguration', () => {
+                it('should not do anything', () => {
+                    isGDPREnabled = true;
+                    consentlastsent = false;
+                    consent = true;
+                    getStub.reset();
+                    getStub.callsFake(() => {
+                        isGDPREnabled = false;
+                        return Promise.resolve(true);
+                    });
+                    return gdprManager.getConsentAndUpdateConfiguration().then((storedConsent: boolean) => {
+                        assert.equal(storedConsent, true);
+                        sinon.assert.calledWith(getStub, StorageType.PUBLIC, 'gdpr.consent.value');
+                        sinon.assert.notCalled(sendGDPREventStub);
+                        sinon.assert.notCalled(setStub);
+                        sinon.assert.notCalled(writeStub);
+                        sinon.assert.notCalled(<sinon.SinonStub>configuration.setOptOutEnabled);
+                        sinon.assert.notCalled(<sinon.SinonStub>configuration.setOptOutRecorded);
+                    });
+                });
+            });
+
+            describe('and configuration isGDPREnabled is false', () => {
+                it('should not do anything', () => {
+                    isGDPREnabled = false;
+                    consentlastsent = false;
+                    const writePromise = new Promise<void>((resolve) => {
+                        writeStub.reset();
+                        writeStub.callsFake(() => {
+                            return Promise.resolve().then(resolve);
+                        });
+                    });
+                    return gdprManager.getConsentAndUpdateConfiguration().then(() => {
+                        assert.fail('should throw');
+                    }).catch((error: Error) => {
+                        assert.equal(error.message, 'Configuration gdpr is not enabled');
+                        sinon.assert.notCalled(getStub);
+                        sinon.assert.notCalled(sendGDPREventStub);
+                        sinon.assert.notCalled(setStub);
+                        sinon.assert.notCalled(writeStub);
+                        sinon.assert.notCalled(<sinon.SinonStub>configuration.setOptOutEnabled);
+                        sinon.assert.notCalled(<sinon.SinonStub>configuration.setOptOutRecorded);
+                    });
+                });
+            });
+
             describe('and last consent has not been stored', () => {
                 [[false, 'optout'], [true, 'consent']].forEach(([userConsents, event]) => {
                     it(`should send and store the last consent for ${userConsents}`, () => {
+                        isGDPREnabled = true;
                         getStub.withArgs(StorageType.PRIVATE, 'gdpr.consentlastsent').reset();
                         getStub.withArgs(StorageType.PRIVATE, 'gdpr.consentlastsent').rejects('test error');
                         const writePromise = new Promise<void>((resolve) => {
