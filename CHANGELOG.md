@@ -1,3 +1,8 @@
+# Pending
+
+* Use the included microsoft typescript linting rules
+* Add promo initialization check before attempting to parse a promo campaign
+
 # Mon Jun 25 22:21:06 UTC 2018
 
 * Never send Android ID with advertising ID in operative events
