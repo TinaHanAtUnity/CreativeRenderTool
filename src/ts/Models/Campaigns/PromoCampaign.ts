@@ -2,7 +2,7 @@ import { Campaign, ICampaign } from 'Models/Campaign';
 import { HTML } from 'Models/Assets/HTML';
 
 export interface IPromoCampaign extends ICampaign {
-    iapProductId: string;
+    iapProductId: string | undefined;
     additionalTrackingEvents: { [eventName: string]: string[] } | undefined;
     dynamicMarkup: string | undefined;
     creativeAsset: HTML;
@@ -12,7 +12,7 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
     constructor(campaign: IPromoCampaign) {
         super('PromoCampaign', {
             ... Campaign.Schema,
-            iapProductId: ['string'],
+            iapProductId: ['string', 'undefined'],
             additionalTrackingEvents: ['object', 'undefined'],
             dynamicMarkup: ['string', 'undefined'],
             creativeAsset: ['object']
@@ -46,7 +46,11 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
         return this.get('dynamicMarkup');
     }
 
-    public getIapProductId(): string {
+    public setIapProductId(iapProductId: string) {
+        this.set('iapProductId', iapProductId);
+    }
+
+    public getIapProductId(): string | undefined {
         return this.get('iapProductId');
     }
 

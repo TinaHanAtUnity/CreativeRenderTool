@@ -14,43 +14,46 @@ export class PromoCampaignParser extends CampaignParser {
     public static ContentType = 'purchasing/iap';
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: ABGroup): Promise<Campaign> {
         const promoJson = JsonParser.parse(response.getContent());
-        if (promoJson && promoJson.iapProductId) {
-            if (PurchasingUtilities.promoResponseIndex < PurchasingUtilities.iapCampaignCount) {
-                PurchasingUtilities.response[PurchasingUtilities.promoResponseIndex] = response;
-                PurchasingUtilities.promoResponseIndex++;
-            }
-            return PurchasingUtilities.refreshCatalog().then(() => {
+
+        const baseCampaignParams: ICampaign = {
+            id: promoJson.id,
+            gamerId: gamerId,
+            abGroup: abGroup,
+            willExpireAt: promoJson.expiry ? parseInt(promoJson.expiry, 10) * 1000 : undefined,
+            adType: undefined,
+            correlationId: undefined,
+            creativeId: undefined,
+            seatId: undefined,
+            meta: promoJson.meta,
+            session: session,
+            mediaId: response.getMediaId()
+        };
+
+        const promoCampaignParams: IPromoCampaign = {
+            ... baseCampaignParams,
+            iapProductId: promoJson.iapProductId ? promoJson.iapProductId : undefined,
+            additionalTrackingEvents: response.getTrackingUrls() ? response.getTrackingUrls() : undefined,
+            dynamicMarkup: promoJson.dynamicMarkup,
+            creativeAsset: new HTML(promoJson.creativeUrl, session)
+        };
+
+        const promoCampaign = new PromoCampaign(promoCampaignParams);
+
+        if (promoJson && promoJson.iapProductId && PurchasingUtilities.isInitialized()) {
+            PurchasingUtilities.refreshCatalog().then(() => {
                 if (PurchasingUtilities.isProductAvailable(promoJson.iapProductId)) {
-
-                    const baseCampaignParams: ICampaign = {
-                        id: promoJson.id,
-                        gamerId: gamerId,
-                        abGroup: abGroup,
-                        willExpireAt: promoJson.expiry ? parseInt(promoJson.expiry, 10) * 1000 : undefined,
-                        adType: undefined,
-                        correlationId: undefined,
-                        creativeId: undefined,
-                        seatId: undefined,
-                        meta: promoJson.meta,
-                        session: session,
-                        mediaId: response.getMediaId()
-                    };
-
-                    const promoCampaignParams: IPromoCampaign = {
-                        ... baseCampaignParams,
-                        iapProductId: promoJson.iapProductId,
-                        additionalTrackingEvents: response.getTrackingUrls() ? response.getTrackingUrls() : undefined,
-                        dynamicMarkup: promoJson.dynamicMarkup,
-                        creativeAsset: new HTML(promoJson.creativeUrl, session)
-                    };
-
-                    const promoCampaign = new PromoCampaign(promoCampaignParams);
-                    return promoCampaign;
+                    promoCampaign.setIapProductId(promoJson.iapProductIds);
                 } else {
-                    throw new Error(`Promo product id ${promoJson.iapProductId} is unavailable`);
+                    throw new Error(`Promo product id ${promoJson.iapProductId} is unavailable at this time`);
                 }
             });
+        } else {
+            if (PurchasingUtilities.promoResponseIndex < PurchasingUtilities.iapCampaignCount) {
+                PurchasingUtilities.promoCampaigns[PurchasingUtilities.promoResponseIndex] = promoCampaign;
+                PurchasingUtilities.promoResponseIndex++;
+            }
         }
-        throw new Error('No JSON payload for Promo Campaign');
+
+        return Promise.resolve(promoCampaign);
     }
 }
