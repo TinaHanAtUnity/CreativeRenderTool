@@ -213,7 +213,7 @@
     },
     {
       "parameter": "androidId",
-      "required": "android",
+      "required": "no",
       "queryString": false,
       "body": true
     },
