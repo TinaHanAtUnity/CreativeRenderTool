@@ -75,7 +75,11 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     }
 
     public show() {
-        return super.show();
+        return super.show().then(() => {
+            if (this.isShowing() && this.canShowVideo() && this._moat) {
+                this._moat.play(this.getVolume());
+            }
+        });
     }
 
     public hide(): Promise<void> {

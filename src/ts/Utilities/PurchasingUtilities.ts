@@ -1,8 +1,8 @@
+import { ClientInfo } from 'Models/ClientInfo';
+import { Configuration } from 'Models/Configuration';
 import { PurchasingCatalog } from 'Models/PurchasingCatalog';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Diagnostics } from './Diagnostics';
-import { Configuration } from 'Models/Configuration';
-import { ClientInfo } from 'Models/ClientInfo';
 
 export enum IPromoRequest {
     SETIDS = 'setids',
@@ -136,7 +136,7 @@ export class PurchasingUtilities {
             const promoVersionObserver = this._nativeBridge.Purchasing.onGetPromoVersion.subscribe((promoVersion) => {
                 this._nativeBridge.Purchasing.onGetPromoVersion.unsubscribe(promoVersionObserver);
                 if(!this.isPromoVersionSupported(promoVersion)) {
-                    reject(this.logIssue('promo_version_not_supported', 'Promo version not supported'));
+                    reject(this.logIssue('promo_version_not_supported', `Promo version: ${promoVersion} is not supported`));
                 } else {
                     resolve();
                 }

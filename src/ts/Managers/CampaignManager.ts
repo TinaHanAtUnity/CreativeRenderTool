@@ -414,7 +414,7 @@ export class CampaignManager {
         }
 
         const parseTimestamp = Date.now();
-        return parser.parse(this._nativeBridge, this._request, response, session, this._configuration.getGamerId(), this.getAbGroup()).then((campaign) => {
+        return parser.parse(this._nativeBridge, this._request, response, session, this._configuration.getGamerId(), this.getAbGroup(), this._deviceInfo.getOsVersion()).then((campaign) => {
             const parseDuration = Date.now() - parseTimestamp;
             for(const placement of response.getPlacements()) {
                 SdkStats.setParseDuration(placement, parseDuration);
