@@ -9,6 +9,8 @@ import {
 import { Double } from 'Utilities/Double';
 import { FocusManager } from 'Managers/FocusManager';
 import { IosDeviceInfo } from 'Models/IosDeviceInfo';
+import { ClientInfo } from 'Models/ClientInfo';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
 
 interface IIosOptions {
     supportedOrientations: UIInterfaceOrientationMask;
@@ -28,6 +30,7 @@ export class ViewController extends AdUnitContainer {
     private _deviceInfo: IosDeviceInfo;
     private _showing: boolean;
     private _options: IIosOptions;
+    private _clientInfo: ClientInfo;
 
     private _onViewControllerDidAppearObserver: any;
     private _onViewControllerDidDisappearObserver: any;
@@ -36,12 +39,13 @@ export class ViewController extends AdUnitContainer {
     private _onAppBackgroundObserver: any;
     private _onAppForegroundObserver: any;
 
-    constructor(nativeBridge: NativeBridge, deviceInfo: IosDeviceInfo, focusManager: FocusManager) {
+    constructor(nativeBridge: NativeBridge, deviceInfo: IosDeviceInfo, focusManager: FocusManager, clientInfo: ClientInfo) {
         super();
 
         this._nativeBridge = nativeBridge;
         this._focusManager = focusManager;
         this._deviceInfo = deviceInfo;
+        this._clientInfo = clientInfo;
 
         this._onViewControllerDidDisappearObserver = this._nativeBridge.IosAdUnit.onViewControllerDidDisappear.subscribe(() => this.onViewDidDisappear());
         this._onViewControllerDidAppearObserver = this._nativeBridge.IosAdUnit.onViewControllerDidAppear.subscribe(() => this.onViewDidAppear());
@@ -83,6 +87,11 @@ export class ViewController extends AdUnitContainer {
 
     public close(): Promise<void> {
         this._showing = false;
+
+        if(CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
+            this.unPause();
+        }
+
         this._focusManager.onAppBackground.unsubscribe(this._onAppBackgroundObserver);
         this._focusManager.onAppForeground.unsubscribe(this._onAppForegroundObserver);
         this._nativeBridge.Notification.removeAVNotificationObserver(ViewController._audioSessionInterrupt);

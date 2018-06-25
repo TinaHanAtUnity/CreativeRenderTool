@@ -113,7 +113,11 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
 
     public hide() {
         super.hide();
-        document.body.removeChild(this._privacy.container());
+        if (this._privacy) {
+            this._privacy.hide();
+            document.body.removeChild(this._privacy.container());
+            delete this._privacy;
+        }
 
         if (this._showGDPRBanner && !this._gdprPopupClicked) {
             this._handlers.forEach(handler => handler.onGDPRPopupSkipped());
@@ -254,14 +258,18 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
             this.choosePrivacyShown();
         }
         this._nativeBridge.VideoPlayer.pause();
-        this._privacy.show();
+        if (this._privacy) {
+            this._privacy.show();
+        }
     }
 
     private onPrivacyEvent(event: Event) {
         this._isPrivacyShowing = true;
         event.preventDefault();
         this._nativeBridge.VideoPlayer.pause();
-        this._privacy.show();
+        if (this._privacy) {
+            this._privacy.show();
+        }
     }
 
     private onSkipEvent(event: Event): void {
