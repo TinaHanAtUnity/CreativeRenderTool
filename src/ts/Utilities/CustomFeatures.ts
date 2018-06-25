@@ -8,7 +8,7 @@ export class CustomFeatures {
     }
 
     public static isMixedPlacementExperiment(gameId: string): boolean {
-        return gameId === '1543512' || gameId === '1003628';
+        return gameId === '1543512' || gameId === '1003628' || gameId === '1042745';
     }
 
     public static isPlayableConfigurationEnabled(originalResourceUrl: string) {

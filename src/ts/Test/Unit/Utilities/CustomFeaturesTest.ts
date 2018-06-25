@@ -49,6 +49,12 @@ describe('CustomFeatures', () => {
             assert.isTrue(value);
         });
 
+        it('should return true if gameId is 1042745', () => {
+            const value = CustomFeatures.isMixedPlacementExperiment('1042745');
+            assert.isTrue(value);
+        });
+
+
         it('should return false if gameId is anything besides 1543512 and 1003628', () => {
             const value = CustomFeatures.isMixedPlacementExperiment('asdfasdf');
             assert.isFalse(value);
