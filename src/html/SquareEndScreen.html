@@ -1,0 +1,49 @@
+<div class="btn-close-region<%= data.endscreenAlt ? ' ' + data.endscreenAlt : '' %>">
+    <span class="icon-close"></span>
+</div>
+<div class="campaign-container<%= data.endscreenAlt ? ' ' + data.endscreenAlt : '' %>">
+    <div class="game-background game-background-blurred" style="background-image: url('<%= data.endScreenPortrait && data.endScreenPortrait.replace("file://", "") %>')"></div>
+    <div class="game-background-container">
+        <div class="game-image" style="background-image: url('<%= data.endScreenPortrait && data.endScreenPortrait.replace("file://", "") %>')"></div>
+            <div class="gdpr-pop-up">
+                <div class="icon-gdpr"></div>
+                <div class="gdpr-text">Unity is personalizing your ads experience in this application.
+                    <span class="gdpr-link">Tap here</span> to learn more about Unity and your privacy choices.
+                </div>
+            </div>
+    </div>
+    <div class="end-screen-info-background">
+        <!--TODO: Is it in use?-->
+        <!--<div class="end-screen-stripe"></div>-->
+        <div class="end-screen-info">
+            <div class="row-container">
+                <div class="game-icon" style="background-image: url('<%= data.gameIcon && data.gameIcon.replace("file://", "") %>')"></div>
+            <div class="column-container">
+                <div class="name-container"><%= data.gameName %></div>
+                <div class="store-container">
+
+                    <% if(!!data.rating) { %>
+                    <span class="game-rating">
+                <span class="game-rating-mask" style="width: <%= data.rating %>%">
+                  <% for (var i = 0; i < 5; i++) { %><span class="icon-star"></span><% } %>
+                </span>
+                <% for (var i = 0; i < 5; i++) { %><span class="icon-star"></span><% } %>
+              </span>
+                    <% } %>
+
+                    <% if (!!data.ratingCount && data.ratingCount !== "0") { %>
+                    <span class="game-rating-count">
+                (<span class="game-rating-count-number"><%= data.ratingCount %></span>)
+              </span>
+                    <% } %>
+
+                </div>
+            </div>
+        </div>
+        <div class="download-container">
+            <span class="download-text"><%= data.t("Download For Free") %></span>
+        </div>
+    </div>
+    <div class="privacy-button"><span class="icon-gdpr"></span></div>
+    <div class="unityads-logo"></div>
+</div>
