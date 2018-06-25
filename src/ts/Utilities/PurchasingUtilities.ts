@@ -29,10 +29,6 @@ export class PurchasingUtilities {
         this._nativeBridge = nativeBridge;
     }
 
-    public static setInitializationPayloadSentValue(val: boolean) {
-        this._isInitialized = val;
-    }
-
     public static sendPurchaseInitializationEvent(): Promise<void> {
         if (this.configurationIncludesPromoPlacement()) {
             return this.initializeIAPPromo()
@@ -45,7 +41,7 @@ export class PurchasingUtilities {
     }
 
     public static sendPromoPayload(iapPayload: string): Promise<void> {
-        if (!this._isInitialized) {
+        if (!this.isInitialized()) {
             return this.sendPurchaseInitializationEvent().then(() => {
                 return this.sendPurchasingCommand(iapPayload);
             });
