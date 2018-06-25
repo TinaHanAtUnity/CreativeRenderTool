@@ -47,6 +47,6 @@ export class PromoCampaignParser extends CampaignParser {
                 }
             });
         }
-        throw new Error('Promo campaign cannot be parsed');
+        throw new Error(`Promo campaign cannot be parsed. Promo initialization status: ${PurchasingUtilities.isInitialized()}`);
     }
 }
