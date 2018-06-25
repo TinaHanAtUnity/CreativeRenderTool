@@ -1,4 +1,4 @@
-# Mon Jun 25 20:02:43 UTC 2018
+# Mon Jun 25 22:21:06 UTC 2018
 
 * Never send Android ID with advertising ID in operative events
 * New square endscreen image test in groups 18 and 19
