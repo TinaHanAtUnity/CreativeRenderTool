@@ -86,6 +86,10 @@ export class PurchasingUtilities {
         return false;
     }
 
+    public static isInitialized(): boolean {
+        return this._isInitialized;
+    }
+
     public static handleSendIAPEvent(nativeBridge: NativeBridge, iapPayload: string): void {
         // TODO: Handle IAPPayload/send event/do something with the payload
     }
