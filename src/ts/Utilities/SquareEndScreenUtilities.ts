@@ -78,7 +78,7 @@ export const SQUARE_CAMPAIGNS = [
             '5a942a06ae3f9603ea72aefb',
             '5a942a078b8b5c03e49a7da8',
             '5b179a795972c5152841689d',
-            '5ae051f033bca802f43154f8', 
+            '5ae051f033bca802f43154f8',
             '5ae051f033bca802f43154fc',
             '5ac4ae393f01c1024ab83684',
             '5ac4ae393f01c1024ab83683',
