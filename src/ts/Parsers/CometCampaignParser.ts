@@ -110,12 +110,12 @@ export class CometCampaignParser extends CampaignParser {
                 bypassAppSheet: json.bypassAppSheet,
                 store: storeName,
                 adUnitStyle: this.parseAdUnitStyle(json.adUnitStyle),
+                creativeId: json.creativeId,
                 portraitCreativeId: json.portraitCreativeId,
-                landscapeCreativeId: json.landscapeCreativeId
             };
 
             if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
-                parameters.video = new Video(this.validateAndEncodeUrl(json.trailerDownloadable, session), session, json.trailerDownloadableSize, parameters.landscapeCreativeId);
+                parameters.video = new Video(this.validateAndEncodeUrl(json.trailerDownloadable, session), session, json.trailerDownloadableSize, parameters.creativeId);
                 parameters.streamingVideo = new Video(this.validateAndEncodeUrl(json.trailerStreaming, session), session);
             }
 

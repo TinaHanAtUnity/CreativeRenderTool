@@ -95,7 +95,7 @@ export class TestFixtures {
             bypassAppSheet: json.bypassAppSheet,
             store: storeName,
             adUnitStyle: json.adUnitStyle,
-            landscapeCreativeId: json.landscapeCreativeId,
+            creativeId: json.creativeId,
             portraitCreativeId: json.portraitCreativeId
         };
 

@@ -30,7 +30,6 @@ export interface IPerformanceCampaign extends ICampaign {
     store: StoreName;
     adUnitStyle: AdUnitStyle | undefined;
     portraitCreativeId: string | undefined;
-    landscapeCreativeId: string | undefined;
 }
 
 export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
@@ -57,7 +56,6 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             store: ['number'],
             adUnitStyle: ['object', 'undefined'],
             portraitCreativeId: ['string', 'undefined'],
-            landscapeCreativeId: ['string', 'undefined']
         }, campaign);
     }
 
