@@ -5,6 +5,8 @@ export class IosUtils {
             return true;
         } else if(osVersion.match(/^8\.[0-3]/)) {
             return true;
+        } else if(osVersion.match(/^7\.[0-9]/)) {
+            return true;
         } else {
             return false;
         }
