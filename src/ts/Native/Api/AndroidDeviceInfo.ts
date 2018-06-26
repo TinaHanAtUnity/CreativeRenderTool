@@ -1,7 +1,7 @@
 import { NativeApi } from 'Native/NativeApi';
 import { StreamType } from 'Constants/Android/StreamType';
 import { NativeBridge } from 'Native/NativeBridge';
-import { DeviceInfoEvent } from 'Native/Api/DeviceInfo';
+import { DeviceInfoEvent } from 'Native/Api/DeviceInfoEvent';
 import { Observable3 } from 'Utilities/Observable';
 
 export enum StorageType {

@@ -1,7 +1,7 @@
 import { NativeApi } from 'Native/NativeApi';
 import { NativeBridge } from 'Native/NativeBridge';
 import { UIUserInterfaceIdiom } from 'Constants/iOS/UIUserInterfaceIdiom';
-import { DeviceInfoEvent } from 'Native/Api/DeviceInfo';
+import { DeviceInfoEvent } from 'Native/Api/DeviceInfoEvent';
 import { Observable2 } from 'Utilities/Observable';
 
 export class IosDeviceInfoApi extends NativeApi {
