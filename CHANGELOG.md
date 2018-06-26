@@ -1,3 +1,7 @@
+# Tue Jun 26 08:23:00 UTC 2018
+
+* Revert previous deployment
+
 # Tue Jun 26 05:40:10 UTC 2018
 
 * Use the included microsoft typescript linting rules
