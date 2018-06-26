@@ -1,7 +1,7 @@
 import { StorageType } from 'Native/Api/Storage';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Request } from 'Utilities/Request';
-import { SessionManager } from 'Managers/SessionManager';
+import { SessionUtils } from 'Utilities/SessionUtils';
 
 export class FailedOperativeEventManager {
 
@@ -18,7 +18,7 @@ export class FailedOperativeEventManager {
     }
 
     public getEventsStorageKey(): string {
-        return SessionManager.getSessionKey(this._sessionId) + '.operative';
+        return SessionUtils.getSessionStorageKey(this._sessionId) + '.operative';
     }
 
     public storeFailedEvent(nativeBridge: NativeBridge, data: { [key: string]: any }): Promise<void> {
