@@ -2,14 +2,13 @@ import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
 import { PurchasingUtilities, IPromoPayload, IPromoRequest } from 'Utilities/PurchasingUtilities';
 import { Configuration } from 'Models/Configuration';
 import { FinishState } from 'Constants/FinishState';
-import { Placement } from 'Models/Placement';
 import { ABGroup } from 'Models/ABGroup';
 import { GdprManager, GDPREventAction } from 'Managers/GdprManager';
 
 export class PromoEventHandler {
 
     public static onClose(adUnit: PromoAdUnit, gamerToken: string, gameId: string, abGroup: ABGroup, purchaseTrackingUrls: string[], isOptOutEnabled: boolean): void {
-        adUnit.setFinishState(FinishState.SKIPPED);
+        adUnit.setFinishState(FinishState.COMPLETED);
         adUnit.hide();
         const iapPayload: IPromoPayload = {
             gamerToken: gamerToken,
