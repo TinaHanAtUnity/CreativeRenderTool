@@ -3,7 +3,6 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { RingerMode } from 'Constants/Android/RingerMode';
 import { ISensorInfo, StorageType } from 'Native/Api/AndroidDeviceInfo';
 import { StreamType } from 'Constants/Android/StreamType';
-import { Platform } from 'Constants/Platform';
 
 export interface IAndroidDeviceInfo extends IDeviceInfo {
     androidId: string;
@@ -257,6 +256,13 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
         return this._nativeBridge.DeviceInfo.Android.getNetworkMetered().then(isNetworkMetered => {
             this.set('networkMetered', isNetworkMetered);
             return this.get('networkMetered');
+        });
+    }
+
+    public getFreeSpace(): Promise<number> {
+        return this._nativeBridge.DeviceInfo.Android.getFreeSpace(StorageType.INTERNAL).then(freeInternalSpace => {
+            this.set('freeInternalSpace', freeInternalSpace);
+            return this.get('freeInternalSpace');
         });
     }
 

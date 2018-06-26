@@ -3,16 +3,14 @@ import * as sinon from 'sinon';
 import { assert } from 'chai';
 
 import { NativeBridge } from 'Native/NativeBridge';
-import { DeviceInfo } from 'Models/DeviceInfo';
 import { Platform } from 'Constants/Platform';
-import { RingerMode } from 'Constants/Android/RingerMode';
-import { UIUserInterfaceIdiom } from 'Constants/iOS/UIUserInterfaceIdiom';
 import { EventCategory } from 'Constants/EventCategory';
-import { DeviceInfoApi, DeviceInfoEvent } from 'Native/Api/DeviceInfo';
+import { DeviceInfoApi } from 'Native/Api/DeviceInfo';
 import { StreamType } from 'Constants/Android/StreamType';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
+import { DeviceInfoEvent } from 'Native/Api/DeviceInfoEvent';
 
 describe('DeviceInfoTest', () => {
 
