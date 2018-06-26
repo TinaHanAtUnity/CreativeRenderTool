@@ -104,6 +104,33 @@ describe('PurchasingUtilitiesTest', () => {
             });
             sinon.assert.notCalled(<sinon.SinonSpy>purchasing.initiatePurchasingCommand);
         });
+
+        it('should set isInitialized to true when successful', () => {
+            const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge);
+
+            sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('True'));
+            sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.16'));
+            sandbox.stub(purchasing.onCommandResult, 'subscribe').callsFake((resolve) => resolve('True'));
+
+            PurchasingUtilities.sendPurchaseInitializationEvent().then(() => {
+                sinon.assert.called(<sinon.SinonStub>purchasing.initiatePurchasingCommand);
+                assert.isTrue(PurchasingUtilities.isInitialized());
+            });
+        });
+
+        it('should not set isInitialized to true if command result is false', () => {
+            const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge);
+
+            sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('True'));
+            sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.16'));
+
+            PurchasingUtilities.sendPurchaseInitializationEvent().then(() => {
+                sinon.assert.called(<sinon.SinonStub>purchasing.initiatePurchasingCommand);
+                assert.isFalse(PurchasingUtilities.isInitialized());
+            });
+        });
     });
 
     describe('sendPromoPayload', () => {
@@ -117,6 +144,7 @@ describe('PurchasingUtilitiesTest', () => {
 
             it('should call initialization event and initiate purchasing command when initialization Payloads are not set', () => {
                 sandbox.stub(PurchasingUtilities, 'isInitialized').returns(false);
+
                 return PurchasingUtilities.sendPromoPayload(JSON.stringify(iapPayloadPurchase)).then(() => {
                     sinon.assert.called(sendPurchaseInitializationEventStub);
                     sinon.assert.calledWith(<sinon.SinonStub>purchasing.initiatePurchasingCommand, JSON.stringify(iapPayloadPurchase));
@@ -124,7 +152,7 @@ describe('PurchasingUtilitiesTest', () => {
             });
 
             it ('should call initiate purchasing command when initialization Payloads are set', () => {
-                PurchasingUtilities.setInitializationPayloadSentValue(true);
+                sandbox.stub(PurchasingUtilities, 'isInitialized').returns(true);
 
                 return PurchasingUtilities.sendPromoPayload(JSON.stringify(iapPayloadPurchase)).then(() => {
                     sinon.assert.notCalled(sendPurchaseInitializationEventStub);
@@ -137,7 +165,7 @@ describe('PurchasingUtilitiesTest', () => {
         describe('on Failed command trigger', () => {
 
             it('should fail when onCommandResult triggered with false', () => {
-                PurchasingUtilities.setInitializationPayloadSentValue(false);
+                sandbox.stub(PurchasingUtilities, 'isInitialized').returns(false);
 
                 PurchasingUtilities.sendPromoPayload(JSON.stringify(iapPayloadPurchase)).catch((e) => {
                     assert.equal(e.message, 'Purchase command attempt failed');
