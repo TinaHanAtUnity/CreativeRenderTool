@@ -8,7 +8,6 @@ export interface IVideo extends IAsset {
     positionRepeats: number;
     quartile: number;
     started: boolean;
-    creativeId: string | undefined;
 }
 
 export class Video extends Asset<IVideo> {
