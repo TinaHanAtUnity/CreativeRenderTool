@@ -38,7 +38,7 @@ export class PurchasingUtilities {
             return this.initializeIAPPromo()
             .then(() => this.checkPromoVersion())
             .then(() => {
-                return this.sendPurchasingCommand(JSON.stringify(this.loadInitializationPayloads()));
+                return this.sendPurchasingCommand(JSON.stringify(this.getInitializationPayload()));
             });
         }
         return Promise.resolve();
@@ -176,7 +176,7 @@ export class PurchasingUtilities {
         return false;
     }
 
-    private static loadInitializationPayloads(): IPromoPayload {
+    private static getInitializationPayload(): IPromoPayload {
         return <IPromoPayload>{
             iapPromo: true,
             abGroup: this._configuration.getAbGroup().toNumber(),
