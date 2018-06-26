@@ -58,7 +58,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     }
 
     public onVPAIDEvent(eventType: string, args: any[]) {
-        let argsCopy: any[];
+        let argsCopy: any[] | undefined;
         if(args) {
             argsCopy = Array.prototype.slice.call(args);
         }
