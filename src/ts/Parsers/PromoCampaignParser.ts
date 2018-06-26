@@ -14,7 +14,7 @@ export class PromoCampaignParser extends CampaignParser {
     public static ContentType = 'purchasing/iap';
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: ABGroup): Promise<Campaign> {
         const promoJson = JsonParser.parse(response.getContent());
-        if (promoJson && promoJson.iapProductId && PurchasingUtilities.isInitialized()) {
+        if (promoJson && promoJson.iapProductId) {
             return PurchasingUtilities.refreshCatalog().then(() => {
                 if (PurchasingUtilities.isProductAvailable(promoJson.iapProductId)) {
 
@@ -47,6 +47,6 @@ export class PromoCampaignParser extends CampaignParser {
                 }
             });
         }
-        throw new Error(`Promo campaign cannot be parsed. Promo initialization status: ${PurchasingUtilities.isInitialized()}`);
+        throw new Error('No JSON payload for Promo Campaign');
     }
 }
