@@ -124,7 +124,7 @@ describe('PurchasingUtilitiesTest', () => {
             });
 
             it ('should call initiate purchasing command when initialization Payloads are set', () => {
-                sandbox.stub(PurchasingUtilities, 'isInitialized').returns(true);
+                PurchasingUtilities.setInitializationPayloadSentValue(true);
 
                 return PurchasingUtilities.sendPromoPayload(JSON.stringify(iapPayloadPurchase)).then(() => {
                     sinon.assert.notCalled(sendPurchaseInitializationEventStub);
@@ -137,7 +137,7 @@ describe('PurchasingUtilitiesTest', () => {
         describe('on Failed command trigger', () => {
 
             it('should fail when onCommandResult triggered with false', () => {
-                sandbox.stub(PurchasingUtilities, 'isInitialized').returns(false);
+                PurchasingUtilities.setInitializationPayloadSentValue(false);
 
                 PurchasingUtilities.sendPromoPayload(JSON.stringify(iapPayloadPurchase)).catch((e) => {
                     assert.equal(e.message, 'Purchase command attempt failed');
