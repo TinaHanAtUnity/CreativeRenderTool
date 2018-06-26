@@ -1,3 +1,14 @@
+# Tue Jun 26 05:40:10 UTC 2018
+
+* Use the included microsoft typescript linting rules
+* Add promo initialization check before attempting to parse a promo campaign
+
+# Mon Jun 25 22:21:06 UTC 2018
+
+* Never send Android ID with advertising ID in operative events
+* New square endscreen image test in groups 18 and 19
+* Reduce JS errors
+
 # Thu Jun 21 09:14:47 UTC 2018
 
 * Pinpoint promo_version_not_supported errors
