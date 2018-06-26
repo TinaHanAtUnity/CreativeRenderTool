@@ -116,7 +116,7 @@ describe('PurchasingUtilitiesTest', () => {
             });
 
             it('should call initialization event and initiate purchasing command when initialization Payloads are not set', () => {
-
+                sandbox.stub(PurchasingUtilities, 'isInitialized').returns(false);
                 return PurchasingUtilities.sendPromoPayload(JSON.stringify(iapPayloadPurchase)).then(() => {
                     sinon.assert.called(sendPurchaseInitializationEventStub);
                     sinon.assert.calledWith(<sinon.SinonStub>purchasing.initiatePurchasingCommand, JSON.stringify(iapPayloadPurchase));

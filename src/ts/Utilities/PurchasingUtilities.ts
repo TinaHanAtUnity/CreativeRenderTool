@@ -152,7 +152,7 @@ export class PurchasingUtilities {
         return new Promise<void>((resolve, reject) => {
             const observer = this._nativeBridge.Purchasing.onCommandResult.subscribe((isCommandSuccessful) => {
                 if (isCommandSuccessful === 'True') {
-                    if (iapPayload.indexOf('SETIDS') !== -1) {
+                    if (JSON.parse(iapPayload).request === IPromoRequest.SETIDS) {
                         this._isInitialized = true;
                     }
                     resolve();
