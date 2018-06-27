@@ -1,5 +1,9 @@
 # Pending
 
+* Change handling of crosspromo third quartile event
+
+# Wed Jun 27 06:05:33 UTC 2018
+
 * Remove circular dependencies
 * Fix iOS 7.x appsheet problems by sending user to the browser 
 * Fix new js_error that surfaced by because of fixing the c.join js_error 
