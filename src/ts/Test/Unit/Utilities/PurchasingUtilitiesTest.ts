@@ -70,9 +70,9 @@ describe('PurchasingUtilitiesTest', () => {
         it('should call SendPurchasingCommand on successful trigger of all underlying promises', () => {
             const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge);
-            sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('True'));
-            sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.16'));
-            sandbox.stub(purchasing.onCommandResult, 'subscribe').callsFake((resolve) => resolve('True'));
+            sandbox.stub(purchasing.onInitialize, 'subscribe').resolves('True');
+            sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').resolves('1.16');
+            sandbox.stub(purchasing.onCommandResult, 'subscribe').resolves('True');
 
             PurchasingUtilities.sendPurchaseInitializationEvent().then(() => {
                 sinon.assert.called(<sinon.SinonStub>purchasing.initiatePurchasingCommand);
@@ -82,9 +82,9 @@ describe('PurchasingUtilitiesTest', () => {
         it('should fail with IAP Promo was not ready if promo is not ready', () => {
             const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge);
-            sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('False'));
-            sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.16'));
-            sandbox.stub(purchasing.onCommandResult, 'subscribe').callsFake((resolve) => resolve('True'));
+            sandbox.stub(purchasing.onInitialize, 'subscribe').resolves('False');
+            sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').resolves('1.16');
+            sandbox.stub(purchasing.onCommandResult, 'subscribe').resolves('True');
             PurchasingUtilities.sendPurchaseInitializationEvent().catch((e) => {
                 assert.equal(e.message, 'IAP Promo was not ready');
             });
@@ -95,9 +95,9 @@ describe('PurchasingUtilitiesTest', () => {
             const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             const promoVersion = '1.15';
             PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge);
-            sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('True'));
-            sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve(promoVersion));
-            sandbox.stub(purchasing.onCommandResult, 'subscribe').callsFake((resolve) => resolve('True'));
+            sandbox.stub(purchasing.onInitialize, 'subscribe').resolves('True');
+            sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').resolves(promoVersion);
+            sandbox.stub(purchasing.onCommandResult, 'subscribe').resolves('True');
 
             PurchasingUtilities.sendPurchaseInitializationEvent().catch((e) => {
                 assert.equal(e.message, `Promo version: ${promoVersion} is not supported`);
@@ -109,9 +109,9 @@ describe('PurchasingUtilitiesTest', () => {
             const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge);
 
-            sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('True'));
-            sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.16'));
-            sandbox.stub(purchasing.onCommandResult, 'subscribe').callsFake((resolve) => resolve('True'));
+            sandbox.stub(purchasing.onInitialize, 'subscribe').resolves('True');
+            sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').resolves('1.16');
+            sandbox.stub(purchasing.onCommandResult, 'subscribe').resolves('True');
 
             PurchasingUtilities.sendPurchaseInitializationEvent().then(() => {
                 sinon.assert.called(<sinon.SinonStub>purchasing.initiatePurchasingCommand);
@@ -123,8 +123,8 @@ describe('PurchasingUtilitiesTest', () => {
             const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge);
 
-            sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('True'));
-            sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.16'));
+            sandbox.stub(purchasing.onInitialize, 'subscribe').resolves('True');
+            sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').resolves('1.16');
 
             PurchasingUtilities.sendPurchaseInitializationEvent().then(() => {
                 sinon.assert.called(<sinon.SinonStub>purchasing.initiatePurchasingCommand);
@@ -145,7 +145,7 @@ describe('PurchasingUtilitiesTest', () => {
             it('should call initialization event and initiate purchasing command when initialization Payloads are not set', () => {
                 sandbox.stub(PurchasingUtilities, 'isInitialized').returns(false);
 
-                return PurchasingUtilities.sendPromoPayload(JSON.stringify(iapPayloadPurchase)).then(() => {
+                return PurchasingUtilities.sendPromoPayload(iapPayloadPurchase).then(() => {
                     sinon.assert.called(sendPurchaseInitializationEventStub);
                     sinon.assert.calledWith(<sinon.SinonStub>purchasing.initiatePurchasingCommand, JSON.stringify(iapPayloadPurchase));
                 });
@@ -154,7 +154,7 @@ describe('PurchasingUtilitiesTest', () => {
             it ('should call initiate purchasing command when initialization Payloads are set', () => {
                 sandbox.stub(PurchasingUtilities, 'isInitialized').returns(true);
 
-                return PurchasingUtilities.sendPromoPayload(JSON.stringify(iapPayloadPurchase)).then(() => {
+                return PurchasingUtilities.sendPromoPayload(iapPayloadPurchase).then(() => {
                     sinon.assert.notCalled(sendPurchaseInitializationEventStub);
                     sinon.assert.calledWith(<sinon.SinonStub>purchasing.initiatePurchasingCommand, JSON.stringify(iapPayloadPurchase));
                 });
@@ -167,7 +167,7 @@ describe('PurchasingUtilitiesTest', () => {
             it('should fail when onCommandResult triggered with false', () => {
                 sandbox.stub(PurchasingUtilities, 'isInitialized').returns(false);
 
-                PurchasingUtilities.sendPromoPayload(JSON.stringify(iapPayloadPurchase)).catch((e) => {
+                PurchasingUtilities.sendPromoPayload(iapPayloadPurchase).catch((e) => {
                     assert.equal(e.message, 'Purchase command attempt failed');
                 });
                 purchasing.onCommandResult.trigger('False');

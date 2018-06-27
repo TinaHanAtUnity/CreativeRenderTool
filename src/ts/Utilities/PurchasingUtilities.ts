@@ -38,13 +38,13 @@ export class PurchasingUtilities {
             return this.initializeIAPPromo()
             .then(() => this.checkPromoVersion())
             .then(() => {
-                return this.sendPurchasingCommand(JSON.stringify(this.getInitializationPayload()));
+                return this.sendPurchasingCommand(this.getInitializationPayload());
             });
         }
         return Promise.resolve();
     }
 
-    public static sendPromoPayload(iapPayload: string): Promise<void> {
+    public static sendPromoPayload(iapPayload: IPromoPayload): Promise<void> {
         if (!this.isInitialized()) {
             return this.sendPurchaseInitializationEvent().then(() => {
                 return this.sendPurchasingCommand(iapPayload);
@@ -148,11 +148,11 @@ export class PurchasingUtilities {
         });
     }
 
-    private static sendPurchasingCommand(iapPayload: string): Promise<void> {
+    private static sendPurchasingCommand(iapPayload: IPromoPayload): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             const observer = this._nativeBridge.Purchasing.onCommandResult.subscribe((isCommandSuccessful) => {
                 if (isCommandSuccessful === 'True') {
-                    if (JSON.parse(iapPayload).request === IPromoRequest.SETIDS) {
+                    if (iapPayload.request === IPromoRequest.SETIDS) {
                         this._isInitialized = true;
                     }
                     resolve();
@@ -160,7 +160,7 @@ export class PurchasingUtilities {
                     reject(this.logIssue('purchase_command_attempt_failed', `Purchase command attempt failed with command ${isCommandSuccessful}`));
                 }
             });
-            this._nativeBridge.Purchasing.initiatePurchasingCommand(iapPayload).catch(() => {
+            this._nativeBridge.Purchasing.initiatePurchasingCommand(JSON.stringify(iapPayload)).catch(() => {
                 this._nativeBridge.Purchasing.onCommandResult.unsubscribe(observer);
                 reject(this.logIssue('send_purchase_event_failed', 'Purchase event failed to send'));
             });
