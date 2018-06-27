@@ -58,13 +58,6 @@ export class XPromoVideoEventHandler extends VideoEventHandler {
         // Not sent for Xpromos
     }
 
-    protected handleThirdQuartileEvent(progress: number): void {
-        const trackingUrls = this._xpromoCampaign.getTrackingUrlsForEvent('third_quartile');
-        for (const url of trackingUrls) {
-            this._thirdPartyEventManager.sendEvent('xpromo third quartile', this._xpromoCampaign.getSession().getId(), url);
-        }
-    }
-
     protected handleCompleteEvent(): void {
         const params: IOperativeEventParams = {
             placement: this._placement,

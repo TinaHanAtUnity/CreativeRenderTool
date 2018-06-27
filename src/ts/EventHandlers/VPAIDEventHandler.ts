@@ -1,17 +1,17 @@
-import { IVPAIDHandler, VPAID } from 'Views/VPAID';
-import { NativeBridge } from 'Native/NativeBridge';
 import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'AdUnits/VPAIDAdUnit';
-import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
+import { FinishState } from 'Constants/FinishState';
+import { DiagnosticError } from 'Errors/DiagnosticError';
+import { GDPREventAction, GdprManager } from 'Managers/GdprManager';
 import { OperativeEventManager, IOperativeEventParams } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
-import { Diagnostics } from 'Utilities/Diagnostics';
-import { DiagnosticError } from 'Errors/DiagnosticError';
-import { FinishState } from 'Constants/FinishState';
-import { Placement } from 'Models/Placement';
-import { Closer } from 'Views/Closer';
 import { Configuration } from 'Models/Configuration';
-import { GDPREventAction, GdprManager } from 'Managers/GdprManager';
+import { Placement } from 'Models/Placement';
+import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
+import { NativeBridge } from 'Native/NativeBridge';
+import { Diagnostics } from 'Utilities/Diagnostics';
+import { Closer } from 'Views/Closer';
+import { IVPAIDHandler } from 'Views/VPAID';
+import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
 
 export class VPAIDEventHandler implements IVPAIDHandler {
     private _nativeBridge: NativeBridge;
@@ -25,7 +25,6 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     private _closer: Closer;
     private _adDuration: number = -2;
     private _adRemainingTime: number = -2;
-    private _campaign: VPAIDCampaign;
     private _configuration: Configuration;
     private _gdprManager: GdprManager;
 
@@ -38,7 +37,6 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         this._placement = parameters.placement;
         this._closer = parameters.closer;
         this._vpaidEndScreen = parameters.endScreen;
-        this._campaign = parameters.campaign;
         this._configuration = parameters.configuration;
         this._gdprManager = parameters.gdprManager;
 
@@ -60,7 +58,12 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     }
 
     public onVPAIDEvent(eventType: string, args: any[]) {
-        this._nativeBridge.Sdk.logDebug(`vpaid event ${eventType} with args ${args && args.length ? args.join(' ') : 'None'}`);
+        let argsCopy: any[] | undefined;
+        if(args) {
+            argsCopy = Array.prototype.slice.call(args);
+        }
+
+        this._nativeBridge.Sdk.logDebug(`vpaid event ${eventType} with args ${argsCopy && argsCopy.length ? argsCopy.join(' ') : 'None'}`);
         const handler = this._vpaidEventHandlers[eventType];
         if (handler) {
             handler.apply(this, args);

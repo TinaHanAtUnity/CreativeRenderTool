@@ -19,6 +19,7 @@ import { Configuration } from 'Models/Configuration';
 import { GameSessionCounters } from 'Utilities/GameSessionCounters';
 import { FailedOperativeEventManager } from 'Managers/FailedOperativeEventManager';
 import { Diagnostics } from 'Utilities/Diagnostics';
+import { SessionUtils } from 'Utilities/SessionUtils';
 import { Asset } from 'Models/Assets/Asset';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {
@@ -46,7 +47,7 @@ export interface IOperativeSkipEventParams extends IOperativeEventParams {
 export class OperativeEventManager {
 
     public static getEventKey(sessionId: string, eventId: string): string {
-        return SessionManager.getSessionKey(sessionId) + '.operative.' + eventId;
+        return SessionUtils.getSessionStorageKey(sessionId) + '.operative.' + eventId;
     }
 
     public static getUrlKey(sessionId: string, eventId: string): string {
@@ -322,9 +323,15 @@ export class OperativeEventManager {
                 'apiLevel': this._deviceInfo.getApiLevel(),
                 'deviceMake': this._deviceInfo.getManufacturer(),
                 'screenDensity': this._deviceInfo.getScreenDensity(),
-                'screenSize': this._deviceInfo.getScreenLayout(),
-                'androidId': this._deviceInfo.getAndroidId()
+                'screenSize': this._deviceInfo.getScreenLayout()
             };
+
+            if(!this._deviceInfo.getAdvertisingIdentifier()) {
+                infoJson = {
+                    ... infoJson,
+                    'androidId': this._deviceInfo.getAndroidId()
+                };
+            }
         }
 
         infoJson.videoOrientation = params.videoOrientation;

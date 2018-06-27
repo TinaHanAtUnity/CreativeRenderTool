@@ -3,12 +3,12 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Request } from 'Utilities/Request';
 import { HttpKafka, KafkaCommonObjectType } from 'Utilities/HttpKafka';
 import { FailedOperativeEventManager } from 'Managers/FailedOperativeEventManager';
-import { SessionManager } from 'Managers/SessionManager';
+import { SessionUtils } from 'Utilities/SessionUtils';
 
 export class FailedXpromoOperativeEventManager extends FailedOperativeEventManager {
 
     public getEventsStorageKey(): string {
-        return SessionManager.getSessionKey(this._sessionId) + '.xpromooperative';
+        return SessionUtils.getSessionStorageKey(this._sessionId) + '.xpromooperative';
     }
 
     public sendFailedEvent(nativeBridge: NativeBridge, request: Request, writeStorage?: boolean): Promise<void> {
