@@ -27,7 +27,7 @@ describe('UrlTest', () => {
         ['http://www.google.fi?&param1=125&param2=test', 'param2', 'http://www.google.fi?&param1=125'],
         ['http://www.google.fi?&param1=125&param2=test', 'param1', 'http://www.google.fi?&param2=test'],
         ['http://www.google.fi?&param1=125&param2=test&param3=true', 'param2', 'http://www.google.fi?&param1=125&param3=true'],
-        ['http://www.google.fi?&param1=125', 'param1', 'http://www.google.fi?'],
+        ['http://www.google.fi?&param1=125', 'param1', 'http://www.google.fi?']
     ].forEach(([originalUrl, parameter, expected]) => {
         it(`should remove ${parameter} from ${originalUrl}`, () => {
             const url: string = Url.removeQueryParameter(originalUrl, parameter);

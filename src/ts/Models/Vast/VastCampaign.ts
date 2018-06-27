@@ -129,7 +129,7 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
             'video': this.getVast().getDTO(),
             'hasEndscreen': this.hasEndscreen(),
             'portrait': portrait,
-            'landscape': landscape,
+            'landscape': landscape
         };
     }
 

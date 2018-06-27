@@ -51,7 +51,7 @@ export class Closer extends View<ICloseHandler> implements IPrivacyHandler {
                 event: 'click',
                 listener: (event: Event) => this.onPrivacyEvent(event),
                 selector: '.icon-gdpr'
-            },
+            }
         ];
 
         this._privacy.render();
