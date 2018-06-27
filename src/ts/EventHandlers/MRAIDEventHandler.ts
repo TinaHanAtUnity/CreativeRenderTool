@@ -1,7 +1,7 @@
 import { IMRAIDViewHandler, IOrientationProperties } from 'Views/MRAIDView';
 import { HttpKafka, KafkaCommonObjectType } from 'Utilities/HttpKafka';
 import { NativeBridge } from 'Native/NativeBridge';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { OperativeEventManager, IOperativeEventParams } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
@@ -48,14 +48,17 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
 
     public onMraidClick(url: string): Promise<void> {
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
+        const operativeEventParams: IOperativeEventParams = {
+            placement: this._placement
+        };
         if(!this._campaign.getSession().getEventSent(EventType.THIRD_QUARTILE)) {
-            this._operativeEventManager.sendThirdQuartile(this._placement);
+            this._operativeEventManager.sendThirdQuartile(operativeEventParams);
         }
         if(!this._campaign.getSession().getEventSent(EventType.VIEW)) {
-            this._operativeEventManager.sendView(this._placement);
+            this._operativeEventManager.sendView(operativeEventParams);
         }
         if(!this._campaign.getSession().getEventSent(EventType.CLICK)) {
-            this._operativeEventManager.sendClick(this._placement);
+            this._operativeEventManager.sendClick(operativeEventParams);
         }
 
         this._adUnit.sendClick();
@@ -76,7 +79,10 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
     }
 
     public onMraidReward(): void {
-        this._operativeEventManager.sendThirdQuartile(this._placement);
+        const operativeEventParams: IOperativeEventParams = {
+            placement: this._placement
+        };
+        this._operativeEventManager.sendThirdQuartile(operativeEventParams);
     }
 
     public onMraidSkip(): void {

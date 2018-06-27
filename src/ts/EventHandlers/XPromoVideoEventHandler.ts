@@ -4,6 +4,7 @@ import { IVideoEventHandlerParams } from 'EventHandlers/BaseVideoEventHandler';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { XPromoOperativeEventManager } from 'Managers/XPromoOperativeEventManager';
 import { TestEnvironment } from 'Utilities/TestEnvironment';
+import { IOperativeEventParams } from 'Managers/OperativeEventManager';
 
 export class XPromoVideoEventHandler extends VideoEventHandler {
 
@@ -37,7 +38,11 @@ export class XPromoVideoEventHandler extends VideoEventHandler {
     }
 
     protected handleStartEvent(progress: number): void {
-        this._xpromoOperativeEventManager.sendStart(this._placement, this.getVideoOrientation());
+        const params: IOperativeEventParams = {
+            placement: this._placement,
+            videoOrientation: this.getVideoOrientation()
+        };
+        this._xpromoOperativeEventManager.sendStart(params);
         const trackingUrls = this._xpromoCampaign.getTrackingUrlsForEvent('start');
         for (const url of trackingUrls) {
             this._thirdPartyEventManager.sendEvent('xpromo start', this._xpromoCampaign.getSession().getId(), url);
@@ -61,7 +66,11 @@ export class XPromoVideoEventHandler extends VideoEventHandler {
     }
 
     protected handleCompleteEvent(): void {
-        this._xpromoOperativeEventManager.sendView(this._placement, this.getVideoOrientation());
+        const params: IOperativeEventParams = {
+            placement: this._placement,
+            videoOrientation: this.getVideoOrientation()
+        };
+        this._xpromoOperativeEventManager.sendView(params);
         const clickTrackingUrls = this._xpromoCampaign.getTrackingUrlsForEvent('view');
         for (const clickUrl of clickTrackingUrls) {
             this._thirdPartyEventManager.sendEvent('xpromo view', this._xpromoCampaign.getSession().getId(), clickUrl);

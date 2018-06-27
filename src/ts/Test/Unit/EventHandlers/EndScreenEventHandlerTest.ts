@@ -125,7 +125,7 @@ describe('EndScreenEventHandlerTest', () => {
                 clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
             });
 
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, placement);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, { placement: placement, videoOrientation: 'landscape', adUnitStyle: undefined });
         });
 
         describe('with follow redirects', () => {
@@ -257,7 +257,7 @@ describe('EndScreenEventHandlerTest', () => {
             });
 
             it('should send a click with session manager', () => {
-                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, placement);
+                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, { placement: placement, videoOrientation: 'landscape', adUnitStyle: undefined });
             });
 
             it('should launch market view', () => {
@@ -353,7 +353,7 @@ describe('EndScreenEventHandlerTest', () => {
                 clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
             });
 
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, placement);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, { placement: placement, videoOrientation: 'landscape', adUnitStyle: undefined });
         });
 
         describe('with follow redirects', () => {
@@ -508,7 +508,7 @@ describe('EndScreenEventHandlerTest', () => {
             });
 
             it('should send a click with session manager', () => {
-                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, placement);
+                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, { placement: placement, videoOrientation: 'landscape', adUnitStyle: undefined });
             });
         });
     });

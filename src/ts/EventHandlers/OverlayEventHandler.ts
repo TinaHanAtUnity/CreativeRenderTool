@@ -1,7 +1,7 @@
 import { IOverlayHandler } from 'Views/AbstractVideoOverlay';
 import { NativeBridge } from 'Native/NativeBridge';
 import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { OperativeEventManager, IOperativeSkipEventParams } from 'Managers/OperativeEventManager';
 import { ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 import { VideoAdUnit, VideoState } from 'AdUnits/VideoAdUnit';
 import { FinishState } from 'Constants/FinishState';
@@ -10,7 +10,6 @@ import { Campaign } from 'Models/Campaign';
 import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { Placement } from 'Models/Placement';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
-import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { GdprManager, GDPREventAction } from 'Managers/GdprManager';
 import { Configuration } from 'Models/Configuration';
 
@@ -39,7 +38,15 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
         this._nativeBridge.VideoPlayer.pause();
         this._adUnit.setVideoState(VideoState.SKIPPED);
         this._adUnit.setFinishState(FinishState.SKIPPED);
-        this._operativeEventManager.sendSkip(this._placement, this._adUnit.getVideo().getPosition(), this.getVideoOrientation(), this._adUnitStyle);
+
+        const operativeEventParams: IOperativeSkipEventParams = {
+            placement: this._placement,
+            videoOrientation: this.getVideoOrientation(),
+            adUnitStyle: this._adUnitStyle,
+            videoProgress: this._adUnit.getVideo().getPosition()
+
+        };
+        this._operativeEventManager.sendSkip(operativeEventParams);
 
         this._adUnit.getContainer().reconfigure(ViewConfiguration.ENDSCREEN);
 
@@ -75,7 +82,13 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
         this._adUnit.setActive(false);
         this._adUnit.setVideoState(VideoState.SKIPPED);
         this._adUnit.setFinishState(FinishState.SKIPPED);
-        this._operativeEventManager.sendSkip(this._placement, this._adUnit.getVideo().getPosition(), this.getVideoOrientation());
+
+        const operativeEventParams: IOperativeSkipEventParams = {
+            placement: this._placement,
+            videoOrientation: this.getVideoOrientation(),
+            videoProgress: this._adUnit.getVideo().getPosition()
+        };
+        this._operativeEventManager.sendSkip(operativeEventParams);
 
         this._adUnit.onFinish.trigger();
         this._adUnit.hide();

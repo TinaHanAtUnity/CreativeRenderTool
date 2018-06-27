@@ -17,6 +17,7 @@ import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { AdUnitContainerSystemMessage, IAdUnitContainerListener } from 'AdUnits/Containers/AdUnitContainer';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { ClientInfo } from 'Models/ClientInfo';
+import { IOperativeEventParams } from 'Managers/OperativeEventManager';
 
 export interface IDisplayInterstitialAdUnitParameters extends IAdUnitParameters<DisplayInterstitialCampaign> {
     view: DisplayInterstitial;
@@ -195,7 +196,11 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
         if(this._clickEventHasBeenSent) {
             return;
         }
-        this._operativeEventManager.sendClick(this._placement);
+
+        const params: IOperativeEventParams = {
+            placement: this._placement
+        };
+        this._operativeEventManager.sendClick(params);
         this._clickEventHasBeenSent = true;
 
         for (const trackingUrl of this._campaign.getTrackingUrlsForEvent('click')) {
@@ -249,7 +254,10 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
         for (const url of (this._campaign).getTrackingUrlsForEvent('impression')) {
             this._thirdPartyEventManager.sendEvent('display impression', this._campaign.getSession().getId(), url);
         }
-        this._operativeEventManager.sendStart(this._placement).then(() => {
+        const params: IOperativeEventParams = {
+            placement: this._placement
+        };
+        this._operativeEventManager.sendStart(params).then(() => {
             this.onStartProcessed.trigger();
         });
     }

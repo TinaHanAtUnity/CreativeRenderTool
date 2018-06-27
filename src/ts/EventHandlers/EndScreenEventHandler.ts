@@ -19,9 +19,9 @@ import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
-import { XPromoOperativeEventManager } from 'Managers/XPromoOperativeEventManager';
 import { Configuration } from 'Models/Configuration';
 import { GdprManager, GDPREventAction } from 'Managers/GdprManager';
+import { IOperativeEventParams } from 'Managers/OperativeEventManager';
 
 export interface IEndScreenDownloadParameters {
     clickAttributionUrl: string | undefined;
@@ -81,7 +81,12 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
 
     private onDownloadAndroid(parameters: IEndScreenDownloadParameters): void {
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
-        this._operativeEventManager.sendClick(this._placement, this.getVideoOrientation(), parameters.adUnitStyle);
+        const operativeEventParams: IOperativeEventParams = {
+            placement: this._placement,
+            videoOrientation: this.getVideoOrientation(),
+            adUnitStyle: parameters.adUnitStyle
+        };
+        this._operativeEventManager.sendClick(operativeEventParams);
         if(this._campaign instanceof XPromoCampaign) {
             const clickTrackingUrls = this._campaign.getTrackingUrlsForEvent('click');
             for (const url of clickTrackingUrls) {
@@ -103,7 +108,12 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     private onDownloadIos(parameters: IEndScreenDownloadParameters): void {
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
 
-        this._operativeEventManager.sendClick(this._placement, this.getVideoOrientation(), parameters.adUnitStyle);
+        const operativeEventParams: IOperativeEventParams = {
+            placement: this._placement,
+            videoOrientation: this.getVideoOrientation(),
+            adUnitStyle: parameters.adUnitStyle
+        };
+        this._operativeEventManager.sendClick(operativeEventParams);
         if(this._campaign instanceof XPromoCampaign) {
             const clickTrackingUrls = this._campaign.getTrackingUrlsForEvent('click');
             for (const url of clickTrackingUrls) {

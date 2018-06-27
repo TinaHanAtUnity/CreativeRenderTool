@@ -8,7 +8,7 @@ import {
     Orientation
 } from 'AdUnits/Containers/AdUnitContainer';
 import { EndScreen } from 'Views/EndScreen';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { OperativeEventManager, IOperativeEventParams } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { EventType } from 'Models/Session';
@@ -73,7 +73,11 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this.setShowingMRAID(true);
         this._mraid.show();
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
-        this._operativeEventManager.sendStart(this._placement).then(() => {
+
+        const params: IOperativeEventParams = {
+            placement: this._placement
+        };
+        this._operativeEventManager.sendStart(params).then(() => {
             this.onStartProcessed.trigger();
         });
         this.sendTrackingEvent('impression');
@@ -103,17 +107,21 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
             this._privacy.container().parentElement!.removeChild(this._privacy.container());
         }
 
+        const params: IOperativeEventParams = {
+            placement: this._placement
+        };
+
         const finishState = this.getFinishState();
         if(finishState === FinishState.COMPLETED) {
             if(!this._campaign.getSession().getEventSent(EventType.THIRD_QUARTILE)) {
-                this._operativeEventManager.sendThirdQuartile(this._placement);
+                this._operativeEventManager.sendThirdQuartile(params);
             }
             if(!this._campaign.getSession().getEventSent(EventType.VIEW)) {
-                this._operativeEventManager.sendView(this._placement);
+                this._operativeEventManager.sendView(params);
             }
             this.sendTrackingEvent('complete');
         } else if(finishState === FinishState.SKIPPED) {
-            this._operativeEventManager.sendSkip(this._placement);
+            this._operativeEventManager.sendSkip(params);
         }
 
         this.onFinish.trigger();

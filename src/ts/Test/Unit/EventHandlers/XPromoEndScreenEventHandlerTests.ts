@@ -27,6 +27,7 @@ import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFact
 import { XPromoOperativeEventManager } from 'Managers/XPromoOperativeEventManager';
 import { Privacy } from 'Views/Privacy';
 import { GdprManager } from 'Managers/GdprManager';
+import { IOperativeEventParams } from 'Managers/OperativeEventManager';
 
 describe('XPromoEndScreenEventHandlerTest', () => {
 
@@ -124,8 +125,11 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 clickAttributionUrl: xPromoAdUnitParameters.campaign.getClickAttributionUrl()
             });
 
+            const params: IOperativeEventParams = { placement: xPromoAdUnitParameters.placement,
+                videoOrientation: xPromoAdUnit.getVideoOrientation(), adUnitStyle: undefined };
+
             sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendClick);
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendHttpKafkaEvent, 'ads.xpromo.operative.videoclick.v1.json', 'click', placement, xPromoAdUnit.getVideoOrientation());
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendHttpKafkaEvent, 'ads.xpromo.operative.videoclick.v1.json', 'click', params);
         });
 
     });
@@ -207,8 +211,11 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 clickAttributionUrl: xPromoAdUnitParameters.campaign.getClickAttributionUrl()
             });
 
+            const params: IOperativeEventParams = { placement: xPromoAdUnitParameters.placement,
+                videoOrientation: xPromoAdUnit.getVideoOrientation(), adUnitStyle: undefined };
+
             sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendClick);
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendHttpKafkaEvent, 'ads.xpromo.operative.videoclick.v1.json', 'click', placement, xPromoAdUnit.getVideoOrientation());
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendHttpKafkaEvent, 'ads.xpromo.operative.videoclick.v1.json', 'click', params);
         });
     });
 });

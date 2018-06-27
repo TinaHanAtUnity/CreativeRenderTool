@@ -4,7 +4,7 @@ import { KeyCode } from 'Constants/Android/KeyCode';
 import { SensorDelay } from 'Constants/Android/SensorDelay';
 import { FinishState } from 'Constants/FinishState';
 import { Platform } from 'Constants/Platform';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { IOperativeEventParams, OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
 import { ClientInfo } from 'Models/ClientInfo';
@@ -91,7 +91,11 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public sendClickEvent() {
         this.sendTrackingEvent('click');
-        this._operativeEventManager.sendClick(this._placement);
+        const params: IOperativeEventParams = {
+            placement: this._placement
+        };
+
+        this._operativeEventManager.sendClick(params);
 
         UserCountData.getClickCount(this._nativeBridge).then((clickCount) => {
             if (typeof clickCount === 'number') {
@@ -107,12 +111,20 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     public sendStartEvent() {
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
         this.sendTrackingEvent('start');
-        this._operativeEventManager.sendStart(this._placement);
+
+        const params: IOperativeEventParams = {
+            placement: this._placement
+        };
+        this._operativeEventManager.sendStart(params);
     }
 
     public sendSkipEvent() {
         this.sendTrackingEvent('skip');
-        this._operativeEventManager.sendSkip(this._placement);
+
+        const params: IOperativeEventParams = {
+            placement: this._placement
+        };
+        this._operativeEventManager.sendSkip(params);
     }
 
     public sendCompleteEvent() {
@@ -120,8 +132,11 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public sendRewardEvent() {
-        this._operativeEventManager.sendThirdQuartile(this._placement);
-        this._operativeEventManager.sendView(this._placement);
+        const params: IOperativeEventParams = {
+            placement: this._placement
+        };
+        this._operativeEventManager.sendThirdQuartile(params);
+        this._operativeEventManager.sendView(params);
     }
 
     public sendOpenableIntentsResponse(response: IOpenableIntentsResponse) {
