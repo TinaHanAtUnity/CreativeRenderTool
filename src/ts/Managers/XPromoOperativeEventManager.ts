@@ -104,4 +104,8 @@ export class XPromoOperativeEventManager extends OperativeEventManager {
 
         return this.createUniqueEventMetadata(placement, this._sessionManager.getGameSessionId(), this._gamerServerId, OperativeEventManager.getPreviousPlacementId(), videoOrientation).then(fulfilled);
     }
+
+    protected createVideoEventUrl(type: string): string | undefined {
+        return this._xPromoCampaign.getVideoEventUrl(type);
+    }
 }

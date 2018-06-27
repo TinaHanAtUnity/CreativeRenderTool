@@ -11,11 +11,11 @@ export class PerformanceOperativeEventManager extends OperativeEventManager {
         this._performanceCampaign = params.campaign;
     }
 
-    protected createVideoEventUrl(type: string): string {
+    protected createVideoEventUrl(type: string): string | undefined {
         return this._performanceCampaign.getVideoEventUrl(type);
     }
 
-    protected createClickEventUrl(): string {
+    protected createClickEventUrl(): string | undefined {
         return Url.addParameters(this._performanceCampaign.getClickUrl(), { redirect: false });
     }
 }
