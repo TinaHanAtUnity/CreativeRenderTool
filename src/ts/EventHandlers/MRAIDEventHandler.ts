@@ -17,6 +17,7 @@ import { FinishState } from 'Constants/FinishState';
 import { Placement } from 'Models/Placement';
 import { Configuration } from 'Models/Configuration';
 import { GDPREventAction, GdprManager } from 'Managers/GdprManager';
+import { CTAOpenUrlAbTest, ABGroup } from 'Models/ABGroup';
 
 export class MRAIDEventHandler implements IMRAIDViewHandler {
 
@@ -31,6 +32,7 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
     private _placement: Placement;
     private _configuration: Configuration;
     private _gdprManager: GdprManager;
+    private _abGroup: ABGroup;
 
     constructor(nativeBridge: NativeBridge, adUnit: MRAIDAdUnit, parameters: IMRAIDAdUnitParameters) {
         this._nativeBridge = nativeBridge;
@@ -44,6 +46,7 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
         this._request = parameters.request;
         this._configuration = parameters.configuration;
         this._gdprManager = parameters.gdprManager;
+        this._abGroup = parameters.configuration.getAbGroup();
     }
 
     public onMraidClick(url: string): Promise<void> {
