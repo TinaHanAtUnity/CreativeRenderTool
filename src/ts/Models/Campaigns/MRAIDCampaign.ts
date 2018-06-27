@@ -24,7 +24,6 @@ export interface IMRAIDCampaign extends IProgrammaticCampaign {
     bypassAppSheet: boolean | undefined;
     store: StoreName | undefined;
     appStoreId: string | undefined;
-    mraidCreativeId: string | undefined;
     playableConfiguration: IPlayableConfiguration | undefined;
 }
 
@@ -52,7 +51,6 @@ export class MRAIDCampaign extends ProgrammaticCampaign<IMRAIDCampaign> {
             bypassAppSheet: ['boolean', 'undefined'],
             store: ['number', 'undefined'],
             appStoreId: ['string', 'undefined'],
-            mraidCreativeId: ['string', 'undefined'],
             videoEventUrls: ['object', 'undefined'],
             playableConfiguration: ['object', 'undefined']
         }, campaign);

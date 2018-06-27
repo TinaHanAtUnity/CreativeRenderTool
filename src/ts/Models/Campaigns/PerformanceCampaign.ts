@@ -29,7 +29,6 @@ export interface IPerformanceCampaign extends ICampaign {
     bypassAppSheet: boolean;
     store: StoreName;
     adUnitStyle: AdUnitStyle | undefined;
-    portraitCreativeId: string | undefined;
 }
 
 export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
@@ -55,7 +54,6 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             bypassAppSheet: ['boolean'],
             store: ['number'],
             adUnitStyle: ['object', 'undefined'],
-            portraitCreativeId: ['string', 'undefined'],
         }, campaign);
     }
 

@@ -65,6 +65,10 @@ export abstract class Asset<T extends IAsset = IAsset> extends Model<T> {
         return this.get('session');
     }
 
+    public getCreativeId(): string | undefined {
+        return this.get('creativeId');
+    }
+
     public getDTO(): { [key: string]: any } {
         return {
             'url': this.getOriginalUrl(),

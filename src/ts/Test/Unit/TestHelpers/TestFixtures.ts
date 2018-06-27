@@ -95,17 +95,15 @@ export class TestFixtures {
             bypassAppSheet: json.bypassAppSheet,
             store: storeName,
             adUnitStyle: json.adUnitStyle,
-            creativeId: json.creativeId,
-            portraitCreativeId: json.portraitCreativeId
         };
 
         if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
-            parameters.video = new Video(json.trailerDownloadable, session, json.trailerDownloadableSize);
+            parameters.video = new Video(json.trailerDownloadable, session, json.trailerDownloadableSize, json.creativeId);
             parameters.streamingVideo = new Video(json.trailerStreaming, session);
         }
 
         if(json.trailerPortraitDownloadable && json.trailerPortraitDownloadableSize && json.trailerPortraitStreaming) {
-            parameters.videoPortrait = new Video(json.trailerPortraitDownloadable, session, json.trailerPortraitDownloadableSize);
+            parameters.videoPortrait = new Video(json.trailerPortraitDownloadable, session, json.trailerPortraitDownloadableSize, json.portraitCreativeId);
             parameters.streamingPortraitVideo = new Video(json.trailerPortraitStreaming, session);
         }
 
@@ -168,8 +166,7 @@ export class TestFixtures {
             bypassAppSheet: mraidContentJson.bypassAppSheet,
             store: storeName,
             appStoreId: mraidContentJson.appStoreId,
-            playableConfiguration: undefined,
-            mraidCreativeId: undefined
+            playableConfiguration: undefined
         };
     }
 
@@ -216,8 +213,7 @@ export class TestFixtures {
             store: undefined,
             appStoreId: mraidContentJson.appStoreId,
             useWebViewUserAgentForTracking: mraidJson.useWebViewUserAgentForTracking,
-            playableConfiguration: undefined,
-            mraidCreativeId: undefined
+            playableConfiguration: undefined
         };
     }
 
