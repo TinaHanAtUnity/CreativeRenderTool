@@ -49,7 +49,8 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
     public onMraidClick(url: string): Promise<void> {
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
         const operativeEventParams: IOperativeEventParams = {
-            placement: this._placement
+            placement: this._placement,
+            asset: this._campaign.getResourceUrl()
         };
         if(!this._campaign.getSession().getEventSent(EventType.THIRD_QUARTILE)) {
             this._operativeEventManager.sendThirdQuartile(operativeEventParams);

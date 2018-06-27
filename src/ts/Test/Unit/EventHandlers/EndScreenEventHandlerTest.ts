@@ -19,7 +19,7 @@ import { PerformanceCampaign, StoreName } from 'Models/Campaigns/PerformanceCamp
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { Video } from 'Models/Assets/Video';
 import { FocusManager } from 'Managers/FocusManager';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { IOperativeEventParams, OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { PerformanceEndScreenEventHandler } from 'EventHandlers/PerformanceEndScreenEventHandler';
 import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
@@ -125,7 +125,12 @@ describe('EndScreenEventHandlerTest', () => {
                 clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
             });
 
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, { placement: placement, videoOrientation: 'landscape', adUnitStyle: undefined });
+            const params: IOperativeEventParams = { placement: placement,
+                videoOrientation: 'landscape',
+                adUnitStyle: undefined,
+                asset: performanceAdUnit.getVideo()
+            };
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, params);
         });
 
         describe('with follow redirects', () => {
@@ -257,7 +262,12 @@ describe('EndScreenEventHandlerTest', () => {
             });
 
             it('should send a click with session manager', () => {
-                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, { placement: placement, videoOrientation: 'landscape', adUnitStyle: undefined });
+                const params: IOperativeEventParams = { placement: placement,
+                    videoOrientation: 'landscape',
+                    adUnitStyle: undefined,
+                    asset: performanceAdUnit.getVideo()
+                };
+                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, params);
             });
 
             it('should launch market view', () => {
@@ -353,7 +363,12 @@ describe('EndScreenEventHandlerTest', () => {
                 clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
             });
 
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, { placement: placement, videoOrientation: 'landscape', adUnitStyle: undefined });
+            const params: IOperativeEventParams = { placement: placement,
+                videoOrientation: 'landscape',
+                adUnitStyle: undefined,
+                asset: performanceAdUnit.getVideo()
+            };
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, params);
         });
 
         describe('with follow redirects', () => {
@@ -508,7 +523,12 @@ describe('EndScreenEventHandlerTest', () => {
             });
 
             it('should send a click with session manager', () => {
-                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, { placement: placement, videoOrientation: 'landscape', adUnitStyle: undefined });
+                const params: IOperativeEventParams = { placement: placement,
+                    videoOrientation: 'landscape',
+                    adUnitStyle: undefined,
+                    asset: performanceAdUnit.getVideo()
+                };
+                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, params);
             });
         });
     });

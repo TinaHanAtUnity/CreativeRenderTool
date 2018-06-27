@@ -126,7 +126,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             });
 
             const params: IOperativeEventParams = { placement: xPromoAdUnitParameters.placement,
-                videoOrientation: xPromoAdUnit.getVideoOrientation(), adUnitStyle: undefined };
+                videoOrientation: xPromoAdUnit.getVideoOrientation(), adUnitStyle: undefined, asset: undefined };
 
             sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendClick);
             sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendHttpKafkaEvent, 'ads.xpromo.operative.videoclick.v1.json', 'click', params);
@@ -212,7 +212,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             });
 
             const params: IOperativeEventParams = { placement: xPromoAdUnitParameters.placement,
-                videoOrientation: xPromoAdUnit.getVideoOrientation(), adUnitStyle: undefined };
+                videoOrientation: xPromoAdUnit.getVideoOrientation(), adUnitStyle: undefined, asset: undefined };
 
             sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendClick);
             sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendHttpKafkaEvent, 'ads.xpromo.operative.videoclick.v1.json', 'click', params);

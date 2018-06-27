@@ -238,7 +238,8 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
         const params: IOperativeEventParams = {
             placement: this._placement,
             videoOrientation: this.getVideoOrientation(),
-            adUnitStyle: this._adUnitStyle
+            adUnitStyle: this._adUnitStyle,
+            asset: this._video
         };
         this._operativeEventManager.sendStart(params).then(() => {
             this._adUnit.onStartProcessed.trigger();
@@ -251,7 +252,8 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
         const params: IOperativeEventParams = {
             placement: this._placement,
             videoOrientation: this.getVideoOrientation(),
-            adUnitStyle: this._adUnitStyle
+            adUnitStyle: this._adUnitStyle,
+            asset: this._video
         };
         this._operativeEventManager.sendFirstQuartile(params);
     }
@@ -260,7 +262,8 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
         const params: IOperativeEventParams = {
             placement: this._placement,
             videoOrientation: this.getVideoOrientation(),
-            adUnitStyle: this._adUnitStyle
+            adUnitStyle: this._adUnitStyle,
+            asset: this._video
         };
         this._operativeEventManager.sendMidpoint(params);
     }
@@ -269,7 +272,8 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
         const params: IOperativeEventParams = {
             placement: this._placement,
             videoOrientation: this.getVideoOrientation(),
-            adUnitStyle: this._adUnitStyle
+            adUnitStyle: this._adUnitStyle,
+            asset: this._video
         };
         this._operativeEventManager.sendThirdQuartile(params);
     }
@@ -278,7 +282,8 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
         const params: IOperativeEventParams = {
             placement: this._placement,
             videoOrientation: this.getVideoOrientation(),
-            adUnitStyle: this._adUnitStyle
+            adUnitStyle: this._adUnitStyle,
+            asset: this._video
         };
         this._operativeEventManager.sendView(params);
     }

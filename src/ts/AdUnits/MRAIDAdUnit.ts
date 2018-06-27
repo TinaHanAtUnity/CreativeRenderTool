@@ -75,7 +75,8 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
 
         const params: IOperativeEventParams = {
-            placement: this._placement
+            placement: this._placement,
+            asset: this._campaign.getResourceUrl()
         };
         this._operativeEventManager.sendStart(params).then(() => {
             this.onStartProcessed.trigger();
@@ -108,7 +109,8 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         }
 
         const params: IOperativeEventParams = {
-            placement: this._placement
+            placement: this._placement,
+            asset: this._campaign.getResourceUrl()
         };
 
         const finishState = this.getFinishState();

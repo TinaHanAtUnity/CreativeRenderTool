@@ -22,6 +22,7 @@ import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { Configuration } from 'Models/Configuration';
 import { GdprManager, GDPREventAction } from 'Managers/GdprManager';
 import { IOperativeEventParams } from 'Managers/OperativeEventManager';
+import { Video } from 'Models/Assets/Video';
 
 export interface IEndScreenDownloadParameters {
     clickAttributionUrl: string | undefined;
@@ -84,7 +85,8 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         const operativeEventParams: IOperativeEventParams = {
             placement: this._placement,
             videoOrientation: this.getVideoOrientation(),
-            adUnitStyle: parameters.adUnitStyle
+            adUnitStyle: parameters.adUnitStyle,
+            asset: this.getVideo()
         };
         this._operativeEventManager.sendClick(operativeEventParams);
         if(this._campaign instanceof XPromoCampaign) {
@@ -111,7 +113,8 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         const operativeEventParams: IOperativeEventParams = {
             placement: this._placement,
             videoOrientation: this.getVideoOrientation(),
-            adUnitStyle: parameters.adUnitStyle
+            adUnitStyle: parameters.adUnitStyle,
+            asset: this.getVideo()
         };
         this._operativeEventManager.sendClick(operativeEventParams);
         if(this._campaign instanceof XPromoCampaign) {
@@ -267,6 +270,14 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     private getVideoOrientation(): string | undefined {
         if(this._adUnit instanceof PerformanceAdUnit || this._adUnit instanceof XPromoAdUnit) {
             return (<PerformanceAdUnit>this._adUnit).getVideoOrientation();
+        }
+
+        return undefined;
+    }
+
+    private getVideo(): Video | undefined {
+        if(this._adUnit instanceof PerformanceAdUnit) {
+            return this._adUnit.getVideo();
         }
 
         return undefined;
