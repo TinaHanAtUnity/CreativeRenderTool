@@ -59,7 +59,7 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
         cpuCount: ['integer'],
         glVersion: ['string'],
         maxVolume: ['number'],
-        headset: ['boolean'],
+        headset: ['boolean']
     };
 
     protected _nativeBridge: NativeBridge;
@@ -293,7 +293,7 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
                 'batteryStatus': batteryStatus,
                 'freeMemory': freeMemory,
                 'totalMemory': this.getTotalMemory(),
-                'rooted': this.isRooted(),
+                'rooted': this.isRooted()
             };
         });
     }
@@ -317,7 +317,7 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
             'language': this.getLanguage(),
             'totalSpaceInternal': this.getTotalSpace(),
             'totalMemory': this.getTotalMemory(),
-            'rooted': this.isRooted(),
+            'rooted': this.isRooted()
         };
     }
 

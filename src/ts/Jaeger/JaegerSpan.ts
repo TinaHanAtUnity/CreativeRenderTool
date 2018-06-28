@@ -45,7 +45,7 @@ export enum JaegerTags {
     StatusCode = 'status.code',
     DeviceType = 'device.type',
     Error = 'error',
-    ErrorMessage = 'error.message',
+    ErrorMessage = 'error.message'
 }
 
 export class JaegerSpan implements IJaegerSpan {

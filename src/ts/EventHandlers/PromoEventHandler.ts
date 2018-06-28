@@ -17,7 +17,7 @@ export class PromoEventHandler {
             gameId: gameId + '|' + gamerToken,
             abGroup: abGroup.toNumber(),
             request: IPromoRequest.CLOSE,
-            purchaseTrackingUrls: purchaseTrackingUrls,
+            purchaseTrackingUrls: purchaseTrackingUrls
         };
         PurchasingUtilities.sendPromoPayload(iapPayload);
     }
@@ -30,7 +30,7 @@ export class PromoEventHandler {
             productId: iapProductId,
             iapPromo: true,
             request: IPromoRequest.PURCHASE,
-            purchaseTrackingUrls: purchaseTrackingUrls,
+            purchaseTrackingUrls: purchaseTrackingUrls
         };
         PurchasingUtilities.sendPromoPayload(iapPayload);
     }
