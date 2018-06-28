@@ -1,3 +1,7 @@
+# Wed Jun 27 22:04:48 UTC 2018
+
+* Change handling of crosspromo third quartile event
+
 # Wed Jun 27 06:05:33 UTC 2018
 
 * Remove circular dependencies
