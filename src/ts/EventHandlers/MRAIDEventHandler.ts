@@ -48,10 +48,7 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
 
     public onMraidClick(url: string): Promise<void> {
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
-        const operativeEventParams: IOperativeEventParams = {
-            placement: this._placement,
-            asset: this._campaign.getResourceUrl()
-        };
+        const operativeEventParams: IOperativeEventParams = this.getOperativeEventParams();
         if(!this._campaign.getSession().getEventSent(EventType.THIRD_QUARTILE)) {
             this._operativeEventManager.sendThirdQuartile(operativeEventParams);
         }
@@ -80,10 +77,7 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
     }
 
     public onMraidReward(): void {
-        const operativeEventParams: IOperativeEventParams = {
-            placement: this._placement
-        };
-        this._operativeEventManager.sendThirdQuartile(operativeEventParams);
+        this._operativeEventManager.sendThirdQuartile(this.getOperativeEventParams());
     }
 
     public onMraidSkip(): void {
@@ -186,5 +180,12 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
     // Follows the redirects of a URL, returning the final location.
     private followUrl(link: string): Promise<string> {
         return this._request.followRedirectChain(link);
+    }
+
+    private getOperativeEventParams(): IOperativeEventParams {
+        return {
+            placement: this._placement,
+            asset: this._campaign.getResourceUrl()
+        };
     }
 }
