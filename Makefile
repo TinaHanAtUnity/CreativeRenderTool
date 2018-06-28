@@ -255,7 +255,7 @@ lint:
 	@echo Running linter
 	@echo
 
-	$(TSLINT) -c tslint.json --project tsconfig.json `find $(TS_SRC) -name "*.ts" | xargs`
+	$(TSLINT) -c tslint.json --project tsconfig.json
 
 test: test-unit test-integration
 
