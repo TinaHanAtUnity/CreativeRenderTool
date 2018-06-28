@@ -1447,7 +1447,7 @@ describe('CampaignManager', () => {
                 if(placements.hasOwnProperty(placementid)) {
                     placementRequestMap[placementid] = {
                         adTypes: placements[placementid].getAdTypes(),
-                        allowSkip: placements[placementid].allowSkip(),
+                        allowSkip: placements[placementid].allowSkip()
                     };
 
                     if (placementRequestMap[placementid].adTypes === undefined) {

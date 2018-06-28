@@ -337,7 +337,7 @@ export class TestFixtures {
             additionalTrackingEvents: json.promo.tracking ? json.promo.tracking : undefined,
             dynamicMarkup: json.promo.dynamicMarkup,
             creativeAsset: new HTML(json.promo.creativeUrl, session),
-            rewardedPromo: isRewardedPromo,
+            rewardedPromo: isRewardedPromo
         };
     }
 
