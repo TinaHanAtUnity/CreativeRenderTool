@@ -73,12 +73,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this.setShowingMRAID(true);
         this._mraid.show();
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
-
-        const params: IOperativeEventParams = {
-            placement: this._placement,
-            asset: this._campaign.getResourceUrl()
-        };
-        this._operativeEventManager.sendStart(params).then(() => {
+        this._operativeEventManager.sendStart(this.getOperativeEventParams()).then(() => {
             this.onStartProcessed.trigger();
         });
         this.sendTrackingEvent('impression');
@@ -108,22 +103,18 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
             this._privacy.container().parentElement!.removeChild(this._privacy.container());
         }
 
-        const params: IOperativeEventParams = {
-            placement: this._placement,
-            asset: this._campaign.getResourceUrl()
-        };
-
+        const operativeEventParams = this.getOperativeEventParams();
         const finishState = this.getFinishState();
         if(finishState === FinishState.COMPLETED) {
             if(!this._campaign.getSession().getEventSent(EventType.THIRD_QUARTILE)) {
-                this._operativeEventManager.sendThirdQuartile(params);
+                this._operativeEventManager.sendThirdQuartile(operativeEventParams);
             }
             if(!this._campaign.getSession().getEventSent(EventType.VIEW)) {
-                this._operativeEventManager.sendView(params);
+                this._operativeEventManager.sendView(operativeEventParams);
             }
             this.sendTrackingEvent('complete');
         } else if(finishState === FinishState.SKIPPED) {
-            this._operativeEventManager.sendSkip(params);
+            this._operativeEventManager.sendSkip(operativeEventParams);
         }
 
         this.onFinish.trigger();
@@ -223,5 +214,12 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
                 }
             }
         }
+    }
+
+    private getOperativeEventParams(): IOperativeEventParams {
+        return {
+            placement: this._placement,
+            asset: this._campaign.getResourceUrl()
+        };
     }
 }
