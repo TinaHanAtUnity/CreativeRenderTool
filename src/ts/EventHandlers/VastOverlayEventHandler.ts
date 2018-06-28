@@ -10,7 +10,8 @@ import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 import { MOAT } from 'Views/MOAT';
 import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { CTAOpenUrlAbTest, ABGroup } from 'Models/ABGroup';
+import { ABGroup } from 'Models/ABGroup';
+import { CTAOpenUrlAbTest } from 'Models/ABGroup';
 
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _vastAdUnit: VastAdUnit;
@@ -80,7 +81,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
 
             return this._request.followRedirectChain(clickThroughURL).then(
                 (url: string) => {
-                    return this.openUrl(url).then(() => {
+                    this.openUrl(url).then(() => {
                         this.setCallButtonEnabled(true);
                     });
                 }
