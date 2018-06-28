@@ -88,7 +88,6 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
         return undefined;
     }
 
-
     private getOperativeSkipEventParams(): IOperativeSkipEventParams {
         return {
             placement: this._placement,
