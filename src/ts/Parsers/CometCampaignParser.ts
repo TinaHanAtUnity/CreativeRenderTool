@@ -113,12 +113,12 @@ export class CometCampaignParser extends CampaignParser {
 
             if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
                 parameters.video = new Video(this.validateAndEncodeUrl(json.trailerDownloadable, session), session, json.trailerDownloadableSize, json.creativeId);
-                parameters.streamingVideo = new Video(this.validateAndEncodeUrl(json.trailerStreaming, session), session);
+                parameters.streamingVideo = new Video(this.validateAndEncodeUrl(json.trailerStreaming, session), session, undefined, json.creativeId);
             }
 
             if(json.trailerPortraitDownloadable && json.trailerPortraitDownloadableSize && json.trailerPortraitStreaming) {
                 parameters.videoPortrait = new Video(this.validateAndEncodeUrl(json.trailerPortraitDownloadable, session), session, json.trailerPortraitDownloadableSize, json.portraitCreativeId);
-                parameters.streamingPortraitVideo = new Video(this.validateAndEncodeUrl(json.trailerPortraitStreaming, session), session);
+                parameters.streamingPortraitVideo = new Video(this.validateAndEncodeUrl(json.trailerPortraitStreaming, session), session, undefined, json.portraitCreativeId);
             }
 
             return Promise.resolve(new PerformanceCampaign(parameters));
