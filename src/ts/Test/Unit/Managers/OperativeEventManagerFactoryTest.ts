@@ -32,7 +32,7 @@ describe('OperativeEventManagerFactoryTest', () => {
     beforeEach(() => {
         nativeBridge = new NativeBridge({
             handleInvocation,
-            handleCallback,
+            handleCallback
         }, Platform.ANDROID);
 
         request = sinon.createStubInstance(Request);

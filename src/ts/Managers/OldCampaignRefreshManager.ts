@@ -237,7 +237,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
         }
 
         Diagnostics.trigger(diagnosticsType, {
-            error: error,
+            error: error
         }, session);
         this._nativeBridge.Sdk.logError(JSON.stringify(error));
 
