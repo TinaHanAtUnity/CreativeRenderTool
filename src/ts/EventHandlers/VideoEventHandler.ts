@@ -38,17 +38,20 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
     public onProgress(progress: number): void {
         const overlay = this._adUnit.getOverlay();
 
+        this._nativeBridge.Sdk.logDebug('PROGRESS: ' + progress + ', ' + this._adUnit.getVideoState());
+
         if(progress > 0 && this._adUnit.getVideoState() === VideoState.READY) {
+            this._nativeBridge.Sdk.logDebug('PROGRESS READY: ' + progress + ', ' + this._adUnit.getVideoState() + ', ' + this._video.hasStarted());
             this._adUnit.setVideoState(VideoState.PLAYING);
 
             if(overlay) {
                 overlay.setSpinnerEnabled(false);
             }
+        }
 
-            if (!this._video.hasStarted()) {
-                this._video.setStarted(true);
-                this.handleStartEvent(progress);
-            }
+        if(progress > 0 && !this._video.hasStarted()) {
+            this._video.setStarted(true);
+            this.handleStartEvent(progress);
         }
 
         if(progress >= 0) {
