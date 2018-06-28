@@ -32,6 +32,17 @@ describe('PurchasingUtilitiesTest', () => {
         purchaseTrackingUrls: ['https://www.scooooooooter.com', 'https://www.scottyboy.com']
     };
 
+    const iapPayloadSetIds: IPromoPayload = {
+        productId: 'myPromo',
+        trackingOptOut: false,
+        gamerToken: '111',
+        iapPromo: true,
+        gameId: '222',
+        abGroup: 1,
+        request: IPromoRequest.SETIDS,
+        purchaseTrackingUrls: ['https://www.scooooooooter.com', 'https://www.scottyboy.com']
+    };
+
     beforeEach(() => {
         nativeBridge = sinon.createStubInstance(NativeBridge);
         purchasing = sinon.createStubInstance(PurchasingApi);
@@ -142,12 +153,28 @@ describe('PurchasingUtilitiesTest', () => {
                 sendPurchaseInitializationEventStub = sandbox.stub(PurchasingUtilities, 'sendPurchaseInitializationEvent').resolves();
             });
 
+            it('should not set isInitialized to true if payload passed does not include SETIDS', () => {
+
+                return PurchasingUtilities.sendPromoPayload(iapPayloadPurchase).then(() => {
+                    sinon.assert.calledWith(<sinon.SinonStub>purchasing.initiatePurchasingCommand, JSON.stringify(iapPayloadPurchase));
+                    assert.isFalse(PurchasingUtilities.isInitialized());
+                });
+            });
+
+            it('should set isInitialized to true if payload passed does includes SETIDS', () => {
+
+                return PurchasingUtilities.sendPromoPayload(iapPayloadSetIds).then(() => {
+                    sinon.assert.calledWith(<sinon.SinonStub>purchasing.initiatePurchasingCommand, JSON.stringify(iapPayloadSetIds));
+                    assert.isTrue(PurchasingUtilities.isInitialized());
+                });
+            });
+
             it('should call initialization event and initiate purchasing command when initialization Payloads are not set', () => {
                 sandbox.stub(PurchasingUtilities, 'isInitialized').returns(false);
 
-                return PurchasingUtilities.sendPromoPayload(iapPayloadPurchase).then(() => {
+                return PurchasingUtilities.sendPromoPayload(iapPayloadSetIds).then(() => {
                     sinon.assert.called(sendPurchaseInitializationEventStub);
-                    sinon.assert.calledWith(<sinon.SinonStub>purchasing.initiatePurchasingCommand, JSON.stringify(iapPayloadPurchase));
+                    sinon.assert.calledWith(<sinon.SinonStub>purchasing.initiatePurchasingCommand, JSON.stringify(iapPayloadSetIds));
                 });
             });
 
@@ -158,7 +185,6 @@ describe('PurchasingUtilitiesTest', () => {
                     sinon.assert.notCalled(sendPurchaseInitializationEventStub);
                     sinon.assert.calledWith(<sinon.SinonStub>purchasing.initiatePurchasingCommand, JSON.stringify(iapPayloadPurchase));
                 });
-
             });
         });
 
