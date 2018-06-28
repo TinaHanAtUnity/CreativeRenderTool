@@ -82,13 +82,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
 
     private onDownloadAndroid(parameters: IEndScreenDownloadParameters): void {
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
-        const operativeEventParams: IOperativeEventParams = {
-            placement: this._placement,
-            videoOrientation: this.getVideoOrientation(),
-            adUnitStyle: parameters.adUnitStyle,
-            asset: this.getVideo()
-        };
-        this._operativeEventManager.sendClick(operativeEventParams);
+        this._operativeEventManager.sendClick(this.getOperativeEventParams(parameters));
         if(this._campaign instanceof XPromoCampaign) {
             const clickTrackingUrls = this._campaign.getTrackingUrlsForEvent('click');
             for (const url of clickTrackingUrls) {
@@ -110,13 +104,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     private onDownloadIos(parameters: IEndScreenDownloadParameters): void {
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
 
-        const operativeEventParams: IOperativeEventParams = {
-            placement: this._placement,
-            videoOrientation: this.getVideoOrientation(),
-            adUnitStyle: parameters.adUnitStyle,
-            asset: this.getVideo()
-        };
-        this._operativeEventManager.sendClick(operativeEventParams);
+        this._operativeEventManager.sendClick(this.getOperativeEventParams(parameters));
         if(this._campaign instanceof XPromoCampaign) {
             const clickTrackingUrls = this._campaign.getTrackingUrlsForEvent('click');
             for (const url of clickTrackingUrls) {
@@ -275,14 +263,6 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         return undefined;
     }
 
-    private getVideo(): Video | undefined {
-        if(this._adUnit instanceof PerformanceAdUnit) {
-            return this._adUnit.getVideo();
-        }
-
-        return undefined;
-    }
-
     private getAppStoreUrl(parameters: IEndScreenDownloadParameters, packageName?: string): string | undefined {
         if(!parameters.appStoreId) {
             return;
@@ -298,5 +278,22 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
             default:
                 return '';
         }
+    }
+
+    private getVideo(): Video | undefined {
+        if(this._adUnit instanceof PerformanceAdUnit) {
+            return this._adUnit.getVideo();
+        }
+
+        return undefined;
+    }
+
+    private getOperativeEventParams(parameters: IEndScreenDownloadParameters): IOperativeEventParams {
+        return {
+            placement: this._placement,
+            videoOrientation: this.getVideoOrientation(),
+            adUnitStyle: parameters.adUnitStyle,
+            asset: this.getVideo()
+        };
     }
 }

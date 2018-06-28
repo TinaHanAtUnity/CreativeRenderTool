@@ -38,16 +38,7 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
         this._nativeBridge.VideoPlayer.pause();
         this._adUnit.setVideoState(VideoState.SKIPPED);
         this._adUnit.setFinishState(FinishState.SKIPPED);
-
-        const operativeEventParams: IOperativeSkipEventParams = {
-            placement: this._placement,
-            videoOrientation: this.getVideoOrientation(),
-            adUnitStyle: this._adUnitStyle,
-            asset: this._adUnit.getVideo(),
-            videoProgress: this._adUnit.getVideo().getPosition()
-
-        };
-        this._operativeEventManager.sendSkip(operativeEventParams);
+        this._operativeEventManager.sendSkip(this.getOperativeSkipEventParams());
 
         this._adUnit.getContainer().reconfigure(ViewConfiguration.ENDSCREEN);
 
@@ -83,13 +74,7 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
         this._adUnit.setActive(false);
         this._adUnit.setVideoState(VideoState.SKIPPED);
         this._adUnit.setFinishState(FinishState.SKIPPED);
-
-        const operativeEventParams: IOperativeSkipEventParams = {
-            placement: this._placement,
-            videoOrientation: this.getVideoOrientation(),
-            videoProgress: this._adUnit.getVideo().getPosition()
-        };
-        this._operativeEventManager.sendSkip(operativeEventParams);
+        this._operativeEventManager.sendSkip(this.getOperativeSkipEventParams());
 
         this._adUnit.onFinish.trigger();
         this._adUnit.hide();
@@ -101,5 +86,16 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
         }
 
         return undefined;
+    }
+
+
+    private getOperativeSkipEventParams(): IOperativeSkipEventParams {
+        return {
+            placement: this._placement,
+            videoOrientation: this.getVideoOrientation(),
+            adUnitStyle: this._adUnitStyle,
+            asset: this._adUnit.getVideo(),
+            videoProgress: this._adUnit.getVideo().getPosition()
+        };
     }
 }
