@@ -106,6 +106,20 @@ describe('PurchasingUtilitiesTest', () => {
             });
         });
 
+        it('should fail with Promo version not supported if promo version split length is less than 2', () => {
+            const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            const promoVersion = '1';
+            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge);
+            sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('True'));
+            sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve(promoVersion));
+            sandbox.stub(purchasing.onCommandResult, 'subscribe').callsFake((resolve) => resolve('True'));
+
+            return PurchasingUtilities.sendPurchaseInitializationEvent().catch((e) => {
+                assert.equal(e.message, `Promo version: ${promoVersion} is not supported`);
+                sinon.assert.notCalled(<sinon.SinonSpy>purchasing.initiatePurchasingCommand);
+            });
+        });
+
         it('should fail and not set isInitialized to true if command result is false', () => {
             const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge);
@@ -118,6 +132,43 @@ describe('PurchasingUtilitiesTest', () => {
                 assert.equal(e.message, 'Purchase command attempt failed with command False');
                 sinon.assert.called(<sinon.SinonStub>purchasing.initiatePurchasingCommand);
                 assert.isFalse(PurchasingUtilities.isInitialized());
+            });
+        });
+
+        it('should fail when initializePurchasing rejects', () => {
+            const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge);
+            (<sinon.SinonStub>purchasing.initializePurchasing).rejects();
+
+            return PurchasingUtilities.sendPurchaseInitializationEvent().catch((e: any) => {
+                assert.equal(e.message, 'Purchase initialization failed');
+                sinon.assert.notCalled(<sinon.SinonSpy>purchasing.initiatePurchasingCommand);
+            });
+        });
+
+        it('should fail when getPromoVersion rejects', () => {
+            const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge);
+
+            sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('True'));
+            (<sinon.SinonStub>purchasing.getPromoVersion).rejects();
+
+            return PurchasingUtilities.sendPurchaseInitializationEvent().catch((e: any) => {
+                assert.equal(e.message, 'Promo version check failed');
+                sinon.assert.notCalled(<sinon.SinonSpy>purchasing.initiatePurchasingCommand);
+            });
+        });
+
+        it('should fail when initiatePurchasingCommand rejects', () => {
+            const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge);
+
+            sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('True'));
+            sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.16'));
+            (<sinon.SinonStub>purchasing.initiatePurchasingCommand).rejects();
+
+            return PurchasingUtilities.sendPurchaseInitializationEvent().catch((e: any) => {
+                assert.equal(e.message, 'Purchase event failed to send');
             });
         });
 
