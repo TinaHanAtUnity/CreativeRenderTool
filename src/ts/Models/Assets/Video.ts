@@ -85,10 +85,6 @@ export class Video extends Asset<IVideo> {
         this.set('quartile', quartile);
     }
 
-    public getCreativeId(): string | undefined {
-        return this.get('creativeId');
-    }
-
     public getDTO(): { [key: string]: any } {
         return {
             'asset': super.getDTO(),

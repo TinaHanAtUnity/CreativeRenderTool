@@ -43,6 +43,7 @@ export class OverlayEventHandler<T extends Campaign> implements IOverlayHandler 
             placement: this._placement,
             videoOrientation: this.getVideoOrientation(),
             adUnitStyle: this._adUnitStyle,
+            asset: this._adUnit.getVideo(),
             videoProgress: this._adUnit.getVideo().getPosition()
 
         };
