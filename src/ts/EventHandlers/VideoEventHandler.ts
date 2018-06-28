@@ -44,11 +44,11 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
             if(overlay) {
                 overlay.setSpinnerEnabled(false);
             }
+        }
 
-            if (!this._video.hasStarted()) {
-                this._video.setStarted(true);
-                this.handleStartEvent(progress);
-            }
+        if(progress > 0 && !this._video.hasStarted()) {
+            this._video.setStarted(true);
+            this.handleStartEvent(progress);
         }
 
         if(progress >= 0) {

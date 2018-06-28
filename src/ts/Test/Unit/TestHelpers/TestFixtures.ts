@@ -56,7 +56,7 @@ export class TestFixtures {
             skipInSeconds: 0,
             disableBackButton: false,
             useDeviceOrientationForVideo: false,
-            muteVideo: false,
+            muteVideo: false
         });
     }
 
@@ -323,7 +323,7 @@ export class TestFixtures {
             advertiserCampaignId: json.advertiserCampaignId || undefined,
             advertiserBundleId: json.advertiserBundleId || undefined,
             useWebViewUserAgentForTracking: false,
-            buyerId: json.buyerId || undefined,
+            buyerId: json.buyerId || undefined
 
         };
     }
@@ -443,7 +443,7 @@ export class TestFixtures {
             url: 'http://foo.url.com',
             response: 'foo response',
             responseCode: 200,
-            headers: [['location', 'http://foobar.com']],
+            headers: [['location', 'http://foobar.com']]
         };
     }
 
@@ -570,7 +570,7 @@ export class TestFixtures {
             getStatusBarHeight: sinon.stub().returns(Promise.resolve(40)),
             getStatusBarWidth: sinon.stub().returns(Promise.resolve(768)),
             getDeviceMaxVolume: sinon.stub().returns(Promise.resolve(1)),
-            getSensorList: sinon.stub().returns(Promise.resolve([])),
+            getSensorList: sinon.stub().returns(Promise.resolve([]))
         };
     }
 

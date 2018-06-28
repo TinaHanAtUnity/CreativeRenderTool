@@ -184,7 +184,7 @@ export class Localization {
             'endscreen': JSON.parse(PortugueseEndscreen),
             'overlay': JSON.parse(PortugueseOverlay),
             'loadingscreen': JSON.parse(PortugueseLoadingScreen)
-        },
+        }
     };
 
     private static _localizedAbbreviations: ILocalizedAbbreviations = {

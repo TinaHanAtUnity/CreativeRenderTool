@@ -1,5 +1,11 @@
 # Pending
 
+* Fix race condition in iOS video start event logic
+* Fix js_error when args is not an array or is undefined or null
+* tslint trailing comma removal
+
+# Wed Jun 27 22:04:48 UTC 2018
+
 * Change handling of crosspromo third quartile event
 
 # Wed Jun 27 06:05:33 UTC 2018
