@@ -2,24 +2,14 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
 
-import { Campaign } from 'Models/Campaign';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Request } from 'Utilities/Request';
 import { AuctionResponse } from 'Models/AuctionResponse';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Session } from 'Models/Session';
-import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
-import { Platform } from 'Constants/Platform';
 import { SdkApi } from 'Native/Api/Sdk';
-import { ProgrammaticVPAIDParser } from 'Parsers/ProgrammaticVPAIDParser';
 
 import IAPPromoCampaign from 'json/campaigns/promo/PromoCampaign.json';
-import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
-import { Url } from 'Utilities/Url';
-import { VastCampaign } from 'Models/Vast/VastCampaign';
-import { VastParser } from 'Utilities/VastParser';
-import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
-import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { PromoCampaignParser } from 'Parsers/PromoCampaignParser';
 import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';

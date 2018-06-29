@@ -2,7 +2,6 @@ import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
 import { PurchasingUtilities, IPromoPayload, IPromoRequest } from 'Utilities/PurchasingUtilities';
 import { Configuration } from 'Models/Configuration';
 import { FinishState } from 'Constants/FinishState';
-import { Placement } from 'Models/Placement';
 import { ABGroup } from 'Models/ABGroup';
 import { GdprManager, GDPREventAction } from 'Managers/GdprManager';
 
@@ -20,7 +19,7 @@ export class PromoEventHandler {
             request: IPromoRequest.CLOSE,
             purchaseTrackingUrls: purchaseTrackingUrls
         };
-        PurchasingUtilities.sendPromoPayload(JSON.stringify(iapPayload));
+        PurchasingUtilities.sendPromoPayload(iapPayload);
     }
 
     public static onPromo(adUnit: PromoAdUnit, iapProductId: string, purchaseTrackingUrls: string[]): void {
@@ -33,7 +32,7 @@ export class PromoEventHandler {
             request: IPromoRequest.PURCHASE,
             purchaseTrackingUrls: purchaseTrackingUrls
         };
-        PurchasingUtilities.sendPromoPayload(JSON.stringify(iapPayload));
+        PurchasingUtilities.sendPromoPayload(iapPayload);
     }
 
     public static onGDPRPopupSkipped(configuration: Configuration, gdprManager: GdprManager): void {
