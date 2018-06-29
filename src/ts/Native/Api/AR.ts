@@ -2,6 +2,7 @@ import { NativeApi } from 'Native/NativeApi';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Observable0, Observable1, Observable2 } from 'Utilities/Observable';
 import { ARUtil, IARFrameInfo, IARFrameScale, IARPoint, IARRect, IARSize } from 'Utilities/ARUtil';
+import { Platform } from 'Constants/Platform';
 
 enum AREvent {
     AR_PLANES_ADDED,
@@ -103,6 +104,11 @@ export class ARApi extends NativeApi {
     }
 
     public advanceFrame(): Promise<void> {
+        // We don't have scaling logic in Android at the moment.
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            return this._nativeBridge.invoke<void>(this._apiClass, 'advanceFrame');
+        }
+
         // Get frame info, calculate scaling and then call advanceFrame
         return this.getFrameInfo().then((frameInfo) => {
             const scale = ARApi.calculateVideoScale(frameInfo);
