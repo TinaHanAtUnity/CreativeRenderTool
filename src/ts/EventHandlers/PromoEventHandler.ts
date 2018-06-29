@@ -19,7 +19,7 @@ export class PromoEventHandler {
             request: IPromoRequest.CLOSE,
             purchaseTrackingUrls: purchaseTrackingUrls
         };
-        PurchasingUtilities.sendPromoPayload(JSON.stringify(iapPayload));
+        PurchasingUtilities.sendPromoPayload(iapPayload);
     }
 
     public static onPromo(adUnit: PromoAdUnit, iapProductId: string, purchaseTrackingUrls: string[]): void {
@@ -32,7 +32,7 @@ export class PromoEventHandler {
             request: IPromoRequest.PURCHASE,
             purchaseTrackingUrls: purchaseTrackingUrls
         };
-        PurchasingUtilities.sendPromoPayload(JSON.stringify(iapPayload));
+        PurchasingUtilities.sendPromoPayload(iapPayload);
     }
 
     public static onGDPRPopupSkipped(configuration: Configuration, gdprManager: GdprManager): void {
