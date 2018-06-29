@@ -56,7 +56,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         if(campaign) {
             this._templateData = {
-                'gameName': campaign.getGameName(),
+                'gameName': campaign.getGameName()
             };
             const gameIcon = campaign.getGameIcon();
             if(gameIcon) {

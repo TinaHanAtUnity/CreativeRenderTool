@@ -130,7 +130,7 @@ describe('CampaignManager', () => {
                 onDownloadProgress: new Observable0(),
                 onDownloadEnd: new Observable0(),
                 onDownloadStopped: new Observable0(),
-                onDownloadError: new Observable0(),
+                onDownloadError: new Observable0()
             },
             Sdk: {
                 logWarning: warningSpy,
@@ -173,7 +173,7 @@ describe('CampaignManager', () => {
                     getTotalSpace: sinon.stub().returns(Promise.resolve(1024)),
                     getDeviceVolume: sinon.stub().returns(Promise.resolve(0.5)),
                     getFreeSpace: sinon.stub().returns(Promise.resolve(16)),
-                    getStatusBarHeight: sinon.stub().returns(Promise.resolve(40)),
+                    getStatusBarHeight: sinon.stub().returns(Promise.resolve(40))
                 },
                 Android: {
                     getAndroidId: sinon.stub().returns(Promise.resolve('17')),

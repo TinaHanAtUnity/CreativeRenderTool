@@ -354,7 +354,7 @@ describe('CacheCleanTest', () => {
                         size: 123456789,
                         totalSize: 123456789,
                         extension: 'mp4'
-                    },
+                    }
                 }
             }
         });

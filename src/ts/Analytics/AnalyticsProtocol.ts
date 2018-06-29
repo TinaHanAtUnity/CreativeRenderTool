@@ -193,7 +193,7 @@ export class AnalyticsProtocol {
         } else {
             return Promise.all([
                 deviceInfo.getScreenWidth(),
-                deviceInfo.getScreenHeight(),
+                deviceInfo.getScreenHeight()
             ]).then(([width, height]) => {
                 let screenWidth = width;
                 let screenHeight = height;

@@ -11,7 +11,7 @@ export class PlayerMetaData extends BaseMetaData<IPlayerMetaData> {
     constructor() {
         super('PlayerMetaData', {
             ... BaseMetaData.Schema,
-            server_id: ['string'],
+            server_id: ['string']
         });
 
         this.set('keys', ['server_id']);
@@ -37,7 +37,7 @@ export class PlayerMetaData extends BaseMetaData<IPlayerMetaData> {
 
     public getDTO(): { [key: string]: any } {
         return {
-            'sid': this.getServerId(),
+            'sid': this.getServerId()
         };
     }
 }
