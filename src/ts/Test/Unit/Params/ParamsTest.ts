@@ -443,7 +443,10 @@ describe('Event parameters should match specifications', () => {
                 });
                 OperativeEventManager.setPreviousPlacementId(undefined);
                 operativeEventParams = {
-                    placement: TestFixtures.getPlacement()
+                    placement: TestFixtures.getPlacement(),
+                    adUnitStyle: campaign.getAdUnitStyle(),
+                    videoOrientation: 'landscape',
+                    asset: campaign.getVideo()
                 };
             });
 

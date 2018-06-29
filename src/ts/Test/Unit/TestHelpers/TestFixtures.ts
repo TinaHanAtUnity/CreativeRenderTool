@@ -28,6 +28,7 @@ import { FakeAndroidDeviceInfo } from 'Test/Unit/TestHelpers/FakeAndroidDeviceIn
 import { RingerMode } from 'Constants/Android/RingerMode';
 import { UIUserInterfaceIdiom } from 'Constants/iOS/UIUserInterfaceIdiom';
 import { FakeIosDeviceInfo } from 'Test/Unit/TestHelpers/FakeIosDeviceInfo';
+import { AdUnitStyle } from 'Models/AdUnitStyle';
 
 import DummyPromoCampaign from 'json/DummyPromoCampaign.json';
 import OnCometMraidPlcCampaignFollowsRedirects from 'json/OnCometMraidPlcCampaignFollowsRedirects.json';
@@ -94,17 +95,17 @@ export class TestFixtures {
             videoEventUrls: json.videoEventUrls,
             bypassAppSheet: json.bypassAppSheet,
             store: storeName,
-            adUnitStyle: json.adUnitStyle
+            adUnitStyle: new AdUnitStyle(json.adUnitStyle)
         };
 
         if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
             parameters.video = new Video(json.trailerDownloadable, session, json.trailerDownloadableSize, json.creativeId);
-            parameters.streamingVideo = new Video(json.trailerStreaming, session);
+            parameters.streamingVideo = new Video(json.trailerStreaming, session, undefined, json.creativeId);
         }
 
         if(json.trailerPortraitDownloadable && json.trailerPortraitDownloadableSize && json.trailerPortraitStreaming) {
             parameters.videoPortrait = new Video(json.trailerPortraitDownloadable, session, json.trailerPortraitDownloadableSize, json.portraitCreativeId);
-            parameters.streamingPortraitVideo = new Video(json.trailerPortraitStreaming, session);
+            parameters.streamingPortraitVideo = new Video(json.trailerPortraitStreaming, session, undefined, json.portraitCreativeId);
         }
 
         return parameters;
@@ -150,7 +151,7 @@ export class TestFixtures {
         return {
             ... this.getCometCampaignBaseParams(session, mraidContentJson.id, this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup(), undefined),
             useWebViewUserAgentForTracking: mraidJson.useWebViewUserAgentForTracking,
-            resourceAsset: mraidContentJson.resourceUrl ? new HTML(mraidContentJson.resourceUrl, session) : undefined,
+            resourceAsset: mraidContentJson.resourceUrl ? new HTML(mraidContentJson.resourceUrl, session, mraidContentJson.creativeId) : undefined,
             resource: undefined,
             dynamicMarkup: mraidContentJson.dynamicMarkup,
             trackingUrls: {},
