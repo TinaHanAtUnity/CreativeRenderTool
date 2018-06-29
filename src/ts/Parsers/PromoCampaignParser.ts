@@ -23,7 +23,7 @@ export class PromoCampaignParser extends CampaignParser {
                         gamerId: gamerId,
                         abGroup: abGroup,
                         willExpireAt: promoJson.expiry ? parseInt(promoJson.expiry, 10) * 1000 : undefined,
-                        adType: undefined,
+                        adType: promoJson.contentType || response.getContentType() || undefined,
                         correlationId: undefined,
                         creativeId: undefined,
                         seatId: undefined,
@@ -37,7 +37,8 @@ export class PromoCampaignParser extends CampaignParser {
                         iapProductId: promoJson.iapProductId,
                         additionalTrackingEvents: response.getTrackingUrls() ? response.getTrackingUrls() : undefined,
                         dynamicMarkup: promoJson.dynamicMarkup,
-                        creativeAsset: new HTML(promoJson.creativeUrl, session)
+                        creativeAsset: new HTML(promoJson.creativeUrl, session),
+                        rewardedPromo: promoJson.rewardedPromo ? promoJson.rewardedPromo : false
                     };
 
                     const promoCampaign = new PromoCampaign(promoCampaignParams);
