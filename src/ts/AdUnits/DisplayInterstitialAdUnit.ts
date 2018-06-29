@@ -197,10 +197,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
             return;
         }
 
-        const params: IOperativeEventParams = {
-            placement: this._placement
-        };
-        this._operativeEventManager.sendClick(params);
+        this._operativeEventManager.sendClick(this.getOperativeEventParams());
         this._clickEventHasBeenSent = true;
 
         for (const trackingUrl of this._campaign.getTrackingUrlsForEvent('click')) {
@@ -254,10 +251,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
         for (const url of (this._campaign).getTrackingUrlsForEvent('impression')) {
             this._thirdPartyEventManager.sendEvent('display impression', this._campaign.getSession().getId(), url);
         }
-        const params: IOperativeEventParams = {
-            placement: this._placement
-        };
-        this._operativeEventManager.sendStart(params).then(() => {
+        this._operativeEventManager.sendStart(this.getOperativeEventParams()).then(() => {
             this.onStartProcessed.trigger();
         });
     }
@@ -310,5 +304,11 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
                 this._contentReady = true;
             });
         });
+    }
+
+    private getOperativeEventParams(): IOperativeEventParams {
+        return {
+            placement: this._placement
+        };
     }
 }
