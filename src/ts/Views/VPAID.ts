@@ -67,7 +67,7 @@ export class VPAID extends View<IVPAIDHandler> {
 
         const adParameters = <IVPAIDAdParameters>{
             skipEnabled: this._placement.allowSkip(),
-            skipDuration: this._placement.allowSkipInSeconds(),
+            skipDuration: this._placement.allowSkipInSeconds()
         };
 
         const templateData = <IVPAIDTemplateData>{

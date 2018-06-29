@@ -25,7 +25,7 @@ export class VPAIDCampaign extends ProgrammaticCampaign<IVPAIDCampaign> {
             advertiserDomain: ['string', 'undefined'],
             advertiserCampaignId: ['string', 'undefined'],
             advertiserBundleId: ['string', 'undefined'],
-            buyerId: ['string', 'undefined'],
+            buyerId: ['string', 'undefined']
         }, campaign);
 
         this.addTrackingToVAST(campaign.trackingUrls);

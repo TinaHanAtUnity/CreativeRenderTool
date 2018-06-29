@@ -36,7 +36,7 @@ export class ClientInfo extends Model<IClientInfo> {
             webviewHash: ['string', 'null'],
             webviewVersion: ['string', 'null'],
             initTimestamp: ['number'],
-            reinitialized: ['boolean'],
+            reinitialized: ['boolean']
         });
 
         this.set('platform', platform);
