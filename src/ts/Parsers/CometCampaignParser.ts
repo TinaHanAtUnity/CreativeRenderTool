@@ -84,7 +84,7 @@ export class CometCampaignParser extends CampaignParser {
                         mraidCampaign.setPlayableConfiguration(playableConfiguration);
                     } catch (e) {
                         Diagnostics.trigger('playable_configuration_invalid_json', {
-                            configuration: configurationResponse.response
+                            playableConfigurationUrl: playableConfigurationUrl
                         });
                     }
                 }).catch(error => {
