@@ -7,13 +7,19 @@ export class ConfigurationParser {
         const configPlacements = configJson.placements;
         const placements: { [id: string]: Placement } = {};
         let defaultPlacement: Placement | undefined;
+        let defaultBannerPlacement: Placement | undefined;
 
         if (configPlacements) {
             configPlacements.forEach((rawPlacement: any): void => {
                 const placement: Placement = new Placement(rawPlacement);
                 placements[placement.getId()] = placement;
+
                 if (placement.isDefault()) {
-                    defaultPlacement = placement;
+                    if (placement.isBannerPlacement()) {
+                        defaultBannerPlacement = placement;
+                    } else {
+                        defaultPlacement = placement;
+                    }
                 }
             });
         } else {
@@ -42,7 +48,8 @@ export class ConfigurationParser {
             organizationId: configJson.organizationId,
             gdprEnabled: configJson.gdprEnabled,
             optOutRecorded: configJson.optOutRecorded,
-            optOutEnabled: configJson.optOutEnabled
+            optOutEnabled: configJson.optOutEnabled,
+            defaultBannerPlacement: defaultBannerPlacement
         };
         return new Configuration(configurationParams);
     }

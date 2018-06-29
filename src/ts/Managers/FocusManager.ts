@@ -1,6 +1,7 @@
 import { Observable0, Observable1 } from 'Utilities/Observable';
 import { NativeBridge } from 'Native/NativeBridge';
 
+export const AdUnitActivities = ['com.unity3d.ads.adunit.AdUnitActivity', 'com.unity3d.ads.adunit.AdUnitTransparentActivity', 'com.unity3d.ads.adunit.AdUnitTransparentSoftwareActivity', 'com.unity3d.ads.adunit.AdUnitSoftwareActivity'];
 export class FocusManager {
     private static _appForegroundNotification: string = 'UIApplicationDidBecomeActiveNotification';
     private static _appBackgroundNotification: string = 'UIApplicationWillResignActiveNotification';

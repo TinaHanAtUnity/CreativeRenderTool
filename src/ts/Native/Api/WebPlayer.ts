@@ -1,6 +1,6 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { NativeApi } from 'Native/NativeApi';
-import { Observable1, Observable0, Observable2 } from 'Utilities/Observable';
+import { Observable2, Observable3 } from 'Utilities/Observable';
 
 // Platform specific, first three are available on both Android & iOS. The rest are Android only.
 export enum WebplayerEvent {
@@ -37,7 +37,8 @@ export enum WebplayerEvent {
     PAGE_COMMIT_VISIBLE,
     FORM_RESUBMISSION,
     UNHANDLED_KEY_EVENT,
-    SHOULD_INTERCEPT_REQUEST
+    SHOULD_INTERCEPT_REQUEST,
+    CREATE_WEBVIEW
 }
 
 export interface IWebPlayerEventSettings {
@@ -152,6 +153,7 @@ export interface IWebPlayerWebSettingsIos {
     keyboardDisplayRequiresUserAction?: boolean; // UIWebView only
     ignoresViewportScaleLimits?: boolean; // WKWebView iOS10+ only
     dataDetectorTypes?: number; // WKWebView iOS10+ only (bitfield) & UIWebView (enum)
+    scrollEnabled?: boolean; // SDK 2.3.0+
 }
 
 export enum WKAudiovisualMediaTypes {
@@ -161,67 +163,75 @@ export enum WKAudiovisualMediaTypes {
     ALL     = WKAudiovisualMediaTypes.AUDIO | WKAudiovisualMediaTypes.VIDEO
 }
 
+export enum WebPlayerViewId {
+    BannerPlayer = 'bannerplayer',
+    WebPlayer = 'webplayer'
+}
+
 export class WebPlayerApi extends NativeApi {
 
-    public readonly onPageStarted = new Observable1<string>();
-    public readonly onPageFinished = new Observable1<string>();
-    public readonly onWebPlayerEvent = new Observable1<string>();
-    public readonly onCreateWindow = new Observable1<string>();
-    public readonly shouldOverrideUrlLoading = new Observable2<string, string>();
+    public readonly onPageStarted = new Observable2<string, string>();
+    public readonly onPageFinished = new Observable2<string, string>();
+    public readonly onWebPlayerEvent = new Observable2<string, string>();
+    public readonly onCreateWindow = new Observable2<string, string>();
+    public readonly shouldOverrideUrlLoading = new Observable3<string, string, string>();
+    public readonly onCreateWebView = new Observable2<string, string>();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'WebPlayer');
     }
 
-    public setUrl(url: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setUrl', [url]);
+    public setUrl(url: string, viewId: string): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'setUrl', [url, viewId]);
     }
 
-    public setData(data: string, mimeType: string, encoding: string): Promise<void>  {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setData', [data, mimeType, encoding]);
+    public setData(data: string, mimeType: string, encoding: string, viewId: string): Promise<void>  {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'setData', [data, mimeType, encoding, viewId]);
     }
 
-    public setDataWithUrl(baseUrl: string, data: string, mimeType: string, encoding: string): Promise<void>  {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setDataWithUrl', [baseUrl, data, mimeType, encoding]);
+    public setDataWithUrl(baseUrl: string, data: string, mimeType: string, encoding: string, viewId: string): Promise<void>  {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'setDataWithUrl', [baseUrl, data, mimeType, encoding, viewId]);
     }
 
-    public setSettings(webSettings: IWebPlayerWebSettingsAndroid | IWebPlayerWebSettingsIos, webPlayerSettings: IWebPlayerPlayerSettingsAndroid): Promise<void>  {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setSettings', [webSettings, webPlayerSettings]);
+    public setSettings(webSettings: IWebPlayerWebSettingsAndroid | IWebPlayerWebSettingsIos, webPlayerSettings: IWebPlayerPlayerSettingsAndroid, viewId: string): Promise<void>  {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'setSettings', [webSettings, webPlayerSettings, viewId]);
     }
 
-    public clearSettings(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'clearSettings');
+    public clearSettings(viewId: string): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'clearSettings', [viewId]);
     }
 
-    public setEventSettings(eventSettings: IWebPlayerEventSettings): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setEventSettings', [eventSettings]);
+    public setEventSettings(eventSettings: IWebPlayerEventSettings, viewId: string): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'setEventSettings', [eventSettings, viewId]);
     }
 
-    public sendEvent(args: any[]): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'sendEvent', [args]);
+    public sendEvent(args: any[], viewId: string): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'sendEvent', [args, viewId]);
     }
 
     public handleEvent(event: string, parameters: any[]): void {
         switch(event) {
             case WebplayerEvent[WebplayerEvent.PAGE_STARTED]:
-                this.onPageStarted.trigger(parameters[0]);
+                this.onPageStarted.trigger(parameters.pop(), parameters[0]);
                 break;
 
             case WebplayerEvent[WebplayerEvent.PAGE_FINISHED]:
-                this.onPageFinished.trigger(parameters[0]);
+                this.onPageFinished.trigger(parameters.pop(), parameters[0]);
                 break;
 
             case WebplayerEvent[WebplayerEvent.ERROR]:
-                this.onPageFinished.trigger(parameters[0]);
+                this.onPageFinished.trigger(parameters.pop(), parameters[0]);
                 break;
             case WebplayerEvent[WebplayerEvent.WEBPLAYER_EVENT]:
-                this.onWebPlayerEvent.trigger(parameters[0]);
+                this.onWebPlayerEvent.trigger(parameters.pop(), parameters[0]);
                 break;
 
             case WebplayerEvent[WebplayerEvent.SHOULD_OVERRIDE_URL_LOADING]:
-                this.shouldOverrideUrlLoading.trigger(parameters[0], parameters[1]);
+                this.shouldOverrideUrlLoading.trigger(parameters.pop(), parameters[0], parameters[1]);
                 break;
-
+            case WebplayerEvent[WebplayerEvent.CREATE_WEBVIEW]:
+                this.onCreateWebView.trigger(parameters.pop(), parameters[0]);
+                break;
             default:
                 super.handleEvent(event, parameters);
         }

@@ -39,6 +39,9 @@ import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFact
 import { GdprManager } from 'Managers/GdprManager';
 
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
+import { WebPlayerContainer } from 'Utilities/WebPlayer/WebPlayerContainer';
+import { Observable1, Observable2 } from 'Utilities/Observable';
+import { asStub } from '../TestHelpers/Functions';
 
 describe('AdUnitFactoryTest', () => {
 
@@ -93,7 +96,13 @@ describe('AdUnitFactoryTest', () => {
 
         sandbox.stub(MoatViewabilityService, 'initMoat');
 
+        const webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
+        (<any>webPlayerContainer).onPageStarted = new Observable1<string>();
+        (<any>webPlayerContainer).shouldOverrideUrlLoading = new Observable2<string, string>();
+        asStub(webPlayerContainer.setSettings).resolves();
+        asStub(webPlayerContainer.clearSettings).resolves();
         adUnitParameters = {
+            webPlayerContainer: webPlayerContainer,
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
             container: container,

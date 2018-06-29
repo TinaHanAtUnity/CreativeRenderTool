@@ -1,0 +1,23 @@
+{
+    "contentType": "programmatic/banner-html",
+    "content": "<script language='JavaScript' src='https://tags.mathtag.com/notify/js?id=5aW95q2jLzE0LyAvTVRjME9UY3paR0V0WkRRd01pMDBaVFZqTFRrMFpUSXROamhoWW1FMk5qRTNPRE01Lzc2NjkyMTU1NzU0MjI4OTUwOC81NzAwMjAxLzM0MzY2NDkvOTYvY1YyalRnLTdfWlQzcVVCRlc3VFdTZm5SMTlfNXhRcmYxLThsXzFDd2oxNC8xLzk2LzAvMC80NzE5NTQvMjg4OTU0MjEzMi8xODgyODAvMzkyMTA2LzgvMC8yL01UYzBPVGN6WkdFdFpEUXdNaTAwWlRWakxUazBaVEl0TmpoaFltRTJOakUzT0RNNS8wLzAvMC8wLzAvNzY2OTIxNTU3NTQyMjg5NTA4L29yZC8/uPIOTvsG31ZJLxkszxZQt-plv6E&nodeid=1066&auctionid=766921557542289508&exch=gor&sid=3436649&cid=5700201&price=&act=LiIiJiQocHxrPSwuJCMqcHxrKy5wfGshIioqJCMqcHw&group=us-east&bp=a_cjhhdj'></script>",
+    "trackingUrls": {
+        "click": [
+            "http://localhost:5000/operative?abGroup=9&adType=BANNER&apiLevel=0&auctionId=675899b3-e760-445a-bf9e-fd83872d1c02&bundleId=com.unity3d.ads.example&buyerID=101580&campaignId=00005472656d6f7220694f53&connectionType=wifi&country=&creativeId=5700201&dealCode=&deviceMake=&deviceModel=iPhone7%2C2&dspId=mediamath&eventType=click&frameworkName=&frameworkVersion=&gameId=1000149&limitedAdTracking=false&mediationName=mediationPartner&mediationOrdinal=0&mediationVersion=v12345&networkType=13&osVersion=10.3.3&platform=ios&screenDensity=0&screenHeight=647&screenSize=0&screenWidth=375&sdkVersion=2200&seatId=9075&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWMiOjE3NywiY3BpIjoxNDEsImV4cCI6MTUyNDg3ODY5NSwiaWFwIjozOSwiaWF0IjoxNTI0NzkyMjk1LCJpc3MiOiJhZHMtZ2FtZS1jb25maWd1cmF0aW9uLnVuaXR5YWRzLnVuaXR5M2QuY29tIiwibHR2IjoyMzgsInBybyI6NSwic3ViIjoiWkFqRktwVEhVOGQ1MGw4T3orNW10Tm56cUI0YU9sYURYMkhJTDN6YVpvR0FWOU9CMDIydEV0MHJYVE5mOTEvc1AwSHFLdz09IiwieHByIjozNH0.6IBydDxHhq5Dde8mlfSdTxgDrnbB_-kTOUFm38J2j0A&webviewUa=Mozilla%2F5.0+%28Linux%3B+Android+5.1%3B+Nexus+6+Build%2FLMY47D%3B+wv%29+AppleWebKit%2F537.36+%28KHTML%2C+like+Gecko%29+Version%2F4.0+Chrome%2F56.0.2924.87+Mobile+Safari%2F537.36",
+            "https:///brands/1000149/%ZONE%/click/common?adSourceId=&adType=BANNER&advertiserDomain=gotahoenorth.com&auctionAbGroup=177&auctionId=675899b3-e760-445a-bf9e-fd83872d1c02&connectionType=wifi&creativeId=5700201&dealCode=&demandSeatId=&deviceInfo.screenDensity=0&deviceInfo.screenSize=0&deviceType=iPhone7%2C2&iapAbGroup=39&limitedTracking=false<vAbGroup=238&mediaType=banner&mediation.name=mediationPartner&mediation.ordinal=0&mediation.version=v12345&platform=ios&pubRevOptAbGroup=5&sdkVersion=2200&seatId=9075&softwareVersion=10.3.3&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWMiOjE3NywiY3BpIjoxNDEsImV4cCI6MTUyNDg3ODY5NSwiaWFwIjozOSwiaWF0IjoxNTI0NzkyMjk1LCJpc3MiOiJhZHMtZ2FtZS1jb25maWd1cmF0aW9uLnVuaXR5YWRzLnVuaXR5M2QuY29tIiwibHR2IjoyMzgsInBybyI6NSwic3ViIjoiWkFqRktwVEhVOGQ1MGw4T3orNW10Tm56cUI0YU9sYURYMkhJTDN6YVpvR0FWOU9CMDIydEV0MHJYVE5mOTEvc1AwSHFLdz09IiwieHByIjozNH0.6IBydDxHhq5Dde8mlfSdTxgDrnbB_-kTOUFm38J2j0A"
+        ],
+        "impression": [
+            "https://tags.mathtag.com/notify/js?id=5aW95q2jLzE0LyAvTVRjME9UY3paR0V0WkRRd01pMDBaVFZqTFRrMFpUSXROamhoWW1FMk5qRTNPRE01Lzc2NjkyMTU1NzU0MjI4OTUwOC81NzAwMjAxLzM0MzY2NDkvOTYvY1YyalRnLTdfWlQzcVVCRlc3VFdTYjlabkVVM0wyQWlVeUwxVDJYUWtnVS8xLzk2LzAvMC80NzE5NTQvMjg4OTU0MjEzMi8xODgyODAvMzkyMTA2LzgvMC8yL01UYzBPVGN6WkdFdFpEUXdNaTAwWlRWakxUazBaVEl0TmpoaFltRTJOakUzT0RNNS8wLzAvMC8wLzAvNzY2OTIxNTU3NTQyMjg5NTA4L29yZC8/D7UTIsj7pHT3FktGvtL3CNT2JPc&nodeid=1066&auctionid=766921557542289508&exch=gor&sid=3436649&cid=5700201&price=${AUCTION_PRICE}&act=LiIiJiQocHxrPSwuJCMqcHxrKy5wfGshIioqJCMqcHw&group=us-east&bp=a_cjhhdj&src=api"
+        ]
+    },
+    "creativeId": "5700201",
+    "campaignId": "392106",
+    "buyerId": "101580",
+    "seatId": 9075,
+    "advDomain": "gotahoenorth.com",
+    "adType": "BANNER",
+    "cacheTTL": 7200,
+    "width": 320,
+    "height": 50,
+    "isMoatEnabled": true
+}

@@ -28,6 +28,7 @@ export interface IConfiguration {
     gdprEnabled: boolean;
     optOutRecorded: boolean;
     optOutEnabled: boolean;
+    defaultBannerPlacement: Placement | undefined;
 }
 
 export class Configuration extends Model<IConfiguration> {
@@ -49,7 +50,8 @@ export class Configuration extends Model<IConfiguration> {
         organizationId: ['string', 'undefined'],
         gdprEnabled: ['boolean'],
         optOutRecorded: ['boolean'],
-        optOutEnabled: ['boolean']
+        optOutEnabled: ['boolean'],
+        defaultBannerPlacement: ['string', 'undefined']
     };
 
     constructor(data: IConfiguration) {
@@ -100,6 +102,14 @@ export class Configuration extends Model<IConfiguration> {
         return this.getPlacements()[placementId];
     }
 
+    public removePlacements(ids: string[]) {
+        const placements = this.getPlacements();
+        ids.forEach((id) => {
+            delete placements[id];
+        });
+        this.set('placements', placements);
+    }
+
     public getPlacementIds(): string[] {
         const placementIds: string[] = [];
         for(const placement in this.getPlacements()) {
@@ -132,6 +142,10 @@ export class Configuration extends Model<IConfiguration> {
 
     public getDefaultPlacement(): Placement {
         return this.get('defaultPlacement');
+    }
+
+    public getDefaultBannerPlacement(): Placement | undefined {
+        return this.get('defaultBannerPlacement');
     }
 
     public getUnityProjectId(): string {

@@ -272,7 +272,7 @@ export class AdUnitFactory {
         const privacy = this.createPrivacy(nativeBridge, parameters);
         const showGDPRBanner = this.showGDPRBanner(parameters);
         const closer = new Closer(nativeBridge, parameters.placement, privacy, showGDPRBanner);
-        const vpaid = new VPAID(nativeBridge, <VPAIDCampaign>parameters.campaign, parameters.placement, showGDPRBanner);
+        const vpaid = new VPAID(nativeBridge, parameters.webPlayerContainer!, <VPAIDCampaign>parameters.campaign, parameters.placement, showGDPRBanner);
         let endScreen: VPAIDEndScreen | undefined;
 
         const vpaidAdUnitParameters: IVPAIDAdUnitParameters = {

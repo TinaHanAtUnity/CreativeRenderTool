@@ -26,16 +26,24 @@ import { Platform } from 'Constants/Platform';
 import { ProgrammaticOperativeEventManager } from 'Managers/ProgrammaticOperativeEventManager';
 import { GdprManager } from 'Managers/GdprManager';
 import { Privacy } from 'Views/Privacy';
+import { WebPlayerContainer } from 'Utilities/WebPlayer/WebPlayerContainer';
 
 describe('VPAIDAdUnit', () => {
     let nativeBridge: NativeBridge;
+    let webPlayerContainer: WebPlayerContainer;
     let parameters: IVPAIDAdUnitParameters;
     let adUnit: VPAIDAdUnit;
 
     beforeEach(() => {
         nativeBridge = sinon.createStubInstance(NativeBridge);
 
+        webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
+        (<sinon.SinonStub>webPlayerContainer.setSettings).returns(Promise.resolve());
+        (<sinon.SinonStub>webPlayerContainer.setEventSettings).returns(Promise.resolve());
+        (<any>webPlayerContainer).shouldOverrideUrlLoading = new Observable2<string, string>();
+
         parameters = {
+            webPlayerContainer,
             campaign: sinon.createStubInstance(VPAIDCampaign),
             closer: sinon.createStubInstance(Closer),
             vpaid: sinon.createStubInstance(VPAID),
@@ -54,12 +62,6 @@ describe('VPAIDAdUnit', () => {
             options: {},
             gdprManager: sinon.createStubInstance(GdprManager)
         };
-
-        const webPlayer = sinon.createStubInstance(WebPlayerApi);
-        (<sinon.SinonStub>webPlayer.setSettings).returns(Promise.resolve());
-        (<sinon.SinonStub>webPlayer.setEventSettings).returns(Promise.resolve());
-        (<any>webPlayer).shouldOverrideUrlLoading = new Observable2<string, string>();
-        (<any>nativeBridge).WebPlayer = webPlayer;
 
         (<any>nativeBridge).Listener = sinon.createStubInstance(ListenerApi);
 
@@ -97,8 +99,8 @@ describe('VPAIDAdUnit', () => {
             });
 
             it('should set up the web player', () => {
-                sinon.assert.calledOnce(<sinon.SinonSpy>nativeBridge.WebPlayer.setSettings);
-                sinon.assert.calledOnce(<sinon.SinonSpy>nativeBridge.WebPlayer.setEventSettings);
+                sinon.assert.calledOnce(<sinon.SinonSpy>webPlayerContainer.setSettings);
+                sinon.assert.calledOnce(<sinon.SinonSpy>webPlayerContainer.setEventSettings);
             });
 
             it('should open the container', () => {
