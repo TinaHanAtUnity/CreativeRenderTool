@@ -71,7 +71,7 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
                     return this.openUrl(url);
                 }
                 return this.followUrl(url).then((storeUrl) => {
-                    this.openUrl(storeUrl);
+                    return this.openUrl(storeUrl);
                 });
             }
         } else {
@@ -79,7 +79,7 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
                 return this.openUrl(url);
             }
             return this.followUrl(url).then((storeUrl) => {
-                this.openUrl(storeUrl);
+                return this.openUrl(storeUrl);
             });
         }
         return Promise.resolve();
