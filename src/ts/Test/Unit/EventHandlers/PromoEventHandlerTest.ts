@@ -23,7 +23,6 @@ import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 import { Configuration } from 'Models/Configuration';
-import { SinonStub, SinonSandbox } from 'sinon';
 import { ABGroup } from 'Models/ABGroup';
 import { PurchasingApi } from 'Native/Api/Purchasing';
 import { ClientInfo } from 'Models/ClientInfo';
