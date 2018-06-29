@@ -17,8 +17,7 @@ import { FinishState } from 'Constants/FinishState';
 import { Placement } from 'Models/Placement';
 import { Configuration } from 'Models/Configuration';
 import { GDPREventAction, GdprManager } from 'Managers/GdprManager';
-import { ABGroup } from 'Models/ABGroup';
-import { CTAOpenUrlAbTest } from 'Models/ABGroup';
+import { ABGroup, CTAOpenUrlAbTest } from 'Models/ABGroup';
 
 export class MRAIDEventHandler implements IMRAIDViewHandler {
 
