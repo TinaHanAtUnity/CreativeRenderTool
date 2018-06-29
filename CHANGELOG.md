@@ -1,4 +1,4 @@
-# Pending
+# Fri Jun 29 04:54:56 UTC 2018
 
 * Fix race condition in iOS video start event logic
 * Fix js_error when args is not an array or is undefined or null
