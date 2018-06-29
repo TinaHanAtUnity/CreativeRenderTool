@@ -17,7 +17,7 @@ export abstract class Asset<T extends IAsset = IAsset> extends Model<T> {
         cachedUrl: ['string', 'undefined'],
         fileId: ['string', 'undefined'],
         session: ['object'],
-        creativeId: ['string', 'undefined'],
+        creativeId: ['string', 'undefined']
     };
 
     constructor(name: string, session: Session, schema: ISchema<T>) {

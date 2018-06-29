@@ -94,7 +94,7 @@ export class TestFixtures {
             videoEventUrls: json.videoEventUrls,
             bypassAppSheet: json.bypassAppSheet,
             store: storeName,
-            adUnitStyle: json.adUnitStyle,
+            adUnitStyle: json.adUnitStyle
         };
 
         if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {

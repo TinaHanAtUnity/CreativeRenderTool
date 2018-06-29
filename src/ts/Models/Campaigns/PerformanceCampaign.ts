@@ -53,7 +53,7 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             videoEventUrls: ['object'],
             bypassAppSheet: ['boolean'],
             store: ['number'],
-            adUnitStyle: ['object', 'undefined'],
+            adUnitStyle: ['object', 'undefined']
         }, campaign);
     }
 
