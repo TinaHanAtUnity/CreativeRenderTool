@@ -18,9 +18,10 @@ import { JsonParser } from 'Utilities/JsonParser';
 import { StorageType } from 'Native/Api/Storage';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Cache } from 'Utilities/Cache';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { JaegerSpan } from 'Jaeger/JaegerSpan';
 import { UserCountData } from 'Utilities/UserCountData';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { MixedPlacementUtility } from 'Utilities/MixedPlacementUtility';
 
 export class OldCampaignRefreshManager extends RefreshManager {
     private _nativeBridge: NativeBridge;
@@ -217,8 +218,17 @@ export class OldCampaignRefreshManager extends RefreshManager {
     private onCampaign(placementId: string, campaign: Campaign) {
         this._parsingErrorCount = 0;
 
-        this.setCampaignForPlacement(placementId, campaign);
-        this.handlePlacementState(placementId, PlacementState.READY);
+        if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
+            if (MixedPlacementUtility.shouldFillMixedPlacement(placementId, this._configuration, campaign)) {
+                this.setCampaignForPlacement(placementId, campaign);
+                this.handlePlacementState(placementId, PlacementState.READY);
+            } else {
+                this.onNoFill(placementId);
+            }
+        } else {
+            this.setCampaignForPlacement(placementId, campaign);
+            this.handlePlacementState(placementId, PlacementState.READY);
+        }
     }
 
     private onNoFill(placementId: string) {
