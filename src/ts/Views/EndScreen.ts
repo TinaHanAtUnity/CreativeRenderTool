@@ -13,8 +13,7 @@ import { IEndScreenDownloadParameters } from 'EventHandlers/EndScreenEventHandle
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { Platform } from 'Constants/Platform';
-import { ABGroup } from 'Models/ABGroup';
-import { FancyEndScreenEnabledAbTest } from 'Models/ABGroup';
+import { ABGroup, FancyEndScreenEnabledAbTest } from 'Models/ABGroup';
 import { SquareEndScreenUtilities } from 'Utilities/SquareEndScreenUtilities';
 
 export interface IEndScreenHandler {

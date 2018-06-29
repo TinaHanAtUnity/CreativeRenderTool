@@ -10,8 +10,7 @@ import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 import { MOAT } from 'Views/MOAT';
 import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { ABGroup } from 'Models/ABGroup';
-import { CTAOpenUrlAbTest } from 'Models/ABGroup';
+import { ABGroup, CTAOpenUrlAbTest } from 'Models/ABGroup';
 
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _vastAdUnit: VastAdUnit;

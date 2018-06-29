@@ -1,6 +1,5 @@
 import { Platform } from 'Constants/Platform';
-import { ABGroup } from 'Models/ABGroup';
-import { SquareEndScreenEnabledAbTest } from 'Models/ABGroup';
+import { ABGroup, SquareEndScreenEnabledAbTest } from 'Models/ABGroup';
 
 export const SQUARE_CAMPAIGNS = [
     {
