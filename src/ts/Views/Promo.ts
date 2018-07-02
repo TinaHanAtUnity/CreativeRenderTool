@@ -140,6 +140,8 @@ export class Promo extends View<{}> implements IPrivacyHandler {
             case 'promo':
                 this.onPromoEvent(e);
                 break;
+            default:
+                break;
         }
     }
 
