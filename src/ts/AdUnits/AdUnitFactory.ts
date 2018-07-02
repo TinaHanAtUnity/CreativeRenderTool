@@ -45,8 +45,7 @@ import { MRAIDEndScreenEventHandler } from 'EventHandlers/MRAIDEndScreenEventHan
 import { PerformanceEndScreenEventHandler } from 'EventHandlers/PerformanceEndScreenEventHandler';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { XPromoEndScreen } from 'Views/XPromoEndScreen';
-import { IXPromoAdUnitParameters } from 'AdUnits/XPromoAdUnit';
-import { XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
+import { IXPromoAdUnitParameters, XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
 import { XPromoOverlayEventHandler } from 'EventHandlers/XPromoOverlayEventHandler';
 import { XPromoEndScreenEventHandler } from 'EventHandlers/XPromoEndScreenEventHandler';
 import { XPromoVideoEventHandler } from 'EventHandlers/XPromoVideoEventHandler';

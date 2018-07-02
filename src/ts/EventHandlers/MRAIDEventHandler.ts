@@ -17,6 +17,7 @@ import { FinishState } from 'Constants/FinishState';
 import { Placement } from 'Models/Placement';
 import { Configuration } from 'Models/Configuration';
 import { GDPREventAction, GdprManager } from 'Managers/GdprManager';
+import { ABGroup, CTAOpenUrlAbTest } from 'Models/ABGroup';
 
 export class MRAIDEventHandler implements IMRAIDViewHandler {
 
@@ -31,6 +32,7 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
     private _placement: Placement;
     private _configuration: Configuration;
     private _gdprManager: GdprManager;
+    private _abGroup: ABGroup;
 
     constructor(nativeBridge: NativeBridge, adUnit: MRAIDAdUnit, parameters: IMRAIDAdUnitParameters) {
         this._nativeBridge = nativeBridge;
@@ -44,6 +46,7 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
         this._request = parameters.request;
         this._configuration = parameters.configuration;
         this._gdprManager = parameters.gdprManager;
+        this._abGroup = parameters.configuration.getAbGroup();
     }
 
     public onMraidClick(url: string): Promise<void> {
@@ -63,13 +66,19 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
         if(this._campaign.getClickAttributionUrl()) {
             this.handleClickAttribution();
             if(!this._campaign.getClickAttributionUrlFollowsRedirects()) {
+                if (CTAOpenUrlAbTest.isValid(this._abGroup)) {
+                    return this.openUrl(url);
+                }
                 return this.followUrl(url).then((storeUrl) => {
-                    this.openUrl(storeUrl);
+                    return this.openUrl(storeUrl);
                 });
             }
         } else {
+            if (CTAOpenUrlAbTest.isValid(this._abGroup)) {
+                return this.openUrl(url);
+            }
             return this.followUrl(url).then((storeUrl) => {
-                this.openUrl(storeUrl);
+                return this.openUrl(storeUrl);
             });
         }
         return Promise.resolve();
@@ -165,11 +174,11 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
         }
     }
 
-    private openUrl(url: string) {
+    private openUrl(url: string): Promise<void> {
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
-            this._nativeBridge.UrlScheme.open(url);
-        } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            this._nativeBridge.Intent.launch({
+            return this._nativeBridge.UrlScheme.open(url);
+        } else {
+            return this._nativeBridge.Intent.launch({
                 'action': 'android.intent.action.VIEW',
                 'uri': url // todo: these come from 3rd party sources, should be validated before general MRAID support
             });

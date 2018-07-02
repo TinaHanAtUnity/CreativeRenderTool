@@ -13,7 +13,6 @@ import { FocusManager } from 'Managers/FocusManager';
 import { FileId } from 'Utilities/FileId';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
 import { FileInfo } from 'Utilities/FileInfo';
-import { SinonStub } from 'sinon';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 class TestCacheApi extends CacheApi {
@@ -162,7 +161,7 @@ describe('CacheTest', () => {
     let programmaticTrackingService: ProgrammaticTrackingService;
     let cacheManager: Cache;
     let wakeUpManager: WakeUpManager;
-    let isCachedStub: SinonStub;
+    let isCachedStub: sinon.SinonStub;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
