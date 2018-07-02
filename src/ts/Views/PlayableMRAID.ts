@@ -163,7 +163,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 this._arErrorObserver = this._nativeBridge.AR.onError.subscribe(errorCode => this.handleAREvent('error', JSON.stringify({errorCode})));
                 this._arSessionInterruptedObserver = this._nativeBridge.AR.onSessionInterrupted.subscribe(() => this.handleAREvent('sessioninterrupted', ''));
                 this._arSessionInterruptionEndedObserver = this._nativeBridge.AR.onSessionInterruptionEnded.subscribe(() => this.handleAREvent('sessioninterruptionended', ''));
-                window.addEventListener('deviceorientation', this.handleDeviceOrientation);
+                window.addEventListener('deviceorientation', event => this.handleDeviceOrientation(event));
             }
         });
 
