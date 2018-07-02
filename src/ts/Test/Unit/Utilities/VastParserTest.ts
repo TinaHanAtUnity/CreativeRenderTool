@@ -17,7 +17,7 @@ import RootVastDirty from 'xml/RootVastDirty.xml';
 import VastWithSpaces from 'xml/VastWithSpaces.xml';
 import VastCompanionAd from 'xml/VastCompanionAd.xml';
 import VastCompanionAdWithoutImages from 'xml/VastCompanionAdWithoutImages.xml';
-import VastCompanionAdWithoutClickthrough from 'xml/VastCompanionAdWithoutImages.xml';
+import VastCompanionAdWithoutClickThrough from 'xml/VastCompanionAdWithoutClickThrough.xml';
 
 describe('VastParser', () => {
     let request: Request;
@@ -230,13 +230,13 @@ describe('VastParser', () => {
         });
 
         it('should have correct companion landscape url when no clickthrough url is present', () => {
-            const vast = TestFixtures.getVastParser().parseVast(VastCompanionAdWithoutClickthrough);
-            assert.equal(vast.getCompanionLandscapeUrl(), null);
+            const vast = TestFixtures.getVastParser().parseVast(VastCompanionAdWithoutClickThrough);
+            assert.equal(vast.getCompanionLandscapeUrl(), 'http://unity.com/landscape.jpg');
         });
 
         it('should have correct companion portrait url when no clickthrough url is present', () => {
-            const vast = TestFixtures.getVastParser().parseVast(VastCompanionAdWithoutClickthrough);
-            assert.equal(vast.getCompanionPortraitUrl(), null);
+            const vast = TestFixtures.getVastParser().parseVast(VastCompanionAdWithoutClickThrough);
+            assert.equal(vast.getCompanionPortraitUrl(), 'http://unity.com/portrait.jpg');
         });
 
         it('should have the correct companion tracking urls', () => {

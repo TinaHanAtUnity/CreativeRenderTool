@@ -2,7 +2,6 @@ import 'mocha';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
 import { XHRequest } from 'Utilities/XHRequest';
-import { SinonStub } from 'sinon';
 
 describe('XHRequestTest', () => {
 
