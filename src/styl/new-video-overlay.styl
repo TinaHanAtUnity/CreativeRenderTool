@@ -23,18 +23,15 @@ $touchable-area-width = $new-video-overlay-size * 2.5;
     opacity: 1;
   }
 
+  .center {
+    flex: 6;
+  }
+  .right-corner,
   .left-corner {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 50%;
-    height: $touchable-area-height;
+    flex: 2;
   }
 
   .button {
-    position: absolute;
-    top: 0;
-    left: 0;
     width: $touchable-area-width;
     height: $touchable-area-height;
     opacity: 0;
@@ -46,8 +43,14 @@ $touchable-area-width = $new-video-overlay-size * 2.5;
   }
 
   .bottom-container {
+    position: absolute;
     top: auto;
     bottom: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: $touchable-area-height;
 
     .tab {
       top: auto;
@@ -83,9 +86,11 @@ $touchable-area-width = $new-video-overlay-size * 2.5;
 
   .gdpr-button {
     position: absolute;
+    top: 0;
     left: $touchable-area-width;
 
     .tab {
+      bottom: $new-video-overlay-size * .54;
       width: $new-video-overlay-size;
       height: $new-video-overlay-size;
       border-radius: $new-video-overlay-size * .2;
@@ -106,6 +111,9 @@ $touchable-area-width = $new-video-overlay-size * 2.5;
   }
 
   .call-button {
+    position: absolute;
+    right: 0;
+    bottom: 0;
     opacity: 1;
     transform: translateX(100%);
     transition: transform .4s ease-in;
@@ -213,16 +221,34 @@ $touchable-area-width = $new-video-overlay-size * 2.5;
     .gdpr-pop-up {
       // TODO: Is this correct scale-size to pass?
       $gdpr-pop-up($new-video-overlay-font-size);
-      width: 60%;
+      position: static;
+      margin: auto;
+      width: 90%;
+      height: $new-video-overlay-size * 1.5;
+      border-radius: $new-video-overlay-size * .2;
+      pointer-events: 1;
+
+      .icon-gdpr {
+        font-size: $new-video-overlay-font-size * .5;
+      }
 
       .gdpr-text {
         color: $black;
-        font-size: .5rem;
+        font-size: $new-video-overlay-font-size * .35;
       }
     }
+  }
 
+  &:not(.show-gdpr-button) {
     .gdpr-button {
       display: none;
+    }
+  }
+
+  &.show-gdpr-button {
+    .gdpr-button {
+      display: block;
+      pointer-events: 1;
     }
   }
 }

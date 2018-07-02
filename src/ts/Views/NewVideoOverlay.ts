@@ -28,8 +28,6 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _debugMessageElement: HTMLElement;
     private _callButtonElement: HTMLElement;
     private _timerElement: HTMLElement;
-    private _privacyButtonElement: HTMLElement;
-    private _GDPRPopupElement: HTMLElement;
 
     private _fadeTimer: any;
     private _areControlsVisible: boolean = false;
@@ -103,15 +101,13 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
 
         this._skipElement = <HTMLElement>this._container.querySelector('.skip-button');
         this._skipElement.style.display = 'none';
-
         this._spinnerElement = <HTMLElement>this._container.querySelector('.buffering-spinner');
         this._muteButtonElement = <HTMLElement>this._container.querySelector('.mute-button');
         this._debugMessageElement = <HTMLElement>this._container.querySelector('.debug-message-text');
-
         this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
         this._callButtonElement.style.display = 'block';
-
         this._timerElement = <HTMLElement>this._container.querySelector('.timer');
+        this.choosePrivacyShown();
     }
 
     public setSpinnerEnabled(value: boolean): void {
@@ -205,18 +201,15 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
 
     public choosePrivacyShown(): void {
         if (this._disablePrivacyDuringVideo) {
-            this._privacyButtonElement.style.visibility = 'hidden';
-            this._GDPRPopupElement.style.visibility = 'hidden';
-            this._privacyButtonElement.style.pointerEvents = '1';
-            this._GDPRPopupElement.style.pointerEvents = '1';
+            this._container.classList.remove('show-gdpr-banner');
+            this._container.classList.remove('show-gdpr-button');
         } else if (!this._gdprPopupClicked && this._showGDPRBanner) {
-            this._GDPRPopupElement.style.visibility = 'visible';
-            this._privacyButtonElement.style.pointerEvents = '1';
-            this._privacyButtonElement.style.visibility = 'hidden';
+            this._container.classList.add('show-gdpr-banner');
+            // TODO: ENABLE this._container.classList.remove('show-gdpr-button');
+            this._container.classList.add('show-gdpr-button');
         } else {
-            this._privacyButtonElement.style.visibility = 'visible';
-            this._GDPRPopupElement.style.pointerEvents = '1';
-            this._GDPRPopupElement.style.visibility = 'hidden';
+            this._container.classList.remove('show-gdpr-banner');
+            this._container.classList.add('show-gdpr-button');
         }
     }
 
