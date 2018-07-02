@@ -14,6 +14,7 @@ import { FileId } from 'Utilities/FileId';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
 import { FileInfo } from 'Utilities/FileInfo';
 import { SinonStub } from 'sinon';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 class TestCacheApi extends CacheApi {
 
@@ -158,6 +159,7 @@ describe('CacheTest', () => {
     let storageApi: TestStorageApi;
     let request: Request;
     let cacheBookkeeping: CacheBookkeeping;
+    let programmaticTrackingService: ProgrammaticTrackingService;
     let cacheManager: Cache;
     let wakeUpManager: WakeUpManager;
     let isCachedStub: SinonStub;
@@ -174,7 +176,8 @@ describe('CacheTest', () => {
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
         cacheBookkeeping = new CacheBookkeeping(nativeBridge);
-        cacheManager = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, {retries: 3, retryDelay: 1000});
+        programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+        cacheManager = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService, {retries: 3, retryDelay: 1000});
         isCachedStub = sinon.stub(FileInfo, 'isCached').returns(Promise.resolve(false));
     });
 
