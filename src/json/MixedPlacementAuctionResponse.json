@@ -1,0 +1,40 @@
+{
+    "auctionId": "bc2b3ca3-4698-40fd-8a90-3a368b83f96c",
+    "correlationId": "zhpq2G6WBwjsW5sF2Adsq4",
+    "media": {
+        "000000000000000000000000": {
+            "adType": "VIDEO",
+            "campaignId": "000000000000000000000000",
+			"content": "{\"id\":\"000000000000000000000000\",\"platform\":\"android\",\"store\":\"google\",\"appStoreId\":\"com.iUnity.angryBots\",\"gameId\":11017,\"gameName\":\"Test game android\",\"gameIcon\":\"http://cdn-highwinds.unityads.unity3d.com/impact/11017/test_game_icon.png\",\"rating\":4.5,\"ratingCount\":10000,\"endScreenLandscape\":\"http://cdn-highwinds.unityads.unity3d.com/impact/11017/test_endscreen_landscape.png\",\"endScreenPortrait\":\"http://cdn-highwinds.unityads.unity3d.com/impact/11017/test_endscreen_portrait.png\",\"trailerDownloadable\":\"http://cdn-highwinds.unityads.unity3d.com/impact/11017/blue_test_trailer_legacy.mp4\",\"trailerDownloadableSize\":134924,\"trailerStreaming\":\"http://cdn-highwinds.unityads.unity3d.com/impact/11017/blue_test_trailer.mp4\",\"clickUrl\":\"https://impact.applifier.com/mobile/campaigns/000000000000000000000000/click/50507b163822f20000000001?gameId=1543461\",\"videoEventUrls\":{\"video_start\":\"https://impact.applifier.com/mobile/gamers/50507b163822f20000000001/video/video_start/000000000000000000000000/1543461\",\"first_quartile\":\"https://impact.applifier.com/mobile/gamers/50507b163822f20000000001/video/first_quartile/000000000000000000000000/1543461\",\"midpoint\":\"https://impact.applifier.com/mobile/gamers/50507b163822f20000000001/video/midpoint/000000000000000000000000/1543461\",\"third_quartile\":\"https://impact.applifier.com/mobile/gamers/50507b163822f20000000001/video/third_quartile/000000000000000000000000/1543461\",\"video_end\":\"https://impact.applifier.com/mobile/gamers/50507b163822f20000000001/video/video_end/000000000000000000000000/1543461\"},\"bypassAppSheet\":false,\"quality\":\"\",\"adUnitStyle\":{\"ctaButtonColor\":\"#ff69b4\"}}",            "contentType": "comet/campaign",
+            "seatId": 9000,
+            "trackingUrls": {}
+        },
+        "1111111111111111111111": {
+            "adType": "IAP",
+            "buyerId": "iap-promo",
+            "cacheTTL": 7200,
+			"content": "{\"id\":\"59bab3d95d60bf6e8497a017\",\"iapProductId\":\"100.gold.coins\",\"rewardedPromo\":true,\"creativeUrl\":\"localhost:8000/creatives/rewardedPromo_wip.html}}\",\"dynamicMarkup\":\"\\u003cscript type=\\\"text/javascript\\\"\\u003e    HIDE_COUNTDOWN =  true ;    COUNTDOWN_SECONDS =  0 ;    IS_STICKY =  false ;\\u003c/script\\u003e\"}",            "contentType": "purchasing/iap",
+            "creativeId": "5a7a390114eeae82fd71bcc6",
+            "seatId": 9015,
+            "trackingUrls": {
+                "click": [
+                    "https://pixel.com/start"
+                ],
+                "complete": [
+                    "https://pixel.com/start"
+                ],
+                "impression": [
+                    "https://pixel.com/start"
+                ],
+                "purchase": [
+                    "https://pixel.com/start"
+                ]
+            }
+        }
+    },
+    "placements": {
+        "video": "000000000000000000000000",
+        "mixedPlacement": "1111111111111111111111"
+    },
+    "realtimeData": {}
+}

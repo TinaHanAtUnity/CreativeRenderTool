@@ -6,6 +6,7 @@ export interface IPromoCampaign extends ICampaign {
     additionalTrackingEvents: { [eventName: string]: string[] } | undefined;
     dynamicMarkup: string | undefined;
     creativeAsset: HTML;
+    rewardedPromo: boolean;
 }
 
 export class PromoCampaign extends Campaign<IPromoCampaign> {
@@ -15,7 +16,8 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
             iapProductId: ['string'],
             additionalTrackingEvents: ['object', 'undefined'],
             dynamicMarkup: ['string', 'undefined'],
-            creativeAsset: ['object']
+            creativeAsset: ['object'],
+            rewardedPromo: ['boolean']
         }, campaign);
     }
 
@@ -56,5 +58,9 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
 
     public getOptionalAssets() {
         return [];
+    }
+
+    public getRewardedPromo(): boolean {
+        return this.get('rewardedPromo');
     }
 }
