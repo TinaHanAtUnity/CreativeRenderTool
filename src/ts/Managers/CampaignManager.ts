@@ -6,7 +6,7 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { Platform } from 'Constants/Platform';
 import { NativeBridge } from 'Native/NativeBridge';
 import { MetaDataManager } from 'Managers/MetaDataManager';
-import { StorageType, StorageApi } from 'Native/Api/Storage';
+import { StorageType } from 'Native/Api/Storage';
 import { AssetManager } from 'Managers/AssetManager';
 import { WebViewError } from 'Errors/WebViewError';
 import { Configuration } from 'Models/Configuration';
@@ -32,9 +32,11 @@ import { CampaignParserFactory } from 'Managers/CampaignParserFactory';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
 import { UserCountData } from 'Utilities/UserCountData';
 import { JaegerManager } from 'Jaeger/JaegerManager';
-import { JaegerTags, JaegerSpan } from 'Jaeger/JaegerSpan';
+import { JaegerTags } from 'Jaeger/JaegerSpan';
 import { GameSessionCounters } from 'Utilities/GameSessionCounters';
 import { ABGroup } from 'Models/ABGroup';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { MixedPlacementUtility } from 'Utilities/MixedPlacementUtility';
 
 export class CampaignManager {
 
@@ -301,6 +303,9 @@ export class CampaignManager {
         if('placements' in json) {
             const fill: { [mediaId: string]: string[] } = {};
             const noFill: string[] = [];
+            if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
+                json.placements = MixedPlacementUtility.insertMediaIdsIntoJSON(this._configuration, json.placements);
+            }
 
             const placements = this._configuration.getPlacements();
             for(const placement in placements) {
@@ -681,7 +686,14 @@ export class CampaignManager {
                     body.frameworkVersion = framework.getVersion();
                 }
 
-                const placements = this._configuration.getPlacements();
+                let placements: { [id: string]: Placement } = {};
+
+                if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
+                    placements = MixedPlacementUtility.originalPlacements;
+                } else {
+                    placements = this._configuration.getPlacements();
+                }
+
                 for(const placement in placements) {
                     if(placements.hasOwnProperty(placement)) {
                         placementRequest[placement] = {
