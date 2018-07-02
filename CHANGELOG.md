@@ -1,4 +1,4 @@
-# Pending
+# Mon Jul  2 06:15:21 UTC 2018
 
 * Fix IAP Promo payload initialization check
 * Add configuration url to playable configuration diagnostic message
