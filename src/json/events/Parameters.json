@@ -509,5 +509,12 @@
     "description": "Whether the user has opted out from behavioral ads targeting in current game",
     "provider": "Server",
     "platforms": "all"
+  },
+  {
+    "key": "unityCreativeId",
+    "type": "string",
+    "description": "Creative id of the shown creative",
+    "provider": "SDK",
+    "platforms": "all"
   }
 ]

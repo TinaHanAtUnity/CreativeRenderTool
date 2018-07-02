@@ -336,14 +336,6 @@ describe('Event parameters should match specifications', () => {
     });
 
     describe('with click event', () => {
-        let operativeEventParams: IOperativeEventParams;
-
-        beforeEach(() => {
-            operativeEventParams = {
-                placement: TestFixtures.getPlacement()
-            };
-        });
-
         it('on Android', () => {
             const nativeBridge: NativeBridge = TestHelper.getNativeBridge(Platform.ANDROID);
             const focusManager = new FocusManager(nativeBridge);
@@ -366,6 +358,13 @@ describe('Event parameters should match specifications', () => {
                 campaign: campaign
             });
             OperativeEventManager.setPreviousPlacementId(undefined);
+
+            const operativeEventParams: IOperativeEventParams = {
+                placement: TestFixtures.getPlacement(),
+                videoOrientation: 'landscape',
+                adUnitStyle: campaign.getAdUnitStyle(),
+                asset: campaign.getVideo()
+            };
             return operativeEventManager.sendClick(operativeEventParams).then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];
@@ -397,8 +396,11 @@ describe('Event parameters should match specifications', () => {
                 campaign: campaign
             });
             OperativeEventManager.setPreviousPlacementId(undefined);
-            operativeEventParams = {
-                placement: TestFixtures.getPlacement()
+            const operativeEventParams: IOperativeEventParams = {
+                placement: TestFixtures.getPlacement(),
+                videoOrientation: 'landscape',
+                adUnitStyle: campaign.getAdUnitStyle(),
+                asset: campaign.getVideo()
             };
             return operativeEventManager.sendClick(operativeEventParams).then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
