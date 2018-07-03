@@ -316,7 +316,7 @@ describe('OperativeEventManagerTest', () => {
 
         describe('should send the proper data', () => {
             it('common data', () => {
-                return operativeEventManager.sendClick(placement).then(() => {
+                return operativeEventManager.sendClick({ placement: placement }).then(() => {
                     assert(requestSpy.calledOnce, 'Operative event did not send POST request');
                     const data = JSON.parse(requestSpy.getCall(0).args[1]);
 
@@ -347,7 +347,7 @@ describe('OperativeEventManagerTest', () => {
             });
 
             it('PerformanceCampaign specific', () => {
-                return operativeEventManager.sendClick(placement).then(() => {
+                return operativeEventManager.sendClick({ placement: placement }).then(() => {
                     assert(requestSpy.calledOnce, 'Operative event did not send POST request');
                     const data = JSON.parse(requestSpy.getCall(0).args[1]);
                     const url = requestSpy.getCall(0).args[0];
@@ -368,7 +368,7 @@ describe('OperativeEventManagerTest', () => {
 
                 const xPromoOperativeEventManager = <XPromoOperativeEventManager>OperativeEventManagerFactory.createOperativeEventManager(params);
                 HttpKafka.setRequest(request);
-                return xPromoOperativeEventManager.sendClick(placement, 'landscape').then(() => {
+                return xPromoOperativeEventManager.sendClick({ placement: placement, videoOrientation: 'landscape' }).then(() => {
                     assert(requestSpy.calledOnce, 'Operative event did not send POST request');
                     const url = requestSpy.getCall(0).args[0];
                     assert.equal(url, 'https://httpkafka.unityads.unity3d.com/v1/events', 'URL not what was expected');
@@ -383,7 +383,7 @@ describe('OperativeEventManagerTest', () => {
                 };
 
                 operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(params);
-                return operativeEventManager.sendClick(placement).then(() => {
+                return operativeEventManager.sendClick({ placement: placement }).then(() => {
                     assert(requestSpy.notCalled, 'Operative event did send POST request');
                 });
             });
@@ -396,7 +396,7 @@ describe('OperativeEventManagerTest', () => {
                 };
 
                 operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(params);
-                return operativeEventManager.sendClick(placement).then(() => {
+                return operativeEventManager.sendClick({ placement: placement }).then(() => {
                     assert(requestSpy.calledOnce, 'Operative event did not send POST request');
                     const data = JSON.parse(requestSpy.getCall(0).args[1]);
                     const url = requestSpy.getCall(0).args[0];
@@ -415,7 +415,7 @@ describe('OperativeEventManagerTest', () => {
                 };
 
                 operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(params);
-                return operativeEventManager.sendClick(placement).then(() => {
+                return operativeEventManager.sendClick({ placement: placement }).then(() => {
                     assert(requestSpy.notCalled, 'Operative event did send POST request');
                 });
             });
