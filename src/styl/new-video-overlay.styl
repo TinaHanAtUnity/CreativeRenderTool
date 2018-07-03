@@ -12,6 +12,20 @@ $touchable-area-width = $new-video-overlay-size * 2.5;
 #end-screen {
   visibility: hidden;
 }
+
+
+@media (orientation: portrait) {
+  #new-video-overlay {
+    .bottom-container {
+      height: $touchable-area-height * 2.5;
+    }
+
+    .show-gdpr-banner .gdpr-pop-up {
+      width: 90%;
+    }
+  }
+}
+
 #new-video-overlay {
   width: 100%;
   height: 100%;
@@ -21,14 +35,6 @@ $touchable-area-width = $new-video-overlay-size * 2.5;
 
   &.fade-in .button {
     opacity: 1;
-  }
-
-  .center {
-    flex: 6;
-  }
-  .right-corner,
-  .left-corner {
-    flex: 2;
   }
 
   .button {
@@ -47,14 +53,32 @@ $touchable-area-width = $new-video-overlay-size * 2.5;
     top: auto;
     bottom: 0;
     left: 0;
-    display: flex;
     align-items: center;
     width: 100%;
     height: $touchable-area-height;
 
+    .center,
     .tab {
       top: auto;
       bottom: $new-video-overlay-size * .3;
+    }
+
+    .center {
+      position: absolute;
+      margin: auto;
+      width: 100%;
+    }
+
+    .right-corner {
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+
+    .left-corner {
+      position: absolute;
+      top: 0;
+      left: 0;
     }
   }
 
@@ -111,9 +135,6 @@ $touchable-area-width = $new-video-overlay-size * 2.5;
   }
 
   .call-button {
-    position: absolute;
-    right: 0;
-    bottom: 0;
     opacity: 1;
     transform: translateX(100%);
     transition: transform .4s ease-in;
@@ -223,7 +244,7 @@ $touchable-area-width = $new-video-overlay-size * 2.5;
       $gdpr-pop-up($new-video-overlay-font-size);
       position: static;
       margin: auto;
-      width: 90%;
+      width: 50%;
       height: $new-video-overlay-size * 1.5;
       border-radius: $new-video-overlay-size * .2;
       pointer-events: 1;
