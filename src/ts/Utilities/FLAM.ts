@@ -2,7 +2,7 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { NativeBridge } from 'Native/NativeBridge';
 import { StorageType } from 'Native/Api/Storage';
 
-import Base64Data from 'Utilities/Base64data';
+import { Base64data } from 'Utilities/Base64data';
 
 interface IFLAMTest {
     name: string;
@@ -30,9 +30,9 @@ class FLAMSingleton {
     private static _instance: FLAMSingleton;
     private _FLAMTestResult: { [key: string]: boolean } = {};
     private _FLAMTests: { [key: string]: IFLAMTest } = {
-        webp: {name: 'webp', type: 'img', base64data: Base64Data.images.webp},
-        hevc: {name: 'hevc', type: 'video', base64data: Base64Data.video.hevc},
-        vp9: {name: 'vp9', type: 'video', base64data: Base64Data.video.vp9}
+        webp: {name: 'webp', type: 'img', base64data: Base64data.images.webp},
+        hevc: {name: 'hevc', type: 'video', base64data: Base64data.video.hevc},
+        vp9: {name: 'vp9', type: 'video', base64data: Base64data.video.vp9}
     };
 
     constructor() {
