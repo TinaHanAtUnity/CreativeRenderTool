@@ -8,6 +8,7 @@ $tab-font-color = "#f1f1f1";
 $fade-transition = opacity .45s ease-in;
 $touchable-area-height = $new-video-overlay-size * 2;
 $touchable-area-width = $new-video-overlay-size * 2.5;
+$tab-border-radius = $new-video-overlay-size * .2;
 
 slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
   transform: translateX($translation);
@@ -61,8 +62,14 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
 
     .center {
       position: absolute;
+      z-index: 1;
       margin: auto;
       width: 100%;
+    }
+
+    .right-corner,
+    .left-corner {
+      z-index: 10;
     }
 
     .right-corner {
@@ -85,7 +92,7 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
     .tab {
       right: 0;
       left: auto;
-      border-radius: $new-video-overlay-size * .2 0 0 $new-video-overlay-size * .2;
+      border-radius: $tab-border-radius 0 0 $tab-border-radius;
     }
   }
 
@@ -95,7 +102,7 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
     left: 0;
     width: $new-video-overlay-size * 2;
     height: $new-video-overlay-size * 1.5;
-    border-radius: 0 $new-video-overlay-size * .2 $new-video-overlay-size * .2 0;
+    border-radius: 0 $tab-border-radius $tab-border-radius 0;
     background-color: rgba(0, 0, 0, .54);
     color: $tab-font-color;
     text-align: center;
@@ -113,7 +120,7 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
       bottom: $new-video-overlay-size * .54;
       width: $new-video-overlay-size;
       height: $new-video-overlay-size;
-      border-radius: $new-video-overlay-size * .2;
+      border-radius: $tab-border-radius;
       font-size: $new-video-overlay-size * .5;
     }
 
@@ -242,7 +249,7 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
       margin: auto;
       width: 50%;
       height: $new-video-overlay-size * 1.5;
-      border-radius: $new-video-overlay-size * .2;
+      border-radius: $tab-border-radius;
       pointer-events: 1;
 
       .icon-gdpr {
@@ -270,10 +277,22 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
   }
 }
 
+/**
+ * Portrait layout customization
+ */
+
 @media (orientation: portrait) {
   #new-video-overlay {
     .bottom-container {
-      height: $touchable-area-height * 2.5;
+      height: $touchable-area-height * 2;
+
+      .center {
+        bottom: 0;
+
+        .gdpr-pop-up {
+          border-radius: $tab-border-radius $tab-border-radius 0 0;
+        }
+      }
     }
 
     &.show-gdpr-banner .gdpr-pop-up {
@@ -282,33 +301,24 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
   }
 }
 
-@media (max-width: 768px) and (min-width: 569px) and (orientation: landscape) {
+/**
+ * Landscape font sizes
+ */
+@media (max-width: 568px) and (min-width: 447px) and (orientation: landscape) {
+  html.new-video-overlay {
+      font-size: 19px;
+  }
+}
+
+@media (max-width: 1024px) and (min-width: 751px) and (orientation: landscape) {
+  html.new-video-overlay {
+      font-size: 32px;
+  }
+}
+
+@media (max-width: 750px) and (min-width: 569px) and (orientation: landscape) {
   html.new-video-overlay {
     font-size: 25px;
-  }
-}
-
-@media (max-width: 568px) and (min-width: 481px) and (orientation: portrait) {
-  html.new-video-overlay {
-      font-size: 26.4px;
-  }
-}
-
-@media (max-width: 480px) and (min-width: 414px) and (orientation: portrait) {
-  html.new-video-overlay {
-      font-size: 23.8px;
-  }
-}
-
-@media (max-width: 413px) and (min-width: 360px) and (orientation: portrait) {
-  html.new-video-overlay {
-      font-size: 20.2px;
-  }
-}
-
-@media (max-width: 359px) and (min-width: 321px) and (orientation: portrait) {
-  html.new-video-overlay {
-      font-size: 18px;
   }
 }
 
@@ -321,5 +331,39 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
 @media (max-width: 800px) and (min-width: 769px) and (orientation: landscape) {
   html.new-video-overlay {
     font-size: 32px;
+  }
+}
+
+/**
+ * Portrait font sizes
+ */
+
+@media (max-width: 568px) and (min-width: 481px) and (orientation: portrait) {
+  html.new-video-overlay {
+      font-size: 30px;
+  }
+}
+
+@media (max-width: 480px) and (min-width: 414px) and (orientation: portrait) {
+  html.new-video-overlay {
+      font-size: 28px;
+  }
+}
+
+@media (max-width: 413px) and (min-width: 360px) and (orientation: portrait) {
+  html.new-video-overlay {
+      font-size: 28px;
+  }
+}
+
+@media (max-width: 359px) and (min-width: 321px) and (orientation: portrait) {
+  html.new-video-overlay {
+      font-size: 26px;
+  }
+}
+
+@media (max-width: 320px) and (orientation: portrait) {
+  html.new-video-overlay {
+      font-size: 20px;
   }
 }

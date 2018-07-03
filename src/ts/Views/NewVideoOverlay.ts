@@ -41,8 +41,8 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
 
         this._localization = new Localization(language, 'overlay');
         this._privacy = privacy;
-        this._showGDPRBanner = showGDPRBanner;
-        this._disablePrivacyDuringVideo = disablePrivacyDuringVideo;
+        this._showGDPRBanner = true; // showGDPRBanner;
+        this._disablePrivacyDuringVideo = false; // disablePrivacyDuringVideo;
         this._template = new Template(NewVideoOverlayTemplate, this._localization);
 
         this._templateData = {
@@ -109,6 +109,21 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._callButtonElement.style.display = 'block';
         this._timerElement = <HTMLElement>this._container.querySelector('.timer');
         this.choosePrivacyShown();
+    }
+
+    public hide() {
+        super.hide();
+
+        document.documentElement.classList.remove('new-video-overlay');
+        if (this._privacy) {
+            this._privacy.hide();
+            document.body.removeChild(this._privacy.container());
+            delete this._privacy;
+        }
+
+        if (this._showGDPRBanner && !this._gdprPopupClicked) {
+            this._handlers.forEach(handler => handler.onGDPRPopupSkipped());
+        }
     }
 
     public setSpinnerEnabled(value: boolean): void {
