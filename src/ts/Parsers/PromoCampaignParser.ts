@@ -8,21 +8,22 @@ import { IPromoCampaign, PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 import { AuctionResponse } from 'Models/AuctionResponse';
 import { Session } from 'Models/Session';
 import { HTML } from 'Models/Assets/HTML';
+import { ABGroup } from 'Models/ABGroup';
 
 export class PromoCampaignParser extends CampaignParser {
     public static ContentType = 'purchasing/iap';
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: ABGroup): Promise<Campaign> {
         const promoJson = JsonParser.parse(response.getContent());
         if (promoJson && promoJson.iapProductId) {
-            return PurchasingUtilities.refreshCatalog(nativeBridge).then(() => {
-                if (PurchasingUtilities.productAvailable(promoJson.iapProductId)) {
+            return PurchasingUtilities.refreshCatalog().then(() => {
+                if (PurchasingUtilities.isProductAvailable(promoJson.iapProductId)) {
 
                     const baseCampaignParams: ICampaign = {
                         id: promoJson.id,
                         gamerId: gamerId,
                         abGroup: abGroup,
                         willExpireAt: promoJson.expiry ? parseInt(promoJson.expiry, 10) * 1000 : undefined,
-                        adType: undefined,
+                        adType: promoJson.contentType || response.getContentType() || undefined,
                         correlationId: undefined,
                         creativeId: undefined,
                         seatId: undefined,
@@ -36,7 +37,8 @@ export class PromoCampaignParser extends CampaignParser {
                         iapProductId: promoJson.iapProductId,
                         additionalTrackingEvents: response.getTrackingUrls() ? response.getTrackingUrls() : undefined,
                         dynamicMarkup: promoJson.dynamicMarkup,
-                        creativeAsset: new HTML(promoJson.creativeUrl, session)
+                        creativeAsset: new HTML(promoJson.creativeUrl, session),
+                        rewardedPromo: promoJson.rewardedPromo ? promoJson.rewardedPromo : false
                     };
 
                     const promoCampaign = new PromoCampaign(promoCampaignParams);

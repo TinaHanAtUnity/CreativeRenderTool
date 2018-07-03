@@ -21,14 +21,14 @@ import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { Video } from 'Models/Assets/Video';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { FocusManager } from 'Managers/FocusManager';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { OperativeEventManager, IOperativeSkipEventParams } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 import { Placement } from 'Models/Placement';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { Configuration } from 'Models/Configuration';
 import { Privacy } from 'Views/Privacy';
-import { GdprConsentManager } from 'Managers/GdprConsentManager';
+import { GdprManager } from 'Managers/GdprManager';
 
 describe('OverlayEventHandlerTest', () => {
 
@@ -85,9 +85,9 @@ describe('OverlayEventHandlerTest', () => {
 
         const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
         endScreen = new PerformanceEndScreen(nativeBridge, campaign, deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, false);
-        overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
+        overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
         placement = TestFixtures.getPlacement();
-        const gdprManager = sinon.createStubInstance(GdprConsentManager);
+        const gdprManager = sinon.createStubInstance(GdprManager);
 
         performanceAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,
@@ -138,7 +138,14 @@ describe('OverlayEventHandlerTest', () => {
         });
 
         it('should send skip', () => {
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendSkip, placement, performanceAdUnit.getVideo().getPosition());
+            const params: IOperativeSkipEventParams = { placement: placement,
+                videoOrientation: performanceAdUnit.getVideoOrientation(),
+                adUnitStyle: undefined,
+                asset: performanceAdUnit.getVideo(),
+                videoProgress: performanceAdUnit.getVideo().getPosition()
+            };
+
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendSkip, params);
         });
 
         it('should call reconfigure', () => {

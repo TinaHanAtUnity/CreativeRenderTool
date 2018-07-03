@@ -41,11 +41,11 @@ export interface ITouchCounts {
 }
 
 export interface ITouchInfo {
-    start: IPoint;
-    end: IPoint;
-    diameter: number;
-    pressure: number;
-    duration: number;
+    start: IPoint | undefined;
+    end: IPoint | undefined;
+    diameter: number | undefined;
+    pressure: number | undefined;
+    duration: number | undefined;
     counts: ITouchCounts;
 }
 

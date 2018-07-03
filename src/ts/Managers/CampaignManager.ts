@@ -6,7 +6,7 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { Platform } from 'Constants/Platform';
 import { NativeBridge } from 'Native/NativeBridge';
 import { MetaDataManager } from 'Managers/MetaDataManager';
-import { StorageType, StorageApi } from 'Native/Api/Storage';
+import { StorageType } from 'Native/Api/Storage';
 import { AssetManager } from 'Managers/AssetManager';
 import { WebViewError } from 'Errors/WebViewError';
 import { Configuration } from 'Models/Configuration';
@@ -32,12 +32,15 @@ import { CampaignParserFactory } from 'Managers/CampaignParserFactory';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
 import { UserCountData } from 'Utilities/UserCountData';
 import { JaegerManager } from 'Jaeger/JaegerManager';
-import { JaegerTags, JaegerSpan } from 'Jaeger/JaegerSpan';
+import { JaegerTags } from 'Jaeger/JaegerSpan';
 import { GameSessionCounters } from 'Utilities/GameSessionCounters';
+import { ABGroup } from 'Models/ABGroup';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { MixedPlacementUtility } from 'Utilities/MixedPlacementUtility';
 
 export class CampaignManager {
 
-    public static setAbGroup(abGroup: number) {
+    public static setAbGroup(abGroup: ABGroup) {
         CampaignManager.AbGroup = abGroup;
     }
 
@@ -63,7 +66,7 @@ export class CampaignManager {
 
     protected static CampaignResponse: string | undefined;
 
-    protected static AbGroup: number | undefined;
+    protected static AbGroup: ABGroup | undefined;
 
     private static BaseUrl: string = 'https://auction.unityads.unity3d.com/v4/games';
 
@@ -300,6 +303,9 @@ export class CampaignManager {
         if('placements' in json) {
             const fill: { [mediaId: string]: string[] } = {};
             const noFill: string[] = [];
+            if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
+                json.placements = MixedPlacementUtility.insertMediaIdsIntoJSON(this._configuration, json.placements);
+            }
 
             const placements = this._configuration.getPlacements();
             for(const placement in placements) {
@@ -413,7 +419,7 @@ export class CampaignManager {
         }
 
         const parseTimestamp = Date.now();
-        return parser.parse(this._nativeBridge, this._request, response, session, this._configuration.getGamerId(), this.getAbGroup()).then((campaign) => {
+        return parser.parse(this._nativeBridge, this._request, response, session, this._configuration.getGamerId(), this.getAbGroup(), this._deviceInfo.getOsVersion()).then((campaign) => {
             const parseDuration = Date.now() - parseTimestamp;
             for(const placement of response.getPlacements()) {
                 SdkStats.setParseDuration(placement, parseDuration);
@@ -474,7 +480,7 @@ export class CampaignManager {
         ].join('/');
     }
 
-    private getAbGroup(): number {
+    private getAbGroup(): ABGroup {
         return CampaignManager.AbGroup ? CampaignManager.AbGroup : this._configuration.getAbGroup();
     }
 
@@ -548,7 +554,7 @@ export class CampaignManager {
 
         if(CampaignManager.AbGroup) {
             url = Url.addParameters(url, {
-                forceAbGroup: CampaignManager.AbGroup
+                forceAbGroup: CampaignManager.AbGroup.toNumber()
             });
         }
 
@@ -586,7 +592,7 @@ export class CampaignManager {
                 if (placements.hasOwnProperty(placement)) {
                     placementRequest[placement] = {
                         adTypes: placements[placement].getAdTypes(),
-                        allowSkip: placements[placement].allowSkip(),
+                        allowSkip: placements[placement].allowSkip()
                     };
                 }
             }
@@ -680,12 +686,19 @@ export class CampaignManager {
                     body.frameworkVersion = framework.getVersion();
                 }
 
-                const placements = this._configuration.getPlacements();
+                let placements: { [id: string]: Placement } = {};
+
+                if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
+                    placements = MixedPlacementUtility.originalPlacements;
+                } else {
+                    placements = this._configuration.getPlacements();
+                }
+
                 for(const placement in placements) {
                     if(placements.hasOwnProperty(placement)) {
                         placementRequest[placement] = {
                             adTypes: placements[placement].getAdTypes(),
-                            allowSkip: placements[placement].allowSkip(),
+                            allowSkip: placements[placement].allowSkip()
                         };
                     }
                 }

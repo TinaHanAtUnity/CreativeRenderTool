@@ -7,29 +7,39 @@ import { Placement } from 'Models/Placement';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { Platform } from 'Constants/Platform';
 import { Template } from 'Utilities/Template';
+import { ENGINE_METHOD_DIGESTS } from 'constants';
+import { IPrivacyHandler, AbstractPrivacy } from 'Views/AbstractPrivacy';
 
 export interface IDisplayInterstitialHandler {
     onDisplayInterstitialClose(): void;
+    onGDPRPopupSkipped(): void;
 }
 
-export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
+export class DisplayInterstitial extends View<IDisplayInterstitialHandler> implements IPrivacyHandler {
 
     private _placement: Placement;
     private _campaign: DisplayInterstitialCampaign;
 
     private _closeElement: HTMLElement;
+    private _GDPRPopupElement: HTMLElement;
+    private _privacyButtonElement: HTMLElement;
+    private _privacy: AbstractPrivacy;
+    private _gdprPopupClicked: boolean = false;
 
     private _webPlayerPrepared = false;
 
     private _messageListener: EventListener;
     private _timers: number[] = [];
+    private _showGDPRBanner: boolean;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: DisplayInterstitialCampaign) {
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: DisplayInterstitialCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
         super(nativeBridge, 'display-interstitial');
 
         this._placement = placement;
         this._campaign = campaign;
         this._template = new Template(DisplayInterstitialTemplate);
+        this._privacy = privacy;
+        this._showGDPRBanner = showGDPRBanner;
 
         this._messageListener = (e: Event) => this.onMessage(<MessageEvent>e);
 
@@ -37,19 +47,38 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
             {
                 event: 'click',
                 listener: (event: Event) => this.onCloseEvent(event),
-                selector: '.close-region'
+                selector: '.close'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onGDPRPopupEvent(event),
+                selector: '.gdpr-link'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onPrivacyEvent(event),
+                selector: '.icon-gdpr'
             }
         ];
+
+        this._privacy.render();
+        this._privacy.hide();
+        document.body.appendChild(this._privacy.container());
+        this._privacy.addEventHandler(this);
     }
 
     public render() {
         super.render();
 
         this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
+        this._GDPRPopupElement = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
+        this._privacyButtonElement = <HTMLElement>this._container.querySelector('.privacy-button');
     }
 
     public show(): void {
         super.show();
+
+        this.choosePrivacyShown();
 
         window.addEventListener('message', this._messageListener);
         this._closeElement.style.opacity = '1';
@@ -60,10 +89,44 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
         window.removeEventListener('message', this._messageListener);
         super.hide();
 
+        if (this._privacy.container().parentElement) {
+            document.body.removeChild(this._privacy.container());
+        }
+
         for (const timer of this._timers) {
             window.clearInterval(timer);
         }
         this._timers = [];
+
+        if (this._showGDPRBanner && !this._gdprPopupClicked) {
+            this._handlers.forEach(handler => handler.onGDPRPopupSkipped());
+        }
+    }
+
+    public onPrivacy(url: string): void {
+        // do nothing
+    }
+
+    public onPrivacyClose(): void {
+        if (this._privacy) {
+            this._privacy.hide();
+        }
+    }
+
+    public onGDPROptOut(optOutEnabled: boolean): void {
+        // do nothing
+    }
+
+    private choosePrivacyShown(): void {
+        if (!this._gdprPopupClicked && this._showGDPRBanner) {
+            this._GDPRPopupElement.style.visibility = 'visible';
+            this._privacyButtonElement.style.pointerEvents = '1';
+            this._privacyButtonElement.style.visibility = 'hidden';
+        } else {
+            this._privacyButtonElement.style.visibility = 'visible';
+            this._GDPRPopupElement.style.pointerEvents = '1';
+            this._GDPRPopupElement.style.visibility = 'hidden';
+        }
     }
 
     private clearTimer(handle: number) {
@@ -103,6 +166,22 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> {
         event.preventDefault();
         event.stopPropagation();
         this._handlers.forEach(handler => handler.onDisplayInterstitialClose());
+    }
+
+    private onGDPRPopupEvent(event: Event) {
+        event.preventDefault();
+
+        if (!this._gdprPopupClicked) {
+            this._gdprPopupClicked = true;
+            this.choosePrivacyShown();
+        }
+        this._privacy.show();
+    }
+
+    private onPrivacyEvent(event: Event) {
+        event.preventDefault();
+
+        this._privacy.show();
     }
 
     private onMessage(e: MessageEvent) {

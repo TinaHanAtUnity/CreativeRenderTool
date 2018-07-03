@@ -4,7 +4,7 @@ import { FinishState } from 'Constants/FinishState';
 import { IObserver2, IObserver1 } from 'Utilities/IObserver';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { DisplayInterstitial } from 'Views/DisplayInterstitial';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { OperativeEventManager, IOperativeEventParams } from 'Managers/OperativeEventManager';
 import { Platform } from 'Constants/Platform';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { Placement } from 'Models/Placement';
@@ -15,6 +15,8 @@ import { IWebPlayerWebSettingsAndroid, IWebPlayerWebSettingsIos } from 'Native/A
 import { Url } from 'Utilities/Url';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { AdUnitContainerSystemMessage, IAdUnitContainerListener } from 'AdUnits/Containers/AdUnitContainer';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { ClientInfo } from 'Models/ClientInfo';
 
 export interface IDisplayInterstitialAdUnitParameters extends IAdUnitParameters<DisplayInterstitialCampaign> {
     view: DisplayInterstitial;
@@ -29,6 +31,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
     private _campaign: DisplayInterstitialCampaign;
     private _placement: Placement;
     private _deviceInfo: DeviceInfo;
+    private _clientInfo: ClientInfo;
     private _receivedOnPageStart: boolean = false;
     private _clickEventHasBeenSent: boolean = false;
     private _handlingShouldOverrideUrlLoading: boolean = false;
@@ -48,6 +51,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
         this._campaign = parameters.campaign;
         this._placement = parameters.placement;
         this._deviceInfo = parameters.deviceInfo;
+        this._clientInfo = parameters.clientInfo;
 
         this._view.render();
         document.body.appendChild(this._view.container());
@@ -131,6 +135,9 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
     }
 
     public onContainerBackground(): void {
+        if(this.isShowing() && CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
+            this.hide();
+        }
         // EMPTY
     }
 
@@ -176,7 +183,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
         }
         const webviewXPos = screenWidth - webviewAreaSize;
         const webviewYPos = 0;
-        return this._container.setViewFrame('webview', Math.floor(webviewXPos), Math.floor(webviewYPos), Math.floor(webviewAreaSize), Math.floor(webviewAreaSize));
+        return this._container.setViewFrame('webview', 0, 0, screenWidth, screenHeight);
     }
 
     private onPageStarted(url: string): void {
@@ -188,12 +195,11 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
         if(this._clickEventHasBeenSent) {
             return;
         }
-        this._operativeEventManager.sendClick(this._placement);
+
+        this._operativeEventManager.sendClick(this.getOperativeEventParams());
         this._clickEventHasBeenSent = true;
 
-        for (let trackingUrl of this._campaign.getTrackingUrlsForEvent('click')) {
-            trackingUrl = trackingUrl.replace(/%ZONE%/, this._placement.getId());
-            trackingUrl = trackingUrl.replace(/%SDK_VERSION%/, this._operativeEventManager.getClientInfo().getSdkVersion().toString());
+        for (const trackingUrl of this._campaign.getTrackingUrlsForEvent('click')) {
             this._thirdPartyEventManager.sendEvent('display click', this._campaign.getSession().getId(), trackingUrl);
         }
     }
@@ -241,12 +247,10 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
     }
 
     private sendStartEvents(): void {
-        for (let url of (this._campaign).getTrackingUrlsForEvent('impression')) {
-            url = url.replace(/%ZONE%/, this._campaign.getId());
-            url = url.replace(/%SDK_VERSION%/, this._operativeEventManager.getClientInfo().getSdkVersion().toString());
+        for (const url of (this._campaign).getTrackingUrlsForEvent('impression')) {
             this._thirdPartyEventManager.sendEvent('display impression', this._campaign.getSession().getId(), url);
         }
-        this._operativeEventManager.sendStart(this._placement).then(() => {
+        this._operativeEventManager.sendStart(this.getOperativeEventParams()).then(() => {
             this.onStartProcessed.trigger();
         });
     }
@@ -299,5 +303,11 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
                 this._contentReady = true;
             });
         });
+    }
+
+    private getOperativeEventParams(): IOperativeEventParams {
+        return {
+            placement: this._placement
+        };
     }
 }

@@ -19,7 +19,7 @@ import { PerformanceCampaign, StoreName } from 'Models/Campaigns/PerformanceCamp
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { Video } from 'Models/Assets/Video';
 import { FocusManager } from 'Managers/FocusManager';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { IOperativeEventParams, OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { PerformanceEndScreenEventHandler } from 'EventHandlers/PerformanceEndScreenEventHandler';
 import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
@@ -27,7 +27,7 @@ import { Placement } from 'Models/Placement';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { Configuration } from 'Models/Configuration';
 import { Privacy } from 'Views/Privacy';
-import { GdprConsentManager } from 'Managers/GdprConsentManager';
+import { GdprManager } from 'Managers/GdprManager';
 
 describe('EndScreenEventHandlerTest', () => {
 
@@ -87,9 +87,9 @@ describe('EndScreenEventHandlerTest', () => {
 
             const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
             endScreen = new PerformanceEndScreen(nativeBridge, TestFixtures.getCampaign(), deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, false);
-            overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
+            overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
             placement = TestFixtures.getPlacement();
-            const gdprManager = sinon.createStubInstance(GdprConsentManager);
+            const gdprManager = sinon.createStubInstance(GdprManager);
 
             performanceAdUnitParameters = {
                 forceOrientation: Orientation.LANDSCAPE,
@@ -125,7 +125,12 @@ describe('EndScreenEventHandlerTest', () => {
                 clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
             });
 
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, placement);
+            const params: IOperativeEventParams = { placement: placement,
+                videoOrientation: 'landscape',
+                adUnitStyle: undefined,
+                asset: performanceAdUnit.getVideo()
+            };
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, params);
         });
 
         describe('with follow redirects', () => {
@@ -257,7 +262,12 @@ describe('EndScreenEventHandlerTest', () => {
             });
 
             it('should send a click with session manager', () => {
-                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, placement);
+                const params: IOperativeEventParams = { placement: placement,
+                    videoOrientation: 'landscape',
+                    adUnitStyle: undefined,
+                    asset: performanceAdUnit.getVideo()
+                };
+                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, params);
             });
 
             it('should launch market view', () => {
@@ -280,7 +290,7 @@ describe('EndScreenEventHandlerTest', () => {
                 handleCallback
             }, Platform.IOS);
 
-            container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager);
+            container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager, clientInfo);
             const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request = new Request(nativeBridge, wakeUpManager);
             clientInfo = TestFixtures.getClientInfo(Platform.IOS);
@@ -311,8 +321,8 @@ describe('EndScreenEventHandlerTest', () => {
 
             const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
             endScreen = new PerformanceEndScreen(nativeBridge, campaign, deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, false);
-            overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId());
-            const gdprManager = sinon.createStubInstance(GdprConsentManager);
+            overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
+            const gdprManager = sinon.createStubInstance(GdprManager);
 
             performanceAdUnitParameters = {
                 forceOrientation: Orientation.LANDSCAPE,
@@ -353,7 +363,12 @@ describe('EndScreenEventHandlerTest', () => {
                 clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
             });
 
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, placement);
+            const params: IOperativeEventParams = { placement: placement,
+                videoOrientation: 'landscape',
+                adUnitStyle: undefined,
+                asset: performanceAdUnit.getVideo()
+            };
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, params);
         });
 
         describe('with follow redirects', () => {
@@ -508,7 +523,12 @@ describe('EndScreenEventHandlerTest', () => {
             });
 
             it('should send a click with session manager', () => {
-                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, placement);
+                const params: IOperativeEventParams = { placement: placement,
+                    videoOrientation: 'landscape',
+                    adUnitStyle: undefined,
+                    asset: performanceAdUnit.getVideo()
+                };
+                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, params);
             });
         });
     });

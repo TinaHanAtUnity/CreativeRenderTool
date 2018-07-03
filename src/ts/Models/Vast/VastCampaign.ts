@@ -17,6 +17,7 @@ export interface IVastCampaign extends IProgrammaticCampaign {
     advertiserCampaignId: string | undefined;
     advertiserBundleId: string | undefined;
     buyerId: string | undefined;
+    isMoatEnabled: boolean | undefined;
 }
 
 export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
@@ -34,6 +35,7 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
             advertiserCampaignId: ['string', 'undefined'],
             advertiserBundleId: ['string', 'undefined'],
             buyerId: ['string', 'undefined'],
+            isMoatEnabled: ['boolean', 'undefined']
         }, campaign);
 
         this.processCustomTracking(campaign.trackingUrls);
@@ -104,6 +106,10 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
         return this.get('advertiserBundleId');
     }
 
+    public isMoatEnabled(): boolean | undefined {
+        return this.get('isMoatEnabled');
+    }
+
     public getDTO(): { [key: string]: any } {
         let portrait;
         const portraitAsset = this.get('portrait');
@@ -123,7 +129,7 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
             'video': this.getVast().getDTO(),
             'hasEndscreen': this.hasEndscreen(),
             'portrait': portrait,
-            'landscape': landscape,
+            'landscape': landscape
         };
     }
 

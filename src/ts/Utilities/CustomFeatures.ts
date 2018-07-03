@@ -1,9 +1,3 @@
-import { AdUnitStyle } from 'Models/AdUnitStyle';
-import { StorageType } from 'Native/Api/Storage';
-import { NativeBridge } from 'Native/NativeBridge';
-import { Configuration } from 'Models/Configuration';
-import { StorageError } from 'Native/Api/Storage';
-
 export class CustomFeatures {
     public static isExampleGameId(gameId: string): boolean {
         return gameId === '14850' || gameId === '14851';
@@ -13,19 +7,20 @@ export class CustomFeatures {
         return gameId === '1300023' || gameId === '1300024';
     }
 
+    public static isMixedPlacementExperiment(gameId: string): boolean {
+        return gameId === '1543512' ||
+               gameId === '1003628' ||
+               gameId === '1042745' ||
+               gameId === '1543513';
+    }
+
     public static isPlayableConfigurationEnabled(originalResourceUrl: string) {
         return originalResourceUrl.match(/playables\/production\/unity/);
     }
 
-    public static getAdUnitStyle(abGroup: number): AdUnitStyle {
-        return new AdUnitStyle({ctaButtonColor: '#167dfb'});
-    }
-
-    public static isGDPRBaseTest(abGroup: number): boolean {
-        return abGroup === 16 || abGroup === 17;
-    }
-
-    public static isPlayableEndScreenHideDelayDisabled(abGroup: number): boolean {
-        return abGroup === 18 || abGroup === 19;
+    public static isSimejiJapaneseKeyboardApp(gameId: string): boolean {
+        // Baidu's Simeji Japanese Keyboard extension app
+        // Ad unit should be closed when going background on iOS
+        return gameId === '1795561';
     }
 }

@@ -5,11 +5,10 @@ import { DiagnosticError } from 'Errors/DiagnosticError';
 import { TestEnvironment } from 'Utilities/TestEnvironment';
 import { Configuration } from 'Models/Configuration';
 import { FileInfo } from 'Utilities/FileInfo';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { OperativeEventManager, IOperativeEventParams } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { Placement } from 'Models/Placement';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
-import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { IVideoEventHandler } from 'Native/Api/VideoPlayer';
 import { Video } from 'Models/Assets/Video';
 import { BaseVideoEventHandler, IVideoEventHandlerParams } from 'EventHandlers/BaseVideoEventHandler';
@@ -38,13 +37,16 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
     public onProgress(progress: number): void {
         const overlay = this._adUnit.getOverlay();
 
-        if(progress > 0 && this._adUnit.getVideoState() === VideoState.READY && this._adUnit.getVideoState() !== VideoState.PLAYING) {
+        if(progress > 0 && this._adUnit.getVideoState() === VideoState.READY) {
             this._adUnit.setVideoState(VideoState.PLAYING);
 
             if(overlay) {
                 overlay.setSpinnerEnabled(false);
             }
+        }
 
+        if(progress > 0 && !this._video.hasStarted()) {
+            this._video.setStarted(true);
             this.handleStartEvent(progress);
         }
 
@@ -122,7 +124,7 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
             }
 
             if(overlay) {
-                if(lastPosition > 0 && progress - lastPosition < 100) {
+                if(lastPosition > 0 && progress > lastPosition && progress - lastPosition < 100) {
                     overlay.setSpinnerEnabled(true);
                 } else {
                     overlay.setSpinnerEnabled(false);
@@ -195,12 +197,12 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
         this._nativeBridge.VideoPlayer.setVolume(new Double(overlay && overlay.isMuted() ? 0.0 : 1.0)).then(() => {
             if(this._video.getPosition() > 0) {
                 this._nativeBridge.VideoPlayer.seekTo(this._video.getPosition()).then(() => {
-                    if(!this._adUnit.getContainer().isPaused()) {
+                    if(!this._adUnit.getContainer().isPaused() && (overlay && !overlay.isPrivacyShowing())) {
                         this._nativeBridge.VideoPlayer.play();
                     }
                 });
             } else {
-                if(!this._adUnit.getContainer().isPaused()) {
+                if(!this._adUnit.getContainer().isPaused() && (overlay && !overlay.isPrivacyShowing())) {
                     this._nativeBridge.VideoPlayer.play();
                 }
             }
@@ -233,7 +235,7 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
     }
 
     protected handleStartEvent(progress: number): void {
-        this._operativeEventManager.sendStart(this._placement, this.getVideoOrientation(), this._adUnitStyle).then(() => {
+        this._operativeEventManager.sendStart(this.getOperativeEventParams()).then(() => {
             this._adUnit.onStartProcessed.trigger();
         });
 
@@ -241,18 +243,27 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
     }
 
     protected handleFirstQuartileEvent(progress: number): void {
-        this._operativeEventManager.sendFirstQuartile(this._placement, this.getVideoOrientation(), this._adUnitStyle);
+        this._operativeEventManager.sendFirstQuartile(this.getOperativeEventParams());
     }
 
     protected handleMidPointEvent(progress: number): void {
-        this._operativeEventManager.sendMidpoint(this._placement, this.getVideoOrientation(), this._adUnitStyle);
+        this._operativeEventManager.sendMidpoint(this.getOperativeEventParams());
     }
 
     protected handleThirdQuartileEvent(progress: number): void {
-        this._operativeEventManager.sendThirdQuartile(this._placement, this.getVideoOrientation(), this._adUnitStyle);
+        this._operativeEventManager.sendThirdQuartile(this.getOperativeEventParams());
     }
 
     protected handleCompleteEvent(url: string): void {
-        this._operativeEventManager.sendView(this._placement, this.getVideoOrientation(), this._adUnitStyle);
+        this._operativeEventManager.sendView(this.getOperativeEventParams());
+    }
+
+    private getOperativeEventParams(): IOperativeEventParams {
+        return {
+            placement: this._placement,
+            videoOrientation: this.getVideoOrientation(),
+            adUnitStyle: this._adUnitStyle,
+            asset: this._video
+        };
     }
 }

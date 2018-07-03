@@ -1,26 +1,29 @@
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
-import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
-import { NativeBridge } from 'Native/NativeBridge';
-import { VPAID } from 'Views/VPAID';
+import { AdUnitContainerSystemMessage, IAdUnitContainerListener } from 'AdUnits/Containers/AdUnitContainer';
 import { FinishState } from 'Constants/FinishState';
 import { Platform } from 'Constants/Platform';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { Timer } from 'Utilities/Timer';
-import { Diagnostics } from 'Utilities/Diagnostics';
 import { DiagnosticError } from 'Errors/DiagnosticError';
-import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
-import { Closer } from 'Views/Closer';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Placement } from 'Models/Placement';
-import { IObserver2 } from 'Utilities/IObserver';
+import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
 import { WKAudiovisualMediaTypes } from 'Native/Api/WebPlayer';
-import { AdUnitContainerSystemMessage, IAdUnitContainerListener } from 'AdUnits/Containers/AdUnitContainer';
+import { NativeBridge } from 'Native/NativeBridge';
+import { Diagnostics } from 'Utilities/Diagnostics';
+import { IObserver2 } from 'Utilities/IObserver';
+import { Timer } from 'Utilities/Timer';
+import { AbstractPrivacy } from 'Views/AbstractPrivacy';
+import { Closer } from 'Views/Closer';
+import { VPAID } from 'Views/VPAID';
+import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
+import { ClientInfo } from 'Models/ClientInfo';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
 
 export interface IVPAIDAdUnitParameters extends IAdUnitParameters<VPAIDCampaign> {
     vpaid: VPAID;
     closer: Closer;
     endScreen?: VPAIDEndScreen;
+    privacy: AbstractPrivacy;
 }
 
 export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListener {
@@ -32,7 +35,6 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private static _adLoadTimeout: number = 10 * 1000;
     private _closer: Closer;
     private _placement: Placement;
-    private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _view: VPAID;
     private _vpaidCampaign: VPAIDCampaign;
@@ -40,21 +42,24 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _options: any;
     private _deviceInfo: DeviceInfo;
     private _urlLoadingObserver: IObserver2<string, string>;
+    private _privacyShowing = false;
+    private _clientInfo: ClientInfo;
 
     constructor(nativeBridge: NativeBridge, parameters: IVPAIDAdUnitParameters) {
         super(nativeBridge, parameters);
 
         this._vpaidCampaign = parameters.campaign;
-        this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._options = parameters.options;
         this._view = parameters.vpaid;
         this._closer = parameters.closer;
         this._deviceInfo = parameters.deviceInfo;
         this._placement = parameters.placement;
+        this._clientInfo = parameters.clientInfo;
         this._timer = new Timer(() => this.onAdUnitNotLoaded(), VPAIDAdUnit._adLoadTimeout);
 
         this._closer.render();
+        this._closer.choosePrivacyShown();
     }
 
     public show(): Promise<void> {
@@ -62,6 +67,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
         return this.setupWebPlayer().then(() => {
             this._urlLoadingObserver = this._nativeBridge.WebPlayer.shouldOverrideUrlLoading.subscribe((url, method) => this.onUrlLoad(url));
+            this.setupPrivacyObservers();
             return this._container.open(this, ['webplayer', 'webview'], false, this._forceOrientation, false, false, true, false, this._options).then(() => {
                 this.onStart.trigger();
             });
@@ -93,27 +99,21 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public sendTrackingEvent(eventType: string) {
         const urls = this._vpaidCampaign.getTrackingUrlsForEvent(eventType);
+        const sessionId = this._vpaidCampaign.getSession().getId();
 
         for (const url of urls) {
-            this.sendThirdPartyEvent(`vpaid ${eventType}`, url);
+            this._thirdPartyEventManager.sendEvent(`vpaid ${eventType}`, sessionId, url);
         }
     }
 
     public sendImpressionTracking() {
         const impressionUrls = this._vpaidCampaign.getImpressionUrls();
+        const sessionId = this._vpaidCampaign.getSession().getId();
         if (impressionUrls) {
             for (const impressionUrl of impressionUrls) {
-                this.sendThirdPartyEvent('vpaid impression', impressionUrl);
+                this._thirdPartyEventManager.sendEvent('vpaid impression', sessionId, impressionUrl);
             }
         }
-    }
-
-    public sendThirdPartyEvent(eventType: string, url: string) {
-        const sessionId = this._vpaidCampaign.getSession().getId();
-        const sdkVersion = this._operativeEventManager.getClientInfo().getSdkVersion();
-        url = url.replace(/%ZONE%/, this._placement.getId());
-        url = url.replace(/%SDK_VERSION%/, sdkVersion.toString());
-        this._thirdPartyEventManager.sendEvent(eventType, sessionId, url, this._vpaidCampaign.getUseWebViewUserAgentForTracking());
     }
 
     public mute() {
@@ -131,6 +131,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public onContainerShow(): void {
         this.setShowing(true);
+        this.onContainerForeground();
     }
 
     public onContainerDestroy(): void {
@@ -139,19 +140,40 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public onContainerBackground(): void {
         this._view.pauseAd();
+
+        if (this.isShowing() && CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
+            this.hide();
+        }
     }
 
     public onContainerForeground(): void {
         this.showCloser();
-        if (this._view.isLoaded()) {
+        if (this._view.isLoaded() && !this._privacyShowing) {
             this._view.resumeAd();
-        } else {
+        } else if (!this._view.isLoaded()) {
             this._view.loadWebPlayer();
+        } else {
+            // Popup will resume video
         }
     }
 
     public onContainerSystemMessage(message: AdUnitContainerSystemMessage): void {
         // EMPTY
+    }
+
+    private setupPrivacyObservers(): void {
+        if (this._closer.onPrivacyClosed) {
+            this._closer.onPrivacyClosed.subscribe(() => {
+                this._view.resumeAd();
+                this._privacyShowing = false;
+            });
+        }
+        if (this._closer.onPrivacyOpened) {
+            this._closer.onPrivacyOpened.subscribe(() => {
+                this._view.pauseAd();
+                this._privacyShowing = true;
+            });
+        }
     }
 
     private setupWebPlayer(): Promise<any> {
@@ -167,7 +189,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         promises.push(this._nativeBridge.WebPlayer.setSettings({
             setSupportMultipleWindows: [false],
             setJavaScriptCanOpenWindowsAutomatically: [true],
-            setMediaPlaybackRequiresUserGesture: [false],
+            setMediaPlaybackRequiresUserGesture: [false]
         }, {}));
         const eventSettings = {
             'onPageStarted': { 'sendEvent': true },
@@ -203,8 +225,6 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     private onShow() {
         this.setShowing(true);
-        // todo: is the timer needed at all?
-        // this._timer.start();
 
         this._container.addEventHandler(this);
     }
@@ -222,21 +242,14 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._container.removeEventHandler(this);
     }
 
-    private showView() {
-        this._view.show();
-    }
-
     private hideView() {
+        this._closer.hide();
         this._view.hide();
     }
 
     private showCloser() {
         return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
-            const left = Math.floor(width * 0.85);
-            const top = 0;
-            const viewWidth = Math.floor(width * 0.15);
-            const viewHeight = viewWidth;
-            return this._container.setViewFrame('webview', left, top, viewWidth, viewHeight).then(() => {
+            return this._container.setViewFrame('webview', 0, 0, width, height).then(() => {
                 if (!this._closer.container().parentNode) {
                     document.body.appendChild(this._closer.container());
                 }

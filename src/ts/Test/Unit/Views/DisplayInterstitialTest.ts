@@ -9,6 +9,7 @@ import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitia
 import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
 import { Platform } from 'Constants/Platform';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
+import { Privacy } from 'Views/Privacy';
 const json = JSON.parse(DummyDisplayInterstitialCampaign);
 
 describe('DisplayInterstitial View', () => {
@@ -37,8 +38,11 @@ describe('DisplayInterstitial View', () => {
                 muteVideo: false
             });
             campaign = TestFixtures.getDisplayInterstitialCampaign();
+            const configuration = TestFixtures.getConfiguration();
 
-            view = new DisplayInterstitial(nativeBridge, placement, campaign);
+            const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+
+            view = new DisplayInterstitial(nativeBridge, placement, campaign, privacy, false);
 
             sandbox.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
             sandbox.stub(nativeBridge, 'getApiLevel').returns(16);

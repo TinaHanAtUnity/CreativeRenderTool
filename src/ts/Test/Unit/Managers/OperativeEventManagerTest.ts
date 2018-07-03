@@ -23,6 +23,8 @@ import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
+import { XPromoOperativeEventManager } from 'Managers/XPromoOperativeEventManager';
+import { HttpKafka } from 'Utilities/HttpKafka';
 
 class TestStorageApi extends StorageApi {
 
@@ -314,13 +316,12 @@ describe('OperativeEventManagerTest', () => {
 
         describe('should send the proper data', () => {
             it('common data', () => {
-                return operativeEventManager.sendClick(placement).then(() => {
+                return operativeEventManager.sendClick({ placement: placement }).then(() => {
                     assert(requestSpy.calledOnce, 'Operative event did not send POST request');
                     const data = JSON.parse(requestSpy.getCall(0).args[1]);
 
                     assert.equal(data.auctionId, session.getId());
                     assert.equal(data.gameSessionId, sessionManager.getGameSessionId());
-                    assert.equal(data.gamerId, campaign.getGamerId());
                     assert.equal(data.campaignId, campaign.getId());
                     assert.equal(data.adType, campaign.getAdType());
                     assert.equal(data.correlationId, campaign.getCorrelationId());
@@ -346,7 +347,7 @@ describe('OperativeEventManagerTest', () => {
             });
 
             it('PerformanceCampaign specific', () => {
-                return operativeEventManager.sendClick(placement).then(() => {
+                return operativeEventManager.sendClick({ placement: placement }).then(() => {
                     assert(requestSpy.calledOnce, 'Operative event did not send POST request');
                     const data = JSON.parse(requestSpy.getCall(0).args[1]);
                     const url = requestSpy.getCall(0).args[0];
@@ -358,21 +359,19 @@ describe('OperativeEventManagerTest', () => {
             });
 
             it('XPromoCampaign specific', () => {
+                HttpKafka.setRequest(request);
                 campaign = TestFixtures.getXPromoCampaign();
                 const params = {
                     ... operativeEventManagerParams,
                     campaign: campaign
                 };
 
-                operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(params);
-                return operativeEventManager.sendClick(placement).then(() => {
+                const xPromoOperativeEventManager = <XPromoOperativeEventManager>OperativeEventManagerFactory.createOperativeEventManager(params);
+                HttpKafka.setRequest(request);
+                return xPromoOperativeEventManager.sendClick({ placement: placement, videoOrientation: 'landscape' }).then(() => {
                     assert(requestSpy.calledOnce, 'Operative event did not send POST request');
-                    const data = JSON.parse(requestSpy.getCall(0).args[1]);
                     const url = requestSpy.getCall(0).args[0];
-
-                    assert.equal(url, 'https://adserver.unityads.unity3d.com/mobile/campaigns/' + campaign.getId() + '/click/' + campaign.getGamerId() + '?gameId=' + clientInfo.getGameId() + '&redirect=false', 'URL not what was expected');
-                    assert.isDefined(data.cached, 'cached -value should be defined');
-                    assert.isFalse(data.cached, 'cached -value should be false');
+                    assert.equal(url, 'https://httpkafka.unityads.unity3d.com/v1/events', 'URL not what was expected');
                 });
             });
 
@@ -384,14 +383,8 @@ describe('OperativeEventManagerTest', () => {
                 };
 
                 operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(params);
-                return operativeEventManager.sendClick(placement).then(() => {
-                    assert(requestSpy.calledOnce, 'Operative event did not send POST request');
-                    const data = JSON.parse(requestSpy.getCall(0).args[1]);
-                    const url = requestSpy.getCall(0).args[0];
-
-                    assert.equal(url, 'https://adserver.unityads.unity3d.com/mobile/campaigns/' + campaign.getId() + '/click/' + campaign.getGamerId() + '?gameId=' + clientInfo.getGameId() + '&redirect=false', 'URL not what was expected');
-                    assert.isDefined(data.cached, 'cached -value should be defined');
-                    assert.isFalse(data.cached, 'cached -value should be false');
+                return operativeEventManager.sendClick({ placement: placement }).then(() => {
+                    assert(requestSpy.notCalled, 'Operative event did send POST request');
                 });
             });
 
@@ -403,7 +396,7 @@ describe('OperativeEventManagerTest', () => {
                 };
 
                 operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(params);
-                return operativeEventManager.sendClick(placement).then(() => {
+                return operativeEventManager.sendClick({ placement: placement }).then(() => {
                     assert(requestSpy.calledOnce, 'Operative event did not send POST request');
                     const data = JSON.parse(requestSpy.getCall(0).args[1]);
                     const url = requestSpy.getCall(0).args[0];
@@ -422,14 +415,8 @@ describe('OperativeEventManagerTest', () => {
                 };
 
                 operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(params);
-                return operativeEventManager.sendClick(placement).then(() => {
-                    assert(requestSpy.calledOnce, 'Operative event did not send POST request');
-                    const data = JSON.parse(requestSpy.getCall(0).args[1]);
-                    const url = requestSpy.getCall(0).args[0];
-
-                    assert.equal(url, 'https://adserver.unityads.unity3d.com/mobile/campaigns/' + campaign.getId() + '/click/' + campaign.getGamerId() + '?gameId=' + clientInfo.getGameId() + '&redirect=false', 'URL not what was expected');
-                    assert.isDefined(data.cached, 'cached -value should be defined');
-                    assert.isFalse(data.cached, 'cached -value should be false');
+                return operativeEventManager.sendClick({ placement: placement }).then(() => {
+                    assert(requestSpy.notCalled, 'Operative event did send POST request');
                 });
             });
         });

@@ -3,16 +3,14 @@ import * as sinon from 'sinon';
 import { assert } from 'chai';
 
 import { NativeBridge } from 'Native/NativeBridge';
-import { DeviceInfo } from 'Models/DeviceInfo';
 import { Platform } from 'Constants/Platform';
-import { RingerMode } from 'Constants/Android/RingerMode';
-import { UIUserInterfaceIdiom } from 'Constants/iOS/UIUserInterfaceIdiom';
 import { EventCategory } from 'Constants/EventCategory';
-import { DeviceInfoApi, DeviceInfoEvent } from 'Native/Api/DeviceInfo';
+import { DeviceInfoApi } from 'Native/Api/DeviceInfo';
 import { StreamType } from 'Constants/Android/StreamType';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
+import { DeviceInfoEvent } from 'Native/Api/DeviceInfoEvent';
 
 describe('DeviceInfoTest', () => {
 
@@ -30,7 +28,7 @@ describe('DeviceInfoTest', () => {
                 Android: {
                     ... TestFixtures.getFakeNativeAndroidDeviceInfo()
                 }
-            },
+            }
 
         };
         deviceInfo = new AndroidDeviceInfo(nativeBridge);
@@ -107,7 +105,7 @@ describe('DeviceInfoTest Android', () => {
                 Android: {
                     ... TestFixtures.getFakeNativeAndroidDeviceInfo()
                 }
-            },
+            }
         };
         deviceInfo = new AndroidDeviceInfo(nativeBridge);
 
@@ -139,7 +137,7 @@ describe('DeviceInfoTest Android', () => {
                 Android: {
                     ... TestFixtures.getFakeNativeAndroidDeviceInfo()
                 }
-            },
+            }
 
         };
         deviceInfo = new AndroidDeviceInfo(nativeBridge);
@@ -168,7 +166,7 @@ describe('DeviceInfoTest Android', () => {
                 Android: {
                     ... TestFixtures.getFakeNativeAndroidDeviceInfo()
                 }
-            },
+            }
         };
         deviceInfo = new AndroidDeviceInfo(nativeBridge);
         deviceInfoApi = new DeviceInfoApi(nativeBridge);
@@ -221,7 +219,7 @@ describe('DeviceInfoTest iOS', () => {
                 Ios: {
                     ... TestFixtures.getFakeNativeIosDeviceInfo()
                 }
-            },
+            }
         };
         deviceInfo = new IosDeviceInfo(nativeBridge);
         deviceInfoApi = new DeviceInfoApi(nativeBridge);
@@ -273,7 +271,7 @@ describe('DeviceInfoTest catch random reject', () => {
                 return Platform.TEST;
             },
             Sdk: {
-                logWarning: (msg: string) => { return; },
+                logWarning: (msg: string) => { return; }
             },
             DeviceInfo: {
                 ... TestFixtures.getFakeNativeDeviceInfo(),
@@ -283,7 +281,7 @@ describe('DeviceInfoTest catch random reject', () => {
                 Android: {
                     ... TestFixtures.getFakeNativeAndroidDeviceInfo()
                 }
-            },
+            }
 
         };
 
@@ -326,7 +324,7 @@ describe('DeviceInfoTest reject promises', () => {
                 return Platform.TEST;
             },
             Sdk: {
-                logWarning: (msg: string) => { return; },
+                logWarning: (msg: string) => { return; }
             },
             DeviceInfo: {
                 getConnectionType: sinon.stub().returns(Promise.reject(new Error('testError'))),
@@ -345,8 +343,8 @@ describe('DeviceInfoTest reject promises', () => {
                 getScreenBrightness: sinon.stub().returns(Promise.reject(new Error('testError'))),
                 getBatteryLevel: sinon.stub().returns(Promise.reject(new Error('testError'))),
                 getBatteryStatus: sinon.stub().returns(Promise.reject(new Error('testError'))),
-                getFreeMemory: sinon.stub().returns(Promise.reject(new Error('testError'))),
-            },
+                getFreeMemory: sinon.stub().returns(Promise.reject(new Error('testError')))
+            }
 
         };
         deviceInfo = new AndroidDeviceInfo(nativeBridge);

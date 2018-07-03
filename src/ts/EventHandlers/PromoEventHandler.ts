@@ -1,29 +1,28 @@
-import { NativeBridge } from 'Native/NativeBridge';
 import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
 import { PurchasingUtilities, IPromoPayload, IPromoRequest } from 'Utilities/PurchasingUtilities';
 import { Configuration } from 'Models/Configuration';
 import { FinishState } from 'Constants/FinishState';
-import { Placement } from 'Models/Placement';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ABGroup } from 'Models/ABGroup';
+import { GdprManager, GDPREventAction } from 'Managers/GdprManager';
 
 export class PromoEventHandler {
 
-    public static onClose(nativeBridge: NativeBridge, adUnit: PromoAdUnit, gamerToken: string, gameId: string, abGroup: number, purchaseTrackingUrls: string[], isOptOutEnabled: boolean): void {
-        adUnit.setFinishState(FinishState.SKIPPED);
+    public static onClose(adUnit: PromoAdUnit, gamerToken: string, gameId: string, abGroup: ABGroup, purchaseTrackingUrls: string[], isOptOutEnabled: boolean): void {
+        adUnit.setFinishState(FinishState.COMPLETED);
         adUnit.hide();
         const iapPayload: IPromoPayload = {
             gamerToken: gamerToken,
             trackingOptOut: isOptOutEnabled,
             iapPromo: true,
             gameId: gameId + '|' + gamerToken,
-            abGroup: abGroup,
+            abGroup: abGroup.toNumber(),
             request: IPromoRequest.CLOSE,
-            purchaseTrackingUrls: purchaseTrackingUrls,
+            purchaseTrackingUrls: purchaseTrackingUrls
         };
-        PurchasingUtilities.beginPurchaseEvent(nativeBridge, JSON.stringify(iapPayload));
+        PurchasingUtilities.sendPromoPayload(iapPayload);
     }
 
-    public static onPromo(nativeBridge: NativeBridge, adUnit: PromoAdUnit, iapProductId: string, purchaseTrackingUrls: string[]): void {
+    public static onPromo(adUnit: PromoAdUnit, iapProductId: string, purchaseTrackingUrls: string[]): void {
         adUnit.setFinishState(FinishState.COMPLETED);
         adUnit.hide();
         adUnit.sendClick();
@@ -31,15 +30,15 @@ export class PromoEventHandler {
             productId: iapProductId,
             iapPromo: true,
             request: IPromoRequest.PURCHASE,
-            purchaseTrackingUrls: purchaseTrackingUrls,
+            purchaseTrackingUrls: purchaseTrackingUrls
         };
-        PurchasingUtilities.beginPurchaseEvent(nativeBridge, JSON.stringify(iapPayload));
+        PurchasingUtilities.sendPromoPayload(iapPayload);
     }
 
-    public static onGDPRPopupSkipped(configuration: Configuration, operativeEventManager: OperativeEventManager): void {
+    public static onGDPRPopupSkipped(configuration: Configuration, gdprManager: GdprManager): void {
         if (!configuration.isOptOutRecorded()) {
             configuration.setOptOutRecorded(true);
-            operativeEventManager.sendGDPREvent('skip');
+            gdprManager.sendGDPREvent(GDPREventAction.SKIP);
         }
     }
 }

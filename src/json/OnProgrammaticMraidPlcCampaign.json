@@ -10,6 +10,7 @@
       "adType": "mraid-sample-ad-type",
       "creativeId": "mraid-sample-creative-id",
       "seatId": 902,
+      "isMoatEnabled": false,
       "contentType": "programmatic/mraid",
       "content": "{\"markup\":\"<div>markup</div>\",\"inlinedUrl\":\"https://cdn.unityads.unity3d.com/playables/xinstall.html\"}",
       "trackingUrls": {

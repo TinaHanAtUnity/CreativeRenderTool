@@ -78,6 +78,13 @@ export class IosDeviceInfo extends DeviceInfo<IIosDeviceInfo> {
         return this.get('sensorList');
     }
 
+    public getFreeSpace(): Promise<number> {
+        return this._nativeBridge.DeviceInfo.Ios.getFreeSpace().then(freeInternalSpace => {
+            this.set('freeInternalSpace', freeInternalSpace);
+            return this.get('freeInternalSpace');
+        });
+    }
+
     public getDTO(): Promise<any> {
         return super.getDTO().then((commonDTO) => {
             return {

@@ -445,7 +445,7 @@ export class Cache {
         }).catch((error) => {
             Diagnostics.trigger('cache_desync_failure', {
                 url: url,
-                error: error,
+                error: error
             }, callback.session);
             this._cacheBookkeeping.removeFileEntry(callback.fileId);
             this.fulfillCallback(url, CacheStatus.FAILED);
