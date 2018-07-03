@@ -1019,7 +1019,7 @@ describe('CampaignManager', () => {
                     assert.equal(triggeredPlacement, 'mraid');
                     assert.equal(triggeredCampaign.getGamerId(), '57a35671bb58271e002d93c9');
                     assert.equal(triggeredCampaign.getAbGroup(), ABGroup.getAbGroup(99));
-                    assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getResourceUrl(), new HTML('https://cdn.unityads.unity3d.com/playables/sma_re2.0.0_ios/index.html', triggeredCampaign.getSession()));
+                    assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getResourceUrl(), new HTML('https://cdn.unityads.unity3d.com/playables/sma_re2.0.0_ios/index.html', triggeredCampaign.getSession(), 'mraid-test-creative-id'));
                 });
             });
         });

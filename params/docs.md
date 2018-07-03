@@ -84,6 +84,7 @@
 | gdprEnabled | boolean | If GDPR is enabled | Server | all |
 | optOutRecorded | boolean | Whether the user has seen the opt-out banner in current game | Server | all |
 | optOutEnabled | boolean | Whether the user has opted out from behavioral ads targeting in current game | Server | all |
+| unityCreativeId | string | Creative id of the shown creative | SDK | all |
 
 
 
@@ -215,6 +216,7 @@
 | gdprEnabled | all | False | True | boolean | If GDPR is enabled | Server | all |
 | optOutEnabled | all | False | True | boolean | Whether the user has opted out from behavioral ads targeting in current game | Server | all |
 | optOutRecorded | all | False | True | boolean | Whether the user has seen the opt-out banner in current game | Server | all |
+| unityCreativeId | all | False | True | string | Creative id of the shown creative | SDK | all |
 
 
 
@@ -260,4 +262,6 @@
 | gdprEnabled | all | False | True | boolean | If GDPR is enabled | Server | all |
 | optOutEnabled | all | False | True | boolean | Whether the user has opted out from behavioral ads targeting in current game | Server | all |
 | optOutRecorded | all | False | True | boolean | Whether the user has seen the opt-out banner in current game | Server | all |
+| videoOrientation | no | False | True | string | Chosen video orientation | SDK | all |
+| unityCreativeId | all | False | True | string | Creative id of the shown creative | SDK | all |
 

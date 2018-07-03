@@ -4,7 +4,7 @@ import { FinishState } from 'Constants/FinishState';
 import { IObserver2, IObserver1 } from 'Utilities/IObserver';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { DisplayInterstitial } from 'Views/DisplayInterstitial';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { OperativeEventManager, IOperativeEventParams } from 'Managers/OperativeEventManager';
 import { Platform } from 'Constants/Platform';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { Placement } from 'Models/Placement';
@@ -195,7 +195,8 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
         if(this._clickEventHasBeenSent) {
             return;
         }
-        this._operativeEventManager.sendClick(this._placement);
+
+        this._operativeEventManager.sendClick(this.getOperativeEventParams());
         this._clickEventHasBeenSent = true;
 
         for (const trackingUrl of this._campaign.getTrackingUrlsForEvent('click')) {
@@ -249,7 +250,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
         for (const url of (this._campaign).getTrackingUrlsForEvent('impression')) {
             this._thirdPartyEventManager.sendEvent('display impression', this._campaign.getSession().getId(), url);
         }
-        this._operativeEventManager.sendStart(this._placement).then(() => {
+        this._operativeEventManager.sendStart(this.getOperativeEventParams()).then(() => {
             this.onStartProcessed.trigger();
         });
     }
@@ -302,5 +303,11 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
                 this._contentReady = true;
             });
         });
+    }
+
+    private getOperativeEventParams(): IOperativeEventParams {
+        return {
+            placement: this._placement
+        };
     }
 }

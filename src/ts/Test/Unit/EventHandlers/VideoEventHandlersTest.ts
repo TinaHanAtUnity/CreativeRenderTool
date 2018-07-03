@@ -24,7 +24,10 @@ import { Video } from 'Models/Assets/Video';
 import { TestEnvironment } from 'Utilities/TestEnvironment';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { FocusManager } from 'Managers/FocusManager';
-import { IOperativeEventManagerParams, OperativeEventManager } from 'Managers/OperativeEventManager';
+import {
+    IOperativeEventManagerParams, IOperativeEventParams,
+    OperativeEventManager
+} from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 import { Placement } from 'Models/Placement';
@@ -223,7 +226,12 @@ describe('VideoEventHandlersTest', () => {
 
             performanceVideoEventHandler.onProgress(1);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendStart, placement);
+            const params: IOperativeEventParams = { placement: placement,
+                videoOrientation: performanceAdUnit.getVideoOrientation(),
+                adUnitStyle: undefined,
+                asset: videoEventHandlerParams.video };
+
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendStart, params);
         });
 
         it('should invoke onUnityAdsStart callback ', () => {
@@ -262,7 +270,12 @@ describe('VideoEventHandlersTest', () => {
             performanceAdUnit.getVideo().setPosition(4000);
             performanceVideoEventHandler.onProgress(6000);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendFirstQuartile, placement);
+            const params: IOperativeEventParams = { placement: placement,
+                videoOrientation: performanceAdUnit.getVideoOrientation(),
+                adUnitStyle: undefined,
+                asset: performanceAdUnit.getVideo() };
+
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendFirstQuartile, params);
         });
 
         it('should send midpoint event', () => {
@@ -272,7 +285,12 @@ describe('VideoEventHandlersTest', () => {
             performanceAdUnit.getVideo().setPosition(9000);
             performanceVideoEventHandler.onProgress(11000);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendMidpoint, placement);
+            const params: IOperativeEventParams = { placement: placement,
+                videoOrientation: performanceAdUnit.getVideoOrientation(),
+                adUnitStyle: undefined,
+                asset: performanceAdUnit.getVideo() };
+
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendMidpoint, params);
         });
 
         it('should send third quartile event', () => {
@@ -282,7 +300,12 @@ describe('VideoEventHandlersTest', () => {
             performanceAdUnit.getVideo().setPosition(14000);
             performanceVideoEventHandler.onProgress(16000);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile, placement);
+            const params: IOperativeEventParams = { placement: placement,
+                videoOrientation: performanceAdUnit.getVideoOrientation(),
+                adUnitStyle: undefined,
+                asset: performanceAdUnit.getVideo() };
+
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile, params);
         });
     });
 
@@ -312,7 +335,12 @@ describe('VideoEventHandlersTest', () => {
         it('should send view to session manager', () => {
             performanceVideoEventHandler.onCompleted(video.getUrl());
 
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendView, placement);
+            const params: IOperativeEventParams = { placement: placement,
+                videoOrientation: performanceAdUnit.getVideoOrientation(),
+                adUnitStyle: undefined,
+                asset: videoEventHandlerParams.video };
+
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendView, params);
         });
 
         it('should hide overlay', () => {
@@ -337,8 +365,11 @@ describe('VideoEventHandlersTest', () => {
 
             xPromoVideoEventHandler.onCompleted('https://test.com');
 
+            const params: IOperativeEventParams = { placement: xPromoAdUnitParameters.placement,
+                videoOrientation: xPromoAdUnit.getVideoOrientation()};
+
             sinon.assert.called(<sinon.SinonSpy>xPromoOperativeEventManager.sendView);
-            sinon.assert.calledWith(<sinon.SinonSpy>xPromoOperativeEventManager.sendHttpKafkaEvent, 'ads.xpromo.operative.videoview.v1.json', 'view', placement, xPromoAdUnit.getVideoOrientation());
+            sinon.assert.calledWith(<sinon.SinonSpy>xPromoOperativeEventManager.sendHttpKafkaEvent, 'ads.xpromo.operative.videoview.v1.json', 'view', params);
         });
     });
 

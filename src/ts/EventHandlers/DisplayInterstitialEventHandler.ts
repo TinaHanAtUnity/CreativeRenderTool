@@ -1,6 +1,6 @@
 import { IDisplayInterstitialHandler } from 'Views/DisplayInterstitial';
 import { NativeBridge } from 'Native/NativeBridge';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { IOperativeEventParams, OperativeEventManager } from 'Managers/OperativeEventManager';
 import { DisplayInterstitialAdUnit, IDisplayInterstitialAdUnitParameters } from 'AdUnits/DisplayInterstitialAdUnit';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { Placement } from 'Models/Placement';
@@ -27,8 +27,11 @@ export class DisplayInterstitialEventHandler implements IDisplayInterstitialHand
     }
 
     public onDisplayInterstitialClose(): void {
-        this._operativeEventManager.sendThirdQuartile(this._placement);
-        this._operativeEventManager.sendView(this._placement);
+        const params: IOperativeEventParams = {
+            placement: this._placement
+        };
+        this._operativeEventManager.sendThirdQuartile(params);
+        this._operativeEventManager.sendView(params);
         this._adUnit.hide();
     }
 

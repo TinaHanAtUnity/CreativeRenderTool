@@ -2,7 +2,7 @@ import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'AdUnits/VPAIDAdUnit';
 import { FinishState } from 'Constants/FinishState';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { GDPREventAction, GdprManager } from 'Managers/GdprManager';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { OperativeEventManager, IOperativeEventParams } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { Configuration } from 'Models/Configuration';
 import { Placement } from 'Models/Placement';
@@ -139,7 +139,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
 
     private onAdSkipped() {
         this._adUnit.sendTrackingEvent('skip');
-        this._operativeEventManager.sendSkip(this._placement);
+        this._operativeEventManager.sendSkip(this.getOperativeEventParams());
         this._adUnit.setFinishState(FinishState.SKIPPED);
         this._adUnit.mute();
         this._adUnit.hide();
@@ -156,7 +156,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     private onAdStarted() {
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
         this._adUnit.sendTrackingEvent('creativeView');
-        this._operativeEventManager.sendStart(this._placement).then(() => {
+        this._operativeEventManager.sendStart(this.getOperativeEventParams()).then(() => {
             this._adUnit.onStartProcessed.trigger();
         });
     }
@@ -172,23 +172,23 @@ export class VPAIDEventHandler implements IVPAIDHandler {
 
     private onAdVideoFirstQuartile() {
         this._adUnit.sendTrackingEvent('firstQuartile');
-        this._operativeEventManager.sendFirstQuartile(this._placement);
+        this._operativeEventManager.sendFirstQuartile(this.getOperativeEventParams());
     }
 
     private onAdVideoMidpoint() {
         this._adUnit.sendTrackingEvent('midpoint');
-        this._operativeEventManager.sendMidpoint(this._placement);
+        this._operativeEventManager.sendMidpoint(this.getOperativeEventParams());
     }
 
     private onAdVideoThirdQuartile() {
         this._adUnit.sendTrackingEvent('thirdQuartile');
-        this._operativeEventManager.sendThirdQuartile(this._placement);
+        this._operativeEventManager.sendThirdQuartile(this.getOperativeEventParams());
     }
 
     private onAdVideoComplete() {
         this._adUnit.sendTrackingEvent('complete');
         this._adUnit.setFinishState(FinishState.COMPLETED);
-        this._operativeEventManager.sendView(this._placement);
+        this._operativeEventManager.sendView(this.getOperativeEventParams());
     }
 
     private onAdPaused() {
@@ -233,5 +233,11 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         for (const url of urls) {
             this._thirdPartyEventManager.sendEvent('vpaid video click', sessionId, url);
         }
+    }
+
+    private getOperativeEventParams(): IOperativeEventParams {
+        return {
+            placement: this._placement
+        };
     }
 }
