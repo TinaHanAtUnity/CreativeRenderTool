@@ -63,8 +63,9 @@ describe('CometCampaignParser', () => {
                 return StoreName.GOOGLE;
             case 'xiaomi':
                 return StoreName.XIAOMI;
+            default:
+                throw new Error('Unknown store value "' + store + '"');
             }
-            throw new Error('Unknown store value "' + store + '"');
         };
 
         const assertBaseCampaign = (content: any) => {
