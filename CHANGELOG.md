@@ -1,3 +1,7 @@
+# Pending
+
+* Parse creative ids from the ad request response and pass used creativeId in operative events
+
 # Tue Jul  3 05:00:01 UTC 2018
 
 * Mixed Placement Experiment version 2
