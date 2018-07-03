@@ -82,7 +82,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
             {
                 event: 'click',
                 listener: (event: Event) => this.onPrivacyEvent(event),
-                selector: '.icon-gdpr'
+                selector: '.gdpr-button'
             }
         ];
 
@@ -99,6 +99,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     public render(): void {
         super.render();
 
+        document.documentElement.classList.add('new-video-overlay');
         this._skipElement = <HTMLElement>this._container.querySelector('.skip-button');
         this._skipElement.style.display = 'none';
         this._spinnerElement = <HTMLElement>this._container.querySelector('.buffering-spinner');
