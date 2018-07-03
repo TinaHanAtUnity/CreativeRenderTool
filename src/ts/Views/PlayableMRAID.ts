@@ -34,6 +34,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _iframeLoaded = false;
 
     private _messageListener: any;
+    private _deviceorientationListener: any;
     private _loadingScreenTimeout: any;
     private _prepareTimeout: any;
     private _updateInterval: any;
@@ -163,7 +164,9 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 this._arErrorObserver = this._nativeBridge.AR.onError.subscribe(errorCode => this.handleAREvent('error', JSON.stringify({errorCode})));
                 this._arSessionInterruptedObserver = this._nativeBridge.AR.onSessionInterrupted.subscribe(() => this.handleAREvent('sessioninterrupted', ''));
                 this._arSessionInterruptionEndedObserver = this._nativeBridge.AR.onSessionInterruptionEnded.subscribe(() => this.handleAREvent('sessioninterruptionended', ''));
-                window.addEventListener('deviceorientation', event => this.handleDeviceOrientation(event));
+
+                this._deviceorientationListener = (event: DeviceOrientationEvent) => this.handleDeviceOrientation(event);
+                window.addEventListener('deviceorientation', this._deviceorientationListener, false);
             }
         });
 
@@ -432,6 +435,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 this._nativeBridge.AR.onError.unsubscribe(this._arErrorObserver);
                 this._nativeBridge.AR.onSessionInterrupted.unsubscribe(this._arSessionInterruptedObserver);
                 this._nativeBridge.AR.onSessionInterruptionEnded.unsubscribe(this._arSessionInterruptionEndedObserver);
+                window.removeEventListener('deviceorientation', this._deviceorientationListener, false);
             }
         }
     }
