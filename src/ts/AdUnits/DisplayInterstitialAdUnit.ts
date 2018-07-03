@@ -4,7 +4,7 @@ import { FinishState } from 'Constants/FinishState';
 import { IObserver2, IObserver1 } from 'Utilities/IObserver';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { DisplayInterstitial } from 'Views/DisplayInterstitial';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { OperativeEventManager, IOperativeEventParams } from 'Managers/OperativeEventManager';
 import { Platform } from 'Constants/Platform';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { Placement } from 'Models/Placement';
@@ -17,7 +17,6 @@ import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { AdUnitContainerSystemMessage, IAdUnitContainerListener } from 'AdUnits/Containers/AdUnitContainer';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { ClientInfo } from 'Models/ClientInfo';
-import { IOperativeEventParams } from 'Managers/OperativeEventManager';
 
 export interface IDisplayInterstitialAdUnitParameters extends IAdUnitParameters<DisplayInterstitialCampaign> {
     view: DisplayInterstitial;

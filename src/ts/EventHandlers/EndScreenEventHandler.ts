@@ -1,6 +1,6 @@
 import { IEndScreenHandler } from 'Views/EndScreen';
 import { NativeBridge } from 'Native/NativeBridge';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { OperativeEventManager, IOperativeEventParams } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { ClientInfo } from 'Models/ClientInfo';
@@ -21,7 +21,6 @@ import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { Configuration } from 'Models/Configuration';
 import { GdprManager, GDPREventAction } from 'Managers/GdprManager';
-import { IOperativeEventParams } from 'Managers/OperativeEventManager';
 import { Video } from 'Models/Assets/Video';
 
 export interface IEndScreenDownloadParameters {
