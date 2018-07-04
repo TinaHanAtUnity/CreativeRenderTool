@@ -138,7 +138,6 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
   }
 
   .call-button {
-    opacity: 1;
     transform: translateX(100%);
     transition: transform .4s ease-in;
   }
@@ -149,7 +148,7 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
 
   .call-button,
   .call-button .tab {
-    width: 5.5rem;
+    width: $new-video-overlay-size * 5.5;
   }
 
   .call-button .tab,
@@ -177,8 +176,8 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
 
   .timer {
     position: relative;
-    top: .2rem;
-    left: .5rem;
+    top: $new-video-overlay-size * .2;
+    left: $new-video-overlay-size * .5;
     width: $new-video-overlay-size;
     height: $new-video-overlay-size;
     border: 2px solid $white;

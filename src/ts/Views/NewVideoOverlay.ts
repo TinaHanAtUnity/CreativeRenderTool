@@ -318,13 +318,6 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._callButtonElement.classList.add('show-call-button');
     }
 
-    private hideCallButton() {
-        if (this._areControlsVisible) {
-            return;
-        }
-        this._callButtonElement.classList.remove('show-call-button');
-    }
-
     private fadeIn() {
         this._container.classList.add('fade-in');
         this._areControlsVisible = true;
@@ -336,8 +329,5 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private fadeOut() {
         this._container.classList.remove('fade-in');
         this._areControlsVisible = false;
-        setTimeout(() => {
-            this.hideCallButton();
-        }, 2000);
     }
 }
