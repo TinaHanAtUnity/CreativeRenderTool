@@ -282,7 +282,7 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
  */
 
 @media (orientation: portrait) {
-  #new-video-overlay {
+  #new-video-overlay.show-gdpr-banner {
     .bottom-container {
       height: $touchable-area-height * 2;
 
@@ -290,13 +290,10 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
         bottom: 0;
 
         .gdpr-pop-up {
+          width: 90%;
           border-radius: $tab-border-radius $tab-border-radius 0 0;
         }
       }
-    }
-
-    &.show-gdpr-banner .gdpr-pop-up {
-      width: 90%;
     }
   }
 }
