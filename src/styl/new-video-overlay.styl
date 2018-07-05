@@ -1,8 +1,10 @@
 @import "vars.styl";
 @import "gdpr-pop-up.styl";
 
-$new-video-overlay-size = $default-scale-size * $default-size;
-$new-video-overlay-font-size = $new-video-overlay-size;
+$overlay-default-font-size = 1em;
+$overlay-default-font-px-size = 16px;
+$overlay-default-size = unit($overlay-default-font-px-size/16, "em");
+$new-video-overlay-size = $overlay-default-size * $default-size;
 
 $tab-font-color = "#f1f1f1";
 $fade-transition = opacity .45s ease-in;
@@ -29,6 +31,7 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
   height: 100%;
   background-color: transparent;
   color: $white;
+  font-size: 16px;
   transition: $fade-transition;
 
   &.fade-in .button {
@@ -112,7 +115,11 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
     text-align: center;
     text-shadow: 2px 2px 5px rgba(0, 0, 0, .8), 0 0 2px rgba(0, 0, 0, 1);
     font-weight: 300;
-    font-size: $new-video-overlay-font-size * .55;
+  }
+
+  .icon,
+  .text {
+    font-size: $new-video-overlay-size * .75;
   }
 
   .gdpr-button {
@@ -125,11 +132,14 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
       width: $new-video-overlay-size;
       height: $new-video-overlay-size;
       border-radius: $tab-border-radius;
-      font-size: $new-video-overlay-size * .5;
+      line-height: $new-video-overlay-size * .95;
     }
 
+    .icon-container {
+      line-height: .9em;
+    }
     .icon {
-      line-height: $new-video-overlay-font-size * .95;
+      font-size: $new-video-overlay-size * .5;
     }
   }
   
@@ -156,8 +166,12 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
   }
 
   .call-button .tab,
-  .icon {
-    line-height: $new-video-overlay-font-size * 1.58;
+  .icon-container {
+    line-height: $new-video-overlay-size * 1.4;
+  }
+
+  .icon-container {
+    line-height: $new-video-overlay-size * 1.55;
   }
 
   .icon-volume-mute {
@@ -178,7 +192,7 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
     }
   }
 
-  .timer {
+  .timer-container {
     position: relative;
     top: $new-video-overlay-size * .2;
     left: $new-video-overlay-size * .5;
@@ -186,8 +200,10 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
     height: $new-video-overlay-size;
     border: 2px solid $white;
     border-radius: 50%;
-    font-size: $new-video-overlay-font-size * .45;
-    line-height: $new-video-overlay-font-size;
+    line-height: $new-video-overlay-size;
+  }
+  .timer {
+    font-size: $new-video-overlay-size * .45;
   }
   
 
@@ -251,7 +267,7 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
   &.show-gdpr-banner {
     .gdpr-pop-up {
       // TODO: Is this correct scale-size to pass?
-      $gdpr-pop-up($new-video-overlay-font-size);
+      $gdpr-pop-up($new-video-overlay-size);
       position: static;
       margin: auto;
       width: 50%;
@@ -260,12 +276,12 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
       pointer-events: 1;
 
       .icon-gdpr {
-        font-size: $new-video-overlay-font-size * .5;
+        font-size: $new-video-overlay-size * .5;
       }
 
       .gdpr-text {
         color: $black;
-        font-size: $new-video-overlay-font-size * .35;
+        font-size: $new-video-overlay-size * .35;
       }
     }
   }
@@ -310,31 +326,31 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
  */
 @media (orientation: landscape)
   @media (max-width: 568px) and (min-width: 447px) {
-    html.new-video-overlay {
-        font-size: 19px;
+    #new-video-overlay {
+      font-size: 19px;
     }
   }
 
   @media (max-width: 1024px) and (min-width: 751px) {
-    html.new-video-overlay {
-        font-size: 32px;
+    #new-video-overlay {
+      font-size: 32px;
     }
   }
 
   @media (max-width: 750px) and (min-width: 569px) {
-    html.new-video-overlay {
+    #new-video-overlay {
       font-size: 25px;
     }
   }
 
   @media (max-width: 959) and (min-width: 801px) {
-    html.new-video-overlay {
-        font-size: 33px;
+    #new-video-overlay {
+      font-size: 33px;
     }
   }
 
   @media (max-width: 800px) and (min-width: 769px) {
-    html.new-video-overlay {
+    #new-video-overlay {
       font-size: 32px;
     }
   }
@@ -344,32 +360,32 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
  */
 @media (orientation: portrait)
   @media (max-width: 568px) and (min-width: 481px) {
-    html.new-video-overlay {
-        font-size: 30px;
+    #new-video-overlay {
+      font-size: 30px;
     }
   }
 
   @media (max-width: 480px) and (min-width: 414px) {
-    html.new-video-overlay {
-        font-size: 28px;
+    #new-video-overlay {
+      font-size: 28px;
     }
   }
 
   @media (max-width: 413px) and (min-width: 360px) {
-    html.new-video-overlay {
-        font-size: 28px;
+    #new-video-overlay {
+      font-size: 28px;
     }
   }
 
   @media (max-width: 359px) and (min-width: 321px){
-    html.new-video-overlay {
-        font-size: 26px;
+    #new-video-overlay {
+      font-size: 26px;
     }
   }
 
   @media (max-width: 320px) {
-    html.new-video-overlay {
-        font-size: 20px;
+    #new-video-overlay {
+      font-size: 20px;
     }
   }
   

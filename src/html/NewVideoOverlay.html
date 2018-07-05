@@ -1,12 +1,16 @@
 <div class="top-container">
     <div class="skip-button button button-left">
         <div class="tab">
-            <span class="icon icon-skip"></span>
+            <div class="icon-container">
+                <span class="icon icon-skip"></span>
+            </div>
         </div>
     </div>
     <div class="timer-button button button-right">
         <div class="tab">
-            <div class="timer"></div>
+            <div class="timer-container">
+                <div class="timer"></div>
+            </div>
         </div>
     </div>
 </div>
@@ -20,13 +24,19 @@
     <div class="left-corner">
         <div class="mute-button button button-left <%= data.muted ? 'muted' : '' %>">
             <div class="tab">
-                <span class="icon icon-volume"></span>
-                <span class="icon icon-volume-mute"></span>
+                <div class="icon-container">
+                    <span class="icon icon-volume"></span>
+                </div>
+                <div class="icon-container">
+                    <span class="icon icon-volume-mute"></span>
+                </div>
             </div>
         </div>
         <div class="gdpr-button button">
             <div class="tab tab-rounded">
-                <span class="icon icon-gdpr"></span>
+                <div class="icon-container">
+                    <span class="icon icon-gdpr"></span>
+                </div>
             </div>
         </div>
     </div>
@@ -42,7 +52,7 @@
     <div class="right-corner">
         <div class="call-button button button-bottom button-right">
             <div class="tab">
-                <%= data.t("Learn More") %>
+                <span class="text"><%= data.t("Learn More") %></span>
             </div>
         </div>
     </div>
