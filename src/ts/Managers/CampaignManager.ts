@@ -412,7 +412,7 @@ export class CampaignManager {
         this._nativeBridge.Sdk.logDebug('Parsing campaign ' + response.getContentType() + ': ' + response.getContent());
         let parser: CampaignParser;
 
-        if((this._sessionManager.getGameSessionId() % 100=== 99) && backupCampaign === false) {
+        if((this._sessionManager.getGameSessionId() % 100 === 99) && backupCampaign === false) {
             Diagnostics.trigger('ad_received', {
                 contentType: response.getContentType()
             }, session);
