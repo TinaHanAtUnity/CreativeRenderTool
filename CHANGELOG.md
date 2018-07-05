@@ -1,4 +1,4 @@
-# Pending
+# Thu Jul  5 15:21:01 UTC 2018
 
 * Test for campaign parsing and caching success rates
 
