@@ -1,7 +1,7 @@
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { NativeBridge } from 'Native/NativeBridge';
 import { StorageType } from 'Native/Api/Storage';
-
+import { HttpKafka, KafkaCommonObjectType } from 'Utilities/HttpKafka';
 import { Base64data } from 'Utilities/Base64data';
 
 interface IFLAMTest {
@@ -148,13 +148,14 @@ class FLAMSingleton {
     }
 
     private storeData(nativeBridge: NativeBridge) {
-        Diagnostics.trigger('flam_measure_test', this._FLAMTestResult);
-
-        for (const name in this._FLAMTestResult) {
-            if (this._FLAMTestResult.hasOwnProperty(name)) {
-                const pass = this._FLAMTestResult[name];
-                nativeBridge.Sdk.logDebug(`FLAM: Test for ${name}: ${this.translateTestResult(pass)}`);
-                nativeBridge.Storage.set(StorageType.PRIVATE, `flam.${name}`, pass);
+        if(Object.keys(this._FLAMTestResult).length > 0) {
+            HttpKafka.sendEvent('ads.sdk2.events.flam.json', KafkaCommonObjectType.ANONYMOUS, this._FLAMTestResult);
+            for (const name in this._FLAMTestResult) {
+                if (this._FLAMTestResult.hasOwnProperty(name)) {
+                    const pass = this._FLAMTestResult[name];
+                    nativeBridge.Sdk.logDebug(`FLAM: Test for ${name}: ${this.translateTestResult(pass)}`);
+                    nativeBridge.Storage.set(StorageType.PRIVATE, `flam.${name}`, pass);
+                }
             }
         }
 
