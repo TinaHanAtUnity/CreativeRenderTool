@@ -1,3 +1,7 @@
+# Pending
+
+* Test for campaign parsing and caching success rates
+
 # Wed Jul  4 09:26:35 UTC 2018
 
 * Remove the fancy endscreen test from groups 16 and 17
