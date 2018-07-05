@@ -322,73 +322,69 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
 }
 
 /**
- * Landscape font sizes
+ * Landscape sizes
  */
 @media (orientation: landscape)
-  @media (max-width: 568px) and (min-width: 447px) {
-    #new-video-overlay {
-      font-size: 19px;
+  #new-video-overlay .content {
+    @media (max-width: 374) {
+      font-size: $new-video-overlay-size * .8;
     }
-  }
 
-  @media (max-width: 1024px) and (min-width: 751px) {
-    #new-video-overlay {
-      font-size: 32px;
+    @media (min-width: 447px) and (max-width: 568px) {
+      font-size: $new-video-overlay-size * 1.2;
     }
-  }
 
-  @media (max-width: 750px) and (min-width: 569px) {
-    #new-video-overlay {
-      font-size: 25px;
+    @media (min-width: 569px) and (max-width: 750px) {
+      font-size: $new-video-overlay-size * 1.5;
     }
-  }
-
-  @media (max-width: 959) and (min-width: 801px) {
-    #new-video-overlay {
-      font-size: 33px;
+  
+    @media (min-width: 751px) and (max-width: 768px) {
+      font-size: $new-video-overlay-size * 2;
     }
-  }
 
-  @media (max-width: 800px) and (min-width: 769px) {
-    #new-video-overlay {
-      font-size: 32px;
+    @media (min-width: 769px) and (max-width: 800px) {
+      font-size: $new-video-overlay-size * 2;
+    }
+
+    @media (min-width: 801px) and (max-width: 959px) {
+      font-size: $new-video-overlay-size * 2.1;
+    }
+
+    @media (min-width: 960px) {
+      font-size: $new-video-overlay-size * 2.2;
     }
   }
 
 /**
- * Portrait font sizes
+ * Portrait sizes
  */
 @media (orientation: portrait)
-  @media (max-width: 568px) and (min-width: 481px) {
-    #new-video-overlay {
-      font-size: 30px;
+  #new-video-overlay .content {
+    @media (max-width: 320px) {
+      font-size: $new-video-overlay-size * 1.2;
+    }
+
+    @media (min-width: 321px) and (max-width: 359px) {
+      font-size: $new-video-overlay-size * 1.5;
+    }
+
+    @media (min-width: 360px) and (max-width: 413px) {
+      font-size: $new-video-overlay-size * 1.7;
+    }
+
+    @media (min-width: 414px) and (max-width: 480px) {
+      font-size: $new-video-overlay-size * 1.9;
+    }
+
+    @media (min-width: 481px) and (max-width: 568px) {
+      font-size: $new-video-overlay-size * 2;
+    }
+
+    @media (min-width: 569px) {
+      font-size: $new-video-overlay-size * 2.4;
     }
   }
 
-  @media (max-width: 480px) and (min-width: 414px) {
-    #new-video-overlay {
-      font-size: 28px;
-    }
-  }
-
-  @media (max-width: 413px) and (min-width: 360px) {
-    #new-video-overlay {
-      font-size: 28px;
-    }
-  }
-
-  @media (max-width: 359px) and (min-width: 321px){
-    #new-video-overlay {
-      font-size: 26px;
-    }
-  }
-
-  @media (max-width: 320px) {
-    #new-video-overlay {
-      font-size: 20px;
-    }
-  }
-  
   /* iPhone X */
   @media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
     #new-video-overlay.show-gdpr-banner .bottom-container .center .gdpr-pop-up {
@@ -396,6 +392,9 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
     }
   }
 
+/** 
+ * iPhone X safe area customizations
+ */
 @media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
   #new-video-overlay {
     &.show-gdpr-banner .bottom-container {
