@@ -9,7 +9,8 @@ $new-video-overlay-size = $overlay-default-size * $default-size;
 $tab-font-color = "#f1f1f1";
 $fade-transition = opacity .45s ease-in;
 $touchable-area-height = $new-video-overlay-size * 2;
-$touchable-area-width = $new-video-overlay-size * 2.5;
+$touchable-area-width = $new-video-overlay-size * 2.2;
+$call-button-width = $new-video-overlay-size * 5.5;
 $tab-border-radius = $new-video-overlay-size * .2;
 $tab-vertical-margin = $new-video-overlay-size * .3;
 
@@ -48,6 +49,23 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
     position: relative;
   }
 
+  .right-corner,
+  .left-corner {
+    z-index: 10;
+  }
+
+  .right-corner {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+
+  .left-corner {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
   .top-container {
     position: relative;
   }
@@ -72,23 +90,6 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
       z-index: 1;
       margin: auto;
       width: 100%;
-    }
-
-    .right-corner,
-    .left-corner {
-      z-index: 10;
-    }
-
-    .right-corner {
-      position: absolute;
-      top: 0;
-      right: 0;
-    }
-
-    .left-corner {
-      position: absolute;
-      top: 0;
-      left: 0;
     }
   }
 
@@ -119,7 +120,7 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
 
   .icon,
   .text {
-    font-size: $new-video-overlay-size * .75;
+    font-size: $new-video-overlay-size * .65;
   }
 
   .gdpr-button {
@@ -153,7 +154,7 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
 
   .call-button {
     transform: translateX(100%);
-    transition: transform .4s ease-in;
+    transition: transform .3s ease-in;
   }
 
   .show-call-button {
@@ -162,12 +163,11 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
 
   .call-button,
   .call-button .tab {
-    width: $new-video-overlay-size * 5.5;
+    width: $call-button-width;
   }
 
-  .call-button .tab,
-  .icon-container {
-    line-height: $new-video-overlay-size * 1.4;
+  .call-button .tab{
+    line-height: $new-video-overlay-size * 1.37;
   }
 
   .icon-container {
@@ -200,7 +200,7 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
     height: $new-video-overlay-size;
     border: 2px solid $white;
     border-radius: 50%;
-    line-height: $new-video-overlay-size;
+    line-height: $new-video-overlay-size * 1;
   }
   .timer {
     font-size: $new-video-overlay-size * .45;
@@ -385,29 +385,63 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
     }
   }
 
-  /* iPhone X */
-  @media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
-    #new-video-overlay.show-gdpr-banner .bottom-container .center .gdpr-pop-up {
-      border-radius: $tab-border-radius;
-    }
-  }
-
 /** 
  * iPhone X safe area customizations
  */
-@media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
+
+@media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)
+  @media (orientation: portrait)
+    #new-video-overlay.show-gdpr-banner .bottom-container .center .gdpr-pop-up {
+      border-radius: $tab-border-radius;
+    }
+
+  @media (orientation: landscape)
+    #new-video-overlay.show-gdpr-banner .bottom-container .center .gdpr-pop-up {
+      width: 42%;
+
+      .gdpr-text {
+        font-size: $new-video-overlay-size * .3;
+      }
+    }
+
+    #new-video-overlay .bottom-container {
+      .center,
+      .tab {
+        bottom: 0;
+      }
+            
+      .gdpr-button .tab {
+        bottom: $new-video-overlay-size * .28;
+      }
+    }
+
+@media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)
   #new-video-overlay {
-    &.show-gdpr-banner .bottom-container {
-      margin-bottom: "calc(constant(safe-area-inset-bottom) - %s)" % $tab-vertical-margin;
+    .bottom-container {
+      margin-bottom: constant(safe-area-inset-bottom);
       // @stylint off
-      margin-bottom: "calc(env(safe-area-inset-bottom) - %s)" % $tab-vertical-margin;
+      margin-bottom: env(safe-area-inset-bottom);
       // @stylint on
     }
 
     .top-container {
+      margin-top: calc(constant(safe-area-inset-top));
       // @stylint off
-      margin-top: "calc(constant(safe-area-inset-top) - %s)" % $tab-vertical-margin;
-      margin-top: "calc(env(safe-area-inset-top) - %s)" % $tab-vertical-margin;
+      margin-top: calc(env(safe-area-inset-top));
+      // @stylint on
+    }
+
+    .button-left .tab {
+      padding-left: constant(safe-area-inset-left);
+      // @stylint off
+      padding-left: env(safe-area-inset-left);
+      // @stylint on
+    }
+
+    .button-left {
+      width: "calc(constant(safe-area-inset-left) + %s)" % $touchable-area-width;
+      // @stylint off
+      width: "calc(env(safe-area-inset-left) + %s)" % $touchable-area-width;
       // @stylint on
     }
 
@@ -418,12 +452,25 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
       // @stylint on
     }
 
-    .button-left .tab {
-      padding-left: constant(safe-area-inset-left);
+    .button-right {
+      width: "calc(constant(safe-area-inset-right) + %s)" % $touchable-area-width;
       // @stylint off
-      padding-left: env(safe-area-inset-left);
+      width: "calc(env(safe-area-inset-right) + %s)" % $touchable-area-width;
       // @stylint on
     }
+
+
+    .call-button {
+      width: "calc(constant(safe-area-inset-right) + %s)" % $call-button-width;
+      // @stylint off
+      width: "calc(env(safe-area-inset-right) + %s)" % $call-button-width;
+      // @stylint on
+    }
+
+    .gdpr-button {
+      left: "calc(%s + constant(safe-area-inset-left))" % $touchable-area-width;
+      // @stylint off
+      left: "calc(%s + env(safe-area-inset-left))" % $touchable-area-width;
+      // @ stylint on
+    }
   }
-  // width: calc(100vw - constant(safe-area-inset-left) - constant(safe-area-inset-right));
-}
