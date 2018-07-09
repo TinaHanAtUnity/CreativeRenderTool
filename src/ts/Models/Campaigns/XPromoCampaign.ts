@@ -26,6 +26,7 @@ export interface IXPromoCampaign extends ICampaign {
     bypassAppSheet: boolean;
     store: StoreName;
     trackingUrls?: { [eventName: string]: string[] };
+    videoEventUrls: { [eventType: string]: string };
 }
 
 export class XPromoCampaign extends Campaign<IXPromoCampaign> {
@@ -49,6 +50,7 @@ export class XPromoCampaign extends Campaign<IXPromoCampaign> {
             bypassAppSheet: ['boolean'],
             store: ['number'],
             trackingUrls: ['object', 'undefined'],
+            videoEventUrls: ['object']
         }, campaign);
     }
 
@@ -122,6 +124,10 @@ export class XPromoCampaign extends Campaign<IXPromoCampaign> {
             return (<any>trackingUrls)[eventName] || [];
         }
         return [];
+    }
+
+    public getVideoEventUrl(eventType: string): string {
+        return this.get('videoEventUrls')[eventType];
     }
 
     public getTimeoutInSeconds(): number {

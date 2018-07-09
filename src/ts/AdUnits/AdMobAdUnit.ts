@@ -4,7 +4,7 @@ import { KeyCode } from 'Constants/Android/KeyCode';
 import { SensorDelay } from 'Constants/Android/SensorDelay';
 import { FinishState } from 'Constants/FinishState';
 import { Platform } from 'Constants/Platform';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { IOperativeEventParams, OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
 import { ClientInfo } from 'Models/ClientInfo';
@@ -91,7 +91,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public sendClickEvent() {
         this.sendTrackingEvent('click');
-        this._operativeEventManager.sendClick(this._placement);
+        this._operativeEventManager.sendClick(this.getOperativeEventParams());
 
         UserCountData.getClickCount(this._nativeBridge).then((clickCount) => {
             if (typeof clickCount === 'number') {
@@ -107,12 +107,12 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     public sendStartEvent() {
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
         this.sendTrackingEvent('start');
-        this._operativeEventManager.sendStart(this._placement);
+        this._operativeEventManager.sendStart(this.getOperativeEventParams());
     }
 
     public sendSkipEvent() {
         this.sendTrackingEvent('skip');
-        this._operativeEventManager.sendSkip(this._placement);
+        this._operativeEventManager.sendSkip(this.getOperativeEventParams());
     }
 
     public sendCompleteEvent() {
@@ -120,8 +120,9 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public sendRewardEvent() {
-        this._operativeEventManager.sendThirdQuartile(this._placement);
-        this._operativeEventManager.sendView(this._placement);
+        const params = this.getOperativeEventParams();
+        this._operativeEventManager.sendThirdQuartile(params);
+        this._operativeEventManager.sendView(params);
     }
 
     public sendOpenableIntentsResponse(response: IOpenableIntentsResponse) {
@@ -152,7 +153,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public onContainerShow(): void {
-        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+        if (this._nativeBridge.getPlatform() === Platform.IOS) {
             this._nativeBridge.SensorInfo.Ios.startAccelerometerUpdates(new Double(0.01));
         }
     }
@@ -165,14 +166,14 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     public onContainerBackground(): void {
         this._nativeBridge.SensorInfo.stopAccelerometerUpdates();
 
-        if(this.isShowing() && CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
+        if (this.isShowing() && CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
             this.setFinishState(FinishState.SKIPPED);
             this.hide();
         }
     }
 
     public onContainerDestroy(): void {
-        if(this.isShowing()) {
+        if (this.isShowing()) {
             this.setFinishState(FinishState.SKIPPED);
             this.hide();
         }
@@ -207,7 +208,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
         this._nativeBridge.SensorInfo.stopAccelerometerUpdates();
 
-        if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
             this._nativeBridge.AndroidAdUnit.endMotionEventCapture();
             this._nativeBridge.AndroidAdUnit.clearMotionEventCapture();
         }
@@ -228,5 +229,11 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         if (key === KeyCode.BACK) {
             this._view.onBackPressed();
         }
+    }
+
+    private getOperativeEventParams(): IOperativeEventParams {
+        return {
+            placement: this._placement
+        };
     }
 }

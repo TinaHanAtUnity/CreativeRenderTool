@@ -10,6 +10,7 @@ import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 import { MOAT } from 'Views/MOAT';
 import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { ABGroup, CTAOpenUrlAbTest } from 'Models/ABGroup';
 
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _vastAdUnit: VastAdUnit;
@@ -19,6 +20,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _moat?: MOAT;
     private _vastOverlay?: AbstractVideoOverlay;
     private _thirdPartyEventManager: ThirdPartyEventManager;
+    private _abGroup: ABGroup;
 
     constructor(nativeBridge: NativeBridge, adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
         super(nativeBridge, adUnit, parameters);
@@ -31,6 +33,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
         this._moat = MoatViewabilityService.getMoat();
         this._vastOverlay = this._vastAdUnit.getOverlay();
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
+        this._abGroup = parameters.configuration.getAbGroup();
     }
 
     public onOverlaySkip(position: number): void {
@@ -69,6 +72,12 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
 
         const clickThroughURL = this._vastAdUnit.getVideoClickThroughURL();
         if(clickThroughURL) {
+            if (CTAOpenUrlAbTest.isValid(this._abGroup)) {
+                return this.openUrl(clickThroughURL).then(() => {
+                    this.setCallButtonEnabled(true);
+                });
+            }
+
             return this._request.followRedirectChain(clickThroughURL).then(
                 (url: string) => {
                     return this.openUrl(url).then(() => {

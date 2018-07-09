@@ -2,20 +2,22 @@ import { Campaign, ICampaign } from 'Models/Campaign';
 import { HTML } from 'Models/Assets/HTML';
 
 export interface IPromoCampaign extends ICampaign {
-    iapProductId: string | undefined;
+    iapProductId: string;
     additionalTrackingEvents: { [eventName: string]: string[] } | undefined;
     dynamicMarkup: string | undefined;
     creativeAsset: HTML;
+    rewardedPromo: boolean;
 }
 
 export class PromoCampaign extends Campaign<IPromoCampaign> {
     constructor(campaign: IPromoCampaign) {
         super('PromoCampaign', {
             ... Campaign.Schema,
-            iapProductId: ['string', 'undefined'],
+            iapProductId: ['string'],
             additionalTrackingEvents: ['object', 'undefined'],
             dynamicMarkup: ['string', 'undefined'],
-            creativeAsset: ['object']
+            creativeAsset: ['object'],
+            rewardedPromo: ['boolean']
         }, campaign);
     }
 
@@ -50,7 +52,7 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
         this.set('iapProductId', iapProductId);
     }
 
-    public getIapProductId(): string | undefined {
+    public getIapProductId(): string {
         return this.get('iapProductId');
     }
 
@@ -60,5 +62,9 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
 
     public getOptionalAssets() {
         return [];
+    }
+
+    public getRewardedPromo(): boolean {
+        return this.get('rewardedPromo');
     }
 }

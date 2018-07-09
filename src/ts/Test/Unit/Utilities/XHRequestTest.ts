@@ -2,7 +2,6 @@ import 'mocha';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
 import { XHRequest } from 'Utilities/XHRequest';
-import { SinonStub } from 'sinon';
 
 describe('XHRequestTest', () => {
 
@@ -11,7 +10,7 @@ describe('XHRequestTest', () => {
     beforeEach(() => {
         server = sinon.fakeServer.create({
             autoRespond: true,
-            autoRespondAfter: 5,
+            autoRespondAfter: 5
         });
     });
 
@@ -37,7 +36,7 @@ describe('XHRequestTest', () => {
         [199, {}, 'Status code 199'], // Lower border
         [300, {}, 'Bad Request'], // Upper border
         [404, {}, 'File not found'], // Common HTTP error code
-        [500, {}, 'Server Error'], // Common HTTP error code
+        [500, {}, 'Server Error'] // Common HTTP error code
     ].forEach((params) =>
         it(`should fail from bad response for status code ${params[0]}`, async () => {
             server.respondWith('GET', 'https://api.unity3d.com/test', params);

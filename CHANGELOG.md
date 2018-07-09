@@ -1,3 +1,58 @@
+# Thu Jul  5 15:21:01 UTC 2018
+
+* Test for campaign parsing and caching success rates
+
+# Wed Jul  4 09:26:35 UTC 2018
+
+* Remove the fancy endscreen test from groups 16 and 17
+* Re-enable tslint default in switch rule
+
+# Tue Jul  3 12:34:47 UTC 2018
+
+* Parse creative ids from the ad request response and pass used creativeId in operative events
+
+# Tue Jul  3 05:00:01 UTC 2018
+
+* Mixed Placement Experiment version 2
+* AB testing for CTA behavior - directly open web browser vs handling redirects in webview (groups 11 & 12)
+* Enable tslint no duplicate imports rule
+
+# Mon Jul  2 06:15:21 UTC 2018
+
+* Fix IAP Promo payload initialization check
+* Add configuration url to playable configuration diagnostic message
+
+# Fri Jun 29 04:54:56 UTC 2018
+
+* Fix race condition in iOS video start event logic
+* Fix js_error when args is not an array or is undefined or null
+* tslint trailing comma removal
+
+# Wed Jun 27 22:04:48 UTC 2018
+
+* Change handling of crosspromo third quartile event
+
+# Wed Jun 27 06:05:33 UTC 2018
+
+* Remove circular dependencies
+* Fix iOS 7.x appsheet problems by sending user to the browser 
+* Fix new js_error that surfaced by because of fixing the c.join js_error 
+
+# Tue Jun 26 08:23:00 UTC 2018
+
+* Revert previous deployment
+
+# Tue Jun 26 05:40:10 UTC 2018
+
+* Use the included microsoft typescript linting rules
+* Add promo initialization check before attempting to parse a promo campaign
+
+# Mon Jun 25 22:21:06 UTC 2018
+
+* Never send Android ID with advertising ID in operative events
+* New square endscreen image test in groups 18 and 19
+* Reduce JS errors
+
 # Thu Jun 21 09:14:47 UTC 2018
 
 * Pinpoint promo_version_not_supported errors

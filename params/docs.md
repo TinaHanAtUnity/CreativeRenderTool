@@ -84,6 +84,7 @@
 | gdprEnabled | boolean | If GDPR is enabled | Server | all |
 | optOutRecorded | boolean | Whether the user has seen the opt-out banner in current game | Server | all |
 | optOutEnabled | boolean | Whether the user has opted out from behavioral ads targeting in current game | Server | all |
+| unityCreativeId | string | Creative id of the shown creative | SDK | all |
 
 
 
@@ -133,7 +134,6 @@
 | connectionType | all | True | False | string | "wifi", "cellular" or "none" | SDK | all |
 | networkType | no | True | False | number | Detailed cellular network type | SDK | all |
 | stores | yes | True | False | string | List of stores on device. ('apple', 'google', 'xiaomi,google', 'none') | SDK | all |
-| gamerId | yes | True | False | string | Internal gamer identifier | Server | all |
 | bundleVersion | all | False | True | string | Game version | SDK | all |
 | bundleId | all | False | True | string | Bundle identifier for the app | SDK | all |
 | language | all | False | True | string | Device language code (e.g. en_US or fr_CA) | SDK | all |
@@ -179,7 +179,6 @@
 | eventId | all | False | True | string | Unique event identifier | SDK | all |
 | auctionId | all | False | True | string | Unique identifier for joining ad requests and operative events. This identifies one ad unit lifecycle so e.g. ad request, start and end events share same auctionId. | SDK | all |
 | gameSessionId | all | False | True | number | Unique game session identifier. This identifier is shared with analytics events. | SDK | all |
-| gamerId | all | False | True | string | Internal gamer identifier | Server | all |
 | campaignId | all | False | True | string | Internal campaign identifier | Server | all |
 | placementId | all | False | True | string | Internal placement identifier | Admin | all |
 | apiLevel | android | False | True | number | Android device API level | SDK | android |
@@ -212,11 +211,12 @@
 | language | all | False | True | string | Device language code (e.g. en_US or fr_CA) | SDK | all |
 | adUnitStyle | no | False | True | object | Style of the ad unit | SDK | all |
 | token | all | False | True | string | Signed JSON Web Token (JWT) with orthogonal (statistically independent) A/B groups for each Unity Monetization component | Server | all |
-| androidId | android | False | True | string | Android ID | SDK | android |
+| androidId | no | False | True | string | Android ID | SDK | android |
 | gameSessionCounters | all | False | True | object | Game session based counts of starts, views and ad requests | SDK | all |
 | gdprEnabled | all | False | True | boolean | If GDPR is enabled | Server | all |
 | optOutEnabled | all | False | True | boolean | Whether the user has opted out from behavioral ads targeting in current game | Server | all |
 | optOutRecorded | all | False | True | boolean | Whether the user has seen the opt-out banner in current game | Server | all |
+| unityCreativeId | all | False | True | string | Creative id of the shown creative | SDK | all |
 
 
 
@@ -228,7 +228,6 @@
 | eventId | all | False | True | string | Unique event identifier | SDK | all |
 | auctionId | all | False | True | string | Unique identifier for joining ad requests and operative events. This identifies one ad unit lifecycle so e.g. ad request, start and end events share same auctionId. | SDK | all |
 | gameSessionId | all | False | True | number | Unique game session identifier. This identifier is shared with analytics events. | SDK | all |
-| gamerId | all | False | True | string | Internal gamer identifier | Server | all |
 | campaignId | all | False | True | string | Internal campaign identifier | Server | all |
 | placementId | all | False | True | string | Internal placement identifier | Admin | all |
 | apiLevel | android | False | True | number | Android device API level | SDK | android |
@@ -258,9 +257,11 @@
 | language | all | False | True | string | Device language code (e.g. en_US or fr_CA) | SDK | all |
 | adUnitStyle | no | False | True | object | Style of the ad unit | SDK | all |
 | token | all | False | True | string | Signed JSON Web Token (JWT) with orthogonal (statistically independent) A/B groups for each Unity Monetization component | Server | all |
-| androidId | android | False | True | string | Android ID | SDK | android |
+| androidId | no | False | True | string | Android ID | SDK | android |
 | gameSessionCounters | all | False | True | object | Game session based counts of starts, views and ad requests | SDK | all |
 | gdprEnabled | all | False | True | boolean | If GDPR is enabled | Server | all |
 | optOutEnabled | all | False | True | boolean | Whether the user has opted out from behavioral ads targeting in current game | Server | all |
 | optOutRecorded | all | False | True | boolean | Whether the user has seen the opt-out banner in current game | Server | all |
+| videoOrientation | no | False | True | string | Chosen video orientation | SDK | all |
+| unityCreativeId | all | False | True | string | Creative id of the shown creative | SDK | all |
 

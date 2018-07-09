@@ -30,7 +30,11 @@
       "disableBackButton": true,
       "muteVideo": false,
       "useDeviceOrientationForVideo": false,
-      "skipInSeconds": 5
+      "skipInSeconds": 5,
+      "adTypes": [
+        "MRAID",
+        "VIDEO"
+      ]
     },
     {
         "id": "promoPlacement",
@@ -55,6 +59,118 @@
       "disableBackButton": true,
       "muteVideo": false,
       "useDeviceOrientationForVideo": false
+    },
+    {
+      "id": "mixedPlacement",
+      "name": "mixedPlacement",
+      "default": false,
+      "allowSkip": false,
+      "skipEndCardOnClose": false,
+      "disableVideoControlsFade": false,
+      "disableBackButton": true,
+      "muteVideo": false,
+      "useDeviceOrientationForVideo": false,
+      "adTypes": [
+          "IAP",
+          "VIDEO"
+      ],
+      "skipInSeconds": 5
+    },
+    {
+      "id": "mixedPlacement-promo",
+      "name": "mixedPlacement",
+      "default": false,
+      "allowSkip": false,
+      "skipEndCardOnClose": false,
+      "disableVideoControlsFade": false,
+      "disableBackButton": true,
+      "muteVideo": false,
+      "useDeviceOrientationForVideo": false,
+      "adTypes": [
+          "IAP",
+          "VIDEO"
+      ],
+      "skipInSeconds": 5
+    },
+    {
+      "id": "skippableMixedPlacement",
+      "name": "mixedPlacement",
+      "default": false,
+      "allowSkip": true,
+      "skipEndCardOnClose": false,
+      "disableVideoControlsFade": false,
+      "disableBackButton": true,
+      "muteVideo": false,
+      "useDeviceOrientationForVideo": false,
+      "adTypes": [
+          "IAP",
+          "VIDEO"
+      ],
+      "skipInSeconds": 5
+    },
+    {
+      "id": "rewardedPromoPlacement-rewardedpromo",
+      "name": "rewardedPromoPlacement-rewardedpromo",
+      "default": false,
+      "allowSkip": true,
+      "skipEndCardOnClose": false,
+      "disableVideoControlsFade": false,
+      "disableBackButton": true,
+      "muteVideo": false,
+      "useDeviceOrientationForVideo": false,
+      "adTypes": [
+          "IAP",
+          "VIDEO"
+      ],
+      "skipInSeconds": 5
+    },
+    {
+      "id": "testDashPlacement-rewarded",
+      "name": "testDashPlacement-promo",
+      "default": false,
+      "allowSkip": false,
+      "skipEndCardOnClose": false,
+      "disableVideoControlsFade": false,
+      "disableBackButton": true,
+      "muteVideo": false,
+      "useDeviceOrientationForVideo": false,
+      "adTypes": [
+          "IAP",
+          "VIDEO"
+      ],
+      "skipInSeconds": 5
+    },
+    {
+      "id": "testDashPlacement-promo-promo",
+      "name": "testDashPlacement-promo-promo",
+      "default": false,
+      "allowSkip": true,
+      "skipEndCardOnClose": false,
+      "disableVideoControlsFade": false,
+      "disableBackButton": true,
+      "muteVideo": false,
+      "useDeviceOrientationForVideo": false,
+      "adTypes": [
+          "IAP",
+          "VIDEO"
+      ],
+      "skipInSeconds": 5
+    },
+    {
+      "id": "testDashPlacement-promo-boo",
+      "name": "testDashPlacement-promo-boo",
+      "default": false,
+      "allowSkip": true,
+      "skipEndCardOnClose": false,
+      "disableVideoControlsFade": false,
+      "disableBackButton": true,
+      "muteVideo": false,
+      "useDeviceOrientationForVideo": false,
+      "adTypes": [
+          "IAP",
+          "VIDEO"
+      ],
+      "skipInSeconds": 5
     }
   ],
   "useAuction": true,

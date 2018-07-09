@@ -371,7 +371,7 @@ export class WebView {
             }).catch((e) => {
                 if (e instanceof TimeoutError) {
                     Diagnostics.trigger('realtime_network_timeout', {
-                        auctionId: campaign.getSession().getId(),
+                        auctionId: campaign.getSession().getId()
                     });
                 }
                 Diagnostics.trigger('realtime_error', {
@@ -405,7 +405,7 @@ export class WebView {
                 this.showError(true, placement.getId(), 'No connection');
 
                 const error = new DiagnosticError(new Error('No connection is available'), {
-                    id: campaign.getId(),
+                    id: campaign.getId()
                 });
                 Diagnostics.trigger('mraid_no_connection', error, campaign.getSession());
                 return;
@@ -420,7 +420,7 @@ export class WebView {
                 clientInfo: this._clientInfo,
                 thirdPartyEventManager: new ThirdPartyEventManager(this._nativeBridge, this._request, {
                     '%ZONE%': placement.getId(),
-                    '%SDK_VERSION%': this._clientInfo.getSdkVersion().toString(),
+                    '%SDK_VERSION%': this._clientInfo.getSdkVersion().toString()
                 }),
                 operativeEventManager: OperativeEventManagerFactory.createOperativeEventManager({
                     nativeBridge: this._nativeBridge,

@@ -45,8 +45,7 @@ import { MRAIDEndScreenEventHandler } from 'EventHandlers/MRAIDEndScreenEventHan
 import { PerformanceEndScreenEventHandler } from 'EventHandlers/PerformanceEndScreenEventHandler';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { XPromoEndScreen } from 'Views/XPromoEndScreen';
-import { IXPromoAdUnitParameters } from 'AdUnits/XPromoAdUnit';
-import { XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
+import { IXPromoAdUnitParameters, XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
 import { XPromoOverlayEventHandler } from 'EventHandlers/XPromoOverlayEventHandler';
 import { XPromoEndScreenEventHandler } from 'EventHandlers/XPromoEndScreenEventHandler';
 import { XPromoVideoEventHandler } from 'EventHandlers/XPromoVideoEventHandler';
@@ -185,7 +184,7 @@ export class AdUnitFactory {
         const vastAdUnitParameters: IVastAdUnitParameters = {
             ... parameters,
             video: parameters.campaign.getVideo(),
-            overlay: overlay,
+            overlay: overlay
         };
 
         if(parameters.campaign.hasEndscreen()) {
@@ -330,7 +329,7 @@ export class AdUnitFactory {
         const view = new DisplayInterstitial(nativeBridge, parameters.placement, <DisplayInterstitialCampaign>parameters.campaign, privacy, this.showGDPRBanner(parameters));
         const displayInterstitialParameters: IDisplayInterstitialAdUnitParameters = {
             ... parameters,
-            view: view,
+            view: view
         };
 
         const displayInterstitialAdUnit = new DisplayInterstitialAdUnit(nativeBridge, displayInterstitialParameters);

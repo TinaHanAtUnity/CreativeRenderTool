@@ -1,4 +1,3 @@
-
 export class CustomFeatures {
     public static isExampleGameId(gameId: string): boolean {
         return gameId === '14850' || gameId === '14851';
@@ -6,6 +5,13 @@ export class CustomFeatures {
 
     public static isTimehopApp(gameId: string): boolean {
         return gameId === '1300023' || gameId === '1300024';
+    }
+
+    public static isMixedPlacementExperiment(gameId: string): boolean {
+        return gameId === '1543512' ||
+               gameId === '1003628' ||
+               gameId === '1042745' ||
+               gameId === '1543513';
     }
 
     public static isPlayableConfigurationEnabled(originalResourceUrl: string) {

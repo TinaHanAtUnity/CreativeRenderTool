@@ -52,7 +52,7 @@ describe('MRAIDEventHandlersTest', () => {
         beforeEach(() => {
             nativeBridge = new NativeBridge({
                 handleInvocation,
-                handleCallback,
+                handleCallback
             }, Platform.ANDROID);
 
             sinon.spy(nativeBridge.Intent, 'launch');
@@ -109,17 +109,17 @@ describe('MRAIDEventHandlersTest', () => {
 
         it('should send a click with session manager', () => {
             mraidEventHandler.onMraidClick('http://example.net');
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, placement);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, { placement: placement, asset: mraidAdUnitParameters.campaign.getResourceUrl() });
         });
 
         it('should send a view with session manager', () => {
             mraidEventHandler.onMraidClick('http://example.net');
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendView, placement);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendView, { placement: placement, asset: mraidAdUnitParameters.campaign.getResourceUrl() });
         });
 
         it('should send a third quartile event with session manager', () => {
             mraidEventHandler.onMraidClick('http://example.net');
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile, placement);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile, { placement: placement, asset: mraidAdUnitParameters.campaign.getResourceUrl() });
         });
 
         it('should send a native click event', () => {

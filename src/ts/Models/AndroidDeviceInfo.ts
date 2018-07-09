@@ -3,7 +3,6 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { RingerMode } from 'Constants/Android/RingerMode';
 import { ISensorInfo, StorageType } from 'Native/Api/AndroidDeviceInfo';
 import { StreamType } from 'Constants/Android/StreamType';
-import { Platform } from 'Constants/Platform';
 
 export interface IAndroidDeviceInfo extends IDeviceInfo {
     androidId: string;
@@ -260,6 +259,13 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
         });
     }
 
+    public getFreeSpace(): Promise<number> {
+        return this._nativeBridge.DeviceInfo.Android.getFreeSpace(StorageType.INTERNAL).then(freeInternalSpace => {
+            this.set('freeInternalSpace', freeInternalSpace);
+            return this.get('freeInternalSpace');
+        });
+    }
+
     public getDTO(): Promise<any> {
         return super.getDTO().then(commonDTO => {
             const dto: any = {
@@ -268,7 +274,7 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
                 'deviceMake': this.getManufacturer(),
                 'screenLayout': this.getScreenLayout(),
                 'screenDensity': this.getScreenDensity(),
-                'totalSpaceExternal': this.getTotalSpaceExternal(),
+                'totalSpaceExternal': this.getTotalSpaceExternal()
             };
 
             if(!this.getAdvertisingIdentifier()) {
@@ -298,7 +304,7 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
                 'deviceMake': this.getManufacturer(),
                 'screenLayout': this.getScreenLayout(),
                 'screenDensity': this.getScreenDensity(),
-                'totalSpaceExternal': this.getTotalSpaceExternal(),
+                'totalSpaceExternal': this.getTotalSpaceExternal()
             };
 
             return Promise.all([
@@ -323,7 +329,7 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
             'deviceMake': this.getManufacturer(),
             'screenLayout': this.getScreenLayout(),
             'screenDensity': this.getScreenDensity(),
-            'totalSpaceExternal': this.getTotalSpaceExternal(),
+            'totalSpaceExternal': this.getTotalSpaceExternal()
         };
 
         if(!this.getAdvertisingIdentifier()) {
@@ -340,7 +346,7 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
             'deviceMake': this.getManufacturer(),
             'screenLayout': this.getScreenLayout(),
             'screenDensity': this.getScreenDensity(),
-            'totalSpaceExternal': this.getTotalSpaceExternal(),
+            'totalSpaceExternal': this.getTotalSpaceExternal()
         };
     }
 }

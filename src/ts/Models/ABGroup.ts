@@ -98,4 +98,6 @@ const GroupTest = new ABGroup(99);
 
 // Add ABTests below
 // Example : export const GdprBaseAbTest = new ABTest(GroupSixteen, GroupSeventeen);
-export const FancyEndScreenEnabledAbTest = new ABTest(GroupSixteen, GroupSeventeen);
+
+export const SquareEndScreenEnabledAbTest = new ABTest(GroupEighteen, GroupNineteen);
+export const CTAOpenUrlAbTest = new ABTest(GroupEleven, GroupTwelve);

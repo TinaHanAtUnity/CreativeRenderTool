@@ -71,7 +71,7 @@ describe('PlayerMetaDataTest', () => {
     it('should fetch correctly', () => {
         storageApi.setStorage({
             player: {
-                server_id: {value: 'test_sid'},
+                server_id: {value: 'test_sid'}
             }
         });
 
@@ -80,7 +80,7 @@ describe('PlayerMetaDataTest', () => {
             if(metaData) {
                 assert.equal(metaData.getServerId(), 'test_sid', 'PlayerMetaData.getServerId() did not pass through correctly');
                 assert.deepEqual(metaData.getDTO(), {
-                    sid: 'test_sid',
+                    sid: 'test_sid'
                 }, 'PlayerMetaData.getDTO() produced invalid output');
                 return metaDataManager.fetch(PlayerMetaData).then(exists => {
                     assert.isUndefined(exists, 'PlayerMetaData was not deleted after fetching');

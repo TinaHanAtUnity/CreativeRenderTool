@@ -5,16 +5,9 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { Request } from 'Utilities/Request';
 import { FailedOperativeEventManager } from 'Managers/FailedOperativeEventManager';
 import { FailedXpromoOperativeEventManager } from 'Managers/FailedXpromoOperativeEventManager';
+import { SessionUtils } from 'Utilities/SessionUtils';
 
 export class SessionManager {
-    public static getSessionKey(sessionId: string): string {
-        return 'session.' + sessionId;
-    }
-
-    private static getSessionTimestampKey(sessionId: string): string {
-        return SessionManager.getSessionKey(sessionId) + '.ts';
-    }
-
     private _nativeBridge: NativeBridge;
     private _request: Request;
     private _gameSessionId: number;
@@ -30,7 +23,7 @@ export class SessionManager {
     }
 
     public startNewSession(sessionId: string): Promise<any[]> {
-        const sessionTimestampKey = SessionManager.getSessionTimestampKey(sessionId);
+        const sessionTimestampKey = SessionUtils.getSessionStorageTimestampKey(sessionId);
         const timestamp = Date.now();
 
         return Promise.all([
@@ -69,7 +62,7 @@ export class SessionManager {
 
     private deleteSession(sessionId: string): Promise<any[]> {
         return Promise.all([
-            this._nativeBridge.Storage.delete(StorageType.PRIVATE, SessionManager.getSessionKey(sessionId)),
+            this._nativeBridge.Storage.delete(StorageType.PRIVATE, SessionUtils.getSessionStorageKey(sessionId)),
             this._nativeBridge.Storage.write(StorageType.PRIVATE)
         ]);
     }
@@ -79,7 +72,7 @@ export class SessionManager {
     }
 
     private isSessionOutdated(sessionId: string): Promise<boolean> {
-        return this._nativeBridge.Storage.get<number>(StorageType.PRIVATE, SessionManager.getSessionTimestampKey(sessionId)).then(timestamp => {
+        return this._nativeBridge.Storage.get<number>(StorageType.PRIVATE, SessionUtils.getSessionStorageTimestampKey(sessionId)).then(timestamp => {
             const timeThresholdMin: number = new Date().getTime() - 7 * 24 * 60 * 60 * 1000;
             const timeThresholdMax: number = new Date().getTime();
 
