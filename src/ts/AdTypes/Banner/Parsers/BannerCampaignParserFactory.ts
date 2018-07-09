@@ -8,7 +8,8 @@ export class BannerCampaignParserFactory {
                 return new BannerCampaignParser(true);
             case BannerCampaignParser.ContentTypeHTML:
                 return new BannerCampaignParser();
+            default:
+                throw new Error(`Unsupported content-type: ${contentType}`);
         }
-        throw new Error(`Unsupported content-type: ${contentType}`);
     }
 }

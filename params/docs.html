@@ -82,6 +82,7 @@
 <tr><td>gdprEnabled</td><td>boolean</td><td>If GDPR is enabled</td><td>Server</td><td>all</td></tr>
 <tr><td>optOutRecorded</td><td>boolean</td><td>Whether the user has seen the opt-out banner in current game</td><td>Server</td><td>all</td></tr>
 <tr><td>optOutEnabled</td><td>boolean</td><td>Whether the user has opted out from behavioral ads targeting in current game</td><td>Server</td><td>all</td></tr>
+<tr><td>unityCreativeId</td><td>string</td><td>Creative id of the shown creative</td><td>SDK</td><td>all</td></tr>
  </table><br><br></h3> <a name="configuration-request"></a> <h3> Configuration request </h3> 
  <table> <tr><th>key</th><th>required</th><th>queryString</th><th>body</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
 <tr><td>bundleId</td><td>all</td><td>True</td><td>False</td><td>string</td><td>Bundle identifier for the app</td><td>SDK</td><td>all</td></tr>
@@ -201,6 +202,7 @@
 <tr><td>gdprEnabled</td><td>all</td><td>False</td><td>True</td><td>boolean</td><td>If GDPR is enabled</td><td>Server</td><td>all</td></tr>
 <tr><td>optOutEnabled</td><td>all</td><td>False</td><td>True</td><td>boolean</td><td>Whether the user has opted out from behavioral ads targeting in current game</td><td>Server</td><td>all</td></tr>
 <tr><td>optOutRecorded</td><td>all</td><td>False</td><td>True</td><td>boolean</td><td>Whether the user has seen the opt-out banner in current game</td><td>Server</td><td>all</td></tr>
+<tr><td>unityCreativeId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Creative id of the shown creative</td><td>SDK</td><td>all</td></tr>
  </table><br><br></h3> <a name="click-event"></a> <h3> Click event </h3> 
  <table> <tr><th>key</th><th>required</th><th>queryString</th><th>body</th><th>type</th><th>description</th><th>provider</th><th>platforms</th></tr>
 <tr><td>gameId</td><td>all</td><td>True</td><td>False</td><td>string</td><td>Source game identifier</td><td>App</td><td>all</td></tr>
@@ -242,4 +244,6 @@
 <tr><td>gdprEnabled</td><td>all</td><td>False</td><td>True</td><td>boolean</td><td>If GDPR is enabled</td><td>Server</td><td>all</td></tr>
 <tr><td>optOutEnabled</td><td>all</td><td>False</td><td>True</td><td>boolean</td><td>Whether the user has opted out from behavioral ads targeting in current game</td><td>Server</td><td>all</td></tr>
 <tr><td>optOutRecorded</td><td>all</td><td>False</td><td>True</td><td>boolean</td><td>Whether the user has seen the opt-out banner in current game</td><td>Server</td><td>all</td></tr>
+<tr><td>videoOrientation</td><td>no</td><td>False</td><td>True</td><td>string</td><td>Chosen video orientation</td><td>SDK</td><td>all</td></tr>
+<tr><td>unityCreativeId</td><td>all</td><td>False</td><td>True</td><td>string</td><td>Creative id of the shown creative</td><td>SDK</td><td>all</td></tr>
  </table></body></html>

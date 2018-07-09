@@ -90,6 +90,8 @@ export class BannerApi extends NativeApi {
             case BannerEvents.BannerDestroyedEvent:
                 this.handleBannerDestroyedEvent();
                 break;
+            default:
+                super.handleEvent(event, parameters);
         }
     }
 

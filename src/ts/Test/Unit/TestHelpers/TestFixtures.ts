@@ -28,6 +28,7 @@ import { FakeAndroidDeviceInfo } from 'Test/Unit/TestHelpers/FakeAndroidDeviceIn
 import { RingerMode } from 'Constants/Android/RingerMode';
 import { UIUserInterfaceIdiom } from 'Constants/iOS/UIUserInterfaceIdiom';
 import { FakeIosDeviceInfo } from 'Test/Unit/TestHelpers/FakeIosDeviceInfo';
+import { AdUnitStyle } from 'Models/AdUnitStyle';
 
 import DummyPromoCampaign from 'json/DummyPromoCampaign.json';
 import OnCometMraidPlcCampaignFollowsRedirects from 'json/OnCometMraidPlcCampaignFollowsRedirects.json';
@@ -60,13 +61,13 @@ export class TestFixtures {
         });
     }
 
-    public static getCometCampaignBaseParams(session: Session, campaignId: string, gamerId: string, abGroup: ABGroup, meta: string | undefined): ICampaign {
+    public static getCometCampaignBaseParams(session: Session, campaignId: string, gamerId: string, abGroup: ABGroup, meta: string | undefined, adType?: string): ICampaign {
         return {
             id: campaignId,
             gamerId: gamerId,
             abGroup: abGroup,
             willExpireAt: undefined,
-            adType: undefined,
+            adType: adType || undefined,
             correlationId: undefined,
             creativeId: undefined,
             seatId: undefined,
@@ -94,17 +95,17 @@ export class TestFixtures {
             videoEventUrls: json.videoEventUrls,
             bypassAppSheet: json.bypassAppSheet,
             store: storeName,
-            adUnitStyle: json.adUnitStyle
+            adUnitStyle: new AdUnitStyle(json.adUnitStyle)
         };
 
         if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
-            parameters.video = new Video(json.trailerDownloadable, session, json.trailerDownloadableSize);
-            parameters.streamingVideo = new Video(json.trailerStreaming, session);
+            parameters.video = new Video(json.trailerDownloadable, session, json.trailerDownloadableSize, json.creativeId);
+            parameters.streamingVideo = new Video(json.trailerStreaming, session, undefined, json.creativeId);
         }
 
         if(json.trailerPortraitDownloadable && json.trailerPortraitDownloadableSize && json.trailerPortraitStreaming) {
-            parameters.videoPortrait = new Video(json.trailerPortraitDownloadable, session, json.trailerPortraitDownloadableSize);
-            parameters.streamingPortraitVideo = new Video(json.trailerPortraitStreaming, session);
+            parameters.videoPortrait = new Video(json.trailerPortraitDownloadable, session, json.trailerPortraitDownloadableSize, json.portraitCreativeId);
+            parameters.streamingPortraitVideo = new Video(json.trailerPortraitStreaming, session, undefined, json.portraitCreativeId);
         }
 
         return parameters;
@@ -150,7 +151,7 @@ export class TestFixtures {
         return {
             ... this.getCometCampaignBaseParams(session, mraidContentJson.id, this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup(), undefined),
             useWebViewUserAgentForTracking: mraidJson.useWebViewUserAgentForTracking,
-            resourceAsset: mraidContentJson.resourceUrl ? new HTML(mraidContentJson.resourceUrl, session) : undefined,
+            resourceAsset: mraidContentJson.resourceUrl ? new HTML(mraidContentJson.resourceUrl, session, mraidContentJson.creativeId) : undefined,
             resource: undefined,
             dynamicMarkup: mraidContentJson.dynamicMarkup,
             trackingUrls: {},
@@ -328,20 +329,22 @@ export class TestFixtures {
         };
     }
 
-    public static getPromoCampaignParams(json: any): IPromoCampaign {
+    public static getPromoCampaignParams(json: any, adType?: string, rewardedPromo?: boolean): IPromoCampaign {
         const session = this.getSession();
+        const isRewardedPromo = (rewardedPromo !== undefined) ? rewardedPromo : false;
         return {
-            ... this.getCometCampaignBaseParams(session, json.promo.id, json.gamerId, ABGroup.getAbGroup(json.abGroup), json.meta),
+            ... this.getCometCampaignBaseParams(session, json.promo.id, json.gamerId, ABGroup.getAbGroup(json.abGroup), json.meta, adType),
             iapProductId: json.promo.iapProductId,
             additionalTrackingEvents: json.promo.tracking ? json.promo.tracking : undefined,
             dynamicMarkup: json.promo.dynamicMarkup,
-            creativeAsset: new HTML(json.promo.creativeUrl, session)
+            creativeAsset: new HTML(json.promo.creativeUrl, session),
+            rewardedPromo: isRewardedPromo
         };
     }
 
-    public static getPromoCampaign(): PromoCampaign {
+    public static getPromoCampaign(adType?: string, rewardedPromo?: boolean): PromoCampaign {
         const json = JSON.parse(DummyPromoCampaign);
-        return new PromoCampaign(this.getPromoCampaignParams(json));
+        return new PromoCampaign(this.getPromoCampaignParams(json, adType, rewardedPromo));
     }
 
     public static getCampaignFollowsRedirects(): PerformanceCampaign {
@@ -406,13 +409,13 @@ export class TestFixtures {
         return new DisplayInterstitialCampaign(displayInterstitialParams);
     }
 
-    public static getClientInfo(platform?: Platform): ClientInfo {
+    public static getClientInfo(platform?: Platform, gameId?: string): ClientInfo {
         if(typeof platform === 'undefined') {
             platform = Platform.ANDROID;
         }
 
         return new ClientInfo(platform, [
-            '12345',
+            gameId ? gameId : '12345',
             false,
             'com.unity3d.ads.example',
             '2.0.0-test2',

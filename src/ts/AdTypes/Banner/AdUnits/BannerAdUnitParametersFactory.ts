@@ -60,7 +60,7 @@ export class BannerAdUnitParametersFactory {
                 clientInfo: this._clientInfo,
                 thirdPartyEventManager: new ThirdPartyEventManager(this._nativeBridge, this._request, {
                     '%ZONE%': placement.getId(),
-                    '%SDK_VERSION%': this._clientInfo.getSdkVersion().toString(),
+                    '%SDK_VERSION%': this._clientInfo.getSdkVersion().toString()
                 }),
                 operativeEventManager: OperativeEventManagerFactory.createOperativeEventManager({
                     nativeBridge: this._nativeBridge,

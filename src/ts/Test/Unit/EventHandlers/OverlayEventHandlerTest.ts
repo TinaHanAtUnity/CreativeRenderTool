@@ -21,7 +21,7 @@ import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { Video } from 'Models/Assets/Video';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { FocusManager } from 'Managers/FocusManager';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { OperativeEventManager, IOperativeSkipEventParams } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 import { Placement } from 'Models/Placement';
@@ -138,7 +138,14 @@ describe('OverlayEventHandlerTest', () => {
         });
 
         it('should send skip', () => {
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendSkip, placement, performanceAdUnit.getVideo().getPosition());
+            const params: IOperativeSkipEventParams = { placement: placement,
+                videoOrientation: performanceAdUnit.getVideoOrientation(),
+                adUnitStyle: undefined,
+                asset: performanceAdUnit.getVideo(),
+                videoProgress: performanceAdUnit.getVideo().getPosition()
+            };
+
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendSkip, params);
         });
 
         it('should call reconfigure', () => {

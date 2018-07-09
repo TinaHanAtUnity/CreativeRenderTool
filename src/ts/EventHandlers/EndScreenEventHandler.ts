@@ -1,6 +1,6 @@
 import { IEndScreenHandler } from 'Views/EndScreen';
 import { NativeBridge } from 'Native/NativeBridge';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { OperativeEventManager, IOperativeEventParams } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { ClientInfo } from 'Models/ClientInfo';
@@ -19,9 +19,9 @@ import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
-import { XPromoOperativeEventManager } from 'Managers/XPromoOperativeEventManager';
 import { Configuration } from 'Models/Configuration';
 import { GdprManager, GDPREventAction } from 'Managers/GdprManager';
+import { Video } from 'Models/Assets/Video';
 
 export interface IEndScreenDownloadParameters {
     clickAttributionUrl: string | undefined;
@@ -81,7 +81,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
 
     private onDownloadAndroid(parameters: IEndScreenDownloadParameters): void {
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
-        this._operativeEventManager.sendClick(this._placement, this.getVideoOrientation(), parameters.adUnitStyle);
+        this._operativeEventManager.sendClick(this.getOperativeEventParams(parameters));
         if(this._campaign instanceof XPromoCampaign) {
             const clickTrackingUrls = this._campaign.getTrackingUrlsForEvent('click');
             for (const url of clickTrackingUrls) {
@@ -103,7 +103,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     private onDownloadIos(parameters: IEndScreenDownloadParameters): void {
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
 
-        this._operativeEventManager.sendClick(this._placement, this.getVideoOrientation(), parameters.adUnitStyle);
+        this._operativeEventManager.sendClick(this.getOperativeEventParams(parameters));
         if(this._campaign instanceof XPromoCampaign) {
             const clickTrackingUrls = this._campaign.getTrackingUrlsForEvent('click');
             for (const url of clickTrackingUrls) {
@@ -277,5 +277,22 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
             default:
                 return '';
         }
+    }
+
+    private getVideo(): Video | undefined {
+        if(this._adUnit instanceof PerformanceAdUnit) {
+            return this._adUnit.getVideo();
+        }
+
+        return undefined;
+    }
+
+    private getOperativeEventParams(parameters: IEndScreenDownloadParameters): IOperativeEventParams {
+        return {
+            placement: this._placement,
+            videoOrientation: this.getVideoOrientation(),
+            adUnitStyle: parameters.adUnitStyle,
+            asset: this.getVideo()
+        };
     }
 }
