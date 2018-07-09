@@ -18,6 +18,7 @@ import { AdMobSignal } from 'Models/AdMobSignal';
 import { AdMobOptionalSignal } from 'Models/AdMobOptionalSignal';
 import { Configuration } from 'Models/Configuration';
 import { GdprManager, GDPREventAction } from 'Managers/GdprManager';
+import { GDPREventHandler } from 'EventHandlers/GDPREventHandler';
 
 export interface IAdMobEventHandlerParameters {
     adUnit: AdMobAdUnit;
@@ -32,7 +33,7 @@ export interface IAdMobEventHandlerParameters {
     gdprManager: GdprManager;
 }
 
-export class AdMobEventHandler implements IAdMobEventHandler {
+export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHandler {
     // Abstracted for testing
     public static setLoadTimeout(timeout: number) {
         AdMobEventHandler._loadTimeout = timeout;
@@ -47,10 +48,9 @@ export class AdMobEventHandler implements IAdMobEventHandler {
     private _adMobSignalFactory: AdMobSignalFactory;
     private _campaign: AdMobCampaign;
     private _clientInfo: ClientInfo;
-    private _configuration: Configuration;
-    private _gdprManager: GdprManager;
 
     constructor(parameters: IAdMobEventHandlerParameters) {
+        super(parameters.gdprManager, parameters.configuration);
         this._adUnit = parameters.adUnit;
         this._nativeBridge = parameters.nativeBridge;
         this._request = parameters.request;
@@ -59,9 +59,7 @@ export class AdMobEventHandler implements IAdMobEventHandler {
         this._adMobSignalFactory = parameters.adMobSignalFactory;
         this._campaign = parameters.campaign;
         this._clientInfo = parameters.clientInfo;
-        this._configuration = parameters.configuration;
         this._timeoutTimer = new Timer(() => this.onFailureToLoad(), AdMobEventHandler._loadTimeout);
-        this._gdprManager = parameters.gdprManager;
     }
 
     public onClose(): void {
@@ -150,13 +148,6 @@ export class AdMobEventHandler implements IAdMobEventHandler {
             };
             this._adUnit.sendClickSignalResponse(response);
         });
-    }
-
-    public onGDPRPopupSkipped(): void {
-        if (!this._configuration.isOptOutRecorded()) {
-            this._configuration.setOptOutRecorded(true);
-        }
-        this._gdprManager.sendGDPREvent(GDPREventAction.SKIP);
     }
 
     private getClickSignal(touchInfo: ITouchInfo): Promise<AdMobSignal> {
