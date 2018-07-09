@@ -67,7 +67,11 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
   }
 
   .top-container {
-    position: relative;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: $touchable-area-height;
   }
 
   .bottom-container {
@@ -133,11 +137,10 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
       width: $new-video-overlay-size;
       height: $new-video-overlay-size;
       border-radius: $tab-border-radius;
-      line-height: $new-video-overlay-size * .95;
     }
 
     .icon-container {
-      line-height: .9em;
+      line-height: .8em;
     }
     .icon {
       font-size: $new-video-overlay-size * .5;
