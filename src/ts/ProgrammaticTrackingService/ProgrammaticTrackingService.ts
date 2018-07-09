@@ -13,6 +13,7 @@ export interface IProgrammaticTrackingErrorData {
     osVersion: string;
     sdkVersion: string;
     adType: string;
+    seatId: number | undefined;
 }
 
 export class ProgrammaticTrackingService {
@@ -38,7 +39,7 @@ export class ProgrammaticTrackingService {
         return this.request.post(url, data, headers);
     }
 
-    public buildErrorData(error: ProgrammaticTrackingError, adType: string): IProgrammaticTrackingErrorData {
+    public buildErrorData(error: ProgrammaticTrackingError, adType: string, seatId: number | undefined): IProgrammaticTrackingErrorData {
         const platform: Platform = this.clientInfo.getPlatform();
         const osVersion: string = this.deviceInfo.getOsVersion();
         const sdkVersion: string = this.clientInfo.getSdkVersionName();
@@ -47,7 +48,8 @@ export class ProgrammaticTrackingService {
             platform: Platform[platform],
             osVersion: osVersion,
             sdkVersion: sdkVersion,
-            adType: adType
+            adType: adType,
+            seatId: seatId
         };
         return data;
     }

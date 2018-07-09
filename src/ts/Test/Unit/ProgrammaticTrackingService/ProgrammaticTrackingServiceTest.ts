@@ -37,16 +37,17 @@ describe('ProgrammaticTrackingService', () => {
             platformStub.returns(Platform.TEST);
             osVersionStub.returns('11.2.1');
             sdkVersionStub.returns('2.3.0');
-            const errorData = programmaticTrackingService.buildErrorData(ProgrammaticTrackingError.TooLargeFile, 'test');
+            const errorData = programmaticTrackingService.buildErrorData(ProgrammaticTrackingError.TooLargeFile, 'test', 1234);
             sinon.assert.calledOnce(platformStub);
             sinon.assert.calledOnce(osVersionStub);
             sinon.assert.calledOnce(sdkVersionStub);
             assert.deepEqual(errorData, {
-                event: 'too_large_file',
+                event: ProgrammaticTrackingError.TooLargeFile,
                 platform: 'TEST',
                 osVersion: '11.2.1',
                 sdkVersion: '2.3.0',
-                adType: 'test'
+                adType: 'test',
+                seatId: 1234
             });
         });
     });
@@ -56,7 +57,7 @@ describe('ProgrammaticTrackingService', () => {
             platformStub.returns(Platform.TEST);
             osVersionStub.returns('11.2.1');
             sdkVersionStub.returns('2.3.0');
-            const errorData = programmaticTrackingService.buildErrorData(ProgrammaticTrackingError.TooLargeFile, 'test');
+            const errorData = programmaticTrackingService.buildErrorData(ProgrammaticTrackingError.TooLargeFile, 'test', 1234);
             const promise = programmaticTrackingService.reportError(errorData);
             sinon.assert.calledOnce(postStub);
             assert.equal(postStub.firstCall.args.length, 3);

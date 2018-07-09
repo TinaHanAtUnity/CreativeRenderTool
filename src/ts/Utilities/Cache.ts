@@ -63,6 +63,7 @@ interface ICallbackObject {
     reject: (reason?: any) => void;
     originalUrl?: string;
     adType: string;
+    seatId: number | undefined;
 }
 
 export class Cache {
@@ -136,7 +137,8 @@ export class Cache {
             if (maybeAdType !== undefined) {
                 adType = maybeAdType;
             }
-            const promise = this.registerCallback(url, fileId, this._paused, diagnostics, campaign.getSession(), adType);
+            const seatId: number | undefined = campaign.getSeatId();
+            const promise = this.registerCallback(url, fileId, this._paused, diagnostics, campaign.getSession(), adType, seatId);
             if(!this._paused) {
                 this.downloadFile(url, fileId);
             }
@@ -220,7 +222,7 @@ export class Cache {
         });
     }
 
-    private registerCallback(url: string, fileId: string, paused: boolean, diagnostics: ICacheDiagnostics, session: Session, adType: string, originalUrl?: string): Promise<[CacheStatus, string]> {
+    private registerCallback(url: string, fileId: string, paused: boolean, diagnostics: ICacheDiagnostics, session: Session, adType: string, seatId: number | undefined, originalUrl?: string): Promise<[CacheStatus, string]> {
         return new Promise<[CacheStatus, string]>((resolve, reject) => {
             const callbackObject: ICallbackObject = {
                 fileId: fileId,
@@ -235,7 +237,8 @@ export class Cache {
                 resolve: resolve,
                 reject: reject,
                 originalUrl: originalUrl,
-                adType: adType
+                adType: adType,
+                seatId: seatId
             };
             this._callbacks[url] = callbackObject;
         });
@@ -286,7 +289,7 @@ export class Cache {
                     responseCode: responseCode,
                     headers: headers
                 }, callback.session);
-                const errorData = this._programmaticTrackingService.buildErrorData(ProgrammaticTrackingError.TooLargeFile, callback.adType);
+                const errorData = this._programmaticTrackingService.buildErrorData(ProgrammaticTrackingError.TooLargeFile, callback.adType, callback.seatId);
                 this._programmaticTrackingService.reportError(errorData);
             }
         } else {
@@ -331,7 +334,7 @@ export class Cache {
                         fileId = this._callbacks[callback.originalUrl].fileId;
                         originalUrl = callback.originalUrl;
                     }
-                    this.registerCallback(location, fileId, false, callback.diagnostics, callback.session, originalUrl);
+                    this.registerCallback(location, fileId, false, callback.diagnostics, callback.session, callback.adType, callback.seatId, originalUrl);
                     this.downloadFile(location, fileId);
                     return;
                 }
