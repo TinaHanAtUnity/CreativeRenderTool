@@ -3,7 +3,6 @@ import { Configuration } from 'Models/Configuration';
 
 export interface IGDPREventHandler {
     onGDPRPopupSkipped(): void;
-    // onGDPRConsentPopupAccept(): void;
 }
 
 export abstract class GDPREventHandler implements IGDPREventHandler {
@@ -22,11 +21,4 @@ export abstract class GDPREventHandler implements IGDPREventHandler {
             this._gdprManager.sendGDPREvent(GDPREventAction.SKIP);
         }
     }
-
-    // public onGDPRConsentPopupAccept(): void {
-    //     if (!this._configuration.isOptOutRecorded()) {
-    //         this._configuration.setOptOutRecorded(true);
-    //         this._gdprManager.sendGDPREvent(GDPREventAction.OPTIN, GDPREventSource.USER);
-    //     }
-    // }
 }
