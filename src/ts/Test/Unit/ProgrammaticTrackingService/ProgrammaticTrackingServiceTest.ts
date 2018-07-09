@@ -61,7 +61,7 @@ describe('ProgrammaticTrackingService', () => {
             const promise = programmaticTrackingService.reportError(errorData);
             sinon.assert.calledOnce(postStub);
             assert.equal(postStub.firstCall.args.length, 3);
-            assert.equal(postStub.firstCall.args[0], 'https://tracking.adsx.unityads.unity3d.com/tracking/error');
+            assert.equal(postStub.firstCall.args[0], 'https://tracking.adsx.unityads.unity3d.com/tracking/sdk/error');
             assert.equal(postStub.firstCall.args[1], JSON.stringify(errorData));
             assert.deepEqual(postStub.firstCall.args[2], [['Content-Type', 'application/json']]);
             return promise;
