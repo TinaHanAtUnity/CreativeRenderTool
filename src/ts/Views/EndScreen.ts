@@ -1,4 +1,5 @@
 import EndScreenTemplate from 'html/EndScreen.html';
+import SquareEndScreenTemplate from 'html/SquareEndScreen.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -10,6 +11,8 @@ import { Campaign } from 'Models/Campaign';
 import { IEndScreenDownloadParameters } from 'EventHandlers/EndScreenEventHandler';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { ABGroup } from 'Models/ABGroup';
+import { SquareEndScreenUtilities } from 'Utilities/SquareEndScreenUtilities';
 
 export interface IEndScreenHandler {
     onEndScreenDownload(parameters: IEndScreenDownloadParameters): void;
@@ -18,8 +21,7 @@ export interface IEndScreenHandler {
     onGDPRPopupSkipped(): void;
 }
 
-const GDPR_OPT_OUT_BASE = 'gdpr-pop-up-base';
-const GDPR_OPT_OUT_ICON = 'gdpr-pop-up-icon';
+const SQUARE_END_SCREEN = 'square-end-screen';
 
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
 
@@ -28,13 +30,13 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     private _gameName: string | undefined;
     private _privacy: AbstractPrivacy;
     private _isSwipeToCloseEnabled: boolean = false;
-    private _abGroup: number;
+    private _abGroup: ABGroup;
     private _showGDPRBanner: boolean = false;
     private _gdprPopupClicked = false;
     private _campaignId: string | undefined;
     private _osVersion: string | undefined;
 
-    constructor(nativeBridge: NativeBridge, language: string, gameId: string, gameName: string | undefined, abGroup: number, privacy: AbstractPrivacy, showGDPRBanner: boolean, adUnitStyle?: AdUnitStyle, campaignId?: string, osVersion?: string) {
+    constructor(nativeBridge: NativeBridge, language: string, gameId: string, gameName: string | undefined, abGroup: ABGroup, privacy: AbstractPrivacy, showGDPRBanner: boolean, adUnitStyle?: AdUnitStyle, campaignId?: string, osVersion?: string) {
         super(nativeBridge, 'end-screen');
         this._localization = new Localization(language, 'endscreen');
         this._abGroup = abGroup;
@@ -47,11 +49,13 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
         this._template = new Template(this.getTemplate(), this._localization);
 
+        this._template = new Template(this.getTemplate(), this._localization);
+
         this._bindings = [
             {
                 event: 'click',
                 listener: (event: Event) => this.onDownloadEvent(event),
-                selector: '.game-background, .download-container, .game-icon'
+                selector: '.game-background, .download-container, .game-icon, .game-image'
             },
             {
                 event: 'click',
@@ -94,23 +98,18 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         }
 
         const ctaButtonColor = this._adUnitStyle && this._adUnitStyle.getCTAButtonColor() ? this._adUnitStyle.getCTAButtonColor() : undefined;
-        if (ctaButtonColor && !this.getEndscreenAlt()) {
+        if (ctaButtonColor) {
             (<HTMLElement>this._container.querySelector('.download-container')).style.background = ctaButtonColor;
         }
 
         const endScreenAlt = this.getEndscreenAlt();
         if (typeof endScreenAlt === 'string') {
             this._container.classList.add(endScreenAlt);
-
-            /* If pop up is visible, hide privacy button */
-            if (endScreenAlt === GDPR_OPT_OUT_BASE || endScreenAlt === GDPR_OPT_OUT_ICON) {
-                (<HTMLElement>this._container.querySelector('.privacy-button')).style.display = 'none';
-            }
+            document.documentElement.classList.add(endScreenAlt);
         }
 
-        /* TODO: Should go away once we finish with a/b test */
-        if (!CustomFeatures.isGDPRBaseTest(this._abGroup)) {
-            this._container.classList.add('use-gdpr-privacy-icon');
+        if (this._showGDPRBanner) {
+            this._container.classList.add('show-gdpr-banner');
         }
     }
 
@@ -162,8 +161,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     protected getEndscreenAlt(campaign?: Campaign) {
-        if (this._showGDPRBanner) {
-            return CustomFeatures.isGDPRBaseTest(this._abGroup) ? GDPR_OPT_OUT_BASE : GDPR_OPT_OUT_ICON;
+        const campaignId = campaign ? campaign.getId() : this._campaignId;
+        const platform = this._nativeBridge.getPlatform();
+        if (SquareEndScreenUtilities.useSquareEndScreenAlt(this._abGroup, platform, campaignId, this._osVersion)) {
+            return SQUARE_END_SCREEN;
         }
 
         return undefined;
@@ -186,6 +187,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     private getTemplate() {
+        if (this.getEndscreenAlt() === SQUARE_END_SCREEN) {
+            return SquareEndScreenTemplate;
+        }
+
         return EndScreenTemplate;
     }
 }

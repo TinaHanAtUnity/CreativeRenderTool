@@ -50,22 +50,24 @@ export class VPAID extends View<IVPAIDHandler> {
     private _isLoaded = false;
     private _webplayerEventObserver: IObserver1<string>;
     private _isCoppaCompliant: boolean;
+    private _showGDPRBanner: boolean;
 
-    constructor(nativeBridge: NativeBridge, campaign: VPAIDCampaign, placement: Placement) {
+    constructor(nativeBridge: NativeBridge, campaign: VPAIDCampaign, placement: Placement, showGDPRBanner: boolean) {
         super(nativeBridge, 'vpaid');
 
         this._template = new Template(VPAIDTemplate);
         this._campaign = campaign;
         this._placement = placement;
+        this._showGDPRBanner = showGDPRBanner;
         this._stuckTimer = new Timer(() => this._handlers.forEach(handler => handler.onVPAIDStuck()), VPAID.stuckDelay);
         this._bindings = [];
     }
 
     public loadWebPlayer(): Promise<void> {
-        this._isLoaded = true;
+
         const adParameters = <IVPAIDAdParameters>{
             skipEnabled: this._placement.allowSkip(),
-            skipDuration: this._placement.allowSkipInSeconds(),
+            skipDuration: this._placement.allowSkipInSeconds()
         };
 
         const templateData = <IVPAIDTemplateData>{
@@ -79,6 +81,7 @@ export class VPAID extends View<IVPAIDHandler> {
 
         this._webplayerEventObserver = this._nativeBridge.WebPlayer.onWebPlayerEvent.subscribe((args: string) => this.onWebPlayerEvent(JSON.parse(args)));
         iframeSrcDoc = this._nativeBridge.getPlatform() === Platform.ANDROID ? encodeURIComponent(iframeSrcDoc) : iframeSrcDoc;
+        this._isLoaded = true;
         return this._nativeBridge.WebPlayer.setData(iframeSrcDoc, 'text/html', 'UTF-8');
     }
 

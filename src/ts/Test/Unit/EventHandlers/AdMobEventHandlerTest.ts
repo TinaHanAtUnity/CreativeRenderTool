@@ -7,14 +7,12 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { IntentApi } from 'Native/Api/Intent';
 import { UrlSchemeApi } from 'Native/Api/UrlScheme';
 import { Platform } from 'Constants/Platform';
-import { FinishState } from 'Constants/FinishState';
 import { Request } from 'Utilities/Request';
 import { Session } from 'Models/Session';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { AdMobSignal } from 'Models/AdMobSignal';
-import { SinonSandbox } from 'sinon';
 import { Url } from 'Utilities/Url';
 
 import { unity_proto } from '../../../../proto/unity_proto.js';
@@ -23,6 +21,8 @@ import { SdkStats } from 'Utilities/SdkStats';
 import { ITouchInfo } from 'Views/AFMABridge';
 import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
 import { ClientInfo } from 'Models/ClientInfo';
+import { Configuration } from 'Models/Configuration';
+import { GdprManager } from 'Managers/GdprManager';
 
 const resolveAfter = (timeout: number): Promise<void> => {
     return new Promise((resolve, reject) => setTimeout(resolve, timeout));
@@ -39,6 +39,8 @@ describe('AdMobEventHandler', () => {
     let campaign: AdMobCampaign;
     let clientInfo: ClientInfo;
     const testTimeout = 250;
+    let configuration;
+    let gdprManager;
 
     beforeEach(() => {
         adUnit = sinon.createStubInstance(AdMobAdUnit);
@@ -51,6 +53,8 @@ describe('AdMobEventHandler', () => {
         nativeBridge.UrlScheme = sinon.createStubInstance(UrlSchemeApi);
         campaign = sinon.createStubInstance(AdMobCampaign);
         (<sinon.SinonStub>campaign.getSession).returns(TestFixtures.getSession());
+        configuration = sinon.createStubInstance(Configuration);
+        gdprManager = sinon.createStubInstance(GdprManager);
 
         clientInfo = sinon.createStubInstance(ClientInfo);
 
@@ -63,7 +67,9 @@ describe('AdMobEventHandler', () => {
             session: session,
             adMobSignalFactory: adMobSignalFactory,
             campaign: campaign,
-            clientInfo: clientInfo
+            clientInfo: clientInfo,
+            configuration: configuration,
+            gdprManager: gdprManager
         });
     });
 

@@ -10,13 +10,14 @@ import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { Session } from 'Models/Session';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { Url } from 'Utilities/Url';
-import { SdkStats } from 'Utilities/SdkStats';
 import { ITouchInfo, IOpenableIntentsRequest } from 'Views/AFMABridge';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
 import { ClientInfo } from 'Models/ClientInfo';
 import { AdMobSignal } from 'Models/AdMobSignal';
 import { AdMobOptionalSignal } from 'Models/AdMobOptionalSignal';
+import { Configuration } from 'Models/Configuration';
+import { GdprManager, GDPREventAction } from 'Managers/GdprManager';
 
 export interface IAdMobEventHandlerParameters {
     adUnit: AdMobAdUnit;
@@ -27,6 +28,8 @@ export interface IAdMobEventHandlerParameters {
     adMobSignalFactory: AdMobSignalFactory;
     clientInfo: ClientInfo;
     campaign: AdMobCampaign;
+    configuration: Configuration;
+    gdprManager: GdprManager;
 }
 
 export class AdMobEventHandler implements IAdMobEventHandler {
@@ -44,6 +47,8 @@ export class AdMobEventHandler implements IAdMobEventHandler {
     private _adMobSignalFactory: AdMobSignalFactory;
     private _campaign: AdMobCampaign;
     private _clientInfo: ClientInfo;
+    private _configuration: Configuration;
+    private _gdprManager: GdprManager;
 
     constructor(parameters: IAdMobEventHandlerParameters) {
         this._adUnit = parameters.adUnit;
@@ -54,7 +59,9 @@ export class AdMobEventHandler implements IAdMobEventHandler {
         this._adMobSignalFactory = parameters.adMobSignalFactory;
         this._campaign = parameters.campaign;
         this._clientInfo = parameters.clientInfo;
+        this._configuration = parameters.configuration;
         this._timeoutTimer = new Timer(() => this.onFailureToLoad(), AdMobEventHandler._loadTimeout);
+        this._gdprManager = parameters.gdprManager;
     }
 
     public onClose(): void {
@@ -145,20 +152,15 @@ export class AdMobEventHandler implements IAdMobEventHandler {
         });
     }
 
+    public onGDPRPopupSkipped(): void {
+        if (!this._configuration.isOptOutRecorded()) {
+            this._configuration.setOptOutRecorded(true);
+        }
+        this._gdprManager.sendGDPREvent(GDPREventAction.SKIP);
+    }
+
     private getClickSignal(touchInfo: ITouchInfo): Promise<AdMobSignal> {
         return this._adMobSignalFactory.getClickSignal(touchInfo, this._adUnit).then((signal) => {
-            signal.setTimeOnScreen(this._adUnit.getTimeOnScreen());
-            signal.setTouchDiameter(touchInfo.diameter);
-            signal.setTouchPressure(touchInfo.pressure);
-            signal.setTouchXDown(touchInfo.start.x);
-            signal.setTouchYDown(touchInfo.start.y);
-            signal.setTouchXUp(touchInfo.end.x);
-            signal.setTouchYUp(touchInfo.end.y);
-            signal.setTouchDownTotal(touchInfo.counts.down);
-            signal.setTouchUpTotal(touchInfo.counts.up);
-            signal.setTouchMoveTotal(touchInfo.counts.move);
-            signal.setTouchCancelTotal(touchInfo.counts.cancel);
-            signal.setTouchDuration(touchInfo.duration);
             return signal;
         });
     }

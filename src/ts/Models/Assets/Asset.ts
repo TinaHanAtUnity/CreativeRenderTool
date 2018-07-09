@@ -8,6 +8,7 @@ export interface IAsset {
     cachedUrl: string | undefined;
     fileId: string | undefined;
     session: Session;
+    creativeId: string | undefined;
 }
 
 export abstract class Asset<T extends IAsset = IAsset> extends Model<T> {
@@ -15,7 +16,8 @@ export abstract class Asset<T extends IAsset = IAsset> extends Model<T> {
         url: ['string'],
         cachedUrl: ['string', 'undefined'],
         fileId: ['string', 'undefined'],
-        session: ['object']
+        session: ['object'],
+        creativeId: ['string', 'undefined']
     };
 
     constructor(name: string, session: Session, schema: ISchema<T>) {
@@ -61,6 +63,10 @@ export abstract class Asset<T extends IAsset = IAsset> extends Model<T> {
 
     public getSession(): Session {
         return this.get('session');
+    }
+
+    public getCreativeId(): string | undefined {
+        return this.get('creativeId');
     }
 
     public getDTO(): { [key: string]: any } {

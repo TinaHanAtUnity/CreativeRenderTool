@@ -199,7 +199,7 @@ export class SdkStats {
             SdkStats.getAssetSize(campaign),
             SdkStats._metaDataManager.fetch(MediationMetaData)]).then(([cachedCampaigns, assetSize, mediationMetaData]: [string[], number, MediationMetaData | undefined]) => {
             const userInfo: IUserInfo = {
-                abGroup: SdkStats._configuration.getAbGroup()
+                abGroup: SdkStats._configuration.getAbGroup().toNumber()
             };
 
             const placementInfo: IPlacementInfo = {

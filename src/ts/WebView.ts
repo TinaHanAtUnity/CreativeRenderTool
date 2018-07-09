@@ -50,14 +50,16 @@ import { OldCampaignRefreshManager } from 'Managers/OldCampaignRefreshManager';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { MissedImpressionManager } from 'Managers/MissedImpressionManager';
 import { GameSessionCounters } from 'Utilities/GameSessionCounters';
+import { TimeoutError, Promises } from 'Utilities/Promises';
+import { JaegerSpan, JaegerTags } from 'Jaeger/JaegerSpan';
+import { JaegerManager } from 'Jaeger/JaegerManager';
+import { ProgrammaticOperativeEventManager } from 'Managers/ProgrammaticOperativeEventManager';
+import { GdprManager } from 'Managers/GdprManager';
 
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
-import { TimeoutError, Promises } from 'Utilities/Promises';
-import { JaegerSpan, JaegerTags } from 'Jaeger/JaegerSpan';
-import { JaegerManager } from 'Jaeger/JaegerManager';
-import { GdprConsentManager } from 'Managers/GdprConsentManager';
+import { ABGroup } from 'Models/ABGroup';
 
 export class WebView {
 
@@ -80,13 +82,12 @@ export class WebView {
     private _currentAdUnit: AbstractAdUnit;
 
     private _sessionManager: SessionManager;
-    private _thirdPartyEventManager: ThirdPartyEventManager;
     private _wakeUpManager: WakeUpManager;
     private _focusManager: FocusManager;
     private _analyticsManager: AnalyticsManager;
     private _adMobSignalFactory: AdMobSignalFactory;
     private _missedImpressionManager: MissedImpressionManager;
-    private _gdprConsentManager: GdprConsentManager;
+    private _gdprManager: GdprManager;
     private _jaegerManager: JaegerManager;
 
     private _showing: boolean = false;
@@ -135,7 +136,6 @@ export class WebView {
             this._cacheBookkeeping = new CacheBookkeeping(this._nativeBridge);
             this._cache = new Cache(this._nativeBridge, this._wakeUpManager, this._request, this._cacheBookkeeping);
             this._resolve = new Resolve(this._nativeBridge);
-            this._thirdPartyEventManager = new ThirdPartyEventManager(this._nativeBridge, this._request);
             this._metadataManager = new MetaDataManager(this._nativeBridge);
             this._adMobSignalFactory = new AdMobSignalFactory(this._nativeBridge, this._clientInfo, this._deviceInfo, this._focusManager);
             this._jaegerManager = new JaegerManager(this._request);
@@ -145,6 +145,13 @@ export class WebView {
             HttpKafka.setClientInfo(this._clientInfo);
             SdkStats.setInitTimestamp();
             GameSessionCounters.init();
+
+            if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                this._nativeBridge.Request.Android.setMaximumPoolSize(8);
+                this._nativeBridge.Request.Android.setKeepAliveTime(10000);
+            } else {
+                this._nativeBridge.Request.setConcurrentRequestCount(8);
+            }
 
             return Promise.all([this._deviceInfo.fetch(), this.setupTestEnvironment()]);
         }).then(() => {
@@ -159,7 +166,7 @@ export class WebView {
                 } else if(model.match(/ipad/i)) {
                     document.body.classList.add('ipad');
                 }
-                this._container = new ViewController(this._nativeBridge, this._deviceInfo, this._focusManager);
+                this._container = new ViewController(this._nativeBridge, this._deviceInfo, this._focusManager, this._clientInfo);
             }
             HttpKafka.setDeviceInfo(this._deviceInfo);
             this._sessionManager = new SessionManager(this._nativeBridge, this._request);
@@ -203,15 +210,14 @@ export class WebView {
 
             return Promise.all([configPromise, cachedCampaignResponsePromise, cachePromise]);
         }).then(([configuration, cachedCampaignResponse]) => {
-            this._gdprConsentManager = new GdprConsentManager(this._nativeBridge, this._deviceInfo, this._clientInfo, configuration, this._request);
+            this._gdprManager = new GdprManager(this._nativeBridge, this._deviceInfo, this._clientInfo, configuration, this._request);
             this._configuration = configuration;
             this._cachedCampaignResponse = cachedCampaignResponse;
             HttpKafka.setConfiguration(this._configuration);
             this._jaegerManager.setJaegerTracingEnabled(this._configuration.isJaegerTracingEnabled());
 
-            PurchasingUtilities.setConfiguration(this._configuration);
-            PurchasingUtilities.setClientInfo(this._clientInfo);
-            PurchasingUtilities.sendPurchaseInitializationEvent(this._nativeBridge);
+            PurchasingUtilities.initialize(this._clientInfo, this._configuration, this._nativeBridge);
+            PurchasingUtilities.sendPurchaseInitializationEvent();
 
             if (!this._configuration.isEnabled()) {
                 const error = new Error('Game with ID ' + this._clientInfo.getGameId() +  ' is not enabled');
@@ -219,20 +225,24 @@ export class WebView {
                 throw error;
             }
 
+            let analyticsPromise;
             if(this._configuration.isAnalyticsEnabled() || CustomFeatures.isExampleGameId(this._clientInfo.getGameId())) {
                 this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo, this._configuration, this._focusManager);
-                return this._analyticsManager.init().then(() => {
+                analyticsPromise = this._analyticsManager.init().then(() => {
                     this._sessionManager.setGameSessionId(this._analyticsManager.getGameSessionId());
-                    return this._gdprConsentManager.fetch();
                 });
             } else {
                 const analyticsStorage: AnalyticsStorage = new AnalyticsStorage(this._nativeBridge);
-                return analyticsStorage.getSessionId(this._clientInfo.isReinitialized()).then(gameSessionId => {
+                analyticsPromise = analyticsStorage.getSessionId(this._clientInfo.isReinitialized()).then(gameSessionId => {
                     analyticsStorage.setSessionId(gameSessionId);
                     this._sessionManager.setGameSessionId(gameSessionId);
-                    return this._gdprConsentManager.fetch();
                 });
             }
+            const gdprConsentPromise = this._gdprManager.getConsentAndUpdateConfiguration().catch((error) => {
+                // do nothing
+                // error happens when consent value is undefined
+            });
+            return Promise.all([analyticsPromise, gdprConsentPromise]);
         }).then(() => {
             if(this._sessionManager.getGameSessionId() % 10000 === 0) {
                 this._cache.setDiagnostics(true);
@@ -273,6 +283,9 @@ export class WebView {
         }).then(() => {
             if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
                 this._nativeBridge.setAutoBatchEnabled(false);
+                this._nativeBridge.Request.Android.setMaximumPoolSize(1);
+            } else {
+                this._nativeBridge.Request.setConcurrentRequestCount(1);
             }
         }).catch(error => {
             jaegerInitSpan.addAnnotation(error.message);
@@ -356,7 +369,7 @@ export class WebView {
             }).catch((e) => {
                 if (e instanceof TimeoutError) {
                     Diagnostics.trigger('realtime_network_timeout', {
-                        auctionId: campaign.getSession().getId(),
+                        auctionId: campaign.getSession().getId()
                     });
                 }
                 Diagnostics.trigger('realtime_error', {
@@ -390,7 +403,7 @@ export class WebView {
                 this.showError(true, placement.getId(), 'No connection');
 
                 const error = new DiagnosticError(new Error('No connection is available'), {
-                    id: campaign.getId(),
+                    id: campaign.getId()
                 });
                 Diagnostics.trigger('mraid_no_connection', error, campaign.getSession());
                 return;
@@ -403,7 +416,10 @@ export class WebView {
                 container: this._container,
                 deviceInfo: this._deviceInfo,
                 clientInfo: this._clientInfo,
-                thirdPartyEventManager: this._thirdPartyEventManager,
+                thirdPartyEventManager: new ThirdPartyEventManager(this._nativeBridge, this._request, {
+                    '%ZONE%': placement.getId(),
+                    '%SDK_VERSION%': this._clientInfo.getSdkVersion().toString()
+                }),
                 operativeEventManager: OperativeEventManagerFactory.createOperativeEventManager({
                     nativeBridge: this._nativeBridge,
                     request: this._request,
@@ -419,7 +435,7 @@ export class WebView {
                 configuration: this._configuration,
                 request: this._request,
                 options: options,
-                gdprManager: this._gdprConsentManager,
+                gdprManager: this._gdprManager,
                 adMobSignalFactory: this._adMobSignalFactory
             });
             this._refreshManager.setCurrentAdUnit(this._currentAdUnit);
@@ -463,6 +479,9 @@ export class WebView {
             this._currentAdUnit.show().then(() => {
                 if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
                     this._nativeBridge.setAutoBatchEnabled(true);
+                    this._nativeBridge.Request.Android.setMaximumPoolSize(8);
+                } else {
+                    this._nativeBridge.Request.setConcurrentRequestCount(8);
                 }
             });
         });
@@ -481,6 +500,9 @@ export class WebView {
 
         if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
             this._nativeBridge.setAutoBatchEnabled(false);
+            this._nativeBridge.Request.Android.setMaximumPoolSize(1);
+        } else {
+            this._nativeBridge.Request.setConcurrentRequestCount(1);
         }
     }
 
@@ -510,7 +532,7 @@ export class WebView {
         return TestEnvironment.setup(new MetaData(this._nativeBridge)).then(() => {
             if(TestEnvironment.get('serverUrl')) {
                 ConfigManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
-                OperativeEventManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
+                ProgrammaticOperativeEventManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
                 CampaignManager.setBaseUrl(TestEnvironment.get('serverUrl'));
             }
 
@@ -524,8 +546,12 @@ export class WebView {
 
             if(TestEnvironment.get('abGroup')) {
                 // needed in both due to placement level control support
-                ConfigManager.setAbGroup(TestEnvironment.get('abGroup'));
-                CampaignManager.setAbGroup(TestEnvironment.get('abGroup'));
+                const abGroupNumber: number = Number(TestEnvironment.get('abGroup'));
+                if (!isNaN(abGroupNumber)) { // if it is a number get the group
+                    const abGroup = ABGroup.getAbGroup(abGroupNumber);
+                    ConfigManager.setAbGroup(abGroup);
+                    CampaignManager.setAbGroup(abGroup);
+                }
             }
 
             if(TestEnvironment.get('campaignId')) {

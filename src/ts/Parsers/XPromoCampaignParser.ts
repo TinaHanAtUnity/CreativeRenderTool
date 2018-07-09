@@ -8,10 +8,11 @@ import { AuctionResponse } from 'Models/AuctionResponse';
 import { Session } from 'Models/Session';
 import { Video } from 'Models/Assets/Video';
 import { Image } from 'Models/Assets/Image';
+import { ABGroup } from 'Models/ABGroup';
 
 export class XPromoCampaignParser extends CampaignParser {
     public static ContentType = 'xpromo/video';
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: number): Promise<Campaign> {
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: ABGroup): Promise<Campaign> {
         const json = response.getJsonContent();
 
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';
@@ -59,6 +60,7 @@ export class XPromoCampaignParser extends CampaignParser {
             clickAttributionUrlFollowsRedirects: json.clickAttributionUrlFollowsRedirects,
             bypassAppSheet: json.bypassAppSheet,
             trackingUrls: response.getTrackingUrls() ? this.validateAndEncodeTrackingUrls(response.getTrackingUrls(), session) : undefined,
+            videoEventUrls: this.validateAndEncodeVideoEventUrls(json.videoEventUrls, session),
             store: storeName
         };
 
@@ -73,5 +75,17 @@ export class XPromoCampaignParser extends CampaignParser {
         }
 
         return Promise.resolve(new XPromoCampaign(parameters));
+    }
+
+    private validateAndEncodeVideoEventUrls(urls: { [eventType: string]: string }, session: Session): { [eventType: string]: string } {
+        if(urls && urls !== null) {
+            for(const urlKey in urls) {
+                if(urls.hasOwnProperty(urlKey)) {
+                    urls[urlKey] = this.validateAndEncodeUrl(urls[urlKey], session);
+                }
+            }
+        }
+
+        return urls;
     }
 }

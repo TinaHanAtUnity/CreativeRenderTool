@@ -7,17 +7,20 @@ export interface IVideo extends IAsset {
     position: number;
     positionRepeats: number;
     quartile: number;
+    started: boolean;
 }
 
 export class Video extends Asset<IVideo> {
-    constructor(url: string, session: Session, size?: number) {
+    constructor(url: string, session: Session, size?: number, creativeId?: string) {
         super('Video', session, {
             ... Asset.Schema,
             size: ['number', 'undefined'],
             duration: ['number'],
             position: ['number'],
             positionRepeats: ['number'],
-            quartile: ['number']
+            quartile: ['number'],
+            started: ['boolean'],
+            creativeId: ['string', 'undefined']
         });
 
         this.set('url', url);
@@ -26,6 +29,8 @@ export class Video extends Asset<IVideo> {
         this.set('position', 0);
         this.set('positionRepeats', 0);
         this.set('quartile', 0);
+        this.set('started', false);
+        this.set('creativeId', creativeId);
     }
 
     public getDescription(): string {
@@ -34,6 +39,14 @@ export class Video extends Asset<IVideo> {
 
     public getSize() {
         return this.get('size');
+    }
+
+    public hasStarted() {
+        return this.get('started');
+    }
+
+    public setStarted(started: boolean) {
+        this.set('started', started);
     }
 
     public getDuration() {

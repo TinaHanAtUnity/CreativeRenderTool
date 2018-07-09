@@ -1,5 +1,6 @@
 @import "components.styl";
 @import "vars.styl";
+@import "gdpr-pop-up.styl";
 
 #mraid {
   #mraid-iframe {
@@ -10,7 +11,7 @@
   }
   .icon-close {
     position: absolute;
-    top: 4px;
+    top: 5px;
     right: 2px;
     width: 32px;
     height: 32px;
@@ -70,9 +71,15 @@
     -webkit-animation-duration: .01s;
   }
 
+  .gdpr-pop-up {
+    $gdpr-pop-up($default-scale-size);
+  }
+
   .privacy-button {
+    position: absolute;
     $privacy-button-default($default-scale-size);
     left: 0;
-    margin: 0 0 0 $default-size * $default-scale-size * .25;
+    z-index: 1;
+    padding: 7px 7px 0 5px;
   }
 }

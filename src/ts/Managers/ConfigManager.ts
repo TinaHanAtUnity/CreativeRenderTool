@@ -16,6 +16,7 @@ import { Platform } from 'Constants/Platform';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { JaegerSpan, JaegerTags } from 'Jaeger/JaegerSpan';
+import { ABGroup } from 'Models/ABGroup';
 
 export class ConfigManager {
 
@@ -47,7 +48,7 @@ export class ConfigManager {
                 jaegerSpan.addTag(JaegerTags.StatusCode, response.responseCode.toString());
                 try {
                     const configJson = JsonParser.parse(response.response);
-                    const config: Configuration = ConfigurationParser.parse(configJson);
+                    const config: Configuration = ConfigurationParser.parse(configJson, clientInfo);
                     nativeBridge.Sdk.logInfo('Received configuration with ' + config.getPlacementCount() + ' placements for token ' + config.getToken() + ' (A/B group ' + config.getAbGroup() + ')');
                     if(config.getToken()) {
                         if(nativeBridge.getPlatform() === Platform.IOS && deviceInfo.getLimitAdTracking()) {
@@ -99,12 +100,12 @@ export class ConfigManager {
         ConfigManager.ConfigBaseUrl = baseUrl + '/games';
     }
 
-    public static setAbGroup(abGroup: number) {
+    public static setAbGroup(abGroup: ABGroup) {
         ConfigManager.AbGroup = abGroup;
     }
 
     private static ConfigBaseUrl: string = 'https://publisher-config.unityads.unity3d.com/games';
-    private static AbGroup: number | undefined;
+    private static AbGroup: ABGroup | undefined;
 
     private static createConfigUrl(clientInfo: ClientInfo, deviceInfo: DeviceInfo, framework?: FrameworkMetaData, adapter?: AdapterMetaData, gamerToken?: string): string {
         let url: string = [
@@ -112,6 +113,11 @@ export class ConfigManager {
             clientInfo.getGameId(),
             'configuration'
         ].join('/');
+
+        let abGroup;
+        if (ConfigManager.AbGroup) {
+            abGroup = ConfigManager.AbGroup.toNumber();
+        }
 
         url = Url.addParameters(url, {
             bundleId: clientInfo.getApplicationName(),
@@ -124,7 +130,7 @@ export class ConfigManager {
             language: deviceInfo.getLanguage(),
             test: clientInfo.getTestMode(),
             gamerToken: gamerToken,
-            forceAbGroup: ConfigManager.AbGroup
+            forceAbGroup: abGroup
         });
 
         if(clientInfo.getPlatform() === Platform.ANDROID && deviceInfo instanceof AndroidDeviceInfo) {

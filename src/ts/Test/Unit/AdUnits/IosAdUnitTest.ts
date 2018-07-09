@@ -21,7 +21,7 @@ import { Request } from 'Utilities/Request';
 import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
-import { GdprConsentManager } from 'Managers/GdprConsentManager';
+import { GdprManager } from 'Managers/GdprManager';
 
 describe('IosAdUnitTest', () => {
     let nativeBridge: NativeBridge;
@@ -48,10 +48,10 @@ describe('IosAdUnitTest', () => {
         const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         const sessionManager = new SessionManager(nativeBridge, request);
         const deviceInfo = TestFixtures.getIosDeviceInfo();
-        container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager);
+        container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager, clientInfo);
         const campaign = TestFixtures.getCampaign();
         const configuration = TestFixtures.getConfiguration();
-        const gdprManager = sinon.createStubInstance(GdprConsentManager);
+        const gdprManager = sinon.createStubInstance(GdprManager);
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             nativeBridge: nativeBridge,
             request: request,
@@ -107,7 +107,7 @@ describe('IosAdUnitTest', () => {
     it('should close ad unit', () => {
         nativeBridge = TestFixtures.getNativeBridge(Platform.IOS);
         focusManager = new FocusManager(nativeBridge);
-        container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager);
+        container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager, TestFixtures.getClientInfo());
         const stub = sinon.stub(nativeBridge.IosAdUnit, 'close').returns(Promise.resolve());
 
         return container.close().then(() => {
@@ -119,7 +119,7 @@ describe('IosAdUnitTest', () => {
     // note: when reconfigure method is enhanced with some actual parameters, this test needs to be refactored
     it('should reconfigure ad unit', () => {
         nativeBridge = TestFixtures.getNativeBridge(Platform.IOS);
-        container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager);
+        container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager, TestFixtures.getClientInfo());
 
         const stubViews = sinon.stub(nativeBridge.IosAdUnit, 'setViews').returns(Promise.resolve());
         const stubOrientation = sinon.stub(nativeBridge.IosAdUnit, 'setSupportedOrientations').returns(Promise.resolve());
@@ -151,7 +151,7 @@ describe('IosAdUnitTest', () => {
             },
             onContainerSystemMessage: function(message: AdUnitContainerSystemMessage) {
                 // EMPTY
-            },
+            }
         };
 
         container.addEventHandler(listener);
@@ -183,7 +183,7 @@ describe('IosAdUnitTest', () => {
                 },
                 onContainerSystemMessage: function(message: AdUnitContainerSystemMessage) {
                     onContainerSystemMessage = true;
-                },
+                }
             };
             testAdUnit = new TestAdUnit(nativeBridge, adUnitParams);
             sinon.stub(nativeBridge.IosAdUnit, 'open').returns(Promise.resolve());

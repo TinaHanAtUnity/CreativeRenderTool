@@ -1,8 +1,12 @@
 import { IConfiguration, Configuration, CacheMode } from 'Models/Configuration';
 import { Placement } from 'Models/Placement';
+import { ABGroup } from 'Models/ABGroup';
+import { MixedPlacementUtility, MixedPlacementTypes } from 'Utilities/MixedPlacementUtility';
+import { ClientInfo } from 'Models/ClientInfo';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
 
 export class ConfigurationParser {
-    public static parse(configJson: any): Configuration {
+    public static parse(configJson: any, clientInfo?: ClientInfo): Configuration {
         const configPlacements = configJson.placements;
         const placements: { [id: string]: Placement } = {};
         let defaultPlacement: Placement | undefined;
@@ -10,7 +14,16 @@ export class ConfigurationParser {
         if (configPlacements) {
             configPlacements.forEach((rawPlacement: any): void => {
                 const placement: Placement = new Placement(rawPlacement);
-                placements[placement.getId()] = placement;
+                if(clientInfo && CustomFeatures.isMixedPlacementExperiment(clientInfo.getGameId())) {
+                    MixedPlacementUtility.originalPlacements[placement.getId()] = placement;
+                    if (MixedPlacementUtility.isMixedPlacement(placement)) {
+                        MixedPlacementUtility.createMixedPlacements(rawPlacement, placements);
+                    } else {
+                        placements[placement.getId()] = placement;
+                    }
+                } else {
+                    placements[placement.getId()] = placement;
+                }
                 if (placement.isDefault()) {
                     defaultPlacement = placement;
                 }
@@ -27,7 +40,7 @@ export class ConfigurationParser {
             enabled: configJson.enabled,
             country: configJson.country,
             coppaCompliant: configJson.coppaCompliant,
-            abGroup: configJson.abGroup,
+            abGroup: ABGroup.getAbGroup(configJson.abGroup),
             gamerId: configJson.gamerId,
             properties: configJson.properties,
             cacheMode: this.parseCacheMode(configJson),

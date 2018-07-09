@@ -23,7 +23,7 @@ import { FocusManager } from 'Managers/FocusManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { GDPRPrivacy } from 'Views/GDPRPrivacy';
-import { GdprConsentManager } from 'Managers/GdprConsentManager';
+import { GdprManager } from 'Managers/GdprManager';
 
 describe('MRAIDEventHandlersTest', () => {
 
@@ -44,7 +44,7 @@ describe('MRAIDEventHandlersTest', () => {
     let mraidAdUnitParameters: IMRAIDAdUnitParameters;
     let mraidEventHandler: MRAIDEventHandler;
     let mraidCampaign: MRAIDCampaign;
-    let gdprManager: GdprConsentManager;
+    let gdprManager: GdprManager;
 
     describe('with onClick', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -52,7 +52,7 @@ describe('MRAIDEventHandlersTest', () => {
         beforeEach(() => {
             nativeBridge = new NativeBridge({
                 handleInvocation,
-                handleCallback,
+                handleCallback
             }, Platform.ANDROID);
 
             sinon.spy(nativeBridge.Intent, 'launch');
@@ -81,7 +81,7 @@ describe('MRAIDEventHandlersTest', () => {
             mraidView = sinon.createStubInstance(MRAID);
             (<sinon.SinonSpy>mraidView.container).restore();
             sinon.stub(mraidView, 'container').returns(document.createElement('div'));
-            gdprManager = sinon.createStubInstance(GdprConsentManager);
+            gdprManager = sinon.createStubInstance(GdprManager);
 
             mraidAdUnitParameters = {
                 forceOrientation: Orientation.LANDSCAPE,
@@ -109,17 +109,17 @@ describe('MRAIDEventHandlersTest', () => {
 
         it('should send a click with session manager', () => {
             mraidEventHandler.onMraidClick('http://example.net');
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, placement);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, { placement: placement, asset: mraidAdUnitParameters.campaign.getResourceUrl() });
         });
 
         it('should send a view with session manager', () => {
             mraidEventHandler.onMraidClick('http://example.net');
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendView, placement);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendView, { placement: placement, asset: mraidAdUnitParameters.campaign.getResourceUrl() });
         });
 
         it('should send a third quartile event with session manager', () => {
             mraidEventHandler.onMraidClick('http://example.net');
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile, placement);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile, { placement: placement, asset: mraidAdUnitParameters.campaign.getResourceUrl() });
         });
 
         it('should send a native click event', () => {
@@ -138,7 +138,7 @@ describe('MRAIDEventHandlersTest', () => {
                     headers: [['location', 'market://foobar.com']]
                 }));
 
-                mraidView = new MRAID(nativeBridge, placement, mraidCampaign, mraidAdUnitParameters.privacy);
+                mraidView = new MRAID(nativeBridge, placement, mraidCampaign, mraidAdUnitParameters.privacy, true);
                 sinon.stub(mraidView, 'createMRAID').callsFake(() => {
                     return Promise.resolve();
                 });

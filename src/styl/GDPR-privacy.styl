@@ -2,8 +2,21 @@
 @import "components.styl";
 
 #gdpr-privacy {
-  $full-screen-pop-up-view($default-scale-size, 1000);
+  $full-screen-pop-up-view($default-scale-size, 9999);
 
+  .pop-up-content {
+    .icon-gdpr {
+      display: block;
+      text-align: center;
+      font-size: 2.5rem;
+      opacity: .41;
+    }
+
+    .centered-title {
+      display: block;
+      text-align: center;
+    }
+  }
   .back-side {
     display: none;
     font-size: $default-size * $default-font-size * .75;

@@ -20,12 +20,6 @@
       "body": true
     },
     {
-      "parameter": "gamerId",
-      "required": "all",
-      "queryString": false,
-      "body": true
-    },
-    {
       "parameter": "campaignId",
       "required": "all",
       "queryString": false,
@@ -219,7 +213,7 @@
     },
     {
       "parameter": "androidId",
-      "required": "android",
+      "required": "no",
       "queryString": false,
       "body": true
     },
@@ -243,6 +237,12 @@
     },
     {
       "parameter": "optOutRecorded",
+      "required": "all",
+      "queryString": false,
+      "body": true
+    },
+    {
+      "parameter": "unityCreativeId",
       "required": "all",
       "queryString": false,
       "body": true
