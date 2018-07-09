@@ -119,7 +119,6 @@ export class Url {
                 whitelisted = this.androidWhitelistedProtocols;
                 break;
             default:
-                break;
         }
 
         for (const protocol of whitelisted) {

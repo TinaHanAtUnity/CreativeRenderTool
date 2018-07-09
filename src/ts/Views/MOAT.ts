@@ -172,7 +172,6 @@ export class MOAT extends View<VastCampaign> {
                     break;
                 default:
                     this._nativeBridge.Sdk.logWarning(`MOAT Unknown message type ${e.data.type}`);
-                    break;
             }
         }
     }
