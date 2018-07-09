@@ -5,11 +5,10 @@ import { DiagnosticError } from 'Errors/DiagnosticError';
 import { TestEnvironment } from 'Utilities/TestEnvironment';
 import { Configuration } from 'Models/Configuration';
 import { FileInfo } from 'Utilities/FileInfo';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { OperativeEventManager, IOperativeEventParams } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { Placement } from 'Models/Placement';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
-import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { IVideoEventHandler } from 'Native/Api/VideoPlayer';
 import { Video } from 'Models/Assets/Video';
 import { BaseVideoEventHandler, IVideoEventHandlerParams } from 'EventHandlers/BaseVideoEventHandler';
@@ -236,7 +235,7 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
     }
 
     protected handleStartEvent(progress: number): void {
-        this._operativeEventManager.sendStart(this._placement, this.getVideoOrientation(), this._adUnitStyle).then(() => {
+        this._operativeEventManager.sendStart(this.getOperativeEventParams()).then(() => {
             this._adUnit.onStartProcessed.trigger();
         });
 
@@ -244,18 +243,27 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
     }
 
     protected handleFirstQuartileEvent(progress: number): void {
-        this._operativeEventManager.sendFirstQuartile(this._placement, this.getVideoOrientation(), this._adUnitStyle);
+        this._operativeEventManager.sendFirstQuartile(this.getOperativeEventParams());
     }
 
     protected handleMidPointEvent(progress: number): void {
-        this._operativeEventManager.sendMidpoint(this._placement, this.getVideoOrientation(), this._adUnitStyle);
+        this._operativeEventManager.sendMidpoint(this.getOperativeEventParams());
     }
 
     protected handleThirdQuartileEvent(progress: number): void {
-        this._operativeEventManager.sendThirdQuartile(this._placement, this.getVideoOrientation(), this._adUnitStyle);
+        this._operativeEventManager.sendThirdQuartile(this.getOperativeEventParams());
     }
 
     protected handleCompleteEvent(url: string): void {
-        this._operativeEventManager.sendView(this._placement, this.getVideoOrientation(), this._adUnitStyle);
+        this._operativeEventManager.sendView(this.getOperativeEventParams());
+    }
+
+    private getOperativeEventParams(): IOperativeEventParams {
+        return {
+            placement: this._placement,
+            videoOrientation: this.getVideoOrientation(),
+            adUnitStyle: this._adUnitStyle,
+            asset: this._video
+        };
     }
 }

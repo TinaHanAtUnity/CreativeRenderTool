@@ -1,7 +1,7 @@
 import { IMRAIDViewHandler, IOrientationProperties } from 'Views/MRAIDView';
 import { HttpKafka, KafkaCommonObjectType } from 'Utilities/HttpKafka';
 import { NativeBridge } from 'Native/NativeBridge';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { OperativeEventManager, IOperativeEventParams } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
@@ -51,14 +51,15 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
 
     public onMraidClick(url: string): Promise<void> {
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
+        const operativeEventParams: IOperativeEventParams = this.getOperativeEventParams();
         if(!this._campaign.getSession().getEventSent(EventType.THIRD_QUARTILE)) {
-            this._operativeEventManager.sendThirdQuartile(this._placement);
+            this._operativeEventManager.sendThirdQuartile(operativeEventParams);
         }
         if(!this._campaign.getSession().getEventSent(EventType.VIEW)) {
-            this._operativeEventManager.sendView(this._placement);
+            this._operativeEventManager.sendView(operativeEventParams);
         }
         if(!this._campaign.getSession().getEventSent(EventType.CLICK)) {
-            this._operativeEventManager.sendClick(this._placement);
+            this._operativeEventManager.sendClick(operativeEventParams);
         }
 
         this._adUnit.sendClick();
@@ -85,7 +86,7 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
     }
 
     public onMraidReward(): void {
-        this._operativeEventManager.sendThirdQuartile(this._placement);
+        this._operativeEventManager.sendThirdQuartile(this.getOperativeEventParams());
     }
 
     public onMraidSkip(): void {
@@ -188,5 +189,12 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
     // Follows the redirects of a URL, returning the final location.
     private followUrl(link: string): Promise<string> {
         return this._request.followRedirectChain(link);
+    }
+
+    private getOperativeEventParams(): IOperativeEventParams {
+        return {
+            placement: this._placement,
+            asset: this._campaign.getResourceUrl()
+        };
     }
 }

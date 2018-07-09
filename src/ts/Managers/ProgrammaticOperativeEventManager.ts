@@ -1,4 +1,7 @@
-import { IOperativeEventManagerParams, OperativeEventManager } from 'Managers/OperativeEventManager';
+import {
+    IOperativeEventManagerParams, IOperativeEventParams,
+    OperativeEventManager
+} from 'Managers/OperativeEventManager';
 import { Campaign } from 'Models/Campaign';
 
 export class ProgrammaticOperativeEventManager extends OperativeEventManager {
@@ -23,5 +26,13 @@ export class ProgrammaticOperativeEventManager extends OperativeEventManager {
 
     protected createClickEventUrl(): string | undefined {
         return undefined;
+    }
+
+    protected getInfoJson(params: IOperativeEventParams, eventId: string, gameSession: number, gamerSid?: string, previousPlacementId?: string): Promise<[string, any]> {
+        return super.getInfoJson(params, eventId, gameSession, gamerSid, previousPlacementId).then(([id, infoJson]) => {
+            infoJson.creativeId =  this._campaign.getCreativeId();
+
+            return <[string, any]>[eventId, infoJson];
+        });
     }
 }

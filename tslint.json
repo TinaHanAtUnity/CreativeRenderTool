@@ -41,7 +41,6 @@
     "align": [false, "parameters", "arguments", "statements"],
     "switch-final-break": false,
     "no-object-literal-type-assertion": false,
-    "switch-default": false,
     "no-irregular-whitespace": false,
     "no-reserved-keywords": false,
     "prefer-method-signature": false,

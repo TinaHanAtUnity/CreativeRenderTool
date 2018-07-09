@@ -23,7 +23,7 @@ import { Cache } from 'Utilities/Cache';
 import { AssetManager } from 'Managers/AssetManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { FocusManager } from 'Managers/FocusManager';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { OperativeEventManager, IOperativeEventParams } from 'Managers/OperativeEventManager';
 import { Session } from 'Models/Session';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { AndroidDeviceInfoApi, IPackageInfo } from 'Native/Api/AndroidDeviceInfo';
@@ -361,7 +361,14 @@ describe('Event parameters should match specifications', () => {
                 campaign: campaign
             });
             OperativeEventManager.setPreviousPlacementId(undefined);
-            return operativeEventManager.sendClick(TestFixtures.getPlacement()).then(() => {
+
+            const operativeEventParams: IOperativeEventParams = {
+                placement: TestFixtures.getPlacement(),
+                videoOrientation: 'landscape',
+                adUnitStyle: campaign.getAdUnitStyle(),
+                asset: campaign.getVideo()
+            };
+            return operativeEventManager.sendClick(operativeEventParams).then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];
 
@@ -392,7 +399,13 @@ describe('Event parameters should match specifications', () => {
                 campaign: campaign
             });
             OperativeEventManager.setPreviousPlacementId(undefined);
-            return operativeEventManager.sendClick(TestFixtures.getPlacement()).then(() => {
+            const operativeEventParams: IOperativeEventParams = {
+                placement: TestFixtures.getPlacement(),
+                videoOrientation: 'landscape',
+                adUnitStyle: campaign.getAdUnitStyle(),
+                asset: campaign.getVideo()
+            };
+            return operativeEventManager.sendClick(operativeEventParams).then(() => {
                 const url: string = requestSpy.getCall(0).args[0];
                 const body: string = requestSpy.getCall(0).args[1];
 
@@ -409,6 +422,7 @@ describe('Event parameters should match specifications', () => {
         let sessionManager: SessionManager;
         let operativeEventManager: OperativeEventManager;
         let campaign: PerformanceCampaign;
+        let operativeEventParams: IOperativeEventParams;
 
         describe('on Android', () => {
             beforeEach(() => {
@@ -433,10 +447,16 @@ describe('Event parameters should match specifications', () => {
                     campaign: campaign
                 });
                 OperativeEventManager.setPreviousPlacementId(undefined);
+                operativeEventParams = {
+                    placement: TestFixtures.getPlacement(),
+                    adUnitStyle: campaign.getAdUnitStyle(),
+                    videoOrientation: 'landscape',
+                    asset: campaign.getVideo()
+                };
             });
 
             it('with start event', () => {
-                return operativeEventManager.sendStart(TestFixtures.getPlacement()).then(() => {
+                return operativeEventManager.sendStart(operativeEventParams).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -446,7 +466,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with first quartile event', () => {
-                return operativeEventManager.sendFirstQuartile(TestFixtures.getPlacement()).then(() => {
+                return operativeEventManager.sendFirstQuartile(operativeEventParams).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -456,7 +476,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with midpoint event', () => {
-                return operativeEventManager.sendMidpoint(TestFixtures.getPlacement()).then(() => {
+                return operativeEventManager.sendMidpoint(operativeEventParams).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -466,7 +486,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with third quartile event', () => {
-                return operativeEventManager.sendThirdQuartile(TestFixtures.getPlacement()).then(() => {
+                return operativeEventManager.sendThirdQuartile(operativeEventParams).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -476,7 +496,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with end event', () => {
-                return operativeEventManager.sendView(TestFixtures.getPlacement()).then(() => {
+                return operativeEventManager.sendView(operativeEventParams).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -512,7 +532,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with start event', () => {
-                return operativeEventManager.sendStart(TestFixtures.getPlacement()).then(() => {
+                return operativeEventManager.sendStart(operativeEventParams).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -522,7 +542,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with first quartile event', () => {
-                return operativeEventManager.sendFirstQuartile(TestFixtures.getPlacement()).then(() => {
+                return operativeEventManager.sendFirstQuartile(operativeEventParams).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -532,7 +552,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with midpoint event', () => {
-                return operativeEventManager.sendMidpoint(TestFixtures.getPlacement()).then(() => {
+                return operativeEventManager.sendMidpoint(operativeEventParams).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -542,7 +562,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with third quartile event', () => {
-                return operativeEventManager.sendThirdQuartile(TestFixtures.getPlacement()).then(() => {
+                return operativeEventManager.sendThirdQuartile(operativeEventParams).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
@@ -552,7 +572,7 @@ describe('Event parameters should match specifications', () => {
             });
 
             it('with end event', () => {
-                return operativeEventManager.sendView(TestFixtures.getPlacement()).then(() => {
+                return operativeEventManager.sendView(operativeEventParams).then(() => {
                     const url: string = requestSpy.getCall(0).args[0];
                     const body: string = requestSpy.getCall(0).args[1];
 
