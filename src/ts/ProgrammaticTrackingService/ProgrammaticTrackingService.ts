@@ -17,7 +17,7 @@ export interface IProgrammaticTrackingErrorData {
 }
 
 export class ProgrammaticTrackingService {
-    private static productionErrorServiceUrl: string = 'https://tracking.adsx.unityads.unity3d.com/tracking/error';
+    private static productionErrorServiceUrl: string = 'https://tracking.adsx.unityads.unity3d.com/tracking/sdk/error';
 
     private request: Request;
     private clientInfo: ClientInfo;
