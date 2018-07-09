@@ -13,14 +13,15 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
 
     private _skipVisible: boolean = false;
     private _skipEnabled: boolean;
+
     private _videoDurationEnabled: boolean = false;
     private _videoProgress: number;
 
     private _muteEnabled: boolean = false;
 
     private _debugMessageVisible: boolean = false;
-
     private _callButtonVisible: boolean = false;
+    private _callButtonEnabled: boolean = true;
 
     private _skipElement: HTMLElement;
     private _spinnerElement: HTMLElement;
@@ -86,6 +87,13 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
             }
         ];
 
+        if (CustomFeatures.isTimehopApp(gameId)) {
+            this._bindings.push({
+                event: 'swipe',
+                listener: (event: Event) => this.onSkipEvent(event)
+            });
+        }
+
         this._privacy.render();
         this._privacy.hide();
         document.body.appendChild(this._privacy.container());
@@ -96,25 +104,9 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         }, 1000);
     }
 
-    public render(): void {
-        super.render();
-
-        document.documentElement.classList.add('new-video-overlay');
-        this._skipElement = <HTMLElement>this._container.querySelector('.skip-button');
-        this._skipElement.style.display = 'none';
-        this._spinnerElement = <HTMLElement>this._container.querySelector('.buffering-spinner');
-        this._muteButtonElement = <HTMLElement>this._container.querySelector('.mute-button');
-        this._debugMessageElement = <HTMLElement>this._container.querySelector('.debug-message-text');
-        this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
-        this._callButtonElement.style.display = 'block';
-        this._timerElement = <HTMLElement>this._container.querySelector('.timer');
-        this.choosePrivacyShown();
-    }
-
     public hide() {
         super.hide();
 
-        document.documentElement.classList.remove('new-video-overlay');
         if (this._privacy) {
             this._privacy.hide();
             document.body.removeChild(this._privacy.container());
@@ -124,6 +116,20 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         if (this._showGDPRBanner && !this._gdprPopupClicked) {
             this._handlers.forEach(handler => handler.onGDPRPopupSkipped());
         }
+    }
+
+    public render(): void {
+        super.render();
+
+        this._skipElement = <HTMLElement>this._container.querySelector('.skip-button');
+        this._skipElement.style.display = 'none';
+        this._spinnerElement = <HTMLElement>this._container.querySelector('.buffering-spinner');
+        this._muteButtonElement = <HTMLElement>this._container.querySelector('.mute-button');
+        this._debugMessageElement = <HTMLElement>this._container.querySelector('.debug-message-text');
+        this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
+        this._callButtonElement.style.display = 'block';
+        this._timerElement = <HTMLElement>this._container.querySelector('.timer');
+        this.choosePrivacyShown();
     }
 
     public setSpinnerEnabled(value: boolean): void {
@@ -192,7 +198,9 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     }
 
     public setCallButtonEnabled(value: boolean) {
-        // EMPTY
+        if (this._callButtonEnabled !== value) {
+            this._callButtonEnabled = value;
+        }
     }
 
     public isMuted(): boolean {
@@ -221,7 +229,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
             this._container.classList.remove('show-gdpr-button');
         } else if (!this._gdprPopupClicked && this._showGDPRBanner) {
             this._container.classList.add('show-gdpr-banner');
-            // TODO: ENABLE this._container.classList.remove('show-gdpr-button');
+            // TODO: ENABLE: this._container.classList.remove('show-gdpr-button');
             this._container.classList.add('show-gdpr-button');
         } else {
             this._container.classList.remove('show-gdpr-banner');
@@ -237,14 +245,18 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
             this.choosePrivacyShown();
         }
         this._nativeBridge.VideoPlayer.pause();
-        this._privacy.show();
+        if (this._privacy) {
+            this._privacy.show();
+        }
     }
 
     private onPrivacyEvent(event: Event) {
         this._isPrivacyShowing = true;
         event.preventDefault();
         this._nativeBridge.VideoPlayer.pause();
-        this._privacy.show();
+        if (this._privacy) {
+            this._privacy.show();
+        }
     }
 
     private onSkipEvent(event: Event): void {
@@ -270,6 +282,9 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     }
 
     private onCallButtonEvent(event: Event): void {
+        if (!this._callButtonEnabled) {
+            return;
+        }
         event.preventDefault();
         event.stopPropagation();
         this.resetFadeTimer();
