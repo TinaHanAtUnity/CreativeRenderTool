@@ -15,28 +15,28 @@ export class PromoCampaignParser extends CampaignParser {
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: ABGroup): Promise<Campaign> {
         const promoJson = JsonParser.parse(response.getContent());
 
-                    const baseCampaignParams: ICampaign = {
-                        id: promoJson.id,
-                        gamerId: gamerId,
-                        abGroup: abGroup,
-                        willExpireAt: promoJson.expiry ? parseInt(promoJson.expiry, 10) * 1000 : undefined,
-                        adType: promoJson.contentType || response.getContentType() || undefined,
-                        correlationId: undefined,
-                        creativeId: undefined,
-                        seatId: undefined,
-                        meta: promoJson.meta,
-                        session: session,
-                        mediaId: response.getMediaId()
-                    };
+        const baseCampaignParams: ICampaign = {
+            id: promoJson.id,
+            gamerId: gamerId,
+            abGroup: abGroup,
+            willExpireAt: promoJson.expiry ? parseInt(promoJson.expiry, 10) * 1000 : undefined,
+            adType: promoJson.contentType || response.getContentType() || undefined,
+            correlationId: undefined,
+            creativeId: undefined,
+            seatId: undefined,
+            meta: promoJson.meta,
+            session: session,
+            mediaId: response.getMediaId()
+        };
 
-                    const promoCampaignParams: IPromoCampaign = {
-                        ... baseCampaignParams,
-                        iapProductId: promoJson.iapProductId,
-                        additionalTrackingEvents: response.getTrackingUrls() ? response.getTrackingUrls() : undefined,
-                        dynamicMarkup: promoJson.dynamicMarkup,
-                        creativeAsset: new HTML(promoJson.creativeUrl, session),
-                        rewardedPromo: promoJson.rewardedPromo ? promoJson.rewardedPromo : false
-                    };
+        const promoCampaignParams: IPromoCampaign = {
+            ... baseCampaignParams,
+            iapProductId: promoJson.iapProductId,
+            additionalTrackingEvents: response.getTrackingUrls() ? response.getTrackingUrls() : undefined,
+            dynamicMarkup: promoJson.dynamicMarkup,
+            creativeAsset: new HTML(promoJson.creativeUrl, session),
+            rewardedPromo: promoJson.rewardedPromo ? promoJson.rewardedPromo : false
+        };
 
         const promoCampaign = new PromoCampaign(promoCampaignParams);
 
@@ -48,11 +48,9 @@ export class PromoCampaignParser extends CampaignParser {
                     throw new Error(`Promo product id ${promoJson.iapProductId} is unavailable at this time`);
                 }
             });
-        } else {
-            if (PurchasingUtilities.promoResponseIndex < PurchasingUtilities.iapCampaignCount) {
-                PurchasingUtilities.promoCampaigns[PurchasingUtilities.promoResponseIndex] = promoCampaign;
-                PurchasingUtilities.promoResponseIndex++;
-            }
+        } else if (PurchasingUtilities.promoResponseIndex < PurchasingUtilities.iapCampaignCount) {
+            PurchasingUtilities.promoCampaigns[PurchasingUtilities.promoResponseIndex] = promoCampaign;
+            PurchasingUtilities.promoResponseIndex++;
         }
 
         return Promise.resolve(promoCampaign);

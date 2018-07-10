@@ -1,8 +1,8 @@
-import { PlacementManager } from 'Managers/PlacementManager';
 import { Placement, PlacementState } from 'Models/Placement';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Configuration } from 'Models/Configuration';
 import { SdkStats } from 'Utilities/SdkStats';
+import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 
 export interface IPlacementMap {
     [placementId: string]: Placement;
@@ -18,12 +18,25 @@ export class PromoPlacementManager {
         this._promoPlacements = this.getPromoPlacements(configuration);
         this._placementIds = configuration.getPlacementIds();
         this._nativeBridge = nativeBridge;
-        configuration.removePlacements(Object.keys(this._promoPlacements));
+    }
+
+    public getPromoPlacementIds(): string[] {
+        const promoPlacements = this._promoPlacements;
+        const out: string[] = [];
+        Object.keys(promoPlacements).forEach((placementId) => {
+            out.push(placementId);
+        });
+
+        return out;
+    }
+
+    public setPromoPlacementReady(placementId: string) {
+        this.setPlacementState(placementId, PlacementState.READY);
     }
 
     public setPromoPlacementsReady(): void {
-        for (const placementIds of this._placementIds) {
-            this.setPlacementState(placementIds, PlacementState.READY);
+        for (const placementId of this._placementIds) {
+            this.setPlacementState(placementId, PlacementState.READY);
         }
     }
 
@@ -72,6 +85,6 @@ export class PromoPlacementManager {
                 promos[placementId] = placement;
             }
         });
-        return placements;
+        return promos;
     }
 }

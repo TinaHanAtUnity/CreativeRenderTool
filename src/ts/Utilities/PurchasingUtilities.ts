@@ -5,8 +5,8 @@ import { Configuration } from 'Models/Configuration';
 import { ClientInfo } from 'Models/ClientInfo';
 import { CampaignManager } from 'Managers/CampaignManager';
 import { Placement, PlacementState } from 'Models/Placement';
-import { SdkStats } from 'Utilities/SdkStats';
 import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
+import { PromoPlacementManager } from 'Managers/PromoPlacementManager';
 
 export enum IPromoRequest {
     SETIDS = 'setids',
@@ -25,10 +25,6 @@ export interface IPromoPayload {
     purchaseTrackingUrls: string[];
 }
 
-interface IPlacementMap {
-    [id: string]: Placement;
-}
-
 export class PurchasingUtilities {
 
     public static promoJsons: any[] = [];
@@ -36,11 +32,13 @@ export class PurchasingUtilities {
     public static campaignManager: CampaignManager;
     public static promoResponseIndex: number = 0;
     public static iapCampaignCount: number = 0;
+    public static promoPlacementManager: PromoPlacementManager;
 
-    public static initialize(clientInfo: ClientInfo, configuration: Configuration, nativeBridge: NativeBridge) {
+    public static initialize(clientInfo: ClientInfo, configuration: Configuration, nativeBridge: NativeBridge, promoPlacementManager?: PromoPlacementManager) {
         this._clientInfo = clientInfo;
         this._configuration = configuration;
         this._nativeBridge = nativeBridge;
+        this.promoPlacementManager = promoPlacementManager!;
     }
 
     public static isInitialized(): boolean {
@@ -102,6 +100,7 @@ export class PurchasingUtilities {
 
     public static handleSendIAPEvent(iapPayload: string): void {
         const jsonPayload = JSON.parse(iapPayload);
+        const promoPlacmentIds = this.promoPlacementManager.getPromoPlacementIds();
 
         if (jsonPayload.type === 'CatalogUpdated') {
             this.sendPurchaseInitializationEvent();
@@ -115,8 +114,9 @@ export class PurchasingUtilities {
                         this.refreshCatalog().then(() => {
                             if (PurchasingUtilities.isProductAvailable(this.promoJsons[i].iapProductId)) {
                                 this.promoCampaigns[i].setIapProductId(this.promoJsons[i].iapProductIds);
-                                this.sendPromosReady();
+                                this.promoPlacementManager.setPromoPlacementReady(promoPlacmentIds[i]);
                             } else {
+                                this.promoPlacementManager.setPlacementState(promoPlacmentIds[i], PlacementState.NO_FILL);
                                 throw new Error(`Promo product id ${this.promoJsons[i].iapProductId} is unavailable at this time`);
                             }
                         })
@@ -129,32 +129,11 @@ export class PurchasingUtilities {
         }
     }
 
-    public static sendPromosReady() {
-        Object.keys(this._placements).forEach((placementId) => {
-            this.setPlacementState(placementId, PlacementState.READY);
-        });
-    }
-
-    public static getPlacement(placementId: string): Placement | undefined {
-        return this._placements[placementId];
-    }
-
-    public static setPlacementState(placementId: string, newState: PlacementState) {
-        const placement: Placement = this._placements[placementId];
-        if (placement) {
-            const oldState: PlacementState = placement.getState();
-
-            placement.setState(newState);
-            this.sendPlacementStateChange(placementId, oldState, newState);
-        }
-    }
-
     private static _catalog: PurchasingCatalog = new PurchasingCatalog([]);
     private static _clientInfo: ClientInfo;
     private static _configuration: Configuration;
     private static _nativeBridge: NativeBridge;
     private static _isInitialized = false;
-    private static _placements: IPlacementMap;
 
     private static initializeIAPPromo(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
@@ -252,33 +231,5 @@ export class PurchasingUtilities {
             }
         }
         return false;
-    }
-
-    private static getPromoPlacements(): IPlacementMap {
-        const promoPlacements: IPlacementMap = {};
-        if (this._configuration) {
-            const placements = this._configuration.getPlacements();
-            const placementIds = this._configuration.getPlacementIds();
-            for (const placementId of placementIds) {
-                const adTypes = placements[placementId].getAdTypes();
-                if (adTypes && adTypes.indexOf('IAP') > -1) {
-                    promoPlacements[placementId] = placements[placementId];
-                }
-            }
-        }
-        return promoPlacements;
-    }
-
-    private static sendPlacementStateChange(placementId: string, oldState: PlacementState, newState: PlacementState) {
-        if(oldState !== newState) {
-            this._nativeBridge.Placement.setPlacementState(placementId, newState);
-            this._nativeBridge.Listener.sendPlacementStateChangedEvent(placementId, PlacementState[oldState], PlacementState[newState]);
-
-            if(newState === PlacementState.READY) {
-                this._nativeBridge.Listener.sendReadyEvent(placementId);
-                SdkStats.setReadyEventTimestamp(placementId);
-                SdkStats.sendReadyEvent(placementId);
-            }
-        }
     }
 }
