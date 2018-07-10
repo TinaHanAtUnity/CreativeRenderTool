@@ -110,6 +110,9 @@ describe('CampaignManager', () => {
                 write: () => {
                     return Promise.resolve();
                 },
+                delete: () => {
+                    return Promise.resolve();
+                },
                 getKeys: sinon.stub().callsFake((type: StorageType, key: string, recursive: boolean) => {
                     if (key && key === 'cache.campaigns') {
                         return Promise.resolve(['12345', '67890']);
@@ -1230,7 +1233,7 @@ describe('CampaignManager', () => {
         let requestData: string = '{}';
         sinon.stub(request, 'post').callsFake((url: string, data: string = '', headers: Array<[string, string]> = [], options?: any) => {
             requestData = data;
-            return Promise.resolve<INativeResponse>({url: 'http://test/request', response: 'test_response', responseCode: 200, headers: []});
+            return Promise.resolve<INativeResponse>({url: 'http://test/request', response: OnProgrammaticMraidUrlPlcCampaignJson, responseCode: 200, headers: []});
         });
 
         let actualResponse: INativeResponse;
@@ -1246,7 +1249,7 @@ describe('CampaignManager', () => {
         return campaignManager.request().then(() => {
             assert.isObject(actualResponse);
             assert.equal(actualResponse.url, 'http://test/request');
-            assert.equal(actualResponse.response, 'test_response');
+            assert.deepEqual(JSON.parse(actualResponse.response), JSON.parse(OnProgrammaticMraidUrlPlcCampaignJson));
         });
     });
 

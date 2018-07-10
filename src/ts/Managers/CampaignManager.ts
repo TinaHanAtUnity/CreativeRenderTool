@@ -182,7 +182,9 @@ export class CampaignManager {
 
             SdkStats.setAdRequestTimestamp();
             const requestTimestamp: number = Date.now();
-            return Promise.resolve().then((): Promise<INativeResponse> => {
+            return Promise.resolve().then(() => {
+                return this._cacheBookkeeping.deleteCachedCampaignResponse();
+            }).then((): Promise<INativeResponse> => {
                 if(CampaignManager.CampaignResponse) {
                     return Promise.resolve({
                         url: requestUrl,
@@ -206,7 +208,6 @@ export class CampaignManager {
                     jaegerSpan.addTag(JaegerTags.StatusCode, response.responseCode.toString());
                 }
                 if(response) {
-                    this._cacheBookkeeping.setCachedCampaignResponse(response);
                     this.setSDKSignalValues(requestTimestamp);
 
                     return this.parseCampaigns(response, false).catch((e) => {
@@ -281,7 +282,7 @@ export class CampaignManager {
     }
 
     private parseCampaigns(response: INativeResponse, backupResponse: boolean): Promise<void[]> {
-        let json;
+        let json: any;
         try {
             json = JsonParser.parse(response.response);
         } catch (e) {
@@ -303,6 +304,7 @@ export class CampaignManager {
         if('placements' in json) {
             const fill: { [mediaId: string]: string[] } = {};
             const noFill: string[] = [];
+            const ignorePlacement: string[] = [];
             if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
                 json.placements = MixedPlacementUtility.insertMediaIdsIntoJSON(this._configuration, json.placements);
             }
@@ -319,6 +321,7 @@ export class CampaignManager {
                             fill[mediaId] = [placement];
                         }
                     } else {
+                        ignorePlacement.push(placement);
                         noFill.push(placement);
                     }
 
@@ -346,6 +349,14 @@ export class CampaignManager {
                     if(contentType && contentType !== 'comet/campaign' && cacheTTL > 0 && (cacheTTL < refreshDelay || refreshDelay === 0)) {
                         refreshDelay = cacheTTL;
                     }
+
+                    if (contentType && contentType === 'programmatic/vast') {
+                        fill[mediaId].forEach(placement => {
+                            if(ignorePlacement.indexOf(placement) === -1) {
+                                ignorePlacement.push(placement);
+                            }
+                        });
+                    }
                 }
             }
 
@@ -360,6 +371,12 @@ export class CampaignManager {
                     try {
                         auctionResponse = new AuctionResponse(fill[mediaId], json.media[mediaId], mediaId, json.correlationId);
                         promises.push(this.handleCampaign(auctionResponse, session, backupResponse).catch(error => {
+                            fill[mediaId].forEach(placement => {
+                                if(ignorePlacement.indexOf(placement) === -1) {
+                                    ignorePlacement.push(placement);
+                                }
+                            });
+
                             if(error === CacheStatus.STOPPED) {
                                 return Promise.resolve();
                             } else if(error === CacheStatus.FAILED) {
@@ -372,12 +389,31 @@ export class CampaignManager {
                             return this.handleError(error, fill[mediaId], 'handle_campaign_error', session);
                         }));
                     } catch(error) {
+                        fill[mediaId].forEach(placement => {
+                            if(ignorePlacement.indexOf(placement) === -1) {
+                                ignorePlacement.push(placement);
+                            }
+                        });
                         this.handleError(error, fill[mediaId], 'error_creating_handle_campaign_chain', session);
                     }
                 }
             }
 
-            return Promise.all(promises);
+            return Promise.all(promises).then(x => {
+                if (backupResponse) {
+                    return Promise.resolve();
+                }
+
+                for(const placement of ignorePlacement) {
+                    delete json.placements[placement];
+                }
+                return this._cacheBookkeeping.setCachedCampaignResponse({
+                    url: response.url,
+                    response: JSON.stringify(json),
+                    responseCode: response.responseCode,
+                    headers: response.headers
+                });
+            });
         } else {
             throw new Error('No placements found');
         }
