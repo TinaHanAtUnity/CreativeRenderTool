@@ -197,7 +197,7 @@ export class AdUnitFactory {
             MoatViewabilityService.initMoat(nativeBridge, parameters.campaign, parameters.clientInfo, parameters.placement, parameters.deviceInfo, parameters.configuration);
         }
 
-        const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters, this.showGDPRBanner(parameters));
+        const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
 
         if(parameters.campaign.hasEndscreen() && vastEndScreen) {
             const vastEndScreenHandler = new VastEndScreenEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
