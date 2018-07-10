@@ -45,12 +45,19 @@ export class PromoCampaignParser extends CampaignParser {
                 if (PurchasingUtilities.isProductAvailable(promoJson.iapProductId)) {
                     promoCampaign.setIapProductId(promoJson.iapProductIds);
                 } else {
+                    PurchasingUtilities.promoCampaigns[PurchasingUtilities.promoResponseIndex] = promoCampaign;
+                    PurchasingUtilities.promoJsons[PurchasingUtilities.promoResponseIndex] = promoJson;
+                    PurchasingUtilities.promoResponseIndex++;
                     throw new Error(`Promo product id ${promoJson.iapProductId} is unavailable at this time`);
                 }
             });
-        } else if (PurchasingUtilities.promoResponseIndex < PurchasingUtilities.iapCampaignCount) {
-            PurchasingUtilities.promoCampaigns[PurchasingUtilities.promoResponseIndex] = promoCampaign;
-            PurchasingUtilities.promoResponseIndex++;
+        } else {
+            if (PurchasingUtilities.promoResponseIndex < PurchasingUtilities.iapCampaignCount) {
+                PurchasingUtilities.promoCampaigns[PurchasingUtilities.promoResponseIndex] = promoCampaign;
+                PurchasingUtilities.promoJsons[PurchasingUtilities.promoResponseIndex] = promoJson;
+                PurchasingUtilities.promoResponseIndex++;
+                throw new Error(`Promo product id ${promoJson.iapProductId} is unavailable at this time`);
+            }
         }
 
         return Promise.resolve(promoCampaign);
