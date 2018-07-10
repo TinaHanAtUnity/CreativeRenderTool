@@ -272,7 +272,7 @@ export class WebView {
             const bannerCampaignManager = new BannerCampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._adMobSignalFactory, this._request, this._clientInfo, this._deviceInfo, this._metadataManager, this._jaegerManager);
             const bannerWebPlayerContainer = new BannerWebPlayerContainer(this._nativeBridge);
             const bannerAdUnitParametersFactory = new BannerAdUnitParametersFactory(this._nativeBridge, this._request, this._metadataManager, this._configuration, this._container, this._deviceInfo, this._clientInfo, this._sessionManager, this._focusManager, this._analyticsManager, this._adMobSignalFactory, this._gdprManager, bannerWebPlayerContainer);
-            this._bannerAdContext = new BannerAdContext(this._nativeBridge, bannerAdUnitParametersFactory, bannerCampaignManager, bannerPlacementManager, this._focusManager);
+            this._bannerAdContext = new BannerAdContext(this._nativeBridge, bannerAdUnitParametersFactory, bannerCampaignManager, bannerPlacementManager, this._focusManager, this._deviceInfo);
 
             SdkStats.initialize(this._nativeBridge, this._request, this._configuration, this._sessionManager, this._campaignManager, this._metadataManager, this._clientInfo);
 

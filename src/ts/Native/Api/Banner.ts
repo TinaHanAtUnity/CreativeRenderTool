@@ -51,10 +51,6 @@ export class BannerApi extends NativeApi {
         super(nativeBridge, 'Banner');
     }
 
-    public isOpened(): Promise<boolean> {
-        return this._nativeBridge.invoke(this._apiClass, 'isOpened');
-    }
-
     public load(views: BannerViewType[], style: string, width: number, height: number): Promise<void> {
         return this._nativeBridge.invoke(this._apiClass, 'load', [views, style, width, height]);
     }
@@ -65,6 +61,10 @@ export class BannerApi extends NativeApi {
 
     public setViewFrame(view: BannerViewType, x: number, y: number, width: number, height: number) {
         return this._nativeBridge.invoke(this._apiClass, 'setViewFrame', [view, x, y, width, height]);
+    }
+
+    public setViews(views: BannerViewType[]) {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'setViews', [views]);
     }
 
     public handleEvent(event: string, parameters: any[]) {

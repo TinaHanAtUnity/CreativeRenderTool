@@ -5,7 +5,7 @@ import { BannerAdUnit, IBannerAdUnitParameters } from 'AdTypes/Banner/AdUnits/Ba
 import { BannerCampaign } from 'AdTypes/Banner/Models/Campaigns/BannerCampaign';
 
 export class BannerAdUnitFactory {
-    public static createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractAdUnit {
+    public static createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): BannerAdUnit {
         if (parameters.campaign instanceof BannerCampaign) {
             return this.createBannerAdUnit(nativeBridge, <IAdUnitParameters<BannerCampaign>>parameters);
         } else {
