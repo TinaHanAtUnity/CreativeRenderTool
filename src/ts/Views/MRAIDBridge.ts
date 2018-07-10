@@ -73,7 +73,6 @@ export class MRAIDBridge {
                 forceOrientation = Orientation.NONE;
                 break;
             default:
-                break;
             }
         }
         this._handler.onSetOrientationProperties(properties.allowOrientation, forceOrientation);
