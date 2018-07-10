@@ -289,8 +289,12 @@ export class Cache {
                     responseCode: responseCode,
                     headers: headers
                 }, callback.session);
-                const errorData = this._programmaticTrackingService.buildErrorData(ProgrammaticTrackingError.TooLargeFile, callback.adType, callback.seatId);
-                this._programmaticTrackingService.reportError(errorData);
+                if (callback.seatId !== undefined) {
+                    // should only be sent for programmatic currently
+                    // and seatId exists for programmatic only
+                    const errorData = this._programmaticTrackingService.buildErrorData(ProgrammaticTrackingError.TooLargeFile, callback.adType, callback.seatId);
+                    this._programmaticTrackingService.reportError(errorData);
+                }
             }
         } else {
             Diagnostics.trigger('cache_callback_error', {
