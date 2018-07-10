@@ -22,6 +22,7 @@ import { JaegerSpan } from 'Jaeger/JaegerSpan';
 import { UserCountData } from 'Utilities/UserCountData';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { MixedPlacementUtility } from 'Utilities/MixedPlacementUtility';
+import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 
 export class OldCampaignRefreshManager extends RefreshManager {
     private _nativeBridge: NativeBridge;
@@ -226,8 +227,12 @@ export class OldCampaignRefreshManager extends RefreshManager {
                 this.onNoFill(placementId);
             }
         } else {
-            this.setCampaignForPlacement(placementId, campaign);
-            this.handlePlacementState(placementId, PlacementState.READY);
+            if (campaign.getAdType() === 'purchasing/iap' && !(<PromoCampaign>campaign).getIapProductId()) {
+                this.onNoFill(placementId);
+            } else {
+                this.setCampaignForPlacement(placementId, campaign);
+                this.handlePlacementState(placementId, PlacementState.READY);
+            }
         }
     }
 
