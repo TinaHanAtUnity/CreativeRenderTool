@@ -197,7 +197,7 @@ export class AdUnitFactory {
             MoatViewabilityService.initMoat(nativeBridge, parameters.campaign, parameters.clientInfo, parameters.placement, parameters.deviceInfo, parameters.configuration);
         }
 
-        const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters, this.showGDPRBanner(parameters));
+        const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
 
         if(parameters.campaign.hasEndscreen() && vastEndScreen) {
             const vastEndScreenHandler = new VastEndScreenEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
@@ -271,7 +271,7 @@ export class AdUnitFactory {
         const privacy = this.createPrivacy(nativeBridge, parameters);
         const showGDPRBanner = this.showGDPRBanner(parameters);
         const closer = new Closer(nativeBridge, parameters.placement, privacy, showGDPRBanner);
-        const vpaid = new VPAID(nativeBridge, <VPAIDCampaign>parameters.campaign, parameters.placement, showGDPRBanner);
+        const vpaid = new VPAID(nativeBridge, <VPAIDCampaign>parameters.campaign, parameters.placement);
         let endScreen: VPAIDEndScreen | undefined;
 
         const vpaidAdUnitParameters: IVPAIDAdUnitParameters = {

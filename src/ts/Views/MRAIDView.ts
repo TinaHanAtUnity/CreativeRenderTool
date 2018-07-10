@@ -9,13 +9,14 @@ import { IPrivacyHandler, AbstractPrivacy } from 'Views/AbstractPrivacy';
 import { platform } from 'os';
 import { DOMUtils } from 'Utilities/DOMUtils';
 import { XHRequest } from 'Utilities/XHRequest';
+import { GDPREventHandler } from 'EventHandlers/GDPREventHandler';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
     forceOrientation: Orientation;
 }
 
-export interface IMRAIDViewHandler {
+export interface IMRAIDViewHandler extends GDPREventHandler {
     onMraidClick(url: string): void;
     onMraidReward(): void;
     onMraidSkip(): void;
@@ -23,7 +24,6 @@ export interface IMRAIDViewHandler {
     onMraidOrientationProperties(orientationProperties: IOrientationProperties): void;
     onMraidAnalyticsEvent(timeFromShow: number|undefined, timeFromPlayableStart: number|undefined, backgroundTime: number|undefined, event: string, eventData: any): void;
     onMraidShowEndScreen(): void;
-    onGDPRPopupSkipped(): void;
 }
 
 export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> implements IPrivacyHandler {

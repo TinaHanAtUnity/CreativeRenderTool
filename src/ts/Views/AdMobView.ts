@@ -9,13 +9,11 @@ import { Template } from 'Utilities/Template';
 import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { AFMABridge, IOpenableIntentsResponse, IOpenableIntentsRequest, ITouchInfo, IClickSignalResponse } from 'Views/AFMABridge';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
-import { ClientInfo } from 'Models/ClientInfo';
 import { MRAIDBridge } from 'Views/MRAIDBridge';
-import { SdkStats } from 'Utilities/SdkStats';
 import { IPrivacyHandler, AbstractPrivacy } from 'Views/AbstractPrivacy';
-import { GDPRPrivacy } from 'Views/GDPRPrivacy';
+import { IGDPREventHandler } from 'EventHandlers/GDPREventHandler';
 
-export interface IAdMobEventHandler {
+export interface IAdMobEventHandler extends IGDPREventHandler {
     onClose(): void;
     onOpenURL(url: string): void;
     onAttribution(url: string, touchInfo: ITouchInfo): Promise<void>;
@@ -26,7 +24,6 @@ export interface IAdMobEventHandler {
     onOpenableIntentsRequest(request: IOpenableIntentsRequest): void;
     onTrackingEvent(event: string, data?: any): void;
     onClickSignalRequest(touchInfo: ITouchInfo): void;
-    onGDPRPopupSkipped(): void;
 }
 
 const AFMAClickStringMacro = '{{AFMA_CLICK_SIGNALS_PLACEHOLDER}}';
