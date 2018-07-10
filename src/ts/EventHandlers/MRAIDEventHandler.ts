@@ -15,11 +15,10 @@ import { RequestError } from 'Errors/RequestError';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { FinishState } from 'Constants/FinishState';
 import { Placement } from 'Models/Placement';
-import { Configuration } from 'Models/Configuration';
-import { GDPREventAction, GdprManager } from 'Managers/GdprManager';
 import { ABGroup, CTAOpenUrlAbTest } from 'Models/ABGroup';
+import { GDPREventHandler } from 'EventHandlers/GDPREventHandler';
 
-export class MRAIDEventHandler implements IMRAIDViewHandler {
+export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHandler {
 
     private _nativeBridge: NativeBridge;
     private _operativeEventManager: OperativeEventManager;
@@ -30,11 +29,10 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
     private _campaign: MRAIDCampaign;
     private _request: Request;
     private _placement: Placement;
-    private _configuration: Configuration;
-    private _gdprManager: GdprManager;
     private _abGroup: ABGroup;
 
     constructor(nativeBridge: NativeBridge, adUnit: MRAIDAdUnit, parameters: IMRAIDAdUnitParameters) {
+        super(parameters.gdprManager, parameters.configuration);
         this._nativeBridge = nativeBridge;
         this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
@@ -44,8 +42,6 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
         this._campaign = parameters.campaign;
         this._placement = parameters.placement;
         this._request = parameters.request;
-        this._configuration = parameters.configuration;
-        this._gdprManager = parameters.gdprManager;
         this._abGroup = parameters.configuration.getAbGroup();
     }
 
@@ -133,13 +129,6 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
             this._adUnit.getMRAIDView().hide();
             endScreen.show();
         }
-    }
-
-    public onGDPRPopupSkipped(): void {
-        if (!this._configuration.isOptOutRecorded()) {
-            this._configuration.setOptOutRecorded(true);
-        }
-        this._gdprManager.sendGDPREvent(GDPREventAction.SKIP);
     }
 
     private handleClickAttribution() {

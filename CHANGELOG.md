@@ -1,3 +1,9 @@
+# Pending
+
+* Re-enable Microsoft linter rule, no break in default in switch
+* Remove gamerId from configuration request
+* Create a separate event handler for GDPR skip events 
+
 # Thu Jul  5 15:21:01 UTC 2018
 
 * Test for campaign parsing and caching success rates

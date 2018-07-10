@@ -1,10 +1,8 @@
 import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'AdUnits/VPAIDAdUnit';
 import { FinishState } from 'Constants/FinishState';
 import { DiagnosticError } from 'Errors/DiagnosticError';
-import { GDPREventAction, GdprManager } from 'Managers/GdprManager';
 import { OperativeEventManager, IOperativeEventParams } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { Configuration } from 'Models/Configuration';
 import { Placement } from 'Models/Placement';
 import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
 import { NativeBridge } from 'Native/NativeBridge';
@@ -25,8 +23,6 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     private _closer: Closer;
     private _adDuration: number = -2;
     private _adRemainingTime: number = -2;
-    private _configuration: Configuration;
-    private _gdprManager: GdprManager;
 
     constructor(nativeBridge: NativeBridge, adUnit: VPAIDAdUnit, parameters: IVPAIDAdUnitParameters) {
         this._nativeBridge = nativeBridge;
@@ -37,8 +33,6 @@ export class VPAIDEventHandler implements IVPAIDHandler {
         this._placement = parameters.placement;
         this._closer = parameters.closer;
         this._vpaidEndScreen = parameters.endScreen;
-        this._configuration = parameters.configuration;
-        this._gdprManager = parameters.gdprManager;
 
         this._vpaidEventHandlers.AdError = this.onAdError;
         this._vpaidEventHandlers.AdLoaded = this.onAdLoaded;
@@ -72,13 +66,6 @@ export class VPAIDEventHandler implements IVPAIDHandler {
                 handler.call(this);
             }
         }
-    }
-
-    public onGDPRPopupSkipped(): void {
-        if (!this._configuration.isOptOutRecorded()) {
-            this._configuration.setOptOutRecorded(true);
-        }
-        this._gdprManager.sendGDPREvent(GDPREventAction.SKIP);
     }
 
     public onVPAIDCompanionClick() {

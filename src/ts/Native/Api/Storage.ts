@@ -62,7 +62,6 @@ export class StorageApi extends NativeApi {
                 break;
 
             default:
-                break;
         }
     }
 }

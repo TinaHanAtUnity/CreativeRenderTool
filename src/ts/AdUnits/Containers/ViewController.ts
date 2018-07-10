@@ -125,7 +125,6 @@ export class ViewController extends AdUnitContainer {
                     promises.push(this._nativeBridge.IosAdUnit.setSupportedOrientations(UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_ALL));
                     break;
                 default:
-                    break;
             }
             return Promise.all(promises);
         });
@@ -168,7 +167,6 @@ export class ViewController extends AdUnitContainer {
                     orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_LANDSCAPE_RIGHT;
                     break;
                 default:
-                    break;
             }
         } else if(forceOrientation === Orientation.PORTRAIT) {
             switch (options.statusBarOrientation) {
@@ -179,7 +177,6 @@ export class ViewController extends AdUnitContainer {
                     orientation = UIInterfaceOrientationMask.INTERFACE_ORIENTATION_MASK_PORTRAIT_UPSIDE_DOWN;
                     break;
                 default:
-                    break;
             }
         }
         // safety check
@@ -243,7 +240,6 @@ export class ViewController extends AdUnitContainer {
 
             default:
                 // ignore other events
-                break;
         }
     }
 
