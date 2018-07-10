@@ -300,9 +300,7 @@ export class VastParser {
 
             const trackingEvents = this.getTrackingEventsFromElement(companionAdElement);
 
-            const companionAd = new VastCreativeCompanionAd(id, creativeType, height, width, staticResourceURL, companionClickThroughURLTemplate, trackingEvents);
-
-            return companionAd;
+            return new VastCreativeCompanionAd(id, creativeType, height, width, staticResourceURL, companionClickThroughURLTemplate, trackingEvents);
         } else {
             return null;
         }
