@@ -40,7 +40,6 @@ export class FileInfo {
 
                         default:
                             // unknown key, ignore
-                            break;
                     }
                 }
 
