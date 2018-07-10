@@ -250,7 +250,6 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
                 break;
 
             default:
-                break;
         }
     }
 

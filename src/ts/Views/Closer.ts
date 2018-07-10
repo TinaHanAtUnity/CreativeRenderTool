@@ -4,13 +4,12 @@ import { Placement } from 'Models/Placement';
 
 import CloserTemplate from 'html/closer.html';
 import { Template } from 'Utilities/Template';
-import { GDPRPrivacy } from 'Views/GDPRPrivacy';
 import { Observable0 } from 'Utilities/Observable';
 import { IPrivacyHandler, AbstractPrivacy } from 'Views/AbstractPrivacy';
+import { IGDPREventHandler } from 'EventHandlers/GDPREventHandler';
 
-export interface ICloseHandler {
+export interface ICloseHandler extends IGDPREventHandler {
     onClose(skipped: boolean): void;
-    onGDPRPopupSkipped(): void;
 }
 
 export class Closer extends View<ICloseHandler> implements IPrivacyHandler {

@@ -89,7 +89,6 @@ export class Cache {
 
                 default:
                     // error handling not implemented
-                    break;
             }
         }
 

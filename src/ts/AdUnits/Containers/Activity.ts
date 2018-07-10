@@ -119,7 +119,6 @@ export class Activity extends AdUnitContainer {
 
                     break;
                 default:
-                    break;
             }
             return Promise.all(promises);
         });

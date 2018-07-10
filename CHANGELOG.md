@@ -1,5 +1,15 @@
 # Pending
 
+* Re-enable Microsoft linter rule, no break in default in switch
+* Remove gamerId from configuration request
+* Create a separate event handler for GDPR skip events 
+
+# Thu Jul  5 15:21:01 UTC 2018
+
+* Test for campaign parsing and caching success rates
+
+# Wed Jul  4 09:26:35 UTC 2018
+
 * Remove the fancy endscreen test from groups 16 and 17
 * Re-enable tslint default in switch rule
 
