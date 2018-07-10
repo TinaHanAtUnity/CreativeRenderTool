@@ -141,7 +141,6 @@ export class Promo extends View<{}> implements IPrivacyHandler {
                 this.onPromoEvent(e);
                 break;
             default:
-                break;
         }
     }
 

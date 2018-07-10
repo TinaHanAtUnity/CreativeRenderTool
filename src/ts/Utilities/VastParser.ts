@@ -198,7 +198,6 @@ export class VastParser {
                                     }
                                     break;
                                 default:
-                                    break;
                             }
                         }
                     }
@@ -209,7 +208,6 @@ export class VastParser {
                     }
                     break;
                 default:
-                    break;
             }
         }
         return ad;

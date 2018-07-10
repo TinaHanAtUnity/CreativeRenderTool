@@ -168,7 +168,6 @@ export class VPAID extends View<IVPAIDHandler> {
                 break;
             default:
                 this._nativeBridge.Sdk.logWarning(`VPAID Unknown message type ${eventType}`);
-                break;
         }
     }
 }
