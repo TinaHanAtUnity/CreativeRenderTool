@@ -1264,10 +1264,10 @@ describe('CampaignManager', () => {
             onAdPlanReceived = true;
         });
 
-        return campaignManager.requestFromCache({
+        return campaignManager.requestFromCache(<INativeResponse>{
             response: OnProgrammaticMraidUrlPlcCampaignJson,
             url: 'https://auction.unityads.unity3d.com/v4/games/12345/requests?&platform=android&sdkVersion=2000&stores=none&&screenWidth=800&screenHeight=1200&connectionType=wifi&networkType=0'
-        } as INativeResponse).then(() => {
+        }).then(() => {
             assert.equal(triggeredCampaign.getAbGroup(), ABGroup.getAbGroup(99));
             assert.isFalse(onAdPlanReceived, 'onAdPlanReceived was triggered');
         });
@@ -1287,10 +1287,10 @@ describe('CampaignManager', () => {
             onAdPlanReceived = true;
         });
 
-        return campaignManager.requestFromCache({
+        return campaignManager.requestFromCache(<INativeResponse>{
             response: OnProgrammaticMraidUrlPlcCampaignJson,
             url: 'https://auction.unityads.unity3d.com/v4/games/500/requests?&platform=android&sdkVersion=2000&stores=none&&screenWidth=800&screenHeight=1200&connectionType=wifi&networkType=0'
-        } as INativeResponse).then(() => {
+        }).then(() => {
             assert.isUndefined(triggeredCampaign);
             assert.isFalse(onAdPlanReceived, 'onAdPlanReceived was triggered');
         });
@@ -1310,10 +1310,10 @@ describe('CampaignManager', () => {
             onAdPlanReceived = true;
         });
 
-        return campaignManager.requestFromCache({
+        return campaignManager.requestFromCache(<INativeResponse>{
             response: OnProgrammaticMraidUrlPlcCampaignJson,
             url: 'https://auction.unityads.unity3d.com/v4/games/12345/requests?&platform=android&sdkVersion=2000&stores=none&&screenWidth=800&screenHeight=1200&connectionType=test&networkType=1'
-        } as INativeResponse).then(() => {
+        }).then(() => {
             assert.equal(triggeredCampaign.getAbGroup(), ABGroup.getAbGroup(99));
             assert.isFalse(onAdPlanReceived, 'onAdPlanReceived was triggered');
         });
@@ -1343,10 +1343,10 @@ describe('CampaignManager', () => {
             onAdPlanReceived = true;
         });
 
-        return campaignManager.requestFromCache({
+        return campaignManager.requestFromCache(<INativeResponse>{
             response: OnProgrammaticVastPlcCampaignNullData,
             url: 'https://auction.unityads.unity3d.com/v4/games/500/requests?&platform=android&sdkVersion=2000&stores=none&&screenWidth=800&screenHeight=1200&connectionType=wifi&networkType=0'
-        } as INativeResponse).then(() => {
+        }).then(() => {
             assert.isUndefined(triggeredCampaign);
             assert.isFalse(noFill, 'onNoFill was triggered');
             assert.isFalse(onError, 'onError was triggered');
@@ -1378,10 +1378,10 @@ describe('CampaignManager', () => {
             onAdPlanReceived = true;
         });
 
-        return campaignManager.requestFromCache({
+        return campaignManager.requestFromCache(<INativeResponse>{
             response: OnProgrammaticVastPlcCampaignNullData,
             url: 'https://auction.unityads.unity3d.com/v4/games/500/requests?&platform=android&sdkVersion=2000&stores=none&&screenWidth=800&screenHeight=1200&connectionType=wifi&networkType=0'
-        } as INativeResponse).then(() => {
+        }).then(() => {
             assert.isUndefined(triggeredCampaign);
             assert.isFalse(noFill, 'onNoFill was triggered');
             assert.isFalse(onError, 'onError was triggered');

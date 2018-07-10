@@ -58,7 +58,6 @@
     "array-type": [false, "array"],
     "prefer-array-literal": false,
     "max-classes-per-file": [false, 3],
-    "prefer-type-cast": false,
     "no-string-based-set-timeout": false,
     "mocha-no-side-effect-code": false,
     "no-http-string": [false, "http://www.example.com/?.*", "http://www.examples.com/?.*"],
