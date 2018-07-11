@@ -31,6 +31,7 @@ import { ListenerApi } from 'Native/Api/Listener';
 import { JaegerManager } from 'Jaeger/JaegerManager';
 import { JaegerSpan } from 'Jaeger/JaegerSpan';
 import { GdprManager } from 'Managers/GdprManager';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 describe('NewRefreshManagerTest', () => {
     let nativeBridge: NativeBridge;
@@ -56,6 +57,7 @@ describe('NewRefreshManagerTest', () => {
     let adUnit: TestAdUnit;
     let jaegerManager: JaegerManager;
     let gdprManager: GdprManager;
+    let programmaticTrackingService: ProgrammaticTrackingService;
 
     beforeEach(() => {
         nativeBridge = TestFixtures.getNativeBridge();
@@ -67,7 +69,8 @@ describe('NewRefreshManagerTest', () => {
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
         request = new Request(nativeBridge, wakeUpManager);
         cacheBookKeeping = new CacheBookkeeping(nativeBridge);
-        cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookKeeping);
+        programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+        cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookKeeping, programmaticTrackingService);
         reinitManager = new ReinitManager(nativeBridge, clientInfo, request, cache);
         assetManager = new AssetManager(cache, CacheMode.DISABLED, deviceInfo, cacheBookKeeping, nativeBridge);
         sessionManager = new SessionManager(nativeBridge, request);
