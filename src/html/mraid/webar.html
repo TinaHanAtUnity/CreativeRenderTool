@@ -65,6 +65,10 @@
             }, '*');
         }
 
+        function nativeInitAR() {
+            callNativeFunction('initAR');
+        }
+
         function nativeHideCameraFeed() {
             callNativeFunction('hideCameraFeed')
         }
@@ -1043,6 +1047,9 @@
                         case 'windowresized':
                             window.WebARonARKitSetWindowSize(parameters);
                             break;
+                        case 'androidenumsreceived':
+                            WebARonARKitVRDisplay.androidEnums = parameters;
+                            break;
                         case 'error':
                         case 'sessioninterrupted':
                         case 'sessioninterruptionended':
@@ -1051,6 +1058,7 @@
                     }
                 }
             });
+            nativeInitAR();
         });
 
         //
@@ -1272,6 +1280,9 @@
         }
 
         window.installWebARHooks = function() {
+            if (!WebARonARKitVRDisplay.androidEnums) {
+                nativeInitAR();
+            }
             if (windowHooksInstalled) {
                 return;
             }
@@ -1287,6 +1298,10 @@
             console.log = oldConsoleLog;
             window.requestAnimationFrame = oldRequestAnimationFrame;
             windowHooksInstalled = false;
+        };
+
+        window.androidAREnums = function() {
+            return WebARonARKitVRDisplay.androidEnums;
         };
 
         function raf() {

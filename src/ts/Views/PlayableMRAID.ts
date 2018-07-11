@@ -60,6 +60,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _arErrorObserver: IObserver1<number>;
     private _arSessionInterruptedObserver: IObserver0;
     private _arSessionInterruptionEndedObserver: IObserver0;
+    private _arAndroidEnumsReceivedObserver: IObserver1<any>;
 
     private _isMRAIDAR: boolean = false;
 
@@ -164,7 +165,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 this._arErrorObserver = this._nativeBridge.AR.onError.subscribe(errorCode => this.handleAREvent('error', JSON.stringify({errorCode})));
                 this._arSessionInterruptedObserver = this._nativeBridge.AR.onSessionInterrupted.subscribe(() => this.handleAREvent('sessioninterrupted', ''));
                 this._arSessionInterruptionEndedObserver = this._nativeBridge.AR.onSessionInterruptionEnded.subscribe(() => this.handleAREvent('sessioninterruptionended', ''));
-
+                this._arAndroidEnumsReceivedObserver = this._nativeBridge.AR.onAndroidEnumsReceived.subscribe((enums) => this.handleAREvent('androidenumsreceived', JSON.stringify(enums)));
                 this._deviceorientationListener = (event: DeviceOrientationEvent) => this.handleDeviceOrientation(event);
                 window.addEventListener('deviceorientation', this._deviceorientationListener, false);
             }
@@ -435,6 +436,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 this._nativeBridge.AR.onError.unsubscribe(this._arErrorObserver);
                 this._nativeBridge.AR.onSessionInterrupted.unsubscribe(this._arSessionInterruptedObserver);
                 this._nativeBridge.AR.onSessionInterruptionEnded.unsubscribe(this._arSessionInterruptionEndedObserver);
+                this._nativeBridge.AR.onAndroidEnumsReceived.unsubscribe(this._arAndroidEnumsReceivedObserver);
                 window.removeEventListener('deviceorientation', this._deviceorientationListener, false);
             }
         }
@@ -472,6 +474,9 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
             case 'log':
                 return this._nativeBridge.Sdk.logDebug('NATIVELOG ' + JSON.stringify(args));
+
+            case 'initAR':
+                return this._nativeBridge.AR.initAR();
 
             default:
                 throw new Error('Unknown AR message');

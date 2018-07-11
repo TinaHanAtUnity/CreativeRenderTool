@@ -66,6 +66,7 @@ export class ARApi extends NativeApi {
     public readonly onError = new Observable1<number>();
     public readonly onSessionInterrupted = new Observable0();
     public readonly onSessionInterruptionEnded = new Observable0();
+    public readonly onAndroidEnumsReceived = new Observable1<any>();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'AR');
@@ -128,6 +129,18 @@ export class ARApi extends NativeApi {
 
     public getSupportedVideoFormats(): Promise<IARVideoFormat[]> {
         return this._nativeBridge.invoke<IARVideoFormat[]>(this._apiClass, 'getSupportedVideoFormats');
+    }
+
+    public initAR(): Promise<void> {
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            return this._nativeBridge.invoke<any>(this._apiClass, 'getAndroidConfigEnums').then((enums) => {
+                this.onAndroidEnumsReceived.trigger(enums);
+
+                return Promise.resolve();
+            });
+        }
+
+        return Promise.resolve();
     }
 
     public handleEvent(event: string, parameters: any[]): void {
