@@ -24,6 +24,7 @@ import { IntentApi } from 'Native/Api/Intent';
 import { GDPRPrivacy } from 'Views/GDPRPrivacy';
 import { Placement } from 'Models/Placement';
 import { GdprManager, GDPREventSource } from 'Managers/GdprManager';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 describe('PrivacyEventHandlerTest', () => {
 
@@ -51,7 +52,8 @@ describe('PrivacyEventHandlerTest', () => {
             overlay: sinon.createStubInstance(Overlay),
             video: sinon.createStubInstance(Video),
             privacy: sinon.createStubInstance(GDPRPrivacy),
-            gdprManager: sinon.createStubInstance(GdprManager)
+            gdprManager: sinon.createStubInstance(GdprManager),
+            programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService)
         };
 
         adUnit = sinon.createStubInstance(PerformanceAdUnit);

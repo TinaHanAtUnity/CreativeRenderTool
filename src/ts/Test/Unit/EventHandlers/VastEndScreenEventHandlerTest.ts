@@ -23,6 +23,7 @@ import EventTestVast from 'xml/EventTestVast.xml';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { GdprManager } from 'Managers/GdprManager';
 import { Privacy } from 'Views/Privacy';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 describe('VastEndScreenEventHandlersTest', () => {
     const handleInvocation = sinon.spy();
@@ -68,6 +69,7 @@ describe('VastEndScreenEventHandlersTest', () => {
         const video = new Video('', TestFixtures.getSession());
         const overlay = new Overlay(nativeBridge, true, 'en', 'testGameId', privacy, false);
         const gdprManager = sinon.createStubInstance(GdprManager);
+        const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
         vastAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,
@@ -85,7 +87,8 @@ describe('VastEndScreenEventHandlersTest', () => {
             endScreen: undefined,
             overlay: overlay,
             video: video,
-            gdprManager: gdprManager
+            gdprManager: gdprManager,
+            programmaticTrackingService: programmaticTrackingService
         };
     });
 

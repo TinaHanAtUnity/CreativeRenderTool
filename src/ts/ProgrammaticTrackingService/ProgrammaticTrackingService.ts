@@ -7,6 +7,11 @@ export enum ProgrammaticTrackingError {
     TooLargeFile = 'too_large_file'
 }
 
+export enum ProgrammaticTrackingMetric {
+    AdmobUsedCachedVideo = 'admob_used_cached_video',
+    AdmobUsedStreamedVideo = 'admob_used_streamed_video'
+}
+
 export interface IProgrammaticTrackingErrorData {
     event: ProgrammaticTrackingError;
     platform: string;
@@ -16,8 +21,13 @@ export interface IProgrammaticTrackingErrorData {
     seatId: number | undefined;
 }
 
+export interface IProgrammaticTrackingMetricData {
+    event: ProgrammaticTrackingMetric;
+}
+
 export class ProgrammaticTrackingService {
     private static productionErrorServiceUrl: string = 'https://tracking.adsx.unityads.unity3d.com/tracking/sdk/error';
+    private static productionMetricServiceUrl: string = 'https://tracking.adsx.unityads.unity3d.com/tracking/sdk/metric';
 
     private request: Request;
     private clientInfo: ClientInfo;
@@ -27,6 +37,18 @@ export class ProgrammaticTrackingService {
         this.request = request;
         this.clientInfo = clientInfo;
         this.deviceInfo = deviceInfo;
+    }
+
+    public reportMetric(event: ProgrammaticTrackingMetric): Promise<INativeResponse> {
+        const url: string = ProgrammaticTrackingService.productionMetricServiceUrl;
+        const data: string = JSON.stringify(<IProgrammaticTrackingMetricData>{
+            event: event
+        });
+        const headers: Array<[string, string]> = [];
+
+        headers.push(['Content-Type', 'application/json']);
+
+        return this.request.post(url, data, headers);
     }
 
     public reportError(errorData: IProgrammaticTrackingErrorData): Promise<INativeResponse> {
