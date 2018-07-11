@@ -232,8 +232,7 @@ class TestHelper {
     }
 
     public static getSessionManager(nativeBridge: NativeBridge, request: Request): SessionManager {
-        const sessionManager: SessionManager = new SessionManager(nativeBridge, request);
-        return sessionManager;
+        return new SessionManager(nativeBridge, request);
     }
 }
 

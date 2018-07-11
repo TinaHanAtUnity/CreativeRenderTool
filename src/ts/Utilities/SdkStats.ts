@@ -249,7 +249,7 @@ export class SdkStats {
                 eventInfo.delayInitToShow = eventTimestamp - SdkStats._initTimestamp;
             }
 
-            const statsEvent: ISdkStatsEvent = {
+            return {
                 eventTimestamp: eventTimestamp,
                 userInfo: userInfo,
                 placementInfo: placementInfo,
@@ -258,8 +258,6 @@ export class SdkStats {
                 mediationInfo: mediationInfo,
                 eventInfo: eventInfo
             };
-
-            return statsEvent;
         });
     }
 
