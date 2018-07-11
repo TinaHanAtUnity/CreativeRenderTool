@@ -43,8 +43,8 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
 
         this._localization = new Localization(language, 'overlay');
         this._privacy = privacy;
-        this._showGDPRBanner = true; // showGDPRBanner;
-        this._disablePrivacyDuringVideo = false; // disablePrivacyDuringVideo;
+        this._showGDPRBanner = showGDPRBanner;
+        this._disablePrivacyDuringVideo = disablePrivacyDuringVideo;
         this._template = new Template(NewVideoOverlayTemplate, this._localization);
 
         this._templateData = {
@@ -128,7 +128,6 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._muteButtonElement = <HTMLElement>this._container.querySelector('.mute-button');
         this._debugMessageElement = <HTMLElement>this._container.querySelector('.debug-message-text');
         this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
-        this._callButtonElement.style.display = 'block';
         this._timerElement = <HTMLElement>this._container.querySelector('.timer');
         this.choosePrivacyShown();
     }
@@ -230,8 +229,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
             this._container.classList.remove('show-gdpr-button');
         } else if (!this._gdprPopupClicked && this._showGDPRBanner) {
             this._container.classList.add('show-gdpr-banner');
-            // TODO: ENABLE: this._container.classList.remove('show-gdpr-button');
-            this._container.classList.add('show-gdpr-button');
+            this._container.classList.remove('show-gdpr-button');
         } else {
             this._container.classList.remove('show-gdpr-banner');
             this._container.classList.add('show-gdpr-button');
