@@ -59,7 +59,8 @@ import { GdprManager } from 'Managers/GdprManager';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
-import { ABGroup } from 'Models/ABGroup';
+import { ABGroup, FLAMTest } from 'Models/ABGroup';
+import { FLAM } from 'Utilities/FLAM';
 
 export class WebView {
 
@@ -278,6 +279,10 @@ export class WebView {
         }).then(() => {
             this._initialized = true;
             this._jaegerManager.stop(jaegerInitSpan);
+
+            if(FLAMTest.isValid(this._configuration.getAbGroup())) {
+                FLAM.measure(['webp', 'hevc', 'vp9'], this._nativeBridge);
+            }
 
             return this._sessionManager.sendUnsentSessions();
         }).then(() => {
