@@ -423,13 +423,14 @@ export class AdUnitFactory {
     private static createOverlay(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractVideoOverlay {
         const privacy = this.createPrivacy(nativeBridge, parameters);
         const showGDPRBanner = (parameters.campaign instanceof VastCampaign) ? this.showGDPRBanner(parameters) : false;
-        const disablePrivacyDuringVideo = (parameters.campaign instanceof PerformanceCampaign || parameters.campaign instanceof XPromoCampaign) && !parameters.placement.skipEndCardOnClose();
+        const isPerformanceCampaign = parameters.campaign instanceof PerformanceCampaign;
+        const disablePrivacyDuringVideo = (isPerformanceCampaign || parameters.campaign instanceof XPromoCampaign) && !parameters.placement.skipEndCardOnClose();
         let overlay: AbstractVideoOverlay;
 
         if (parameters.placement.allowSkip() && parameters.placement.skipEndCardOnClose()) {
             overlay = new ClosableVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         } else {
-            if (NewVideoOverlayEnabledAbTest.isValid(parameters.campaign.getAbGroup())) {
+            if (isPerformanceCampaign && NewVideoOverlayEnabledAbTest.isValid(parameters.campaign.getAbGroup())) {
                 overlay = new NewVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, disablePrivacyDuringVideo);
             } else {
                 overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, disablePrivacyDuringVideo);
