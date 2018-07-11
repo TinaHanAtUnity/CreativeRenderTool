@@ -101,4 +101,3 @@ const GroupTest = new ABGroup(99);
 
 export const SquareEndScreenEnabledAbTest = new ABTest(GroupEighteen, GroupNineteen);
 export const CTAOpenUrlAbTest = new ABTest(GroupEleven, GroupTwelve);
-export const FLAMTest = new ABTest(GroupSixteen);
