@@ -43,7 +43,7 @@ export class ProgrammaticTrackingService {
         const platform: Platform = this.clientInfo.getPlatform();
         const osVersion: string = this.deviceInfo.getOsVersion();
         const sdkVersion: string = this.clientInfo.getSdkVersionName();
-        const data: IProgrammaticTrackingErrorData = {
+        return <IProgrammaticTrackingErrorData>{
             event: error,
             platform: Platform[platform],
             osVersion: osVersion,
@@ -51,7 +51,6 @@ export class ProgrammaticTrackingService {
             adType: adType,
             seatId: seatId
         };
-        return data;
     }
 
 }
