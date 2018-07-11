@@ -31,6 +31,7 @@ export class PromoPlacementManager {
     }
 
     public setPromoPlacementReady(placementId: string) {
+        this._nativeBridge.Sdk.logInfo(placementId);
         this.setPlacementState(placementId, PlacementState.READY);
     }
 

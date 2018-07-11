@@ -366,6 +366,11 @@ export class CampaignManager {
                     let auctionResponse: AuctionResponse;
                     try {
                         auctionResponse = new AuctionResponse(fill[mediaId], json.media[mediaId], mediaId, json.correlationId);
+                        for(const placement of auctionResponse.getPlacements()) {
+                            if (auctionResponse.getContentType() === 'purchasing/iap') {
+                                PurchasingUtilities.promoPlacements.push(placement);
+                            }
+                        }
                         promises.push(this.handleCampaign(auctionResponse, session, backupResponse).catch(error => {
                             if(error === CacheStatus.STOPPED) {
                                 return Promise.resolve();

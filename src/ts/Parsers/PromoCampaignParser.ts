@@ -43,12 +43,12 @@ export class PromoCampaignParser extends CampaignParser {
         if (promoJson && promoJson.iapProductId && PurchasingUtilities.isInitialized()) {
             PurchasingUtilities.refreshCatalog().then(() => {
                 if (PurchasingUtilities.isProductAvailable(promoJson.iapProductId)) {
-                    promoCampaign.setIapProductId(promoJson.iapProductIds);
                 } else {
                     PurchasingUtilities.promoCampaigns[PurchasingUtilities.promoResponseIndex] = promoCampaign;
                     PurchasingUtilities.promoJsons[PurchasingUtilities.promoResponseIndex] = promoJson;
                     PurchasingUtilities.promoResponseIndex++;
-                    throw new Error(`Promo product id ${promoJson.iapProductId} is unavailable at this time`);
+                    nativeBridge.Sdk.logInfo(`Promo product id ${promoJson.iapProductId} is unavailable at this time`);
+                    // throw new Error(`Promo product id ${promoJson.iapProductId} is unavailable at this time`);
                 }
             });
         } else {
@@ -56,7 +56,8 @@ export class PromoCampaignParser extends CampaignParser {
                 PurchasingUtilities.promoCampaigns[PurchasingUtilities.promoResponseIndex] = promoCampaign;
                 PurchasingUtilities.promoJsons[PurchasingUtilities.promoResponseIndex] = promoJson;
                 PurchasingUtilities.promoResponseIndex++;
-                throw new Error(`Promo product id ${promoJson.iapProductId} is unavailable at this time`);
+                nativeBridge.Sdk.logInfo(`Promo product id ${promoJson.iapProductId} is unavailable at this time when purchasing is not inited ^_^`);
+                // throw new Error(`Promo product id ${promoJson.iapProductId} is unavailable at this time`);
             }
         }
 
