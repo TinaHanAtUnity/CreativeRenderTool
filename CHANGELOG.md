@@ -1,3 +1,7 @@
+# Pending
+
+* Tslint no-unnecessary-local-variable is re-enabled
+
 # Wed Jul 11 21:24:48 UTC 2018
 
 * Send too_large_file errors to programmatic tracking service
