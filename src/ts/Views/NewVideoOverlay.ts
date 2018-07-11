@@ -332,6 +332,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
             return;
         }
         this._callButtonElement.classList.add('show-call-button');
+        this._callButtonElement.classList.add('show-go-text');
     }
 
     private fadeIn() {

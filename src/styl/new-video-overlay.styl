@@ -10,7 +10,7 @@ $tab-font-color = "#f1f1f1";
 $fade-transition = opacity .45s ease-in;
 $touchable-area-height = $new-video-overlay-size * 2;
 $touchable-area-width = $new-video-overlay-size * 2.2;
-$call-button-width = $new-video-overlay-size * 5.5;
+$call-button-width = $new-video-overlay-size * 6;
 $tab-border-radius = $new-video-overlay-size * .2;
 $tab-vertical-margin = $new-video-overlay-size * .3;
 
@@ -118,7 +118,7 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
     background-color: rgba(0, 0, 0, .54);
     color: $tab-font-color;
     text-align: center;
-    text-shadow: 2px 2px 5px rgba(0, 0, 0, .8), 0 0 2px rgba(0, 0, 0, 1);
+    text-shadow: $new-video-overlay-size * .01 $new-video-overlay-size * .01 $new-video-overlay-size * .025 rgba(0, 0, 0, .8), 0 0 $new-video-overlay-size * .1 rgba(0, 0, 0, 1);
     font-weight: 300;
   }
 
@@ -158,10 +158,48 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
   .call-button {
     transform: translateX(100%);
     transition: transform .3s ease-in;
+
+    .tab {
+      text-align: left;
+    }
+
+    .text {
+      margin-left: $new-video-overlay-size * .8;
+      text-align: center;
+    }
+
+    .go-text {
+      position: absolute;
+      margin-top: $new-video-overlay-size * .55;
+      margin-left: $new-video-overlay-size *  .55;
+      width: $new-video-overlay-size *  2.4;
+      height: $new-video-overlay-size * 1.7;
+      border: 1px solid;
+      border-radius: $new-video-overlay-size * .25;
+      font-size: $new-video-overlay-size * .8;
+      line-height: $new-video-overlay-size * 1.85;
+      transform: translateX(200%);
+      transition: transform .6s ease-in;
+    }
+
+    /*.go-text {
+      padding: .4em .6em;
+      border: 1px solid;
+      border-radius: .25em;
+      font-size: .8em;
+      transform: translateX(100%);
+      transition: transform .6 ease-in;
+    }*/
   }
 
   .show-call-button {
     transform: translateX(0%);
+  }
+
+  .show-go-text {
+    .go-text {
+      transform: translateX(0%);
+    }
   }
 
   .call-button,
@@ -257,10 +295,6 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
     font-weight: bold;
   }
 
-  .gdpr-pop-up  {
-
-  }
-
   &:not(.show-gdpr-banner) {
     .gdpr-pop-up {
       display: none;
@@ -329,27 +363,23 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
  */
 @media (orientation: landscape)
   #new-video-overlay .content {
-    @media (max-width: 374) {
-      font-size: $new-video-overlay-size * .8;
+    @media (max-width: 392) {
+      font-size: $new-video-overlay-size * .6;
     }
 
-    @media (min-width: 447px) and (max-width: 568px) {
+    @media (min-width: 472px) and (max-width: 593px) {
       font-size: $new-video-overlay-size * 1.2;
     }
 
-    @media (min-width: 569px) and (max-width: 750px) {
+    @media (min-width: 594px) and (max-width: 750px) {
       font-size: $new-video-overlay-size * 1.5;
     }
   
-    @media (min-width: 751px) and (max-width: 768px) {
+    @media (min-width: 751px) and (max-width: 823px) {
       font-size: $new-video-overlay-size * 2;
     }
 
-    @media (min-width: 769px) and (max-width: 800px) {
-      font-size: $new-video-overlay-size * 2;
-    }
-
-    @media (min-width: 801px) and (max-width: 959px) {
+    @media (min-width: 824px) and (max-width: 959px) {
       font-size: $new-video-overlay-size * 2.1;
     }
 
