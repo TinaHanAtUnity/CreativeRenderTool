@@ -1,3 +1,7 @@
+# Wed Jul 11 12:45:00 UTC 2018
+
+* Revert previous deployment
+
 # Wed Jul 11 12:31:27 UTC 2018
 
 * Feature list and measurements A/B test in group 16
