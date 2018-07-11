@@ -4,6 +4,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Template } from 'Utilities/Template';
 import { Localization } from 'Utilities/Localization';
 import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Views/AbstractPrivacy';
 
 export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHandler {
