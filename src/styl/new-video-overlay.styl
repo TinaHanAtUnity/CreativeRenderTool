@@ -182,15 +182,6 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
       transform: translateX(200%);
       transition: transform .6s ease-in;
     }
-
-    /*.go-text {
-      padding: .4em .6em;
-      border: 1px solid;
-      border-radius: .25em;
-      font-size: .8em;
-      transform: translateX(100%);
-      transition: transform .6 ease-in;
-    }*/
   }
 
   .show-call-button {
@@ -236,16 +227,16 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
 
   .timer-container {
     position: relative;
-    top: $new-video-overlay-size * .2;
+    top: $new-video-overlay-size * .27;
     left: $new-video-overlay-size * .5;
-    width: $new-video-overlay-size;
-    height: $new-video-overlay-size;
-    border: 2px solid $white;
+    width: $new-video-overlay-size * .9;
+    height: $new-video-overlay-size * .9;
+    border: 1px solid $white;
     border-radius: 50%;
-    line-height: $new-video-overlay-size * 1.04;
+    line-height: $new-video-overlay-size * .92;
   }
   .timer {
-    font-size: $new-video-overlay-size * .45;
+    font-size: $new-video-overlay-size * .4;
   }
   
 
