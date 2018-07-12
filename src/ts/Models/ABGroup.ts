@@ -101,4 +101,4 @@ const GroupTest = new ABGroup(99);
 
 export const SquareEndScreenEnabledAbTest = new ABTest(GroupEighteen, GroupNineteen);
 export const CTAOpenUrlAbTest = new ABTest(GroupEleven, GroupTwelve);
-export const NewVideoOverlayEnabledAbTest = { isValid: (abGroup: ABGroup) => true };
+export const NewVideoOverlayEnabledAbTest = new ABTest(GroupSixteen, GroupSeventeen);
