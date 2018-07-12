@@ -1,6 +1,7 @@
 # Pending
 
 * Tslint no-unnecessary-local-variable is re-enabled
+* Tslint no-invalid-this re-enabled
 
 # Wed Jul 11 21:24:48 UTC 2018
 
