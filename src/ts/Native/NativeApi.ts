@@ -16,7 +16,7 @@ export abstract class NativeApi {
     protected _apiClass: string;
     protected _apiPackage: ApiPackage;
 
-    constructor(nativeBridge: NativeBridge, apiClass: string, apiPackage: ApiPackage = ApiPackage.CORE) {
+    constructor(nativeBridge: NativeBridge, apiClass: string, apiPackage: ApiPackage) {
         this._nativeBridge = nativeBridge;
         this._apiClass = apiClass;
         this._apiPackage = apiPackage;
