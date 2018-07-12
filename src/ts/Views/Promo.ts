@@ -147,7 +147,7 @@ export class Promo extends View<{}> implements IPrivacyHandler {
 
     private onPromoEvent(event: Event): void {
         event.preventDefault();
-        this.onPromo.trigger(this._promoCampaign.getIapProductId()!);
+        this.onPromo.trigger(this._promoCampaign.getIapProductId());
     }
 
     private onCloseEvent(event: Event): void {

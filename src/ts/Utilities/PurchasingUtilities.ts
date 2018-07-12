@@ -3,8 +3,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Diagnostics } from './Diagnostics';
 import { Configuration } from 'Models/Configuration';
 import { ClientInfo } from 'Models/ClientInfo';
-import { CampaignManager } from 'Managers/CampaignManager';
-import { Placement, PlacementState } from 'Models/Placement';
+import { PlacementState } from 'Models/Placement';
 import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 import { PromoPlacementManager } from 'Managers/PromoPlacementManager';
 
@@ -29,17 +28,16 @@ export class PurchasingUtilities {
 
     public static promoJsons: any[] = [];
     public static promoCampaigns: PromoCampaign[] = [];
-    public static campaignManager: CampaignManager;
     public static promoResponseIndex: number = 0;
     public static iapCampaignCount: number = 0;
     public static promoPlacementManager: PromoPlacementManager;
     public static promoPlacements: string[] = [];
 
-    public static initialize(clientInfo: ClientInfo, configuration: Configuration, nativeBridge: NativeBridge, promoPlacementManager?: PromoPlacementManager) {
+    public static initialize(clientInfo: ClientInfo, configuration: Configuration, nativeBridge: NativeBridge, promoPlacementManager: PromoPlacementManager) {
         this._clientInfo = clientInfo;
         this._configuration = configuration;
         this._nativeBridge = nativeBridge;
-        this.promoPlacementManager = promoPlacementManager!;
+        this.promoPlacementManager = promoPlacementManager;
     }
 
     public static isInitialized(): boolean {

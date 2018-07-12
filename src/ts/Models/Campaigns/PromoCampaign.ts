@@ -48,10 +48,6 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
         return this.get('dynamicMarkup');
     }
 
-    public setIapProductId(iapProductId: string) {
-        this.set('iapProductId', iapProductId);
-    }
-
     public getIapProductId(): string {
         return this.get('iapProductId');
     }
