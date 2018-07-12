@@ -1,9 +1,9 @@
-import { NativeApi } from 'Native/NativeApi';
+import { ApiPackage, NativeApi } from 'Native/NativeApi';
 import { NativeBridge } from 'Native/NativeBridge';
 
 export class AndroidCacheApi extends NativeApi {
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Cache');
+        super(nativeBridge, 'Cache', ApiPackage.CORE);
     }
 
     public getMetaData(fileId: string, properties: number[]): Promise<Array<[number, any]>> {
