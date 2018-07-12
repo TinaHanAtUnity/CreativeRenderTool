@@ -1,4 +1,4 @@
-# Pending
+# Staged
 
 * Tslint no-unnecessary-local-variable is re-enabled
 * Tslint no-invalid-this is re-enabled
