@@ -23,6 +23,7 @@ import { UserCountData } from 'Utilities/UserCountData';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { MixedPlacementUtility } from 'Utilities/MixedPlacementUtility';
 import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
+import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 
 export class OldCampaignRefreshManager extends RefreshManager {
     private _nativeBridge: NativeBridge;
@@ -227,7 +228,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
                 this.onNoFill(placementId);
             }
         } else {
-            if (campaign.getAdType() === 'purchasing/iap' && !(<PromoCampaign>campaign).getIapProductId()) {
+            if (campaign.getAdType() === 'purchasing/iap' && !PurchasingUtilities.isProductAvailable((<PromoCampaign>campaign).getIapProductId())) {
                 this.onNoFill(placementId);
             } else {
                 this.setCampaignForPlacement(placementId, campaign);
