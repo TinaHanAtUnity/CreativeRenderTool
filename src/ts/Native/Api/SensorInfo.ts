@@ -1,5 +1,5 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { NativeApi } from 'Native/NativeApi';
+import { ApiPackage, NativeApi } from 'Native/NativeApi';
 import { Platform } from 'Constants/Platform';
 import { AndroidSensorInfoApi } from 'Native/Api/AndroidSensorInfo';
 import { IosSensorInfoApi } from 'Native/Api/IosSensorInfo';
@@ -15,7 +15,7 @@ export class SensorInfoApi extends NativeApi {
     public Ios: IosSensorInfoApi;
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'SensorInfo');
+        super(nativeBridge, 'SensorInfo', ApiPackage.CORE);
 
         if(nativeBridge.getPlatform() === Platform.IOS) {
             this.Ios = new IosSensorInfoApi(nativeBridge);
@@ -25,14 +25,14 @@ export class SensorInfoApi extends NativeApi {
     }
 
     public stopAccelerometerUpdates(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'stopAccelerometerUpdates');
+        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'stopAccelerometerUpdates');
     }
 
     public isAccelerometerActive(): Promise<boolean> {
-        return this._nativeBridge.invoke<boolean>(this._apiClass, 'isAccelerometerActive');
+        return this._nativeBridge.invoke<boolean>(this.getFullApiClassName(), 'isAccelerometerActive');
     }
 
     public getAccelerometerData(): Promise<IAccelerometerData> {
-        return this._nativeBridge.invoke<IAccelerometerData>(this._apiClass, 'getAccelerometerData');
+        return this._nativeBridge.invoke<IAccelerometerData>(this.getFullApiClassName(), 'getAccelerometerData');
     }
 }

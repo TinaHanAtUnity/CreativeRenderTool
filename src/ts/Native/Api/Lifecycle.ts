@@ -1,5 +1,5 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { NativeApi } from 'Native/NativeApi';
+import { ApiPackage, NativeApi } from 'Native/NativeApi';
 import { Observable1 } from 'Utilities/Observable';
 
 export enum LifecycleError {
@@ -29,15 +29,15 @@ export class LifecycleApi extends NativeApi {
     public readonly onActivityDestroyed = new Observable1<string>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Lifecycle');
+        super(nativeBridge, 'Lifecycle', ApiPackage.CORE);
     }
 
     public register(events: string[]): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'register', [events]);
+        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'register', [events]);
     }
 
     public unregister(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'unregister');
+        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'unregister');
     }
 
     public handleEvent(event: string, parameters: any[]): void {

@@ -1,9 +1,9 @@
-import { NativeApi } from 'Native/NativeApi';
+import { ApiPackage, NativeApi } from 'Native/NativeApi';
 import { NativeBridge } from 'Native/NativeBridge';
 
 export class AndroidRequestApi extends NativeApi {
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Request');
+        super(nativeBridge, 'Request', ApiPackage.CORE);
     }
 
     public setMaximumPoolSize(count: number): Promise<void> {

@@ -1,5 +1,5 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { NativeApi } from 'Native/NativeApi';
+import { ApiPackage, NativeApi } from 'Native/NativeApi';
 import { Observable1 } from 'Utilities/Observable';
 
 export enum PurchasingEvent {
@@ -19,23 +19,23 @@ export class PurchasingApi extends NativeApi {
     public readonly onIAPSendEvent = new Observable1<string>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Purchasing');
+        super(nativeBridge, 'Purchasing', ApiPackage.ADS_CORE);
     }
 
     public initializePurchasing(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'initializePurchasing');
+        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'initializePurchasing');
     }
 
     public getPromoVersion(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'getPromoVersion');
+        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'getPromoVersion');
     }
 
     public getPromoCatalog(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'getPromoCatalog');
+        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'getPromoCatalog');
     }
 
     public initiatePurchasingCommand(event: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'initiatePurchasingCommand', [event]);
+        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'initiatePurchasingCommand', [event]);
     }
 
     public handleEvent(event: string, parameters: any[]): void {

@@ -1,6 +1,6 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { Observable4, Observable3 } from 'Utilities/Observable';
-import { NativeApi } from 'Native/NativeApi';
+import { ApiPackage, NativeApi } from 'Native/NativeApi';
 
 export enum ResolveEvent {
     COMPLETE,
@@ -13,11 +13,11 @@ export class ResolveApi extends NativeApi {
     public readonly onFailed = new Observable4<string, string, string, string>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Resolve');
+        super(nativeBridge, 'Resolve', ApiPackage.CORE);
     }
 
     public resolve(id: string, host: string): Promise<string> {
-        return this._nativeBridge.invoke<string>(this._apiClass, 'resolve', [id, host]);
+        return this._nativeBridge.invoke<string>(this.getFullApiClassName(), 'resolve', [id, host]);
     }
 
     public handleEvent(event: string, parameters: any[]): void {

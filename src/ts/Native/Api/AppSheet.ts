@@ -1,4 +1,4 @@
-import { NativeApi } from 'Native/NativeApi';
+import { ApiPackage, NativeApi } from 'Native/NativeApi';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Observable2, Observable1 } from 'Utilities/Observable';
 
@@ -59,34 +59,34 @@ export class AppSheetApi extends NativeApi {
     public readonly onError = new Observable2<string, IAppSheetOptions>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'AppSheet');
+        super(nativeBridge, 'AppSheet', ApiPackage.CORE);
     }
 
     public canOpen(): Promise<boolean> {
-        return this._nativeBridge.invoke<boolean>(this._apiClass, 'canOpen');
+        return this._nativeBridge.invoke<boolean>(this.getFullApiClassName(), 'canOpen');
     }
 
     public prepare(options: IAppSheetOptions, timeout: number = 30000): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'prepare', [options, timeout]);
+        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'prepare', [options, timeout]);
     }
 
     public present(options: IAppSheetOptions, animated: boolean = true): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'present', [options, animated]);
+        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'present', [options, animated]);
     }
 
     public destroy(options?: IAppSheetOptions): Promise<void> {
         if(typeof options === 'undefined') {
-            return this._nativeBridge.invoke<void>(this._apiClass, 'destroy');
+            return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'destroy');
         }
-        return this._nativeBridge.invoke<void>(this._apiClass, 'destroy', [options]);
+        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'destroy', [options]);
     }
 
     public setPrepareTimeout(timeout: number): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setPrepareTimeout', [timeout]);
+        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'setPrepareTimeout', [timeout]);
     }
 
     public getPrepareTimeout(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this._apiClass, 'getPrepareTimeout');
+        return this._nativeBridge.invoke<number>(this.getFullApiClassName(), 'getPrepareTimeout');
     }
 
     public handleEvent(event: string, parameters: any[]): void {

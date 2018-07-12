@@ -1,6 +1,6 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { Observable5, Observable3 } from 'Utilities/Observable';
-import { NativeApi } from 'Native/NativeApi';
+import { ApiPackage, NativeApi } from 'Native/NativeApi';
 import { Platform } from 'Constants/Platform';
 import { AndroidRequestApi } from 'Native/Api/AndroidRequestApi';
 
@@ -16,7 +16,7 @@ export class RequestApi extends NativeApi {
     public readonly onFailed = new Observable3<string, string, string>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Request');
+        super(nativeBridge, 'Request', ApiPackage.CORE);
 
         if(nativeBridge.getPlatform() === Platform.ANDROID) {
             this.Android = new AndroidRequestApi(nativeBridge);

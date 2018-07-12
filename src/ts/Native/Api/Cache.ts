@@ -1,6 +1,6 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { Observable3, Observable6, Observable5 } from 'Utilities/Observable';
-import { NativeApi } from 'Native/NativeApi';
+import { ApiPackage, NativeApi } from 'Native/NativeApi';
 import { AndroidCacheApi } from 'Native/Api/AndroidCache';
 import { IosCacheApi } from 'Native/Api/IosCache';
 import { Platform } from 'Constants/Platform';
@@ -44,7 +44,7 @@ export class CacheApi extends NativeApi {
     public readonly onDownloadError = new Observable3<string, string, string>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Cache');
+        super(nativeBridge, 'Cache', ApiPackage.CORE);
 
         if(nativeBridge.getPlatform() === Platform.IOS) {
             this.Ios = new IosCacheApi(nativeBridge);

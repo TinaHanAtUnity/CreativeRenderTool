@@ -1,4 +1,4 @@
-import { NativeApi } from 'Native/NativeApi';
+import { ApiPackage, NativeApi } from 'Native/NativeApi';
 import { StreamType } from 'Constants/Android/StreamType';
 import { NativeBridge } from 'Native/NativeBridge';
 import { DeviceInfoEvent } from 'Native/Api/DeviceInfoEvent';
@@ -33,7 +33,7 @@ export class AndroidDeviceInfoApi extends NativeApi {
     public readonly onVolumeChanged = new Observable3<number, number, number>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'DeviceInfo');
+        super(nativeBridge, 'DeviceInfo', ApiPackage.CORE);
     }
 
     public getAndroidId(): Promise<string> {

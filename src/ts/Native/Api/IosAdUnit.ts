@@ -1,6 +1,6 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { Observable0 } from 'Utilities/Observable';
-import { NativeApi } from 'Native/NativeApi';
+import { ApiPackage, NativeApi } from 'Native/NativeApi';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 import { Double } from 'Utilities/Double';
 
@@ -29,67 +29,67 @@ export class IosAdUnitApi extends NativeApi {
     public readonly onViewControllerDidReceiveMemoryWarning = new Observable0();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'AdUnit');
+        super(nativeBridge, 'AdUnit', ApiPackage.ADS_CORE);
     }
 
     public open(view: string[], supportedOrientations: UIInterfaceOrientationMask, statusBarHidden: boolean, shouldAutorotate: boolean, isTransparent: boolean, withAnimation: boolean): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'open', [view, supportedOrientations, statusBarHidden, shouldAutorotate, isTransparent, withAnimation]);
+        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'open', [view, supportedOrientations, statusBarHidden, shouldAutorotate, isTransparent, withAnimation]);
     }
 
     public close(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'close');
+        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'close');
     }
 
     public setViews(views: string[]): Promise<string[]> {
-        return this._nativeBridge.invoke<string[]>(this._apiClass, 'setViews', [views]);
+        return this._nativeBridge.invoke<string[]>(this.getFullApiClassName(), 'setViews', [views]);
     }
 
     public getViews(): Promise<string[]> {
-        return this._nativeBridge.invoke<string[]>(this._apiClass, 'getViews');
+        return this._nativeBridge.invoke<string[]>(this.getFullApiClassName(), 'getViews');
     }
 
     public setSupportedOrientations(supportedOrientations: UIInterfaceOrientationMask): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setSupportedOrientations', [supportedOrientations]);
+        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'setSupportedOrientations', [supportedOrientations]);
     }
 
     public getSupportedOrientations(): Promise<UIInterfaceOrientationMask> {
-        return this._nativeBridge.invoke<UIInterfaceOrientationMask>(this._apiClass, 'getSupportedOrientations');
+        return this._nativeBridge.invoke<UIInterfaceOrientationMask>(this.getFullApiClassName(), 'getSupportedOrientations');
     }
 
     public setKeepScreenOn(screenOn: boolean): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setKeepScreenOn', [screenOn]);
+        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'setKeepScreenOn', [screenOn]);
     }
 
     public setStatusBarHidden(hidden: boolean): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setStatusBarHidden', [hidden]);
+        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'setStatusBarHidden', [hidden]);
     }
 
     public getStatusBarHidden(): Promise<boolean> {
-        return this._nativeBridge.invoke<boolean>(this._apiClass, 'getStatusBarHidden');
+        return this._nativeBridge.invoke<boolean>(this.getFullApiClassName(), 'getStatusBarHidden');
     }
 
     public setShouldAutorotate(autorotate: boolean): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setShouldAutorotate', [autorotate]);
+        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'setShouldAutorotate', [autorotate]);
     }
 
     public getShouldAutorotate(): Promise<boolean> {
-        return this._nativeBridge.invoke<boolean>(this._apiClass, 'getShouldAutorotate');
+        return this._nativeBridge.invoke<boolean>(this.getFullApiClassName(), 'getShouldAutorotate');
     }
 
     public setTransform(rotation: Double): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setTransform', [rotation]);
+        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'setTransform', [rotation]);
     }
 
     public getTransform(): Promise<Double> {
-        return this._nativeBridge.invoke<Double>(this._apiClass, 'getTransform');
+        return this._nativeBridge.invoke<Double>(this.getFullApiClassName(), 'getTransform');
     }
 
     public setViewFrame(view: string, x: Double, y: Double, width: Double, height: Double): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setViewFrame', [view, x, y, width, height]);
+        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'setViewFrame', [view, x, y, width, height]);
     }
 
     public getViewFrame(view: string): Promise<Double[]> {
-        return this._nativeBridge.invoke<Double[]>(this._apiClass, 'getViewFrame', [view]);
+        return this._nativeBridge.invoke<Double[]>(this.getFullApiClassName(), 'getViewFrame', [view]);
     }
 
     public handleEvent(event: string, parameters: any[]): void {

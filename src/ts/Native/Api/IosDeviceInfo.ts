@@ -1,4 +1,4 @@
-import { NativeApi } from 'Native/NativeApi';
+import { ApiPackage, NativeApi } from 'Native/NativeApi';
 import { NativeBridge } from 'Native/NativeBridge';
 import { UIUserInterfaceIdiom } from 'Constants/iOS/UIUserInterfaceIdiom';
 import { DeviceInfoEvent } from 'Native/Api/DeviceInfoEvent';
@@ -8,7 +8,7 @@ export class IosDeviceInfoApi extends NativeApi {
     public readonly onVolumeChanged = new Observable2<number, number>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'DeviceInfo');
+        super(nativeBridge, 'DeviceInfo', ApiPackage.CORE);
     }
 
     public getScreenScale(): Promise<number> {

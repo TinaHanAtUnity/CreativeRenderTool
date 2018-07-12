@@ -4,6 +4,7 @@ import { Platform } from 'Constants/Platform';
 import { IosVideoPlayerApi } from 'Native/Api/IosVideoPlayer';
 import { AndroidVideoPlayerApi } from 'Native/Api/AndroidVideoPlayer';
 import { NativeApiWithEventHandlers } from 'Native/NativeApiWithEventHandlers';
+import { ApiPackage } from 'Native/NativeApi';
 
 enum VideoPlayerEvent {
     PROGRESS,
@@ -33,7 +34,7 @@ export class VideoPlayerApi extends NativeApiWithEventHandlers<IVideoEventHandle
     public Android: AndroidVideoPlayerApi;
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'VideoPlayer');
+        super(nativeBridge, 'VideoPlayer', ApiPackage.ADS_CORE);
         if(nativeBridge.getPlatform() === Platform.IOS) {
             this.Ios = new IosVideoPlayerApi(nativeBridge);
         } else if(nativeBridge.getPlatform() === Platform.ANDROID) {
@@ -42,47 +43,47 @@ export class VideoPlayerApi extends NativeApiWithEventHandlers<IVideoEventHandle
     }
 
     public setProgressEventInterval(milliseconds: number): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setProgressEventInterval', [milliseconds]);
+        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'setProgressEventInterval', [milliseconds]);
     }
 
     public getProgressEventInterval(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this._apiClass, 'getProgressEventInterval');
+        return this._nativeBridge.invoke<number>(this.getFullApiClassName(), 'getProgressEventInterval');
     }
 
     public prepare(url: string, initialVolume: Double, timeout: number): Promise<string> {
-        return this._nativeBridge.invoke<string>(this._apiClass, 'prepare', [url, initialVolume, timeout]);
+        return this._nativeBridge.invoke<string>(this.getFullApiClassName(), 'prepare', [url, initialVolume, timeout]);
     }
 
     public play(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'play');
+        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'play');
     }
 
     public pause(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'pause');
+        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'pause');
     }
 
     public stop(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'stop');
+        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'stop');
     }
 
     public seekTo(time: number): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'seekTo', [time]);
+        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'seekTo', [time]);
     }
 
     public getCurrentPosition(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this._apiClass, 'getCurrentPosition');
+        return this._nativeBridge.invoke<number>(this.getFullApiClassName(), 'getCurrentPosition');
     }
 
     public getVolume(): Promise<Double> {
-        return this._nativeBridge.invoke<Double>(this._apiClass, 'getVolume');
+        return this._nativeBridge.invoke<Double>(this.getFullApiClassName(), 'getVolume');
     }
 
     public setVolume(volume: Double): Promise<Double> {
-        return this._nativeBridge.invoke<Double>(this._apiClass, 'setVolume', [volume]);
+        return this._nativeBridge.invoke<Double>(this.getFullApiClassName(), 'setVolume', [volume]);
     }
 
     public setAutomaticallyWaitsToMinimizeStalling(value: boolean): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setAutomaticallyWaitsToMinimizeStalling', [value]);
+        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'setAutomaticallyWaitsToMinimizeStalling', [value]);
     }
 
     public handleEvent(event: string, parameters: any[]): void {

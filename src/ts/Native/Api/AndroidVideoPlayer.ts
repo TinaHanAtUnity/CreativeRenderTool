@@ -1,5 +1,6 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { NativeApiWithEventHandlers } from 'Native/NativeApiWithEventHandlers';
+import { ApiPackage } from 'Native/NativeApi';
 
 enum AndroidVideoPlayerEvent {
     INFO
@@ -27,11 +28,11 @@ export interface IAndroidVideoEventHandler {
 export class AndroidVideoPlayerApi extends NativeApiWithEventHandlers<IAndroidVideoEventHandler> {
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'VideoPlayer');
+        super(nativeBridge, 'VideoPlayer', ApiPackage.ADS_CORE);
     }
 
     public setInfoListenerEnabled(enabled: boolean): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setInfoListenerEnabled', [enabled]);
+        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'setInfoListenerEnabled', [enabled]);
     }
 
     public handleEvent(event: string, parameters: any[]): void {

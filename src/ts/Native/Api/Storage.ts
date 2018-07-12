@@ -1,5 +1,5 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { NativeApi } from 'Native/NativeApi';
+import { ApiPackage, NativeApi } from 'Native/NativeApi';
 import { Observable2 } from 'Utilities/Observable';
 
 export enum StorageType {
@@ -24,7 +24,7 @@ export class StorageApi extends NativeApi {
     public onSet: Observable2<string, object> = new Observable2();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Storage');
+        super(nativeBridge, 'Storage', ApiPackage.CORE);
     }
 
     public read(type: StorageType): Promise<void> {
