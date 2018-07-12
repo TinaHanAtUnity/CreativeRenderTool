@@ -1,5 +1,5 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { NativeApi } from 'Native/NativeApi';
+import { ApiPackage, NativeApi } from 'Native/NativeApi';
 
 export interface IntentExtra {
     key: string;
@@ -21,18 +21,18 @@ export interface IntentData {
 export class IntentApi extends NativeApi {
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Intent');
+        super(nativeBridge, 'Intent', ApiPackage.CORE);
     }
 
     public launch(intentData: IntentData): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'launch', [intentData]);
+        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'launch', [intentData]);
     }
 
     public canOpenIntent(intentData: IntentData): Promise<boolean> {
-        return this._nativeBridge.invoke<boolean>(this._apiClass, 'canOpenIntent', [intentData]);
+        return this._nativeBridge.invoke<boolean>(this.getFullApiClassName(), 'canOpenIntent', [intentData]);
     }
 
     public canOpenIntents(intents: IntentData[]): Promise<{ [id: string]: boolean }> {
-        return this._nativeBridge.invoke<{ [id: string]: boolean }>(this._apiClass, 'canOpenIntents', [intents]);
+        return this._nativeBridge.invoke<{ [id: string]: boolean }>(this.getFullApiClassName(), 'canOpenIntents', [intents]);
     }
 }

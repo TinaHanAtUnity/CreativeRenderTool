@@ -54,67 +54,67 @@ export class CacheApi extends NativeApi {
     }
 
     public download(url: string, fileId: string, headers: Array<[string, string]>, append: boolean): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'download', [url, fileId, headers, append]);
+        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'download', [url, fileId, headers, append]);
     }
 
     public stop(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'stop');
+        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'stop');
     }
 
     public isCaching(): Promise<boolean> {
-        return this._nativeBridge.invoke<boolean>(this._apiClass, 'isCaching');
+        return this._nativeBridge.invoke<boolean>(this.getFullApiClassName(), 'isCaching');
     }
 
     public getFiles(): Promise<IFileInfo[]> {
-        return this._nativeBridge.invoke<IFileInfo[]>(this._apiClass, 'getFiles');
+        return this._nativeBridge.invoke<IFileInfo[]>(this.getFullApiClassName(), 'getFiles');
     }
 
     public getFileInfo(fileId: string): Promise<IFileInfo> {
-        return this._nativeBridge.invoke<IFileInfo>(this._apiClass, 'getFileInfo', [fileId]);
+        return this._nativeBridge.invoke<IFileInfo>(this.getFullApiClassName(), 'getFileInfo', [fileId]);
     }
 
     public getFilePath(fileId: string): Promise<string> {
-        return this._nativeBridge.invoke<string>(this._apiClass, 'getFilePath', [fileId]);
+        return this._nativeBridge.invoke<string>(this.getFullApiClassName(), 'getFilePath', [fileId]);
     }
 
     public getHash(value: string): Promise<string> {
-        return this._nativeBridge.invoke<string>(this._apiClass, 'getHash', [value]);
+        return this._nativeBridge.invoke<string>(this.getFullApiClassName(), 'getHash', [value]);
     }
 
     public deleteFile(fileId: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'deleteFile', [fileId]);
+        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'deleteFile', [fileId]);
     }
 
     public setProgressInterval(interval: number): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setProgressInterval', [interval]);
+        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'setProgressInterval', [interval]);
     }
 
     public getProgressInterval(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this._apiClass, 'getProgressInterval');
+        return this._nativeBridge.invoke<number>(this.getFullApiClassName(), 'getProgressInterval');
     }
 
     public setTimeouts(connectTimeout: number, readTimeout: number): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setTimeouts', [connectTimeout, readTimeout]);
+        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'setTimeouts', [connectTimeout, readTimeout]);
     }
 
     public getTimeouts(): Promise<[number, number]> {
-        return this._nativeBridge.invoke<[number, number]>(this._apiClass, 'getTimeouts');
+        return this._nativeBridge.invoke<[number, number]>(this.getFullApiClassName(), 'getTimeouts');
     }
 
     public getFreeSpace(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this._apiClass, 'getFreeSpace');
+        return this._nativeBridge.invoke<number>(this.getFullApiClassName(), 'getFreeSpace');
     }
 
     public getTotalSpace(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this._apiClass, 'getTotalSpace');
+        return this._nativeBridge.invoke<number>(this.getFullApiClassName(), 'getTotalSpace');
     }
 
     public getFileContent(fileId: string, encoding: string) {
-        return this._nativeBridge.invoke<string>(this._apiClass, 'getFileContent', [fileId, encoding]);
+        return this._nativeBridge.invoke<string>(this.getFullApiClassName(), 'getFileContent', [fileId, encoding]);
     }
 
     public setFileContent(fileId: string, encoding: string, content: string) {
-        return this._nativeBridge.invoke<string>(this._apiClass, 'setFileContent', [fileId, encoding, content]);
+        return this._nativeBridge.invoke<string>(this.getFullApiClassName(), 'setFileContent', [fileId, encoding, content]);
     }
 
     public handleEvent(event: string, parameters: any[]): void {
