@@ -101,33 +101,23 @@ export class PurchasingUtilities {
 
     public static handleSendIAPEvent(iapPayload: string): void {
         const jsonPayload = JSON.parse(iapPayload);
-        // const promoPlacementIds = this.promoPlacementManager.getPromoPlacementIds();
         const promoPlacementIds: string[] = this.promoPlacements;
-        this._nativeBridge.Sdk.logInfo('HANDLE SEND EVENT WAS CALLED ! ^_^');
-        this._nativeBridge.Sdk.logInfo(iapPayload);
-        this._nativeBridge.Sdk.logInfo(jsonPayload.type);
-        this._nativeBridge.Sdk.logInfo('HANDLE SEND EVENT WAS CALLED ! ^_^');
 
         if (jsonPayload.type === 'CatalogUpdated') {
             this.sendPurchaseInitializationEvent();
-            this._nativeBridge.Sdk.logInfo('HANDLing boy boy boy for: ^_^:' + this.iapCampaignCount);
             const promises = [];
             for (let i = 0; i < this.iapCampaignCount; i++) {
-                this._nativeBridge.Sdk.logInfo('HANDLing boy for: ^_^:' + this.promoJsons[i].iapProductId);
                 if (this.promoCampaigns[i] === undefined) {
                     this.logIssue('handle_send_event_failure', 'Promo Camapaign value is null');
                 } else {
-                    this._nativeBridge.Sdk.logInfo('HANDLE SEND EVENT WAS CALLED for: ^_^:' + this.promoJsons[i].iapProductId);
                     promises.push(
                         this.refreshCatalog().then(() => {
                             if (PurchasingUtilities.isProductAvailable(this.promoJsons[i].iapProductId)) {
                                 if (this.promoCampaigns[i].getIapProductId() === this.promoJsons[i].iapProductId) {
                                     this.promoPlacementManager.setPromoPlacementReady(promoPlacementIds[i]);
-                                    this._nativeBridge.Sdk.logInfo('SEND EVENT WAS called for promo ^_^: ' + promoPlacementIds[i]);
                                 }
                             } else {
                                 this.promoPlacementManager.setPlacementState(promoPlacementIds[i], PlacementState.NO_FILL);
-                                throw new Error(`Promo product id ${this.promoJsons[i].iapProductId} is unavailable at this time`);
                             }
                         })
                     );
