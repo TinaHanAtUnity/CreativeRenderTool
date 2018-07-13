@@ -63,7 +63,6 @@
     "no-unnecessary-callback-wrapper": false,
     "number-literal-format": false,
     "no-use-before-declare": false,
-    "no-invalid-this": false,
     "no-unnecessary-qualifier": false,
     "export-name": false,
     "no-unnecessary-field-initialization": false,
