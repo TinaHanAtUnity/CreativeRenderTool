@@ -40,7 +40,7 @@ describe('JaegerUtilitiesTest', () => {
             output: 'http://google.com/test'
         }];
         tests.forEach((t) => {
-            it(`stripQueryAndFragment should ouput "${t.output}" when input is "${t.input}"`, () => {
+            it(`stripQueryAndFragment should ouput url without query or fragment`, () => {
                 const urlString = JaegerUtilities.stripQueryAndFragment(t.input);
                 assert.equal(urlString, t.output);
             });
