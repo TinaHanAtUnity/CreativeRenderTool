@@ -100,14 +100,6 @@ export class Configuration extends Model<IConfiguration> {
         return this.getPlacements()[placementId];
     }
 
-    public removePlacements(ids: string[]): void {
-        const placements = this.getPlacements();
-        ids.forEach((id) => {
-            delete placements[id];
-        });
-        this.set('placements', placements);
-    }
-
     public getPlacementIds(): string[] {
         const placementIds: string[] = [];
         for(const placement in this.getPlacements()) {

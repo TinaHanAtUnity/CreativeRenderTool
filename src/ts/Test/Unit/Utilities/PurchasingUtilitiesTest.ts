@@ -12,6 +12,8 @@ import { ClientInfo } from 'Models/ClientInfo';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import { PromoPlacementManager } from 'Managers/PromoPlacementManager';
+import PromoCampaign from 'json/campaigns/promo/PromoCampaign.json';
+import { AuctionResponse } from 'Models/AuctionResponse';
 
 describe('PurchasingUtilitiesTest', () => {
     let nativeBridge: NativeBridge;
@@ -340,70 +342,63 @@ describe('PurchasingUtilitiesTest', () => {
     });
 
     // xdescribe('Handle Send Event', () => {
-    //     let campaignManager: CampaignManager;
+    //     // let campaignManager: CampaignManager;
 
     //     const placements = ['TestPlacement'];
     //     const mediaId = 'o2YMT0Cmps6xHiOwNMeCrH';
     //     const correlationId = '583dfda0d933a3630a53249c';
     //     const data = JSON.parse(PromoCampaign);
-    //     const response = new AuctionResponse(placements, data, mediaId, correlationId);
-    //     const session = TestFixtures.getSession();
+    //     // const response = new AuctionResponse(placements, data, mediaId, correlationId);
 
     //     beforeEach(() => {
     //         sandbox.stub(PurchasingUtilities, 'sendPurchaseInitializationEvent');
-
-    //         campaignManager = sandbox.createStubInstance(CampaignManager);
-
-    //         PurchasingUtilities.campaignManager = campaignManager;
-    //         PurchasingUtilities.response[0] = response;
-    //         PurchasingUtilities.session = session;
     //     });
 
-    //     it('Should handle campaign when iap payload type is catalogupdated', () => {
+    //     it('Should send the purchase initialization event when iap payload type is catalogupdated', () => {
     //         PurchasingUtilities.iapCampaignCount = 1;
     //         PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}');
-    //         (<sinon.SinonStub>campaignManager.handleCampaign).returns(Promise.resolve());
+    //         // (<sinon.SinonStub>campaignManager.handleCampaign).returns(Promise.resolve());
 
     //         sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
-    //         sinon.assert.called(<sinon.SinonStub>PurchasingUtilities.campaignManager.handleCampaign);
+    //         // sinon.assert.called(<sinon.SinonStub>PurchasingUtilities.campaignManager.handleCampaign);
     //     });
 
-    //     it('Should set up campaign with stored response and session', () => {
-    //         PurchasingUtilities.iapCampaignCount = 1;
-    //         PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}');
-    //         (<sinon.SinonStub>campaignManager.handleCampaign).returns(Promise.resolve());
+    //     // it('Should set up campaign with stored response and session', () => {
+    //     //     PurchasingUtilities.iapCampaignCount = 1;
+    //     //     PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}');
+    //     //     (<sinon.SinonStub>campaignManager.handleCampaign).returns(Promise.resolve());
 
-    //         sinon.assert.calledWith(<sinon.SinonStub>PurchasingUtilities.campaignManager.handleCampaign, response, session);
-    //     });
+    //     //     sinon.assert.calledWith(<sinon.SinonStub>PurchasingUtilities.campaignManager.handleCampaign, response, session);
+    //     // });
 
-    //     it('Should not call when passed iap payload type is a random string', () => {
-    //         PurchasingUtilities.iapCampaignCount = 1;
-    //         PurchasingUtilities.handleSendIAPEvent('{"type":"sadfasdf"}');
-    //         (<sinon.SinonStub>campaignManager.handleCampaign).returns(Promise.resolve());
+    //     // it('Should not call when passed iap payload type is a random string', () => {
+    //     //     PurchasingUtilities.iapCampaignCount = 1;
+    //     //     PurchasingUtilities.handleSendIAPEvent('{"type":"sadfasdf"}');
+    //     //     (<sinon.SinonStub>campaignManager.handleCampaign).returns(Promise.resolve());
 
-    //         sinon.assert.notCalled(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
-    //         sinon.assert.notCalled(<sinon.SinonStub>PurchasingUtilities.campaignManager.handleCampaign);
-    //     });
+    //     //     sinon.assert.notCalled(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
+    //     //     sinon.assert.notCalled(<sinon.SinonStub>PurchasingUtilities.campaignManager.handleCampaign);
+    //     // });
 
-    //     it('Should not call when no value is included in given index in the array', () => {
-    //         PurchasingUtilities.iapCampaignCount = 2;
-    //         PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}');
+    //     // it('Should not call when no value is included in given index in the array', () => {
+    //     //     PurchasingUtilities.iapCampaignCount = 2;
+    //     //     PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}');
 
-    //         const handleCampaignSpy = (<sinon.SinonStub>campaignManager.handleCampaign).returns(Promise.resolve());
-    //         const handleCampaignCall = handleCampaignSpy.getCall(1);
-    //         assert.equal(handleCampaignCall, null);
-    //     });
+    //     //     const handleCampaignSpy = (<sinon.SinonStub>campaignManager.handleCampaign).returns(Promise.resolve());
+    //     //     const handleCampaignCall = handleCampaignSpy.getCall(1);
+    //     //     assert.equal(handleCampaignCall, null);
+    //     // });
 
-    //     it('Should handle campaign and be called twice when campaign count is 2', () => {
-    //         PurchasingUtilities.promoResponseIndex++;
-    //         PurchasingUtilities.response[1] = response;
-    //         PurchasingUtilities.session = session;
-    //         PurchasingUtsilities.iapCampaignCount = 2;
+    //     // it('Should handle campaign and be called twice when campaign count is 2', () => {
+    //     //     PurchasingUtilities.promoResponseIndex++;
+    //     //     PurchasingUtilities.response[1] = response;
+    //     //     PurchasingUtilities.session = session;
+    //     //     PurchasingUtsilities.iapCampaignCount = 2;
 
-    //         PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}');
-    //         (<sinon.SinonStub>campaignManager.handleCampaign).returns(Promise.resolve());
+    //     //     PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}');
+    //     //     (<sinon.SinonStub>campaignManager.handleCampaign).returns(Promise.resolve());
 
-    //         sinon.assert.calledTwice(<sinon.SinonStub>PurchasingUtilities.campaignManager.handleCampaign);
-    //     });
+    //     //     sinon.assert.calledTwice(<sinon.SinonStub>PurchasingUtilities.campaignManager.handleCampaign);
+    //     // });
     // });
 });

@@ -228,7 +228,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
                 this.onNoFill(placementId);
             }
         } else {
-            if (campaign.getAdType() === 'purchasing/iap' && !PurchasingUtilities.isProductAvailable((<PromoCampaign>campaign).getIapProductId())) {
+            if (campaign instanceof PromoCampaign && !PurchasingUtilities.isProductAvailable(campaign.getIapProductId())) {
                 this.onNoFill(placementId);
             } else {
                 this.setCampaignForPlacement(placementId, campaign);

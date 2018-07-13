@@ -2,7 +2,7 @@ import { Placement, PlacementState } from 'Models/Placement';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Configuration } from 'Models/Configuration';
 import { SdkStats } from 'Utilities/SdkStats';
-import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
+import { Campaign } from 'Models/Campaign';
 
 export interface IPlacementMap {
     [placementId: string]: Placement;
@@ -30,9 +30,14 @@ export class PromoPlacementManager {
         return out;
     }
 
-    public setPromoPlacementReady(placementId: string) {
+    public setPromoPlacementReady(placementId: string, campaign: Campaign) {
         this._nativeBridge.Sdk.logInfo(placementId);
         this.setPlacementState(placementId, PlacementState.READY);
+
+        const placement = this.getPlacement(placementId);
+        if(placement) {
+            placement.setCurrentCampaign(campaign);
+        }
     }
 
     public setPromoPlacementsReady(): void {

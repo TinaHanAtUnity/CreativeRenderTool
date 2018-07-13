@@ -99,10 +99,10 @@ export class PurchasingUtilities {
 
     public static handleSendIAPEvent(iapPayload: string): void {
         const jsonPayload = JSON.parse(iapPayload);
-        const promoPlacementIds: string[] = this.promoPlacements;
 
         if (jsonPayload.type === 'CatalogUpdated') {
             this.sendPurchaseInitializationEvent();
+
             const promises = [];
             for (let i = 0; i < this.iapCampaignCount; i++) {
                 if (this.promoCampaigns[i] === undefined) {
@@ -112,15 +112,18 @@ export class PurchasingUtilities {
                         this.refreshCatalog().then(() => {
                             if (PurchasingUtilities.isProductAvailable(this.promoJsons[i].iapProductId)) {
                                 if (this.promoCampaigns[i].getIapProductId() === this.promoJsons[i].iapProductId) {
-                                    this.promoPlacementManager.setPromoPlacementReady(promoPlacementIds[i]);
+                                    this.promoPlacementManager.setPromoPlacementReady(this.promoPlacements[i], this.promoCampaigns[i]);
+                                } else {
+                                    this.promoPlacementManager.setPlacementState(this.promoPlacements[i], PlacementState.NO_FILL);
                                 }
                             } else {
-                                this.promoPlacementManager.setPlacementState(promoPlacementIds[i], PlacementState.NO_FILL);
+                                this.promoPlacementManager.setPlacementState(this.promoPlacements[i], PlacementState.NO_FILL);
                             }
                         })
                     );
                 }
             }
+
             Promise.all(promises);
         } else {
             this.logIssue('handle_send_event_failure', 'IAP Payload is incorrect');

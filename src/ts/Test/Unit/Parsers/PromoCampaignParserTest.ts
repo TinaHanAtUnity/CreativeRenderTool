@@ -71,7 +71,7 @@ describe('PromoCampaignParser', () => {
                 assert.equal(campaign.getAbGroup(), abGroup, 'ABGroup is not equal');
                 assert.equal(campaign.getSession(), session, 'Session is not equal');
                 assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not equal');
-                // assert.equal(campaign.getIapProductId(), content.iapProductId, 'IAP Product ID is not equal');
+                assert.equal(campaign.getIapProductId(), content.iapProductId, 'IAP Product ID is not equal');
                 assert.equal(campaign.getDynamicMarkup(), content.dynamicMarkup, 'Dynamic Markup is not equal');
                 assert.equal(campaign.getRewardedPromo(), content.rewardedPromo, 'Allow Skip is not equal');
                 assert.equal(campaign.getCreativeResource().getUrl(), content.creativeUrl, 'Creative URL is not equal');
