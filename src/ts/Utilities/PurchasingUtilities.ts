@@ -32,7 +32,6 @@ export class PurchasingUtilities {
     public static promoResponseIndex: number = 0;
     public static iapCampaignCount: number = 0;
     public static promoPlacementManager: PromoPlacementManager;
-    public static promoPlacements: string[] = [];
 
     public static initialize(clientInfo: ClientInfo, configuration: Configuration, nativeBridge: NativeBridge, promoPlacementManager: PromoPlacementManager) {
         this._clientInfo = clientInfo;
@@ -100,6 +99,7 @@ export class PurchasingUtilities {
 
     public static handleSendIAPEvent(iapPayload: string): void {
         const jsonPayload = JSON.parse(iapPayload);
+        const promoPlacementIds = this.promoPlacementManager.getAuctionFillPlacementIds();
 
         if (jsonPayload.type === 'CatalogUpdated') {
             this.sendPurchaseInitializationEvent();
@@ -108,12 +108,12 @@ export class PurchasingUtilities {
                 for (let i = 0; i < this.iapCampaignCount; i++) {
                     if (PurchasingUtilities.isProductAvailable(this.promoJsons[i].iapProductId)) {
                         if (this.promoCampaigns[i].getIapProductId() === this.promoJsons[i].iapProductId) {
-                            this.promoPlacementManager.setPromoPlacementReady(this.promoPlacements[i], this.promoCampaigns[i]);
+                            this.promoPlacementManager.setPromoPlacementReady(promoPlacementIds[i], this.promoCampaigns[i]);
                         } else {
-                            this.promoPlacementManager.setPlacementState(this.promoPlacements[i], PlacementState.NO_FILL);
+                            this.promoPlacementManager.setPlacementState(promoPlacementIds[i], PlacementState.NO_FILL);
                         }
                     } else {
-                        this.promoPlacementManager.setPlacementState(this.promoPlacements[i], PlacementState.NO_FILL);
+                        this.promoPlacementManager.setPlacementState(promoPlacementIds[i], PlacementState.NO_FILL);
                     }
                 }
             });

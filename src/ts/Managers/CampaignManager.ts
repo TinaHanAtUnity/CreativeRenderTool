@@ -368,7 +368,7 @@ export class CampaignManager {
                         auctionResponse = new AuctionResponse(fill[mediaId], json.media[mediaId], mediaId, json.correlationId);
                         for(const placement of auctionResponse.getPlacements()) {
                             if (auctionResponse.getContentType() === 'purchasing/iap') {
-                                PurchasingUtilities.promoPlacements.push(placement);
+                                PurchasingUtilities.promoPlacementManager.addAuctionFillPromoPlacementId(placement);
                             }
                         }
                         promises.push(this.handleCampaign(auctionResponse, session, backupResponse).catch(error => {

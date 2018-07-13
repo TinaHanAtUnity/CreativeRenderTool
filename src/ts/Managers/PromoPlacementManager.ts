@@ -16,18 +16,16 @@ export class PromoPlacementManager {
 
     constructor(nativeBridge: NativeBridge, configuration: Configuration) {
         this._promoPlacements = this.getPromoPlacements(configuration);
-        this._placementIds = configuration.getPlacementIds();
         this._nativeBridge = nativeBridge;
+        this._placementIds = [];
     }
 
-    public getPromoPlacementIds(): string[] {
-        const promoPlacements = this._promoPlacements;
-        const out: string[] = [];
-        Object.keys(promoPlacements).forEach((placementId) => {
-            out.push(placementId);
-        });
+    public addAuctionFillPromoPlacementId(placementId: string) {
+        this._placementIds.push(placementId);
+    }
 
-        return out;
+    public getAuctionFillPlacementIds(): string[] {
+        return this._placementIds;
     }
 
     public setPromoPlacementReady(placementId: string, campaign: Campaign): void {
@@ -37,12 +35,6 @@ export class PromoPlacementManager {
         const placement = this.getPlacement(placementId);
         if(placement) {
             placement.setCurrentCampaign(campaign);
-        }
-    }
-
-    public setPromoPlacementsReady(): void {
-        for (const placementId of this._placementIds) {
-            this.setPlacementState(placementId, PlacementState.READY);
         }
     }
 
