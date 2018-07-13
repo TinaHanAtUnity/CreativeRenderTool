@@ -3,7 +3,6 @@
 * Tslint no-unnecessary-local-variable is re-enabled
 * Tslint no-invalid-this is re-enabled
 * New Video Overlay for Performance on ABGroups 16 and 17
-* Updated GDPR Legal Text
 
 # Wed Jul 11 21:24:48 UTC 2018
 
