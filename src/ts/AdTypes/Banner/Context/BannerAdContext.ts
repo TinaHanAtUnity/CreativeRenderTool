@@ -82,15 +82,19 @@ export class BannerAdContext {
                 return this.sendBannerError(new Error(`Placement ${placementId} is not a banner placement`));
             }
             this._placement = placement;
-            this._placementManager.setActivePlacementId(placement.getId());
+            this._placementManager.sendBannersWaiting();
             this.setState(BannerLoadState.Loading);
-            return this.loadBannerAdUnit();
+            return this.loadBannerAdUnit().catch((e) => {
+                this._placementManager.sendBannersReady();
+                throw e;
+            });
         }
     }
 
     public hide() {
         window.clearTimeout(this._refreshTimeoutID);
         this.setState(BannerLoadState.Unloaded);
+        this._placementManager.sendBannersReady();
         if (this._adUnit) {
             return this._adUnit.destroy().then(() => {
                 delete this._adUnit;

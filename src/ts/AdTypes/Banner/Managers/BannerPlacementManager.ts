@@ -23,11 +23,9 @@ export class BannerPlacementManager {
         });
     }
 
-    public setActivePlacementId(activePlacementId: string) {
+    public sendBannersWaiting() {
         Object.keys(this._placements).forEach((placementId) => {
-            if (activePlacementId !== placementId) {
-                this.setPlacementState(placementId, PlacementState.WAITING);
-            }
+            this.setPlacementState(placementId, PlacementState.WAITING);
         });
     }
 
