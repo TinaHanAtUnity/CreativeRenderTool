@@ -30,7 +30,7 @@ export class PromoPlacementManager {
         return out;
     }
 
-    public setPromoPlacementReady(placementId: string, campaign: Campaign) {
+    public setPromoPlacementReady(placementId: string, campaign: Campaign): void {
         this._nativeBridge.Sdk.logInfo(placementId);
         this.setPlacementState(placementId, PlacementState.READY);
 
@@ -46,18 +46,6 @@ export class PromoPlacementManager {
         }
     }
 
-    public setActivePlacementId(activePlacementId: string) {
-        Object.keys(this._promoPlacements).forEach((placementId) => {
-            if (activePlacementId !== placementId) {
-                this.setPlacementState(placementId, PlacementState.WAITING);
-            }
-        });
-    }
-
-    public getPlacement(placementId: string): Placement | undefined {
-        return this._promoPlacements[placementId];
-    }
-
     public setPlacementState(placementId: string, newState: PlacementState): void {
         const placement: Placement = this._promoPlacements[placementId];
         if (placement) {
@@ -66,6 +54,10 @@ export class PromoPlacementManager {
             placement.setState(newState);
             this.sendPlacementStateChange(placementId, oldState, newState);
         }
+    }
+
+    private getPlacement(placementId: string): Placement | undefined {
+        return this._promoPlacements[placementId];
     }
 
     private sendPlacementStateChange(placementId: string, oldState: PlacementState, newState: PlacementState): void {

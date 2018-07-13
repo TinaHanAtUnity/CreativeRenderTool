@@ -6,6 +6,7 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { PlacementState } from 'Models/Placement';
 import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 import { PromoPlacementManager } from 'Managers/PromoPlacementManager';
+import { Sdk } from 'Native/Backend/Api/Sdk';
 
 export enum IPromoRequest {
     SETIDS = 'setids',
@@ -103,28 +104,19 @@ export class PurchasingUtilities {
         if (jsonPayload.type === 'CatalogUpdated') {
             this.sendPurchaseInitializationEvent();
 
-            const promises = [];
-            for (let i = 0; i < this.iapCampaignCount; i++) {
-                if (this.promoCampaigns[i] === undefined) {
-                    this.logIssue('handle_send_event_failure', 'Promo Camapaign value is null');
-                } else {
-                    promises.push(
-                        this.refreshCatalog().then(() => {
-                            if (PurchasingUtilities.isProductAvailable(this.promoJsons[i].iapProductId)) {
-                                if (this.promoCampaigns[i].getIapProductId() === this.promoJsons[i].iapProductId) {
-                                    this.promoPlacementManager.setPromoPlacementReady(this.promoPlacements[i], this.promoCampaigns[i]);
-                                } else {
-                                    this.promoPlacementManager.setPlacementState(this.promoPlacements[i], PlacementState.NO_FILL);
-                                }
-                            } else {
-                                this.promoPlacementManager.setPlacementState(this.promoPlacements[i], PlacementState.NO_FILL);
-                            }
-                        })
-                    );
+            this.refreshCatalog().then(() => {
+                for (let i = 0; i < this.iapCampaignCount; i++) {
+                    if (PurchasingUtilities.isProductAvailable(this.promoJsons[i].iapProductId)) {
+                        if (this.promoCampaigns[i].getIapProductId() === this.promoJsons[i].iapProductId) {
+                            this.promoPlacementManager.setPromoPlacementReady(this.promoPlacements[i], this.promoCampaigns[i]);
+                        } else {
+                            this.promoPlacementManager.setPlacementState(this.promoPlacements[i], PlacementState.NO_FILL);
+                        }
+                    } else {
+                        this.promoPlacementManager.setPlacementState(this.promoPlacements[i], PlacementState.NO_FILL);
+                    }
                 }
-            }
-
-            Promise.all(promises);
+            });
         } else {
             this.logIssue('handle_send_event_failure', 'IAP Payload is incorrect');
         }
