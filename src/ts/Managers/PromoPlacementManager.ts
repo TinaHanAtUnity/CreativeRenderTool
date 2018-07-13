@@ -29,11 +29,9 @@ export class PromoPlacementManager {
     }
 
     public setPromoPlacementReady(placementId: string, campaign: Campaign): void {
-        this._nativeBridge.Sdk.logInfo(placementId);
-        this.setPlacementState(placementId, PlacementState.READY);
-
         const placement = this.getPlacement(placementId);
         if(placement) {
+            this.setPlacementState(placementId, PlacementState.READY);
             placement.setCurrentCampaign(campaign);
         }
     }
