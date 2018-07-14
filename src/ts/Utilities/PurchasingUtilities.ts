@@ -6,7 +6,6 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { PlacementState } from 'Models/Placement';
 import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 import { PromoPlacementManager } from 'Managers/PromoPlacementManager';
-import { Sdk } from 'Native/Backend/Api/Sdk';
 
 export enum IPromoRequest {
     SETIDS = 'setids',

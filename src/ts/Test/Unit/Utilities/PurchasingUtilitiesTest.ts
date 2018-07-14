@@ -12,6 +12,8 @@ import { ClientInfo } from 'Models/ClientInfo';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import { PromoPlacementManager } from 'Managers/PromoPlacementManager';
+import { TestFixtures } from '../TestHelpers/TestFixtures';
+import { PlacementState } from 'Models/Placement';
 
 describe('PurchasingUtilitiesTest', () => {
     let nativeBridge: NativeBridge;
@@ -50,7 +52,6 @@ describe('PurchasingUtilitiesTest', () => {
         purchasing = sinon.createStubInstance(PurchasingApi);
         sdk = sinon.createStubInstance(SdkApi);
         clientInfo = sinon.createStubInstance(ClientInfo);
-        promoPlacementManager = sinon.createStubInstance(PromoPlacementManager);
         sandbox = sinon.sandbox.create();
         nativeBridge.Sdk = sdk;
         (<any>purchasing).onInitialize = new Observable1<string>();
@@ -63,6 +64,7 @@ describe('PurchasingUtilitiesTest', () => {
         (<sinon.SinonStub>purchasing.initializePurchasing).returns(Promise.resolve());
         (<any>nativeBridge).Purchasing = purchasing;
         const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
+        promoPlacementManager = new PromoPlacementManager(nativeBridge, configuration);
         PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, promoPlacementManager);
     });
 
@@ -340,63 +342,77 @@ describe('PurchasingUtilitiesTest', () => {
     });
 
     describe('Handle Send Event', () => {
-        // let campaignManager: CampaignManager;
-
-        // const placements = ['TestPlacement'];
-        // const mediaId = 'o2YMT0Cmps6xHiOwNMeCrH';
-        // const correlationId = '583dfda0d933a3630a53249c';
-        // const data = JSON.parse(PromoCampaign);
-        // const response = new AuctionResponse(placements, data, mediaId, correlationId);
-
         beforeEach(() => {
+
             sandbox.stub(PurchasingUtilities, 'sendPurchaseInitializationEvent');
+
+            PurchasingUtilities.promoJsons[0] = JSON.parse('{\"iapProductId\":\"scooterdooter\"}');
+            PurchasingUtilities.promoCampaigns[0] = TestFixtures.getPromoCampaign();
+            sandbox.stub(PurchasingUtilities.promoPlacementManager, 'getAuctionFillPlacementIds').returns(['promoPlacement']);
+
+            sandbox.stub(PurchasingUtilities.promoPlacementManager, 'setPromoPlacementReady');
+            sandbox.stub(PurchasingUtilities.promoPlacementManager, 'setPlacementState');
+            sandbox.stub(PurchasingUtilities, 'refreshCatalog').returns(Promise.resolve());
         });
 
-        it('Should send the purchase initialization event when iap payload type is catalogupdated', () => {
-            PurchasingUtilities.iapCampaignCount = 1;
+        afterEach(() => {
+            sandbox.restore();
+        });
+
+        it('Should send the purchase initialization event and call refresh catalog when iap payload type is catalogupdated', () => {
             PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}');
-            // (<sinon.SinonStub>campaignManager.handleCampaign).returns(Promise.resolve());
 
             sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
-            // sinon.assert.called(<sinon.SinonStub>PurchasingUtilities.campaignManager.handleCampaign);
+            sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.refreshCatalog);
         });
 
-        // it('Should set up campaign with stored response and session', () => {
-        //     PurchasingUtilities.iapCampaignCount = 1;
-        //     PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}');
-        //     (<sinon.SinonStub>campaignManager.handleCampaign).returns(Promise.resolve());
+        it('Should not handle update when passed iap payload type is not CatalogUpdated', () => {
+            PurchasingUtilities.handleSendIAPEvent('{"type":"sadfasdf"}');
 
-        //     sinon.assert.calledWith(<sinon.SinonStub>PurchasingUtilities.campaignManager.handleCampaign, response, session);
-        // });
+            sinon.assert.notCalled(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
+            sinon.assert.notCalled(<sinon.SinonSpy>PurchasingUtilities.refreshCatalog);
+            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Sdk.logError, 'IAP Payload is incorrect');
+        });
 
-        // it('Should not call when passed iap payload type is a random string', () => {
-        //     PurchasingUtilities.iapCampaignCount = 1;
-        //     PurchasingUtilities.handleSendIAPEvent('{"type":"sadfasdf"}');
-        //     (<sinon.SinonStub>campaignManager.handleCampaign).returns(Promise.resolve());
+        it('Should set the current placement state to nofill if product is not in the catalog', () => {
+            PurchasingUtilities.iapCampaignCount = 1;
+            PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}');
+            sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(false);
 
-        //     sinon.assert.notCalled(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
-        //     sinon.assert.notCalled(<sinon.SinonStub>PurchasingUtilities.campaignManager.handleCampaign);
-        // });
+            sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
 
-        // it('Should not call when no value is included in given index in the array', () => {
-        //     PurchasingUtilities.iapCampaignCount = 2;
-        //     PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}');
+            return PurchasingUtilities.refreshCatalog().then(() => {
+                sinon.assert.calledWith(<sinon.SinonSpy>PurchasingUtilities.isProductAvailable, 'scooterdooter');
+                sinon.assert.calledWith(<sinon.SinonSpy>PurchasingUtilities.promoPlacementManager.setPlacementState, 'promoPlacement', PlacementState.NO_FILL);
+            });
+        });
 
-        //     const handleCampaignSpy = (<sinon.SinonStub>campaignManager.handleCampaign).returns(Promise.resolve());
-        //     const handleCampaignCall = handleCampaignSpy.getCall(1);
-        //     assert.equal(handleCampaignCall, null);
-        // });
+        it('Should set the placement as ready if campaign catalog productid and promo json productid match', () => {
+            PurchasingUtilities.iapCampaignCount = 1;
+            PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}');
+            sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
+            sandbox.stub(PurchasingUtilities.promoCampaigns[0], 'getIapProductId').returns('scooterdooter');
 
-        // it('Should handle campaign and be called twice when campaign count is 2', () => {
-        //     PurchasingUtilities.promoResponseIndex++;
-        //     PurchasingUtilities.response[1] = response;
-        //     PurchasingUtilities.session = session;
-        //     PurchasingUtsilities.iapCampaignCount = 2;
+            sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
 
-        //     PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}');
-        //     (<sinon.SinonStub>campaignManager.handleCampaign).returns(Promise.resolve());
+            return PurchasingUtilities.refreshCatalog().then(() => {
+                sinon.assert.calledWith(<sinon.SinonSpy>PurchasingUtilities.isProductAvailable, 'scooterdooter');
+                sinon.assert.calledWith(<sinon.SinonSpy>PurchasingUtilities.promoPlacementManager.setPromoPlacementReady, 'promoPlacement', PurchasingUtilities.promoCampaigns[0]);
+            });
+        });
 
-        //     sinon.assert.calledTwice(<sinon.SinonStub>PurchasingUtilities.campaignManager.handleCampaign);
-        // });
+        it('Should set the placement as nofill if campaign catalog productid and promo json productid dont match', () => {
+            PurchasingUtilities.iapCampaignCount = 1;
+            PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}');
+            sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
+            sandbox.stub(PurchasingUtilities.promoCampaigns[0], 'getIapProductId').returns('scootydooty');
+
+            sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
+
+            return PurchasingUtilities.refreshCatalog().then(() => {
+                sinon.assert.calledWith(<sinon.SinonSpy>PurchasingUtilities.isProductAvailable, 'scooterdooter');
+                sinon.assert.calledWith(<sinon.SinonSpy>PurchasingUtilities.promoPlacementManager.setPlacementState, 'promoPlacement', PlacementState.NO_FILL);
+            });
+        });
     });
 });
