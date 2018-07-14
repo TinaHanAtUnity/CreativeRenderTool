@@ -17,7 +17,6 @@ import { FocusManager } from 'Managers/FocusManager';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { MetaDataManager } from 'Managers/MetaDataManager';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { SessionManager } from 'Managers/SessionManager';
 
 import EventTestVast from 'xml/EventTestVast.xml';
@@ -94,7 +93,7 @@ describe('VastEndScreenEventHandlersTest', () => {
         it('should hide endcard', () => {
             const vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.configuration.isCoppaCompliant(), vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
             vastAdUnitParameters.endScreen = vastEndScreen;
-            const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters, false);
+            const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
             sinon.stub(vastAdUnit, 'hide').returns(sinon.spy());
             const vastEndScreenEventHandler = new VastEndScreenEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
 
@@ -122,7 +121,7 @@ describe('VastEndScreenEventHandlersTest', () => {
             vastAdUnitParameters.placement = TestFixtures.getPlacement();
             const vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.configuration.isCoppaCompliant(), vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
             vastAdUnitParameters.endScreen = vastEndScreen;
-            vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters, false);
+            vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
             vastEndScreenEventHandler = new VastEndScreenEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
         });
 

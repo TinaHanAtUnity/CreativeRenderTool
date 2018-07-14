@@ -246,7 +246,6 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
                         break;
 
                     default:
-                        break;
                 }
                 this._handlers.forEach(handler => handler.onMraidOrientationProperties({
                     allowOrientationChange: event.data.properties.allowOrientationChange,
@@ -261,7 +260,6 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
                 }
                 break;
             default:
-                break;
         }
     }
 }

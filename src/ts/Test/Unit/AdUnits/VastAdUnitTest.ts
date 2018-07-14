@@ -117,7 +117,7 @@ describe('VastAdUnit', () => {
             gdprManager: gdprManager
         };
 
-        vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters, false);
+        vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
     });
 
     afterEach(() => sandbox.restore());
@@ -132,7 +132,7 @@ describe('VastAdUnit', () => {
             const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
             vastAdUnitParameters.overlay = overlay;
             vastAdUnitParameters.campaign = vastCampaign;
-            vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters, false);
+            vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
         });
 
         it('should return correct http:// url', () => {
@@ -199,7 +199,7 @@ describe('VastAdUnit', () => {
             vastAdUnitParameters.overlay = overlay;
             vastAdUnitParameters.campaign = vastCampaign;
             vastAdUnitParameters.endScreen = vastEndScreen;
-            vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters, false);
+            vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
         });
 
         it('should return correct companion click through url', () => {

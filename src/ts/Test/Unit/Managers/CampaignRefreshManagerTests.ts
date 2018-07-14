@@ -45,6 +45,7 @@ import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFact
 import { JaegerManager } from 'Jaeger/JaegerManager';
 import { JaegerSpan } from 'Jaeger/JaegerSpan';
 import { GdprManager } from 'Managers/GdprManager';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 
@@ -71,6 +72,7 @@ describe('CampaignRefreshManager', () => {
     let cache: Cache;
     let jaegerManager: JaegerManager;
     let gdprManager: GdprManager;
+    let programmaticTrackingService: ProgrammaticTrackingService;
 
     beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo();
@@ -150,7 +152,8 @@ describe('CampaignRefreshManager', () => {
         sessionManager = new SessionManager(nativeBridge, request);
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
         cacheBookkeeping = new CacheBookkeeping(nativeBridge);
-        cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping);
+        programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+        cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService);
         assetManager = new AssetManager(cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
         container = new TestContainer();
         const campaign = TestFixtures.getCampaign();
