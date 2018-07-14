@@ -137,5 +137,120 @@ describe('PromoCampaignParser', () => {
                 assert.equal(campaign.getRewardedPromo(), false);
             });
         });
+
+        describe('if Purchasing is initialized', () => {
+            let campaign: PromoCampaign;
+            let sandbox: sinon.SinonSandbox;
+
+            beforeEach(() => {
+                sandbox = sinon.createSandbox();
+                sandbox.stub(PurchasingUtilities, 'isInitialized').returns(true);
+            });
+
+            afterEach(() => {
+                sandbox.restore();
+            });
+
+            it('should no-op resolve when product is avaiable', () => {
+                PurchasingUtilities.iapCampaignCount = 1;
+                PurchasingUtilities.promoResponseIndex = 0;
+
+                sandbox.stub(PurchasingUtilities, 'refreshCatalog').returns(Promise.resolve());
+                sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
+
+                const parse = (data: any) => {
+                    const response = new AuctionResponse(placements, data, mediaId, correlationId);
+                    return parser.parse(nativeBridge, request, response, session, gamerId, abGroup).then((parsedCampaign) => {
+                        campaign = <PromoCampaign>parsedCampaign;
+                        const json = JSON.parse(IAPPromoCampaign).campaign1;
+                        const content = JSON.parse(json.content);
+
+                        assert.notEqual(PurchasingUtilities.promoCampaigns[0], campaign);
+                        assert.notDeepEqual(PurchasingUtilities.promoJsons[0], content);
+                        assert.equal(PurchasingUtilities.promoResponseIndex, 0);
+                    });
+                };
+
+                return parse(JSON.parse(IAPPromoCampaign).campaign1);
+            });
+
+            it('should increase the promo response index, store campaign, and json in Purchasing Utilities', () => {
+                PurchasingUtilities.iapCampaignCount = 1;
+                PurchasingUtilities.promoResponseIndex = 0;
+
+                sandbox.stub(PurchasingUtilities, 'refreshCatalog').returns(Promise.resolve());
+                sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(false);
+
+                const parse = (data: any) => {
+                    const response = new AuctionResponse(placements, data, mediaId, correlationId);
+                    return parser.parse(nativeBridge, request, response, session, gamerId, abGroup).then((parsedCampaign) => {
+                        campaign = <PromoCampaign>parsedCampaign;
+                        const json = JSON.parse(IAPPromoCampaign).campaign1;
+                        const content = JSON.parse(json.content);
+
+                        assert.equal(PurchasingUtilities.promoCampaigns[0], campaign);
+                        assert.deepEqual(PurchasingUtilities.promoJsons[0], content);
+                        assert.equal(PurchasingUtilities.promoResponseIndex, 1);
+                    });
+                };
+
+                return parse(JSON.parse(IAPPromoCampaign).campaign1);
+            });
+        });
+
+        describe('if Purchasing is not initialized', () => {
+            let campaign: PromoCampaign;
+            let sandbox: sinon.SinonSandbox;
+
+            beforeEach(() => {
+                sandbox = sinon.createSandbox();
+                sandbox.stub(PurchasingUtilities, 'isInitialized').returns(false);
+            });
+
+            afterEach(() => {
+                sandbox.restore();
+            });
+
+            it('should increase the promo response index, store campaign, and json in Purchasing Utilities', () => {
+                PurchasingUtilities.iapCampaignCount = 1;
+                PurchasingUtilities.promoResponseIndex = 0;
+                assert.equal(PurchasingUtilities.promoResponseIndex, 0);
+
+                const parse = (data: any) => {
+                    const response = new AuctionResponse(placements, data, mediaId, correlationId);
+                    return parser.parse(nativeBridge, request, response, session, gamerId, abGroup).then((parsedCampaign) => {
+                        campaign = <PromoCampaign>parsedCampaign;
+                        const json = JSON.parse(IAPPromoCampaign).campaign1;
+                        const content = JSON.parse(json.content);
+                        assert.equal(PurchasingUtilities.promoCampaigns[0], campaign);
+                        assert.deepEqual(PurchasingUtilities.promoJsons[0], content);
+                        assert.equal(PurchasingUtilities.promoResponseIndex, 1);
+                    });
+                };
+
+                return parse(JSON.parse(IAPPromoCampaign).campaign1);
+            });
+
+            it('should no-op when response index is greater or equal to the campaign count', () => {
+                PurchasingUtilities.iapCampaignCount = 1;
+                PurchasingUtilities.promoResponseIndex = 1;
+                assert.equal(PurchasingUtilities.promoResponseIndex, 1);
+
+                const parse = (data: any) => {
+                    const response = new AuctionResponse(placements, data, mediaId, correlationId);
+                    return parser.parse(nativeBridge, request, response, session, gamerId, abGroup).then((parsedCampaign) => {
+                        campaign = <PromoCampaign>parsedCampaign;
+                        const json = JSON.parse(IAPPromoCampaign).campaign1;
+                        const content = JSON.parse(json.content);
+
+                        assert.notEqual(PurchasingUtilities.promoCampaigns[1], campaign);
+                        assert.notDeepEqual(PurchasingUtilities.promoJsons[1], content);
+                        assert.equal(PurchasingUtilities.promoResponseIndex, 1);
+                    });
+                };
+
+                return parse(JSON.parse(IAPPromoCampaign).campaign1);
+            });
+        });
     });
 });

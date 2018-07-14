@@ -20,7 +20,7 @@ export class PromoCampaignParser extends CampaignParser {
             gamerId: gamerId,
             abGroup: abGroup,
             willExpireAt: promoJson.expiry ? parseInt(promoJson.expiry, 10) * 1000 : undefined,
-            adType: promoJson.contentType || response.getContentType() || undefined,
+            adType: promoJson.contentType || response.getContentType(),
             correlationId: undefined,
             creativeId: undefined,
             seatId: undefined,
@@ -40,7 +40,7 @@ export class PromoCampaignParser extends CampaignParser {
 
         const promoCampaign = new PromoCampaign(promoCampaignParams);
 
-        if (promoJson && promoJson.iapProductId && PurchasingUtilities.isInitialized()) {
+        if (PurchasingUtilities.isInitialized()) {
             PurchasingUtilities.refreshCatalog().then(() => {
                 if (!PurchasingUtilities.isProductAvailable(promoJson.iapProductId)) {
                     PurchasingUtilities.promoCampaigns[PurchasingUtilities.promoResponseIndex] = promoCampaign;
