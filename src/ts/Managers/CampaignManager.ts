@@ -357,7 +357,6 @@ export class CampaignManager {
             if (!this._ignoreEvents) {
                 this._nativeBridge.Sdk.logInfo('AdPlan received with ' + campaigns + ' campaigns and refreshDelay ' + refreshDelay);
                 PurchasingUtilities.iapCampaignCount = iapCampaignCount;
-                this._nativeBridge.Sdk.logInfo(iapCampaignCount + ' are IAP promos');
                 this.onAdPlanReceived.trigger(refreshDelay, campaigns);
             }
 

@@ -222,8 +222,12 @@ export class OldCampaignRefreshManager extends RefreshManager {
 
         if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
             if (MixedPlacementUtility.shouldFillMixedPlacement(placementId, this._configuration, campaign)) {
-                this.setCampaignForPlacement(placementId, campaign);
-                this.handlePlacementState(placementId, PlacementState.READY);
+                if (campaign instanceof PromoCampaign && !PurchasingUtilities.isProductAvailable(campaign.getIapProductId())) {
+                    this.onNoFill(placementId);
+                } else {
+                    this.setCampaignForPlacement(placementId, campaign);
+                    this.handlePlacementState(placementId, PlacementState.READY);
+                }
             } else {
                 this.onNoFill(placementId);
             }
