@@ -1,5 +1,5 @@
 import { Platform } from 'Constants/Platform';
-import { ABGroup, SquareEndScreenEnabledAbTest } from 'Models/ABGroup';
+import { ABGroupBuilder, SquareEndScreenEnabledAbTest, ABGroup } from 'Models/ABGroup';
 
 export const SQUARE_CAMPAIGNS = [
     {
@@ -393,7 +393,7 @@ export const SQUARE_CAMPAIGNS = [
     }
 ];
 
-export const SQUARE_END_SCREEN_AB_GROUPS = [ABGroup.getAbGroup(18), ABGroup.getAbGroup(19)];
+export const SQUARE_END_SCREEN_AB_GROUPS = [ABGroupBuilder.getAbGroup(18), ABGroupBuilder.getAbGroup(19)];
 
 export class SquareEndScreenUtilities {
 

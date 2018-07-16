@@ -44,7 +44,7 @@ import EventTestVast from 'xml/EventTestVast.xml';
 import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xml';
 
 import * as sinon from 'sinon';
-import { ABGroup } from 'Models/ABGroup';
+import { ABGroup, ABGroupBuilder } from 'Models/ABGroup';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -333,7 +333,7 @@ export class TestFixtures {
         const session = this.getSession();
         const isRewardedPromo = (rewardedPromo !== undefined) ? rewardedPromo : false;
         return {
-            ... this.getCometCampaignBaseParams(session, json.promo.id, json.gamerId, ABGroup.getAbGroup(json.abGroup), json.meta, adType),
+            ... this.getCometCampaignBaseParams(session, json.promo.id, json.gamerId, ABGroupBuilder.getAbGroup(json.abGroup), json.meta, adType),
             iapProductId: json.promo.iapProductId,
             additionalTrackingEvents: json.promo.tracking ? json.promo.tracking : undefined,
             dynamicMarkup: json.promo.dynamicMarkup,
