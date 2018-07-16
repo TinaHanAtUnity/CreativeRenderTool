@@ -27,7 +27,6 @@
     "no-floating-promises": false,
     "max-func-body-length": [false, 100, {"ignore-parameters-to-function-regex": "describe"}],
     "no-parameter-reassignment": false,
-    "space-within-parens": false,
     "ordered-imports": false,
     "import-name": false,
     "no-unnecessary-type-assertion": false,
