@@ -119,7 +119,7 @@ export class WebView {
             jaegerInitSpan.addAnnotation('nativeBridge loadComplete');
             this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
 
-            if(!/^\d+$/.test( this._clientInfo.getGameId())) {
+            if(!/^\d+$/.test(this._clientInfo.getGameId())) {
                 const message = `Provided Game ID '${this._clientInfo.getGameId()}' is invalid. Game ID may contain only digits (0-9).`;
                 this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INVALID_ARGUMENT], message);
                 return Promise.reject(message);
