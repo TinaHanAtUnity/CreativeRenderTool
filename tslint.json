@@ -40,7 +40,6 @@
     "no-non-null-assertion": false,
     "align": [false, "parameters", "arguments", "statements"],
     "no-object-literal-type-assertion": false,
-    "no-irregular-whitespace": false,
     "no-reserved-keywords": false,
     "prefer-method-signature": false,
     "no-multiline-string": false,

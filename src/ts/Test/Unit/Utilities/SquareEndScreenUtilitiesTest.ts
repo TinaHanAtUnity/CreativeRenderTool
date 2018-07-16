@@ -2,7 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 
 import { IosUtils } from 'Utilities/IosUtils';
-import { Platform } from 'Constants/Platform';
+import { Platform } from 'Constants/Platform';
 import { SquareEndScreenUtilities, SQUARE_CAMPAIGNS, SQUARE_END_SCREEN_AB_GROUPS } from 'Utilities/SquareEndScreenUtilities';
 import { ABGroupBuilder } from 'Models/ABGroup';
 
