@@ -59,7 +59,7 @@ import { GdprManager } from 'Managers/GdprManager';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
-import { ABGroup } from 'Models/ABGroup';
+import { ABGroupBuilder } from 'Models/ABGroup';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 import { PromoPlacementManager } from 'Managers/PromoPlacementManager';
 
@@ -554,7 +554,7 @@ export class WebView {
                 // needed in both due to placement level control support
                 const abGroupNumber: number = Number(TestEnvironment.get('abGroup'));
                 if (!isNaN(abGroupNumber)) { // if it is a number get the group
-                    const abGroup = ABGroup.getAbGroup(abGroupNumber);
+                    const abGroup = ABGroupBuilder.getAbGroup(abGroupNumber);
                     ConfigManager.setAbGroup(abGroup);
                     CampaignManager.setAbGroup(abGroup);
                 }

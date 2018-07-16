@@ -8,44 +8,6 @@ describe('JaegerSpan', () => {
 
     const stubbedDateTimestamp: number = 3333;
 
-    describe('generate timestamp', () => {
-        beforeEach(() => {
-            sinon.stub(Date, 'now').returns(stubbedDateTimestamp);
-        });
-
-        afterEach(() => {
-            (<sinon.SinonStub>Date.now).restore();
-        });
-
-        it('should return stubbedDateTimestamp * 1000', () => {
-            assert.equal(JaegerSpan.genTimestamp(), 3333000);
-            assert.equal(JaegerSpan.genTimestamp(), stubbedDateTimestamp * 1000);
-        });
-
-    });
-
-    describe('on stripQueryAndFragment', () => {
-        it('should return without query when only query is supplied', () => {
-            const urlString = JaegerSpan.stripQueryAndFragment('http://google.com/test?key=value&hello=world');
-            assert.equal(urlString, 'http://google.com/test');
-        });
-
-        it('should return without fragment when only fragment is supplied', () => {
-            const urlString = JaegerSpan.stripQueryAndFragment('http://google.com/test#key=value&hello=world');
-            assert.equal(urlString, 'http://google.com/test');
-        });
-
-        it('should return without query and fragment when query is supplied first with fragment', () => {
-            const urlString = JaegerSpan.stripQueryAndFragment('http://google.com/test?key=value&hello=world#more=things,4&to=test');
-            assert.equal(urlString, 'http://google.com/test');
-        });
-
-        it('should return without query and fragment when fragment is supplied first with query', () => {
-            const urlString = JaegerSpan.stripQueryAndFragment('http://google.com/test#more=things,4&to=test?key=value&hello=world');
-            assert.equal(urlString, 'http://google.com/test');
-        });
-    });
-
     describe('on construction', () => {
 
         let span: JaegerSpan;

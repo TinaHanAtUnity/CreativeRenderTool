@@ -7,7 +7,7 @@ import { ConfigurationParser } from 'Parsers/ConfigurationParser';
 
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
-import { ABGroup } from 'Models/ABGroup';
+import { ABGroupBuilder } from 'Models/ABGroup';
 import { Platform } from 'Constants/Platform';
 import { MixedPlacementUtility } from 'Utilities/MixedPlacementUtility';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
@@ -34,7 +34,7 @@ describe('configurationParserTest', () => {
         });
 
         it('should have abGroup parameter from configuration', () => {
-            assert.equal(configuration.getAbGroup(), ABGroup.getAbGroup(99));
+            assert.equal(configuration.getAbGroup(), ABGroupBuilder.getAbGroup(99));
         });
 
         it('should have gamerId parameter from configuration', () => {
