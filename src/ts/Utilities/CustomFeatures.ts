@@ -11,10 +11,7 @@ export class CustomFeatures {
         return gameId === '1543512' ||
                gameId === '1003628' ||
                gameId === '1042745' ||
-               gameId === '1543513' ||
-               gameId === '1042747' ||
-               gameId === '1783249'
-               ;
+               gameId === '1543513';
     }
 
     public static isPlayableConfigurationEnabled(originalResourceUrl: string) {
