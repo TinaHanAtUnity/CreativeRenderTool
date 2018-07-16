@@ -1,4 +1,10 @@
-# Staged
+# Pending
+
+* Tslint no-irregular-whitespace
+* Tslint no-spaces-in-parens
+* Tslint no-use-before-declare re-enabled
+
+# Mon Jul 16 20:03:32 UTC 2018
 
 * Tslint no-unnecessary-local-variable is re-enabled
 * Tslint no-invalid-this is re-enabled
