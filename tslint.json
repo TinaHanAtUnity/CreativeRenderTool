@@ -62,7 +62,6 @@
     "no-http-string": [false, "http://www.example.com/?.*", "http://www.examples.com/?.*"],
     "no-unnecessary-callback-wrapper": false,
     "number-literal-format": false,
-    "no-use-before-declare": false,
     "no-unnecessary-qualifier": false,
     "export-name": false,
     "no-unnecessary-field-initialization": false,
