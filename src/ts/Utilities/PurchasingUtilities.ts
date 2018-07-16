@@ -101,7 +101,9 @@ export class PurchasingUtilities {
         const promoPlacementIds = this.promoPlacementManager.getAuctionFillPlacementIds();
 
         if (jsonPayload.type === 'CatalogUpdated') {
-            this.sendPurchaseInitializationEvent();
+            if (!this.isInitialized()) {
+                this.sendPurchaseInitializationEvent();
+            }
 
             this.refreshCatalog().then(() => {
                 for (let i = 0; i < this.iapCampaignCount; i++) {

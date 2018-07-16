@@ -360,6 +360,23 @@ describe('PurchasingUtilitiesTest', () => {
         });
 
         it('Should send the purchase initialization event and call refresh catalog when iap payload type is catalogupdated', () => {
+            sandbox.stub(PurchasingUtilities, 'isInitialized').returns(false);
+            PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}');
+
+            sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
+            sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.refreshCatalog);
+        });
+
+        it('Should not send the purchase initialization event when if IAP is already initialized', () => {
+            sandbox.stub(PurchasingUtilities, 'isInitialized').returns(true);
+            PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}');
+
+            sinon.assert.notCalled(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
+            sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.refreshCatalog);
+        });
+
+        it('Should send the purchase initialization event and call refresh catalog when iap payload type is catalogupdated', () => {
+            sandbox.stub(PurchasingUtilities, 'isInitialized').returns(false);
             PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}');
 
             sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
@@ -367,6 +384,7 @@ describe('PurchasingUtilitiesTest', () => {
         });
 
         it('Should not handle update when passed iap payload type is not CatalogUpdated', () => {
+            sandbox.stub(PurchasingUtilities, 'isInitialized').returns(false);
             PurchasingUtilities.handleSendIAPEvent('{"type":"sadfasdf"}');
 
             sinon.assert.notCalled(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
@@ -376,8 +394,9 @@ describe('PurchasingUtilitiesTest', () => {
 
         it('Should set the current placement state to nofill if product is not in the catalog', () => {
             PurchasingUtilities.iapCampaignCount = 1;
-            PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}');
             sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(false);
+            sandbox.stub(PurchasingUtilities, 'isInitialized').returns(false);
+            PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}');
 
             sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
 
@@ -389,9 +408,10 @@ describe('PurchasingUtilitiesTest', () => {
 
         it('Should set the placement as ready if campaign catalog productid and promo json productid match', () => {
             PurchasingUtilities.iapCampaignCount = 1;
-            PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}');
             sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
+            sandbox.stub(PurchasingUtilities, 'isInitialized').returns(false);
             sandbox.stub(PurchasingUtilities.promoCampaigns[0], 'getIapProductId').returns('scooterdooter');
+            PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}');
 
             sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
 
@@ -403,9 +423,10 @@ describe('PurchasingUtilitiesTest', () => {
 
         it('Should set the placement as nofill if campaign catalog productid and promo json productid dont match', () => {
             PurchasingUtilities.iapCampaignCount = 1;
-            PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}');
             sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
+            sandbox.stub(PurchasingUtilities, 'isInitialized').returns(false);
             sandbox.stub(PurchasingUtilities.promoCampaigns[0], 'getIapProductId').returns('scootydooty');
+            PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}');
 
             sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
 
