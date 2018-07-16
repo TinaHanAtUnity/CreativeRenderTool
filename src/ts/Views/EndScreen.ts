@@ -12,7 +12,7 @@ import { IEndScreenDownloadParameters } from 'EventHandlers/EndScreenEventHandle
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { ABGroup } from 'Models/ABGroup';
-import { SquareEndScreenUtilities } from 'Utilities/SquareEndScreenUtilities';
+import { SquareEndScreenUtilities } from 'Utilities/SquareEndScreenUtilities';
 import { IGDPREventHandler } from 'EventHandlers/GDPREventHandler';
 
 export interface IEndScreenHandler extends IGDPREventHandler {
