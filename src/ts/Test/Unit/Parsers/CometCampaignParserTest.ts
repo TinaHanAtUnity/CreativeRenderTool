@@ -16,7 +16,7 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 
 import OnCometMraidPlcCampaign from 'json/campaigns/performance/CometMraidUrlCampaign.json';
 import OnCometVideoPlcCampaign from 'json/campaigns/performance/CometVideoCampaign.json';
-import { ABGroup } from 'Models/ABGroup';
+import { ABGroup, ABGroupBuilder } from 'Models/ABGroup';
 
 import { SQUARE_CAMPAIGNS, SQUARE_END_SCREEN_AB_GROUPS } from 'Utilities/SquareEndScreenUtilities';
 
@@ -25,7 +25,7 @@ describe('CometCampaignParser', () => {
     const gamerId = 'TestGamerId';
     const mediaId = 'o2YMT0Cmps6xHiOwNMeCrH';
     const correlationId = '583dfda0d933a3630a53249c';
-    const abGroup = ABGroup.getAbGroup(0);
+    const abGroup = ABGroupBuilder.getAbGroup(0);
 
     let parser: CometCampaignParser;
     let nativeBridge: NativeBridge;
@@ -68,6 +68,13 @@ describe('CometCampaignParser', () => {
             }
         };
 
+        const encodeVideoUrls = (urls: { [event: string]: string }) => {
+            return Object.keys(urls).reduce((v: { [event: string]: string }, event: string) => {
+                v[event] = Url.encode(urls[event]);
+                return v;
+            }, {});
+        };
+
         const assertBaseCampaign = (content: any) => {
             assert.equal(campaign.getGamerId(), gamerId, 'GamerID is not equal');
             assert.equal(campaign.getAbGroup(), abGroup, 'ABGroup is not equal');
@@ -87,13 +94,6 @@ describe('CometCampaignParser', () => {
             assert.equal(campaign.getBypassAppSheet(), content.bypassAppSheet, 'Bypass App Sheet is not equal');
             assert.equal(campaign.getStore(), getStore(content.store), 'Store is not equal');
             assert.equal(campaign.getAppStoreId(), content.appStoreId, 'App Store ID is not equal');
-        };
-
-        const encodeVideoUrls = (urls: { [event: string]: string }) => {
-            return Object.keys(urls).reduce((v: { [event: string]: string }, event: string) => {
-                v[event] = Url.encode(urls[event]);
-                return v;
-            }, {});
         };
 
         describe('when it is an mraid campaign', () => {
@@ -258,7 +258,7 @@ describe('CometCampaignParser', () => {
         json.content = JSON.stringify(content);
 
         it('should return default images when not in A/B group', () => {
-            parse(json, ABGroup.getAbGroup(0)).then(() => {
+            parse(json, ABGroupBuilder.getAbGroup(0)).then(() => {
                 assert.equal(campaign.getLandscape()!.getOriginalUrl(), Url.encode(content.endScreenLandscape), 'Landscape URL is not equal');
                 assert.equal(campaign.getPortrait()!.getOriginalUrl(), Url.encode(content.endScreenPortrait), 'Portrait URL is not equal');
             });

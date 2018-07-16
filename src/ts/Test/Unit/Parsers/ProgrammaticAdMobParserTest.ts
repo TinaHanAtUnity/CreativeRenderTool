@@ -12,7 +12,7 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { FileId } from 'Utilities/FileId';
-import { ABGroup } from 'Models/ABGroup';
+import { ABGroupBuilder } from 'Models/ABGroup';
 
 describe('ProgrammaticAdMobParser', () => {
     const placements = ['TestPlacement'];
@@ -27,7 +27,7 @@ describe('ProgrammaticAdMobParser', () => {
     let request: Request;
     let session: Session;
     let setFileIdSpy: sinon.SinonSpy;
-    const abGroup = ABGroup.getAbGroup(0);
+    const abGroup = ABGroupBuilder.getAbGroup(0);
 
     describe('parsing a campaign', () => {
         let campaign: AdMobCampaign;
