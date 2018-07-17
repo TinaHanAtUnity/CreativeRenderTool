@@ -23,6 +23,7 @@ import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFact
 import { GdprManager } from 'Managers/GdprManager';
 import { Privacy } from 'Views/Privacy';
 import { PrivacyEventHandler } from 'EventHandlers/PrivacyEventHandler';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 describe('DisplayInterstitialAdUnit', () => {
     let adUnit: DisplayInterstitialAdUnit;
@@ -66,6 +67,7 @@ describe('DisplayInterstitialAdUnit', () => {
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
             sessionManager = new SessionManager(nativeBridge, request);
             const gdprManager = sinon.createStubInstance(GdprManager);
+            const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
             operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
                 nativeBridge: nativeBridge,
                 request: request,
@@ -99,7 +101,8 @@ describe('DisplayInterstitialAdUnit', () => {
                 request: request,
                 options: {},
                 view: view,
-                gdprManager: gdprManager
+                gdprManager: gdprManager,
+                programmaticTrackingService: programmaticTrackingService
             };
 
             adUnit = new DisplayInterstitialAdUnit(nativeBridge, displayInterstitialAdUnitParameters);

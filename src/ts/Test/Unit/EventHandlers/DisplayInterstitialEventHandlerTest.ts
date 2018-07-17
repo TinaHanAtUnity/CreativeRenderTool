@@ -18,6 +18,7 @@ import { Activity } from 'AdUnits/Containers/Activity';
 import { DisplayInterstitialEventHandler } from 'EventHandlers/DisplayInterstitialEventHandler';
 import { GdprManager } from 'Managers/GdprManager';
 import { Privacy } from 'Views/Privacy';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 describe('DisplayInterstitialEventHandler', () => {
     let view: DisplayInterstitial;
@@ -62,6 +63,7 @@ describe('DisplayInterstitialEventHandler', () => {
             operativeEventManager = sinon.createStubInstance(OperativeEventManager);
             const gdprManager = sinon.createStubInstance(GdprManager);
             const configuration = TestFixtures.getConfiguration();
+            const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
             const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
 
@@ -81,7 +83,8 @@ describe('DisplayInterstitialEventHandler', () => {
                 request: request,
                 options: {},
                 view: view,
-                gdprManager: gdprManager
+                gdprManager: gdprManager,
+                programmaticTrackingService: programmaticTrackingService
             };
 
             displayInterstitialAdUnit = new DisplayInterstitialAdUnit(nativeBridge, displayInterstitialAdUnitParameters);

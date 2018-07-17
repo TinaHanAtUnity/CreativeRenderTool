@@ -26,6 +26,7 @@ import { Platform } from 'Constants/Platform';
 import { ProgrammaticOperativeEventManager } from 'Managers/ProgrammaticOperativeEventManager';
 import { GdprManager } from 'Managers/GdprManager';
 import { Privacy } from 'Views/Privacy';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 describe('VPAIDAdUnit', () => {
     let nativeBridge: NativeBridge;
@@ -52,7 +53,8 @@ describe('VPAIDAdUnit', () => {
             privacy: sinon.createStubInstance(Privacy),
             forceOrientation: Orientation.NONE,
             options: {},
-            gdprManager: sinon.createStubInstance(GdprManager)
+            gdprManager: sinon.createStubInstance(GdprManager),
+            programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService)
         };
 
         const webPlayer = sinon.createStubInstance(WebPlayerApi);
