@@ -24,6 +24,7 @@ import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { GDPRPrivacy } from 'Views/GDPRPrivacy';
 import { GdprManager } from 'Managers/GdprManager';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 describe('MRAIDEventHandlersTest', () => {
 
@@ -45,6 +46,7 @@ describe('MRAIDEventHandlersTest', () => {
     let mraidEventHandler: MRAIDEventHandler;
     let mraidCampaign: MRAIDCampaign;
     let gdprManager: GdprManager;
+    let programmaticTrackingService: ProgrammaticTrackingService;
 
     describe('with onClick', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -82,6 +84,7 @@ describe('MRAIDEventHandlersTest', () => {
             (<sinon.SinonSpy>mraidView.container).restore();
             sinon.stub(mraidView, 'container').returns(document.createElement('div'));
             gdprManager = sinon.createStubInstance(GdprManager);
+            programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
             mraidAdUnitParameters = {
                 forceOrientation: Orientation.LANDSCAPE,
@@ -99,7 +102,8 @@ describe('MRAIDEventHandlersTest', () => {
                 mraid: mraidView,
                 endScreen: undefined,
                 privacy: new GDPRPrivacy(nativeBridge, gdprManager, false, true),
-                gdprManager: gdprManager
+                gdprManager: gdprManager,
+                programmaticTrackingService: programmaticTrackingService
             };
 
             mraidAdUnit = new MRAIDAdUnit(nativeBridge, mraidAdUnitParameters);
