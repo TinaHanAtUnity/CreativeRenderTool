@@ -392,7 +392,6 @@ describe('PurchasingUtilitiesTest', () => {
             sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(false);
             sandbox.stub(PurchasingUtilities, 'isInitialized').returns(false);
 
-
             return PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}').then(() => {
                 sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
                 sinon.assert.calledWith(<sinon.SinonSpy>PurchasingUtilities.isProductAvailable, 'scooterdooter');
