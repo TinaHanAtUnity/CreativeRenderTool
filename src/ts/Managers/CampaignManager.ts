@@ -282,7 +282,7 @@ export class CampaignManager {
     }
 
     private parseCampaigns(response: INativeResponse, backupResponse: boolean): Promise<void[]> {
-        let json: any;
+        let json;
         try {
             json = JsonParser.parse(response.response);
         } catch (e) {
@@ -304,7 +304,7 @@ export class CampaignManager {
         if('placements' in json) {
             const fill: { [mediaId: string]: string[] } = {};
             const noFill: string[] = [];
-            const ignorePlacement: string[] = [];
+            const failedToCachePlacement: string[] = [];
             if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
                 json.placements = MixedPlacementUtility.insertMediaIdsIntoJSON(this._configuration, json.placements);
             }
@@ -321,7 +321,6 @@ export class CampaignManager {
                             fill[mediaId] = [placement];
                         }
                     } else {
-                        ignorePlacement.push(placement);
                         noFill.push(placement);
                     }
 
@@ -349,14 +348,6 @@ export class CampaignManager {
                     if(contentType && contentType !== 'comet/campaign' && cacheTTL > 0 && (cacheTTL < refreshDelay || refreshDelay === 0)) {
                         refreshDelay = cacheTTL;
                     }
-
-                    if (contentType && contentType === 'programmatic/vast') {
-                        fill[mediaId].forEach(placement => {
-                            if(ignorePlacement.indexOf(placement) === -1) {
-                                ignorePlacement.push(placement);
-                            }
-                        });
-                    }
                 }
             }
 
@@ -372,8 +363,8 @@ export class CampaignManager {
                         auctionResponse = new AuctionResponse(fill[mediaId], json.media[mediaId], mediaId, json.correlationId);
                         promises.push(this.handleCampaign(auctionResponse, session, backupResponse).catch(error => {
                             fill[mediaId].forEach(placement => {
-                                if(ignorePlacement.indexOf(placement) === -1) {
-                                    ignorePlacement.push(placement);
+                                if(failedToCachePlacement.indexOf(placement) === -1) {
+                                    failedToCachePlacement.push(placement);
                                 }
                             });
 
@@ -390,8 +381,8 @@ export class CampaignManager {
                         }));
                     } catch(error) {
                         fill[mediaId].forEach(placement => {
-                            if(ignorePlacement.indexOf(placement) === -1) {
-                                ignorePlacement.push(placement);
+                            if(failedToCachePlacement.indexOf(placement) === -1) {
+                                failedToCachePlacement.push(placement);
                             }
                         });
                         this.handleError(error, fill[mediaId], 'error_creating_handle_campaign_chain', session);
@@ -404,12 +395,36 @@ export class CampaignManager {
                     return Promise.resolve();
                 }
 
-                for(const placement of ignorePlacement) {
-                    delete json.placements[placement];
+                let cachedJson: any;
+                try {
+                    cachedJson = JsonParser.parse(response.response);
+                } catch (e) {
+                    return Promise.resolve();
                 }
+
+                for(const mediaId in fill) {
+                    if(fill.hasOwnProperty(mediaId)) {
+                        const contentType = cachedJson.media[mediaId].contentType;
+
+                        if (contentType && contentType === 'programmatic/vast') {
+                            fill[mediaId].forEach(p => {
+                                delete cachedJson.placements[p];
+                            });
+                        }
+                    }
+                }
+
+                for(const placement of failedToCachePlacement) {
+                    delete cachedJson.placements[placement];
+                }
+
+                for(const placement of noFill) {
+                    delete cachedJson.placements[placement];
+                }
+
                 return this._cacheBookkeeping.setCachedCampaignResponse({
                     url: response.url,
-                    response: JSON.stringify(json),
+                    response: JSON.stringify(cachedJson),
                     responseCode: response.responseCode,
                     headers: response.headers
                 });
