@@ -4,7 +4,7 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
 
 export enum ProgrammaticTrackingError {
-    TooLargeFile = 'too_large_file' // files 20mb and over are considered too large
+    TooLargeFile = 'too_large_file' // a file 20mb and over are considered too large
 }
 
 export enum ProgrammaticTrackingMetric {
