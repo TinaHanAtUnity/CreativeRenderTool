@@ -455,7 +455,7 @@ describe('VideoEventHandlersTest', () => {
             sinon.stub(vastCampaign, 'getVideo').returns(video);
             operativeEventManagerParams.campaign = vastCampaign;
             vastAdUnitParameters.operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
-            const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters, false);
+            const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
             performanceAdUnit.setVideoState(VideoState.PREPARING);
             videoEventHandlerParams.campaign = vastCampaign;
             videoEventHandlerParams.adUnit = vastAdUnit;
@@ -487,7 +487,7 @@ describe('VideoEventHandlersTest', () => {
             vastAdUnitParameters.campaign = vastCampaign;
             operativeEventManagerParams.campaign = vastCampaign;
             vastAdUnitParameters.operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
-            const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters, false);
+            const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
             performanceAdUnit.setVideoState(VideoState.PREPARING);
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('http://foo.com');
             videoEventHandlerParams.campaign = vastCampaign;
@@ -508,7 +508,7 @@ describe('VideoEventHandlersTest', () => {
             vastAdUnitParameters.campaign = vastCampaign;
             operativeEventManagerParams.campaign = vastCampaign;
             vastAdUnitParameters.operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
-            const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters, false);
+            const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
             performanceAdUnit.setVideoState(VideoState.PREPARING);
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns(null);
             videoEventHandlerParams.campaign = vastCampaign;
@@ -529,7 +529,7 @@ describe('VideoEventHandlersTest', () => {
             vastAdUnitParameters.campaign = vastCampaign;
             operativeEventManagerParams.campaign = vastCampaign;
             vastAdUnitParameters.operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
-            const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters, false);
+            const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
             performanceAdUnit.setVideoState(VideoState.PREPARING);
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('http://foo.com');
             videoEventHandlerParams.campaign = vastCampaign;
@@ -550,7 +550,7 @@ describe('VideoEventHandlersTest', () => {
             vastAdUnitParameters.campaign = vastCampaign;
             operativeEventManagerParams.campaign = vastCampaign;
             vastAdUnitParameters.operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
-            const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters, false);
+            const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
             performanceAdUnit.setVideoState(VideoState.PREPARING);
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns(null);
             videoEventHandlerParams.campaign = vastCampaign;

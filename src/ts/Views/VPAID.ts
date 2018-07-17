@@ -50,15 +50,13 @@ export class VPAID extends View<IVPAIDHandler> {
     private _isLoaded = false;
     private _webplayerEventObserver: IObserver1<string>;
     private _isCoppaCompliant: boolean;
-    private _showGDPRBanner: boolean;
 
-    constructor(nativeBridge: NativeBridge, campaign: VPAIDCampaign, placement: Placement, showGDPRBanner: boolean) {
+    constructor(nativeBridge: NativeBridge, campaign: VPAIDCampaign, placement: Placement) {
         super(nativeBridge, 'vpaid');
 
         this._template = new Template(VPAIDTemplate);
         this._campaign = campaign;
         this._placement = placement;
-        this._showGDPRBanner = showGDPRBanner;
         this._stuckTimer = new Timer(() => this._handlers.forEach(handler => handler.onVPAIDStuck()), VPAID.stuckDelay);
         this._bindings = [];
     }
@@ -168,7 +166,6 @@ export class VPAID extends View<IVPAIDHandler> {
                 break;
             default:
                 this._nativeBridge.Sdk.logWarning(`VPAID Unknown message type ${eventType}`);
-                break;
         }
     }
 }

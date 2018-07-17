@@ -12,6 +12,7 @@ import { Request } from 'Utilities/Request';
 import { FakeSdkApi } from '../TestHelpers/FakeSdkApi';
 import { FocusManager } from 'Managers/FocusManager';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 class TestCacheApi extends CacheApi {
     private _files: IFileInfo[];
@@ -213,8 +214,9 @@ describe('CacheCleanTest', () => {
         const focusManager = new FocusManager(nativeBridge);
         const wakeUpManager: WakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         const request: Request = new Request(nativeBridge, wakeUpManager);
+        const programmaticTrackingService: ProgrammaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         cacheBookkeeping = new CacheBookkeeping(nativeBridge);
-        cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping);
+        cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService);
         cacheApi = new TestCacheApi(nativeBridge);
         storageApi = new TestStorageApi(nativeBridge);
         nativeBridge.Cache = cacheApi;

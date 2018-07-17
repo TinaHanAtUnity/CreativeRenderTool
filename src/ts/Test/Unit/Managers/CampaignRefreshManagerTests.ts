@@ -45,7 +45,50 @@ import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFact
 import { JaegerManager } from 'Jaeger/JaegerManager';
 import { JaegerSpan } from 'Jaeger/JaegerSpan';
 import { GdprManager } from 'Managers/GdprManager';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
+
+export class TestContainer extends AdUnitContainer {
+    public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, options: any): Promise<void> {
+        return Promise.resolve();
+    }
+    public close(): Promise<void> {
+        return Promise.resolve();
+    }
+    public reconfigure(configuration: ViewConfiguration): Promise<any[]> {
+        return Promise.all([]);
+    }
+    public reorient(allowRotation: boolean, forceOrientation: Orientation): Promise<any[]> {
+        return Promise.all([]);
+    }
+    public isPaused(): boolean {
+        return false;
+    }
+    public setViewFrame(view: string, x: number, y: number, width: number, height: number): Promise<void> {
+        return Promise.resolve();
+    }
+    public getViews(): Promise<string[]> {
+        return Promise.all([]);
+    }
+}
+
+export class TestAdUnit extends AbstractAdUnit {
+    public show(): Promise<void> {
+        return Promise.resolve();
+    }
+    public hide(): Promise<void> {
+        return Promise.resolve();
+    }
+    public description(): string {
+        return 'TestAdUnit';
+    }
+    public isShowing() {
+        return true;
+    }
+    public isCached() {
+        return false;
+    }
+}
 
 describe('CampaignRefreshManager', () => {
     let deviceInfo: DeviceInfo;
@@ -70,6 +113,7 @@ describe('CampaignRefreshManager', () => {
     let cache: Cache;
     let jaegerManager: JaegerManager;
     let gdprManager: GdprManager;
+    let programmaticTrackingService: ProgrammaticTrackingService;
 
     beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo();
@@ -152,7 +196,8 @@ describe('CampaignRefreshManager', () => {
         sessionManager = new SessionManager(nativeBridge, request);
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
         cacheBookkeeping = new CacheBookkeeping(nativeBridge);
-        cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping);
+        programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+        cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService);
         assetManager = new AssetManager(cache, CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
         container = new TestContainer();
         const campaign = TestFixtures.getCampaign();
@@ -767,45 +812,3 @@ describe('CampaignRefreshManager', () => {
         });
     });
 });
-
-export class TestContainer extends AdUnitContainer {
-    public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, options: any): Promise<void> {
-        return Promise.resolve();
-    }
-    public close(): Promise<void> {
-        return Promise.resolve();
-    }
-    public reconfigure(configuration: ViewConfiguration): Promise<any[]> {
-        return Promise.all([]);
-    }
-    public reorient(allowRotation: boolean, forceOrientation: Orientation): Promise<any[]> {
-        return Promise.all([]);
-    }
-    public isPaused(): boolean {
-        return false;
-    }
-    public setViewFrame(view: string, x: number, y: number, width: number, height: number): Promise<void> {
-        return Promise.resolve();
-    }
-    public getViews(): Promise<string[]> {
-        return Promise.all([]);
-    }
-}
-
-export class TestAdUnit extends AbstractAdUnit {
-    public show(): Promise<void> {
-        return Promise.resolve();
-    }
-    public hide(): Promise<void> {
-        return Promise.resolve();
-    }
-    public description(): string {
-        return 'TestAdUnit';
-    }
-    public isShowing() {
-        return true;
-    }
-    public isCached() {
-        return false;
-    }
-}

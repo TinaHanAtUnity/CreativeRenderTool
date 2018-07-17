@@ -198,7 +198,6 @@ export class VastParser {
                                     }
                                     break;
                                 default:
-                                    break;
                             }
                         }
                     }
@@ -209,7 +208,6 @@ export class VastParser {
                     }
                     break;
                 default:
-                    break;
             }
         }
         return ad;
@@ -302,9 +300,7 @@ export class VastParser {
 
             const trackingEvents = this.getTrackingEventsFromElement(companionAdElement);
 
-            const companionAd = new VastCreativeCompanionAd(id, creativeType, height, width, staticResourceURL, companionClickThroughURLTemplate, trackingEvents);
-
-            return companionAd;
+            return new VastCreativeCompanionAd(id, creativeType, height, width, staticResourceURL, companionClickThroughURLTemplate, trackingEvents);
         } else {
             return null;
         }

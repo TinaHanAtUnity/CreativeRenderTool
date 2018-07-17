@@ -1,4 +1,4 @@
-import { Platform } from 'Constants/Platform';
+import { JaegerUtilities } from 'Jaeger/JaegerUtilities';
 
 interface IJaegerLocalEndpoint {
     readonly serviceName: string;
@@ -16,7 +16,7 @@ interface IJaegerAnnotation {
     readonly value: string;
 }
 class JaegerAnnotation implements IJaegerAnnotation {
-    public timestamp: number = JaegerSpan.genTimestamp();
+    public timestamp: number = JaegerUtilities.genTimestamp();
     public value: string;
 
     constructor(value: string) {
@@ -50,29 +50,12 @@ export enum JaegerTags {
 
 export class JaegerSpan implements IJaegerSpan {
 
-    public static genTimestamp(): number {
-        return Date.now() * 1000;
-    }
-
-    public static stripQueryAndFragment(url: string): string {
-        return url.split(/[?#]/)[0];
-    }
-
-    // https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
-    // this should not be done over the native bridge else we end up with delay added to all network requests.
-    private static uuidv4(): string {
-        return 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
-            return v.toString(16);
-          });
-    }
-
-    public traceId: string = JaegerSpan.uuidv4().substring(8, 24);
+    public traceId: string = JaegerUtilities.uuidv4().substring(8, 24);
     public name: string;
-    public id: string = JaegerSpan.uuidv4().substring(8, 24);
+    public id: string = JaegerUtilities.uuidv4().substring(8, 24);
     public parentId?: string;
     public kind: string = 'CLIENT';
-    public timestamp: number = JaegerSpan.genTimestamp();
+    public timestamp: number = JaegerUtilities.genTimestamp();
     public duration: number = 0;
     public debug: boolean = true;
     public shared: boolean = true;
@@ -87,7 +70,7 @@ export class JaegerSpan implements IJaegerSpan {
         if (traceId) {
             this.traceId = traceId;
         }
-        this.name = JaegerSpan.stripQueryAndFragment(operation);
+        this.name = JaegerUtilities.stripQueryAndFragment(operation);
     }
 
     public addTag(key: JaegerTags, value: string) {
@@ -100,7 +83,7 @@ export class JaegerSpan implements IJaegerSpan {
     }
 
     public stop() {
-        this.duration = JaegerSpan.genTimestamp() - this.timestamp;
+        this.duration = JaegerUtilities.genTimestamp() - this.timestamp;
     }
 
 }

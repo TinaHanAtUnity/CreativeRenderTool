@@ -12,7 +12,7 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
 import { SdkStats } from 'Utilities/SdkStats';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
-import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
 
 export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -330,7 +330,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private onCloseEvent(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
-        if(this._canSkip && !this._canClose) {
+        if(this._canSkip && !this._canClose) {
             this._handlers.forEach(handler => handler.onMraidSkip());
         } else if(this._canClose) {
             this._handlers.forEach(handler => handler.onMraidClose());
@@ -357,7 +357,6 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                         break;
 
                     default:
-                        break;
                 }
                 this._handlers.forEach(handler => handler.onMraidOrientationProperties({
                     allowOrientationChange: event.data.properties.allowOrientationChange,
@@ -380,11 +379,9 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                     case 'showEndScreen':
                         break;
                     default:
-                        break;
                 }
                 break;
             default:
-                break;
         }
     }
 
