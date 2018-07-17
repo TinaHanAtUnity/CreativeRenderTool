@@ -1,8 +1,9 @@
-# Pending
+# Staged
 
 * Tslint no-irregular-whitespace
 * Tslint no-spaces-in-parens
 * Tslint no-use-before-declare re-enabled
+* Send admob cache metrics to PTS
 
 # Mon Jul 16 20:03:32 UTC 2018
 
