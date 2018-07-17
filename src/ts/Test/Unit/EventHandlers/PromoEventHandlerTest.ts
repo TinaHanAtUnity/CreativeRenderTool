@@ -1,34 +1,17 @@
 import 'mocha';
+import { assert } from 'chai';
 import * as sinon from 'sinon';
 
 import { NativeBridge } from 'Native/NativeBridge';
-import { TestFixtures } from '../TestHelpers/TestFixtures';
-import { PromoAdUnit, IPromoAdUnitParameters } from 'AdUnits/PromoAdUnit';
+import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
 import { PromoEventHandler } from 'EventHandlers/PromoEventHandler';
-import { Activity } from 'AdUnits/Containers/Activity';
-import { Promo } from 'Views/Promo';
-import { Platform } from 'Constants/Platform';
-import { AdUnitContainer } from 'AdUnits/Containers/AdUnitContainer';
-import { Placement } from 'Models/Placement';
-import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
-import { DeviceInfo } from 'Models/DeviceInfo';
-import { SessionManager } from 'Managers/SessionManager';
-import { WakeUpManager } from 'Managers/WakeUpManager';
-import { MetaDataManager } from 'Managers/MetaDataManager';
-import { Request, INativeResponse } from 'Utilities/Request';
-import { Session } from 'Models/Session';
+
 import DummyPromo from 'json/DummyPromoCampaign.json';
-import { FocusManager } from 'Managers/FocusManager';
-import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 import { Configuration } from 'Models/Configuration';
-import { SinonStub, SinonSandbox } from 'sinon';
-import { ABGroup } from 'Models/ABGroup';
-import { PurchasingApi } from 'Native/Api/Purchasing';
-import { ClientInfo } from 'Models/ClientInfo';
-import { Observable1 } from 'Utilities/Observable';
+import { ABGroupBuilder } from 'Models/ABGroup';
 import { GdprManager } from 'Managers/GdprManager';
+import { FinishState } from 'Constants/FinishState';
 
 describe('PromoEventHandlersTest', () => {
     const handleInvocation = sinon.spy();
@@ -56,17 +39,21 @@ describe('PromoEventHandlersTest', () => {
         it('should hide adunit', () => {
             promoAdUnit = sinon.createStubInstance(PromoAdUnit);
 
-            PromoEventHandler.onClose(promoAdUnit, '111', '111', ABGroup.getAbGroup(1), [purchaseTrackingUrls], false);
+            PromoEventHandler.onClose(promoAdUnit, '111', '111', ABGroupBuilder.getAbGroup(1), [purchaseTrackingUrls], false);
             sinon.assert.called(<sinon.SinonSpy>promoAdUnit.hide);
         });
 
-        it('should call sendPromoPayload', () => {
-            const promoView = <Promo><any> {
-                hide: sinon.spy()
-            };
+        it('should set adunit finish state to completed', () => {
             promoAdUnit = sinon.createStubInstance(PromoAdUnit);
 
-            PromoEventHandler.onClose(promoAdUnit, '111', '111', ABGroup.getAbGroup(1), [purchaseTrackingUrls], false);
+            PromoEventHandler.onClose(promoAdUnit, '111', '111', ABGroupBuilder.getAbGroup(1), [purchaseTrackingUrls], false);
+            sinon.assert.calledWith(<sinon.SinonStub>promoAdUnit.setFinishState, FinishState.COMPLETED);
+        });
+
+        it('should call sendPromoPayload', () => {
+            promoAdUnit = sinon.createStubInstance(PromoAdUnit);
+
+            PromoEventHandler.onClose(promoAdUnit, '111', '111', ABGroupBuilder.getAbGroup(1), [purchaseTrackingUrls], false);
             sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPromoPayload);
         });
     });
@@ -79,10 +66,14 @@ describe('PromoEventHandlersTest', () => {
             sinon.assert.called(<sinon.SinonSpy>promoAdUnit.hide);
         });
 
+        it('should set adunit finish state to completed', () => {
+            promoAdUnit = sinon.createStubInstance(PromoAdUnit);
+
+            PromoEventHandler.onPromo(promoAdUnit, 'com.unit.test.iapproductid', [purchaseTrackingUrls]);
+            sinon.assert.calledWith(<sinon.SinonStub>promoAdUnit.setFinishState, FinishState.COMPLETED);
+        });
+
         it('should call sendPromoPayload', () => {
-            const promoView = <Promo><any> {
-                hide: sinon.spy()
-            };
             promoAdUnit = sinon.createStubInstance(PromoAdUnit);
 
             PromoEventHandler.onPromo(promoAdUnit, 'com.unit.test.iapproductid', [purchaseTrackingUrls]);

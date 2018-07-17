@@ -2,20 +2,12 @@ import { Session } from 'Models/Session';
 import { NativeBridge } from 'Native/NativeBridge';
 import { StorageType } from 'Native/Api/Storage';
 import { Diagnostics } from 'Utilities/Diagnostics';
-import { DiagnosticError } from 'Errors/DiagnosticError';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { SdkStats } from 'Utilities/SdkStats';
 import { Request } from 'Utilities/Request';
+import { FailedOperativeEventManager } from 'Managers/FailedOperativeEventManager';
+import { FailedXpromoOperativeEventManager } from 'Managers/FailedXpromoOperativeEventManager';
+import { SessionUtils } from 'Utilities/SessionUtils';
 
 export class SessionManager {
-    public static getSessionKey(sessionId: string): string {
-        return 'session.' + sessionId;
-    }
-
-    private static getSessionTimestampKey(sessionId: string): string {
-        return SessionManager.getSessionKey(sessionId) + '.ts';
-    }
-
     private _nativeBridge: NativeBridge;
     private _request: Request;
     private _gameSessionId: number;
@@ -31,7 +23,7 @@ export class SessionManager {
     }
 
     public startNewSession(sessionId: string): Promise<any[]> {
-        const sessionTimestampKey = SessionManager.getSessionTimestampKey(sessionId);
+        const sessionTimestampKey = SessionUtils.getSessionStorageTimestampKey(sessionId);
         const timestamp = Date.now();
 
         return Promise.all([
@@ -70,7 +62,7 @@ export class SessionManager {
 
     private deleteSession(sessionId: string): Promise<any[]> {
         return Promise.all([
-            this._nativeBridge.Storage.delete(StorageType.PRIVATE, SessionManager.getSessionKey(sessionId)),
+            this._nativeBridge.Storage.delete(StorageType.PRIVATE, SessionUtils.getSessionStorageKey(sessionId)),
             this._nativeBridge.Storage.write(StorageType.PRIVATE)
         ]);
     }
@@ -80,7 +72,7 @@ export class SessionManager {
     }
 
     private isSessionOutdated(sessionId: string): Promise<boolean> {
-        return this._nativeBridge.Storage.get<number>(StorageType.PRIVATE, SessionManager.getSessionTimestampKey(sessionId)).then(timestamp => {
+        return this._nativeBridge.Storage.get<number>(StorageType.PRIVATE, SessionUtils.getSessionStorageTimestampKey(sessionId)).then(timestamp => {
             const timeThresholdMin: number = new Date().getTime() - 7 * 24 * 60 * 60 * 1000;
             const timeThresholdMax: number = new Date().getTime();
 
@@ -91,35 +83,11 @@ export class SessionManager {
     }
 
     private sendUnsentEvents(sessionId: string): Promise<any[]> {
-        return this.getUnsentEvents(sessionId).then(events => {
-            return Promise.all(events.map(eventId => {
-                return this.resendEvent(sessionId, eventId);
-            }));
-        });
-    }
-
-    private getUnsentEvents(sessionId: string): Promise<string[]> {
-        return this._nativeBridge.Storage.getKeys(StorageType.PRIVATE, 'session.' + sessionId + '.operative', false);
-    }
-
-    private resendEvent(sessionId: string, eventId: string): Promise<void | void[]> {
-        return this.getStoredEvent(sessionId, eventId).then(([url, data]) => {
-            this._nativeBridge.Sdk.logDebug('Unity Ads operative event: resending operative event to ' + url + ' (session ' + sessionId + ', event ' + eventId + ')');
-            return this._request.post(url, data);
-        }).then(() => {
-            return Promise.all([
-                this._nativeBridge.Storage.delete(StorageType.PRIVATE, OperativeEventManager.getEventKey(sessionId, eventId)),
-                this._nativeBridge.Storage.write(StorageType.PRIVATE)
-            ]);
-        }).catch(() => {
-            // ignore failed resends, they will be retried later
-        });
-    }
-
-    private getStoredEvent(sessionId: string, eventId: string): Promise<string[]> {
-        return Promise.all([
-            this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, OperativeEventManager.getUrlKey(sessionId, eventId)),
-            this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, OperativeEventManager.getDataKey(sessionId, eventId))
-        ]);
+        const promises: Array<Promise<any>> = [];
+        const failedOperativeEventManager = new FailedOperativeEventManager(sessionId);
+        promises.push(failedOperativeEventManager.sendFailedEvents(this._nativeBridge, this._request));
+        const failedXpromoOperativeEventManager = new FailedXpromoOperativeEventManager(sessionId);
+        promises.push(failedXpromoOperativeEventManager.sendFailedEvents(this._nativeBridge, this._request));
+        return Promise.all(promises);
     }
 }

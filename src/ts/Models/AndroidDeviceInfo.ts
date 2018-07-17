@@ -3,7 +3,6 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { RingerMode } from 'Constants/Android/RingerMode';
 import { ISensorInfo, StorageType } from 'Native/Api/AndroidDeviceInfo';
 import { StreamType } from 'Constants/Android/StreamType';
-import { Platform } from 'Constants/Platform';
 
 export interface IAndroidDeviceInfo extends IDeviceInfo {
     androidId: string;
@@ -93,6 +92,8 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
             promises.push(this._nativeBridge.DeviceInfo.Android.isAppInstalled(AndroidDeviceInfo.GoogleMapsPackageName).then(isGoogleMapsInstalled => this.set('isGoogleMapsInstalled', isGoogleMapsInstalled)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._nativeBridge.DeviceInfo.Android.isAppInstalled(AndroidDeviceInfo.TelephonyPackageName).then(isTelephonyInstalled => this.set('isTelephonyInstalled', isTelephonyInstalled)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._nativeBridge.DeviceInfo.Android.getDeviceMaxVolume(StreamType.STREAM_MUSIC).then(maxVolume => this.set('maxVolume', maxVolume)).catch(err => this.handleDeviceInfoError(err)));
+            // only add this to 2.2.1 and above
+            promises.push(this._nativeBridge.DeviceInfo.Android.getApkDigest().then(apkDigest => this.set('apkDigest', apkDigest)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._nativeBridge.DeviceInfo.Android.getCertificateFingerprint().then(certificateFingerPrint => this.set('certificateFingerPrint', certificateFingerPrint)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._nativeBridge.DeviceInfo.Android.getBoard().then(board => this.set('board', board)).catch(err => this.handleDeviceInfoError(err)));
             promises.push(this._nativeBridge.DeviceInfo.Android.getBootloader().then(bootLoader => this.set('bootLoader', bootLoader)).catch(err => this.handleDeviceInfoError(err)));
@@ -258,6 +259,13 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
         });
     }
 
+    public getFreeSpace(): Promise<number> {
+        return this._nativeBridge.DeviceInfo.Android.getFreeSpace(StorageType.INTERNAL).then(freeInternalSpace => {
+            this.set('freeInternalSpace', freeInternalSpace);
+            return this.get('freeInternalSpace');
+        });
+    }
+
     public getDTO(): Promise<any> {
         return super.getDTO().then(commonDTO => {
             const dto: any = {
@@ -266,7 +274,7 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
                 'deviceMake': this.getManufacturer(),
                 'screenLayout': this.getScreenLayout(),
                 'screenDensity': this.getScreenDensity(),
-                'totalSpaceExternal': this.getTotalSpaceExternal(),
+                'totalSpaceExternal': this.getTotalSpaceExternal()
             };
 
             if(!this.getAdvertisingIdentifier()) {
@@ -296,7 +304,7 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
                 'deviceMake': this.getManufacturer(),
                 'screenLayout': this.getScreenLayout(),
                 'screenDensity': this.getScreenDensity(),
-                'totalSpaceExternal': this.getTotalSpaceExternal(),
+                'totalSpaceExternal': this.getTotalSpaceExternal()
             };
 
             return Promise.all([
@@ -321,7 +329,7 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
             'deviceMake': this.getManufacturer(),
             'screenLayout': this.getScreenLayout(),
             'screenDensity': this.getScreenDensity(),
-            'totalSpaceExternal': this.getTotalSpaceExternal(),
+            'totalSpaceExternal': this.getTotalSpaceExternal()
         };
 
         if(!this.getAdvertisingIdentifier()) {
@@ -338,7 +346,7 @@ export class AndroidDeviceInfo extends DeviceInfo<IAndroidDeviceInfo> {
             'deviceMake': this.getManufacturer(),
             'screenLayout': this.getScreenLayout(),
             'screenDensity': this.getScreenDensity(),
-            'totalSpaceExternal': this.getTotalSpaceExternal(),
+            'totalSpaceExternal': this.getTotalSpaceExternal()
         };
     }
 }

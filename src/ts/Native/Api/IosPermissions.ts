@@ -3,7 +3,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Observable2 } from 'Utilities/Observable';
 
 enum PermissionsEvent {
-    PERMISSIONS_RESULT,
+    PERMISSIONS_RESULT
 }
 
 export enum IosPermission {

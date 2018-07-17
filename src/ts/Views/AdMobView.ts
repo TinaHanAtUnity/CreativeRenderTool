@@ -9,13 +9,12 @@ import { Template } from 'Utilities/Template';
 import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { AFMABridge, IOpenableIntentsResponse, IOpenableIntentsRequest, ITouchInfo, IClickSignalResponse } from 'Views/AFMABridge';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
-import { ClientInfo } from 'Models/ClientInfo';
 import { MRAIDBridge } from 'Views/MRAIDBridge';
-import { SdkStats } from 'Utilities/SdkStats';
 import { IPrivacyHandler, AbstractPrivacy } from 'Views/AbstractPrivacy';
-import { GDPRPrivacy } from 'Views/GDPRPrivacy';
+import { IGDPREventHandler } from 'EventHandlers/GDPREventHandler';
+import { ProgrammaticTrackingService, ProgrammaticTrackingMetric } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
-export interface IAdMobEventHandler {
+export interface IAdMobEventHandler extends IGDPREventHandler {
     onClose(): void;
     onOpenURL(url: string): void;
     onAttribution(url: string, touchInfo: ITouchInfo): Promise<void>;
@@ -26,7 +25,6 @@ export interface IAdMobEventHandler {
     onOpenableIntentsRequest(request: IOpenableIntentsRequest): void;
     onTrackingEvent(event: string, data?: any): void;
     onClickSignalRequest(touchInfo: ITouchInfo): void;
-    onGDPRPopupSkipped(): void;
 }
 
 const AFMAClickStringMacro = '{{AFMA_CLICK_SIGNALS_PLACEHOLDER}}';
@@ -45,13 +43,15 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
     private _privacy: AbstractPrivacy;
     private _showGDPRBanner: boolean = false;
     private _gdprPopupClicked: boolean = false;
+    private _programmaticTrackingService: ProgrammaticTrackingService;
 
-    constructor(nativeBridge: NativeBridge, adMobSignalFactory: AdMobSignalFactory, container: AdUnitContainer, campaign: AdMobCampaign, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
+    constructor(nativeBridge: NativeBridge, adMobSignalFactory: AdMobSignalFactory, container: AdUnitContainer, campaign: AdMobCampaign, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, programmaticTrackingService: ProgrammaticTrackingService) {
         super(nativeBridge, 'admob');
 
         this._campaign = campaign;
         this._template = new Template(AdMobContainer);
         this._adMobSignalFactory = adMobSignalFactory;
+        this._programmaticTrackingService = programmaticTrackingService;
 
         this._privacy = privacy;
         this._showGDPRBanner = showGDPRBanner;
@@ -192,11 +192,16 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
             const scriptEl = dom.querySelector('body script');
             const mediaFileURL = this.encodeURLForHTML(video.getMediaFileURL());
             let cachedFileURL = video.getVideo().getCachedUrl();
-            if (cachedFileURL) {
-                cachedFileURL = this.encodeURLForHTML(cachedFileURL);
-                if (scriptEl && scriptEl.textContent) {
+            if (scriptEl && scriptEl.textContent) {
+                if (cachedFileURL) {
+                    cachedFileURL = this.encodeURLForHTML(cachedFileURL);
                     const replacedSrc = scriptEl.textContent.replace(mediaFileURL, cachedFileURL);
                     scriptEl.textContent = replacedSrc;
+                    // report using cached video
+                    this._programmaticTrackingService.reportMetric(ProgrammaticTrackingMetric.AdmobUsedCachedVideo).catch();
+                } else {
+                    // report using streaming video
+                    this._programmaticTrackingService.reportMetric(ProgrammaticTrackingMetric.AdmobUsedStreamedVideo).catch();
                 }
             }
         }

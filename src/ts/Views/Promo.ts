@@ -42,7 +42,8 @@ export class Promo extends View<{}> implements IPrivacyHandler {
 
         if(campaign) {
             this._templateData = {
-                'localizedPrice': PurchasingUtilities.getProductPrice(campaign.getIapProductId())
+                'localizedPrice': PurchasingUtilities.getProductPrice(campaign.getIapProductId()),
+                'isRewardedPromo': this._promoCampaign.getRewardedPromo()
             };
         }
 
@@ -139,6 +140,7 @@ export class Promo extends View<{}> implements IPrivacyHandler {
             case 'promo':
                 this.onPromoEvent(e);
                 break;
+            default:
         }
     }
 

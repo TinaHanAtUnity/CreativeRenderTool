@@ -13,6 +13,7 @@ import { FocusManager } from 'Managers/FocusManager';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
 import { StorageApi } from 'Native/Api/Storage';
 import { Platform } from 'Constants/Platform';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 class TestHelper {
     public static getClientInfo(webviewhash: string | null) {
@@ -41,6 +42,7 @@ describe('ReinitManagerTest', () => {
         let request: Request;
         let cache: Cache;
         let reinitManager: ReinitManager;
+        let programmaticTrackingService: ProgrammaticTrackingService;
 
         beforeEach(() => {
             nativeBridge = TestFixtures.getNativeBridge();
@@ -48,7 +50,8 @@ describe('ReinitManagerTest', () => {
             clientInfo = TestFixtures.getClientInfo();
             const wakeUpManager = new WakeUpManager(nativeBridge, new FocusManager(nativeBridge));
             request = new Request(nativeBridge, wakeUpManager);
-            cache = new Cache(nativeBridge, wakeUpManager, request, new CacheBookkeeping(nativeBridge));
+            programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+            cache = new Cache(nativeBridge, wakeUpManager, request, new CacheBookkeeping(nativeBridge), programmaticTrackingService);
             reinitManager = new ReinitManager(nativeBridge, clientInfo, request, cache);
         });
 
@@ -65,12 +68,14 @@ describe('ReinitManagerTest', () => {
         let nativeBridge: NativeBridge;
         let request: Request;
         let cache: Cache;
+        let programmaticTrackingService: ProgrammaticTrackingService;
 
         beforeEach(() => {
             nativeBridge = TestFixtures.getNativeBridge();
             const wakeUpManager = new WakeUpManager(nativeBridge, new FocusManager(nativeBridge));
             request = new Request(nativeBridge, wakeUpManager);
-            cache = new Cache(nativeBridge, wakeUpManager, request, new CacheBookkeeping(nativeBridge));
+            programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+            cache = new Cache(nativeBridge, wakeUpManager, request, new CacheBookkeeping(nativeBridge), programmaticTrackingService);
         });
 
         it('should not reinit with development webview', () => {

@@ -14,6 +14,7 @@ import { Request } from 'Utilities/Request';
 import { FocusManager } from 'Managers/FocusManager';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
 import { FileInfo } from 'Utilities/FileInfo';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 describe('VideoMetadataTest', () => {
     const validVideo: string = 'https://www.example.net/valid.mp4';
@@ -27,6 +28,7 @@ describe('VideoMetadataTest', () => {
     let nativeBridge: NativeBridge;
     let wakeUpManager: WakeUpManager;
     let request: Request;
+    let programmaticTrackingService: ProgrammaticTrackingService;
     let cache: Cache;
     let focusManager: FocusManager;
     let cacheBookkeeping: CacheBookkeeping;
@@ -40,7 +42,8 @@ describe('VideoMetadataTest', () => {
             wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             request = new Request(nativeBridge, wakeUpManager);
             cacheBookkeeping = new CacheBookkeeping(nativeBridge);
-            cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping);
+            programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+            cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService);
         });
 
         it('should validate valid video', () => {
@@ -75,7 +78,8 @@ describe('VideoMetadataTest', () => {
             wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             request = new Request(nativeBridge, wakeUpManager);
             cacheBookkeeping = new CacheBookkeeping(nativeBridge);
-            cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping);
+            programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
+            cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService);
         });
 
         it('should validate valid video', () => {

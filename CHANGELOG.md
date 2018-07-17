@@ -1,3 +1,124 @@
+# Staged
+
+* Tslint no-irregular-whitespace
+* Tslint no-spaces-in-parens
+* Tslint no-use-before-declare re-enabled
+* Send admob cache metrics to PTS
+
+# Mon Jul 16 20:03:32 UTC 2018
+
+* Tslint no-unnecessary-local-variable is re-enabled
+* Tslint no-invalid-this is re-enabled
+* New Video Overlay for Performance on ABGroups 16 and 17
+
+# Wed Jul 11 21:24:48 UTC 2018
+
+* Send too_large_file errors to programmatic tracking service
+
+# Wed Jul 11 12:45:00 UTC 2018
+
+* Revert previous deployment
+
+# Wed Jul 11 12:31:27 UTC 2018
+
+* Feature list and measurements A/B test in group 16
+
+# Wed Jul 11 06:36:59 UTC 2018
+
+* Re-enable Microsoft linter rule, no break in default in switch
+* Remove gamerId from configuration request
+* Create a separate event handler for GDPR skip events
+
+# Thu Jul  5 15:21:01 UTC 2018
+
+* Test for campaign parsing and caching success rates
+
+# Wed Jul  4 09:26:35 UTC 2018
+
+* Remove the fancy endscreen test from groups 16 and 17
+* Re-enable tslint default in switch rule
+
+# Tue Jul  3 12:34:47 UTC 2018
+
+* Parse creative ids from the ad request response and pass used creativeId in operative events
+
+# Tue Jul  3 05:00:01 UTC 2018
+
+* Mixed Placement Experiment version 2
+* AB testing for CTA behavior - directly open web browser vs handling redirects in webview (groups 11 & 12)
+* Enable tslint no duplicate imports rule
+
+# Mon Jul  2 06:15:21 UTC 2018
+
+* Fix IAP Promo payload initialization check
+* Add configuration url to playable configuration diagnostic message
+
+# Fri Jun 29 04:54:56 UTC 2018
+
+* Fix race condition in iOS video start event logic
+* Fix js_error when args is not an array or is undefined or null
+* tslint trailing comma removal
+
+# Wed Jun 27 22:04:48 UTC 2018
+
+* Change handling of crosspromo third quartile event
+
+# Wed Jun 27 06:05:33 UTC 2018
+
+* Remove circular dependencies
+* Fix iOS 7.x appsheet problems by sending user to the browser 
+* Fix new js_error that surfaced by because of fixing the c.join js_error 
+
+# Tue Jun 26 08:23:00 UTC 2018
+
+* Revert previous deployment
+
+# Tue Jun 26 05:40:10 UTC 2018
+
+* Use the included microsoft typescript linting rules
+* Add promo initialization check before attempting to parse a promo campaign
+
+# Mon Jun 25 22:21:06 UTC 2018
+
+* Never send Android ID with advertising ID in operative events
+* New square endscreen image test in groups 18 and 19
+* Reduce JS errors
+
+# Thu Jun 21 09:14:47 UTC 2018
+
+* Pinpoint promo_version_not_supported errors
+* Custom fix for Baidu: Close ad units when going background on iOS
+* Address apparent regressions in MOAT Functionality
+* Fix iOS onAppForeGround discrepancy
+
+# Wed Jun 20 20:13:28 UTC 2018
+
+* Remove playable endscreen A/B test from groups 18 and 19
+* Reduce JS errors
+
+# Wed Jun 20 10:38:12 UTC 2018
+
+* Check GDPR consent metadata only when GDPR is enabled in configuration
+* Use ssl for jaeger tracing
+
+# Tue Jun 19 20:34:19 UTC 2018
+
+* Optimized unnecessarily large GDPR radio buttons
+* Refactor resending failed operative events
+* Use shared tslib
+* Initial support for multithreaded Request API
+
+# Mon Jun 18 09:51:31 UTC 2018
+
+* Send xpromo third quartile event
+* Run tslint before compiling TypeScript
+* Enable apk hashing / apk digest for 2.2.1 and above
+
+# Thu Jun 14 20:14:43 UTC 2018
+
+* Add the GDPR icon to the Privacy model
+* Obfuscate Admob AFMA Container
+
 # Wed Jun 13 05:22:38 UTC 2018
 
 * Fix Vpaid loading issue in iOS

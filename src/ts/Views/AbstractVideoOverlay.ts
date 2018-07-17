@@ -1,13 +1,13 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
+import { IGDPREventHandler } from 'EventHandlers/GDPREventHandler';
 
-export interface IOverlayHandler {
+export interface IOverlayHandler extends IGDPREventHandler {
     onOverlaySkip(position: number): void;
     onOverlayMute(isMuted: boolean): void;
     onOverlayPauseForTesting(paused: boolean): void;
     onOverlayCallButton(): void;
     onOverlayClose(): void;
-    onGDPRPopupSkipped(): void;
 }
 
 export abstract class AbstractVideoOverlay extends View<IOverlayHandler> {

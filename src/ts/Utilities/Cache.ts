@@ -13,6 +13,7 @@ import { SdkStats } from 'Utilities/SdkStats';
 import { Session } from 'Models/Session';
 import { FileId } from 'Utilities/FileId';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
+import { ProgrammaticTrackingService, ProgrammaticTrackingError } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 export enum CacheStatus {
     OK,
@@ -61,6 +62,8 @@ interface ICallbackObject {
     resolve: (value?: [CacheStatus, string]) => void;
     reject: (reason?: any) => void;
     originalUrl?: string;
+    adType: string;
+    seatId: number | undefined;
 }
 
 export class Cache {
@@ -70,6 +73,7 @@ export class Cache {
     private _wakeUpManager: WakeUpManager;
     private _request: Request;
     private _cacheBookkeeping: CacheBookkeeping;
+    private _programmaticTrackingService: ProgrammaticTrackingService;
 
     private _callbacks: { [url: string]: ICallbackObject } = {};
 
@@ -87,11 +91,12 @@ export class Cache {
 
     private _sendDiagnosticEvents = false;
 
-    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, request: Request, cacheBookkeeping: CacheBookkeeping, options?: ICacheOptions) {
+    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, request: Request, cacheBookkeeping: CacheBookkeeping, programmaticTrackingService: ProgrammaticTrackingService, options?: ICacheOptions) {
         this._nativeBridge = nativeBridge;
         this._cacheBookkeeping = cacheBookkeeping;
         this._wakeUpManager = wakeUpManager;
         this._request = request;
+        this._programmaticTrackingService = programmaticTrackingService;
 
         if(options) {
             this._maxRetries = options.retries;
@@ -127,7 +132,13 @@ export class Cache {
             if(isCached) {
                 return Promise.resolve<[CacheStatus, string]>([CacheStatus.OK, fileId]);
             }
-            const promise = this.registerCallback(url, fileId, this._paused, diagnostics, campaign.getSession());
+            let adType: string = '';
+            const maybeAdType: string | undefined = campaign.getAdType();
+            if (maybeAdType !== undefined) {
+                adType = maybeAdType;
+            }
+            const seatId: number | undefined = campaign.getSeatId();
+            const promise = this.registerCallback(url, fileId, this._paused, diagnostics, campaign.getSession(), adType, seatId);
             if(!this._paused) {
                 this.downloadFile(url, fileId);
             }
@@ -211,7 +222,7 @@ export class Cache {
         });
     }
 
-    private registerCallback(url: string, fileId: string, paused: boolean, diagnostics: ICacheDiagnostics, session: Session, originalUrl?: string): Promise<[CacheStatus, string]> {
+    private registerCallback(url: string, fileId: string, paused: boolean, diagnostics: ICacheDiagnostics, session: Session, adType: string, seatId: number | undefined, originalUrl?: string): Promise<[CacheStatus, string]> {
         return new Promise<[CacheStatus, string]>((resolve, reject) => {
             const callbackObject: ICallbackObject = {
                 fileId: fileId,
@@ -225,7 +236,9 @@ export class Cache {
                 session: session,
                 resolve: resolve,
                 reject: reject,
-                originalUrl: originalUrl
+                originalUrl: originalUrl,
+                adType: adType,
+                seatId: seatId
             };
             this._callbacks[url] = callbackObject;
         });
@@ -276,6 +289,12 @@ export class Cache {
                     responseCode: responseCode,
                     headers: headers
                 }, callback.session);
+                if (callback.seatId !== undefined) {
+                    // should only be sent for programmatic currently
+                    // and seatId exists for programmatic only
+                    const errorData = this._programmaticTrackingService.buildErrorData(ProgrammaticTrackingError.TooLargeFile, callback.adType, callback.seatId);
+                    this._programmaticTrackingService.reportError(errorData);
+                }
             }
         } else {
             Diagnostics.trigger('cache_callback_error', {
@@ -319,7 +338,7 @@ export class Cache {
                         fileId = this._callbacks[callback.originalUrl].fileId;
                         originalUrl = callback.originalUrl;
                     }
-                    this.registerCallback(location, fileId, false, callback.diagnostics, callback.session, originalUrl);
+                    this.registerCallback(location, fileId, false, callback.diagnostics, callback.session, callback.adType, callback.seatId, originalUrl);
                     this.downloadFile(location, fileId);
                     return;
                 }
@@ -445,7 +464,7 @@ export class Cache {
         }).catch((error) => {
             Diagnostics.trigger('cache_desync_failure', {
                 url: url,
-                error: error,
+                error: error
             }, callback.session);
             this._cacheBookkeeping.removeFileEntry(callback.fileId);
             this.fulfillCallback(url, CacheStatus.FAILED);

@@ -1,8 +1,8 @@
+import { ClientInfo } from 'Models/ClientInfo';
+import { Configuration } from 'Models/Configuration';
 import { PurchasingCatalog } from 'Models/PurchasingCatalog';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Diagnostics } from './Diagnostics';
-import { Configuration } from 'Models/Configuration';
-import { ClientInfo } from 'Models/ClientInfo';
 
 export enum IPromoRequest {
     SETIDS = 'setids',
@@ -29,8 +29,8 @@ export class PurchasingUtilities {
         this._nativeBridge = nativeBridge;
     }
 
-    public static setInitializationPayloadSentValue(val: boolean) {
-        this._isInitialized = val;
+    public static isInitialized(): boolean {
+        return this._isInitialized;
     }
 
     public static sendPurchaseInitializationEvent(): Promise<void> {
@@ -38,14 +38,14 @@ export class PurchasingUtilities {
             return this.initializeIAPPromo()
             .then(() => this.checkPromoVersion())
             .then(() => {
-                return this.sendPurchasingCommand(JSON.stringify(this.loadInitializationPayloads()));
+                return this.sendPurchasingCommand(this.getInitializationPayload());
             });
         }
         return Promise.resolve();
     }
 
-    public static sendPromoPayload(iapPayload: string): Promise<void> {
-        if (!this._isInitialized) {
+    public static sendPromoPayload(iapPayload: IPromoPayload): Promise<void> {
+        if (!this.isInitialized()) {
             return this.sendPurchaseInitializationEvent().then(() => {
                 return this.sendPurchasingCommand(iapPayload);
             });
@@ -136,7 +136,7 @@ export class PurchasingUtilities {
             const promoVersionObserver = this._nativeBridge.Purchasing.onGetPromoVersion.subscribe((promoVersion) => {
                 this._nativeBridge.Purchasing.onGetPromoVersion.unsubscribe(promoVersionObserver);
                 if(!this.isPromoVersionSupported(promoVersion)) {
-                    reject(this.logIssue('promo_version_not_supported', 'Promo version not supported'));
+                    reject(this.logIssue('promo_version_not_supported', `Promo version: ${promoVersion} is not supported`));
                 } else {
                     resolve();
                 }
@@ -148,11 +148,11 @@ export class PurchasingUtilities {
         });
     }
 
-    private static sendPurchasingCommand(iapPayload: string): Promise<void> {
+    private static sendPurchasingCommand(iapPayload: IPromoPayload): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             const observer = this._nativeBridge.Purchasing.onCommandResult.subscribe((isCommandSuccessful) => {
                 if (isCommandSuccessful === 'True') {
-                    if (iapPayload.indexOf('SETIDS') !== -1) {
+                    if (iapPayload.request === IPromoRequest.SETIDS) {
                         this._isInitialized = true;
                     }
                     resolve();
@@ -160,7 +160,7 @@ export class PurchasingUtilities {
                     reject(this.logIssue('purchase_command_attempt_failed', `Purchase command attempt failed with command ${isCommandSuccessful}`));
                 }
             });
-            this._nativeBridge.Purchasing.initiatePurchasingCommand(iapPayload).catch(() => {
+            this._nativeBridge.Purchasing.initiatePurchasingCommand(JSON.stringify(iapPayload)).catch(() => {
                 this._nativeBridge.Purchasing.onCommandResult.unsubscribe(observer);
                 reject(this.logIssue('send_purchase_event_failed', 'Purchase event failed to send'));
             });
@@ -176,7 +176,7 @@ export class PurchasingUtilities {
         return false;
     }
 
-    private static loadInitializationPayloads(): IPromoPayload {
+    private static getInitializationPayload(): IPromoPayload {
         return <IPromoPayload>{
             iapPromo: true,
             abGroup: this._configuration.getAbGroup().toNumber(),

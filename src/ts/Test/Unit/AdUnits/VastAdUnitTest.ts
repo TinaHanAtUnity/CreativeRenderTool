@@ -28,6 +28,7 @@ import { GdprManager } from 'Managers/GdprManager';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
 import { Privacy } from 'Views/Privacy';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 describe('VastAdUnit', () => {
 
@@ -97,6 +98,7 @@ describe('VastAdUnit', () => {
         const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
         const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
         const gdprManager = sinon.createStubInstance(GdprManager);
+        const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
         vastAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,
@@ -114,10 +116,11 @@ describe('VastAdUnit', () => {
             endScreen: undefined,
             overlay: overlay,
             video: video,
-            gdprManager: gdprManager
+            gdprManager: gdprManager,
+            programmaticTrackingService: programmaticTrackingService
         };
 
-        vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters, false);
+        vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
     });
 
     afterEach(() => sandbox.restore());
@@ -132,7 +135,7 @@ describe('VastAdUnit', () => {
             const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
             vastAdUnitParameters.overlay = overlay;
             vastAdUnitParameters.campaign = vastCampaign;
-            vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters, false);
+            vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
         });
 
         it('should return correct http:// url', () => {
@@ -199,7 +202,7 @@ describe('VastAdUnit', () => {
             vastAdUnitParameters.overlay = overlay;
             vastAdUnitParameters.campaign = vastCampaign;
             vastAdUnitParameters.endScreen = vastEndScreen;
-            vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters, false);
+            vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
         });
 
         it('should return correct companion click through url', () => {

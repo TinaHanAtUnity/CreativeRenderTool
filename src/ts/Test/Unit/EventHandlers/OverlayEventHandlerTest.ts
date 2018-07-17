@@ -21,7 +21,7 @@ import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { Video } from 'Models/Assets/Video';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { FocusManager } from 'Managers/FocusManager';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { OperativeEventManager, IOperativeSkipEventParams } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 import { Placement } from 'Models/Placement';
@@ -29,6 +29,7 @@ import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFact
 import { Configuration } from 'Models/Configuration';
 import { Privacy } from 'Views/Privacy';
 import { GdprManager } from 'Managers/GdprManager';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 describe('OverlayEventHandlerTest', () => {
 
@@ -88,6 +89,7 @@ describe('OverlayEventHandlerTest', () => {
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
         placement = TestFixtures.getPlacement();
         const gdprManager = sinon.createStubInstance(GdprManager);
+        const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
         performanceAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,
@@ -106,7 +108,8 @@ describe('OverlayEventHandlerTest', () => {
             overlay: overlay,
             video: video,
             privacy: privacy,
-            gdprManager: gdprManager
+            gdprManager: gdprManager,
+            programmaticTrackingService: programmaticTrackingService
         };
         sinon.stub(performanceAdUnitParameters.campaign, 'getAbGroup').returns(5);
 
@@ -138,7 +141,14 @@ describe('OverlayEventHandlerTest', () => {
         });
 
         it('should send skip', () => {
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendSkip, placement, performanceAdUnit.getVideo().getPosition());
+            const params: IOperativeSkipEventParams = { placement: placement,
+                videoOrientation: performanceAdUnit.getVideoOrientation(),
+                adUnitStyle: undefined,
+                asset: performanceAdUnit.getVideo(),
+                videoProgress: performanceAdUnit.getVideo().getPosition()
+            };
+
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendSkip, params);
         });
 
         it('should call reconfigure', () => {

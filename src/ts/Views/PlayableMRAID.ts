@@ -14,9 +14,8 @@ import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
 import { IObserver0, IObserver1, IObserver2 } from 'Utilities/IObserver';
 import { SdkStats } from 'Utilities/SdkStats';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
-import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { ARUtil } from '../Utilities/ARUtil';
-import { PlayableEndScreenHideDelayDisabledAbTest } from 'Models/ABGroup';
 
 export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -75,7 +74,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         if(campaign) {
             this._templateData = {
-                'gameName': campaign.getGameName(),
+                'gameName': campaign.getGameName()
             };
             const gameIcon = campaign.getGameIcon();
             if(gameIcon) {
@@ -266,8 +265,8 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                     alpha: event.alpha,
                     beta: event.beta,
                     gamma: event.gamma,
-                    absolute: event.absolute,
-                },
+                    absolute: event.absolute
+                }
             }, '*');
         }
     }
@@ -375,10 +374,6 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
             }, false);
         });
 
-        if (PlayableEndScreenHideDelayDisabledAbTest.isValid(this._campaign.getAbGroup())) {
-            this._loadingScreen.classList.add('disable-delay');
-        }
-
         this._loadingScreen.classList.add('hidden');
         this._loadingScreenAR.classList.add('hidden');
     }
@@ -415,7 +410,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         const timeFromPlayableStart = this.checkIsValid((Date.now() - this._playableStartTimestamp) / 1000);
         const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
 
-        if(this._canSkip && !this._canClose) {
+        if(this._canSkip && !this._canClose) {
             this._handlers.forEach(handler => handler.onMraidSkip());
             if (this._isMRAIDAR) {
                 this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, 'playable_skip', undefined));
@@ -503,7 +498,6 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                         break;
 
                     default:
-                        break;
                 }
                 this._handlers.forEach(handler => handler.onMraidOrientationProperties({
                     allowOrientationChange: event.data.properties.allowOrientationChange,
@@ -526,14 +520,12 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                     case 'showEndScreen':
                         break;
                     default:
-                        break;
                 }
                 break;
             case 'ar':
                 this.onAREvent(event).catch((reason) => this._nativeBridge.Sdk.logError('AR message error: ' + reason.toString()));
                 break;
             default:
-                break;
         }
     }
 

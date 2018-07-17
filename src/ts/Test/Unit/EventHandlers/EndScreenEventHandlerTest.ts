@@ -19,7 +19,7 @@ import { PerformanceCampaign, StoreName } from 'Models/Campaigns/PerformanceCamp
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { Video } from 'Models/Assets/Video';
 import { FocusManager } from 'Managers/FocusManager';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { IOperativeEventParams, OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { PerformanceEndScreenEventHandler } from 'EventHandlers/PerformanceEndScreenEventHandler';
 import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
@@ -28,6 +28,7 @@ import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFact
 import { Configuration } from 'Models/Configuration';
 import { Privacy } from 'Views/Privacy';
 import { GdprManager } from 'Managers/GdprManager';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 describe('EndScreenEventHandlerTest', () => {
 
@@ -90,6 +91,7 @@ describe('EndScreenEventHandlerTest', () => {
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
             placement = TestFixtures.getPlacement();
             const gdprManager = sinon.createStubInstance(GdprManager);
+            const programmticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
             performanceAdUnitParameters = {
                 forceOrientation: Orientation.LANDSCAPE,
@@ -108,7 +110,8 @@ describe('EndScreenEventHandlerTest', () => {
                 overlay: overlay,
                 video: video,
                 privacy: privacy,
-                gdprManager: gdprManager
+                gdprManager: gdprManager,
+                programmaticTrackingService: programmticTrackingService
             };
 
             performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
@@ -125,7 +128,12 @@ describe('EndScreenEventHandlerTest', () => {
                 clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
             });
 
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, placement);
+            const params: IOperativeEventParams = { placement: placement,
+                videoOrientation: 'landscape',
+                adUnitStyle: undefined,
+                asset: performanceAdUnit.getVideo()
+            };
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, params);
         });
 
         describe('with follow redirects', () => {
@@ -257,7 +265,12 @@ describe('EndScreenEventHandlerTest', () => {
             });
 
             it('should send a click with session manager', () => {
-                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, placement);
+                const params: IOperativeEventParams = { placement: placement,
+                    videoOrientation: 'landscape',
+                    adUnitStyle: undefined,
+                    asset: performanceAdUnit.getVideo()
+                };
+                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, params);
             });
 
             it('should launch market view', () => {
@@ -280,7 +293,7 @@ describe('EndScreenEventHandlerTest', () => {
                 handleCallback
             }, Platform.IOS);
 
-            container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager);
+            container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager, clientInfo);
             const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request = new Request(nativeBridge, wakeUpManager);
             clientInfo = TestFixtures.getClientInfo(Platform.IOS);
@@ -313,6 +326,7 @@ describe('EndScreenEventHandlerTest', () => {
             endScreen = new PerformanceEndScreen(nativeBridge, campaign, deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, false);
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
             const gdprManager = sinon.createStubInstance(GdprManager);
+            const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
             performanceAdUnitParameters = {
                 forceOrientation: Orientation.LANDSCAPE,
@@ -331,7 +345,8 @@ describe('EndScreenEventHandlerTest', () => {
                 overlay: overlay,
                 video: video,
                 privacy: privacy,
-                gdprManager: gdprManager
+                gdprManager: gdprManager,
+                programmaticTrackingService: programmaticTrackingService
             };
 
             performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
@@ -353,7 +368,12 @@ describe('EndScreenEventHandlerTest', () => {
                 clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
             });
 
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, placement);
+            const params: IOperativeEventParams = { placement: placement,
+                videoOrientation: 'landscape',
+                adUnitStyle: undefined,
+                asset: performanceAdUnit.getVideo()
+            };
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, params);
         });
 
         describe('with follow redirects', () => {
@@ -508,7 +528,12 @@ describe('EndScreenEventHandlerTest', () => {
             });
 
             it('should send a click with session manager', () => {
-                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, placement);
+                const params: IOperativeEventParams = { placement: placement,
+                    videoOrientation: 'landscape',
+                    adUnitStyle: undefined,
+                    asset: performanceAdUnit.getVideo()
+                };
+                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, params);
             });
         });
     });

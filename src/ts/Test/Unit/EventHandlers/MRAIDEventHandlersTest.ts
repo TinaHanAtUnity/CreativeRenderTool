@@ -24,6 +24,7 @@ import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { GDPRPrivacy } from 'Views/GDPRPrivacy';
 import { GdprManager } from 'Managers/GdprManager';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 describe('MRAIDEventHandlersTest', () => {
 
@@ -45,6 +46,7 @@ describe('MRAIDEventHandlersTest', () => {
     let mraidEventHandler: MRAIDEventHandler;
     let mraidCampaign: MRAIDCampaign;
     let gdprManager: GdprManager;
+    let programmaticTrackingService: ProgrammaticTrackingService;
 
     describe('with onClick', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -52,7 +54,7 @@ describe('MRAIDEventHandlersTest', () => {
         beforeEach(() => {
             nativeBridge = new NativeBridge({
                 handleInvocation,
-                handleCallback,
+                handleCallback
             }, Platform.ANDROID);
 
             sinon.spy(nativeBridge.Intent, 'launch');
@@ -82,6 +84,7 @@ describe('MRAIDEventHandlersTest', () => {
             (<sinon.SinonSpy>mraidView.container).restore();
             sinon.stub(mraidView, 'container').returns(document.createElement('div'));
             gdprManager = sinon.createStubInstance(GdprManager);
+            programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
             mraidAdUnitParameters = {
                 forceOrientation: Orientation.LANDSCAPE,
@@ -99,7 +102,8 @@ describe('MRAIDEventHandlersTest', () => {
                 mraid: mraidView,
                 endScreen: undefined,
                 privacy: new GDPRPrivacy(nativeBridge, gdprManager, false, true),
-                gdprManager: gdprManager
+                gdprManager: gdprManager,
+                programmaticTrackingService: programmaticTrackingService
             };
 
             mraidAdUnit = new MRAIDAdUnit(nativeBridge, mraidAdUnitParameters);
@@ -109,17 +113,17 @@ describe('MRAIDEventHandlersTest', () => {
 
         it('should send a click with session manager', () => {
             mraidEventHandler.onMraidClick('http://example.net');
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, placement);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, { placement: placement, asset: mraidAdUnitParameters.campaign.getResourceUrl() });
         });
 
         it('should send a view with session manager', () => {
             mraidEventHandler.onMraidClick('http://example.net');
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendView, placement);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendView, { placement: placement, asset: mraidAdUnitParameters.campaign.getResourceUrl() });
         });
 
         it('should send a third quartile event with session manager', () => {
             mraidEventHandler.onMraidClick('http://example.net');
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile, placement);
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile, { placement: placement, asset: mraidAdUnitParameters.campaign.getResourceUrl() });
         });
 
         it('should send a native click event', () => {

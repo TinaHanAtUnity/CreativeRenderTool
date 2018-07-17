@@ -1,5 +1,5 @@
 import EndScreenTemplate from 'html/EndScreen.html';
-import FancyEndScreenTemplate from 'html/FancyEndScreen.html';
+import SquareEndScreenTemplate from 'html/SquareEndScreen.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -11,18 +11,17 @@ import { Campaign } from 'Models/Campaign';
 import { IEndScreenDownloadParameters } from 'EventHandlers/EndScreenEventHandler';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
-import { Platform } from 'Constants/Platform';
 import { ABGroup } from 'Models/ABGroup';
-import { FancyEndScreenEnabledAbTest } from 'Models/ABGroup';
+import { SquareEndScreenUtilities } from 'Utilities/SquareEndScreenUtilities';
+import { IGDPREventHandler } from 'EventHandlers/GDPREventHandler';
 
-export interface IEndScreenHandler {
+export interface IEndScreenHandler extends IGDPREventHandler {
     onEndScreenDownload(parameters: IEndScreenDownloadParameters): void;
     onEndScreenClose(): void;
     onKeyEvent(keyCode: number): void;
-    onGDPRPopupSkipped(): void;
 }
 
-const FANCY_END_SCREEN = 'fancy-end-screen';
+const SQUARE_END_SCREEN = 'square-end-screen';
 
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
 
@@ -56,7 +55,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             {
                 event: 'click',
                 listener: (event: Event) => this.onDownloadEvent(event),
-                selector: '.game-background, .download-container, .game-icon'
+                selector: '.game-background, .download-container, .game-icon, .game-image'
             },
             {
                 event: 'click',
@@ -106,6 +105,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         const endScreenAlt = this.getEndscreenAlt();
         if (typeof endScreenAlt === 'string') {
             this._container.classList.add(endScreenAlt);
+            document.documentElement.classList.add(endScreenAlt);
         }
 
         if (this._showGDPRBanner) {
@@ -161,8 +161,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     protected getEndscreenAlt(campaign?: Campaign) {
-        if (FancyEndScreenEnabledAbTest.isValid(this._abGroup) && this.canShowFancyEndScreen()) {
-            return FANCY_END_SCREEN;
+        const campaignId = campaign ? campaign.getId() : this._campaignId;
+        const platform = this._nativeBridge.getPlatform();
+        if (SquareEndScreenUtilities.useSquareEndScreenAlt(this._abGroup, platform, campaignId, this._osVersion)) {
+            return SQUARE_END_SCREEN;
         }
 
         return undefined;
@@ -184,17 +186,9 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._privacy.show();
     }
 
-    private canShowFancyEndScreen(): boolean {
-        if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            return true;
-        }
-
-        return !!this._osVersion && !this._osVersion.match(/^4/);
-    }
-
     private getTemplate() {
-        if (this.getEndscreenAlt() === FANCY_END_SCREEN) {
-            return FancyEndScreenTemplate;
+        if (this.getEndscreenAlt() === SQUARE_END_SCREEN) {
+            return SquareEndScreenTemplate;
         }
 
         return EndScreenTemplate;

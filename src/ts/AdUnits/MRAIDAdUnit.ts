@@ -8,13 +8,14 @@ import {
     Orientation
 } from 'AdUnits/Containers/AdUnitContainer';
 import { EndScreen } from 'Views/EndScreen';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { OperativeEventManager, IOperativeEventParams } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { EventType } from 'Models/Session';
 import { Placement } from 'Models/Placement';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
-import { ARUtil } from '../Utilities/ARUtil';
+import { ARUtil } from 'Utilities/ARUtil';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
 
 export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign> {
     mraid: MRAIDView<IMRAIDViewHandler>;
@@ -73,7 +74,7 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this.setShowingMRAID(true);
         this._mraid.show();
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
-        this._operativeEventManager.sendStart(this._placement).then(() => {
+        this._operativeEventManager.sendStart(this.getOperativeEventParams()).then(() => {
             this.onStartProcessed.trigger();
         });
         this.sendTrackingEvent('impression');
@@ -110,17 +111,18 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
             this._privacy.container().parentElement!.removeChild(this._privacy.container());
         }
 
+        const operativeEventParams = this.getOperativeEventParams();
         const finishState = this.getFinishState();
         if(finishState === FinishState.COMPLETED) {
             if(!this._campaign.getSession().getEventSent(EventType.THIRD_QUARTILE)) {
-                this._operativeEventManager.sendThirdQuartile(this._placement);
+                this._operativeEventManager.sendThirdQuartile(operativeEventParams);
             }
             if(!this._campaign.getSession().getEventSent(EventType.VIEW)) {
-                this._operativeEventManager.sendView(this._placement);
+                this._operativeEventManager.sendView(operativeEventParams);
             }
             this.sendTrackingEvent('complete');
         } else if(finishState === FinishState.SKIPPED) {
-            this._operativeEventManager.sendSkip(this._placement);
+            this._operativeEventManager.sendSkip(operativeEventParams);
         }
 
         this.onFinish.trigger();
@@ -184,6 +186,11 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     public onContainerBackground(): void {
         if(this.isShowing()) {
             this._mraid.setViewableState(false);
+
+            if(CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
+                this.setFinishState(FinishState.SKIPPED);
+                this.hide();
+            }
         }
     }
 
@@ -215,5 +222,12 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
                 }
             }
         }
+    }
+
+    private getOperativeEventParams(): IOperativeEventParams {
+        return {
+            placement: this._placement,
+            asset: this._campaign.getResourceUrl()
+        };
     }
 }

@@ -27,6 +27,8 @@ import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFact
 import { XPromoOperativeEventManager } from 'Managers/XPromoOperativeEventManager';
 import { Privacy } from 'Views/Privacy';
 import { GdprManager } from 'Managers/GdprManager';
+import { IOperativeEventParams } from 'Managers/OperativeEventManager';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 describe('XPromoEndScreenEventHandlerTest', () => {
 
@@ -45,6 +47,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
     let endScreenEventHandler: XPromoEndScreenEventHandler;
     let campaign: XPromoCampaign;
     let placement: Placement;
+    let programmaticTrackingService: ProgrammaticTrackingService;
 
     describe('with onDownloadAndroid', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -66,6 +69,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
             sessionManager = new SessionManager(nativeBridge, request);
             const configuration = TestFixtures.getConfiguration();
+            programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
             operativeEventManager = <XPromoOperativeEventManager>OperativeEventManagerFactory.createOperativeEventManager({
                 nativeBridge: nativeBridge,
                 request: request,
@@ -107,7 +111,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 overlay: overlay,
                 video: video,
                 privacy: privacy,
-                gdprManager: gdprManager
+                gdprManager: gdprManager,
+                programmaticTrackingService: programmaticTrackingService
             };
 
             xPromoAdUnit = new XPromoAdUnit(nativeBridge, xPromoAdUnitParameters);
@@ -124,8 +129,11 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 clickAttributionUrl: xPromoAdUnitParameters.campaign.getClickAttributionUrl()
             });
 
+            const params: IOperativeEventParams = { placement: xPromoAdUnitParameters.placement,
+                videoOrientation: xPromoAdUnit.getVideoOrientation(), adUnitStyle: undefined, asset: undefined };
+
             sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendClick);
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendHttpKafkaEvent, 'ads.xpromo.operative.videoclick.v1.json', 'click', placement, xPromoAdUnit.getVideoOrientation());
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendHttpKafkaEvent, 'ads.xpromo.operative.videoclick.v1.json', 'click', params);
         });
 
     });
@@ -143,10 +151,10 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             campaign.set('store', StoreName.APPLE);
             campaign.set('appStoreId', '11111');
 
-            container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager);
+            clientInfo = TestFixtures.getClientInfo(Platform.IOS);
+            container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager, clientInfo);
             const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request = new Request(nativeBridge, wakeUpManager);
-            clientInfo = TestFixtures.getClientInfo(Platform.IOS);
             deviceInfo = TestFixtures.getIosDeviceInfo();
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
             sessionManager = new SessionManager(nativeBridge, request);
@@ -190,7 +198,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 overlay: overlay,
                 video: video,
                 privacy: privacy,
-                gdprManager: gdprManager
+                gdprManager: gdprManager,
+                programmaticTrackingService: programmaticTrackingService
             };
 
             xPromoAdUnit = new XPromoAdUnit(nativeBridge, xPromoAdUnitParameters);
@@ -207,8 +216,11 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 clickAttributionUrl: xPromoAdUnitParameters.campaign.getClickAttributionUrl()
             });
 
+            const params: IOperativeEventParams = { placement: xPromoAdUnitParameters.placement,
+                videoOrientation: xPromoAdUnit.getVideoOrientation(), adUnitStyle: undefined, asset: undefined };
+
             sinon.assert.called(<sinon.SinonSpy>operativeEventManager.sendClick);
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendHttpKafkaEvent, 'ads.xpromo.operative.videoclick.v1.json', 'click', placement, xPromoAdUnit.getVideoOrientation());
+            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendHttpKafkaEvent, 'ads.xpromo.operative.videoclick.v1.json', 'click', params);
         });
     });
 });

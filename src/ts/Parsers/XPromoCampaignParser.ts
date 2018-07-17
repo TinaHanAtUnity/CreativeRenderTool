@@ -60,6 +60,7 @@ export class XPromoCampaignParser extends CampaignParser {
             clickAttributionUrlFollowsRedirects: json.clickAttributionUrlFollowsRedirects,
             bypassAppSheet: json.bypassAppSheet,
             trackingUrls: response.getTrackingUrls() ? this.validateAndEncodeTrackingUrls(response.getTrackingUrls(), session) : undefined,
+            videoEventUrls: this.validateAndEncodeVideoEventUrls(json.videoEventUrls, session),
             store: storeName
         };
 
@@ -74,5 +75,17 @@ export class XPromoCampaignParser extends CampaignParser {
         }
 
         return Promise.resolve(new XPromoCampaign(parameters));
+    }
+
+    private validateAndEncodeVideoEventUrls(urls: { [eventType: string]: string }, session: Session): { [eventType: string]: string } {
+        if(urls && urls !== null) {
+            for(const urlKey in urls) {
+                if(urls.hasOwnProperty(urlKey)) {
+                    urls[urlKey] = this.validateAndEncodeUrl(urls[urlKey], session);
+                }
+            }
+        }
+
+        return urls;
     }
 }

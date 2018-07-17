@@ -3,11 +3,64 @@ import * as sinon from 'sinon';
 import { assert } from 'chai';
 import { NativeBridge } from 'Native/NativeBridge';
 import { MOAT } from 'Views/MOAT';
-import { MoatViewabilityService, IMoatData, IMoatIds } from 'Utilities/MoatViewabilityService';
-import { Campaign } from 'Models/Campaign';
+import { IMoatData, IMoatIds } from 'Utilities/MoatViewabilityService';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
-import { Platform } from 'Constants/Platform';
-import MOATContainer from 'html/moat/container.html';
+import { Diagnostics } from 'Utilities/Diagnostics';
+import { SdkApi } from 'Native/Api/Sdk';
+
+describe('MOAT', () => {
+    describe('onMessage', () => {
+        let diagnosticsTriggerStub: sinon.SinonStub;
+        let logWarningStub: sinon.SinonStub;
+        let moat: any;
+        beforeEach(() => {
+            const nativeBridge = sinon.createStubInstance(NativeBridge);
+            const sdk: SdkApi = sinon.createStubInstance(SdkApi);
+            nativeBridge.Sdk = sdk;
+            logWarningStub = <sinon.SinonStub> sdk.logWarning;
+            moat = new MOAT(nativeBridge);
+            diagnosticsTriggerStub = sinon.stub(Diagnostics, 'trigger');
+        });
+
+        afterEach(() => {
+            diagnosticsTriggerStub.restore();
+        });
+
+        const tests: Array<{
+            event: any,
+            assertions: () => void
+        }> = [{
+            event: {data: {type: 'MOATVideoError', error: 'test error'}},
+            assertions: () => {
+                sinon.assert.calledWithExactly(diagnosticsTriggerStub, 'moat_video_error', 'test error');
+            }
+        }, {
+            event: {data: {type: 'loaded'}},
+            assertions: () => {
+                sinon.assert.notCalled(diagnosticsTriggerStub);
+            }
+        }, {
+            event: {data: {}},
+            assertions: () => {
+                sinon.assert.notCalled(logWarningStub);
+                sinon.assert.notCalled(diagnosticsTriggerStub);
+            }
+        }, {
+            event: {data: {type: 'test'}},
+            assertions: () => {
+                sinon.assert.calledWithExactly(logWarningStub, `MOAT Unknown message type test`);
+                sinon.assert.notCalled(diagnosticsTriggerStub);
+            }
+        }];
+
+        tests.forEach((test) => {
+            it(`should pass assertions`, () => {
+                moat.onMessage(test.event);
+                test.assertions();
+            });
+        });
+    });
+});
 
 // disable all because failing hybrid tests for android devices that dont support html5
 xdescribe('MOAT View', () => {
@@ -78,7 +131,7 @@ xdescribe('MOAT View', () => {
         });
 
         it('should send the init message', () => {
-            const promise = new Promise((resolve, reject) => {
+            return new Promise((resolve, reject) => {
                 setTimeout(() => {
                     try {
                         sinon.assert.called(messageListener);
@@ -90,7 +143,6 @@ xdescribe('MOAT View', () => {
                     }
                 });
             });
-            return promise;
         });
     });
 
@@ -108,7 +160,7 @@ xdescribe('MOAT View', () => {
         });
 
         it ('should fire the video message', () => {
-            const promise = new Promise((resolve, reject) => {
+            return new Promise((resolve, reject) => {
                 setTimeout(() => {
                     try {
                         sinon.assert.called(messageListener);
@@ -120,7 +172,6 @@ xdescribe('MOAT View', () => {
                     }
                 });
             });
-            return promise;
         });
     });
 
@@ -138,7 +189,7 @@ xdescribe('MOAT View', () => {
         });
 
         it ('should fire the viewability message of the specified type', () => {
-            const promise = new Promise((resolve, reject) => {
+            return new Promise((resolve, reject) => {
                 setTimeout(() => {
                     try {
                         sinon.assert.called(messageListener);
@@ -150,7 +201,6 @@ xdescribe('MOAT View', () => {
                     }
                 });
             });
-            return promise;
         });
     });
 });

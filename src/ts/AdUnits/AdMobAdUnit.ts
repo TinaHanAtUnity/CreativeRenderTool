@@ -1,34 +1,31 @@
-import { NativeBridge } from 'Native/NativeBridge';
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
-import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
-import { AdMobView } from 'Views/AdMobView';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { FinishState } from 'Constants/FinishState';
-import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { Diagnostics } from 'Utilities/Diagnostics';
-import { Platform } from 'Constants/Platform';
+import { AdUnitContainerSystemMessage, IAdUnitContainerListener } from 'AdUnits/Containers/AdUnitContainer';
 import { KeyCode } from 'Constants/Android/KeyCode';
-import { Placement } from 'Models/Placement';
-import { IOpenableIntentsResponse } from 'Views/AFMABridge';
-import { FocusManager } from 'Managers/FocusManager';
-import { Double } from 'Utilities/Double';
 import { SensorDelay } from 'Constants/Android/SensorDelay';
-import { IClickSignalResponse } from 'Views/AFMABridge';
+import { FinishState } from 'Constants/FinishState';
+import { Platform } from 'Constants/Platform';
+import { IOperativeEventParams, OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
+import { ClientInfo } from 'Models/ClientInfo';
+import { Placement } from 'Models/Placement';
+import { NativeBridge } from 'Native/NativeBridge';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { Diagnostics } from 'Utilities/Diagnostics';
+import { Double } from 'Utilities/Double';
 import { SdkStats } from 'Utilities/SdkStats';
 import { UserCountData } from 'Utilities/UserCountData';
-import { AdUnitContainerSystemMessage, IAdUnitContainerListener } from 'AdUnits/Containers/AdUnitContainer';
+import { AdMobView } from 'Views/AdMobView';
+import { IClickSignalResponse, IOpenableIntentsResponse } from 'Views/AFMABridge';
 
 export interface IAdMobAdUnitParameters extends IAdUnitParameters<AdMobCampaign> {
     view: AdMobView;
 }
 
-const AdUnitActivities = ['com.unity3d.ads.adunit.AdUnitActivity', 'com.unity3d.ads.adunit.AdUnitTransparentActivity', 'com.unity3d.ads.adunit.AdUnitTransparentSoftwareActivity', 'com.unity3d.ads.adunit.AdUnitSoftwareActivity'];
-
 export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListener {
     private _operativeEventManager: OperativeEventManager;
     private _view: AdMobView;
     private _thirdPartyEventManager: ThirdPartyEventManager;
-    private _focusManager: FocusManager;
     private _options: any;
     private _keyDownListener: (kc: number) => void;
     private _campaign: AdMobCampaign;
@@ -36,6 +33,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _foregroundTime: number = 0;
     private _startTime: number = 0;
     private _requestToViewTime: number = 0;
+    private _clientInfo: ClientInfo;
 
     constructor(nativeBridge: NativeBridge, parameters: IAdMobAdUnitParameters) {
         super(nativeBridge, parameters);
@@ -44,10 +42,10 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._options = parameters.options;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._operativeEventManager = parameters.operativeEventManager;
-        this._focusManager = parameters.focusManager;
         this._keyDownListener = (kc: number) => this.onKeyDown(kc);
         this._campaign = parameters.campaign;
         this._placement = parameters.placement;
+        this._clientInfo = parameters.clientInfo;
 
         // TODO, we skip initial because the AFMA grantReward event tells us the video
         // has been completed. Is there a better way to do this with AFMA right now?
@@ -71,6 +69,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
                 this._startTime = Date.now();
             }
             this._foregroundTime = Date.now();
+            this.startAccelerometerUpdates();
             this.showView();
         });
     }
@@ -92,7 +91,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public sendClickEvent() {
         this.sendTrackingEvent('click');
-        this._operativeEventManager.sendClick(this._placement);
+        this._operativeEventManager.sendClick(this.getOperativeEventParams());
 
         UserCountData.getClickCount(this._nativeBridge).then((clickCount) => {
             if (typeof clickCount === 'number') {
@@ -108,12 +107,12 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     public sendStartEvent() {
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
         this.sendTrackingEvent('start');
-        this._operativeEventManager.sendStart(this._placement);
+        this._operativeEventManager.sendStart(this.getOperativeEventParams());
     }
 
     public sendSkipEvent() {
         this.sendTrackingEvent('skip');
-        this._operativeEventManager.sendSkip(this._placement);
+        this._operativeEventManager.sendSkip(this.getOperativeEventParams());
     }
 
     public sendCompleteEvent() {
@@ -121,8 +120,9 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public sendRewardEvent() {
-        this._operativeEventManager.sendThirdQuartile(this._placement);
-        this._operativeEventManager.sendView(this._placement);
+        const params = this.getOperativeEventParams();
+        this._operativeEventManager.sendThirdQuartile(params);
+        this._operativeEventManager.sendView(params);
     }
 
     public sendOpenableIntentsResponse(response: IOpenableIntentsResponse) {
@@ -153,28 +153,27 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     public onContainerShow(): void {
-        if(this._nativeBridge.getPlatform() === Platform.IOS) {
+        if (this._nativeBridge.getPlatform() === Platform.IOS) {
             this._nativeBridge.SensorInfo.Ios.startAccelerometerUpdates(new Double(0.01));
         }
     }
 
     public onContainerForeground(): void {
         this._foregroundTime = Date.now();
-
-        if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            this._nativeBridge.SensorInfo.Android.startAccelerometerUpdates(SensorDelay.SENSOR_DELAY_FASTEST);
-            this._nativeBridge.AndroidAdUnit.startMotionEventCapture(10000);
-        } else {
-            this._nativeBridge.SensorInfo.Ios.startAccelerometerUpdates(new Double(0.01));
-        }
+        this.startAccelerometerUpdates();
     }
 
     public onContainerBackground(): void {
         this._nativeBridge.SensorInfo.stopAccelerometerUpdates();
+
+        if (this.isShowing() && CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
+            this.setFinishState(FinishState.SKIPPED);
+            this.hide();
+        }
     }
 
     public onContainerDestroy(): void {
-        if(this.isShowing()) {
+        if (this.isShowing()) {
             this.setFinishState(FinishState.SKIPPED);
             this.hide();
         }
@@ -182,6 +181,15 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public onContainerSystemMessage(message: AdUnitContainerSystemMessage): void {
         // EMPTY
+    }
+
+    private startAccelerometerUpdates(): void {
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            this._nativeBridge.SensorInfo.Android.startAccelerometerUpdates(SensorDelay.SENSOR_DELAY_FASTEST);
+            this._nativeBridge.AndroidAdUnit.startMotionEventCapture(10000);
+        } else {
+            this._nativeBridge.SensorInfo.Ios.startAccelerometerUpdates(new Double(0.01));
+        }
     }
 
     private showView() {
@@ -200,7 +208,7 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
         this._nativeBridge.SensorInfo.stopAccelerometerUpdates();
 
-        if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
             this._nativeBridge.AndroidAdUnit.endMotionEventCapture();
             this._nativeBridge.AndroidAdUnit.clearMotionEventCapture();
         }
@@ -221,5 +229,11 @@ export class AdMobAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         if (key === KeyCode.BACK) {
             this._view.onBackPressed();
         }
+    }
+
+    private getOperativeEventParams(): IOperativeEventParams {
+        return {
+            placement: this._placement
+        };
     }
 }

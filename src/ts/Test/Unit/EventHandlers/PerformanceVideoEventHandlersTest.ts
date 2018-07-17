@@ -23,6 +23,7 @@ import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { VideoState } from 'AdUnits/VideoAdUnit';
 import { Privacy } from 'Views/Privacy';
 import { GdprManager } from 'Managers/GdprManager';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 describe('PerformanceVideoEventHandlersTest', () => {
 
@@ -69,6 +70,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
         endScreen = new PerformanceEndScreen(nativeBridge, campaign, deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, false);
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
         const gdprManager = sinon.createStubInstance(GdprManager);
+        const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
         performanceAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,
@@ -87,7 +89,8 @@ describe('PerformanceVideoEventHandlersTest', () => {
             overlay: overlay,
             video: video,
             privacy: privacy,
-            gdprManager: gdprManager
+            gdprManager: gdprManager,
+            programmaticTrackingService: programmaticTrackingService
         };
 
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);

@@ -28,6 +28,7 @@ import { FakeAndroidDeviceInfo } from 'Test/Unit/TestHelpers/FakeAndroidDeviceIn
 import { RingerMode } from 'Constants/Android/RingerMode';
 import { UIUserInterfaceIdiom } from 'Constants/iOS/UIUserInterfaceIdiom';
 import { FakeIosDeviceInfo } from 'Test/Unit/TestHelpers/FakeIosDeviceInfo';
+import { AdUnitStyle } from 'Models/AdUnitStyle';
 
 import DummyPromoCampaign from 'json/DummyPromoCampaign.json';
 import OnCometMraidPlcCampaignFollowsRedirects from 'json/OnCometMraidPlcCampaignFollowsRedirects.json';
@@ -43,7 +44,7 @@ import EventTestVast from 'xml/EventTestVast.xml';
 import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xml';
 
 import * as sinon from 'sinon';
-import { ABGroup } from 'Models/ABGroup';
+import { ABGroup, ABGroupBuilder } from 'Models/ABGroup';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -56,17 +57,17 @@ export class TestFixtures {
             skipInSeconds: 0,
             disableBackButton: false,
             useDeviceOrientationForVideo: false,
-            muteVideo: false,
+            muteVideo: false
         });
     }
 
-    public static getCometCampaignBaseParams(session: Session, campaignId: string, gamerId: string, abGroup: ABGroup, meta: string | undefined): ICampaign {
+    public static getCometCampaignBaseParams(session: Session, campaignId: string, gamerId: string, abGroup: ABGroup, meta: string | undefined, adType?: string): ICampaign {
         return {
             id: campaignId,
             gamerId: gamerId,
             abGroup: abGroup,
             willExpireAt: undefined,
-            adType: undefined,
+            adType: adType || undefined,
             correlationId: undefined,
             creativeId: undefined,
             seatId: undefined,
@@ -94,17 +95,17 @@ export class TestFixtures {
             videoEventUrls: json.videoEventUrls,
             bypassAppSheet: json.bypassAppSheet,
             store: storeName,
-            adUnitStyle: json.adUnitStyle
+            adUnitStyle: new AdUnitStyle(json.adUnitStyle)
         };
 
         if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
-            parameters.video = new Video(json.trailerDownloadable, session, json.trailerDownloadableSize);
-            parameters.streamingVideo = new Video(json.trailerStreaming, session);
+            parameters.video = new Video(json.trailerDownloadable, session, json.trailerDownloadableSize, json.creativeId);
+            parameters.streamingVideo = new Video(json.trailerStreaming, session, undefined, json.creativeId);
         }
 
         if(json.trailerPortraitDownloadable && json.trailerPortraitDownloadableSize && json.trailerPortraitStreaming) {
-            parameters.videoPortrait = new Video(json.trailerPortraitDownloadable, session, json.trailerPortraitDownloadableSize);
-            parameters.streamingPortraitVideo = new Video(json.trailerPortraitStreaming, session);
+            parameters.videoPortrait = new Video(json.trailerPortraitDownloadable, session, json.trailerPortraitDownloadableSize, json.portraitCreativeId);
+            parameters.streamingPortraitVideo = new Video(json.trailerPortraitStreaming, session, undefined, json.portraitCreativeId);
         }
 
         return parameters;
@@ -126,7 +127,8 @@ export class TestFixtures {
             clickAttributionUrlFollowsRedirects: json.clickAttributionUrlFollowsRedirects,
             bypassAppSheet: json.bypassAppSheet,
             store: storeName,
-            trackingUrls: json.trackingUrls
+            trackingUrls: json.trackingUrls,
+            videoEventUrls: json.videoEventUrls
         };
 
         if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {
@@ -149,7 +151,7 @@ export class TestFixtures {
         return {
             ... this.getCometCampaignBaseParams(session, mraidContentJson.id, this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup(), undefined),
             useWebViewUserAgentForTracking: mraidJson.useWebViewUserAgentForTracking,
-            resourceAsset: mraidContentJson.resourceUrl ? new HTML(mraidContentJson.resourceUrl, session) : undefined,
+            resourceAsset: mraidContentJson.resourceUrl ? new HTML(mraidContentJson.resourceUrl, session, mraidContentJson.creativeId) : undefined,
             resource: undefined,
             dynamicMarkup: mraidContentJson.dynamicMarkup,
             trackingUrls: {},
@@ -166,7 +168,7 @@ export class TestFixtures {
             bypassAppSheet: mraidContentJson.bypassAppSheet,
             store: storeName,
             appStoreId: mraidContentJson.appStoreId,
-            playableConfiguration: undefined,
+            playableConfiguration: undefined
         };
     }
 
@@ -213,7 +215,7 @@ export class TestFixtures {
             store: undefined,
             appStoreId: mraidContentJson.appStoreId,
             useWebViewUserAgentForTracking: mraidJson.useWebViewUserAgentForTracking,
-            playableConfiguration: undefined,
+            playableConfiguration: undefined
         };
     }
 
@@ -322,25 +324,27 @@ export class TestFixtures {
             advertiserCampaignId: json.advertiserCampaignId || undefined,
             advertiserBundleId: json.advertiserBundleId || undefined,
             useWebViewUserAgentForTracking: false,
-            buyerId: json.buyerId || undefined,
+            buyerId: json.buyerId || undefined
 
         };
     }
 
-    public static getPromoCampaignParams(json: any): IPromoCampaign {
+    public static getPromoCampaignParams(json: any, adType?: string, rewardedPromo?: boolean): IPromoCampaign {
         const session = this.getSession();
+        const isRewardedPromo = (rewardedPromo !== undefined) ? rewardedPromo : false;
         return {
-            ... this.getCometCampaignBaseParams(session, json.promo.id, json.gamerId, ABGroup.getAbGroup(json.abGroup), json.meta),
+            ... this.getCometCampaignBaseParams(session, json.promo.id, json.gamerId, ABGroupBuilder.getAbGroup(json.abGroup), json.meta, adType),
             iapProductId: json.promo.iapProductId,
             additionalTrackingEvents: json.promo.tracking ? json.promo.tracking : undefined,
             dynamicMarkup: json.promo.dynamicMarkup,
-            creativeAsset: new HTML(json.promo.creativeUrl, session)
+            creativeAsset: new HTML(json.promo.creativeUrl, session),
+            rewardedPromo: isRewardedPromo
         };
     }
 
-    public static getPromoCampaign(): PromoCampaign {
+    public static getPromoCampaign(adType?: string, rewardedPromo?: boolean): PromoCampaign {
         const json = JSON.parse(DummyPromoCampaign);
-        return new PromoCampaign(this.getPromoCampaignParams(json));
+        return new PromoCampaign(this.getPromoCampaignParams(json, adType, rewardedPromo));
     }
 
     public static getCampaignFollowsRedirects(): PerformanceCampaign {
@@ -405,13 +409,13 @@ export class TestFixtures {
         return new DisplayInterstitialCampaign(displayInterstitialParams);
     }
 
-    public static getClientInfo(platform?: Platform): ClientInfo {
+    public static getClientInfo(platform?: Platform, gameId?: string): ClientInfo {
         if(typeof platform === 'undefined') {
             platform = Platform.ANDROID;
         }
 
         return new ClientInfo(platform, [
-            '12345',
+            gameId ? gameId : '12345',
             false,
             'com.unity3d.ads.example',
             '2.0.0-test2',
@@ -440,7 +444,7 @@ export class TestFixtures {
             url: 'http://foo.url.com',
             response: 'foo response',
             responseCode: 200,
-            headers: [['location', 'http://foobar.com']],
+            headers: [['location', 'http://foobar.com']]
         };
     }
 
@@ -548,7 +552,7 @@ export class TestFixtures {
             getHost: sinon.stub().returns(Promise.resolve('host')),
             getProduct: sinon.stub().returns(Promise.resolve('product')),
             getFingerprint: sinon.stub().returns(Promise.resolve('fingerPrint')),
-            getSupportedAbis: sinon.stub().returns(Promise.resolve( ['supported_abi_1', 'supported_abi_2'])),
+            getSupportedAbis: sinon.stub().returns(Promise.resolve(['supported_abi_1', 'supported_abi_2'])),
             getSensorList: sinon.stub().returns(Promise.resolve([])),
             isUSBConnected: sinon.stub().returns(Promise.resolve(false)),
             getUptime: sinon.stub().returns(Promise.resolve(10000)),
@@ -567,7 +571,7 @@ export class TestFixtures {
             getStatusBarHeight: sinon.stub().returns(Promise.resolve(40)),
             getStatusBarWidth: sinon.stub().returns(Promise.resolve(768)),
             getDeviceMaxVolume: sinon.stub().returns(Promise.resolve(1)),
-            getSensorList: sinon.stub().returns(Promise.resolve([])),
+            getSensorList: sinon.stub().returns(Promise.resolve([]))
         };
     }
 

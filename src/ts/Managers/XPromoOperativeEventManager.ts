@@ -1,14 +1,17 @@
-import { IOperativeEventManagerParams, OperativeEventManager } from 'Managers/OperativeEventManager';
-import { Placement } from 'Models/Placement';
+import {
+    IOperativeEventManagerParams, IOperativeEventParams,
+    OperativeEventManager
+} from 'Managers/OperativeEventManager';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { HttpKafka, KafkaCommonObjectType } from 'Utilities/HttpKafka';
 import { PlayerMetaData } from 'Models/MetaData/PlayerMetaData';
 import { EventType } from 'Models/Session';
 import { INativeResponse } from 'Utilities/Request';
 import { GameSessionCounters } from 'Utilities/GameSessionCounters';
-import { AdUnitStyle } from 'Models/AdUnitStyle';
+import { FailedXpromoOperativeEventManager } from 'Managers/FailedXpromoOperativeEventManager';
 
 export class XPromoOperativeEventManager extends OperativeEventManager {
+
     private _xPromoCampaign: XPromoCampaign;
 
     constructor(params: IOperativeEventManagerParams<XPromoCampaign>) {
@@ -17,7 +20,7 @@ export class XPromoOperativeEventManager extends OperativeEventManager {
         this._xPromoCampaign = params.campaign;
     }
 
-    public sendStart(placement: Placement, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<void> {
+    public sendStart(params: IOperativeEventParams): Promise<void> {
         const session = this._campaign.getSession();
 
         if(session.getEventSent(EventType.START)) {
@@ -32,13 +35,13 @@ export class XPromoOperativeEventManager extends OperativeEventManager {
             } else {
                 this.setGamerServerId(undefined);
             }
-            return this.sendHttpKafkaEvent('ads.xpromo.operative.videostart.v1.json', 'start', placement, videoOrientation);
+            return this.sendHttpKafkaEvent('ads.xpromo.operative.videostart.v1.json', 'start', params);
         }).then(() => {
             return;
         });
     }
 
-    public sendView(placement: Placement, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<void> {
+    public sendView(params: IOperativeEventParams): Promise<void> {
         const session = this._campaign.getSession();
 
         if(session.getEventSent(EventType.VIEW)) {
@@ -48,24 +51,24 @@ export class XPromoOperativeEventManager extends OperativeEventManager {
 
         GameSessionCounters.addView(this._xPromoCampaign);
 
-        return this.sendHttpKafkaEvent('ads.xpromo.operative.videoview.v1.json', 'view', placement, videoOrientation).then(() => {
+        return this.sendHttpKafkaEvent('ads.xpromo.operative.videoview.v1.json', 'view', params).then(() => {
             return;
         });
     }
 
-    public sendClick(placement: Placement, videoOrientation?: string, adUnitStyle?: AdUnitStyle): Promise<void> {
+    public sendClick(params: IOperativeEventParams): Promise<void> {
         const session = this._campaign.getSession();
 
         if(session.getEventSent(EventType.CLICK)) {
             return Promise.resolve(void(0));
         }
         session.setEventSent(EventType.CLICK);
-        return this.sendHttpKafkaEvent('ads.xpromo.operative.videoclick.v1.json', 'click', placement, videoOrientation).then(() => {
+        return this.sendHttpKafkaEvent('ads.xpromo.operative.videoclick.v1.json', 'click', params).then(() => {
             return;
         });
     }
 
-    public sendHttpKafkaEvent(kafkaType: string, eventType: string, placement: Placement, videoOrientation?: string): Promise<INativeResponse> {
+    public sendHttpKafkaEvent(kafkaType: string, eventType: string, params: IOperativeEventParams): Promise<INativeResponse> {
         const fulfilled = ([id, infoJson]: [string, any]) => {
 
             // todo: clears duplicate data for httpkafka, should be cleaned up
@@ -88,9 +91,22 @@ export class XPromoOperativeEventManager extends OperativeEventManager {
             infoJson.sourceGameId = this._clientInfo.getGameId();
             infoJson.targetGameId = this._xPromoCampaign.getGameId().toString();
 
-            return HttpKafka.sendEvent(kafkaType, KafkaCommonObjectType.PERSONAL, infoJson);
+            return HttpKafka.sendEvent(kafkaType, KafkaCommonObjectType.PERSONAL, infoJson).catch(() => {
+                const sessionId = this._campaign.getSession().getId();
+                return this._nativeBridge.DeviceInfo.getUniqueEventId().then(eventId => {
+                    new FailedXpromoOperativeEventManager(sessionId, eventId).storeFailedEvent(this._nativeBridge, {
+                        kafkaType: kafkaType,
+                        data: JSON.stringify(infoJson)
+                    });
+                    return Promise.resolve(<INativeResponse>{});
+                });
+            });
         };
 
-        return this.createUniqueEventMetadata(placement, this._sessionManager.getGameSessionId(), this._gamerServerId, OperativeEventManager.getPreviousPlacementId(), videoOrientation).then(fulfilled);
+        return this.createUniqueEventMetadata(params, this._sessionManager.getGameSessionId(), this._gamerServerId, OperativeEventManager.getPreviousPlacementId()).then(fulfilled);
+    }
+
+    protected createVideoEventUrl(type: string): string | undefined {
+        return this._xPromoCampaign.getVideoEventUrl(type);
     }
 }

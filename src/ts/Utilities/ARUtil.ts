@@ -54,14 +54,14 @@ export class ARUtil {
             c: -t.c * invDet,
             d: t.a * invDet,
             tx: (t.c * t.ty - t.d * t.tx) * invDet,
-            ty: (t.b * t.tx - t.a * t.ty) * invDet,
+            ty: (t.b * t.tx - t.a * t.ty) * invDet
         };
     }
 
     public static transformPoint(point: IARPoint, t: IARFrameTransform): IARPoint {
         return {
             x: t.a * point.x + t.c * point.y + t.tx,
-            y: t.b * point.x + t.d * point.y + t.ty,
+            y: t.b * point.x + t.d * point.y + t.ty
         };
     }
 

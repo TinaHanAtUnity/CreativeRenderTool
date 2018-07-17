@@ -118,6 +118,7 @@ export class Url {
             case Platform.ANDROID:
                 whitelisted = this.androidWhitelistedProtocols;
                 break;
+            default:
         }
 
         for (const protocol of whitelisted) {

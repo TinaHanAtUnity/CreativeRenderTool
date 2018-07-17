@@ -52,7 +52,7 @@ export class MRAIDCampaign extends ProgrammaticCampaign<IMRAIDCampaign> {
             store: ['number', 'undefined'],
             appStoreId: ['string', 'undefined'],
             videoEventUrls: ['object', 'undefined'],
-            playableConfiguration: ['object', 'undefined'],
+            playableConfiguration: ['object', 'undefined']
         }, campaign);
     }
 

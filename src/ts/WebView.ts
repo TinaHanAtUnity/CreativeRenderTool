@@ -59,7 +59,8 @@ import { GdprManager } from 'Managers/GdprManager';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
-import { ABGroup } from 'Models/ABGroup';
+import { ABGroupBuilder } from 'Models/ABGroup';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 export class WebView {
 
@@ -89,6 +90,7 @@ export class WebView {
     private _missedImpressionManager: MissedImpressionManager;
     private _gdprManager: GdprManager;
     private _jaegerManager: JaegerManager;
+    private _programmaticTrackingService: ProgrammaticTrackingService;
 
     private _showing: boolean = false;
     private _initialized: boolean = false;
@@ -116,7 +118,7 @@ export class WebView {
             jaegerInitSpan.addAnnotation('nativeBridge loadComplete');
             this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
 
-            if(!/^\d+$/.test( this._clientInfo.getGameId())) {
+            if(!/^\d+$/.test(this._clientInfo.getGameId())) {
                 const message = `Provided Game ID '${this._clientInfo.getGameId()}' is invalid. Game ID may contain only digits (0-9).`;
                 this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INVALID_ARGUMENT], message);
                 return Promise.reject(message);
@@ -134,7 +136,8 @@ export class WebView {
             this._wakeUpManager = new WakeUpManager(this._nativeBridge, this._focusManager);
             this._request = new Request(this._nativeBridge, this._wakeUpManager);
             this._cacheBookkeeping = new CacheBookkeeping(this._nativeBridge);
-            this._cache = new Cache(this._nativeBridge, this._wakeUpManager, this._request, this._cacheBookkeeping);
+            this._programmaticTrackingService = new ProgrammaticTrackingService(this._request, this._clientInfo, this._deviceInfo);
+            this._cache = new Cache(this._nativeBridge, this._wakeUpManager, this._request, this._cacheBookkeeping, this._programmaticTrackingService);
             this._resolve = new Resolve(this._nativeBridge);
             this._metadataManager = new MetaDataManager(this._nativeBridge);
             this._adMobSignalFactory = new AdMobSignalFactory(this._nativeBridge, this._clientInfo, this._deviceInfo, this._focusManager);
@@ -145,6 +148,13 @@ export class WebView {
             HttpKafka.setClientInfo(this._clientInfo);
             SdkStats.setInitTimestamp();
             GameSessionCounters.init();
+
+            if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                this._nativeBridge.Request.Android.setMaximumPoolSize(8);
+                this._nativeBridge.Request.Android.setKeepAliveTime(10000);
+            } else {
+                this._nativeBridge.Request.setConcurrentRequestCount(8);
+            }
 
             return Promise.all([this._deviceInfo.fetch(), this.setupTestEnvironment()]);
         }).then(() => {
@@ -159,7 +169,7 @@ export class WebView {
                 } else if(model.match(/ipad/i)) {
                     document.body.classList.add('ipad');
                 }
-                this._container = new ViewController(this._nativeBridge, this._deviceInfo, this._focusManager);
+                this._container = new ViewController(this._nativeBridge, this._deviceInfo, this._focusManager, this._clientInfo);
             }
             HttpKafka.setDeviceInfo(this._deviceInfo);
             this._sessionManager = new SessionManager(this._nativeBridge, this._request);
@@ -276,6 +286,9 @@ export class WebView {
         }).then(() => {
             if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
                 this._nativeBridge.setAutoBatchEnabled(false);
+                this._nativeBridge.Request.Android.setMaximumPoolSize(1);
+            } else {
+                this._nativeBridge.Request.setConcurrentRequestCount(1);
             }
         }).catch(error => {
             jaegerInitSpan.addAnnotation(error.message);
@@ -359,7 +372,7 @@ export class WebView {
             }).catch((e) => {
                 if (e instanceof TimeoutError) {
                     Diagnostics.trigger('realtime_network_timeout', {
-                        auctionId: campaign.getSession().getId(),
+                        auctionId: campaign.getSession().getId()
                     });
                 }
                 Diagnostics.trigger('realtime_error', {
@@ -393,7 +406,7 @@ export class WebView {
                 this.showError(true, placement.getId(), 'No connection');
 
                 const error = new DiagnosticError(new Error('No connection is available'), {
-                    id: campaign.getId(),
+                    id: campaign.getId()
                 });
                 Diagnostics.trigger('mraid_no_connection', error, campaign.getSession());
                 return;
@@ -408,7 +421,7 @@ export class WebView {
                 clientInfo: this._clientInfo,
                 thirdPartyEventManager: new ThirdPartyEventManager(this._nativeBridge, this._request, {
                     '%ZONE%': placement.getId(),
-                    '%SDK_VERSION%': this._clientInfo.getSdkVersion().toString(),
+                    '%SDK_VERSION%': this._clientInfo.getSdkVersion().toString()
                 }),
                 operativeEventManager: OperativeEventManagerFactory.createOperativeEventManager({
                     nativeBridge: this._nativeBridge,
@@ -426,7 +439,8 @@ export class WebView {
                 request: this._request,
                 options: options,
                 gdprManager: this._gdprManager,
-                adMobSignalFactory: this._adMobSignalFactory
+                adMobSignalFactory: this._adMobSignalFactory,
+                programmaticTrackingService: this._programmaticTrackingService
             });
             this._refreshManager.setCurrentAdUnit(this._currentAdUnit);
             this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());
@@ -469,6 +483,9 @@ export class WebView {
             this._currentAdUnit.show().then(() => {
                 if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
                     this._nativeBridge.setAutoBatchEnabled(true);
+                    this._nativeBridge.Request.Android.setMaximumPoolSize(8);
+                } else {
+                    this._nativeBridge.Request.setConcurrentRequestCount(8);
                 }
             });
         });
@@ -487,6 +504,9 @@ export class WebView {
 
         if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
             this._nativeBridge.setAutoBatchEnabled(false);
+            this._nativeBridge.Request.Android.setMaximumPoolSize(1);
+        } else {
+            this._nativeBridge.Request.setConcurrentRequestCount(1);
         }
     }
 
@@ -532,7 +552,7 @@ export class WebView {
                 // needed in both due to placement level control support
                 const abGroupNumber: number = Number(TestEnvironment.get('abGroup'));
                 if (!isNaN(abGroupNumber)) { // if it is a number get the group
-                    const abGroup = ABGroup.getAbGroup(abGroupNumber);
+                    const abGroup = ABGroupBuilder.getAbGroup(abGroupNumber);
                     ConfigManager.setAbGroup(abGroup);
                     CampaignManager.setAbGroup(abGroup);
                 }

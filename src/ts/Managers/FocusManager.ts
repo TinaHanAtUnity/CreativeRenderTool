@@ -109,7 +109,6 @@ export class FocusManager {
                 break;
 
             default:
-                break;
         }
     }
 }

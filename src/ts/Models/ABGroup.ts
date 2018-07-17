@@ -1,6 +1,41 @@
 
 export class ABGroup {
 
+    private _abGroup: number;
+
+    constructor(abGroup: number) {
+        this._abGroup = abGroup;
+    }
+
+    public toNumber(): number {
+        return this._abGroup;
+    }
+}
+
+const GroupNone = new ABGroup(-1);
+const GroupZero = new ABGroup(0);
+const GroupOne = new ABGroup(1);
+const GroupTwo = new ABGroup(2);
+const GroupThree = new ABGroup(3);
+const GroupFour = new ABGroup(4);
+const GroupFive = new ABGroup(5);
+const GroupSix = new ABGroup(6);
+const GroupSeven = new ABGroup(7);
+const GroupEight = new ABGroup(8);
+const GroupNine = new ABGroup(9);
+const GroupTen = new ABGroup(10);
+const GroupEleven = new ABGroup(11);
+const GroupTwelve = new ABGroup(12);
+const GroupThirteen = new ABGroup(13);
+const GroupFourteen = new ABGroup(14);
+const GroupFifteen = new ABGroup(15);
+const GroupSixteen = new ABGroup(16);
+const GroupSeventeen = new ABGroup(17);
+const GroupEighteen = new ABGroup(18);
+const GroupNineteen = new ABGroup(19);
+const GroupTest = new ABGroup(99);
+
+export class ABGroupBuilder {
     public static getAbGroup = (group: number) => {
         switch (group) {
             case 0:
@@ -49,16 +84,6 @@ export class ABGroup {
                 return GroupNone;
         }
     }
-
-    private _abGroup: number;
-
-    constructor(abGroup: number) {
-        this._abGroup = abGroup;
-    }
-
-    public toNumber(): number {
-        return this._abGroup;
-    }
 }
 
 class ABTest {
@@ -73,30 +98,9 @@ class ABTest {
     }
 }
 
-const GroupNone = new ABGroup(-1);
-const GroupZero = new ABGroup(0);
-const GroupOne = new ABGroup(1);
-const GroupTwo = new ABGroup(2);
-const GroupThree = new ABGroup(3);
-const GroupFour = new ABGroup(4);
-const GroupFive = new ABGroup(5);
-const GroupSix = new ABGroup(6);
-const GroupSeven = new ABGroup(7);
-const GroupEight = new ABGroup(8);
-const GroupNine = new ABGroup(9);
-const GroupTen = new ABGroup(10);
-const GroupEleven = new ABGroup(11);
-const GroupTwelve = new ABGroup(12);
-const GroupThirteen = new ABGroup(13);
-const GroupFourteen = new ABGroup(14);
-const GroupFifteen = new ABGroup(15);
-const GroupSixteen = new ABGroup(16);
-const GroupSeventeen = new ABGroup(17);
-const GroupEighteen = new ABGroup(18);
-const GroupNineteen = new ABGroup(19);
-const GroupTest = new ABGroup(99);
-
 // Add ABTests below
 // Example : export const GdprBaseAbTest = new ABTest(GroupSixteen, GroupSeventeen);
-export const PlayableEndScreenHideDelayDisabledAbTest = new ABTest(GroupEighteen, GroupNineteen);
-export const FancyEndScreenEnabledAbTest = new ABTest(GroupSixteen, GroupSeventeen);
+
+export const SquareEndScreenEnabledAbTest = new ABTest(GroupEighteen, GroupNineteen);
+export const CTAOpenUrlAbTest = new ABTest(GroupEleven, GroupTwelve);
+export const NewVideoOverlayEnabledAbTest = new ABTest(GroupSixteen, GroupSeventeen);

@@ -16,6 +16,8 @@ import { AbstractPrivacy } from 'Views/AbstractPrivacy';
 import { Closer } from 'Views/Closer';
 import { VPAID } from 'Views/VPAID';
 import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
+import { ClientInfo } from 'Models/ClientInfo';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
 
 export interface IVPAIDAdUnitParameters extends IAdUnitParameters<VPAIDCampaign> {
     vpaid: VPAID;
@@ -41,6 +43,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _deviceInfo: DeviceInfo;
     private _urlLoadingObserver: IObserver2<string, string>;
     private _privacyShowing = false;
+    private _clientInfo: ClientInfo;
 
     constructor(nativeBridge: NativeBridge, parameters: IVPAIDAdUnitParameters) {
         super(nativeBridge, parameters);
@@ -52,6 +55,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._closer = parameters.closer;
         this._deviceInfo = parameters.deviceInfo;
         this._placement = parameters.placement;
+        this._clientInfo = parameters.clientInfo;
         this._timer = new Timer(() => this.onAdUnitNotLoaded(), VPAIDAdUnit._adLoadTimeout);
 
         this._closer.render();
@@ -136,6 +140,10 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public onContainerBackground(): void {
         this._view.pauseAd();
+
+        if (this.isShowing() && CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
+            this.hide();
+        }
     }
 
     public onContainerForeground(): void {
@@ -181,7 +189,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         promises.push(this._nativeBridge.WebPlayer.setSettings({
             setSupportMultipleWindows: [false],
             setJavaScriptCanOpenWindowsAutomatically: [true],
-            setMediaPlaybackRequiresUserGesture: [false],
+            setMediaPlaybackRequiresUserGesture: [false]
         }, {}));
         const eventSettings = {
             'onPageStarted': { 'sendEvent': true },

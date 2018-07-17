@@ -1,7 +1,7 @@
 import { IMRAIDViewHandler, IOrientationProperties } from 'Views/MRAIDView';
 import { HttpKafka, KafkaCommonObjectType } from 'Utilities/HttpKafka';
 import { NativeBridge } from 'Native/NativeBridge';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { OperativeEventManager, IOperativeEventParams } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
@@ -15,10 +15,10 @@ import { RequestError } from 'Errors/RequestError';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { FinishState } from 'Constants/FinishState';
 import { Placement } from 'Models/Placement';
-import { Configuration } from 'Models/Configuration';
-import { GDPREventAction, GdprManager } from 'Managers/GdprManager';
+import { ABGroup, CTAOpenUrlAbTest } from 'Models/ABGroup';
+import { GDPREventHandler } from 'EventHandlers/GDPREventHandler';
 
-export class MRAIDEventHandler implements IMRAIDViewHandler {
+export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHandler {
 
     private _nativeBridge: NativeBridge;
     private _operativeEventManager: OperativeEventManager;
@@ -29,10 +29,10 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
     private _campaign: MRAIDCampaign;
     private _request: Request;
     private _placement: Placement;
-    private _configuration: Configuration;
-    private _gdprManager: GdprManager;
+    private _abGroup: ABGroup;
 
     constructor(nativeBridge: NativeBridge, adUnit: MRAIDAdUnit, parameters: IMRAIDAdUnitParameters) {
+        super(parameters.gdprManager, parameters.configuration);
         this._nativeBridge = nativeBridge;
         this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
@@ -42,20 +42,20 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
         this._campaign = parameters.campaign;
         this._placement = parameters.placement;
         this._request = parameters.request;
-        this._configuration = parameters.configuration;
-        this._gdprManager = parameters.gdprManager;
+        this._abGroup = parameters.configuration.getAbGroup();
     }
 
     public onMraidClick(url: string): Promise<void> {
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
+        const operativeEventParams: IOperativeEventParams = this.getOperativeEventParams();
         if(!this._campaign.getSession().getEventSent(EventType.THIRD_QUARTILE)) {
-            this._operativeEventManager.sendThirdQuartile(this._placement);
+            this._operativeEventManager.sendThirdQuartile(operativeEventParams);
         }
         if(!this._campaign.getSession().getEventSent(EventType.VIEW)) {
-            this._operativeEventManager.sendView(this._placement);
+            this._operativeEventManager.sendView(operativeEventParams);
         }
         if(!this._campaign.getSession().getEventSent(EventType.CLICK)) {
-            this._operativeEventManager.sendClick(this._placement);
+            this._operativeEventManager.sendClick(operativeEventParams);
         }
 
         this._adUnit.sendClick();
@@ -63,20 +63,26 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
         if(this._campaign.getClickAttributionUrl()) {
             this.handleClickAttribution();
             if(!this._campaign.getClickAttributionUrlFollowsRedirects()) {
+                if (CTAOpenUrlAbTest.isValid(this._abGroup)) {
+                    return this.openUrl(url);
+                }
                 return this.followUrl(url).then((storeUrl) => {
-                    this.openUrl(storeUrl);
+                    return this.openUrl(storeUrl);
                 });
             }
         } else {
+            if (CTAOpenUrlAbTest.isValid(this._abGroup)) {
+                return this.openUrl(url);
+            }
             return this.followUrl(url).then((storeUrl) => {
-                this.openUrl(storeUrl);
+                return this.openUrl(storeUrl);
             });
         }
         return Promise.resolve();
     }
 
     public onMraidReward(): void {
-        this._operativeEventManager.sendThirdQuartile(this._placement);
+        this._operativeEventManager.sendThirdQuartile(this.getOperativeEventParams());
     }
 
     public onMraidSkip(): void {
@@ -125,13 +131,6 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
         }
     }
 
-    public onGDPRPopupSkipped(): void {
-        if (!this._configuration.isOptOutRecorded()) {
-            this._configuration.setOptOutRecorded(true);
-        }
-        this._gdprManager.sendGDPREvent(GDPREventAction.SKIP);
-    }
-
     private handleClickAttribution() {
         const clickAttributionUrl = this._campaign.getClickAttributionUrl();
         const useWebViewUA = this._campaign.getUseWebViewUserAgentForTracking();
@@ -165,11 +164,11 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
         }
     }
 
-    private openUrl(url: string) {
+    private openUrl(url: string): Promise<void> {
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
-            this._nativeBridge.UrlScheme.open(url);
-        } else if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            this._nativeBridge.Intent.launch({
+            return this._nativeBridge.UrlScheme.open(url);
+        } else {
+            return this._nativeBridge.Intent.launch({
                 'action': 'android.intent.action.VIEW',
                 'uri': url // todo: these come from 3rd party sources, should be validated before general MRAID support
             });
@@ -179,5 +178,12 @@ export class MRAIDEventHandler implements IMRAIDViewHandler {
     // Follows the redirects of a URL, returning the final location.
     private followUrl(link: string): Promise<string> {
         return this._request.followRedirectChain(link);
+    }
+
+    private getOperativeEventParams(): IOperativeEventParams {
+        return {
+            placement: this._placement,
+            asset: this._campaign.getResourceUrl()
+        };
     }
 }
