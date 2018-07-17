@@ -723,6 +723,7 @@ export class CampaignManager {
                 body.gdprEnabled = this._configuration.isGDPREnabled();
                 body.optOutEnabled = this._configuration.isOptOutEnabled();
                 body.optOutRecorded = this._configuration.isOptOutRecorded();
+                body.abGroup = this._configuration.getAbGroup().toNumber();
 
                 const organizationId = this._configuration.getOrganizationId();
                 if(organizationId) {
