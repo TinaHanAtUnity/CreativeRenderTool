@@ -342,16 +342,15 @@ describe('PurchasingUtilitiesTest', () => {
     });
 
     describe('Handle Send Event', () => {
+
         beforeEach(() => {
-
-            sandbox.stub(PurchasingUtilities, 'sendPurchaseInitializationEvent');
-
             PurchasingUtilities.promoJsons[0] = JSON.parse('{\"iapProductId\":\"scooterdooter\"}');
             PurchasingUtilities.promoCampaigns[0] = TestFixtures.getPromoCampaign();
             sandbox.stub(PurchasingUtilities.promoPlacementManager, 'getAuctionFillPlacementIds').returns(['promoPlacement']);
 
             sandbox.stub(PurchasingUtilities.promoPlacementManager, 'setPromoPlacementReady');
             sandbox.stub(PurchasingUtilities.promoPlacementManager, 'setPlacementState');
+            sandbox.stub(PurchasingUtilities, 'sendPurchaseInitializationEvent').returns(Promise.resolve());
             sandbox.stub(PurchasingUtilities, 'refreshCatalog').returns(Promise.resolve());
         });
 
@@ -361,46 +360,41 @@ describe('PurchasingUtilitiesTest', () => {
 
         it('Should send the purchase initialization event and call refresh catalog when iap payload type is catalogupdated', () => {
             sandbox.stub(PurchasingUtilities, 'isInitialized').returns(false);
-            PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}');
 
-            sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
-            sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.refreshCatalog);
+            return PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}').then(() => {
+                sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
+                sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.refreshCatalog);
+            });
         });
 
         it('Should not send the purchase initialization event when if IAP is already initialized', () => {
             sandbox.stub(PurchasingUtilities, 'isInitialized').returns(true);
-            PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}');
 
-            sinon.assert.notCalled(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
-            sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.refreshCatalog);
-        });
-
-        it('Should send the purchase initialization event and call refresh catalog when iap payload type is catalogupdated', () => {
-            sandbox.stub(PurchasingUtilities, 'isInitialized').returns(false);
-            PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}');
-
-            sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
-            sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.refreshCatalog);
+            return PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}').then(() => {
+                sinon.assert.notCalled(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
+                sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.refreshCatalog);
+            });
         });
 
         it('Should not handle update when passed iap payload type is not CatalogUpdated', () => {
             sandbox.stub(PurchasingUtilities, 'isInitialized').returns(false);
-            PurchasingUtilities.handleSendIAPEvent('{"type":"sadfasdf"}');
 
-            sinon.assert.notCalled(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
-            sinon.assert.notCalled(<sinon.SinonSpy>PurchasingUtilities.refreshCatalog);
-            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Sdk.logError, 'IAP Payload is incorrect');
+            return PurchasingUtilities.handleSendIAPEvent('{"type":"sadfasdf"}').then(() => {
+                sinon.assert.notCalled(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
+                sinon.assert.notCalled(<sinon.SinonSpy>PurchasingUtilities.refreshCatalog);
+            }).catch((e) => {
+                assert.equal(e.message, 'IAP Payload is incorrect');
+            });
         });
 
         it('Should set the current placement state to nofill if product is not in the catalog', () => {
             PurchasingUtilities.iapCampaignCount = 1;
             sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(false);
             sandbox.stub(PurchasingUtilities, 'isInitialized').returns(false);
-            PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}');
 
-            sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
 
-            return PurchasingUtilities.refreshCatalog().then(() => {
+            return PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}').then(() => {
+                sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
                 sinon.assert.calledWith(<sinon.SinonSpy>PurchasingUtilities.isProductAvailable, 'scooterdooter');
                 sinon.assert.calledWith(<sinon.SinonSpy>PurchasingUtilities.promoPlacementManager.setPlacementState, 'promoPlacement', PlacementState.NO_FILL);
             });
@@ -411,11 +405,9 @@ describe('PurchasingUtilitiesTest', () => {
             sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
             sandbox.stub(PurchasingUtilities, 'isInitialized').returns(false);
             sandbox.stub(PurchasingUtilities.promoCampaigns[0], 'getIapProductId').returns('scooterdooter');
-            PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}');
 
-            sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
-
-            return PurchasingUtilities.refreshCatalog().then(() => {
+            return PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}').then(() => {
+                sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
                 sinon.assert.calledWith(<sinon.SinonSpy>PurchasingUtilities.isProductAvailable, 'scooterdooter');
                 sinon.assert.calledWith(<sinon.SinonSpy>PurchasingUtilities.promoPlacementManager.setPromoPlacementReady, 'promoPlacement', PurchasingUtilities.promoCampaigns[0]);
             });
@@ -426,11 +418,9 @@ describe('PurchasingUtilitiesTest', () => {
             sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
             sandbox.stub(PurchasingUtilities, 'isInitialized').returns(false);
             sandbox.stub(PurchasingUtilities.promoCampaigns[0], 'getIapProductId').returns('scootydooty');
-            PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}');
 
-            sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
-
-            return PurchasingUtilities.refreshCatalog().then(() => {
+            return PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}').then(() => {
+                sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
                 sinon.assert.calledWith(<sinon.SinonSpy>PurchasingUtilities.isProductAvailable, 'scooterdooter');
                 sinon.assert.calledWith(<sinon.SinonSpy>PurchasingUtilities.promoPlacementManager.setPlacementState, 'promoPlacement', PlacementState.NO_FILL);
             });

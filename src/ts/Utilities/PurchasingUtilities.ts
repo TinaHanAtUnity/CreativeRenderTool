@@ -96,30 +96,19 @@ export class PurchasingUtilities {
         return false;
     }
 
-    public static handleSendIAPEvent(iapPayload: string): void {
+    public static handleSendIAPEvent(iapPayload: string): Promise<void> {
         const jsonPayload = JSON.parse(iapPayload);
-        const promoPlacementIds = this.promoPlacementManager.getAuctionFillPlacementIds();
 
         if (jsonPayload.type === 'CatalogUpdated') {
             if (!this.isInitialized()) {
-                this.sendPurchaseInitializationEvent();
+                return this.sendPurchaseInitializationEvent()
+                .then(() => this.refreshCatalog())
+                .then(() => this.setProductPlacementStates());
+            } else {
+                return this.refreshCatalog().then(() => this.setProductPlacementStates());
             }
-
-            this.refreshCatalog().then(() => {
-                for (let i = 0; i < this.iapCampaignCount; i++) {
-                    if (PurchasingUtilities.isProductAvailable(this.promoJsons[i].iapProductId)) {
-                        if (this.promoCampaigns[i].getIapProductId() === this.promoJsons[i].iapProductId) {
-                            this.promoPlacementManager.setPromoPlacementReady(promoPlacementIds[i], this.promoCampaigns[i]);
-                        } else {
-                            this.promoPlacementManager.setPlacementState(promoPlacementIds[i], PlacementState.NO_FILL);
-                        }
-                    } else {
-                        this.promoPlacementManager.setPlacementState(promoPlacementIds[i], PlacementState.NO_FILL);
-                    }
-                }
-            });
         } else {
-            this.logIssue('handle_send_event_failure', 'IAP Payload is incorrect');
+            return Promise.reject(this.logIssue('handle_send_event_failure', 'IAP Payload is incorrect'));
         }
     }
 
@@ -128,6 +117,21 @@ export class PurchasingUtilities {
     private static _configuration: Configuration;
     private static _nativeBridge: NativeBridge;
     private static _isInitialized = false;
+
+    private static setProductPlacementStates(): void {
+        const promoPlacementIds = this.promoPlacementManager.getAuctionFillPlacementIds();
+        for (let i = 0; i < this.iapCampaignCount; i++) {
+            if (PurchasingUtilities.isProductAvailable(this.promoJsons[i].iapProductId)) {
+                if (this.promoCampaigns[i].getIapProductId() === this.promoJsons[i].iapProductId) {
+                    this.promoPlacementManager.setPromoPlacementReady(promoPlacementIds[i], this.promoCampaigns[i]);
+                } else {
+                    this.promoPlacementManager.setPlacementState(promoPlacementIds[i], PlacementState.NO_FILL);
+                }
+            } else {
+                this.promoPlacementManager.setPlacementState(promoPlacementIds[i], PlacementState.NO_FILL);
+            }
+        }
+    }
 
     private static initializeIAPPromo(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
