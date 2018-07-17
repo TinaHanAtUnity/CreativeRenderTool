@@ -42,7 +42,6 @@
     "no-reserved-keywords": false,
     "prefer-method-signature": false,
     "no-multiline-string": false,
-    "no-unnecessary-override": false,
     "no-single-line-block-comment": false,
     "function-name": false,
     "no-unnecessary-class": false,
