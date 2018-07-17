@@ -29,6 +29,7 @@ import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFact
 import { Configuration } from 'Models/Configuration';
 import { Privacy } from 'Views/Privacy';
 import { GdprManager } from 'Managers/GdprManager';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 describe('OverlayEventHandlerTest', () => {
 
@@ -88,6 +89,7 @@ describe('OverlayEventHandlerTest', () => {
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
         placement = TestFixtures.getPlacement();
         const gdprManager = sinon.createStubInstance(GdprManager);
+        const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
         performanceAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,
@@ -106,7 +108,8 @@ describe('OverlayEventHandlerTest', () => {
             overlay: overlay,
             video: video,
             privacy: privacy,
-            gdprManager: gdprManager
+            gdprManager: gdprManager,
+            programmaticTrackingService: programmaticTrackingService
         };
         sinon.stub(performanceAdUnitParameters.campaign, 'getAbGroup').returns(5);
 

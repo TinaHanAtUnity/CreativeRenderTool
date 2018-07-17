@@ -439,7 +439,8 @@ export class WebView {
                 request: this._request,
                 options: options,
                 gdprManager: this._gdprManager,
-                adMobSignalFactory: this._adMobSignalFactory
+                adMobSignalFactory: this._adMobSignalFactory,
+                programmaticTrackingService: this._programmaticTrackingService
             });
             this._refreshManager.setCurrentAdUnit(this._currentAdUnit);
             this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());

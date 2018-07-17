@@ -32,6 +32,7 @@ import { AbstractPrivacy } from 'Views/AbstractPrivacy';
 import { Privacy } from 'Views/Privacy';
 
 import EventTestVast from 'xml/EventTestVast.xml';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 describe('VastVideoEventHandler tests', () => {
     const handleInvocation = sinon.spy();
@@ -58,6 +59,7 @@ describe('VastVideoEventHandler tests', () => {
     let videoEventHandlerParams: IVideoEventHandlerParams;
     let gdprManager: GdprManager;
     let privacy: AbstractPrivacy;
+    let programmaticTrackingService: ProgrammaticTrackingService;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -76,6 +78,7 @@ describe('VastVideoEventHandler tests', () => {
         container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
         privacy = new Privacy(nativeBridge, true);
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
+        programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
         placement = new Placement({
             id: '123',
@@ -124,7 +127,8 @@ describe('VastVideoEventHandler tests', () => {
             endScreen: undefined,
             overlay: overlay,
             video: campaign.getVideo(),
-            gdprManager: gdprManager
+            gdprManager: gdprManager,
+            programmaticTrackingService: programmaticTrackingService
         };
 
         testAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
