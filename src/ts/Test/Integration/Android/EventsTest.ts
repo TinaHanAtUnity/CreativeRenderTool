@@ -42,7 +42,9 @@ describe('EventsTest', () => {
     };
 
     beforeEach(function(done) {
+        // tslint:disable:no-invalid-this
         this.timeout(7000);
+        // tslint:enable
         const xhr = new XMLHttpRequest();
         xhr.timeout = 5000;
         xhr.onload = (event: Event) => {
@@ -58,7 +60,9 @@ describe('EventsTest', () => {
     });
 
     afterEach(function(done) {
+        // tslint:disable:no-invalid-this
         this.timeout(7000);
+        // tslint:enable
         const xhr = new XMLHttpRequest();
         xhr.timeout = 5000;
         xhr.onload = (event: Event) => {

@@ -1,6 +1,14 @@
 # Pending
 
+* Tslint no-irregular-whitespace
+* Tslint no-spaces-in-parens
+* Tslint no-use-before-declare re-enabled
+
+# Mon Jul 16 20:03:32 UTC 2018
+
 * Tslint no-unnecessary-local-variable is re-enabled
+* Tslint no-invalid-this is re-enabled
+* New Video Overlay for Performance on ABGroups 16 and 17
 
 # Wed Jul 11 21:24:48 UTC 2018
 
@@ -18,7 +26,7 @@
 
 * Re-enable Microsoft linter rule, no break in default in switch
 * Remove gamerId from configuration request
-* Create a separate event handler for GDPR skip events 
+* Create a separate event handler for GDPR skip events
 
 # Thu Jul  5 15:21:01 UTC 2018
 
