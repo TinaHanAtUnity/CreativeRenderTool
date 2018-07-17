@@ -228,7 +228,8 @@ describe('CampaignRefreshManager', () => {
             configuration: configuration,
             request: request,
             options: {},
-            gdprManager: gdprManager
+            gdprManager: gdprManager,
+            programmaticTrackingService: programmaticTrackingService
         };
 
         RefreshManager.ParsingErrorRefillDelay = 0; // prevent tests from hanging due to long retry timeouts

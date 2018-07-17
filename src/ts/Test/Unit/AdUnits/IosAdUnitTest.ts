@@ -22,6 +22,7 @@ import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { GdprManager } from 'Managers/GdprManager';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 describe('IosAdUnitTest', () => {
     let nativeBridge: NativeBridge;
@@ -52,6 +53,7 @@ describe('IosAdUnitTest', () => {
         const campaign = TestFixtures.getCampaign();
         const configuration = TestFixtures.getConfiguration();
         const gdprManager = sinon.createStubInstance(GdprManager);
+        const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             nativeBridge: nativeBridge,
             request: request,
@@ -76,7 +78,8 @@ describe('IosAdUnitTest', () => {
             configuration: configuration,
             request: request,
             options: {},
-            gdprManager: gdprManager
+            gdprManager: gdprManager,
+            programmaticTrackingService: programmaticTrackingService
         };
     });
 

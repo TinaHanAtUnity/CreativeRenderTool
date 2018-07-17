@@ -14,6 +14,7 @@ import { FocusManager } from 'Managers/FocusManager';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { CampaignAssetInfo } from 'Utilities/CampaignAssetInfo';
 import { GdprManager } from 'Managers/GdprManager';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 export interface IAdUnitParameters<T extends Campaign> {
     forceOrientation: Orientation;
@@ -30,6 +31,7 @@ export interface IAdUnitParameters<T extends Campaign> {
     options: any;
     gdprManager: GdprManager;
     adMobSignalFactory?: AdMobSignalFactory;
+    programmaticTrackingService: ProgrammaticTrackingService;
 }
 
 export abstract class AbstractAdUnit {

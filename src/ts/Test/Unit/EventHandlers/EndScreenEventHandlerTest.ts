@@ -28,6 +28,7 @@ import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFact
 import { Configuration } from 'Models/Configuration';
 import { Privacy } from 'Views/Privacy';
 import { GdprManager } from 'Managers/GdprManager';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 describe('EndScreenEventHandlerTest', () => {
 
@@ -90,6 +91,7 @@ describe('EndScreenEventHandlerTest', () => {
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
             placement = TestFixtures.getPlacement();
             const gdprManager = sinon.createStubInstance(GdprManager);
+            const programmticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
             performanceAdUnitParameters = {
                 forceOrientation: Orientation.LANDSCAPE,
@@ -108,7 +110,8 @@ describe('EndScreenEventHandlerTest', () => {
                 overlay: overlay,
                 video: video,
                 privacy: privacy,
-                gdprManager: gdprManager
+                gdprManager: gdprManager,
+                programmaticTrackingService: programmticTrackingService
             };
 
             performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
@@ -323,6 +326,7 @@ describe('EndScreenEventHandlerTest', () => {
             endScreen = new PerformanceEndScreen(nativeBridge, campaign, deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, false);
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
             const gdprManager = sinon.createStubInstance(GdprManager);
+            const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
             performanceAdUnitParameters = {
                 forceOrientation: Orientation.LANDSCAPE,
@@ -341,7 +345,8 @@ describe('EndScreenEventHandlerTest', () => {
                 overlay: overlay,
                 video: video,
                 privacy: privacy,
-                gdprManager: gdprManager
+                gdprManager: gdprManager,
+                programmaticTrackingService: programmaticTrackingService
             };
 
             performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
