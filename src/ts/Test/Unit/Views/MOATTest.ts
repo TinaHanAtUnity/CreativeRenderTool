@@ -131,7 +131,7 @@ xdescribe('MOAT View', () => {
         });
 
         it('should send the init message', () => {
-            const promise = new Promise((resolve, reject) => {
+            return new Promise((resolve, reject) => {
                 setTimeout(() => {
                     try {
                         sinon.assert.called(messageListener);
@@ -143,7 +143,6 @@ xdescribe('MOAT View', () => {
                     }
                 });
             });
-            return promise;
         });
     });
 
@@ -161,7 +160,7 @@ xdescribe('MOAT View', () => {
         });
 
         it ('should fire the video message', () => {
-            const promise = new Promise((resolve, reject) => {
+            return new Promise((resolve, reject) => {
                 setTimeout(() => {
                     try {
                         sinon.assert.called(messageListener);
@@ -173,7 +172,6 @@ xdescribe('MOAT View', () => {
                     }
                 });
             });
-            return promise;
         });
     });
 
@@ -191,7 +189,7 @@ xdescribe('MOAT View', () => {
         });
 
         it ('should fire the viewability message of the specified type', () => {
-            const promise = new Promise((resolve, reject) => {
+            return new Promise((resolve, reject) => {
                 setTimeout(() => {
                     try {
                         sinon.assert.called(messageListener);
@@ -203,7 +201,6 @@ xdescribe('MOAT View', () => {
                     }
                 });
             });
-            return promise;
         });
     });
 });

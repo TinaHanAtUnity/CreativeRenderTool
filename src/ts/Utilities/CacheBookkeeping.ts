@@ -194,12 +194,12 @@ export class CacheBookkeeping {
         const cachedCampaignResponsePromise = this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGN, 'response'));
 
         return Promise.all([cacheCampaignUrlPromise, cachedCampaignResponsePromise]).then(([requestUrl, cachedResponse]) =>
-            ({
+            (<INativeResponse>{
                 url: requestUrl,
                 response: cachedResponse,
                 responseCode: 200,
                 headers: []
-            } as INativeResponse)
+            })
         ).catch(() => {
             return undefined;
         });

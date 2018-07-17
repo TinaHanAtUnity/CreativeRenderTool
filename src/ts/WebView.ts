@@ -59,8 +59,8 @@ import { GdprManager } from 'Managers/GdprManager';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
-import { ABGroup, FLAMTest } from 'Models/ABGroup';
-import { FLAM } from 'Utilities/FLAM';
+import { ABGroupBuilder } from 'Models/ABGroup';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 export class WebView {
 
@@ -90,6 +90,7 @@ export class WebView {
     private _missedImpressionManager: MissedImpressionManager;
     private _gdprManager: GdprManager;
     private _jaegerManager: JaegerManager;
+    private _programmaticTrackingService: ProgrammaticTrackingService;
 
     private _showing: boolean = false;
     private _initialized: boolean = false;
@@ -117,7 +118,7 @@ export class WebView {
             jaegerInitSpan.addAnnotation('nativeBridge loadComplete');
             this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
 
-            if(!/^\d+$/.test( this._clientInfo.getGameId())) {
+            if(!/^\d+$/.test(this._clientInfo.getGameId())) {
                 const message = `Provided Game ID '${this._clientInfo.getGameId()}' is invalid. Game ID may contain only digits (0-9).`;
                 this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INVALID_ARGUMENT], message);
                 return Promise.reject(message);
@@ -135,7 +136,8 @@ export class WebView {
             this._wakeUpManager = new WakeUpManager(this._nativeBridge, this._focusManager);
             this._request = new Request(this._nativeBridge, this._wakeUpManager);
             this._cacheBookkeeping = new CacheBookkeeping(this._nativeBridge);
-            this._cache = new Cache(this._nativeBridge, this._wakeUpManager, this._request, this._cacheBookkeeping);
+            this._programmaticTrackingService = new ProgrammaticTrackingService(this._request, this._clientInfo, this._deviceInfo);
+            this._cache = new Cache(this._nativeBridge, this._wakeUpManager, this._request, this._cacheBookkeeping, this._programmaticTrackingService);
             this._resolve = new Resolve(this._nativeBridge);
             this._metadataManager = new MetaDataManager(this._nativeBridge);
             this._adMobSignalFactory = new AdMobSignalFactory(this._nativeBridge, this._clientInfo, this._deviceInfo, this._focusManager);
@@ -279,10 +281,6 @@ export class WebView {
         }).then(() => {
             this._initialized = true;
             this._jaegerManager.stop(jaegerInitSpan);
-
-            if(FLAMTest.isValid(this._configuration.getAbGroup())) {
-                FLAM.measure(['webp', 'hevc', 'vp9'], this._nativeBridge);
-            }
 
             return this._sessionManager.sendUnsentSessions();
         }).then(() => {
@@ -553,7 +551,7 @@ export class WebView {
                 // needed in both due to placement level control support
                 const abGroupNumber: number = Number(TestEnvironment.get('abGroup'));
                 if (!isNaN(abGroupNumber)) { // if it is a number get the group
-                    const abGroup = ABGroup.getAbGroup(abGroupNumber);
+                    const abGroup = ABGroupBuilder.getAbGroup(abGroupNumber);
                     ConfigManager.setAbGroup(abGroup);
                     CampaignManager.setAbGroup(abGroup);
                 }

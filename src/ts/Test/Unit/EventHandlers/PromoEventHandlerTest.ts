@@ -9,7 +9,7 @@ import { PromoEventHandler } from 'EventHandlers/PromoEventHandler';
 import DummyPromo from 'json/DummyPromoCampaign.json';
 import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 import { Configuration } from 'Models/Configuration';
-import { ABGroup } from 'Models/ABGroup';
+import { ABGroupBuilder } from 'Models/ABGroup';
 import { GdprManager } from 'Managers/GdprManager';
 import { FinishState } from 'Constants/FinishState';
 
@@ -39,21 +39,21 @@ describe('PromoEventHandlersTest', () => {
         it('should hide adunit', () => {
             promoAdUnit = sinon.createStubInstance(PromoAdUnit);
 
-            PromoEventHandler.onClose(promoAdUnit, '111', '111', ABGroup.getAbGroup(1), [purchaseTrackingUrls], false);
+            PromoEventHandler.onClose(promoAdUnit, '111', '111', ABGroupBuilder.getAbGroup(1), [purchaseTrackingUrls], false);
             sinon.assert.called(<sinon.SinonSpy>promoAdUnit.hide);
         });
 
         it('should set adunit finish state to completed', () => {
             promoAdUnit = sinon.createStubInstance(PromoAdUnit);
 
-            PromoEventHandler.onClose(promoAdUnit, '111', '111', ABGroup.getAbGroup(1), [purchaseTrackingUrls], false);
+            PromoEventHandler.onClose(promoAdUnit, '111', '111', ABGroupBuilder.getAbGroup(1), [purchaseTrackingUrls], false);
             sinon.assert.calledWith(<sinon.SinonStub>promoAdUnit.setFinishState, FinishState.COMPLETED);
         });
 
         it('should call sendPromoPayload', () => {
             promoAdUnit = sinon.createStubInstance(PromoAdUnit);
 
-            PromoEventHandler.onClose(promoAdUnit, '111', '111', ABGroup.getAbGroup(1), [purchaseTrackingUrls], false);
+            PromoEventHandler.onClose(promoAdUnit, '111', '111', ABGroupBuilder.getAbGroup(1), [purchaseTrackingUrls], false);
             sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPromoPayload);
         });
     });
