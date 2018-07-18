@@ -1,3 +1,11 @@
+# Pending
+
+* Add more parameters to AbstractPrivacy Build Information
+* Remove new square endscreen image test
+* Add ABGroup parameter to auction request body
+* Tslint no-unnecessary-field-initialization
+* Tslint no-unnecessary-override
+
 # Wed Jul 18 19:58:01 UTC 2018
 
 * Tslint no-irregular-whitespace
