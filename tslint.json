@@ -42,7 +42,6 @@
     "no-reserved-keywords": false,
     "prefer-method-signature": false,
     "no-multiline-string": false,
-    "no-unnecessary-override": false,
     "no-single-line-block-comment": false,
     "function-name": false,
     "no-unnecessary-class": false,
@@ -62,7 +61,6 @@
     "number-literal-format": false,
     "no-unnecessary-qualifier": false,
     "export-name": false,
-    "no-unnecessary-field-initialization": false,
     "insecure-random": false,
     "use-default-type-parameter": false
   }

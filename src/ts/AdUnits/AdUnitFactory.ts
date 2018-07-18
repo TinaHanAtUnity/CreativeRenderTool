@@ -394,7 +394,7 @@ export class AdUnitFactory {
 
         const privacy = this.createPrivacy(nativeBridge, parameters);
         const showGDPRBanner = this.showGDPRBanner(parameters);
-        const view = new AdMobView(nativeBridge, parameters.adMobSignalFactory, parameters.container, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner);
+        const view = new AdMobView(nativeBridge, parameters.adMobSignalFactory, parameters.container, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, parameters.programmaticTrackingService);
         view.render();
 
         const adUnitParameters: IAdMobAdUnitParameters = {
