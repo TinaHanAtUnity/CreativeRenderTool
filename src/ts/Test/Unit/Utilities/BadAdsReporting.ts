@@ -1,8 +1,7 @@
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Campaign } from 'Models/Campaign';
-import { Request, INativeResponse } from 'Utilities/Request';
-import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { ProgrammaticTrackingService, ProgrammaticTrackingMetric } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 export enum BadAdReason {
     OFFENSIVE,
@@ -14,13 +13,7 @@ export enum BadAdReason {
 
 export class BadAdsReporting {
 
-    private _request: Request;
-
-    constructor(request: Request) {
-        this._request = request;
-    }
-
-    public static onUserReport(campaign: Campaign, reason: BadAdReason, explanation: string): Promise<INativeResponse> {
+    public static onUserReport(pts: ProgrammaticTrackingService, campaign: Campaign, reason: BadAdReason, explanation: string): void {
 
         const data: string = JSON.stringify({
             creativeId: campaign.getCreativeId(),
@@ -29,13 +22,11 @@ export class BadAdsReporting {
             explanation: explanation
         });
 
-        const url: string = ProgrammaticTrackingService.productionMetricServiceUrl;
-
-
-        return this._request.post(url, data);
+        // This does not work, currently
+        pts.reportMetric(<ProgrammaticTrackingMetric>data);
     }
     // Currently unused, remove before PR goes out
-    public static onScreenshotTaken(isVerifiedScreenshot: boolean, adUnit: AbstractAdUnit, nativeBridge: NativeBridge, campaign: Campaign) {
+    public onScreenshotTaken(isVerifiedScreenshot: boolean, adUnit: AbstractAdUnit, nativeBridge: NativeBridge, campaign: Campaign) {
         if (adUnit.isShowing()) {
             nativeBridge.Sdk.logInfo(`Screenshot was taken with verified status of ${isVerifiedScreenshot}`);
             const badAdBody = {
