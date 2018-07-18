@@ -4,10 +4,8 @@ import { assert } from 'chai';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { PerformanceCampaign, StoreName } from 'Models/Campaigns/PerformanceCampaign';
-import { Configuration } from 'Models/Configuration';
 
 import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
-import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import SimpleVast from 'xml/SimpleVast.xml';
 import CacheSimpleVast from 'xml/CacheSimpleVast.xml';
 import { ABGroupBuilder } from 'Models/ABGroup';
@@ -23,7 +21,6 @@ describe('PerformanceCampaign', () => {
             const params = TestFixtures.getPerformanceCampaignParams(campaignObject, StoreName.GOOGLE);
             const campaign = new PerformanceCampaign(params);
             assert.equal(campaign.getAbGroup(), configuration.getAbGroup());
-            assert.equal(campaign.getGamerId(), configuration.getGamerId());
             assert.equal(campaign.getAppStoreId(), campaignObject.appStoreId);
             assert.equal(campaign.getLandscape().getUrl(), campaignObject.endScreenLandscape);
             assert.equal(campaign.getPortrait().getUrl(), campaignObject.endScreenPortrait);
@@ -46,7 +43,6 @@ describe('VastCampaign', () => {
             const params = TestFixtures.getVastCampaignParams(parsedVast, 3600, '12345');
             const campaign = new VastCampaign(params);
             assert.equal(campaign.getAbGroup(), ABGroupBuilder.getAbGroup(99));
-            assert.equal(campaign.getGamerId(), '57a35671bb58271e002d93c9');
             assert.equal(campaign.getId(), '12345');
             const vast = campaign.getVast();
             assert.equal(1, vast.getAds().length);

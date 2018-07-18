@@ -44,7 +44,7 @@ describe('PromoCampaignParser', () => {
 
             const parse = (data: any) => {
                 const response = new AuctionResponse(placements, data, mediaId, correlationId);
-                return parser.parse(nativeBridge, request, response, session, gamerId, abGroup).then((parsedCampaign) => {
+                return parser.parse(nativeBridge, request, response, session, abGroup).then((parsedCampaign) => {
                     campaign = <PromoCampaign>parsedCampaign;
                 });
             };
@@ -67,7 +67,6 @@ describe('PromoCampaignParser', () => {
                 const json = JSON.parse(IAPPromoCampaign).campaign1;
                 const content = JSON.parse(json.content);
 
-                assert.equal(campaign.getGamerId(), gamerId, 'GamerID is not equal');
                 assert.equal(campaign.getAbGroup(), abGroup, 'ABGroup is not equal');
                 assert.equal(campaign.getSession(), session, 'Session is not equal');
                 assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not equal');
@@ -84,7 +83,7 @@ describe('PromoCampaignParser', () => {
 
             const parse = (data: any) => {
                 const response = new AuctionResponse(placements, data, mediaId, correlationId);
-                return parser.parse(nativeBridge, request, response, session, gamerId, abGroup).then((parsedCampaign) => {
+                return parser.parse(nativeBridge, request, response, session, abGroup).then((parsedCampaign) => {
                     campaign = <PromoCampaign>parsedCampaign;
                 });
             };
@@ -114,7 +113,7 @@ describe('PromoCampaignParser', () => {
 
             const parse = (data: any) => {
                 const response = new AuctionResponse(placements, data, mediaId, correlationId);
-                return parser.parse(nativeBridge, request, response, session, gamerId, abGroup).then((parsedCampaign) => {
+                return parser.parse(nativeBridge, request, response, session, abGroup).then((parsedCampaign) => {
                     campaign = <PromoCampaign>parsedCampaign;
                 });
             };

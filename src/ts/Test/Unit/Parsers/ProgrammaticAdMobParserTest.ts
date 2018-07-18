@@ -34,7 +34,7 @@ describe('ProgrammaticAdMobParser', () => {
 
         const parse = (data: any) => {
             const response = new AuctionResponse(placements, data, mediaId, correlationId);
-            return parser.parse(nativeBridge, request, response, session, gamerId, abGroup).then((parsedCampaign) => {
+            return parser.parse(nativeBridge, request, response, session, abGroup).then((parsedCampaign) => {
                 campaign = <AdMobCampaign>parsedCampaign;
             });
         };

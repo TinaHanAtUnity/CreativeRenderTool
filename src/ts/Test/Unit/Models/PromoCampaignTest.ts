@@ -14,7 +14,6 @@ describe('PromoCampaign', () => {
 
             assert.equal(campaign.getId(), json.promo.id);
             assert.equal(campaign.getAbGroup().toNumber(), json.abGroup);
-            assert.equal(campaign.getGamerId(), json.gamerId);
         });
     });
 });

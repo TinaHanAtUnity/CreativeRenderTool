@@ -22,7 +22,6 @@ import { SQUARE_CAMPAIGNS, SQUARE_END_SCREEN_AB_GROUPS } from 'Utilities/SquareE
 
 describe('CometCampaignParser', () => {
     const placements = ['TestPlacement'];
-    const gamerId = 'TestGamerId';
     const mediaId = 'o2YMT0Cmps6xHiOwNMeCrH';
     const correlationId = '583dfda0d933a3630a53249c';
     const abGroup = ABGroupBuilder.getAbGroup(0);
@@ -50,7 +49,7 @@ describe('CometCampaignParser', () => {
 
         const parse = (data: any) => {
             const response = new AuctionResponse(placements, data, mediaId, correlationId);
-            return parser.parse(nativeBridge, request, response, session, gamerId, abGroup).then((parsedCampaign) => {
+            return parser.parse(nativeBridge, request, response, session, abGroup).then((parsedCampaign) => {
                 campaign = <MRAIDCampaign | PerformanceCampaign>parsedCampaign;
             });
         };
@@ -76,7 +75,6 @@ describe('CometCampaignParser', () => {
         };
 
         const assertBaseCampaign = (content: any) => {
-            assert.equal(campaign.getGamerId(), gamerId, 'GamerID is not equal');
             assert.equal(campaign.getAbGroup(), abGroup, 'ABGroup is not equal');
             assert.equal(campaign.getSession(), session, 'Session is not equal');
             assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not the equal');
@@ -247,7 +245,7 @@ describe('CometCampaignParser', () => {
 
         const parse = (data: any, abGroupNumber: ABGroup) => {
             const response = new AuctionResponse(placements, data, mediaId, correlationId);
-            return parser.parse(nativeBridge, request, response, session, gamerId, abGroupNumber, '8.0').then((parsedCampaign) => {
+            return parser.parse(nativeBridge, request, response, session, abGroupNumber, '8.0').then((parsedCampaign) => {
                 campaign = <PerformanceCampaign>parsedCampaign;
             });
         };

@@ -114,7 +114,7 @@ describe('VideoEventHandlersTest', () => {
         video = new Video('', TestFixtures.getSession());
         placement = TestFixtures.getPlacement();
         const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
-        overlay = new Overlay(nativeBridge, false, 'en', configuration.getGamerId(), privacy, false);
+        overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
 
         endScreen = new PerformanceEndScreen(nativeBridge, performanceCampaign, 'en', '12345', privacy, false);
         const gdprManager = sinon.createStubInstance(GdprManager);

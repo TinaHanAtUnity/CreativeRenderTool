@@ -2,20 +2,15 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
 
-import { Campaign } from 'Models/Campaign';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Request } from 'Utilities/Request';
 import { AuctionResponse } from 'Models/AuctionResponse';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Session } from 'Models/Session';
-import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
-import { Platform } from 'Constants/Platform';
 import { SdkApi } from 'Native/Api/Sdk';
 import { ProgrammaticVastParser } from 'Parsers/ProgrammaticVastParser';
 
 import ProgrammaticVastCampaignFlat from 'json/campaigns/vast/ProgrammaticVastCampaignFlat.json';
-import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
-import { Url } from 'Utilities/Url';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { VastParser } from 'Utilities/VastParser';
 import { ABGroupBuilder } from 'Models/ABGroup';
@@ -48,7 +43,7 @@ describe('ProgrammaticVastParser', () => {
 
             const parse = (data: any) => {
                 const response = new AuctionResponse(placements, data, mediaId, correlationId);
-                return parser.parse(nativeBridge, request, response, session, gamerId, abGroup).then((parsedCampaign) => {
+                return parser.parse(nativeBridge, request, response, session, abGroup).then((parsedCampaign) => {
                     campaign = <VastCampaign>parsedCampaign;
                 });
             };
@@ -64,7 +59,6 @@ describe('ProgrammaticVastParser', () => {
                 const json = JSON.parse(ProgrammaticVastCampaignFlat);
                 const vast = new VastParser().parseVast(decodeURIComponent(json.content));
 
-                assert.equal(campaign.getGamerId(), gamerId, 'GamerID is not equal');
                 assert.equal(campaign.getAbGroup(), abGroup, 'ABGroup is not equal');
                 assert.equal(campaign.getSession(), session, 'Session is not equal');
                 assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not the equal');

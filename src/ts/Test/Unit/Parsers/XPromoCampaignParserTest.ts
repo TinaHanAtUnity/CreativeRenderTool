@@ -2,14 +2,11 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
 
-import { Campaign } from 'Models/Campaign';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Request } from 'Utilities/Request';
 import { AuctionResponse } from 'Models/AuctionResponse';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Session } from 'Models/Session';
-import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
-import { Platform } from 'Constants/Platform';
 import { SdkApi } from 'Native/Api/Sdk';
 import { XPromoCampaignParser } from 'Parsers/XPromoCampaignParser';
 
@@ -47,7 +44,7 @@ describe('XPromoCampaignParser', () => {
 
             const parse = (data: any) => {
                 const response = new AuctionResponse(placements, data, mediaId, correlationId);
-                return parser.parse(nativeBridge, request, response, session, gamerId, abGroup).then((parsedCampaign) => {
+                return parser.parse(nativeBridge, request, response, session, abGroup).then((parsedCampaign) => {
                     campaign = <XPromoCampaign>parsedCampaign;
                 });
             };
@@ -76,12 +73,6 @@ describe('XPromoCampaignParser', () => {
                 const json = JSON.parse(XPromoCampaignJSON);
                 const content = JSON.parse(json.content);
 
-                assert.equal(campaign.getGamerId(), gamerId, 'GamerID is not equal');
-                assert.equal(campaign.getAbGroup(), abGroup, 'ABGroup is not equal');
-                assert.equal(campaign.getSession(), session, 'Session is not equal');
-                assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not the equal');
-
-                assert.equal(campaign.getGamerId(), gamerId, 'GamerID is not equal');
                 assert.equal(campaign.getAbGroup(), abGroup, 'ABGroup is not equal');
                 assert.equal(campaign.getSession(), session, 'Session is not equal');
                 assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not the equal');
