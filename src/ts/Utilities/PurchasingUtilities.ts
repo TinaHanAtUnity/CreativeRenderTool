@@ -111,10 +111,6 @@ export class PurchasingUtilities {
         }
     }
 
-    public static resetResponseIndex() {
-        this.promoResponseIndex = 0;
-    }
-
     private static _catalog: PurchasingCatalog = new PurchasingCatalog([]);
     private static _clientInfo: ClientInfo;
     private static _configuration: Configuration;

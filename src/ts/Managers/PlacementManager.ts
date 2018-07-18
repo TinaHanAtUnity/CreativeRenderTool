@@ -32,10 +32,6 @@ export class PlacementManager {
         return Object.keys(this._auctionPlacementIds);
     }
 
-    public getAuctionFillPlacementIdsCount(): number {
-        return this.getAuctionFillPlacementIds().length;
-    }
-
     public setPlacementState(placementId: string, newState: PlacementState) {
         const placement: Placement = this._configuration.getPlacement(placementId);
         const oldState: PlacementState = placement.getState();

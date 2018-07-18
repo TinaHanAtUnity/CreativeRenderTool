@@ -1,5 +1,5 @@
 import 'mocha';
-import { assert } from 'chai';
+import { assert, expect } from 'chai';
 import * as sinon from 'sinon';
 
 import { NativeBridge } from 'Native/NativeBridge';
@@ -10,6 +10,8 @@ import { Campaign } from 'Models/Campaign';
 import { PlacementApi } from 'Native/Api/Placement';
 import { ListenerApi } from 'Native/Api/Listener';
 import { PlacementState } from 'Models/Placement';
+import { ConfigurationParser } from 'Parsers/ConfigurationParser';
+import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
 
 describe('PlacementManagerTest', () => {
     let nativeBridge: NativeBridge;
@@ -18,6 +20,70 @@ describe('PlacementManagerTest', () => {
     beforeEach(() => {
         nativeBridge = TestFixtures.getNativeBridge();
         configuration = TestFixtures.getConfiguration();
+    });
+
+    describe('addAuctionFillPlacementId', () => {
+        const placementManager = new PlacementManager(nativeBridge, configuration);
+
+        it('should add passed placementid to the placementIds array', () => {
+            placementManager.addAuctionFillPlacementId('testid');
+            assert.equal(placementManager.getAuctionFillPlacementIds()[0], 'testid');
+            assert.deepEqual(placementManager.getAuctionFillPlacementIds(), ['testid']);
+        });
+    });
+
+    describe('clearAuctionFillPlacementIds', () => {
+        const placementManager = new PlacementManager(nativeBridge, configuration);
+        it('should empty all placement IDs', () => {
+            placementManager.addAuctionFillPlacementId('testid');
+            assert.equal(placementManager.getAuctionFillPlacementIds().length, 1);
+            placementManager.clearAuctionFillPlacementIds();
+            assert.equal(placementManager.getAuctionFillPlacementIds().length, 0);
+        });
+    });
+
+    describe('getAuctionFillPlacementIds', () => {
+        const placementManager = new PlacementManager(nativeBridge, configuration);
+
+        it('should return the placementIds array', () => {
+            let placements = placementManager.getAuctionFillPlacementIds();
+            expect(placements).to.have.length(0);
+            placementManager.addAuctionFillPlacementId('testid');
+            placements = placementManager.getAuctionFillPlacementIds();
+            expect(placements).to.have.length(1);
+            assert.deepEqual(placementManager.getAuctionFillPlacementIds(), ['testid']);
+        });
+    });
+
+    describe('setPlacementReady', () => {
+        let campaign: Campaign;
+        let sandbox: sinon.SinonSandbox;
+        let placementManager: PlacementManager;
+
+        beforeEach(() => {
+            nativeBridge = TestFixtures.getNativeBridge();
+            configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            campaign = TestFixtures.getPromoCampaign();
+            sandbox = sinon.sandbox.create();
+
+            placementManager = new PlacementManager(nativeBridge, configuration);
+        });
+
+        afterEach(() => {
+            sandbox.restore();
+        });
+
+        it('should set placement state of the passed placementId', () => {
+            assert.equal(configuration.getPlacement('promoPlacement').getState(), PlacementState.NOT_AVAILABLE);
+            placementManager.setPlacementReady('promoPlacement', campaign);
+            assert.equal(configuration.getPlacement('promoPlacement').getState(), PlacementState.READY);
+        });
+
+        it('should set the campaign of the placement to passed campaign', () => {
+            assert.equal(configuration.getPlacement('promoPlacement').getCurrentCampaign(), undefined);
+            placementManager.setPlacementReady('promoPlacement', campaign);
+            assert.equal(configuration.getPlacement('promoPlacement').getCurrentCampaign(), campaign);
+        });
     });
 
     it('should get and set campaign for known placement', () => {
