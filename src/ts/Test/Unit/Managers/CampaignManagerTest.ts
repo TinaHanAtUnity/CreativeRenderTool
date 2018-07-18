@@ -96,7 +96,7 @@ describe('CampaignManager', () => {
     let cacheBookkeeping: CacheBookkeeping;
     let jaegerManager: JaegerManager;
     let programmaticTrackingService: ProgrammaticTrackingService;
-    let placementManager: PlacementManager 
+    let placementManager: PlacementManager;
 
     beforeEach(() => {
         configuration = ConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
