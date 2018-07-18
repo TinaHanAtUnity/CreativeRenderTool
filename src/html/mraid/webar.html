@@ -1186,8 +1186,9 @@
          * @constructor
          */
         window.WebARonARKitSetWindowSize = function(size) {
-            window.innerWidth = size.width;
-            window.innerHeight = size.height;
+           // this broke Android view size to be multiple of 4
+           // window.innerWidth = size.width;
+           // window.innerHeight = size.height;
             var resizeEvent = new Event("resize");
             for (var i = 0; i < resizeEventListeners.length; i++) {
                 if (typeof(resizeEventListeners[i]) === "function") {
