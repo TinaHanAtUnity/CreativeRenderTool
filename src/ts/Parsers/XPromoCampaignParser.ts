@@ -12,7 +12,7 @@ import { ABGroup } from 'Models/ABGroup';
 
 export class XPromoCampaignParser extends CampaignParser {
     public static ContentType = 'xpromo/video';
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: ABGroup): Promise<Campaign> {
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, abGroup: ABGroup): Promise<Campaign> {
         const json = response.getJsonContent();
 
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';
@@ -33,7 +33,6 @@ export class XPromoCampaignParser extends CampaignParser {
 
         const baseCampaignParams: ICampaign = {
             id: json.id,
-            gamerId: gamerId,
             abGroup: abGroup,
             willExpireAt: undefined,
             adType: undefined,

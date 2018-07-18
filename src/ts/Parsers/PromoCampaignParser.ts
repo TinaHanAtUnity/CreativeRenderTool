@@ -12,7 +12,7 @@ import { ABGroup } from 'Models/ABGroup';
 
 export class PromoCampaignParser extends CampaignParser {
     public static ContentType = 'purchasing/iap';
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: ABGroup): Promise<Campaign> {
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, abGroup: ABGroup): Promise<Campaign> {
         const promoJson = JsonParser.parse(response.getContent());
         if (promoJson && promoJson.iapProductId) {
             return PurchasingUtilities.refreshCatalog().then(() => {
@@ -20,7 +20,6 @@ export class PromoCampaignParser extends CampaignParser {
 
                     const baseCampaignParams: ICampaign = {
                         id: promoJson.id,
-                        gamerId: gamerId,
                         abGroup: abGroup,
                         willExpireAt: promoJson.expiry ? parseInt(promoJson.expiry, 10) * 1000 : undefined,
                         adType: promoJson.contentType || response.getContentType() || undefined,

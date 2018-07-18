@@ -11,12 +11,11 @@ import { VastParser } from 'Utilities/VastParser';
 import { FileId } from 'Utilities/FileId';
 import { Platform } from 'Constants/Platform';
 import { Url } from 'Utilities/Url';
-import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { ABGroup } from 'Models/ABGroup';
 
 export class ProgrammaticAdMobParser extends CampaignParser {
     public static ContentType = 'programmatic/admob-video';
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: ABGroup): Promise<Campaign> {
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, abGroup: ABGroup): Promise<Campaign> {
         const markup = response.getContent();
         const cacheTTL = response.getCacheTTL();
         const platform = nativeBridge.getPlatform();
@@ -31,7 +30,6 @@ export class ProgrammaticAdMobParser extends CampaignParser {
             }
             const baseCampaignParams: ICampaign = {
                 id: this.getProgrammaticCampaignId(nativeBridge),
-                gamerId: gamerId,
                 abGroup: abGroup,
                 willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
                 adType: response.getAdType() || undefined,
