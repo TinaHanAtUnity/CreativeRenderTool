@@ -21,6 +21,7 @@ import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { Video } from 'Models/Assets/Video';
 import { GDPREventHandler } from 'EventHandlers/GDPREventHandler';
+import { Configuration } from 'Models/Configuration';
 
 export interface IEndScreenDownloadParameters {
     clickAttributionUrl: string | undefined;
@@ -28,7 +29,6 @@ export interface IEndScreenDownloadParameters {
     bypassAppSheet: boolean | undefined;
     appStoreId: string | undefined;
     store: StoreName | undefined;
-    gamerId: string;
     adUnitStyle?: AdUnitStyle;
 }
 
@@ -263,7 +263,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
             case StoreName.GOOGLE:
                 return 'market://details?id=' + parameters.appStoreId;
             case StoreName.XIAOMI:
-                return 'migamecenter://details?pkgname=' + parameters.appStoreId + '&channel=unityAds&from=' + packageName + '&trace=' + parameters.gamerId;
+                return 'migamecenter://details?pkgname=' + parameters.appStoreId + '&channel=unityAds&from=' + packageName + '&trace=' + this._configuration.getToken();
             default:
                 return '';
         }
