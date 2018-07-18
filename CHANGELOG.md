@@ -1,4 +1,4 @@
-# Pending
+# Staged
 
 * Add more parameters to AbstractPrivacy Build Information
 * Remove new square endscreen image test
