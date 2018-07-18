@@ -218,26 +218,34 @@ export class OldCampaignRefreshManager extends RefreshManager {
 
     private onCampaign(placementId: string, campaign: Campaign) {
         this._parsingErrorCount = 0;
+        const isPromoWithoutProduct = campaign instanceof PromoCampaign && !PurchasingUtilities.isProductAvailable(campaign.getIapProductId());
 
         if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
-            if (MixedPlacementUtility.shouldFillMixedPlacement(placementId, this._configuration, campaign)) {
-                if (campaign instanceof PromoCampaign && !PurchasingUtilities.isProductAvailable(campaign.getIapProductId())) {
-                    this.onNoFill(placementId);
-                } else {
-                    this.setCampaignForPlacement(placementId, campaign);
-                    this.handlePlacementState(placementId, PlacementState.READY);
-                }
-            } else {
-                this.onNoFill(placementId);
-            }
+            this.handleMixedPlacementFill(placementId, campaign, isPromoWithoutProduct);
         } else {
-            if (campaign instanceof PromoCampaign && !PurchasingUtilities.isProductAvailable(campaign.getIapProductId())) {
+            if (isPromoWithoutProduct) {
                 this.onNoFill(placementId);
             } else {
-                this.setCampaignForPlacement(placementId, campaign);
-                this.handlePlacementState(placementId, PlacementState.READY);
+                this.setPlacementReady(placementId, campaign);
             }
         }
+    }
+
+    private handleMixedPlacementFill(placementId: string, campaign: Campaign, isPromoWithoutProduct: boolean) {
+        if (MixedPlacementUtility.shouldFillMixedPlacement(placementId, this._configuration, campaign)) {
+            if (isPromoWithoutProduct) {
+                this.onNoFill(placementId);
+            } else {
+                this.setPlacementReady(placementId, campaign);
+            }
+        } else {
+            this.onNoFill(placementId);
+        }
+    }
+
+    private setPlacementReady(placementId: string, campaign: Campaign) {
+        this.setCampaignForPlacement(placementId, campaign);
+        this.handlePlacementState(placementId, PlacementState.READY);
     }
 
     private onNoFill(placementId: string) {
