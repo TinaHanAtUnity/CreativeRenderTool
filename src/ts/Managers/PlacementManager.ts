@@ -3,6 +3,7 @@ import { Configuration } from 'Models/Configuration';
 import { Placement, PlacementState } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
 import { SdkStats } from 'Utilities/SdkStats';
+import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 
 export interface IMap<T> {
     [placementId: string]: T;

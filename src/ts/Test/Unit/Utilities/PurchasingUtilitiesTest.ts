@@ -346,7 +346,6 @@ describe('PurchasingUtilitiesTest', () => {
         beforeEach(() => {
             PurchasingUtilities.promoJsons[0] = JSON.parse('{\"iapProductId\":\"scooterdooter\"}');
             PurchasingUtilities.promoCampaigns[0] = TestFixtures.getPromoCampaign();
-            sandbox.stub(PurchasingUtilities.placementManager, 'getAuctionFillPlacementIds').returns(['promoPlacement']);
 
             sandbox.stub(PurchasingUtilities.placementManager, 'setPlacementReady');
             sandbox.stub(PurchasingUtilities.placementManager, 'setPlacementState');
@@ -388,7 +387,8 @@ describe('PurchasingUtilitiesTest', () => {
         });
 
         it('Should set the current placement state to nofill if product is not in the catalog', () => {
-            PurchasingUtilities.iapCampaignCount = 1;
+            // PurchasingUtilities.iapCampaignCount = 1;
+            sandbox.stub(PurchasingUtilities.placementManager, 'getAuctionFillPlacementIds').returns(['promoPlacement']);
             sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(false);
             sandbox.stub(PurchasingUtilities, 'isInitialized').returns(false);
 
@@ -400,7 +400,8 @@ describe('PurchasingUtilitiesTest', () => {
         });
 
         it('Should set the placement as ready if campaign catalog productid and promo json productid match', () => {
-            PurchasingUtilities.iapCampaignCount = 1;
+            // PurchasingUtilities.iapCampaignCount = 1;
+            sandbox.stub(PurchasingUtilities.placementManager, 'getAuctionFillPlacementIds').returns(['promoPlacement']);
             sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
             sandbox.stub(PurchasingUtilities, 'isInitialized').returns(false);
             sandbox.stub(PurchasingUtilities.promoCampaigns[0], 'getIapProductId').returns('scooterdooter');
@@ -413,7 +414,8 @@ describe('PurchasingUtilitiesTest', () => {
         });
 
         it('Should set the placement as nofill if campaign catalog productid and promo json productid dont match', () => {
-            PurchasingUtilities.iapCampaignCount = 1;
+            // PurchasingUtilities.iapCampaignCount = 1;
+            sandbox.stub(PurchasingUtilities.placementManager, 'getAuctionFillPlacementIds').returns(['promoPlacement']);
             sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
             sandbox.stub(PurchasingUtilities, 'isInitialized').returns(false);
             sandbox.stub(PurchasingUtilities.promoCampaigns[0], 'getIapProductId').returns('scootydooty');

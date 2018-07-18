@@ -40,22 +40,25 @@ export class PromoCampaignParser extends CampaignParser {
 
         const promoCampaign = new PromoCampaign(promoCampaignParams);
 
+        let promise = Promise.resolve();
+
         if (PurchasingUtilities.isInitialized()) {
-            PurchasingUtilities.refreshCatalog().then(() => {
+            promise = PurchasingUtilities.refreshCatalog().then(() => {
                 if (!PurchasingUtilities.isProductAvailable(promoJson.iapProductId)) {
-                    PurchasingUtilities.promoCampaigns[PurchasingUtilities.promoResponseIndex] = promoCampaign;
-                    PurchasingUtilities.promoJsons[PurchasingUtilities.promoResponseIndex] = promoJson;
-                    PurchasingUtilities.promoResponseIndex++;
+                    this.storeCampaign(promoCampaign, promoJson);
                 }
             });
         } else {
-            if (PurchasingUtilities.promoResponseIndex < PurchasingUtilities.iapCampaignCount) {
-                PurchasingUtilities.promoCampaigns[PurchasingUtilities.promoResponseIndex] = promoCampaign;
-                PurchasingUtilities.promoJsons[PurchasingUtilities.promoResponseIndex] = promoJson;
-                PurchasingUtilities.promoResponseIndex++;
-            }
+            this.storeCampaign(promoCampaign, promoJson);
         }
 
-        return Promise.resolve(promoCampaign);
+        return promise.then(() => Promise.resolve(promoCampaign));
+
+    }
+
+    private storeCampaign(promoCampaign: PromoCampaign, promoJson: any) {
+        PurchasingUtilities.promoCampaigns[PurchasingUtilities.promoResponseIndex] = promoCampaign;
+        PurchasingUtilities.promoJsons[PurchasingUtilities.promoResponseIndex] = promoJson;
+        PurchasingUtilities.promoResponseIndex++;
     }
 }

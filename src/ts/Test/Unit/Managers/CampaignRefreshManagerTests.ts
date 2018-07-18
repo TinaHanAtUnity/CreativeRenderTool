@@ -48,6 +48,7 @@ import { GdprManager } from 'Managers/GdprManager';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
+import { PlacementManager } from 'Managers/PlacementManager';
 
 export class TestContainer extends AdUnitContainer {
     public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, options: any): Promise<void> {
@@ -115,6 +116,7 @@ describe('CampaignRefreshManager', () => {
     let jaegerManager: JaegerManager;
     let gdprManager: GdprManager;
     let programmaticTrackingService: ProgrammaticTrackingService;
+    let placementManager: PlacementManager;
 
     beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo();
@@ -186,6 +188,8 @@ describe('CampaignRefreshManager', () => {
             }
         };
 
+        placementManager = sinon.createStubInstance(PlacementManager);
+        PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, placementManager);
         focusManager = new FocusManager(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);

@@ -28,8 +28,7 @@ export class PurchasingUtilities {
 
     public static promoJsons: any[] = [];
     public static promoCampaigns: PromoCampaign[] = [];
-    public static promoResponseIndex: number = 0;
-    public static iapCampaignCount: number = 0;
+    public static promoResponseIndex = 0;
     public static placementManager: PlacementManager;
 
     public static initialize(clientInfo: ClientInfo, configuration: Configuration, nativeBridge: NativeBridge, placementManager: PlacementManager) {
@@ -112,6 +111,10 @@ export class PurchasingUtilities {
         }
     }
 
+    public static resetResponseIndex() {
+        this.promoResponseIndex = 0;
+    }
+
     private static _catalog: PurchasingCatalog = new PurchasingCatalog([]);
     private static _clientInfo: ClientInfo;
     private static _configuration: Configuration;
@@ -120,7 +123,7 @@ export class PurchasingUtilities {
 
     private static setProductPlacementStates(): void {
         const promoPlacementIds = this.placementManager.getAuctionFillPlacementIds();
-        for (let i = 0; i < this.iapCampaignCount; i++) {
+        for (let i = 0; i < promoPlacementIds.length; i++) {
             const isProductAvailable = PurchasingUtilities.isProductAvailable(this.promoJsons[i].iapProductId);
             const isProductIdWithinAuction = this.promoCampaigns[i].getIapProductId() === this.promoJsons[i].iapProductId;
             if (isProductAvailable && isProductIdWithinAuction) {
