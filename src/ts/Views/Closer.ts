@@ -85,10 +85,6 @@ export class Closer extends View<ICloseHandler> implements IPrivacyHandler {
         this.onPrivacyOpened.unsubscribe();
     }
 
-    public show() {
-        super.show();
-    }
-
     public render() {
         super.render();
         this._GDPRPopupElement = <HTMLElement>this._container.querySelector('.gdpr-pop-up');

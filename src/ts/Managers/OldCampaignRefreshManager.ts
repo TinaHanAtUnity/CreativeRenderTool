@@ -68,7 +68,6 @@ export class OldCampaignRefreshManager extends RefreshManager {
         this._parsingErrorCount = 0;
         this._noFills = 0;
         this._configJsonCheckedAt = Date.now();
-        this._mustReinitialize = false;
 
         this._campaignManager.onCampaign.subscribe((placementId, campaign) => this.onCampaign(placementId, campaign));
         this._campaignManager.onNoFill.subscribe((placementId) => this.onNoFill(placementId));

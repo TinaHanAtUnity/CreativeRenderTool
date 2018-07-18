@@ -22,7 +22,7 @@ export class Placement {
         return 'NOT_AVAILABLE';
     }
 
-    private static _defaultPlacement: string | undefined = undefined;
+    private static _defaultPlacement: string | undefined;
     private static _placements: { [key: string]: string } = {};
 
 }
