@@ -7,7 +7,6 @@ import { ABGroup } from './ABGroup';
 
 export interface ICampaign {
     id: string;
-    gamerId: string;
     abGroup: ABGroup;
     willExpireAt: number | undefined;
     adType: string | undefined;
@@ -22,7 +21,6 @@ export interface ICampaign {
 export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T> {
     public static Schema: ISchema<ICampaign> = {
         id: ['string'],
-        gamerId: ['string'],
         abGroup: ['object'],
         willExpireAt: ['number', 'undefined'],
         adType: ['string', 'undefined'],
@@ -44,10 +42,6 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
 
     public getSession(): Session {
         return this.get('session');
-    }
-
-    public getGamerId(): string {
-        return this.get('gamerId');
     }
 
     public getAbGroup(): ABGroup {
@@ -94,7 +88,6 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
     public getDTO(): { [key: string]: any } {
         return {
             'id': this.getId(),
-            'gamerId': this.getGamerId(),
             'abGroup': this.getAbGroup().toNumber(),
             'willExpireAt': this.getWillExpireAt(),
             'mediaId': this.getMediaId()
