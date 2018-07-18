@@ -25,6 +25,7 @@ import { SdkApi } from 'Native/Api/Sdk';
 import { Closer } from 'Views/Closer';
 import { GdprManager } from 'Managers/GdprManager';
 import { Privacy } from 'Views/Privacy';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 describe('VPAIDEventHandlerTest', () => {
     let eventHandler: VPAIDEventHandler;
@@ -33,6 +34,7 @@ describe('VPAIDEventHandlerTest', () => {
     let parameters: IVPAIDAdUnitParameters;
 
     beforeEach(() => {
+        const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         parameters = {
             campaign: sinon.createStubInstance(VPAIDCampaign),
             closer: sinon.createStubInstance(Closer),
@@ -50,7 +52,8 @@ describe('VPAIDEventHandlerTest', () => {
             privacy: sinon.createStubInstance(Privacy),
             forceOrientation: Orientation.NONE,
             options: {},
-            gdprManager: sinon.createStubInstance(GdprManager)
+            gdprManager: sinon.createStubInstance(GdprManager),
+            programmaticTrackingService: programmaticTrackingService
         };
         adUnit = sinon.createStubInstance(VPAIDAdUnit);
         (<sinon.SinonStub>parameters.campaign.getSession).returns(TestFixtures.getSession());

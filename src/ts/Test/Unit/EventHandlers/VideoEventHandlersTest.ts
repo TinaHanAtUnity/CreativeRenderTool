@@ -46,6 +46,7 @@ import { AndroidVideoEventHandler } from 'EventHandlers/AndroidVideoEventHandler
 import { VideoState } from 'AdUnits/VideoAdUnit';
 import { Privacy } from 'Views/Privacy';
 import { GdprManager } from 'Managers/GdprManager';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 describe('VideoEventHandlersTest', () => {
 
@@ -74,6 +75,7 @@ describe('VideoEventHandlersTest', () => {
     let xPromoEndScreen: XPromoEndScreen;
     let performanceVideoEventHandler: PerformanceVideoEventHandler;
     let videoEventHandlerParams: IVideoEventHandlerParams;
+    let programmaticTrackingService: ProgrammaticTrackingService;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -95,6 +97,7 @@ describe('VideoEventHandlersTest', () => {
         sessionManager = new SessionManager(nativeBridge, request);
         vastCampaign = TestFixtures.getEventVastCampaign();
         performanceCampaign = TestFixtures.getCampaign();
+        programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
         operativeEventManagerParams = {
             nativeBridge: nativeBridge,
@@ -132,7 +135,8 @@ describe('VideoEventHandlersTest', () => {
             endScreen: undefined,
             overlay: overlay,
             video: video,
-            gdprManager: gdprManager
+            gdprManager: gdprManager,
+            programmaticTrackingService: programmaticTrackingService
         };
 
         performanceAdUnitParameters = {
@@ -152,7 +156,8 @@ describe('VideoEventHandlersTest', () => {
             overlay: overlay,
             video: video,
             privacy: privacy,
-            gdprManager: gdprManager
+            gdprManager: gdprManager,
+            programmaticTrackingService: programmaticTrackingService
         };
 
         const xpromoPrivacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
@@ -175,7 +180,8 @@ describe('VideoEventHandlersTest', () => {
             overlay: overlay,
             video: video,
             privacy: privacy,
-            gdprManager: gdprManager
+            gdprManager: gdprManager,
+            programmaticTrackingService: programmaticTrackingService
         };
 
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);

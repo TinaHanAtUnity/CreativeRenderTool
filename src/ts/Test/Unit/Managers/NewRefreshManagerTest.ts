@@ -108,7 +108,8 @@ describe('NewRefreshManagerTest', () => {
             request: request,
             options: {},
             adMobSignalFactory: adMobSignalFactory,
-            gdprManager: gdprManager
+            gdprManager: gdprManager,
+            programmaticTrackingService: programmaticTrackingService
         });
     });
 
