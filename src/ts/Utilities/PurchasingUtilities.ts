@@ -5,7 +5,7 @@ import { Configuration } from 'Models/Configuration';
 import { ClientInfo } from 'Models/ClientInfo';
 import { PlacementState } from 'Models/Placement';
 import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
-import { PromoPlacementManager } from 'Managers/PromoPlacementManager';
+import { PlacementManager } from 'Managers/PlacementManager';
 
 export enum IPromoRequest {
     SETIDS = 'setids',
@@ -30,13 +30,13 @@ export class PurchasingUtilities {
     public static promoCampaigns: PromoCampaign[] = [];
     public static promoResponseIndex: number = 0;
     public static iapCampaignCount: number = 0;
-    public static promoPlacementManager: PromoPlacementManager;
+    public static placementManager: PlacementManager;
 
-    public static initialize(clientInfo: ClientInfo, configuration: Configuration, nativeBridge: NativeBridge, promoPlacementManager: PromoPlacementManager) {
+    public static initialize(clientInfo: ClientInfo, configuration: Configuration, nativeBridge: NativeBridge, placementManager: PlacementManager) {
         this._clientInfo = clientInfo;
         this._configuration = configuration;
         this._nativeBridge = nativeBridge;
-        this.promoPlacementManager = promoPlacementManager;
+        this.placementManager = placementManager;
     }
 
     public static isInitialized(): boolean {
@@ -119,16 +119,14 @@ export class PurchasingUtilities {
     private static _isInitialized = false;
 
     private static setProductPlacementStates(): void {
-        const promoPlacementIds = this.promoPlacementManager.getAuctionFillPlacementIds();
+        const promoPlacementIds = this.placementManager.getAuctionFillPlacementIds();
         for (let i = 0; i < this.iapCampaignCount; i++) {
-            if (PurchasingUtilities.isProductAvailable(this.promoJsons[i].iapProductId)) {
-                if (this.promoCampaigns[i].getIapProductId() === this.promoJsons[i].iapProductId) {
-                    this.promoPlacementManager.setPromoPlacementReady(promoPlacementIds[i], this.promoCampaigns[i]);
-                } else {
-                    this.promoPlacementManager.setPlacementState(promoPlacementIds[i], PlacementState.NO_FILL);
-                }
+            const isProductAvailable = PurchasingUtilities.isProductAvailable(this.promoJsons[i].iapProductId);
+            const isProductIdWithinAuction = this.promoCampaigns[i].getIapProductId() === this.promoJsons[i].iapProductId;
+            if (isProductAvailable && isProductIdWithinAuction) {
+                this.placementManager.setPlacementReady(promoPlacementIds[i], this.promoCampaigns[i]);
             } else {
-                this.promoPlacementManager.setPlacementState(promoPlacementIds[i], PlacementState.NO_FILL);
+                this.placementManager.setPlacementState(promoPlacementIds[i], PlacementState.NO_FILL);
             }
         }
     }

@@ -11,7 +11,7 @@ import { ConfigurationParser } from 'Parsers/ConfigurationParser';
 import { ClientInfo } from 'Models/ClientInfo';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
-import { PromoPlacementManager } from 'Managers/PromoPlacementManager';
+import { PlacementManager } from 'Managers/PlacementManager';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { PlacementState } from 'Models/Placement';
 
@@ -20,7 +20,7 @@ describe('PurchasingUtilitiesTest', () => {
     let purchasing: PurchasingApi;
     let sdk: SdkApi;
     let clientInfo: ClientInfo;
-    let promoPlacementManager: PromoPlacementManager;
+    let placementManager: PlacementManager;
     let sandbox: sinon.SinonSandbox;
     const promoCatalog = '[\n  {\n    \"localizedPriceString\" : \"$0.00\",\n    \"localizedTitle\" : \"Sword of Minimal Value\",\n    \"productId\" : \"myPromo\"\n  },\n  {\n    \"localizedPriceString\" : \"$0.99\",\n    \"localizedTitle\" : \"100 in-game Gold Coins\",\n    \"productId\" : \"100.gold.coins\"\n  }\n]';
     const promoCatalogBad = '[\n    {\"pn}]';
@@ -64,8 +64,8 @@ describe('PurchasingUtilitiesTest', () => {
         (<sinon.SinonStub>purchasing.initializePurchasing).returns(Promise.resolve());
         (<any>nativeBridge).Purchasing = purchasing;
         const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
-        promoPlacementManager = new PromoPlacementManager(nativeBridge, configuration);
-        PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, promoPlacementManager);
+        placementManager = new PlacementManager(nativeBridge, configuration);
+        PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, placementManager);
     });
 
     afterEach(() => {
@@ -76,7 +76,7 @@ describe('PurchasingUtilitiesTest', () => {
 
         it('should resolve without calling sendPurchasingCommand if configuration does not include promo', () => {
             const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
-            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, promoPlacementManager);
+            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, placementManager);
             return PurchasingUtilities.sendPurchaseInitializationEvent().then(() => {
                 sinon.assert.notCalled(<sinon.SinonSpy>purchasing.initializePurchasing);
                 sinon.assert.notCalled(<sinon.SinonSpy>purchasing.getPromoVersion);
@@ -86,7 +86,7 @@ describe('PurchasingUtilitiesTest', () => {
 
         it('should fail with IAP Promo was not ready if promo is not ready', () => {
             const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, promoPlacementManager);
+            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, placementManager);
             sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('False'));
             sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.16'));
             sandbox.stub(purchasing.onCommandResult, 'subscribe').callsFake((resolve) => resolve('True'));
@@ -100,7 +100,7 @@ describe('PurchasingUtilitiesTest', () => {
         it('should fail with Promo version not supported if promo version is not 1.16 or above', () => {
             const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             const promoVersion = '1.15';
-            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, promoPlacementManager);
+            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, placementManager);
             sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('True'));
             sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve(promoVersion));
             sandbox.stub(purchasing.onCommandResult, 'subscribe').callsFake((resolve) => resolve('True'));
@@ -114,7 +114,7 @@ describe('PurchasingUtilitiesTest', () => {
         it('should fail with Promo version not supported if promo version split length is less than 2', () => {
             const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             const promoVersion = '1';
-            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, promoPlacementManager);
+            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, placementManager);
             sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('True'));
             sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve(promoVersion));
             sandbox.stub(purchasing.onCommandResult, 'subscribe').callsFake((resolve) => resolve('True'));
@@ -127,7 +127,7 @@ describe('PurchasingUtilitiesTest', () => {
 
         it('should fail and not set isInitialized to true if command result is false', () => {
             const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, promoPlacementManager);
+            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, placementManager);
 
             sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('True'));
             sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.16'));
@@ -142,7 +142,7 @@ describe('PurchasingUtilitiesTest', () => {
 
         it('should fail when initializePurchasing rejects', () => {
             const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, promoPlacementManager);
+            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, placementManager);
             (<sinon.SinonStub>purchasing.initializePurchasing).rejects();
 
             return PurchasingUtilities.sendPurchaseInitializationEvent().catch((e: any) => {
@@ -153,7 +153,7 @@ describe('PurchasingUtilitiesTest', () => {
 
         it('should fail when getPromoVersion rejects', () => {
             const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, promoPlacementManager);
+            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, placementManager);
 
             sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('True'));
             (<sinon.SinonStub>purchasing.getPromoVersion).rejects();
@@ -166,7 +166,7 @@ describe('PurchasingUtilitiesTest', () => {
 
         it('should fail when initiatePurchasingCommand rejects', () => {
             const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, promoPlacementManager);
+            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, placementManager);
 
             sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('True'));
             sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.16'));
@@ -179,7 +179,7 @@ describe('PurchasingUtilitiesTest', () => {
 
         it('should call SendPurchasingCommand on successful trigger of all underlying promises', () => {
             const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, promoPlacementManager);
+            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, placementManager);
             sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('True'));
             sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.16'));
             sandbox.stub(purchasing.onCommandResult, 'subscribe').callsFake((resolve) => resolve('True'));
@@ -346,10 +346,10 @@ describe('PurchasingUtilitiesTest', () => {
         beforeEach(() => {
             PurchasingUtilities.promoJsons[0] = JSON.parse('{\"iapProductId\":\"scooterdooter\"}');
             PurchasingUtilities.promoCampaigns[0] = TestFixtures.getPromoCampaign();
-            sandbox.stub(PurchasingUtilities.promoPlacementManager, 'getAuctionFillPlacementIds').returns(['promoPlacement']);
+            sandbox.stub(PurchasingUtilities.placementManager, 'getAuctionFillPlacementIds').returns(['promoPlacement']);
 
-            sandbox.stub(PurchasingUtilities.promoPlacementManager, 'setPromoPlacementReady');
-            sandbox.stub(PurchasingUtilities.promoPlacementManager, 'setPlacementState');
+            sandbox.stub(PurchasingUtilities.placementManager, 'setPlacementReady');
+            sandbox.stub(PurchasingUtilities.placementManager, 'setPlacementState');
             sandbox.stub(PurchasingUtilities, 'sendPurchaseInitializationEvent').returns(Promise.resolve());
             sandbox.stub(PurchasingUtilities, 'refreshCatalog').returns(Promise.resolve());
         });
@@ -395,7 +395,7 @@ describe('PurchasingUtilitiesTest', () => {
             return PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}').then(() => {
                 sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
                 sinon.assert.calledWith(<sinon.SinonSpy>PurchasingUtilities.isProductAvailable, 'scooterdooter');
-                sinon.assert.calledWith(<sinon.SinonSpy>PurchasingUtilities.promoPlacementManager.setPlacementState, 'promoPlacement', PlacementState.NO_FILL);
+                sinon.assert.calledWith(<sinon.SinonSpy>PurchasingUtilities.placementManager.setPlacementState, 'promoPlacement', PlacementState.NO_FILL);
             });
         });
 
@@ -408,7 +408,7 @@ describe('PurchasingUtilitiesTest', () => {
             return PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}').then(() => {
                 sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
                 sinon.assert.calledWith(<sinon.SinonSpy>PurchasingUtilities.isProductAvailable, 'scooterdooter');
-                sinon.assert.calledWith(<sinon.SinonSpy>PurchasingUtilities.promoPlacementManager.setPromoPlacementReady, 'promoPlacement', PurchasingUtilities.promoCampaigns[0]);
+                sinon.assert.calledWith(<sinon.SinonSpy>PurchasingUtilities.placementManager.setPlacementReady, 'promoPlacement', PurchasingUtilities.promoCampaigns[0]);
             });
         });
 
@@ -421,7 +421,7 @@ describe('PurchasingUtilitiesTest', () => {
             return PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}').then(() => {
                 sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
                 sinon.assert.calledWith(<sinon.SinonSpy>PurchasingUtilities.isProductAvailable, 'scooterdooter');
-                sinon.assert.calledWith(<sinon.SinonSpy>PurchasingUtilities.promoPlacementManager.setPlacementState, 'promoPlacement', PlacementState.NO_FILL);
+                sinon.assert.calledWith(<sinon.SinonSpy>PurchasingUtilities.placementManager.setPlacementState, 'promoPlacement', PlacementState.NO_FILL);
             });
         });
     });

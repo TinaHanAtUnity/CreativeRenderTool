@@ -61,7 +61,7 @@ import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
 import { ABGroupBuilder } from 'Models/ABGroup';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
-import { PromoPlacementManager } from 'Managers/PromoPlacementManager';
+import { PlacementManager } from 'Managers/PlacementManager';
 
 export class WebView {
 
@@ -220,8 +220,8 @@ export class WebView {
             HttpKafka.setConfiguration(this._configuration);
             this._jaegerManager.setJaegerTracingEnabled(this._configuration.isJaegerTracingEnabled());
 
-            const promoPlacementManager = new PromoPlacementManager(this._nativeBridge, this._configuration);
-            PurchasingUtilities.initialize(this._clientInfo, this._configuration, this._nativeBridge, promoPlacementManager);
+            const placementManager = new PlacementManager(this._nativeBridge, this._configuration);
+            PurchasingUtilities.initialize(this._clientInfo, this._configuration, this._nativeBridge, placementManager);
             PurchasingUtilities.sendPurchaseInitializationEvent();
             this._nativeBridge.Purchasing.onIAPSendEvent.subscribe((iapPayload) => PurchasingUtilities.handleSendIAPEvent(iapPayload));
 

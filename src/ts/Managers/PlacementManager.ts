@@ -4,26 +4,58 @@ import { Placement, PlacementState } from 'Models/Placement';
 import { Campaign } from 'Models/Campaign';
 import { SdkStats } from 'Utilities/SdkStats';
 
+export interface IMap<T> {
+    [placementId: string]: T;
+}
+
 export class PlacementManager {
     private _nativeBridge: NativeBridge;
     private _configuration: Configuration;
+    private _auctionPlacementIds: IMap<boolean>;
 
     constructor(nativeBridge: NativeBridge, configuration: Configuration) {
         this._nativeBridge = nativeBridge;
         this._configuration = configuration;
+        this._auctionPlacementIds = {};
+    }
+
+    public addAuctionFillPlacementId(placementId: string) {
+        this._auctionPlacementIds[placementId] = true;
+    }
+
+    public clearAuctionFillPlacementIds() {
+        this._auctionPlacementIds = {};
+    }
+
+    public getAuctionFillPlacementIds(): string[] {
+        return Object.keys(this._auctionPlacementIds);
+    }
+
+    public getAuctionFillPlacementIdsCount(): number {
+        return this.getAuctionFillPlacementIds().length;
     }
 
     public setPlacementState(placementId: string, newState: PlacementState) {
         const placement: Placement = this._configuration.getPlacement(placementId);
         const oldState: PlacementState = placement.getState();
 
-        placement.setState(newState);
-        this.sendPlacementStateChange(placementId, oldState, newState);
+        if (placement) {
+            placement.setState(newState);
+            this.sendPlacementStateChange(placementId, oldState, newState);
+        }
     }
 
     public setAllPlacementStates(newState: PlacementState) {
         for(const placementId of this._configuration.getPlacementIds()) {
             this.setPlacementState(placementId, newState);
+        }
+    }
+
+    public setPlacementReady(placementId: string, campaign: Campaign): void {
+        const placement = this._configuration.getPlacement(placementId);
+        if(placement) {
+            this.setPlacementState(placementId, PlacementState.READY);
+            placement.setCurrentCampaign(campaign);
         }
     }
 

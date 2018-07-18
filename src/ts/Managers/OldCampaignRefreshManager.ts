@@ -219,27 +219,14 @@ export class OldCampaignRefreshManager extends RefreshManager {
     private onCampaign(placementId: string, campaign: Campaign) {
         this._parsingErrorCount = 0;
         const isPromoWithoutProduct = campaign instanceof PromoCampaign && !PurchasingUtilities.isProductAvailable(campaign.getIapProductId());
+        const isMixedPlacementExperiment = CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId());
+        const shouldFillMixedPlacement = MixedPlacementUtility.shouldFillMixedPlacement(placementId, this._configuration, campaign);
+        const shouldNoFillMixedPlacement = isMixedPlacementExperiment && !shouldFillMixedPlacement;
 
-        if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
-            this.handleMixedPlacementFill(placementId, campaign, isPromoWithoutProduct);
-        } else {
-            if (isPromoWithoutProduct) {
-                this.onNoFill(placementId);
-            } else {
-                this.setPlacementReady(placementId, campaign);
-            }
-        }
-    }
-
-    private handleMixedPlacementFill(placementId: string, campaign: Campaign, isPromoWithoutProduct: boolean) {
-        if (MixedPlacementUtility.shouldFillMixedPlacement(placementId, this._configuration, campaign)) {
-            if (isPromoWithoutProduct) {
-                this.onNoFill(placementId);
-            } else {
-                this.setPlacementReady(placementId, campaign);
-            }
-        } else {
+        if (shouldNoFillMixedPlacement || isPromoWithoutProduct) {
             this.onNoFill(placementId);
+        } else {
+            this.setPlacementReady(placementId, campaign);
         }
     }
 

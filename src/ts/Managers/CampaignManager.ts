@@ -338,7 +338,6 @@ export class CampaignManager {
             }
 
             let campaigns: number = 0;
-            let iapCampaignCount: number = 0;
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
                     campaigns++;
@@ -348,18 +347,14 @@ export class CampaignManager {
                     if(contentType && contentType !== 'comet/campaign' && cacheTTL > 0 && (cacheTTL < refreshDelay || refreshDelay === 0)) {
                         refreshDelay = cacheTTL;
                     }
-                    if(contentType && contentType === 'purchasing/iap') {
-                        iapCampaignCount++;
-                    }
                 }
             }
 
             if (!this._ignoreEvents) {
                 this._nativeBridge.Sdk.logInfo('AdPlan received with ' + campaigns + ' campaigns and refreshDelay ' + refreshDelay);
-                PurchasingUtilities.iapCampaignCount = iapCampaignCount;
                 this.onAdPlanReceived.trigger(refreshDelay, campaigns);
             }
-
+            PurchasingUtilities.placementManager.clearAuctionFillPlacementIds();
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
                     let auctionResponse: AuctionResponse;
@@ -367,7 +362,7 @@ export class CampaignManager {
                         auctionResponse = new AuctionResponse(fill[mediaId], json.media[mediaId], mediaId, json.correlationId);
                         for(const placementid of auctionResponse.getPlacements()) {
                             if (auctionResponse.getContentType() === 'purchasing/iap') {
-                                PurchasingUtilities.promoPlacementManager.addAuctionFillPromoPlacementId(placementid);
+                                PurchasingUtilities.placementManager.addAuctionFillPlacementId(placementid);
                             }
                         }
                         promises.push(this.handleCampaign(auctionResponse, session, backupResponse).catch(error => {
