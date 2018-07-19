@@ -45,7 +45,7 @@ export class PromoCampaignParser extends CampaignParser {
         if (PurchasingUtilities.isInitialized()) {
             promise = PurchasingUtilities.refreshCatalog().then(() => {
                 if (!PurchasingUtilities.isProductAvailable(promoJson.iapProductId)) {
-                    this.storeCampaign(promoCampaign, promoJson);
+                    this.storeCampaign(promoCampaign, response);
                 }
             });
         } else {
@@ -56,9 +56,9 @@ export class PromoCampaignParser extends CampaignParser {
 
     }
 
-    private storeCampaign(promoCampaign: PromoCampaign, promoJson: any) {
-        PurchasingUtilities.promoCampaigns[PurchasingUtilities.promoResponseIndex] = promoCampaign;
-        PurchasingUtilities.promoJsons[PurchasingUtilities.promoResponseIndex] = promoJson;
-        PurchasingUtilities.promoResponseIndex++;
+    private storeCampaign(promoCampaign: PromoCampaign, response: AuctionResponse) {
+        for(const placementid of response.getPlacements()) {
+            PurchasingUtilities.placementCampaigns[placementid] = promoCampaign;
+        }
     }
 }

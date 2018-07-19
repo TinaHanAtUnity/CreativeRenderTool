@@ -355,7 +355,6 @@ export class CampaignManager {
                 this.onAdPlanReceived.trigger(refreshDelay, campaigns);
             }
             PurchasingUtilities.placementManager.clearAuctionFillPlacementIds();
-            PurchasingUtilities.promoResponseIndex = 0;
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
                     let auctionResponse: AuctionResponse;

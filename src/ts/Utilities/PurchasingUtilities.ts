@@ -24,12 +24,14 @@ export interface IPromoPayload {
     purchaseTrackingUrls: string[];
 }
 
+export interface IPlacementIdMap<T> {
+    [placementId: string]: T;
+}
+
 export class PurchasingUtilities {
 
-    public static promoJsons: any[] = [];
-    public static promoCampaigns: PromoCampaign[] = [];
-    public static promoResponseIndex = 0;
     public static placementManager: PlacementManager;
+    public static placementCampaigns: IPlacementIdMap<PromoCampaign>;
 
     public static initialize(clientInfo: ClientInfo, configuration: Configuration, nativeBridge: NativeBridge, placementManager: PlacementManager) {
         this._clientInfo = clientInfo;
@@ -119,13 +121,12 @@ export class PurchasingUtilities {
 
     private static setProductPlacementStates(): void {
         const promoPlacementIds = this.placementManager.getAuctionFillPlacementIds();
-        for (let i = 0; i < promoPlacementIds.length; i++) {
-            const isProductAvailable = PurchasingUtilities.isProductAvailable(this.promoJsons[i].iapProductId);
-            const isProductIdWithinAuction = this.promoCampaigns[i].getIapProductId() === this.promoJsons[i].iapProductId;
-            if (isProductAvailable && isProductIdWithinAuction) {
-                this.placementManager.setPlacementReady(promoPlacementIds[i], this.promoCampaigns[i]);
+        for (const placementId of promoPlacementIds) {
+            const isProductAvailable = PurchasingUtilities.isProductAvailable(this.placementCampaigns[placementId].getIapProductId());
+            if (isProductAvailable) {
+                this.placementManager.setPlacementReady(placementId, this.placementCampaigns[placementId]);
             } else {
-                this.placementManager.setPlacementState(promoPlacementIds[i], PlacementState.NO_FILL);
+                this.placementManager.setPlacementState(placementId, PlacementState.NO_FILL);
             }
         }
     }
