@@ -27,8 +27,8 @@ describe('MOAT', () => {
         });
 
         const tests: Array<{
-            event: any,
-            assertions: () => void
+            event: any;
+            assertions: () => void;
         }> = [{
             event: {data: {type: 'MOATVideoError', error: 'test error'}},
             assertions: () => {

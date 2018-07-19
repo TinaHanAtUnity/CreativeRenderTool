@@ -34,7 +34,6 @@
     "completed-docs": [false, "classes"],
     "no-inner-html": false,
     "member-ordering": [false, { "order": "fields-first" }],
-    "type-literal-delimiter": false,
     "no-suspicious-comment": false,
     "no-non-null-assertion": false,
     "align": [false, "parameters", "arguments", "statements"],
