@@ -39,6 +39,7 @@ import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFact
 import { GdprManager } from 'Managers/GdprManager';
 
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 describe('AdUnitFactoryTest', () => {
 
@@ -79,6 +80,7 @@ describe('AdUnitFactoryTest', () => {
         sessionManager = new SessionManager(nativeBridge, request);
         const campaign = TestFixtures.getCampaign();
         const gdprManager = sinon.createStubInstance(GdprManager);
+        const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             nativeBridge: nativeBridge,
@@ -106,7 +108,8 @@ describe('AdUnitFactoryTest', () => {
             configuration: config,
             request: request,
             options: {},
-            gdprManager: gdprManager
+            gdprManager: gdprManager,
+            programmaticTrackingService: programmaticTrackingService
         };
 
         sandbox.spy(thirdPartyEventManager, 'sendEvent');

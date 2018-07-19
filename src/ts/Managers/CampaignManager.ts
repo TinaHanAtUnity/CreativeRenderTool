@@ -529,7 +529,7 @@ export class CampaignManager {
         }
 
         const parseTimestamp = Date.now();
-        return parser.parse(this._nativeBridge, this._request, response, session, this._configuration.getGamerId(), this.getAbGroup(), this._deviceInfo.getOsVersion()).then((campaign) => {
+        return parser.parse(this._nativeBridge, this._request, response, session, this._configuration.getGamerId(), this.getAbGroup()).then((campaign) => {
             const parseDuration = Date.now() - parseTimestamp;
             for(const placement of response.getPlacements()) {
                 SdkStats.setParseDuration(placement, parseDuration);
@@ -827,6 +827,7 @@ export class CampaignManager {
                 body.gdprEnabled = this._configuration.isGDPREnabled();
                 body.optOutEnabled = this._configuration.isOptOutEnabled();
                 body.optOutRecorded = this._configuration.isOptOutRecorded();
+                body.abGroup = this._configuration.getAbGroup().toNumber();
 
                 const organizationId = this._configuration.getOrganizationId();
                 if(organizationId) {
