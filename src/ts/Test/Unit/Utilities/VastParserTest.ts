@@ -40,7 +40,7 @@ describe('VastParser', () => {
     it('should throw when given a vast string with invalid document element', () => {
         assert.throws(() => {
             assert.isNull(TestFixtures.getVastParser().parseVast(
-                `<?xml version="1.0" encoding="UTF-8" standalone="no"?><foo></foo>`
+                '<?xml version="1.0" encoding="UTF-8" standalone="no"?><foo></foo>'
             ));
         });
     });
@@ -101,9 +101,7 @@ describe('VastParser', () => {
     });
 
     it('should throw when given vast has no Ad element', () => {
-        const vastNoAdRaw = `
-            <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-            <VAST version="2.0"></VAST>`;
+        const vastNoAdRaw = '<?xml version="1.0" encoding="UTF-8" standalone="no"?><VAST version="2.0"></VAST>';
 
         try {
             const vastPromise = TestFixtures.getVastParser().retrieveVast(vastNoAdRaw, nativeBridge, request);
