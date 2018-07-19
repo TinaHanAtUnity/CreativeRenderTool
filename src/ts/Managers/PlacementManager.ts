@@ -21,7 +21,7 @@ export class PlacementManager {
         this._placementCampaignMap = {};
     }
 
-    public addCampaignPlacmentIds(placementId: string, campaign: Campaign) {
+    public addCampaignPlacementIds(placementId: string, campaign: Campaign) {
         this._placementCampaignMap[placementId] = campaign;
     }
 

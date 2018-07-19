@@ -30,7 +30,7 @@ describe('PlacementManagerTest', () => {
         sinon.stub(campaign, 'getAdType').returns('purchasing/iap');
 
         it('should add passed placementid and campaign to the placementCampaignMap', () => {
-            placementManager.addCampaignPlacmentIds('testid', campaign);
+            placementManager.addCampaignPlacementIds('testid', campaign);
             assert.deepEqual(placementManager.getPlacementCampaignMap(), {'testid': campaign});
         });
     });
@@ -42,7 +42,7 @@ describe('PlacementManagerTest', () => {
 
         it('should add passed placementid to the auction map', () => {
             placementManager.addAuctionFillPlacementId('testid');
-            placementManager.addCampaignPlacmentIds('testid', campaign);
+            placementManager.addCampaignPlacementIds('testid', campaign);
             assert.equal(placementManager.getAuctionFillPlacementIds(PromoCampaignParser.ContentType)[0], 'testid');
             assert.deepEqual(placementManager.getAuctionFillPlacementIds(PromoCampaignParser.ContentType), ['testid']);
         });
@@ -55,7 +55,7 @@ describe('PlacementManagerTest', () => {
 
         it('should empty all placement IDs', () => {
             placementManager.addAuctionFillPlacementId('testid');
-            placementManager.addCampaignPlacmentIds('testid', campaign);
+            placementManager.addCampaignPlacementIds('testid', campaign);
             assert.equal(placementManager.getAuctionFillPlacementIds(PromoCampaignParser.ContentType).length, 1);
             assert.equal(Object.keys(placementManager.getPlacementCampaignMap()).length, 1);
             placementManager.clear();
@@ -77,8 +77,8 @@ describe('PlacementManagerTest', () => {
 
             placementManager.addAuctionFillPlacementId('testid');
             placementManager.addAuctionFillPlacementId('testid2');
-            placementManager.addCampaignPlacmentIds('testid', campaign1);
-            placementManager.addCampaignPlacmentIds('testid2', campaign2);
+            placementManager.addCampaignPlacementIds('testid', campaign1);
+            placementManager.addCampaignPlacementIds('testid2', campaign2);
 
             placements = placementManager.getAuctionFillPlacementIds(PromoCampaignParser.ContentType);
             expect(placements).to.have.length(1);
@@ -98,8 +98,8 @@ describe('PlacementManagerTest', () => {
             let map = placementManager.getPlacementCampaignMap();
             expect(Object.keys(map)).to.have.length(0);
 
-            placementManager.addCampaignPlacmentIds('testid', campaign1);
-            placementManager.addCampaignPlacmentIds('testid2', campaign2);
+            placementManager.addCampaignPlacementIds('testid', campaign1);
+            placementManager.addCampaignPlacementIds('testid2', campaign2);
             map = placementManager.getPlacementCampaignMap();
             expect(Object.keys(map)).to.have.length(2);
             assert.deepEqual(placementManager.getPlacementCampaignMap(), {
