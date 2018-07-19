@@ -1,12 +1,20 @@
 ## Description
-_A few sentences talking about why this change is being made and about any difficult to understand sections of code._
+
+### Why
+_Why is this change necessary?_
+### How
+_What are the changes that are being made?_
 
 ## Link to a Jira Ticket
 [insert ticket name here](insert ticket link here)
 
-## Todos
-- [ ] Tested on iOS
-- [ ] Tested on Android
+## Testing
+
+| Device type to test | iOS | Android |
+|---------------------|-----|---------|
+| old | _insert device_ | _insert device_ |
+| recent | | |
+| new | | |
 
  _If you do not test on both platforms please leave a description as to why._
 
