@@ -71,8 +71,6 @@ import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
 import { GDPRPrivacy } from 'Views/GDPRPrivacy';
 import { PrivacyEventHandler } from 'EventHandlers/PrivacyEventHandler';
-import { NewVideoOverlayEnabledAbTest } from 'Models/ABGroup';
-import { NewVideoOverlay } from 'Views/NewVideoOverlay';
 
 export class AdUnitFactory {
 
@@ -423,25 +421,28 @@ export class AdUnitFactory {
     private static createOverlay(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractVideoOverlay {
         const privacy = this.createPrivacy(nativeBridge, parameters);
         const showGDPRBanner = (parameters.campaign instanceof VastCampaign) ? this.showGDPRBanner(parameters) : false;
-        const isPerformanceCampaign = parameters.campaign instanceof PerformanceCampaign;
-        const disablePrivacyDuringVideo = (isPerformanceCampaign || parameters.campaign instanceof XPromoCampaign) && !parameters.placement.skipEndCardOnClose();
-        let overlay: AbstractVideoOverlay;
+        const disablePrivacyDuringVideo = (parameters.campaign instanceof PerformanceCampaign || parameters.campaign instanceof XPromoCampaign) && !parameters.placement.skipEndCardOnClose();
 
-        if (parameters.placement.allowSkip() && parameters.placement.skipEndCardOnClose()) {
-            overlay = new ClosableVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+        if (!parameters.placement.allowSkip()) {
+            const overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, disablePrivacyDuringVideo);
+            if (parameters.placement.disableVideoControlsFade()) {
+                overlay.setFadeEnabled(false);
+            }
+            return overlay;
         } else {
-            if (isPerformanceCampaign && NewVideoOverlayEnabledAbTest.isValid(parameters.campaign.getAbGroup())) {
-                overlay = new NewVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, disablePrivacyDuringVideo);
+            let overlay: AbstractVideoOverlay;
+
+            if (parameters.placement.skipEndCardOnClose()) {
+                overlay = new ClosableVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
             } else {
                 overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, disablePrivacyDuringVideo);
             }
-        }
 
-        if (parameters.placement.disableVideoControlsFade()) {
-            overlay.setFadeEnabled(false);
+            if (parameters.placement.disableVideoControlsFade()) {
+                overlay.setFadeEnabled(false);
+            }
+            return overlay;
         }
-
-        return overlay;
     }
 
     private static getVideoEventHandlerParams(nativeBridge: NativeBridge, adUnit: VideoAdUnit, video: Video, adUnitStyle: AdUnitStyle | undefined, params: IAdUnitParameters<Campaign>): IVideoEventHandlerParams {
