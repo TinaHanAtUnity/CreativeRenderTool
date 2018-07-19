@@ -54,7 +54,7 @@ describe('XHRequestTest', () => {
     );
 
     // Test skipped since is not faking XMLHttpRequest properly.
-    xit(`should give an OK response from the file`, () => {
+    xit('should give an OK response from the file', () => {
         server.respondWith('GET', 'file:///path/to/file.txt', [0, {}, 'File content']);
 
         return XHRequest.get('file:///path/to/file.txt').then((responseText) => {
@@ -63,7 +63,7 @@ describe('XHRequestTest', () => {
         });
     });
 
-    it(`should fail from file:// with status not 0`, async () => {
+    it('should fail from file:// with status not 0', async () => {
         server.respondWith('GET', /\/path\/to\/file.txt$/, [300, {}, 'Text']);
 
         try {
@@ -90,7 +90,7 @@ describe('XHRequestTest', () => {
             await promise;
         } catch(err) {
             assert.isTrue(err instanceof Error, 'Did not fail from the error');
-            assert.equal(err.toString(), `Error: Error ocurred while executing request: status - 0`);
+            assert.equal(err.toString(), 'Error: Error ocurred while executing request: status - 0');
             return;
         }
 
@@ -110,7 +110,7 @@ describe('XHRequestTest', () => {
             await promise;
         } catch(err) {
             assert.isTrue(err instanceof Error, 'Did not fail from the error');
-            assert.equal(err.toString(), `Error: Request was aborted`);
+            assert.equal(err.toString(), 'Error: Request was aborted');
             return;
         }
 
@@ -128,7 +128,7 @@ describe('XHRequestTest', () => {
             await promise;
         } catch(err) {
             assert.isTrue(err instanceof Error, 'Did not fail from the error');
-            assert.equal(err.toString(), `Error: Request timed out`);
+            assert.equal(err.toString(), 'Error: Request timed out');
             return;
         }
 
