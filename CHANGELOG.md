@@ -1,4 +1,8 @@
-# Staged
+# Pending
+
+* Revert "Merge pull request #5566 from Applifier/feature/new-video-overlay
+
+# Thu Jul 19 20:07:08 UTC 2018
 
 * Add more parameters to AbstractPrivacy Build Information
 * Remove new square endscreen image test
