@@ -48,13 +48,13 @@ describe('MOAT', () => {
         }, {
             event: {data: {type: 'test'}},
             assertions: () => {
-                sinon.assert.calledWithExactly(logWarningStub, `MOAT Unknown message type test`);
+                sinon.assert.calledWithExactly(logWarningStub, 'MOAT Unknown message type test');
                 sinon.assert.notCalled(diagnosticsTriggerStub);
             }
         }];
 
         tests.forEach((test) => {
-            it(`should pass assertions`, () => {
+            it('should pass assertions', () => {
                 moat.onMessage(test.event);
                 test.assertions();
             });
