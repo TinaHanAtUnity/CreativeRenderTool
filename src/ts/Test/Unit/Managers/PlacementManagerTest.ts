@@ -52,7 +52,7 @@ describe('PlacementManagerTest', () => {
             map = placementManager.getPlacementCampaignMap(PromoCampaignParser.ContentType);
             expect(Object.keys(map)).to.have.length(1);
             assert.deepEqual(placementManager.getPlacementCampaignMap(PromoCampaignParser.ContentType), {
-                'testid': campaign1,
+                'testid': campaign1
             });
         });
     });
