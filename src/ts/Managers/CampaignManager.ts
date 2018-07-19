@@ -150,6 +150,41 @@ export class CampaignManager {
 
             SdkStats.setAdRequestTimestamp();
         }).then(() => {
+            let cachedJson: any;
+            try {
+                cachedJson = JsonParser.parse(cachedResponse.response);
+            } catch (e) {
+                return Promise.reject('failed to parse cached response, invalidate cache');
+            }
+
+            const expiredPlacements = [];
+
+            const now = new Date(Date.now());
+            const utcTimestamp = Math.floor(new Date(now.getUTCFullYear(),now.getUTCMonth(), now.getUTCDate(),
+                now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), now.getUTCMilliseconds()).getTime() / 1000);
+
+            for(const placement in cachedJson.placements) {
+                if(!cachedJson.placements.hasOwnProperty(placement)) {
+                    continue;
+                }
+                const mediaId: string = cachedJson.placements[placement];
+                const absoluteCacheTTL = cachedJson.media[mediaId].absoluteCacheTTL;
+
+                if (absoluteCacheTTL && utcTimestamp > absoluteCacheTTL) {
+                    expiredPlacements.push(placement);
+                }
+            }
+
+            for(const placement of expiredPlacements) {
+                delete cachedJson.placements[placement];
+            }
+
+            if (Object.keys(cachedJson.placements).length === 0) {
+                return Promise.reject('all placements expired, invalidate cache');
+            }
+
+            cachedResponse.response = JSON.stringify(cachedJson);
+
             return this.parseCampaigns(cachedResponse, true);
         }).then(() => {
             this._ignoreEvents = false;
@@ -403,14 +438,15 @@ export class CampaignManager {
                 }
 
                 for(const mediaId in fill) {
-                    if(fill.hasOwnProperty(mediaId)) {
-                        const contentType = cachedJson.media[mediaId].contentType;
+                    if(!fill.hasOwnProperty(mediaId)) {
+                        continue;
+                    }
+                    const contentType = cachedJson.media[mediaId].contentType;
 
-                        if (contentType && contentType === 'programmatic/vast') {
-                            fill[mediaId].forEach(p => {
-                                delete cachedJson.placements[p];
-                            });
-                        }
+                    if (contentType && contentType === 'programmatic/vast') {
+                        fill[mediaId].forEach(p => {
+                            delete cachedJson.placements[p];
+                        });
                     }
                 }
 
@@ -420,6 +456,23 @@ export class CampaignManager {
 
                 for(const placement of noFill) {
                     delete cachedJson.placements[placement];
+                }
+
+                if (Object.keys(cachedJson.placements).length === 0) {
+                    return Promise.resolve();
+                }
+
+                const now = new Date(Date.now());
+                const utcTimestamp = Math.floor(new Date(now.getUTCFullYear(),now.getUTCMonth(), now.getUTCDate(),
+                    now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), now.getUTCMilliseconds()).getTime() / 1000);
+
+                for(const mediaId in fill) {
+                    if(!fill.hasOwnProperty(mediaId)) {
+                        continue;
+                    }
+
+                    const cacheTTL = cachedJson.media[mediaId].cacheTTL ? cachedJson.media[mediaId].cacheTTL : 3600;
+                    cachedJson.media[mediaId].absoluteCacheTTL = utcTimestamp + cacheTTL;
                 }
 
                 return this._cacheBookkeeping.setCachedCampaignResponse({
