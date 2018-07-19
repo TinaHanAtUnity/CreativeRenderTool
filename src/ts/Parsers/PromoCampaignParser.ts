@@ -58,7 +58,7 @@ export class PromoCampaignParser extends CampaignParser {
 
     private storeCampaign(promoCampaign: PromoCampaign, response: AuctionResponse) {
         for(const placementid of response.getPlacements()) {
-            PurchasingUtilities.placementCampaigns[placementid] = promoCampaign;
+            PurchasingUtilities.placementManager.addCampaignPlacmentIds(placementid, promoCampaign);
         }
     }
 }

@@ -354,16 +354,14 @@ export class CampaignManager {
                 this._nativeBridge.Sdk.logInfo('AdPlan received with ' + campaigns + ' campaigns and refreshDelay ' + refreshDelay);
                 this.onAdPlanReceived.trigger(refreshDelay, campaigns);
             }
-            PurchasingUtilities.placementManager.clearAuctionFillPlacementIds();
+            PurchasingUtilities.placementManager.clear();
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
                     let auctionResponse: AuctionResponse;
                     try {
                         auctionResponse = new AuctionResponse(fill[mediaId], json.media[mediaId], mediaId, json.correlationId);
                         for(const placementid of auctionResponse.getPlacements()) {
-                            if (auctionResponse.getContentType() === 'purchasing/iap') {
-                                PurchasingUtilities.placementManager.addAuctionFillPlacementId(placementid);
-                            }
+                            PurchasingUtilities.placementManager.addAuctionFillPlacementId(placementid);
                         }
                         promises.push(this.handleCampaign(auctionResponse, session, backupResponse).catch(error => {
                             if(error === CacheStatus.STOPPED) {
@@ -434,6 +432,7 @@ export class CampaignManager {
         return parser.parse(this._nativeBridge, this._request, response, session, this._configuration.getGamerId(), this.getAbGroup()).then((campaign) => {
             const parseDuration = Date.now() - parseTimestamp;
             for(const placement of response.getPlacements()) {
+                PurchasingUtilities.placementManager.addCampaignPlacmentIds(placement, campaign);
                 SdkStats.setParseDuration(placement, parseDuration);
             }
 

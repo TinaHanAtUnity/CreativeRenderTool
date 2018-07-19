@@ -6,6 +6,7 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { PlacementState } from 'Models/Placement';
 import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 import { PlacementManager } from 'Managers/PlacementManager';
+import { PromoCampaignParser } from 'Parsers/PromoCampaignParser';
 
 export enum IPromoRequest {
     SETIDS = 'setids',
@@ -24,14 +25,9 @@ export interface IPromoPayload {
     purchaseTrackingUrls: string[];
 }
 
-export interface IPlacementIdMap<T> {
-    [placementId: string]: T;
-}
-
 export class PurchasingUtilities {
 
     public static placementManager: PlacementManager;
-    public static placementCampaigns: IPlacementIdMap<PromoCampaign>;
 
     public static initialize(clientInfo: ClientInfo, configuration: Configuration, nativeBridge: NativeBridge, placementManager: PlacementManager) {
         this._clientInfo = clientInfo;
@@ -120,11 +116,13 @@ export class PurchasingUtilities {
     private static _isInitialized = false;
 
     private static setProductPlacementStates(): void {
-        const promoPlacementIds = this.placementManager.getAuctionFillPlacementIds();
+        const promoPlacementIds = this.placementManager.getAuctionFillPlacementIds(PromoCampaignParser.ContentType);
+        const placementCampaignMap = this.placementManager.getPlacementCampaignMap();
         for (const placementId of promoPlacementIds) {
-            const isProductAvailable = PurchasingUtilities.isProductAvailable(this.placementCampaigns[placementId].getIapProductId());
-            if (isProductAvailable) {
-                this.placementManager.setPlacementReady(placementId, this.placementCampaigns[placementId]);
+            const currentCampaign = placementCampaignMap[placementId];
+
+            if (currentCampaign instanceof PromoCampaign && this.isProductAvailable(currentCampaign.getIapProductId())) {
+                this.placementManager.setPlacementReady(placementId, currentCampaign);
             } else {
                 this.placementManager.setPlacementState(placementId, PlacementState.NO_FILL);
             }

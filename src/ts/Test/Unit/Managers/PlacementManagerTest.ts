@@ -12,6 +12,7 @@ import { ListenerApi } from 'Native/Api/Listener';
 import { PlacementState } from 'Models/Placement';
 import { ConfigurationParser } from 'Parsers/ConfigurationParser';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
+import { PromoCampaignParser } from 'Parsers/PromoCampaignParser';
 
 describe('PlacementManagerTest', () => {
     let nativeBridge: NativeBridge;
@@ -27,18 +28,18 @@ describe('PlacementManagerTest', () => {
 
         it('should add passed placementid to the placementIds array', () => {
             placementManager.addAuctionFillPlacementId('testid');
-            assert.equal(placementManager.getAuctionFillPlacementIds()[0], 'testid');
-            assert.deepEqual(placementManager.getAuctionFillPlacementIds(), ['testid']);
+            assert.equal(placementManager.getAuctionFillPlacementIds(PromoCampaignParser.ContentType)[0], 'testid');
+            assert.deepEqual(placementManager.getAuctionFillPlacementIds(PromoCampaignParser.ContentType), ['testid']);
         });
     });
 
-    describe('clearAuctionFillPlacementIds', () => {
+    describe('clear', () => {
         const placementManager = new PlacementManager(nativeBridge, configuration);
         it('should empty all placement IDs', () => {
             placementManager.addAuctionFillPlacementId('testid');
-            assert.equal(placementManager.getAuctionFillPlacementIds().length, 1);
-            placementManager.clearAuctionFillPlacementIds();
-            assert.equal(placementManager.getAuctionFillPlacementIds().length, 0);
+            assert.equal(placementManager.getAuctionFillPlacementIds(PromoCampaignParser.ContentType).length, 1);
+            placementManager.clear();
+            assert.equal(placementManager.getAuctionFillPlacementIds(PromoCampaignParser.ContentType).length, 0);
         });
     });
 
@@ -46,12 +47,12 @@ describe('PlacementManagerTest', () => {
         const placementManager = new PlacementManager(nativeBridge, configuration);
 
         it('should return the placementIds array', () => {
-            let placements = placementManager.getAuctionFillPlacementIds();
+            let placements = placementManager.getAuctionFillPlacementIds(PromoCampaignParser.ContentType);
             expect(placements).to.have.length(0);
             placementManager.addAuctionFillPlacementId('testid');
-            placements = placementManager.getAuctionFillPlacementIds();
+            placements = placementManager.getAuctionFillPlacementIds(PromoCampaignParser.ContentType);
             expect(placements).to.have.length(1);
-            assert.deepEqual(placementManager.getAuctionFillPlacementIds(), ['testid']);
+            assert.deepEqual(placementManager.getAuctionFillPlacementIds(PromoCampaignParser.ContentType), ['testid']);
         });
     });
 
