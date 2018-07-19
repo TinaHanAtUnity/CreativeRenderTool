@@ -360,9 +360,6 @@ export class CampaignManager {
                     let auctionResponse: AuctionResponse;
                     try {
                         auctionResponse = new AuctionResponse(fill[mediaId], json.media[mediaId], mediaId, json.correlationId);
-                        for(const placementid of auctionResponse.getPlacements()) {
-                            PurchasingUtilities.placementManager.addAuctionFillPlacementId(placementid);
-                        }
                         promises.push(this.handleCampaign(auctionResponse, session, backupResponse).catch(error => {
                             if(error === CacheStatus.STOPPED) {
                                 return Promise.resolve();

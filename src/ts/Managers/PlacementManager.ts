@@ -11,13 +11,11 @@ export interface IPlacementIdMap<T> {
 export class PlacementManager {
     private _nativeBridge: NativeBridge;
     private _configuration: Configuration;
-    private _placementAuctionMap: IPlacementIdMap<boolean>;
     private _placementCampaignMap: IPlacementIdMap<Campaign>;
 
     constructor(nativeBridge: NativeBridge, configuration: Configuration) {
         this._nativeBridge = nativeBridge;
         this._configuration = configuration;
-        this._placementAuctionMap = {};
         this._placementCampaignMap = {};
     }
 
@@ -25,30 +23,21 @@ export class PlacementManager {
         this._placementCampaignMap[placementId] = campaign;
     }
 
-    public addAuctionFillPlacementId(placementId: string) {
-        this._placementAuctionMap[placementId] = true;
-    }
-
-    public clear() {
-        this._placementAuctionMap = {};
-        this._placementCampaignMap = {};
-    }
-
-    public getAuctionFillPlacementIds(adType: string): string[] {
-        const placementIds = Object.keys(this._placementAuctionMap);
-        const res: string[] = [];
+    public getPlacementCampaignMap(adType: string): IPlacementIdMap<Campaign> {
+        const placementIds = Object.keys(this._placementCampaignMap);
+        const res: IPlacementIdMap<Campaign> = {};
 
         placementIds.forEach((placementId) => {
             if (this._placementCampaignMap[placementId].getAdType() === adType) {
-                res.push(placementId);
+                res[placementId] = this._placementCampaignMap[placementId];
             }
         });
 
         return res;
     }
 
-    public getPlacementCampaignMap(): IPlacementIdMap<Campaign> {
-        return this._placementCampaignMap;
+    public clear() {
+        this._placementCampaignMap = {};
     }
 
     public setPlacementState(placementId: string, newState: PlacementState) {

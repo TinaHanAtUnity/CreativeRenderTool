@@ -116,8 +116,8 @@ export class PurchasingUtilities {
     private static _isInitialized = false;
 
     private static setProductPlacementStates(): void {
-        const promoPlacementIds = this.placementManager.getAuctionFillPlacementIds(PromoCampaignParser.ContentType);
-        const placementCampaignMap = this.placementManager.getPlacementCampaignMap();
+        const placementCampaignMap = this.placementManager.getPlacementCampaignMap(PromoCampaignParser.ContentType);
+        const promoPlacementIds = Object.keys(placementCampaignMap);
         for (const placementId of promoPlacementIds) {
             const currentCampaign = placementCampaignMap[placementId];
 

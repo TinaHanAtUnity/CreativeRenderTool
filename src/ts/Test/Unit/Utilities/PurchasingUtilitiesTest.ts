@@ -384,7 +384,6 @@ describe('PurchasingUtilitiesTest', () => {
         });
 
         it('Should set the current placement state to nofill if product is not in the catalog', () => {
-            sandbox.stub(PurchasingUtilities.placementManager, 'getAuctionFillPlacementIds').returns(['promoPlacement']);
             const campaign = TestFixtures.getPromoCampaign();
             sandbox.stub(PurchasingUtilities.placementManager, 'getPlacementCampaignMap').returns({'promoPlacement': campaign});
 
@@ -400,7 +399,6 @@ describe('PurchasingUtilitiesTest', () => {
         });
 
         it('Should set the placement as ready if product is in the catalog', () => {
-            sandbox.stub(PurchasingUtilities.placementManager, 'getAuctionFillPlacementIds').returns(['promoPlacement']);
             const campaign = TestFixtures.getPromoCampaign();
             sandbox.stub(PurchasingUtilities.placementManager, 'getPlacementCampaignMap').returns({'promoPlacement': campaign});
 
@@ -415,7 +413,6 @@ describe('PurchasingUtilitiesTest', () => {
         });
 
         it('Should set the placement as nofill if campaign is not a promo campaign', () => {
-            sandbox.stub(PurchasingUtilities.placementManager, 'getAuctionFillPlacementIds').returns(['placement']);
             const campaign = TestFixtures.getXPromoCampaign();
             sandbox.stub(PurchasingUtilities.placementManager, 'getPlacementCampaignMap').returns({'placement': campaign});
 
