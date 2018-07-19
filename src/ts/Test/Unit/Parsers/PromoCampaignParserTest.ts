@@ -15,7 +15,7 @@ import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 import { ABGroupBuilder } from 'Models/ABGroup';
 
-xdescribe('PromoCampaignParser', () => {
+describe('PromoCampaignParser', () => {
     const placements = ['TestPlacement'];
     const gamerId = 'TestGamerId';
     const mediaId = 'o2YMT0Cmps6xHiOwNMeCrH';
@@ -144,7 +144,6 @@ xdescribe('PromoCampaignParser', () => {
 
             beforeEach(() => {
                 sandbox = sinon.createSandbox();
-                // PurchasingUtilities.promoJsons[0] = null;
                 sandbox.stub(PurchasingUtilities, 'isInitialized').returns(true);
             });
 
@@ -152,44 +151,15 @@ xdescribe('PromoCampaignParser', () => {
                 sandbox.restore();
             });
 
-            it('should no-op resolve when product is avaiable', () => {
-                // PurchasingUtilities.promoResponseIndex = 0;
+            it('should refresh catalog and resolve campaign', () => {
 
                 sandbox.stub(PurchasingUtilities, 'refreshCatalog').returns(Promise.resolve());
-                sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
 
                 const parse = (data: any) => {
                     const response = new AuctionResponse(placements, data, mediaId, correlationId);
                     return parser.parse(nativeBridge, request, response, session, gamerId, abGroup).then((parsedCampaign) => {
                         campaign = <PromoCampaign>parsedCampaign;
-                        const json = JSON.parse(IAPPromoCampaign).campaign1;
-                        const content = JSON.parse(json.content);
-
-                        // assert.notEqual(PurchasingUtilities.promoCampaigns[0], campaign);
-                        // assert.notDeepEqual(PurchasingUtilities.promoJsons[0], content);
-                        // assert.equal(PurchasingUtilities.promoResponseIndex, 0);
-                    });
-                };
-
-                return parse(JSON.parse(IAPPromoCampaign).campaign1);
-            });
-
-            it('should increase the promo response index, store campaign, and json in Purchasing Utilities', () => {
-                // PurchasingUtilities.promoResponseIndex = 0;
-
-                sandbox.stub(PurchasingUtilities, 'refreshCatalog').returns(Promise.resolve());
-                sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(false);
-
-                const parse = (data: any) => {
-                    const response = new AuctionResponse(placements, data, mediaId, correlationId);
-                    return parser.parse(nativeBridge, request, response, session, gamerId, abGroup).then((parsedCampaign) => {
-                        campaign = <PromoCampaign>parsedCampaign;
-                        const json = JSON.parse(IAPPromoCampaign).campaign1;
-                        const content = JSON.parse(json.content);
-
-                        // assert.equal(PurchasingUtilities.promoCampaigns[0], campaign);
-                        // assert.deepEqual(PurchasingUtilities.promoJsons[0], content);
-                        // assert.equal(PurchasingUtilities.promoResponseIndex, 1);
+                        sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.refreshCatalog);
                     });
                 };
 
@@ -210,19 +180,13 @@ xdescribe('PromoCampaignParser', () => {
                 sandbox.restore();
             });
 
-            it('should increase the promo response index, store campaign, and json in Purchasing Utilities', () => {
-                // PurchasingUtilities.promoResponseIndex = 0;
-                // assert.equal(PurchasingUtilities.promoResponseIndex, 0);
-
+            it('should resolve campaign and not refresh catalog', () => {
+                sandbox.stub(PurchasingUtilities, 'refreshCatalog').returns(Promise.resolve());
                 const parse = (data: any) => {
                     const response = new AuctionResponse(placements, data, mediaId, correlationId);
                     return parser.parse(nativeBridge, request, response, session, gamerId, abGroup).then((parsedCampaign) => {
                         campaign = <PromoCampaign>parsedCampaign;
-                        const json = JSON.parse(IAPPromoCampaign).campaign1;
-                        const content = JSON.parse(json.content);
-                        // assert.equal(PurchasingUtilities.promoCampaigns[0], campaign);
-                        // assert.deepEqual(PurchasingUtilities.promoJsons[0], content);
-                        // assert.equal(PurchasingUtilities.promoResponseIndex, 1);
+                        sinon.assert.notCalled(<sinon.SinonSpy>PurchasingUtilities.refreshCatalog);
                     });
                 };
 

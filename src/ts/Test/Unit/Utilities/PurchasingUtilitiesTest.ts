@@ -12,8 +12,8 @@ import { ClientInfo } from 'Models/ClientInfo';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import { PlacementManager } from 'Managers/PlacementManager';
-import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { PlacementState } from 'Models/Placement';
+import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 
 describe('PurchasingUtilitiesTest', () => {
     let nativeBridge: NativeBridge;
@@ -341,12 +341,9 @@ describe('PurchasingUtilitiesTest', () => {
         });
     });
 
-    xdescribe('Handle Send Event', () => {
+    describe('Handle Send Event', () => {
 
         beforeEach(() => {
-            // PurchasingUtilities.promoJsons[0] = JSON.parse('{\"iapProductId\":\"scooterdooter\"}');
-            // PurchasingUtilities.promoCampaigns[0] = TestFixtures.getPromoCampaign();
-
             sandbox.stub(PurchasingUtilities.placementManager, 'setPlacementReady');
             sandbox.stub(PurchasingUtilities.placementManager, 'setPlacementState');
             sandbox.stub(PurchasingUtilities, 'sendPurchaseInitializationEvent').returns(Promise.resolve());
@@ -366,7 +363,7 @@ describe('PurchasingUtilitiesTest', () => {
             });
         });
 
-        it('Should not send the purchase initialization event when if IAP is already initialized', () => {
+        it('Should not send the purchase initialization event if IAP is already initialized', () => {
             sandbox.stub(PurchasingUtilities, 'isInitialized').returns(true);
 
             return PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}').then(() => {
@@ -387,43 +384,48 @@ describe('PurchasingUtilitiesTest', () => {
         });
 
         it('Should set the current placement state to nofill if product is not in the catalog', () => {
-            // PurchasingUtilities.iapCampaignCount = 1;
             sandbox.stub(PurchasingUtilities.placementManager, 'getAuctionFillPlacementIds').returns(['promoPlacement']);
+            const campaign = TestFixtures.getPromoCampaign();
+            sandbox.stub(PurchasingUtilities.placementManager, 'getPlacementCampaignMap').returns({'promoPlacement': campaign});
+
             sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(false);
             sandbox.stub(PurchasingUtilities, 'isInitialized').returns(false);
+            sandbox.stub(campaign, 'getAdType').returns('purchasing/iap');
 
             return PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}').then(() => {
                 sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
-                sinon.assert.calledWith(<sinon.SinonSpy>PurchasingUtilities.isProductAvailable, 'scooterdooter');
+                sinon.assert.calledWith(<sinon.SinonSpy>PurchasingUtilities.isProductAvailable, 'com.example.iap.product1');
                 sinon.assert.calledWith(<sinon.SinonSpy>PurchasingUtilities.placementManager.setPlacementState, 'promoPlacement', PlacementState.NO_FILL);
             });
         });
 
-        it('Should set the placement as ready if campaign catalog productid and promo json productid match', () => {
-            // PurchasingUtilities.iapCampaignCount = 1;
+        it('Should set the placement as ready if product is in the catalog', () => {
             sandbox.stub(PurchasingUtilities.placementManager, 'getAuctionFillPlacementIds').returns(['promoPlacement']);
+            const campaign = TestFixtures.getPromoCampaign();
+            sandbox.stub(PurchasingUtilities.placementManager, 'getPlacementCampaignMap').returns({'promoPlacement': campaign});
+
             sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
             sandbox.stub(PurchasingUtilities, 'isInitialized').returns(false);
-            // sandbox.stub(PurchasingUtilities.promoCampaigns[0], 'getIapProductId').returns('scooterdooter');
 
             return PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}').then(() => {
                 sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
-                sinon.assert.calledWith(<sinon.SinonSpy>PurchasingUtilities.isProductAvailable, 'scooterdooter');
-                // sinon.assert.calledWith(<sinon.SinonSpy>PurchasingUtilities.placementManager.setPlacementReady, 'promoPlacement', PurchasingUtilities.promoCampaigns[0]);
+                sinon.assert.calledWith(<sinon.SinonSpy>PurchasingUtilities.isProductAvailable, 'com.example.iap.product1');
+                sinon.assert.calledWith(<sinon.SinonSpy>PurchasingUtilities.placementManager.setPlacementReady, 'promoPlacement', campaign);
             });
         });
 
-        it('Should set the placement as nofill if campaign catalog productid and promo json productid dont match', () => {
-            // PurchasingUtilities.iapCampaignCount = 1;
-            sandbox.stub(PurchasingUtilities.placementManager, 'getAuctionFillPlacementIds').returns(['promoPlacement']);
+        it('Should set the placement as nofill if campaign is not a promo campaign', () => {
+            sandbox.stub(PurchasingUtilities.placementManager, 'getAuctionFillPlacementIds').returns(['placement']);
+            const campaign = TestFixtures.getXPromoCampaign();
+            sandbox.stub(PurchasingUtilities.placementManager, 'getPlacementCampaignMap').returns({'placement': campaign});
+
             sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
             sandbox.stub(PurchasingUtilities, 'isInitialized').returns(false);
-            // sandbox.stub(PurchasingUtilities.promoCampaigns[0], 'getIapProductId').returns('scootydooty');
 
             return PurchasingUtilities.handleSendIAPEvent('{\"type\":\"CatalogUpdated\"}').then(() => {
                 sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.sendPurchaseInitializationEvent);
-                sinon.assert.calledWith(<sinon.SinonSpy>PurchasingUtilities.isProductAvailable, 'scooterdooter');
-                sinon.assert.calledWith(<sinon.SinonSpy>PurchasingUtilities.placementManager.setPlacementState, 'promoPlacement', PlacementState.NO_FILL);
+                sinon.assert.notCalled(<sinon.SinonSpy>PurchasingUtilities.isProductAvailable);
+                sinon.assert.calledWith(<sinon.SinonSpy>PurchasingUtilities.placementManager.setPlacementState, 'placement', PlacementState.NO_FILL);
             });
         });
     });

@@ -18,6 +18,7 @@ export class PlacementManager {
         this._nativeBridge = nativeBridge;
         this._configuration = configuration;
         this._placementAuctionMap = {};
+        this._placementCampaignMap = {};
     }
 
     public addCampaignPlacmentIds(placementId: string, campaign: Campaign) {

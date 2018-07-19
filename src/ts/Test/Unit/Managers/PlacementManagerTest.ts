@@ -13,6 +13,7 @@ import { PlacementState } from 'Models/Placement';
 import { ConfigurationParser } from 'Parsers/ConfigurationParser';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
 import { PromoCampaignParser } from 'Parsers/PromoCampaignParser';
+import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 
 describe('PlacementManagerTest', () => {
     let nativeBridge: NativeBridge;
@@ -23,11 +24,25 @@ describe('PlacementManagerTest', () => {
         configuration = TestFixtures.getConfiguration();
     });
 
+    describe('addCampaignPlacementIds', () => {
+        const placementManager = new PlacementManager(nativeBridge, configuration);
+        const campaign: PromoCampaign = TestFixtures.getPromoCampaign();
+        sinon.stub(campaign, 'getAdType').returns('purchasing/iap');
+
+        it('should add passed placementid and campaign to the placementCampaignMap', () => {
+            placementManager.addCampaignPlacmentIds('testid', campaign);
+            assert.deepEqual(placementManager.getPlacementCampaignMap(), {'testid': campaign});
+        });
+    });
+
     describe('addAuctionFillPlacementId', () => {
         const placementManager = new PlacementManager(nativeBridge, configuration);
+        const campaign: PromoCampaign = TestFixtures.getPromoCampaign();
+        sinon.stub(campaign, 'getAdType').returns('purchasing/iap');
 
-        it('should add passed placementid to the placementIds array', () => {
+        it('should add passed placementid to the auction map', () => {
             placementManager.addAuctionFillPlacementId('testid');
+            placementManager.addCampaignPlacmentIds('testid', campaign);
             assert.equal(placementManager.getAuctionFillPlacementIds(PromoCampaignParser.ContentType)[0], 'testid');
             assert.deepEqual(placementManager.getAuctionFillPlacementIds(PromoCampaignParser.ContentType), ['testid']);
         });
@@ -35,24 +50,62 @@ describe('PlacementManagerTest', () => {
 
     describe('clear', () => {
         const placementManager = new PlacementManager(nativeBridge, configuration);
+        const campaign: PromoCampaign = TestFixtures.getPromoCampaign();
+        sinon.stub(campaign, 'getAdType').returns('purchasing/iap');
+
         it('should empty all placement IDs', () => {
             placementManager.addAuctionFillPlacementId('testid');
+            placementManager.addCampaignPlacmentIds('testid', campaign);
             assert.equal(placementManager.getAuctionFillPlacementIds(PromoCampaignParser.ContentType).length, 1);
+            assert.equal(Object.keys(placementManager.getPlacementCampaignMap()).length, 1);
             placementManager.clear();
             assert.equal(placementManager.getAuctionFillPlacementIds(PromoCampaignParser.ContentType).length, 0);
+            assert.equal(Object.keys(placementManager.getPlacementCampaignMap()).length, 0);
         });
     });
 
     describe('getAuctionFillPlacementIds', () => {
         const placementManager = new PlacementManager(nativeBridge, configuration);
+        const campaign1 = TestFixtures.getPromoCampaign();
+        const campaign2 = TestFixtures.getXPromoCampaign();
+        sinon.stub(campaign1, 'getAdType').returns('purchasing/iap');
+        sinon.stub(campaign2, 'getAdType').returns('xpromo/video');
 
-        it('should return the placementIds array', () => {
+        it('should return the auctionPlacementIds array of the specified content type', () => {
             let placements = placementManager.getAuctionFillPlacementIds(PromoCampaignParser.ContentType);
             expect(placements).to.have.length(0);
+
             placementManager.addAuctionFillPlacementId('testid');
+            placementManager.addAuctionFillPlacementId('testid2');
+            placementManager.addCampaignPlacmentIds('testid', campaign1);
+            placementManager.addCampaignPlacmentIds('testid2', campaign2);
+
             placements = placementManager.getAuctionFillPlacementIds(PromoCampaignParser.ContentType);
             expect(placements).to.have.length(1);
             assert.deepEqual(placementManager.getAuctionFillPlacementIds(PromoCampaignParser.ContentType), ['testid']);
+        });
+    });
+
+    describe('getPlacementCampaignMap', () => {
+        const placementManager = new PlacementManager(nativeBridge, configuration);
+
+        const campaign1 = TestFixtures.getPromoCampaign();
+        const campaign2 = TestFixtures.getXPromoCampaign();
+        sinon.stub(campaign1, 'getAdType').returns('purchasing/iap');
+        sinon.stub(campaign2, 'getAdType').returns('xpromo/video');
+
+        it('should return map of all placements added to placement campaign map', () => {
+            let map = placementManager.getPlacementCampaignMap();
+            expect(Object.keys(map)).to.have.length(0);
+
+            placementManager.addCampaignPlacmentIds('testid', campaign1);
+            placementManager.addCampaignPlacmentIds('testid2', campaign2);
+            map = placementManager.getPlacementCampaignMap();
+            expect(Object.keys(map)).to.have.length(2);
+            assert.deepEqual(placementManager.getPlacementCampaignMap(), {
+                'testid': campaign1,
+                'testid2': campaign2
+            });
         });
     });
 
@@ -63,11 +116,8 @@ describe('PlacementManagerTest', () => {
 
         beforeEach(() => {
             nativeBridge = TestFixtures.getNativeBridge();
-            configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             campaign = TestFixtures.getPromoCampaign();
             sandbox = sinon.sandbox.create();
-
-            placementManager = new PlacementManager(nativeBridge, configuration);
         });
 
         afterEach(() => {
@@ -75,15 +125,30 @@ describe('PlacementManagerTest', () => {
         });
 
         it('should set placement state of the passed placementId', () => {
+            configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            placementManager = new PlacementManager(nativeBridge, configuration);
             assert.equal(configuration.getPlacement('promoPlacement').getState(), PlacementState.NOT_AVAILABLE);
             placementManager.setPlacementReady('promoPlacement', campaign);
             assert.equal(configuration.getPlacement('promoPlacement').getState(), PlacementState.READY);
         });
 
         it('should set the campaign of the placement to passed campaign', () => {
+            configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            placementManager = new PlacementManager(nativeBridge, configuration);
             assert.equal(configuration.getPlacement('promoPlacement').getCurrentCampaign(), undefined);
             placementManager.setPlacementReady('promoPlacement', campaign);
             assert.equal(configuration.getPlacement('promoPlacement').getCurrentCampaign(), campaign);
+        });
+
+        it('should not change placement state to ready if placement doesnt exist in config', () => {
+            configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            placementManager = new PlacementManager(nativeBridge, configuration);
+
+            sandbox.stub(configuration, 'getPlacement').returns(undefined);
+            sandbox.stub(placementManager, 'setPlacementState');
+
+            placementManager.setPlacementReady('promoPlacement', campaign);
+            sinon.assert.notCalled(<sinon.SinonSpy>placementManager.setPlacementState);
         });
     });
 
