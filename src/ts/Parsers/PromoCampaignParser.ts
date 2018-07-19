@@ -43,22 +43,10 @@ export class PromoCampaignParser extends CampaignParser {
         let promise = Promise.resolve();
 
         if (PurchasingUtilities.isInitialized()) {
-            promise = PurchasingUtilities.refreshCatalog().then(() => {
-                if (!PurchasingUtilities.isProductAvailable(promoJson.iapProductId)) {
-                    this.storeCampaign(promoCampaign, response);
-                }
-            });
-        } else {
-            this.storeCampaign(promoCampaign, promoJson);
+            promise = PurchasingUtilities.refreshCatalog();
         }
 
         return promise.then(() => Promise.resolve(promoCampaign));
 
-    }
-
-    private storeCampaign(promoCampaign: PromoCampaign, response: AuctionResponse) {
-        for(const placementid of response.getPlacements()) {
-            PurchasingUtilities.placementManager.addCampaignPlacmentIds(placementid, promoCampaign);
-        }
     }
 }
