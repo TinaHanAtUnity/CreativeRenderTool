@@ -103,7 +103,7 @@ describe('CampaignManager', () => {
         warningSpy = sinon.spy();
         nativeBridge = <NativeBridge><any>{
             Storage: {
-                get: function(storageType: number, key: string) {
+                get: (storageType: number, key: string) => {
                     return Promise.resolve('123');
                 },
                 set: () => {

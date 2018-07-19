@@ -4,7 +4,6 @@
     "no-import-side-effect": false,
     "missing-jsdoc": false,
     "typedef": [false, "call-signature", "arrow-call-signature", "parameter", "arrow-parameter", "property-declaration", "variable-declaration", "member-variable-declaration"],
-    "no-function-expression": false,
     "variable-name": false,
     "no-bitwise": false,
     "no-this-assignment": false,
