@@ -22,6 +22,8 @@ import { JaegerSpan } from 'Jaeger/JaegerSpan';
 import { UserCountData } from 'Utilities/UserCountData';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { MixedPlacementUtility } from 'Utilities/MixedPlacementUtility';
+import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
+import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 
 export class OldCampaignRefreshManager extends RefreshManager {
     private _nativeBridge: NativeBridge;
@@ -216,18 +218,21 @@ export class OldCampaignRefreshManager extends RefreshManager {
 
     private onCampaign(placementId: string, campaign: Campaign) {
         this._parsingErrorCount = 0;
+        const isPromoWithoutProduct = campaign instanceof PromoCampaign && !PurchasingUtilities.isProductAvailable(campaign.getIapProductId());
+        const isMixedPlacementExperiment = CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId());
+        const shouldFillMixedPlacement = MixedPlacementUtility.shouldFillMixedPlacement(placementId, this._configuration, campaign);
+        const shouldNoFillMixedPlacement = isMixedPlacementExperiment && !shouldFillMixedPlacement;
 
-        if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
-            if (MixedPlacementUtility.shouldFillMixedPlacement(placementId, this._configuration, campaign)) {
-                this.setCampaignForPlacement(placementId, campaign);
-                this.handlePlacementState(placementId, PlacementState.READY);
-            } else {
-                this.onNoFill(placementId);
-            }
+        if (shouldNoFillMixedPlacement || isPromoWithoutProduct) {
+            this.onNoFill(placementId);
         } else {
-            this.setCampaignForPlacement(placementId, campaign);
-            this.handlePlacementState(placementId, PlacementState.READY);
+            this.setPlacementReady(placementId, campaign);
         }
+    }
+
+    private setPlacementReady(placementId: string, campaign: Campaign) {
+        this.setCampaignForPlacement(placementId, campaign);
+        this.handlePlacementState(placementId, PlacementState.READY);
     }
 
     private onNoFill(placementId: string) {
