@@ -511,6 +511,13 @@
     "platforms": "all"
   },
   {
+    "key": "abGroup",
+    "type": "number",
+    "description": "AB Group number assigned to this user from configuration",
+    "provider": "Server",
+    "platforms": "all"
+  },
+  {
     "key": "unityCreativeId",
     "type": "string",
     "description": "Creative id of the shown creative",
