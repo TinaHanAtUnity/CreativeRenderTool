@@ -1,29 +1,66 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { Configuration } from 'Models/Configuration';
 import { Placement, PlacementState } from 'Models/Placement';
-import { Campaign } from 'Models/Campaign';
+import { Campaign, ICampaign } from 'Models/Campaign';
 import { SdkStats } from 'Utilities/SdkStats';
+
+export interface IPlacementIdMap<T> {
+    [placementId: string]: T;
+}
 
 export class PlacementManager {
     private _nativeBridge: NativeBridge;
     private _configuration: Configuration;
+    private _placementCampaignMap: IPlacementIdMap<Campaign>;
 
     constructor(nativeBridge: NativeBridge, configuration: Configuration) {
         this._nativeBridge = nativeBridge;
         this._configuration = configuration;
+        this._placementCampaignMap = {};
+    }
+
+    public addCampaignPlacementIds(placementId: string, campaign: Campaign) {
+        this._placementCampaignMap[placementId] = campaign;
+    }
+
+    public getPlacementCampaignMap(adType: string): IPlacementIdMap<Campaign> {
+        const placementIds = Object.keys(this._placementCampaignMap);
+        const res: IPlacementIdMap<Campaign> = {};
+
+        placementIds.forEach((placementId) => {
+            if (this._placementCampaignMap[placementId].getAdType() === adType) {
+                res[placementId] = this._placementCampaignMap[placementId];
+            }
+        });
+
+        return res;
+    }
+
+    public clear() {
+        this._placementCampaignMap = {};
     }
 
     public setPlacementState(placementId: string, newState: PlacementState) {
         const placement: Placement = this._configuration.getPlacement(placementId);
         const oldState: PlacementState = placement.getState();
 
-        placement.setState(newState);
-        this.sendPlacementStateChange(placementId, oldState, newState);
+        if (placement) {
+            placement.setState(newState);
+            this.sendPlacementStateChange(placementId, oldState, newState);
+        }
     }
 
     public setAllPlacementStates(newState: PlacementState) {
         for(const placementId of this._configuration.getPlacementIds()) {
             this.setPlacementState(placementId, newState);
+        }
+    }
+
+    public setPlacementReady(placementId: string, campaign: Campaign): void {
+        const placement = this._configuration.getPlacement(placementId);
+        if(placement) {
+            this.setPlacementState(placementId, PlacementState.READY);
+            placement.setCurrentCampaign(campaign);
         }
     }
 
