@@ -557,7 +557,6 @@ export class WebView {
                 if (!isNaN(abGroupNumber)) { // if it is a number get the group
                     const abGroup = ABGroupBuilder.getAbGroup(abGroupNumber);
                     ConfigManager.setAbGroup(abGroup);
-                    CampaignManager.setAbGroup(abGroup);
                 }
             }
 

@@ -252,7 +252,6 @@ describe('CampaignManager', () => {
 
                 // then the onVastCampaign observable is triggered with the correct campaign data
                 mockRequest.verify();
-                assert.equal(triggeredCampaign.getAbGroup(), ABGroupBuilder.getAbGroup(99));
                 assert.equal(triggeredCampaign.getGamerId(), '57a35671bb58271e002d93c9');
                 assert.equal((<VastCampaign>triggeredCampaign).getVideo().getUrl(), 'https://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
             });
@@ -280,7 +279,6 @@ describe('CampaignManager', () => {
                     // then the onVastCampaign observable is triggered with the correct campaign data
                     mockRequest.verify();
 
-                    assert.equal(triggeredCampaign.getAbGroup(), ABGroupBuilder.getAbGroup(99));
                     assert.equal(triggeredCampaign.getGamerId(), '57a35671bb58271e002d93c9');
                     assert.equal(triggeredCampaign.getVideo().getUrl(), 'http://cdnp.tremormedia.com/video/acudeo/Carrot_400x300_500kb.mp4');
 
@@ -362,7 +360,6 @@ describe('CampaignManager', () => {
                 // then the onVastCampaign observable is triggered with the correct campaign data
                 mockRequest.verify();
 
-                assert.equal(triggeredCampaign.getAbGroup(), ABGroupBuilder.getAbGroup(99));
                 assert.equal(triggeredCampaign.getGamerId(), '57a35671bb58271e002d93c9');
                 assert.equal(triggeredCampaign.getVideo().getUrl(), 'https://speed-s.pointroll.com/pointroll/media/asset/Nissan/221746/Nissan_FY16_FTC_GM_Generic_Instream_1280x720_400kbps_15secs.mp4');
                 assert.deepEqual(triggeredCampaign.getVast().getAd()!.getErrorURLTemplates(), [
@@ -658,7 +655,6 @@ describe('CampaignManager', () => {
 
                 // then the onVastCampaign observable is triggered with the correct campaign data
                 mockRequest.verify();
-                assert.equal(triggeredCampaign.getAbGroup(), ABGroupBuilder.getAbGroup(99));
                 assert.equal(triggeredCampaign.getGamerId(), '57a35671bb58271e002d93c9');
                 assert.equal(triggeredCampaign.getVideo().getUrl(), 'http://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
             });
@@ -719,7 +715,6 @@ describe('CampaignManager', () => {
 
                 // then the onVastCampaign observable is triggered with the correct campaign data
                 mockRequest.verify();
-                assert.equal(triggeredCampaign.getAbGroup(), ABGroupBuilder.getAbGroup(99));
                 assert.equal(triggeredCampaign.getGamerId(), '57a35671bb58271e002d93c9');
                 assert.equal(triggeredCampaign.getVideo().getUrl(), 'http://static.applifier.com/impact/videos/104090/e97394713b8efa50/1602-30s-v22r3-seven-knights-character-select/m31-1000.mp4');
 
@@ -773,7 +768,6 @@ describe('CampaignManager', () => {
                 mockRequest.verify();
 
                 assert.equal(triggeredCampaign.getId(), 'UNKNOWN');
-                assert.equal(triggeredCampaign.getAbGroup(), configuration.getAbGroup());
                 assert.equal(triggeredCampaign.getGamerId(), configuration.getGamerId());
 
                 const asset = new HTML(content.inlinedUrl, triggeredCampaign.getSession());
@@ -819,7 +813,6 @@ describe('CampaignManager', () => {
                 mockRequest.verify();
 
                 assert.equal(triggeredCampaign.getId(), 'UNKNOWN');
-                assert.equal(triggeredCampaign.getAbGroup(), configuration.getAbGroup());
                 assert.equal(triggeredCampaign.getGamerId(), configuration.getGamerId());
                 assert.deepEqual(triggeredCampaign.getOptionalAssets(), []);
                 assert.equal(triggeredCampaign.getResource(), content.markup);
@@ -931,7 +924,6 @@ describe('CampaignManager', () => {
 
                 mockRequest.verify();
 
-                assert.equal(triggeredCampaign.getAbGroup(), configuration.getAbGroup());
                 assert.equal(triggeredCampaign.getGamerId(), configuration.getGamerId());
                 assert.deepEqual(triggeredCampaign.getOptionalAssets(), []);
             });
@@ -963,7 +955,6 @@ describe('CampaignManager', () => {
 
                 mockRequest.verify();
 
-                assert.equal(triggeredCampaign.getAbGroup(), configuration.getAbGroup());
                 assert.equal(triggeredCampaign.getGamerId(), configuration.getGamerId());
                 assert.deepEqual(triggeredCampaign.getOptionalAssets(), []);
             });
@@ -1008,7 +999,6 @@ describe('CampaignManager', () => {
                     assert.isTrue(triggeredCampaign instanceof PerformanceCampaign);
                     assert.equal(triggeredPlacement, 'video');
                     assert.equal(triggeredCampaign.getGamerId(), '57a35671bb58271e002d93c9');
-                    assert.equal(triggeredCampaign.getAbGroup(), ABGroupBuilder.getAbGroup(99));
                 });
             });
 
@@ -1026,7 +1016,6 @@ describe('CampaignManager', () => {
                     assert.isTrue(triggeredCampaign instanceof MRAIDCampaign);
                     assert.equal(triggeredPlacement, 'mraid');
                     assert.equal(triggeredCampaign.getGamerId(), '57a35671bb58271e002d93c9');
-                    assert.equal(triggeredCampaign.getAbGroup(), ABGroupBuilder.getAbGroup(99));
                     assert.deepEqual((<MRAIDCampaign>triggeredCampaign).getResourceUrl(), new HTML('https://cdn.unityads.unity3d.com/playables/sma_re2.0.0_ios/index.html', triggeredCampaign.getSession(), 'mraid-test-creative-id'));
                 });
             });
@@ -1047,7 +1036,6 @@ describe('CampaignManager', () => {
                     assert.isTrue(triggeredCampaign instanceof XPromoCampaign);
                     assert.equal(triggeredPlacement, 'video');
                     assert.equal(triggeredCampaign.getGamerId(), '57a35671bb58271e002d93c9');
-                    assert.equal(triggeredCampaign.getAbGroup(), ABGroupBuilder.getAbGroup(99));
                 });
             });
         });
@@ -1067,7 +1055,6 @@ describe('CampaignManager', () => {
                     assert.isTrue(triggeredCampaign instanceof VastCampaign);
                     assert.equal(triggeredPlacement, 'video');
                     assert.equal(triggeredCampaign.getGamerId(), '57a35671bb58271e002d93c9');
-                    assert.equal(triggeredCampaign.getAbGroup(), ABGroupBuilder.getAbGroup(99));
                     assert.equal(triggeredCampaign.getAdType(), 'vast-sample-ad-type');
                     assert.equal(triggeredCampaign.getCreativeId(), 'vast-sample-creative-id');
                     assert.equal(triggeredCampaign.getSeatId(), 900);
@@ -1094,7 +1081,6 @@ describe('CampaignManager', () => {
                     assert.isTrue(triggeredCampaign instanceof MRAIDCampaign);
                     assert.equal(triggeredPlacement, 'mraid');
                     assert.equal(triggeredCampaign.getGamerId(), '57a35671bb58271e002d93c9');
-                    assert.equal(triggeredCampaign.getAbGroup(), ABGroupBuilder.getAbGroup(99));
                     assert.equal(triggeredCampaign.getAdType(), 'mraid-url-sample-ad-type');
                     assert.equal(triggeredCampaign.getCreativeId(), 'mraid-url-sample-creative-id');
                     assert.equal(triggeredCampaign.getSeatId(), 901);
@@ -1131,7 +1117,6 @@ describe('CampaignManager', () => {
                     assert.isTrue(triggeredCampaign instanceof MRAIDCampaign);
                     assert.equal(triggeredPlacement, 'mraid');
                     assert.equal(triggeredCampaign.getGamerId(), '57a35671bb58271e002d93c9');
-                    assert.equal(triggeredCampaign.getAbGroup(), ABGroupBuilder.getAbGroup(99));
                     assert.equal(triggeredCampaign.getAdType(), 'mraid-sample-ad-type');
                     assert.equal(triggeredCampaign.getCreativeId(), 'mraid-sample-creative-id');
                     assert.equal(triggeredCampaign.getSeatId(), 902);
@@ -1276,7 +1261,6 @@ describe('CampaignManager', () => {
             response: OnProgrammaticMraidUrlPlcCampaignJson,
             url: 'https://auction.unityads.unity3d.com/v4/games/12345/requests?&platform=android&sdkVersion=2000&stores=none&&screenWidth=800&screenHeight=1200&connectionType=wifi&networkType=0'
         }).then(() => {
-            assert.equal(triggeredCampaign.getAbGroup(), ABGroupBuilder.getAbGroup(99));
             assert.isFalse(onAdPlanReceived, 'onAdPlanReceived was triggered');
         });
     });
@@ -1322,7 +1306,6 @@ describe('CampaignManager', () => {
             response: OnProgrammaticMraidUrlPlcCampaignJson,
             url: 'https://auction.unityads.unity3d.com/v4/games/12345/requests?&platform=android&sdkVersion=2000&stores=none&&screenWidth=800&screenHeight=1200&connectionType=test&networkType=1'
         }).then(() => {
-            assert.equal(triggeredCampaign.getAbGroup(), ABGroupBuilder.getAbGroup(99));
             assert.isFalse(onAdPlanReceived, 'onAdPlanReceived was triggered');
         });
     });
