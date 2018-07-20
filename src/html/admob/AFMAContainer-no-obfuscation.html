@@ -121,6 +121,10 @@
                         event: 'loaded'
                     });
                 });
+
+                self.postMessage('tracking', {
+                    event: 'impression'
+                });
             });
 
             this.forceOrientation = function(orientation, override, animationDuration) {
