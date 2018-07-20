@@ -1,6 +1,8 @@
-# Pending
+# Fri Jul 20 07:37:21 UTC 2018
 
 * Revert "Merge pull request #5566 from Applifier/feature/new-video-overlay
+* Handle Promo initialization order over SendEvent
+* Tslint no-multiline-string
 
 # Thu Jul 19 20:07:08 UTC 2018
 
