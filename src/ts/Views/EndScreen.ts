@@ -11,7 +11,7 @@ import { Campaign } from 'Models/Campaign';
 import { IEndScreenDownloadParameters } from 'EventHandlers/EndScreenEventHandler';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
-import { ABGroup } from 'Models/ABGroup';
+import { ABGroup, IPhoneXEndScreenTest } from 'Models/ABGroup';
 import { IGDPREventHandler } from 'EventHandlers/GDPREventHandler';
 
 export interface IEndScreenHandler extends IGDPREventHandler {
@@ -192,14 +192,14 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         const ratio: number = window.devicePixelRatio;
         const screenSize = {
             height: window.screen.height * ratio,
-            width: window.screen.width * ratio,
+            width: window.screen.width * ratio
         };
 
         return (screenSize.height === 1125 && screenSize.width === 2436) || (screenSize.height === 2436 && screenSize.width === 1125);
     }
 
     private useIPhoneXStyle(): boolean {
-        return CustomFeatures.isIPhoneXStylesEnabled(this._abGroup) && this.isIPhoneX();
+        return IPhoneXEndScreenTest.isValid(this._abGroup) && this.isIPhoneX();
     }
 
     private getTemplate() {

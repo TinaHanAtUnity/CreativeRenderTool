@@ -29,7 +29,7 @@ const changeOrientation = () => {
     /* Calculate orientation based on width and height by default */
     let orientation: string = window.innerWidth / window.innerHeight >= 1 ? 'landscape' : 'portrait';
 
-    console.log("CHANGE ORIENTATION: ", window.orientation);
+    console.log('CHANGE ORIENTATION: ', window.orientation);
     if (typeof window.orientation !== 'undefined' && platform === 'ios' && !isIOS7) {
         orientation = (Math.abs(<number>window.orientation) === 90) ? 'landscape' : 'portrait';
     }
@@ -42,7 +42,7 @@ const changeOrientation = () => {
 };
 
 const resizeHandler = () => {
-    console.log("changeorientation!!");
+    console.log('changeorientation!!');
     if (runningResizeEvent) {
         return;
     }
@@ -76,6 +76,8 @@ const onChangeOrientation = () => {
         case -90:
             iosOrientation = 'ios-landscape-right';
             break;
+        default:
+            iosOrientation = 'ios-portrait';
     }
 
     document.body.classList.remove(...['ios-landscape-left', 'ios-landscape-right', 'ios-portrait-upside-down']);

@@ -25,8 +25,4 @@ export class CustomFeatures {
         // Ad unit should be closed when going background on iOS
         return gameId === '1795561';
     }
-
-    public static isIPhoneXStylesEnabled(abGroup: number): boolean {
-        return true; //abGroup === 18 || abGroup === 19;
-    }
 }
