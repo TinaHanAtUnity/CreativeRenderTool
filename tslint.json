@@ -60,7 +60,6 @@
     "number-literal-format": false,
     "no-unnecessary-qualifier": false,
     "export-name": false,
-    "insecure-random": false,
-    "use-default-type-parameter": false
+    "insecure-random": false
   }
 }
