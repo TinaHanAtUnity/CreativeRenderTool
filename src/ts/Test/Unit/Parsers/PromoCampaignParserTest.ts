@@ -154,7 +154,7 @@ describe('PromoCampaignParser', () => {
 
                 const parse = (data: any) => {
                     const response = new AuctionResponse(placements, data, mediaId, correlationId);
-                    return parser.parse(nativeBridge, request, response, session, gamerId, abGroup).then((parsedCampaign) => {
+                    return parser.parse(nativeBridge, request, response, session, gamerId).then((parsedCampaign) => {
                         campaign = <PromoCampaign>parsedCampaign;
                         sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.refreshCatalog);
                     });
@@ -181,7 +181,7 @@ describe('PromoCampaignParser', () => {
                 sandbox.stub(PurchasingUtilities, 'refreshCatalog').returns(Promise.resolve());
                 const parse = (data: any) => {
                     const response = new AuctionResponse(placements, data, mediaId, correlationId);
-                    return parser.parse(nativeBridge, request, response, session, gamerId, abGroup).then((parsedCampaign) => {
+                    return parser.parse(nativeBridge, request, response, session, gamerId).then((parsedCampaign) => {
                         campaign = <PromoCampaign>parsedCampaign;
                         sinon.assert.notCalled(<sinon.SinonSpy>PurchasingUtilities.refreshCatalog);
                     });
