@@ -59,7 +59,6 @@
     "no-unnecessary-callback-wrapper": false,
     "number-literal-format": false,
     "export-name": false,
-    "insecure-random": false,
-    "use-default-type-parameter": false
+    "insecure-random": false
   }
 }
