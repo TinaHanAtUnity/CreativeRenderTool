@@ -80,10 +80,9 @@ export class PurchasingUtilities {
     }
 
     public static getProductPrice(productId: string): string {
-        if (this.isProductAvailable(productId)) {
-            if (this._catalog.getProducts()[productId]) {
-                return this._catalog.getProducts()[productId].getPrice();
-            }
+        const product = this._catalog.getProducts()[productId];
+        if (product) {
+            return product.getPrice();
         }
         throw new Error('Attempted to get price of invalid product: ' + productId);
     }
