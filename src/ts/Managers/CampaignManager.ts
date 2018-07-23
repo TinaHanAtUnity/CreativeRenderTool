@@ -34,6 +34,7 @@ import { UserCountData } from 'Utilities/UserCountData';
 import { JaegerManager } from 'Jaeger/JaegerManager';
 import { JaegerTags } from 'Jaeger/JaegerSpan';
 import { GameSessionCounters } from 'Utilities/GameSessionCounters';
+import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 import { ABGroup } from 'Models/ABGroup';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { MixedPlacementUtility } from 'Utilities/MixedPlacementUtility';
@@ -219,7 +220,7 @@ export class CampaignManager {
             }).catch((error) => {
                 this._requesting = false;
                 if(error instanceof RequestError) {
-                    if(!(<RequestError>error).nativeResponse) {
+                    if(!error.nativeResponse) {
                         this.onConnectivityError.trigger(this._configuration.getPlacementIds());
                         return Promise.resolve();
                     }
@@ -353,7 +354,7 @@ export class CampaignManager {
                 this._nativeBridge.Sdk.logInfo('AdPlan received with ' + campaigns + ' campaigns and refreshDelay ' + refreshDelay);
                 this.onAdPlanReceived.trigger(refreshDelay, campaigns);
             }
-
+            PurchasingUtilities.placementManager.clear();
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
                     let auctionResponse: AuctionResponse;
@@ -425,9 +426,10 @@ export class CampaignManager {
         }
 
         const parseTimestamp = Date.now();
-        return parser.parse(this._nativeBridge, this._request, response, session, this._configuration.getGamerId(), this.getAbGroup(), this._deviceInfo.getOsVersion()).then((campaign) => {
+        return parser.parse(this._nativeBridge, this._request, response, session, this._configuration.getGamerId(), this.getAbGroup()).then((campaign) => {
             const parseDuration = Date.now() - parseTimestamp;
             for(const placement of response.getPlacements()) {
+                PurchasingUtilities.placementManager.addCampaignPlacementIds(placement, campaign);
                 SdkStats.setParseDuration(placement, parseDuration);
             }
 
@@ -723,6 +725,7 @@ export class CampaignManager {
                 body.gdprEnabled = this._configuration.isGDPREnabled();
                 body.optOutEnabled = this._configuration.isOptOutEnabled();
                 body.optOutRecorded = this._configuration.isOptOutRecorded();
+                body.abGroup = this._configuration.getAbGroup().toNumber();
 
                 const organizationId = this._configuration.getOrganizationId();
                 if(organizationId) {

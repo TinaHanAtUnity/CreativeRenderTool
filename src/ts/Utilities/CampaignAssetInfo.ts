@@ -122,7 +122,7 @@ export class CampaignAssetInfo {
         if(campaign instanceof PerformanceCampaign || campaign instanceof XPromoCampaign || campaign instanceof VastCampaign) {
             return CampaignAssetInfo.getOrientedVideo(campaign, Orientation.LANDSCAPE, VideoType.CACHE);
         } else if(campaign instanceof MRAIDCampaign) {
-            const resource = (<MRAIDCampaign>campaign).getResourceUrl();
+            const resource = campaign.getResourceUrl();
             if(resource && resource.isCached()) {
                 return resource;
             }

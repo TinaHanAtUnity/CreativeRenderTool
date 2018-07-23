@@ -76,6 +76,8 @@ import { AdMobOptionalSignal } from 'Models/AdMobOptionalSignal';
 import { ABGroupBuilder } from 'Models/ABGroup';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 import { MixedPlacementUtility, IPlacementRequestMap } from 'Utilities/MixedPlacementUtility';
+import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
+import { PlacementManager } from 'Managers/PlacementManager';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;
@@ -94,6 +96,7 @@ describe('CampaignManager', () => {
     let cacheBookkeeping: CacheBookkeeping;
     let jaegerManager: JaegerManager;
     let programmaticTrackingService: ProgrammaticTrackingService;
+    let placementManager: PlacementManager;
 
     beforeEach(() => {
         configuration = ConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
@@ -103,7 +106,7 @@ describe('CampaignManager', () => {
         warningSpy = sinon.spy();
         nativeBridge = <NativeBridge><any>{
             Storage: {
-                get: function(storageType: number, key: string) {
+                get: (storageType: number, key: string) => {
                     return Promise.resolve('123');
                 },
                 set: () => {
@@ -216,6 +219,8 @@ describe('CampaignManager', () => {
         jaegerManager.startSpan = sinon.stub().returns(new JaegerSpan('test'));
         (<sinon.SinonStub>adMobSignalFactory.getAdRequestSignal).returns(Promise.resolve(new AdMobSignal()));
         (<sinon.SinonStub>adMobSignalFactory.getOptionalSignal).returns(Promise.resolve(new AdMobOptionalSignal()));
+        placementManager = sinon.createStubInstance(PlacementManager);
+        PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, placementManager);
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
     });
 

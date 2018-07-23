@@ -68,7 +68,7 @@ describe('ProgrammaticVastParser', () => {
                 assert.equal(campaign.getAbGroup(), abGroup, 'ABGroup is not equal');
                 assert.equal(campaign.getSession(), session, 'Session is not equal');
                 assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not the equal');
-                assert.equal(campaign.getVideo()!.getUrl(), vast.getVideoUrl(), 'Video URL is not the same');
+                assert.equal(campaign.getVideo().getUrl(), vast.getVideoUrl(), 'Video URL is not the same');
             });
         });
     });
