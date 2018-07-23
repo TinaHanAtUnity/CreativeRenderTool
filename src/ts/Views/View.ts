@@ -10,11 +10,11 @@ export abstract class View<T extends object> {
 
     private static addEventListener(binding: IViewBinding, element: HTMLElement, attachTap: boolean) {
         if(binding.event === 'swipe') {
-            binding.swipe = new Swipe(<HTMLElement>element);
+            binding.swipe = new Swipe(element);
         }
 
         if(attachTap && binding.event === 'click') {
-            binding.tap = new Tap(<HTMLElement>element);
+            binding.tap = new Tap(element);
         }
         element.addEventListener(binding.event, binding.listener, false);
     }

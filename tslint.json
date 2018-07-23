@@ -28,7 +28,6 @@
     "no-parameter-reassignment": false,
     "ordered-imports": false,
     "import-name": false,
-    "no-unnecessary-type-assertion": false,
     "match-default-export-name": false,
     "completed-docs": [false, "classes"],
     "no-inner-html": false,
