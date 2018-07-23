@@ -282,6 +282,10 @@ export class WebView {
                 throw error;
             });
         }).then(() => {
+            // TODO
+            // send diagnostics event for abnormal ad termination
+            return Promise.resolve();
+        }).then(() => {
             this._initialized = true;
             this._jaegerManager.stop(jaegerInitSpan);
 
