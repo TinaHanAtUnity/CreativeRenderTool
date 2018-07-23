@@ -61,6 +61,7 @@ import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
 import { ABGroupBuilder } from 'Models/ABGroup';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { PlacementManager } from 'Managers/PlacementManager';
 
 export class WebView {
 
@@ -219,8 +220,10 @@ export class WebView {
             HttpKafka.setConfiguration(this._configuration);
             this._jaegerManager.setJaegerTracingEnabled(this._configuration.isJaegerTracingEnabled());
 
-            PurchasingUtilities.initialize(this._clientInfo, this._configuration, this._nativeBridge);
+            const placementManager = new PlacementManager(this._nativeBridge, this._configuration);
+            PurchasingUtilities.initialize(this._clientInfo, this._configuration, this._nativeBridge, placementManager);
             PurchasingUtilities.sendPurchaseInitializationEvent();
+            this._nativeBridge.Purchasing.onIAPSendEvent.subscribe((iapPayload) => PurchasingUtilities.handleSendIAPEvent(iapPayload));
 
             if (!this._configuration.isEnabled()) {
                 const error = new Error('Game with ID ' + this._clientInfo.getGameId() +  ' is not enabled');
@@ -261,10 +264,11 @@ export class WebView {
 
             SdkStats.initialize(this._nativeBridge, this._request, this._configuration, this._sessionManager, this._campaignManager, this._metadataManager, this._clientInfo);
 
+            const enableCachedResponse = !CustomFeatures.isCacheUpdateDisabledApp(this._clientInfo.getGameId());
             const refreshSpan = this._jaegerManager.startSpan('Refresh', jaegerInitSpan.id, jaegerInitSpan.traceId);
             refreshSpan.addTag(JaegerTags.DeviceType, Platform[this._nativeBridge.getPlatform()]);
             let refreshPromise;
-            if (this._cachedCampaignResponse !== undefined) {
+            if (this._cachedCampaignResponse !== undefined && enableCachedResponse) {
                 refreshPromise = this._refreshManager.refreshFromCache(this._cachedCampaignResponse, refreshSpan);
             } else {
                 refreshPromise = this._refreshManager.refresh();
