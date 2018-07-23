@@ -88,7 +88,7 @@ opt you out from personalized ads.
         </p>
 
     </div>
-    <div class="pop-up-content back-side">
+    <div class="pop-up-content build-side">
         <% for (var k in data.buildInformation) { %>
         <span class="build-information-key"><%= k %>:</span> <span class="build-information-value"> <%= (data.buildInformation[k] === null || typeof data.buildInformation[k] === "undefined") ? "N/A" : data.buildInformation[k] %></span>;
         <% } %>
@@ -97,5 +97,6 @@ opt you out from personalized ads.
     <div class="pop-up-footer">
         <div class="left-side-link"></div>
         <div class="close-button">Confirm</div>
+        <div class="middle-link">Report Ad ⚑</div>
     </div>
 </div>

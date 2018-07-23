@@ -17,7 +17,7 @@
       text-align: center;
     }
   }
-  .back-side {
+  .build-side {
     display: none;
     font-size: $default-size * $default-font-size * .75;
   }
@@ -51,8 +51,8 @@
     }
   }
 
-  &.flip {
-    .back-side {
+  &.build {
+    .build-side {
       display: block;
       word-wrap: break-word;
 
@@ -61,10 +61,12 @@
       }
     }
 
-    .pop-up-content:not(.back-side) {
+    .pop-up-content:not(.build-side) {
       display: none;
     }
   }
+
+
 }
 
 body.android #gdpr-privacy .gdpr-text-android,

@@ -48,6 +48,11 @@ export class GDPRPrivacy extends AbstractPrivacy {
                 event: 'click',
                 listener: (event: Event) => this.onDataDeletionConfirmation(event),
                 selector: '#data-deletion-confirm'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onMiddleLinkClick(event),
+                selector: '.middle-link'
             }
         ];
     }
@@ -144,7 +149,7 @@ export class GDPRPrivacy extends AbstractPrivacy {
 
     private onLeftSideClick(event: Event): void {
         event.preventDefault();
-        const buildInformationActive = this._container.classList.contains('flip');
+        const buildInformationActive = this._container.classList.contains('build');
         this.setCardState(!buildInformationActive);
     }
 
@@ -152,10 +157,15 @@ export class GDPRPrivacy extends AbstractPrivacy {
         const linkEL = <HTMLDivElement>this._container.querySelector('.left-side-link');
         if (isFlipped) {
             linkEL.innerText = 'Privacy info';
-            this._container.classList.add('flip');
+            this._container.classList.add('build');
         } else {
             linkEL.innerText = 'Build info';
-            this._container.classList.remove('flip');
+            this._container.classList.remove('build');
         }
+    }
+
+    private onMiddleLinkClick(event: Event): void {
+        event.preventDefault();
+        const middleLink = <HTMLDivElement>this._container.querySelector('.middle-link');
     }
 }
