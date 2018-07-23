@@ -341,7 +341,7 @@ export class AdUnitFactory {
         return displayInterstitialAdUnit;
     }
 
-    private static prepareVideoPlayer<T extends VideoEventHandler, T2 extends VideoAdUnit, T3 extends Campaign, T4 extends OperativeEventManager, ParamsType extends IVideoEventHandlerParams<T2, T3, T4>>(VideoEventHandlerConstructor: { new(p: ParamsType): T; }, params: ParamsType): T {
+    private static prepareVideoPlayer<T extends VideoEventHandler, T2 extends VideoAdUnit, T3 extends Campaign, T4 extends OperativeEventManager, ParamsType extends IVideoEventHandlerParams<T2, T3, T4>>(VideoEventHandlerConstructor: { new(p: ParamsType): T }, params: ParamsType): T {
         const nativeBridge = params.nativeBrige;
         const adUnit = params.adUnit;
         const videoEventHandler = new VideoEventHandlerConstructor(params);
