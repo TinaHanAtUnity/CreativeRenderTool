@@ -32,7 +32,7 @@ export class AndroidVideoPlayerApi extends NativeApiWithEventHandlers<IAndroidVi
     }
 
     public setInfoListenerEnabled(enabled: boolean): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'setInfoListenerEnabled', [enabled]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setInfoListenerEnabled', [enabled]);
     }
 
     public handleEvent(event: string, parameters: any[]): void {

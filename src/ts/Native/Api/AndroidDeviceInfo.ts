@@ -37,143 +37,143 @@ export class AndroidDeviceInfoApi extends NativeApi {
     }
 
     public getAndroidId(): Promise<string> {
-        return this._nativeBridge.invoke<string>(this.getFullApiClassName(), 'getAndroidId');
+        return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getAndroidId');
     }
 
     public getApiLevel(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this.getFullApiClassName(), 'getApiLevel');
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getApiLevel');
     }
 
     public getManufacturer(): Promise<string> {
-        return this._nativeBridge.invoke<string>(this.getFullApiClassName(), 'getManufacturer');
+        return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getManufacturer');
     }
 
     public getScreenLayout(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this.getFullApiClassName(), 'getScreenLayout');
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getScreenLayout');
     }
 
     public getScreenDensity(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this.getFullApiClassName(), 'getScreenDensity');
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getScreenDensity');
     }
 
     public isAppInstalled(packageName: string): Promise<boolean> {
-        return this._nativeBridge.invoke<boolean>(this.getFullApiClassName(), 'isAppInstalled', [packageName]);
+        return this._nativeBridge.invoke<boolean>(this._fullApiClassName, 'isAppInstalled', [packageName]);
     }
 
     public getInstalledPackages(md5: boolean): Promise<string[]> {
-        return this._nativeBridge.invoke<string[]>(this.getFullApiClassName(), 'getInstalledPackages', [md5]);
+        return this._nativeBridge.invoke<string[]>(this._fullApiClassName, 'getInstalledPackages', [md5]);
     }
 
     public getPackageInfo(packageName: string): Promise<IPackageInfo> {
-        return this._nativeBridge.invoke<IPackageInfo>(this.getFullApiClassName(), 'getPackageInfo', [packageName]);
+        return this._nativeBridge.invoke<IPackageInfo>(this._fullApiClassName, 'getPackageInfo', [packageName]);
     }
 
     public getSystemProperty(propertyName: string, defaultValue: string): Promise<string> {
-        return this._nativeBridge.invoke<string>(this.getFullApiClassName(), 'getSystemProperty', [propertyName, defaultValue]);
+        return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getSystemProperty', [propertyName, defaultValue]);
     }
 
     public getRingerMode(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this.getFullApiClassName(), 'getRingerMode');
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getRingerMode');
     }
 
     public getDeviceVolume(streamType: StreamType): Promise<number> {
-        return this._nativeBridge.invoke<number>(this.getFullApiClassName(), 'getDeviceVolume', [streamType]);
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getDeviceVolume', [streamType]);
     }
 
     public getDeviceMaxVolume(streamType: StreamType): Promise<number> {
-        return this._nativeBridge.invoke<number>(this.getFullApiClassName(), 'getDeviceMaxVolume', [streamType]);
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getDeviceMaxVolume', [streamType]);
     }
 
     public registerVolumeChangeListener(streamType: StreamType): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'registerVolumeChangeListener', [streamType]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'registerVolumeChangeListener', [streamType]);
     }
 
     public unregisterVolumeChangeListener(streamType: StreamType): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'unregisterVolumeChangeListener', [streamType]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'unregisterVolumeChangeListener', [streamType]);
     }
 
     public getFreeSpace(storageType: StorageType): Promise<number> {
-        return this._nativeBridge.invoke<number>(this.getFullApiClassName(), 'getFreeSpace', [StorageType[storageType]]);
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getFreeSpace', [StorageType[storageType]]);
     }
 
     public getTotalSpace(storageType: StorageType): Promise<number> {
-        return this._nativeBridge.invoke<number>(this.getFullApiClassName(), 'getTotalSpace', [StorageType[storageType]]);
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getTotalSpace', [StorageType[storageType]]);
     }
 
     public getSensorList(): Promise<ISensorInfo[]> {
-        return this._nativeBridge.invoke<ISensorInfo[]>(this.getFullApiClassName(), 'getSensorList');
+        return this._nativeBridge.invoke<ISensorInfo[]>(this._fullApiClassName, 'getSensorList');
     }
 
     public getBoard(): Promise<string> {
-        return this._nativeBridge.invoke<string>(this.getFullApiClassName(), 'getBoard');
+        return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getBoard');
     }
 
     public getBootloader(): Promise<string> {
-        return this._nativeBridge.invoke<string>(this.getFullApiClassName(), 'getBootloader');
+        return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getBootloader');
     }
 
     public getBrand(): Promise<string> {
-        return this._nativeBridge.invoke<string>(this.getFullApiClassName(), 'getBrand');
+        return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getBrand');
     }
 
     public getDevice(): Promise<string> {
-        return this._nativeBridge.invoke<string>(this.getFullApiClassName(), 'getDevice');
+        return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getDevice');
     }
 
     public getHardware(): Promise<string> {
-        return this._nativeBridge.invoke<string>(this.getFullApiClassName(), 'getHardware');
+        return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getHardware');
     }
 
     public getHost(): Promise<string> {
-        return this._nativeBridge.invoke<string>(this.getFullApiClassName(), 'getHost');
+        return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getHost');
     }
 
     public getProduct(): Promise<string> {
-        return this._nativeBridge.invoke<string>(this.getFullApiClassName(), 'getProduct');
+        return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getProduct');
     }
 
     public getFingerprint(): Promise<string> {
-        return this._nativeBridge.invoke<string>(this.getFullApiClassName(), 'getFingerprint');
+        return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getFingerprint');
     }
 
     public getSupportedAbis(): Promise<string[]> {
-        return this._nativeBridge.invoke<string[]>(this.getFullApiClassName(), 'getSupportedAbis');
+        return this._nativeBridge.invoke<string[]>(this._fullApiClassName, 'getSupportedAbis');
     }
 
     public getUptime(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this.getFullApiClassName(), 'getUptime');
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getUptime');
     }
 
     public getElapsedRealtime(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this.getFullApiClassName(), 'getElapsedRealtime');
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getElapsedRealtime');
     }
 
     public isUSBConnected(): Promise<boolean> {
-        return this._nativeBridge.invoke<boolean>(this.getFullApiClassName(), 'isUSBConnected');
+        return this._nativeBridge.invoke<boolean>(this._fullApiClassName, 'isUSBConnected');
     }
 
     public isAdbEnabled(): Promise<boolean> {
-        return this._nativeBridge.invoke<boolean>(this.getFullApiClassName(), 'isAdbEnabled');
+        return this._nativeBridge.invoke<boolean>(this._fullApiClassName, 'isAdbEnabled');
     }
 
     public getApkDigest(): Promise<string> {
-        return this._nativeBridge.invoke<string>(this.getFullApiClassName(), 'getApkDigest');
+        return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getApkDigest');
     }
 
     public getCertificateFingerprint(): Promise<string> {
-        return this._nativeBridge.invoke<string>(this.getFullApiClassName(), 'getCertificateFingerprint');
+        return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getCertificateFingerprint');
     }
 
     public getBuildId(): Promise<string> {
-        return this._nativeBridge.invoke<string>(this.getFullApiClassName(), 'getBuildId');
+        return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getBuildId');
     }
 
     public getBuildVersionIncremental(): Promise<string> {
-        return this._nativeBridge.invoke<string>(this.getFullApiClassName(), 'getBuildVersionIncremental');
+        return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getBuildVersionIncremental');
     }
 
     public getNetworkMetered(): Promise<boolean> {
-        return this._nativeBridge.invoke<boolean>(this.getFullApiClassName(), 'getNetworkMetered');
+        return this._nativeBridge.invoke<boolean>(this._fullApiClassName, 'getNetworkMetered');
     }
 
     public handleEvent(event: string, parameters: any[]): void {

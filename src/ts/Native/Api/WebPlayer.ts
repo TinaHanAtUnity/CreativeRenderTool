@@ -174,31 +174,31 @@ export class WebPlayerApi extends NativeApi {
     }
 
     public setUrl(url: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'setUrl', [url]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setUrl', [url]);
     }
 
     public setData(data: string, mimeType: string, encoding: string): Promise<void>  {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'setData', [data, mimeType, encoding]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setData', [data, mimeType, encoding]);
     }
 
     public setDataWithUrl(baseUrl: string, data: string, mimeType: string, encoding: string): Promise<void>  {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'setDataWithUrl', [baseUrl, data, mimeType, encoding]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setDataWithUrl', [baseUrl, data, mimeType, encoding]);
     }
 
     public setSettings(webSettings: IWebPlayerWebSettingsAndroid | IWebPlayerWebSettingsIos, webPlayerSettings: IWebPlayerPlayerSettingsAndroid): Promise<void>  {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'setSettings', [webSettings, webPlayerSettings]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setSettings', [webSettings, webPlayerSettings]);
     }
 
     public clearSettings(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'clearSettings');
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'clearSettings');
     }
 
     public setEventSettings(eventSettings: IWebPlayerEventSettings): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'setEventSettings', [eventSettings]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setEventSettings', [eventSettings]);
     }
 
     public sendEvent(args: any[]): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'sendEvent', [args]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendEvent', [args]);
     }
 
     public handleEvent(event: string, parameters: any[]): void {

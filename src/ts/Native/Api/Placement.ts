@@ -9,15 +9,15 @@ export class PlacementApi extends NativeApi {
     }
 
     public setDefaultPlacement(placementId: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'setDefaultPlacement', [placementId]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setDefaultPlacement', [placementId]);
     }
 
     public setPlacementState(placementId: string, placementState: PlacementState): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'setPlacementState', [placementId, PlacementState[placementState]]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setPlacementState', [placementId, PlacementState[placementState]]);
     }
 
     public setPlacementAnalytics(sendAnalytics: boolean): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'setPlacementAnalytics', [sendAnalytics]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setPlacementAnalytics', [sendAnalytics]);
     }
 
 }

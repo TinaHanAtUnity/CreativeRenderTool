@@ -8,6 +8,6 @@ export class IosSensorInfoApi extends NativeApi {
     }
 
     public startAccelerometerUpdates(delay: Double): Promise<boolean> {
-        return this._nativeBridge.invoke<boolean>(this.getFullApiClassName(), 'startAccelerometerUpdates', [delay]);
+        return this._nativeBridge.invoke<boolean>(this._fullApiClassName, 'startAccelerometerUpdates', [delay]);
     }
 }

@@ -25,46 +25,46 @@ export class RequestApi extends NativeApi {
 
     public get(id: string, url: string, headers: Array<[string, string]>, connectTimeout: number, readTimeout: number): Promise<string> {
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
-            return this._nativeBridge.invoke<string>(this.getFullApiClassName(), 'get', [id, url, headers, connectTimeout]);
+            return this._nativeBridge.invoke<string>(this._fullApiClassName, 'get', [id, url, headers, connectTimeout]);
         } else {
-            return this._nativeBridge.invoke<string>(this.getFullApiClassName(), 'get', [id, url, headers, connectTimeout, readTimeout]);
+            return this._nativeBridge.invoke<string>(this._fullApiClassName, 'get', [id, url, headers, connectTimeout, readTimeout]);
         }
     }
 
     public post(id: string, url: string, requestBody: string, headers: Array<[string, string]>, connectTimeout: number, readTimeout: number): Promise<string> {
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
-            return this._nativeBridge.invoke<string>(this.getFullApiClassName(), 'post', [id, url, requestBody, headers, connectTimeout]);
+            return this._nativeBridge.invoke<string>(this._fullApiClassName, 'post', [id, url, requestBody, headers, connectTimeout]);
         } else {
-            return this._nativeBridge.invoke<string>(this.getFullApiClassName(), 'post', [id, url, requestBody, headers, connectTimeout, readTimeout]);
+            return this._nativeBridge.invoke<string>(this._fullApiClassName, 'post', [id, url, requestBody, headers, connectTimeout, readTimeout]);
         }
     }
 
     public head(id: string, url: string, headers: Array<[string, string]>, connectTimeout: number, readTimeout: number): Promise<string> {
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
-            return this._nativeBridge.invoke<string>(this.getFullApiClassName(), 'head', [id, url, headers, connectTimeout]);
+            return this._nativeBridge.invoke<string>(this._fullApiClassName, 'head', [id, url, headers, connectTimeout]);
         } else {
-            return this._nativeBridge.invoke<string>(this.getFullApiClassName(), 'head', [id, url, headers, connectTimeout, readTimeout]);
+            return this._nativeBridge.invoke<string>(this._fullApiClassName, 'head', [id, url, headers, connectTimeout, readTimeout]);
         }
     }
 
     public setConnectTimeout(connectTimeout: number): Promise<number> {
-        return this._nativeBridge.invoke<number>(this.getFullApiClassName(), 'setConnectTimeout', [connectTimeout]);
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'setConnectTimeout', [connectTimeout]);
     }
 
     public getConnectTimeout(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this.getFullApiClassName(), 'getConnectTimeout');
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getConnectTimeout');
     }
 
     public setReadTimeout(readTimeout: number): Promise<number> {
-        return this._nativeBridge.invoke<number>(this.getFullApiClassName(), 'setReadTimeout', [readTimeout]);
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'setReadTimeout', [readTimeout]);
     }
 
     public getReadTimeout(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this.getFullApiClassName(), 'getReadTimeout');
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getReadTimeout');
     }
 
     public setConcurrentRequestCount(count: number): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'setConcurrentRequestCount', [count]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setConcurrentRequestCount', [count]);
     }
 
     public handleEvent(event: string, parameters: any[]): void {

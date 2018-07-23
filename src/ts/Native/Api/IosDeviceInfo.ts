@@ -12,55 +12,55 @@ export class IosDeviceInfoApi extends NativeApi {
     }
 
     public getScreenScale(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this.getFullApiClassName(), 'getScreenScale');
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getScreenScale');
     }
 
     public getUserInterfaceIdiom(): Promise<UIUserInterfaceIdiom> {
-        return this._nativeBridge.invoke<UIUserInterfaceIdiom>(this.getFullApiClassName(), 'getUserInterfaceIdiom');
+        return this._nativeBridge.invoke<UIUserInterfaceIdiom>(this._fullApiClassName, 'getUserInterfaceIdiom');
     }
 
     public getDeviceVolume(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this.getFullApiClassName(), 'getDeviceVolume');
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getDeviceVolume');
     }
 
     public getFreeSpace(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this.getFullApiClassName(), 'getFreeSpace');
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getFreeSpace');
     }
 
     public getTotalSpace(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this.getFullApiClassName(), 'getTotalSpace');
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getTotalSpace');
     }
 
     public isSimulator(): Promise<boolean> {
-        return this._nativeBridge.invoke<boolean>(this.getFullApiClassName(), 'isSimulator');
+        return this._nativeBridge.invoke<boolean>(this._fullApiClassName, 'isSimulator');
     }
 
     public getSensorList(): Promise<string[]> {
-        return this._nativeBridge.invoke<string[]>(this.getFullApiClassName(), 'getSensorList');
+        return this._nativeBridge.invoke<string[]>(this._fullApiClassName, 'getSensorList');
     }
 
     public getStatusBarHeight(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this.getFullApiClassName(), 'getStatusBarHeight');
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getStatusBarHeight');
     }
 
     public getStatusBarWidth(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this.getFullApiClassName(), 'getStatusBarWidth');
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getStatusBarWidth');
     }
 
     public isStatusBarHidden(): Promise<boolean> {
-        return this._nativeBridge.invoke<boolean>(this.getFullApiClassName(), 'isStatusBarHidden');
+        return this._nativeBridge.invoke<boolean>(this._fullApiClassName, 'isStatusBarHidden');
     }
 
     public getDeviceMaxVolume(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this.getFullApiClassName(), 'getDeviceMaxVolume');
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getDeviceMaxVolume');
     }
 
     public registerVolumeChangeListener(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'registerVolumeChangeListener');
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'registerVolumeChangeListener');
     }
 
     public unregisterVolumeChangeListener(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'unregisterVolumeChangeListener');
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'unregisterVolumeChangeListener');
     }
 
     public handleEvent(event: string, parameters: any[]): void {

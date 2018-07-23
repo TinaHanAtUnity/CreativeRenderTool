@@ -43,47 +43,47 @@ export class VideoPlayerApi extends NativeApiWithEventHandlers<IVideoEventHandle
     }
 
     public setProgressEventInterval(milliseconds: number): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'setProgressEventInterval', [milliseconds]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setProgressEventInterval', [milliseconds]);
     }
 
     public getProgressEventInterval(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this.getFullApiClassName(), 'getProgressEventInterval');
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getProgressEventInterval');
     }
 
     public prepare(url: string, initialVolume: Double, timeout: number): Promise<string> {
-        return this._nativeBridge.invoke<string>(this.getFullApiClassName(), 'prepare', [url, initialVolume, timeout]);
+        return this._nativeBridge.invoke<string>(this._fullApiClassName, 'prepare', [url, initialVolume, timeout]);
     }
 
     public play(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'play');
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'play');
     }
 
     public pause(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'pause');
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'pause');
     }
 
     public stop(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'stop');
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'stop');
     }
 
     public seekTo(time: number): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'seekTo', [time]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'seekTo', [time]);
     }
 
     public getCurrentPosition(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this.getFullApiClassName(), 'getCurrentPosition');
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getCurrentPosition');
     }
 
     public getVolume(): Promise<Double> {
-        return this._nativeBridge.invoke<Double>(this.getFullApiClassName(), 'getVolume');
+        return this._nativeBridge.invoke<Double>(this._fullApiClassName, 'getVolume');
     }
 
     public setVolume(volume: Double): Promise<Double> {
-        return this._nativeBridge.invoke<Double>(this.getFullApiClassName(), 'setVolume', [volume]);
+        return this._nativeBridge.invoke<Double>(this._fullApiClassName, 'setVolume', [volume]);
     }
 
     public setAutomaticallyWaitsToMinimizeStalling(value: boolean): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'setAutomaticallyWaitsToMinimizeStalling', [value]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setAutomaticallyWaitsToMinimizeStalling', [value]);
     }
 
     public handleEvent(event: string, parameters: any[]): void {

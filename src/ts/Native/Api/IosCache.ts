@@ -7,6 +7,6 @@ export class IosCacheApi extends NativeApi {
     }
 
     public getVideoInfo(fileId: string): Promise<[number, number, number]> {
-        return this._nativeBridge.invoke<[number, number, number]>(this.getFullApiClassName(), 'getVideoInfo', [fileId]);
+        return this._nativeBridge.invoke<[number, number, number]>(this._fullApiClassName, 'getVideoInfo', [fileId]);
     }
 }

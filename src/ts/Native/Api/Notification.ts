@@ -15,23 +15,23 @@ export class NotificationApi extends NativeApi {
     }
 
     public addNotificationObserver(name: string, keys: string[]): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'addNotificationObserver', [name, keys]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'addNotificationObserver', [name, keys]);
     }
 
     public removeNotificationObserver(name: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'removeNotificationObserver', [name]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'removeNotificationObserver', [name]);
     }
 
     public removeAllNotificationObservers(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'removeAllNotificationObservers');
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'removeAllNotificationObservers');
     }
 
     public addAVNotificationObserver(name: string, keys: string[]): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'addAVNotificationObserver', [name, keys]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'addAVNotificationObserver', [name, keys]);
     }
 
     public removeAVNotificationObserver(name: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'removeAVNotificationObserver', [name]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'removeAVNotificationObserver', [name]);
     }
 
     public handleEvent(event: string, parameters: any[]): void {

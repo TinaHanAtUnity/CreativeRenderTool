@@ -63,30 +63,30 @@ export class AppSheetApi extends NativeApi {
     }
 
     public canOpen(): Promise<boolean> {
-        return this._nativeBridge.invoke<boolean>(this.getFullApiClassName(), 'canOpen');
+        return this._nativeBridge.invoke<boolean>(this._fullApiClassName, 'canOpen');
     }
 
     public prepare(options: IAppSheetOptions, timeout: number = 30000): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'prepare', [options, timeout]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'prepare', [options, timeout]);
     }
 
     public present(options: IAppSheetOptions, animated: boolean = true): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'present', [options, animated]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'present', [options, animated]);
     }
 
     public destroy(options?: IAppSheetOptions): Promise<void> {
         if(typeof options === 'undefined') {
-            return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'destroy');
+            return this._nativeBridge.invoke<void>(this._fullApiClassName, 'destroy');
         }
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'destroy', [options]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'destroy', [options]);
     }
 
     public setPrepareTimeout(timeout: number): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'setPrepareTimeout', [timeout]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setPrepareTimeout', [timeout]);
     }
 
     public getPrepareTimeout(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this.getFullApiClassName(), 'getPrepareTimeout');
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getPrepareTimeout');
     }
 
     public handleEvent(event: string, parameters: any[]): void {

@@ -17,7 +17,7 @@ export class ResolveApi extends NativeApi {
     }
 
     public resolve(id: string, host: string): Promise<string> {
-        return this._nativeBridge.invoke<string>(this.getFullApiClassName(), 'resolve', [id, host]);
+        return this._nativeBridge.invoke<string>(this._fullApiClassName, 'resolve', [id, host]);
     }
 
     public handleEvent(event: string, parameters: any[]): void {

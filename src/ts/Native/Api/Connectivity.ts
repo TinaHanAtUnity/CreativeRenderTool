@@ -18,7 +18,7 @@ export class ConnectivityApi extends NativeApi {
     }
 
     public setListeningStatus(status: boolean): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'setConnectionMonitoring', [status]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setConnectionMonitoring', [status]);
     }
 
     public handleEvent(event: string, parameters: any[]): void {

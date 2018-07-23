@@ -8,6 +8,6 @@ export class UrlSchemeApi extends NativeApi {
     }
 
     public open(url: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'open', [url]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'open', [url]);
     }
 }

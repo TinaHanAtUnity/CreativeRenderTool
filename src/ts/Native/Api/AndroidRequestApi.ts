@@ -7,10 +7,10 @@ export class AndroidRequestApi extends NativeApi {
     }
 
     public setMaximumPoolSize(count: number): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'setMaximumPoolSize', [count]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setMaximumPoolSize', [count]);
     }
 
     public setKeepAliveTime(keepAliveTime: number): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'setKeepAliveTime', [keepAliveTime]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setKeepAliveTime', [keepAliveTime]);
     }
 }

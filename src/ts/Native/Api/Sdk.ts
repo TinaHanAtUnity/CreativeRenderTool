@@ -9,43 +9,43 @@ export class SdkApi extends NativeApi {
     }
 
     public loadComplete(): Promise<ClientInfoData> {
-        return this._nativeBridge.invoke<ClientInfoData>(this.getFullApiClassName(), 'loadComplete');
+        return this._nativeBridge.invoke<ClientInfoData>(this._fullApiClassName, 'loadComplete');
     }
 
     public initComplete(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'initComplete');
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'initComplete');
     }
 
     public setDebugMode(debugMode: boolean): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'setDebugMode', [debugMode]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setDebugMode', [debugMode]);
     }
 
     public getDebugMode(): Promise<boolean> {
-        return this._nativeBridge.invoke<boolean>(this.getFullApiClassName(), 'getDebugMode');
+        return this._nativeBridge.invoke<boolean>(this._fullApiClassName, 'getDebugMode');
     }
 
     public logError(message: string) {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'logError', [message]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'logError', [message]);
     }
 
     public logWarning(message: string) {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'logWarning', [message]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'logWarning', [message]);
     }
 
     public logInfo(message: string) {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'logInfo', [message]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'logInfo', [message]);
     }
 
     public logDebug(message: string) {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'logDebug', [message]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'logDebug', [message]);
     }
 
     public setShowTimeout(timeout: number): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'setShowTimeout', [timeout]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setShowTimeout', [timeout]);
     }
 
     public reinitialize(): void {
-        this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'reinitialize');
+        this._nativeBridge.invoke<void>(this._fullApiClassName, 'reinitialize');
     }
 
 }

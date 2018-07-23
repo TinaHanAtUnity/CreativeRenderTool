@@ -25,14 +25,14 @@ export class SensorInfoApi extends NativeApi {
     }
 
     public stopAccelerometerUpdates(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'stopAccelerometerUpdates');
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'stopAccelerometerUpdates');
     }
 
     public isAccelerometerActive(): Promise<boolean> {
-        return this._nativeBridge.invoke<boolean>(this.getFullApiClassName(), 'isAccelerometerActive');
+        return this._nativeBridge.invoke<boolean>(this._fullApiClassName, 'isAccelerometerActive');
     }
 
     public getAccelerometerData(): Promise<IAccelerometerData> {
-        return this._nativeBridge.invoke<IAccelerometerData>(this.getFullApiClassName(), 'getAccelerometerData');
+        return this._nativeBridge.invoke<IAccelerometerData>(this._fullApiClassName, 'getAccelerometerData');
     }
 }

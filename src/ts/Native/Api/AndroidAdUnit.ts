@@ -62,71 +62,71 @@ export class AndroidAdUnitApi extends NativeApi {
     }
 
     public open(activityId: number, views: string[], orientation: ScreenOrientation, keyEvents: number[] = [], systemUiVisibility: SystemUiVisibility = 0, hardwareAccel: boolean = true, isTransparent: boolean = false): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'open', [activityId, views, orientation, keyEvents, systemUiVisibility, hardwareAccel, isTransparent]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'open', [activityId, views, orientation, keyEvents, systemUiVisibility, hardwareAccel, isTransparent]);
     }
 
     public close(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'close');
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'close');
     }
 
     public setViews(views: string[]): Promise<string[]> {
-        return this._nativeBridge.invoke<string[]>(this.getFullApiClassName(), 'setViews', [views]);
+        return this._nativeBridge.invoke<string[]>(this._fullApiClassName, 'setViews', [views]);
     }
 
     public getViews(): Promise<string[]> {
-        return this._nativeBridge.invoke<string[]>(this.getFullApiClassName(), 'getViews');
+        return this._nativeBridge.invoke<string[]>(this._fullApiClassName, 'getViews');
     }
 
     public setOrientation(orientation: ScreenOrientation): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'setOrientation', [orientation]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setOrientation', [orientation]);
     }
 
     public getOrientation(): Promise<ScreenOrientation> {
-        return this._nativeBridge.invoke<ScreenOrientation>(this.getFullApiClassName(), 'getOrientation');
+        return this._nativeBridge.invoke<ScreenOrientation>(this._fullApiClassName, 'getOrientation');
     }
 
     public setKeepScreenOn(screenOn: boolean): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'setKeepScreenOn', [screenOn]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setKeepScreenOn', [screenOn]);
     }
 
     public setSystemUiVisibility(systemUiVisibility: SystemUiVisibility): Promise<SystemUiVisibility> {
-        return this._nativeBridge.invoke<SystemUiVisibility>(this.getFullApiClassName(), 'setSystemUiVisibility', [systemUiVisibility]);
+        return this._nativeBridge.invoke<SystemUiVisibility>(this._fullApiClassName, 'setSystemUiVisibility', [systemUiVisibility]);
     }
 
     public setKeyEventList(keyEventList: KeyCode[]): Promise<KeyCode[]> {
-        return this._nativeBridge.invoke<KeyCode[]>(this.getFullApiClassName(), 'setKeyEventList', [keyEventList]);
+        return this._nativeBridge.invoke<KeyCode[]>(this._fullApiClassName, 'setKeyEventList', [keyEventList]);
     }
 
     public setViewFrame(view: string, x: number, y: number, width: number, height: number): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'setViewFrame', [view, x, y, width, height]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setViewFrame', [view, x, y, width, height]);
     }
 
     public getViewFrame(view: string): Promise<number[]> {
-        return this._nativeBridge.invoke<number[]>(this.getFullApiClassName(), 'getViewFrame', [view]);
+        return this._nativeBridge.invoke<number[]>(this._fullApiClassName, 'getViewFrame', [view]);
     }
 
     public startMotionEventCapture(maxEvents: number): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'startMotionEventCapture', [maxEvents]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'startMotionEventCapture', [maxEvents]);
     }
 
     public endMotionEventCapture(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'endMotionEventCapture');
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'endMotionEventCapture');
     }
 
     public clearMotionEventCapture(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'clearMotionEventCapture');
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'clearMotionEventCapture');
     }
 
     public getMotionEventCount(actions: MotionEventAction[]): Promise<{ [action: string]: number}> {
-        return this._nativeBridge.invoke<{ [action: string]: number}>(this.getFullApiClassName(), 'getMotionEventCount', [actions]);
+        return this._nativeBridge.invoke<{ [action: string]: number}>(this._fullApiClassName, 'getMotionEventCount', [actions]);
     }
 
     public getMotionEventData(data: { [action: string]: number[] }): Promise<{ [action: string]: { [index: string]: IMotionEvent } }> {
-        return this._nativeBridge.invoke<{ [action: string]: { [index: string]: IMotionEvent } }>(this.getFullApiClassName(), 'getMotionEventData', [data]);
+        return this._nativeBridge.invoke<{ [action: string]: { [index: string]: IMotionEvent } }>(this._fullApiClassName, 'getMotionEventData', [data]);
     }
 
     public getCurrentMotionEventCount(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this.getFullApiClassName(), 'getCurrentMotionEventCount');
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getCurrentMotionEventCount');
     }
 
     public handleEvent(event: string, parameters: any[]): void {

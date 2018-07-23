@@ -23,19 +23,19 @@ export class PurchasingApi extends NativeApi {
     }
 
     public initializePurchasing(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'initializePurchasing');
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'initializePurchasing');
     }
 
     public getPromoVersion(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'getPromoVersion');
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'getPromoVersion');
     }
 
     public getPromoCatalog(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'getPromoCatalog');
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'getPromoCatalog');
     }
 
     public initiatePurchasingCommand(event: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'initiatePurchasingCommand', [event]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'initiatePurchasingCommand', [event]);
     }
 
     public handleEvent(event: string, parameters: any[]): void {

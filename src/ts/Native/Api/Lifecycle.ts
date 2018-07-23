@@ -33,11 +33,11 @@ export class LifecycleApi extends NativeApi {
     }
 
     public register(events: string[]): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'register', [events]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'register', [events]);
     }
 
     public unregister(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this.getFullApiClassName(), 'unregister');
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'unregister');
     }
 
     public handleEvent(event: string, parameters: any[]): void {
