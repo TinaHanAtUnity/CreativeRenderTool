@@ -72,6 +72,8 @@ describe('LocalizationTest', () => {
         assert.equal(new Localization('zh_Hans', 'endscreen').translate(phrase), '免费下载', 'Localization zh_Hans did not map to correct language');
         assert.equal(new Localization('zh_Hans_CN', 'endscreen').translate(phrase), '免费下载', 'Localization zh_Hans_CN did not map to correct language');
         assert.equal(new Localization('zh_Hans_US', 'endscreen').translate(phrase), '免费下载', 'Localization zh_Hans_US did not map to correct language'); // because we don't really care about the last _XX
+        assert.equal(new Localization('zh_#Hans_CN', 'endscreen').translate(phrase), '免费下载', 'Localization zh_#Hans_CN did not map to correct language');
+        assert.equal(new Localization('zh_CN_#Hans', 'endscreen').translate(phrase), '免费下载', 'Localization zh_CN_#Hans did not map to correct language');
     });
 
     it('should translate correctly all Chinese traditional codes', () => {
@@ -81,6 +83,8 @@ describe('LocalizationTest', () => {
         assert.equal(new Localization('zh_Hant_TW', 'endscreen').translate(phrase), '免費下載', 'Localization zh_Hant_TW did not map to correct language');
         assert.equal(new Localization('zh_HK', 'endscreen').translate(phrase), '免費下載', 'Localization zh_HK did not map to correct language');
         assert.equal(new Localization('zh_MO', 'endscreen').translate(phrase), '免費下載', 'Localization zh_HK did not map to correct language');
+        assert.equal(new Localization('zh_#Hant_TW', 'endscreen').translate(phrase), '免費下載', 'Localization zh_#Hant_TW did not map to correct language');
+        assert.equal(new Localization('zh_TW_#Hant', 'endscreen').translate(phrase), '免費下載', 'Localization zh_TW_#Hant did not map to correct language');
     });
 
 });
