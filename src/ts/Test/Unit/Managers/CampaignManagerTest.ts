@@ -1262,11 +1262,15 @@ describe('CampaignManager', () => {
             const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
 
+            const now = new Date(Date.now());
+            const utcTimestamp = Math.floor(new Date(now.getUTCFullYear(),now.getUTCMonth(), now.getUTCDate(),
+                    now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), now.getUTCMilliseconds()).getTime() / 1000);
+
             return campaignManager.request().then(() => {
                 assert.isObject(actualResponse);
                 assert.equal(actualResponse.url, 'http://test/request');
                 const data = JSON.parse(OnProgrammaticMraidUrlPlcCampaignJson);
-                data.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].absoluteCacheTTL = 5145;
+                data.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].absoluteCacheTTL = utcTimestamp + 12345;
                 assert.deepEqual(JSON.parse(actualResponse.response), data);
             });
         });
@@ -1325,6 +1329,10 @@ describe('CampaignManager', () => {
             nowStub.reset();
             nowStub.returns(36000 * 1000);
 
+            const now = new Date(Date.now());
+            const utcTimestamp = Math.floor(new Date(now.getUTCFullYear(),now.getUTCMonth(), now.getUTCDate(),
+                    now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), now.getUTCMilliseconds()).getTime() / 1000);
+
             let triggeredCampaign: MRAIDCampaign;
             campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
                 triggeredCampaign = <MRAIDCampaign>campaign;
@@ -1336,7 +1344,7 @@ describe('CampaignManager', () => {
             });
 
             const data = JSON.parse(OnProgrammaticMraidUrlPlcCampaignJson);
-            data.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].absoluteCacheTTL = 5145;
+            data.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].absoluteCacheTTL = utcTimestamp - 12345;
 
             return campaignManager.requestFromCache(<INativeResponse>{
                 response: JSON.stringify(data),
@@ -1354,6 +1362,10 @@ describe('CampaignManager', () => {
             nowStub.reset();
             nowStub.returns(36000 * 1000);
 
+            const now = new Date(Date.now());
+            const utcTimestamp = Math.floor(new Date(now.getUTCFullYear(),now.getUTCMonth(), now.getUTCDate(),
+                    now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), now.getUTCMilliseconds()).getTime() / 1000);
+
             let campaignCount = 0;
             campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
                 campaignCount++;
@@ -1365,7 +1377,7 @@ describe('CampaignManager', () => {
             });
 
             const data = JSON.parse(OnProgrammaticMraidPlcTwoMedia);
-            data.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85_1'].absoluteCacheTTL = 5145;
+            data.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85_1'].absoluteCacheTTL = utcTimestamp - 12345;
 
             return campaignManager.requestFromCache(<INativeResponse>{
                 response: JSON.stringify(data),

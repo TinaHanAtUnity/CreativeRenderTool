@@ -471,7 +471,13 @@ export class CampaignManager {
                         continue;
                     }
 
-                    const cacheTTL = cachedJson.media[mediaId].cacheTTL ? cachedJson.media[mediaId].cacheTTL : 3600;
+                    const contentType = cachedJson.media[mediaId].contentType;
+                    let cacheTTL = cachedJson.media[mediaId].cacheTTL ? cachedJson.media[mediaId].cacheTTL : 3600;
+
+                    if(!cachedJson.media[mediaId].cacheTTL && contentType && contentType === 'comet/campaign') {
+                        cacheTTL = 7 * 24 * 3600;
+                    }
+
                     cachedJson.media[mediaId].absoluteCacheTTL = utcTimestamp + cacheTTL;
                 }
 
