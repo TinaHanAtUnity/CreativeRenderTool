@@ -131,12 +131,12 @@ export class Localization {
             'overlay': JSON.parse(GermanOverlay),
             'loadingscreen': JSON.parse(GermanLoadingScreen)
         },
-        'zh(_Hant)?(_TW|_HK|_MO|_Hant)+$': {
+        'zh(_TW|_HK|_MO|_#?Hant)?(_TW|_HK|_MO|_#?Hant)+$': {
             'endscreen': JSON.parse(ChineseTraditionalEndscreen),
             'overlay': JSON.parse(ChineseTraditionalOverlay),
             'loadingscreen': JSON.parse(ChineseTraditionalLoadingScreen)
         },
-        'zh(_Hans)?(_\\D\\D)?$': {
+        'zh(((_#?Hans)?(_\\D\\D)?)|((_\\D\\D)?(_#?Hans)?))$': {
             'endscreen': JSON.parse(ChineseSimplifiedEndscreen),
             'overlay': JSON.parse(ChineseSimplifiedOverlay),
             'loadingscreen': JSON.parse(ChineseSimplifiedLoadingScreen)
