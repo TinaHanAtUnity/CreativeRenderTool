@@ -48,15 +48,15 @@ import PortugueseLoadingScreen from 'json/locale/pt/loadingscreen.json';
 interface ILanguageMap {
     [key: string]: { // device language regexp
         [key: string]: { // namespace
-            [key: string]: string // translation map
-        }
+            [key: string]: string; // translation map
+        };
     };
 }
 
 interface ILocalizedAbbreviations {
     [key: string]: { // device language regexp
-        thousand: string,
-        million: string
+        thousand: string;
+        million: string;
     };
 }
 
@@ -87,7 +87,7 @@ export class Localization {
         Localization._languageMap[language][namespace] = map;
     }
 
-    public static getLocalizedAbbreviations(language: string): { thousand: string, million: string } | undefined {
+    public static getLocalizedAbbreviations(language: string): { thousand: string; million: string } | undefined {
         const localizedAbbreviations = Localization._localizedAbbreviations[language];
         if(localizedAbbreviations) {
             return localizedAbbreviations;
