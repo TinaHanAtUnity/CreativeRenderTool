@@ -29,6 +29,8 @@ import { Configuration } from 'Models/Configuration';
 import { Privacy } from 'Views/Privacy';
 import { GdprManager } from 'Managers/GdprManager';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { IEndScreenParameters } from 'Views/EndScreen';
+import { ABGroupBuilder } from 'Models/ABGroup';
 
 describe('EndScreenEventHandlerTest', () => {
 
@@ -87,7 +89,17 @@ describe('EndScreenEventHandlerTest', () => {
             const video = new Video('', TestFixtures.getSession());
 
             const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
-            endScreen = new PerformanceEndScreen(nativeBridge, TestFixtures.getCampaign(), deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, false);
+
+            const endScreenParams : IEndScreenParameters = {
+                nativeBridge: nativeBridge,
+                language : deviceInfo.getLanguage(),
+                gameId: clientInfo.getGameId(),
+                privacy: privacy,
+                showGDPRBanner: false,
+                abGroup: ABGroupBuilder.getAbGroup(99),
+                targetGameName: TestFixtures.getCampaign().getGameName()
+            };
+            endScreen = new PerformanceEndScreen(endScreenParams, TestFixtures.getCampaign());
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
             placement = TestFixtures.getPlacement();
             const gdprManager = sinon.createStubInstance(GdprManager);
@@ -323,7 +335,16 @@ describe('EndScreenEventHandlerTest', () => {
             sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
 
             const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
-            endScreen = new PerformanceEndScreen(nativeBridge, campaign, deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, false);
+            const endScreenParams : IEndScreenParameters = {
+                nativeBridge: nativeBridge,
+                language : deviceInfo.getLanguage(),
+                gameId: clientInfo.getGameId(),
+                privacy: privacy,
+                showGDPRBanner: false,
+                abGroup: ABGroupBuilder.getAbGroup(99),
+                targetGameName: campaign.getGameName()
+            };
+            endScreen = new PerformanceEndScreen(endScreenParams, campaign);
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
             const gdprManager = sinon.createStubInstance(GdprManager);
             const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);

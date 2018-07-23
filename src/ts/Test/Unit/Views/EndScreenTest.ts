@@ -9,6 +9,7 @@ import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 import { Privacy } from 'Views/Privacy';
 
 import EndScreenFixture from 'html/fixtures/EndScreenFixture.html';
+import { IEndScreenParameters } from 'Views/EndScreen';
 
 describe('EndScreen', () => {
     let handleInvocation: sinon.SinonSpy;
@@ -27,18 +28,29 @@ describe('EndScreen', () => {
         });
     });
 
-    xit('should render', () => {
+    function createEndScreen(language : string) {
         const privacy = new Privacy(nativeBridge, false);
+        const params : IEndScreenParameters = {
+            nativeBridge,
+            language,
+            gameId: 'testGameId',
+            targetGameName: TestFixtures.getCampaign().getGameName(),
+            abGroup: TestFixtures.getCampaign().getAbGroup(),
+            privacy,
+            showGDPRBanner: false,
+            campaignId: TestFixtures.getCampaign().getId()
+        };
+        return new PerformanceEndScreen(params, TestFixtures.getCampaign());
+    }
 
-        const endScreen = new PerformanceEndScreen(nativeBridge, TestFixtures.getCampaign(), 'en', 'testGameId', privacy, false);
+    xit('should render', () => {
+        const endScreen = createEndScreen('en');
         endScreen.render();
         assert.equal(endScreen.container().innerHTML, EndScreenFixture);
     });
 
     it('should render with translations', () => {
-        const privacy = new Privacy(nativeBridge, false);
-
-        const endScreen = new PerformanceEndScreen(nativeBridge, TestFixtures.getCampaign(), 'fi', 'testGameId', privacy, false);
+        const endScreen = createEndScreen('fi');
         endScreen.render();
         const downloadElement = endScreen.container().querySelectorAll('.download-text')[0];
         assert.equal(downloadElement.innerHTML, 'Lataa ilmaiseksi');
