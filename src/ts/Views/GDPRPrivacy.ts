@@ -13,6 +13,7 @@ export class GDPRPrivacy extends AbstractPrivacy {
     private _isCoppaCompliant: boolean;
     private _personalInfoObtained: boolean = false;
     private _dataDeletionConfirmation: boolean = false;
+    private _currentState : number = -1;
 
     constructor(nativeBridge: NativeBridge, gdprManager: GdprManager, isCoppaCompliant: boolean, optOutEnabled: boolean) {
         super(nativeBridge, isCoppaCompliant, 'gdpr-privacy');
@@ -31,7 +32,7 @@ export class GDPRPrivacy extends AbstractPrivacy {
             },
             {
                 event: 'click',
-                listener: (event: Event) => this.onLeftSideClick(event),
+                listener: (event: Event) => this.onStateClick(event, true),
                 selector: '.left-side-link'
             },
             {
@@ -51,7 +52,7 @@ export class GDPRPrivacy extends AbstractPrivacy {
             },
             {
                 event: 'click',
-                listener: (event: Event) => this.onMiddleLinkClick(event),
+                listener: (event: Event) => this.onStateClick(event, false),
                 selector: '.middle-link'
             }
         ];
@@ -60,7 +61,6 @@ export class GDPRPrivacy extends AbstractPrivacy {
     public show(): void {
         super.show();
         this.editPopupPerUser();
-        this.setCardState();
 
         const agreeRadioButton = <HTMLInputElement>this._container.querySelector('#gdpr-agree-radio');
         agreeRadioButton.onclick = () => {
@@ -82,7 +82,7 @@ export class GDPRPrivacy extends AbstractPrivacy {
         const activeRadioButton = <HTMLInputElement>this._container.querySelector(`#${elId}`);
         activeRadioButton.checked = true;
 
-        this.setCardState();
+        this.setCardState(false);
     }
 
     protected onCloseEvent(event: Event): void {
@@ -147,25 +147,54 @@ export class GDPRPrivacy extends AbstractPrivacy {
         }
     }
 
-    private onLeftSideClick(event: Event): void {
+    private onStateClick(event: Event, leftClick: boolean): void {
         event.preventDefault();
-        const buildInformationActive = this._container.classList.contains('build');
-        this.setCardState(!buildInformationActive);
+        this.setCardState(leftClick);
     }
 
-    private setCardState(isFlipped: boolean = false): void {
-        const linkEL = <HTMLDivElement>this._container.querySelector('.left-side-link');
-        if (isFlipped) {
-            linkEL.innerText = 'Privacy info';
-            this._container.classList.add('build');
-        } else {
-            linkEL.innerText = 'Build info';
-            this._container.classList.remove('build');
+    // State 0: Privacy info - Left: Build info - Middle: Report Ad
+    // State 1: Build info - Left: Privacy info - Middle: Report Ad
+    // State 2: Report Ad - Left: Privacy info - Middle: Build info
+    private setCardState(leftClick: boolean) {
+
+        const leftEl = <HTMLDivElement>this._container.querySelector('.left-side-link');
+        const middleEl = <HTMLDivElement>this._container.querySelector('.middle-link');
+        const classList = this._container.classList;
+
+        switch(this._currentState) {
+
+            // Privacy info showing
+            case 0: {
+                this._currentState = leftClick ? 1 : 2;
+                leftEl.innerText = leftClick ? 'Privacy info' : 'Privacy info';
+                middleEl.innerText = leftClick ? 'Report Ad ⚑': 'Build info';
+                leftClick ? classList.add('build') : classList.add('report');
+                break;
+            }
+            // Build info showing
+            case 1: {
+                classList.remove('build');
+                this._currentState = leftClick ? 0 : 2;
+                leftEl.innerText = leftClick ? 'Build info' : 'Privacy info';
+                middleEl.innerText = leftClick ? 'Report Ad ⚑': 'Build info';
+                if (!leftClick) { classList.add('report'); }
+                break;
+            }
+            // Report Ad showing
+            case 2: {
+                classList.remove('report');
+                this._currentState = leftClick ? 0 : 1;
+                leftEl.innerText = leftClick ? 'Build info' : 'Privacy info';
+                middleEl.innerText = leftClick ? 'Report Ad ⚑': 'Report Ad ⚑';
+                if (!leftClick) { classList.add('build'); }
+                break;
+            }
+            // For initial configuration
+            default: {
+                this._currentState = 0;
+                leftEl.innerText = 'Build info';
+                middleEl.innerText = 'Report Ad ⚑';
+            }
         }
-    }
-
-    private onMiddleLinkClick(event: Event): void {
-        event.preventDefault();
-        const middleLink = <HTMLDivElement>this._container.querySelector('.middle-link');
     }
 }
