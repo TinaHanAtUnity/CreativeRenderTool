@@ -34,6 +34,7 @@ import { UserCountData } from 'Utilities/UserCountData';
 import { JaegerManager } from 'Jaeger/JaegerManager';
 import { JaegerTags } from 'Jaeger/JaegerSpan';
 import { GameSessionCounters } from 'Utilities/GameSessionCounters';
+import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 import { ABGroup } from 'Models/ABGroup';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { MixedPlacementUtility } from 'Utilities/MixedPlacementUtility';
@@ -390,7 +391,7 @@ export class CampaignManager {
                 this._nativeBridge.Sdk.logInfo('AdPlan received with ' + campaigns + ' campaigns and refreshDelay ' + refreshDelay);
                 this.onAdPlanReceived.trigger(refreshDelay, campaigns);
             }
-
+            PurchasingUtilities.placementManager.clear();
             for(const mediaId in fill) {
                 if(fill.hasOwnProperty(mediaId)) {
                     let auctionResponse: AuctionResponse;
@@ -538,6 +539,7 @@ export class CampaignManager {
         return parser.parse(this._nativeBridge, this._request, response, session, this._configuration.getGamerId(), this.getAbGroup()).then((campaign) => {
             const parseDuration = Date.now() - parseTimestamp;
             for(const placement of response.getPlacements()) {
+                PurchasingUtilities.placementManager.addCampaignPlacementIds(placement, campaign);
                 SdkStats.setParseDuration(placement, parseDuration);
             }
 

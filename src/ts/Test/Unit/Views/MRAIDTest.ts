@@ -74,7 +74,7 @@ describe('MRAID', () => {
         const json = JSON.parse(OnProgrammaticMraidUrlPlcCampaign);
         const params = TestFixtures.getProgrammaticMRAIDCampaignParams(json, 3600, '123abc');
         params.resourceAsset = undefined;
-        params.resource = `<script src="mraid.js"></script><script>{UNITY_DYNAMIC_MARKUP}</script><div>Hello</div>`;
+        params.resource = '<script src="mraid.js"></script><script>{UNITY_DYNAMIC_MARKUP}</script><div>Hello</div>';
         params.dynamicMarkup = 'InjectMe';
         const campaign = new MRAIDCampaign(params);
 
@@ -104,13 +104,13 @@ describe('MRAID', () => {
         const json = JSON.parse(OnProgrammaticMraidUrlPlcCampaign);
         const params = TestFixtures.getProgrammaticMRAIDCampaignParams(json, 3600, '123abc');
         params.resourceAsset = undefined;
-        params.resource = `<script src="mraid.js"></script><script>{UNITY_DYNAMIC_MARKUP}</script><script>var test = "Hello $&"</script><div>Hello World</div>`;
+        params.resource = '<script src="mraid.js"></script><script>{UNITY_DYNAMIC_MARKUP}</script><script>var test = "Hello $&"</script><div>Hello World</div>';
         params.dynamicMarkup = 'InjectMe';
         const campaign = new MRAIDCampaign(params);
         const mraid = new MRAID(nativeBridge, placement, campaign, privacy, false);
         return mraid.createMRAID(MRAIDContainer).then((mraidSrc) => {
             assert.notEqual(mraidSrc.indexOf('InjectMe'), -1);
-            assert.notEqual(mraidSrc.indexOf(`<script>var test = "Hello $&"</script>`), -1);
+            assert.notEqual(mraidSrc.indexOf('<script>var test = "Hello $&"</script>'), -1);
         });
     });
 });

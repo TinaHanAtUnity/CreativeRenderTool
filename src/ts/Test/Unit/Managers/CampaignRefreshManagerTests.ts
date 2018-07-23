@@ -47,6 +47,8 @@ import { JaegerSpan } from 'Jaeger/JaegerSpan';
 import { GdprManager } from 'Managers/GdprManager';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
+import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
+import { PlacementManager } from 'Managers/PlacementManager';
 
 export class TestContainer extends AdUnitContainer {
     public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, options: any): Promise<void> {
@@ -114,6 +116,7 @@ describe('CampaignRefreshManager', () => {
     let jaegerManager: JaegerManager;
     let gdprManager: GdprManager;
     let programmaticTrackingService: ProgrammaticTrackingService;
+    let placementManager: PlacementManager;
 
     beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo();
@@ -188,6 +191,8 @@ describe('CampaignRefreshManager', () => {
             }
         };
 
+        placementManager = sinon.createStubInstance(PlacementManager);
+        PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, placementManager);
         focusManager = new FocusManager(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
@@ -637,15 +642,71 @@ describe('CampaignRefreshManager', () => {
         });
     });
 
-    describe('With mixed placement campaigns', () => {
+    describe('On Promo', () => {
+        let sandbox: sinon.SinonSandbox;
         beforeEach(() => {
+            sandbox = sinon.createSandbox();
+            const clientInfoPromoGame = TestFixtures.getClientInfo(Platform.ANDROID, '00000');
+            configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfoPromoGame, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
+            campaignRefreshManager = new OldCampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration, focusManager, sessionManager, clientInfoPromoGame, request, cache);
+        });
+
+        afterEach(() => {
+            sandbox.restore();
+        });
+
+        it('should mark a placement for a promo campaign as ready', () => {
+            sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
+            sinon.stub(campaignManager, 'request').callsFake(() => {
+                campaignManager.onCampaign.trigger('promoPlacement', TestFixtures.getPromoCampaign('purchasing/iap'));
+                return Promise.resolve();
+            });
+
+            return campaignRefreshManager.refresh().then(() => {
+                assert.isDefined(campaignRefreshManager.getCampaign('promoPlacement'));
+                assert.isTrue(campaignRefreshManager.getCampaign('promoPlacement') instanceof PromoCampaign);
+
+                const tmpCampaign = campaignRefreshManager.getCampaign('promoPlacement');
+                assert.isDefined(tmpCampaign);
+                if (tmpCampaign) {
+                    assert.equal(tmpCampaign.getId(), '000000000000000000000123');
+                    assert.equal(tmpCampaign.getAdType(), 'purchasing/iap');
+                }
+
+                assert.equal(configuration.getPlacement('promoPlacement').getState(), PlacementState.READY);
+            });
+        });
+
+        it('should mark a placement for a promo campaign as nofill if product is not available', () => {
+            sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(false);
+            sinon.stub(campaignManager, 'request').callsFake(() => {
+                campaignManager.onCampaign.trigger('promoPlacement', TestFixtures.getPromoCampaign('purchasing/iap'));
+                return Promise.resolve();
+            });
+
+            return campaignRefreshManager.refresh().then(() => {
+                assert.equal(configuration.getPlacement('promoPlacement').getState(), PlacementState.NO_FILL);
+            });
+        });
+    });
+
+    describe('With mixed placement campaigns', () => {
+        let sandbox: sinon.SinonSandbox;
+        beforeEach(() => {
+            sandbox = sinon.createSandbox();
             const clientInfoPromoGame = TestFixtures.getClientInfo(Platform.ANDROID, '1003628');
             configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfoPromoGame, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
             campaignRefreshManager = new OldCampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration, focusManager, sessionManager, clientInfoPromoGame, request, cache);
         });
 
+        afterEach(() => {
+            sandbox.restore();
+        });
+
         it('should mark a placement for a mixed placement promo campaign as ready', () => {
+            sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('mixedPlacement-promo', TestFixtures.getPromoCampaign('purchasing/iap'));
                 return Promise.resolve();
@@ -666,7 +727,20 @@ describe('CampaignRefreshManager', () => {
             });
         });
 
+        it('should mark a placement for a mixed placement promo campaign as nofill if product is not available', () => {
+            sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(false);
+            sinon.stub(campaignManager, 'request').callsFake(() => {
+                campaignManager.onCampaign.trigger('mixedPlacement-promo', TestFixtures.getPromoCampaign('purchasing/iap'));
+                return Promise.resolve();
+            });
+
+            return campaignRefreshManager.refresh().then(() => {
+                assert.equal(configuration.getPlacement('mixedPlacement-promo').getState(), PlacementState.NO_FILL);
+            });
+        });
+
         it('should mark a placement for a mixed placement with rewarded campaign as ready', () => {
+            sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('testDashPlacement-rewarded', TestFixtures.getCampaign());
                 return Promise.resolve();
@@ -687,6 +761,7 @@ describe('CampaignRefreshManager', () => {
         });
 
         it('should mark a placement for a mixed placement with rewardedpromo campaign as ready', () => {
+            sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('rewardedPromoPlacement-rewardedpromo', TestFixtures.getPromoCampaign('purchasing/iap', true));
                 return Promise.resolve();
@@ -707,6 +782,7 @@ describe('CampaignRefreshManager', () => {
         });
 
         it('if mixed placement is already marked as ready then any other mixed placement should be marked as nofill', () => {
+            sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('mixedPlacement-promo', TestFixtures.getPromoCampaign('purchasing/iap'));
                 campaignManager.onCampaign.trigger('testDashPlacement-rewarded', TestFixtures.getPromoCampaign('purchasing/iap'));
@@ -732,6 +808,7 @@ describe('CampaignRefreshManager', () => {
         });
 
         it('should invalidate mixed rewarded campaigns and set suffixed placement as ready the second time onCampaign is triggered after being invalidated', () => {
+            sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
             const campaign = TestFixtures.getPromoCampaign();
             const placement: Placement = configuration.getPlacement('premium');
             adUnitParams.campaign = campaign;
@@ -790,6 +867,7 @@ describe('CampaignRefreshManager', () => {
         });
 
         it('placement states should end up with NO_FILL if mixed', () => {
+            sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
             sinon.stub(campaignManager, 'request').callsFake(() => {
                 campaignManager.onCampaign.trigger('mixedPlacement-promo', TestFixtures.getPromoCampaign('purchasing/iap'));
                 campaignManager.onNoFill.trigger('mixedPlacement-promo');
