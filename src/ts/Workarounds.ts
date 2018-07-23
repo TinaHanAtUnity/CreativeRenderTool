@@ -16,7 +16,7 @@ if(!Array.prototype.forEach) {
 }
 
 if(!Number.isInteger) {
-    Number.isInteger = function(value: any) {
+    Number.isInteger = (value: any) => {
         return typeof value === 'number' && isFinite(value) && Math.floor(value) === value;
     };
 }
@@ -27,7 +27,7 @@ if(!('classList' in document.documentElement) && Object.defineProperty && typeof
             const self = this;
 
             function update(fn: (classes: string[], index: number, value?: string) => any) {
-                return function(value: string) {
+                return (value: string) => {
                     const classes = self.className.split(/\s+/);
                     const index = classes.indexOf(value);
                     fn(classes, index, value);
@@ -36,29 +36,29 @@ if(!('classList' in document.documentElement) && Object.defineProperty && typeof
             }
 
             const ret = {
-                add: update(function(classes: string[], index: number, value?: string) {
+                add: update((classes: string[], index: number, value?: string) => {
                     ~index || value && classes.push(value);
                 }),
 
-                remove: update(function(classes: string[], index: number) {
+                remove: update((classes: string[], index: number) => {
                     ~index && classes.splice(index, 1);
                 }),
 
-                toggle: update(function(classes: string[], index: number, value?: string) {
+                toggle: update((classes: string[], index: number, value?: string) => {
                     ~index ? classes.splice(index, 1) : value && classes.push(value);
                 }),
 
-                contains: function(value: string) {
+                contains: (value: string) => {
                     return !!~self.className.split(/\s+/).indexOf(value);
                 },
 
-                item: function(i: number) {
+                item: (i: number) => {
                     return self.className.split(/\s+/)[i] || null;
                 }
             };
 
             Object.defineProperty(ret, 'length', {
-                get: function() {
+                get: () => {
                     return self.className.split(/\s+/).length;
                 }
             });
@@ -73,7 +73,7 @@ if(!('classList' in document.documentElement) && Object.defineProperty && typeof
 
 // tslint:disable:no-empty
 
-(function(DOMParser) {
+(((DOMParser) => {
 
     // Firefox/Opera/IE throw errors on unsupported types
     try {
@@ -87,7 +87,7 @@ if(!('classList' in document.documentElement) && Object.defineProperty && typeof
 
     DOMParser.prototype.parseFromString = DOMUtils.parseFromString;
 
-}(DOMParser));
+})(DOMParser));
 
 // tslint:enable:no-empty
 
