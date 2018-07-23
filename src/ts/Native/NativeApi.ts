@@ -15,11 +15,13 @@ export abstract class NativeApi {
     protected _nativeBridge: NativeBridge;
     protected _apiClass: string;
     protected _apiPackage: ApiPackage;
+    protected _fullApiClassName: string;
 
     constructor(nativeBridge: NativeBridge, apiClass: string, apiPackage: ApiPackage) {
         this._nativeBridge = nativeBridge;
         this._apiClass = apiClass;
         this._apiPackage = apiPackage;
+        this._fullApiClassName = this.getFullApiClassName();
     }
 
     public handleEvent(event: string, parameters: any[]) {
