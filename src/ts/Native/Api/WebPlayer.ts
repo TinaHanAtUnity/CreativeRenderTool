@@ -158,7 +158,7 @@ export enum WKAudiovisualMediaTypes {
     NONE    = 0,
     AUDIO   = 1 << 0,
     VIDEO   = 1 << 1,
-    ALL     = WKAudiovisualMediaTypes.AUDIO | WKAudiovisualMediaTypes.VIDEO
+    ALL     = AUDIO | VIDEO
 }
 
 export class WebPlayerApi extends NativeApi {
