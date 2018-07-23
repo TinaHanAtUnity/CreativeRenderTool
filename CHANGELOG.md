@@ -1,3 +1,14 @@
+# Pending
+
+* Add a fixed version of the new video overlay
+* Send Admob impression when ad loads
+* Expanding Localization regex to be more flexible for Chinese
+* Tslint no-unnecessary-qualifier
+* Tslint no-unnecessary-type-assertion
+* Tslint use-default-type-parameter
+* Tslint type-literal-delimiter
+* Tslint no-function-expression
+
 # Fri Jul 20 21:20:03 UTC 2018
 
 * Not using cached adPlan for Uken games - attempt to fix black screen issue
