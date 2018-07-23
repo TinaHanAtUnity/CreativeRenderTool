@@ -40,12 +40,7 @@ export class SdkApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'logDebug', [message]);
     }
 
-    public setShowTimeout(timeout: number): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setShowTimeout', [timeout]);
-    }
-
     public reinitialize(): void {
         this._nativeBridge.invoke<void>(this._fullApiClassName, 'reinitialize');
     }
-
 }
