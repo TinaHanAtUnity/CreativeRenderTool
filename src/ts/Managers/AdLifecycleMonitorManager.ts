@@ -60,6 +60,6 @@ export class AdLifecycleMonitorManager {
     }
 
     private onStorageSet(eventType: string, data: any) {
-        // what will do on storage set? 
+        // what will do on storage set?
     }
 }
