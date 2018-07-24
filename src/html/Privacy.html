@@ -19,7 +19,7 @@
     <% } %>
     <div class="build-information-container">
         <% for (var k in data.buildInformation) { %>
-            <span class="build-information-key"><%= k %>:</span> <span class="build-information-value"> <%= (data.buildInformation[k] === null || typeof data.buildInformation[k] === "undefined") ? "N/A" : data.buildInformation[k] %></span>;
+            <span class="build-information-key"><%= k %>:</span> <span class="build-information-value"> <%= (data.buildInformation[k] === null || typeof data.buildInformation[k] === "undefined") ? "N/A" : data.buildInformation[k] %><br /></span>
         <% } %>
     </div>
     <div class="ok-button">OK</div>
