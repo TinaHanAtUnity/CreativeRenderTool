@@ -14,25 +14,15 @@ export class AdLifecycleMonitorManager {
     private static AdLifecycleTerminatedStorageKey = 'adlifecycle.terminated';
 
     private _nativeBridge: NativeBridge;
-    private _deviceInfo: DeviceInfo;
-    private _clientInfo: ClientInfo;
-    private _configuration: Configuration;
-    private _request: Request;
 
-    constructor(nativeBridge: NativeBridge, configuration: Configuration, deviceInfo: DeviceInfo, clientInfo: ClientInfo, request: Request) {
+    constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
-        this._configuration = configuration;
-        this._deviceInfo = deviceInfo;
-        this._clientInfo = clientInfo;
-        this._request = request;
 
         this._nativeBridge.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, data));
     }
 
-    public createAdLifecycleLog(session: Session): Promise<void> {
-        const adLifecycleLog = {
-            adSession: session
-        };
+    public createAdLifecycleLog(adLog: IAdLifecycleLog): Promise<void> {
+        const adLifecycleLog = adLog;
 
         return this._nativeBridge.Storage.set(StorageType.PRIVATE, AdLifecycleMonitorManager.AdLifecycleTerminatedStorageKey, adLifecycleLog).then(() => {
            return this._nativeBridge.Storage.write(StorageType.PRIVATE);
@@ -42,6 +32,8 @@ export class AdLifecycleMonitorManager {
     public hasAdLifecycleLog(): Promise<boolean> {
         return this._nativeBridge.Storage.get(StorageType.PRIVATE, AdLifecycleMonitorManager.AdLifecycleTerminatedStorageKey).then((data: any) => {
             return Promise.resolve(typeof(data) !== 'undefined');
+        }).catch(() => {
+            return Promise.resolve(false);
         });
     }
 

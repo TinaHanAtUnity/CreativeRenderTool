@@ -15,6 +15,7 @@ import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { CampaignAssetInfo } from 'Utilities/CampaignAssetInfo';
 import { GdprManager } from 'Managers/GdprManager';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { IAdLifecycleLog } from 'Managers/AdLifecycleMonitorManager';
 
 export interface IAdUnitParameters<T extends Campaign> {
     forceOrientation: Orientation;
@@ -112,5 +113,11 @@ export abstract class AbstractAdUnit {
         if(this._finishState !== FinishState.COMPLETED) {
             this._finishState = finishState;
         }
+    }
+
+    public getAdLifecycleLog(): IAdLifecycleLog {
+        return {
+            adSession: this._baseCampaign.getSession()
+        };
     }
 }

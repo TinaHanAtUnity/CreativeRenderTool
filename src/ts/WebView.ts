@@ -62,6 +62,7 @@ import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
 import { ABGroupBuilder } from 'Models/ABGroup';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 import { PlacementManager } from 'Managers/PlacementManager';
+import { AdLifecycleMonitorManager, IAdLifecycleLog } from 'Managers/AdLifecycleMonitorManager';
 
 export class WebView {
 
@@ -92,6 +93,7 @@ export class WebView {
     private _gdprManager: GdprManager;
     private _jaegerManager: JaegerManager;
     private _programmaticTrackingService: ProgrammaticTrackingService;
+    private _adLifecycleMonitorManager: AdLifecycleMonitorManager;
 
     private _showing: boolean = false;
     private _initialized: boolean = false;
@@ -138,6 +140,7 @@ export class WebView {
             this._request = new Request(this._nativeBridge, this._wakeUpManager);
             this._cacheBookkeeping = new CacheBookkeeping(this._nativeBridge);
             this._programmaticTrackingService = new ProgrammaticTrackingService(this._request, this._clientInfo, this._deviceInfo);
+            this._adLifecycleMonitorManager = new AdLifecycleMonitorManager(this._nativeBridge);
             this._cache = new Cache(this._nativeBridge, this._wakeUpManager, this._request, this._cacheBookkeeping, this._programmaticTrackingService);
             this._resolve = new Resolve(this._nativeBridge);
             this._metadataManager = new MetaDataManager(this._nativeBridge);
@@ -282,8 +285,17 @@ export class WebView {
                 throw error;
             });
         }).then(() => {
-            // TODO
             // send diagnostics event for abnormal ad termination
+            if (this._adLifecycleMonitorManager.hasAdLifecycleLog()) {
+                const adLogError = new DiagnosticError(new Error('Ad lifecycle terminated'), {
+                    clientInfo: this._clientInfo,
+                    deviceInfo: this._deviceInfo
+                });
+
+                this._adLifecycleMonitorManager.getAdLifecycleLog().then((data) => {
+                    Diagnostics.trigger('ad_lifecycle_terminated', adLogError, data.adSession);
+                });
+            }
             return Promise.resolve();
         }).then(() => {
             this._initialized = true;

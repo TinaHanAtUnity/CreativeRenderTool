@@ -11,6 +11,7 @@ import { FocusManager } from 'Managers/FocusManager';
 import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { AdLifecycleMonitorManager, IAdLifecycleLog } from 'Managers/AdLifecycleMonitorManager';
 
 interface IIosOptions {
     supportedOrientations: UIInterfaceOrientationMask;
@@ -31,6 +32,7 @@ export class ViewController extends AdUnitContainer {
     private _showing: boolean;
     private _options: IIosOptions;
     private _clientInfo: ClientInfo;
+    private _adLifecycleMonitorManager: AdLifecycleMonitorManager;
 
     private _onViewControllerDidAppearObserver: any;
     private _onViewControllerDidDisappearObserver: any;
@@ -46,6 +48,7 @@ export class ViewController extends AdUnitContainer {
         this._focusManager = focusManager;
         this._deviceInfo = deviceInfo;
         this._clientInfo = clientInfo;
+        this._adLifecycleMonitorManager = new AdLifecycleMonitorManager(this._nativeBridge);
 
         this._onViewControllerDidDisappearObserver = this._nativeBridge.IosAdUnit.onViewControllerDidDisappear.subscribe(() => this.onViewDidDisappear());
         this._onViewControllerDidAppearObserver = this._nativeBridge.IosAdUnit.onViewControllerDidAppear.subscribe(() => this.onViewDidAppear());
@@ -78,9 +81,15 @@ export class ViewController extends AdUnitContainer {
         this._nativeBridge.Sdk.logInfo('Opening ' + adUnit.description() + ' ad with orientation ' + Orientation[this._lockedOrientation]);
 
         let hideStatusBar = true;
-        if(allowStatusBar) {
+        if (allowStatusBar) {
             hideStatusBar = options.statusBarHidden;
         }
+
+        // Only send ad lifecycle log when an app restarted while watching ads
+        if (this._adLifecycleMonitorManager.hasAdLifecycleLog()) {
+            this._adLifecycleMonitorManager.destroyAdLifecyleLog();
+        }
+        this._adLifecycleMonitorManager.createAdLifecycleLog(adUnit.getAdLifecycleLog());
 
         return this._nativeBridge.IosAdUnit.open(nativeViews, this.getOrientation(options, allowRotation, this._lockedOrientation), hideStatusBar, allowRotation, isTransparent, withAnimation);
     }
@@ -96,6 +105,9 @@ export class ViewController extends AdUnitContainer {
         this._focusManager.onAppForeground.unsubscribe(this._onAppForegroundObserver);
         this._nativeBridge.Notification.removeAVNotificationObserver(ViewController._audioSessionInterrupt);
         this._nativeBridge.Notification.removeAVNotificationObserver(ViewController._audioSessionRouteChange);
+
+        this._adLifecycleMonitorManager.destroyAdLifecyleLog();
+
         return this._nativeBridge.IosAdUnit.close();
     }
 

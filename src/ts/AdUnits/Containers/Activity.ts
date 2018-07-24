@@ -6,6 +6,7 @@ import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { AdUnitContainer, Orientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
 import { Rotation } from 'Constants/Android/Rotation';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
+import { AdLifecycleMonitorManager } from 'Managers/AdLifecycleMonitorManager';
 
 interface IAndroidOptions {
     requestedOrientation: ScreenOrientation;
@@ -22,6 +23,7 @@ export class Activity extends AdUnitContainer {
 
     private _nativeBridge: NativeBridge;
     private _deviceInfo: AndroidDeviceInfo;
+    private _adLifecycleMonitorManager: AdLifecycleMonitorManager;
 
     private _activityId: number;
     private _currentActivityFinished: boolean;
@@ -42,6 +44,7 @@ export class Activity extends AdUnitContainer {
 
         this._nativeBridge = nativeBridge;
         this._deviceInfo = deviceInfo;
+        this._adLifecycleMonitorManager = new AdLifecycleMonitorManager(this._nativeBridge);
 
         this._activityId = 0;
         this._currentActivityFinished = false;
@@ -81,6 +84,12 @@ export class Activity extends AdUnitContainer {
 
         this._onFocusGainedObserver = this._nativeBridge.AndroidAdUnit.onFocusGained.subscribe(() => this.onFocusGained());
         this._onFocusLostObserver = this._nativeBridge.AndroidAdUnit.onFocusLost.subscribe(() => this.onFocusLost());
+
+        // Only send ad lifecycle log when an app restarted while watching ads
+        if (this._adLifecycleMonitorManager.hasAdLifecycleLog()) {
+            this._adLifecycleMonitorManager.destroyAdLifecyleLog();
+        }
+        this._adLifecycleMonitorManager.createAdLifecycleLog(adUnit.getAdLifecycleLog());
 
         return this._nativeBridge.AndroidAdUnit.open(this._activityId, nativeViews, this.getOrientation(allowRotation, this._lockedOrientation, options), keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel, isTransparent);
     }
