@@ -90,8 +90,7 @@ opt you out from personalized ads.
     </div>
     <div class="pop-up-content build-side">
         <% for (var k in data.buildInformation) { %>
-        <span class="build-information-key"><%= k %>:</span> <span class="build-information-value
-        "> <%= (data.buildInformation[k] === null || typeof data.buildInformation[k] === "undefined") ? "N/A" : data.buildInformation[k] %></span>
+        <span class="build-information-key"><%= k %>:</span> <span class="build-information-value"><%= (data.buildInformation[k] === null || typeof data.buildInformation[k] === "undefined") ? "N/A" : data.buildInformation[k] %><br /></span>
         <% } %>
     </div>
     <div class="pop-up-content report-side">
