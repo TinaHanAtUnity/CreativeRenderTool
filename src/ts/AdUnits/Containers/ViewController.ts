@@ -217,7 +217,7 @@ export class ViewController extends AdUnitContainer {
 
         switch(event) {
             case ViewController._audioSessionInterrupt:
-                const interruptData: { AVAudioSessionInterruptionTypeKey: number, AVAudioSessionInterruptionOptionKey: number } = parameters;
+                const interruptData: { AVAudioSessionInterruptionTypeKey: number; AVAudioSessionInterruptionOptionKey: number } = parameters;
 
                 if(interruptData.AVAudioSessionInterruptionTypeKey === 0) {
                     if(interruptData.AVAudioSessionInterruptionOptionKey === 1) {

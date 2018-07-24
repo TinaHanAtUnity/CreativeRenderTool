@@ -298,7 +298,7 @@ export class AdMobSignalFactory {
 
             // this should only be added to 2.2.1 and above
             if(this._deviceInfo instanceof AndroidDeviceInfo) {
-                signal.setApkHash((<AndroidDeviceInfo>this._deviceInfo).getApkDigest());
+                signal.setApkHash(this._deviceInfo.getApkDigest());
             }
 
             promises.push(this._nativeBridge.DeviceInfo.Android.getCertificateFingerprint().then(certificate => {
@@ -464,13 +464,13 @@ export class AdMobSignalFactory {
     private checkDeviceIncapabilities(): string {
         let deviceIncapabilities = '';
         if (this._deviceInfo instanceof AndroidDeviceInfo) {
-            if (!(<AndroidDeviceInfo>this._deviceInfo).isGoogleStoreInstalled()) {
+            if (!this._deviceInfo.isGoogleStoreInstalled()) {
                 deviceIncapabilities += 'a';
             }
-            if (!(<AndroidDeviceInfo>this._deviceInfo).isGoogleMapsInstalled()) {
+            if (!this._deviceInfo.isGoogleMapsInstalled()) {
                 deviceIncapabilities += 'm';
             }
-            if (!(<AndroidDeviceInfo>this._deviceInfo).isTelephonyInstalled()) {
+            if (!this._deviceInfo.isTelephonyInstalled()) {
                 deviceIncapabilities += 't';
             }
         } else {

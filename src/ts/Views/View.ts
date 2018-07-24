@@ -10,11 +10,11 @@ export abstract class View<T extends object> {
 
     private static addEventListener(binding: IViewBinding, element: HTMLElement, attachTap: boolean) {
         if(binding.event === 'swipe') {
-            binding.swipe = new Swipe(<HTMLElement>element);
+            binding.swipe = new Swipe(element);
         }
 
         if(attachTap && binding.event === 'click') {
-            binding.tap = new Tap(<HTMLElement>element);
+            binding.tap = new Tap(element);
         }
         element.addEventListener(binding.event, binding.listener, false);
     }
@@ -22,7 +22,7 @@ export abstract class View<T extends object> {
     protected _nativeBridge: NativeBridge;
 
     protected _template: Template;
-    protected _templateData: { [key: string]: string | number | boolean | undefined | IBuildInformation ; };
+    protected _templateData: { [key: string]: string | number | boolean | undefined | IBuildInformation };
     protected _bindings: IViewBinding[];
     protected _container: HTMLElement;
     protected _handlers: T[] = [];
