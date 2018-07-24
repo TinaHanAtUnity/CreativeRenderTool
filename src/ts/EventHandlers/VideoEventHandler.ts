@@ -194,7 +194,7 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
             overlay.setDebugMessageVisible(true);
         }
 
-        this._nativeBridge.VideoPlayer.setVolume(new Double(overlay && overlay.isMuted() ? 0.0 : 1.0)).then(() => {
+        this._nativeBridge.VideoPlayer.setVolume(new Double(overlay && overlay.isMuted() ? 0 : 1)).then(() => {
             if(this._video.getPosition() > 0) {
                 this._nativeBridge.VideoPlayer.seekTo(this._video.getPosition()).then(() => {
                     if(!this._adUnit.getContainer().isPaused() && (overlay && !overlay.isPrivacyShowing())) {
