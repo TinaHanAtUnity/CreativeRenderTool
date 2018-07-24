@@ -58,8 +58,8 @@ describe('ABGroup tests', () => {
 
     describe('setupTestEnvironment in webview should set AbGroup on ConfigManager and CampaignManager', () => {
         const tests: Array<{
-            metaDataGroup: any,
-            expectedGroup: number | undefined
+            metaDataGroup: any;
+            expectedGroup: number | undefined;
         }> = [{
             metaDataGroup: '5',
             expectedGroup: 5

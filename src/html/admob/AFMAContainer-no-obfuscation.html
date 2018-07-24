@@ -68,6 +68,11 @@
             var clickSignalListeners = [];
 
             document.addEventListener('DOMContentLoaded', function() {
+
+                self.postMessage('tracking', {
+                    event: 'impression'
+                });
+
                 var videoEl = document.querySelector('video');
                 if (videoEl === null) {
                     var error = 'videoEl for admob is not found';

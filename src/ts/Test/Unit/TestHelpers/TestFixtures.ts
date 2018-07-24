@@ -455,10 +455,10 @@ export class TestFixtures {
             platform = Platform.TEST;
         }
         const backend = {
-            handleInvocation: function() {
+            handleInvocation: () => {
                 // no-op
             },
-            handleCallback: function() {
+            handleCallback: () => {
                 // no-op
             }
         };

@@ -24,8 +24,8 @@ describe('JaegerUtilitiesTest', () => {
 
     describe('on stripQueryAndFragment', () => {
         const tests: Array<{
-            input: string,
-            output: string
+            input: string;
+            output: string;
         }> = [{
             input: 'http://google.com/test?key=value&hello=world',
             output: 'http://google.com/test'
