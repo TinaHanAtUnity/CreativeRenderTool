@@ -286,16 +286,19 @@ export class WebView {
             });
         }).then(() => {
             // send diagnostics event for abnormal ad termination
-            if (this._adLifecycleMonitorManager.hasAdLifecycleLog()) {
-                const adLogError = new DiagnosticError(new Error('Ad lifecycle terminated'), {
-                    clientInfo: this._clientInfo,
-                    deviceInfo: this._deviceInfo
-                });
+            this._adLifecycleMonitorManager.hasAdLifecycleLog().then((hasAdLifecycleLog: boolean) => {
+                if (hasAdLifecycleLog) {
+                    const adLogError = new DiagnosticError(new Error('Ad lifecycle terminated'), {
+                        clientInfo: this._clientInfo,
+                        deviceInfo: this._deviceInfo
+                    });
 
-                this._adLifecycleMonitorManager.getAdLifecycleLog().then((data) => {
-                    Diagnostics.trigger('ad_lifecycle_terminated', adLogError, data.adSession);
-                });
-            }
+                    this._adLifecycleMonitorManager.getAdLifecycleLog().then((data) => {
+                        Diagnostics.trigger('ad_lifecycle_terminated', adLogError, data.adSession);
+                    });
+                }
+            });
+
             return Promise.resolve();
         }).then(() => {
             this._initialized = true;
@@ -326,7 +329,7 @@ export class WebView {
             Diagnostics.trigger('initialization_error', error);
         });
     }
-
+            // tslint:enable:no-console
     /*
      PUBLIC API EVENT HANDLERS
      */

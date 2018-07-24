@@ -95,6 +95,8 @@ export class Activity extends AdUnitContainer {
     }
 
     public close(): Promise<void> {
+        this._adLifecycleMonitorManager.destroyAdLifecyleLog();
+
         if(!this._currentActivityFinished) {
             this._currentActivityFinished = true;
             this._nativeBridge.AndroidAdUnit.onFocusLost.unsubscribe(this._onFocusLostObserver);
