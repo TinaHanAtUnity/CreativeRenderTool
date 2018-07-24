@@ -2,11 +2,11 @@
 @import "components.styl";
 @import "mixins.styl";
 
-$iphone-button-right = calc(env(safe-area-inset-right) - 1rem);
+$iphone-x-button-right = calc(env(safe-area-inset-right) - 1rem);
 
-$end-screen-mixin($scale-size = $default-scale-size) {
+$iphone-x-end-screen-mixin($scale-size = $default-scale-size) {
 
-  $common-margin = $default-size * $scale-size * .25;
+  $iphone-x-common-margin = $default-size * $scale-size * .25;
 
   html {
     #end-screen.iphone-x-styles {
@@ -18,8 +18,36 @@ $end-screen-mixin($scale-size = $default-scale-size) {
 
   body {
 
+    &.portrait.iphone-x-styles #gdpr-privacy {
+      height: calc(100% - constant(safe-area-inset-top));
+      // @stylint off
+      height: calc(100% - env(safe-area-inset-top));
+      // @stylint on
+    }
+
+    &.landscape {
+      &.iphone-x-styles {
+        #gdpr-privacy {
+          height: 100%;
+        }
+
+        &.ios-landscape-right #gdpr-privacy {
+          left: 0;
+        }
+
+        &.ios-landscape-left #gdpr-privacy {
+          .pop-up {
+            margin: 5% 8%;
+          }
+        }
+      }
+    }
+
     &.landscape #end-screen.show-gdpr-banner.iphone-x-styles .gdpr-pop-up {
+      padding-bottom: constant(safe-area-inset-bottom);
+      // @stylint off
       padding-bottom: env(safe-area-inset-bottom);
+      // @stylint on
 
       .gdpr-text {
         padding-bottom: 0;
@@ -126,4 +154,4 @@ $end-screen-mixin($scale-size = $default-scale-size) {
   }
 }
 
-$end-screen-mixin();
+$iphone-x-end-screen-mixin();

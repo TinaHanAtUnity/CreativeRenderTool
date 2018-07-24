@@ -104,6 +104,11 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         const endScreenAlt = this.getEndscreenAlt();
         if (typeof endScreenAlt === 'string') {
             this._container.classList.add(endScreenAlt);
+
+            // Need this to modify the #gdpr-privacy
+            if (endScreenAlt === IPHONE_X_STYLES_ID) {
+                document.body.classList.add(endScreenAlt);
+            }
         }
 
         if (this._showGDPRBanner) {
