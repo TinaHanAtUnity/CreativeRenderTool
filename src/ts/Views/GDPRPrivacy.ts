@@ -166,7 +166,7 @@ export class GDPRPrivacy extends AbstractPrivacy {
             // Privacy info showing
             case 0: {
                 this._currentState = leftClick ? 1 : 2;
-                leftEl.innerText = leftClick ? 'Privacy info' : 'Privacy info';
+                leftEl.innerText = 'Privacy info';
                 middleEl.innerText = leftClick ? 'Report Ad ⚑': 'Build info';
                 leftClick ? classList.add('build') : classList.add('report');
                 break;
@@ -185,7 +185,7 @@ export class GDPRPrivacy extends AbstractPrivacy {
                 classList.remove('report');
                 this._currentState = leftClick ? 0 : 1;
                 leftEl.innerText = leftClick ? 'Build info' : 'Privacy info';
-                middleEl.innerText = leftClick ? 'Report Ad ⚑': 'Report Ad ⚑';
+                middleEl.innerText = 'Report Ad ⚑';
                 if (!leftClick) { classList.add('build'); }
                 break;
             }
