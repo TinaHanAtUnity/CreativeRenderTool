@@ -20,15 +20,15 @@ enum CacheType {
 interface ICampaignQueueObject {
     campaign: Campaign;
     resolved: boolean;
-    resolve: (campaign: Campaign) => void;
-    reject: (reason?: any) => void;
+    resolve(campaign: Campaign): void;
+    reject(reason?: any): void;
 }
 
 interface IAssetQueueObject {
     url: string;
     diagnostics: ICacheDiagnostics;
-    resolve: (value: string[]) => void;
-    reject: (reason?: any) => void;
+    resolve(value: string[]): void;
+    reject(reason?: any): void;
 }
 
 export class AssetManager {

@@ -59,8 +59,8 @@ interface ICallbackObject {
     contentLength: number;
     diagnostics: ICacheDiagnostics;
     session: Session;
-    resolve: (value?: [CacheStatus, string]) => void;
-    reject: (reason?: any) => void;
+    resolve(value?: [CacheStatus, string]): void;
+    reject(reason?: any): void;
     originalUrl?: string;
     adType: string;
     seatId: number | undefined;
