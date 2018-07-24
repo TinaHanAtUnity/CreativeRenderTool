@@ -1,4 +1,4 @@
-# Pending
+# Tue Jul 24 20:57:31 UTC 2018
 
 * Add a fixed version of the new video overlay
 * Send Admob impression when ad loads
