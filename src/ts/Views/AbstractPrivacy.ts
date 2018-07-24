@@ -4,6 +4,7 @@ import { View } from 'Views/View';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Campaign } from 'Models/Campaign';
 import { Platform } from 'Constants/Platform';
+import { BadAdReason } from 'Test/Unit/Utilities/BadAdsReporting'; //Move this file
 
 export interface IPrivacyHandler {
     onPrivacy(url: string): void;
@@ -53,6 +54,7 @@ export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
     }
 
     private static buildInformation: IBuildInformation;
+    private static badAdReasons: BadAdReason;
 
     constructor(nativeBridge: NativeBridge, isCoppaCompliant: boolean, id: string) {
         super(nativeBridge, id);
