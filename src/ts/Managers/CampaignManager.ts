@@ -440,10 +440,19 @@ export class CampaignManager {
     }
 
     private setupCampaignAssets(placements: string[], campaign: Campaign, backupCampaign: boolean, contentType: string, session: Session): Promise<void> {
+        const cachingTimestamp = Date.now();
         return this._assetManager.setup(campaign).then(() => {
             if((this._sessionManager.getGameSessionId() % 1000 === 99) && backupCampaign === false) {
                 Diagnostics.trigger('ad_ready', {
                     contentType: contentType
+                }, session);
+            }
+
+            if(contentType === 'programmatic/mraid' || contentType === 'programmatic/mraid-url') {
+                const cachingDuration = Date.now() - cachingTimestamp;
+                Diagnostics.trigger('mraid_caching_time', {
+                    contentType: contentType,
+                    cachingDuration: cachingDuration
                 }, session);
             }
 

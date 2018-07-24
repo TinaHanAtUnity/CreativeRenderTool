@@ -10,6 +10,7 @@ import { platform } from 'os';
 import { DOMUtils } from 'Utilities/DOMUtils';
 import { XHRequest } from 'Utilities/XHRequest';
 import { GDPREventHandler } from 'EventHandlers/GDPREventHandler';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
@@ -64,6 +65,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     }
 
     public createMRAID(container: any): Promise<string> {
+        const fetchingTimestamp = Date.now();
         return this.fetchMRAID().then(mraid => {
             if(mraid) {
                 const markup = this._campaign.getDynamicMarkup();
@@ -76,6 +78,13 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
                 return container.replace('<body></body>', '<body>' + mraid + '</body>');
             }
             throw new WebViewError('Unable to fetch MRAID');
+        }).then((data) => {
+            const fetchingDuration = Date.now() - fetchingTimestamp;
+            Diagnostics.trigger('mraid_fetching_time', {
+                fetchingDuration: fetchingDuration
+            }, this._campaign.getSession());
+
+            return data;
         });
     }
 

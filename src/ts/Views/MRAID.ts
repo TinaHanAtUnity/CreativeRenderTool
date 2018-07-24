@@ -11,6 +11,7 @@ import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Template } from 'Utilities/Template';
 import { SdkStats } from 'Utilities/SdkStats';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -224,6 +225,10 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
                 this.onLoaded.trigger();
                 const frameLoadDuration = Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId());
                 this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' iframe load duration ' + frameLoadDuration + ' ms');
+                Diagnostics.trigger('mraid_loading_time', {
+                    frameLoadDuration: frameLoadDuration,
+                    viewType: 'MRAID'
+                }, this._campaign.getSession());
                 break;
 
             case 'open':
