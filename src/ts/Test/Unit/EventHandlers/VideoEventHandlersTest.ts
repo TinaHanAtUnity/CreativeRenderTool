@@ -402,14 +402,14 @@ describe('VideoEventHandlersTest', () => {
         it('should set video volume to 1.0 by default', () => {
             performanceVideoEventHandler.onPrepared(video.getUrl(), video.getDuration(), 1024, 768);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.VideoPlayer.setVolume, new Double(1.0));
+            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.VideoPlayer.setVolume, new Double(1));
         });
 
         it('should set video volume to 0.0 when overlay says it is muted', () => {
             overlay.isMuted = sinon.mock().returns(true);
             performanceVideoEventHandler.onPrepared(video.getUrl(), video.getDuration(), 1024, 768);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.VideoPlayer.setVolume, new Double(0.0));
+            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.VideoPlayer.setVolume, new Double(0));
         });
 
         it('should just play when video position is set to 0', () => {
