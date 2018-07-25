@@ -185,12 +185,12 @@ describe('DeviceInfoTest Android', () => {
             assert.equal(triggered, true);
             assert.equal(receivedStreamType, StreamType.STREAM_MUSIC);
             assert.equal(receivedVolume, 0.5);
-            assert.equal(receivedMaxVolume, 1.0);
+            assert.equal(receivedMaxVolume, 1);
 
             done();
         });
 
-        nativeBridge.handleEvent([EventCategory[EventCategory.DEVICEINFO], DeviceInfoEvent[DeviceInfoEvent.VOLUME_CHANGED], StreamType.STREAM_MUSIC, 0.5, 1.0]);
+        nativeBridge.handleEvent([EventCategory[EventCategory.DEVICEINFO], DeviceInfoEvent[DeviceInfoEvent.VOLUME_CHANGED], StreamType.STREAM_MUSIC, 0.5, 1]);
     });
 });
 
@@ -251,12 +251,12 @@ describe('DeviceInfoTest iOS', () => {
 
             assert.equal(triggered, true);
             assert.equal(receivedVolume, 0.5);
-            assert.equal(receivedMaxVolume, 1.0);
+            assert.equal(receivedMaxVolume, 1);
 
             done();
         });
 
-        nativeBridge.handleEvent([EventCategory[EventCategory.DEVICEINFO], DeviceInfoEvent[DeviceInfoEvent.VOLUME_CHANGED], 0.5, 1.0]);
+        nativeBridge.handleEvent([EventCategory[EventCategory.DEVICEINFO], DeviceInfoEvent[DeviceInfoEvent.VOLUME_CHANGED], 0.5, 1]);
     });
 });
 
