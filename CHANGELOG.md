@@ -1,4 +1,5 @@
-# Pending
+# Wed Jul 25 20:12:52 UTC 2018
+
 * New GDPR legal text
 * Fixed issues with backup campaign, expired campaigns were shown, VAST had issues
 
