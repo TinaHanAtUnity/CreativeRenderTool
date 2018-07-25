@@ -1,3 +1,7 @@
+# Pending
+* New GDPR legal text
+* Fixed issues with backup campaign, expired campaigns were shown, VAST had issues
+
 # Tue Jul 24 20:57:31 UTC 2018
 
 * Add a fixed version of the new video overlay
