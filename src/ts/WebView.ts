@@ -295,6 +295,7 @@ export class WebView {
 
                     this._adLifecycleMonitorManager.getAdLifecycleLog().then((data) => {
                         Diagnostics.trigger('ad_lifecycle_terminated', adLogError, data.adSession);
+                        this._adLifecycleMonitorManager.destroyAdLifecyleLog();
                     });
                 }
             });
