@@ -16,6 +16,12 @@ export interface IOrientationProperties {
     forceOrientation: Orientation;
 }
 
+export interface IMRAIDStats {
+    totalTime: number;
+    frameCount: number;
+    averageFps: number;
+}
+
 export interface IMRAIDViewHandler extends GDPREventHandler {
     onMraidClick(url: string): void;
     onMraidReward(): void;
@@ -33,6 +39,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     protected _privacy: AbstractPrivacy;
     protected _showGDPRBanner = false;
     protected _gdprPopupClicked = false;
+    protected _stats: IMRAIDStats;
 
     constructor(nativeBridge: NativeBridge, id: string, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
         super(nativeBridge, id);
@@ -60,6 +67,10 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
         if (this._showGDPRBanner && !this._gdprPopupClicked) {
             this._handlers.forEach(handler => handler.onGDPRPopupSkipped());
+        }
+
+        if (this._stats !== undefined) {
+            this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(0, 0, 0, 'mraid_performance_stats', this._stats));
         }
     }
 
@@ -106,6 +117,10 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     }
 
     protected abstract choosePrivacyShown(): void;
+
+    protected updateStats(stats: IMRAIDStats): void {
+        this._stats = stats;
+    }
 
     private replaceMraidSources(mraid: string): string {
         // Workaround for https://jira.hq.unity3d.com/browse/ABT-333

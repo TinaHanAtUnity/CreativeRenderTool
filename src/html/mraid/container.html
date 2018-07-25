@@ -11,6 +11,9 @@
 
     <script>
         (function() {
+            var frameCount = 0;
+            var playableStartTime = undefined;
+
             var MRAID = function() {
                 var state = 'loading';
 
@@ -225,7 +228,26 @@
                     return playableConfiguration;
                 }
             };
+
+            function sendStats() {
+                if (playableStartTime !== undefined) {
+                    window.parent.postMessage({
+                            type: 'sendStats',
+                            frameCount: frameCount,
+                            totalTime: (Date.now() - playableStartTime) / 1000,
+                        }, '*');
+                }
+            }
+            setInterval(sendStats, 500);
+
             window.mraid = new MRAID();
+            var originalRequestAnimationFrame = window.requestAnimationFrame;
+            window.requestAnimationFrame = function(callback) {
+                if (playableStartTime === undefined) {
+                    playableStartTime = Date.now();
+                }
+                return originalRequestAnimationFrame((time) => { frameCount++; callback(time); });
+            }.bind(window);
         })();
     </script>
 </head>

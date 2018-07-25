@@ -3,7 +3,7 @@ import MRAIDContainer from 'html/mraid/container.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
-import { Observable0 } from 'Utilities/Observable';
+import { Observable0, Observable2 } from 'Utilities/Observable';
 import { Placement } from 'Models/Placement';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Platform } from 'Constants/Platform';
@@ -228,6 +228,14 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
             case 'open':
                 this._handlers.forEach(handler => handler.onMraidClick(event.data.url));
+                break;
+
+            case 'sendStats':
+                this.updateStats({
+                    totalTime: event.data.totalTime,
+                    frameCount: event.data.frameCount,
+                    averageFps: event.data.frameCount / event.data.totalTime
+                });
                 break;
 
             case 'close':

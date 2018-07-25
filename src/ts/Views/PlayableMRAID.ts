@@ -345,6 +345,13 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
             case 'close':
                 this._handlers.forEach(handler => handler.onMraidClose());
                 break;
+            case 'sendStats':
+                this.updateStats({
+                    totalTime: event.data.totalTime,
+                    frameCount: event.data.frameCount,
+                    averageFps: event.data.frameCount / event.data.totalTime
+                });
+                break;
             case 'orientation':
                 let forceOrientation = Orientation.NONE;
                 switch(event.data.properties.forceOrientation) {
