@@ -1,21 +1,21 @@
-import { Placement } from 'Models/Placement';
-import { Campaign } from 'Models/Campaign';
-import { Observable0 } from 'Utilities/Observable';
-import { NativeBridge } from 'Native/NativeBridge';
+import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { FinishState } from 'Constants/FinishState';
-import { DeviceInfo } from 'Models/DeviceInfo';
-import { ClientInfo } from 'Models/ClientInfo';
-import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { Configuration } from 'Models/Configuration';
-import { Request } from 'Utilities/Request';
 import { FocusManager } from 'Managers/FocusManager';
-import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
-import { CampaignAssetInfo } from 'Utilities/CampaignAssetInfo';
+import { IForceQuitData } from 'Managers/ForceQuitManager';
 import { GdprManager } from 'Managers/GdprManager';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { Campaign } from 'Models/Campaign';
+import { ClientInfo } from 'Models/ClientInfo';
+import { Configuration } from 'Models/Configuration';
+import { DeviceInfo } from 'Models/DeviceInfo';
+import { Placement } from 'Models/Placement';
+import { NativeBridge } from 'Native/NativeBridge';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
-import { IAdLifecycleLog } from 'Managers/AdLifecycleMonitorManager';
+import { CampaignAssetInfo } from 'Utilities/CampaignAssetInfo';
+import { Observable0 } from 'Utilities/Observable';
+import { Request } from 'Utilities/Request';
 
 export interface IAdUnitParameters<T extends Campaign> {
     forceOrientation: Orientation;
@@ -115,7 +115,7 @@ export abstract class AbstractAdUnit {
         }
     }
 
-    public getAdLifecycleLog(): IAdLifecycleLog {
+    public createForceQuitKey(): IForceQuitData {
         return {
             adSession: this._baseCampaign.getSession()
         };

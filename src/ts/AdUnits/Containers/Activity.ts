@@ -1,12 +1,12 @@
-import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
-import { KeyCode } from 'Constants/Android/KeyCode';
-import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
-import { NativeBridge } from 'Native/NativeBridge';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { AdUnitContainer, Orientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
+import { KeyCode } from 'Constants/Android/KeyCode';
 import { Rotation } from 'Constants/Android/Rotation';
+import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
+import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
+import { ForceQuitManager } from 'Managers/ForceQuitManager';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
-import { AdLifecycleMonitorManager } from 'Managers/AdLifecycleMonitorManager';
+import { NativeBridge } from 'Native/NativeBridge';
 
 interface IAndroidOptions {
     requestedOrientation: ScreenOrientation;
@@ -23,7 +23,7 @@ export class Activity extends AdUnitContainer {
 
     private _nativeBridge: NativeBridge;
     private _deviceInfo: AndroidDeviceInfo;
-    private _adLifecycleMonitorManager: AdLifecycleMonitorManager;
+    private _forceQuitManager: ForceQuitManager;
 
     private _activityId: number;
     private _currentActivityFinished: boolean;
@@ -44,7 +44,7 @@ export class Activity extends AdUnitContainer {
 
         this._nativeBridge = nativeBridge;
         this._deviceInfo = deviceInfo;
-        this._adLifecycleMonitorManager = new AdLifecycleMonitorManager(this._nativeBridge);
+        this._forceQuitManager = new ForceQuitManager(this._nativeBridge);
 
         this._activityId = 0;
         this._currentActivityFinished = false;
@@ -85,17 +85,13 @@ export class Activity extends AdUnitContainer {
         this._onFocusGainedObserver = this._nativeBridge.AndroidAdUnit.onFocusGained.subscribe(() => this.onFocusGained());
         this._onFocusLostObserver = this._nativeBridge.AndroidAdUnit.onFocusLost.subscribe(() => this.onFocusLost());
 
-        // Only send ad lifecycle log when an app restarted while watching ads
-        if (this._adLifecycleMonitorManager.hasAdLifecycleLog()) {
-            this._adLifecycleMonitorManager.destroyAdLifecyleLog();
-        }
-        this._adLifecycleMonitorManager.createAdLifecycleLog(adUnit.getAdLifecycleLog());
+        this._forceQuitManager.createForceQuitKey(adUnit.createForceQuitKey());
 
         return this._nativeBridge.AndroidAdUnit.open(this._activityId, nativeViews, this.getOrientation(allowRotation, this._lockedOrientation, options), keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel, isTransparent);
     }
 
     public close(): Promise<void> {
-        this._adLifecycleMonitorManager.destroyAdLifecyleLog();
+        this._forceQuitManager.destroyForceQuitKey();
 
         if(!this._currentActivityFinished) {
             this._currentActivityFinished = true;

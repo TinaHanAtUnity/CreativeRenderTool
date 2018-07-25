@@ -1,68 +1,67 @@
-import { NativeBridge, INativeCallback, CallbackStatus } from 'Native/NativeBridge';
-import { DeviceInfo } from 'Models/DeviceInfo';
-import { ConfigManager } from 'Managers/ConfigManager';
-import { Configuration, CacheMode } from 'Models/Configuration';
-import { ConfigurationParser } from 'Parsers/ConfigurationParser';
-import { CampaignManager } from 'Managers/CampaignManager';
-import { Cache } from 'Utilities/Cache';
-import { Placement } from 'Models/Placement';
-import { Request, INativeResponse } from 'Utilities/Request';
-import { SessionManager } from 'Managers/SessionManager';
-import { ClientInfo } from 'Models/ClientInfo';
-import { Diagnostics } from 'Utilities/Diagnostics';
-import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { FinishState } from 'Constants/FinishState';
+import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
-import { UnityAdsError } from 'Constants/UnityAdsError';
-import { Platform } from 'Constants/Platform';
-import { Resolve } from 'Utilities/Resolve';
-import { WakeUpManager } from 'Managers/WakeUpManager';
 import { AdUnitFactory } from 'AdUnits/AdUnitFactory';
-import { JsonParser } from 'Utilities/JsonParser';
-import { DiagnosticError } from 'Errors/DiagnosticError';
-import { Overlay } from 'Views/Overlay';
-import { IosUtils } from 'Utilities/IosUtils';
-import { HttpKafka } from 'Utilities/HttpKafka';
-import { ConfigError } from 'Errors/ConfigError';
-import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
-import { AssetManager } from 'Managers/AssetManager';
-import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
+import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { ViewController } from 'AdUnits/Containers/ViewController';
-import { TestEnvironment } from 'Utilities/TestEnvironment';
-import { MetaData } from 'Utilities/MetaData';
-import { RefreshManager } from 'Managers/RefreshManager';
-import { MetaDataManager } from 'Managers/MetaDataManager';
 import { AnalyticsManager } from 'Analytics/AnalyticsManager';
 import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
-import { FocusManager } from 'Managers/FocusManager';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { SdkStats } from 'Utilities/SdkStats';
-import { Campaign } from 'Models/Campaign';
-import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
-import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
-import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
-import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
-import { IosDeviceInfo } from 'Models/IosDeviceInfo';
-import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
-import { CustomFeatures } from 'Utilities/CustomFeatures';
-import { OldCampaignRefreshManager } from 'Managers/OldCampaignRefreshManager';
-import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
-import { MissedImpressionManager } from 'Managers/MissedImpressionManager';
-import { GameSessionCounters } from 'Utilities/GameSessionCounters';
-import { TimeoutError, Promises } from 'Utilities/Promises';
-import { JaegerSpan, JaegerTags } from 'Jaeger/JaegerSpan';
+import { FinishState } from 'Constants/FinishState';
+import { Platform } from 'Constants/Platform';
+import { UnityAdsError } from 'Constants/UnityAdsError';
+import { ConfigError } from 'Errors/ConfigError';
+import { DiagnosticError } from 'Errors/DiagnosticError';
 import { JaegerManager } from 'Jaeger/JaegerManager';
-import { ProgrammaticOperativeEventManager } from 'Managers/ProgrammaticOperativeEventManager';
-import { GdprManager } from 'Managers/GdprManager';
-
+import { JaegerSpan, JaegerTags } from 'Jaeger/JaegerSpan';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
-import { ABGroupBuilder } from 'Models/ABGroup';
-import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { AssetManager } from 'Managers/AssetManager';
+import { CampaignManager } from 'Managers/CampaignManager';
+import { ConfigManager } from 'Managers/ConfigManager';
+import { FocusManager } from 'Managers/FocusManager';
+import { ForceQuitManager } from 'Managers/ForceQuitManager';
+import { GdprManager } from 'Managers/GdprManager';
+import { MetaDataManager } from 'Managers/MetaDataManager';
+import { MissedImpressionManager } from 'Managers/MissedImpressionManager';
+import { OldCampaignRefreshManager } from 'Managers/OldCampaignRefreshManager';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { PlacementManager } from 'Managers/PlacementManager';
-import { AdLifecycleMonitorManager, IAdLifecycleLog } from 'Managers/AdLifecycleMonitorManager';
+import { ProgrammaticOperativeEventManager } from 'Managers/ProgrammaticOperativeEventManager';
+import { RefreshManager } from 'Managers/RefreshManager';
+import { SessionManager } from 'Managers/SessionManager';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { WakeUpManager } from 'Managers/WakeUpManager';
+import { ABGroupBuilder } from 'Models/ABGroup';
+import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
+import { Campaign } from 'Models/Campaign';
+import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
+import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
+import { ClientInfo } from 'Models/ClientInfo';
+import { CacheMode, Configuration } from 'Models/Configuration';
+import { DeviceInfo } from 'Models/DeviceInfo';
+import { IosDeviceInfo } from 'Models/IosDeviceInfo';
+import { Placement } from 'Models/Placement';
+import { CallbackStatus, INativeCallback, NativeBridge } from 'Native/NativeBridge';
+import { ConfigurationParser } from 'Parsers/ConfigurationParser';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { Cache } from 'Utilities/Cache';
+import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { Diagnostics } from 'Utilities/Diagnostics';
+import { GameSessionCounters } from 'Utilities/GameSessionCounters';
+import { HttpKafka } from 'Utilities/HttpKafka';
+import { IosUtils } from 'Utilities/IosUtils';
+import { JsonParser } from 'Utilities/JsonParser';
+import { MetaData } from 'Utilities/MetaData';
+import { Promises, TimeoutError } from 'Utilities/Promises';
+import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
+import { INativeResponse, Request } from 'Utilities/Request';
+import { Resolve } from 'Utilities/Resolve';
+import { SdkStats } from 'Utilities/SdkStats';
+import { TestEnvironment } from 'Utilities/TestEnvironment';
+import { Overlay } from 'Views/Overlay';
 
 export class WebView {
 
@@ -93,7 +92,7 @@ export class WebView {
     private _gdprManager: GdprManager;
     private _jaegerManager: JaegerManager;
     private _programmaticTrackingService: ProgrammaticTrackingService;
-    private _adLifecycleMonitorManager: AdLifecycleMonitorManager;
+    private _forceQuitManager: ForceQuitManager;
 
     private _showing: boolean = false;
     private _initialized: boolean = false;
@@ -140,7 +139,7 @@ export class WebView {
             this._request = new Request(this._nativeBridge, this._wakeUpManager);
             this._cacheBookkeeping = new CacheBookkeeping(this._nativeBridge);
             this._programmaticTrackingService = new ProgrammaticTrackingService(this._request, this._clientInfo, this._deviceInfo);
-            this._adLifecycleMonitorManager = new AdLifecycleMonitorManager(this._nativeBridge);
+            this._forceQuitManager = new ForceQuitManager(this._nativeBridge);
             this._cache = new Cache(this._nativeBridge, this._wakeUpManager, this._request, this._cacheBookkeeping, this._programmaticTrackingService);
             this._resolve = new Resolve(this._nativeBridge);
             this._metadataManager = new MetaDataManager(this._nativeBridge);
@@ -287,21 +286,19 @@ export class WebView {
             });
         }).then(() => {
             // send diagnostics event for abnormal ad termination
-            this._adLifecycleMonitorManager.hasAdLifecycleLog().then((hasAdLifecycleLog: boolean) => {
-                if (hasAdLifecycleLog) {
-                    const adLogError = new DiagnosticError(new Error('Ad lifecycle terminated'), {
+            return this._forceQuitManager.hasForceQuit().then((userHadForceQuit) => {
+                if (userHadForceQuit) {
+                    const error = new DiagnosticError(new Error('Ad Force Quit'), {
                         clientInfo: this._clientInfo,
                         deviceInfo: this._deviceInfo
                     });
 
-                    this._adLifecycleMonitorManager.getAdLifecycleLog().then((data) => {
-                        Diagnostics.trigger('ad_lifecycle_terminated', adLogError, data.adSession);
-                        this._adLifecycleMonitorManager.destroyAdLifecyleLog();
+                    this._forceQuitManager.getForceQuitStatus().then((data) => {
+                        Diagnostics.trigger('force_quit', error, data.adSession);
+                        this._forceQuitManager.destroyForceQuitKey();
                     });
                 }
             });
-
-            return Promise.resolve();
         }).then(() => {
             this._initialized = true;
             this._jaegerManager.stop(jaegerInitSpan);
@@ -331,7 +328,7 @@ export class WebView {
             Diagnostics.trigger('initialization_error', error);
         });
     }
-            // tslint:enable:no-console
+
     /*
      PUBLIC API EVENT HANDLERS
      */
