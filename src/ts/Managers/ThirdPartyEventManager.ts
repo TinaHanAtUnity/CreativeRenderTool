@@ -53,11 +53,11 @@ export class ThirdPartyEventManager {
             const urlParts = Url.parse(url);
             if(error instanceof RequestError) {
                 error = new DiagnosticError(new Error(error.message), {
-                    request: (<RequestError>error).nativeRequest,
+                    request: error.nativeRequest,
                     event: event,
                     sessionId: sessionId,
                     url: url,
-                    response: (<RequestError>error).nativeResponse,
+                    response: error.nativeResponse,
                     host: urlParts.host,
                     protocol: urlParts.protocol
                 });

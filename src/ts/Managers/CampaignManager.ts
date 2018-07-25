@@ -256,7 +256,7 @@ export class CampaignManager {
             }).catch((error) => {
                 this._requesting = false;
                 if(error instanceof RequestError) {
-                    if(!(<RequestError>error).nativeResponse) {
+                    if(!error.nativeResponse) {
                         this.onConnectivityError.trigger(this._configuration.getPlacementIds());
                         return Promise.resolve();
                     }

@@ -70,8 +70,8 @@ describe('ProgrammaticTrackingService', () => {
 
     describe('reportMetric', () => {
         const tests: Array<{
-            input: ProgrammaticTrackingMetric,
-            expected: IProgrammaticTrackingMetricData
+            input: ProgrammaticTrackingMetric;
+            expected: IProgrammaticTrackingMetricData;
         }> = [{
             input: ProgrammaticTrackingMetric.AdmobUsedCachedVideo,
             expected: {

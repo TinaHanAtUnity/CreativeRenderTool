@@ -63,31 +63,31 @@ export class ComScoreTrackingService {
             subCategory = '';
         }
 
-        const queryParamsDict = {
+        const queryParamsDict: { [key: string]: string } = {
             // Constants
-            c1: <string> '19',
-            c2: <string> '23027898',  // Unity client ID.
-            ns_type: <string> 'hidden',
-            ns_st_ct: <string> 'va00',
-            ns_ap_sv: <string> '2.1602.11',
-            ns_st_it: <string> 'a',
-            ns_st_sv: <string> '4.0.0',
-            ns_st_ad: <string> '1',
-            ns_st_sq: <string> '1',
+            c1: '19',
+            c2: '23027898',  // Unity client ID.
+            ns_type: 'hidden',
+            ns_st_ct: 'va00',
+            ns_ap_sv: '2.1602.11',
+            ns_st_it: 'a',
+            ns_st_sv: '4.0.0',
+            ns_st_ad: '1',
+            ns_st_sq: '1',
 
-            c12: <string> `${advertisingTrackingId}`,
-            ns_ap_pn: <string> `${platform}`,
-            ns_ap_device: <string> `${deviceModel}`,
-            ns_st_id: <string> `${adBreakId}`,
-            ns_st_ec: <string> `${tagUrlCounter}`,
-            ns_st_ev: <string> `${eventName}`,
-            ns_st_cn: <string> `${adCounter}`,
-            ns_st_ci: <string> `${creativeId}`,
-            ns_st_cl: <string> `${duration}`,
-            ns_st_pt: <string> `${playedTime}`,
-            c3: <string> `${category}`,
-            ns_st_ge: <string> `${subCategory}`,
-            ns_ts: <string> `${Date.now()}`
+            c12: `${advertisingTrackingId}`,
+            ns_ap_pn: `${platform}`,
+            ns_ap_device: `${deviceModel}`,
+            ns_st_id: `${adBreakId}`,
+            ns_st_ec: `${tagUrlCounter}`,
+            ns_st_ev: `${eventName}`,
+            ns_st_cn: `${adCounter}`,
+            ns_st_ci: `${creativeId}`,
+            ns_st_cl: `${duration}`,
+            ns_st_pt: `${playedTime}`,
+            c3: `${category}`,
+            ns_st_ge: `${subCategory}`,
+            ns_ts: `${Date.now()}`
         };
 
         return Url.addParameters('https://sb.scorecardresearch.com/p', queryParamsDict);

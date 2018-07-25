@@ -5,7 +5,7 @@ import { Model } from 'Models/Model';
 
 interface IVastAd {
     id: string | null;
-    creatives: Array<VastCreative<IVastCreative>>;
+    creatives: Array<VastCreative>;
     companionAds: VastCreativeCompanionAd[];
     errorURLTemplates: string[];
     impressionURLTemplates: string[];
@@ -15,7 +15,7 @@ interface IVastAd {
 export class VastAd extends Model<IVastAd> {
 
     constructor();
-    constructor(id?: string, creatives?: Array<VastCreative<IVastCreative>>, errorURLTemplates?: string[], impressionURLTemplates?: string[], wrapperURLs?: string[], companionAds?: VastCreativeCompanionAd[]) {
+    constructor(id?: string, creatives?: Array<VastCreative>, errorURLTemplates?: string[], impressionURLTemplates?: string[], wrapperURLs?: string[], companionAds?: VastCreativeCompanionAd[]) {
         super('VastAd', {
             id: ['string', 'null'],
             creatives: ['array'],
@@ -41,11 +41,11 @@ export class VastAd extends Model<IVastAd> {
         this.set('id', id);
     }
 
-    public getCreatives(): Array<VastCreative<IVastCreative>> {
+    public getCreatives(): Array<VastCreative> {
         return this.get('creatives');
     }
 
-    public getCreative(): VastCreative<IVastCreative> | null {
+    public getCreative(): VastCreative | null {
         if (this.getCreatives() && this.getCreatives().length > 0) {
             return this.getCreatives()[0];
         }
@@ -53,7 +53,7 @@ export class VastAd extends Model<IVastAd> {
         return null;
     }
 
-    public addCreative(creative: VastCreative<IVastCreative>) {
+    public addCreative(creative: VastCreative) {
         this.get('creatives').push(creative);
     }
 
