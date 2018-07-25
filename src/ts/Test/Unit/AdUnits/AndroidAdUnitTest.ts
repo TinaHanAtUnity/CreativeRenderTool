@@ -145,19 +145,19 @@ describe('AndroidAdUnitTest', () => {
         it('with onResume', () => {
             let onContainerForegroundTriggered: boolean = false;
             const listener: IAdUnitContainerListener = {
-                onContainerShow: function() {
+                onContainerShow: () => {
                     // EMPTY
                 },
-                onContainerDestroy: function() {
+                onContainerDestroy: () => {
                     // EMPTY
                 },
-                onContainerBackground: function() {
+                onContainerBackground: () => {
                     // EMPTY
                 },
-                onContainerForeground: function() {
+                onContainerForeground: () => {
                     onContainerForegroundTriggered = true;
                 },
-                onContainerSystemMessage: function(message: AdUnitContainerSystemMessage) {
+                onContainerSystemMessage: (message: AdUnitContainerSystemMessage) => {
                     // EMPTY
                 }
             };
@@ -174,19 +174,19 @@ describe('AndroidAdUnitTest', () => {
         it('with onPause', () => {
             let onContainerDestroyTriggered: boolean = false;
             const listener: IAdUnitContainerListener = {
-                onContainerShow: function() {
+                onContainerShow: () => {
                     // EMPTY
                 },
-                onContainerDestroy: function() {
+                onContainerDestroy: () => {
                     onContainerDestroyTriggered = true;
                 },
-                onContainerBackground: function() {
+                onContainerBackground: () => {
                     // EMPTY
                 },
-                onContainerForeground: function() {
+                onContainerForeground: () => {
                     // EMPTY
                 },
-                onContainerSystemMessage: function(message: AdUnitContainerSystemMessage) {
+                onContainerSystemMessage: (message: AdUnitContainerSystemMessage) => {
                     // EMPTY
                 }
             };
@@ -204,19 +204,19 @@ describe('AndroidAdUnitTest', () => {
             let onContainerDestroyTriggered: boolean = false;
 
             const listener: IAdUnitContainerListener = {
-                onContainerShow: function() {
+                onContainerShow: () => {
                     // EMPTY
                 },
-                onContainerDestroy: function() {
+                onContainerDestroy: () => {
                     onContainerDestroyTriggered = true;
                 },
-                onContainerBackground: function() {
+                onContainerBackground: () => {
                     // EMPTY
                 },
-                onContainerForeground: function() {
+                onContainerForeground: () => {
                     // EMPTY
                 },
-                onContainerSystemMessage: function(message: AdUnitContainerSystemMessage) {
+                onContainerSystemMessage: (message: AdUnitContainerSystemMessage) => {
                     // EMPTY
                 }
             };
