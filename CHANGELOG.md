@@ -1,3 +1,28 @@
+# Staged
+
+* Tslint no-unnecessary-local-variable is re-enabled
+* Tslint no-invalid-this is re-enabled
+* New Video Overlay for Performance on ABGroups 16 and 17
+* Updated GDPR Legal Text
+
+# Wed Jul 11 21:24:48 UTC 2018
+
+* Send too_large_file errors to programmatic tracking service
+
+# Wed Jul 11 12:45:00 UTC 2018
+
+* Revert previous deployment
+
+# Wed Jul 11 12:31:27 UTC 2018
+
+* Feature list and measurements A/B test in group 16
+
+# Wed Jul 11 06:36:59 UTC 2018
+
+* Re-enable Microsoft linter rule, no break in default in switch
+* Remove gamerId from configuration request
+* Create a separate event handler for GDPR skip events
+
 # Thu Jul  5 15:21:01 UTC 2018
 
 * Test for campaign parsing and caching success rates

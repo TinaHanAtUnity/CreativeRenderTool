@@ -124,7 +124,7 @@ describe('VastOverlayEventHandlersTest', () => {
             gdprManager: gdprManager
         };
 
-        vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters, false);
+        vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
         vastOverlayEventHandler = new VastOverlayEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
 
         moat = sinon.createStubInstance(MOAT);
@@ -151,7 +151,7 @@ describe('VastOverlayEventHandlersTest', () => {
                 const vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.configuration.isCoppaCompliant(), vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
                 sinon.spy(vastEndScreen, 'show');
                 vastAdUnitParameters.endScreen = vastEndScreen;
-                vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters, false);
+                vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
                 sinon.spy(vastAdUnit, 'hide');
                 vastOverlayEventHandler = new VastOverlayEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
                 vastOverlayEventHandler.onOverlaySkip(1);
@@ -163,7 +163,7 @@ describe('VastOverlayEventHandlersTest', () => {
     describe('When calling onMute', () => {
 
         beforeEach(() => {
-            vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters, false);
+            vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
             vastOverlayEventHandler = new VastOverlayEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
         });
 
@@ -203,7 +203,7 @@ describe('VastOverlayEventHandlersTest', () => {
 
     describe('When calling onCallButton', () => {
         beforeEach(() => {
-            vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters, false);
+            vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
             vastOverlayEventHandler = new VastOverlayEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
             sinon.spy(nativeBridge.VideoPlayer, 'pause');
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('http://foo.com');

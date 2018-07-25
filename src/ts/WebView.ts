@@ -68,6 +68,7 @@ import { WebPlayerContainer } from 'Utilities/WebPlayer/WebPlayerContainer';
 import { InterstitialWebPlayerContainer } from 'Utilities/WebPlayer/InterstitialWebPlayerContainer';
 import { BannerWebPlayerContainer } from 'Utilities/WebPlayer/BannerWebPlayerContainer';
 import { BannerAdUnitParametersFactory } from 'AdTypes/Banner/AdUnits/BannerAdUnitParametersFactory';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 export class WebView {
 
@@ -98,6 +99,7 @@ export class WebView {
     private _gdprManager: GdprManager;
     private _jaegerManager: JaegerManager;
     private _interstitialWebPlayerContainer: WebPlayerContainer;
+    private _programmaticTrackingService: ProgrammaticTrackingService;
 
     private _showing: boolean = false;
     private _initialized: boolean = false;
@@ -144,7 +146,8 @@ export class WebView {
             this._wakeUpManager = new WakeUpManager(this._nativeBridge, this._focusManager);
             this._request = new Request(this._nativeBridge, this._wakeUpManager);
             this._cacheBookkeeping = new CacheBookkeeping(this._nativeBridge);
-            this._cache = new Cache(this._nativeBridge, this._wakeUpManager, this._request, this._cacheBookkeeping);
+            this._programmaticTrackingService = new ProgrammaticTrackingService(this._request, this._clientInfo, this._deviceInfo);
+            this._cache = new Cache(this._nativeBridge, this._wakeUpManager, this._request, this._cacheBookkeeping, this._programmaticTrackingService);
             this._resolve = new Resolve(this._nativeBridge);
             this._metadataManager = new MetaDataManager(this._nativeBridge);
             this._adMobSignalFactory = new AdMobSignalFactory(this._nativeBridge, this._clientInfo, this._deviceInfo, this._focusManager);

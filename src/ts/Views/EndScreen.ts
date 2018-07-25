@@ -13,12 +13,12 @@ import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { ABGroup } from 'Models/ABGroup';
 import { SquareEndScreenUtilities } from 'Utilities/SquareEndScreenUtilities';
+import { IGDPREventHandler } from 'EventHandlers/GDPREventHandler';
 
-export interface IEndScreenHandler {
+export interface IEndScreenHandler extends IGDPREventHandler {
     onEndScreenDownload(parameters: IEndScreenDownloadParameters): void;
     onEndScreenClose(): void;
     onKeyEvent(keyCode: number): void;
-    onGDPRPopupSkipped(): void;
 }
 
 const SQUARE_END_SCREEN = 'square-end-screen';

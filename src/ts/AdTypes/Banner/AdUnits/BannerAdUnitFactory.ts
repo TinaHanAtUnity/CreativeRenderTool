@@ -14,7 +14,6 @@ export class BannerAdUnitFactory {
     }
 
     private static createBannerAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<BannerCampaign>): BannerAdUnit {
-        const adUnit = new BannerAdUnit(nativeBridge, <IBannerAdUnitParameters>parameters);
-        return adUnit;
+        return new BannerAdUnit(nativeBridge, <IBannerAdUnitParameters>parameters);
     }
 }

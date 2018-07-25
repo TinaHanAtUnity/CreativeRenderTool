@@ -42,7 +42,7 @@ describe('VPAID View', () => {
         (<sinon.SinonStub>campaign.getVPAID).returns(model);
 
         const privacy = new Privacy(nativeBridge, true);
-        view = new VPAID(nativeBridge, webPlayerContainer, campaign, TestFixtures.getPlacement(), false);
+        view = new VPAID(nativeBridge, webPlayerContainer, campaign, TestFixtures.getPlacement());
 
         eventHandler = {
             onVPAIDCompanionClick: sinon.spy(),

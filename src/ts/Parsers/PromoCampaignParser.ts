@@ -41,8 +41,7 @@ export class PromoCampaignParser extends CampaignParser {
                         rewardedPromo: promoJson.rewardedPromo ? promoJson.rewardedPromo : false
                     };
 
-                    const promoCampaign = new PromoCampaign(promoCampaignParams);
-                    return promoCampaign;
+                    return new PromoCampaign(promoCampaignParams);
                 } else {
                     throw new Error(`Promo product id ${promoJson.iapProductId} is unavailable`);
                 }

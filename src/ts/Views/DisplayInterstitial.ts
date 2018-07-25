@@ -9,10 +9,10 @@ import { Platform } from 'Constants/Platform';
 import { Template } from 'Utilities/Template';
 import { ENGINE_METHOD_DIGESTS } from 'constants';
 import { IPrivacyHandler, AbstractPrivacy } from 'Views/AbstractPrivacy';
+import { IGDPREventHandler } from 'EventHandlers/GDPREventHandler';
 
-export interface IDisplayInterstitialHandler {
+export interface IDisplayInterstitialHandler extends IGDPREventHandler {
     onDisplayInterstitialClose(): void;
-    onGDPRPopupSkipped(): void;
 }
 
 export class DisplayInterstitial extends View<IDisplayInterstitialHandler> implements IPrivacyHandler {
