@@ -9,7 +9,7 @@ export class MetaDataManager {
         this._nativeBridge = nativeBridge;
     }
 
-    public fetch<T extends BaseMetaData>(MetaDataConstructor: { new(): T; }, cache: boolean = true, keys?: string[]): Promise<T | undefined> {
+    public fetch<T extends BaseMetaData>(MetaDataConstructor: { new(): T}, cache: boolean = true, keys?: string[]): Promise<T | undefined> {
         let metaData: T = new MetaDataConstructor();
 
         if (this._metaDataCache[metaData.getCategory()]) {

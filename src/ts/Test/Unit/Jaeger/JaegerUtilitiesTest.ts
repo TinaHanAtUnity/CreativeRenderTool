@@ -24,8 +24,8 @@ describe('JaegerUtilitiesTest', () => {
 
     describe('on stripQueryAndFragment', () => {
         const tests: Array<{
-            input: string,
-            output: string
+            input: string;
+            output: string;
         }> = [{
             input: 'http://google.com/test?key=value&hello=world',
             output: 'http://google.com/test'
@@ -40,7 +40,7 @@ describe('JaegerUtilitiesTest', () => {
             output: 'http://google.com/test'
         }];
         tests.forEach((t) => {
-            it(`stripQueryAndFragment should ouput url without query or fragment`, () => {
+            it('stripQueryAndFragment should ouput url without query or fragment', () => {
                 const urlString = JaegerUtilities.stripQueryAndFragment(t.input);
                 assert.equal(urlString, t.output);
             });
