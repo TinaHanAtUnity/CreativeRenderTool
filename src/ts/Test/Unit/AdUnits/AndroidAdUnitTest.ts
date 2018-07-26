@@ -26,6 +26,7 @@ import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { Request } from 'Utilities/Request';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { GdprManager } from 'Managers/GdprManager';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 describe('AndroidAdUnitTest', () => {
     let nativeBridge: NativeBridge;
@@ -51,6 +52,7 @@ describe('AndroidAdUnitTest', () => {
         const configuration = TestFixtures.getConfiguration();
         container = new Activity(nativeBridge, deviceInfo);
         const gdprManager = sinon.createStubInstance(GdprManager);
+        const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             nativeBridge: nativeBridge,
             request: request,
@@ -75,7 +77,8 @@ describe('AndroidAdUnitTest', () => {
             configuration: configuration,
             request: request,
             options: {},
-            gdprManager: gdprManager
+            gdprManager: gdprManager,
+            programmaticTrackingService: programmaticTrackingService
         };
     });
 
@@ -142,19 +145,19 @@ describe('AndroidAdUnitTest', () => {
         it('with onResume', () => {
             let onContainerForegroundTriggered: boolean = false;
             const listener: IAdUnitContainerListener = {
-                onContainerShow: function() {
+                onContainerShow: () => {
                     // EMPTY
                 },
-                onContainerDestroy: function() {
+                onContainerDestroy: () => {
                     // EMPTY
                 },
-                onContainerBackground: function() {
+                onContainerBackground: () => {
                     // EMPTY
                 },
-                onContainerForeground: function() {
+                onContainerForeground: () => {
                     onContainerForegroundTriggered = true;
                 },
-                onContainerSystemMessage: function(message: AdUnitContainerSystemMessage) {
+                onContainerSystemMessage: (message: AdUnitContainerSystemMessage) => {
                     // EMPTY
                 }
             };
@@ -171,19 +174,19 @@ describe('AndroidAdUnitTest', () => {
         it('with onPause', () => {
             let onContainerDestroyTriggered: boolean = false;
             const listener: IAdUnitContainerListener = {
-                onContainerShow: function() {
+                onContainerShow: () => {
                     // EMPTY
                 },
-                onContainerDestroy: function() {
+                onContainerDestroy: () => {
                     onContainerDestroyTriggered = true;
                 },
-                onContainerBackground: function() {
+                onContainerBackground: () => {
                     // EMPTY
                 },
-                onContainerForeground: function() {
+                onContainerForeground: () => {
                     // EMPTY
                 },
-                onContainerSystemMessage: function(message: AdUnitContainerSystemMessage) {
+                onContainerSystemMessage: (message: AdUnitContainerSystemMessage) => {
                     // EMPTY
                 }
             };
@@ -201,19 +204,19 @@ describe('AndroidAdUnitTest', () => {
             let onContainerDestroyTriggered: boolean = false;
 
             const listener: IAdUnitContainerListener = {
-                onContainerShow: function() {
+                onContainerShow: () => {
                     // EMPTY
                 },
-                onContainerDestroy: function() {
+                onContainerDestroy: () => {
                     onContainerDestroyTriggered = true;
                 },
-                onContainerBackground: function() {
+                onContainerBackground: () => {
                     // EMPTY
                 },
-                onContainerForeground: function() {
+                onContainerForeground: () => {
                     // EMPTY
                 },
-                onContainerSystemMessage: function(message: AdUnitContainerSystemMessage) {
+                onContainerSystemMessage: (message: AdUnitContainerSystemMessage) => {
                     // EMPTY
                 }
             };

@@ -18,8 +18,6 @@ import OnCometMraidPlcCampaign from 'json/campaigns/performance/CometMraidUrlCam
 import OnCometVideoPlcCampaign from 'json/campaigns/performance/CometVideoCampaign.json';
 import { ABGroup, ABGroupBuilder } from 'Models/ABGroup';
 
-import { SQUARE_CAMPAIGNS, SQUARE_END_SCREEN_AB_GROUPS } from 'Utilities/SquareEndScreenUtilities';
-
 describe('CometCampaignParser', () => {
     const placements = ['TestPlacement'];
     const gamerId = 'TestGamerId';
@@ -165,8 +163,8 @@ describe('CometCampaignParser', () => {
                 it('is undefined, leaves adUnitStyle undefined', () => {
                     campaignJSON.content.adUnitStyle = undefined;
                     campaignJSON.content = JSON.stringify(campaignJSON.content);
-                    return parse(campaignJSON).then( () => {
-                        assert.isUndefined( (<PerformanceCampaign>campaign).getAdUnitStyle() );
+                    return parse(campaignJSON).then(() => {
+                        assert.isUndefined((<PerformanceCampaign>campaign).getAdUnitStyle());
                         sinon.assert.calledWith(<sinon.SinonSpy>Diagnostics.trigger, 'configuration_ad_unit_style_parse_error');
                     });
                 });
@@ -174,8 +172,8 @@ describe('CometCampaignParser', () => {
                 it('is missing, leaves adUnitStyle undefined ', () => {
                     delete campaignJSON.content.adUnitStyle;
                     campaignJSON.content = JSON.stringify(campaignJSON.content);
-                    return parse(campaignJSON).then( () => {
-                        assert.isUndefined( (<PerformanceCampaign>campaign).getAdUnitStyle() );
+                    return parse(campaignJSON).then(() => {
+                        assert.isUndefined((<PerformanceCampaign>campaign).getAdUnitStyle());
                         sinon.assert.calledWith(<sinon.SinonSpy>Diagnostics.trigger, 'configuration_ad_unit_style_parse_error');
                     });
                 });
@@ -183,8 +181,8 @@ describe('CometCampaignParser', () => {
                 it('is malformed, leaves adUnitStyle undefined ', () => {
                     campaignJSON.content.adUnitStyle = { 'thisIsNot': 'A Proper stylesheet' };
                     campaignJSON.content = JSON.stringify(campaignJSON.content);
-                    return parse(campaignJSON).then( () => {
-                        assert.isUndefined( (<PerformanceCampaign>campaign).getAdUnitStyle() );
+                    return parse(campaignJSON).then(() => {
+                        assert.isUndefined((<PerformanceCampaign>campaign).getAdUnitStyle());
                         sinon.assert.calledWith(<sinon.SinonSpy>Diagnostics.trigger, 'configuration_ad_unit_style_parse_error');
                     });
                 });
@@ -192,9 +190,9 @@ describe('CometCampaignParser', () => {
                 it('has a blank string, returns undefined ctaButtonColor', () => {
                     campaignJSON.content.adUnitStyle.ctaButtonColor = '';
                     campaignJSON.content = JSON.stringify(campaignJSON.content);
-                    return parse(campaignJSON).then( () => {
+                    return parse(campaignJSON).then(() => {
                         const returnedAdUnitStyle = (<PerformanceCampaign>campaign).getAdUnitStyle();
-                        assert.isUndefined( (<AdUnitStyle>returnedAdUnitStyle).getCTAButtonColor() );
+                        assert.isUndefined((<AdUnitStyle>returnedAdUnitStyle).getCTAButtonColor());
                         sinon.assert.notCalled(<sinon.SinonSpy>Diagnostics.trigger);
                     });
                 });
@@ -202,9 +200,9 @@ describe('CometCampaignParser', () => {
                 it('has a undefined value, returns undefined ctaButtonColor', () => {
                     campaignJSON.content.adUnitStyle.ctaButtonColor = undefined;
                     campaignJSON.content = JSON.stringify(campaignJSON.content);
-                    return parse(campaignJSON).then( () => {
+                    return parse(campaignJSON).then(() => {
                         const returnedAdUnitStyle = (<PerformanceCampaign>campaign).getAdUnitStyle();
-                        assert.isUndefined( (<AdUnitStyle>returnedAdUnitStyle).getCTAButtonColor() );
+                        assert.isUndefined((<AdUnitStyle>returnedAdUnitStyle).getCTAButtonColor());
                         sinon.assert.notCalled(<sinon.SinonSpy>Diagnostics.trigger);
                     });
                 });
@@ -212,9 +210,9 @@ describe('CometCampaignParser', () => {
                 it('has a non-color value, returns undefined ctaButtonColor', () => {
                     campaignJSON.content.adUnitStyle.ctaButtonColor = '#blue12';
                     campaignJSON.content = JSON.stringify(campaignJSON.content);
-                    return parse(campaignJSON).then( () => {
+                    return parse(campaignJSON).then(() => {
                         const returnedAdUnitStyle = (<PerformanceCampaign>campaign).getAdUnitStyle();
-                        assert.isUndefined( (<AdUnitStyle>returnedAdUnitStyle).getCTAButtonColor() );
+                        assert.isUndefined((<AdUnitStyle>returnedAdUnitStyle).getCTAButtonColor());
                         sinon.assert.notCalled(<sinon.SinonSpy>Diagnostics.trigger);
                     });
                 });
@@ -222,9 +220,9 @@ describe('CometCampaignParser', () => {
                 it('has a lower case color, returns proper ctaButtonColor', () => {
                     campaignJSON.content.adUnitStyle.ctaButtonColor = fuchsia;
                     campaignJSON.content = JSON.stringify(campaignJSON.content);
-                    return parse(campaignJSON).then( () => {
+                    return parse(campaignJSON).then(() => {
                         const returnedAdUnitStyle = (<PerformanceCampaign>campaign).getAdUnitStyle();
-                        assert.equal( (<AdUnitStyle>returnedAdUnitStyle).getCTAButtonColor(), fuchsia );
+                        assert.equal((<AdUnitStyle>returnedAdUnitStyle).getCTAButtonColor(), fuchsia);
                         sinon.assert.notCalled(<sinon.SinonSpy>Diagnostics.trigger);
                     });
                 });
@@ -232,42 +230,12 @@ describe('CometCampaignParser', () => {
                 it('has a upper case color, returns proper ctaButtonColor', () => {
                     campaignJSON.content.adUnitStyle.ctaButtonColor = fafafa;
                     campaignJSON.content = JSON.stringify(campaignJSON.content);
-                    return parse(campaignJSON).then( () => {
+                    return parse(campaignJSON).then(() => {
                         const returnedAdUnitStyle = (<PerformanceCampaign>campaign).getAdUnitStyle();
-                        assert.equal( (<AdUnitStyle>returnedAdUnitStyle).getCTAButtonColor(), fafafa );
+                        assert.equal((<AdUnitStyle>returnedAdUnitStyle).getCTAButtonColor(), fafafa);
                         sinon.assert.notCalled(<sinon.SinonSpy>Diagnostics.trigger);
                     });
                 });
-            });
-        });
-    });
-
-    describe('square end screen image A/B test and parsing a campaign', () => {
-        let campaign: PerformanceCampaign;
-
-        const parse = (data: any, abGroupNumber: ABGroup) => {
-            const response = new AuctionResponse(placements, data, mediaId, correlationId);
-            return parser.parse(nativeBridge, request, response, session, gamerId, abGroupNumber, '8.0').then((parsedCampaign) => {
-                campaign = <PerformanceCampaign>parsedCampaign;
-            });
-        };
-
-        const json = JSON.parse(OnCometVideoPlcCampaign);
-        const content = JSON.parse(json.content);
-        content.id = SQUARE_CAMPAIGNS[0].campaignIds[0];
-        json.content = JSON.stringify(content);
-
-        it('should return default images when not in A/B group', () => {
-            parse(json, ABGroupBuilder.getAbGroup(0)).then(() => {
-                assert.equal(campaign.getLandscape()!.getOriginalUrl(), Url.encode(content.endScreenLandscape), 'Landscape URL is not equal');
-                assert.equal(campaign.getPortrait()!.getOriginalUrl(), Url.encode(content.endScreenPortrait), 'Portrait URL is not equal');
-            });
-        });
-
-        it('should return a custom images when in A/B group', () => {
-            parse(json, SQUARE_END_SCREEN_AB_GROUPS[0]).then(() => {
-                assert.equal(campaign.getLandscape()!.getOriginalUrl(), Url.encode(SQUARE_CAMPAIGNS[0].customImage), 'Landscape URL is not equal');
-                assert.equal(campaign.getPortrait()!.getOriginalUrl(), Url.encode(SQUARE_CAMPAIGNS[0].customImage), 'Portrait URL is not equal');
             });
         });
     });

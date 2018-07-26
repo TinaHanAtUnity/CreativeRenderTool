@@ -18,7 +18,7 @@ export class AdUnitStyle extends Model<IAdUnitStyle> {
     private static validateIAdUnitStyle(adUnitStyle: IAdUnitStyle) {
         const validatedAdUnitStyle: IAdUnitStyle = {...adUnitStyle};
         // ctaButtonColor needs to be a proper html color code string or undefined
-        if ( (!adUnitStyle.ctaButtonColor) || !adUnitStyle.ctaButtonColor.match(/#[0-F]{6}/i)) {
+        if ((!adUnitStyle.ctaButtonColor) || !adUnitStyle.ctaButtonColor.match(/#[0-F]{6}/i)) {
             validatedAdUnitStyle.ctaButtonColor = undefined;
         }
         return validatedAdUnitStyle;
@@ -33,7 +33,7 @@ export class AdUnitStyle extends Model<IAdUnitStyle> {
         return this.get('ctaButtonColor');
     }
 
-    public getDTO(): { [key: string]: any; } {
+    public getDTO(): { [key: string]: any } {
         return {
             'ctaButtonColor': this.getCTAButtonColor()
         };

@@ -28,6 +28,7 @@ import { XPromoOperativeEventManager } from 'Managers/XPromoOperativeEventManage
 import { Privacy } from 'Views/Privacy';
 import { GdprManager } from 'Managers/GdprManager';
 import { IOperativeEventParams } from 'Managers/OperativeEventManager';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 describe('XPromoEndScreenEventHandlerTest', () => {
 
@@ -46,6 +47,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
     let endScreenEventHandler: XPromoEndScreenEventHandler;
     let campaign: XPromoCampaign;
     let placement: Placement;
+    let programmaticTrackingService: ProgrammaticTrackingService;
 
     describe('with onDownloadAndroid', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -67,6 +69,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
             sessionManager = new SessionManager(nativeBridge, request);
             const configuration = TestFixtures.getConfiguration();
+            programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
             operativeEventManager = <XPromoOperativeEventManager>OperativeEventManagerFactory.createOperativeEventManager({
                 nativeBridge: nativeBridge,
                 request: request,
@@ -108,7 +111,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 overlay: overlay,
                 video: video,
                 privacy: privacy,
-                gdprManager: gdprManager
+                gdprManager: gdprManager,
+                programmaticTrackingService: programmaticTrackingService
             };
 
             xPromoAdUnit = new XPromoAdUnit(nativeBridge, xPromoAdUnitParameters);
@@ -194,7 +198,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 overlay: overlay,
                 video: video,
                 privacy: privacy,
-                gdprManager: gdprManager
+                gdprManager: gdprManager,
+                programmaticTrackingService: programmaticTrackingService
             };
 
             xPromoAdUnit = new XPromoAdUnit(nativeBridge, xPromoAdUnitParameters);

@@ -1,4 +1,50 @@
-# Staged
+# Pending
+
+* Fix GDPR Privacy width for iPhone X in landscape
+* Tslint number-literal-format
+
+# Wed Jul 25 20:12:52 UTC 2018
+
+* New GDPR legal text
+* Fixed issues with backup campaign, expired campaigns were shown, VAST had issues
+
+# Tue Jul 24 20:57:31 UTC 2018
+
+* Add a fixed version of the new video overlay
+* Send Admob impression when ad loads
+* Expanding Localization regex to be more flexible for Chinese
+* Tslint no-unnecessary-qualifier
+* Tslint no-unnecessary-type-assertion
+* Tslint use-default-type-parameter
+* Tslint type-literal-delimiter
+* Tslint no-function-expression
+
+# Fri Jul 20 21:20:03 UTC 2018
+
+* Not using cached adPlan for Uken games - attempt to fix black screen issue
+
+# Fri Jul 20 07:37:21 UTC 2018
+
+* Revert "Merge pull request #5566 from Applifier/feature/new-video-overlay
+* Handle Promo initialization order over SendEvent
+* Tslint no-multiline-string
+
+# Thu Jul 19 20:07:08 UTC 2018
+
+* Add more parameters to AbstractPrivacy Build Information
+* Remove new square endscreen image test
+* Add ABGroup parameter to auction request body
+* Tslint no-unnecessary-field-initialization
+* Tslint no-unnecessary-override
+
+# Wed Jul 18 19:58:01 UTC 2018
+
+* Tslint no-irregular-whitespace
+* Tslint no-spaces-in-parens
+* Tslint no-use-before-declare re-enabled
+* Send admob cache metrics to PTS
+
+# Mon Jul 16 20:03:32 UTC 2018
 
 * Tslint no-unnecessary-local-variable is re-enabled
 * Tslint no-invalid-this is re-enabled

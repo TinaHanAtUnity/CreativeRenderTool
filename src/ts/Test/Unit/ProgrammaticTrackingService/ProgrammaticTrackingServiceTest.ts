@@ -1,7 +1,7 @@
 import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
-import { ProgrammaticTrackingService, ProgrammaticTrackingError } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { ProgrammaticTrackingService, ProgrammaticTrackingError, ProgrammaticTrackingMetric, IProgrammaticTrackingMetricData } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 import { Request } from 'Utilities/Request';
 import { ClientInfo } from 'Models/ClientInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
@@ -65,6 +65,34 @@ describe('ProgrammaticTrackingService', () => {
             assert.equal(postStub.firstCall.args[1], JSON.stringify(errorData));
             assert.deepEqual(postStub.firstCall.args[2], [['Content-Type', 'application/json']]);
             return promise;
+        });
+    });
+
+    describe('reportMetric', () => {
+        const tests: Array<{
+            input: ProgrammaticTrackingMetric;
+            expected: IProgrammaticTrackingMetricData;
+        }> = [{
+            input: ProgrammaticTrackingMetric.AdmobUsedCachedVideo,
+            expected: {
+                event: ProgrammaticTrackingMetric.AdmobUsedCachedVideo
+            }
+        }, {
+            input: ProgrammaticTrackingMetric.AdmobUsedStreamedVideo,
+            expected: {
+                event: ProgrammaticTrackingMetric.AdmobUsedStreamedVideo
+            }
+        }];
+        tests.forEach((t) => {
+            it(`should send "${t.expected}" when "${t.input}" is passed in`, () => {
+                const promise = programmaticTrackingService.reportMetric(t.input);
+                sinon.assert.calledOnce(postStub);
+                assert.equal(postStub.firstCall.args.length, 3);
+                assert.equal(postStub.firstCall.args[0], 'https://tracking.adsx.unityads.unity3d.com/tracking/sdk/metric');
+                assert.equal(postStub.firstCall.args[1], JSON.stringify(t.expected));
+                assert.deepEqual(postStub.firstCall.args[2], [['Content-Type', 'application/json']]);
+                return promise;
+            });
         });
     });
 

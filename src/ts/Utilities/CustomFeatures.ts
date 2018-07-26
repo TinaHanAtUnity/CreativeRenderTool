@@ -11,6 +11,8 @@ export class CustomFeatures {
         return gameId === '1543512' ||
                gameId === '1003628' ||
                gameId === '1042745' ||
+               gameId === '1783249' ||
+               gameId === '1783250' ||
                gameId === '1543513';
     }
 
@@ -22,5 +24,14 @@ export class CustomFeatures {
         // Baidu's Simeji Japanese Keyboard extension app
         // Ad unit should be closed when going background on iOS
         return gameId === '1795561';
+    }
+
+    public static isCacheUpdateDisabledApp(gameId: string): boolean {
+        // Uken game id to disable cache change PR https://github.com/Applifier/unity-ads-webview/pull/4755
+        // ABT-466 black screen issue
+        return gameId === '1000671' ||
+               gameId === '1000670' ||
+               gameId === '1557353' ||
+               gameId === '1557354';
     }
 }
