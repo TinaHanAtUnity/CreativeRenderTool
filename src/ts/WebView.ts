@@ -293,9 +293,16 @@ export class WebView {
                         deviceInfo: this._deviceInfo
                     });
 
-                    this._forceQuitManager.getForceQuitStatus().then((data) => {
-                        Diagnostics.trigger('force_quit', error, data.adSession);
-                        this._forceQuitManager.destroyForceQuitKey();
+                    this._forceQuitManager.getForceQuitData().then((data) => {
+
+                        // Eventually output these to PTS rather than Kibana
+                        if (data && data.adSession) {
+                            Diagnostics.trigger('force_quit', error, data.adSession);
+                            this._forceQuitManager.destroyForceQuitKey();
+                        } else {
+                            Diagnostics.trigger('force_quit_error', error, undefined);
+                            this._forceQuitManager.destroyForceQuitKey();
+                        }
                     });
                 }
             });

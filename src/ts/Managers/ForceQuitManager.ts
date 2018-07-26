@@ -15,8 +15,8 @@ export class ForceQuitManager {
         this._nativeBridge = nativeBridge;
     }
 
-    public createForceQuitKey(adLog: IForceQuitData): Promise<void> {
-        return this._nativeBridge.Storage.set(StorageType.PRIVATE, ForceQuitManager.ForceQuitKey, adLog).then(() => {
+    public createForceQuitKey(data: IForceQuitData): Promise<void> {
+        return this._nativeBridge.Storage.set(StorageType.PRIVATE, ForceQuitManager.ForceQuitKey, data).then(() => {
            return this._nativeBridge.Storage.write(StorageType.PRIVATE);
         });
     }
@@ -29,9 +29,11 @@ export class ForceQuitManager {
         });
     }
 
-    public getForceQuitStatus(): Promise<IForceQuitData> {
+    public getForceQuitData(): Promise<IForceQuitData | undefined> {
         return this._nativeBridge.Storage.get(StorageType.PRIVATE, ForceQuitManager.ForceQuitKey).then(data => {
             return Promise.resolve(<IForceQuitData>data);
+        }).catch(() => {
+            return Promise.resolve(undefined);
         });
     }
 
