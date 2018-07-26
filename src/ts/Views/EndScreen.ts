@@ -200,7 +200,12 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             width: window.screen.width * ratio
         };
 
-        return (screenSize.height === 1125 && screenSize.width === 2436) || (screenSize.height === 2436 && screenSize.width === 1125);
+        const iPhoneXWidth = 1125;
+        const iPhoneXHeight = 2436;
+        const isIPhoneXPortrait = screenSize.height === iPhoneXHeight && screenSize.width === iPhoneXWidth;
+        const isIPhoneXLandscape = screenSize.height === iPhoneXWidth && screenSize.width === iPhoneXHeight;
+
+        return isIPhoneXLandscape || isIPhoneXPortrait;
     }
 
     private useIPhoneXStyle(): boolean {
