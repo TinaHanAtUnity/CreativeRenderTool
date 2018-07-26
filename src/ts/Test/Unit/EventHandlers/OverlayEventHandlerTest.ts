@@ -168,13 +168,13 @@ describe('OverlayEventHandlerTest', () => {
         it('should set volume to zero when muted', () => {
             overlayEventHandler.onOverlayMute(true);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.VideoPlayer.setVolume, new Double(0.0));
+            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.VideoPlayer.setVolume, new Double(0));
         });
 
         it('should set volume to 1 when not muted', () => {
             overlayEventHandler.onOverlayMute(false);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.VideoPlayer.setVolume, new Double(1.0));
+            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.VideoPlayer.setVolume, new Double(1));
         });
     });
 

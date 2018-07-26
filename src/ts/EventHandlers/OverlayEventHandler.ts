@@ -47,7 +47,7 @@ export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler im
     }
 
     public onOverlayMute(isMuted: boolean): void {
-        this._nativeBridge.VideoPlayer.setVolume(new Double(isMuted ? 0.0 : 1.0));
+        this._nativeBridge.VideoPlayer.setVolume(new Double(isMuted ? 0 : 1));
     }
 
     public onOverlayCallButton(): void {
