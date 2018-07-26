@@ -1,3 +1,8 @@
+# Pending
+
+* Fix GDPR Privacy width for iPhone X in landscape
+* Tslint number-literal-format
+
 # Wed Jul 25 20:12:52 UTC 2018
 
 * New GDPR legal text

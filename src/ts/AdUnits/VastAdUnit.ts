@@ -18,7 +18,7 @@ class DeviceOrientation {
             height = 1;
         }
         const aspectRatio = window.innerWidth / height;
-        return aspectRatio >= 1.0 ? Orientation.LANDSCAPE : Orientation.PORTRAIT;
+        return aspectRatio >= 1 ? Orientation.LANDSCAPE : Orientation.PORTRAIT;
     }
 }
 
@@ -32,7 +32,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     private _moat?: MOAT;
     private _volume: number;
     private _muted: boolean = false;
-    private _events: Array<[number, string]> = [[0.0, 'AdVideoStart'], [0.25, 'AdVideoFirstQuartile'], [0.5, 'AdVideoMidpoint'], [0.75, 'AdVideoThirdQuartile']];
+    private _events: Array<[number, string]> = [[0, 'AdVideoStart'], [0.25, 'AdVideoFirstQuartile'], [0.5, 'AdVideoMidpoint'], [0.75, 'AdVideoThirdQuartile']];
     private _vastCampaign: VastCampaign;
     private _vastPlacement: Placement;
 
