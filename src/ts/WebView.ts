@@ -286,24 +286,17 @@ export class WebView {
             });
         }).then(() => {
             // send diagnostics event for abnormal ad termination
-            return this._forceQuitManager.hasForceQuit().then((userHadForceQuit) => {
-                if (userHadForceQuit) {
+            return this._forceQuitManager.getForceQuitData().then((forceQuitData) => {
+                if (forceQuitData && forceQuitData.adSession) {
                     const error = new DiagnosticError(new Error('Ad Force Quit'), {
                         clientInfo: this._clientInfo,
                         deviceInfo: this._deviceInfo
                     });
+                    this._nativeBridge.Sdk.logInfo('Konecny: ForceKey kibanafied');
 
-                    this._forceQuitManager.getForceQuitData().then((data) => {
-
-                        // Eventually output these to PTS rather than Kibana
-                        if (data && data.adSession) {
-                            Diagnostics.trigger('force_quit', error, data.adSession);
-                            this._forceQuitManager.destroyForceQuitKey();
-                        } else {
-                            Diagnostics.trigger('force_quit_error', error, undefined);
-                            this._forceQuitManager.destroyForceQuitKey();
-                        }
-                    });
+                    // Eventually output these to PTS rather than Kibana
+                    Diagnostics.trigger('force_quit', error, forceQuitData.adSession);
+                    this._forceQuitManager.destroyForceQuitKey();
                 }
             });
         }).then(() => {

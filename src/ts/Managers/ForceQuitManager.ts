@@ -21,14 +21,6 @@ export class ForceQuitManager {
         });
     }
 
-    public hasForceQuit(): Promise<boolean> {
-        return this._nativeBridge.Storage.get(StorageType.PRIVATE, ForceQuitManager.ForceQuitKey).then(data => {
-            return Promise.resolve(typeof(data) !== 'undefined');
-        }).catch(() => {
-            return Promise.resolve(false);
-        });
-    }
-
     public getForceQuitData(): Promise<IForceQuitData | undefined> {
         return this._nativeBridge.Storage.get(StorageType.PRIVATE, ForceQuitManager.ForceQuitKey).then(data => {
             return Promise.resolve(<IForceQuitData>data);

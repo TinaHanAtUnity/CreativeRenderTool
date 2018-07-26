@@ -88,6 +88,7 @@ export class ViewController extends AdUnitContainer {
     }
 
     public close(): Promise<void> {
+        this._forceQuitManager.destroyForceQuitKey();
         this._showing = false;
 
         if(CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
@@ -98,8 +99,6 @@ export class ViewController extends AdUnitContainer {
         this._focusManager.onAppForeground.unsubscribe(this._onAppForegroundObserver);
         this._nativeBridge.Notification.removeAVNotificationObserver(ViewController._audioSessionInterrupt);
         this._nativeBridge.Notification.removeAVNotificationObserver(ViewController._audioSessionRouteChange);
-
-        this._forceQuitManager.destroyForceQuitKey();
 
         return this._nativeBridge.IosAdUnit.close();
     }

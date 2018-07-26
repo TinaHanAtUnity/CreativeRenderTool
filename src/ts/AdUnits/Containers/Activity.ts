@@ -86,12 +86,14 @@ export class Activity extends AdUnitContainer {
         this._onFocusLostObserver = this._nativeBridge.AndroidAdUnit.onFocusLost.subscribe(() => this.onFocusLost());
 
         this._forceQuitManager.createForceQuitKey(adUnit.createForceQuitKey());
+        this._nativeBridge.Sdk.logInfo('Konecny: ForceKey Created');
 
         return this._nativeBridge.AndroidAdUnit.open(this._activityId, nativeViews, this.getOrientation(allowRotation, this._lockedOrientation, options), keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel, isTransparent);
     }
 
     public close(): Promise<void> {
         this._forceQuitManager.destroyForceQuitKey();
+        this._nativeBridge.Sdk.logInfo('Konecny: ForceKey deleted');
 
         if(!this._currentActivityFinished) {
             this._currentActivityFinished = true;
