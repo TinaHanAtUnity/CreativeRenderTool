@@ -292,7 +292,6 @@ export class WebView {
                         clientInfo: this._clientInfo,
                         deviceInfo: this._deviceInfo
                     });
-                    this._nativeBridge.Sdk.logInfo('Konecny: ForceKey kibanafied');
 
                     // Eventually output these to PTS rather than Kibana
                     Diagnostics.trigger('force_quit', error, forceQuitData.adSession);
