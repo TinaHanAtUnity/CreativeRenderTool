@@ -46,9 +46,9 @@ export class ARApi extends NativeApi {
         let dstHeight = frameInfo.drawableSize.height;
 
         if(drawableAspectRatio > videoAspectRatio) {
-            dstHeight *= drawableAspectRatio * (1.0 / videoAspectRatio);
+            dstHeight *= drawableAspectRatio * (1 / videoAspectRatio);
         } else {
-            dstWidth *= (1.0 / drawableAspectRatio) * videoAspectRatio;
+            dstWidth *= (1 / drawableAspectRatio) * videoAspectRatio;
         }
 
         return {

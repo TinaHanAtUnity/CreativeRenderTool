@@ -46,7 +46,7 @@ export class ARUtil {
         if (determinant === 0) {
             return transform;
         }
-        const invDet = 1.0 / determinant;
+        const invDet = 1 / determinant;
 
         return {
             a: t.d * invDet,
