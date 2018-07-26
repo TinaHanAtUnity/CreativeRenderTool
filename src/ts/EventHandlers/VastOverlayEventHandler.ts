@@ -85,9 +85,7 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
                         this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId());
                     });
                 }
-            ).catch(() => {
-                return Promise.reject(new Error('Failed to resolve followRedirectChain'));
-            });
+            );
         } else {
             return Promise.reject(new Error('No clickThroughURL was defined'));
         }
