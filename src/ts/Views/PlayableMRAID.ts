@@ -191,6 +191,21 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
             type: 'viewable',
             value: false
         }, '*');
+
+        if (this._arFrameUpdatedObserver) {
+            this._nativeBridge.AR.onFrameUpdated.unsubscribe(this._arFrameUpdatedObserver);
+            this._nativeBridge.AR.onPlanesAdded.unsubscribe(this._arPlanesAddedObserver);
+            this._nativeBridge.AR.onPlanesUpdated.unsubscribe(this._arPlanesUpdatedObserver);
+            this._nativeBridge.AR.onPlanesRemoved.unsubscribe(this._arPlanesRemovedObserver);
+            this._nativeBridge.AR.onAnchorsUpdated.unsubscribe(this._arAnchorsUpdatedObserver);
+            this._nativeBridge.AR.onWindowResized.unsubscribe(this._arWindowResizedObserver);
+            this._nativeBridge.AR.onError.unsubscribe(this._arErrorObserver);
+            this._nativeBridge.AR.onSessionInterrupted.unsubscribe(this._arSessionInterruptedObserver);
+            this._nativeBridge.AR.onSessionInterruptionEnded.unsubscribe(this._arSessionInterruptionEndedObserver);
+            this._nativeBridge.AR.onAndroidEnumsReceived.unsubscribe(this._arAndroidEnumsReceivedObserver);
+            window.removeEventListener('deviceorientation', this._deviceorientationListener, false);
+        }
+
         if(this._messageListener) {
             window.removeEventListener('message', this._messageListener, false);
             this._messageListener = undefined;
@@ -419,20 +434,6 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
             this._handlers.forEach(handler => handler.onMraidClose());
             if (this._isMRAIDAR) {
                 this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, 'playable_close', undefined));
-            }
-
-            if (this._arFrameUpdatedObserver) {
-                this._nativeBridge.AR.onFrameUpdated.unsubscribe(this._arFrameUpdatedObserver);
-                this._nativeBridge.AR.onPlanesAdded.unsubscribe(this._arPlanesAddedObserver);
-                this._nativeBridge.AR.onPlanesUpdated.unsubscribe(this._arPlanesUpdatedObserver);
-                this._nativeBridge.AR.onPlanesRemoved.unsubscribe(this._arPlanesRemovedObserver);
-                this._nativeBridge.AR.onAnchorsUpdated.unsubscribe(this._arAnchorsUpdatedObserver);
-                this._nativeBridge.AR.onWindowResized.unsubscribe(this._arWindowResizedObserver);
-                this._nativeBridge.AR.onError.unsubscribe(this._arErrorObserver);
-                this._nativeBridge.AR.onSessionInterrupted.unsubscribe(this._arSessionInterruptedObserver);
-                this._nativeBridge.AR.onSessionInterruptionEnded.unsubscribe(this._arSessionInterruptionEndedObserver);
-                this._nativeBridge.AR.onAndroidEnumsReceived.unsubscribe(this._arAndroidEnumsReceivedObserver);
-                window.removeEventListener('deviceorientation', this._deviceorientationListener, false);
             }
         }
     }
