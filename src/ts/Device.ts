@@ -68,6 +68,7 @@ const onChangeOrientation = () => {
     switch(window.orientation) {
         case 180:
             iosOrientation = 'ios-portrait-upside-down';
+            break;
         case 90:
             iosOrientation  = 'ios-landscape-left';
             break;
