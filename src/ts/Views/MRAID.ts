@@ -11,6 +11,7 @@ import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Template } from 'Utilities/Template';
 import { SdkStats } from 'Utilities/SdkStats';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
 
 export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -89,7 +90,8 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
             SdkStats.setFrameSetStartTimestamp(this._placement.getId());
             this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' set iframe.src started ' + SdkStats.getFrameSetStartTimestamp(this._placement.getId()));
             iframe.srcdoc = mraid;
-            if (this._campaign.getCreativeId() === '108031399') {
+            const creativeId: string | undefined = this._campaign.getCreativeId();
+            if (CustomFeatures.isSonicPlayable(creativeId)) {
                 iframe.sandbox = 'allow-scripts allow-same-origin';
             }
         }).catch(e => this._nativeBridge.Sdk.logError('failed to create mraid: ' + e));
