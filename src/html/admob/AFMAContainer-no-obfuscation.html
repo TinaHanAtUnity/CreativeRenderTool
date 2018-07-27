@@ -223,8 +223,10 @@
             };
 
             this.notifyRewardedVideoStart = function() {
-                self.nonRewardedStart = true;
-                this.postMessage('rewardedVideoStart');
+                if (!self.nonRewardedStart) {
+                    self.nonRewardedStart = true;
+                    this.postMessage('rewardedVideoStart');
+                }
             };
 
             this.grantReward = function() {
