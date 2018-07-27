@@ -161,19 +161,6 @@ export class WebView {
 
             return Promise.all([this._deviceInfo.fetch(), this.setupTestEnvironment()]);
         }).then(() => {
-            // Send diagnostic events for abnormal ad termination
-            return this._forceQuitManager.getForceQuitData().then((forceQuitData) => {
-                if (forceQuitData && forceQuitData.adSession) {
-                    const error = {
-                        clientInfo: this._clientInfo,
-                        deviceInfo: this._deviceInfo
-                    };
-
-                    Diagnostics.trigger('force_quit', error, forceQuitData.adSession);
-                    this._forceQuitManager.destroyForceQuitKey();
-                }
-            });
-        }).then(() => {
             if(this._clientInfo.getPlatform() === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
                 document.body.classList.add('android');
                 this._nativeBridge.setApiLevel(this._deviceInfo.getApiLevel());
@@ -309,6 +296,18 @@ export class WebView {
             } else {
                 this._nativeBridge.Request.setConcurrentRequestCount(1);
             }
+        }).then(() => {
+            // Send diagnostic events for abnormal ad termination
+            this._forceQuitManager.getForceQuitData().then((forceQuitData) => {
+                if (forceQuitData && forceQuitData.adSession) {
+                    const error = {
+                        clientInfo: this._clientInfo,
+                        deviceInfo: this._deviceInfo
+                    };
+                    Diagnostics.trigger('force_quit', error, forceQuitData.adSession);
+                    this._forceQuitManager.destroyForceQuitKey();
+                }
+            });
         }).catch(error => {
             jaegerInitSpan.addAnnotation(error.message);
             jaegerInitSpan.addTag(JaegerTags.Error, 'true');
