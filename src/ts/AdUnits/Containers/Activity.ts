@@ -39,12 +39,12 @@ export class Activity extends AdUnitContainer {
 
     private _androidOptions: IAndroidOptions;
 
-    constructor(nativeBridge: NativeBridge, deviceInfo: AndroidDeviceInfo) {
+    constructor(nativeBridge: NativeBridge, deviceInfo: AndroidDeviceInfo, forceQuitManager: ForceQuitManager) {
         super();
 
         this._nativeBridge = nativeBridge;
         this._deviceInfo = deviceInfo;
-        this._forceQuitManager = new ForceQuitManager(this._nativeBridge);
+        this._forceQuitManager = forceQuitManager;
 
         this._activityId = 0;
         this._currentActivityFinished = false;

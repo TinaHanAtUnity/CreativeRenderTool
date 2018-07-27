@@ -161,10 +161,23 @@ export class WebView {
 
             return Promise.all([this._deviceInfo.fetch(), this.setupTestEnvironment()]);
         }).then(() => {
+            // Send diagnostic events for abnormal ad termination
+            return this._forceQuitManager.getForceQuitData().then((forceQuitData) => {
+                if (forceQuitData && forceQuitData.adSession) {
+                    const error = {
+                        clientInfo: this._clientInfo,
+                        deviceInfo: this._deviceInfo
+                    };
+
+                    Diagnostics.trigger('force_quit', error, forceQuitData.adSession);
+                    this._forceQuitManager.destroyForceQuitKey();
+                }
+            });
+        }).then(() => {
             if(this._clientInfo.getPlatform() === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
                 document.body.classList.add('android');
                 this._nativeBridge.setApiLevel(this._deviceInfo.getApiLevel());
-                this._container = new Activity(this._nativeBridge, this._deviceInfo);
+                this._container = new Activity(this._nativeBridge, this._deviceInfo, this._forceQuitManager);
             } else if(this._clientInfo.getPlatform() === Platform.IOS && this._deviceInfo instanceof IosDeviceInfo) {
                 const model = this._deviceInfo.getModel();
                 if(model.match(/iphone/i) || model.match(/ipod/i)) {
@@ -172,7 +185,7 @@ export class WebView {
                 } else if(model.match(/ipad/i)) {
                     document.body.classList.add('ipad');
                 }
-                this._container = new ViewController(this._nativeBridge, this._deviceInfo, this._focusManager, this._clientInfo);
+                this._container = new ViewController(this._nativeBridge, this._deviceInfo, this._focusManager, this._clientInfo, this._forceQuitManager);
             }
             HttpKafka.setDeviceInfo(this._deviceInfo);
             this._sessionManager = new SessionManager(this._nativeBridge, this._request);
@@ -283,19 +296,6 @@ export class WebView {
                 refreshSpan.addTag(JaegerTags.ErrorMessage, error.message);
                 this._jaegerManager.stop(refreshSpan);
                 throw error;
-            });
-        }).then(() => {
-            // Send diagnostic events for abnormal ad termination
-            return this._forceQuitManager.getForceQuitData().then((forceQuitData) => {
-                if (forceQuitData && forceQuitData.adSession) {
-                    const error = new DiagnosticError(new Error('Ad Force Quit'), {
-                        clientInfo: this._clientInfo,
-                        deviceInfo: this._deviceInfo
-                    });
-
-                    Diagnostics.trigger('force_quit', error, forceQuitData.adSession);
-                    this._forceQuitManager.destroyForceQuitKey();
-                }
             });
         }).then(() => {
             this._initialized = true;

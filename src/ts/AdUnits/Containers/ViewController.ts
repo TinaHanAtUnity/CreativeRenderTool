@@ -38,14 +38,14 @@ export class ViewController extends AdUnitContainer {
     private _onAppBackgroundObserver: any;
     private _onAppForegroundObserver: any;
 
-    constructor(nativeBridge: NativeBridge, deviceInfo: IosDeviceInfo, focusManager: FocusManager, clientInfo: ClientInfo) {
+    constructor(nativeBridge: NativeBridge, deviceInfo: IosDeviceInfo, focusManager: FocusManager, clientInfo: ClientInfo, forceQuitManager: ForceQuitManager) {
         super();
 
         this._nativeBridge = nativeBridge;
         this._focusManager = focusManager;
         this._deviceInfo = deviceInfo;
         this._clientInfo = clientInfo;
-        this._forceQuitManager = new ForceQuitManager(this._nativeBridge);
+        this._forceQuitManager = forceQuitManager;
 
         this._onViewControllerDidDisappearObserver = this._nativeBridge.IosAdUnit.onViewControllerDidDisappear.subscribe(() => this.onViewDidDisappear());
         this._onViewControllerDidAppearObserver = this._nativeBridge.IosAdUnit.onViewControllerDidAppear.subscribe(() => this.onViewDidAppear());

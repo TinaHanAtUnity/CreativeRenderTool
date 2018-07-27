@@ -29,6 +29,7 @@ import { Configuration } from 'Models/Configuration';
 import { Privacy } from 'Views/Privacy';
 import { GdprManager } from 'Managers/GdprManager';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { ForceQuitManager } from 'Managers/ForceQuitManager';
 
 describe('EndScreenEventHandlerTest', () => {
 
@@ -48,6 +49,7 @@ describe('EndScreenEventHandlerTest', () => {
     let campaign: PerformanceCampaign;
     let placement: Placement;
     let configuration: Configuration;
+    let forceQuitManager: ForceQuitManager;
 
     describe('with onDownloadAndroid', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -60,7 +62,8 @@ describe('EndScreenEventHandlerTest', () => {
 
             campaign = TestFixtures.getCampaign();
             focusManager = new FocusManager(nativeBridge);
-            container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
+            forceQuitManager = sinon.createStubInstance(ForceQuitManager);
+            container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo(), forceQuitManager);
             metaDataManager = new MetaDataManager(nativeBridge);
             const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request = new Request(nativeBridge, wakeUpManager);
@@ -293,7 +296,7 @@ describe('EndScreenEventHandlerTest', () => {
                 handleCallback
             }, Platform.IOS);
 
-            container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager, clientInfo);
+            container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager, clientInfo, forceQuitManager);
             const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request = new Request(nativeBridge, wakeUpManager);
             clientInfo = TestFixtures.getClientInfo(Platform.IOS);

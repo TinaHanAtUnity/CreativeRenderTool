@@ -42,7 +42,7 @@ describe('ForceQuitManagerTest', () => {
         it('should create and store the force quit key', () => {
             setStub.returns(Promise.resolve());
             writeStub.returns(Promise.resolve());
-        return forceQuitManager.createForceQuitKey(forceQuitData).then(() => {
+            return forceQuitManager.createForceQuitKey(forceQuitData).then(() => {
                 sinon.assert.calledOnce(setStub);
                 assert.equal(setStub.firstCall.args[0], StorageType.PRIVATE);
                 assert.equal(setStub.firstCall.args[1], ForceQuitKey);
