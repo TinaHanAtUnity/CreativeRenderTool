@@ -60,7 +60,7 @@ describe('ForceQuitManagerTest', () => {
                 sinon.assert.calledOnce(getStub);
                 assert.equal(getStub.firstCall.args[0], StorageType.PRIVATE);
                 assert.equal(getStub.firstCall.args[1], ForceQuitKey);
-                assert.equal(forceQuitData, data, 'Returned data did not equal the force quit data');
+                assert.deepEqual(forceQuitData, data, 'Returned data did not equal the force quit data');
             });
         });
 
