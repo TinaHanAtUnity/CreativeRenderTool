@@ -1,0 +1,40 @@
+{
+  "auctionId": "a15a4fb6-f9ce-4b09-a0cc-0672f1de4d20",
+  "correlationId": "zGg2TfRsBNbqlc7AVdhLAw",
+  "placements": {
+    "video": "UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85_1",
+    "mraid": "UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85_2"
+  },
+  "media": {
+    "UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85_1": {
+      "cacheTTL": 12345,
+      "adType": "mraid-sample-ad-type",
+      "creativeId": "mraid-sample-creative-id",
+      "seatId": 902,
+      "isMoatEnabled": false,
+      "contentType": "programmatic/mraid",
+      "content": "{\"markup\":\"<div>markup</div>\",\"inlinedUrl\":\"https://cdn.unityads.unity3d.com/playables/xinstall.html\"}",
+      "trackingUrls": {
+        "impression": [
+          "https://ads-brand-postback.unityads.unity3d.com/brands/2000/%ZONE%/impression/common?data=Kz2J"
+        ]
+      },
+      "useWebViewUserAgentForTracking": true
+    },
+    "UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85_2": {
+      "cacheTTL": 12345,
+      "adType": "mraid-sample-ad-type",
+      "creativeId": "mraid-sample-creative-id",
+      "seatId": 902,
+      "isMoatEnabled": false,
+      "contentType": "programmatic/mraid",
+      "content": "{\"markup\":\"<div>markup</div>\",\"inlinedUrl\":\"https://cdn.unityads.unity3d.com/playables/xinstall.html\"}",
+      "trackingUrls": {
+        "impression": [
+          "https://ads-brand-postback.unityads.unity3d.com/brands/2000/%ZONE%/impression/common?data=Kz2J"
+        ]
+      },
+      "useWebViewUserAgentForTracking": true
+    }
+  }
+}

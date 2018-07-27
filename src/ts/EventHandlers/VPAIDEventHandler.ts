@@ -16,7 +16,7 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _adUnit: VPAIDAdUnit;
-    private _vpaidEventHandlers: { [key: string]: () => void; } = {};
+    private _vpaidEventHandlers: { [key: string]: () => void } = {};
     private _vpaidCampaign: VPAIDCampaign;
     private _placement: Placement;
     private _vpaidEndScreen: VPAIDEndScreen | undefined;

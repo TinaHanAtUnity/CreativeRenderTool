@@ -151,6 +151,41 @@ export class CampaignManager {
 
             SdkStats.setAdRequestTimestamp();
         }).then(() => {
+            let cachedJson: any;
+            try {
+                cachedJson = JsonParser.parse(cachedResponse.response);
+            } catch (e) {
+                return Promise.reject('failed to parse cached response, invalidate cache');
+            }
+
+            const expiredPlacements = [];
+
+            const now = new Date(Date.now());
+            const utcTimestamp = Math.floor(new Date(now.getUTCFullYear(),now.getUTCMonth(), now.getUTCDate(),
+                now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), now.getUTCMilliseconds()).getTime() / 1000);
+
+            for(const placement in cachedJson.placements) {
+                if(!cachedJson.placements.hasOwnProperty(placement)) {
+                    continue;
+                }
+                const mediaId: string = cachedJson.placements[placement];
+                const absoluteCacheTTL = cachedJson.media[mediaId].absoluteCacheTTL;
+
+                if (absoluteCacheTTL && utcTimestamp > absoluteCacheTTL) {
+                    expiredPlacements.push(placement);
+                }
+            }
+
+            for(const placement of expiredPlacements) {
+                delete cachedJson.placements[placement];
+            }
+
+            if (Object.keys(cachedJson.placements).length === 0) {
+                return Promise.reject('all placements expired, invalidate cache');
+            }
+
+            cachedResponse.response = JSON.stringify(cachedJson);
+
             return this.parseCampaigns(cachedResponse, true);
         }).then(() => {
             this._ignoreEvents = false;
@@ -183,7 +218,9 @@ export class CampaignManager {
 
             SdkStats.setAdRequestTimestamp();
             const requestTimestamp: number = Date.now();
-            return Promise.resolve().then((): Promise<INativeResponse> => {
+            return Promise.resolve().then(() => {
+                return this._cacheBookkeeping.deleteCachedCampaignResponse();
+            }).then((): Promise<INativeResponse> => {
                 if(CampaignManager.CampaignResponse) {
                     return Promise.resolve({
                         url: requestUrl,
@@ -207,7 +244,6 @@ export class CampaignManager {
                     jaegerSpan.addTag(JaegerTags.StatusCode, response.responseCode.toString());
                 }
                 if(response) {
-                    this._cacheBookkeeping.setCachedCampaignResponse(response);
                     this.setSDKSignalValues(requestTimestamp);
 
                     return this.parseCampaigns(response, false).catch((e) => {
@@ -220,7 +256,7 @@ export class CampaignManager {
             }).catch((error) => {
                 this._requesting = false;
                 if(error instanceof RequestError) {
-                    if(!(<RequestError>error).nativeResponse) {
+                    if(!error.nativeResponse) {
                         this.onConnectivityError.trigger(this._configuration.getPlacementIds());
                         return Promise.resolve();
                     }
@@ -304,6 +340,7 @@ export class CampaignManager {
         if('placements' in json) {
             const fill: { [mediaId: string]: string[] } = {};
             const noFill: string[] = [];
+            const failedToCachePlacement: string[] = [];
             if (CustomFeatures.isMixedPlacementExperiment(this._clientInfo.getGameId())) {
                 json.placements = MixedPlacementUtility.insertMediaIdsIntoJSON(this._configuration, json.placements);
             }
@@ -361,6 +398,12 @@ export class CampaignManager {
                     try {
                         auctionResponse = new AuctionResponse(fill[mediaId], json.media[mediaId], mediaId, json.correlationId);
                         promises.push(this.handleCampaign(auctionResponse, session, backupResponse).catch(error => {
+                            fill[mediaId].forEach(placement => {
+                                if(failedToCachePlacement.indexOf(placement) === -1) {
+                                    failedToCachePlacement.push(placement);
+                                }
+                            });
+
                             if(error === CacheStatus.STOPPED) {
                                 return Promise.resolve();
                             } else if(error === CacheStatus.FAILED) {
@@ -373,12 +416,79 @@ export class CampaignManager {
                             return this.handleError(error, fill[mediaId], 'handle_campaign_error', session);
                         }));
                     } catch(error) {
+                        fill[mediaId].forEach(placement => {
+                            if(failedToCachePlacement.indexOf(placement) === -1) {
+                                failedToCachePlacement.push(placement);
+                            }
+                        });
                         this.handleError(error, fill[mediaId], 'error_creating_handle_campaign_chain', session);
                     }
                 }
             }
 
-            return Promise.all(promises);
+            return Promise.all(promises).then(x => {
+                if (backupResponse) {
+                    return Promise.resolve();
+                }
+
+                let cachedJson: any;
+                try {
+                    cachedJson = JsonParser.parse(response.response);
+                } catch (e) {
+                    return Promise.resolve();
+                }
+
+                for(const mediaId in fill) {
+                    if(!fill.hasOwnProperty(mediaId)) {
+                        continue;
+                    }
+                    const contentType = cachedJson.media[mediaId].contentType;
+
+                    if (contentType && contentType === 'programmatic/vast') {
+                        fill[mediaId].forEach(p => {
+                            delete cachedJson.placements[p];
+                        });
+                    }
+                }
+
+                for(const placement of failedToCachePlacement) {
+                    delete cachedJson.placements[placement];
+                }
+
+                for(const placement of noFill) {
+                    delete cachedJson.placements[placement];
+                }
+
+                if (Object.keys(cachedJson.placements).length === 0) {
+                    return Promise.resolve();
+                }
+
+                const now = new Date(Date.now());
+                const utcTimestamp = Math.floor(new Date(now.getUTCFullYear(),now.getUTCMonth(), now.getUTCDate(),
+                    now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), now.getUTCMilliseconds()).getTime() / 1000);
+
+                for(const mediaId in fill) {
+                    if(!fill.hasOwnProperty(mediaId)) {
+                        continue;
+                    }
+
+                    const contentType = cachedJson.media[mediaId].contentType;
+                    let cacheTTL = cachedJson.media[mediaId].cacheTTL ? cachedJson.media[mediaId].cacheTTL : 3600;
+
+                    if(!cachedJson.media[mediaId].cacheTTL && contentType && contentType === 'comet/campaign') {
+                        cacheTTL = 7 * 24 * 3600;
+                    }
+
+                    cachedJson.media[mediaId].absoluteCacheTTL = utcTimestamp + cacheTTL;
+                }
+
+                return this._cacheBookkeeping.setCachedCampaignResponse({
+                    url: response.url,
+                    response: JSON.stringify(cachedJson),
+                    responseCode: response.responseCode,
+                    headers: response.headers
+                });
+            });
         } else {
             throw new Error('No placements found');
         }

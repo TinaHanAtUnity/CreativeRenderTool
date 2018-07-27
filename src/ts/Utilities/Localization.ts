@@ -48,15 +48,15 @@ import PortugueseLoadingScreen from 'json/locale/pt/loadingscreen.json';
 interface ILanguageMap {
     [key: string]: { // device language regexp
         [key: string]: { // namespace
-            [key: string]: string // translation map
-        }
+            [key: string]: string; // translation map
+        };
     };
 }
 
 interface ILocalizedAbbreviations {
     [key: string]: { // device language regexp
-        thousand: string,
-        million: string
+        thousand: string;
+        million: string;
     };
 }
 
@@ -87,7 +87,7 @@ export class Localization {
         Localization._languageMap[language][namespace] = map;
     }
 
-    public static getLocalizedAbbreviations(language: string): { thousand: string, million: string } | undefined {
+    public static getLocalizedAbbreviations(language: string): { thousand: string; million: string } | undefined {
         const localizedAbbreviations = Localization._localizedAbbreviations[language];
         if(localizedAbbreviations) {
             return localizedAbbreviations;
@@ -131,12 +131,12 @@ export class Localization {
             'overlay': JSON.parse(GermanOverlay),
             'loadingscreen': JSON.parse(GermanLoadingScreen)
         },
-        'zh(_Hant)?(_TW|_HK|_MO|_Hant)+$': {
+        'zh(_TW|_HK|_MO|_#?Hant)?(_TW|_HK|_MO|_#?Hant)+$': {
             'endscreen': JSON.parse(ChineseTraditionalEndscreen),
             'overlay': JSON.parse(ChineseTraditionalOverlay),
             'loadingscreen': JSON.parse(ChineseTraditionalLoadingScreen)
         },
-        'zh(_Hans)?(_\\D\\D)?$': {
+        'zh(((_#?Hans)?(_\\D\\D)?)|((_\\D\\D)?(_#?Hans)?))$': {
             'endscreen': JSON.parse(ChineseSimplifiedEndscreen),
             'overlay': JSON.parse(ChineseSimplifiedOverlay),
             'loadingscreen': JSON.parse(ChineseSimplifiedLoadingScreen)

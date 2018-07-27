@@ -109,7 +109,7 @@ export class WebView {
         this._nativeBridge = nativeBridge;
 
         if(window && window.addEventListener) {
-            window.addEventListener('error', (event) => this.onError(<ErrorEvent>event), false);
+            window.addEventListener('error', (event) => this.onError(event), false);
         }
     }
 

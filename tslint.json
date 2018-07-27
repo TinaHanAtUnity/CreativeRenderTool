@@ -4,7 +4,6 @@
     "no-import-side-effect": false,
     "missing-jsdoc": false,
     "typedef": [false, "call-signature", "arrow-call-signature", "parameter", "arrow-parameter", "property-declaration", "variable-declaration", "member-variable-declaration"],
-    "no-function-expression": false,
     "variable-name": false,
     "no-bitwise": false,
     "no-this-assignment": false,
@@ -29,12 +28,10 @@
     "no-parameter-reassignment": false,
     "ordered-imports": false,
     "import-name": false,
-    "no-unnecessary-type-assertion": false,
     "match-default-export-name": false,
     "completed-docs": [false, "classes"],
     "no-inner-html": false,
     "member-ordering": [false, { "order": "fields-first" }],
-    "type-literal-delimiter": false,
     "no-suspicious-comment": false,
     "no-non-null-assertion": false,
     "align": [false, "parameters", "arguments", "statements"],
@@ -57,10 +54,7 @@
     "mocha-no-side-effect-code": false,
     "no-http-string": [false, "http://www.example.com/?.*", "http://www.examples.com/?.*"],
     "no-unnecessary-callback-wrapper": false,
-    "number-literal-format": false,
-    "no-unnecessary-qualifier": false,
     "export-name": false,
-    "insecure-random": false,
-    "use-default-type-parameter": false
+    "insecure-random": false
   }
 }

@@ -63,18 +63,18 @@ class TestStorageApi extends StorageApi {
             id = id.split('.')[0];
 
             if(this._contents && this._contents.cache && this._contents.cache.files && this._contents.cache.files[id]) {
-                return Promise.resolve(<any>this._contents.cache.files[id]);
+                return Promise.resolve(this._contents.cache.files[id]);
             }
         }
         if (key && key.match(/^cache\.campaigns\./)) {
             const id: string = key.substring(16);
             if(this._contents && this._contents.cache && this._contents.cache.campaigns && this._contents.cache.campaigns[id]) {
-                return Promise.resolve(<any>this._contents.cache.campaigns[id]);
+                return Promise.resolve(this._contents.cache.campaigns[id]);
             }
         }
         if (key && key.match(/^cache\.campaigns/)) {
             if(this._contents && this._contents.cache && this._contents.cache.campaigns) {
-                return Promise.resolve(<any>this._contents.cache.campaigns);
+                return Promise.resolve(this._contents.cache.campaigns);
             }
         }
 

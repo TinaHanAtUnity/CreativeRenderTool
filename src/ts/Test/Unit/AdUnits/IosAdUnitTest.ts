@@ -140,19 +140,19 @@ describe('IosAdUnitTest', () => {
 
         let onShowTriggered: boolean = false;
         const listener: IAdUnitContainerListener = {
-            onContainerShow: function() {
+            onContainerShow: () => {
                 onShowTriggered = true;
             },
-            onContainerDestroy: function() {
+            onContainerDestroy: () => {
                 // EMPTY
             },
-            onContainerBackground: function() {
+            onContainerBackground: () => {
                 // EMPTY
             },
-            onContainerForeground: function() {
+            onContainerForeground: () => {
                 // EMPTY
             },
-            onContainerSystemMessage: function(message: AdUnitContainerSystemMessage) {
+            onContainerSystemMessage: (message: AdUnitContainerSystemMessage) => {
                 // EMPTY
             }
         };
@@ -172,19 +172,19 @@ describe('IosAdUnitTest', () => {
 
         beforeEach(() => {
             const listener: IAdUnitContainerListener = {
-                onContainerShow: function() {
+                onContainerShow: () => {
                     // EMPTY
                 },
-                onContainerDestroy: function() {
+                onContainerDestroy: () => {
                     // EMPTY
                 },
-                onContainerBackground: function() {
+                onContainerBackground: () => {
                     onContainerVisibilityChanged = true;
                 },
-                onContainerForeground: function() {
+                onContainerForeground: () => {
                     onContainerVisibilityChanged = true;
                 },
-                onContainerSystemMessage: function(message: AdUnitContainerSystemMessage) {
+                onContainerSystemMessage: (message: AdUnitContainerSystemMessage) => {
                     onContainerSystemMessage = true;
                 }
             };
