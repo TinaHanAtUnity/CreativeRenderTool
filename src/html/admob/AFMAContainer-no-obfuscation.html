@@ -62,6 +62,7 @@
 
         var AFMA = function() {
             var self = this;
+            this.nonRewardedStart = false;
             this.intentCallbacks = {};
             this.intentCallbackId = 0;
             this.sentQuartiles = {};
@@ -93,7 +94,11 @@
 
                 videoEl.addEventListener('timeupdate', function() {
                     var quartile = Math.floor((videoEl.currentTime / videoEl.duration) * 4);
-                    if (quartile !== 0 && !(quartile in self.sentQuartiles)) {
+                    // Bandaid fix so Admob doesn't have to make a "notifyNonrewardedVideoStart"
+                    if (!self.nonRewardedStart && quartile > 0) {
+                        self.nonRewardedStart = true;
+                        self.notifyRewardedVideoStart();
+                    } else if (quartile !== 0 && !(quartile in self.sentQuartiles)) {
                         self.sentQuartiles[quartile] = true;
                         var adQuartile;
                         switch (quartile) {
@@ -218,6 +223,7 @@
             };
 
             this.notifyRewardedVideoStart = function() {
+                self.nonRewardedStart = true;
                 this.postMessage('rewardedVideoStart');
             };
 
