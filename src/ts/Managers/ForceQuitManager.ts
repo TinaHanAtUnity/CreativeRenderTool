@@ -8,7 +8,7 @@ export interface IForceQuitData {
 
 export class ForceQuitManager {
 
-    private static ForceQuitKey = 'ad.forcequit';
+    private static ForceQuitKey = 'ForceQuitManager.ForceQuitKey';
     private _nativeBridge: NativeBridge;
 
     constructor(nativeBridge: NativeBridge) {

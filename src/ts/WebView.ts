@@ -285,7 +285,7 @@ export class WebView {
                 throw error;
             });
         }).then(() => {
-            // send diagnostics event for abnormal ad termination
+            // Send diagnostic events for abnormal ad termination
             return this._forceQuitManager.getForceQuitData().then((forceQuitData) => {
                 if (forceQuitData && forceQuitData.adSession) {
                     const error = new DiagnosticError(new Error('Ad Force Quit'), {
@@ -293,7 +293,6 @@ export class WebView {
                         deviceInfo: this._deviceInfo
                     });
 
-                    // Eventually output these to PTS rather than Kibana
                     Diagnostics.trigger('force_quit', error, forceQuitData.adSession);
                     this._forceQuitManager.destroyForceQuitKey();
                 }

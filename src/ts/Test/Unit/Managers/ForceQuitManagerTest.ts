@@ -5,11 +5,11 @@ import { assert } from 'chai';
 import { ForceQuitManager, IForceQuitData } from 'Managers/ForceQuitManager';
 import { StorageType } from 'Native/Api/Storage';
 import { NativeBridge } from 'Native/NativeBridge';
-import { TestFixtures } from '../TestHelpers/TestFixtures';
+import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
 
 describe('ForceQuitManagerTest', () => {
 
-    const ForceQuitKey = 'ad.forcequit';
+    const ForceQuitKey = 'ForceQuitManager.ForceQuitKey';
     let nativeBridge: NativeBridge;
     let forceQuitData: IForceQuitData;
     let forceQuitManager: ForceQuitManager;
