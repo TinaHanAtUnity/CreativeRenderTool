@@ -39,12 +39,14 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
     private _playableStartTimestamp: number;
     private _backgroundTime: number = 0;
     private _backgroundTimestamp: number;
+    private _creativeId: string | undefined;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
         super(nativeBridge, 'mraid', placement, campaign, privacy, showGDPRBanner);
 
         this._placement = placement;
         this._campaign = campaign;
+        this._creativeId = campaign.getCreativeId();
 
         this._template = new Template(MRAIDTemplate);
 
@@ -90,8 +92,8 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
             SdkStats.setFrameSetStartTimestamp(this._placement.getId());
             this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' set iframe.src started ' + SdkStats.getFrameSetStartTimestamp(this._placement.getId()));
             iframe.srcdoc = mraid;
-            const creativeId: string | undefined = this._campaign.getCreativeId();
-            if (CustomFeatures.isSonicPlayable(creativeId)) {
+
+            if (CustomFeatures.isSonicPlayable(this._creativeId)) {
                 iframe.sandbox = 'allow-scripts allow-same-origin';
             }
         }).catch(e => this._nativeBridge.Sdk.logError('failed to create mraid: ' + e));
@@ -277,10 +279,12 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
                 }));
                 break;
             case 'analyticsEvent':
-                const timeFromShow = this.checkIsValid((Date.now() - this._showTimestamp) / 1000);
-                const timeFromPlayableStart = this.checkIsValid((Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000);
-                const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
-                this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, event.data.event, event.data.eventData));
+                if(CustomFeatures.isSonicPlayable(this._creativeId)) {
+                    const timeFromShow = this.checkIsValid((Date.now() - this._showTimestamp) / 1000);
+                    const timeFromPlayableStart = this.checkIsValid((Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000);
+                    const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
+                    this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, event.data.event, event.data.eventData));
+                }
                 break;
 
             case 'customMraidState':
