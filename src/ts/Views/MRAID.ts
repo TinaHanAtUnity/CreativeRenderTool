@@ -150,10 +150,12 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
             }, 1000);
         }
 
-        this._playableStartTimestamp = Date.now();
-        const timeFromShow = this.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
-        const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
-        this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_start', undefined));
+        if(CustomFeatures.isSonicPlayable(this._creativeId)) {
+            this._playableStartTimestamp = Date.now();
+            const timeFromShow = this.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
+            const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
+            this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_start', undefined));
+        }
 
         if(this._loaded) {
             this.setViewableState(true);
