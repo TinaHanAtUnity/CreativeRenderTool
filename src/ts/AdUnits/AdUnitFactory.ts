@@ -155,7 +155,7 @@ export class AdUnitFactory {
             language: parameters.deviceInfo.getLanguage(),
             gameId: parameters.clientInfo.getGameId(),
             targetGameName: targetGameName,
-            abGroup: parameters.campaign.getAbGroup(),
+            abGroup: parameters.configuration.getAbGroup(),
             privacy: privacy,
             showGDPRBanner: showGDPRBanner,
             adUnitStyle: undefined,

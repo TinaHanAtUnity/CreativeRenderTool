@@ -1,8 +1,9 @@
-# Pending
+# Mon Jul 30 21:52:01 UTC 2018
 
 * Fix GDPR Privacy width for iPhone X in landscape
 * Sending unity internal tracking events for clicks after followRedirectChain
 * Tslint number-literal-format
+* Sonic Creative temporary creative ID Whitelist
 
 # Wed Jul 25 20:12:52 UTC 2018
 
