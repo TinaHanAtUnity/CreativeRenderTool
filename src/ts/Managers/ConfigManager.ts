@@ -79,7 +79,7 @@ export class ConfigManager {
                 }
             }).catch(error => {
                 if (error instanceof RequestError) {
-                    const requestError = <RequestError>error;
+                    const requestError = error;
                     if (requestError.nativeResponse && requestError.nativeResponse.responseCode) {
                         jaegerSpan.addTag(JaegerTags.StatusCode, requestError.nativeResponse.responseCode.toString());
                     }

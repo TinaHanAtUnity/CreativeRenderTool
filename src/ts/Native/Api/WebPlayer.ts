@@ -42,39 +42,39 @@ export enum WebplayerEvent {
 }
 
 export interface IWebPlayerEventSettings {
-    onPageStarted?: { sendEvent?: boolean, shouldCallSuper?: boolean };
-    onPageFinished?: { sendEvent?: boolean, shouldCallSuper?: boolean };
-    onReceivedError?: { sendEvent?: boolean, shouldCallSuper?: boolean };
-    onLoadResource?: { sendEvent?: boolean, shouldCallSuper?: boolean };
-    onReceivedSslError?: { sendEvent?: boolean, shouldCallSuper?: boolean };
-    onReceivedClientCertRequest?: { sendEvent?: boolean, shouldCallSuper?: boolean };
-    onReceivedHttpAuthRequest?: { sendEvent?: boolean, shouldCallSuper?: boolean };
-    onScaleChanged?: { sendEvent?: boolean, shouldCallSuper?: boolean };
-    onReceivedLoginRequest?: { sendEvent?: boolean, shouldCallSuper?: boolean };
-    onReceivedHttpError?: { sendEvent?: boolean, shouldCallSuper?: boolean };
-    onGeolocationPermissionsShowPrompt?: { sendEvent?: boolean, shouldCallSuper?: boolean };
-    onPermissionRequest?: { sendEvent?: boolean, shouldCallSuper?: boolean };
-    onProgressChanged?: { sendEvent?: boolean, shouldCallSuper?: boolean };
-    onReceivedTitle?: { sendEvent?: boolean, shouldCallSuper?: boolean };
-    onReceivedIcon?: { sendEvent?: boolean, shouldCallSuper?: boolean };
-    onReceivedTouchIconUrl?: { sendEvent?: boolean, shouldCallSuper?: boolean };
-    onShowCustomView?: { sendEvent?: boolean, shouldCallSuper?: boolean };
-    onHideCustomView?: { sendEvent?: boolean, shouldCallSuper?: boolean };
-    onCreateWindow?: { sendEvent?: boolean, shouldCallSuper?: boolean, getReturnValue?: boolean };
-    onRequestFocus?: { sendEvent?: boolean, shouldCallSuper?: boolean };
-    onCloseWindow?: { sendEvent?: boolean, shouldCallSuper?: boolean };
-    onJsAlert?: { sendEvent?: boolean, shouldCallSuper?: boolean, getReturnValue?: boolean };
-    onJsConfirm?: { sendEvent?: boolean, shouldCallSuper?: boolean, getReturnValue?: boolean };
-    onJsPrompt?: { sendEvent?: boolean, shouldCallSuper?: boolean, getReturnValue?: boolean };
-    onConsoleMessage?: { sendEvent?: boolean, shouldCallSuper?: boolean, getReturnValue?: boolean };
-    onShowFileChooser?: { sendEvent?: boolean, shouldCallSuper?: boolean, getReturnValue?: boolean };
-    onDownloadStart?: { sendEvent?: boolean, shouldCallSuper?: boolean, getReturnValue?: boolean };
-    shouldOverrideUrlLoading?: { sendEvent?: boolean, shouldCallSuper?: boolean, getReturnValue?: boolean };
-    onPageCommitVisible?: { sendEvent?: boolean, shouldCallSuper?: boolean };
-    shouldInterceptRequest?: { sendEvent?: boolean, shouldCallSuper?: boolean };
-    onFormResubmission?: { sendEvent?: boolean, shouldCallSuper?: boolean };
-    shouldOverrideKeyEvent?: { sendEvent?: boolean, shouldCallSuper?: boolean, getReturnValue?: boolean };
-    onUnhandledKeyEvent?: { sendEvent?: boolean, shouldCallSuper?: boolean };
+    onPageStarted?: { sendEvent?: boolean; shouldCallSuper?: boolean };
+    onPageFinished?: { sendEvent?: boolean; shouldCallSuper?: boolean };
+    onReceivedError?: { sendEvent?: boolean; shouldCallSuper?: boolean };
+    onLoadResource?: { sendEvent?: boolean; shouldCallSuper?: boolean };
+    onReceivedSslError?: { sendEvent?: boolean; shouldCallSuper?: boolean };
+    onReceivedClientCertRequest?: { sendEvent?: boolean; shouldCallSuper?: boolean };
+    onReceivedHttpAuthRequest?: { sendEvent?: boolean; shouldCallSuper?: boolean };
+    onScaleChanged?: { sendEvent?: boolean; shouldCallSuper?: boolean };
+    onReceivedLoginRequest?: { sendEvent?: boolean; shouldCallSuper?: boolean };
+    onReceivedHttpError?: { sendEvent?: boolean; shouldCallSuper?: boolean };
+    onGeolocationPermissionsShowPrompt?: { sendEvent?: boolean; shouldCallSuper?: boolean };
+    onPermissionRequest?: { sendEvent?: boolean; shouldCallSuper?: boolean };
+    onProgressChanged?: { sendEvent?: boolean; shouldCallSuper?: boolean };
+    onReceivedTitle?: { sendEvent?: boolean; shouldCallSuper?: boolean };
+    onReceivedIcon?: { sendEvent?: boolean; shouldCallSuper?: boolean };
+    onReceivedTouchIconUrl?: { sendEvent?: boolean; shouldCallSuper?: boolean };
+    onShowCustomView?: { sendEvent?: boolean; shouldCallSuper?: boolean };
+    onHideCustomView?: { sendEvent?: boolean; shouldCallSuper?: boolean };
+    onCreateWindow?: { sendEvent?: boolean; shouldCallSuper?: boolean; getReturnValue?: boolean };
+    onRequestFocus?: { sendEvent?: boolean; shouldCallSuper?: boolean };
+    onCloseWindow?: { sendEvent?: boolean; shouldCallSuper?: boolean };
+    onJsAlert?: { sendEvent?: boolean; shouldCallSuper?: boolean; getReturnValue?: boolean };
+    onJsConfirm?: { sendEvent?: boolean; shouldCallSuper?: boolean; getReturnValue?: boolean };
+    onJsPrompt?: { sendEvent?: boolean; shouldCallSuper?: boolean; getReturnValue?: boolean };
+    onConsoleMessage?: { sendEvent?: boolean; shouldCallSuper?: boolean; getReturnValue?: boolean };
+    onShowFileChooser?: { sendEvent?: boolean; shouldCallSuper?: boolean; getReturnValue?: boolean };
+    onDownloadStart?: { sendEvent?: boolean; shouldCallSuper?: boolean; getReturnValue?: boolean };
+    shouldOverrideUrlLoading?: { sendEvent?: boolean; shouldCallSuper?: boolean; getReturnValue?: boolean };
+    onPageCommitVisible?: { sendEvent?: boolean; shouldCallSuper?: boolean };
+    shouldInterceptRequest?: { sendEvent?: boolean; shouldCallSuper?: boolean };
+    onFormResubmission?: { sendEvent?: boolean; shouldCallSuper?: boolean };
+    shouldOverrideKeyEvent?: { sendEvent?: boolean; shouldCallSuper?: boolean; getReturnValue?: boolean };
+    onUnhandledKeyEvent?: { sendEvent?: boolean; shouldCallSuper?: boolean };
 }
 
 export interface IWebPlayerWebSettingsAndroid {
@@ -124,8 +124,7 @@ export interface IWebPlayerWebSettingsAndroid {
     setSupportZoom?: [ boolean ];
     setTextZoom?: [ number ];
     setUseWideViewPort?: [ boolean ];
-    setLayoutAlgorithm?: [ { type: 'Enum', className: 'android.webkit.WebSettings$LayoutAlgorithm',
-        value: 'NARROW_COLUMNS' | 'NORMAL' | 'SINGLE_COLUMN' | 'TEXT_AUTOSIZING' } ];
+    setLayoutAlgorithm?: [ { type: 'Enum'; className: 'android.webkit.WebSettings$LayoutAlgorithm'; value: 'NARROW_COLUMNS' | 'NORMAL' | 'SINGLE_COLUMN' | 'TEXT_AUTOSIZING' } ];
 }
 
 export interface IWebPlayerPlayerSettingsAndroid {
@@ -160,7 +159,7 @@ export enum WKAudiovisualMediaTypes {
     NONE    = 0,
     AUDIO   = 1 << 0,
     VIDEO   = 1 << 1,
-    ALL     = WKAudiovisualMediaTypes.AUDIO | WKAudiovisualMediaTypes.VIDEO
+    ALL     = AUDIO | VIDEO
 }
 
 export enum WebPlayerViewId {

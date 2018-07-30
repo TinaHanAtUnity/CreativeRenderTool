@@ -22,11 +22,15 @@ export interface IBuildInformation {
     webviewHash: string | null;
     app: string;
     appVersion: string;
+    creativeId: string | undefined;
+    seatId: number | undefined;
+    timestampUTC: string;
 }
 
 export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
 
     public static createBuildInformation(clientInfo: ClientInfo, campaign: Campaign, nativeBridge: NativeBridge) {
+        const date = new Date();
         AbstractPrivacy.buildInformation = {
             userAgent: window.navigator.userAgent,
             platform: clientInfo.getPlatform() === Platform.IOS ? 'iOS' : 'Android',
@@ -37,7 +41,10 @@ export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
             webview: clientInfo.getWebviewVersion(),
             webviewHash: clientInfo.getWebviewHash(),
             app: clientInfo.getApplicationName(),
-            appVersion: clientInfo.getApplicationVersion()
+            appVersion: clientInfo.getApplicationVersion(),
+            creativeId: campaign.getCreativeId(),
+            seatId: campaign.getSeatId(),
+            timestampUTC: `${date.getUTCMonth()}/${date.getUTCDay()} - ${date.getUTCHours()}:${date.getUTCMinutes()}`
         };
     }
 

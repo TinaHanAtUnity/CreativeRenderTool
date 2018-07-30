@@ -10,14 +10,14 @@ import { BannerCampaign } from 'AdTypes/Banner/Models/Campaigns/BannerCampaign';
 import { Request } from 'Utilities/Request';
 
 import BannerCampaignJSON from 'json/campaigns/banner/ValidBannerCampaign.json';
-import { ABGroup } from 'Models/ABGroup';
+import { ABGroupBuilder } from 'Models/ABGroup';
 
 describe('BannerCampaignParser', () => {
     const placements = ['TestPlacement'];
     const gamerId = 'TestGamerId';
     const mediaId = 'o2YMT0Cmps6xHiOwNMeCrH';
     const correlationId = '583dfda0d933a3630a53249c';
-    const abGroup = ABGroup.getAbGroup(99);
+    const abGroup = ABGroupBuilder.getAbGroup(99);
 
     let parser: BannerCampaignParser;
     let nativeBridge: NativeBridge;

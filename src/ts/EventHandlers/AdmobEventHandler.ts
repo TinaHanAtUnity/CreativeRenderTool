@@ -109,7 +109,6 @@ export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHa
     public onVideoStart(): void {
         // this._timeoutTimer.stop();
         this._adUnit.sendStartEvent();
-        this._adUnit.sendImpressionEvent();
     }
 
     public onShow(): void {

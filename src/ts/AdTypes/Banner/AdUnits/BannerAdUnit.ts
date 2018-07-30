@@ -43,7 +43,7 @@ export class BannerAdUnit {
         this._campaign = parameters.campaign;
         this._clientInfo = parameters.clientInfo;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
-        this._webPlayerContainer = parameters.webPlayerContainer!;
+        this._webPlayerContainer = parameters.webPlayerContainer;
         this._template = new Template(BannerContainer);
     }
 
@@ -63,7 +63,7 @@ export class BannerAdUnit {
                         this._webPlayerContainer.onPageFinished.unsubscribe(observer);
                         this.setUpBannerPlayerEvents(true).then(() => resolve());
                     });
-                    this._webPlayerContainer.setData(container!, 'text/html', 'UTF-8');
+                    this._webPlayerContainer.setData(container, 'text/html', 'UTF-8');
                 });
             });
     }

@@ -1,6 +1,6 @@
 import { IConfiguration, Configuration, CacheMode } from 'Models/Configuration';
 import { Placement } from 'Models/Placement';
-import { ABGroup } from 'Models/ABGroup';
+import { ABGroupBuilder } from 'Models/ABGroup';
 import { MixedPlacementUtility, MixedPlacementTypes } from 'Utilities/MixedPlacementUtility';
 import { ClientInfo } from 'Models/ClientInfo';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
@@ -45,7 +45,7 @@ export class ConfigurationParser {
             enabled: configJson.enabled,
             country: configJson.country,
             coppaCompliant: configJson.coppaCompliant,
-            abGroup: ABGroup.getAbGroup(configJson.abGroup),
+            abGroup: ABGroupBuilder.getAbGroup(configJson.abGroup),
             gamerId: configJson.gamerId,
             properties: configJson.properties,
             cacheMode: this.parseCacheMode(configJson),

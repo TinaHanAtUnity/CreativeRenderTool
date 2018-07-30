@@ -16,6 +16,7 @@ import { Placement } from 'Models/Placement';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Request } from 'Utilities/Request';
 import { WebPlayerContainer } from 'Utilities/WebPlayer/WebPlayerContainer';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 export class BannerAdUnitParametersFactory {
 
@@ -31,8 +32,9 @@ export class BannerAdUnitParametersFactory {
     private _adMobSignalFactory: AdMobSignalFactory;
     private _webPlayerContainer: WebPlayerContainer;
     private _gdprManager: GdprManager;
+    private _programmaticTrackingService: ProgrammaticTrackingService;
 
-    constructor(nativeBridge: NativeBridge, request: Request, metadataManager: MetaDataManager, configuration: Configuration, container: AdUnitContainer, deviceInfo: DeviceInfo, clientInfo: ClientInfo, sessionManager: SessionManager, focusManager: FocusManager, analyticsManager: AnalyticsManager, adMobSignalFactory: AdMobSignalFactory, gdprManager: GdprManager, webPlayerContainer: WebPlayerContainer) {
+    constructor(nativeBridge: NativeBridge, request: Request, metadataManager: MetaDataManager, configuration: Configuration, container: AdUnitContainer, deviceInfo: DeviceInfo, clientInfo: ClientInfo, sessionManager: SessionManager, focusManager: FocusManager, analyticsManager: AnalyticsManager, adMobSignalFactory: AdMobSignalFactory, gdprManager: GdprManager, webPlayerContainer: WebPlayerContainer, programmaticTrackingService: ProgrammaticTrackingService) {
         this._nativeBridge = nativeBridge;
         this._request = request;
         this._metadataManager = metadataManager;
@@ -45,6 +47,7 @@ export class BannerAdUnitParametersFactory {
         this._adMobSignalFactory = adMobSignalFactory;
         this._gdprManager = gdprManager;
         this._webPlayerContainer = webPlayerContainer;
+        this._programmaticTrackingService = programmaticTrackingService;
     }
 
     public create(campaign: Campaign, placement: Placement, options: any): Promise<IAdUnitParameters<Campaign>> {
@@ -78,7 +81,8 @@ export class BannerAdUnitParametersFactory {
                 request: this._request,
                 options: options,
                 adMobSignalFactory: this._adMobSignalFactory,
-                gdprManager: this._gdprManager
+                gdprManager: this._gdprManager,
+                programmaticTrackingService: this._programmaticTrackingService
             };
         });
     }

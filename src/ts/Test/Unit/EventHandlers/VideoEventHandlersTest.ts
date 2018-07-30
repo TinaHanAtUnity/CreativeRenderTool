@@ -46,6 +46,7 @@ import { AndroidVideoEventHandler } from 'EventHandlers/AndroidVideoEventHandler
 import { VideoState } from 'AdUnits/VideoAdUnit';
 import { Privacy } from 'Views/Privacy';
 import { GdprManager } from 'Managers/GdprManager';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 describe('VideoEventHandlersTest', () => {
 
@@ -74,6 +75,7 @@ describe('VideoEventHandlersTest', () => {
     let xPromoEndScreen: XPromoEndScreen;
     let performanceVideoEventHandler: PerformanceVideoEventHandler;
     let videoEventHandlerParams: IVideoEventHandlerParams;
+    let programmaticTrackingService: ProgrammaticTrackingService;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -95,6 +97,7 @@ describe('VideoEventHandlersTest', () => {
         sessionManager = new SessionManager(nativeBridge, request);
         vastCampaign = TestFixtures.getEventVastCampaign();
         performanceCampaign = TestFixtures.getCampaign();
+        programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
         operativeEventManagerParams = {
             nativeBridge: nativeBridge,
@@ -132,7 +135,8 @@ describe('VideoEventHandlersTest', () => {
             endScreen: undefined,
             overlay: overlay,
             video: video,
-            gdprManager: gdprManager
+            gdprManager: gdprManager,
+            programmaticTrackingService: programmaticTrackingService
         };
 
         performanceAdUnitParameters = {
@@ -152,7 +156,8 @@ describe('VideoEventHandlersTest', () => {
             overlay: overlay,
             video: video,
             privacy: privacy,
-            gdprManager: gdprManager
+            gdprManager: gdprManager,
+            programmaticTrackingService: programmaticTrackingService
         };
 
         const xpromoPrivacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
@@ -175,7 +180,8 @@ describe('VideoEventHandlersTest', () => {
             overlay: overlay,
             video: video,
             privacy: privacy,
-            gdprManager: gdprManager
+            gdprManager: gdprManager,
+            programmaticTrackingService: programmaticTrackingService
         };
 
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
@@ -396,14 +402,14 @@ describe('VideoEventHandlersTest', () => {
         it('should set video volume to 1.0 by default', () => {
             performanceVideoEventHandler.onPrepared(video.getUrl(), video.getDuration(), 1024, 768);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.VideoPlayer.setVolume, new Double(1.0));
+            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.VideoPlayer.setVolume, new Double(1));
         });
 
         it('should set video volume to 0.0 when overlay says it is muted', () => {
             overlay.isMuted = sinon.mock().returns(true);
             performanceVideoEventHandler.onPrepared(video.getUrl(), video.getDuration(), 1024, 768);
 
-            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.VideoPlayer.setVolume, new Double(0.0));
+            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.VideoPlayer.setVolume, new Double(0));
         });
 
         it('should just play when video position is set to 0', () => {

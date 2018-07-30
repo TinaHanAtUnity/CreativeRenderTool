@@ -18,14 +18,14 @@ import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Url } from 'Utilities/Url';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { VastParser } from 'Utilities/VastParser';
-import { ABGroup } from 'Models/ABGroup';
+import { ABGroupBuilder } from 'Models/ABGroup';
 
 describe('ProgrammaticVastParser', () => {
     const placements = ['TestPlacement'];
     const gamerId = 'TestGamerId';
     const mediaId = 'o2YMT0Cmps6xHiOwNMeCrH';
     const correlationId = '583dfda0d933a3630a53249c';
-    const abGroup = ABGroup.getAbGroup(0);
+    const abGroup = ABGroupBuilder.getAbGroup(0);
 
     let parser: ProgrammaticVastParser;
     let nativeBridge: NativeBridge;
@@ -68,7 +68,7 @@ describe('ProgrammaticVastParser', () => {
                 assert.equal(campaign.getAbGroup(), abGroup, 'ABGroup is not equal');
                 assert.equal(campaign.getSession(), session, 'Session is not equal');
                 assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not the equal');
-                assert.equal(campaign.getVideo()!.getUrl(), vast.getVideoUrl(), 'Video URL is not the same');
+                assert.equal(campaign.getVideo().getUrl(), vast.getVideoUrl(), 'Video URL is not the same');
             });
         });
     });

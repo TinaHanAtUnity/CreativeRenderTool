@@ -22,6 +22,7 @@ import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { GdprManager } from 'Managers/GdprManager';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 describe('IosAdUnitTest', () => {
     let nativeBridge: NativeBridge;
@@ -52,6 +53,7 @@ describe('IosAdUnitTest', () => {
         const campaign = TestFixtures.getCampaign();
         const configuration = TestFixtures.getConfiguration();
         const gdprManager = sinon.createStubInstance(GdprManager);
+        const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             nativeBridge: nativeBridge,
             request: request,
@@ -76,7 +78,8 @@ describe('IosAdUnitTest', () => {
             configuration: configuration,
             request: request,
             options: {},
-            gdprManager: gdprManager
+            gdprManager: gdprManager,
+            programmaticTrackingService: programmaticTrackingService
         };
     });
 
@@ -137,19 +140,19 @@ describe('IosAdUnitTest', () => {
 
         let onShowTriggered: boolean = false;
         const listener: IAdUnitContainerListener = {
-            onContainerShow: function() {
+            onContainerShow: () => {
                 onShowTriggered = true;
             },
-            onContainerDestroy: function() {
+            onContainerDestroy: () => {
                 // EMPTY
             },
-            onContainerBackground: function() {
+            onContainerBackground: () => {
                 // EMPTY
             },
-            onContainerForeground: function() {
+            onContainerForeground: () => {
                 // EMPTY
             },
-            onContainerSystemMessage: function(message: AdUnitContainerSystemMessage) {
+            onContainerSystemMessage: (message: AdUnitContainerSystemMessage) => {
                 // EMPTY
             }
         };
@@ -169,19 +172,19 @@ describe('IosAdUnitTest', () => {
 
         beforeEach(() => {
             const listener: IAdUnitContainerListener = {
-                onContainerShow: function() {
+                onContainerShow: () => {
                     // EMPTY
                 },
-                onContainerDestroy: function() {
+                onContainerDestroy: () => {
                     // EMPTY
                 },
-                onContainerBackground: function() {
+                onContainerBackground: () => {
                     onContainerVisibilityChanged = true;
                 },
-                onContainerForeground: function() {
+                onContainerForeground: () => {
                     onContainerVisibilityChanged = true;
                 },
-                onContainerSystemMessage: function(message: AdUnitContainerSystemMessage) {
+                onContainerSystemMessage: (message: AdUnitContainerSystemMessage) => {
                     onContainerSystemMessage = true;
                 }
             };

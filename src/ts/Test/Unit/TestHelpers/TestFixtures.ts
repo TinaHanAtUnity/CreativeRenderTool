@@ -44,7 +44,7 @@ import EventTestVast from 'xml/EventTestVast.xml';
 import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xml';
 
 import * as sinon from 'sinon';
-import { ABGroup } from 'Models/ABGroup';
+import { ABGroup, ABGroupBuilder } from 'Models/ABGroup';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -333,7 +333,7 @@ export class TestFixtures {
         const session = this.getSession();
         const isRewardedPromo = (rewardedPromo !== undefined) ? rewardedPromo : false;
         return {
-            ... this.getCometCampaignBaseParams(session, json.promo.id, json.gamerId, ABGroup.getAbGroup(json.abGroup), json.meta, adType),
+            ... this.getCometCampaignBaseParams(session, json.promo.id, json.gamerId, ABGroupBuilder.getAbGroup(json.abGroup), json.meta, adType),
             iapProductId: json.promo.iapProductId,
             additionalTrackingEvents: json.promo.tracking ? json.promo.tracking : undefined,
             dynamicMarkup: json.promo.dynamicMarkup,
@@ -460,10 +460,10 @@ export class TestFixtures {
             platform = Platform.TEST;
         }
         const backend = {
-            handleInvocation: function() {
+            handleInvocation: () => {
                 // no-op
             },
-            handleCallback: function() {
+            handleCallback: () => {
                 // no-op
             }
         };
@@ -552,7 +552,7 @@ export class TestFixtures {
             getHost: sinon.stub().returns(Promise.resolve('host')),
             getProduct: sinon.stub().returns(Promise.resolve('product')),
             getFingerprint: sinon.stub().returns(Promise.resolve('fingerPrint')),
-            getSupportedAbis: sinon.stub().returns(Promise.resolve( ['supported_abi_1', 'supported_abi_2'])),
+            getSupportedAbis: sinon.stub().returns(Promise.resolve(['supported_abi_1', 'supported_abi_2'])),
             getSensorList: sinon.stub().returns(Promise.resolve([])),
             isUSBConnected: sinon.stub().returns(Promise.resolve(false)),
             getUptime: sinon.stub().returns(Promise.resolve(10000)),

@@ -59,7 +59,7 @@ import { GdprManager } from 'Managers/GdprManager';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
-import { ABGroup } from 'Models/ABGroup';
+import { ABGroupBuilder } from 'Models/ABGroup';
 import { BannerAdContext } from 'AdTypes/Banner/Context/BannerAdContext';
 import { BannerCampaignManager } from 'AdTypes/Banner/Managers/BannerCampaignManager';
 import { AuctionRequest } from 'AdTypes/Banner/Utilities/AuctionRequest';
@@ -69,6 +69,7 @@ import { InterstitialWebPlayerContainer } from 'Utilities/WebPlayer/Interstitial
 import { BannerWebPlayerContainer } from 'Utilities/WebPlayer/BannerWebPlayerContainer';
 import { BannerAdUnitParametersFactory } from 'AdTypes/Banner/AdUnits/BannerAdUnitParametersFactory';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { PlacementManager } from 'Managers/PlacementManager';
 
 export class WebView {
 
@@ -118,7 +119,7 @@ export class WebView {
         this._nativeBridge = nativeBridge;
 
         if(window && window.addEventListener) {
-            window.addEventListener('error', (event) => this.onError(<ErrorEvent>event), false);
+            window.addEventListener('error', (event) => this.onError(event), false);
         }
     }
 
@@ -128,7 +129,7 @@ export class WebView {
             jaegerInitSpan.addAnnotation('nativeBridge loadComplete');
             this._clientInfo = new ClientInfo(this._nativeBridge.getPlatform(), data);
 
-            if(!/^\d+$/.test( this._clientInfo.getGameId())) {
+            if(!/^\d+$/.test(this._clientInfo.getGameId())) {
                 const message = `Provided Game ID '${this._clientInfo.getGameId()}' is invalid. Game ID may contain only digits (0-9).`;
                 this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.INVALID_ARGUMENT], message);
                 return Promise.reject(message);
@@ -230,8 +231,10 @@ export class WebView {
             HttpKafka.setConfiguration(this._configuration);
             this._jaegerManager.setJaegerTracingEnabled(this._configuration.isJaegerTracingEnabled());
 
-            PurchasingUtilities.initialize(this._clientInfo, this._configuration, this._nativeBridge);
+            const placementManager = new PlacementManager(this._nativeBridge, this._configuration);
+            PurchasingUtilities.initialize(this._clientInfo, this._configuration, this._nativeBridge, placementManager);
             PurchasingUtilities.sendPurchaseInitializationEvent();
+            this._nativeBridge.Purchasing.onIAPSendEvent.subscribe((iapPayload) => PurchasingUtilities.handleSendIAPEvent(iapPayload));
 
             if (!this._configuration.isEnabled()) {
                 const error = new Error('Game with ID ' + this._clientInfo.getGameId() +  ' is not enabled');
@@ -274,15 +277,16 @@ export class WebView {
 
             const bannerCampaignManager = new BannerCampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._adMobSignalFactory, this._request, this._clientInfo, this._deviceInfo, this._metadataManager, this._jaegerManager);
             const bannerWebPlayerContainer = new BannerWebPlayerContainer(this._nativeBridge);
-            const bannerAdUnitParametersFactory = new BannerAdUnitParametersFactory(this._nativeBridge, this._request, this._metadataManager, this._configuration, this._container, this._deviceInfo, this._clientInfo, this._sessionManager, this._focusManager, this._analyticsManager, this._adMobSignalFactory, this._gdprManager, bannerWebPlayerContainer);
+            const bannerAdUnitParametersFactory = new BannerAdUnitParametersFactory(this._nativeBridge, this._request, this._metadataManager, this._configuration, this._container, this._deviceInfo, this._clientInfo, this._sessionManager, this._focusManager, this._analyticsManager, this._adMobSignalFactory, this._gdprManager, bannerWebPlayerContainer, this._programmaticTrackingService);
             this._bannerAdContext = new BannerAdContext(this._nativeBridge, bannerAdUnitParametersFactory, bannerCampaignManager, bannerPlacementManager, this._focusManager, this._deviceInfo);
 
             SdkStats.initialize(this._nativeBridge, this._request, this._configuration, this._sessionManager, this._campaignManager, this._metadataManager, this._clientInfo);
 
+            const enableCachedResponse = !CustomFeatures.isCacheUpdateDisabledApp(this._clientInfo.getGameId());
             const refreshSpan = this._jaegerManager.startSpan('Refresh', jaegerInitSpan.id, jaegerInitSpan.traceId);
             refreshSpan.addTag(JaegerTags.DeviceType, Platform[this._nativeBridge.getPlatform()]);
             let refreshPromise;
-            if (this._cachedCampaignResponse !== undefined) {
+            if (this._cachedCampaignResponse !== undefined && enableCachedResponse) {
                 refreshPromise = this._refreshManager.refreshFromCache(this._cachedCampaignResponse, refreshSpan);
             } else {
                 refreshPromise = this._refreshManager.refresh();
@@ -474,6 +478,7 @@ export class WebView {
                 options: options,
                 gdprManager: this._gdprManager,
                 adMobSignalFactory: this._adMobSignalFactory,
+                programmaticTrackingService: this._programmaticTrackingService,
                 webPlayerContainer: this._interstitialWebPlayerContainer
             });
             this._refreshManager.setCurrentAdUnit(this._currentAdUnit);
@@ -587,7 +592,7 @@ export class WebView {
                 // needed in both due to placement level control support
                 const abGroupNumber: number = Number(TestEnvironment.get('abGroup'));
                 if (!isNaN(abGroupNumber)) { // if it is a number get the group
-                    const abGroup = ABGroup.getAbGroup(abGroupNumber);
+                    const abGroup = ABGroupBuilder.getAbGroup(abGroupNumber);
                     ConfigManager.setAbGroup(abGroup);
                     CampaignManager.setAbGroup(abGroup);
                 }

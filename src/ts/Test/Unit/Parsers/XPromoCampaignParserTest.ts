@@ -17,14 +17,14 @@ import XPromoCampaignJSON from 'json/campaigns/xpromo/XPromoCampaign.json';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { Url } from 'Utilities/Url';
 import { StoreName } from 'Models/Campaigns/PerformanceCampaign';
-import { ABGroup } from 'Models/ABGroup';
+import { ABGroupBuilder } from 'Models/ABGroup';
 
 describe('XPromoCampaignParser', () => {
     const placements = ['TestPlacement'];
     const gamerId = 'TestGamerId';
     const mediaId = 'o2YMT0Cmps6xHiOwNMeCrH';
     const correlationId = '583dfda0d933a3630a53249c';
-    const abGroup = ABGroup.getAbGroup(0);
+    const abGroup = ABGroupBuilder.getAbGroup(0);
 
     let parser: XPromoCampaignParser;
     let nativeBridge: NativeBridge;
@@ -90,10 +90,10 @@ describe('XPromoCampaignParser', () => {
                 assert.equal(campaign.getClickAttributionUrl(), Url.encode(content.clickAttributionUrl), 'Click Attribution URL is not equal');
                 assert.equal(campaign.getClickAttributionUrlFollowsRedirects(), content.clickAttributionUrlFollowsRedirects, 'Click Attribution Url follows redirects is not equal');
                 assert.equal(campaign.getGameName(), content.gameName, 'Game Name is equal');
-                assert.equal(campaign.getGameIcon()!.getUrl(), Url.encode(content.gameIcon), 'Game Icon is not equal');
+                assert.equal(campaign.getGameIcon().getUrl(), Url.encode(content.gameIcon), 'Game Icon is not equal');
                 assert.equal(campaign.getRating(), content.rating, 'Rating is not the same');
-                assert.equal(campaign.getLandscape()!.getOriginalUrl(), Url.encode(content.endScreenLandscape), 'Landscape URL is not equal');
-                assert.equal(campaign.getPortrait()!.getOriginalUrl(), Url.encode(content.endScreenPortrait), 'Portrait URL is not equal');
+                assert.equal(campaign.getLandscape().getOriginalUrl(), Url.encode(content.endScreenLandscape), 'Landscape URL is not equal');
+                assert.equal(campaign.getPortrait().getOriginalUrl(), Url.encode(content.endScreenPortrait), 'Portrait URL is not equal');
                 assert.equal(campaign.getBypassAppSheet(), content.bypassAppSheet, 'Bypass App Sheet is not equal');
                 assert.equal(campaign.getStore(), getStore(content.store), 'Store is not equal');
                 assert.equal(campaign.getAppStoreId(), content.appStoreId, 'App Store ID is not equal');

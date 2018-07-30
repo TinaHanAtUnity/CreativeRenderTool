@@ -42,6 +42,7 @@ import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
 import { WebPlayerContainer } from 'Utilities/WebPlayer/WebPlayerContainer';
 import { Observable1, Observable2 } from 'Utilities/Observable';
 import { asStub } from '../TestHelpers/Functions';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 describe('AdUnitFactoryTest', () => {
 
@@ -82,6 +83,7 @@ describe('AdUnitFactoryTest', () => {
         sessionManager = new SessionManager(nativeBridge, request);
         const campaign = TestFixtures.getCampaign();
         const gdprManager = sinon.createStubInstance(GdprManager);
+        const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             nativeBridge: nativeBridge,
@@ -97,8 +99,8 @@ describe('AdUnitFactoryTest', () => {
         sandbox.stub(MoatViewabilityService, 'initMoat');
 
         const webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
-        (<any>webPlayerContainer).onPageStarted = new Observable1<string>();
-        (<any>webPlayerContainer).shouldOverrideUrlLoading = new Observable2<string, string>();
+        webPlayerContainer.onPageStarted = new Observable1<string>();
+        webPlayerContainer.shouldOverrideUrlLoading = new Observable2<string, string>();
         asStub(webPlayerContainer.setSettings).resolves();
         asStub(webPlayerContainer.clearSettings).resolves();
         adUnitParameters = {
@@ -115,7 +117,8 @@ describe('AdUnitFactoryTest', () => {
             configuration: config,
             request: request,
             options: {},
-            gdprManager: gdprManager
+            gdprManager: gdprManager,
+            programmaticTrackingService: programmaticTrackingService
         };
 
         sandbox.spy(thirdPartyEventManager, 'sendEvent');

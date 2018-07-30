@@ -39,7 +39,7 @@ export class Swipe {
         const xDiff = this._startX - endX;
         const yDiff = this._startY - endY;
 
-        if(Math.abs( xDiff ) > Math.abs( yDiff ) ) {
+        if(Math.abs(xDiff) > Math.abs(yDiff)) {
             if (Math.abs(xDiff) > Swipe._moveTolerance) {
                 // left or right swipe
                 const swipeEvent = document.createEvent('MouseEvent');

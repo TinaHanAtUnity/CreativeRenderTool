@@ -324,6 +324,12 @@
       "required": "all",
       "queryString": false,
       "body": true
+    },
+    {
+        "parameter": "abGroup",
+        "required": "no",
+        "queryString": false,
+        "body": true
     }
   ]
 }

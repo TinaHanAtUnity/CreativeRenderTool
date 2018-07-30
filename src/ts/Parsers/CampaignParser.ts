@@ -9,7 +9,7 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { ABGroup } from 'Models/ABGroup';
 
 export abstract class CampaignParser {
-    public abstract parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: ABGroup, osVersion?: string): Promise<Campaign>;
+    public abstract parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: ABGroup): Promise<Campaign>;
 
     protected getProgrammaticCampaignId(nativeBridge: NativeBridge): string {
         switch (nativeBridge.getPlatform()) {

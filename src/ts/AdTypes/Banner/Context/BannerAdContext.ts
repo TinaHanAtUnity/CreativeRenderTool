@@ -239,8 +239,8 @@ export class BannerAdContext {
         let height = StandardBannerHeight;
         if (this._deviceInfo instanceof AndroidDeviceInfo) {
             const density = this._deviceInfo.getScreenDensity();
-            width = Math.floor(width * (density / 160.0));
-            height = Math.floor(height * (density / 160.0));
+            width = Math.floor(width * (density / 160));
+            height = Math.floor(height * (density / 160));
         } else if (this._deviceInfo instanceof IosDeviceInfo) {
             width = Math.floor(StandardBannerWidth);
             height = Math.floor(StandardBannerHeight);

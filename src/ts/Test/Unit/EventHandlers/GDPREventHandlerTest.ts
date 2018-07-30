@@ -20,6 +20,7 @@ import { Placement } from 'Models/Placement';
 import { GdprManager, GDPREventAction } from 'Managers/GdprManager';
 import { OverlayEventHandler } from 'EventHandlers/OverlayEventHandler';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 describe('GDPREventHandlerTest', () => {
 
@@ -47,7 +48,8 @@ describe('GDPREventHandlerTest', () => {
             overlay: sinon.createStubInstance(Overlay),
             video: sinon.createStubInstance(Video),
             privacy: sinon.createStubInstance(GDPRPrivacy),
-            gdprManager: sinon.createStubInstance(GdprManager)
+            gdprManager: sinon.createStubInstance(GdprManager),
+            programmaticTrackingService: sinon.createStubInstance(ProgrammaticTrackingService)
         };
 
         adUnit = sinon.createStubInstance(PerformanceAdUnit);
