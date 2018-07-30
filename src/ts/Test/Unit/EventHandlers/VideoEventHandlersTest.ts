@@ -119,7 +119,7 @@ describe('VideoEventHandlersTest', () => {
         const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
         overlay = new Overlay(nativeBridge, false, 'en', configuration.getGamerId(), privacy, false);
 
-        endScreen = new PerformanceEndScreen(nativeBridge, performanceCampaign, 'en', '12345', privacy, false);
+        endScreen = new PerformanceEndScreen(nativeBridge, performanceCampaign, 'en', '12345', privacy, false, configuration.getAbGroup());
         const gdprManager = sinon.createStubInstance(GdprManager);
 
         vastAdUnitParameters = {
@@ -165,7 +165,7 @@ describe('VideoEventHandlersTest', () => {
 
         const xpromoPrivacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
         xPromoCampaign = TestFixtures.getXPromoCampaign();
-        xPromoEndScreen = new XPromoEndScreen(nativeBridge, xPromoCampaign, 'en', '12345', xpromoPrivacy, false);
+        xPromoEndScreen = new XPromoEndScreen(nativeBridge, xPromoCampaign, 'en', '12345', xpromoPrivacy, false, configuration.getAbGroup());
         xPromoAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
@@ -204,7 +204,6 @@ describe('VideoEventHandlersTest', () => {
 
         performanceVideoEventHandler = new PerformanceVideoEventHandler(<IVideoEventHandlerParams<PerformanceAdUnit, PerformanceCampaign>>videoEventHandlerParams);
         performanceAdUnit.setVideoState(VideoState.PREPARING);
-        sinon.stub(performanceAdUnitParameters.campaign, 'getAbGroup').returns(5);
     });
 
     describe('with onVideoPlay', () => {

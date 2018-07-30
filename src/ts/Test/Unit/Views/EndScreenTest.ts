@@ -9,11 +9,13 @@ import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 import { Privacy } from 'Views/Privacy';
 
 import EndScreenFixture from 'html/fixtures/EndScreenFixture.html';
+import { Configuration } from 'Models/Configuration';
 
 describe('EndScreen', () => {
     let handleInvocation: sinon.SinonSpy;
     let handleCallback: sinon.SinonSpy;
     let nativeBridge: NativeBridge;
+    let configuration: Configuration;
 
     beforeEach(() => {
         handleInvocation = sinon.spy();
@@ -25,12 +27,13 @@ describe('EndScreen', () => {
         Localization.setLanguageMap('fi.*', 'endscreen', {
             'Download For Free': 'Lataa ilmaiseksi'
         });
+        configuration = TestFixtures.getConfiguration();
     });
 
     xit('should render', () => {
         const privacy = new Privacy(nativeBridge, false);
 
-        const endScreen = new PerformanceEndScreen(nativeBridge, TestFixtures.getCampaign(), 'en', 'testGameId', privacy, false);
+        const endScreen = new PerformanceEndScreen(nativeBridge, TestFixtures.getCampaign(), 'en', 'testGameId', privacy, false, configuration.getAbGroup());
         endScreen.render();
         assert.equal(endScreen.container().innerHTML, EndScreenFixture);
     });
@@ -38,7 +41,7 @@ describe('EndScreen', () => {
     it('should render with translations', () => {
         const privacy = new Privacy(nativeBridge, false);
 
-        const endScreen = new PerformanceEndScreen(nativeBridge, TestFixtures.getCampaign(), 'fi', 'testGameId', privacy, false);
+        const endScreen = new PerformanceEndScreen(nativeBridge, TestFixtures.getCampaign(), 'fi', 'testGameId', privacy, false, configuration.getAbGroup());
         endScreen.render();
         const downloadElement = endScreen.container().querySelectorAll('.download-text')[0];
         assert.equal(downloadElement.innerHTML, 'Lataa ilmaiseksi');
