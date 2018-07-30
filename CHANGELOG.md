@@ -1,3 +1,15 @@
+# Mon Jul 30 21:52:01 UTC 2018
+
+* Fix GDPR Privacy width for iPhone X in landscape
+* Sending unity internal tracking events for clicks after followRedirectChain
+* Tslint number-literal-format
+* Sonic Creative temporary creative ID Whitelist
+
+# Wed Jul 25 20:12:52 UTC 2018
+
+* New GDPR legal text
+* Fixed issues with backup campaign, expired campaigns were shown, VAST had issues
+
 # Tue Jul 24 20:57:31 UTC 2018
 
 * Add a fixed version of the new video overlay

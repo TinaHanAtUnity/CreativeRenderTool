@@ -29,6 +29,7 @@ import { Privacy } from 'Views/Privacy';
 import { GdprManager } from 'Managers/GdprManager';
 import { IOperativeEventParams } from 'Managers/OperativeEventManager';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { ForceQuitManager } from 'Managers/ForceQuitManager';
 
 describe('XPromoEndScreenEventHandlerTest', () => {
 
@@ -48,6 +49,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
     let campaign: XPromoCampaign;
     let placement: Placement;
     let programmaticTrackingService: ProgrammaticTrackingService;
+    let forceQuitManager: ForceQuitManager;
 
     describe('with onDownloadAndroid', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -60,7 +62,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
 
             campaign = TestFixtures.getXPromoCampaign();
             focusManager = new FocusManager(nativeBridge);
-            container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
+            forceQuitManager = sinon.createStubInstance(ForceQuitManager);
+            container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo(), forceQuitManager);
             metaDataManager = new MetaDataManager(nativeBridge);
             const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request = new Request(nativeBridge, wakeUpManager);
@@ -152,7 +155,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             campaign.set('appStoreId', '11111');
 
             clientInfo = TestFixtures.getClientInfo(Platform.IOS);
-            container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager, clientInfo);
+            container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager, clientInfo, forceQuitManager);
             const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request = new Request(nativeBridge, wakeUpManager);
             deviceInfo = TestFixtures.getIosDeviceInfo();

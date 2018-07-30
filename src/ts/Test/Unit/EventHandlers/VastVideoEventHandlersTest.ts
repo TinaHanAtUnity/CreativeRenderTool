@@ -33,6 +33,7 @@ import { Privacy } from 'Views/Privacy';
 
 import EventTestVast from 'xml/EventTestVast.xml';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { ForceQuitManager } from 'Managers/ForceQuitManager';
 
 describe('VastVideoEventHandler tests', () => {
     const handleInvocation = sinon.spy();
@@ -60,6 +61,7 @@ describe('VastVideoEventHandler tests', () => {
     let gdprManager: GdprManager;
     let privacy: AbstractPrivacy;
     let programmaticTrackingService: ProgrammaticTrackingService;
+    let forceQuitManager: ForceQuitManager;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -75,7 +77,8 @@ describe('VastVideoEventHandler tests', () => {
         metaDataManager = new MetaDataManager(nativeBridge);
         campaign = TestFixtures.getEventVastCampaign();
         clientInfo = TestFixtures.getClientInfo();
-        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
+        forceQuitManager = sinon.createStubInstance(ForceQuitManager);
+        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo(), forceQuitManager);
         privacy = new Privacy(nativeBridge, true);
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
