@@ -1,4 +1,4 @@
-# Staged
+# Mon Jul 30 21:52:01 UTC 2018
 
 * Fix GDPR Privacy width for iPhone X in landscape
 * Sending unity internal tracking events for clicks after followRedirectChain
