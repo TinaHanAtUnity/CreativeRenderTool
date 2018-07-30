@@ -1,6 +1,7 @@
 # Pending
 
 * Fix GDPR Privacy width for iPhone X in landscape
+* Sending unity internal tracking events for clicks after followRedirectChain
 * Tslint number-literal-format
 
 # Wed Jul 25 20:12:52 UTC 2018
