@@ -8,7 +8,7 @@ export enum ApiPackage {
 
 export abstract class NativeApi {
     private static _apiPackageMapping = {
-        [ApiPackage.CORE]: {android: 'com.unity3d.services.core.api', ios: 'UADSApi'},
+        [ApiPackage.CORE]: {android: 'com.unity3d.services.core.api', ios: 'USRVApi'},
         [ApiPackage.ADS_CORE]: {android: 'com.unity3d.services.ads.core.api', ios: 'UADSApi'}
     };
 
@@ -34,7 +34,7 @@ export abstract class NativeApi {
                 return NativeApi._apiPackageMapping[this._apiPackage].android + '.' + this._apiClass;
 
             case Platform.IOS:
-                return NativeApi._apiPackageMapping[this._apiPackage].ios + '.' + this._apiClass;
+                return NativeApi._apiPackageMapping[this._apiPackage].ios  + this._apiClass;
 
             default:
                 return this._apiClass;
