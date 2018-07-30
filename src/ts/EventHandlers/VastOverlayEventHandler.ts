@@ -68,13 +68,13 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
 
         this.setCallButtonEnabled(false);
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
-        this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId());
 
         const clickThroughURL = this._vastAdUnit.getVideoClickThroughURL();
         if(clickThroughURL) {
             if (CTAOpenUrlAbTest.isValid(this._abGroup)) {
                 return this.openUrl(clickThroughURL).then(() => {
                     this.setCallButtonEnabled(true);
+                    this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId());
                 });
             }
 
@@ -82,11 +82,13 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
                 (url: string) => {
                     return this.openUrl(url).then(() => {
                         this.setCallButtonEnabled(true);
+                        this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId());
                     });
                 }
             );
+        } else {
+            return Promise.reject(new Error('No clickThroughURL was defined'));
         }
-        return Promise.reject(new Error('No clickThroughURL was defined'));
     }
 
     private openUrl(url: string): Promise<void> {

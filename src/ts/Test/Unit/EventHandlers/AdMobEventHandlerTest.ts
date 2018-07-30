@@ -130,14 +130,14 @@ describe('AdMobEventHandler', () => {
         let clock: sinon.SinonFakeTimers;
         const touch = <ITouchInfo>{
             start: {
-                x: 0.0,
-                y: 0.0
+                x: 0,
+                y: 0
             },
             end: {
-                x: 1.0,
-                y: 1.0
+                x: 1,
+                y: 1
             },
-            diameter: 1.0,
+            diameter: 1,
             pressure: 0.5,
             duration: 5,
             counts: {
