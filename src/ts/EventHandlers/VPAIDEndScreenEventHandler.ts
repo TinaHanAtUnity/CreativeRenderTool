@@ -9,7 +9,7 @@ export class VPAIDEndScreenEventHandler implements IVPAIDEndScreenHandler {
 
     constructor(nativeBridge: NativeBridge, adUnit: VPAIDAdUnit, parameters: IVPAIDAdUnitParameters) {
         this._adUnit = adUnit;
-        this._vpaidCampaign = <VPAIDCampaign>parameters.campaign;
+        this._vpaidCampaign = parameters.campaign;
     }
 
     public onVPAIDEndScreenClick(): void {

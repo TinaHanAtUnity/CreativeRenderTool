@@ -62,7 +62,7 @@ describe('PromoCampaignParser', () => {
 
             it('should have valid data', () => {
                 assert.isNotNull(campaign, 'Campaign is null');
-                assert.isTrue(campaign instanceof PromoCampaign, 'Campaign was not an DisplayInterstitialCampaign');
+                assert.isTrue(campaign instanceof PromoCampaign, 'Campaign was not a PromoCampaign');
 
                 const json = JSON.parse(IAPPromoCampaign).campaign1;
                 const content = JSON.parse(json.content);
@@ -134,6 +134,62 @@ describe('PromoCampaignParser', () => {
                 const content = JSON.parse(json.content);
                 assert.equal(content.rewardedPromo, undefined);
                 assert.equal(campaign.getRewardedPromo(), false);
+            });
+        });
+
+        describe('if Purchasing is initialized', () => {
+            let campaign: PromoCampaign;
+            let sandbox: sinon.SinonSandbox;
+
+            beforeEach(() => {
+                sandbox = sinon.createSandbox();
+                sandbox.stub(PurchasingUtilities, 'isInitialized').returns(true);
+            });
+
+            afterEach(() => {
+                sandbox.restore();
+            });
+
+            it('should refresh catalog and resolve campaign', () => {
+
+                sandbox.stub(PurchasingUtilities, 'refreshCatalog').returns(Promise.resolve());
+
+                const parse = (data: any) => {
+                    const response = new AuctionResponse(placements, data, mediaId, correlationId);
+                    return parser.parse(nativeBridge, request, response, session, abGroup).then((parsedCampaign) => {
+                        campaign = <PromoCampaign>parsedCampaign;
+                        sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.refreshCatalog);
+                    });
+                };
+
+                return parse(JSON.parse(IAPPromoCampaign).campaign1);
+            });
+        });
+
+        describe('if Purchasing is not initialized', () => {
+            let campaign: PromoCampaign;
+            let sandbox: sinon.SinonSandbox;
+
+            beforeEach(() => {
+                sandbox = sinon.createSandbox();
+                sandbox.stub(PurchasingUtilities, 'isInitialized').returns(false);
+            });
+
+            afterEach(() => {
+                sandbox.restore();
+            });
+
+            it('should resolve campaign and not refresh catalog', () => {
+                sandbox.stub(PurchasingUtilities, 'refreshCatalog').returns(Promise.resolve());
+                const parse = (data: any) => {
+                    const response = new AuctionResponse(placements, data, mediaId, correlationId);
+                    return parser.parse(nativeBridge, request, response, session, abGroup).then((parsedCampaign) => {
+                        campaign = <PromoCampaign>parsedCampaign;
+                        sinon.assert.notCalled(<sinon.SinonSpy>PurchasingUtilities.refreshCatalog);
+                    });
+                };
+
+                return parse(JSON.parse(IAPPromoCampaign).campaign1);
             });
         });
     });

@@ -1,8 +1,12 @@
-import { ClientInfo } from 'Models/ClientInfo';
-import { Configuration } from 'Models/Configuration';
 import { PurchasingCatalog } from 'Models/PurchasingCatalog';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Diagnostics } from './Diagnostics';
+import { Configuration } from 'Models/Configuration';
+import { ClientInfo } from 'Models/ClientInfo';
+import { PlacementState } from 'Models/Placement';
+import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
+import { PlacementManager } from 'Managers/PlacementManager';
+import { PromoCampaignParser } from 'Parsers/PromoCampaignParser';
 
 export enum IPromoRequest {
     SETIDS = 'setids',
@@ -23,10 +27,13 @@ export interface IPromoPayload {
 
 export class PurchasingUtilities {
 
-    public static initialize(clientInfo: ClientInfo, configuration: Configuration, nativeBridge: NativeBridge) {
+    public static placementManager: PlacementManager;
+
+    public static initialize(clientInfo: ClientInfo, configuration: Configuration, nativeBridge: NativeBridge, placementManager: PlacementManager) {
         this._clientInfo = clientInfo;
         this._configuration = configuration;
         this._nativeBridge = nativeBridge;
+        this.placementManager = placementManager;
     }
 
     public static isInitialized(): boolean {
@@ -74,7 +81,7 @@ export class PurchasingUtilities {
 
     public static getProductPrice(productId: string): string {
         if (this.isProductAvailable(productId)) {
-            return this._catalog.getProducts()[productId]!.getPrice();
+            return this._catalog.getProducts()[productId].getPrice();
         }
         throw new Error('Attempted to get price of invalid product: ' + productId);
     }
@@ -86,8 +93,20 @@ export class PurchasingUtilities {
         return false;
     }
 
-    public static handleSendIAPEvent(nativeBridge: NativeBridge, iapPayload: string): void {
-        // TODO: Handle IAPPayload/send event/do something with the payload
+    public static handleSendIAPEvent(iapPayload: string): Promise<void> {
+        const jsonPayload = JSON.parse(iapPayload);
+
+        if (jsonPayload.type === 'CatalogUpdated') {
+            if (!this.isInitialized()) {
+                return this.sendPurchaseInitializationEvent()
+                .then(() => this.refreshCatalog())
+                .then(() => this.setProductPlacementStates());
+            } else {
+                return this.refreshCatalog().then(() => this.setProductPlacementStates());
+            }
+        } else {
+            return Promise.reject(this.logIssue('handle_send_event_failure', 'IAP Payload is incorrect'));
+        }
     }
 
     private static _catalog: PurchasingCatalog = new PurchasingCatalog([]);
@@ -96,22 +115,18 @@ export class PurchasingUtilities {
     private static _nativeBridge: NativeBridge;
     private static _isInitialized = false;
 
-    private static isCatalogValid(): boolean {
-        return (this._catalog !== undefined && this._catalog.getProducts() !== undefined && this._catalog.getSize() !== 0);
-    }
+    private static setProductPlacementStates(): void {
+        const placementCampaignMap = this.placementManager.getPlacementCampaignMap(PromoCampaignParser.ContentType);
+        const promoPlacementIds = Object.keys(placementCampaignMap);
+        for (const placementId of promoPlacementIds) {
+            const currentCampaign = placementCampaignMap[placementId];
 
-    private static configurationIncludesPromoPlacement(): boolean {
-        if (this._configuration) {
-            const placements = this._configuration.getPlacements();
-            const placementIds = this._configuration.getPlacementIds();
-            for (const placementId of placementIds) {
-                const adTypes = placements[placementId].getAdTypes();
-                if (adTypes && adTypes.indexOf('IAP') > -1) {
-                    return true;
-                }
+            if (currentCampaign instanceof PromoCampaign && this.isProductAvailable(currentCampaign.getIapProductId())) {
+                this.placementManager.setPlacementReady(placementId, currentCampaign);
+            } else {
+                this.placementManager.setPlacementState(placementId, PlacementState.NO_FILL);
             }
         }
-        return false;
     }
 
     private static initializeIAPPromo(): Promise<void> {
@@ -176,7 +191,12 @@ export class PurchasingUtilities {
         return false;
     }
 
+    private static isCatalogValid(): boolean {
+        return (this._catalog !== undefined && this._catalog.getProducts() !== undefined && this._catalog.getSize() !== 0);
+    }
+
     private static getInitializationPayload(): IPromoPayload {
+
         return <IPromoPayload>{
             iapPromo: true,
             abGroup: this._configuration.getAbGroup().toNumber(),
@@ -191,5 +211,19 @@ export class PurchasingUtilities {
         this._nativeBridge.Sdk.logError(errorMessage);
         Diagnostics.trigger(errorType, { message: errorMessage });
         return new Error(errorMessage);
+    }
+
+    private static configurationIncludesPromoPlacement(): boolean {
+        if (this._configuration) {
+            const placements = this._configuration.getPlacements();
+            const placementIds = this._configuration.getPlacementIds();
+            for (const placementId of placementIds) {
+                const adTypes = placements[placementId].getAdTypes();
+                if (adTypes && adTypes.indexOf('IAP') > -1) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

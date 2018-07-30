@@ -47,37 +47,17 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
 
     public onMraidClick(url: string): Promise<void> {
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
-        const operativeEventParams: IOperativeEventParams = this.getOperativeEventParams();
-        if(!this._campaign.getSession().getEventSent(EventType.THIRD_QUARTILE)) {
-            this._operativeEventManager.sendThirdQuartile(operativeEventParams);
-        }
-        if(!this._campaign.getSession().getEventSent(EventType.VIEW)) {
-            this._operativeEventManager.sendView(operativeEventParams);
-        }
-        if(!this._campaign.getSession().getEventSent(EventType.CLICK)) {
-            this._operativeEventManager.sendClick(operativeEventParams);
-        }
-
-        this._adUnit.sendClick();
 
         if(this._campaign.getClickAttributionUrl()) {
             this.handleClickAttribution();
             if(!this._campaign.getClickAttributionUrlFollowsRedirects()) {
-                if (CTAOpenUrlAbTest.isValid(this._abGroup)) {
-                    return this.openUrl(url);
-                }
-                return this.followUrl(url).then((storeUrl) => {
-                    return this.openUrl(storeUrl);
-                });
+                this.openClickUrl(url);
             }
         } else {
-            if (CTAOpenUrlAbTest.isValid(this._abGroup)) {
-                return this.openUrl(url);
-            }
-            return this.followUrl(url).then((storeUrl) => {
-                return this.openUrl(storeUrl);
-            });
+            this.openClickUrl(url);
         }
+        this.sendTrackingEvents();
+
         return Promise.resolve();
     }
 
@@ -149,10 +129,10 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
             }).catch(error => {
                 if(error instanceof RequestError) {
                     error = new DiagnosticError(new Error(error.message), {
-                        request: (<RequestError>error).nativeRequest,
+                        request: error.nativeRequest,
                         auctionId: this._campaign.getSession().getId(),
                         url: this._campaign.getClickAttributionUrl(),
-                        response: (<RequestError>error).nativeResponse
+                        response: error.nativeResponse
                     });
                 }
                 Diagnostics.trigger('mraid_click_attribution_failed', error);
@@ -162,6 +142,30 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
                 this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, false, useWebViewUA);
             }
         }
+    }
+
+    private sendTrackingEvents() {
+        const operativeEventParams: IOperativeEventParams = this.getOperativeEventParams();
+        if (!this._campaign.getSession().getEventSent(EventType.THIRD_QUARTILE)) {
+            this._operativeEventManager.sendThirdQuartile(operativeEventParams);
+        }
+        if (!this._campaign.getSession().getEventSent(EventType.VIEW)) {
+            this._operativeEventManager.sendView(operativeEventParams);
+        }
+        if (!this._campaign.getSession().getEventSent(EventType.CLICK)) {
+            this._operativeEventManager.sendClick(operativeEventParams);
+        }
+
+        this._adUnit.sendClick();
+    }
+
+    private openClickUrl(url: string): Promise<void> {
+        if (CTAOpenUrlAbTest.isValid(this._abGroup)) {
+            return this.openUrl(url);
+        }
+        return this.followUrl(url).then((storeUrl) => {
+            return this.openUrl(storeUrl);
+        });
     }
 
     private openUrl(url: string): Promise<void> {

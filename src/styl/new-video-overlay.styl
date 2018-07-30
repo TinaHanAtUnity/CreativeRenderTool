@@ -1,31 +1,19 @@
 @import "vars.styl";
 @import "gdpr-pop-up.styl";
 
-$overlay-default-font-size = 1em;
-$overlay-default-font-px-size = 16px;
-$overlay-default-size = unit($overlay-default-font-px-size/16, "em");
-$new-video-overlay-size = $overlay-default-size * $default-size;
 
-$tab-font-color = "#f1f1f1";
-$fade-transition = opacity .45s ease-in;
-$touchable-area-height = $new-video-overlay-size * 2;
-$touchable-area-width = $new-video-overlay-size * 2.2;
-$call-button-width = $new-video-overlay-size * 6;
-$tab-border-radius = $new-video-overlay-size * .2;
-$tab-vertical-margin = $new-video-overlay-size * .3;
-
-slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
-  transform: translateX($translation);
-  transition: transform $duration $function;
+$new-video-overlay-styles = {
+  base-size: unit(16px/16, "em") * $default-size,
+  tab-font-color: "#f1f1f1",
 }
 
-.slide-in-from-left {
-  slide-animation(.4s, ease-in, -100%);
-}
-
-#end-screen {
-  visibility: hidden;
-}
+$new-video-overlay-styles.touchable-area-height = $new-video-overlay-styles.base-size * 2;
+$new-video-overlay-styles.touchable-area-width = $new-video-overlay-styles.base-size * 2.2;
+$new-video-overlay-styles.call-button-width = $new-video-overlay-styles.base-size * 6;
+// @stylint off
+$new-video-overlay-styles.tab-border-radius = $new-video-overlay-styles.base-size * 0.2;
+$new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-size * 0.3;
+// @stylint on
 
 #new-video-overlay {
   width: 100%;
@@ -33,15 +21,20 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
   background-color: transparent;
   color: $white;
   font-size: 16px;
-  transition: $fade-transition;
+  transition: opacity .45s ease-in;
+
+  .slide-in-from-left {
+    transform: translateX(-100%);
+    transition: transform .4s ease-in;
+  }
 
   &.fade-in .button {
     opacity: 1;
   }
 
   .button {
-    width: $touchable-area-width;
-    height: $touchable-area-height;
+    width: $new-video-overlay-styles.touchable-area-width;
+    height: $new-video-overlay-styles.touchable-area-height;
     opacity: 0;
   }
 
@@ -71,7 +64,7 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
     top: 0;
     left: 0;
     width: 100%;
-    height: $touchable-area-height;
+    height: $new-video-overlay-styles.touchable-area-height;
   }
 
   .bottom-container {
@@ -81,12 +74,12 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
     left: 0;
     align-items: center;
     width: 100%;
-    height: $touchable-area-height;
+    height: $new-video-overlay-styles.touchable-area-height;
 
     .center,
     .tab {
       top: auto;
-      bottom: $tab-vertical-margin;
+      bottom: $new-video-overlay-styles.tab-vertical-margin;
     }
 
     .center {
@@ -104,46 +97,46 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
     .tab {
       right: 0;
       left: auto;
-      border-radius: $tab-border-radius 0 0 $tab-border-radius;
+      border-radius: $new-video-overlay-styles.tab-border-radius 0 0 $new-video-overlay-styles.tab-border-radius;
     }
   }
 
   .tab {
     position: absolute;
-    top: $tab-vertical-margin;
+    top: $new-video-overlay-styles.tab-vertical-margin;
     left: 0;
-    width: $new-video-overlay-size * 2;
-    height: $new-video-overlay-size * 1.5;
-    border-radius: 0 $tab-border-radius $tab-border-radius 0;
+    width: $new-video-overlay-styles.base-size * 2;
+    height: $new-video-overlay-styles.base-size * 1.5;
+    border-radius: 0 $new-video-overlay-styles.tab-border-radius $new-video-overlay-styles.tab-border-radius 0;
     background-color: rgba(0, 0, 0, .54);
-    color: $tab-font-color;
+    color: $new-video-overlay-styles.tab-font-color;
     text-align: center;
-    text-shadow: $new-video-overlay-size * .01 $new-video-overlay-size * .01 $new-video-overlay-size * .025 rgba(0, 0, 0, .8), 0 0 $new-video-overlay-size * .1 rgba(0, 0, 0, 1);
+    text-shadow: $new-video-overlay-styles.base-size * .01 $new-video-overlay-styles.base-size * .01 $new-video-overlay-styles.base-size * .025 rgba(0, 0, 0, .8), 0 0 $new-video-overlay-styles.base-size * .1 rgba(0, 0, 0, 1);
     font-weight: 300;
   }
 
   .icon,
   .text {
-    font-size: $new-video-overlay-size * .65;
+    font-size: $new-video-overlay-styles.base-size * .65;
   }
 
   .gdpr-button {
     position: absolute;
     top: 0;
-    left: $touchable-area-width;
+    left: $new-video-overlay-styles.touchable-area-width;
 
     .tab {
-      bottom: $new-video-overlay-size * .54;
-      width: $new-video-overlay-size;
-      height: $new-video-overlay-size;
-      border-radius: $tab-border-radius;
+      bottom: $new-video-overlay-styles.base-size * .54;
+      width: $new-video-overlay-styles.base-size;
+      height: $new-video-overlay-styles.base-size;
+      border-radius: $new-video-overlay-styles.tab-border-radius;
     }
 
     .icon-container {
       line-height: .8em;
     }
     .icon {
-      font-size: $new-video-overlay-size * .5;
+      font-size: $new-video-overlay-styles.base-size * .5;
     }
   }
   
@@ -165,20 +158,20 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
     }
 
     .text {
-      margin-left: $new-video-overlay-size * .8;
+      margin-left: $new-video-overlay-styles.base-size * .8;
       text-align: center;
     }
 
     .go-text {
       position: absolute;
-      margin-top: $new-video-overlay-size * .55;
-      margin-left: $new-video-overlay-size *  .55;
-      width: $new-video-overlay-size *  2.4;
-      height: $new-video-overlay-size * 1.7;
+      margin-top: $new-video-overlay-styles.base-size * .55;
+      margin-left: $new-video-overlay-styles.base-size *  .55;
+      width: $new-video-overlay-styles.base-size *  2.4;
+      height: $new-video-overlay-styles.base-size * 1.7;
       border: 1px solid;
-      border-radius: $new-video-overlay-size * .25;
-      font-size: $new-video-overlay-size * .8;
-      line-height: $new-video-overlay-size * 1.85;
+      border-radius: $new-video-overlay-styles.base-size * .25;
+      font-size: $new-video-overlay-styles.base-size * .8;
+      line-height: $new-video-overlay-styles.base-size * 1.85;
       transform: translateX(200%);
       transition: transform .6s ease-in;
     }
@@ -196,15 +189,15 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
 
   .call-button,
   .call-button .tab {
-    width: $call-button-width;
+    width: $new-video-overlay-styles.call-button-width;
   }
 
   .call-button .tab{
-    line-height: $new-video-overlay-size * 1.31;
+    line-height: $new-video-overlay-styles.base-size * 1.31;
   }
 
   .icon-container {
-    line-height: $new-video-overlay-size * 1.55;
+    line-height: $new-video-overlay-styles.base-size * 1.55;
   }
 
   .icon-volume-mute {
@@ -227,16 +220,17 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
 
   .timer-container {
     position: relative;
-    top: $new-video-overlay-size * .27;
-    left: $new-video-overlay-size * .5;
-    width: $new-video-overlay-size * .9;
-    height: $new-video-overlay-size * .9;
+    top: $new-video-overlay-styles.base-size * .27;
+    left: $new-video-overlay-styles.base-size * .5;
+    width: $new-video-overlay-styles.base-size * .9;
+    height: $new-video-overlay-styles.base-size * .9;
     border: 1px solid $white;
     border-radius: 50%;
-    line-height: $new-video-overlay-size * .92;
+    line-height: $new-video-overlay-styles.base-size * .92;
   }
+
   .timer {
-    font-size: $new-video-overlay-size * .4;
+    font-size: $new-video-overlay-styles.base-size * .4;
   }
   
 
@@ -295,22 +289,21 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
 
   &.show-gdpr-banner {
     .gdpr-pop-up {
-      // TODO: Is this correct scale-size to pass?
-      $gdpr-pop-up($new-video-overlay-size);
+      $gdpr-pop-up($new-video-overlay-styles.base-size);
       position: static;
       margin: auto;
       width: 50%;
-      height: $new-video-overlay-size * 1.5;
-      border-radius: $tab-border-radius;
+      height: $new-video-overlay-styles.base-size * 1.5;
+      border-radius: $new-video-overlay-styles.tab-border-radius;
       pointer-events: 1;
 
       .icon-gdpr {
-        font-size: $new-video-overlay-size * .5;
+        font-size: $new-video-overlay-styles.base-size * .5;
       }
 
       .gdpr-text {
         color: $black;
-        font-size: $new-video-overlay-size * .35;
+        font-size: $new-video-overlay-styles.base-size * .35;
       }
     }
   }
@@ -327,121 +320,125 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
       pointer-events: 1;
     }
   }
-}
 
-/**
- * Portrait layout customization
- */
 
-@media (orientation: portrait) {
-  #new-video-overlay.show-gdpr-banner {
-    .bottom-container {
-      height: $touchable-area-height * 2;
+  /**
+  * Portrait layout customization
+  */
 
-      .center {
-        bottom: 0;
+  @media (orientation: portrait) {
+    &.show-gdpr-banner {
+      .bottom-container {
+        height: $new-video-overlay-styles.touchable-area-height * 2;
 
-        .gdpr-pop-up {
-          width: 90%;
-          border-radius: $tab-border-radius $tab-border-radius 0 0;
+        .center {
+          bottom: 0;
+
+          .gdpr-pop-up {
+            width: 90%;
+            border-radius: $new-video-overlay-styles.tab-border-radius $new-video-overlay-styles.tab-border-radius 0 0;
+          }
         }
       }
     }
   }
-}
 
-/**
- * Landscape sizes
- */
-@media (orientation: landscape)
-  #new-video-overlay .content {
-    @media (max-width: 392) {
-      font-size: $new-video-overlay-size * .6;
-    }
+  /**
+  * Landscape sizes
+  */
+  @media (orientation: landscape) {
+    .content {
+      @media (max-width: 392) {
+        font-size: $new-video-overlay-styles.base-size * .6;
+      }
 
-    @media (min-width: 472px) and (max-width: 593px) {
-      font-size: $new-video-overlay-size * 1.2;
-    }
+      @media (min-width: 472px) and (max-width: 593px) {
+        font-size: $new-video-overlay-styles.base-size * 1.2;
+      }
 
-    @media (min-width: 594px) and (max-width: 750px) {
-      font-size: $new-video-overlay-size * 1.5;
-    }
-  
-    @media (min-width: 751px) and (max-width: 823px) {
-      font-size: $new-video-overlay-size * 2;
-    }
+      @media (min-width: 594px) and (max-width: 750px) {
+        font-size: $new-video-overlay-styles.base-size * 1.5;
+      }
+    
+      @media (min-width: 751px) and (max-width: 823px) {
+        font-size: $new-video-overlay-styles.base-size * 2;
+      }
 
-    @media (min-width: 824px) and (max-width: 959px) {
-      font-size: $new-video-overlay-size * 2.1;
-    }
+      @media (min-width: 824px) and (max-width: 959px) {
+        font-size: $new-video-overlay-styles.base-size * 2.1;
+      }
 
-    @media (min-width: 960px) {
-      font-size: $new-video-overlay-size * 2.2;
+      @media (min-width: 960px) {
+        font-size: $new-video-overlay-styles.base-size * 2.2;
+      }
     }
   }
 
-/**
- * Portrait sizes
- */
-@media (orientation: portrait)
-  #new-video-overlay .content {
-    @media (max-width: 320px) {
-      font-size: $new-video-overlay-size * 1.2;
-    }
+  /**
+  * Portrait sizes
+  */
+  @media (orientation: portrait) {
+    .content {
+      @media (max-width: 320px) {
+        font-size: $new-video-overlay-styles.base-size * 1.2;
+      }
 
-    @media (min-width: 321px) and (max-width: 359px) {
-      font-size: $new-video-overlay-size * 1.5;
-    }
+      @media (min-width: 321px) and (max-width: 359px) {
+        font-size: $new-video-overlay-styles.base-size * 1.5;
+      }
 
-    @media (min-width: 360px) and (max-width: 413px) {
-      font-size: $new-video-overlay-size * 1.7;
-    }
+      @media (min-width: 360px) and (max-width: 413px) {
+        font-size: $new-video-overlay-styles.base-size * 1.7;
+      }
 
-    @media (min-width: 414px) and (max-width: 480px) {
-      font-size: $new-video-overlay-size * 1.9;
-    }
+      @media (min-width: 414px) and (max-width: 480px) {
+        font-size: $new-video-overlay-styles.base-size * 1.9;
+      }
 
-    @media (min-width: 481px) and (max-width: 568px) {
-      font-size: $new-video-overlay-size * 2;
-    }
+      @media (min-width: 481px) and (max-width: 568px) {
+        font-size: $new-video-overlay-styles.base-size * 2;
+      }
 
-    @media (min-width: 569px) {
-      font-size: $new-video-overlay-size * 2.4;
+      @media (min-width: 569px) {
+        font-size: $new-video-overlay-styles.base-size * 2.4;
+      }
     }
   }
 
-/** 
- * iPhone X safe area customizations
- */
+  /** 
+  * iPhone X safe area customizations
+  */
 
-@media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)
-  @media (orientation: portrait)
-    #new-video-overlay.show-gdpr-banner .bottom-container .center .gdpr-pop-up {
-      border-radius: $tab-border-radius;
-    }
-
-  @media (orientation: landscape)
-    #new-video-overlay.show-gdpr-banner .bottom-container .center .gdpr-pop-up {
-      width: 42%;
-
-      .gdpr-text {
-        font-size: $new-video-overlay-size * .3;
+  @media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
+    @media (orientation: portrait) {
+      &.show-gdpr-banner .bottom-container .center .gdpr-pop-up {
+        border-radius: $new-video-overlay-styles.tab-border-radius;
       }
     }
 
-    #new-video-overlay .bottom-container {
-      .center,
-      .tab {
-        bottom: 0;
+    @media (orientation: landscape) {
+      &.show-gdpr-banner .bottom-container .center .gdpr-pop-up {
+        width: 42%;
+
+        .gdpr-text {
+          font-size: $new-video-overlay-styles.base-size * .3;
+        }
       }
-            
-      .gdpr-button .tab {
-        bottom: $new-video-overlay-size * .28;
+
+      .bottom-container {
+        .center,
+        .tab {
+          bottom: 0;
+        }
+              
+        .gdpr-button .tab {
+          bottom: $new-video-overlay-styles.base-size * .28;
+        }
       }
     }
+  }
 
-@media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)
-  #new-video-overlay {
+  @media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
     .bottom-container {
       margin-bottom: constant(safe-area-inset-bottom);
       // @stylint off
@@ -464,9 +461,9 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
     }
 
     .button-left {
-      width: "calc(constant(safe-area-inset-left) + %s)" % $touchable-area-width;
+      width: "calc(constant(safe-area-inset-left) + %s)" % $new-video-overlay-styles.touchable-area-width;
       // @stylint off
-      width: "calc(env(safe-area-inset-left) + %s)" % $touchable-area-width;
+      width: "calc(env(safe-area-inset-left) + %s)" % $new-video-overlay-styles.touchable-area-width;
       // @stylint on
     }
 
@@ -478,24 +475,25 @@ slide-animation($duration = .4s, $function = ease-in, $translation = 0) {
     }
 
     .button-right {
-      width: "calc(constant(safe-area-inset-right) + %s)" % $touchable-area-width;
+      width: "calc(constant(safe-area-inset-right) + %s)" % $new-video-overlay-styles.touchable-area-width;
       // @stylint off
-      width: "calc(env(safe-area-inset-right) + %s)" % $touchable-area-width;
+      width: "calc(env(safe-area-inset-right) + %s)" % $new-video-overlay-styles.touchable-area-width;
       // @stylint on
     }
 
 
     .call-button {
-      width: "calc(constant(safe-area-inset-right) + %s)" % $call-button-width;
+      width: "calc(constant(safe-area-inset-right) + %s)" % $new-video-overlay-styles.call-button-width;
       // @stylint off
-      width: "calc(env(safe-area-inset-right) + %s)" % $call-button-width;
+      width: "calc(env(safe-area-inset-right) + %s)" % $new-video-overlay-styles.call-button-width;
       // @stylint on
     }
 
     .gdpr-button {
-      left: "calc(%s + constant(safe-area-inset-left))" % $touchable-area-width;
+      left: "calc(%s + constant(safe-area-inset-left))" % $new-video-overlay-styles.touchable-area-width;
       // @stylint off
-      left: "calc(%s + env(safe-area-inset-left))" % $touchable-area-width;
+      left: "calc(%s + env(safe-area-inset-left))" % $new-video-overlay-styles.touchable-area-width;
       // @ stylint on
     }
   }
+}

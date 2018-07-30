@@ -32,6 +32,7 @@ import { JaegerManager } from 'Jaeger/JaegerManager';
 import { JaegerSpan } from 'Jaeger/JaegerSpan';
 import { GdprManager } from 'Managers/GdprManager';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { ForceQuitManager } from 'Managers/ForceQuitManager';
 
 describe('NewRefreshManagerTest', () => {
     let nativeBridge: NativeBridge;
@@ -58,6 +59,7 @@ describe('NewRefreshManagerTest', () => {
     let jaegerManager: JaegerManager;
     let gdprManager: GdprManager;
     let programmaticTrackingService: ProgrammaticTrackingService;
+    let forceQuitManager: ForceQuitManager;
 
     beforeEach(() => {
         nativeBridge = TestFixtures.getNativeBridge();
@@ -91,7 +93,8 @@ describe('NewRefreshManagerTest', () => {
             configuration: configuration,
             campaign: campaign
         });
-        container = new Activity(nativeBridge, deviceInfo);
+        forceQuitManager = sinon.createStubInstance(ForceQuitManager);
+        container = new Activity(nativeBridge, deviceInfo, forceQuitManager);
         gdprManager = sinon.createStubInstance(GdprManager);
 
         adUnit = new TestAdUnit(nativeBridge, {

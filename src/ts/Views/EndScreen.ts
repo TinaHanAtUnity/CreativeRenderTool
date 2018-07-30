@@ -1,4 +1,5 @@
 import EndScreenTemplate from 'html/EndScreen.html';
+import IPhoneXEndScreenTemplate from 'html/IPhoneXEndScreen.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
@@ -10,7 +11,7 @@ import { Campaign } from 'Models/Campaign';
 import { IEndScreenDownloadParameters } from 'EventHandlers/EndScreenEventHandler';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
-import { ABGroup } from 'Models/ABGroup';
+import { ABGroup, IPhoneXEndScreenTest } from 'Models/ABGroup';
 import { IGDPREventHandler } from 'EventHandlers/GDPREventHandler';
 
 export interface IEndScreenHandler extends IGDPREventHandler {
@@ -18,6 +19,8 @@ export interface IEndScreenHandler extends IGDPREventHandler {
     onEndScreenClose(): void;
     onKeyEvent(keyCode: number): void;
 }
+
+const IPHONE_X_STYLES_ID = 'iphone-x-styles';
 
 export abstract class EndScreen extends View<IEndScreenHandler> implements IPrivacyHandler {
 
@@ -101,6 +104,11 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         const endScreenAlt = this.getEndscreenAlt();
         if (typeof endScreenAlt === 'string') {
             this._container.classList.add(endScreenAlt);
+
+            // Need this to modify the #gdpr-privacy
+            if (endScreenAlt === IPHONE_X_STYLES_ID) {
+                document.body.classList.add(endScreenAlt);
+            }
         }
 
         if (this._showGDPRBanner) {
@@ -156,6 +164,10 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     }
 
     protected getEndscreenAlt(campaign?: Campaign) {
+        if (this.useIPhoneXStyle()) {
+            return IPHONE_X_STYLES_ID;
+        }
+
         return undefined;
     }
 
@@ -175,7 +187,36 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._privacy.show();
     }
 
+    private isIPhoneX(): boolean {
+        const isIPhone: boolean = /iPhone/.test(navigator.userAgent);
+
+        if (!isIPhone) {
+            return false;
+        }
+
+        const ratio: number = window.devicePixelRatio;
+        const screenSize = {
+            height: window.screen.height * ratio,
+            width: window.screen.width * ratio
+        };
+
+        const iPhoneXWidth = 1125;
+        const iPhoneXHeight = 2436;
+        const isIPhoneXPortrait = screenSize.height === iPhoneXHeight && screenSize.width === iPhoneXWidth;
+        const isIPhoneXLandscape = screenSize.height === iPhoneXWidth && screenSize.width === iPhoneXHeight;
+
+        return isIPhoneXLandscape || isIPhoneXPortrait;
+    }
+
+    private useIPhoneXStyle(): boolean {
+        return IPhoneXEndScreenTest.isValid(this._abGroup) && this.isIPhoneX();
+    }
+
     private getTemplate() {
+        if (this.useIPhoneXStyle()) {
+            return IPhoneXEndScreenTemplate;
+        }
+
         return EndScreenTemplate;
     }
 }

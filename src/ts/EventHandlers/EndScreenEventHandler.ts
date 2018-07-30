@@ -184,10 +184,10 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
 
         if (error instanceof RequestError) {
             error = new DiagnosticError(new Error(error.message), {
-                request: (<RequestError>error).nativeRequest,
+                request: error.nativeRequest,
                 auctionId: currentSession.getId(),
                 url: clickAttributionUrl,
-                response: (<RequestError>error).nativeResponse
+                response: error.nativeResponse
             });
         }
         Diagnostics.trigger('click_attribution_failed', error, currentSession);

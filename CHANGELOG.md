@@ -1,4 +1,37 @@
-# Staged
+# Mon Jul 30 21:52:01 UTC 2018
+
+* Fix GDPR Privacy width for iPhone X in landscape
+* Sending unity internal tracking events for clicks after followRedirectChain
+* Tslint number-literal-format
+* Sonic Creative temporary creative ID Whitelist
+
+# Wed Jul 25 20:12:52 UTC 2018
+
+* New GDPR legal text
+* Fixed issues with backup campaign, expired campaigns were shown, VAST had issues
+
+# Tue Jul 24 20:57:31 UTC 2018
+
+* Add a fixed version of the new video overlay
+* Send Admob impression when ad loads
+* Expanding Localization regex to be more flexible for Chinese
+* Tslint no-unnecessary-qualifier
+* Tslint no-unnecessary-type-assertion
+* Tslint use-default-type-parameter
+* Tslint type-literal-delimiter
+* Tslint no-function-expression
+
+# Fri Jul 20 21:20:03 UTC 2018
+
+* Not using cached adPlan for Uken games - attempt to fix black screen issue
+
+# Fri Jul 20 07:37:21 UTC 2018
+
+* Revert "Merge pull request #5566 from Applifier/feature/new-video-overlay
+* Handle Promo initialization order over SendEvent
+* Tslint no-multiline-string
+
+# Thu Jul 19 20:07:08 UTC 2018
 
 * Add more parameters to AbstractPrivacy Build Information
 * Remove new square endscreen image test
