@@ -31,55 +31,43 @@ describe('ForceQuitManagerTest', () => {
 
     });
 
-    afterEach(() => {
-        setStub.restore();
-        writeStub.restore();
-        getStub.restore();
-        deleteStub.restore();
-    });
-
     describe('createForceQuitKey', () => {
         it('should create and store the force quit key', () => {
-            setStub.returns(Promise.resolve());
-            writeStub.returns(Promise.resolve());
+            setStub.resolves();
+            writeStub.resolves();
             return forceQuitManager.createForceQuitKey(forceQuitData).then(() => {
                 sinon.assert.calledOnce(setStub);
-                assert.equal(setStub.firstCall.args[0], StorageType.PRIVATE);
-                assert.equal(setStub.firstCall.args[1], ForceQuitKey);
-                assert.deepEqual(setStub.firstCall.args[2], forceQuitData);
+                sinon.assert.calledWith(setStub, StorageType.PRIVATE, ForceQuitKey, forceQuitData);
                 sinon.assert.calledOnce(writeStub);
-                assert.equal(writeStub.firstCall.args[0], StorageType.PRIVATE);
+                sinon.assert.calledWith(writeStub, StorageType.PRIVATE);
             });
         });
     });
 
     describe('getForceQuitData', () => {
         it('should get the force quit data', () => {
-            getStub.returns(Promise.resolve(forceQuitData));
+            getStub.resolves(forceQuitData);
             return forceQuitManager.getForceQuitData().then((data) => {
                 sinon.assert.calledOnce(getStub);
-                assert.equal(getStub.firstCall.args[0], StorageType.PRIVATE);
-                assert.equal(getStub.firstCall.args[1], ForceQuitKey);
+                sinon.assert.calledWith(getStub, StorageType.PRIVATE, ForceQuitKey);
                 assert.deepEqual(forceQuitData, data, 'Returned data did not equal the force quit data');
             });
         });
 
         it('should not contain force quit data', () => {
-            getStub.returns(Promise.resolve(undefined));
+            getStub.resolves(undefined);
             return forceQuitManager.getForceQuitData().then((data) => {
                 sinon.assert.calledOnce(getStub);
-                assert.equal(getStub.firstCall.args[0], StorageType.PRIVATE);
-                assert.equal(getStub.firstCall.args[1], ForceQuitKey);
+                sinon.assert.calledWith(getStub, StorageType.PRIVATE, ForceQuitKey);
                 assert.isUndefined(data, 'Returned data was not undefined');
             });
         });
 
         it('should fail to get the force quit data', () => {
-            getStub.returns(Promise.reject(undefined));
+            getStub.rejects(undefined);
             return forceQuitManager.getForceQuitData().then((data) => {
                 sinon.assert.calledOnce(getStub);
-                assert.equal(getStub.firstCall.args[0], StorageType.PRIVATE);
-                assert.equal(getStub.firstCall.args[1], ForceQuitKey);
+                sinon.assert.calledWith(getStub, StorageType.PRIVATE, ForceQuitKey);
                 assert.isUndefined(data, 'Returned force quit data was not undefined');
             });
         });
@@ -87,21 +75,19 @@ describe('ForceQuitManagerTest', () => {
 
     describe('destroyForceQuitKey', () => {
         it('should delete the force quit key', () => {
-            deleteStub.returns(Promise.resolve(true));
+            deleteStub.resolves(true);
             return forceQuitManager.destroyForceQuitKey().then((res) => {
                 sinon.assert.calledOnce(deleteStub);
-                assert.equal(deleteStub.firstCall.args[0], StorageType.PRIVATE);
-                assert.equal(deleteStub.firstCall.args[1], ForceQuitKey);
+                sinon.assert.calledWith(deleteStub, StorageType.PRIVATE, ForceQuitKey);
                 assert.isTrue(res, 'Return value did not equal true');
             });
         });
 
         it('should fail to delete the force quit key', () => {
-            deleteStub.returns(Promise.reject(undefined));
+            deleteStub.rejects(undefined);
             return forceQuitManager.destroyForceQuitKey().then((res) => {
                 sinon.assert.calledOnce(deleteStub);
-                assert.equal(deleteStub.firstCall.args[0], StorageType.PRIVATE);
-                assert.equal(deleteStub.firstCall.args[1], ForceQuitKey);
+                sinon.assert.calledWith(deleteStub, StorageType.PRIVATE, ForceQuitKey);
                 assert.isFalse(res, 'Return value was not false');
             });
         });
