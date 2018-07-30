@@ -30,6 +30,7 @@ import { Configuration } from 'Models/Configuration';
 import { Privacy } from 'Views/Privacy';
 import { GdprManager } from 'Managers/GdprManager';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { ForceQuitManager } from 'Managers/ForceQuitManager';
 
 describe('OverlayEventHandlerTest', () => {
 
@@ -53,6 +54,7 @@ describe('OverlayEventHandlerTest', () => {
     let campaign: PerformanceCampaign;
     let placement: Placement;
     let configuration: Configuration;
+    let forceQuitManager: ForceQuitManager;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -63,6 +65,7 @@ describe('OverlayEventHandlerTest', () => {
         focusManager = new FocusManager(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
+        forceQuitManager = sinon.createStubInstance(ForceQuitManager);
         request = new Request(nativeBridge, wakeUpManager);
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
@@ -81,7 +84,7 @@ describe('OverlayEventHandlerTest', () => {
             configuration: configuration,
             campaign: campaign
         });
-        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
+        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo(), forceQuitManager);
         video = new Video('', TestFixtures.getSession());
 
         const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
