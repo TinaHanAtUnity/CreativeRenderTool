@@ -47,6 +47,7 @@ import { VideoState } from 'AdUnits/VideoAdUnit';
 import { Privacy } from 'Views/Privacy';
 import { GdprManager } from 'Managers/GdprManager';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { ForceQuitManager } from 'Managers/ForceQuitManager';
 
 describe('VideoEventHandlersTest', () => {
 
@@ -76,6 +77,7 @@ describe('VideoEventHandlersTest', () => {
     let performanceVideoEventHandler: PerformanceVideoEventHandler;
     let videoEventHandlerParams: IVideoEventHandlerParams;
     let programmaticTrackingService: ProgrammaticTrackingService;
+    let forceQuitManager: ForceQuitManager;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -85,7 +87,8 @@ describe('VideoEventHandlersTest', () => {
 
         focusManager = new FocusManager(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
-        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
+        forceQuitManager = sinon.createStubInstance(ForceQuitManager);
+        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo(), forceQuitManager);
         const configuration = TestFixtures.getConfiguration();
 
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
@@ -116,7 +119,7 @@ describe('VideoEventHandlersTest', () => {
         const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
         overlay = new Overlay(nativeBridge, false, 'en', configuration.getGamerId(), privacy, false);
 
-        endScreen = new PerformanceEndScreen(nativeBridge, performanceCampaign, 'en', '12345', privacy, false);
+        endScreen = new PerformanceEndScreen(nativeBridge, performanceCampaign, 'en', '12345', privacy, false, configuration.getAbGroup());
         const gdprManager = sinon.createStubInstance(GdprManager);
 
         vastAdUnitParameters = {
@@ -162,7 +165,7 @@ describe('VideoEventHandlersTest', () => {
 
         const xpromoPrivacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
         xPromoCampaign = TestFixtures.getXPromoCampaign();
-        xPromoEndScreen = new XPromoEndScreen(nativeBridge, xPromoCampaign, 'en', '12345', xpromoPrivacy, false);
+        xPromoEndScreen = new XPromoEndScreen(nativeBridge, xPromoCampaign, 'en', '12345', xpromoPrivacy, false, configuration.getAbGroup());
         xPromoAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
@@ -201,7 +204,6 @@ describe('VideoEventHandlersTest', () => {
 
         performanceVideoEventHandler = new PerformanceVideoEventHandler(<IVideoEventHandlerParams<PerformanceAdUnit, PerformanceCampaign>>videoEventHandlerParams);
         performanceAdUnit.setVideoState(VideoState.PREPARING);
-        sinon.stub(performanceAdUnitParameters.campaign, 'getAbGroup').returns(5);
     });
 
     describe('with onVideoPlay', () => {

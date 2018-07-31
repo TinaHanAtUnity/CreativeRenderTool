@@ -16,6 +16,13 @@ export class CustomFeatures {
                gameId === '1543513';
     }
 
+    public static isSonicPlayable(creativeId: string | undefined) {
+        return  creativeId === '109455881' ||
+                creativeId === '109455877' ||
+                creativeId === '109091853' ||
+                creativeId === '109091754';
+    }
+
     public static isPlayableConfigurationEnabled(originalResourceUrl: string) {
         return originalResourceUrl.match(/playables\/production\/unity/);
     }
