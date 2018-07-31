@@ -3,12 +3,13 @@ import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { NativeBridge } from 'Native/NativeBridge';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
+import { ABGroup } from 'Models/ABGroup';
 
 export class PerformanceEndScreen extends EndScreen {
     private _campaign: PerformanceCampaign;
 
-    constructor(nativeBridge: NativeBridge, campaign: PerformanceCampaign, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, osVersion?: string, adUnitStyle?: AdUnitStyle) {
-        super(nativeBridge, language, gameId, campaign.getGameName(), campaign.getAbGroup(), privacy, showGDPRBanner, adUnitStyle, campaign.getId(), osVersion);
+    constructor(nativeBridge: NativeBridge, campaign: PerformanceCampaign, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, osVersion?: string, adUnitStyle?: AdUnitStyle) {
+        super(nativeBridge, language, gameId, campaign.getGameName(), abGroup, privacy, showGDPRBanner, adUnitStyle, campaign.getId(), osVersion);
 
         const adjustedRating: number = campaign.getRating() * 20;
         this._templateData = {
