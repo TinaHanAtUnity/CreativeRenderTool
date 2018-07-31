@@ -41,7 +41,6 @@ const changeOrientation = () => {
 };
 
 const resizeHandler = () => {
-
     if (runningResizeEvent) {
         return;
     }
@@ -57,6 +56,38 @@ const resizeHandler = () => {
 
 resizeHandler();
 window.addEventListener('resize', resizeHandler, false);
+
+// 'resize' event doesn't work when switching directly from one landscape orientation to another
+// so we need to utilize 'orientationchange' event.
+const onChangeOrientation = () => {
+    if (typeof window.orientation === 'undefined' || platform !== 'ios' || isIOS7) {
+        return;
+    }
+
+    let iosOrientation = '';
+    switch(window.orientation) {
+        case 180:
+            iosOrientation = 'ios-portrait-upside-down';
+            break;
+        case 90:
+            iosOrientation  = 'ios-landscape-left';
+            break;
+        case -90:
+            iosOrientation = 'ios-landscape-right';
+            break;
+        default:
+            iosOrientation = 'ios-portrait';
+    }
+
+    document.body.classList.remove(...['ios-landscape-left', 'ios-landscape-right', 'ios-portrait-upside-down']);
+
+    if(iosOrientation) {
+        document.body.classList.add(iosOrientation);
+    }
+};
+
+onChangeOrientation();
+window.addEventListener('orientationchange', onChangeOrientation, false);
 
 if(typeof location !== 'undefined') {
     let nativeBridge: NativeBridge;

@@ -103,3 +103,4 @@ class ABTest {
 
 export const CTAOpenUrlAbTest = new ABTest(GroupEleven, GroupTwelve);
 export const NewVideoOverlayEnabledAbTest = new ABTest(GroupSixteen, GroupSeventeen);
+export const IPhoneXEndScreenTest = new ABTest(GroupEighteen, GroupNineteen);

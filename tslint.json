@@ -52,7 +52,6 @@
     "no-string-based-set-timeout": false,
     "mocha-no-side-effect-code": false,
     "no-http-string": [false, "http://www.example.com/?.*", "http://www.examples.com/?.*"],
-    "no-unnecessary-callback-wrapper": false,
     "export-name": false,
     "insecure-random": false
   }

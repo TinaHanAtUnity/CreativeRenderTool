@@ -1,11 +1,12 @@
-import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
-import { KeyCode } from 'Constants/Android/KeyCode';
-import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
-import { NativeBridge } from 'Native/NativeBridge';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { AdUnitContainer, Orientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
+import { KeyCode } from 'Constants/Android/KeyCode';
 import { Rotation } from 'Constants/Android/Rotation';
+import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
+import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
+import { ForceQuitManager } from 'Managers/ForceQuitManager';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
+import { NativeBridge } from 'Native/NativeBridge';
 
 interface IAndroidOptions {
     requestedOrientation: ScreenOrientation;
@@ -22,6 +23,7 @@ export class Activity extends AdUnitContainer {
 
     private _nativeBridge: NativeBridge;
     private _deviceInfo: AndroidDeviceInfo;
+    private _forceQuitManager: ForceQuitManager;
 
     private _activityId: number;
     private _currentActivityFinished: boolean;
@@ -37,11 +39,12 @@ export class Activity extends AdUnitContainer {
 
     private _androidOptions: IAndroidOptions;
 
-    constructor(nativeBridge: NativeBridge, deviceInfo: AndroidDeviceInfo) {
+    constructor(nativeBridge: NativeBridge, deviceInfo: AndroidDeviceInfo, forceQuitManager: ForceQuitManager) {
         super();
 
         this._nativeBridge = nativeBridge;
         this._deviceInfo = deviceInfo;
+        this._forceQuitManager = forceQuitManager;
 
         this._activityId = 0;
         this._currentActivityFinished = false;
@@ -82,10 +85,14 @@ export class Activity extends AdUnitContainer {
         this._onFocusGainedObserver = this._nativeBridge.AndroidAdUnit.onFocusGained.subscribe(() => this.onFocusGained());
         this._onFocusLostObserver = this._nativeBridge.AndroidAdUnit.onFocusLost.subscribe(() => this.onFocusLost());
 
+        this._forceQuitManager.createForceQuitKey(adUnit.createForceQuitKey());
+
         return this._nativeBridge.AndroidAdUnit.open(this._activityId, nativeViews, this.getOrientation(allowRotation, this._lockedOrientation, options), keyEvents, SystemUiVisibility.LOW_PROFILE, hardwareAccel, isTransparent);
     }
 
     public close(): Promise<void> {
+        this._forceQuitManager.destroyForceQuitKey();
+
         if(!this._currentActivityFinished) {
             this._currentActivityFinished = true;
             this._nativeBridge.AndroidAdUnit.onFocusLost.unsubscribe(this._onFocusLostObserver);
