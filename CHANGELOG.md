@@ -1,3 +1,9 @@
+# Pending
+
+* iPhone X Endscreen test on ABGroups 18 and 19
+* Forcequit Manager added to track abnormal ad termination
+* Remove ABGroup from Campaign model
+
 # Mon Jul 30 21:52:01 UTC 2018
 
 * Fix GDPR Privacy width for iPhone X in landscape
