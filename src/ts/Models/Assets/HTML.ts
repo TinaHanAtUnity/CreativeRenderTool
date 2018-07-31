@@ -1,7 +1,7 @@
 import { Asset, IAsset } from 'Models/Assets/Asset';
 import { Session } from 'Models/Session';
 
-export class HTML extends Asset<IAsset> {
+export class HTML extends Asset {
     constructor(url: string, session: Session, creativeId?: string) {
         super('HTML', session, Asset.Schema);
 

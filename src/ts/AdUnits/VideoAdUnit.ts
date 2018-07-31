@@ -286,7 +286,7 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         this.setVideoState(VideoState.PREPARING);
         this.getValidVideoUrl().then(url => {
             this._finalVideoUrl = url;
-            this._nativeBridge.VideoPlayer.prepare(url, new Double(this._placement.muteVideo() ? 0.0 : 1.0), 10000);
+            this._nativeBridge.VideoPlayer.prepare(url, new Double(this._placement.muteVideo() ? 0 : 1), 10000);
         });
     }
 

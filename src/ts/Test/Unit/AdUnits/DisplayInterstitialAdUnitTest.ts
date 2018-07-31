@@ -22,8 +22,8 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { GdprManager } from 'Managers/GdprManager';
 import { Privacy } from 'Views/Privacy';
-import { PrivacyEventHandler } from 'EventHandlers/PrivacyEventHandler';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { ForceQuitManager } from 'Managers/ForceQuitManager';
 
 describe('DisplayInterstitialAdUnit', () => {
     let adUnit: DisplayInterstitialAdUnit;
@@ -39,6 +39,7 @@ describe('DisplayInterstitialAdUnit', () => {
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
     let displayInterstitialAdUnitParameters: IDisplayInterstitialAdUnitParameters;
+    let forceQuitManager: ForceQuitManager;
 
     describe('On static-interstial campaign', () => {
         adUnitTests();
@@ -48,6 +49,7 @@ describe('DisplayInterstitialAdUnit', () => {
         beforeEach(() => {
             campaign = TestFixtures.getDisplayInterstitialCampaign();
 
+            forceQuitManager = sinon.createStubInstance(ForceQuitManager);
             sandbox = sinon.sandbox.create();
             nativeBridge = TestFixtures.getNativeBridge(Platform.ANDROID);
             sandbox.stub(nativeBridge.WebPlayer, 'setSettings').returns(Promise.resolve());
@@ -59,7 +61,7 @@ describe('DisplayInterstitialAdUnit', () => {
             const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request = new Request(nativeBridge, wakeUpManager);
             const configuration = TestFixtures.getConfiguration();
-            container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
+            container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo(), forceQuitManager);
             sandbox.stub(container, 'open').returns(Promise.resolve());
             sandbox.stub(container, 'close').returns(Promise.resolve());
             clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);

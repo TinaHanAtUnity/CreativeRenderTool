@@ -10,7 +10,7 @@ export class JaegerUtilities {
     // https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
     // this should not be done over the native bridge else we end up with delay added to all network requests.
     public static uuidv4(): string {
-        return 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        return 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
             const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
             return v.toString(16);
           });

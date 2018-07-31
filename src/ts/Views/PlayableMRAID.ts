@@ -13,6 +13,7 @@ import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
 import { SdkStats } from 'Utilities/SdkStats';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { ABGroup } from 'Models/ABGroup';
 
 export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -43,9 +44,11 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _backgroundTime: number = 0;
     private _backgroundTimestamp: number;
 
+    private _abGroup: ABGroup;
+
     private _configuration: any;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup) {
         super(nativeBridge, 'playable-mraid', placement, campaign, privacy, showGDPRBanner);
 
         this._placement = placement;
@@ -53,6 +56,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         this._localization = new Localization(language, 'loadingscreen');
 
         this._template = new Template(PlayableMRAIDTemplate, this._localization);
+        this._abGroup = abGroup;
 
         if(campaign) {
             this._templateData = {
@@ -109,7 +113,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         const playableConfiguration = this._campaign.getPlayableConfiguration();
         if(playableConfiguration) {
             // check configuration based on the ab group
-            const groupKey = 'group' + this._campaign.getAbGroup();
+            const groupKey = 'group' + this._abGroup.toNumber();
             if(playableConfiguration[groupKey]) {
                 this._configuration = playableConfiguration[groupKey];
             } else if (playableConfiguration.default) {

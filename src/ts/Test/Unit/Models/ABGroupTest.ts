@@ -58,8 +58,8 @@ describe('ABGroup tests', () => {
 
     describe('setupTestEnvironment in webview should set AbGroup on ConfigManager and CampaignManager', () => {
         const tests: Array<{
-            metaDataGroup: any,
-            expectedGroup: number | undefined
+            metaDataGroup: any;
+            expectedGroup: number | undefined;
         }> = [{
             metaDataGroup: '5',
             expectedGroup: 5
@@ -82,25 +82,16 @@ describe('ABGroup tests', () => {
                     sinon.assert.calledWith(getStub, 'abGroup');
                     let configAbGroupNumber: number | undefined;
                     const configManager = <any>ConfigManager;
-                    const campaignManager = <any>CampaignManager;
                     const maybeGroup = configManager.AbGroup;
                     if (maybeGroup) {
                         configAbGroupNumber = maybeGroup.toNumber();
                     }
                     assert.equal(configAbGroupNumber, t.expectedGroup);
-                    let campaignAbGroupNumber: number | undefined;
-                    const maybeCampaignGroup = campaignManager.AbGroup;
-                    if (maybeCampaignGroup) {
-                        campaignAbGroupNumber = maybeCampaignGroup.toNumber();
-                    }
-                    assert.equal(campaignAbGroupNumber, t.expectedGroup);
                     configManager.AbGroup = undefined;
-                    campaignManager.AbGroup = undefined;
                     getStub.restore();
                     setupStub.restore();
                 }).catch((error: Error) => {
                     (<any>ConfigManager).AbGroup = undefined;
-                    (<any>CampaignManager).AbGroup = undefined;
                     getStub.restore();
                     setupStub.restore();
                     throw error;

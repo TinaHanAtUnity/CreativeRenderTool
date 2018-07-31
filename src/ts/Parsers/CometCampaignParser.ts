@@ -12,12 +12,10 @@ import { HTML } from 'Models/Assets/HTML';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { Diagnostics } from 'Utilities/Diagnostics';
-import { ABGroup } from 'Models/ABGroup';
-import { SquareEndScreenUtilities } from 'Utilities/SquareEndScreenUtilities';
 
 export class CometCampaignParser extends CampaignParser {
     public static ContentType = 'comet/campaign';
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: ABGroup, osVersion?: string): Promise<Campaign> {
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string): Promise<Campaign> {
         const json = response.getJsonContent();
 
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';
@@ -39,7 +37,6 @@ export class CometCampaignParser extends CampaignParser {
         const baseCampaignParams: ICampaign = {
             id: json.id,
             gamerId: gamerId,
-            abGroup: abGroup,
             willExpireAt: undefined,
             adType: undefined,
             correlationId: undefined,
@@ -95,13 +92,14 @@ export class CometCampaignParser extends CampaignParser {
         } else {
             const parameters: IPerformanceCampaign = {
                 ... baseCampaignParams,
-                ... this.getImages(baseCampaignParams, abGroup, nativeBridge, session, json, osVersion),
                 appStoreId: json.appStoreId,
                 gameId: json.gameId,
                 gameName: json.gameName,
                 gameIcon: new Image(this.validateAndEncodeUrl(json.gameIcon, session), session),
                 rating: json.rating,
                 ratingCount: json.ratingCount,
+                landscapeImage: new Image(this.validateAndEncodeUrl(json.endScreenLandscape, session), session),
+                portraitImage: new Image(this.validateAndEncodeUrl(json.endScreenPortrait, session), session),
                 clickAttributionUrl: json.clickAttributionUrl ? this.validateAndEncodeUrl(json.clickAttributionUrl, session) : undefined,
                 clickAttributionUrlFollowsRedirects: json.clickAttributionUrlFollowsRedirects,
                 clickUrl: this.validateAndEncodeUrl(json.clickUrl, session),
@@ -123,24 +121,6 @@ export class CometCampaignParser extends CampaignParser {
 
             return Promise.resolve(new PerformanceCampaign(parameters));
         }
-    }
-
-    private getImages(baseCampaignParams: ICampaign, abGroup: ABGroup, nativeBridge: NativeBridge, session: Session, json: any, osVersion?: string) {
-        if(SquareEndScreenUtilities.useSquareEndScreenAlt(abGroup, nativeBridge.getPlatform(), baseCampaignParams.id, osVersion)) {
-            const customImageUrl = SquareEndScreenUtilities.getCustomImage(baseCampaignParams.id);
-            if(customImageUrl) {
-                const image = new Image(this.validateAndEncodeUrl(customImageUrl, session), session);
-                return {
-                    portraitImage: image,
-                    landscapeImage: image
-                };
-            }
-        }
-
-        return {
-            landscapeImage: new Image(this.validateAndEncodeUrl(json.endScreenLandscape, session), session),
-            portraitImage: new Image(this.validateAndEncodeUrl(json.endScreenPortrait, session), session)
-        };
     }
 
     private validateAndEncodeVideoEventUrls(urls: { [eventType: string]: string }, session: Session): { [eventType: string]: string } {

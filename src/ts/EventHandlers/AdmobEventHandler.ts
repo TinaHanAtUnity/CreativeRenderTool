@@ -19,6 +19,7 @@ import { AdMobOptionalSignal } from 'Models/AdMobOptionalSignal';
 import { Configuration } from 'Models/Configuration';
 import { GdprManager, GDPREventAction } from 'Managers/GdprManager';
 import { GDPREventHandler } from 'EventHandlers/GDPREventHandler';
+import { Promises } from 'Utilities/Promises';
 
 export interface IAdMobEventHandlerParameters {
     adUnit: AdMobAdUnit;
@@ -95,9 +96,8 @@ export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHa
             urlPromise = this.createClickUrl(url, touchInfo);
         }
         return urlPromise.then((clickUrl) => {
-            return new Promise<void>((resolve, reject) => {
-                this._thirdPartyEventManager.sendEvent('admob click', this._session.getId(), clickUrl, true, headers).then(() => resolve()).catch(reject);
-            });
+            // voidResult transforms promise to Promise<void>
+            return Promises.voidResult(this._thirdPartyEventManager.sendEvent('admob click', this._session.getId(), clickUrl, true, headers));
         });
    }
 
@@ -109,7 +109,6 @@ export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHa
     public onVideoStart(): void {
         // this._timeoutTimer.stop();
         this._adUnit.sendStartEvent();
-        this._adUnit.sendImpressionEvent();
     }
 
     public onShow(): void {

@@ -31,7 +31,7 @@ describe('VPAID View', () => {
         (<any>nativeBridge).DeviceInfo = deviceInfo;
 
         const webPlayer = sinon.createStubInstance(WebPlayerApi);
-        (<any>webPlayer).onWebPlayerEvent = new Observable1<string>();
+        webPlayer.onWebPlayerEvent = new Observable1<string>();
         (<sinon.SinonStub>webPlayer.setData).returns(Promise.resolve());
         (<sinon.SinonStub>webPlayer.sendEvent).returns(Promise.resolve());
         (<any>nativeBridge).WebPlayer = webPlayer;

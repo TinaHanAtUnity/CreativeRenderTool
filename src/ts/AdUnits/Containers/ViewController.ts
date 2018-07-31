@@ -1,16 +1,14 @@
-import { NativeBridge } from 'Native/NativeBridge';
-import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
-import { UIInterfaceOrientation } from 'Constants/iOS/UIInterfaceOrientation';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
-import {
-    AdUnitContainer, AdUnitContainerSystemMessage, Orientation,
-    ViewConfiguration
-} from 'AdUnits/Containers/AdUnitContainer';
-import { Double } from 'Utilities/Double';
+import { AdUnitContainer, AdUnitContainerSystemMessage, Orientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
+import { UIInterfaceOrientation } from 'Constants/iOS/UIInterfaceOrientation';
+import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 import { FocusManager } from 'Managers/FocusManager';
-import { IosDeviceInfo } from 'Models/IosDeviceInfo';
+import { ForceQuitManager } from 'Managers/ForceQuitManager';
 import { ClientInfo } from 'Models/ClientInfo';
+import { IosDeviceInfo } from 'Models/IosDeviceInfo';
+import { NativeBridge } from 'Native/NativeBridge';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { Double } from 'Utilities/Double';
 
 interface IIosOptions {
     supportedOrientations: UIInterfaceOrientationMask;
@@ -31,6 +29,7 @@ export class ViewController extends AdUnitContainer {
     private _showing: boolean;
     private _options: IIosOptions;
     private _clientInfo: ClientInfo;
+    private _forceQuitManager: ForceQuitManager;
 
     private _onViewControllerDidAppearObserver: any;
     private _onViewControllerDidDisappearObserver: any;
@@ -39,13 +38,14 @@ export class ViewController extends AdUnitContainer {
     private _onAppBackgroundObserver: any;
     private _onAppForegroundObserver: any;
 
-    constructor(nativeBridge: NativeBridge, deviceInfo: IosDeviceInfo, focusManager: FocusManager, clientInfo: ClientInfo) {
+    constructor(nativeBridge: NativeBridge, deviceInfo: IosDeviceInfo, focusManager: FocusManager, clientInfo: ClientInfo, forceQuitManager: ForceQuitManager) {
         super();
 
         this._nativeBridge = nativeBridge;
         this._focusManager = focusManager;
         this._deviceInfo = deviceInfo;
         this._clientInfo = clientInfo;
+        this._forceQuitManager = forceQuitManager;
 
         this._onViewControllerDidDisappearObserver = this._nativeBridge.IosAdUnit.onViewControllerDidDisappear.subscribe(() => this.onViewDidDisappear());
         this._onViewControllerDidAppearObserver = this._nativeBridge.IosAdUnit.onViewControllerDidAppear.subscribe(() => this.onViewDidAppear());
@@ -78,14 +78,17 @@ export class ViewController extends AdUnitContainer {
         this._nativeBridge.Sdk.logInfo('Opening ' + adUnit.description() + ' ad with orientation ' + Orientation[this._lockedOrientation]);
 
         let hideStatusBar = true;
-        if(allowStatusBar) {
+        if (allowStatusBar) {
             hideStatusBar = options.statusBarHidden;
         }
+
+        this._forceQuitManager.createForceQuitKey(adUnit.createForceQuitKey());
 
         return this._nativeBridge.IosAdUnit.open(nativeViews, this.getOrientation(options, allowRotation, this._lockedOrientation), hideStatusBar, allowRotation, isTransparent, withAnimation);
     }
 
     public close(): Promise<void> {
+        this._forceQuitManager.destroyForceQuitKey();
         this._showing = false;
 
         if(CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
@@ -96,6 +99,7 @@ export class ViewController extends AdUnitContainer {
         this._focusManager.onAppForeground.unsubscribe(this._onAppForegroundObserver);
         this._nativeBridge.Notification.removeAVNotificationObserver(ViewController._audioSessionInterrupt);
         this._nativeBridge.Notification.removeAVNotificationObserver(ViewController._audioSessionRouteChange);
+
         return this._nativeBridge.IosAdUnit.close();
     }
 
@@ -217,7 +221,7 @@ export class ViewController extends AdUnitContainer {
 
         switch(event) {
             case ViewController._audioSessionInterrupt:
-                const interruptData: { AVAudioSessionInterruptionTypeKey: number, AVAudioSessionInterruptionOptionKey: number } = parameters;
+                const interruptData: { AVAudioSessionInterruptionTypeKey: number; AVAudioSessionInterruptionOptionKey: number } = parameters;
 
                 if(interruptData.AVAudioSessionInterruptionTypeKey === 0) {
                     if(interruptData.AVAudioSessionInterruptionOptionKey === 1) {

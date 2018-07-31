@@ -420,9 +420,9 @@ describe('GdprManagerTest', () => {
 
     describe('Sending gdpr events', () => {
         const tests: Array<{
-            action: GDPREventAction,
-            source: GDPREventSource | undefined,
-            infoJson: any
+            action: GDPREventAction;
+            source: GDPREventSource | undefined;
+            infoJson: any;
         }> = [{
             action: GDPREventAction.SKIP,
             source: undefined,

@@ -57,7 +57,6 @@ describe('VPAIDEventHandlerTest', () => {
         };
         adUnit = sinon.createStubInstance(VPAIDAdUnit);
         (<sinon.SinonStub>parameters.campaign.getSession).returns(TestFixtures.getSession());
-        (<sinon.SinonStub>parameters.campaign.getAbGroup).returns(5);
         (<sinon.SinonStub>parameters.campaign.getVideoClickTrackingURLs).returns(['https://tracking.unityads.unity3d.com']);
         (<sinon.SinonStub>parameters.campaign.getVideoClickThroughURL).returns('https://unityads.unity3d.com');
 
@@ -156,7 +155,7 @@ describe('VPAIDEventHandlerTest', () => {
             const checkClickThroughTracking = () => {
                 const urls = parameters.campaign.getVideoClickTrackingURLs();
                 for (const url of urls) {
-                    sinon.assert.calledWith(<sinon.SinonSpy>parameters.thirdPartyEventManager.sendEvent, `vpaid video click`, TestFixtures.getSession().getId(), url);
+                    sinon.assert.calledWith(<sinon.SinonSpy>parameters.thirdPartyEventManager.sendEvent, 'vpaid video click', TestFixtures.getSession().getId(), url);
                 }
             };
 
