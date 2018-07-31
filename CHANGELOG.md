@@ -3,6 +3,7 @@
 * iPhone X Endscreen test on ABGroups 18 and 19
 * Forcequit Manager added to track abnormal ad termination
 * Remove ABGroup from Campaign model
+* Tslint prefer-method-signature
 
 # Mon Jul 30 21:52:01 UTC 2018
 
