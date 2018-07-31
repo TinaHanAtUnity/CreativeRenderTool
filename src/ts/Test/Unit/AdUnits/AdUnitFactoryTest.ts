@@ -305,6 +305,8 @@ describe('AdUnitFactoryTest', () => {
             sandbox.stub(operativeEventManager, 'sendView').returns(Promise.resolve());
             sandbox.stub(operativeEventManager, 'sendThirdQuartile').returns(Promise.resolve());
             sandbox.stub(operativeEventManager, 'sendSkip').returns(Promise.resolve());
+            sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
+            sandbox.stub(PurchasingUtilities, 'getProductType').returns('NonConsumable');
 
             promoAdUnit = <PromoAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
         });

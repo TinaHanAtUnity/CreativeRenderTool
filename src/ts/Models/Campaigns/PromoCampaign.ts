@@ -1,5 +1,6 @@
 import { Campaign, ICampaign } from 'Models/Campaign';
 import { HTML } from 'Models/Assets/HTML';
+import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 
 export interface IPromoCampaign extends ICampaign {
     iapProductId: string;
@@ -28,8 +29,30 @@ export class PromoCampaign extends Campaign<IPromoCampaign> {
         return !resource.getFileId();
     }
 
+    private createTrackingEventUrlsWithProductType(productType: string): { [url: string]: string[] } {
+        const additionalTrackingEvents = this.get('additionalTrackingEvents');
+        const result: { [url: string]: string[] } = { };
+        if (additionalTrackingEvents !== undefined) {
+            for (const key in additionalTrackingEvents) {
+                if(additionalTrackingEvents.hasOwnProperty(key)) {
+                    result[key] = [];
+                    const trackingURLs = additionalTrackingEvents[key];
+                    for(const trackingURL of trackingURLs) {
+                        result[key].push(trackingURL + '&productType=' + productType);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
     public getTrackingEventUrls(): { [eventName: string]: string[] } | undefined {
-        return this.get('additionalTrackingEvents');
+        const productId = this.getIapProductId();
+        const productType = PurchasingUtilities.getProductType(productId);
+        if (productType === undefined) {
+            return this.get('additionalTrackingEvents');
+        }
+        return this.createTrackingEventUrlsWithProductType(productType);
     }
 
     public getTrackingUrlsForEvent(eventName: string): string[] {

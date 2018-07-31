@@ -1,0 +1,13 @@
+[
+    {
+        "localizedPriceString": "$0.00",
+        "localizedTitle" : "Sword of Minimal Value",
+        "productId" : "myPromo"
+    },
+    {
+        "localizedPriceString" : "$0.99",
+        "localizedTitle" : "100 in-game Gold Coins",
+        "productId" : "100.gold.coins",
+        "productType" : "nonConsumable"
+    }
+]
