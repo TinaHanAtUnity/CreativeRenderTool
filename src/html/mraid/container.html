@@ -241,13 +241,26 @@
             setInterval(sendStats, 500);
 
             window.mraid = new MRAID();
-            var originalRequestAnimationFrame = window.requestAnimationFrame;
-            window.requestAnimationFrame = function(callback) {
-                if (playableStartTime === undefined) {
-                    playableStartTime = Date.now();
-                }
-                return originalRequestAnimationFrame((time) => { frameCount++; callback(time); });
-            }.bind(window);
+
+            if (window.requestAnimationFrame)
+            {
+                var originalRequestAnimationFrame = window.requestAnimationFrame;
+                window.requestAnimationFrame = function(callback) {
+                    if (playableStartTime === undefined) {
+                        playableStartTime = Date.now();
+                    }
+                    return originalRequestAnimationFrame((time) => { frameCount++; callback(time); });
+                }.bind(window);
+            } else if (window.webkitRequestAnimationFrame)
+            {
+                var originalRequestAnimationFrame = window.webkitRequestAnimationFrame;
+                window.webkitRequestAnimationFrame = function(callback) {
+                    if (playableStartTime === undefined) {
+                        playableStartTime = Date.now();
+                    }
+                    return originalRequestAnimationFrame((time) => { frameCount++; callback(time); });
+                }.bind(window);
+            }
         })();
     </script>
 </head>
