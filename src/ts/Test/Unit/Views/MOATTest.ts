@@ -26,9 +26,11 @@ describe('MOAT', () => {
             diagnosticsTriggerStub.restore();
         });
 
+        type IAssertionFunction = () => void;
+
         const tests: Array<{
             event: any;
-            assertions: () => void;
+            assertions: IAssertionFunction;
         }> = [{
             event: {data: {type: 'MOATVideoError', error: 'test error'}},
             assertions: () => {
