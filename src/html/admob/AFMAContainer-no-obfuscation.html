@@ -66,6 +66,7 @@
             this.intentCallbackId = 0;
             this.sentQuartiles = {};
             var clickSignalListeners = [];
+            var hasSentStart = false;
 
             document.addEventListener('DOMContentLoaded', function() {
 
@@ -127,8 +128,11 @@
                     });
                 });
 
-                videoEl.addEventListener('play', function() {
-                    self.postMessage('videoStart');
+                videoEl.addEventListener('playing', function() {
+                    if (!hasSentStart) {
+                        hasSentStart = true;
+                        self.postMessage('videoStart');
+                    }
                 });
             });
 
