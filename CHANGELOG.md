@@ -4,6 +4,7 @@
 * Forcequit Manager added to track abnormal ad termination
 * Remove ABGroup from Campaign model
 * Tslint prefer-method-signature
+* Revert CustomFeature change for Uken Games
 
 # Mon Jul 30 21:52:01 UTC 2018
 
