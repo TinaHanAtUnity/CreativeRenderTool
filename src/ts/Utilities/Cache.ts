@@ -49,6 +49,9 @@ export interface ICacheCampaignsResponse {
     [id: string]: ICacheCampaignResponse;
 }
 
+type ICallbackResolveFunction = (value?: [CacheStatus, string]) => void;
+type ICallbackRejectFunction = (reason?: any) => void;
+
 interface ICallbackObject {
     fileId: string;
     networkRetry: boolean;
@@ -59,8 +62,8 @@ interface ICallbackObject {
     contentLength: number;
     diagnostics: ICacheDiagnostics;
     session: Session;
-    resolve(value?: [CacheStatus, string]): void;
-    reject(reason?: any): void;
+    resolve: ICallbackResolveFunction;
+    reject: ICallbackRejectFunction;
     originalUrl?: string;
     adType: string;
     seatId: number | undefined;

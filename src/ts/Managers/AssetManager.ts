@@ -17,18 +17,24 @@ enum CacheType {
     OPTIONAL
 }
 
+type ICampaignQueueResolveFunction = (campaign: Campaign) => void;
+type ICampaignQueueRejectFunction = (reason?: any) => void;
+
 interface ICampaignQueueObject {
     campaign: Campaign;
     resolved: boolean;
-    resolve(campaign: Campaign): void;
-    reject(reason?: any): void;
+    resolve: ICampaignQueueResolveFunction;
+    reject: ICampaignQueueRejectFunction;
 }
+
+type IAssetQueueResolveFunction = (value: string[]) => void;
+type IAssetQueueRejectFunction = (reason?: any) => void;
 
 interface IAssetQueueObject {
     url: string;
     diagnostics: ICacheDiagnostics;
-    resolve(value: string[]): void;
-    reject(reason?: any): void;
+    resolve: IAssetQueueResolveFunction;
+    reject: IAssetQueueRejectFunction;
 }
 
 export class AssetManager {
