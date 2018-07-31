@@ -10,11 +10,13 @@ import { Privacy } from 'Views/Privacy';
 
 import EndScreenFixture from 'html/fixtures/EndScreenFixture.html';
 import { IEndScreenParameters } from 'Views/EndScreen';
+import { Configuration } from 'Models/Configuration';
 
 describe('EndScreen', () => {
     let handleInvocation: sinon.SinonSpy;
     let handleCallback: sinon.SinonSpy;
     let nativeBridge: NativeBridge;
+    let configuration: Configuration;
 
     beforeEach(() => {
         handleInvocation = sinon.spy();
@@ -26,6 +28,7 @@ describe('EndScreen', () => {
         Localization.setLanguageMap('fi.*', 'endscreen', {
             'Download For Free': 'Lataa ilmaiseksi'
         });
+        configuration = TestFixtures.getConfiguration();
     });
 
     function createEndScreen(language : string) {
@@ -35,7 +38,7 @@ describe('EndScreen', () => {
             language,
             gameId: 'testGameId',
             targetGameName: TestFixtures.getCampaign().getGameName(),
-            abGroup: TestFixtures.getCampaign().getAbGroup(),
+            abGroup: configuration.getAbGroup(),
             privacy,
             showGDPRBanner: false,
             campaignId: TestFixtures.getCampaign().getId()

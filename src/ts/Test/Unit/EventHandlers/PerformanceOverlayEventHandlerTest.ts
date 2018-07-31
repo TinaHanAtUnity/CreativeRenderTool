@@ -24,7 +24,6 @@ import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFact
 import { Privacy } from 'Views/Privacy';
 import { GdprManager } from 'Managers/GdprManager';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
-import { ABGroupBuilder } from 'Models/ABGroup';
 import { IEndScreenParameters } from 'Views/EndScreen';
 import { ForceQuitManager } from 'Managers/ForceQuitManager';
 
@@ -82,7 +81,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
             gameId: clientInfo.getGameId(),
             privacy: privacy,
             showGDPRBanner: true,
-            abGroup: ABGroupBuilder.getAbGroup(99),
+            abGroup: configuration.getAbGroup(),
             targetGameName: campaign.getGameName()
         };
         endScreen = new PerformanceEndScreen(endScreenParams, campaign);

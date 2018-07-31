@@ -30,7 +30,6 @@ import { Configuration } from 'Models/Configuration';
 import { Privacy } from 'Views/Privacy';
 import { GdprManager } from 'Managers/GdprManager';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
-import { ABGroupBuilder } from 'Models/ABGroup';
 import { IEndScreenParameters } from 'Views/EndScreen';
 import { ForceQuitManager } from 'Managers/ForceQuitManager';
 
@@ -96,7 +95,7 @@ describe('OverlayEventHandlerTest', () => {
             gameId: clientInfo.getGameId(),
             privacy: privacy,
             showGDPRBanner: false,
-            abGroup: ABGroupBuilder.getAbGroup(99),
+            abGroup: configuration.getAbGroup(),
             targetGameName: campaign.getGameName()
         };
         endScreen = new PerformanceEndScreen(endScreenParams, campaign);
@@ -125,7 +124,6 @@ describe('OverlayEventHandlerTest', () => {
             gdprManager: gdprManager,
             programmaticTrackingService: programmaticTrackingService
         };
-        sinon.stub(performanceAdUnitParameters.campaign, 'getAbGroup').returns(5);
 
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
         overlayEventHandler = new OverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);

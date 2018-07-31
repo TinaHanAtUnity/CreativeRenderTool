@@ -29,7 +29,6 @@ import { Privacy } from 'Views/Privacy';
 import { GdprManager } from 'Managers/GdprManager';
 import { IOperativeEventParams } from 'Managers/OperativeEventManager';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
-import { ABGroupBuilder } from 'Models/ABGroup';
 import { IEndScreenParameters } from 'Views/EndScreen';
 import { ForceQuitManager } from 'Managers/ForceQuitManager';
 
@@ -100,7 +99,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 gameId: clientInfo.getGameId(),
                 privacy: privacy,
                 showGDPRBanner: false,
-                abGroup: ABGroupBuilder.getAbGroup(99),
+                abGroup: configuration.getAbGroup(),
                 targetGameName: TestFixtures.getXPromoCampaign().getGameName()
             };
             endScreen = new XPromoEndScreen(endScreenParams, TestFixtures.getXPromoCampaign());
@@ -197,7 +196,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 gameId: clientInfo.getGameId(),
                 privacy: privacy,
                 showGDPRBanner: false,
-                abGroup: ABGroupBuilder.getAbGroup(99),
+                abGroup: configuration.getAbGroup(),
                 targetGameName: campaign.getGameName()
             };
             endScreen = new XPromoEndScreen(endScreenParams, campaign);

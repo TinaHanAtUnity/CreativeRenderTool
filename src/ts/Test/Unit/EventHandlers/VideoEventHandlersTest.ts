@@ -47,7 +47,6 @@ import { VideoState } from 'AdUnits/VideoAdUnit';
 import { Privacy } from 'Views/Privacy';
 import { GdprManager } from 'Managers/GdprManager';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
-import { ABGroupBuilder } from 'Models/ABGroup';
 import { IEndScreenParameters } from 'Views/EndScreen';
 import { ForceQuitManager } from 'Managers/ForceQuitManager';
 
@@ -127,7 +126,7 @@ describe('VideoEventHandlersTest', () => {
             gameId: '12345',
             privacy: privacy,
             showGDPRBanner: false,
-            abGroup: ABGroupBuilder.getAbGroup(99),
+            abGroup: configuration.getAbGroup(),
             targetGameName: performanceCampaign.getGameName()
         };
         endScreen = new PerformanceEndScreen(endScreenParams, performanceCampaign);
@@ -182,7 +181,7 @@ describe('VideoEventHandlersTest', () => {
             gameId: '12345',
             privacy: xpromoPrivacy,
             showGDPRBanner: false,
-            abGroup: ABGroupBuilder.getAbGroup(99),
+            abGroup: configuration.getAbGroup(),
             targetGameName: xPromoCampaign.getGameName()
         };
         xPromoEndScreen = new XPromoEndScreen(xpromoEndScreenParams, xPromoCampaign);
@@ -224,7 +223,6 @@ describe('VideoEventHandlersTest', () => {
 
         performanceVideoEventHandler = new PerformanceVideoEventHandler(<IVideoEventHandlerParams<PerformanceAdUnit, PerformanceCampaign>>videoEventHandlerParams);
         performanceAdUnit.setVideoState(VideoState.PREPARING);
-        sinon.stub(performanceAdUnitParameters.campaign, 'getAbGroup').returns(5);
     });
 
     describe('with onVideoPlay', () => {
