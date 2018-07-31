@@ -24,6 +24,7 @@ import { VideoState } from 'AdUnits/VideoAdUnit';
 import { Privacy } from 'Views/Privacy';
 import { GdprManager } from 'Managers/GdprManager';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { ForceQuitManager } from 'Managers/ForceQuitManager';
 
 describe('PerformanceVideoEventHandlersTest', () => {
 
@@ -35,6 +36,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
     let video: Video;
     let performanceAdUnitParameters: IPerformanceAdUnitParameters;
     let performanceVideoEventHandler: PerformanceVideoEventHandler;
+    let forceQuitManager: ForceQuitManager;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -42,7 +44,8 @@ describe('PerformanceVideoEventHandlersTest', () => {
             handleCallback
         });
 
-        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
+        forceQuitManager = sinon.createStubInstance(ForceQuitManager);
+        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo(), forceQuitManager);
         video = new Video('', TestFixtures.getSession());
 
         const focusManager = new FocusManager(nativeBridge);
@@ -67,7 +70,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
         });
 
         const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
-        endScreen = new PerformanceEndScreen(nativeBridge, campaign, deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, false);
+        endScreen = new PerformanceEndScreen(nativeBridge, campaign, deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, false, configuration.getAbGroup());
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
         const gdprManager = sinon.createStubInstance(GdprManager);
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);

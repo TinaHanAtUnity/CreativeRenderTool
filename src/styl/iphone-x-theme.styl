@@ -1,0 +1,157 @@
+@import "vars.styl";
+@import "components.styl";
+@import "mixins.styl";
+
+$iphone-x-button-right = calc(env(safe-area-inset-right) - 1rem);
+
+$iphone-x-end-screen-mixin($scale-size = $default-scale-size) {
+
+  $iphone-x-common-margin = $default-size * $scale-size * .25;
+
+  html {
+    #end-screen.iphone-x-styles {
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+    }
+  }
+
+  body {
+
+    &.portrait.iphone-x-styles #gdpr-privacy {
+      height: calc(100% - constant(safe-area-inset-top));
+      // @stylint off
+      height: calc(100% - env(safe-area-inset-top));
+      // @stylint on
+    }
+
+    &.landscape {
+      &.iphone-x-styles {
+        #gdpr-privacy {
+          height: 100%;
+        }
+
+        &.ios-landscape-right #gdpr-privacy {
+          left: 0;
+        }
+
+        &.ios-landscape-left #gdpr-privacy {
+          .pop-up {
+            margin: 5% 8%;
+          }
+        }
+      }
+    }
+
+    &.landscape #end-screen.show-gdpr-banner.iphone-x-styles .gdpr-pop-up {
+      padding-bottom: constant(safe-area-inset-bottom);
+      // @stylint off
+      padding-bottom: env(safe-area-inset-bottom);
+      // @stylint on
+
+      .gdpr-text {
+        padding-bottom: 0;
+      }
+    }
+
+    &.landscape #end-screen.iphone-x-styles,
+    &.portrait #end-screen.iphone-x-styles {
+      .end-screen-info-background {
+        position: relative;
+        z-index: 7;
+      }
+    }
+
+    &.portrait #end-screen.iphone-x-styles {
+      padding-top: constant(safe-area-inset-top);
+      // @stylint off
+      padding-top: env(safe-area-inset-top);
+      // @stylint on
+      width: 100vw;
+      height: calc(100vh - env(safe-area-inset-top));
+
+      .end-screen-info-background {
+        height: 50%;
+      }
+
+      .btn-close-region {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+        line-height: 1rem;
+      }
+
+      .unityads-logo {
+        margin-bottom: .15rem;
+      }
+
+      .privacy-button {
+        left: 0;
+        margin-left: 1rem;
+      }
+    }
+
+    &.landscape #end-screen.iphone-x-styles {
+      height: 100vh;
+
+      .column-container {
+        margin: .5rem 0 0 0;
+      }
+
+      .name-container {
+        font-size: 1.2rem;
+      }
+
+      .game-rating {
+        font-size: 1.1rem;
+      }
+
+      .end-screen-info-background {
+        flex-grow: 1;
+      }
+
+      .btn-close-region {
+        padding-right: 1rem;
+        padding-left: 1rem;
+        width: auto;
+      }
+
+      .privacy-button {
+        right: env(safe-area-inset-right);
+        // @stylint off
+        right: constant(safe-area-inset-right);
+        // @stylint on
+        left: auto;
+        padding-left: .3rem;
+        line-height: 1rem;
+      }
+    }
+
+    &.ios-landscape-right #end-screen.iphone-x-styles {
+      padding-right: env(safe-area-inset-right);
+      width: calc(100vw - env(safe-area-inset-right));
+      // @stylint off
+      padding-right: constant(safe-area-inset-right);
+      width: calc(100vw - constant(safe-area-inset-right));
+      // @stylint on
+
+      .btn-close-region {
+        padding-right: 2rem;
+      }
+    }
+
+    &.ios-landscape-left #end-screen.iphone-x-styles {
+      padding-left: env(safe-area-inset-left);
+      width: calc(100vw - env(safe-area-inset-left));
+      // @stylint off
+      padding-left: constant(safe-area-inset-left);
+      width: calc(100vw - constant(safe-area-inset-left));
+      // @stylint on
+
+      .btn-close-region {
+        padding-right: .1rem;
+      }
+    }
+  }
+}
+
+$iphone-x-end-screen-mixin();
