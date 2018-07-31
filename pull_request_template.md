@@ -10,11 +10,11 @@ _What are the changes that are being made?_
 
 ## Testing
 
-| Device type to test | iOS | Android |
-|---------------------|-----|---------|
-| old | _insert device_ | _insert device_ |
-| recent | | |
-| new | | |
+| Device type to test | iOS | Android | Unity
+|---------------------|-----|---------| --------|
+| old | _insert device_ | _insert device_ | |
+| recent | | | |
+| new | | | |
 
  _If you do not test on both platforms please leave a description as to why._
 
