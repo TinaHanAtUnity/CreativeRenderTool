@@ -348,8 +348,8 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
             case 'sendStats':
                 this.updateStats({
                     totalTime: event.data.totalTime,
-                    frameCount: event.data.frameCount,
-                    averageFps: event.data.frameCount / event.data.totalTime
+                    playTime: event.data.playTime,
+                    frameCount: event.data.frameCount
                 });
                 break;
             case 'orientation':

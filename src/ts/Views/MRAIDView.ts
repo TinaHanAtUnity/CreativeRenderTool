@@ -18,8 +18,13 @@ export interface IOrientationProperties {
 
 export interface IMRAIDStats {
     totalTime: number;
+    playTime: number;
     frameCount: number;
+}
+
+export interface IMRAIDFullStats extends IMRAIDStats {
     averageFps: number;
+    averagePlayFps: number;
 }
 
 export interface IMRAIDViewHandler extends GDPREventHandler {
@@ -39,7 +44,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     protected _privacy: AbstractPrivacy;
     protected _showGDPRBanner = false;
     protected _gdprPopupClicked = false;
-    protected _stats: IMRAIDStats;
+    protected _stats: IMRAIDFullStats;
 
     constructor(nativeBridge: NativeBridge, id: string, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
         super(nativeBridge, id);
@@ -70,7 +75,8 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         }
 
         if (this._stats !== undefined) {
-            this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(0, 0, 0, 'mraid_performance_stats', this._stats));
+            this._nativeBridge.Sdk.logInfo('******* > ' + JSON.stringify(this._stats));
+            //this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(0, 0, 0, 'mraid_performance_stats', this._stats));
         }
     }
 
@@ -119,7 +125,11 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     protected abstract choosePrivacyShown(): void;
 
     protected updateStats(stats: IMRAIDStats): void {
-        this._stats = stats;
+        this._stats = {
+            ...stats,
+            averageFps: stats.frameCount / stats.totalTime,
+            averagePlayFps: stats.frameCount / stats.playTime
+        };
     }
 
     private replaceMraidSources(mraid: string): string {
