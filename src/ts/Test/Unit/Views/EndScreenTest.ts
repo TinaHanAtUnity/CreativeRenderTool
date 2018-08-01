@@ -31,7 +31,7 @@ describe('EndScreen', () => {
         configuration = TestFixtures.getConfiguration();
     });
 
-    function createEndScreen(language : string) {
+    const createEndScreen = (language : string) : PerformanceEndScreen => {
         const privacy = new Privacy(nativeBridge, false);
         const params : IEndScreenParameters = {
             nativeBridge,
@@ -44,7 +44,7 @@ describe('EndScreen', () => {
             campaignId: TestFixtures.getCampaign().getId()
         };
         return new PerformanceEndScreen(params, TestFixtures.getCampaign());
-    }
+    };
 
     xit('should render', () => {
         const endScreen = createEndScreen('en');
