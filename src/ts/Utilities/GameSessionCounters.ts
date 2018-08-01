@@ -12,12 +12,15 @@ export class GameSessionCounters {
         this._targetViewCounter = {};
         this._campaignStartCounter = {};
         this._campaignViewCounter = {};
+        this._latestCampaignsStarts = {};
     }
 
     public static addStart(campaign: Campaign) {
         this._totalStartCount++;
 
         const campaignId = campaign.getId();
+        this._latestCampaignsStarts[campaignId] = (new Date()).toISOString();
+
         if (this._campaignStartCounter[campaignId]) {
             let campaignStartCount = this._campaignStartCounter[campaignId];
             this._campaignStartCounter[campaignId] = ++campaignStartCount;
@@ -70,7 +73,8 @@ export class GameSessionCounters {
             startsPerCampaign: this._campaignStartCounter,
             startsPerTarget: this._targetStartCounter,
             viewsPerCampaign: this._campaignViewCounter,
-            viewsPerTarget: this._targetViewCounter };
+            viewsPerTarget: this._targetViewCounter,
+            latestCampaignsStarts: this._latestCampaignsStarts};
     }
 
     private static _adRequestCount: number = 0;
@@ -80,5 +84,6 @@ export class GameSessionCounters {
     private static _targetViewCounter: {[id: string]: number} = {};
     private static _campaignStartCounter: {[id: string]: number} = {};
     private static _campaignViewCounter: {[id: string]: number} = {};
+    private static _latestCampaignsStarts: {[id: string]: string} = {};
 
 }
