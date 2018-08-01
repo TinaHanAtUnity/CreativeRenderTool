@@ -24,7 +24,7 @@ describe('AFMABridge', () => {
             onAFMAGrantReward: sinon.spy(),
             onAFMAOpenInAppStore: sinon.spy(),
             onAFMAOpenStoreOverlay: sinon.spy(),
-            onAFMARewardedVideoStart: sinon.spy(),
+            OnAFMAVideoStart: sinon.spy(),
             onAFMAResolveOpenableIntents: sinon.spy(),
             onAFMATrackingEvent: sinon.spy(),
             onAFMAClickSignalRequest: sinon.spy(),
@@ -77,8 +77,8 @@ describe('AFMABridge', () => {
             },
             verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAForceOrientation, Orientation.LANDSCAPE)
         }, {
-            event: AFMAEvents.REWARDED_VIDEO_START,
-            verify: (data?: any) => sinon.assert.called(<sinon.SinonSpy>handler.onAFMARewardedVideoStart)
+            event: AFMAEvents.VIDEO_START,
+            verify: (data?: any) => sinon.assert.called(<sinon.SinonSpy>handler.OnAFMAVideoStart)
         }, {
             event: AFMAEvents.CLICK,
             data: {

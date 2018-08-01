@@ -69,6 +69,7 @@
             var clickSignalListeners = [];
             var supposedCurrentTime = 0;
             var userSeeked = false;
+            var hasSentStart = false;
 
             document.addEventListener('DOMContentLoaded', function() {
 
@@ -142,6 +143,13 @@
                     if (!userSeeked) {
                         userSeeked = true;
                         self.postMessage('seeked');
+                    }
+                });
+
+                videoEl.addEventListener('playing', function() {
+                    if (!hasSentStart) {
+                        hasSentStart = true;
+                        self.postMessage('videoStart');
                     }
                 });
             });
@@ -236,7 +244,7 @@
             };
 
             this.notifyRewardedVideoStart = function() {
-                this.postMessage('rewardedVideoStart');
+                // Do nothing, but leave so Admob can continue calling it
             };
 
             this.grantReward = function() {

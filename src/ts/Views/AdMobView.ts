@@ -66,7 +66,7 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
             onAFMAGrantReward: () => this.onGrantReward(),
             onAFMAOpenInAppStore: () => { /**/ },
             onAFMAOpenStoreOverlay: () => { /**/ },
-            onAFMARewardedVideoStart: () => this.onVideoStart(),
+            OnAFMAVideoStart: () => this.onVideoStart(),
             onAFMAResolveOpenableIntents: (request) => this.onResolveOpenableIntents(request),
             onAFMATrackingEvent: (event, data?) => this.onTrackingEvent(event, data),
             onAFMAClickSignalRequest: (touchInfo) => this.onClickSignalRequest(touchInfo),
