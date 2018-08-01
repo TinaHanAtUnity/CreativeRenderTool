@@ -78,11 +78,12 @@ export class ProgrammaticVastParser extends CampaignParser {
             advertiserDomain: response.getAdvertiserDomain() || undefined,
             advertiserCampaignId: response.getAdvertiserCampaignId() || undefined,
             advertiserBundleId: response.getAdvertiserBundleId() || undefined,
+            impressionUrls: this.validateAndEncodeUrls(vast.getImpressionUrls(), session),
             isMoatEnabled: response.isMoatEnabled() || undefined
         };
 
         const campaign = new VastCampaign(vastCampaignParms);
-        if(campaign.getVast().getImpressionUrls().length === 0) {
+        if(campaign.getImpressionUrls().length === 0) {
             throw new Error('Campaign does not have an impression url');
         }
         // todo throw an Error if required events are missing. (what are the required events?)
@@ -105,5 +106,4 @@ export class ProgrammaticVastParser extends CampaignParser {
         }
         return Promise.resolve(campaign);
     }
-
 }

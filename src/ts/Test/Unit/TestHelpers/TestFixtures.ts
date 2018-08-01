@@ -262,6 +262,7 @@ export class TestFixtures {
             useWebViewUserAgentForTracking: false,
             buyerId: 'buyerId',
             trackingUrls: {},
+            impressionUrls: [],
             isMoatEnabled: true
         };
     }
