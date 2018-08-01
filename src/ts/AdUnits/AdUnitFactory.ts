@@ -78,7 +78,7 @@ export class AdUnitFactory {
 
     public static createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractAdUnit {
 
-        Privacy.createBuildInformation(parameters.clientInfo, parameters.campaign, nativeBridge);
+        Privacy.createBuildInformation(parameters.clientInfo, parameters.campaign, nativeBridge, parameters.configuration);
 
         // todo: select ad unit based on placement
         if (parameters.campaign instanceof VastCampaign) {
@@ -109,7 +109,7 @@ export class AdUnitFactory {
 
         const showGDPRBanner = this.showGDPRBanner(parameters);
         const privacy = this.createPrivacy(nativeBridge, parameters);
-        const endScreen = new PerformanceEndScreen(nativeBridge, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, parameters.deviceInfo.getOsVersion(), adUnitStyle);
+        const endScreen = new PerformanceEndScreen(nativeBridge, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, parameters.configuration.getAbGroup(), parameters.deviceInfo.getOsVersion(), adUnitStyle);
         const video = this.getVideo(parameters.campaign, parameters.forceOrientation);
 
         const performanceAdUnitParameters: IPerformanceAdUnitParameters = {
@@ -147,7 +147,7 @@ export class AdUnitFactory {
 
         const showGDPRBanner = this.showGDPRBanner(parameters);
         const privacy = this.createPrivacy(nativeBridge, parameters);
-        const endScreen = new XPromoEndScreen(nativeBridge, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner);
+        const endScreen = new XPromoEndScreen(nativeBridge, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, parameters.configuration.getAbGroup());
         const video = this.getVideo(parameters.campaign, parameters.forceOrientation);
 
         const xPromoAdUnitParameters: IXPromoAdUnitParameters = {
@@ -251,7 +251,7 @@ export class AdUnitFactory {
         const showGDPRBanner = this.showGDPRBanner(parameters);
         const privacy = this.createPrivacy(nativeBridge, parameters);
         if(resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) {
-            mraid = new PlayableMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner);
+            mraid = new PlayableMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner, parameters.configuration.getAbGroup());
         } else {
             mraid = new MRAID(nativeBridge, parameters.placement, parameters.campaign, privacy, showGDPRBanner);
         }
@@ -318,7 +318,7 @@ export class AdUnitFactory {
         document.body.appendChild(promoView.container());
 
         promoView.onGDPRPopupSkipped.subscribe(() => PromoEventHandler.onGDPRPopupSkipped(parameters.configuration, parameters.gdprManager));
-        promoView.onClose.subscribe(() => PromoEventHandler.onClose(promoAdUnit, parameters.configuration.getToken(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup(), parameters.campaign.getTrackingUrlsForEvent('purchase'), parameters.configuration.isOptOutEnabled()));
+        promoView.onClose.subscribe(() => PromoEventHandler.onClose(promoAdUnit, parameters.configuration.getToken(), parameters.clientInfo.getGameId(), parameters.configuration.getAbGroup(), parameters.campaign.getTrackingUrlsForEvent('purchase'), parameters.configuration.isOptOutEnabled()));
         promoView.onPromo.subscribe((productId) => PromoEventHandler.onPromo(promoAdUnit, productId, parameters.campaign.getTrackingUrlsForEvent('purchase')));
 
         return promoAdUnit;
@@ -429,7 +429,7 @@ export class AdUnitFactory {
         if (parameters.placement.allowSkip() && parameters.placement.skipEndCardOnClose()) {
             overlay = new ClosableVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         } else {
-            if (isPerformanceCampaign && NewVideoOverlayEnabledAbTest.isValid(parameters.campaign.getAbGroup())) {
+            if (isPerformanceCampaign && NewVideoOverlayEnabledAbTest.isValid(parameters.configuration.getAbGroup())) {
                 overlay = new NewVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, disablePrivacyDuringVideo);
             } else {
                 overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, disablePrivacyDuringVideo);

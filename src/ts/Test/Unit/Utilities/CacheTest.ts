@@ -262,9 +262,9 @@ describe('CacheTest', () => {
         };
 
         cacheApi.setInternet(false);
-        setTimeout(() => triggerNetwork(), 150);
-        setTimeout(() => triggerNetwork(), 200);
-        setTimeout(() => triggerNetwork(), 350);
+        setTimeout(triggerNetwork, 150);
+        setTimeout(triggerNetwork, 200);
+        setTimeout(triggerNetwork, 350);
 
         return cacheManager.cache(testUrl, TestFixtures.getCacheDiagnostics(), TestFixtures.getCampaign()).then(() => {
             assert.fail('Cache one file with repeated network failures: caching should not be successful with no internet');
