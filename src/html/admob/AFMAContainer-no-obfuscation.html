@@ -68,6 +68,7 @@
             this.sentQuartiles = {};
             var clickSignalListeners = [];
             var supposedCurrentTime = 0;
+            var userSeeked = false;
 
             document.addEventListener('DOMContentLoaded', function() {
 
@@ -133,10 +134,14 @@
                     });
                 });
                 
-                videoEl.addEventListener('seeking', function () {
+                videoEl.addEventListener('seeking', function() {
                     var delta = videoEl.currentTime - supposedCurrentTime;
                     if (Math.abs(delta) > 0.01) {
                         videoEl.currentTime = supposedCurrentTime;
+                    }
+                    if (!userSeeked) {
+                        userSeeked = true;
+                        self.postMessage('seeked');
                     }
                 });
             });

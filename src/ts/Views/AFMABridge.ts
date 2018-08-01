@@ -25,7 +25,8 @@ export enum AFMAEvents {
     FETCH_APP_STORE_OVERLAY = 'fetchAppStoreOverlay',
     OPEN_INTENTS_REQUEST    = 'openableIntents',
     TRACKING                = 'tracking',
-    GET_CLICK_SIGNAL        = 'getClickSignal'
+    GET_CLICK_SIGNAL        = 'getClickSignal',
+    USER_SEEKED             = 'seeked'
 }
 
 export interface IPoint {
@@ -74,6 +75,7 @@ export interface IAFMAHandler {
     onAFMAResolveOpenableIntents(productId: IOpenableIntentsRequest): void;
     onAFMATrackingEvent(event: string, data?: any): void;
     onAFMAClickSignalRequest(touchInfo: ITouchInfo): void;
+    onAFMAUserSeeked(): void;
 }
 
 export class AFMABridge {
@@ -101,6 +103,7 @@ export class AFMABridge {
         this._afmaHandlers[AFMAEvents.OPEN_INTENTS_REQUEST] = (msg) => this._handler.onAFMAResolveOpenableIntents(msg.data);
         this._afmaHandlers[AFMAEvents.TRACKING] = (msg) => this._handler.onAFMATrackingEvent(msg.data.event, msg.data.data);
         this._afmaHandlers[AFMAEvents.GET_CLICK_SIGNAL] = (msg) => this._handler.onAFMAClickSignalRequest(msg.data);
+        this._afmaHandlers[AFMAEvents.USER_SEEKED] = (msg) => this._handler.onAFMAUserSeeked();
     }
 
     public connect(iframe: HTMLIFrameElement) {

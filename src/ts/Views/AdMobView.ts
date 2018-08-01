@@ -69,7 +69,8 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
             onAFMARewardedVideoStart: () => this.onVideoStart(),
             onAFMAResolveOpenableIntents: (request) => this.onResolveOpenableIntents(request),
             onAFMATrackingEvent: (event, data?) => this.onTrackingEvent(event, data),
-            onAFMAClickSignalRequest: (touchInfo) => this.onClickSignalRequest(touchInfo)
+            onAFMAClickSignalRequest: (touchInfo) => this.onClickSignalRequest(touchInfo),
+            onAFMAUserSeeked: () => this.onUserSeeked()
         });
         this._mraidBridge = new MRAIDBridge(nativeBridge, {
             onSetOrientationProperties: (allowOrientation: boolean, forceOrientation: Orientation) => this.onSetOrientationProperties(allowOrientation, forceOrientation)
@@ -269,6 +270,10 @@ export class AdMobView extends View<IAdMobEventHandler> implements IPrivacyHandl
 
     private onTrackingEvent(event: string, data?: any) {
         this._handlers.forEach((h) => h.onTrackingEvent(event, data));
+    }
+
+    private onUserSeeked() {
+        this._programmaticTrackingService.reportMetric(ProgrammaticTrackingMetric.AdmobUserVideoSeeked).catch();
     }
 
     private onGDPRPopupEvent(event: Event) {
