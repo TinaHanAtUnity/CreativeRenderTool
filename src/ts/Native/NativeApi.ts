@@ -3,13 +3,13 @@ import { Platform } from 'Constants/Platform';
 
 export enum ApiPackage {
     CORE,
-    ADS_CORE
+    ADS
 }
 
 export abstract class NativeApi {
     private static _apiPackageMapping = {
         [ApiPackage.CORE]: {android: 'com.unity3d.services.core.api', ios: 'USRVApi'},
-        [ApiPackage.ADS_CORE]: {android: 'com.unity3d.services.ads.core.api', ios: 'UADSApi'}
+        [ApiPackage.ADS]: {android: 'com.unity3d.services.ads.api', ios: 'UADSApi'}
     };
 
     protected _nativeBridge: NativeBridge;
