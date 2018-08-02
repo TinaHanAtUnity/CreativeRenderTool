@@ -151,7 +151,7 @@ build-test: clean build-dir build-css build-static build-proto build-ts
 		node_modules/chai/chai.js \
 		node_modules/sinon/pkg/sinon.js \
 		node_modules/systemjs-plugin-text/text.js \
-		node_modules/protobufjs/node_modules/long/dist/long.js \
+		node_modules/node_modules/long/dist/long.js \
 		node_modules/protobufjs/dist/minimal/protobuf.js \
 		node_modules/tslib/tslib.js \
 		test-utils/reporter.js \
