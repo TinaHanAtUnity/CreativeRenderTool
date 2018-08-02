@@ -211,7 +211,10 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         const frameLoadDuration = Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId());
         this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' iframe load duration ' + frameLoadDuration + ' ms');
 
-        this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(0, 0, 0, 'mraid_loading_time', {
+        const timeFromShow = this.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
+        const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
+
+        this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, 0, backgroundTime, 'mraid_loading_time', {
             frameLoadDuration: frameLoadDuration,
             viewType: 'PlayableMRAID'
         }));
