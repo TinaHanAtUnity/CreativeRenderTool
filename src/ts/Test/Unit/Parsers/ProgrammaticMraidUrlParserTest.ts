@@ -2,28 +2,23 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
 
-import { Campaign } from 'Models/Campaign';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Request } from 'Utilities/Request';
 import { AuctionResponse } from 'Models/AuctionResponse';
 import { TestFixtures } from '../TestHelpers/TestFixtures';
 import { Session } from 'Models/Session';
-import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
-import { Platform } from 'Constants/Platform';
 import { SdkApi } from 'Native/Api/Sdk';
 import { ProgrammaticMraidUrlParser } from 'Parsers/ProgrammaticMraidUrlParser';
 
 import ProgrammaticMRAIDCampaign from 'json/campaigns/mraid/ProgrammaticMRAIDCampaign.json';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Url } from 'Utilities/Url';
-import { ABGroupBuilder } from 'Models/ABGroup';
 
 describe('ProgrammaticMraidUrlParser', () => {
     const placements = ['TestPlacement'];
     const gamerId = 'TestGamerId';
     const mediaId = 'o2YMT0Cmps6xHiOwNMeCrH';
     const correlationId = '583dfda0d933a3630a53249c';
-    const abGroup = ABGroupBuilder.getAbGroup(0);
 
     let parser: ProgrammaticMraidUrlParser;
     let nativeBridge: NativeBridge;
@@ -46,7 +41,7 @@ describe('ProgrammaticMraidUrlParser', () => {
 
             const parse = (data: any) => {
                 const response = new AuctionResponse(placements, data, mediaId, correlationId);
-                return parser.parse(nativeBridge, request, response, session, gamerId, abGroup).then((parsedCampaign) => {
+                return parser.parse(nativeBridge, request, response, session, gamerId).then((parsedCampaign) => {
                     campaign = <MRAIDCampaign>parsedCampaign;
                 });
             };
@@ -63,7 +58,6 @@ describe('ProgrammaticMraidUrlParser', () => {
                 const content = JSON.parse(json.content);
 
                 assert.equal(campaign.getGamerId(), gamerId, 'GamerID is not equal');
-                assert.equal(campaign.getAbGroup(), abGroup, 'ABGroup is not equal');
                 assert.equal(campaign.getSession(), session, 'Session is not equal');
                 assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not the equal');
                 assert.deepEqual(campaign.getTrackingUrls(), json.trackingUrls, 'Tracking URLs is not equal');

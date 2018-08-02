@@ -1,8 +1,20 @@
-# Pending
+# Staged
+
+* iPhone X Endscreen test on ABGroups 18 and 19
+* Forcequit Manager added to track abnormal ad termination
+* Remove ABGroup from Campaign model
+* Tslint prefer-method-signature
+* Revert CustomFeature change for Uken Games
+* Align Admob start events for rewarded and interstitial videos
+* Use segno to create QR code for local Webview
+* Refactor Endscreen constructor parameter list
+
+# Mon Jul 30 21:52:01 UTC 2018
 
 * Fix GDPR Privacy width for iPhone X in landscape
 * Sending unity internal tracking events for clicks after followRedirectChain
 * Tslint number-literal-format
+* Sonic Creative temporary creative ID Whitelist
 
 # Wed Jul 25 20:12:52 UTC 2018
 
