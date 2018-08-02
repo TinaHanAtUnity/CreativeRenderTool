@@ -47,6 +47,7 @@ import { VideoState } from 'AdUnits/VideoAdUnit';
 import { Privacy } from 'Views/Privacy';
 import { GdprManager } from 'Managers/GdprManager';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { IEndScreenParameters } from 'Views/EndScreen';
 import { ForceQuitManager } from 'Managers/ForceQuitManager';
 
 describe('VideoEventHandlersTest', () => {
@@ -119,7 +120,16 @@ describe('VideoEventHandlersTest', () => {
         const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
 
-        endScreen = new PerformanceEndScreen(nativeBridge, performanceCampaign, 'en', '12345', privacy, false);
+        const endScreenParams : IEndScreenParameters = {
+            nativeBridge: nativeBridge,
+            language : 'en',
+            gameId: '12345',
+            privacy: privacy,
+            showGDPRBanner: false,
+            abGroup: configuration.getAbGroup(),
+            targetGameName: performanceCampaign.getGameName()
+        };
+        endScreen = new PerformanceEndScreen(endScreenParams, performanceCampaign);
         const gdprManager = sinon.createStubInstance(GdprManager);
 
         vastAdUnitParameters = {
@@ -165,7 +175,16 @@ describe('VideoEventHandlersTest', () => {
 
         const xpromoPrivacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
         xPromoCampaign = TestFixtures.getXPromoCampaign();
-        xPromoEndScreen = new XPromoEndScreen(nativeBridge, xPromoCampaign, 'en', '12345', xpromoPrivacy, false);
+        const xpromoEndScreenParams : IEndScreenParameters = {
+            nativeBridge: nativeBridge,
+            language : 'en',
+            gameId: '12345',
+            privacy: xpromoPrivacy,
+            showGDPRBanner: false,
+            abGroup: configuration.getAbGroup(),
+            targetGameName: xPromoCampaign.getGameName()
+        };
+        xPromoEndScreen = new XPromoEndScreen(xpromoEndScreenParams, xPromoCampaign);
         xPromoAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
@@ -204,7 +223,6 @@ describe('VideoEventHandlersTest', () => {
 
         performanceVideoEventHandler = new PerformanceVideoEventHandler(<IVideoEventHandlerParams<PerformanceAdUnit, PerformanceCampaign>>videoEventHandlerParams);
         performanceAdUnit.setVideoState(VideoState.PREPARING);
-        sinon.stub(performanceAdUnitParameters.campaign, 'getAbGroup').returns(5);
     });
 
     describe('with onVideoPlay', () => {

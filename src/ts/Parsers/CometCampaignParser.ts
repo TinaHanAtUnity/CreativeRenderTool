@@ -12,12 +12,11 @@ import { HTML } from 'Models/Assets/HTML';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { Diagnostics } from 'Utilities/Diagnostics';
-import { ABGroup } from 'Models/ABGroup';
 
 export class CometCampaignParser extends CampaignParser {
     public static ContentType = 'comet/campaign';
 
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, abGroup: ABGroup, osVersion?: string): Promise<Campaign> {
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, osVersion?: string): Promise<Campaign> {
         const json = response.getJsonContent();
 
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';
@@ -38,7 +37,6 @@ export class CometCampaignParser extends CampaignParser {
 
         const baseCampaignParams: ICampaign = {
             id: json.id,
-            abGroup: abGroup,
             willExpireAt: undefined,
             adType: undefined,
             correlationId: undefined,

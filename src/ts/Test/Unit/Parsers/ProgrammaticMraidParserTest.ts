@@ -12,14 +12,11 @@ import { ProgrammaticMraidParser } from 'Parsers/ProgrammaticMraidParser';
 
 import ProgrammaticMRAIDCampaign from 'json/campaigns/mraid/ProgrammaticMRAIDCampaign.json';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
-import { ABGroupBuilder } from 'Models/ABGroup';
 
 describe('ProgrammaticMraidParser', () => {
     const placements = ['TestPlacement'];
-    const gamerId = 'TestGamerId';
     const mediaId = 'o2YMT0Cmps6xHiOwNMeCrH';
     const correlationId = '583dfda0d933a3630a53249c';
-    const abGroup = ABGroupBuilder.getAbGroup(0);
 
     let parser: ProgrammaticMraidParser;
     let nativeBridge: NativeBridge;
@@ -42,7 +39,7 @@ describe('ProgrammaticMraidParser', () => {
 
             const parse = (data: any) => {
                 const response = new AuctionResponse(placements, data, mediaId, correlationId);
-                return parser.parse(nativeBridge, request, response, session, abGroup).then((parsedCampaign) => {
+                return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
                     campaign = <MRAIDCampaign>parsedCampaign;
                 });
             };
@@ -58,7 +55,6 @@ describe('ProgrammaticMraidParser', () => {
                 const json = JSON.parse(ProgrammaticMRAIDCampaign);
                 const content = JSON.parse(json.content);
 
-                assert.equal(campaign.getAbGroup(), abGroup, 'ABGroup is not equal');
                 assert.equal(campaign.getSession(), session, 'Session is not equal');
                 assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not the equal');
                 assert.deepEqual(campaign.getTrackingUrls(), json.trackingUrls, 'Tracking URLs is not equal');

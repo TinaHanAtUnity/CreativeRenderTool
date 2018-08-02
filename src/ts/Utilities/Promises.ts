@@ -20,4 +20,8 @@ export class Promises {
             return result;
         });
     }
+
+    public static voidResult(promise: Promise<any>): Promise<void> {
+        return promise.then(() => {return;});
+    }
 }

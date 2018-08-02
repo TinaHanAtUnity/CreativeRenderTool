@@ -22,7 +22,6 @@ describe('MRAIDCampaign', () => {
             const campaign = new MRAIDCampaign(params);
 
             assert.equal(campaign.getId(), mraidJson.id);
-            assert.equal(campaign.getAbGroup(), configuration.getAbGroup());
             assert.deepEqual(campaign.getResourceUrl(), asset);
             assert.deepEqual(campaign.getRequiredAssets(), [asset]);
             assert.deepEqual(campaign.getOptionalAssets(), []);

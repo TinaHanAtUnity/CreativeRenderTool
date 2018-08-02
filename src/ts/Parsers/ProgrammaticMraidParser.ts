@@ -6,11 +6,10 @@ import { IMRAIDCampaign, MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { AuctionResponse } from 'Models/AuctionResponse';
 import { Session } from 'Models/Session';
-import { ABGroup } from 'Models/ABGroup';
 
 export class ProgrammaticMraidParser extends CampaignParser {
     public static ContentType = 'programmatic/mraid';
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, abGroup: ABGroup): Promise<Campaign> {
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
         const jsonMraid = response.getJsonContent();
 
         if(!jsonMraid) {
@@ -29,7 +28,6 @@ export class ProgrammaticMraidParser extends CampaignParser {
 
         const baseCampaignParams: ICampaign = {
             id: this.getProgrammaticCampaignId(nativeBridge),
-            abGroup: abGroup,
             willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
             adType: response.getAdType() || undefined,
             correlationId: response.getCorrelationId() || undefined,

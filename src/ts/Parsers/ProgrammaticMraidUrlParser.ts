@@ -7,11 +7,10 @@ import { Request } from 'Utilities/Request';
 import { AuctionResponse } from 'Models/AuctionResponse';
 import { Session } from 'Models/Session';
 import { HTML } from 'Models/Assets/HTML';
-import { ABGroup } from 'Models/ABGroup';
 
 export class ProgrammaticMraidUrlParser extends CampaignParser {
     public static ContentType = 'programmatic/mraid-url';
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, abGroup: ABGroup): Promise<Campaign> {
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
         const jsonMraidUrl = response.getJsonContent();
 
         if(!jsonMraidUrl) {
@@ -29,7 +28,6 @@ export class ProgrammaticMraidUrlParser extends CampaignParser {
 
         const baseCampaignParams: ICampaign = {
             id: this.getProgrammaticCampaignId(nativeBridge),
-            abGroup: abGroup,
             willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
             adType: response.getAdType() || undefined,
             correlationId: response.getCorrelationId() || undefined,

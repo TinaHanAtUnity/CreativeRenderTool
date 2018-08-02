@@ -14,14 +14,11 @@ import DisplayStaticInterstitialCampaignHTML from 'json/campaigns/display/Displa
 import DisplayStaticInterstitialCampaignJS from 'json/campaigns/display/DisplayStaticInterstitialCampaignJS.json';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { ProgrammaticStaticInterstitialParser } from 'Parsers/ProgrammaticStaticInterstitialParser';
-import { ABGroupBuilder } from 'Models/ABGroup';
 
 describe('ProgrammaticVPAIDParser', () => {
     const placements = ['TestPlacement'];
-    const gamerId = 'TestGamerId';
     const mediaId = 'o2YMT0Cmps6xHiOwNMeCrH';
     const correlationId = '583dfda0d933a3630a53249c';
-    const abGroup = ABGroupBuilder.getAbGroup(0);
 
     let parser: ProgrammaticStaticInterstitialParser;
     let nativeBridge: NativeBridge;
@@ -46,7 +43,7 @@ describe('ProgrammaticVPAIDParser', () => {
             let campaign: DisplayInterstitialCampaign;
             const parse = (data: any) => {
                 const response = new AuctionResponse(placements, data, mediaId, correlationId);
-                return parser.parse(nativeBridge, request, response, session, abGroup).then((parsedCampaign) => {
+                return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
                     campaign = <DisplayInterstitialCampaign>parsedCampaign;
                 });
             };
@@ -61,7 +58,6 @@ describe('ProgrammaticVPAIDParser', () => {
 
                 const json = JSON.parse(DisplayStaticInterstitialCampaignHTML);
 
-                assert.equal(campaign.getAbGroup(), abGroup, 'ABGroup is not equal');
                 assert.equal(campaign.getSession(), session, 'Session is not equal');
                 assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not equal');
                 assert.equal(campaign.getDynamicMarkup(), decodeURIComponent(json.content), 'Dynamic Markup is not equal');
@@ -78,7 +74,7 @@ describe('ProgrammaticVPAIDParser', () => {
             let campaign: DisplayInterstitialCampaign;
             const parse = (data: any) => {
                 const response = new AuctionResponse(placements, data, mediaId, correlationId);
-                return parser.parse(nativeBridge, request, response, session, abGroup).then((parsedCampaign) => {
+                return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
                     campaign = <DisplayInterstitialCampaign>parsedCampaign;
                 });
             };
@@ -93,7 +89,6 @@ describe('ProgrammaticVPAIDParser', () => {
 
                 const json = JSON.parse(DisplayStaticInterstitialCampaignJS);
 
-                assert.equal(campaign.getAbGroup(), abGroup, 'ABGroup is not equal');
                 assert.equal(campaign.getSession(), session, 'Session is not equal');
                 assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not equal');
                 assert.equal(campaign.getDynamicMarkup(), '<script>' + decodeURIComponent(json.content) + '</script>', 'Dynamic Markup is not equal');

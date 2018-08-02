@@ -10,6 +10,7 @@
 - nginx (`brew install nginx`)
 - Watchman (`brew install watchman`)
 - exiftool (`brew install exiftool`) for integration tests
+- segno (`pip install segno`) for qr code generation
 
 ## IDE
 

@@ -3,11 +3,9 @@ import { ISchema, Model } from 'Models/Model';
 import { Session } from 'Models/Session';
 import { WebViewError } from 'Errors/WebViewError';
 import { Diagnostics } from 'Utilities/Diagnostics';
-import { ABGroup } from './ABGroup';
 
 export interface ICampaign {
     id: string;
-    abGroup: ABGroup;
     willExpireAt: number | undefined;
     adType: string | undefined;
     correlationId: string | undefined;
@@ -21,7 +19,6 @@ export interface ICampaign {
 export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T> {
     public static Schema: ISchema<ICampaign> = {
         id: ['string'],
-        abGroup: ['object'],
         willExpireAt: ['number', 'undefined'],
         adType: ['string', 'undefined'],
         correlationId: ['string', 'undefined'],
@@ -42,10 +39,6 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
 
     public getSession(): Session {
         return this.get('session');
-    }
-
-    public getAbGroup(): ABGroup {
-        return this.get('abGroup');
     }
 
     public getAdType(): string | undefined {
@@ -88,7 +81,6 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
     public getDTO(): { [key: string]: any } {
         return {
             'id': this.getId(),
-            'abGroup': this.getAbGroup().toNumber(),
             'willExpireAt': this.getWillExpireAt(),
             'mediaId': this.getMediaId()
         };

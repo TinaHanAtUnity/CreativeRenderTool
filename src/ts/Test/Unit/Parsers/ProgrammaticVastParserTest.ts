@@ -13,14 +13,11 @@ import { ProgrammaticVastParser } from 'Parsers/ProgrammaticVastParser';
 import ProgrammaticVastCampaignFlat from 'json/campaigns/vast/ProgrammaticVastCampaignFlat.json';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { VastParser } from 'Utilities/VastParser';
-import { ABGroupBuilder } from 'Models/ABGroup';
 
 describe('ProgrammaticVastParser', () => {
     const placements = ['TestPlacement'];
-    const gamerId = 'TestGamerId';
     const mediaId = 'o2YMT0Cmps6xHiOwNMeCrH';
     const correlationId = '583dfda0d933a3630a53249c';
-    const abGroup = ABGroupBuilder.getAbGroup(0);
 
     let parser: ProgrammaticVastParser;
     let nativeBridge: NativeBridge;
@@ -43,7 +40,7 @@ describe('ProgrammaticVastParser', () => {
 
             const parse = (data: any) => {
                 const response = new AuctionResponse(placements, data, mediaId, correlationId);
-                return parser.parse(nativeBridge, request, response, session, abGroup).then((parsedCampaign) => {
+                return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
                     campaign = <VastCampaign>parsedCampaign;
                 });
             };
@@ -59,7 +56,6 @@ describe('ProgrammaticVastParser', () => {
                 const json = JSON.parse(ProgrammaticVastCampaignFlat);
                 const vast = new VastParser().parseVast(decodeURIComponent(json.content));
 
-                assert.equal(campaign.getAbGroup(), abGroup, 'ABGroup is not equal');
                 assert.equal(campaign.getSession(), session, 'Session is not equal');
                 assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not the equal');
                 assert.equal(campaign.getVideo().getUrl(), vast.getVideoUrl(), 'Video URL is not the same');

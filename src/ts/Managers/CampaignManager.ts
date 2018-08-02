@@ -41,10 +41,6 @@ import { MixedPlacementUtility } from 'Utilities/MixedPlacementUtility';
 
 export class CampaignManager {
 
-    public static setAbGroup(abGroup: ABGroup) {
-        CampaignManager.AbGroup = abGroup;
-    }
-
     public static setCampaignId(campaignId: string) {
         CampaignManager.CampaignId = campaignId;
     }
@@ -536,7 +532,7 @@ export class CampaignManager {
         }
 
         const parseTimestamp = Date.now();
-        return parser.parse(this._nativeBridge, this._request, response, session, this.getAbGroup(), this._deviceInfo.getOsVersion()).then((campaign) => {
+        return parser.parse(this._nativeBridge, this._request, response, session, this._deviceInfo.getOsVersion()).then((campaign) => {
             const parseDuration = Date.now() - parseTimestamp;
             for(const placement of response.getPlacements()) {
                 PurchasingUtilities.placementManager.addCampaignPlacementIds(placement, campaign);
@@ -568,7 +564,7 @@ export class CampaignManager {
 
         const parser: CampaignParser = this.getCampaignParser(response.getContentType());
 
-        return parser.parse(this._nativeBridge, this._request, response, session, this.getAbGroup()).then((campaign) => {
+        return parser.parse(this._nativeBridge, this._request, response, session).then((campaign) => {
             campaign.setMediaId(response.getMediaId());
 
             return campaign;
@@ -602,10 +598,6 @@ export class CampaignManager {
             this._clientInfo.getGameId(),
             'requests'
         ].join('/');
-    }
-
-    private getAbGroup(): ABGroup {
-        return CampaignManager.AbGroup ? CampaignManager.AbGroup : this._configuration.getAbGroup();
     }
 
     private createRequestUrl(realtime: boolean, nofillRetry?: boolean, session?: Session): Promise<string> {

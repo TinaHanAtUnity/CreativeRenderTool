@@ -30,6 +30,7 @@ import { Configuration } from 'Models/Configuration';
 import { Privacy } from 'Views/Privacy';
 import { GdprManager } from 'Managers/GdprManager';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { IEndScreenParameters } from 'Views/EndScreen';
 import { ForceQuitManager } from 'Managers/ForceQuitManager';
 
 describe('OverlayEventHandlerTest', () => {
@@ -88,7 +89,16 @@ describe('OverlayEventHandlerTest', () => {
         video = new Video('', TestFixtures.getSession());
 
         const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
-        endScreen = new PerformanceEndScreen(nativeBridge, campaign, deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, false);
+        const endScreenParams : IEndScreenParameters = {
+            nativeBridge: nativeBridge,
+            language : deviceInfo.getLanguage(),
+            gameId: clientInfo.getGameId(),
+            privacy: privacy,
+            showGDPRBanner: false,
+            abGroup: configuration.getAbGroup(),
+            targetGameName: campaign.getGameName()
+        };
+        endScreen = new PerformanceEndScreen(endScreenParams, campaign);
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
         placement = TestFixtures.getPlacement();
         const gdprManager = sinon.createStubInstance(GdprManager);
@@ -114,7 +124,6 @@ describe('OverlayEventHandlerTest', () => {
             gdprManager: gdprManager,
             programmaticTrackingService: programmaticTrackingService
         };
-        sinon.stub(performanceAdUnitParameters.campaign, 'getAbGroup').returns(5);
 
         performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
         overlayEventHandler = new OverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
