@@ -75,8 +75,8 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         }
 
         if (this._stats !== undefined) {
-            this._nativeBridge.Sdk.logInfo('******* > ' + JSON.stringify(this._stats));
-            //this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(0, 0, 0, 'mraid_performance_stats', this._stats));
+            // this._nativeBridge.Sdk.logInfo('******* > ' + JSON.stringify(this._stats));
+            this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(0, 0, 0, 'mraid_performance_stats', this._stats));
         }
     }
 
