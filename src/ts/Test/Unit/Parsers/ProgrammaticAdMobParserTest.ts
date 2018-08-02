@@ -27,14 +27,13 @@ describe('ProgrammaticAdMobParser', () => {
     let request: Request;
     let session: Session;
     let setFileIdSpy: sinon.SinonSpy;
-    const abGroup = ABGroupBuilder.getAbGroup(0);
 
     describe('parsing a campaign', () => {
         let campaign: AdMobCampaign;
 
         const parse = (data: any) => {
             const response = new AuctionResponse(placements, data, mediaId, correlationId);
-            return parser.parse(nativeBridge, request, response, session, gamerId, abGroup).then((parsedCampaign) => {
+            return parser.parse(nativeBridge, request, response, session, gamerId).then((parsedCampaign) => {
                 campaign = <AdMobCampaign>parsedCampaign;
             });
         };

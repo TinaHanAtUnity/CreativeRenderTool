@@ -62,6 +62,18 @@ class TestStorageApi extends StorageApi {
         }
         return Promise.resolve([]);
     }
+
+    public set<T>(type: StorageType, key: string, value: T): Promise<void> {
+        return Promise.resolve();
+    }
+
+    public write(type: StorageType): Promise<void> {
+        return Promise.resolve();
+    }
+
+    public delete(type: StorageType, key: string): Promise<void> {
+        return Promise.resolve();
+    }
 }
 
 class TestRequestApi extends RequestApi {

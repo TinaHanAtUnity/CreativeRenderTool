@@ -9,11 +9,14 @@ import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 import { Privacy } from 'Views/Privacy';
 
 import EndScreenFixture from 'html/fixtures/EndScreenFixture.html';
+import { IEndScreenParameters } from 'Views/EndScreen';
+import { Configuration } from 'Models/Configuration';
 
 describe('EndScreen', () => {
     let handleInvocation: sinon.SinonSpy;
     let handleCallback: sinon.SinonSpy;
     let nativeBridge: NativeBridge;
+    let configuration: Configuration;
 
     beforeEach(() => {
         handleInvocation = sinon.spy();
@@ -25,20 +28,32 @@ describe('EndScreen', () => {
         Localization.setLanguageMap('fi.*', 'endscreen', {
             'Download For Free': 'Lataa ilmaiseksi'
         });
+        configuration = TestFixtures.getConfiguration();
     });
 
-    xit('should render', () => {
+    const createEndScreen = (language : string) : PerformanceEndScreen => {
         const privacy = new Privacy(nativeBridge, false);
+        const params : IEndScreenParameters = {
+            nativeBridge,
+            language,
+            gameId: 'testGameId',
+            targetGameName: TestFixtures.getCampaign().getGameName(),
+            abGroup: configuration.getAbGroup(),
+            privacy,
+            showGDPRBanner: false,
+            campaignId: TestFixtures.getCampaign().getId()
+        };
+        return new PerformanceEndScreen(params, TestFixtures.getCampaign());
+    };
 
-        const endScreen = new PerformanceEndScreen(nativeBridge, TestFixtures.getCampaign(), 'en', 'testGameId', privacy, false);
+    xit('should render', () => {
+        const endScreen = createEndScreen('en');
         endScreen.render();
         assert.equal(endScreen.container().innerHTML, EndScreenFixture);
     });
 
     it('should render with translations', () => {
-        const privacy = new Privacy(nativeBridge, false);
-
-        const endScreen = new PerformanceEndScreen(nativeBridge, TestFixtures.getCampaign(), 'fi', 'testGameId', privacy, false);
+        const endScreen = createEndScreen('fi');
         endScreen.render();
         const downloadElement = endScreen.container().querySelectorAll('.download-text')[0];
         assert.equal(downloadElement.innerHTML, 'Lataa ilmaiseksi');
