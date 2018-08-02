@@ -6,7 +6,6 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 
 export interface ICampaign {
     id: string;
-    gamerId: string;
     willExpireAt: number | undefined;
     adType: string | undefined;
     correlationId: string | undefined;
@@ -20,7 +19,6 @@ export interface ICampaign {
 export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T> {
     public static Schema: ISchema<ICampaign> = {
         id: ['string'],
-        gamerId: ['string'],
         willExpireAt: ['number', 'undefined'],
         adType: ['string', 'undefined'],
         correlationId: ['string', 'undefined'],
@@ -41,10 +39,6 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
 
     public getSession(): Session {
         return this.get('session');
-    }
-
-    public getGamerId(): string {
-        return this.get('gamerId');
     }
 
     public getAdType(): string | undefined {
@@ -87,7 +81,6 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
     public getDTO(): { [key: string]: any } {
         return {
             'id': this.getId(),
-            'gamerId': this.getGamerId(),
             'willExpireAt': this.getWillExpireAt(),
             'mediaId': this.getMediaId()
         };
