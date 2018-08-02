@@ -11,7 +11,7 @@ import { Image } from 'Models/Assets/Image';
 
 export class XPromoCampaignParser extends CampaignParser {
     public static ContentType = 'xpromo/video';
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string): Promise<Campaign> {
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
         const json = response.getJsonContent();
 
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';
@@ -32,7 +32,6 @@ export class XPromoCampaignParser extends CampaignParser {
 
         const baseCampaignParams: ICampaign = {
             id: json.id,
-            gamerId: gamerId,
             willExpireAt: undefined,
             adType: undefined,
             correlationId: undefined,

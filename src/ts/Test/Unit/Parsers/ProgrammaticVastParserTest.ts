@@ -16,7 +16,6 @@ import { VastParser } from 'Utilities/VastParser';
 
 describe('ProgrammaticVastParser', () => {
     const placements = ['TestPlacement'];
-    const gamerId = 'TestGamerId';
     const mediaId = 'o2YMT0Cmps6xHiOwNMeCrH';
     const correlationId = '583dfda0d933a3630a53249c';
 
@@ -41,7 +40,7 @@ describe('ProgrammaticVastParser', () => {
 
             const parse = (data: any) => {
                 const response = new AuctionResponse(placements, data, mediaId, correlationId);
-                return parser.parse(nativeBridge, request, response, session, gamerId).then((parsedCampaign) => {
+                return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
                     campaign = <VastCampaign>parsedCampaign;
                 });
             };
@@ -57,7 +56,6 @@ describe('ProgrammaticVastParser', () => {
                 const json = JSON.parse(ProgrammaticVastCampaignFlat);
                 const vast = new VastParser().parseVast(decodeURIComponent(json.content));
 
-                assert.equal(campaign.getGamerId(), gamerId, 'GamerID is not equal');
                 assert.equal(campaign.getSession(), session, 'Session is not equal');
                 assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not the equal');
                 assert.equal(campaign.getVideo().getUrl(), vast.getVideoUrl(), 'Video URL is not the same');

@@ -15,7 +15,8 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class CometCampaignParser extends CampaignParser {
     public static ContentType = 'comet/campaign';
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string): Promise<Campaign> {
+
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, osVersion?: string): Promise<Campaign> {
         const json = response.getJsonContent();
 
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';
@@ -36,7 +37,6 @@ export class CometCampaignParser extends CampaignParser {
 
         const baseCampaignParams: ICampaign = {
             id: json.id,
-            gamerId: gamerId,
             willExpireAt: undefined,
             adType: undefined,
             correlationId: undefined,
