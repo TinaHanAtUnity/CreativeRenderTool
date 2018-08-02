@@ -20,10 +20,10 @@ describe('ProgrammaticTrackingService', () => {
         const clientInfo = sinon.createStubInstance(ClientInfo);
         const deviceInfo = sinon.createStubInstance(DeviceInfo);
         programmaticTrackingService = new ProgrammaticTrackingService(request, clientInfo, deviceInfo);
-        platformStub = <sinon.SinonStub>clientInfo.getPlatform;
-        osVersionStub = <sinon.SinonStub>deviceInfo.getOsVersion;
-        sdkVersionStub = <sinon.SinonStub>clientInfo.getSdkVersionName;
-        postStub = <sinon.SinonStub>request.post;
+        platformStub = clientInfo.getPlatform;
+        osVersionStub = deviceInfo.getOsVersion;
+        sdkVersionStub = clientInfo.getSdkVersionName;
+        postStub = request.post;
         postStub.resolves({
             url: 'test',
             response: 'test',

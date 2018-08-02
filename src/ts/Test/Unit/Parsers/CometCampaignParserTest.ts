@@ -82,10 +82,10 @@ describe('CometCampaignParser', () => {
             assert.equal(campaign.getClickUrl(), Url.encode(content.clickUrl), 'Click Url is not equal');
             assert.deepEqual(campaign.getVideoEventUrls(), encodeVideoUrls(content.videoEventUrls), 'Video Event URLs is not equal');
             assert.equal(campaign.getGameName(), content.gameName, 'Game Name is equal');
-            assert.equal(campaign.getGameIcon()!.getUrl(), Url.encode(content.gameIcon), 'Game Icon is not equal');
+            assert.equal(campaign.getGameIcon().getUrl(), Url.encode(content.gameIcon), 'Game Icon is not equal');
             assert.equal(campaign.getRating(), content.rating, 'Rating is not the same');
-            assert.equal(campaign.getLandscape()!.getOriginalUrl(), Url.encode(content.endScreenLandscape), 'Landscape URL is not equal');
-            assert.equal(campaign.getPortrait()!.getOriginalUrl(), Url.encode(content.endScreenPortrait), 'Portrait URL is not equal');
+            assert.equal(campaign.getLandscape().getOriginalUrl(), Url.encode(content.endScreenLandscape), 'Landscape URL is not equal');
+            assert.equal(campaign.getPortrait().getOriginalUrl(), Url.encode(content.endScreenPortrait), 'Portrait URL is not equal');
             assert.equal(campaign.getBypassAppSheet(), content.bypassAppSheet, 'Bypass App Sheet is not equal');
             assert.equal(campaign.getStore(), getStore(content.store), 'Store is not equal');
             assert.equal(campaign.getAppStoreId(), content.appStoreId, 'App Store ID is not equal');
