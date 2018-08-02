@@ -41,7 +41,6 @@ export class ConfigurationParser {
             country: configJson.country,
             coppaCompliant: configJson.coppaCompliant,
             abGroup: ABGroupBuilder.getAbGroup(configJson.abGroup),
-            gamerId: configJson.gamerId,
             properties: configJson.properties,
             cacheMode: this.parseCacheMode(configJson),
             placements: placements,

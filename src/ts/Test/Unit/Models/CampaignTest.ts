@@ -19,7 +19,7 @@ describe('PerformanceCampaign', () => {
 
             const params = TestFixtures.getPerformanceCampaignParams(campaignObject, StoreName.GOOGLE);
             const campaign = new PerformanceCampaign(params);
-            assert.equal(campaign.getGamerId(), configuration.getGamerId());
+
             assert.equal(campaign.getAppStoreId(), campaignObject.appStoreId);
             assert.equal(campaign.getLandscape().getUrl(), campaignObject.endScreenLandscape);
             assert.equal(campaign.getPortrait().getUrl(), campaignObject.endScreenPortrait);
@@ -41,7 +41,7 @@ describe('VastCampaign', () => {
             const parsedVast = vastParser.parseVast(vastXml);
             const params = TestFixtures.getVastCampaignParams(parsedVast, 3600, '12345');
             const campaign = new VastCampaign(params);
-            assert.equal(campaign.getGamerId(), '57a35671bb58271e002d93c9');
+
             assert.equal(campaign.getId(), '12345');
             assert.deepEqual(campaign.getImpressionUrls(), [
                 'http://b.scorecardresearch.com/b?C1=1&C2=6000003&C3=0000000200500000197000000&C4=us&C7=http://www.scanscout.com&C8=scanscout.com&C9=http://www.scanscout.com&C10=xn&rn=-103217130'

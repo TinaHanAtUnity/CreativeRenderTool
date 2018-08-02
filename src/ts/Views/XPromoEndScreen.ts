@@ -1,14 +1,12 @@
-import { EndScreen } from 'Views/EndScreen';
+import { EndScreen, IEndScreenParameters } from 'Views/EndScreen';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
-import { NativeBridge } from 'Native/NativeBridge';
-import { AbstractPrivacy } from 'Views/AbstractPrivacy';
-import { ABGroup } from 'Models/ABGroup';
 
 export class XPromoEndScreen extends EndScreen {
     private _campaign: XPromoCampaign;
 
-    constructor(nativeBridge: NativeBridge, campaign: XPromoCampaign, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup) {
-        super(nativeBridge, language, gameId, campaign.getGameName(), abGroup, privacy, showGDPRBanner);
+    constructor(parameters: IEndScreenParameters, campaign: XPromoCampaign) {
+        parameters.targetGameName = campaign.getGameName();
+        super(parameters);
 
         const adjustedRating: number = campaign.getRating() * 20;
         this._templateData = {
@@ -32,8 +30,7 @@ export class XPromoEndScreen extends EndScreen {
             clickAttributionUrlFollowsRedirects: this._campaign.getClickAttributionUrlFollowsRedirects(),
             bypassAppSheet: this._campaign.getBypassAppSheet(),
             appStoreId: this._campaign.getAppStoreId(),
-            store: this._campaign.getStore(),
-            gamerId: this._campaign.getGamerId()
+            store: this._campaign.getStore()
         }));
     }
 }

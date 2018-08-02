@@ -1,15 +1,11 @@
-import { EndScreen } from 'Views/EndScreen';
-import { NativeBridge } from 'Native/NativeBridge';
+import { IEndScreenParameters, EndScreen } from 'Views/EndScreen';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
-import { AbstractPrivacy } from 'Views/AbstractPrivacy';
-import { ABGroup } from 'Models/ABGroup';
 
 export class MRAIDEndScreen extends EndScreen {
     private _campaign: MRAIDCampaign;
 
-    constructor(nativeBridge: NativeBridge, campaign: MRAIDCampaign, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup) {
-        super(nativeBridge, language, gameId, campaign.getGameName(), abGroup, privacy, showGDPRBanner);
-
+    constructor(parameters: IEndScreenParameters, campaign: MRAIDCampaign) {
+        super(parameters);
         this._campaign = campaign;
 
         this._templateData = {
@@ -46,8 +42,7 @@ export class MRAIDEndScreen extends EndScreen {
             clickAttributionUrlFollowsRedirects: this._campaign.getClickAttributionUrlFollowsRedirects(),
             bypassAppSheet: this._campaign.getBypassAppSheet(),
             appStoreId: this._campaign.getAppStoreId(),
-            store: this._campaign.getStore(),
-            gamerId: this._campaign.getGamerId()
+            store: this._campaign.getStore()
         }));
     }
 }

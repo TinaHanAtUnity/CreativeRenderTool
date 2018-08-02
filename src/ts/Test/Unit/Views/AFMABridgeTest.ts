@@ -24,10 +24,11 @@ describe('AFMABridge', () => {
             onAFMAGrantReward: sinon.spy(),
             onAFMAOpenInAppStore: sinon.spy(),
             onAFMAOpenStoreOverlay: sinon.spy(),
-            onAFMARewardedVideoStart: sinon.spy(),
+            OnAFMAVideoStart: sinon.spy(),
             onAFMAResolveOpenableIntents: sinon.spy(),
             onAFMATrackingEvent: sinon.spy(),
-            onAFMAClickSignalRequest: sinon.spy()
+            onAFMAClickSignalRequest: sinon.spy(),
+            onAFMAUserSeeked: sinon.spy()
         };
         afmaBridge = new AFMABridge(nativeBridge, handler);
         iframe = document.createElement('iframe');
@@ -76,8 +77,8 @@ describe('AFMABridge', () => {
             },
             verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAForceOrientation, Orientation.LANDSCAPE)
         }, {
-            event: AFMAEvents.REWARDED_VIDEO_START,
-            verify: (data?: any) => sinon.assert.called(<sinon.SinonSpy>handler.onAFMARewardedVideoStart)
+            event: AFMAEvents.VIDEO_START,
+            verify: (data?: any) => sinon.assert.called(<sinon.SinonSpy>handler.OnAFMAVideoStart)
         }, {
             event: AFMAEvents.CLICK,
             data: {
@@ -135,6 +136,9 @@ describe('AFMABridge', () => {
                 end: { x: 2, y: 2}
             },
             verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAClickSignalRequest, data)
+        }, {
+            event: AFMAEvents.USER_SEEKED,
+            verify: (data?: any) => sinon.assert.calledWith(<sinon.SinonSpy>handler.onAFMAUserSeeked)
         }];
 
         for (const test of tests) {
