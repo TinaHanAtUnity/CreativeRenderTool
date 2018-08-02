@@ -1,10 +1,13 @@
-# Pending
+# Thu Aug  2 10:32:18 UTC 2018
 
 * iPhone X Endscreen test on ABGroups 18 and 19
 * Forcequit Manager added to track abnormal ad termination
 * Remove ABGroup from Campaign model
 * Tslint prefer-method-signature
 * Revert CustomFeature change for Uken Games
+* Align Admob start events for rewarded and interstitial videos
+* Use segno to create QR code for local Webview
+* Refactor Endscreen constructor parameter list
 
 # Mon Jul 30 21:52:01 UTC 2018
 
