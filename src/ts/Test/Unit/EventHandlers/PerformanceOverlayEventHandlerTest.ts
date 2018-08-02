@@ -18,13 +18,14 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { ClientInfo } from 'Models/ClientInfo';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { SessionManager } from 'Managers/SessionManager';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { Privacy } from 'Views/Privacy';
 import { GdprManager } from 'Managers/GdprManager';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { IEndScreenParameters } from 'Views/EndScreen';
+import { ForceQuitManager } from 'Managers/ForceQuitManager';
 
 describe('PerformanceOverlayEventHandlerTest', () => {
 
@@ -41,6 +42,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
     let request: Request;
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
+    let forceQuitManager: ForceQuitManager;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -56,7 +58,8 @@ describe('PerformanceOverlayEventHandlerTest', () => {
         const focusManager = new FocusManager(nativeBridge);
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
-        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
+        forceQuitManager = sinon.createStubInstance(ForceQuitManager);
+        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo(), forceQuitManager);
         video = new Video('', TestFixtures.getSession());
         const thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         const sessionManager = new SessionManager(nativeBridge, request);
@@ -72,7 +75,16 @@ describe('PerformanceOverlayEventHandlerTest', () => {
         });
 
         const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
-        endScreen = new PerformanceEndScreen(nativeBridge, campaign, deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, true);
+        const endScreenParams : IEndScreenParameters = {
+            nativeBridge: nativeBridge,
+            language : deviceInfo.getLanguage(),
+            gameId: clientInfo.getGameId(),
+            privacy: privacy,
+            showGDPRBanner: true,
+            abGroup: configuration.getAbGroup(),
+            targetGameName: campaign.getGameName()
+        };
+        endScreen = new PerformanceEndScreen(endScreenParams, campaign);
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
         const gdprManager = sinon.createStubInstance(GdprManager);
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);

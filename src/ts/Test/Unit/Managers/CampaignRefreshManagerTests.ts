@@ -139,6 +139,9 @@ describe('CampaignRefreshManager', () => {
                 write: () => {
                     return Promise.resolve();
                 },
+                delete: () => {
+                    return Promise.resolve();
+                },
                 getKeys: sinon.stub().returns(Promise.resolve([])),
                 onSet: new Observable2()
             },

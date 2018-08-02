@@ -11,6 +11,7 @@ import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Template } from 'Utilities/Template';
 import { SdkStats } from 'Utilities/SdkStats';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
 
 export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -34,11 +35,18 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
     private _showTimestamp: number;
     private _updateInterval: any;
 
+    // analytics data
+    private _playableStartTimestamp: number;
+    private _backgroundTime: number = 0;
+    private _backgroundTimestamp: number;
+    private _creativeId: string | undefined;
+
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
         super(nativeBridge, 'mraid', placement, campaign, privacy, showGDPRBanner);
 
         this._placement = placement;
         this._campaign = campaign;
+        this._creativeId = campaign.getCreativeId();
 
         this._template = new Template(MRAIDTemplate);
 
@@ -84,6 +92,10 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
             SdkStats.setFrameSetStartTimestamp(this._placement.getId());
             this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' set iframe.src started ' + SdkStats.getFrameSetStartTimestamp(this._placement.getId()));
             iframe.srcdoc = mraid;
+
+            if (CustomFeatures.isSonicPlayable(this._creativeId)) {
+                iframe.sandbox = 'allow-scripts allow-same-origin';
+            }
         }).catch(e => this._nativeBridge.Sdk.logError('failed to create mraid: ' + e));
 
         this._messageListener = (event: MessageEvent) => this.onMessage(event);
@@ -138,6 +150,13 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
             }, 1000);
         }
 
+        if(CustomFeatures.isSonicPlayable(this._creativeId)) {
+            this._playableStartTimestamp = Date.now();
+            const timeFromShow = this.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
+            const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
+            this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_start', undefined));
+        }
+
         if(this._loaded) {
             this.setViewableState(true);
         } else {
@@ -167,6 +186,15 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
                 type: 'viewable',
                 value: viewable
             }, '*');
+        }
+
+        // background time for analytics
+        if(!viewable) {
+            this._backgroundTimestamp = Date.now();
+        } else {
+            if (this._backgroundTimestamp) {
+                this._backgroundTime += Date.now() - this._backgroundTimestamp;
+            }
         }
     }
 
@@ -260,6 +288,15 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
                     forceOrientation: forceOrientation
                 }));
                 break;
+            case 'analyticsEvent':
+                if(CustomFeatures.isSonicPlayable(this._creativeId)) {
+                    const timeFromShow = this.checkIsValid((Date.now() - this._showTimestamp) / 1000);
+                    const timeFromPlayableStart = this.checkIsValid((Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000);
+                    const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
+                    this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, event.data.event, event.data.eventData));
+                }
+                break;
+
             case 'customMraidState':
                 if(event.data.state === 'completed') {
                     if(!this._placement.allowSkip() && this._closeRemaining > 5) {
@@ -269,5 +306,12 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
                 break;
             default:
         }
+    }
+
+    private checkIsValid(timeInSeconds: number): number | undefined {
+        if (timeInSeconds < 0 || timeInSeconds > 600) {
+            return undefined;
+        }
+        return timeInSeconds;
     }
 }

@@ -37,7 +37,6 @@
     "align": [false, "parameters", "arguments", "statements"],
     "no-object-literal-type-assertion": false,
     "no-reserved-keywords": false,
-    "prefer-method-signature": false,
     "no-single-line-block-comment": false,
     "function-name": false,
     "no-unnecessary-class": false,
@@ -53,8 +52,6 @@
     "no-string-based-set-timeout": false,
     "mocha-no-side-effect-code": false,
     "no-http-string": [false, "http://www.example.com/?.*", "http://www.examples.com/?.*"],
-    "no-unnecessary-callback-wrapper": false,
-    "number-literal-format": false,
     "export-name": false,
     "insecure-random": false
   }
