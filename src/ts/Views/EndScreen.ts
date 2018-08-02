@@ -14,6 +14,19 @@ import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { ABGroup, IPhoneXEndScreenTest } from 'Models/ABGroup';
 import { IGDPREventHandler } from 'EventHandlers/GDPREventHandler';
 
+export interface IEndScreenParameters {
+    nativeBridge: NativeBridge;
+    language: string;
+    gameId: string;
+    targetGameName: string | undefined;
+    abGroup: ABGroup;
+    privacy: AbstractPrivacy;
+    showGDPRBanner: boolean;
+    adUnitStyle?: AdUnitStyle;
+    campaignId?: string;
+    osVersion?: string;
+}
+
 export interface IEndScreenHandler extends IGDPREventHandler {
     onEndScreenDownload(parameters: IEndScreenDownloadParameters): void;
     onEndScreenClose(): void;
@@ -35,18 +48,16 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
     private _campaignId: string | undefined;
     private _osVersion: string | undefined;
 
-    constructor(nativeBridge: NativeBridge, language: string, gameId: string, gameName: string | undefined, abGroup: ABGroup, privacy: AbstractPrivacy, showGDPRBanner: boolean, adUnitStyle?: AdUnitStyle, campaignId?: string, osVersion?: string) {
-        super(nativeBridge, 'end-screen');
-        this._localization = new Localization(language, 'endscreen');
-        this._abGroup = abGroup;
-        this._gameName = gameName;
-        this._privacy = privacy;
-        this._adUnitStyle = adUnitStyle;
-        this._showGDPRBanner = showGDPRBanner;
-        this._campaignId = campaignId;
-        this._osVersion = osVersion;
-
-        this._template = new Template(this.getTemplate(), this._localization);
+    constructor(parameters : IEndScreenParameters) {
+        super(parameters.nativeBridge, 'end-screen');
+        this._localization = new Localization(parameters.language, 'endscreen');
+        this._abGroup = parameters.abGroup;
+        this._gameName = parameters.targetGameName;
+        this._privacy = parameters.privacy;
+        this._adUnitStyle = parameters.adUnitStyle;
+        this._showGDPRBanner = parameters.showGDPRBanner;
+        this._campaignId = parameters.campaignId;
+        this._osVersion = parameters.osVersion;
 
         this._template = new Template(this.getTemplate(), this._localization);
 
@@ -73,7 +84,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             }
         ];
 
-        if (CustomFeatures.isTimehopApp(gameId)) {
+        if (CustomFeatures.isTimehopApp(parameters.gameId)) {
             this._isSwipeToCloseEnabled = true;
 
             this._bindings.push({

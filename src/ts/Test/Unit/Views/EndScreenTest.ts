@@ -9,6 +9,7 @@ import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 import { Privacy } from 'Views/Privacy';
 
 import EndScreenFixture from 'html/fixtures/EndScreenFixture.html';
+import { IEndScreenParameters } from 'Views/EndScreen';
 import { Configuration } from 'Models/Configuration';
 
 describe('EndScreen', () => {
@@ -30,18 +31,29 @@ describe('EndScreen', () => {
         configuration = TestFixtures.getConfiguration();
     });
 
-    xit('should render', () => {
+    const createEndScreen = (language : string) : PerformanceEndScreen => {
         const privacy = new Privacy(nativeBridge, false);
+        const params : IEndScreenParameters = {
+            nativeBridge,
+            language,
+            gameId: 'testGameId',
+            targetGameName: TestFixtures.getCampaign().getGameName(),
+            abGroup: configuration.getAbGroup(),
+            privacy,
+            showGDPRBanner: false,
+            campaignId: TestFixtures.getCampaign().getId()
+        };
+        return new PerformanceEndScreen(params, TestFixtures.getCampaign());
+    };
 
-        const endScreen = new PerformanceEndScreen(nativeBridge, TestFixtures.getCampaign(), 'en', 'testGameId', privacy, false, configuration.getAbGroup());
+    xit('should render', () => {
+        const endScreen = createEndScreen('en');
         endScreen.render();
         assert.equal(endScreen.container().innerHTML, EndScreenFixture);
     });
 
     it('should render with translations', () => {
-        const privacy = new Privacy(nativeBridge, false);
-
-        const endScreen = new PerformanceEndScreen(nativeBridge, TestFixtures.getCampaign(), 'fi', 'testGameId', privacy, false, configuration.getAbGroup());
+        const endScreen = createEndScreen('fi');
         endScreen.render();
         const downloadElement = endScreen.container().querySelectorAll('.download-text')[0];
         assert.equal(downloadElement.innerHTML, 'Lataa ilmaiseksi');

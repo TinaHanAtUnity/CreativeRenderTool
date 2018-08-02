@@ -40,8 +40,6 @@ import { MRAIDEventHandler } from 'EventHandlers/MRAIDEventHandler';
 import { DisplayInterstitialEventHandler } from 'EventHandlers/DisplayInterstitialEventHandler';
 import { Campaign } from 'Models/Campaign';
 import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
-import { MRAIDEndScreen } from 'Views/MRAIDEndScreen';
-import { MRAIDEndScreenEventHandler } from 'EventHandlers/MRAIDEndScreenEventHandler';
 import { PerformanceEndScreenEventHandler } from 'EventHandlers/PerformanceEndScreenEventHandler';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { XPromoEndScreen } from 'Views/XPromoEndScreen';
@@ -61,7 +59,6 @@ import { Promo } from 'Views/Promo';
 import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
 import { PromoEventHandler } from 'EventHandlers/PromoEventHandler';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
-import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 import { CampaignAssetInfo } from 'Utilities/CampaignAssetInfo';
 import { IVideoEventHandlerParams } from 'EventHandlers/BaseVideoEventHandler';
 import { AndroidVideoEventHandler } from 'EventHandlers/AndroidVideoEventHandler';
@@ -73,6 +70,7 @@ import { GDPRPrivacy } from 'Views/GDPRPrivacy';
 import { PrivacyEventHandler } from 'EventHandlers/PrivacyEventHandler';
 import { NewVideoOverlayEnabledAbTest } from 'Models/ABGroup';
 import { NewVideoOverlay } from 'Views/NewVideoOverlay';
+import { IEndScreenParameters } from 'Views/EndScreen';
 
 export class AdUnitFactory {
     private static _forcedPlayableMRAID: boolean = false;
@@ -112,9 +110,14 @@ export class AdUnitFactory {
 
         const adUnitStyle: AdUnitStyle = parameters.campaign.getAdUnitStyle() || AdUnitStyle.getDefaultAdUnitStyle();
 
-        const showGDPRBanner = this.showGDPRBanner(parameters);
         const privacy = this.createPrivacy(nativeBridge, parameters);
-        const endScreen = new PerformanceEndScreen(nativeBridge, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, parameters.configuration.getAbGroup(), parameters.deviceInfo.getOsVersion(), adUnitStyle);
+        const endScreenParameters: IEndScreenParameters = {
+            ... this.createEndScreenParameters(nativeBridge, privacy, parameters.campaign.getGameName(), parameters),
+            adUnitStyle: adUnitStyle,
+            campaignId: parameters.campaign.getId(),
+            osVersion: parameters.deviceInfo.getOsVersion()
+        };
+        const endScreen = new PerformanceEndScreen(endScreenParameters, parameters.campaign);
         const video = this.getVideo(parameters.campaign, parameters.forceOrientation);
 
         const performanceAdUnitParameters: IPerformanceAdUnitParameters = {
@@ -147,12 +150,28 @@ export class AdUnitFactory {
         return performanceAdUnit;
     }
 
+    private static createEndScreenParameters(nativeBridge: NativeBridge, privacy: AbstractPrivacy, targetGameName: string | undefined, parameters: IAdUnitParameters<Campaign>): IEndScreenParameters {
+        const showGDPRBanner = this.showGDPRBanner(parameters);
+        return {
+            nativeBridge: nativeBridge,
+            language: parameters.deviceInfo.getLanguage(),
+            gameId: parameters.clientInfo.getGameId(),
+            targetGameName: targetGameName,
+            abGroup: parameters.configuration.getAbGroup(),
+            privacy: privacy,
+            showGDPRBanner: showGDPRBanner,
+            adUnitStyle: undefined,
+            campaignId: undefined,
+            osVersion: undefined
+        };
+    }
+
     private static createXPromoAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<XPromoCampaign>): XPromoAdUnit {
         const overlay = this.createOverlay(nativeBridge, parameters);
 
-        const showGDPRBanner = this.showGDPRBanner(parameters);
         const privacy = this.createPrivacy(nativeBridge, parameters);
-        const endScreen = new XPromoEndScreen(nativeBridge, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, parameters.configuration.getAbGroup());
+        const endScreenParameters = this.createEndScreenParameters(nativeBridge, privacy, parameters.campaign.getGameName(), parameters);
+        const endScreen = new XPromoEndScreen(endScreenParameters, parameters.campaign);
         const video = this.getVideo(parameters.campaign, parameters.forceOrientation);
 
         const xPromoAdUnitParameters: IXPromoAdUnitParameters = {
