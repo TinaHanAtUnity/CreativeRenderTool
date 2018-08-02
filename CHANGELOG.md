@@ -1,3 +1,8 @@
+# Staged
+
+* Remove ability to seek in Admob videos, and sends PTS diagnostic message
+* Remove GamerID from source code
+
 # Thu Aug  2 10:32:18 UTC 2018
 
 * iPhone X Endscreen test on ABGroups 18 and 19
