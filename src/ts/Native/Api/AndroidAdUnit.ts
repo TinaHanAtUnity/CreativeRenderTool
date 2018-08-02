@@ -58,7 +58,7 @@ export class AndroidAdUnitApi extends NativeApi {
     public readonly onFocusLost = new Observable1<number>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'AdUnit', ApiPackage.ADS_CORE);
+        super(nativeBridge, 'AdUnit', ApiPackage.ADS);
     }
 
     public open(activityId: number, views: string[], orientation: ScreenOrientation, keyEvents: number[] = [], systemUiVisibility: SystemUiVisibility = 0, hardwareAccel: boolean = true, isTransparent: boolean = false): Promise<void> {

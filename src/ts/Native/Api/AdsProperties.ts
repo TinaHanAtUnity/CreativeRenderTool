@@ -3,7 +3,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 
 export class AdsPropertiesApi extends NativeApi {
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'AdsProperties', ApiPackage.ADS_CORE);
+        super(nativeBridge, 'AdsProperties', ApiPackage.ADS);
     }
 
     public setShowTimeout(timeout: number): Promise<void> {

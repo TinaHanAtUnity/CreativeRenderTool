@@ -29,7 +29,7 @@ export class IosAdUnitApi extends NativeApi {
     public readonly onViewControllerDidReceiveMemoryWarning = new Observable0();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'AdUnit', ApiPackage.ADS_CORE);
+        super(nativeBridge, 'AdUnit', ApiPackage.ADS);
     }
 
     public open(view: string[], supportedOrientations: UIInterfaceOrientationMask, statusBarHidden: boolean, shouldAutorotate: boolean, isTransparent: boolean, withAnimation: boolean): Promise<void> {

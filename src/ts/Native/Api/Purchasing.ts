@@ -19,7 +19,7 @@ export class PurchasingApi extends NativeApi {
     public readonly onIAPSendEvent = new Observable1<string>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Purchasing', ApiPackage.ADS_CORE);
+        super(nativeBridge, 'Purchasing', ApiPackage.ADS);
     }
 
     public initializePurchasing(): Promise<void> {

@@ -34,7 +34,7 @@ export class VideoPlayerApi extends NativeApiWithEventHandlers<IVideoEventHandle
     public Android: AndroidVideoPlayerApi;
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'VideoPlayer', ApiPackage.ADS_CORE);
+        super(nativeBridge, 'VideoPlayer', ApiPackage.ADS);
         if(nativeBridge.getPlatform() === Platform.IOS) {
             this.Ios = new IosVideoPlayerApi(nativeBridge);
         } else if(nativeBridge.getPlatform() === Platform.ANDROID) {

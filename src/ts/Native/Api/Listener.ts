@@ -5,7 +5,7 @@ import { ApiPackage, NativeApi } from 'Native/NativeApi';
 export class ListenerApi extends NativeApi {
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Listener', ApiPackage.ADS_CORE);
+        super(nativeBridge, 'Listener', ApiPackage.ADS);
     }
 
     public sendReadyEvent(placementId: string): Promise<void> {

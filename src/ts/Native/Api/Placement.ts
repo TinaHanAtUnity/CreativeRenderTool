@@ -5,7 +5,7 @@ import { ApiPackage, NativeApi } from 'Native/NativeApi';
 export class PlacementApi extends NativeApi {
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Placement', ApiPackage.ADS_CORE);
+        super(nativeBridge, 'Placement', ApiPackage.ADS);
     }
 
     public setDefaultPlacement(placementId: string): Promise<void> {

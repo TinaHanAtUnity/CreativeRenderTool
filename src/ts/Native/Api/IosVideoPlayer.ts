@@ -20,7 +20,7 @@ export interface IIosVideoEventHandler {
 export class IosVideoPlayerApi extends NativeApiWithEventHandlers<IIosVideoEventHandler> {
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'VideoPlayer', ApiPackage.ADS_CORE);
+        super(nativeBridge, 'VideoPlayer', ApiPackage.ADS);
     }
 
     public handleEvent(event: string, parameters: any[]): void {

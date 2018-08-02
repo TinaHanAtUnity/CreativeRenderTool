@@ -169,7 +169,7 @@ export class WebPlayerApi extends NativeApi {
     public readonly shouldOverrideUrlLoading = new Observable2<string, string>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'WebPlayer', ApiPackage.ADS_CORE);
+        super(nativeBridge, 'WebPlayer', ApiPackage.ADS);
     }
 
     public setUrl(url: string): Promise<void> {
