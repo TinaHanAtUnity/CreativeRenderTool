@@ -98,7 +98,7 @@ export class Activity extends AdUnitContainer {
             this._nativeBridge.AndroidAdUnit.onFocusGained.unsubscribe(this._onFocusGainedObserver);
             return this._nativeBridge.AndroidAdUnit.close().then(() => {
                 this._forceQuitManager.destroyForceQuitKey();
-            }).catch((e) => {
+            }).catch(() => {
                 const error = {
                     deviceInfo: this._deviceInfo
                 };
