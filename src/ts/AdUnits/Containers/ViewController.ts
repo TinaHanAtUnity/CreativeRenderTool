@@ -9,6 +9,7 @@ import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 import { NativeBridge } from 'Native/NativeBridge';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { Double } from 'Utilities/Double';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 interface IIosOptions {
     supportedOrientations: UIInterfaceOrientationMask;
@@ -88,7 +89,6 @@ export class ViewController extends AdUnitContainer {
     }
 
     public close(): Promise<void> {
-        this._forceQuitManager.destroyForceQuitKey();
         this._showing = false;
 
         if(CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
@@ -100,7 +100,11 @@ export class ViewController extends AdUnitContainer {
         this._nativeBridge.Notification.removeAVNotificationObserver(ViewController._audioSessionInterrupt);
         this._nativeBridge.Notification.removeAVNotificationObserver(ViewController._audioSessionRouteChange);
 
-        return this._nativeBridge.IosAdUnit.close();
+        return this._nativeBridge.IosAdUnit.close().then(() => {
+            this._forceQuitManager.destroyForceQuitKey();
+        }).catch((e) => {
+            Diagnostics.trigger('ios_close_error', e);
+        });
     }
 
     public reconfigure(configuration: ViewConfiguration): Promise<any[]> {

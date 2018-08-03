@@ -7,6 +7,7 @@ import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
 import { ForceQuitManager } from 'Managers/ForceQuitManager';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { NativeBridge } from 'Native/NativeBridge';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 interface IAndroidOptions {
     requestedOrientation: ScreenOrientation;
@@ -91,13 +92,15 @@ export class Activity extends AdUnitContainer {
     }
 
     public close(): Promise<void> {
-        this._forceQuitManager.destroyForceQuitKey();
-
         if(!this._currentActivityFinished) {
             this._currentActivityFinished = true;
             this._nativeBridge.AndroidAdUnit.onFocusLost.unsubscribe(this._onFocusLostObserver);
             this._nativeBridge.AndroidAdUnit.onFocusGained.unsubscribe(this._onFocusGainedObserver);
-            return this._nativeBridge.AndroidAdUnit.close();
+            return this._nativeBridge.AndroidAdUnit.close().then(() => {
+                this._forceQuitManager.destroyForceQuitKey();
+            }).catch((e) => {
+                Diagnostics.trigger('android_close_error', e);
+            });
         } else {
             return Promise.resolve();
         }
