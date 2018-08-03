@@ -1,3 +1,4 @@
+
 <script>
     function getQueryParams(url) {
         var a = document.createElement('a');
@@ -66,6 +67,8 @@
             this.intentCallbackId = 0;
             this.sentQuartiles = {};
             var clickSignalListeners = [];
+            var supposedCurrentTime = 0;
+            var userSeeked = false;
             var hasSentStart = false;
 
             document.addEventListener('DOMContentLoaded', function() {
@@ -93,25 +96,29 @@
                 });
 
                 videoEl.addEventListener('timeupdate', function() {
-                    var quartile = Math.floor((videoEl.currentTime / videoEl.duration) * 4);
-                    if (quartile !== 0 && !(quartile in self.sentQuartiles)) {
-                        self.sentQuartiles[quartile] = true;
-                        var adQuartile;
-                        switch (quartile) {
-                            case 1:
-                                adQuartile = 'firstQuartile';
-                                break;
-                            case 2:
-                                adQuartile = 'midpoint';
-                                break;
-                            case 3:
-                                adQuartile = 'thirdQuartile';
-                                break;
-                        }
-                        if (adQuartile) {
-                            self.postMessage('tracking', {
-                                event: adQuartile
-                            });
+                    if (!videoEl.seeking) {
+                        supposedCurrentTime = videoEl.currentTime;
+
+                        var quartile = Math.floor((videoEl.currentTime / videoEl.duration) * 4);
+                        if (quartile !== 0 && !(quartile in self.sentQuartiles)) {
+                            self.sentQuartiles[quartile] = true;
+                            var adQuartile;
+                            switch (quartile) {
+                                case 1:
+                                    adQuartile = 'firstQuartile';
+                                    break;
+                                case 2:
+                                    adQuartile = 'midpoint';
+                                    break;
+                                case 3:
+                                    adQuartile = 'thirdQuartile';
+                                    break;
+                            }
+                            if (adQuartile) {
+                                self.postMessage('tracking', {
+                                    event: adQuartile
+                                });
+                            }
                         }
                     }
                 });
@@ -126,6 +133,17 @@
                     self.postMessage('tracking', {
                         event: 'loaded'
                     });
+                });
+                
+                videoEl.addEventListener('seeking', function() {
+                    var delta = videoEl.currentTime - supposedCurrentTime;
+                    if (Math.abs(delta) > 0.01) {
+                        videoEl.currentTime = supposedCurrentTime;
+                    }
+                    if (!userSeeked) {
+                        userSeeked = true;
+                        self.postMessage('seeked');
+                    }
                 });
 
                 videoEl.addEventListener('playing', function() {

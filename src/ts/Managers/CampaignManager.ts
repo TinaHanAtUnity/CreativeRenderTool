@@ -532,7 +532,7 @@ export class CampaignManager {
         }
 
         const parseTimestamp = Date.now();
-        return parser.parse(this._nativeBridge, this._request, response, session, this._configuration.getGamerId()).then((campaign) => {
+        return parser.parse(this._nativeBridge, this._request, response, session, this._deviceInfo.getOsVersion()).then((campaign) => {
             const parseDuration = Date.now() - parseTimestamp;
             for(const placement of response.getPlacements()) {
                 PurchasingUtilities.placementManager.addCampaignPlacementIds(placement, campaign);
@@ -573,7 +573,7 @@ export class CampaignManager {
 
         const parser: CampaignParser = this.getCampaignParser(response.getContentType());
 
-        return parser.parse(this._nativeBridge, this._request, response, session, this._configuration.getGamerId()).then((campaign) => {
+        return parser.parse(this._nativeBridge, this._request, response, session).then((campaign) => {
             campaign.setMediaId(response.getMediaId());
 
             return campaign;
