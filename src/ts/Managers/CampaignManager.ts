@@ -38,6 +38,7 @@ import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 import { ABGroup } from 'Models/ABGroup';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { MixedPlacementUtility } from 'Utilities/MixedPlacementUtility';
+import { HttpKafka, KafkaCommonObjectType } from 'Utilities/HttpKafka';
 
 export class CampaignManager {
 
@@ -556,10 +557,19 @@ export class CampaignManager {
 
             if(contentType === 'programmatic/mraid' || contentType === 'programmatic/mraid-url') {
                 const cachingDuration = Date.now() - cachingTimestamp;
-                Diagnostics.trigger('mraid_caching_time', {
+
+                const kafkaObject: any = {};
+                kafkaObject.type = 'mraid_caching_time';
+                kafkaObject.eventData = {
                     contentType: contentType,
                     cachingDuration: cachingDuration
-                }, session);
+                };
+                kafkaObject.timeFromShow = 0;
+                kafkaObject.timeFromPlayableStart = 0;
+                kafkaObject.backgroundTime = 0;
+                kafkaObject.auctionId = campaign.getSession().getId();
+
+                HttpKafka.sendEvent('ads.sdk2.events.playable.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
             }
 
             for(const placement of placements) {
