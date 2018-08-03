@@ -146,19 +146,38 @@ describe('PromoCampaignParser', () => {
                 sandbox.restore();
             });
 
-            it('should refresh catalog and resolve campaign', () => {
+            context('should resolve campaign', () => {
+                it('with invalid catalog by refreshing catalog', () => {
 
-                sandbox.stub(PurchasingUtilities, 'refreshCatalog').returns(Promise.resolve());
+                    sandbox.stub(PurchasingUtilities, 'refreshCatalog').returns(Promise.resolve());
+                    sandbox.stub(PurchasingUtilities, 'isCatalogValid').returns(false);
 
-                const parse = (data: any) => {
-                    const response = new AuctionResponse(placements, data, mediaId, correlationId);
-                    return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
-                        campaign = <PromoCampaign>parsedCampaign;
-                        sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.refreshCatalog);
-                    });
-                };
+                    const parse = (data: any) => {
+                        const response = new AuctionResponse(placements, data, mediaId, correlationId);
+                        return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
+                            campaign = <PromoCampaign>parsedCampaign;
+                            sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.refreshCatalog);
+                        });
+                    };
 
-                return parse(JSON.parse(IAPPromoCampaign).campaign1);
+                    return parse(JSON.parse(IAPPromoCampaign).campaign1);
+                });
+
+                it('with valid catalog by not refreshing catalog', () => {
+
+                    sandbox.stub(PurchasingUtilities, 'refreshCatalog').returns(Promise.resolve());
+                    sandbox.stub(PurchasingUtilities, 'isCatalogValid').returns(true);
+
+                    const parse = (data: any) => {
+                        const response = new AuctionResponse(placements, data, mediaId, correlationId);
+                        return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
+                            campaign = <PromoCampaign>parsedCampaign;
+                            sinon.assert.notCalled(<sinon.SinonSpy>PurchasingUtilities.refreshCatalog);
+                        });
+                    };
+
+                    return parse(JSON.parse(IAPPromoCampaign).campaign1);
+                });
             });
         });
 
