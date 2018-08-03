@@ -1,0 +1,4 @@
+--full-trace
+--check-leaks
+--use_strict
+--require test-utils/text-require

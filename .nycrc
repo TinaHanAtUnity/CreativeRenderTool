@@ -1,0 +1,10 @@
+{
+    "exclude": [
+        "build/test/ts/**/*.js"
+    ],
+    "reporter": [
+        "html",
+        "text-summary"
+    ],
+    "reportDir": "build/coverage/ts"
+}
