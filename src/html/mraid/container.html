@@ -10,61 +10,6 @@
     <meta name="format-detection" content="telephone=no"/>
 
     <script>
-        var globalmraidunityframeCount = 0;
-        var globalmraidunityplayableStartTime = undefined;
-        var globalmraidunityplayableTime = 0;
-
-/*
-        var originalsetTimeout = window.setTimeout;
-        window.setTimeout = function(x, y) {
-            if (globalmraidunityplayableStartTime === undefined) {
-                globalmraidunityplayableStartTime = Date.now();
-            }
-            globalmraidunityframeCount++;
-            return originalsetTimeout(x, y)
-        };
-*/
-        if (window.requestAnimationFrame)
-        {
-            var lastFrameTime = 0;
-            var originalRequestAnimationFrame = window.requestAnimationFrame;
-            window.requestAnimationFrame = function(callback) {
-                if (globalmraidunityplayableStartTime === undefined) {
-                    globalmraidunityplayableStartTime = Date.now();
-                }
-                return originalRequestAnimationFrame((time) => {
-                    if (time - lastFrameTime > 16) {
-                        globalmraidunityframeCount++;
-
-                        if (lastFrameTime !== 0 ) {
-                            globalmraidunityplayableTime += (time - lastFrameTime);
-                        }
-                    }
-                    lastFrameTime = time;
-                    callback(time);
-                });
-            }.bind(window);
-        } else if (window.webkitRequestAnimationFrame) {
-            var lastFrameTime = 0;
-            var originalRequestAnimationFrame = window.webkitRequestAnimationFrame;
-            window.webkitRequestAnimationFrame = function(callback) {
-                if (globalmraidunityplayableStartTime === undefined) {
-                    globalmraidunityplayableStartTime = Date.now();
-                }
-                return originalRequestAnimationFrame((time) => {
-                    if (time - lastFrameTime > 16) {
-                        globalmraidunityframeCount++;
-
-                        if (lastFrameTime !== 0 ) {
-                            globalmraidunityplayableTime += (time - lastFrameTime);
-                        }
-                    }
-                    lastFrameTime = time;
-                    callback(time);
-                });
-            }.bind(window);
-        }
-
         (function() {
             var MRAID = function() {
                 var state = 'loading';
@@ -281,17 +226,46 @@
                 }
             };
 
-            function sendStats() {
-                if (globalmraidunityplayableStartTime !== undefined) {
-                    window.parent.postMessage({
+            var globalmraidunityframeCount = 0;
+            var globalmraidunityplayableStartTime = undefined;
+            var globalmraidunityplayableTime = 0;
+
+            var lastFrameTime = 0;
+            var originalRequestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
+
+            if (typeof originalRequestAnimationFrame === 'function') {
+
+                var sendStats = function() {
+                    if (globalmraidunityplayableStartTime !== undefined) {
+                        window.parent.postMessage({
                             type: 'sendStats',
                             frameCount: globalmraidunityframeCount,
                             playTime: globalmraidunityplayableTime / 1000,
                             totalTime: (Date.now() - globalmraidunityplayableStartTime) / 1000,
                         }, '*');
-                }
+                    }
+                };
+
+                window.requestAnimationFrame = function (callback) {
+                    if (globalmraidunityplayableStartTime === undefined) {
+                        globalmraidunityplayableStartTime = Date.now();
+                    }
+                    
+                    return originalRequestAnimationFrame((time) => {
+                        if (time - lastFrameTime > 16) {
+                            globalmraidunityframeCount++;
+
+                            if (lastFrameTime !== 0) {
+                                globalmraidunityplayableTime += (time - lastFrameTime);
+                            }
+                        }
+                        lastFrameTime = time;
+                        callback(time);
+                    });
+                };
+
+                setInterval(sendStats, 500);
             }
-            setInterval(sendStats, 500);
 
             window.mraid = new MRAID();
         })();
