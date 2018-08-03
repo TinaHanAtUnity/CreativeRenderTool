@@ -71,7 +71,7 @@ export class Activity extends AdUnitContainer {
         if (forcedOrientation) {
             this._lockedOrientation = forcedOrientation;
         } else {
-            this._lockedOrientation = forceOrientation;
+        this._lockedOrientation = forceOrientation;
         }
 
         let keyEvents: any[] = [];
@@ -99,7 +99,10 @@ export class Activity extends AdUnitContainer {
             return this._nativeBridge.AndroidAdUnit.close().then(() => {
                 this._forceQuitManager.destroyForceQuitKey();
             }).catch((e) => {
-                Diagnostics.trigger('android_close_error', e);
+                const error = {
+                    deviceInfo: this._deviceInfo
+                };
+                Diagnostics.trigger('android_close_error', error);
             });
         } else {
             return Promise.resolve();

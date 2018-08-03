@@ -103,7 +103,10 @@ export class ViewController extends AdUnitContainer {
         return this._nativeBridge.IosAdUnit.close().then(() => {
             this._forceQuitManager.destroyForceQuitKey();
         }).catch((e) => {
-            Diagnostics.trigger('ios_close_error', e);
+            const error = {
+                deviceInfo: this._deviceInfo
+            };
+            Diagnostics.trigger('ios_close_error', error);
         });
     }
 
