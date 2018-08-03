@@ -52,8 +52,8 @@ describe('EventsTest', () => {
             currentGameId = responseObj.game_id;
             done();
         };
-        xhr.onerror = (error: ErrorEvent) => {
-            throw error;
+        xhr.onerror = () => {
+            throw new Error(xhr.statusText);
         };
         xhr.open('GET', 'https://fake-ads-backend.applifier.info/setup/first_perf_then_vast?token=373a221f4df5c659f2df918f899fa403');
         xhr.send();
@@ -68,8 +68,8 @@ describe('EventsTest', () => {
         xhr.onload = (event: Event) => {
             done();
         };
-        xhr.onerror = (error: ErrorEvent) => {
-            throw error;
+        xhr.onerror = () => {
+            throw new Error(xhr.statusText);
         };
         xhr.open('GET', 'https://fake-ads-backend.applifier.info/fabulous/' + currentGameId + '/remove?token=373a221f4df5c659f2df918f899fa403');
         xhr.send();
