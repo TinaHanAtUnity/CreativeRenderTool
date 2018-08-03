@@ -8,7 +8,7 @@ export interface IGDPREventHandler {
 export abstract class GDPREventHandler implements IGDPREventHandler {
 
     private _gdprManager: GdprManager;
-    private _configuration: Configuration;
+    protected _configuration: Configuration;
 
     constructor(gdprManager: GdprManager, configuration: Configuration) {
         this._gdprManager = gdprManager;

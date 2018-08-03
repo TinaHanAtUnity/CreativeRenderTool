@@ -1,3 +1,13 @@
+# Pending 
+
+* Encode Impression tracking urls of Programmatic VAST
+
+# Thu Aug  2 23:00:48 UTC 2018
+
+* Remove ability to seek in Admob videos
+* Add diagnostic message if a user attempts to seek in Admob
+* Remove GamerID from source code
+
 # Thu Aug  2 10:32:18 UTC 2018
 
 * iPhone X Endscreen test on ABGroups 18 and 19
