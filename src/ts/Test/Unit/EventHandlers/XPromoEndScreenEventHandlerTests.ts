@@ -136,7 +136,6 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                 appStoreId: xPromoAdUnitParameters.campaign.getAppStoreId(),
                 bypassAppSheet: xPromoAdUnitParameters.campaign.getBypassAppSheet(),
-                gamerId: xPromoAdUnitParameters.campaign.getGamerId(),
                 store: xPromoAdUnitParameters.campaign.getStore(),
                 clickAttributionUrlFollowsRedirects: xPromoAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
                 clickAttributionUrl: xPromoAdUnitParameters.campaign.getClickAttributionUrl()
@@ -232,7 +231,6 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                 appStoreId: xPromoAdUnitParameters.campaign.getAppStoreId(),
                 bypassAppSheet: xPromoAdUnitParameters.campaign.getBypassAppSheet(),
-                gamerId: xPromoAdUnitParameters.campaign.getGamerId(),
                 store: xPromoAdUnitParameters.campaign.getStore(),
                 clickAttributionUrlFollowsRedirects: xPromoAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
                 clickAttributionUrl: xPromoAdUnitParameters.campaign.getClickAttributionUrl()

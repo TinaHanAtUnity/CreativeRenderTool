@@ -14,7 +14,7 @@ import { Url } from 'Utilities/Url';
 
 export class ProgrammaticAdMobParser extends CampaignParser {
     public static ContentType = 'programmatic/admob-video';
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string): Promise<Campaign> {
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
         const markup = response.getContent();
         const cacheTTL = response.getCacheTTL();
         const platform = nativeBridge.getPlatform();
@@ -29,7 +29,6 @@ export class ProgrammaticAdMobParser extends CampaignParser {
             }
             const baseCampaignParams: ICampaign = {
                 id: this.getProgrammaticCampaignId(nativeBridge),
-                gamerId: gamerId,
                 willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
                 adType: response.getAdType() || undefined,
                 correlationId: response.getCorrelationId() || undefined,
