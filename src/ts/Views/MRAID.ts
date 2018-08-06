@@ -12,6 +12,7 @@ import { Template } from 'Utilities/Template';
 import { SdkStats } from 'Utilities/SdkStats';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { ABGroup } from 'Models/ABGroup';
 
 export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -41,8 +42,8 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
     private _backgroundTimestamp: number;
     private _creativeId: string | undefined;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
-        super(nativeBridge, 'mraid', placement, campaign, privacy, showGDPRBanner);
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup) {
+        super(nativeBridge, 'mraid', placement, campaign, privacy, showGDPRBanner, abGroup);
 
         this._placement = placement;
         this._campaign = campaign;

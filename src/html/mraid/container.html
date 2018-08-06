@@ -233,7 +233,7 @@
             var lastFrameTime = 0;
             var originalRequestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
 
-            if (typeof originalRequestAnimationFrame === 'function') {
+            if (IF_FPS_COLLECTION_ENABLED && typeof originalRequestAnimationFrame === 'function') {
 
                 var sendStats = function() {
                     if (playableStartTime !== undefined) {

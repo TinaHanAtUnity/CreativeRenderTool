@@ -10,6 +10,7 @@ import { platform } from 'os';
 import { DOMUtils } from 'Utilities/DOMUtils';
 import { XHRequest } from 'Utilities/XHRequest';
 import { GDPREventHandler } from 'EventHandlers/GDPREventHandler';
+import { ABGroup, FPSCollectionTest } from 'Models/ABGroup';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
@@ -44,15 +45,20 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     protected _privacy: AbstractPrivacy;
     protected _showGDPRBanner = false;
     protected _gdprPopupClicked = false;
+
+    protected _abGroup: ABGroup;
+
     protected _stats: IMRAIDFullStats;
 
-    constructor(nativeBridge: NativeBridge, id: string, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
+    constructor(nativeBridge: NativeBridge, id: string, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup) {
         super(nativeBridge, id);
 
         this._placement = placement;
         this._campaign = campaign;
         this._privacy = privacy;
         this._showGDPRBanner = showGDPRBanner;
+
+        this._abGroup = abGroup;
 
         this._privacy.render();
         this._privacy.hide();
@@ -75,12 +81,13 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         }
 
         if (this._stats !== undefined) {
-            // this._nativeBridge.Sdk.logInfo('******* > ' + JSON.stringify(this._stats));
             this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(0, 0, 0, 'mraid_performance_stats', this._stats));
         }
     }
 
     public createMRAID(container: any): Promise<string> {
+        container = container.replace('IF_FPS_COLLECTION_ENABLED', FPSCollectionTest.isValid(this._abGroup).toString());
+
         return this.fetchMRAID().then(mraid => {
             if(mraid) {
                 const markup = this._campaign.getDynamicMarkup();
