@@ -16,7 +16,6 @@ import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
 
 describe('ProgrammaticVPAIDParser', () => {
     const placements = ['TestPlacement'];
-    const gamerId = 'TestGamerId';
     const mediaId = 'o2YMT0Cmps6xHiOwNMeCrH';
     const correlationId = '583dfda0d933a3630a53249c';
 
@@ -40,7 +39,7 @@ describe('ProgrammaticVPAIDParser', () => {
             let campaign: VPAIDCampaign;
             const parse = (data: any) => {
                 const response = new AuctionResponse(placements, data, mediaId, correlationId);
-                return parser.parse(nativeBridge, request, response, session, gamerId).then((parsedCampaign) => {
+                return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
                     campaign = <VPAIDCampaign>parsedCampaign;
                 });
             };
@@ -56,7 +55,6 @@ describe('ProgrammaticVPAIDParser', () => {
                 const json = JSON.parse(ProgrammaticVPAIDCampaign);
                 const vast = new VastParser().parseVast(decodeURIComponent(json.content));
 
-                assert.equal(campaign.getGamerId(), gamerId, 'GamerID is not equal');
                 assert.equal(campaign.getSession(), session, 'Session is not equal');
                 assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not equal');
                 assert.equal(campaign.getVPAID().getScriptUrl(), 'https://fake-ads-backend.applifier.info/get_file/js/vpaid_sample.js', 'Script URL is not equal');

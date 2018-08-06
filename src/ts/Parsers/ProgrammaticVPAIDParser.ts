@@ -14,7 +14,7 @@ export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
 
     private _vpaidParser: VPAIDParser = new VPAIDParser();
 
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string): Promise<Campaign> {
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
         const decodedVast = decodeURIComponent(response.getContent()).trim();
         return this._vastParser.retrieveVast(decodedVast, nativeBridge, request).then((vast): Promise<Campaign> => {
             const vpaidMediaFile = this.getVPAIDMediaFile(vast);
@@ -26,7 +26,6 @@ export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
 
                 const baseCampaignParams: ICampaign = {
                     id: this.getProgrammaticCampaignId(nativeBridge),
-                    gamerId: gamerId,
                     willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
                     adType: response.getAdType() || undefined,
                     correlationId: response.getCorrelationId() || undefined,
@@ -52,7 +51,7 @@ export class ProgrammaticVPAIDParser extends ProgrammaticVastParser {
 
                 return Promise.resolve(new VPAIDCampaign(vpaidCampaignParams));
             } else {
-                return this.parseVastToCampaign(vast, nativeBridge, campaignId, session, gamerId, response);
+                return this.parseVastToCampaign(vast, nativeBridge, campaignId, session, response);
             }
         });
     }

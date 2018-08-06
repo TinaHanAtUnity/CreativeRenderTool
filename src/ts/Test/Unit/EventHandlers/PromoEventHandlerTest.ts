@@ -91,7 +91,7 @@ describe('PromoEventHandlersTest', () => {
         it ('should set the optOutRecorded flag in the configuration', () => {
             const config = sinon.createStubInstance(Configuration);
 
-            (<sinon.SinonStub>config.isOptOutRecorded).returns(false);
+            config.isOptOutRecorded.returns(false);
 
             PromoEventHandler.onGDPRPopupSkipped(config, gdprManager);
             sinon.assert.calledWith(<sinon.SinonSpy>config.setOptOutRecorded, true);
@@ -100,7 +100,7 @@ describe('PromoEventHandlersTest', () => {
         it('should send GDPR operative Event with skip', () => {
             const config = sinon.createStubInstance(Configuration);
 
-            (<sinon.SinonStub>config.isOptOutRecorded).returns(false);
+            config.isOptOutRecorded.returns(false);
 
             PromoEventHandler.onGDPRPopupSkipped(config, gdprManager);
             sinon.assert.calledWithExactly(<sinon.SinonSpy>gdprManager.sendGDPREvent, 'skip');
@@ -109,7 +109,7 @@ describe('PromoEventHandlersTest', () => {
         it('should not call gdpr or set optOutRecorded when already recorded', () => {
             const config = sinon.createStubInstance(Configuration);
 
-            (<sinon.SinonStub>config.isOptOutRecorded).returns(true);
+            config.isOptOutRecorded.returns(true);
             PromoEventHandler.onGDPRPopupSkipped(config, gdprManager);
             sinon.assert.notCalled(<sinon.SinonSpy>config.setOptOutRecorded);
             sinon.assert.notCalled(<sinon.SinonSpy>gdprManager.sendGDPREvent);
