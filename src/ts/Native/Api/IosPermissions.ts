@@ -18,8 +18,8 @@ export class IosPermissionsApi extends NativeApi {
         super(nativeBridge, 'Permissions');
     }
 
-    public checkPermission(permission: IosPermission): Promise<boolean> {
-        return this._nativeBridge.invoke<boolean>(this._apiClass, 'checkPermission', [permission]);
+    public checkPermission(permission: IosPermission): Promise<number> {
+        return this._nativeBridge.invoke<number>(this._apiClass, 'checkPermission', [permission]);
     }
 
     public requestPermission(permission: IosPermission): Promise<void> {
