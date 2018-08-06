@@ -9,7 +9,6 @@ import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 import { NativeBridge } from 'Native/NativeBridge';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { Double } from 'Utilities/Double';
-import { Diagnostics } from 'Utilities/Diagnostics';
 
 interface IIosOptions {
     supportedOrientations: UIInterfaceOrientationMask;

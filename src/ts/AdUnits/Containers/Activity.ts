@@ -7,7 +7,6 @@ import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
 import { ForceQuitManager } from 'Managers/ForceQuitManager';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { NativeBridge } from 'Native/NativeBridge';
-import { Diagnostics } from 'Utilities/Diagnostics';
 
 interface IAndroidOptions {
     requestedOrientation: ScreenOrientation;
