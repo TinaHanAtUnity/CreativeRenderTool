@@ -17,6 +17,8 @@ import { AbstractPrivacy } from 'Views/AbstractPrivacy';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { ARUtil } from '../Utilities/ARUtil';
 
+import { IosPermission } from '../Native/Api/IosPermissions';
+
 export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private static CloseLength = 30;
@@ -29,6 +31,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _iframe: HTMLIFrameElement;
     private _gdprBanner: HTMLElement;
     private _privacyButton: HTMLElement;
+    private _cameraPermissionPanel: HTMLElement;
 
     private _iframeLoaded = false;
 
@@ -60,6 +63,8 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _arSessionInterruptedObserver: IObserver0;
     private _arSessionInterruptionEndedObserver: IObserver0;
     private _arAndroidEnumsReceivedObserver: IObserver1<any>;
+
+    private _permissionResultObserver: IObserver2<string, boolean>;
 
     private _isMRAIDAR: boolean = false;
 
@@ -109,6 +114,20 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                     this.choosePrivacyShown();
                 },
                 selector: '.gdpr-link'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => {
+                    this.onShowAr();
+                },
+                selector: '.permission-accept-button'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => {
+                    this.onShowFallback();
+                },
+                selector: '.permission-decline-button'
             }
         ];
     }
@@ -119,6 +138,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         this._closeElement = <HTMLElement>this._container.querySelector('.close-region');
         this._loadingScreen = <HTMLElement>this._container.querySelector('.loading-screen');
         this._loadingScreenAR = <HTMLElement>this._container.querySelector('.loading-screen-ar');
+        this._cameraPermissionPanel = <HTMLElement>this._container.querySelector('.camera-permission-panel');
 
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
         this._gdprBanner = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
@@ -204,6 +224,10 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
             this._nativeBridge.AR.onSessionInterruptionEnded.unsubscribe(this._arSessionInterruptionEndedObserver);
             this._nativeBridge.AR.onAndroidEnumsReceived.unsubscribe(this._arAndroidEnumsReceivedObserver);
             window.removeEventListener('deviceorientation', this._deviceorientationListener, false);
+
+            if (this._permissionResultObserver && this._nativeBridge.getPlatform() === Platform.IOS) {
+                this._nativeBridge.Permissions.Ios.onPermissionsResult.unsubscribe(this._permissionResultObserver);
+            }
         }
 
         if(this._messageListener) {
@@ -265,7 +289,11 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
             clearTimeout(this._prepareTimeout);
             this._prepareTimeout = undefined;
 
-            this.showMRAIDAd();
+            if (this._isMRAIDAR) {
+                this.showARPermissionPanel();
+            } else {
+                this.showMRAIDAd();
+            }
         }
 
         const frameLoadDuration = Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId());
@@ -314,7 +342,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private showLoadingScreenAR() {
         this._loadingScreenAR.style.display = 'block';
         if (this._iframeLoaded) {
-            this.showMRAIDAd();
+            this.showARPermissionPanel();
         }
 
         this._closeElement.style.opacity = '1';
@@ -541,5 +569,57 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         if (this._iframeLoaded) {
             this._iframe.contentWindow!.postMessage({type: 'AREvent', data: {parameters, event}}, '*');
         }
+    }
+
+    /**
+     * showARPermissionPanel needs to be shown before the timer starts
+     */
+    private showARPermissionPanel() {
+        this._nativeBridge.Permissions.Ios.checkPermission(IosPermission.AVMediaTypeVideo).then(results => {
+            this._cameraPermissionPanel.style.display = 'block';
+
+            if (results === 0 || results === 3) {
+                // NotDetermined = 0, Authorized = 3
+                this._cameraPermissionPanel.style.display = 'block';
+            } else if (results === 1 || results === 2) {
+                // Restricted = 1, Denied = 2
+                this.onCameraPermissionEvent(false);
+            }
+
+            this._loadingScreen.classList.add('hidden');
+            this._loadingScreenAR.classList.add('hidden');
+        });
+    }
+
+    private onCameraPermissionEvent(hasCameraPermission: boolean) {
+        this._iframe.contentWindow!.postMessage({
+            type: 'permission',
+            value: {
+                type: 'Camera',
+                status: hasCameraPermission
+            }
+        }, '*');
+
+        this.showMRAIDAd();
+        this._cameraPermissionPanel.classList.add('hidden');
+    }
+
+    private onShowAr() {
+        if (this._nativeBridge.getPlatform() === Platform.IOS) {
+            this._permissionResultObserver = this._nativeBridge.Permissions.Ios.onPermissionsResult.subscribe((permission, granted) => {
+                if(permission === IosPermission.AVMediaTypeVideo) {
+                    this.onCameraPermissionEvent(granted);
+                }
+            });
+        }
+
+        this._nativeBridge.Permissions.Ios.requestPermission(IosPermission.AVMediaTypeVideo).then(() => {
+            this._nativeBridge.Sdk.logDebug('Required permission for showing camera');
+        });
+    }
+
+    private onShowFallback() {
+        this.onCameraPermissionEvent(false);
+        this.showMRAIDAd();
     }
 }

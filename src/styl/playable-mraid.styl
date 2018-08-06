@@ -148,7 +148,8 @@ $filling-bar-width = $progress-bar-width * .3;
   }
 
   .loading-screen,
-  .loading-screen-ar {
+  .loading-screen-ar,
+  .camera-permission-panel {
     position: absolute;
     top: 0;
     left: 0;
@@ -158,6 +159,18 @@ $filling-bar-width = $progress-bar-width * .3;
     height: 100vh;
     background-color: $white;
     opacity: 1;
+
+    .permission-accept-button {
+      background-color: #0f0;
+      margin: 5vh 5vw;
+      padding: 5vh 5vw;
+    }
+
+    .permission-decline-button {
+      background-color: #f00;
+      margin: 5vh 5vw;
+      padding: 5vh 5vw;
+    }
 
     &.hidden {
       opacity: 0;
