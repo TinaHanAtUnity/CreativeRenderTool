@@ -246,11 +246,11 @@
                     }
                 };
 
-                window.requestAnimationFrame = function (callback) {
+                window.requestAnimationFrame = widnow.webkitRequestAnimationFrame = function (callback) {
                     if (globalmraidunityplayableStartTime === undefined) {
                         globalmraidunityplayableStartTime = Date.now();
                     }
-                    
+
                     return originalRequestAnimationFrame((time) => {
                         if (time - lastFrameTime > 16) {
                             globalmraidunityframeCount++;
