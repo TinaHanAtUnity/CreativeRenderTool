@@ -246,7 +246,7 @@
                     }
                 };
 
-                window.requestAnimationFrame = widnow.webkitRequestAnimationFrame = function (callback) {
+                window.requestAnimationFrame = window.webkitRequestAnimationFrame = function (callback) {
                     if (globalmraidunityplayableStartTime === undefined) {
                         globalmraidunityplayableStartTime = Date.now();
                     }
