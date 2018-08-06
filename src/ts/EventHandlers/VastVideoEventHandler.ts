@@ -164,7 +164,7 @@ export class VastVideoEventHandler extends VideoEventHandler {
     }
 
     private sendThirdPartyImpressionEvent(): void {
-        const impressionUrls = this._vastCampaign.getImpressionUrls();
+        const impressionUrls = this._vastCampaign.getVast().getImpressionUrls();
         if (impressionUrls) {
             for (const impressionUrl of impressionUrls) {
                 this.sendThirdPartyEvent('vast impression', impressionUrl);

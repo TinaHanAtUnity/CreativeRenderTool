@@ -33,16 +33,6 @@ export abstract class CampaignParser {
         throw new Error('Invalid url: ' + url);
     }
 
-    protected validateAndEncodeUrls(urls: string[], session: Session): string[] {
-        const newUrls: string[] = [];
-        if (urls && urls.length > 0) {
-            for (const url of urls) {
-                newUrls.push(this.validateAndEncodeUrl(url, session));
-            }
-        }
-        return newUrls;
-    }
-
     protected validateAndEncodeTrackingUrls(urls: { [eventName: string]: string[] }, session: Session): { [eventName: string]: string[] } {
         if(urls && urls !== null) {
             for(const urlKey in urls) {
