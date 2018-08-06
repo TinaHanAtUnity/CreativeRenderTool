@@ -1,5 +1,7 @@
-# Pending
+# Staged
 
+* Destroy Forcequit Key only after container cleanly closes
+* Remove ComScore Completely
 * Encode Impression tracking urls of Programmatic VAST
 * Update Dependencies
 
