@@ -247,8 +247,8 @@
                 };
 
                 window.requestAnimationFrame = window.webkitRequestAnimationFrame = function (callback) {
-                    if (globalmraidunityplayableStartTime === undefined) {
-                        globalmraidunityplayableStartTime = Date.now();
+                    if (playableStartTime === undefined) {
+                        playableStartTime = Date.now();
                     }
 
                     return originalRequestAnimationFrame((time) => {
