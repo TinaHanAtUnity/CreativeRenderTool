@@ -1,6 +1,12 @@
-# Staged
+# Pending
 
-* Remove ability to seek in Admob videos, and sends PTS diagnostic message
+* Encode Impression tracking urls of Programmatic VAST
+* Update Dependencies
+
+# Thu Aug  2 23:00:48 UTC 2018
+
+* Remove ability to seek in Admob videos
+* Add diagnostic message if a user attempts to seek in Admob
 * Remove GamerID from source code
 
 # Thu Aug  2 10:32:18 UTC 2018
