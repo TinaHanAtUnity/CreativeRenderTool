@@ -226,9 +226,9 @@
                 }
             };
 
-            var globalmraidunityframeCount = 0;
-            var globalmraidunityplayableStartTime = undefined;
-            var globalmraidunityplayableTime = 0;
+            var frameCount = 0;
+            var playableStartTime = undefined;
+            var playableTime = 0;
 
             var lastFrameTime = 0;
             var originalRequestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
@@ -236,12 +236,12 @@
             if (typeof originalRequestAnimationFrame === 'function') {
 
                 var sendStats = function() {
-                    if (globalmraidunityplayableStartTime !== undefined) {
+                    if (playableStartTime !== undefined) {
                         window.parent.postMessage({
                             type: 'sendStats',
-                            frameCount: globalmraidunityframeCount,
-                            playTime: globalmraidunityplayableTime / 1000,
-                            totalTime: (Date.now() - globalmraidunityplayableStartTime) / 1000,
+                            frameCount: frameCount,
+                            playTime: playableTime / 1000,
+                            totalTime: (Date.now() - playableStartTime) / 1000,
                         }, '*');
                     }
                 };
@@ -253,10 +253,10 @@
 
                     return originalRequestAnimationFrame((time) => {
                         if (time - lastFrameTime > 16) {
-                            globalmraidunityframeCount++;
+                            frameCount++;
 
                             if (lastFrameTime !== 0) {
-                                globalmraidunityplayableTime += (time - lastFrameTime);
+                                playableTime += (time - lastFrameTime);
                             }
                         }
                         lastFrameTime = time;
