@@ -91,13 +91,15 @@ export class Activity extends AdUnitContainer {
     }
 
     public close(): Promise<void> {
-        this._forceQuitManager.destroyForceQuitKey();
-
         if(!this._currentActivityFinished) {
             this._currentActivityFinished = true;
             this._nativeBridge.AndroidAdUnit.onFocusLost.unsubscribe(this._onFocusLostObserver);
             this._nativeBridge.AndroidAdUnit.onFocusGained.unsubscribe(this._onFocusGainedObserver);
-            return this._nativeBridge.AndroidAdUnit.close();
+            return this._nativeBridge.AndroidAdUnit.close().then(() => {
+                this._forceQuitManager.destroyForceQuitKey();
+            }).catch(() => {
+                // Ignore because forcequit will send diagnostic next init
+            });
         } else {
             return Promise.resolve();
         }
