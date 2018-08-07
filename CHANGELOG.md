@@ -1,6 +1,12 @@
-# Pending
+# Staged
 
+* Destroy Forcequit Key only after container cleanly closes
+* Remove ComScore Completely
 * Encode Impression tracking urls of Programmatic VAST
+* Added the field latestCampaignsStarts in gameSessionCounters
+
+# Tue Aug  7 13:23:57 UTC 2018
+
 * Update Dependencies
 
 # Thu Aug  2 23:00:48 UTC 2018
