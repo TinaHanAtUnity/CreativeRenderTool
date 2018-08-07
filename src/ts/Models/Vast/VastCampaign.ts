@@ -17,7 +17,6 @@ export interface IVastCampaign extends IProgrammaticCampaign {
     advertiserCampaignId: string | undefined;
     advertiserBundleId: string | undefined;
     buyerId: string | undefined;
-    impressionUrls: string[];
     isMoatEnabled: boolean | undefined;
 }
 
@@ -36,7 +35,6 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
             advertiserCampaignId: ['string', 'undefined'],
             advertiserBundleId: ['string', 'undefined'],
             buyerId: ['string', 'undefined'],
-            impressionUrls: ['array'],
             isMoatEnabled: ['boolean', 'undefined']
         }, campaign);
 
@@ -106,10 +104,6 @@ export class VastCampaign extends ProgrammaticCampaign<IVastCampaign> {
 
     public getAdvertiserBundleId(): string | undefined {
         return this.get('advertiserBundleId');
-    }
-
-    public getImpressionUrls(): string[] {
-        return this.get('impressionUrls');
     }
 
     public isMoatEnabled(): boolean | undefined {
