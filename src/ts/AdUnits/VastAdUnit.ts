@@ -34,7 +34,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     private _muted: boolean = false;
     private _events: Array<[number, string]> = [[0, 'AdVideoStart'], [0.25, 'AdVideoFirstQuartile'], [0.5, 'AdVideoMidpoint'], [0.75, 'AdVideoThirdQuartile']];
     private _vastCampaign: VastCampaign;
-    private _vastPlacement: Placement;
 
     constructor(nativeBridge: NativeBridge, parameters: IVastAdUnitParameters) {
         super(nativeBridge, parameters);
@@ -44,7 +43,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         this._endScreen = parameters.endScreen || null;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._vastCampaign = parameters.campaign;
-        this._vastPlacement = parameters.placement;
         this._moat = MoatViewabilityService.getMoat();
 
         if(this._endScreen) {
