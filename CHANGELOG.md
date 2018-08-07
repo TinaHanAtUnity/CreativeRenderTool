@@ -4,6 +4,7 @@
 * Remove ComScore Completely
 * Encode Impression tracking urls of Programmatic VAST
 * Added the field latestCampaignsStarts in gameSessionCounters
+* Send close and skip events for playable mraid
 
 # Tue Aug  7 13:23:57 UTC 2018
 
