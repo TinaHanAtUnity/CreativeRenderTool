@@ -67,14 +67,16 @@ export class GameSessionCounters {
     }
 
     public static getDTO(): { [key: string]: any } {
-        return { adRequests: this._adRequestCount,
+        return {
+            adRequests: this._adRequestCount,
             starts: this._totalStartCount,
             views: this._totalViewCount,
             startsPerCampaign: this._campaignStartCounter,
             startsPerTarget: this._targetStartCounter,
             viewsPerCampaign: this._campaignViewCounter,
             viewsPerTarget: this._targetViewCounter,
-            latestCampaignsStarts: this._latestCampaignsStarts};
+            latestCampaignsStarts: this._latestCampaignsStarts
+        };
     }
 
     private static _adRequestCount: number = 0;
@@ -85,5 +87,4 @@ export class GameSessionCounters {
     private static _campaignStartCounter: {[id: string]: number} = {};
     private static _campaignViewCounter: {[id: string]: number} = {};
     private static _latestCampaignsStarts: {[id: string]: string} = {};
-
 }
