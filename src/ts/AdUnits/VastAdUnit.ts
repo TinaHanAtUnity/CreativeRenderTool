@@ -36,8 +36,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     private _vastCampaign: VastCampaign;
     private _vastPlacement: Placement;
 
-    public _nativeBridge: NativeBridge;
-
     constructor(nativeBridge: NativeBridge, parameters: IVastAdUnitParameters) {
         super(nativeBridge, parameters);
 
@@ -48,8 +46,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         this._vastCampaign = parameters.campaign;
         this._vastPlacement = parameters.placement;
         this._moat = MoatViewabilityService.getMoat();
-
-        this._nativeBridge = nativeBridge;
 
         if(this._endScreen) {
             this._endScreen.render();
@@ -161,11 +157,8 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         }
     }
 
-    // tslint:disable:no-console
     public sendCompanionTrackingEvent(sessionId: string): void {
         const companionTrackingUrls = this._vastCampaign.getVast().getCompanionCreativeViewTrackingUrls();
-        console.log('------- companion tracking urls ' + companionTrackingUrls);
-        this._nativeBridge.Sdk.logDebug('----- companion ' + companionTrackingUrls);
         for (const url of companionTrackingUrls) {
             this._thirdPartyEventManager.sendEvent('companion', sessionId, url);
         }
