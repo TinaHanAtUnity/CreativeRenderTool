@@ -13,6 +13,22 @@ import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { Diagnostics } from 'Utilities/Diagnostics';
 
+export enum ICometTrackingUrlEvents {
+    IMPRESSION = 'EventImpression', //
+    START = 'EventStart',
+    CLICK = 'EventClick',
+    ENDCARD_CLICK = 'EventVideoEndCardClick', //
+    FIRST_QUARTILE = 'EventFirstQuartile',
+    MIDPOINT = 'EventMidpoint',
+    THIRD_QUARTILE = 'EventThirdQuartile',
+    ERROR = 'EventError', //
+    STALLED = 'EventStalled', //
+    LOADED = 'EventLoaded',
+    SHOW = 'EventShow', //
+    COMPLETE = 'EventComplete',
+    SKIP = 'EventSkip'
+}
+
 export class CometCampaignParser extends CampaignParser {
     public static ContentType = 'comet/campaign';
 

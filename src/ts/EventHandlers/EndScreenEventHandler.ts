@@ -5,7 +5,7 @@ import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Platform } from 'Constants/Platform';
-import { StoreName } from 'Models/Campaigns/PerformanceCampaign';
+import { StoreName, PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { IosUtils } from 'Utilities/IosUtils';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Diagnostics } from 'Utilities/Diagnostics';
@@ -22,6 +22,7 @@ import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { Video } from 'Models/Assets/Video';
 import { GDPREventHandler } from 'EventHandlers/GDPREventHandler';
 import { Configuration } from 'Models/Configuration';
+import { ICometTrackingUrlEvents } from 'Parsers/CometCampaignParser';
 
 export interface IEndScreenDownloadParameters {
     clickAttributionUrl: string | undefined;
@@ -77,6 +78,11 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
             for (const url of clickTrackingUrls) {
                 this._thirdPartyEventManager.sendEvent('xpromo click', this._campaign.getSession().getId(), url);
             }
+        } else if (this._campaign instanceof PerformanceCampaign) {
+            const url = this._campaign.getVideoEventUrls()[ICometTrackingUrlEvents.CLICK];
+            if (url) {
+                this._thirdPartyEventManager.sendEvent(ICometTrackingUrlEvents.CLICK, this._campaign.getSession().getId(), url);
+            }
         }
 
         if(parameters.clickAttributionUrl) {
@@ -98,6 +104,11 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
             const clickTrackingUrls = this._campaign.getTrackingUrlsForEvent('click');
             for (const url of clickTrackingUrls) {
                 this._thirdPartyEventManager.sendEvent('xpromo click', this._campaign.getSession().getId(), url);
+            }
+        } else if (this._campaign instanceof PerformanceCampaign) {
+            const url = this._campaign.getVideoEventUrls()[ICometTrackingUrlEvents.CLICK];
+            if (url) {
+                this._thirdPartyEventManager.sendEvent(ICometTrackingUrlEvents.CLICK, this._campaign.getSession().getId(), url);
             }
         }
 
