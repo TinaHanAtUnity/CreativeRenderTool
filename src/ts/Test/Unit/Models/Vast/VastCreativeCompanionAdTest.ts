@@ -11,5 +11,6 @@ describe('VastCreativeCompanionAd', () => {
         assert.equal(vastCreativeCompanionAd.getWidth(), 800);
         assert.equal(vastCreativeCompanionAd.getStaticResourceURL(), 'http://image.com');
         assert.equal(vastCreativeCompanionAd.getCompanionClickThroughURLTemplate(), 'https://url.com/companionClickThroughURLTemplate');
+        assert.deepEqual(vastCreativeCompanionAd.getTrackingEvents(), { ['creativeView']: ['https://url.com/companionCreativeViewURLTemplate'] });
     });
 });
