@@ -4,6 +4,7 @@ import { View } from 'Views/View';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Campaign } from 'Models/Campaign';
 import { Platform } from 'Constants/Platform';
+import { Configuration } from 'Models/Configuration';
 
 export interface IPrivacyHandler {
     onPrivacy(url: string): void;
@@ -29,14 +30,14 @@ export interface IBuildInformation {
 
 export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
 
-    public static createBuildInformation(clientInfo: ClientInfo, campaign: Campaign, nativeBridge: NativeBridge) {
+    public static createBuildInformation(clientInfo: ClientInfo, campaign: Campaign, nativeBridge: NativeBridge, configuration: Configuration) {
         const date = new Date();
         AbstractPrivacy.buildInformation = {
             userAgent: window.navigator.userAgent,
             platform: clientInfo.getPlatform() === Platform.IOS ? 'iOS' : 'Android',
             campaign: campaign.getId(),
             apiLevel: nativeBridge.getApiLevel(),
-            group: campaign.getAbGroup().toNumber(),
+            group: configuration.getAbGroup().toNumber(),
             sdk: clientInfo.getSdkVersionName(),
             webview: clientInfo.getWebviewVersion(),
             webviewHash: clientInfo.getWebviewHash(),
