@@ -157,8 +157,10 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
 
     public sendCompanionTrackingEvent(sessionId: string): void {
         const companionTrackingUrls = this._vastCampaign.getVast().getCompanionCreativeViewTrackingUrls();
-        for (const url of companionTrackingUrls) {
-            this._thirdPartyEventManager.sendEvent('companion', sessionId, url);
+        if (companionTrackingUrls) {
+            for (const url of companionTrackingUrls) {
+                this._thirdPartyEventManager.sendEvent('companion', sessionId, url);
+            }
         }
     }
 
