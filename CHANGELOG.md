@@ -1,6 +1,6 @@
-# Pending 
+# Tue Aug  7 13:23:57 UTC 2018
 
-* Encode Impression tracking urls of Programmatic VAST
+* Update Dependencies
 
 # Thu Aug  2 23:00:48 UTC 2018
 
