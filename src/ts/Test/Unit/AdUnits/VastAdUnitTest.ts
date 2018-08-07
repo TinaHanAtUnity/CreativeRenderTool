@@ -226,17 +226,13 @@ describe('VastAdUnit', () => {
         });
 
         it('it should fire companion tracking events', () => {
-            const width = 320;
-            const height = 480;
-            const url = 'http://example.com/companionCreativeView';
-            const companion = new VastCreativeCompanionAd('foobarCompanion', 'Creative', height, width, 'http://example.com/img.png', 'http://example.com/clickme', {
-                'creativeView': [url]
-            });
-            sandbox.stub(vastCampaign.getVast(), 'getLandscapeOrientedCompanionAd').returns(companion);
-            sandbox.stub(vastCampaign.getVast(), 'getPortraitOrientedCompanionAd').returns(companion);
-
             const mockEventManager = sinon.mock(thirdPartyEventManager);
-            mockEventManager.expects('sendEvent').withArgs('companion', '123', companion.getEventTrackingUrls('creativeView')[0]);
+            const companionTrackingUrls = vastCampaign.getVast().getCompanionCreativeViewTrackingUrls();
+            if (companionTrackingUrls) {
+                for (const companionTrackingUrl of companionTrackingUrls) {
+                    mockEventManager.expects('sendEvent').withArgs('companion', '123', companionTrackingUrl);
+                }
+            }
             vastAdUnit.sendCompanionTrackingEvent('123');
             mockEventManager.verify();
         });

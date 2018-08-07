@@ -36,6 +36,8 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     private _vastCampaign: VastCampaign;
     private _vastPlacement: Placement;
 
+    public _nativeBridge: NativeBridge;
+
     constructor(nativeBridge: NativeBridge, parameters: IVastAdUnitParameters) {
         super(nativeBridge, parameters);
 
@@ -46,6 +48,8 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         this._vastCampaign = parameters.campaign;
         this._vastPlacement = parameters.placement;
         this._moat = MoatViewabilityService.getMoat();
+
+        this._nativeBridge = nativeBridge;
 
         if(this._endScreen) {
             this._endScreen.render();
@@ -126,6 +130,10 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         return this._muted;
     }
 
+    public getEndScreen(): VastEndScreen | null {
+        return this._endScreen;
+    }
+
     public sendTrackingEvent(eventName: string, sessionId: string): void {
         const trackingEventUrls = this._vastCampaign.getVast().getTrackingEventUrls(eventName);
         if (trackingEventUrls) {
@@ -153,17 +161,13 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         }
     }
 
-    public getEndScreen(): VastEndScreen | null {
-        return this._endScreen;
-    }
-
+    // tslint:disable:no-console
     public sendCompanionTrackingEvent(sessionId: string): void {
-        const companion = this.getCompanionForOrientation();
-        if (companion) {
-            const urls = companion.getEventTrackingUrls('creativeView');
-            for (const url of urls) {
-                this._thirdPartyEventManager.sendEvent('companion', sessionId, url);
-            }
+        const companionTrackingUrls = this._vastCampaign.getVast().getCompanionCreativeViewTrackingUrls();
+        console.log('------- companion tracking urls ' + companionTrackingUrls);
+        this._nativeBridge.Sdk.logDebug('----- companion ' + companionTrackingUrls);
+        for (const url of companionTrackingUrls) {
+            this._thirdPartyEventManager.sendEvent('companion', sessionId, url);
         }
     }
 
@@ -190,21 +194,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         super.onContainerForeground();
         if (this.isShowing() && this.canShowVideo() && this._moat) {
             this._moat.play(this.getVolume());
-        }
-    }
-
-    private getCompanionForOrientation(): VastCreativeCompanionAd | null {
-        let orientation = DeviceOrientation.getDeviceOrientation();
-        if (this._forceOrientation === Orientation.LANDSCAPE) {
-            orientation = Orientation.LANDSCAPE;
-        } else if (this._forceOrientation === Orientation.PORTRAIT) {
-            orientation = Orientation.PORTRAIT;
-        }
-
-        if (orientation === Orientation.LANDSCAPE) {
-            return this._vastCampaign.getVast().getLandscapeOrientedCompanionAd();
-        } else {
-            return this._vastCampaign.getVast().getPortraitOrientedCompanionAd();
         }
     }
 

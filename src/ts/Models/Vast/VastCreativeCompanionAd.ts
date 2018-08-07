@@ -77,10 +77,12 @@ export class VastCreativeCompanionAd extends Model<IVastCreativeCompanionAd> {
     public getTrackingEvents(): { [eventType: string]: string[] } {
         return this.get('trackingEvents') || {};
     }
-
+// tslint:disable:no-console
     public getEventTrackingUrls(eventType: string): string[] {
         const trackingEvents = this.getTrackingEvents();
+        console.log('----- event tracking urls ' + trackingEvents);
         if (trackingEvents) {
+            console.log('------ trackingEvents[eventType] ' + eventType + '-----' + trackingEvents[eventType]);
             return trackingEvents[eventType] || [];
         }
         return [];
