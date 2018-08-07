@@ -58,8 +58,8 @@ describe('VPAIDAdUnit', () => {
         };
 
         const webPlayer = sinon.createStubInstance(WebPlayerApi);
-        (<sinon.SinonStub>webPlayer.setSettings).returns(Promise.resolve());
-        (<sinon.SinonStub>webPlayer.setEventSettings).returns(Promise.resolve());
+        webPlayer.setSettings.returns(Promise.resolve());
+        webPlayer.setEventSettings.returns(Promise.resolve());
         webPlayer.shouldOverrideUrlLoading = new Observable2<string, string>();
         (<any>nativeBridge).WebPlayer = webPlayer;
 

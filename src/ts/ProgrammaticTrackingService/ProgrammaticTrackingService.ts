@@ -9,7 +9,8 @@ export enum ProgrammaticTrackingError {
 
 export enum ProgrammaticTrackingMetric {
     AdmobUsedCachedVideo = 'admob_used_cached_video',
-    AdmobUsedStreamedVideo = 'admob_used_streamed_video'
+    AdmobUsedStreamedVideo = 'admob_used_streamed_video',
+    AdmobUserVideoSeeked = 'admob_user_video_seeked'
 }
 
 export interface IProgrammaticTrackingErrorData {
