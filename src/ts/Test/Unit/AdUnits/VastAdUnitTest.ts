@@ -228,10 +228,10 @@ describe('VastAdUnit', () => {
         it('it should fire companion tracking events', () => {
             const mockEventManager = sinon.mock(thirdPartyEventManager);
             const companionTrackingUrls = vastCampaign.getVast().getCompanionCreativeViewTrackingUrls();
-            if (companionTrackingUrls) {
-                for (const companionTrackingUrl of companionTrackingUrls) {
-                    mockEventManager.expects('sendEvent').withArgs('companion', '123', companionTrackingUrl);
-                }
+            assert.isTrue(companionTrackingUrls.length > 0); // make sure that there are tracking urls
+            for (const companionTrackingUrl of companionTrackingUrls) {
+                // make each tracking url expected.
+                mockEventManager.expects('sendEvent').withExactArgs('companion', '123', companionTrackingUrl);
             }
             vastAdUnit.sendCompanionTrackingEvent('123');
             mockEventManager.verify();
