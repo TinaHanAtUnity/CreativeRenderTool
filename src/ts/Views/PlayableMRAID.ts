@@ -430,14 +430,10 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         if(this._canSkip && !this._canClose) {
             this._handlers.forEach(handler => handler.onMraidSkip());
-            if (this._isMRAIDAR) {
-                this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, 'playable_skip', undefined));
-            }
+            this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, 'playable_skip', undefined));
         } else if(this._canClose) {
             this._handlers.forEach(handler => handler.onMraidClose());
-            if (this._isMRAIDAR) {
-                this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, 'playable_close', undefined));
-            }
+            this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, 'playable_close', undefined));
         }
     }
 
