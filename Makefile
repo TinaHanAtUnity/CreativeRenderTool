@@ -36,8 +36,10 @@ TARGETS := $(addprefix $(BUILD_DIR)/, \
 			$(patsubst %.ts, %.js, \
 			$(patsubst %.styl, %.css, \
 			$(filter %.ts %.html %.json %.xml %.styl, $(SOURCES))))))
+TARGETS += build/src/proto/unity_proto.js
 
 TEST_TARGETS := $(addprefix $(BUILD_DIR)/, $(patsubst %.ts, %.js, $(filter %.ts, $(TESTS))))
+TEST_TARGETS += build/test/All.js
 
 # Built-in targets
 
@@ -47,6 +49,7 @@ TEST_TARGETS := $(addprefix $(BUILD_DIR)/, $(patsubst %.ts, %.js, $(filter %.ts,
 # Main targets
 
 all: $(TARGETS) $(TEST_TARGETS)
+	@$(ROLLUP) --config
 
 test: all
 	@NODE_PATH=$(SOURCE_BUILD_DIR):$(SOURCE_BUILD_DIR)/ts:$(TEST_BUILD_DIR) $(MOCHA) --opts .mocha.opts test-utils/node_runner.js
@@ -55,8 +58,16 @@ test-coverage: all
 	@NODE_PATH=$(SOURCE_BUILD_DIR):$(SOURCE_BUILD_DIR)/ts:$(TEST_BUILD_DIR) $(NYC) $(MOCHA) --opts .mocha.opts $(TEST_TARGETS)
 
 release: all
-	@$(ROLLUP) --config
-	@$(CC) $(shell xargs -a .cc.opts) --js $(SOURCE_BUILD_DIR)/ts/Device.js --js_output_file $(SOURCE_BUILD_DIR)/ts/Device.min.js
+	@$(CC) $(shell cat .cc.opts | xargs) --js $(SOURCE_BUILD_DIR)/ts/Bundle.js --js_output_file $(SOURCE_BUILD_DIR)/ts/Bundle.min.js
+	@mkdir -p build/release
+	@cp src/prod-index.html build/release/index.html
+	node -e "\
+		var fs=require('fs');\
+		var o={encoding:'utf-8'};\
+		var s=fs.readFileSync('$(SOURCE_BUILD_DIR)/styl/main.css', o);\
+		var j=fs.readFileSync('$(SOURCE_BUILD_DIR)/ts/Bundle.min.js', o);\
+		var i=fs.readFileSync('build/release/index.html', o);\
+		fs.writeFileSync('build/release/index.html', i.replace('{COMPILED_CSS}', s).replace('{COMPILED_JS}', j), o);"
 
 # VPaths
 
@@ -69,7 +80,12 @@ vpath %.xml $(SOURCE_DIR)/xml
 # Implicit rules
 
 $(SOURCE_BUILD_DIR)/ts/%.js: %.ts
-	$(TYPESCRIPT) --project tsconfig.json
+	@$(TYPESCRIPT) --project tsconfig.json
+
+$(SOURCE_BUILD_DIR)/proto/unity_proto.js:
+	@mkdir -p $(SOURCE_BUILD_DIR)/proto
+	@$(PBJS) -t static-module -w es6 --no-create --no-verify --no-convert --no-delimited --no-beautify -o $(SOURCE_BUILD_DIR)/proto/unity_proto.js src/proto/unity_proto.proto
+	@$(PBTS) -o src/proto/unity_proto.d.ts $(SOURCE_BUILD_DIR)/proto/unity_proto.js
 
 $(SOURCE_BUILD_DIR)/html/%.html: %.html
 	@mkdir -p $(dir $@) && cp $< $@
@@ -86,6 +102,9 @@ $(SOURCE_BUILD_DIR)/styl/%.css: %.styl
 $(TEST_BUILD_DIR)/ts/%.js: %.ts
 	@$(TYPESCRIPT) --project tsconfig.json
 
+$(TEST_BUILD_DIR)/All.js:
+	echo $(TESTS) | sed "s/test\\//require('/g" | sed "s/\.ts/');/g" > $@
+
 %::
 	$(warning No rule specified for target "$@")
 
@@ -96,8 +115,6 @@ $(filter %.html, $(TARGETS)): | $(SOURCE_BUILD_DIR)/html
 $(filter %.xml, $(TARGETS)): | $(SOURCE_BUILD_DIR)/xml
 $(filter %.json, $(TARGERS)): | $(SOURCE_BUILD_DIR)/json
 $(filter %.css, $(TARGETS)): | $(SOURCE_BUILD_DIR)/styl
-
-$(filter %.js, $(TEST_TARGETS)): | $(TEST_BUILD_DIR)/ts
 
 # Helper targets
 

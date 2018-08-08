@@ -1,2 +1,3 @@
---language_out ECMASCRIPT_2017
---compilation_level ADVANCED
+--language_out ECMASCRIPT5_STRICT
+--formatting PRETTY_PRINT
+--assume_function_wrapper

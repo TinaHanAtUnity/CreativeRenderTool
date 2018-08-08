@@ -1,24 +1,12 @@
-import include from 'rollup-plugin-includepaths';
-import commonjs from 'rollup-plugin-commonjs';
+import plugins from './rollup.plugins';
 
-export default [
-    {
-        input: 'build/src/ts/Fractal/Main.js',
-        output: {
-            name: 'Fractal',
-            file: 'build/src/ts/Fractal/Bundle.js',
-            format: 'iife',
-            interop: false
-        },
-        plugins: [
-            include({
-                paths: [
-                    'build/src/ts'
-                ]
-            }),
-            commonjs({
-                sourceMap: false
-            })
-        ]
-    }
-]
+export default {
+    input: 'build/src/ts/Device.js',
+    output: {
+        name: 'Device',
+        file: 'build/src/ts/Bundle.js',
+        format: 'iife',
+        interop: false
+    },
+    plugins: plugins
+}
