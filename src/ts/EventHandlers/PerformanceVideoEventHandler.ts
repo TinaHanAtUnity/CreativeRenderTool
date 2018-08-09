@@ -4,6 +4,7 @@ import { VideoEventHandler } from 'EventHandlers/VideoEventHandler';
 import { TestEnvironment } from 'Utilities/TestEnvironment';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { ICometTrackingUrlEvents } from 'Parsers/CometCampaignParser';
+import { Url } from 'Utilities/Url';
 
 export class PerformanceVideoEventHandler extends VideoEventHandler {
 
@@ -78,10 +79,12 @@ export class PerformanceVideoEventHandler extends VideoEventHandler {
 
     private sendTrackingEvent(event: string): void {
         if (this._campaign instanceof PerformanceCampaign) {
-            const url = this._campaign.getVideoEventUrls()[event];
-            if (url) {
-                this._thirdPartyEventManager.sendEvent(event, this._sessionId, url);
-            }
+            const urls = this._campaign.getTrackingUrls()[event];
+            urls.forEach(url => {
+                if (url && Url.isValid(url)) {
+                    this._thirdPartyEventManager.sendEvent(event, this._sessionId, url);
+                }
+            });
         }
     }
 }

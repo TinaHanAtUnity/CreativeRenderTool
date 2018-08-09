@@ -79,10 +79,12 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
                 this._thirdPartyEventManager.sendEvent('xpromo click', this._campaign.getSession().getId(), url);
             }
         } else if (this._campaign instanceof PerformanceCampaign) {
-            const url = this._campaign.getVideoEventUrls()[ICometTrackingUrlEvents.CLICK];
-            if (url) {
-                this._thirdPartyEventManager.sendEvent(ICometTrackingUrlEvents.CLICK, this._campaign.getSession().getId(), url);
-            }
+            const urls = this._campaign.getTrackingUrls()[ICometTrackingUrlEvents.CLICK];
+            urls.forEach(url => {
+                if (url && Url.isValid(url)) {
+                    this._thirdPartyEventManager.sendEvent(ICometTrackingUrlEvents.CLICK, this._campaign.getSession().getId(), url);
+                }
+            });
         }
 
         if(parameters.clickAttributionUrl) {
@@ -106,10 +108,12 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
                 this._thirdPartyEventManager.sendEvent('xpromo click', this._campaign.getSession().getId(), url);
             }
         } else if (this._campaign instanceof PerformanceCampaign) {
-            const url = this._campaign.getVideoEventUrls()[ICometTrackingUrlEvents.CLICK];
-            if (url) {
-                this._thirdPartyEventManager.sendEvent(ICometTrackingUrlEvents.CLICK, this._campaign.getSession().getId(), url);
-            }
+            const urls = this._campaign.getTrackingUrls()[ICometTrackingUrlEvents.CLICK];
+            urls.forEach(url => {
+                if (url && Url.isValid(url)) {
+                    this._thirdPartyEventManager.sendEvent(ICometTrackingUrlEvents.CLICK, this._campaign.getSession().getId(), url);
+                }
+            });
         }
 
         if(parameters.clickAttributionUrl) {

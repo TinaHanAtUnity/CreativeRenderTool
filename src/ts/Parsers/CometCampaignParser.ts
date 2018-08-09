@@ -13,6 +13,7 @@ import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { Diagnostics } from 'Utilities/Diagnostics';
 
+// Events marked with // are currently sent, but are unused
 export enum ICometTrackingUrlEvents {
     IMPRESSION = 'EventImpression', //
     START = 'EventStart',
@@ -22,7 +23,7 @@ export enum ICometTrackingUrlEvents {
     MIDPOINT = 'EventMidpoint',
     THIRD_QUARTILE = 'EventThirdQuartile',
     ERROR = 'EventError', //
-    STALLED = 'EventStalled', //
+    STALLED = 'EventStalled',
     LOADED = 'EventLoaded',
     SHOW = 'EventShow', //
     COMPLETE = 'EventComplete',
@@ -89,8 +90,8 @@ export class CometCampaignParser extends CampaignParser {
 
             const mraidCampaign = new MRAIDCampaign(parameters);
 
-            if(CustomFeatures.isPlayableConfigurationEnabled(json.mraidUrl)) {
-                const playableConfigurationUrl = json.mraidUrl.replace(/index\.html/, 'configuration.json');
+        if(CustomFeatures.isPlayableConfigurationEnabled(json.mraidUrl)) {
+            const playableConfigurationUrl = json.mraidUrl.replace(/index\.html/, 'configuration.json');
                 request.get(playableConfigurationUrl).then(configurationResponse => {
                     try {
                         const playableConfiguration = JSON.parse(configurationResponse.response);
@@ -122,7 +123,8 @@ export class CometCampaignParser extends CampaignParser {
                 videoEventUrls: this.validateAndEncodeVideoEventUrls(json.videoEventUrls, session),
                 bypassAppSheet: json.bypassAppSheet,
                 store: storeName,
-                adUnitStyle: this.parseAdUnitStyle(json.adUnitStyle)
+                adUnitStyle: this.parseAdUnitStyle(json.adUnitStyle),
+                trackingUrls: response.getTrackingUrls()
             };
 
             if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {

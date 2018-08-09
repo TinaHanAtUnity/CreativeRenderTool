@@ -4,20 +4,21 @@ import { OverlayEventHandler } from 'EventHandlers/OverlayEventHandler';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { ICometTrackingUrlEvents } from 'Parsers/CometCampaignParser';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { Url } from 'Utilities/Url';
 
 export class PerformanceOverlayEventHandler extends OverlayEventHandler<PerformanceCampaign> {
 
     private _performanceAdUnit: PerformanceAdUnit;
-    private _videoEventUrls: {[eventType: string]: string};
+    private _trackingUrls: {[key: string]: string[]};
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _sessionId: string;
 
     constructor(nativeBridge: NativeBridge, adUnit: PerformanceAdUnit, parameters: IPerformanceAdUnitParameters) {
         super(nativeBridge, adUnit, parameters, parameters.adUnitStyle);
         this._performanceAdUnit = adUnit;
-        this._videoEventUrls = parameters.campaign.getVideoEventUrls();
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._sessionId = parameters.campaign.getSession().getId();
+        this._trackingUrls = parameters.campaign.getTrackingUrls();
     }
 
     public onOverlaySkip(position: number): void {
@@ -29,9 +30,12 @@ export class PerformanceOverlayEventHandler extends OverlayEventHandler<Performa
         }
         this._performanceAdUnit.onFinish.trigger();
 
-        const skipUrl = this._videoEventUrls[ICometTrackingUrlEvents.SKIP];
-        if (skipUrl) {
-            this._thirdPartyEventManager.sendEvent(ICometTrackingUrlEvents.SKIP, this._sessionId, skipUrl);
-        }
+        const urls = this._trackingUrls[ICometTrackingUrlEvents.SKIP];
+        urls.forEach(url => {
+            if (url && Url.isValid(url)) {
+                this._nativeBridge.Sdk.logInfo(`Konecny: calling with ${url}`);
+                this._thirdPartyEventManager.sendEvent(ICometTrackingUrlEvents.SKIP, this._sessionId, url);
+            }
+        });
     }
 }
