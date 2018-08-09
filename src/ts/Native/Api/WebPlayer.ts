@@ -1,5 +1,5 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { NativeApi } from 'Native/NativeApi';
+import { ApiPackage, NativeApi } from 'Native/NativeApi';
 import { Observable1, Observable0, Observable2 } from 'Utilities/Observable';
 
 // Platform specific, first three are available on both Android & iOS. The rest are Android only.
@@ -169,35 +169,35 @@ export class WebPlayerApi extends NativeApi {
     public readonly shouldOverrideUrlLoading = new Observable2<string, string>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'WebPlayer');
+        super(nativeBridge, 'WebPlayer', ApiPackage.ADS);
     }
 
     public setUrl(url: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setUrl', [url]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setUrl', [url]);
     }
 
     public setData(data: string, mimeType: string, encoding: string): Promise<void>  {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setData', [data, mimeType, encoding]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setData', [data, mimeType, encoding]);
     }
 
     public setDataWithUrl(baseUrl: string, data: string, mimeType: string, encoding: string): Promise<void>  {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setDataWithUrl', [baseUrl, data, mimeType, encoding]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setDataWithUrl', [baseUrl, data, mimeType, encoding]);
     }
 
     public setSettings(webSettings: IWebPlayerWebSettingsAndroid | IWebPlayerWebSettingsIos, webPlayerSettings: IWebPlayerPlayerSettingsAndroid): Promise<void>  {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setSettings', [webSettings, webPlayerSettings]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setSettings', [webSettings, webPlayerSettings]);
     }
 
     public clearSettings(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'clearSettings');
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'clearSettings');
     }
 
     public setEventSettings(eventSettings: IWebPlayerEventSettings): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setEventSettings', [eventSettings]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setEventSettings', [eventSettings]);
     }
 
     public sendEvent(args: any[]): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'sendEvent', [args]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendEvent', [args]);
     }
 
     public handleEvent(event: string, parameters: any[]): void {

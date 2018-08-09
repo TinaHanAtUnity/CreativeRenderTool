@@ -1,13 +1,13 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { NativeApi } from 'Native/NativeApi';
+import { ApiPackage, NativeApi } from 'Native/NativeApi';
 
 export class UrlSchemeApi extends NativeApi {
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'UrlScheme');
+        super(nativeBridge, 'UrlScheme', ApiPackage.CORE);
     }
 
     public open(url: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'open', [url]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'open', [url]);
     }
 }
