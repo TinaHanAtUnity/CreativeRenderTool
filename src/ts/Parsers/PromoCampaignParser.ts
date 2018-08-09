@@ -11,12 +11,11 @@ import { HTML } from 'Models/Assets/HTML';
 
 export class PromoCampaignParser extends CampaignParser {
     public static ContentType = 'purchasing/iap';
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string): Promise<Campaign> {
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
         const promoJson = JsonParser.parse(response.getContent());
 
         const baseCampaignParams: ICampaign = {
             id: promoJson.id,
-            gamerId: gamerId,
             willExpireAt: promoJson.expiry ? parseInt(promoJson.expiry, 10) * 1000 : undefined,
             adType: promoJson.contentType || response.getContentType(),
             correlationId: undefined,

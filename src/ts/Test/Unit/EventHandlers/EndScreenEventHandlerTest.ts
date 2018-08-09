@@ -136,7 +136,6 @@ describe('EndScreenEventHandlerTest', () => {
             endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                 appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
                 bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
-                gamerId: performanceAdUnitParameters.campaign.getGamerId(),
                 store: performanceAdUnitParameters.campaign.getStore(),
                 clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
                 clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
@@ -165,7 +164,6 @@ describe('EndScreenEventHandlerTest', () => {
                 endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                     appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
                     bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
-                    gamerId: performanceAdUnitParameters.campaign.getGamerId(),
                     store: performanceAdUnitParameters.campaign.getStore(),
                     clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
                     clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
@@ -194,7 +192,6 @@ describe('EndScreenEventHandlerTest', () => {
                 endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                     appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
                     bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
-                    gamerId: performanceAdUnitParameters.campaign.getGamerId(),
                     store: performanceAdUnitParameters.campaign.getStore(),
                     clickAttributionUrlFollowsRedirects: true,
                     clickAttributionUrl: 'https://blah.com?apk_download_link=https://cdn.apk.com'
@@ -223,7 +220,6 @@ describe('EndScreenEventHandlerTest', () => {
                 endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                     appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
                     bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
-                    gamerId: performanceAdUnitParameters.campaign.getGamerId(),
                     store: performanceAdUnitParameters.campaign.getStore(),
                     clickAttributionUrlFollowsRedirects: true,
                     clickAttributionUrl: 'https://blah.com?apk_download_link=https://cdn.apk.com'
@@ -250,7 +246,6 @@ describe('EndScreenEventHandlerTest', () => {
                 endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                     appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
                     bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
-                    gamerId: performanceAdUnitParameters.campaign.getGamerId(),
                     store: performanceAdUnitParameters.campaign.getStore(),
                     clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
                     clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
@@ -270,7 +265,6 @@ describe('EndScreenEventHandlerTest', () => {
                 endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                     appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
                     bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
-                    gamerId: performanceAdUnitParameters.campaign.getGamerId(),
                     store: performanceAdUnitParameters.campaign.getStore(),
                     clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
                     clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
@@ -385,7 +379,6 @@ describe('EndScreenEventHandlerTest', () => {
             endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                 appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
                 bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
-                gamerId: performanceAdUnitParameters.campaign.getGamerId(),
                 store: performanceAdUnitParameters.campaign.getStore(),
                 clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
                 clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
@@ -420,7 +413,6 @@ describe('EndScreenEventHandlerTest', () => {
                 endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                     appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
                     bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
-                    gamerId: performanceAdUnitParameters.campaign.getGamerId(),
                     store: performanceAdUnitParameters.campaign.getStore(),
                     clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
                     clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
@@ -441,7 +433,6 @@ describe('EndScreenEventHandlerTest', () => {
                 endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                     appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
                     bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
-                    gamerId: performanceAdUnitParameters.campaign.getGamerId(),
                     store: performanceAdUnitParameters.campaign.getStore(),
                     clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
                     clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
@@ -472,7 +463,6 @@ describe('EndScreenEventHandlerTest', () => {
                 endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                     appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
                     bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
-                    gamerId: performanceAdUnitParameters.campaign.getGamerId(),
                     store: performanceAdUnitParameters.campaign.getStore(),
                     clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
                     clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
@@ -506,7 +496,6 @@ describe('EndScreenEventHandlerTest', () => {
                 endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                     appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
                     bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
-                    gamerId: performanceAdUnitParameters.campaign.getGamerId(),
                     store: performanceAdUnitParameters.campaign.getStore(),
                     clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
                     clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
@@ -532,7 +521,6 @@ describe('EndScreenEventHandlerTest', () => {
                 endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                     appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
                     bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
-                    gamerId: performanceAdUnitParameters.campaign.getGamerId(),
                     store: performanceAdUnitParameters.campaign.getStore(),
                     clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
                     clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
