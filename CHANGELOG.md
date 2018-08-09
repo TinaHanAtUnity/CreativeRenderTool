@@ -1,4 +1,12 @@
-# Staged
+# Wed Aug  8 08:40:08 UTC 2018
+
+* Destroy Forcequit Key only after container cleanly closes
+* Remove ComScore Completely
+* Encode Impression tracking urls of Programmatic VAST
+* Added the field latestCampaignsStarts in gameSessionCounters
+* Send close and skip events for playable mraid
+
+# Tue Aug  7 13:23:57 UTC 2018
 
 * Update Dependencies
 
