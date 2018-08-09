@@ -1,3 +1,8 @@
+# Pending
+
+* Send creativeView tracking event for companionAd using Vast model api
+* Merge out changes related to modularization refactoring
+
 # Wed Aug  8 08:40:08 UTC 2018
 
 * Destroy Forcequit Key only after container cleanly closes
