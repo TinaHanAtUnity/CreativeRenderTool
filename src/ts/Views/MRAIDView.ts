@@ -80,9 +80,8 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
             throw new WebViewError('Unable to fetch MRAID');
         }).then((data) => {
             const fetchingDuration = Date.now() - fetchingTimestamp;
-            Diagnostics.trigger('mraid_fetching_time', {
-                fetchingDuration: fetchingDuration
-            }, this._campaign.getSession());
+
+            this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(fetchingDuration, 0, 0, 'mraid_fetching_time', {}));
 
             return data;
         });
