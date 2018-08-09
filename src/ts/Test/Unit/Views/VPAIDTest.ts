@@ -26,18 +26,18 @@ describe('VPAID View', () => {
         campaign = sinon.createStubInstance(VPAIDCampaign);
 
         const deviceInfo = sinon.createStubInstance(DeviceInfoApi);
-        (<sinon.SinonStub>deviceInfo.getScreenWidth).returns(Promise.resolve(320));
-        (<sinon.SinonStub>deviceInfo.getScreenHeight).returns(Promise.resolve(480));
+        deviceInfo.getScreenWidth.returns(Promise.resolve(320));
+        deviceInfo.getScreenHeight.returns(Promise.resolve(480));
         (<any>nativeBridge).DeviceInfo = deviceInfo;
 
         const webPlayer = sinon.createStubInstance(WebPlayerApi);
         webPlayer.onWebPlayerEvent = new Observable1<string>();
-        (<sinon.SinonStub>webPlayer.setData).returns(Promise.resolve());
-        (<sinon.SinonStub>webPlayer.sendEvent).returns(Promise.resolve());
+        webPlayer.setData.returns(Promise.resolve());
+        webPlayer.sendEvent.returns(Promise.resolve());
         (<any>nativeBridge).WebPlayer = webPlayer;
 
         const model = sinon.createStubInstance(VPAIDModel);
-        (<sinon.SinonStub>model.getCreativeParameters).returns('{}');
+        model.getCreativeParameters.returns('{}');
         (<sinon.SinonStub>campaign.getVPAID).returns(model);
 
         const privacy = new Privacy(nativeBridge, true);

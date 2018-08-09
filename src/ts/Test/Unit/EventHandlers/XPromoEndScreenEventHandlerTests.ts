@@ -29,6 +29,8 @@ import { Privacy } from 'Views/Privacy';
 import { GdprManager } from 'Managers/GdprManager';
 import { IOperativeEventParams } from 'Managers/OperativeEventManager';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { IEndScreenParameters } from 'Views/EndScreen';
+import { ForceQuitManager } from 'Managers/ForceQuitManager';
 
 describe('XPromoEndScreenEventHandlerTest', () => {
 
@@ -48,6 +50,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
     let campaign: XPromoCampaign;
     let placement: Placement;
     let programmaticTrackingService: ProgrammaticTrackingService;
+    let forceQuitManager: ForceQuitManager;
 
     describe('with onDownloadAndroid', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -60,7 +63,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
 
             campaign = TestFixtures.getXPromoCampaign();
             focusManager = new FocusManager(nativeBridge);
-            container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
+            forceQuitManager = sinon.createStubInstance(ForceQuitManager);
+            container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo(), forceQuitManager);
             metaDataManager = new MetaDataManager(nativeBridge);
             const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request = new Request(nativeBridge, wakeUpManager);
@@ -89,7 +93,16 @@ describe('XPromoEndScreenEventHandlerTest', () => {
 
             const video = new Video('', TestFixtures.getSession());
             const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
-            endScreen = new XPromoEndScreen(nativeBridge, TestFixtures.getXPromoCampaign(), deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, false);
+            const endScreenParams : IEndScreenParameters = {
+                nativeBridge: nativeBridge,
+                language : deviceInfo.getLanguage(),
+                gameId: clientInfo.getGameId(),
+                privacy: privacy,
+                showGDPRBanner: false,
+                abGroup: configuration.getAbGroup(),
+                targetGameName: TestFixtures.getXPromoCampaign().getGameName()
+            };
+            endScreen = new XPromoEndScreen(endScreenParams, TestFixtures.getXPromoCampaign());
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
             placement = TestFixtures.getPlacement();
             const gdprManager = sinon.createStubInstance(GdprManager);
@@ -123,7 +136,6 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                 appStoreId: xPromoAdUnitParameters.campaign.getAppStoreId(),
                 bypassAppSheet: xPromoAdUnitParameters.campaign.getBypassAppSheet(),
-                gamerId: xPromoAdUnitParameters.campaign.getGamerId(),
                 store: xPromoAdUnitParameters.campaign.getStore(),
                 clickAttributionUrlFollowsRedirects: xPromoAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
                 clickAttributionUrl: xPromoAdUnitParameters.campaign.getClickAttributionUrl()
@@ -152,7 +164,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             campaign.set('appStoreId', '11111');
 
             clientInfo = TestFixtures.getClientInfo(Platform.IOS);
-            container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager, clientInfo);
+            container = new ViewController(nativeBridge, TestFixtures.getIosDeviceInfo(), focusManager, clientInfo, forceQuitManager);
             const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request = new Request(nativeBridge, wakeUpManager);
             deviceInfo = TestFixtures.getIosDeviceInfo();
@@ -177,7 +189,16 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             const video = new Video('', TestFixtures.getSession());
 
             const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
-            endScreen = new XPromoEndScreen(nativeBridge, campaign, deviceInfo.getLanguage(), clientInfo.getGameId(), privacy, false);
+            const endScreenParams : IEndScreenParameters = {
+                nativeBridge: nativeBridge,
+                language : deviceInfo.getLanguage(),
+                gameId: clientInfo.getGameId(),
+                privacy: privacy,
+                showGDPRBanner: false,
+                abGroup: configuration.getAbGroup(),
+                targetGameName: campaign.getGameName()
+            };
+            endScreen = new XPromoEndScreen(endScreenParams, campaign);
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
             const gdprManager = sinon.createStubInstance(GdprManager);
 
@@ -210,7 +231,6 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
                 appStoreId: xPromoAdUnitParameters.campaign.getAppStoreId(),
                 bypassAppSheet: xPromoAdUnitParameters.campaign.getBypassAppSheet(),
-                gamerId: xPromoAdUnitParameters.campaign.getGamerId(),
                 store: xPromoAdUnitParameters.campaign.getStore(),
                 clickAttributionUrlFollowsRedirects: xPromoAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
                 clickAttributionUrl: xPromoAdUnitParameters.campaign.getClickAttributionUrl()

@@ -74,7 +74,7 @@ System.config({
         'text': './node_modules/systemjs-plugin-text/text.js',
         'es6-promise': './node_modules/es6-promise/dist/es6-promise.auto.js',
         'null': './test-utils/null-plugin.js',
-        'long': './node_modules/protobufjs/node_modules/long/dist/long.js',
+        'long': './node_modules/long/dist/long.js',
         'tslib': './node_modules/tslib/tslib.js',
         'protobufjs/minimal': './node_modules/protobufjs/dist/minimal/protobuf.js'
     },

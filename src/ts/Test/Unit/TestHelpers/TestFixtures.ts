@@ -44,7 +44,6 @@ import EventTestVast from 'xml/EventTestVast.xml';
 import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xml';
 
 import * as sinon from 'sinon';
-import { ABGroup, ABGroupBuilder } from 'Models/ABGroup';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -61,11 +60,9 @@ export class TestFixtures {
         });
     }
 
-    public static getCometCampaignBaseParams(session: Session, campaignId: string, gamerId: string, abGroup: ABGroup, meta: string | undefined, adType?: string): ICampaign {
+    public static getCometCampaignBaseParams(session: Session, campaignId: string, meta: string | undefined, adType?: string): ICampaign {
         return {
             id: campaignId,
-            gamerId: gamerId,
-            abGroup: abGroup,
             willExpireAt: undefined,
             adType: adType || undefined,
             correlationId: undefined,
@@ -80,7 +77,7 @@ export class TestFixtures {
     public static getPerformanceCampaignParams(json: any, storeName: StoreName): IPerformanceCampaign {
         const session = this.getSession();
         const parameters: IPerformanceCampaign = {
-            ... this.getCometCampaignBaseParams(session, json.id, this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup(), undefined),
+            ... this.getCometCampaignBaseParams(session, json.id, undefined),
             appStoreId: json.appStoreId,
             gameId: json.gameId,
             gameName: json.gameName,
@@ -114,7 +111,7 @@ export class TestFixtures {
     public static getXPromoCampaignParams(json: any, storeName: StoreName): IXPromoCampaign {
         const session = this.getSession();
         const parameters: IXPromoCampaign = {
-            ... this.getCometCampaignBaseParams(session, json.id, this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup(), undefined),
+            ... this.getCometCampaignBaseParams(session, json.id, undefined),
             appStoreId: json.appStoreId,
             gameId: json.gameId,
             gameName: json.gameName,
@@ -149,7 +146,7 @@ export class TestFixtures {
         const mraidJson = json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'];
         const session = this.getSession();
         return {
-            ... this.getCometCampaignBaseParams(session, mraidContentJson.id, this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup(), undefined),
+            ... this.getCometCampaignBaseParams(session, mraidContentJson.id, undefined),
             useWebViewUserAgentForTracking: mraidJson.useWebViewUserAgentForTracking,
             resourceAsset: mraidContentJson.resourceUrl ? new HTML(mraidContentJson.resourceUrl, session, mraidContentJson.creativeId) : undefined,
             resource: undefined,
@@ -172,12 +169,10 @@ export class TestFixtures {
         };
     }
 
-    public static getProgrammaticMRAIDCampaignBaseParams(session: Session, campaignId: string, gamerId: string, abGroup: ABGroup, json: any): ICampaign {
+    public static getProgrammaticMRAIDCampaignBaseParams(session: Session, campaignId: string, json: any): ICampaign {
         const mraidJson = json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'];
         return {
             id: campaignId,
-            gamerId: gamerId,
-            abGroup: abGroup,
             willExpireAt: undefined,
             adType: mraidJson.adType || undefined,
             correlationId: json.correlationId || undefined,
@@ -195,7 +190,7 @@ export class TestFixtures {
         const session = this.getSession();
 
         return {
-            ... this.getProgrammaticMRAIDCampaignBaseParams(this.getSession(), campaignId, this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup(), json),
+            ... this.getProgrammaticMRAIDCampaignBaseParams(this.getSession(), campaignId, json),
             willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
             resourceAsset: mraidContentJson.inlinedUrl ? new HTML(mraidContentJson.inlinedUrl, session) : undefined,
             resource: '<div>resource</div>',
@@ -219,11 +214,9 @@ export class TestFixtures {
         };
     }
 
-    public static getVASTCampaignBaseParams(session: Session, campaignId: string, gamerId: string, abGroup: ABGroup): ICampaign {
+    public static getVASTCampaignBaseParams(session: Session, campaignId: string): ICampaign {
         return {
             id: campaignId,
-            gamerId: gamerId,
-            abGroup: abGroup,
             willExpireAt: undefined,
             adType: 'adType',
             correlationId: 'correlationId',
@@ -250,7 +243,7 @@ export class TestFixtures {
         }
 
         return {
-            ... this.getVASTCampaignBaseParams(session, campaignId, this.getConfiguration().getGamerId(), this.getConfiguration().getAbGroup()),
+            ... this.getVASTCampaignBaseParams(session, campaignId),
             willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
             vast: vast,
             video: new Video(vast.getVideoUrl(), session),
@@ -265,17 +258,15 @@ export class TestFixtures {
             useWebViewUserAgentForTracking: false,
             buyerId: 'buyerId',
             trackingUrls: {},
+            impressionUrls: vast.getImpressionUrls(),
             isMoatEnabled: true
         };
     }
 
     public static getDisplayInterstitialCampaignBaseParams(json: any, storeName: StoreName, campaignId: string): IDisplayInterstitialCampaign {
-        const configuration = this.getConfiguration();
         const session = this.getSession();
         const baseCampaignParams: ICampaign = {
             id: campaignId,
-            gamerId: configuration.getGamerId(),
-            abGroup: configuration.getAbGroup(),
             willExpireAt: json.cacheTTL ? Date.now() + json.cacheTTL * 1000 : undefined,
             adType: json.adType || undefined,
             correlationId: json.correlationId || undefined,
@@ -300,8 +291,6 @@ export class TestFixtures {
         const session = this.getSession();
         return {
             id: json.campaignId,
-            gamerId: json.gamerId,
-            abGroup: json.abGroup,
             willExpireAt: json.cacheTTL ? Date.now() + json.cacheTTL * 1000 : undefined,
             adType: json.adType || undefined,
             correlationId: json.correlationId || undefined,
@@ -325,7 +314,6 @@ export class TestFixtures {
             advertiserBundleId: json.advertiserBundleId || undefined,
             useWebViewUserAgentForTracking: false,
             buyerId: json.buyerId || undefined
-
         };
     }
 
@@ -333,7 +321,7 @@ export class TestFixtures {
         const session = this.getSession();
         const isRewardedPromo = (rewardedPromo !== undefined) ? rewardedPromo : false;
         return {
-            ... this.getCometCampaignBaseParams(session, json.promo.id, json.gamerId, ABGroupBuilder.getAbGroup(json.abGroup), json.meta, adType),
+            ... this.getCometCampaignBaseParams(session, json.promo.id, json.meta, adType),
             iapProductId: json.promo.iapProductId,
             additionalTrackingEvents: json.promo.tracking ? json.promo.tracking : undefined,
             dynamicMarkup: json.promo.dynamicMarkup,

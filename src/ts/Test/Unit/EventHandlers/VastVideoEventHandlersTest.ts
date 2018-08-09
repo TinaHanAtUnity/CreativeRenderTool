@@ -33,6 +33,7 @@ import { Privacy } from 'Views/Privacy';
 
 import EventTestVast from 'xml/EventTestVast.xml';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { ForceQuitManager } from 'Managers/ForceQuitManager';
 
 describe('VastVideoEventHandler tests', () => {
     const handleInvocation = sinon.spy();
@@ -60,6 +61,7 @@ describe('VastVideoEventHandler tests', () => {
     let gdprManager: GdprManager;
     let privacy: AbstractPrivacy;
     let programmaticTrackingService: ProgrammaticTrackingService;
+    let forceQuitManager: ForceQuitManager;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -75,7 +77,8 @@ describe('VastVideoEventHandler tests', () => {
         metaDataManager = new MetaDataManager(nativeBridge);
         campaign = TestFixtures.getEventVastCampaign();
         clientInfo = TestFixtures.getClientInfo();
-        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
+        forceQuitManager = sinon.createStubInstance(ForceQuitManager);
+        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo(), forceQuitManager);
         privacy = new Privacy(nativeBridge, true);
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
@@ -330,15 +333,9 @@ describe('VastVideoEventHandler tests', () => {
     });
 
     describe('sendImpressionEvent', () => {
-        let vast: Vast;
-
-        beforeEach(() => {
-            vast = campaign.getVast();
-        });
-
         it('should replace "%ZONE%" in the url with the placement id', () => {
             const urlTemplate = 'http://foo.biz/%ZONE%/456';
-            sandbox.stub(vast, 'getImpressionUrls').returns([ urlTemplate ]);
+            sandbox.stub(campaign, 'getImpressionUrls').returns([ urlTemplate ]);
 
             const mockEventManager = sinon.mock(thirdPartyEventManager);
             const expectation = mockEventManager.expects('sendEvent').thrice();
@@ -350,7 +347,7 @@ describe('VastVideoEventHandler tests', () => {
 
         it('should replace "%SDK_VERSION%" in the url with the SDK version', () => {
             const urlTemplate = 'http://foo.biz/%SDK_VERSION%/456';
-            sandbox.stub(vast, 'getImpressionUrls').returns([ urlTemplate ]);
+            sandbox.stub(campaign, 'getImpressionUrls').returns([ urlTemplate ]);
 
             const mockEventManager = sinon.mock(thirdPartyEventManager);
             const expectation = mockEventManager.expects('sendEvent').thrice();
@@ -362,7 +359,7 @@ describe('VastVideoEventHandler tests', () => {
 
         it('should replace "%SDK_VERSION%" in the url with the SDK version as a query parameter', () => {
             const urlTemplate = 'http://ads-brand-postback.unityads.unity3d.com/brands/2002/defaultVideoAndPictureZone/impression/common?adSourceId=2&advertiserDomain=appnexus.com&advertisingTrackingId=49f7acaa-81f2-4887-9f3b-cd124854879c&cc=USD&creativeId=54411305&dealCode=&demandSeatId=1&fillSource=appnexus&floor=0&gamerId=5834bc21b54e3b0100f44c92&gross=0&networkId=&precomputedFloor=0&seatId=958&value=1.01&sdkVersion=%SDK_VERSION%';
-            sandbox.stub(vast, 'getImpressionUrls').returns([ urlTemplate ]);
+            sandbox.stub(campaign, 'getImpressionUrls').returns([ urlTemplate ]);
 
             const mockEventManager = sinon.mock(thirdPartyEventManager);
             const expectation = mockEventManager.expects('sendEvent').thrice();
@@ -374,7 +371,7 @@ describe('VastVideoEventHandler tests', () => {
 
         it('should replace both "%ZONE%" and "%SDK_VERSION%" in the url with corresponding parameters', () => {
             const urlTemplate = 'http://foo.biz/%ZONE%/%SDK_VERSION%/456';
-            sandbox.stub(vast, 'getImpressionUrls').returns([ urlTemplate ]);
+            sandbox.stub(campaign, 'getImpressionUrls').returns([ urlTemplate ]);
 
             const mockEventManager = sinon.mock(thirdPartyEventManager);
             const expectation = mockEventManager.expects('sendEvent').thrice();
