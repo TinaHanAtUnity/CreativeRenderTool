@@ -26,6 +26,7 @@ import { AndroidPreferencesApi } from 'Native/Api/AndroidPreferences';
 import { IosPreferencesApi } from 'Native/Api/IosPreferences';
 import { SensorInfoApi } from 'Native/Api/SensorInfo';
 import { PurchasingApi } from 'Native/Api/Purchasing';
+import { AdsPropertiesApi } from 'Native/Api/AdsProperties';
 
 export enum CallbackStatus {
     OK,
@@ -72,6 +73,7 @@ export class NativeBridge implements INativeBridge {
     public VideoPlayer: VideoPlayerApi;
     public UrlScheme: UrlSchemeApi;
     public WebPlayer: WebPlayerApi;
+    public AdsProperties: AdsPropertiesApi;
 
     private _callbackId: number = 1;
     private _callbackTable: {[key: number]: CallbackContainer<any>} = {};
@@ -118,6 +120,7 @@ export class NativeBridge implements INativeBridge {
         this.VideoPlayer = new VideoPlayerApi(this);
         this.UrlScheme = new UrlSchemeApi(this);
         this.WebPlayer = new WebPlayerApi(this);
+        this.AdsProperties = new AdsPropertiesApi(this);
     }
 
     public registerCallback<T>(resolve: (value?: T | PromiseLike<T>) => void, reject: (reason?: any) => void): number {
