@@ -1,75 +1,75 @@
-import { NativeBridge, INativeCallback, CallbackStatus } from 'Native/NativeBridge';
-import { DeviceInfo } from 'Models/DeviceInfo';
-import { ConfigManager } from 'Managers/ConfigManager';
-import { Configuration, CacheMode } from 'Models/Configuration';
-import { ConfigurationParser } from 'Parsers/ConfigurationParser';
-import { CampaignManager } from 'Managers/CampaignManager';
-import { Cache } from 'Utilities/Cache';
-import { Placement } from 'Models/Placement';
-import { Request, INativeResponse } from 'Utilities/Request';
-import { SessionManager } from 'Managers/SessionManager';
-import { ClientInfo } from 'Models/ClientInfo';
-import { Diagnostics } from 'Utilities/Diagnostics';
-import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { FinishState } from 'Constants/FinishState';
+import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
+import { BannerAdUnitParametersFactory } from 'AdTypes/Banner/AdUnits/BannerAdUnitParametersFactory';
+import { BannerAdContext } from 'AdTypes/Banner/Context/BannerAdContext';
+import { BannerCampaignManager } from 'AdTypes/Banner/Managers/BannerCampaignManager';
+import { BannerPlacementManager } from 'AdTypes/Banner/Managers/BannerPlacementManager';
+import { AuctionRequest } from 'AdTypes/Banner/Utilities/AuctionRequest';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
-import { UnityAdsError } from 'Constants/UnityAdsError';
-import { Platform } from 'Constants/Platform';
-import { Resolve } from 'Utilities/Resolve';
-import { WakeUpManager } from 'Managers/WakeUpManager';
 import { AdUnitFactory } from 'AdUnits/AdUnitFactory';
-import { JsonParser } from 'Utilities/JsonParser';
-import { DiagnosticError } from 'Errors/DiagnosticError';
-import { Overlay } from 'Views/Overlay';
-import { IosUtils } from 'Utilities/IosUtils';
-import { HttpKafka } from 'Utilities/HttpKafka';
-import { ConfigError } from 'Errors/ConfigError';
-import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
-import { AssetManager } from 'Managers/AssetManager';
-import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
+import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { ViewController } from 'AdUnits/Containers/ViewController';
-import { TestEnvironment } from 'Utilities/TestEnvironment';
-import { MetaData } from 'Utilities/MetaData';
-import { RefreshManager } from 'Managers/RefreshManager';
-import { MetaDataManager } from 'Managers/MetaDataManager';
 import { AnalyticsManager } from 'Analytics/AnalyticsManager';
 import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
-import { FocusManager } from 'Managers/FocusManager';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { SdkStats } from 'Utilities/SdkStats';
-import { Campaign } from 'Models/Campaign';
-import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
-import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
-import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
-import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
-import { IosDeviceInfo } from 'Models/IosDeviceInfo';
-import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
-import { CustomFeatures } from 'Utilities/CustomFeatures';
-import { OldCampaignRefreshManager } from 'Managers/OldCampaignRefreshManager';
-import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
-import { MissedImpressionManager } from 'Managers/MissedImpressionManager';
-import { GameSessionCounters } from 'Utilities/GameSessionCounters';
-import { TimeoutError, Promises } from 'Utilities/Promises';
-import { JaegerSpan, JaegerTags } from 'Jaeger/JaegerSpan';
+import { FinishState } from 'Constants/FinishState';
+import { Platform } from 'Constants/Platform';
+import { UnityAdsError } from 'Constants/UnityAdsError';
+import { ConfigError } from 'Errors/ConfigError';
+import { DiagnosticError } from 'Errors/DiagnosticError';
 import { JaegerManager } from 'Jaeger/JaegerManager';
-import { ProgrammaticOperativeEventManager } from 'Managers/ProgrammaticOperativeEventManager';
-import { GdprManager } from 'Managers/GdprManager';
-
+import { JaegerSpan, JaegerTags } from 'Jaeger/JaegerSpan';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
 import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
-import { ABGroupBuilder } from 'Models/ABGroup';
-import { BannerAdContext } from 'AdTypes/Banner/Context/BannerAdContext';
-import { BannerCampaignManager } from 'AdTypes/Banner/Managers/BannerCampaignManager';
-import { AuctionRequest } from 'AdTypes/Banner/Utilities/AuctionRequest';
-import { BannerPlacementManager } from 'AdTypes/Banner/Managers/BannerPlacementManager';
-import { WebPlayerContainer } from 'Utilities/WebPlayer/WebPlayerContainer';
-import { InterstitialWebPlayerContainer } from 'Utilities/WebPlayer/InterstitialWebPlayerContainer';
-import { BannerWebPlayerContainer } from 'Utilities/WebPlayer/BannerWebPlayerContainer';
-import { BannerAdUnitParametersFactory } from 'AdTypes/Banner/AdUnits/BannerAdUnitParametersFactory';
-import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { AssetManager } from 'Managers/AssetManager';
+import { CampaignManager } from 'Managers/CampaignManager';
+import { ConfigManager } from 'Managers/ConfigManager';
+import { FocusManager } from 'Managers/FocusManager';
+import { ForceQuitManager } from 'Managers/ForceQuitManager';
+import { GdprManager } from 'Managers/GdprManager';
+import { MetaDataManager } from 'Managers/MetaDataManager';
+import { MissedImpressionManager } from 'Managers/MissedImpressionManager';
+import { OldCampaignRefreshManager } from 'Managers/OldCampaignRefreshManager';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { PlacementManager } from 'Managers/PlacementManager';
+import { ProgrammaticOperativeEventManager } from 'Managers/ProgrammaticOperativeEventManager';
+import { RefreshManager } from 'Managers/RefreshManager';
+import { SessionManager } from 'Managers/SessionManager';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { WakeUpManager } from 'Managers/WakeUpManager';
+import { ABGroupBuilder } from 'Models/ABGroup';
+import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
+import { Campaign } from 'Models/Campaign';
+import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
+import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
+import { ClientInfo } from 'Models/ClientInfo';
+import { CacheMode, Configuration } from 'Models/Configuration';
+import { DeviceInfo } from 'Models/DeviceInfo';
+import { IosDeviceInfo } from 'Models/IosDeviceInfo';
+import { Placement } from 'Models/Placement';
+import { CallbackStatus, INativeCallback, NativeBridge } from 'Native/NativeBridge';
+import { ConfigurationParser } from 'Parsers/ConfigurationParser';
+import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { Cache } from 'Utilities/Cache';
+import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { Diagnostics } from 'Utilities/Diagnostics';
+import { GameSessionCounters } from 'Utilities/GameSessionCounters';
+import { HttpKafka } from 'Utilities/HttpKafka';
+import { IosUtils } from 'Utilities/IosUtils';
+import { JsonParser } from 'Utilities/JsonParser';
+import { MetaData } from 'Utilities/MetaData';
+import { Promises, TimeoutError } from 'Utilities/Promises';
+import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
+import { INativeResponse, Request } from 'Utilities/Request';
+import { Resolve } from 'Utilities/Resolve';
+import { SdkStats } from 'Utilities/SdkStats';
+import { TestEnvironment } from 'Utilities/TestEnvironment';
+import { BannerWebPlayerContainer } from 'Utilities/WebPlayer/BannerWebPlayerContainer';
+import { InterstitialWebPlayerContainer } from 'Utilities/WebPlayer/InterstitialWebPlayerContainer';
+import { WebPlayerContainer } from 'Utilities/WebPlayer/WebPlayerContainer';
+import { Overlay } from 'Views/Overlay';
 
 export class WebView {
 
@@ -101,6 +101,7 @@ export class WebView {
     private _jaegerManager: JaegerManager;
     private _interstitialWebPlayerContainer: WebPlayerContainer;
     private _programmaticTrackingService: ProgrammaticTrackingService;
+    private _forceQuitManager: ForceQuitManager;
 
     private _showing: boolean = false;
     private _initialized: boolean = false;
@@ -148,6 +149,7 @@ export class WebView {
             this._request = new Request(this._nativeBridge, this._wakeUpManager);
             this._cacheBookkeeping = new CacheBookkeeping(this._nativeBridge);
             this._programmaticTrackingService = new ProgrammaticTrackingService(this._request, this._clientInfo, this._deviceInfo);
+            this._forceQuitManager = new ForceQuitManager(this._nativeBridge);
             this._cache = new Cache(this._nativeBridge, this._wakeUpManager, this._request, this._cacheBookkeeping, this._programmaticTrackingService);
             this._resolve = new Resolve(this._nativeBridge);
             this._metadataManager = new MetaDataManager(this._nativeBridge);
@@ -173,7 +175,7 @@ export class WebView {
             if(this._clientInfo.getPlatform() === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
                 document.body.classList.add('android');
                 this._nativeBridge.setApiLevel(this._deviceInfo.getApiLevel());
-                this._container = new Activity(this._nativeBridge, this._deviceInfo);
+                this._container = new Activity(this._nativeBridge, this._deviceInfo, this._forceQuitManager);
             } else if(this._clientInfo.getPlatform() === Platform.IOS && this._deviceInfo instanceof IosDeviceInfo) {
                 const model = this._deviceInfo.getModel();
                 if(model.match(/iphone/i) || model.match(/ipod/i)) {
@@ -181,7 +183,7 @@ export class WebView {
                 } else if(model.match(/ipad/i)) {
                     document.body.classList.add('ipad');
                 }
-                this._container = new ViewController(this._nativeBridge, this._deviceInfo, this._focusManager, this._clientInfo);
+                this._container = new ViewController(this._nativeBridge, this._deviceInfo, this._focusManager, this._clientInfo, this._forceQuitManager);
             }
             HttpKafka.setDeviceInfo(this._deviceInfo);
             this._sessionManager = new SessionManager(this._nativeBridge, this._request);
@@ -282,11 +284,10 @@ export class WebView {
 
             SdkStats.initialize(this._nativeBridge, this._request, this._configuration, this._sessionManager, this._campaignManager, this._metadataManager, this._clientInfo);
 
-            const enableCachedResponse = !CustomFeatures.isCacheUpdateDisabledApp(this._clientInfo.getGameId());
             const refreshSpan = this._jaegerManager.startSpan('Refresh', jaegerInitSpan.id, jaegerInitSpan.traceId);
             refreshSpan.addTag(JaegerTags.DeviceType, Platform[this._nativeBridge.getPlatform()]);
             let refreshPromise;
-            if (this._cachedCampaignResponse !== undefined && enableCachedResponse) {
+            if (this._cachedCampaignResponse !== undefined) {
                 refreshPromise = this._refreshManager.refreshFromCache(this._cachedCampaignResponse, refreshSpan);
             } else {
                 refreshPromise = this._refreshManager.refresh();
@@ -312,6 +313,18 @@ export class WebView {
             } else {
                 this._nativeBridge.Request.setConcurrentRequestCount(1);
             }
+        }).then(() => {
+            // Send diagnostic events for abnormal ad termination
+            this._forceQuitManager.getForceQuitData().then((forceQuitData) => {
+                if (forceQuitData && forceQuitData.adSession) {
+                    const error = {
+                        clientInfo: this._clientInfo,
+                        deviceInfo: this._deviceInfo
+                    };
+                    Diagnostics.trigger('force_quit', error, forceQuitData.adSession);
+                    this._forceQuitManager.destroyForceQuitKey();
+                }
+            });
         }).catch(error => {
             jaegerInitSpan.addAnnotation(error.message);
             jaegerInitSpan.addTag(JaegerTags.Error, 'true');
@@ -495,7 +508,12 @@ export class WebView {
                         });
                         this._currentAdUnit.onClose.subscribe(() => {
                             this._nativeBridge.AppSheet.onClose.unsubscribe(onCloseObserver);
-                            this._nativeBridge.AppSheet.destroy(appSheetOptions);
+                            if(CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
+                                // app sheet is not closed properly if the user opens or downloads the game. Reset the app sheet.
+                                this._nativeBridge.AppSheet.destroy();
+                            } else {
+                                this._nativeBridge.AppSheet.destroy(appSheetOptions);
+                            }
                         });
                     });
                 }
@@ -594,7 +612,6 @@ export class WebView {
                 if (!isNaN(abGroupNumber)) { // if it is a number get the group
                     const abGroup = ABGroupBuilder.getAbGroup(abGroupNumber);
                     ConfigManager.setAbGroup(abGroup);
-                    CampaignManager.setAbGroup(abGroup);
                 }
             }
 
@@ -624,6 +641,10 @@ export class WebView {
 
             if(TestEnvironment.get('forcedOrientation')) {
                 AdUnitContainer.setForcedOrientation(TestEnvironment.get('forcedOrientation'));
+            }
+
+            if(TestEnvironment.get('forcedPlayableMRAID')) {
+                AdUnitFactory.setForcedPlayableMRAID(TestEnvironment.get('forcedPlayableMRAID'));
             }
 
             if(TestEnvironment.get('creativeUrl')) {

@@ -14,7 +14,6 @@ export interface IConfiguration {
     country: string;
     coppaCompliant: boolean;
     abGroup: ABGroup;
-    gamerId: string;
     properties: string;
     cacheMode: CacheMode;
     placements: { [id: string]: Placement };
@@ -37,7 +36,6 @@ export class Configuration extends Model<IConfiguration> {
         country: ['string'],
         coppaCompliant: ['boolean'],
         abGroup: ['object'],
-        gamerId: ['string'],
         properties: ['string'],
         cacheMode: ['number'],
         placements: ['object'],
@@ -80,10 +78,6 @@ export class Configuration extends Model<IConfiguration> {
 
     public getAbGroup(): ABGroup {
         return this.get('abGroup');
-    }
-
-    public getGamerId(): string {
-        return this.get('gamerId');
     }
 
     public getProperties(): string {

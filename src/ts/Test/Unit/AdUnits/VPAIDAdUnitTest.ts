@@ -15,7 +15,6 @@ import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { Configuration } from 'Models/Configuration';
 import { Observable0, Observable2 } from 'Utilities/Observable';
 import { IObserver0 } from 'Utilities/IObserver';
-import { WebPlayerApi } from 'Native/Api/WebPlayer';
 import { Request } from 'Utilities/Request';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { ListenerApi } from 'Native/Api/Listener';

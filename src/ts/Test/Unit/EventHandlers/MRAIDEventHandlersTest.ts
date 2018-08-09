@@ -25,15 +25,14 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { GDPRPrivacy } from 'Views/GDPRPrivacy';
 import { GdprManager } from 'Managers/GdprManager';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { ForceQuitManager } from 'Managers/ForceQuitManager';
 
 describe('MRAIDEventHandlersTest', () => {
 
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge, container: AdUnitContainer;
-    let sessionManager: SessionManager;
     let mraidAdUnit: MRAIDAdUnit;
-    let metaDataManager: MetaDataManager;
     let mraidView: MRAID;
     let placement: Placement;
     let focusManager: FocusManager;
@@ -47,6 +46,7 @@ describe('MRAIDEventHandlersTest', () => {
     let mraidCampaign: MRAIDCampaign;
     let gdprManager: GdprManager;
     let programmaticTrackingService: ProgrammaticTrackingService;
+    let forceQuitManager: ForceQuitManager;
 
     describe('with onClick', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -60,11 +60,11 @@ describe('MRAIDEventHandlersTest', () => {
             sinon.spy(nativeBridge.Intent, 'launch');
             sinon.spy(nativeBridge.UrlScheme, 'open');
             sinon.spy(nativeBridge.Listener, 'sendClickEvent');
+            forceQuitManager = sinon.createStubInstance(ForceQuitManager);
 
             focusManager = new FocusManager(nativeBridge);
-            container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
+            container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo(), forceQuitManager);
             request = sinon.createStubInstance(Request);
-            metaDataManager = new MetaDataManager(nativeBridge);
             placement = TestFixtures.getPlacement();
 
             const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
@@ -74,7 +74,6 @@ describe('MRAIDEventHandlersTest', () => {
             deviceInfo = TestFixtures.getAndroidDeviceInfo();
 
             thirdPartyEventManager = sinon.createStubInstance(ThirdPartyEventManager);
-            sessionManager = sinon.createStubInstance(SessionManager);
             operativeEventManager = sinon.createStubInstance(OperativeEventManager);
 
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
@@ -142,7 +141,7 @@ describe('MRAIDEventHandlersTest', () => {
                     headers: [['location', 'market://foobar.com']]
                 }));
 
-                mraidView = new MRAID(nativeBridge, placement, mraidCampaign, mraidAdUnitParameters.privacy, true);
+                mraidView = new MRAID(nativeBridge, placement, mraidCampaign, mraidAdUnitParameters.privacy, true, mraidAdUnitParameters.configuration.getAbGroup());
                 sinon.stub(mraidView, 'createMRAID').callsFake(() => {
                     return Promise.resolve();
                 });
@@ -221,6 +220,8 @@ describe('MRAIDEventHandlersTest', () => {
                 kafkaObject.timeFromShow = 15;
                 kafkaObject.timeFromPlayableStart = 12;
                 kafkaObject.backgroundTime = 0;
+                kafkaObject.auctionId = '12345';
+
                 const resourceUrl = mraidCampaign.getResourceUrl();
                 if(resourceUrl) {
                     kafkaObject.url = resourceUrl.getOriginalUrl();
@@ -241,6 +242,7 @@ describe('MRAIDEventHandlersTest', () => {
                 kafkaObject.timeFromShow = 15;
                 kafkaObject.timeFromPlayableStart = 12;
                 kafkaObject.backgroundTime = 5;
+                kafkaObject.auctionId = '12345';
 
                 const resourceUrl = mraidCampaign.getResourceUrl();
                 if(resourceUrl) {

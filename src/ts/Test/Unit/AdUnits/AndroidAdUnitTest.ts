@@ -22,17 +22,18 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { SessionManager } from 'Managers/SessionManager';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { Request } from 'Utilities/Request';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { GdprManager } from 'Managers/GdprManager';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { ForceQuitManager } from 'Managers/ForceQuitManager';
 
 describe('AndroidAdUnitTest', () => {
     let nativeBridge: NativeBridge;
     let container: Activity;
     let testAdUnit: TestAdUnit;
     let adUnitParams: IAdUnitParameters<PerformanceCampaign>;
+    let forceQuitManager: ForceQuitManager;
     const testDisplay: any = {
         rotation: Rotation.ROTATION_0,
         width: 800,
@@ -41,6 +42,7 @@ describe('AndroidAdUnitTest', () => {
 
     beforeEach(() => {
         nativeBridge = TestFixtures.getNativeBridge(Platform.ANDROID);
+        forceQuitManager = sinon.createStubInstance(ForceQuitManager);
         const clientInfo = TestFixtures.getClientInfo();
         const focusManager = new FocusManager(nativeBridge);
         const metaDataManager = new MetaDataManager(nativeBridge);
@@ -50,7 +52,7 @@ describe('AndroidAdUnitTest', () => {
         const sessionManager = new SessionManager(nativeBridge, request);
         const deviceInfo = TestFixtures.getAndroidDeviceInfo();
         const configuration = TestFixtures.getConfiguration();
-        container = new Activity(nativeBridge, deviceInfo);
+        container = new Activity(nativeBridge, deviceInfo, forceQuitManager);
         const gdprManager = sinon.createStubInstance(GdprManager);
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
@@ -109,7 +111,7 @@ describe('AndroidAdUnitTest', () => {
 
     it('should close ad unit', () => {
         nativeBridge = TestFixtures.getNativeBridge(Platform.ANDROID);
-        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
+        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo(), forceQuitManager);
         const stub = sinon.stub(nativeBridge.AndroidAdUnit, 'close').returns(Promise.resolve());
 
         return container.close().then(() => {
@@ -121,7 +123,7 @@ describe('AndroidAdUnitTest', () => {
     // note: when reconfigure method is enhanced with some actual parameters, this test needs to be refactored
     it('should reconfigure ad unit', () => {
         nativeBridge = TestFixtures.getNativeBridge(Platform.ANDROID);
-        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
+        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo(), forceQuitManager);
 
         const stubViews = sinon.stub(nativeBridge.AndroidAdUnit, 'setViews').returns(Promise.resolve());
         const stubOrientation = sinon.stub(nativeBridge.AndroidAdUnit, 'setOrientation').returns(Promise.resolve());

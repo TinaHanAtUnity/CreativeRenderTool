@@ -43,6 +43,9 @@ import { WebPlayerContainer } from 'Utilities/WebPlayer/WebPlayerContainer';
 import { Observable1, Observable2 } from 'Utilities/Observable';
 import { asStub } from '../TestHelpers/Functions';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { ForceQuitManager } from 'Managers/ForceQuitManager';
+import { MRAID } from 'Views/MRAID';
+import { PlayableMRAID } from 'Views/PlayableMRAID';
 
 describe('AdUnitFactoryTest', () => {
 
@@ -60,6 +63,7 @@ describe('AdUnitFactoryTest', () => {
     let request: Request;
     let adUnitParameters: IAdUnitParameters<Campaign>;
     let wakeUpManager: WakeUpManager;
+    let forceQuitManager: ForceQuitManager;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -71,7 +75,8 @@ describe('AdUnitFactoryTest', () => {
         focusManager = new FocusManager(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
-        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
+        forceQuitManager = sinon.createStubInstance(ForceQuitManager);
+        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo(), forceQuitManager);
         sandbox.stub(container, 'close').returns(Promise.resolve());
         sandbox.stub(container, 'open').returns(Promise.resolve());
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
@@ -129,6 +134,47 @@ describe('AdUnitFactoryTest', () => {
 
     afterEach(() => {
         sandbox.restore();
+    });
+
+    describe('MRAID AdUnit Factory', () => {
+        let campaign: MRAIDCampaign;
+
+        beforeEach(() => {
+            campaign = TestFixtures.getProgrammaticMRAIDCampaign();
+            const resourceUrl = campaign.getResourceUrl();
+            if(resourceUrl) {
+                resourceUrl.setFileId('1234');
+            }
+
+            adUnitParameters.campaign = campaign;
+        });
+
+        after(() => {
+            AdUnitFactory.setForcedPlayableMRAID(false);
+        });
+
+        it('should create PlayableMRAID view', () => {
+            AdUnitFactory.setForcedPlayableMRAID(false);
+
+            const resourceUrl = campaign.getResourceUrl();
+            if(resourceUrl) {
+                resourceUrl.set('url', 'https://cdn.unityads.unity3d.com/playables/production/unity/xinstall.html');
+            }
+
+            const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+            assert.isTrue(adUnit.getMRAIDView() instanceof PlayableMRAID, 'view should be PlayableMRAID');
+        });
+
+        it('should create MRAID view', () => {
+            const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+            assert.isTrue(adUnit.getMRAIDView() instanceof MRAID, 'view should be MRAID');
+        });
+
+        it('should be forced to create PlayableMRAID view', () => {
+            AdUnitFactory.setForcedPlayableMRAID(true);
+            const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+            assert.isTrue(adUnit.getMRAIDView() instanceof PlayableMRAID, 'view should be PlayableMRAID');
+        });
     });
 
     describe('MRAID AdUnit', () => {

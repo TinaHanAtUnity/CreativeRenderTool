@@ -38,7 +38,7 @@ describe('BannerCampaignParser', () => {
 
             const parse = (data: any) => {
                 const response = new AuctionResponse(placements, data, mediaId, correlationId);
-                return parser.parse(nativeBridge, request, response, session, gamerId, abGroup).then((parsedCampaign) => {
+                return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
                     campaign = <BannerCampaign>parsedCampaign;
                 });
             };
@@ -53,8 +53,6 @@ describe('BannerCampaignParser', () => {
 
                 const json = JSON.parse(BannerCampaignJSON);
 
-                assert.equal(campaign.getGamerId(), gamerId, 'GamerID is not equal');
-                assert.equal(campaign.getAbGroup(), abGroup, 'ABGroup is not equal');
                 assert.equal(campaign.getSession(), session, 'Session is not equal');
                 assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not the equal');
                 assert.equal(campaign.getMarkup(), encodeURIComponent(json.content), 'Markup is not the same');

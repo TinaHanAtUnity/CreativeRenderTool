@@ -26,6 +26,6 @@ export class Promises {
      * too strict.
      */
     public static voidResult<T>(promise: Promise<T>): Promise<void> {
-        return <Promise<void>><any>promise;
+        return promise.then(() => {return;});
     }
 }

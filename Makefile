@@ -41,7 +41,7 @@ BUILD_DIR = build
 # For platform specific operations
 OS := $(shell uname)
 
-.PHONY: build-browser build-dev build-release build-test build-dir build-ts build-js build-css build-static clean lint test test-unit test-integration test-coverage test-filter watch setup deploy build-dev-no-ts watch-fast
+.PHONY: build-browser build-dev build-release build-test build-dir build-ts build-js build-css build-static clean lint test test-unit test-integration test-coverage test-filter watch setup deploy build-dev-no-ts watch-fast qr-code
 
 build-browser: BUILD_DIR = build/browser
 build-browser: MODULE = system
@@ -151,7 +151,7 @@ build-test: clean build-dir build-css build-static build-proto build-ts
 		node_modules/chai/chai.js \
 		node_modules/sinon/pkg/sinon.js \
 		node_modules/systemjs-plugin-text/text.js \
-		node_modules/protobufjs/node_modules/long/dist/long.js \
+		node_modules/long/dist/long.js \
 		node_modules/protobufjs/dist/minimal/protobuf.js \
 		node_modules/tslib/tslib.js \
 		test-utils/reporter.js \
@@ -400,3 +400,6 @@ ifeq ($(OS),Darwin)
 else
 	kill $$(cat nginx/server.PID)
 endif
+
+qr-code:
+	segno "http://$(shell ifconfig |grep "inet" |fgrep -v "127.0.0.1"|grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}" |grep -v -E "^0|^127" -m 1):8000/build/dev/config.json"

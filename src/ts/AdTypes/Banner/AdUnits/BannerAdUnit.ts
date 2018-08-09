@@ -61,7 +61,7 @@ export class BannerAdUnit {
                 return new Promise<void>((resolve) => {
                     const observer = this._webPlayerContainer.onPageFinished.subscribe(() => {
                         this._webPlayerContainer.onPageFinished.unsubscribe(observer);
-                        this.setUpBannerPlayerEvents(true).then(() => resolve());
+                        this.setUpBannerPlayerEvents(true).then(resolve);
                     });
                     this._webPlayerContainer.setData(container, 'text/html', 'UTF-8');
                 });

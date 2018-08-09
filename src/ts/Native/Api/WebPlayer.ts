@@ -1,5 +1,5 @@
+import { ApiPackage, NativeApi } from 'Native/NativeApi';
 import { NativeBridge } from 'Native/NativeBridge';
-import { NativeApi } from 'Native/NativeApi';
 import { Observable2, Observable3 } from 'Utilities/Observable';
 
 // Platform specific, first three are available on both Android & iOS. The rest are Android only.
@@ -177,35 +177,35 @@ export class WebPlayerApi extends NativeApi {
     public readonly onCreateWebView = new Observable2<string, string>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'WebPlayer');
+        super(nativeBridge, 'WebPlayer', ApiPackage.ADS);
     }
 
     public setUrl(url: string, viewId: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setUrl', [url, viewId]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setUrl', [url, viewId]);
     }
 
     public setData(data: string, mimeType: string, encoding: string, viewId: string): Promise<void>  {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setData', [data, mimeType, encoding, viewId]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setData', [data, mimeType, encoding, viewId]);
     }
 
     public setDataWithUrl(baseUrl: string, data: string, mimeType: string, encoding: string, viewId: string): Promise<void>  {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setDataWithUrl', [baseUrl, data, mimeType, encoding, viewId]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setDataWithUrl', [baseUrl, data, mimeType, encoding, viewId]);
     }
 
     public setSettings(webSettings: IWebPlayerWebSettingsAndroid | IWebPlayerWebSettingsIos, webPlayerSettings: IWebPlayerPlayerSettingsAndroid, viewId: string): Promise<void>  {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setSettings', [webSettings, webPlayerSettings, viewId]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setSettings', [webSettings, webPlayerSettings, viewId]);
     }
 
     public clearSettings(viewId: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'clearSettings', [viewId]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'clearSettings', [viewId]);
     }
 
     public setEventSettings(eventSettings: IWebPlayerEventSettings, viewId: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setEventSettings', [eventSettings, viewId]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setEventSettings', [eventSettings, viewId]);
     }
 
     public sendEvent(args: any[], viewId: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'sendEvent', [args, viewId]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'sendEvent', [args, viewId]);
     }
 
     public handleEvent(event: string, parameters: any[]): void {

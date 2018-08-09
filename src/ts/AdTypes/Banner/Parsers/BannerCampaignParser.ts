@@ -18,14 +18,12 @@ export class BannerCampaignParser extends CampaignParser {
         this._wrapJS = wrapJS;
     }
 
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: ABGroup): Promise<Campaign> {
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, osVersion?: string): Promise<Campaign> {
         const markup = this._wrapJS ? this.getJSContent(response) : this.getHTMLContent(response);
         const campaign = <IBannerCampaign>{
             id: this.getProgrammaticCampaignId(nativeBridge),
             adType: response.getAdType(),
-            abGroup: abGroup,
             correlationId: response.getCorrelationId(),
-            gamerId: gamerId,
             mediaId: response.getMediaId(),
             creativeId: response.getCreativeId(),
             meta: undefined,

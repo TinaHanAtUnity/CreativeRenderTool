@@ -25,10 +25,9 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import EventTestVast from 'xml/EventTestVast.xml';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { GdprManager } from 'Managers/GdprManager';
-import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
-import { AbstractPrivacy } from 'Views/AbstractPrivacy';
 import { Privacy } from 'Views/Privacy';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { ForceQuitManager } from 'Managers/ForceQuitManager';
 
 describe('VastAdUnit', () => {
 
@@ -41,6 +40,7 @@ describe('VastAdUnit', () => {
     let clientInfo: ClientInfo;
     let placement: Placement;
     let vastCampaign: VastCampaign;
+    let forceQuitManager: ForceQuitManager;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -65,12 +65,13 @@ describe('VastAdUnit', () => {
         });
 
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
+        forceQuitManager = sinon.createStubInstance(ForceQuitManager);
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
         const nativeBridge = TestFixtures.getNativeBridge();
         focusManager = new FocusManager(nativeBridge);
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         const request = new Request(nativeBridge, wakeUpManager);
-        const activity = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
+        const activity = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo(), forceQuitManager);
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         vastCampaign = TestFixtures.getEventVastCampaign();
         const video = vastCampaign.getVideo();
@@ -225,17 +226,13 @@ describe('VastAdUnit', () => {
         });
 
         it('it should fire companion tracking events', () => {
-            const width = 320;
-            const height = 480;
-            const url = 'http://example.com/companionCreativeView';
-            const companion = new VastCreativeCompanionAd('foobarCompanion', 'Creative', height, width, 'http://example.com/img.png', 'http://example.com/clickme', {
-                'creativeView': [url]
-            });
-            sandbox.stub(vastCampaign.getVast(), 'getLandscapeOrientedCompanionAd').returns(companion);
-            sandbox.stub(vastCampaign.getVast(), 'getPortraitOrientedCompanionAd').returns(companion);
-
             const mockEventManager = sinon.mock(thirdPartyEventManager);
-            mockEventManager.expects('sendEvent').withArgs('companion', '123', companion.getEventTrackingUrls('creativeView')[0]);
+            const companionTrackingUrls = vastCampaign.getVast().getCompanionCreativeViewTrackingUrls();
+            assert.isTrue(companionTrackingUrls.length > 0); // make sure that there are tracking urls
+            for (const companionTrackingUrl of companionTrackingUrls) {
+                // make each tracking url expected.
+                mockEventManager.expects('sendEvent').withExactArgs('companion', '123', companionTrackingUrl);
+            }
             vastAdUnit.sendCompanionTrackingEvent('123');
             mockEventManager.verify();
         });

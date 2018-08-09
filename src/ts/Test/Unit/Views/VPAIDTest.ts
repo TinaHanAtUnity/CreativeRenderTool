@@ -1,18 +1,13 @@
 import 'mocha';
 import * as sinon from 'sinon';
-import { assert } from 'chai';
 
-import VPAIDTestXML from 'xml/VPAIDWithAdParameters.xml';
-import VPAIDCampaignJson from 'json/OnProgrammaticVPAIDCampaign.json';
 import { VPAID as VPAIDModel } from 'Models/VPAID/VPAID';
 import { VPAID, IVPAIDHandler } from 'Views/VPAID';
 import { NativeBridge } from 'Native/NativeBridge';
 import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
-import { WebPlayerApi } from 'Native/Api/WebPlayer';
 import { Observable1 } from 'Utilities/Observable';
 import { DeviceInfoApi } from 'Native/Api/DeviceInfo';
-import { setTimeout } from 'timers';
 import { Privacy } from 'Views/Privacy';
 import { WebPlayerContainer } from 'Utilities/WebPlayer/WebPlayerContainer';
 
@@ -28,8 +23,8 @@ describe('VPAID View', () => {
         campaign = sinon.createStubInstance(VPAIDCampaign);
 
         const deviceInfo = sinon.createStubInstance(DeviceInfoApi);
-        (<sinon.SinonStub>deviceInfo.getScreenWidth).returns(Promise.resolve(320));
-        (<sinon.SinonStub>deviceInfo.getScreenHeight).returns(Promise.resolve(480));
+        deviceInfo.getScreenWidth.returns(Promise.resolve(320));
+        deviceInfo.getScreenHeight.returns(Promise.resolve(480));
         (<any>nativeBridge).DeviceInfo = deviceInfo;
 
         webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
@@ -38,7 +33,7 @@ describe('VPAID View', () => {
         (<sinon.SinonStub>webPlayerContainer.sendEvent).resolves();
 
         const model = sinon.createStubInstance(VPAIDModel);
-        (<sinon.SinonStub>model.getCreativeParameters).returns('{}');
+        model.getCreativeParameters.returns('{}');
         (<sinon.SinonStub>campaign.getVPAID).returns(model);
 
         const privacy = new Privacy(nativeBridge, true);

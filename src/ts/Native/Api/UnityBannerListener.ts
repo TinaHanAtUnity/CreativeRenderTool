@@ -1,10 +1,10 @@
-import { NativeApi } from 'Native/NativeApi';
+import { NativeApi, ApiPackage } from 'Native/NativeApi';
 import { NativeBridge } from 'Native/NativeBridge';
 
 export class BannerListenerApi extends NativeApi {
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'BannerListener');
+        super(nativeBridge, 'BannerListener', ApiPackage.BANNER);
     }
 
     // Potentially change to send the position of banner rectangle

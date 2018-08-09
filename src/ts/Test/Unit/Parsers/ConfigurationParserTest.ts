@@ -37,10 +37,6 @@ describe('configurationParserTest', () => {
             assert.equal(configuration.getAbGroup(), ABGroupBuilder.getAbGroup(99));
         });
 
-        it('should have gamerId parameter from configuration', () => {
-            assert.equal(configuration.getGamerId(), '57a35671bb58271e002d93c9');
-        });
-
         it('should have properties parameter from configuration', () => {
             assert.equal(configuration.getProperties(), 'abcdefgh12345678');
         });

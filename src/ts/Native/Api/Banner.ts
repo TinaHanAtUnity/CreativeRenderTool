@@ -1,7 +1,6 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { NativeApiWithEventHandlers } from 'Native/NativeApiWithEventHandlers';
-import { Observable, Observable1, Observable0 } from 'Utilities/Observable';
-import { NativeApi } from '../NativeApi';
+import { Observable1, Observable0 } from 'Utilities/Observable';
+import { NativeApi, ApiPackage } from '../NativeApi';
 
 enum BannerEvents {
     BannerEventResized          = 'BANNER_RESIZED',
@@ -48,7 +47,7 @@ export class BannerApi extends NativeApi {
     public readonly onBannerDestroyed = new Observable0();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Banner');
+        super(nativeBridge, 'Banner', ApiPackage.BANNER);
     }
 
     public load(views: BannerViewType[], style: string, width: number, height: number): Promise<void> {

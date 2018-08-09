@@ -11,7 +11,6 @@ import { Session } from 'Models/Session';
 import { Vast } from 'Models/Vast/Vast';
 import { Video } from 'Models/Assets/Video';
 import { Image } from 'Models/Assets/Image';
-import { ABGroup } from 'Models/ABGroup';
 
 export class ProgrammaticVastParser extends CampaignParser {
     public static ContentType = 'programmatic/vast';
@@ -23,7 +22,7 @@ export class ProgrammaticVastParser extends CampaignParser {
 
     protected _vastParser: VastParser = new VastParser();
 
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: ABGroup): Promise<Campaign> {
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
         const decodedVast = decodeURIComponent(response.getContent()).trim();
 
         if(ProgrammaticVastParser.VAST_PARSER_MAX_DEPTH !== undefined) {
@@ -32,17 +31,15 @@ export class ProgrammaticVastParser extends CampaignParser {
 
         return this._vastParser.retrieveVast(decodedVast, nativeBridge, request).then((vast): Promise<Campaign> => {
             const campaignId = this.getProgrammaticCampaignId(nativeBridge);
-            return this.parseVastToCampaign(vast, nativeBridge, campaignId, session, gamerId, abGroup, response);
+            return this.parseVastToCampaign(vast, nativeBridge, campaignId, session, response);
         });
     }
 
-    protected parseVastToCampaign(vast: Vast, nativeBridge: NativeBridge, campaignId: string, session: Session, gamerId: string, abGroup: ABGroup, response: AuctionResponse): Promise<Campaign> {
+    protected parseVastToCampaign(vast: Vast, nativeBridge: NativeBridge, campaignId: string, session: Session, response: AuctionResponse): Promise<Campaign> {
         const cacheTTL = response.getCacheTTL();
 
         const baseCampaignParams: ICampaign = {
             id: this.getProgrammaticCampaignId(nativeBridge),
-            gamerId: gamerId,
-            abGroup: abGroup,
             willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
             adType: response.getAdType() || undefined,
             correlationId: response.getCorrelationId() || undefined,
@@ -80,11 +77,12 @@ export class ProgrammaticVastParser extends CampaignParser {
             advertiserDomain: response.getAdvertiserDomain() || undefined,
             advertiserCampaignId: response.getAdvertiserCampaignId() || undefined,
             advertiserBundleId: response.getAdvertiserBundleId() || undefined,
+            impressionUrls: this.validateAndEncodeUrls(vast.getImpressionUrls(), session),
             isMoatEnabled: response.isMoatEnabled() || undefined
         };
 
         const campaign = new VastCampaign(vastCampaignParms);
-        if(campaign.getVast().getImpressionUrls().length === 0) {
+        if(campaign.getImpressionUrls().length === 0) {
             throw new Error('Campaign does not have an impression url');
         }
         // todo throw an Error if required events are missing. (what are the required events?)
@@ -107,5 +105,4 @@ export class ProgrammaticVastParser extends CampaignParser {
         }
         return Promise.resolve(campaign);
     }
-
 }
