@@ -10,6 +10,7 @@ import { platform } from 'os';
 import { DOMUtils } from 'Utilities/DOMUtils';
 import { XHRequest } from 'Utilities/XHRequest';
 import { GDPREventHandler } from 'EventHandlers/GDPREventHandler';
+import { Diagnostics } from 'Utilities/Diagnostics';
 import { ABGroup, FPSCollectionTest } from 'Models/ABGroup';
 
 export interface IOrientationProperties {
@@ -86,8 +87,8 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     }
 
     public createMRAID(container: any): Promise<string> {
+        const fetchingTimestamp = Date.now();
         container = container.replace('IF_FPS_COLLECTION_ENABLED', FPSCollectionTest.isValid(this._abGroup).toString());
-
         return this.fetchMRAID().then(mraid => {
             if(mraid) {
                 const markup = this._campaign.getDynamicMarkup();
@@ -100,6 +101,12 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
                 return container.replace('<body></body>', '<body>' + mraid + '</body>');
             }
             throw new WebViewError('Unable to fetch MRAID');
+        }).then((data) => {
+            const fetchingDuration = Date.now() - fetchingTimestamp;
+
+            this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(fetchingDuration, 0, 0, 'mraid_fetching_time', {}));
+
+            return data;
         });
     }
 
