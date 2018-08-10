@@ -40,7 +40,6 @@ TARGETS += build/src/proto/unity_proto.js
 TARGETS += build/src/html/admob/AFMAContainer.html
 
 TEST_TARGETS := $(addprefix $(BUILD_DIR)/, $(patsubst %.ts, %.js, $(filter %.ts, $(TESTS))))
-TEST_TARGETS += build/test/All.js
 
 # Built-in targets
 
@@ -52,8 +51,8 @@ TEST_TARGETS += build/test/All.js
 all: $(TARGETS) $(TEST_TARGETS)
 	@$(ROLLUP) --config
 
-test: all
-	@NODE_PATH=$(SOURCE_BUILD_DIR):$(SOURCE_BUILD_DIR)/ts:$(TEST_BUILD_DIR) $(MOCHA) --opts .mocha.opts test-utils/node_runner.js
+test: build/test/Bundle.js
+	@node test-utils/headless_runner.js
 
 test-coverage: all
 	@NODE_PATH=$(SOURCE_BUILD_DIR):$(SOURCE_BUILD_DIR)/ts:$(TEST_BUILD_DIR) $(NYC) $(MOCHA) --opts .mocha.opts $(TEST_TARGETS)
@@ -103,11 +102,14 @@ $(SOURCE_BUILD_DIR)/xml/%.xml: %.xml
 $(SOURCE_BUILD_DIR)/styl/%.css: %.styl
 	@mkdir -p $(dir $@) && $(STYLUS) -o $(SOURCE_BUILD_DIR)/styl -u autoprefixer-stylus --compress --inline --with '{limit: false}' $<
 
-$(TEST_BUILD_DIR)/ts/%.js: %.ts
+$(TEST_BUILD_DIR)/%.js: %.ts
 	@$(TYPESCRIPT) --project tsconfig.json
 
-$(TEST_BUILD_DIR)/All.js:
-	echo $(TESTS) | sed "s/test\\//require('/g" | sed "s/\.ts/');/g" > $@
+$(TEST_BUILD_DIR)/All.js: all
+	@echo $(TESTS) | sed "s/test\\//require('/g" | sed "s/\.ts/');/g" > $@
+
+$(TEST_BUILD_DIR)/Bundle.js: $(TEST_BUILD_DIR)/All.js
+	@$(ROLLUP) --config rollup.config.test.js
 
 %::
 	$(warning No rule specified for target "$@")
