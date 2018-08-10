@@ -30,15 +30,17 @@ export class PerformanceOverlayEventHandler extends OverlayEventHandler<Performa
         this._performanceAdUnit.onFinish.trigger();
 
         const urls = this._trackingUrls[ICometTrackingUrlEvents.SKIP];
-        for (const url of urls) {
-            if (url && Url.isValid(url)) {
-                this._thirdPartyEventManager.sendEvent(ICometTrackingUrlEvents.SKIP, this._campaign.getSession().getId(), url);
-            } else {
-                const error = {
-                    url: url,
-                    event: ICometTrackingUrlEvents.SKIP
-                };
-                Diagnostics.trigger('invalid_tracking_url', error, this._campaign.getSession());
+        if (Object.keys(urls).length !== 0) {
+            for (const url of urls) {
+                if (url && Url.isValid(url)) {
+                    this._thirdPartyEventManager.sendEvent(ICometTrackingUrlEvents.SKIP, this._campaign.getSession().getId(), url);
+                } else {
+                    const error = {
+                        url: url,
+                        event: ICometTrackingUrlEvents.SKIP
+                    };
+                    Diagnostics.trigger('invalid_tracking_url', error, this._campaign.getSession());
+                }
             }
         }
     }

@@ -77,7 +77,7 @@ export class PerformanceVideoEventHandler extends VideoEventHandler {
     }
 
     private sendTrackingEvent(event: ICometTrackingUrlEvents): void {
-        if (this._campaign instanceof PerformanceCampaign) {
+        if (this._campaign instanceof PerformanceCampaign && Object.keys(this._campaign.getTrackingUrls()[event]).length !== 0) {
             const urls = this._campaign.getTrackingUrls()[event];
             for (const url of urls) {
                 if (url && Url.isValid(url)) {

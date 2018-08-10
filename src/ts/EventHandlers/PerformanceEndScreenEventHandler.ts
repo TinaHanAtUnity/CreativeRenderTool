@@ -22,15 +22,17 @@ export class PerformanceEndScreenEventHandler extends EndScreenEventHandler<Perf
     public onEndScreenDownload(parameters: IEndScreenDownloadParameters): void {
         super.onEndScreenDownload(parameters);
         const urls = this._campaign.getTrackingUrls()[ICometTrackingUrlEvents.CLICK];
-        for (const url of urls) {
-            if (url && Url.isValid(url)) {
-                this._thirdPartyEventManager.sendEvent(ICometTrackingUrlEvents.CLICK, this._campaign.getSession().getId(), url);
-            } else {
-                const error = {
-                    url: url,
-                    event: ICometTrackingUrlEvents.CLICK
-                };
-                Diagnostics.trigger('invalid_tracking_url', error, this._campaign.getSession());
+        if (Object.keys(urls).length !== 0) {
+            for (const url of urls) {
+                if (url && Url.isValid(url)) {
+                    this._thirdPartyEventManager.sendEvent(ICometTrackingUrlEvents.CLICK, this._campaign.getSession().getId(), url);
+                } else {
+                    const error = {
+                        url: url,
+                        event: ICometTrackingUrlEvents.CLICK
+                    };
+                    Diagnostics.trigger('invalid_tracking_url', error, this._campaign.getSession());
+                }
             }
         }
     }
