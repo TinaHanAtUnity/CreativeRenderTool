@@ -1,10 +1,14 @@
 const puppeteer = require('puppeteer');
+const pti = require('puppeteer-to-istanbul');
 
 (async () => {
     const browser = await puppeteer.launch({
         args: ['--no-sandbox']
     });
     const page = await browser.newPage();
+
+    await page.coverage.startJSCoverage({});
+
     page.on('console', (message) => {
         let type = message.type();
         switch(type) {
@@ -38,5 +42,7 @@ const puppeteer = require('puppeteer');
     });
     await page.goto('http://localhost:8000/src/test-index.html');
     console.log(await result);
+    const js_coverage = await page.coverage.stopJSCoverage();
+    pti.write(js_coverage);
     await browser.close();
 })();

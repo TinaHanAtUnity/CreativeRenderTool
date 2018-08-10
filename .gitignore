@@ -25,3 +25,6 @@ nginx/server.PID
 
 # MacOS
 .DS_Store
+
+# Coverage
+.nyc_output
