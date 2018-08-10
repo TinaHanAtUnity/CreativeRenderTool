@@ -22,8 +22,8 @@ export enum ICometTrackingUrlEvents {
     FIRST_QUARTILE = 'EventFirstQuartile',
     MIDPOINT = 'EventMidpoint',
     THIRD_QUARTILE = 'EventThirdQuartile',
-    ERROR = 'EventError', //
-    STALLED = 'EventStalled',
+    ERROR = 'EventError',
+    STALLED = 'EventStalled', //
     LOADED = 'EventLoaded',
     SHOW = 'EventShow', //
     COMPLETE = 'EventComplete',
