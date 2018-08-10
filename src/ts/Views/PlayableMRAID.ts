@@ -64,6 +64,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _arSessionInterruptionEndedObserver: IObserver0;
     private _arAndroidEnumsReceivedObserver: IObserver1<any>;
 
+    private _hasCameraPermission = false;
     private _permissionResultObserver: IObserver2<string, boolean>;
 
     private _isMRAIDAR: boolean = false;
@@ -471,6 +472,10 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         const functionName = data.functionName;
         const args = data.args;
 
+        if (!this._hasCameraPermission) {
+            return Promise.resolve();
+        }
+
         switch (functionName) {
             case 'resetPose':
                 return this._nativeBridge.AR.restartSession(args[0]);
@@ -576,7 +581,6 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
      */
     private showARPermissionPanel() {
         this._nativeBridge.Permissions.checkPermissions(PermissionTypes.CAMERA).then(results => {
-            this._nativeBridge.Sdk.logDebug('Camera permission is ' + results);
             if (results === CurrentPermission.UNKNOWN || results === CurrentPermission.ACCEPTED) {
                 this._cameraPermissionPanel.style.display = 'block';
             } else if (results === CurrentPermission.DENIED) {
@@ -588,6 +592,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     private onCameraPermissionEvent(hasCameraPermission: boolean) {
+        this._hasCameraPermission = hasCameraPermission;
         this._iframe.contentWindow!.postMessage({
             type: 'permission',
             value: {
@@ -601,9 +606,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     private onShowAr() {
-        this._nativeBridge.Sdk.logDebug('Showing AR');
         this._permissionResultObserver = this._nativeBridge.Permissions.onPermissionsResult.subscribe((permission, granted) => {
-            this._nativeBridge.Sdk.logDebug('Got permissions result: ' + permission + ' and it is: ' + granted);
             if(permission === PermissionTypes.CAMERA) {
                 this.onCameraPermissionEvent(granted);
             }
