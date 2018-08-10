@@ -13,7 +13,7 @@ import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { Diagnostics } from 'Utilities/Diagnostics';
 
-// Events marked with // are currently sent, but are unused
+// Events marked with // are currently sent, but are unused - waiting for BI to confirm if they want them sent
 export enum ICometTrackingUrlEvents {
     IMPRESSION = 'EventImpression', //
     START = 'EventStart',
