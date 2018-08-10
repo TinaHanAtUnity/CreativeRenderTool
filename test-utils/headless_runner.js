@@ -1,7 +1,9 @@
 const puppeteer = require('puppeteer');
 
 (async () => {
-    const browser = await puppeteer.launch({});
+    const browser = await puppeteer.launch({
+        args: ['--no-sandbox']
+    });
     const page = await browser.newPage();
     page.on('console', (message) => {
         let type = message.type();

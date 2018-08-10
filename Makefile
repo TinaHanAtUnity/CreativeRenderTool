@@ -35,7 +35,7 @@ TESTS := $(shell find $(TEST_DIR) -type f -name '*Test.ts' -and -not -name '*.d.
 TARGETS := $(addprefix $(BUILD_DIR)/, \
 			$(patsubst %.ts, %.js, \
 			$(patsubst %.styl, %.css, \
-			$(filter %.ts %.html %.json %.xml %.styl, $(SOURCES))))))
+			$(filter %.ts %.html %.json %.xml %.styl, $(SOURCES)))))
 TARGETS += build/src/proto/unity_proto.js
 TARGETS += build/src/html/admob/AFMAContainer.html
 
