@@ -1,4 +1,17 @@
-# Staged
+# Thu Aug  9 23:04:44 UTC 2018
+
+* Send creativeView tracking event for companionAd using Vast model api
+* Merge out changes related to modularization refactoring
+
+# Wed Aug  8 08:40:08 UTC 2018
+
+* Destroy Forcequit Key only after container cleanly closes
+* Remove ComScore Completely
+* Encode Impression tracking urls of Programmatic VAST
+* Added the field latestCampaignsStarts in gameSessionCounters
+* Send close and skip events for playable mraid
+
+# Tue Aug  7 13:23:57 UTC 2018
 
 * Update Dependencies
 

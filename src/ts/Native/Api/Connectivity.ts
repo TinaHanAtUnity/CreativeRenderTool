@@ -1,6 +1,6 @@
 import { Observable0, Observable2 } from 'Utilities/Observable';
 import { NativeBridge } from 'Native/NativeBridge';
-import { NativeApi } from 'Native/NativeApi';
+import { ApiPackage, NativeApi } from 'Native/NativeApi';
 
 enum ConnectivityEvent {
     CONNECTED,
@@ -14,11 +14,11 @@ export class ConnectivityApi extends NativeApi {
     public readonly onDisconnected = new Observable0();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Connectivity');
+        super(nativeBridge, 'Connectivity', ApiPackage.CORE);
     }
 
     public setListeningStatus(status: boolean): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setConnectionMonitoring', [status]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setConnectionMonitoring', [status]);
     }
 
     public handleEvent(event: string, parameters: any[]): void {
