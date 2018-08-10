@@ -37,6 +37,7 @@ TARGETS := $(addprefix $(BUILD_DIR)/, \
 			$(patsubst %.styl, %.css, \
 			$(filter %.ts %.html %.json %.xml %.styl, $(SOURCES))))))
 TARGETS += build/src/proto/unity_proto.js
+TARGETS += build/src/html/admob/AFMAContainer.html
 
 TEST_TARGETS := $(addprefix $(BUILD_DIR)/, $(patsubst %.ts, %.js, $(filter %.ts, $(TESTS))))
 TEST_TARGETS += build/test/All.js
@@ -86,6 +87,9 @@ $(SOURCE_BUILD_DIR)/proto/unity_proto.js:
 	@mkdir -p $(SOURCE_BUILD_DIR)/proto
 	@$(PBJS) -t static-module -w es6 --no-create --no-verify --no-convert --no-delimited --no-beautify -o $(SOURCE_BUILD_DIR)/proto/unity_proto.js src/proto/unity_proto.proto
 	@$(PBTS) -o src/proto/unity_proto.d.ts $(SOURCE_BUILD_DIR)/proto/unity_proto.js
+
+$(SOURCE_BUILD_DIR)/html/admob/AFMAContainer.html:
+	@cp src/html/admob/AFMAContainer-no-obfuscation.html $@
 
 $(SOURCE_BUILD_DIR)/html/%.html: %.html
 	@mkdir -p $(dir $@) && cp $< $@
