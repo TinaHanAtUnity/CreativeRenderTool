@@ -10,13 +10,11 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 export class PerformanceVideoEventHandler extends VideoEventHandler {
 
     private _performanceAdUnit: PerformanceAdUnit;
-    private _sessionId: string;
 
     constructor(parameters: IVideoEventHandlerParams<PerformanceAdUnit>) {
         super(parameters);
         this._performanceAdUnit = parameters.adUnit;
         this._campaign = parameters.campaign;
-        this._sessionId = parameters.campaign.getSession().getId();
     }
 
     public onCompleted(url: string): void {
@@ -83,7 +81,7 @@ export class PerformanceVideoEventHandler extends VideoEventHandler {
             const urls = this._campaign.getTrackingUrls()[event];
             for (const url of urls) {
                 if (url && Url.isValid(url)) {
-                    this._thirdPartyEventManager.sendEvent(event, this._sessionId, url);
+                    this._thirdPartyEventManager.sendEvent(event, this._campaign.getSession().getId(), url);
                 } else {
                     const error = {
                         url: url,
