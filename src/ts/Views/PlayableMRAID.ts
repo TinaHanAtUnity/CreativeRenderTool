@@ -17,7 +17,7 @@ import { AbstractPrivacy } from 'Views/AbstractPrivacy';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { ARUtil } from '../Utilities/ARUtil';
 
-import { IosPermission } from '../Native/Api/IosPermissions';
+import { CurrentPermission, PermissionTypes } from 'Native/Api/Permissions';
 
 export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -225,8 +225,8 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
             this._nativeBridge.AR.onAndroidEnumsReceived.unsubscribe(this._arAndroidEnumsReceivedObserver);
             window.removeEventListener('deviceorientation', this._deviceorientationListener, false);
 
-            if (this._permissionResultObserver && this._nativeBridge.getPlatform() === Platform.IOS) {
-                this._nativeBridge.Permissions.Ios.onPermissionsResult.unsubscribe(this._permissionResultObserver);
+            if (this._permissionResultObserver) {
+                this._nativeBridge.Permissions.onPermissionsResult.unsubscribe(this._permissionResultObserver);
             }
         }
 
@@ -575,17 +575,13 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
      * showARPermissionPanel needs to be shown before the timer starts
      */
     private showARPermissionPanel() {
-        this._nativeBridge.Permissions.Ios.checkPermission(IosPermission.AVMediaTypeVideo).then(results => {
-            this._cameraPermissionPanel.style.display = 'block';
-
-            if (results === 0 || results === 3) {
-                // NotDetermined = 0, Authorized = 3
+        this._nativeBridge.Permissions.checkPermissions(PermissionTypes.CAMERA).then(results => {
+            this._nativeBridge.Sdk.logDebug('Camera permission is ' + results);
+            if (results === CurrentPermission.UNKNOWN || results === CurrentPermission.ACCEPTED) {
                 this._cameraPermissionPanel.style.display = 'block';
-            } else if (results === 1 || results === 2) {
-                // Restricted = 1, Denied = 2
+            } else if (results === CurrentPermission.DENIED) {
                 this.onCameraPermissionEvent(false);
             }
-
             this._loadingScreen.classList.add('hidden');
             this._loadingScreenAR.classList.add('hidden');
         });
@@ -605,15 +601,15 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     private onShowAr() {
-        if (this._nativeBridge.getPlatform() === Platform.IOS) {
-            this._permissionResultObserver = this._nativeBridge.Permissions.Ios.onPermissionsResult.subscribe((permission, granted) => {
-                if(permission === IosPermission.AVMediaTypeVideo) {
-                    this.onCameraPermissionEvent(granted);
-                }
-            });
-        }
+        this._nativeBridge.Sdk.logDebug('Showing AR');
+        this._permissionResultObserver = this._nativeBridge.Permissions.onPermissionsResult.subscribe((permission, granted) => {
+            this._nativeBridge.Sdk.logDebug('Got permissions result: ' + permission + ' and it is: ' + granted);
+            if(permission === PermissionTypes.CAMERA) {
+                this.onCameraPermissionEvent(granted);
+            }
+        });
 
-        this._nativeBridge.Permissions.Ios.requestPermission(IosPermission.AVMediaTypeVideo).then(() => {
+        this._nativeBridge.Permissions.requestPermission(PermissionTypes.CAMERA).then(() => {
             this._nativeBridge.Sdk.logDebug('Required permission for showing camera');
         });
     }

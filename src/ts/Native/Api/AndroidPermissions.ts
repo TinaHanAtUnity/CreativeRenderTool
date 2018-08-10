@@ -24,26 +24,11 @@ export class AndroidPermissionsApi extends NativeApi {
         return this._nativeBridge.invoke<string[]>(this._apiClass, 'getPermissions');
     }
 
-    public checkPermission(permission: AndroidPermission): Promise<number> {
+    public checkPermission(permission: AndroidPermission | string): Promise<number> {
         return this._nativeBridge.invoke<number>(this._apiClass, 'checkPermission', [permission]);
     }
 
-    public requestPermissions(permissions: AndroidPermission[], requestCode: number): Promise<void> {
+    public requestPermissions(permissions: AndroidPermission[] | string[], requestCode: number): Promise<void> {
         return this._nativeBridge.invoke<void>(this._apiClass, 'requestPermissions', [permissions, requestCode]);
-    }
-
-    public handleEvent(event: string, parameters: any[]): void {
-        switch (event) {
-            case PermissionsEvent[PermissionsEvent.PERMISSIONS_RESULT]:
-                this.onPermissionsResult.trigger(parameters[0], parameters[1], parameters[2]);
-                break;
-
-            case PermissionsEvent[PermissionsEvent.PERMISSIONS_ERROR]:
-                this.onPermissionsError.trigger(parameters[0]);
-                break;
-
-            default:
-                super.handleEvent(event, parameters);
-        }
     }
 }

@@ -18,22 +18,11 @@ export class IosPermissionsApi extends NativeApi {
         super(nativeBridge, 'Permissions');
     }
 
-    public checkPermission(permission: IosPermission): Promise<number> {
+    public checkPermission(permission: IosPermission | string): Promise<number> {
         return this._nativeBridge.invoke<number>(this._apiClass, 'checkPermission', [permission]);
     }
 
-    public requestPermission(permission: IosPermission): Promise<void> {
+    public requestPermission(permission: IosPermission | string): Promise<void> {
         return this._nativeBridge.invoke<void>(this._apiClass, 'requestPermission', [permission]);
-    }
-
-    public handleEvent(event: string, parameters: any[]): void {
-        switch (event) {
-            case PermissionsEvent[PermissionsEvent.PERMISSIONS_RESULT]:
-                this.onPermissionsResult.trigger(parameters[0], parameters[1]);
-                break;
-
-            default:
-                super.handleEvent(event, parameters);
-        }
     }
 }
