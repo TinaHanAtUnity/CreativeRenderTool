@@ -77,17 +77,19 @@ export class PerformanceVideoEventHandler extends VideoEventHandler {
     }
 
     private sendTrackingEvent(event: ICometTrackingUrlEvents): void {
-        if (this._campaign instanceof PerformanceCampaign && Object.keys(this._campaign.getTrackingUrls()[event]).length !== 0) {
+        if (this._campaign instanceof PerformanceCampaign) {
             const urls = this._campaign.getTrackingUrls()[event];
-            for (const url of urls) {
-                if (url && Url.isValid(url)) {
-                    this._thirdPartyEventManager.sendEvent(event, this._campaign.getSession().getId(), url);
-                } else {
-                    const error = {
-                        url: url,
-                        event: event
-                    };
-                    Diagnostics.trigger('invalid_tracking_url', error, this._campaign.getSession());
+            if (urls && Object.keys(urls).length !== 0) {
+                for (const url of urls) {
+                    if (url && Url.isValid(url)) {
+                        this._thirdPartyEventManager.sendEvent(event, this._campaign.getSession().getId(), url);
+                    } else {
+                        const error = {
+                            url: url,
+                            event: event
+                        };
+                        Diagnostics.trigger('invalid_tracking_url', error, this._campaign.getSession());
+                    }
                 }
             }
         }

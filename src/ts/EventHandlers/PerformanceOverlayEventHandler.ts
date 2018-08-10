@@ -30,7 +30,7 @@ export class PerformanceOverlayEventHandler extends OverlayEventHandler<Performa
         this._performanceAdUnit.onFinish.trigger();
 
         const urls = this._trackingUrls[ICometTrackingUrlEvents.SKIP];
-        if (Object.keys(urls).length !== 0) {
+        if (urls && Object.keys(urls).length !== 0) {
             for (const url of urls) {
                 if (url && Url.isValid(url)) {
                     this._thirdPartyEventManager.sendEvent(ICometTrackingUrlEvents.SKIP, this._campaign.getSession().getId(), url);

@@ -22,7 +22,7 @@ export class PerformanceEndScreenEventHandler extends EndScreenEventHandler<Perf
     public onEndScreenDownload(parameters: IEndScreenDownloadParameters): void {
         super.onEndScreenDownload(parameters);
         const urls = this._campaign.getTrackingUrls()[ICometTrackingUrlEvents.CLICK];
-        if (Object.keys(urls).length !== 0) {
+        if (urls && Object.keys(urls).length !== 0) {
             for (const url of urls) {
                 if (url && Url.isValid(url)) {
                     this._thirdPartyEventManager.sendEvent(ICometTrackingUrlEvents.CLICK, this._campaign.getSession().getId(), url);
