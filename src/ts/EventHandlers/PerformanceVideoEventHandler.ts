@@ -5,6 +5,7 @@ import { TestEnvironment } from 'Utilities/TestEnvironment';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { ICometTrackingUrlEvents } from 'Parsers/CometCampaignParser';
 import { Url } from 'Utilities/Url';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class PerformanceVideoEventHandler extends VideoEventHandler {
 
@@ -77,14 +78,20 @@ export class PerformanceVideoEventHandler extends VideoEventHandler {
         this.sendTrackingEvent(ICometTrackingUrlEvents.COMPLETE);
     }
 
-    private sendTrackingEvent(event: string): void {
+    private sendTrackingEvent(event: ICometTrackingUrlEvents): void {
         if (this._campaign instanceof PerformanceCampaign) {
             const urls = this._campaign.getTrackingUrls()[event];
-            urls.forEach(url => {
+            for (const url of urls) {
                 if (url && Url.isValid(url)) {
                     this._thirdPartyEventManager.sendEvent(event, this._sessionId, url);
+                } else {
+                    const error = {
+                        url: url,
+                        event: event
+                    };
+                    Diagnostics.trigger('invalid_tracking_url', error, this._campaign.getSession());
                 }
-            });
+            }
         }
     }
 }

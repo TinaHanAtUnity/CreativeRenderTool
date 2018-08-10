@@ -5,7 +5,7 @@ import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { AbstractAdUnit, IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Platform } from 'Constants/Platform';
-import { StoreName, PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
+import { StoreName } from 'Models/Campaigns/PerformanceCampaign';
 import { IosUtils } from 'Utilities/IosUtils';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Diagnostics } from 'Utilities/Diagnostics';
@@ -21,8 +21,6 @@ import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { Video } from 'Models/Assets/Video';
 import { GDPREventHandler } from 'EventHandlers/GDPREventHandler';
-import { Configuration } from 'Models/Configuration';
-import { ICometTrackingUrlEvents } from 'Parsers/CometCampaignParser';
 
 export interface IEndScreenDownloadParameters {
     clickAttributionUrl: string | undefined;
@@ -36,13 +34,14 @@ export interface IEndScreenDownloadParameters {
 export abstract class EndScreenEventHandler<T extends Campaign, T2 extends AbstractAdUnit> extends GDPREventHandler implements IEndScreenHandler {
 
     protected _adUnit: T2;
-    private _nativeBridge: NativeBridge;
+    protected _campaign: T;
+    protected _thirdPartyEventManager: ThirdPartyEventManager;
+    protected _nativeBridge: NativeBridge;
+
     private _operativeEventManager: OperativeEventManager;
-    private _thirdPartyEventManager: ThirdPartyEventManager;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _placement: Placement;
-    private _campaign: T;
 
     constructor(nativeBridge: NativeBridge, adUnit: T2, parameters: IAdUnitParameters<T>) {
         super(parameters.gdprManager, parameters.configuration);
@@ -78,13 +77,6 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
             for (const url of clickTrackingUrls) {
                 this._thirdPartyEventManager.sendEvent('xpromo click', this._campaign.getSession().getId(), url);
             }
-        } else if (this._campaign instanceof PerformanceCampaign) {
-            const urls = this._campaign.getTrackingUrls()[ICometTrackingUrlEvents.CLICK];
-            urls.forEach(url => {
-                if (url && Url.isValid(url)) {
-                    this._thirdPartyEventManager.sendEvent(ICometTrackingUrlEvents.CLICK, this._campaign.getSession().getId(), url);
-                }
-            });
         }
 
         if(parameters.clickAttributionUrl) {
@@ -107,13 +99,6 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
             for (const url of clickTrackingUrls) {
                 this._thirdPartyEventManager.sendEvent('xpromo click', this._campaign.getSession().getId(), url);
             }
-        } else if (this._campaign instanceof PerformanceCampaign) {
-            const urls = this._campaign.getTrackingUrls()[ICometTrackingUrlEvents.CLICK];
-            urls.forEach(url => {
-                if (url && Url.isValid(url)) {
-                    this._thirdPartyEventManager.sendEvent(ICometTrackingUrlEvents.CLICK, this._campaign.getSession().getId(), url);
-                }
-            });
         }
 
         if(parameters.clickAttributionUrl) {

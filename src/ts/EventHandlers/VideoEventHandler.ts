@@ -93,19 +93,7 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
                     if(fileId) {
                         this._nativeBridge.Cache.getFileInfo(fileId).then((fileInfo) => {
                             error.fileInfo = fileInfo;
-                            if(fileInfo.found) {
-                                return FileInfo.getVideoInfo(this._nativeBridge, fileId).then(([width, height, duration]) => {
-                                    const videoInfo: any = {
-                                        width: width,
-                                        height: height,
-                                        duration: duration
-                                    };
-                                    error.videoInfo = videoInfo;
-                                    return error;
-                                });
-                            } else {
-                                return error;
-                            }
+                            return error;
                         }).then((videoError) => {
                             this.handleVideoError('video_player_stuck', videoError);
                         }).catch(() => {

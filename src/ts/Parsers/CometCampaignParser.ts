@@ -90,8 +90,8 @@ export class CometCampaignParser extends CampaignParser {
 
             const mraidCampaign = new MRAIDCampaign(parameters);
 
-        if(CustomFeatures.isPlayableConfigurationEnabled(json.mraidUrl)) {
-            const playableConfigurationUrl = json.mraidUrl.replace(/index\.html/, 'configuration.json');
+            if (CustomFeatures.isPlayableConfigurationEnabled(json.mraidUrl)) {
+                const playableConfigurationUrl = json.mraidUrl.replace(/index\.html/, 'configuration.json');
                 request.get(playableConfigurationUrl).then(configurationResponse => {
                     try {
                         const playableConfiguration = JSON.parse(configurationResponse.response);
