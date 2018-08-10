@@ -43,7 +43,7 @@ TEST_TARGETS := $(addprefix $(BUILD_DIR)/, $(patsubst %.ts, %.js, $(filter %.ts,
 
 # Built-in targets
 
-.PHONY: all test test-coverage release clean lint setup watch
+.PHONY: all test test-coverage release clean lint setup watch start-server
 .NOTPARALLEL: $(TARGETS) $(TEST_TARGETS)
 
 # Main targets
@@ -51,7 +51,7 @@ TEST_TARGETS := $(addprefix $(BUILD_DIR)/, $(patsubst %.ts, %.js, $(filter %.ts,
 all: $(TARGETS) $(TEST_TARGETS)
 	@$(ROLLUP) --config
 
-test: build/test/Bundle.js
+test: build/test/Bundle.js start-server
 	@node test-utils/headless_runner.js
 
 test-coverage: all
@@ -136,3 +136,9 @@ setup: clean
 
 watch:
 	@$(TSC) --project tsconfig.json --watch
+
+start-server:
+	@python3 -m http.server 8000 & echo $$! > server.pid
+
+stop-server:
+	@kill $$(cat server.pid)
