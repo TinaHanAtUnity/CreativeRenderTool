@@ -115,8 +115,13 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     private handleClickAttribution(parameters: IEndScreenDownloadParameters) {
         const platform = this._nativeBridge.getPlatform();
 
+        if (parameters.store === StoreName.STANDALONE_APK) {
+            // do apk pls thank you
+        }
+
         if (parameters.clickAttributionUrlFollowsRedirects && parameters.clickAttributionUrl) {
             const apkDownloadLink = Url.getQueryParameter(parameters.clickAttributionUrl, 'apk_download_link');
+
             if (apkDownloadLink && platform === Platform.ANDROID) {
                 this.handleAPKDownloadLink(apkDownloadLink, parameters.clickAttributionUrl);
             } else {

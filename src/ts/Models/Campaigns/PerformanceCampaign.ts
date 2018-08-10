@@ -6,7 +6,8 @@ import { AdUnitStyle } from 'Models/AdUnitStyle';
 export enum StoreName {
     APPLE,
     GOOGLE,
-    XIAOMI
+    XIAOMI,
+    STANDALONE_APK
 }
 
 export interface IPerformanceCampaign extends ICampaign {
