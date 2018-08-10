@@ -372,6 +372,9 @@ describe('OperativeEventManagerTest', () => {
                     assert(requestSpy.calledOnce, 'Operative event did not send POST request');
                     const url = requestSpy.getCall(0).args[0];
                     assert.equal(url, 'https://httpkafka.unityads.unity3d.com/v1/events', 'URL not what was expected');
+                    const data = JSON.parse((<string>requestSpy.getCall(0).args[1]).split('\n')[1]);
+                    assert.equal(data.msg.creativePackId, TestFixtures.getXPromoCampaign().getCreativeId());
+                    assert.equal(data.msg.targetStoreId, TestFixtures.getXPromoCampaign().getAppStoreId());
                 });
             });
 
