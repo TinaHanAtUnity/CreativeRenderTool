@@ -4,8 +4,6 @@ import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'AdUnits/Perform
 import { NativeBridge } from 'Native/NativeBridge';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { ICometTrackingUrlEvents } from 'Parsers/CometCampaignParser';
-import { Url } from 'Utilities/Url';
-import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class PerformanceEndScreenEventHandler extends EndScreenEventHandler<PerformanceCampaign, PerformanceAdUnit> {
 
@@ -21,19 +19,6 @@ export class PerformanceEndScreenEventHandler extends EndScreenEventHandler<Perf
 
     public onEndScreenDownload(parameters: IEndScreenDownloadParameters): void {
         super.onEndScreenDownload(parameters);
-        const urls = this._campaign.getTrackingUrls()[ICometTrackingUrlEvents.CLICK];
-        if (urls && Object.keys(urls).length !== 0) {
-            for (const url of urls) {
-                if (url && Url.isValid(url)) {
-                    this._thirdPartyEventManager.sendEvent(ICometTrackingUrlEvents.CLICK, this._campaign.getSession().getId(), url);
-                } else {
-                    const error = {
-                        url: url,
-                        event: ICometTrackingUrlEvents.CLICK
-                    };
-                    Diagnostics.trigger('invalid_tracking_url', error, this._campaign.getSession());
-                }
-            }
-        }
+        this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.CLICK);
     }
 }

@@ -4,6 +4,12 @@ import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Analytics } from 'Utilities/Analytics';
 import { RequestError } from 'Errors/RequestError';
 import { Url } from 'Utilities/Url';
+import { ICometTrackingUrlEvents } from 'Parsers/CometCampaignParser';
+import { Campaign } from 'Models/Campaign';
+import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
+import { Diagnostics } from 'Utilities/Diagnostics';
+import { resolve } from 'dns';
+import { PromoCampaignParser } from 'Parsers/PromoCampaignParser';
 
 export class ThirdPartyEventManager {
 
@@ -72,6 +78,27 @@ export class ThirdPartyEventManager {
 
     public setTemplateValue(key: string, value: string): void {
         this._templateValues[key] = value;
+    }
+
+    public sendPerformanceTrackingEvent(campaign: Campaign, event: ICometTrackingUrlEvents): Promise<void> {
+        return new Promise(() => {
+            if (campaign instanceof PerformanceCampaign) {
+                const urls = campaign.getTrackingUrls()[event];
+                if (urls && Object.keys(urls).length !== 0) {
+                    for (const url of urls) {
+                        if (url && Url.isValid(url)) {
+                            this.sendEvent(event, campaign.getSession().getId(), url);
+                        } else {
+                            const error = {
+                                url: url,
+                                event: event
+                            };
+                            Diagnostics.trigger('invalid_tracking_url', error, campaign.getSession());
+                        }
+                    }
+                }
+            }
+        });
     }
 
     private getUrl(url: string): string {
