@@ -43,6 +43,7 @@ import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/Program
 import { ForceQuitManager } from 'Managers/ForceQuitManager';
 import { MRAID } from 'Views/MRAID';
 import { PlayableMRAID } from 'Views/PlayableMRAID';
+import { XHRequest } from 'Utilities/XHRequest';
 
 describe('AdUnitFactoryTest', () => {
 
@@ -121,6 +122,7 @@ describe('AdUnitFactoryTest', () => {
         sandbox.spy(request, 'get');
         sandbox.stub(nativeBridge.WebPlayer, 'setSettings').returns(Promise.resolve());
         sandbox.stub(nativeBridge.WebPlayer, 'clearSettings').returns(Promise.resolve());
+        sandbox.stub(XHRequest, 'get').returns(Promise.resolve('mraid creative'));
     });
 
     afterEach(() => {
