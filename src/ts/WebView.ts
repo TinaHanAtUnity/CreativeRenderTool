@@ -607,10 +607,6 @@ export class WebView {
                 AdUnitContainer.setForcedOrientation(TestEnvironment.get('forcedOrientation'));
             }
 
-            if(TestEnvironment.get('forcedPlayableMRAID')) {
-                AdUnitFactory.setForcedPlayableMRAID(TestEnvironment.get('forcedPlayableMRAID'));
-            }
-
             if(TestEnvironment.get('creativeUrl')) {
                 const creativeUrl = this._creativeUrl = TestEnvironment.get('creativeUrl');
                 if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
