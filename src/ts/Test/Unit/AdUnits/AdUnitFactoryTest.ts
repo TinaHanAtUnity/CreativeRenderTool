@@ -41,8 +41,6 @@ import { GdprManager } from 'Managers/GdprManager';
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 import { ForceQuitManager } from 'Managers/ForceQuitManager';
-import { MRAID } from 'Views/MRAID';
-import { PlayableMRAID } from 'Views/PlayableMRAID';
 import { XHRequest } from 'Utilities/XHRequest';
 
 describe('AdUnitFactoryTest', () => {
@@ -127,47 +125,6 @@ describe('AdUnitFactoryTest', () => {
 
     afterEach(() => {
         sandbox.restore();
-    });
-
-    describe('MRAID AdUnit Factory', () => {
-        let campaign: MRAIDCampaign;
-
-        beforeEach(() => {
-            campaign = TestFixtures.getProgrammaticMRAIDCampaign();
-            const resourceUrl = campaign.getResourceUrl();
-            if(resourceUrl) {
-                resourceUrl.setFileId('1234');
-            }
-
-            adUnitParameters.campaign = campaign;
-        });
-
-        after(() => {
-            AdUnitFactory.setForcedPlayableMRAID(false);
-        });
-
-        it('should create PlayableMRAID view', () => {
-            AdUnitFactory.setForcedPlayableMRAID(false);
-
-            const resourceUrl = campaign.getResourceUrl();
-            if(resourceUrl) {
-                resourceUrl.set('url', 'https://cdn.unityads.unity3d.com/playables/production/unity/xinstall.html');
-            }
-
-            const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
-            assert.isTrue(adUnit.getMRAIDView() instanceof PlayableMRAID, 'view should be PlayableMRAID');
-        });
-
-        it('should create MRAID view', () => {
-            const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
-            assert.isTrue(adUnit.getMRAIDView() instanceof MRAID, 'view should be MRAID');
-        });
-
-        it('should be forced to create PlayableMRAID view', () => {
-            AdUnitFactory.setForcedPlayableMRAID(true);
-            const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
-            assert.isTrue(adUnit.getMRAIDView() instanceof PlayableMRAID, 'view should be PlayableMRAID');
-        });
     });
 
     describe('MRAID AdUnit', () => {
