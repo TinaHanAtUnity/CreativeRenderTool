@@ -1,9 +1,8 @@
-# Mon Aug 13 20:06:12 UTC 2018
+# Pending
 
-* Measuring playable ad loading times
 * Reset the app sheet when closing the ad unit
-* Measuring average fps for mraid content
 * Merge out changes related to modularization refactoring
+* Fix tests if XHRequest is used to fetch MRAIDs
 
 # Thu Aug  9 23:04:44 UTC 2018
 
