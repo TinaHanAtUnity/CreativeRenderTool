@@ -1,7 +1,13 @@
+# Staged
+
+* Measuring playable ad loading times
+* Reset the app sheet when closing the ad unit
+* Measuring average fps for mraid content
+* Merge out changes related to modularization refactoring
+
 # Thu Aug  9 23:04:44 UTC 2018
 
 * Send creativeView tracking event for companionAd using Vast model api
-* Merge out changes related to modularization refactoring
 
 # Wed Aug  8 08:40:08 UTC 2018
 
