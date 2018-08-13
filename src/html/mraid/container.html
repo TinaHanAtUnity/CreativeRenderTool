@@ -113,6 +113,22 @@
                     trigger('ready');
                 }, false);
 
+                this.onShowAR = function(listener) {
+                    if (permissions['Camera'] === true) {
+                        listener();
+                    } else {
+                        this.addEventListener('showAR', listener);
+                    }
+                };
+
+                this.onShowFallback = function(listener) {
+                    if (permissions['Camera'] === false) {
+                        listener();
+                    } else {
+                        this.addEventListener('showFallback', listener);
+                    }
+                }
+
                 this.addEventListener = function(event, listener) {
                     if(event in listeners) {
                         listeners[event].push(listener);
