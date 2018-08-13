@@ -43,12 +43,10 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _backgroundTime: number = 0;
     private _backgroundTimestamp: number;
 
-    private _abGroup: ABGroup;
-
     private _configuration: any;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup) {
-        super(nativeBridge, 'playable-mraid', placement, campaign, privacy, showGDPRBanner);
+        super(nativeBridge, 'playable-mraid', placement, campaign, privacy, showGDPRBanner, abGroup);
 
         this._placement = placement;
         this._campaign = campaign;
@@ -357,6 +355,13 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 break;
             case 'close':
                 this._handlers.forEach(handler => handler.onMraidClose());
+                break;
+            case 'sendStats':
+                this.updateStats({
+                    totalTime: event.data.totalTime,
+                    playTime: event.data.playTime,
+                    frameCount: event.data.frameCount
+                });
                 break;
             case 'orientation':
                 let forceOrientation = Orientation.NONE;
