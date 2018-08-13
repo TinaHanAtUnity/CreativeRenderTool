@@ -20,7 +20,9 @@
                     stateChange: [],
                     viewableChange: [],
                     sizeChange: [],
-                    permissionChange: []
+                    permissionChange: [],
+                    showFallback: [],
+                    showAR: []
                 };
 
                 var viewable = false;
@@ -54,6 +56,16 @@
                     }
                 };
 
+                var triggerExperienceType = function(permissionType, status) {
+                    if (permissionType === 'Camera') {
+                        if (status === true) {
+                            trigger('showAR');
+                        } else {
+                            trigger('showFallback');
+                        }
+                    }
+                };
+
                 var width = window.innerWidth;
                 var height = window.innerHeight;
 
@@ -80,6 +92,7 @@
                         case 'permission':
                             permissions[event.data.value.type] = event.data.value.status;
                             trigger('permissionChange', [event.data.value.type, event.data.value.status]);
+                            triggerExperienceType(event.data.value.type, event.data.value.status);
                             break;
                         default:
                             break;
