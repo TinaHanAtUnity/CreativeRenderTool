@@ -73,7 +73,6 @@ import { NewVideoOverlay } from 'Views/NewVideoOverlay';
 import { IEndScreenParameters } from 'Views/EndScreen';
 
 export class AdUnitFactory {
-    private static _forcedPlayableMRAID: boolean = false;
 
     public static createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractAdUnit {
 
@@ -99,10 +98,6 @@ export class AdUnitFactory {
         } else {
             throw new Error('Unknown campaign instance type');
         }
-    }
-
-    public static setForcedPlayableMRAID(value: boolean) {
-        AdUnitFactory._forcedPlayableMRAID = value;
     }
 
     private static createPerformanceAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PerformanceCampaign>): PerformanceAdUnit {
@@ -274,7 +269,7 @@ export class AdUnitFactory {
         let mraid: MRAIDView<IMRAIDViewHandler>;
         const showGDPRBanner = this.showGDPRBanner(parameters);
         const privacy = this.createPrivacy(nativeBridge, parameters);
-        if((resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) || AdUnitFactory._forcedPlayableMRAID) {
+        if((resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/))) {
             mraid = new PlayableMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner, parameters.configuration.getAbGroup());
         } else {
             mraid = new MRAID(nativeBridge, parameters.placement, parameters.campaign, privacy, showGDPRBanner, parameters.configuration.getAbGroup());
