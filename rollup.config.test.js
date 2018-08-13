@@ -1,4 +1,5 @@
 import plugins from './rollup.plugins';
+import istanbul from 'rollup-plugin-istanbul';
 
 export default {
     input: 'build/test/All.js',
@@ -12,7 +13,13 @@ export default {
         },
         sourcemap: 'inline'
     },
-    plugins: plugins,
+    plugins: plugins.concat([
+        istanbul({
+            include: [
+                'build/src/ts/**/*.js'
+            ]
+        })
+    ]),
     external: [
         'mocha',
         'chai'

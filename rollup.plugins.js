@@ -5,7 +5,6 @@ import alias from 'rollup-plugin-alias';
 import resolve from 'rollup-plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import sourcemaps from 'rollup-plugin-sourcemaps';
-import istanbul from 'rollup-plugin-istanbul';
 
 export default [
     sourcemaps(),
@@ -51,12 +50,6 @@ export default [
     }),
     alias({
         '../../proto/unity_proto.js': 'src/proto/unity_proto.js',
-    }),
-    istanbul({
-        exclude: [
-            'node_modules/**/*.js',
-            'build/test/**/*.js'
-        ]
     })
 ]
 
