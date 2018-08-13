@@ -52,6 +52,7 @@ all: $(TARGETS) $(TEST_TARGETS)
 	@$(ROLLUP) --config
 
 test: build/test/Bundle.js start-server
+	@mkdir -p build/coverage
 	@node test-utils/headless_runner.js
 
 test-coverage: all

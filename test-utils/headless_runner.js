@@ -1,13 +1,11 @@
+const fs = require('fs');
 const puppeteer = require('puppeteer');
-const pti = require('puppeteer-to-istanbul');
 
 (async () => {
     const browser = await puppeteer.launch({
         args: ['--no-sandbox']
     });
     const page = await browser.newPage();
-
-    await page.coverage.startJSCoverage({});
 
     page.on('console', (message) => {
         let type = message.type();
@@ -30,6 +28,9 @@ const pti = require('puppeteer-to-istanbul');
             console.dir(message);
         }
     });
+    page.exposeFunction('writeCoverage', (coverage) => {
+        fs.writeFileSync('build/coverage/coverage.json', coverage);
+    });
     const result = new Promise((resolve) => {
         page.exposeFunction('result', (failures) => {
             resolve(failures);
@@ -37,12 +38,13 @@ const pti = require('puppeteer-to-istanbul');
     });
     page.on('domcontentloaded', () => {
         page.evaluate(() => {
-            mocha.run(window.result);
+            mocha.run((failures) => {
+                window.writeCoverage(JSON.stringify(__coverage__));
+                window.result(failures);
+            });
         });
     });
     await page.goto('http://localhost:8000/src/test-index.html');
     console.log(await result);
-    const js_coverage = await page.coverage.stopJSCoverage();
-    pti.write(js_coverage);
     await browser.close();
 })();

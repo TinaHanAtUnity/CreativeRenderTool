@@ -14,7 +14,7 @@
     },
     "outDir": "build",
     "moduleResolution": "node",
-    "sourceMap": true,
+    "inlineSourceMap": true
   },
   "include": [
     "src/ts/**/*.ts",

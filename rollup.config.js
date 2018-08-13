@@ -6,7 +6,8 @@ export default {
         name: 'Device',
         file: 'build/src/ts/Bundle.js',
         format: 'iife',
-        interop: false
+        interop: false,
+        sourcemap: 'inline'
     },
     plugins: plugins
 }

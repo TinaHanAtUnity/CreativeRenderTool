@@ -9,7 +9,8 @@ export default {
         interop: false,
         globals: {
             chai: 'chai'
-        }
+        },
+        sourcemap: 'inline'
     },
     plugins: plugins,
     external: [
