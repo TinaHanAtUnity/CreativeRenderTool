@@ -10,6 +10,8 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { FocusManager } from 'Managers/FocusManager';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
+import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
+import { ICometTrackingUrlEvents } from 'Parsers/CometCampaignParser';
 
 class TestRequestApi extends RequestApi {
 
@@ -133,5 +135,39 @@ describe('ThirdPartyEventManagerTest', () => {
         thirdPartyEventManager.sendEvent('eventName', 'sessionId', urlTemplate);
         assert(requestSpy.calledOnce, 'request get should\'ve been called');
         assert.equal(requestSpy.getCall(0).args[0], 'http://foo.biz/12345/123', 'Should have replaced %SDK_VERSION% from the url');
+    });
+
+    describe('Sending Performance Tracking Urls', () => {
+
+        let campaign: PerformanceCampaign;
+        let sendEventStub: sinon.SinonSpy;
+
+        beforeEach(() => {
+            campaign = TestFixtures.getCampaign();
+            sendEventStub = sinon.spy(thirdPartyEventManager, 'sendEvent');
+        });
+
+        // Currently sent events - append if more events are added
+        [
+            ICometTrackingUrlEvents.START,
+            ICometTrackingUrlEvents.CLICK,
+            ICometTrackingUrlEvents.FIRST_QUARTILE,
+            ICometTrackingUrlEvents.MIDPOINT,
+            ICometTrackingUrlEvents.THIRD_QUARTILE,
+            ICometTrackingUrlEvents.ERROR,
+            ICometTrackingUrlEvents.LOADED,
+            ICometTrackingUrlEvents.COMPLETE,
+            ICometTrackingUrlEvents.SKIP
+        ].forEach((event) =>
+            it(`should send the tracking event: ${event}`, () => {
+                return thirdPartyEventManager.sendPerformanceTrackingEvent(campaign, event).then(() => {
+                    sinon.assert.calledWith(sendEventStub, event, campaign.getSession().getId(), campaign.getTrackingUrls()[event][0]);
+                });
+            })
+        );
+
+        afterEach(() => {
+            sendEventStub.restore();
+        });
     });
 });

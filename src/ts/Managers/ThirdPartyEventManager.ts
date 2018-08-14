@@ -8,8 +8,6 @@ import { ICometTrackingUrlEvents } from 'Parsers/CometCampaignParser';
 import { Campaign } from 'Models/Campaign';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { Diagnostics } from 'Utilities/Diagnostics';
-import { resolve } from 'dns';
-import { PromoCampaignParser } from 'Parsers/PromoCampaignParser';
 
 export class ThirdPartyEventManager {
 
@@ -81,10 +79,10 @@ export class ThirdPartyEventManager {
     }
 
     public sendPerformanceTrackingEvent(campaign: Campaign, event: ICometTrackingUrlEvents): Promise<void> {
-        return new Promise(() => {
+        return new Promise((resolve) => {
             if (campaign instanceof PerformanceCampaign) {
                 const urls = campaign.getTrackingUrls()[event];
-                if (urls && Object.keys(urls).length !== 0) {
+                if (urls && Object.keys(urls).length !== 0) { // Currently to protect against the FAB dependency on static performance configurations not including the tracking URLs
                     for (const url of urls) {
                         if (url && Url.isValid(url)) {
                             this.sendEvent(event, campaign.getSession().getId(), url);
@@ -98,6 +96,7 @@ export class ThirdPartyEventManager {
                     }
                 }
             }
+            resolve();
         });
     }
 
