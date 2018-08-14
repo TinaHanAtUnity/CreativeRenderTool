@@ -32,6 +32,15 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
     opacity: 1;
   }
 
+  &.fade-in .skip-button,
+  .skip-button {
+    display: none;
+  }
+
+  &.fade-in .show-skip-button {
+    display: block;
+  }
+
   .button {
     width: $new-video-overlay-styles.touchable-area-width;
     height: $new-video-overlay-styles.touchable-area-height;
@@ -140,14 +149,6 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
     }
   }
   
-  .skip-button .icon {
-    opacity: .5;
-  }
-
-  .skip-button-enabled .icon {
-    opacity: 1;
-  }
-
   .call-button {
     display: none;
     transform: translateX(100%);
@@ -224,13 +225,11 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
     left: $new-video-overlay-styles.base-size * .5;
     width: $new-video-overlay-styles.base-size * .9;
     height: $new-video-overlay-styles.base-size * .9;
-    border: 1px solid $white;
-    border-radius: 50%;
     line-height: $new-video-overlay-styles.base-size * .92;
   }
 
   .timer {
-    font-size: $new-video-overlay-styles.base-size * .4;
+    font-size: $new-video-overlay-styles.base-size * .5;
   }
   
 
