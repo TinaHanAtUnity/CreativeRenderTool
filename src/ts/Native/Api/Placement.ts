@@ -12,6 +12,10 @@ export class PlacementApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setDefaultPlacement', [placementId]);
     }
 
+    public setDefaultBannerPlacement(placementId: string): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._apiClass, 'setDefaultBannerPlacement', [placementId]);
+    }
+
     public setPlacementState(placementId: string, placementState: PlacementState): Promise<void> {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setPlacementState', [placementId, PlacementState[placementState]]);
     }

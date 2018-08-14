@@ -1,4 +1,9 @@
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
+import { BannerAdUnitParametersFactory } from 'AdTypes/Banner/AdUnits/BannerAdUnitParametersFactory';
+import { BannerAdContext } from 'AdTypes/Banner/Context/BannerAdContext';
+import { BannerCampaignManager } from 'AdTypes/Banner/Managers/BannerCampaignManager';
+import { BannerPlacementManager } from 'AdTypes/Banner/Managers/BannerPlacementManager';
+import { AuctionRequest } from 'AdTypes/Banner/Utilities/AuctionRequest';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { AdUnitFactory } from 'AdUnits/AdUnitFactory';
 import { Activity } from 'AdUnits/Containers/Activity';
@@ -61,6 +66,9 @@ import { INativeResponse, Request } from 'Utilities/Request';
 import { Resolve } from 'Utilities/Resolve';
 import { SdkStats } from 'Utilities/SdkStats';
 import { TestEnvironment } from 'Utilities/TestEnvironment';
+import { BannerWebPlayerContainer } from 'Utilities/WebPlayer/BannerWebPlayerContainer';
+import { InterstitialWebPlayerContainer } from 'Utilities/WebPlayer/InterstitialWebPlayerContainer';
+import { WebPlayerContainer } from 'Utilities/WebPlayer/WebPlayerContainer';
 import { Overlay } from 'Views/Overlay';
 
 export class WebView {
@@ -91,6 +99,7 @@ export class WebView {
     private _missedImpressionManager: MissedImpressionManager;
     private _gdprManager: GdprManager;
     private _jaegerManager: JaegerManager;
+    private _interstitialWebPlayerContainer: WebPlayerContainer;
     private _programmaticTrackingService: ProgrammaticTrackingService;
     private _forceQuitManager: ForceQuitManager;
 
@@ -105,6 +114,7 @@ export class WebView {
     private _wasRealtimePlacement: boolean = false;
 
     private _cachedCampaignResponse: INativeResponse | undefined;
+    private _bannerAdContext: BannerAdContext;
 
     constructor(nativeBridge: NativeBridge) {
         this._nativeBridge = nativeBridge;
@@ -146,6 +156,7 @@ export class WebView {
             this._adMobSignalFactory = new AdMobSignalFactory(this._nativeBridge, this._clientInfo, this._deviceInfo, this._focusManager);
             this._jaegerManager = new JaegerManager(this._request);
             this._jaegerManager.addOpenSpan(jaegerInitSpan);
+            this._interstitialWebPlayerContainer = new InterstitialWebPlayerContainer(this._nativeBridge);
 
             HttpKafka.setRequest(this._request);
             HttpKafka.setClientInfo(this._clientInfo);
@@ -261,8 +272,15 @@ export class WebView {
 
             this._assetManager = new AssetManager(this._cache, this._configuration.getCacheMode(), this._deviceInfo, this._cacheBookkeeping, this._nativeBridge);
             this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._adMobSignalFactory, this._request, this._clientInfo, this._deviceInfo, this._metadataManager, this._cacheBookkeeping, this._jaegerManager);
-
             this._refreshManager = new OldCampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration, this._focusManager, this._sessionManager, this._clientInfo, this._request, this._cache);
+
+            const bannerPlacementManager = new BannerPlacementManager(this._nativeBridge, this._configuration);
+            bannerPlacementManager.sendBannersReady();
+
+            const bannerCampaignManager = new BannerCampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._adMobSignalFactory, this._request, this._clientInfo, this._deviceInfo, this._metadataManager, this._jaegerManager);
+            const bannerWebPlayerContainer = new BannerWebPlayerContainer(this._nativeBridge);
+            const bannerAdUnitParametersFactory = new BannerAdUnitParametersFactory(this._nativeBridge, this._request, this._metadataManager, this._configuration, this._container, this._deviceInfo, this._clientInfo, this._sessionManager, this._focusManager, this._analyticsManager, this._adMobSignalFactory, this._gdprManager, bannerWebPlayerContainer, this._programmaticTrackingService);
+            this._bannerAdContext = new BannerAdContext(this._nativeBridge, bannerAdUnitParametersFactory, bannerCampaignManager, bannerPlacementManager, this._focusManager, this._deviceInfo);
 
             SdkStats.initialize(this._nativeBridge, this._request, this._configuration, this._sessionManager, this._campaignManager, this._metadataManager, this._clientInfo);
 
@@ -403,6 +421,22 @@ export class WebView {
         }
     }
 
+    public showBanner(placementId: string, callback: INativeCallback) {
+        callback(CallbackStatus.OK);
+
+        const context = this._bannerAdContext;
+        context.load(placementId).catch((e) => {
+            this._nativeBridge.Sdk.logWarning(`Could not show banner due to ${e.message}`);
+        });
+    }
+
+    public hideBanner(callback: INativeCallback) {
+        callback(CallbackStatus.OK);
+
+        const context = this._bannerAdContext;
+        context.hide();
+    }
+
     private showAd(placement: Placement, campaign: Campaign, options: any) {
         const testGroup = this._configuration.getAbGroup();
         const start = Date.now();
@@ -457,7 +491,8 @@ export class WebView {
                 options: options,
                 gdprManager: this._gdprManager,
                 adMobSignalFactory: this._adMobSignalFactory,
-                programmaticTrackingService: this._programmaticTrackingService
+                programmaticTrackingService: this._programmaticTrackingService,
+                webPlayerContainer: this._interstitialWebPlayerContainer
             });
             this._refreshManager.setCurrentAdUnit(this._currentAdUnit);
             this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());
@@ -560,6 +595,7 @@ export class WebView {
                 ConfigManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
                 ProgrammaticOperativeEventManager.setTestBaseUrl(TestEnvironment.get('serverUrl'));
                 CampaignManager.setBaseUrl(TestEnvironment.get('serverUrl'));
+                AuctionRequest.setBaseUrl(TestEnvironment.get('serverUrl'));
             }
 
             if(TestEnvironment.get('configUrl')) {

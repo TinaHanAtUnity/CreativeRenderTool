@@ -21,7 +21,11 @@ export class Promises {
         });
     }
 
-    public static voidResult(promise: Promise<any>): Promise<void> {
+    /**
+     * Converts a Promise<T> to Promise<void> because sometimes TypeScript types are a little
+     * too strict.
+     */
+    public static voidResult<T>(promise: Promise<T>): Promise<void> {
         return promise.then(() => {return;});
     }
 }
