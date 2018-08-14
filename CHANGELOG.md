@@ -1,3 +1,7 @@
+# Pending
+
+* Add tracking URL events for Performance Campaigns
+
 # Tue Aug 14 20:02:05 UTC 2018
 
 * Send a diagnostic event if the mraid creation fails
