@@ -81,14 +81,15 @@ export class ThirdPartyEventManager {
     public sendPerformanceTrackingEvent(campaign: Campaign, event: ICometTrackingUrlEvents): Promise<void> {
         return new Promise((resolve) => {
             if (campaign instanceof PerformanceCampaign) {
-                const urls = campaign.getTrackingUrls()[event];
-                if (urls && Object.keys(urls).length !== 0) { // Currently to protect against the FAB dependency on static performance configurations not including the tracking URLs
-                    for (const url of urls) {
-                        if (url && Url.isValid(url)) {
-                            this.sendEvent(event, campaign.getSession().getId(), url);
+                const urls = campaign.getTrackingUrls();
+                // Object.keys... is Currently to protect against the integration tests FAB dependency on static performance configurations not including the tracking URLs
+                if (urls && urls[event] && Object.keys(urls[event]).length !== 0) {
+                    for (const eventUrl of urls[event]) {
+                        if (eventUrl && Url.isValid(eventUrl)) {
+                            this.sendEvent(event, campaign.getSession().getId(), eventUrl);
                         } else {
                             const error = {
-                                url: url,
+                                eventUrl: eventUrl,
                                 event: event
                             };
                             Diagnostics.trigger('invalid_tracking_url', error, campaign.getSession());

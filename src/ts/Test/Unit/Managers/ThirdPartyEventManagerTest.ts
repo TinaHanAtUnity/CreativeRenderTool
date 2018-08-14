@@ -147,7 +147,7 @@ describe('ThirdPartyEventManagerTest', () => {
             sendEventStub = sinon.spy(thirdPartyEventManager, 'sendEvent');
         });
 
-        // Currently sent events - append if more events are added
+        // Currently used events
         [
             ICometTrackingUrlEvents.START,
             ICometTrackingUrlEvents.CLICK,
@@ -162,6 +162,24 @@ describe('ThirdPartyEventManagerTest', () => {
             it(`should send the tracking event: ${event}`, () => {
                 return thirdPartyEventManager.sendPerformanceTrackingEvent(campaign, event).then(() => {
                     sinon.assert.calledWith(sendEventStub, event, campaign.getSession().getId(), campaign.getTrackingUrls()[event][0]);
+                }).catch(() => {
+                    assert.fail(`Tracking url was not sent for event: ${event}`);
+                });
+            })
+        );
+
+        // Currently unused events
+        [
+            ICometTrackingUrlEvents.IMPRESSION,
+            ICometTrackingUrlEvents.ENDCARD_CLICK,
+            ICometTrackingUrlEvents.STALLED,
+            ICometTrackingUrlEvents.SHOW
+        ].forEach((event) =>
+            it(`should not send the tracking event: ${event}`, () => {
+                return thirdPartyEventManager.sendPerformanceTrackingEvent(campaign, event).then(() => {
+                    assert.fail(`Tracking url was sent for ${event}`);
+                }).catch(() => {
+                    // Pass
                 });
             })
         );
