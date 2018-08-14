@@ -1,4 +1,4 @@
-import { NativeApi } from 'Native/NativeApi';
+import { ApiPackage, NativeApi } from 'Native/NativeApi';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Observable2 } from 'Utilities/Observable';
 
@@ -15,7 +15,7 @@ export class IosPermissionsApi extends NativeApi {
     public readonly onPermissionsResult = new Observable2<string, boolean>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Permissions');
+        super(nativeBridge, 'Permissions', ApiPackage.CORE);
     }
 
     public checkPermission(permission: IosPermission): Promise<boolean> {

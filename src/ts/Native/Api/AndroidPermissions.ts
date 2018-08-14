@@ -1,4 +1,4 @@
-import { NativeApi } from 'Native/NativeApi';
+import { ApiPackage, NativeApi } from 'Native/NativeApi';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Observable1, Observable3 } from 'Utilities/Observable';
 
@@ -17,7 +17,7 @@ export class AndroidPermissionsApi extends NativeApi {
     public readonly onPermissionsError = new Observable1<string>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Permissions');
+        super(nativeBridge, 'Permissions', ApiPackage.AR);
     }
 
     public getPermissions(): Promise<string[]> {

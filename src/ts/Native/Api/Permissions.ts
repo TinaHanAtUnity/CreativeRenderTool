@@ -1,4 +1,4 @@
-import { NativeApi } from 'Native/NativeApi';
+import { ApiPackage, NativeApi } from 'Native/NativeApi';
 import { NativeBridge } from 'Native/NativeBridge';
 import { AndroidPermissionsApi } from 'Native/Api/AndroidPermissions';
 import { Platform } from 'Constants/Platform';
@@ -9,11 +9,10 @@ export class PermissionsApi extends NativeApi {
     public Ios: IosPermissionsApi;
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Permissions');
+        super(nativeBridge, 'Permissions', ApiPackage.AR);
 
         if (nativeBridge.getPlatform() === Platform.ANDROID) {
-            // TODO: uncomment when Android SDK has permission support
-            // this.Android = new AndroidPermissionsApi(nativeBridge);
+            this.Android = new AndroidPermissionsApi(nativeBridge);
         } else if(nativeBridge.getPlatform() === Platform.IOS) {
             this.Ios = new IosPermissionsApi(nativeBridge);
         }

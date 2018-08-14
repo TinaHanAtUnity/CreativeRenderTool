@@ -1,4 +1,4 @@
-import { NativeApi } from 'Native/NativeApi';
+import { ApiPackage, NativeApi } from 'Native/NativeApi';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Observable0, Observable1, Observable2 } from 'Utilities/Observable';
 import { ARUtil, IARFrameInfo, IARFrameScale, IARPoint, IARRect, IARSize } from 'Utilities/ARUtil';
@@ -69,7 +69,7 @@ export class ARApi extends NativeApi {
     public readonly onAndroidEnumsReceived = new Observable1<any>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'AR');
+        super(nativeBridge, 'AR', ApiPackage.AR);
     }
 
     public isARSupported(): Promise<boolean> {

@@ -1,9 +1,9 @@
-import { NativeApi } from 'Native/NativeApi';
+import { ApiPackage, NativeApi } from 'Native/NativeApi';
 import { NativeBridge } from 'Native/NativeBridge';
 
 export class MainBundleApi extends NativeApi {
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'MainBundle');
+        super(nativeBridge, 'MainBundle', ApiPackage.AR);
     }
 
     public getDataForKeysContaining(containsString: string): Promise<{ [key: string]: any }> {
