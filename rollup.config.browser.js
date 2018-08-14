@@ -1,10 +1,10 @@
 import plugins from './rollup.plugins';
 
 export default {
-    input: 'build/src/ts/Device.js',
+    input: 'build/src/ts/Browser.js',
     output: {
-        name: 'Device',
-        file: 'build/src/ts/Bundle.js',
+        name: 'Browser',
+        file: 'build/src/ts/BrowserBundle.js',
         format: 'iife',
         interop: false,
         sourcemap: 'inline'

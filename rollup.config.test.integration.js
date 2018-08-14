@@ -2,10 +2,10 @@ import plugins from './rollup.plugins';
 import istanbul from 'rollup-plugin-istanbul';
 
 export default {
-    input: 'build/test/All.js',
+    input: 'build/test/Integration.js',
     output: {
-        name: 'Test',
-        file: 'build/test/Bundle.js',
+        name: 'Integration',
+        file: 'build/test/IntegrationBundle.js',
         format: 'iife',
         interop: false,
         globals: {

@@ -1,6 +1,12 @@
 const fs = require('fs');
 const puppeteer = require('puppeteer');
 
+if(process.argv.length < 3 || !process.argv[2]) {
+    throw new Error('Missing bundle path');
+}
+const bundle = process.argv[2];
+const coverage = process.argv[3];
+
 (async () => {
     const browser = await puppeteer.launch({
         args: ['--no-sandbox']
@@ -28,23 +34,28 @@ const puppeteer = require('puppeteer');
             console.dir(message);
         }
     });
-    page.exposeFunction('writeCoverage', (coverage) => {
-        fs.writeFileSync('build/coverage/coverage.json', coverage);
-    });
+    if(coverage) {
+        page.exposeFunction('writeCoverage', (coverage) => {
+            fs.writeFileSync('build/coverage/coverage.json', coverage);
+        });
+    }
     const result = new Promise((resolve) => {
         page.exposeFunction('result', (failures) => {
             resolve(failures);
         });
     });
-    page.on('domcontentloaded', () => {
-        page.evaluate(() => {
-            mocha.run((failures) => {
+    await page.goto('http://localhost:8000/src/test-index.html');
+    await page.addScriptTag({
+        url: bundle
+    });
+    page.evaluate(() => {
+        mocha.run((failures) => {
+            if(window.writeCoverage && __coverage__) {
                 window.writeCoverage(JSON.stringify(__coverage__));
-                window.result(failures);
-            });
+            }
+            window.result(failures);
         });
     });
-    await page.goto('http://localhost:8000/src/test-index.html');
     console.log(await result);
     await browser.close();
 })();

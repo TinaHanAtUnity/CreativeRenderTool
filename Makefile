@@ -5,13 +5,11 @@ MAKEFLAGS += -rR
 # Binaries
 
 BIN := node_modules/.bin
-CONCURRENTLY := $(BIN)/concurrently
 TYPESCRIPT := $(BIN)/tsc
-MOCHA := $(BIN)/_mocha
+REMAP_ISTANBUL := $(BIN)/remap-istanbul
 TSLINT := $(BIN)/tslint
 STYLUS := $(BIN)/stylus
 ROLLUP := $(BIN)/rollup
-NYC := $(BIN)/nyc
 STYLINT := $(BIN)/stylint
 PBJS := $(BIN)/pbjs
 PBTS := $(BIN)/pbts
@@ -28,7 +26,9 @@ TEST_BUILD_DIR := $(BUILD_DIR)/$(TEST_DIR)
 # Sources
 
 SOURCES := $(shell find $(SOURCE_DIR) -type f -not -name '*.d.ts')
-TESTS := $(shell find $(TEST_DIR) -type f -name '*Test.ts' -and -not -name '*.d.ts')
+
+UNIT_TESTS := $(shell find $(TEST_DIR)/Unit -type f -name '*Test.ts' -and -not -name '*.d.ts')
+INTEGRATION_TESTS := $(shell find $(TEST_DIR)/Integration -type f -name '*Test.ts' -and -not -name '*.d.ts')
 
 # Targets
 
@@ -39,24 +39,32 @@ TARGETS := $(addprefix $(BUILD_DIR)/, \
 TARGETS += build/src/proto/unity_proto.js
 TARGETS += build/src/html/admob/AFMAContainer.html
 
-TEST_TARGETS := $(addprefix $(BUILD_DIR)/, $(patsubst %.ts, %.js, $(filter %.ts, $(TESTS))))
+UNIT_TEST_TARGETS := $(addprefix $(BUILD_DIR)/, $(patsubst %.ts, %.js, $(filter %.ts, $(UNIT_TESTS))))
+INTEGRATION_TEST_TARGETS := $(addprefix $(BUILD_DIR)/, $(patsubst %.ts, %.js, $(filter %.ts, $(INTEGRATION_TESTS))))
 
 # Built-in targets
 
-.PHONY: all test test-coverage release clean lint setup watch start-server
+.PHONY: all test test-unit test-integration test-coverage release clean lint setup watch start-server
 .NOTPARALLEL: $(TARGETS) $(TEST_TARGETS)
 
 # Main targets
 
 all: $(TARGETS) $(TEST_TARGETS)
-	@$(ROLLUP) --config
 
-test: build/test/Bundle.js start-server
+test: test-unit test-integration
+
+test-unit: $(TARGETS) build/test/UnitBundle.js
+	@node test-utils/headless_runner.js /build/test/UnitBundle.js
+
+test-integration: $(TARGETS) build/test/IntegrationBundle.js
+	@node test-utils/headless_runner.js /build/test/IntegrationBundle.js
+
+test-coverage: $(TARGETS) build/test/UnitBundle.js
 	@mkdir -p build/coverage
-	@node test-utils/headless_runner.js
-
-test-coverage: all
-	@NODE_PATH=$(SOURCE_BUILD_DIR):$(SOURCE_BUILD_DIR)/ts:$(TEST_BUILD_DIR) $(NYC) $(MOCHA) --opts .mocha.opts $(TEST_TARGETS)
+	@node test-utils/headless_runner.js /build/test/UnitBundle.js true
+	@$(REMAP_ISTANBUL) -i build/coverage/coverage.json -o build/coverage -t html
+	@$(REMAP_ISTANBUL) -i build/coverage/coverage.json -o build/coverage/summary -t text-summary
+	@cat build/coverage/summary && echo "\n"
 
 release: all
 	@$(CC) $(shell cat .cc.opts | xargs) --js $(SOURCE_BUILD_DIR)/ts/Bundle.js --js_output_file $(SOURCE_BUILD_DIR)/ts/Bundle.min.js
@@ -69,6 +77,9 @@ release: all
 		var j=fs.readFileSync('$(SOURCE_BUILD_DIR)/ts/Bundle.min.js', o);\
 		var i=fs.readFileSync('build/release/index.html', o);\
 		fs.writeFileSync('build/release/index.html', i.replace('{COMPILED_CSS}', s).replace('{COMPILED_JS}', j), o);"
+
+browser: all
+	@$(ROLLUP) --config rollup.config.browser.js
 
 # VPaths
 
@@ -106,11 +117,17 @@ $(SOURCE_BUILD_DIR)/styl/%.css: %.styl
 $(TEST_BUILD_DIR)/%.js: %.ts
 	@$(TYPESCRIPT) --project tsconfig.json
 
-$(TEST_BUILD_DIR)/All.js: all
-	@echo $(TESTS) | sed "s/test\\//require('/g" | sed "s/\.ts/');/g" > $@
+$(TEST_BUILD_DIR)/Unit.js: $(UNIT_TEST_TARGETS)
+	@echo $(UNIT_TESTS) | sed "s/test\\//import '/g" | sed "s/\.ts/';/g" > $@
 
-$(TEST_BUILD_DIR)/Bundle.js: $(TEST_BUILD_DIR)/All.js
-	@$(ROLLUP) --config rollup.config.test.js
+$(TEST_BUILD_DIR)/UnitBundle.js: $(TEST_BUILD_DIR)/Unit.js
+	@$(ROLLUP) --config rollup.config.test.unit.js
+
+$(TEST_BUILD_DIR)/Integration.js: $(INTEGRATION_TEST_TARGETS)
+	@echo $(INTEGRATION_TESTS) | sed "s/test\\//import '/g" | sed "s/\.ts/';/g" > $@
+
+$(TEST_BUILD_DIR)/IntegrationBundle.js: $(TEST_BUILD_DIR)/Integration.js
+	@$(ROLLUP) --config rollup.config.test.integration.js
 
 %::
 	$(warning No rule specified for target "$@")

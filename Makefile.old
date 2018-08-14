@@ -207,7 +207,7 @@ build-js:
 	@echo Bundling .js files
 	@echo
 
-	$(ROLLUP) -c rollup.config.js
+	$(ROLLUP) -c rollup.config.device.js
 	$(CC) --js $(BUILD_DIR)/bundle.js --js_output_file $(BUILD_DIR)/bundle.min.js --formatting PRETTY_PRINT --assume_function_wrapper --rewrite_polyfills false
 
 build-css:
