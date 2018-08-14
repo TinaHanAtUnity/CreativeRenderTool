@@ -1,4 +1,4 @@
-import plugins from './rollup.plugins';
+import plugins from './rollup.config.plugins';
 import istanbul from 'rollup-plugin-istanbul';
 
 export default {
@@ -23,5 +23,10 @@ export default {
     external: [
         'mocha',
         'chai'
-    ]
+    ],
+    watch: {
+        chokidar: true,
+        include: 'build/**',
+        clearScreen: false
+    }
 }

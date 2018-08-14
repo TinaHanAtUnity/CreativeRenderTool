@@ -152,8 +152,10 @@ setup: clean
 	@rm -rf node_modules
 	@npm install
 
-watch:
-	@$(TSC) --project tsconfig.json --watch
+watch: all
+	parallel --ungroup --tty --jobs 0 ::: \
+		"$(TYPESCRIPT) --project tsconfig.json --watch --preserveWatchOutput" \
+		"$(ROLLUP) --watch --config rollup.config.all.js"
 
 start-server:
 	@python3 -m http.server 8000 & echo $$! > server.pid

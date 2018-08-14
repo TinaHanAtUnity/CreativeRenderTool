@@ -1,4 +1,4 @@
-import plugins from './rollup.plugins';
+import plugins from './rollup.config.plugins';
 
 export default {
     input: 'build/src/ts/Device.js',
@@ -9,5 +9,10 @@ export default {
         interop: false,
         sourcemap: 'inline'
     },
-    plugins: plugins
+    plugins: plugins,
+    watch: {
+        chokidar: true,
+        include: 'build/src/**',
+        clearScreen: false
+    }
 }
