@@ -473,7 +473,12 @@ export class WebView {
                         });
                         this._currentAdUnit.onClose.subscribe(() => {
                             this._nativeBridge.AppSheet.onClose.unsubscribe(onCloseObserver);
-                            this._nativeBridge.AppSheet.destroy(appSheetOptions);
+                            if(CustomFeatures.isSimejiJapaneseKeyboardApp(this._clientInfo.getGameId())) {
+                                // app sheet is not closed properly if the user opens or downloads the game. Reset the app sheet.
+                                this._nativeBridge.AppSheet.destroy();
+                            } else {
+                                this._nativeBridge.AppSheet.destroy(appSheetOptions);
+                            }
                         });
                     });
                 }
@@ -600,6 +605,10 @@ export class WebView {
 
             if(TestEnvironment.get('forcedOrientation')) {
                 AdUnitContainer.setForcedOrientation(TestEnvironment.get('forcedOrientation'));
+            }
+
+            if(TestEnvironment.get('forcedPlayableMRAID')) {
+                AdUnitFactory.setForcedPlayableMRAID(TestEnvironment.get('forcedPlayableMRAID'));
             }
 
             if(TestEnvironment.get('creativeUrl')) {

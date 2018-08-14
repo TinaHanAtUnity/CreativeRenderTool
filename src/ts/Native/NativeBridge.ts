@@ -29,6 +29,7 @@ import { PurchasingApi } from 'Native/Api/Purchasing';
 import { PermissionsApi } from 'Native/Api/Permissions';
 import { MainBundleApi } from 'Native/Api/MainBundle';
 import { ARApi } from 'Native/Api/AR';
+import { AdsPropertiesApi } from 'Native/Api/AdsProperties';
 
 export enum CallbackStatus {
     OK,
@@ -78,6 +79,7 @@ export class NativeBridge implements INativeBridge {
     public WebPlayer: WebPlayerApi;
     public Permissions: PermissionsApi;
     public MainBundle: MainBundleApi;
+    public AdsProperties: AdsPropertiesApi;
 
     private _callbackId: number = 1;
     private _callbackTable: {[key: number]: CallbackContainer<any>} = {};
@@ -127,6 +129,7 @@ export class NativeBridge implements INativeBridge {
         this.WebPlayer = new WebPlayerApi(this);
         this.Permissions = new PermissionsApi(this);
         this.MainBundle = new MainBundleApi(this);
+        this.AdsProperties = new AdsPropertiesApi(this);
     }
 
     public registerCallback<T>(resolve: (value?: T | PromiseLike<T>) => void, reject: (reason?: any) => void): number {

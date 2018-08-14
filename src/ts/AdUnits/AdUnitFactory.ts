@@ -74,6 +74,7 @@ import { NewVideoOverlay } from 'Views/NewVideoOverlay';
 import { IEndScreenParameters } from 'Views/EndScreen';
 
 export class AdUnitFactory {
+    private static _forcedPlayableMRAID: boolean = false;
 
     public static createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractAdUnit {
 
@@ -99,6 +100,10 @@ export class AdUnitFactory {
         } else {
             throw new Error('Unknown campaign instance type');
         }
+    }
+
+    public static setForcedPlayableMRAID(value: boolean) {
+        AdUnitFactory._forcedPlayableMRAID = value;
     }
 
     private static createPerformanceAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PerformanceCampaign>): PerformanceAdUnit {
@@ -273,7 +278,7 @@ export class AdUnitFactory {
         const isMRAIDAR = parameters.campaign.getAdType() === 'MRAID-AR' || ARUtil.isARCreative(parameters.campaign);
         // TODO: Remove /ar/ folder check once we have MRAID-AR type support on the server side
         const isPlayable = (resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) || isMRAIDAR;
-        if(isPlayable) {
+        if(isPlayable || AdUnitFactory._forcedPlayableMRAID) {
             mraid = new PlayableMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner, parameters.configuration.getAbGroup());
         } else {
             mraid = new MRAID(nativeBridge, parameters.placement, parameters.campaign, privacy, showGDPRBanner);

@@ -1,4 +1,15 @@
-# Staged
+# Pending
+
+* Send a diagnostic event if the mraid creation fails
+* Reset the app sheet when closing the ad unit
+* Merge out changes related to modularization refactoring
+* Fix tests if XHRequest is used to fetch MRAIDs
+
+# Thu Aug  9 23:04:44 UTC 2018
+
+* Send creativeView tracking event for companionAd using Vast model api
+
+# Wed Aug  8 08:40:08 UTC 2018
 
 * Destroy Forcequit Key only after container cleanly closes
 * Remove ComScore Completely

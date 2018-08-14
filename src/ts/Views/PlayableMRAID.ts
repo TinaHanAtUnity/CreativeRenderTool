@@ -171,6 +171,12 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 this._deviceorientationListener = (event: DeviceOrientationEvent) => this.handleDeviceOrientation(event);
                 window.addEventListener('deviceorientation', this._deviceorientationListener, false);
             }
+        }).catch((err) => {
+            this._nativeBridge.Sdk.logError('failed to create mraid: ' + err);
+
+            Diagnostics.trigger('create_mraid_error', {
+                message: err.message
+            }, this._campaign.getSession());
         });
 
         this._messageListener = (event: MessageEvent) => this.onMessage(event);
@@ -273,6 +279,11 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         const frameLoadDuration = Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId());
         this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' iframe load duration ' + frameLoadDuration + ' ms');
+
+        const timeFromShow = this.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
+        const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
+
+        this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(frameLoadDuration, 0, 0, 'mraid_loading_time_playable', {}));
     }
 
     private handleDeviceOrientation(event: DeviceOrientationEvent) {

@@ -1,4 +1,4 @@
-import { NativeApi } from 'Native/NativeApi';
+import { ApiPackage, NativeApi } from 'Native/NativeApi';
 import { NativeBridge } from 'Native/NativeBridge';
 import { AndroidDeviceInfoApi } from 'Native/Api/AndroidDeviceInfo';
 import { IosDeviceInfoApi } from 'Native/Api/IosDeviceInfo';
@@ -9,7 +9,7 @@ export class DeviceInfoApi extends NativeApi {
     public Ios: IosDeviceInfoApi;
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'DeviceInfo');
+        super(nativeBridge, 'DeviceInfo', ApiPackage.CORE);
 
         if(nativeBridge.getPlatform() === Platform.IOS) {
             this.Ios = new IosDeviceInfoApi(nativeBridge);
@@ -19,49 +19,49 @@ export class DeviceInfoApi extends NativeApi {
     }
 
     public getAdvertisingTrackingId(): Promise<string> {
-        return this._nativeBridge.invoke<string>(this._apiClass, 'getAdvertisingTrackingId');
+        return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getAdvertisingTrackingId');
     }
 
     public getLimitAdTrackingFlag(): Promise<boolean> {
-        return this._nativeBridge.invoke<boolean>(this._apiClass, 'getLimitAdTrackingFlag');
+        return this._nativeBridge.invoke<boolean>(this._fullApiClassName, 'getLimitAdTrackingFlag');
     }
 
     public getOsVersion(): Promise<string> {
-        return this._nativeBridge.invoke<string>(this._apiClass, 'getOsVersion');
+        return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getOsVersion');
     }
 
     public getModel(): Promise<string> {
-        return this._nativeBridge.invoke<string>(this._apiClass, 'getModel');
+        return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getModel');
     }
 
     public getScreenWidth(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this._apiClass, 'getScreenWidth');
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getScreenWidth');
     }
 
     public getScreenHeight(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this._apiClass, 'getScreenHeight');
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getScreenHeight');
     }
 
     public getTimeZone(dst: boolean): Promise<string> {
-        return this._nativeBridge.invoke<string>(this._apiClass, 'getTimeZone', [dst]);
+        return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getTimeZone', [dst]);
     }
 
     public getTimeZoneOffset(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this._apiClass, 'getTimeZoneOffset');
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getTimeZoneOffset');
     }
 
     public getConnectionType(): Promise<string> {
-        return this._nativeBridge.invoke<string>(this._apiClass, 'getConnectionType');
+        return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getConnectionType');
     }
 
     public getNetworkType(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this._apiClass, 'getNetworkType');
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getNetworkType');
     }
 
     public getNetworkOperator(): Promise<string> {
         // note: iOS device without a SIM card will return an empty reply instead of a string. This is a quick workaround.
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
-            return this._nativeBridge.invoke<string>(this._apiClass, 'getNetworkOperator').then(result => {
+            return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getNetworkOperator').then(result => {
                 if(typeof result === 'string') {
                     return result;
                 } else {
@@ -69,14 +69,14 @@ export class DeviceInfoApi extends NativeApi {
                 }
             });
         } else {
-            return this._nativeBridge.invoke<string>(this._apiClass, 'getNetworkOperator');
+            return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getNetworkOperator');
         }
     }
 
     public getNetworkOperatorName(): Promise<string> {
         // note: iOS device without a SIM card will return an empty reply instead of a string. This is a quick workaround.
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
-            return this._nativeBridge.invoke<string>(this._apiClass, 'getNetworkOperatorName').then(result => {
+            return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getNetworkOperatorName').then(result => {
                 if(typeof result === 'string') {
                     return result;
                 } else {
@@ -84,51 +84,51 @@ export class DeviceInfoApi extends NativeApi {
                 }
             });
         } else {
-            return this._nativeBridge.invoke<string>(this._apiClass, 'getNetworkOperatorName');
+            return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getNetworkOperatorName');
         }
     }
 
     public isRooted(): Promise<boolean> {
-        return this._nativeBridge.invoke<boolean>(this._apiClass, 'isRooted');
+        return this._nativeBridge.invoke<boolean>(this._fullApiClassName, 'isRooted');
     }
 
     public getUniqueEventId(): Promise<string> {
-        return this._nativeBridge.invoke<string>(this._apiClass, 'getUniqueEventId');
+        return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getUniqueEventId');
     }
 
     public getHeadset(): Promise<boolean> {
-        return this._nativeBridge.invoke<boolean>(this._apiClass, 'getHeadset');
+        return this._nativeBridge.invoke<boolean>(this._fullApiClassName, 'getHeadset');
     }
 
     public getSystemLanguage(): Promise<string> {
-        return this._nativeBridge.invoke<string>(this._apiClass, 'getSystemLanguage');
+        return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getSystemLanguage');
     }
 
     public getScreenBrightness(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this._apiClass, 'getScreenBrightness');
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getScreenBrightness');
     }
 
     public getBatteryLevel(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this._apiClass, 'getBatteryLevel');
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getBatteryLevel');
     }
 
     public getBatteryStatus(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this._apiClass, 'getBatteryStatus');
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getBatteryStatus');
     }
 
     public getFreeMemory(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this._apiClass, 'getFreeMemory');
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getFreeMemory');
     }
 
     public getTotalMemory(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this._apiClass, 'getTotalMemory');
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getTotalMemory');
     }
 
     public getGLVersion(): Promise<string> {
-        return this._nativeBridge.invoke<string>(this._apiClass, 'getGLVersion');
+        return this._nativeBridge.invoke<string>(this._fullApiClassName, 'getGLVersion');
     }
 
     public getCPUCount(): Promise<number> {
-        return this._nativeBridge.invoke<number>(this._apiClass, 'getCPUCount');
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'getCPUCount');
     }
 }
