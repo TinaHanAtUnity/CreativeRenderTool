@@ -26,40 +26,51 @@ TEST_BUILD_DIR := $(BUILD_DIR)/$(TEST_DIR)
 # Sources
 
 SOURCES := $(shell find $(SOURCE_DIR) -type f -not -name '*.d.ts')
+TS_SOURCES := $(filter %.ts, $(SOURCES))
+HTML_SOURCES := $(filter %.html, $(SOURCES))
+JSON_SOURCES := $(filter %.json, $(SOURCES))
+XML_SOURCES := $(filter %.xml, $(SOURCES))
 
+TESTS := $(shell find $(TEST_DIR) -type f -not -name '*.d.ts')
 UNIT_TESTS := $(shell find $(TEST_DIR)/Unit -type f -name '*Test.ts' -and -not -name '*.d.ts')
 INTEGRATION_TESTS := $(shell find $(TEST_DIR)/Integration -type f -name '*Test.ts' -and -not -name '*.d.ts')
 
 # Targets
 
-TARGETS := $(addprefix $(BUILD_DIR)/, \
-			$(patsubst %.ts, %.js, \
-			$(patsubst %.styl, %.css, \
-			$(filter %.ts %.html %.json %.xml %.styl, $(SOURCES)))))
-TARGETS += build/src/proto/unity_proto.js
-TARGETS += build/src/html/admob/AFMAContainer.html
+TS_TARGETS := $(addprefix $(BUILD_DIR)/, $(patsubst %.ts, %.js, $(TS_SOURCES)))
+TS_TARGETS += $(SOURCE_BUILD_DIR)/proto/unity_proto.js
 
-UNIT_TEST_TARGETS := $(addprefix $(BUILD_DIR)/, $(patsubst %.ts, %.js, $(filter %.ts, $(UNIT_TESTS))))
-INTEGRATION_TEST_TARGETS := $(addprefix $(BUILD_DIR)/, $(patsubst %.ts, %.js, $(filter %.ts, $(INTEGRATION_TESTS))))
+CSS_TARGETS := $(SOURCE_BUILD_DIR)/styl/main.css
+
+HTML_TARGETS := $(addprefix $(BUILD_DIR)/, $(HTML_SOURCES))
+HTML_TARGETS += $(SOURCE_BUILD_DIR)/html/admob/AFMAContainer.html
+
+JSON_TARGETS := $(addprefix $(BUILD_DIR)/, $(JSON_SOURCES))
+
+XML_TARGETS := $(addprefix $(BUILD_DIR)/, $(XML_SOURCES))
+
+TEST_TARGETS := $(addprefix $(BUILD_DIR)/, $(patsubst %.ts, %.js, $(TESTS)))
+UNIT_TEST_TARGETS := $(addprefix $(BUILD_DIR)/, $(patsubst %.ts, %.js, $(UNIT_TESTS)))
+INTEGRATION_TEST_TARGETS := $(addprefix $(BUILD_DIR)/, $(patsubst %.ts, %.js, $(INTEGRATION_TESTS)))
 
 # Built-in targets
 
-.PHONY: all test test-unit test-integration test-coverage release clean lint setup watch start-server
-.NOTPARALLEL: $(TARGETS) $(TEST_TARGETS)
+.PHONY: all test test-unit test-integration test-coverage release clean lint setup watch start-server stop-server
+.NOTPARALLEL: $(TS_TARGETS) $(TEST_TARGETS)
 
 # Main targets
 
-all: $(TARGETS) $(TEST_TARGETS)
+all: $(TS_TARGETS) $(CSS_TARGETS) $(HTML_TARGETS) $(JSON_TARGETS) $(XML_TARGETS) $(TEST_TARGETS)
 
 test: test-unit test-integration
 
-test-unit: $(TARGETS) build/test/UnitBundle.js
+test-unit: start-server all build/test/UnitBundle.js
 	@node test-utils/headless_runner.js /build/test/UnitBundle.js
 
-test-integration: $(TARGETS) build/test/IntegrationBundle.js
+test-integration: start-server all build/test/IntegrationBundle.js
 	@node test-utils/headless_runner.js /build/test/IntegrationBundle.js
 
-test-coverage: $(TARGETS) build/test/UnitBundle.js
+test-coverage: start-server all build/test/UnitBundle.js
 	@mkdir -p build/coverage
 	@node test-utils/headless_runner.js /build/test/UnitBundle.js true
 	@$(REMAP_ISTANBUL) -i build/coverage/coverage.json -o build/coverage -t html
@@ -143,7 +154,7 @@ $(filter %.css, $(TARGETS)): | $(SOURCE_BUILD_DIR)/styl
 # Helper targets
 
 clean:
-	@rm -rf $(BUILD_DIR)
+	@rm -rf $(BUILD_DIR)/*
 
 lint:
 	@$(TSLINT) --project tsconfig.json $(filter %.ts, $(SOURCES)) $(filter %.ts, $(TESTS))
@@ -158,7 +169,7 @@ watch: all
 		"$(ROLLUP) --watch --config rollup.config.all.js"
 
 start-server:
-	@python3 -m http.server 8000 & echo $$! > server.pid
+	@test ! -f server.pid && { nohup python3 -m http.server 8000 >/dev/null 2>&1 & echo $$! > server.pid; } || true
 
 stop-server:
-	@kill $$(cat server.pid)
+	@test -f server.pid && kill $$(cat server.pid) && rm server.pid || true
