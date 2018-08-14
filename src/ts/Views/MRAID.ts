@@ -3,7 +3,7 @@ import MRAIDContainer from 'html/mraid/container.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
-import { Observable0, Observable2 } from 'Utilities/Observable';
+import { Observable0 } from 'Utilities/Observable';
 import { Placement } from 'Models/Placement';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Platform } from 'Constants/Platform';
@@ -12,7 +12,7 @@ import { Template } from 'Utilities/Template';
 import { SdkStats } from 'Utilities/SdkStats';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
-import { ABGroup } from 'Models/ABGroup';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -42,8 +42,8 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
     private _backgroundTimestamp: number;
     private _creativeId: string | undefined;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup) {
-        super(nativeBridge, 'mraid', placement, campaign, privacy, showGDPRBanner, abGroup);
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
+        super(nativeBridge, 'mraid', placement, campaign, privacy, showGDPRBanner);
 
         this._placement = placement;
         this._campaign = campaign;
@@ -97,7 +97,13 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
             if (CustomFeatures.isSonicPlayable(this._creativeId)) {
                 iframe.sandbox = 'allow-scripts allow-same-origin';
             }
-        }).catch(e => this._nativeBridge.Sdk.logError('failed to create mraid: ' + e));
+        }).catch(e => {
+            this._nativeBridge.Sdk.logError('failed to create mraid: ' + e);
+
+            Diagnostics.trigger('create_mraid_error', {
+                message: e.message
+            }, this._campaign.getSession());
+        });
 
         this._messageListener = (event: MessageEvent) => this.onMessage(event);
         window.addEventListener('message', this._messageListener, false);
@@ -258,14 +264,6 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
             case 'open':
                 this._handlers.forEach(handler => handler.onMraidClick(event.data.url));
-                break;
-
-            case 'sendStats':
-                this.updateStats({
-                    totalTime: event.data.totalTime,
-                    playTime: event.data.playTime,
-                    frameCount: event.data.frameCount
-                });
                 break;
 
             case 'close':
