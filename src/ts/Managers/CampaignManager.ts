@@ -38,8 +38,6 @@ import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 import { ABGroup } from 'Models/ABGroup';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { MixedPlacementUtility } from 'Utilities/MixedPlacementUtility';
-import { HttpKafka, KafkaCommonObjectType } from 'Utilities/HttpKafka';
-import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 
 export class CampaignManager {
 
@@ -548,29 +546,11 @@ export class CampaignManager {
     }
 
     private setupCampaignAssets(placements: string[], campaign: Campaign, backupCampaign: boolean, contentType: string, session: Session): Promise<void> {
-        const cachingTimestamp = Date.now();
         return this._assetManager.setup(campaign).then(() => {
             if((this._sessionManager.getGameSessionId() % 1000 === 99) && backupCampaign === false) {
                 Diagnostics.trigger('ad_ready', {
                     contentType: contentType
                 }, session);
-            }
-
-            if (campaign instanceof MRAIDCampaign) {
-                const cachingDuration = Date.now() - cachingTimestamp;
-
-                const kafkaObject: any = {};
-                kafkaObject.type = 'mraid_caching_time';
-                kafkaObject.eventData = {
-                    contentType: contentType,
-                    cachingDuration: cachingDuration
-                };
-                kafkaObject.timeFromShow = 0;
-                kafkaObject.timeFromPlayableStart = 0;
-                kafkaObject.backgroundTime = 0;
-                kafkaObject.auctionId = campaign.getSession().getId();
-
-                HttpKafka.sendEvent('ads.sdk2.events.playable.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
             }
 
             for(const placement of placements) {
