@@ -128,28 +128,20 @@ $(SOURCE_BUILD_DIR)/styl/%.css: %.styl
 $(TEST_BUILD_DIR)/%.js: %.ts
 	@$(TYPESCRIPT) --project tsconfig.json
 
-$(TEST_BUILD_DIR)/Unit.js: $(UNIT_TEST_TARGETS)
+$(TEST_BUILD_DIR)/Unit.js:
 	@echo $(UNIT_TESTS) | sed "s/test\\//import '/g" | sed "s/\.ts/';/g" > $@
 
-$(TEST_BUILD_DIR)/UnitBundle.js: $(TEST_BUILD_DIR)/Unit.js
+$(TEST_BUILD_DIR)/UnitBundle.js: $(TEST_BUILD_DIR)/Unit.js $(UNIT_TEST_TARGETS)
 	@$(ROLLUP) --config rollup.config.test.unit.js
 
-$(TEST_BUILD_DIR)/Integration.js: $(INTEGRATION_TEST_TARGETS)
+$(TEST_BUILD_DIR)/Integration.js:
 	@echo $(INTEGRATION_TESTS) | sed "s/test\\//import '/g" | sed "s/\.ts/';/g" > $@
 
-$(TEST_BUILD_DIR)/IntegrationBundle.js: $(TEST_BUILD_DIR)/Integration.js
+$(TEST_BUILD_DIR)/IntegrationBundle.js: $(TEST_BUILD_DIR)/Integration.js $(INTEGRATION_TEST_TARGETS)
 	@$(ROLLUP) --config rollup.config.test.integration.js
 
 %::
 	$(warning No rule specified for target "$@")
-
-# Directory rules
-
-$(filter %.js, $(TARGETS)): | $(SOURCE_BUILD_DIR)/ts
-$(filter %.html, $(TARGETS)): | $(SOURCE_BUILD_DIR)/html
-$(filter %.xml, $(TARGETS)): | $(SOURCE_BUILD_DIR)/xml
-$(filter %.json, $(TARGERS)): | $(SOURCE_BUILD_DIR)/json
-$(filter %.css, $(TARGETS)): | $(SOURCE_BUILD_DIR)/styl
 
 # Helper targets
 
