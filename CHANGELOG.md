@@ -1,5 +1,6 @@
 # Pending
 
+* Send a diagnostic event if the mraid creation fails
 * Reset the app sheet when closing the ad unit
 * Merge out changes related to modularization refactoring
 * Fix tests if XHRequest is used to fetch MRAIDs
