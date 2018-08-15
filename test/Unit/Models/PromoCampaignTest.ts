@@ -3,7 +3,7 @@ import { assert } from 'chai';
 
 import DummyPromo from 'json/DummyPromoCampaign.json';
 import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('PromoCampaign', () => {
 

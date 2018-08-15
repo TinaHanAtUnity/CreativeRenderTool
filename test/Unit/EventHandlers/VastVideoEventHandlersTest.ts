@@ -13,7 +13,7 @@ import { DeviceInfo } from 'Models/DeviceInfo';
 import { Request } from 'Utilities/Request';
 import { IVastAdUnitParameters, VastAdUnit } from 'AdUnits/VastAdUnit';
 import { WakeUpManager } from 'Managers/WakeUpManager';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Overlay } from 'Views/Overlay';
 import { VastEndScreen } from 'Views/VastEndScreen';
 import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';

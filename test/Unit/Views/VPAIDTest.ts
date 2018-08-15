@@ -8,7 +8,7 @@ import { VPAID as VPAIDModel } from 'Models/VPAID/VPAID';
 import { VPAID, IVPAIDHandler } from 'Views/VPAID';
 import { NativeBridge } from 'Native/NativeBridge';
 import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { WebPlayerApi } from 'Native/Api/WebPlayer';
 import { Observable1 } from 'Utilities/Observable';
 import { DeviceInfoApi } from 'Native/Api/DeviceInfo';

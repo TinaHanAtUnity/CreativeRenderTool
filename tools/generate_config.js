@@ -40,8 +40,10 @@ hasher.update(fs.readFileSync(input, options));
 const hash = hasher.digest('hex');
 
 const url = [
-    'http://10.35.34.90:8000/build/release/',
-    'index.html'
+    'https://webview.unityads.unity3d.com/webview',
+    branch,
+    commitId,
+    target,
 ].join('/');
 
 fs.writeFileSync(output, JSON.stringify({

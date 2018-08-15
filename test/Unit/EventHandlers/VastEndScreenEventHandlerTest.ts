@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Overlay } from 'Views/Overlay';
 import { Platform } from 'Constants/Platform';
 import { IVastAdUnitParameters, VastAdUnit } from 'AdUnits/VastAdUnit';

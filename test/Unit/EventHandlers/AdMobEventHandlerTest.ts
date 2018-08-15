@@ -10,7 +10,7 @@ import { Platform } from 'Constants/Platform';
 import { Request } from 'Utilities/Request';
 import { Session } from 'Models/Session';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { AdMobSignal } from 'Models/AdMobSignal';
 import { Url } from 'Utilities/Url';

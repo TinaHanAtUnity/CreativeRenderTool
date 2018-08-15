@@ -7,7 +7,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Placement } from 'Models/Placement';
 import { MRAID } from 'Views/MRAID';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Configuration } from 'Models/Configuration';
 import { GDPRPrivacy } from 'Views/GDPRPrivacy';
 import MRAIDContainer from 'html/mraid/container.html';

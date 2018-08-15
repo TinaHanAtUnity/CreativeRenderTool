@@ -4,7 +4,7 @@ import { assert } from 'chai';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { AnalyticsManager } from 'Analytics/AnalyticsManager';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Request } from 'Utilities/Request';
 import { ClientInfo } from 'Models/ClientInfo';

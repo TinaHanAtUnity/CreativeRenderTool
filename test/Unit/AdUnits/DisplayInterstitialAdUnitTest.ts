@@ -9,7 +9,7 @@ import { Placement } from 'Models/Placement';
 import { Request } from 'Utilities/Request';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { DisplayInterstitial } from 'Views/DisplayInterstitial';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { Platform } from 'Constants/Platform';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';

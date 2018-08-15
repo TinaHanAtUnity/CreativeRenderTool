@@ -11,7 +11,7 @@ import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { Observable0, Observable1, Observable2, Observable4 } from 'Utilities/Observable';
 import { Platform } from 'Constants/Platform';
 import { INativeResponse, Request } from 'Utilities/Request';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { ClientInfo } from 'Models/ClientInfo';
 import { VastParser } from 'Utilities/VastParser';
 import { DeviceInfo } from 'Models/DeviceInfo';

@@ -2,7 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 
 import { GameSessionCounters } from 'Utilities/GameSessionCounters';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('GameSessionCountersTest', () => {
 

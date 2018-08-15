@@ -9,7 +9,7 @@ import { Vast } from 'Models/Vast/Vast';
 import { FinishState } from 'Constants/FinishState';
 import { NativeBridge } from 'Native/NativeBridge';
 import { SessionManager } from 'Managers/SessionManager';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { Request } from 'Utilities/Request';

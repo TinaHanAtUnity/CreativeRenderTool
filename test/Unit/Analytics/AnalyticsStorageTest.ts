@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import { assert } from 'chai';
 
 import { NativeBridge } from 'Native/NativeBridge';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { AnalyticsStorage, IIAPInstrumentation } from 'Analytics/AnalyticsStorage';
 import { StorageType } from 'Native/Api/Storage';
 

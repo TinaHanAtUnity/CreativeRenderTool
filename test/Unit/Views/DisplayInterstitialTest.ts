@@ -8,7 +8,7 @@ import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitia
 
 import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
 import { Platform } from 'Constants/Platform';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Privacy } from 'Views/Privacy';
 const json = JSON.parse(DummyDisplayInterstitialCampaign);
 

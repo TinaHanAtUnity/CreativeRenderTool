@@ -10,7 +10,7 @@ import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json
 import { ABGroupBuilder } from 'Models/ABGroup';
 import { Platform } from 'Constants/Platform';
 import { MixedPlacementUtility } from 'Utilities/MixedPlacementUtility';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('configurationParserTest', () => {
 

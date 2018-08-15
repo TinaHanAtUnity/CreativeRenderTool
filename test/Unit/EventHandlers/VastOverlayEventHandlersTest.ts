@@ -5,7 +5,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { SessionManager } from 'Managers/SessionManager';
 import { VastOverlayEventHandler } from 'EventHandlers/VastOverlayEventHandler';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Overlay } from 'Views/Overlay';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { DeviceInfo } from 'Models/DeviceInfo';

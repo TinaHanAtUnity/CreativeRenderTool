@@ -20,7 +20,7 @@ import { Request } from 'Utilities/Request';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { ListenerApi } from 'Native/Api/Listener';
 import { FinishState } from 'Constants/FinishState';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Closer } from 'Views/Closer';
 import { Platform } from 'Constants/Platform';
 import { ProgrammaticOperativeEventManager } from 'Managers/ProgrammaticOperativeEventManager';

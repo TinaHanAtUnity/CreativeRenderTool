@@ -7,7 +7,7 @@ import { Placement } from 'Models/Placement';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 
 import { Platform } from 'Constants/Platform';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { FocusManager } from 'Managers/FocusManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';

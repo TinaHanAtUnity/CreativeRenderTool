@@ -10,7 +10,7 @@ import { assert } from 'chai';
 import ValidAdMobCampaign from 'json/campaigns/admob/ValidAdMobCampaign.json';
 import 'mocha';
 import * as sinon from 'sinon';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { FileId } from 'Utilities/FileId';
 
 describe('ProgrammaticAdMobParser', () => {

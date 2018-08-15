@@ -14,11 +14,9 @@ src/**/*.js.map
 src/**/*.css
 src/html/admob/AFMAContainer.html
 
-# nginx
-nginx/access.log
-nginx/error.log
-nginx/nginx.conf
-nginx/server.PID
+# Test
+test/**/*.js
+src/**/*.js.map
 
 # VS Code
 .vscode

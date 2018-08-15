@@ -2,7 +2,7 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
 
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Request } from 'Utilities/Request';
 import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';

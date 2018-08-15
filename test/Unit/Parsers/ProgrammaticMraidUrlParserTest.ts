@@ -5,7 +5,7 @@ import { assert } from 'chai';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Request } from 'Utilities/Request';
 import { AuctionResponse } from 'Models/AuctionResponse';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Session } from 'Models/Session';
 import { SdkApi } from 'Native/Api/Sdk';
 import { ProgrammaticMraidUrlParser } from 'Parsers/ProgrammaticMraidUrlParser';

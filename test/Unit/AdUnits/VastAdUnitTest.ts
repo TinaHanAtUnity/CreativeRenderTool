@@ -7,7 +7,7 @@ import { VastCreativeCompanionAd } from 'Models/Vast/VastCreativeCompanionAd';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { Overlay } from 'Views/Overlay';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Request } from 'Utilities/Request';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Placement } from 'Models/Placement';

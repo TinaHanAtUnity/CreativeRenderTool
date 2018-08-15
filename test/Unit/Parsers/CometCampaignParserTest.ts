@@ -6,7 +6,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Session } from 'Models/Session';
 import { SdkApi } from 'Native/Api/Sdk';
 import { Request } from 'Utilities/Request';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { PerformanceCampaign, StoreName } from 'Models/Campaigns/PerformanceCampaign';

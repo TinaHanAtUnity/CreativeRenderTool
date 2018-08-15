@@ -9,7 +9,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { FocusManager } from 'Managers/FocusManager';
 import { MetaDataManager } from 'Managers/MetaDataManager';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 class TestRequestApi extends RequestApi {
 

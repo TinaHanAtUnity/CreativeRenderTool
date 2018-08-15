@@ -4,7 +4,7 @@ import { assert } from 'chai';
 
 import { AdUnitFactory } from 'AdUnits/AdUnitFactory';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Request } from 'Utilities/Request';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Platform } from 'Constants/Platform';

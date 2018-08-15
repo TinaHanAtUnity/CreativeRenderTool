@@ -19,7 +19,7 @@ import { GDPRPrivacy } from 'Views/GDPRPrivacy';
 import { Placement } from 'Models/Placement';
 import { GdprManager, GDPREventAction } from 'Managers/GdprManager';
 import { OverlayEventHandler } from 'EventHandlers/OverlayEventHandler';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 describe('GDPREventHandlerTest', () => {

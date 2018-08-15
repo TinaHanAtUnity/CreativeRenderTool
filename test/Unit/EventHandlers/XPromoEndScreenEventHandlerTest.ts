@@ -5,7 +5,7 @@ import { IEndScreenDownloadParameters } from 'EventHandlers/EndScreenEventHandle
 import { NativeBridge } from 'Native/NativeBridge';
 import { Overlay } from 'Views/Overlay';
 import { SessionManager } from 'Managers/SessionManager';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { Request, INativeResponse } from 'Utilities/Request';

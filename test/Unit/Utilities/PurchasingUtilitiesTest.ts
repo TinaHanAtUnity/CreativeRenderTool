@@ -13,7 +13,7 @@ import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import { PlacementManager } from 'Managers/PlacementManager';
 import { PlacementState } from 'Models/Placement';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('PurchasingUtilitiesTest', () => {
     let nativeBridge: NativeBridge;

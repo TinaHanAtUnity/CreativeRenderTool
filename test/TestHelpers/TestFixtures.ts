@@ -24,10 +24,10 @@ import { VPAID } from 'Models/VPAID/VPAID';
 import { IPromoCampaign, PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { IosDeviceInfo } from 'Models/IosDeviceInfo';
-import { FakeAndroidDeviceInfo } from 'Helpers/FakeAndroidDeviceInfo';
+import { FakeAndroidDeviceInfo } from 'TestHelpers/FakeAndroidDeviceInfo';
 import { RingerMode } from 'Constants/Android/RingerMode';
 import { UIUserInterfaceIdiom } from 'Constants/iOS/UIUserInterfaceIdiom';
-import { FakeIosDeviceInfo } from 'Helpers/FakeIosDeviceInfo';
+import { FakeIosDeviceInfo } from 'TestHelpers/FakeIosDeviceInfo';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 
 import DummyPromoCampaign from 'json/DummyPromoCampaign.json';

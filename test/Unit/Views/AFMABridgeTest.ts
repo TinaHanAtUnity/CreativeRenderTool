@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import { IAFMAHandler, AFMABridge, AFMAEvents } from 'Views/AFMABridge';
 import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { NativeBridge } from 'Native/NativeBridge';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('AFMABridge', () => {
 

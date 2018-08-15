@@ -10,7 +10,7 @@ import { MetaDataManager } from 'Managers/MetaDataManager';
 import { SessionManager } from 'Managers/SessionManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { PerformanceOperativeEventManager } from 'Managers/PerformanceOperativeEventManager';
 import { XPromoOperativeEventManager } from 'Managers/XPromoOperativeEventManager';
 import { MRAIDOperativeEventManager } from 'Managers/MRAIDOperativeEventManager';

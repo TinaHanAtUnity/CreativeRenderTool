@@ -2,7 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 
 import { VastCampaign } from 'Models/Vast/VastCampaign';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { PerformanceCampaign, StoreName } from 'Models/Campaigns/PerformanceCampaign';
 
 import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';

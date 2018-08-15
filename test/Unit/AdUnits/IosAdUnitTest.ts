@@ -4,8 +4,8 @@ import { assert } from 'chai';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { Platform } from 'Constants/Platform';
-import { TestFixtures } from 'Helpers/TestFixtures';
-import { TestAdUnit } from 'Helpers/TestAdUnit';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { TestAdUnit } from 'TestHelpers/TestAdUnit';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 import {
     AdUnitContainerSystemMessage, IAdUnitContainerListener, Orientation,

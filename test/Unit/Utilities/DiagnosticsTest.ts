@@ -10,7 +10,7 @@ import { Platform } from 'Constants/Platform';
 import { HttpKafka } from 'Utilities/HttpKafka';
 import { Configuration } from 'Models/Configuration';
 import { ConfigurationParser } from 'Parsers/ConfigurationParser';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { FocusManager } from 'Managers/FocusManager';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';

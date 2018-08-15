@@ -2,7 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 
 import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { ClientInfo } from 'Models/ClientInfo';
 import { FocusManager } from 'Managers/FocusManager';
 import { NativeBridge } from 'Native/NativeBridge';

@@ -4,7 +4,7 @@ import * as sinon from 'sinon';
 
 import { Cache } from 'Utilities/Cache';
 import { NativeBridge } from 'Native/NativeBridge';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Platform } from 'Constants/Platform';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Video } from 'Models/Assets/Video';

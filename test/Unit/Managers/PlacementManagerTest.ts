@@ -5,7 +5,7 @@ import * as sinon from 'sinon';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Configuration } from 'Models/Configuration';
 import { PlacementManager } from 'Managers/PlacementManager';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Campaign } from 'Models/Campaign';
 import { PlacementApi } from 'Native/Api/Placement';
 import { ListenerApi } from 'Native/Api/Listener';

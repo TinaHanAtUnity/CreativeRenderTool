@@ -5,7 +5,7 @@ import * as sinon from 'sinon';
 import { NativeBridge } from 'Native/NativeBridge';
 import { SessionManager } from 'Managers/SessionManager';
 import { OverlayEventHandler } from 'EventHandlers/OverlayEventHandler';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Overlay } from 'Views/Overlay';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { DeviceInfo } from 'Models/DeviceInfo';

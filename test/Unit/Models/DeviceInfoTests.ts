@@ -9,7 +9,7 @@ import { DeviceInfoApi } from 'Native/Api/DeviceInfo';
 import { StreamType } from 'Constants/Android/StreamType';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { IosDeviceInfo } from 'Models/IosDeviceInfo';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { DeviceInfoEvent } from 'Native/Api/DeviceInfoEvent';
 
 describe('DeviceInfoTest', () => {

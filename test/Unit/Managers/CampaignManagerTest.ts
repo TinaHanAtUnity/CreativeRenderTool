@@ -11,7 +11,7 @@ import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { ClientInfo } from 'Models/ClientInfo';
 import { DeviceInfo } from 'Models/DeviceInfo';
 import { Request, INativeResponse } from 'Utilities/Request';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { VastParser } from 'Utilities/VastParser';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Observable0, Observable1, Observable2, Observable4 } from 'Utilities/Observable';

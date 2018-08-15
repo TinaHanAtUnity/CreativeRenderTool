@@ -14,7 +14,7 @@ import { CacheError, IFileInfo, CacheEvent, CacheApi } from 'Native/Api/Cache';
 import { Request } from 'Utilities/Request';
 import { HTML } from 'Models/Assets/HTML';
 import { DeviceInfo } from 'Models/DeviceInfo';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { FocusManager } from 'Managers/FocusManager';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';

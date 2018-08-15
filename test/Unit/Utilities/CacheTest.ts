@@ -8,7 +8,7 @@ import { StorageApi, StorageType } from 'Native/Api/Storage';
 import { NativeBridge } from 'Native/NativeBridge';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { Request } from 'Utilities/Request';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { FocusManager } from 'Managers/FocusManager';
 import { FileId } from 'Utilities/FileId';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';

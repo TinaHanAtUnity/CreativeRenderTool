@@ -4,8 +4,8 @@ import { assert } from 'chai';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { Platform } from 'Constants/Platform';
-import { TestFixtures } from 'Helpers/TestFixtures';
-import { TestAdUnit } from 'Helpers/TestAdUnit';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { TestAdUnit } from 'TestHelpers/TestAdUnit';
 import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
 import { KeyCode } from 'Constants/Android/KeyCode';
 import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';

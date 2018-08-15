@@ -7,7 +7,7 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { INativeResponse, Request } from 'Utilities/Request';
 import { Cache } from 'Utilities/Cache';
 import { ReinitManager } from 'Managers/ReinitManager';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { WakeUpManager } from 'Managers/WakeUpManager';
 import { FocusManager } from 'Managers/FocusManager';
 import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';

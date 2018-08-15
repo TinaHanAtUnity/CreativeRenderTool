@@ -4,7 +4,7 @@ import { assert } from 'chai';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { Localization } from 'Utilities/Localization';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
 import { Privacy } from 'Views/Privacy';
 

@@ -5,7 +5,7 @@ import * as sinon from 'sinon';
 import { HttpKafka, KafkaCommonObjectType } from 'Utilities/HttpKafka';
 import { MissedImpressionManager } from 'Managers/MissedImpressionManager';
 import { NativeBridge } from 'Native/NativeBridge';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { StorageApi, StorageType } from 'Native/Api/Storage';
 
 describe('MissedImpressionManagerTest', () => {

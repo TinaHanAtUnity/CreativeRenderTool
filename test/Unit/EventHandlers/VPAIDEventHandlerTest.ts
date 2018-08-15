@@ -8,7 +8,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'AdUnits/Containers/Activity';
 import { Platform } from 'Constants/Platform';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 import { FocusManager } from 'Managers/FocusManager';

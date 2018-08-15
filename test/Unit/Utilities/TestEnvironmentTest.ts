@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import { assert } from 'chai';
 
 import { MetaData } from 'Utilities/MetaData';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { TestEnvironment } from 'Utilities/TestEnvironment';
 
 describe('MetaDataTest', () => {

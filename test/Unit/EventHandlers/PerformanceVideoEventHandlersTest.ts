@@ -2,7 +2,7 @@ import 'mocha';
 import * as sinon from 'sinon';
 
 import { NativeBridge } from 'Native/NativeBridge';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Overlay } from 'Views/Overlay';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { PerformanceVideoEventHandler } from 'EventHandlers/PerformanceVideoEventHandler';

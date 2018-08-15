@@ -11,7 +11,7 @@ import { WakeUpManager } from 'Managers/WakeUpManager';
 import { FocusManager } from 'Managers/FocusManager';
 import { IOperativeEventManagerParams, OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ClientInfo } from 'Models/ClientInfo';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Platform } from 'Constants/Platform';
 import { SessionManager } from 'Managers/SessionManager';
 import { MetaDataManager } from 'Managers/MetaDataManager';

@@ -4,7 +4,7 @@ import { assert } from 'chai';
 import { NativeBridge } from 'Native/NativeBridge';
 import { MOAT } from 'Views/MOAT';
 import { IMoatData, IMoatIds } from 'Utilities/MoatViewabilityService';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { SdkApi } from 'Native/Api/Sdk';
 

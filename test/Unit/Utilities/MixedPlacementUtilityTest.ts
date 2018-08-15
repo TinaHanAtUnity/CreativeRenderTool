@@ -5,7 +5,7 @@ import { Configuration } from 'Models/Configuration';
 import { ConfigurationParser } from 'Parsers/ConfigurationParser';
 import MixedPlacementAuctionResponse from 'json/MixedPlacementAuctionResponse.json';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
 import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
 import { ClientInfo } from 'Models/ClientInfo';

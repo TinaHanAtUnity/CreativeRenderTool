@@ -11,7 +11,7 @@ import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import { RequestError } from 'Errors/RequestError';
 import { ConfigError } from 'Errors/ConfigError';
 import { DiagnosticError } from 'Errors/DiagnosticError';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { JaegerSpan } from 'Jaeger/JaegerSpan';
 

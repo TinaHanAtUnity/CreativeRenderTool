@@ -5,7 +5,7 @@ import { assert } from 'chai';
 import { ForceQuitManager, IForceQuitData } from 'Managers/ForceQuitManager';
 import { StorageType } from 'Native/Api/Storage';
 import { NativeBridge } from 'Native/NativeBridge';
-import { TestFixtures } from 'Helpers/TestFixtures';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('ForceQuitManagerTest', () => {
 
