@@ -1,3 +1,8 @@
+# Pending
+
+* Add Product type to promo tracking event urls
+* Reducing number of catalog refresh calls to IAP
+
 # Wed Aug 15 05:57:24 UTC 2018
 
 * Banner implementation merged to 3.0.0
