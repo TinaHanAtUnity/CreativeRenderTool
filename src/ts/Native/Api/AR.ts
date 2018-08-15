@@ -73,67 +73,67 @@ export class ARApi extends NativeApi {
     }
 
     public isARSupported(): Promise<boolean> {
-        return this._nativeBridge.invoke<boolean>(this._apiClass, 'isARSupported', ['ARWorldTrackingConfiguration']);
+        return this._nativeBridge.invoke<boolean>(this._fullApiClassName, 'isARSupported', ['ARWorldTrackingConfiguration']);
     }
 
     public restartSession(arRunProperties: IARRunProperties): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'restartSession', [arRunProperties]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'restartSession', [arRunProperties]);
     }
 
     public setDepthFar(depth: number): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setDepthFar', [depth]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setDepthFar', [depth]);
     }
 
     public setDepthNear(depth: number): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setDepthNear', [depth]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setDepthNear', [depth]);
     }
 
     public showCameraFeed(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'showCameraFeed');
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'showCameraFeed');
     }
 
     public hideCameraFeed(): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'hideCameraFeed');
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'hideCameraFeed');
     }
 
     public addAnchor(identifier: string, matrix: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'addAnchor', [identifier, matrix]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'addAnchor', [identifier, matrix]);
     }
 
     public removeAnchor(identifier: string): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'removeAnchor', [identifier]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'removeAnchor', [identifier]);
     }
 
     public advanceFrame(): Promise<void> {
         // We don't have scaling logic in Android at the moment.
         if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            return this._nativeBridge.invoke<void>(this._apiClass, 'advanceFrame');
+            return this._nativeBridge.invoke<void>(this._fullApiClassName, 'advanceFrame');
         }
 
         // Get frame info, calculate scaling and then call advanceFrame
         return this.getFrameInfo().then((frameInfo) => {
             const scale = ARApi.calculateVideoScale(frameInfo);
             return this.setFrameScaling(scale).then(
-                () => this._nativeBridge.invoke<void>(this._apiClass, 'advanceFrame')).catch(
+                () => this._nativeBridge.invoke<void>(this._fullApiClassName, 'advanceFrame')).catch(
                     (error) => this._nativeBridge.Sdk.logInfo('Cannot set scaling: ' + error));
         }).catch((error) => this._nativeBridge.Sdk.logInfo('Cannot get frame info: ' + error));
     }
 
     public getFrameInfo(): Promise<IARFrameInfo> {
-        return this._nativeBridge.invoke<IARFrameInfo>(this._apiClass, 'getFrameInfo');
+        return this._nativeBridge.invoke<IARFrameInfo>(this._fullApiClassName, 'getFrameInfo');
     }
 
     public setFrameScaling(scale: IARFrameScale): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'setFrameScaling', [scale]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setFrameScaling', [scale]);
     }
 
     public getSupportedVideoFormats(): Promise<IARVideoFormat[]> {
-        return this._nativeBridge.invoke<IARVideoFormat[]>(this._apiClass, 'getSupportedVideoFormats');
+        return this._nativeBridge.invoke<IARVideoFormat[]>(this._fullApiClassName, 'getSupportedVideoFormats');
     }
 
     public initAR(): Promise<void> {
         if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            return this._nativeBridge.invoke<any>(this._apiClass, 'getAndroidConfigEnums').then((enums) => {
+            return this._nativeBridge.invoke<any>(this._fullApiClassName, 'getAndroidConfigEnums').then((enums) => {
                 this.onAndroidEnumsReceived.trigger(enums);
 
                 return Promise.resolve();

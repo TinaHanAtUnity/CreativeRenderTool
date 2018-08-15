@@ -17,19 +17,19 @@ export class AndroidPermissionsApi extends NativeApi {
     public readonly onPermissionsError = new Observable1<string>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Permissions', ApiPackage.AR);
+        super(nativeBridge, 'Permissions', ApiPackage.CORE);
     }
 
     public getPermissions(): Promise<string[]> {
-        return this._nativeBridge.invoke<string[]>(this._apiClass, 'getPermissions');
+        return this._nativeBridge.invoke<string[]>(this._fullApiClassName, 'getPermissions');
     }
 
     public checkPermission(permission: AndroidPermission): Promise<number> {
-        return this._nativeBridge.invoke<number>(this._apiClass, 'checkPermission', [permission]);
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'checkPermission', [permission]);
     }
 
     public requestPermissions(permissions: AndroidPermission[], requestCode: number): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._apiClass, 'requestPermissions', [permissions, requestCode]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'requestPermissions', [permissions, requestCode]);
     }
 
     public handleEvent(event: string, parameters: any[]): void {

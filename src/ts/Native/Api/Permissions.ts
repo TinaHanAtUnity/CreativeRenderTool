@@ -9,7 +9,7 @@ export class PermissionsApi extends NativeApi {
     public Ios: IosPermissionsApi;
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Permissions', ApiPackage.AR);
+        super(nativeBridge, 'Permissions', ApiPackage.CORE);
 
         if (nativeBridge.getPlatform() === Platform.ANDROID) {
             this.Android = new AndroidPermissionsApi(nativeBridge);
