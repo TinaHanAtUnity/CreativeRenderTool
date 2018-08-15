@@ -32,6 +32,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _gdprBanner: HTMLElement;
     private _privacyButton: HTMLElement;
     private _cameraPermissionPanel: HTMLElement;
+    private _permissionLearnMorePanel: HTMLElement;
 
     private _iframeLoaded = false;
 
@@ -129,6 +130,20 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                     this.onShowFallback();
                 },
                 selector: '.permission-decline-button'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => {
+                    this.showARPermissionLearnMore();
+                },
+                selector: '.show-learn-more-button'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => {
+                    this.hideARPermissionLearnMore();
+                },
+                selector: '.hide-learn-more-button'
             }
         ];
     }
@@ -140,6 +155,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         this._loadingScreen = <HTMLElement>this._container.querySelector('.loading-screen');
         this._loadingScreenAR = <HTMLElement>this._container.querySelector('.loading-screen-ar');
         this._cameraPermissionPanel = <HTMLElement>this._container.querySelector('.camera-permission-panel');
+        this._permissionLearnMorePanel = <HTMLElement>this._container.querySelector('.permissions-learn-more');
 
         const iframe: any = this._iframe = <HTMLIFrameElement>this._container.querySelector('#mraid-iframe');
         this._gdprBanner = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
@@ -574,6 +590,16 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         if (this._iframeLoaded) {
             this._iframe.contentWindow!.postMessage({type: 'AREvent', data: {parameters, event}}, '*');
         }
+    }
+
+    private showARPermissionLearnMore() {
+        this._permissionLearnMorePanel.style.display = 'block';
+        this._closeElement.style.display = 'none';
+    }
+
+    private hideARPermissionLearnMore() {
+        this._permissionLearnMorePanel.style.display = 'none';
+        this._closeElement.style.display = 'block';
     }
 
     /**

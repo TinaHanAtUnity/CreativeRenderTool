@@ -59,11 +59,33 @@
             <p><%= data.t("This is an Augmented Reality Advertisement and is best viewed with your camera.") %></p>
             <p class="request-text"><%= data.t("Please grant camera access when your device asks for it.") %></p>
         </div>
-        <div class="permission-accept-button">
-            <%= data.t("Begin") %>
+        <div>
+            <div class="permission-accept-button">
+                <%= data.t("Begin") %>
+            </div>
+            <div class="permission-decline-button">
+                <%= data.t("Don't turn my camera on") %>
+            </div>
         </div>
-        <div class="permission-decline-button">
-            <%= data.t("Don't turn my camera on") %>
+    </div>
+    <div class="show-learn-more-button">
+        <%= data.t("Learn more") %>
+    </div>
+</div>
+<div class="permissions-learn-more">
+    <div class="container">
+        <div class="hide-learn-more-button">
+            <%= data.t("Back") %>
+        </div>
+        <div class="learn-more-header"><%= data.t("AR Advertisement Notice") %></div>
+        <p><%= data.t("This ad contains augmented reality (\“AR\”) components that will provide you with branded AR Advertisements (\“AR Advertisement\”).") %></p>
+        <p><%= data.t("While using the AR Advertisement please be aware of your surroundings and be considerate of others.  You understand and agree that your use of the AR Advertisement is at your own risk.") %></p>
+        <p><%= data.t("The AR Advertisement requires use of your device’s camera, which could result in cached images saved to your device.  As always, keep your device’s software up to date to ensure you have the most recent security measures installed.") %></p>
+        <p><%= data.t("You are solely responsible for photos/videos you use in connection with the AR Advertisement. If you choose to share your photos/videos with the AR Advertisement to other platforms or users, they may have access to your name, technology that permits tagging you through facial recognition, and other identifying information depending on the platform to which you share.") %></p>
+        <p><%= data.t("The AR Advertisement uses data in accordance with our Privacy Policy.  You can opt out at anytime by clicking the privacy icon below.") %></p>
+        <div class="bottom-buttons">
+            <div class="privacy-button"><span class="icon-gdpr"></span></div>
+            <div class="privacy-policy-button"><a href="https://unity3d.com/legal/privacy-policy" target="_blank">Privacy Policy</a></div>
         </div>
     </div>
 </div>
