@@ -7,10 +7,10 @@ export class MainBundleApi extends NativeApi {
     }
 
     public getDataForKeysContaining(containsString: string): Promise<{ [key: string]: any }> {
-        return this._nativeBridge.invoke<{ [key: string]: any }>(this._apiClass, 'getDataForKeysContaining', [containsString]);
+        return this._nativeBridge.invoke<{ [key: string]: any }>(this._fullApiClassName, 'getDataForKeysContaining', [containsString]);
     }
 
     public getDataForKey(key: string): Promise<[string, any]> {
-        return this._nativeBridge.invoke<[string, any]>(this._apiClass, 'getDataForKey', [key]);
+        return this._nativeBridge.invoke<[string, any]>(this._fullApiClassName, 'getDataForKey', [key]);
     }
 }
