@@ -14,6 +14,7 @@ STYLINT := $(BIN)/stylint
 PBJS := $(BIN)/pbjs
 PBTS := $(BIN)/pbts
 CC := java -jar node_modules/google-closure-compiler/compiler.jar
+HTML_INLINE := $(BIN)/html-inline
 
 # Directories
 
@@ -53,14 +54,33 @@ TEST_TARGETS := $(addprefix $(BUILD_DIR)/, $(patsubst %.ts, %.js, $(TESTS)))
 UNIT_TEST_TARGETS := $(addprefix $(BUILD_DIR)/, $(patsubst %.ts, %.js, $(UNIT_TESTS)))
 INTEGRATION_TEST_TARGETS := $(addprefix $(BUILD_DIR)/, $(patsubst %.ts, %.js, $(INTEGRATION_TESTS)))
 
+# Build Targets
+
+BROWSER_BUILD_TARGETS := $(SOURCE_BUILD_DIR)/ts/BrowserBundle.js $(SOURCE_BUILD_DIR)/styl/main.css $(BUILD_DIR)/browser/index.html $(BUILD_DIR)/browser/iframe.html
+DEV_BUILD_TARGETS := $(SOURCE_BUILD_DIR)/ts/Bundle.js $(BUILD_DIR)/dev/index.html $(BUILD_DIR)/dev/config.json
+RELEASE_BUILD_TARGETS := $(SOURCE_BUILD_DIR)/ts/Bundle.min.js $(BUILD_DIR)/release/index.html $(BUILD_DIR)/release/config.json
+TEST_BUILD_TARGETS := $(TEST_BUILD_DIR)/UnitBundle.min.js $(BUILD_DIR)/test/index.html $(BUILD_DIR)/test/config.json
+
 # Built-in targets
 
-.PHONY: all test test-unit test-integration test-coverage release clean lint setup watch start-server stop-server
+.PHONY: all build-browser build-dev build-release build-test test test-unit test-integration test-coverage release clean lint setup watch start-server stop-server
 .NOTPARALLEL: $(TS_TARGETS) $(TEST_TARGETS)
 
 # Main targets
 
 all: $(TS_TARGETS) $(CSS_TARGETS) $(HTML_TARGETS) $(JSON_TARGETS) $(XML_TARGETS) $(TEST_TARGETS)
+
+build-browser: all $(BROWSER_BUILD_TARGETS)
+	@$(HTML_INLINE) -i $(BUILD_DIR)/browser/iframe.html -b . > $(BUILD_DIR)/browser/iframe.html
+
+build-dev: all $(DEV_BUILD_TARGETS)
+	@$(HTML_INLINE) -i $(BUILD_DIR)/dev/index.html -b . > $(BUILD_DIR)/dev/index.html
+
+build-release: all $(RELEASE_BUILD_TARGETS)
+	@$(HTML_INLINE) -i $(BUILD_DIR)/release/index.html -b . > $(BUILD_DIR)/release/index.html
+
+build-test: all $(TEST_BUILD_TARGETS)
+	@$(HTML_INLINE) -i $(BUILD_DIR)/test/index.html -b . > $(BUILD_DIR)/test/index.html
 
 test: test-unit test-integration
 
@@ -77,21 +97,6 @@ test-coverage: start-server all build/test/UnitBundle.js
 	@$(REMAP_ISTANBUL) -i build/coverage/coverage.json -o build/coverage/summary -t text-summary
 	@cat build/coverage/summary && echo "\n"
 
-release: all
-	@$(CC) $(shell cat .cc.opts | xargs) --js $(SOURCE_BUILD_DIR)/ts/Bundle.js --js_output_file $(SOURCE_BUILD_DIR)/ts/Bundle.min.js
-	@mkdir -p build/release
-	@cp src/prod-index.html build/release/index.html
-	node -e "\
-		var fs=require('fs');\
-		var o={encoding:'utf-8'};\
-		var s=fs.readFileSync('$(SOURCE_BUILD_DIR)/styl/main.css', o);\
-		var j=fs.readFileSync('$(SOURCE_BUILD_DIR)/ts/Bundle.min.js', o);\
-		var i=fs.readFileSync('build/release/index.html', o);\
-		fs.writeFileSync('build/release/index.html', i.replace('{COMPILED_CSS}', s).replace('{COMPILED_JS}', j), o);"
-
-browser: all
-	@$(ROLLUP) --config rollup.config.browser.js
-
 # VPaths
 
 vpath %.ts $(SOURCE_DIR)/ts
@@ -100,7 +105,30 @@ vpath %.json $(SOURCE_DIR)/json
 vpath %.styl $(SOURCE_DIR)/styl
 vpath %.xml $(SOURCE_DIR)/xml
 
+# Build target rules
+
+$(BUILD_DIR)/browser/index.html: $(SOURCE_DIR)/browser-index.html
+	@mkdir -p $(dir $@) && cp $< $@
+
+$(BUILD_DIR)/browser/iframe.html: $(SOURCE_DIR)/browser-iframe.html
+	@mkdir -p $(dir $@) && cp $< $@
+
+$(BUILD_DIR)/dev/index.html: $(SOURCE_DIR)/dev-index.html
+	@mkdir -p $(dir $@) && cp $< $@
+
+$(BUILD_DIR)/release/index.html: $(SOURCE_DIR)/prod-index.html
+	@mkdir -p $(dir $@) && cp $< $@
+
 # Implicit rules
+
+$(SOURCE_BUILD_DIR)/ts/BrowserBundle.js: all
+	@$(ROLLUP) --config rollup.config.browser.js
+
+$(SOURCE_BUILD_DIR)/ts/Bundle.js: all
+	@$(ROLLUP) --config rollup.config.device.js
+
+$(SOURCE_BUILD_DIR)/ts/Bundle.min.js: $(SOURCE_BUILD_DIR)/ts/Bundle.js
+	@$(CC) $(shell xargs -a .cc.release.opts) --js $(SOURCE_BUILD_DIR)/ts/Bundle.js --js_output_file $(SOURCE_BUILD_DIR)/ts/Bundle.min.js
 
 $(SOURCE_BUILD_DIR)/ts/%.js: %.ts
 	@$(TYPESCRIPT) --project tsconfig.json
@@ -134,6 +162,9 @@ $(TEST_BUILD_DIR)/Unit.js:
 $(TEST_BUILD_DIR)/UnitBundle.js: $(TEST_BUILD_DIR)/Unit.js $(UNIT_TEST_TARGETS)
 	@$(ROLLUP) --config rollup.config.test.unit.js
 
+$(TEST_BUILD_DIR)/UnitBundle.min.js: $(TEST_BUILD_DIR)/UnitBundle.js
+	@$(CC) $(shell xargs -a .cc.test.opts) --js $(TEST_BUILD_DIR)/ts/UnitBundle.js --js_output_file $(TEST_BUILD_DIR)/ts/UnitBundle.min.js
+
 $(TEST_BUILD_DIR)/Integration.js:
 	@echo $(INTEGRATION_TESTS) | sed "s/test\\//import '/g" | sed "s/\.ts/';/g" > $@
 
@@ -155,7 +186,7 @@ setup: clean
 	@rm -rf node_modules
 	@npm install
 
-watch: all
+watch: all $(TEST_BUILD_DIR)/Unit.js $(TEST_BUILD_DIR)/Integration.js
 	parallel --ungroup --tty --jobs 0 ::: \
 		"$(TYPESCRIPT) --project tsconfig.json --watch --preserveWatchOutput" \
 		"$(ROLLUP) --watch --config rollup.config.all.js"
