@@ -26,7 +26,8 @@ describe('ForceQuitManagerTest', () => {
         getStub = sinon.stub(nativeBridge.Storage, 'get');
         deleteStub = sinon.stub(nativeBridge.Storage, 'delete');
         forceQuitData = {
-            adSessionId: TestFixtures.getSession().getId()
+            adSessionId: TestFixtures.getSession().getId(),
+            adPlan: TestFixtures.getSession().getAdPlan()
         };
 
     });

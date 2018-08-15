@@ -4,6 +4,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 
 export interface IForceQuitData {
     adSessionId: string;
+    adPlan: string | undefined;
 }
 
 export class ForceQuitManager {
@@ -23,7 +24,12 @@ export class ForceQuitManager {
 
     public getForceQuitData(): Promise<Session | undefined> {
         return this._nativeBridge.Storage.get(StorageType.PRIVATE, ForceQuitManager.ForceQuitKey).then(data => {
-            return new Session((<IForceQuitData>data).adSessionId);
+            const session = new Session((<IForceQuitData>data).adSessionId);
+            const adPlan = (<IForceQuitData>data).adPlan;
+            if (adPlan) {
+                session.setAdPlan(adPlan);
+            }
+            return session;
         }).catch(() => {
             return undefined;
         });
