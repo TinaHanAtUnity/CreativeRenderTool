@@ -16,7 +16,7 @@ src/html/admob/AFMAContainer.html
 
 # Test
 test/**/*.js
-src/**/*.js.map
+test/**/*.js.map
 
 # VS Code
 .vscode
