@@ -581,10 +581,14 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
      */
     private showARPermissionPanel() {
         this._nativeBridge.Permissions.checkPermissions(PermissionTypes.CAMERA).then(results => {
-            if (results === CurrentPermission.UNKNOWN || results === CurrentPermission.ACCEPTED) {
-                this._cameraPermissionPanel.style.display = 'block';
-            } else if (results === CurrentPermission.DENIED) {
+            const requestPermissionText = <HTMLElement>this._cameraPermissionPanel.querySelector('.request-text');
+            if (results === CurrentPermission.DENIED) {
                 this.onCameraPermissionEvent(false);
+            } else {
+                if (results === CurrentPermission.ACCEPTED) {
+                    requestPermissionText.style.display = 'none';
+                }
+                this._cameraPermissionPanel.style.display = 'block';
             }
             this._loadingScreen.classList.add('hidden');
             this._loadingScreenAR.classList.add('hidden');

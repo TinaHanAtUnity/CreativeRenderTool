@@ -160,18 +160,6 @@ $filling-bar-width = $progress-bar-width * .3;
     background-color: $white;
     opacity: 1;
 
-    .permission-accept-button {
-      background-color: #0f0;
-      margin: 5vh 5vw;
-      padding: 5vh 5vw;
-    }
-
-    .permission-decline-button {
-      background-color: #f00;
-      margin: 5vh 5vw;
-      padding: 5vh 5vw;
-    }
-
     &.hidden {
       opacity: 0;
       transition: opacity 200ms ease-out;
@@ -234,6 +222,49 @@ $filling-bar-width = $progress-bar-width * .3;
         animation: progress-bar-dynamic 1s linear infinite;
         will-change: left;
       }
+    }
+  }
+
+  #camera-permission-panel {
+    background: #fafafa;
+    position: absolute;
+    top: 100vw;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: inherit;
+    width: 100vw;
+    z-index: 9999;
+
+    .container {
+      width: 80%;
+      max-width: 300px;
+      justify-content: space-around;
+    }
+
+    .permission-text {
+      font-size:4vw;
+      text-align: center;
+    }
+
+    .arads-logo {
+      width: 156px;
+      height: 30px;
+      margin: 20px auto 0;
+      background-image: url("../img/adsar.png");
+      background-position: center;
+      background-size: cover;
+    }
+
+    .permission-accept-button {
+      $download-container-default($default-scale-size, true);
+      margin: 0 auto 8px;
+    }
+
+    .permission-decline-button {
+      text-align: center;
+      font-size: 0.75rem;
+      margin-bottom: 16px;
     }
   }
 }
