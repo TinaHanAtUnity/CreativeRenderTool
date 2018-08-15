@@ -9,16 +9,16 @@
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
         <meta name="format-detection" content="telephone=no"/>
 
-        <script src="/node_modules/mocha/mocha.js"></script>
-        <script src="/node_modules/chai/chai.js"></script>
-        <script src="/test-utils/reporter.js"></script>
+        <script inline src="/node_modules/mocha/mocha.js"></script>
+        <script inline src="/node_modules/chai/chai.js"></script>
+        <script inline src="/test-utils/reporter.js"></script>
         <script>
             mocha.setup({
                 ui: 'bdd',
                 reporter: HybridTestReporter
             });
         </script>
-        <script src="/build/test/IntegrationBundle.js"></script>
+        <script inline src="/build/test/IntegrationBundle.js"></script>
     </head>
     <body>
     </body>

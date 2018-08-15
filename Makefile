@@ -14,7 +14,7 @@ STYLINT := $(BIN)/stylint
 PBJS := $(BIN)/pbjs
 PBTS := $(BIN)/pbts
 CC := java -jar node_modules/google-closure-compiler/compiler.jar
-HTML_INLINE := $(BIN)/html-inline
+INLINE := $(BIN)/inline-source
 
 # Directories
 
@@ -23,6 +23,15 @@ TEST_DIR := test
 BUILD_DIR := build
 SOURCE_BUILD_DIR := $(BUILD_DIR)/$(SOURCE_DIR)
 TEST_BUILD_DIR := $(BUILD_DIR)/$(TEST_DIR)
+
+# Branch and commit id
+ifeq ($(TRAVIS), true)
+	BRANCH = $(TRAVIS_BRANCH)
+	COMMIT_ID = $(TRAVIS_COMMIT)
+else
+	BRANCH = $(shell git symbolic-ref --short HEAD)
+	COMMIT_ID = $(shell git rev-parse HEAD)
+endif
 
 # Sources
 
@@ -71,15 +80,18 @@ TEST_BUILD_TARGETS := $(TEST_BUILD_DIR)/HybridBundle.min.js $(BUILD_DIR)/test/in
 all: $(TS_TARGETS) $(CSS_TARGETS) $(HTML_TARGETS) $(JSON_TARGETS) $(XML_TARGETS) $(TEST_TARGETS)
 
 build-browser: all $(BROWSER_BUILD_TARGETS)
-	@$(HTML_INLINE) -i $(BUILD_DIR)/browser/iframe.html -b . > $(BUILD_DIR)/browser/iframe.html
 
 build-dev: all $(DEV_BUILD_TARGETS)
-	@$(HTML_INLINE) -i $(BUILD_DIR)/dev/index.html -b . > $(BUILD_DIR)/dev/index.html
 
 build-release: all $(RELEASE_BUILD_TARGETS)
-	@$(HTML_INLINE) -i $(BUILD_DIR)/release/index.html -b . > $(BUILD_DIR)/release/index.html
+	@mkdir build/$(COMMIT_ID) | true
+	@rsync -r build/release build/$(COMMIT_ID)
+	@rm -rf build/$(COMMIT_ID)/$(COMMIT_ID)
 
 build-test: all $(TEST_BUILD_TARGETS)
+	@mkdir build/$(COMMIT_ID) | true
+	@rsync -r build/test build/$(COMMIT_ID)
+	@rm -rf build/$(COMMIT_ID)/$(COMMIT_ID)
 
 test: test-unit test-integration
 
@@ -110,16 +122,25 @@ $(BUILD_DIR)/browser/index.html: $(SOURCE_DIR)/browser-index.html
 	@mkdir -p $(dir $@) && cp $< $@
 
 $(BUILD_DIR)/browser/iframe.html: $(SOURCE_DIR)/browser-iframe.html
-	@mkdir -p $(dir $@) && cp $< $@
+	@mkdir -p $(dir $@) && $(INLINE) $< $@
 
 $(BUILD_DIR)/dev/index.html: $(SOURCE_DIR)/dev-index.html
-	@mkdir -p $(dir $@) && cp $< $@
+	@mkdir -p $(dir $@) && $(INLINE) $< $@
+
+$(BUILD_DIR)/dev/config.json:
+	@node tools/generate_dev_config.js
 
 $(BUILD_DIR)/release/index.html: $(SOURCE_DIR)/prod-index.html
-	@mkdir -p $(dir $@) && cp $< $@
+	@mkdir -p $(dir $@) && $(INLINE) $< $@
+
+$(BUILD_DIR)/release/config.json:
+	@INPUT=$(BUILD_DIR)/release/index.html OUTPUT=$(BUILD_DIR)/release/config.json BRANCH=$(BRANCH) COMMIT_ID=$(COMMIT_ID) TARGET=release node tools/generate_config.js
 
 $(BUILD_DIR)/test/index.html: $(SOURCE_DIR)/hybrid-test-index.html
-	@$(HTML_INLINE) -i $< -b . > $@
+	@mkdir -p $(dir $@) && $(INLINE) $< $@
+
+$(BUILD_DIR)/test/config.json:
+	@INPUT=$(BUILD_DIR)/test/index.html OUTPUT=$(BUILD_DIR)/test/config.json BRANCH=$(BRANCH) COMMIT_ID=$(COMMIT_ID) TARGET=test node tools/generate_config.js
 
 # Implicit rules
 

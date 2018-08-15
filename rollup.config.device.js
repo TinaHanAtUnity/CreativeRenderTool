@@ -4,7 +4,7 @@ export default {
     input: 'build/src/ts/Device.js',
     output: {
         name: 'Device',
-        file: 'build/src/ts/DeviceBundle.js',
+        file: 'build/src/ts/Bundle.js',
         format: 'iife',
         interop: false,
         sourcemap: 'inline'
