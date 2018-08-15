@@ -116,6 +116,10 @@ export class PurchasingUtilities {
         }
     }
 
+    public static isCatalogValid(): boolean {
+        return (this._catalog !== undefined && this._catalog.getProducts() !== undefined && this._catalog.getSize() !== 0);
+    }
+
     private static _catalog: PurchasingCatalog = new PurchasingCatalog([]);
     private static _clientInfo: ClientInfo;
     private static _configuration: Configuration;
@@ -196,10 +200,6 @@ export class PurchasingUtilities {
             return ((parseInt(promoVersionSplit[0], 10) >= 2) || ((parseInt(promoVersionSplit[0], 10) >= 1 && parseInt(promoVersionSplit[1], 10) >= 16)));
         }
         return false;
-    }
-
-    private static isCatalogValid(): boolean {
-        return (this._catalog !== undefined && this._catalog.getProducts() !== undefined && this._catalog.getSize() !== 0);
     }
 
     private static getInitializationPayload(): IPromoPayload {
