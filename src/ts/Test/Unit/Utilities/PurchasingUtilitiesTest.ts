@@ -250,6 +250,27 @@ describe('PurchasingUtilitiesTest', () => {
         });
     });
 
+    describe('isCatalogValid', () => {
+        context('should be false', () => {
+            it('if the catalog contains zero products', () => {
+                assert.isFalse(PurchasingUtilities.isCatalogValid());
+            });
+        });
+
+        context('should be true', () => {
+            beforeEach(() => {
+                const promise = PurchasingUtilities.refreshCatalog();
+                purchasing.onGetPromoCatalog.trigger(promoCatalog);
+                return promise;
+            });
+
+            it('if the catalog contains at least one product', () => {
+                sinon.assert.called(<sinon.SinonStub>purchasing.getPromoCatalog);
+                assert.isTrue(PurchasingUtilities.isCatalogValid());
+            });
+        });
+    });
+
     describe('refreshCatalog', () => {
         describe('onSuccess', () => {
             beforeEach(() => {
