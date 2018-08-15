@@ -315,13 +315,13 @@ export class WebView {
             }
         }).then(() => {
             // Send diagnostic events for abnormal ad termination
-            this._forceQuitManager.getForceQuitData().then((forceQuitData) => {
-                if (forceQuitData && forceQuitData.adSession) {
+            this._forceQuitManager.getForceQuitData().then((session) => {
+                if (session) {
                     const error = {
                         clientInfo: this._clientInfo,
                         deviceInfo: this._deviceInfo
                     };
-                    Diagnostics.trigger('force_quit', error, forceQuitData.adSession);
+                    Diagnostics.trigger('force_quit', error, session);
                     this._forceQuitManager.destroyForceQuitKey();
                 }
             });

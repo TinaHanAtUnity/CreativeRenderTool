@@ -119,7 +119,7 @@ export abstract class AbstractAdUnit {
 
     public createForceQuitKey(): IForceQuitData {
         return {
-            adSession: this._baseCampaign.getSession()
+            adSessionId: this._baseCampaign.getSession().getId()
         };
     }
 }
