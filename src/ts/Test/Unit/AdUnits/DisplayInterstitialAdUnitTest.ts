@@ -22,6 +22,9 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { GdprManager } from 'Managers/GdprManager';
 import { Privacy } from 'Views/Privacy';
+import { WebPlayerContainer } from 'Utilities/WebPlayer/WebPlayerContainer';
+import { asStub } from '../TestHelpers/Functions';
+import { Observable2, Observable1 } from 'Utilities/Observable';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 import { ForceQuitManager } from 'Managers/ForceQuitManager';
 
@@ -38,6 +41,7 @@ describe('DisplayInterstitialAdUnit', () => {
     let thirdPartyEventManager: ThirdPartyEventManager;
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
+    let webPlayerContainer: WebPlayerContainer;
     let displayInterstitialAdUnitParameters: IDisplayInterstitialAdUnitParameters;
     let forceQuitManager: ForceQuitManager;
 
@@ -52,8 +56,6 @@ describe('DisplayInterstitialAdUnit', () => {
             forceQuitManager = sinon.createStubInstance(ForceQuitManager);
             sandbox = sinon.sandbox.create();
             nativeBridge = TestFixtures.getNativeBridge(Platform.ANDROID);
-            sandbox.stub(nativeBridge.WebPlayer, 'setSettings').returns(Promise.resolve());
-            sandbox.stub(nativeBridge.WebPlayer, 'clearSettings').returns(Promise.resolve());
             placement = TestFixtures.getPlacement();
 
             const metaDataManager = new MetaDataManager(nativeBridge);
@@ -83,6 +85,12 @@ describe('DisplayInterstitialAdUnit', () => {
 
             const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
 
+            webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
+            (<any>webPlayerContainer).onPageStarted = new Observable1<string>();
+            (<any>webPlayerContainer).shouldOverrideUrlLoading = new Observable2<string, string>();
+            asStub(webPlayerContainer.setSettings).resolves();
+            asStub(webPlayerContainer.clearSettings).resolves();
+
             view = new DisplayInterstitial(nativeBridge, placement, campaign, privacy, false);
             view.render();
             document.body.appendChild(view.container());
@@ -90,6 +98,7 @@ describe('DisplayInterstitialAdUnit', () => {
             sandbox.stub(view, 'hide');
 
             displayInterstitialAdUnitParameters = {
+                webPlayerContainer,
                 forceOrientation: Orientation.LANDSCAPE,
                 focusManager: focusManager,
                 container: container,

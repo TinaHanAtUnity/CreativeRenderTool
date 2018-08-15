@@ -830,15 +830,15 @@ export class CampaignManager {
                     placements = this._configuration.getPlacements();
                 }
 
-                for(const placement in placements) {
-                    if(placements.hasOwnProperty(placement)) {
-                        placementRequest[placement] = {
-                            adTypes: placements[placement].getAdTypes(),
-                            allowSkip: placements[placement].allowSkip()
+                Object.keys(placements).forEach((placementId) => {
+                    const placement = placements[placementId];
+                    if (!placement.isBannerPlacement()) {
+                        placementRequest[placementId] = {
+                            adTypes: placement.getAdTypes(),
+                            allowSkip: placement.allowSkip()
                         };
                     }
-                }
-
+                });
                 body.placements = placementRequest;
                 body.properties = this._configuration.getProperties();
                 body.sessionDepth = SdkStats.getAdRequestOrdinal();

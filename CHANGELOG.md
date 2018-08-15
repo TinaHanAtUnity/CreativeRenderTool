@@ -1,9 +1,14 @@
-# Mon Aug 13 20:06:12 UTC 2018
+# Wed Aug 15 05:57:24 UTC 2018
 
-* Measuring playable ad loading times
+* Banner implementation merged to 3.0.0
+* Add tracking URL events for Performance Campaigns
+
+# Tue Aug 14 20:02:05 UTC 2018
+
+* Send a diagnostic event if the mraid creation fails
 * Reset the app sheet when closing the ad unit
-* Measuring average fps for mraid content
 * Merge out changes related to modularization refactoring
+* Fix tests if XHRequest is used to fetch MRAIDs
 
 # Thu Aug  9 23:04:44 UTC 2018
 

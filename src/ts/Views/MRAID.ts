@@ -12,6 +12,7 @@ import { Template } from 'Utilities/Template';
 import { SdkStats } from 'Utilities/SdkStats';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { Diagnostics } from 'Utilities/Diagnostics';
 import { ABGroup } from 'Models/ABGroup';
 
 export class MRAID extends MRAIDView<IMRAIDViewHandler> {
@@ -97,7 +98,13 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
             if (CustomFeatures.isSonicPlayable(this._creativeId)) {
                 iframe.sandbox = 'allow-scripts allow-same-origin';
             }
-        }).catch(e => this._nativeBridge.Sdk.logError('failed to create mraid: ' + e));
+        }).catch(e => {
+            this._nativeBridge.Sdk.logError('failed to create mraid: ' + e);
+
+            Diagnostics.trigger('create_mraid_error', {
+                message: e.message
+            }, this._campaign.getSession());
+        });
 
         this._messageListener = (event: MessageEvent) => this.onMessage(event);
         window.addEventListener('message', this._messageListener, false);

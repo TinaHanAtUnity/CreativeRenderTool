@@ -125,6 +125,12 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
             SdkStats.setFrameSetStartTimestamp(this._placement.getId());
             this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' set iframe.src started ' + SdkStats.getFrameSetStartTimestamp(this._placement.getId()));
             iframe.srcdoc = mraid;
+        }).catch((err) => {
+            this._nativeBridge.Sdk.logError('failed to create mraid: ' + err);
+
+            Diagnostics.trigger('create_mraid_error', {
+                message: err.message
+            }, this._campaign.getSession());
         });
 
         this._messageListener = (event: MessageEvent) => this.onMessage(event);
