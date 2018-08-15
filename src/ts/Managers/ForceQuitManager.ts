@@ -3,8 +3,9 @@ import { StorageType } from 'Native/Api/Storage';
 import { NativeBridge } from 'Native/NativeBridge';
 
 export interface IForceQuitData {
-    adSessionId: string;
-    adPlan: string | undefined;
+    campaignId: string;
+    creativeId: string | undefined;
+    adType: string;
 }
 
 export class ForceQuitManager {
@@ -22,14 +23,9 @@ export class ForceQuitManager {
         });
     }
 
-    public getForceQuitData(): Promise<Session | undefined> {
+    public getForceQuitData(): Promise<IForceQuitData | undefined> {
         return this._nativeBridge.Storage.get(StorageType.PRIVATE, ForceQuitManager.ForceQuitKey).then(data => {
-            const session = new Session((<IForceQuitData>data).adSessionId);
-            const adPlan = (<IForceQuitData>data).adPlan;
-            if (adPlan) {
-                session.setAdPlan(adPlan);
-            }
-            return session;
+            return <IForceQuitData>data;
         }).catch(() => {
             return undefined;
         });
