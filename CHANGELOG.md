@@ -1,5 +1,6 @@
-# Pending
+# Staged
 
+* Banner implementation merged to 3.0.0
 * Add tracking URL events for Performance Campaigns
 
 # Tue Aug 14 20:02:05 UTC 2018
