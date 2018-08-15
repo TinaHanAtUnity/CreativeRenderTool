@@ -30,7 +30,7 @@ export interface IPerformanceCampaign extends ICampaign {
     bypassAppSheet: boolean;
     store: StoreName;
     adUnitStyle: AdUnitStyle | undefined;
-    downloadUrl: string;
+    downloadUrl?: string;
 }
 
 export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
@@ -56,7 +56,7 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             bypassAppSheet: ['boolean'],
             store: ['number'],
             adUnitStyle: ['object', 'undefined'],
-            downloadUrl: ['string'],
+            downloadUrl: ['string', 'undefined']
         }, campaign);
     }
 
