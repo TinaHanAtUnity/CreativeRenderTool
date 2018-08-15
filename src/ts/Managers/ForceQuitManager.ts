@@ -3,7 +3,9 @@ import { StorageType } from 'Native/Api/Storage';
 import { NativeBridge } from 'Native/NativeBridge';
 
 export interface IForceQuitData {
-    adSession: Session;
+    campaignId: string;
+    creativeId: string | undefined;
+    adType: string;
 }
 
 export class ForceQuitManager {
@@ -23,17 +25,17 @@ export class ForceQuitManager {
 
     public getForceQuitData(): Promise<IForceQuitData | undefined> {
         return this._nativeBridge.Storage.get(StorageType.PRIVATE, ForceQuitManager.ForceQuitKey).then(data => {
-            return Promise.resolve(<IForceQuitData>data);
+            return <IForceQuitData>data;
         }).catch(() => {
-            return Promise.resolve(undefined);
+            return undefined;
         });
     }
 
     public destroyForceQuitKey(): Promise<boolean> {
         return this._nativeBridge.Storage.delete(StorageType.PRIVATE, ForceQuitManager.ForceQuitKey).then(() => {
-            return Promise.resolve(true);
+            return true;
         }).catch(() => {
-            return Promise.resolve(false);
+            return false;
         });
     }
 }

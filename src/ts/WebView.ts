@@ -315,13 +315,15 @@ export class WebView {
             }
         }).then(() => {
             // Send diagnostic events for abnormal ad termination
-            this._forceQuitManager.getForceQuitData().then((forceQuitData) => {
-                if (forceQuitData && forceQuitData.adSession) {
+            this._forceQuitManager.getForceQuitData().then((data) => {
+                if (data) {
                     const error = {
-                        clientInfo: this._clientInfo,
-                        deviceInfo: this._deviceInfo
+                        campaignId: data.campaignId,
+                        creativeId: data.creativeId,
+                        adType: data.adType,
+                        gameId: this._clientInfo.getGameId()
                     };
-                    Diagnostics.trigger('force_quit', error, forceQuitData.adSession);
+                    Diagnostics.trigger('force_quit', error);
                     this._forceQuitManager.destroyForceQuitKey();
                 }
             });
