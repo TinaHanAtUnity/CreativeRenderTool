@@ -94,7 +94,7 @@ browser: all
 
 # VPaths
 
-vpath %.ts $(SOURCE_DIR)/ts $(TEST_DIR)
+vpath %.ts $(SOURCE_DIR)/ts
 vpath %.html $(SOURCE_DIR)/html
 vpath %.json $(SOURCE_DIR)/json
 vpath %.styl $(SOURCE_DIR)/styl
