@@ -32,13 +32,4 @@ export class CustomFeatures {
         // Ad unit should be closed when going background on iOS
         return gameId === '1795561';
     }
-
-    public static isCacheUpdateDisabledApp(gameId: string): boolean {
-        // Uken game id to disable cache change PR https://github.com/Applifier/unity-ads-webview/pull/4755
-        // ABT-466 black screen issue
-        return gameId === '1000671' ||
-               gameId === '1000670' ||
-               gameId === '1557353' ||
-               gameId === '1557354';
-    }
 }

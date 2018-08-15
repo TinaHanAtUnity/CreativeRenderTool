@@ -47,6 +47,7 @@ import { VideoState } from 'AdUnits/VideoAdUnit';
 import { Privacy } from 'Views/Privacy';
 import { GdprManager } from 'Managers/GdprManager';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { IEndScreenParameters } from 'Views/EndScreen';
 import { ForceQuitManager } from 'Managers/ForceQuitManager';
 
 describe('VideoEventHandlersTest', () => {
@@ -117,9 +118,18 @@ describe('VideoEventHandlersTest', () => {
         video = new Video('', TestFixtures.getSession());
         placement = TestFixtures.getPlacement();
         const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
-        overlay = new Overlay(nativeBridge, false, 'en', configuration.getGamerId(), privacy, false);
+        overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
 
-        endScreen = new PerformanceEndScreen(nativeBridge, performanceCampaign, 'en', '12345', privacy, false, configuration.getAbGroup());
+        const endScreenParams : IEndScreenParameters = {
+            nativeBridge: nativeBridge,
+            language : 'en',
+            gameId: '12345',
+            privacy: privacy,
+            showGDPRBanner: false,
+            abGroup: configuration.getAbGroup(),
+            targetGameName: performanceCampaign.getGameName()
+        };
+        endScreen = new PerformanceEndScreen(endScreenParams, performanceCampaign);
         const gdprManager = sinon.createStubInstance(GdprManager);
 
         vastAdUnitParameters = {
@@ -165,7 +175,16 @@ describe('VideoEventHandlersTest', () => {
 
         const xpromoPrivacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
         xPromoCampaign = TestFixtures.getXPromoCampaign();
-        xPromoEndScreen = new XPromoEndScreen(nativeBridge, xPromoCampaign, 'en', '12345', xpromoPrivacy, false, configuration.getAbGroup());
+        const xpromoEndScreenParams : IEndScreenParameters = {
+            nativeBridge: nativeBridge,
+            language : 'en',
+            gameId: '12345',
+            privacy: xpromoPrivacy,
+            showGDPRBanner: false,
+            abGroup: configuration.getAbGroup(),
+            targetGameName: xPromoCampaign.getGameName()
+        };
+        xPromoEndScreen = new XPromoEndScreen(xpromoEndScreenParams, xPromoCampaign);
         xPromoAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,

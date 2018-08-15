@@ -14,7 +14,6 @@ export interface IConfiguration {
     country: string;
     coppaCompliant: boolean;
     abGroup: ABGroup;
-    gamerId: string;
     properties: string;
     cacheMode: CacheMode;
     placements: { [id: string]: Placement };
@@ -28,6 +27,7 @@ export interface IConfiguration {
     gdprEnabled: boolean;
     optOutRecorded: boolean;
     optOutEnabled: boolean;
+    defaultBannerPlacement: Placement | undefined;
 }
 
 export class Configuration extends Model<IConfiguration> {
@@ -36,7 +36,6 @@ export class Configuration extends Model<IConfiguration> {
         country: ['string'],
         coppaCompliant: ['boolean'],
         abGroup: ['object'],
-        gamerId: ['string'],
         properties: ['string'],
         cacheMode: ['number'],
         placements: ['object'],
@@ -49,7 +48,8 @@ export class Configuration extends Model<IConfiguration> {
         organizationId: ['string', 'undefined'],
         gdprEnabled: ['boolean'],
         optOutRecorded: ['boolean'],
-        optOutEnabled: ['boolean']
+        optOutEnabled: ['boolean'],
+        defaultBannerPlacement: ['string', 'undefined']
     };
 
     constructor(data: IConfiguration) {
@@ -80,10 +80,6 @@ export class Configuration extends Model<IConfiguration> {
         return this.get('abGroup');
     }
 
-    public getGamerId(): string {
-        return this.get('gamerId');
-    }
-
     public getProperties(): string {
         return this.get('properties');
     }
@@ -98,6 +94,14 @@ export class Configuration extends Model<IConfiguration> {
 
     public getPlacement(placementId: string): Placement {
         return this.getPlacements()[placementId];
+    }
+
+    public removePlacements(ids: string[]) {
+        const placements = this.getPlacements();
+        ids.forEach((id) => {
+            delete placements[id];
+        });
+        this.set('placements', placements);
     }
 
     public getPlacementIds(): string[] {
@@ -132,6 +136,10 @@ export class Configuration extends Model<IConfiguration> {
 
     public getDefaultPlacement(): Placement {
         return this.get('defaultPlacement');
+    }
+
+    public getDefaultBannerPlacement(): Placement | undefined {
+        return this.get('defaultBannerPlacement');
     }
 
     public getUnityProjectId(): string {

@@ -29,6 +29,7 @@ export interface IPerformanceCampaign extends ICampaign {
     bypassAppSheet: boolean;
     store: StoreName;
     adUnitStyle: AdUnitStyle | undefined;
+    trackingUrls: {[key: string]: string[]};
 }
 
 export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
@@ -53,7 +54,8 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             videoEventUrls: ['object'],
             bypassAppSheet: ['boolean'],
             store: ['number'],
-            adUnitStyle: ['object', 'undefined']
+            adUnitStyle: ['object', 'undefined'],
+            trackingUrls: ['object', 'undefined']
         }, campaign);
     }
 
@@ -157,6 +159,10 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
         return this.get('adUnitStyle');
     }
 
+    public getTrackingUrls(): {[key: string]: string[]} {
+        return this.get('trackingUrls');
+    }
+
     public getDTO(): { [key: string]: any } {
         let gameIcon: any;
         const gameIconObject = this.getGameIcon();
@@ -203,7 +209,8 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             'clickAttributionUrl': this.getClickAttributionUrl(),
             'clickAttributionUrlFollowsRedirects': this.getClickAttributionUrlFollowsRedirects(),
             'bypassAppSheet': this.getBypassAppSheet(),
-            'store': StoreName[this.getStore()].toLowerCase()
+            'store': StoreName[this.getStore()].toLowerCase(),
+            'trackingUrls': this.getTrackingUrls()
         };
     }
 }

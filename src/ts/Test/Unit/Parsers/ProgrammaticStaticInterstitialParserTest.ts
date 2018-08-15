@@ -17,7 +17,6 @@ import { ProgrammaticStaticInterstitialParser } from 'Parsers/ProgrammaticStatic
 
 describe('ProgrammaticVPAIDParser', () => {
     const placements = ['TestPlacement'];
-    const gamerId = 'TestGamerId';
     const mediaId = 'o2YMT0Cmps6xHiOwNMeCrH';
     const correlationId = '583dfda0d933a3630a53249c';
 
@@ -44,7 +43,7 @@ describe('ProgrammaticVPAIDParser', () => {
             let campaign: DisplayInterstitialCampaign;
             const parse = (data: any) => {
                 const response = new AuctionResponse(placements, data, mediaId, correlationId);
-                return parser.parse(nativeBridge, request, response, session, gamerId).then((parsedCampaign) => {
+                return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
                     campaign = <DisplayInterstitialCampaign>parsedCampaign;
                 });
             };
@@ -59,7 +58,6 @@ describe('ProgrammaticVPAIDParser', () => {
 
                 const json = JSON.parse(DisplayStaticInterstitialCampaignHTML);
 
-                assert.equal(campaign.getGamerId(), gamerId, 'GamerID is not equal');
                 assert.equal(campaign.getSession(), session, 'Session is not equal');
                 assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not equal');
                 assert.equal(campaign.getDynamicMarkup(), decodeURIComponent(json.content), 'Dynamic Markup is not equal');
@@ -76,7 +74,7 @@ describe('ProgrammaticVPAIDParser', () => {
             let campaign: DisplayInterstitialCampaign;
             const parse = (data: any) => {
                 const response = new AuctionResponse(placements, data, mediaId, correlationId);
-                return parser.parse(nativeBridge, request, response, session, gamerId).then((parsedCampaign) => {
+                return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
                     campaign = <DisplayInterstitialCampaign>parsedCampaign;
                 });
             };
@@ -91,7 +89,6 @@ describe('ProgrammaticVPAIDParser', () => {
 
                 const json = JSON.parse(DisplayStaticInterstitialCampaignJS);
 
-                assert.equal(campaign.getGamerId(), gamerId, 'GamerID is not equal');
                 assert.equal(campaign.getSession(), session, 'Session is not equal');
                 assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not equal');
                 assert.equal(campaign.getDynamicMarkup(), '<script>' + decodeURIComponent(json.content) + '</script>', 'Dynamic Markup is not equal');
