@@ -11,14 +11,14 @@
 
         <script src="/node_modules/mocha/mocha.js"></script>
         <script src="/node_modules/chai/chai.js"></script>
-        <script src="/node_modules/web-console-reporter/WebConsole.js"></script>
+        <script src="/test-utils/reporter.js"></script>
         <script>
             mocha.setup({
                 ui: 'bdd',
-                reporter: WebConsole
+                reporter: HybridTestReporter
             });
         </script>
-        <script src="/build/test/UnitBundle.min.js"></script>
+        <script src="/build/test/UnitBundle.js"></script>
     </head>
     <body>
     </body>

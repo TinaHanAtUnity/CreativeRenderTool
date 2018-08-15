@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Unity Ads WebView</title>
+
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+        <meta name="apple-mobile-web-app-capable" content="yes"/>
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+        <meta name="format-detection" content="telephone=no"/>
+
+        <script src="/node_modules/mocha/mocha.js"></script>
+        <script src="/node_modules/chai/chai.js"></script>
+        <script src="/test-utils/reporter.js"></script>
+        <script>
+            mocha.setup({
+                ui: 'bdd',
+                reporter: HybridTestReporter
+            });
+        </script>
+        <script src="/build/test/HybridBundle.min.js"></script>
+        <script>
+            mocha.run(function(failures) {
+                var platform = (function() {
+                    var queryString = window.location.search.split('?')[1].split('&');
+                    for(var i = 0; i < queryString.length; i++) {
+                        var queryParam = queryString[i].split('=');
+                        if(queryParam[0] === 'platform') {
+                            return queryParam[1];
+                        }
+                    }
+                    return undefined;
+                })();
+                if(platform === 'android') {
+                    window.webviewbridge.handleInvocation(JSON.stringify([['com.unity3d.ads.test.hybrid.HybridTest', 'onTestResult', [failures], 'null']]));
+                } else if(platform === 'ios') {
+                    if(window.webkit) {
+                        window.webkit.messageHandlers.handleInvocation.postMessage(JSON.stringify([['UADSHybridTest', 'onTestResult', [failures], 'null']]));
+                    } else {
+                        var xhr = new XMLHttpRequest();
+                        xhr.open('POST', 'https://webviewbridge.unityads.unity3d.com/handleInvocation', false);
+                        xhr.send(JSON.stringify([['UADSHybridTest', 'onTestResult', [failures], 'null']]));
+                    }
+                }
+            });
+        </script>
+    </head>
+    <body>
+    </body>
+</html>

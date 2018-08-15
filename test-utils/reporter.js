@@ -1,4 +1,4 @@
-define([], function() {
+HybridTestReporter = (function() {
     "use strict";
 
     function Logger(platform) {
@@ -44,6 +44,8 @@ define([], function() {
                 xhr.open('POST', 'https://webviewbridge.unityads.unity3d.com/handleInvocation', false);
                 xhr.send(JSON.stringify([['UADSApi' + className, methodName, parameters, 'null']]));
             }
+        } else {
+            console.log(parameters[0]);
         }
     };
 
@@ -100,13 +102,15 @@ define([], function() {
     }
 
     function getPlatform() {
-        var queryString = window.location.search.split('?')[1].split('&');
-        for(var i = 0; i < queryString.length; i++) {
-            var queryParam = queryString[i].split('=');
-            if(queryParam[0] === 'platform') {
-                return queryParam[1];
+        try {
+            var queryString = window.location.search.split('?')[1].split('&');
+            for(var i = 0; i < queryString.length; i++) {
+                var queryParam = queryString[i].split('=');
+                if(queryParam[0] === 'platform') {
+                    return queryParam[1];
+                }
             }
-        }
+        } catch(error) {}
         return undefined;
     }
 
@@ -199,4 +203,4 @@ define([], function() {
     }
 
     return HybridTestReporter;
-});
+})();

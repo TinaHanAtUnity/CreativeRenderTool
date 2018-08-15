@@ -26,7 +26,7 @@ TEST_BUILD_DIR := $(BUILD_DIR)/$(TEST_DIR)
 
 # Sources
 
-SOURCES := $(shell find $(SOURCE_DIR) -type f -not -name '*.d.ts')
+SOURCES := $(shell find $(SOURCE_DIR) -mindepth 2 -type f -not -name '*.d.ts')
 TS_SOURCES := $(filter %.ts, $(SOURCES))
 HTML_SOURCES := $(filter %.html, $(SOURCES))
 JSON_SOURCES := $(filter %.json, $(SOURCES))
@@ -59,7 +59,7 @@ INTEGRATION_TEST_TARGETS := $(addprefix $(BUILD_DIR)/, $(patsubst %.ts, %.js, $(
 BROWSER_BUILD_TARGETS := $(SOURCE_BUILD_DIR)/ts/BrowserBundle.js $(SOURCE_BUILD_DIR)/styl/main.css $(BUILD_DIR)/browser/index.html $(BUILD_DIR)/browser/iframe.html
 DEV_BUILD_TARGETS := $(SOURCE_BUILD_DIR)/ts/Bundle.js $(BUILD_DIR)/dev/index.html $(BUILD_DIR)/dev/config.json
 RELEASE_BUILD_TARGETS := $(SOURCE_BUILD_DIR)/ts/Bundle.min.js $(BUILD_DIR)/release/index.html $(BUILD_DIR)/release/config.json
-TEST_BUILD_TARGETS := $(TEST_BUILD_DIR)/UnitBundle.min.js $(BUILD_DIR)/test/index.html $(BUILD_DIR)/test/config.json
+TEST_BUILD_TARGETS := $(TEST_BUILD_DIR)/HybridBundle.min.js $(BUILD_DIR)/test/index.html $(BUILD_DIR)/test/config.json
 
 # Built-in targets
 
@@ -80,26 +80,25 @@ build-release: all $(RELEASE_BUILD_TARGETS)
 	@$(HTML_INLINE) -i $(BUILD_DIR)/release/index.html -b . > $(BUILD_DIR)/release/index.html
 
 build-test: all $(TEST_BUILD_TARGETS)
-	@$(HTML_INLINE) -i $(BUILD_DIR)/test/index.html -b . > $(BUILD_DIR)/test/index.html
 
 test: test-unit test-integration
 
-test-unit: start-server all build/test/UnitBundle.js
-	@node test-utils/headless_runner.js /build/test/UnitBundle.js
+test-unit: start-server all build/test/UnitBundle.js build/test/unit-test.html
+	@node test-utils/runner.js http://localhost:8000/build/test/unit-test.html
 
-test-integration: start-server all build/test/IntegrationBundle.js
-	@node test-utils/headless_runner.js /build/test/IntegrationBundle.js
+test-integration: start-server all build/test/IntegrationBundle.js build/test/integration-test.html
+	@node test-utils/runner.js http://localhost:8000/build/test/integration-test.html
 
-test-coverage: start-server all build/test/UnitBundle.js
+test-coverage: start-server all build/test/UnitBundle.js build/test/unit-test.html
 	@mkdir -p build/coverage
-	@node test-utils/headless_runner.js /build/test/UnitBundle.js true
+	@node test-utils/runner.js http://localhost:8000/build/test/unit-test.html true
 	@$(REMAP_ISTANBUL) -i build/coverage/coverage.json -o build/coverage -t html
 	@$(REMAP_ISTANBUL) -i build/coverage/coverage.json -o build/coverage/summary -t text-summary
 	@cat build/coverage/summary && echo "\n"
 
 # VPaths
 
-vpath %.ts $(SOURCE_DIR)/ts
+vpath %.ts $(SOURCE_DIR)/ts $(TEST_DIR)
 vpath %.html $(SOURCE_DIR)/html
 vpath %.json $(SOURCE_DIR)/json
 vpath %.styl $(SOURCE_DIR)/styl
@@ -119,6 +118,9 @@ $(BUILD_DIR)/dev/index.html: $(SOURCE_DIR)/dev-index.html
 $(BUILD_DIR)/release/index.html: $(SOURCE_DIR)/prod-index.html
 	@mkdir -p $(dir $@) && cp $< $@
 
+$(BUILD_DIR)/test/index.html: $(SOURCE_DIR)/hybrid-test-index.html
+	@$(HTML_INLINE) -i $< -b . > $@
+
 # Implicit rules
 
 $(SOURCE_BUILD_DIR)/ts/BrowserBundle.js: all
@@ -128,7 +130,7 @@ $(SOURCE_BUILD_DIR)/ts/Bundle.js: all
 	@$(ROLLUP) --config rollup.config.device.js
 
 $(SOURCE_BUILD_DIR)/ts/Bundle.min.js: $(SOURCE_BUILD_DIR)/ts/Bundle.js
-	@$(CC) $(shell xargs -a .cc.release.opts) --js $(SOURCE_BUILD_DIR)/ts/Bundle.js --js_output_file $(SOURCE_BUILD_DIR)/ts/Bundle.min.js
+	@$(CC) $(shell cat .cc.opts | xargs) --js $(SOURCE_BUILD_DIR)/ts/Bundle.js --js_output_file $(SOURCE_BUILD_DIR)/ts/Bundle.min.js
 
 $(SOURCE_BUILD_DIR)/ts/%.js: %.ts
 	@$(TYPESCRIPT) --project tsconfig.json
@@ -162,14 +164,23 @@ $(TEST_BUILD_DIR)/Unit.js:
 $(TEST_BUILD_DIR)/UnitBundle.js: $(TEST_BUILD_DIR)/Unit.js $(UNIT_TEST_TARGETS)
 	@$(ROLLUP) --config rollup.config.test.unit.js
 
-$(TEST_BUILD_DIR)/UnitBundle.min.js: $(TEST_BUILD_DIR)/UnitBundle.js
-	@$(CC) $(shell xargs -a .cc.test.opts) --js $(TEST_BUILD_DIR)/ts/UnitBundle.js --js_output_file $(TEST_BUILD_DIR)/ts/UnitBundle.min.js
-
 $(TEST_BUILD_DIR)/Integration.js:
 	@echo $(INTEGRATION_TESTS) | sed "s/test\\//import '/g" | sed "s/\.ts/';/g" > $@
 
 $(TEST_BUILD_DIR)/IntegrationBundle.js: $(TEST_BUILD_DIR)/Integration.js $(INTEGRATION_TEST_TARGETS)
 	@$(ROLLUP) --config rollup.config.test.integration.js
+
+$(TEST_BUILD_DIR)/HybridBundle.js: $(TEST_BUILD_DIR)/Unit.js $(UNIT_TEST_TARGETS)
+	@$(ROLLUP) --config rollup.config.test.hybrid.js
+
+$(TEST_BUILD_DIR)/HybridBundle.min.js: $(TEST_BUILD_DIR)/HybridBundle.js
+	@$(CC) $(shell cat .cc.opts | xargs) --js $(TEST_BUILD_DIR)/HybridBundle.js --js_output_file $(TEST_BUILD_DIR)/HybridBundle.min.js
+
+$(TEST_BUILD_DIR)/unit-test.html:
+	@cp $(SOURCE_DIR)/unit-test-index.html $@
+
+$(TEST_BUILD_DIR)/integration-test.html:
+	@cp $(SOURCE_DIR)/integration-test-index.html $@
 
 %::
 	$(warning No rule specified for target "$@")

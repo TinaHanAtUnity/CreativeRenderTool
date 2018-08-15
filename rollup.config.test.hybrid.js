@@ -1,10 +1,10 @@
 import plugins from './rollup.config.plugins';
 
 export default {
-    input: 'build/test/Integration.js',
+    input: 'build/test/Unit.js',
     output: {
-        name: 'Integration',
-        file: 'build/test/IntegrationBundle.js',
+        name: 'Hybrid',
+        file: 'build/test/HybridBundle.js',
         format: 'iife',
         interop: false,
         globals: {
