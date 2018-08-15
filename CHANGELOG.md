@@ -1,6 +1,30 @@
-# Pending 
+# Wed Aug 15 05:57:24 UTC 2018
 
+* Banner implementation merged to 3.0.0
+* Add tracking URL events for Performance Campaigns
+
+# Tue Aug 14 20:02:05 UTC 2018
+
+* Send a diagnostic event if the mraid creation fails
+* Reset the app sheet when closing the ad unit
+* Merge out changes related to modularization refactoring
+* Fix tests if XHRequest is used to fetch MRAIDs
+
+# Thu Aug  9 23:04:44 UTC 2018
+
+* Send creativeView tracking event for companionAd using Vast model api
+
+# Wed Aug  8 08:40:08 UTC 2018
+
+* Destroy Forcequit Key only after container cleanly closes
+* Remove ComScore Completely
 * Encode Impression tracking urls of Programmatic VAST
+* Added the field latestCampaignsStarts in gameSessionCounters
+* Send close and skip events for playable mraid
+
+# Tue Aug  7 13:23:57 UTC 2018
+
+* Update Dependencies
 
 # Thu Aug  2 23:00:48 UTC 2018
 

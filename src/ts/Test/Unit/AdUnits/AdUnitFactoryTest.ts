@@ -39,8 +39,14 @@ import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFact
 import { GdprManager } from 'Managers/GdprManager';
 
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
+import { WebPlayerContainer } from 'Utilities/WebPlayer/WebPlayerContainer';
+import { Observable1, Observable2 } from 'Utilities/Observable';
+import { asStub } from '../TestHelpers/Functions';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 import { ForceQuitManager } from 'Managers/ForceQuitManager';
+import { MRAID } from 'Views/MRAID';
+import { PlayableMRAID } from 'Views/PlayableMRAID';
+import { XHRequest } from 'Utilities/XHRequest';
 
 describe('AdUnitFactoryTest', () => {
 
@@ -98,7 +104,13 @@ describe('AdUnitFactoryTest', () => {
 
         sandbox.stub(MoatViewabilityService, 'initMoat');
 
+        const webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
+        webPlayerContainer.onPageStarted = new Observable1<string>();
+        webPlayerContainer.shouldOverrideUrlLoading = new Observable2<string, string>();
+        asStub(webPlayerContainer.setSettings).resolves();
+        asStub(webPlayerContainer.clearSettings).resolves();
         adUnitParameters = {
+            webPlayerContainer: webPlayerContainer,
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
             container: container,
@@ -119,10 +131,52 @@ describe('AdUnitFactoryTest', () => {
         sandbox.spy(request, 'get');
         sandbox.stub(nativeBridge.WebPlayer, 'setSettings').returns(Promise.resolve());
         sandbox.stub(nativeBridge.WebPlayer, 'clearSettings').returns(Promise.resolve());
+        sandbox.stub(XHRequest, 'get').returns(Promise.resolve('mraid creative'));
     });
 
     afterEach(() => {
         sandbox.restore();
+    });
+
+    describe('MRAID AdUnit Factory', () => {
+        let campaign: MRAIDCampaign;
+
+        beforeEach(() => {
+            campaign = TestFixtures.getProgrammaticMRAIDCampaign();
+            const resourceUrl = campaign.getResourceUrl();
+            if(resourceUrl) {
+                resourceUrl.setFileId('1234');
+            }
+
+            adUnitParameters.campaign = campaign;
+        });
+
+        after(() => {
+            AdUnitFactory.setForcedPlayableMRAID(false);
+        });
+
+        it('should create PlayableMRAID view', () => {
+            AdUnitFactory.setForcedPlayableMRAID(false);
+
+            const resourceUrl = campaign.getResourceUrl();
+            if(resourceUrl) {
+                resourceUrl.set('url', 'https://cdn.unityads.unity3d.com/playables/production/unity/xinstall.html');
+            }
+
+            const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+            assert.isTrue(adUnit.getMRAIDView() instanceof PlayableMRAID, 'view should be PlayableMRAID');
+        });
+
+        it('should create MRAID view', () => {
+            const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+            assert.isTrue(adUnit.getMRAIDView() instanceof MRAID, 'view should be MRAID');
+        });
+
+        it('should be forced to create PlayableMRAID view', () => {
+            AdUnitFactory.setForcedPlayableMRAID(true);
+            const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+            assert.isTrue(adUnit.getMRAIDView() instanceof PlayableMRAID, 'view should be PlayableMRAID');
+        });
     });
 
     describe('MRAID AdUnit', () => {

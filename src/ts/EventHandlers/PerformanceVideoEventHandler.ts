@@ -2,14 +2,16 @@ import { PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { IVideoEventHandlerParams } from 'EventHandlers/BaseVideoEventHandler';
 import { VideoEventHandler } from 'EventHandlers/VideoEventHandler';
 import { TestEnvironment } from 'Utilities/TestEnvironment';
+import { ICometTrackingUrlEvents } from 'Parsers/CometCampaignParser';
 
 export class PerformanceVideoEventHandler extends VideoEventHandler {
 
     private _performanceAdUnit: PerformanceAdUnit;
 
-    constructor(params: IVideoEventHandlerParams<PerformanceAdUnit>) {
-        super(params);
-        this._performanceAdUnit = params.adUnit;
+    constructor(parameters: IVideoEventHandlerParams<PerformanceAdUnit>) {
+        super(parameters);
+        this._performanceAdUnit = parameters.adUnit;
+        this._campaign = parameters.campaign;
     }
 
     public onCompleted(url: string): void {
@@ -29,6 +31,7 @@ export class PerformanceVideoEventHandler extends VideoEventHandler {
         if(TestEnvironment.get('debugOverlayEnabled') && overlay) {
             overlay.setDebugMessage('Performance Ad');
         }
+        this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.LOADED);
     }
 
     protected handleVideoError(errorType?: string, errorData?: any): void {
@@ -38,9 +41,35 @@ export class PerformanceVideoEventHandler extends VideoEventHandler {
         if(endScreen) {
             endScreen.show();
         }
+        this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.ERROR);
     }
 
     protected getVideoOrientation(): string | undefined {
         return this._performanceAdUnit.getVideoOrientation();
+    }
+
+    protected handleStartEvent(progress: number): void {
+        super.handleStartEvent(progress);
+        this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.START);
+    }
+
+    protected handleFirstQuartileEvent(progress: number): void {
+        super.handleFirstQuartileEvent(progress);
+        this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.FIRST_QUARTILE);
+    }
+
+    protected handleMidPointEvent(progress: number): void {
+        super.handleMidPointEvent(progress);
+        this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.MIDPOINT);
+    }
+
+    protected handleThirdQuartileEvent(progress: number): void {
+        super.handleThirdQuartileEvent(progress);
+        this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.THIRD_QUARTILE);
+    }
+
+    protected handleCompleteEvent(url: string): void {
+        super.handleCompleteEvent(url);
+        this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.COMPLETE);
     }
 }

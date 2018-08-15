@@ -1,5 +1,4 @@
 import { NativeBridge } from 'Native/NativeBridge';
-import { Platform } from 'Constants/Platform';
 
 type NativeInvocation = [string, string, any[], string];
 
@@ -13,16 +12,7 @@ export class BatchInvocation {
     }
 
     public queue<T>(className: string, methodName: string, parameters: any[] = []): Promise<T> {
-        switch(this._nativeBridge.getPlatform()) {
-            case Platform.ANDROID:
-                return this.rawQueue<T>('com.unity3d.ads.api.' + className, methodName, parameters);
-
-            case Platform.IOS:
-                return this.rawQueue<T>('UADSApi' + className, methodName, parameters);
-
-            default: // for tests
-                return this.rawQueue<T>(className, methodName, parameters);
-        }
+        return this.rawQueue<T>(className, methodName, parameters);
     }
 
     public rawQueue<T>(fullClassName: string, methodName: string, parameters: any[] = []): Promise<T> {
@@ -35,5 +25,4 @@ export class BatchInvocation {
     public getBatch(): NativeInvocation[] {
         return this._batch;
     }
-
 }
