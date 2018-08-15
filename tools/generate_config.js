@@ -44,6 +44,7 @@ const url = [
     branch,
     commitId,
     target,
+    'index.html'
 ].join('/');
 
 fs.writeFileSync(output, JSON.stringify({
