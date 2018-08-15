@@ -2,18 +2,20 @@ import { NativeBridge } from 'Native/NativeBridge';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
 import { OverlayEventHandler } from 'EventHandlers/OverlayEventHandler';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ICometTrackingUrlEvents } from 'Parsers/CometCampaignParser';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
 
 export class PerformanceOverlayEventHandler extends OverlayEventHandler<PerformanceCampaign> {
+
     private _performanceAdUnit: PerformanceAdUnit;
-    private _performanceOperativeEventManger: OperativeEventManager;
-    private _performanceCampaign: PerformanceCampaign;
+    private _trackingUrls: {[key: string]: string[]};
+    private _thirdPartyEventManager: ThirdPartyEventManager;
 
     constructor(nativeBridge: NativeBridge, adUnit: PerformanceAdUnit, parameters: IPerformanceAdUnitParameters) {
         super(nativeBridge, adUnit, parameters, parameters.adUnitStyle);
         this._performanceAdUnit = adUnit;
-        this._performanceOperativeEventManger = parameters.operativeEventManager;
-        this._performanceCampaign = parameters.campaign;
+        this._thirdPartyEventManager = parameters.thirdPartyEventManager;
+        this._trackingUrls = parameters.campaign.getTrackingUrls();
     }
 
     public onOverlaySkip(position: number): void {
@@ -24,5 +26,7 @@ export class PerformanceOverlayEventHandler extends OverlayEventHandler<Performa
             endScreen.show();
         }
         this._performanceAdUnit.onFinish.trigger();
+
+        this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.SKIP);
     }
 }

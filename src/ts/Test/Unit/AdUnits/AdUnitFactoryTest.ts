@@ -39,10 +39,14 @@ import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFact
 import { GdprManager } from 'Managers/GdprManager';
 
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
+import { WebPlayerContainer } from 'Utilities/WebPlayer/WebPlayerContainer';
+import { Observable1, Observable2 } from 'Utilities/Observable';
+import { asStub } from '../TestHelpers/Functions';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 import { ForceQuitManager } from 'Managers/ForceQuitManager';
 import { MRAID } from 'Views/MRAID';
 import { PlayableMRAID } from 'Views/PlayableMRAID';
+import { XHRequest } from 'Utilities/XHRequest';
 
 describe('AdUnitFactoryTest', () => {
 
@@ -100,7 +104,13 @@ describe('AdUnitFactoryTest', () => {
 
         sandbox.stub(MoatViewabilityService, 'initMoat');
 
+        const webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
+        webPlayerContainer.onPageStarted = new Observable1<string>();
+        webPlayerContainer.shouldOverrideUrlLoading = new Observable2<string, string>();
+        asStub(webPlayerContainer.setSettings).resolves();
+        asStub(webPlayerContainer.clearSettings).resolves();
         adUnitParameters = {
+            webPlayerContainer: webPlayerContainer,
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
             container: container,
@@ -121,6 +131,7 @@ describe('AdUnitFactoryTest', () => {
         sandbox.spy(request, 'get');
         sandbox.stub(nativeBridge.WebPlayer, 'setSettings').returns(Promise.resolve());
         sandbox.stub(nativeBridge.WebPlayer, 'clearSettings').returns(Promise.resolve());
+        sandbox.stub(XHRequest, 'get').returns(Promise.resolve('mraid creative'));
     });
 
     afterEach(() => {
