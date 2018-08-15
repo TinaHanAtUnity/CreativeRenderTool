@@ -5,7 +5,8 @@ import { Image } from 'Models/Assets/Image';
 export enum StoreName {
     APPLE,
     GOOGLE,
-    XIAOMI
+    XIAOMI,
+    STANDALONE_APK
 }
 
 export interface IXPromoCampaign extends ICampaign {

@@ -30,6 +30,7 @@ export interface IPerformanceCampaign extends ICampaign {
     bypassAppSheet: boolean;
     store: StoreName;
     adUnitStyle: AdUnitStyle | undefined;
+    downloadUrl: string;
 }
 
 export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
@@ -54,7 +55,8 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             videoEventUrls: ['object'],
             bypassAppSheet: ['boolean'],
             store: ['number'],
-            adUnitStyle: ['object', 'undefined']
+            adUnitStyle: ['object', 'undefined'],
+            downloadUrl: ['string'],
         }, campaign);
     }
 
@@ -148,6 +150,10 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             this.getPortrait(),
             this.getLandscape()
         ];
+    }
+
+    public getDownloadUrl() {
+        return this.get('downloadUrl');
     }
 
     public isConnectionNeeded(): boolean {
