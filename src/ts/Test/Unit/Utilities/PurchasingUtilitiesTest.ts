@@ -14,6 +14,7 @@ import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import { PlacementManager } from 'Managers/PlacementManager';
 import { PlacementState } from 'Models/Placement';
 import { TestFixtures } from 'Test/Unit/TestHelpers/TestFixtures';
+import IapPromoCatalog from 'json/IapPromoCatalog.json';
 
 describe('PurchasingUtilitiesTest', () => {
     let nativeBridge: NativeBridge;
@@ -22,7 +23,7 @@ describe('PurchasingUtilitiesTest', () => {
     let clientInfo: ClientInfo;
     let placementManager: PlacementManager;
     let sandbox: sinon.SinonSandbox;
-    const promoCatalog = '[\n  {\n    \"localizedPriceString\" : \"$0.00\",\n    \"localizedTitle\" : \"Sword of Minimal Value\",\n    \"productId\" : \"myPromo\"\n  },\n  {\n    \"localizedPriceString\" : \"$0.99\",\n    \"localizedTitle\" : \"100 in-game Gold Coins\",\n    \"productId\" : \"100.gold.coins\"\n  }\n]';
+    let promoCatalog: string;
     const promoCatalogBad = '[\n    {\"pn}]';
     const promoCatalogEmpty = '[]';
     const iapPayloadPurchase: IPromoPayload = {
@@ -54,6 +55,7 @@ describe('PurchasingUtilitiesTest', () => {
         clientInfo = sinon.createStubInstance(ClientInfo);
         sandbox = sinon.sandbox.create();
         nativeBridge.Sdk = sdk;
+        promoCatalog = JSON.stringify(JSON.parse(IapPromoCatalog));
         (<any>purchasing).onInitialize = new Observable1<string>();
         (<any>purchasing).onCommandResult = new Observable1<string>();
         (<any>purchasing).onGetPromoVersion = new Observable1<string>();
@@ -332,6 +334,29 @@ describe('PurchasingUtilitiesTest', () => {
 
             assert.equal(PurchasingUtilities.getProductPrice('myPromo'), '$0.00');
             assert.equal(PurchasingUtilities.getProductPrice('100.gold.coins'), '$0.99');
+        });
+    });
+
+    describe('getProductType', () => {
+        beforeEach(() => {
+            const promise = PurchasingUtilities.refreshCatalog();
+            purchasing.onGetPromoCatalog.trigger(promoCatalog);
+            return promise;
+        });
+
+        it('should be undefined if product is not available', () => {
+            sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(false);
+            assert.equal(PurchasingUtilities.getProductType('myPromo'), undefined);
+        });
+
+        it('should return correct product type for the given productid if product is available', () => {
+            sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
+            assert.equal(PurchasingUtilities.getProductType('100.gold.coins'), 'nonConsumable');
+        });
+
+        it('should return undefined product type for the given productid if product is available but product type is missing from catalog', () => {
+            sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
+            assert.equal(PurchasingUtilities.getProductType('myPromo'), undefined);
         });
     });
 

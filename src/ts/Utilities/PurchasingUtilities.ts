@@ -86,6 +86,13 @@ export class PurchasingUtilities {
         throw new Error('Attempted to get price of invalid product: ' + productId);
     }
 
+    public static getProductType(productId: string): string | undefined {
+        if (this.isProductAvailable(productId)) {
+            return this._catalog.getProducts()[productId].getProductType();
+        }
+        return undefined;
+    }
+
     public static isProductAvailable(productId: string): boolean {
         if (this.isCatalogValid()) {
             return (productId in this._catalog.getProducts());
