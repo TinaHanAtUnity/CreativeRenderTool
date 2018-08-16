@@ -166,7 +166,7 @@ describe('EndScreenEventHandlerTest', () => {
                     appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
                     bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
                     store: StoreName.STANDALONE_ANDROID,
-                    clickAttributionUrlFollowsRedirects: true,
+                    clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
                     clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl(),
                     downloadUrl: 'https://cdn.apk.com'
                 });
@@ -195,7 +195,7 @@ describe('EndScreenEventHandlerTest', () => {
                     appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
                     bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
                     store: StoreName.STANDALONE_ANDROID,
-                    clickAttributionUrlFollowsRedirects: true,
+                    clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
                     clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl(),
                     downloadUrl: 'https://cdn.apk.com'
                 });
