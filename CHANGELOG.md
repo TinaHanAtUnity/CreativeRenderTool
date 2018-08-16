@@ -1,7 +1,7 @@
-# Pending
+# Staged
 
 * Add Product type to promo tracking event urls
-* Reducing number of catalog refresh calls to IAP
+* Reduce number of catalog refresh calls to IAP
 * Fix forcequit diagnostic sending error
 
 # Wed Aug 15 05:57:24 UTC 2018
