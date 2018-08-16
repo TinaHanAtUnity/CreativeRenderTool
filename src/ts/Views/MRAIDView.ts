@@ -87,10 +87,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     public createMRAID(container: any): Promise<string> {
         const fetchingTimestamp = Date.now();
-        let fetchingStopTimestamp = Date.now();
-        let mraidParseTimestamp = Date.now();
         return this.fetchMRAID().then(mraid => {
-            fetchingStopTimestamp = mraidParseTimestamp = Date.now();
             if(mraid) {
                 const markup = this._campaign.getDynamicMarkup();
                 if(markup) {
@@ -103,10 +100,9 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
             }
             throw new WebViewError('Unable to fetch MRAID');
         }).then((data) => {
-            const fetchingDuration = fetchingStopTimestamp - fetchingTimestamp;
-            const mraidParseDuration = Date.now() - mraidParseTimestamp;
+            const fetchingDuration = Date.now() - fetchingTimestamp;
 
-            this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(fetchingDuration, mraidParseDuration, 0, 'mraid_fetching_time', {}));
+            this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(fetchingDuration, 0, 0, 'mraid_fetching_time', {}));
 
             return data;
         });
