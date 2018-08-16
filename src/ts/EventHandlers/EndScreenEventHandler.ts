@@ -119,6 +119,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         if (parameters.store === StoreName.STANDALONE_ANDROID && parameters.gameDownloadUrl && parameters.clickAttributionUrl) {
             this.handleAPKDownloadLink(parameters.gameDownloadUrl, parameters.clickAttributionUrl);
         } else if (parameters.clickAttributionUrlFollowsRedirects && parameters.clickAttributionUrl) {
+            // should be safe to remove after new Comet APK rule changes are deployed
             const apkDownloadLink = Url.getQueryParameter(parameters.clickAttributionUrl, 'apk_download_link');
             if (apkDownloadLink && platform === Platform.ANDROID) {
                 this.handleAPKDownloadLink(apkDownloadLink, parameters.clickAttributionUrl);

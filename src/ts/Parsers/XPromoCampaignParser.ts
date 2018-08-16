@@ -26,6 +26,8 @@ export class XPromoCampaignParser extends CampaignParser {
             case 'xiaomi':
                 storeName = StoreName.XIAOMI;
                 break;
+            case 'standalone_android':
+                storeName = StoreName.STANDALONE_ANDROID;
             default:
                 throw new Error('Unknown store value "' + json.store + '"');
         }
