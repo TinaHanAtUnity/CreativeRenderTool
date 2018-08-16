@@ -224,11 +224,11 @@ setup: clean
 watch: all $(TEST_BUILD_DIR)/Unit.js $(TEST_BUILD_DIR)/Integration.js
 	parallel --ungroup --tty --jobs 0 ::: \
 		"$(TYPESCRIPT) --project tsconfig.json --watch --preserveWatchOutput" \
-		"$(ROLLUP) --watch --silent --config rollup.config.device.js" \
-		"$(ROLLUP) --watch --silent --config rollup.config.browser.js" \
-		"$(ROLLUP) --watch --silent --config rollup.config.test.unit.js" \
-		"$(ROLLUP) --watch --silent --config rollup.config.test.integration.js" \
-		"$(ROLLUP) --watch --silent --config rollup.config.test.coverage.js"
+		"$(ROLLUP) --watch --config rollup.config.device.js" \
+		"$(ROLLUP) --watch --config rollup.config.browser.js" \
+		"$(ROLLUP) --watch --config rollup.config.test.unit.js" \
+		"$(ROLLUP) --watch --config rollup.config.test.integration.js" \
+		"$(ROLLUP) --watch --config rollup.config.test.coverage.js"
 
 start-server:
 	@test ! -f server.pid && { nohup python3 -m http.server 8000 >/dev/null 2>&1 & echo $$! > server.pid; } || true
