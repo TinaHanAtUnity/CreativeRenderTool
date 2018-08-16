@@ -252,7 +252,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     private showCloser() {
         return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
-            return this._container.setViewFrame('webview', 0, 0, width, height).then(() => {
+            return this._container.setViewFrame('webview', 0, 0, width, 200).then(() => {
                 if (!this._closer.container().parentNode) {
                     document.body.appendChild(this._closer.container());
                 }
