@@ -7,7 +7,7 @@ export enum StoreName {
     APPLE,
     GOOGLE,
     XIAOMI,
-    STANDALONE_APK
+    STANDALONE_ANDROID
 }
 
 export interface IPerformanceCampaign extends ICampaign {

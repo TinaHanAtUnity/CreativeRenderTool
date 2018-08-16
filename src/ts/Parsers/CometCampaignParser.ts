@@ -48,8 +48,8 @@ export class CometCampaignParser extends CampaignParser {
             case 'xiaomi':
                 storeName = StoreName.XIAOMI;
                 break;
-            case 'standalone_apk':
-                storeName = StoreName.STANDALONE_APK;
+            case 'standalone_android':
+                storeName = StoreName.STANDALONE_ANDROID;
                 break;
             default:
                 throw new Error('Unknown store value "' + json.store + '"');
