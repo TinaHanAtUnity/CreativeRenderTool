@@ -562,13 +562,17 @@ export class CampaignManager {
                 const kafkaObject: any = {};
                 kafkaObject.type = 'mraid_caching_time';
                 kafkaObject.eventData = {
-                    contentType: contentType,
-                    cachingDuration: cachingDuration
+                    contentType: contentType
                 };
-                kafkaObject.timeFromShow = 0;
+                kafkaObject.timeFromShow = cachingDuration;
                 kafkaObject.timeFromPlayableStart = 0;
                 kafkaObject.backgroundTime = 0;
                 kafkaObject.auctionId = campaign.getSession().getId();
+
+                const resourceUrl = (<MRAIDCampaign>campaign).getResourceUrl();
+                if(resourceUrl) {
+                    kafkaObject.url = resourceUrl.getOriginalUrl();
+                }
 
                 HttpKafka.sendEvent('ads.sdk2.events.playable.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
             }
