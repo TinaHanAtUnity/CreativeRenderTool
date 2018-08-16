@@ -1,7 +1,6 @@
-# Pending
+# Staged
 
-* Improve mraid caching time and add mraid parse time to diagnostics message
-* Collect mraid's average fps in group 16
+* Change comet tracking url names
 
 # Thu Aug 16 11:46:08 UTC 2018
 
