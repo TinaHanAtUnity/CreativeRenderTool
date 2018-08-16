@@ -127,7 +127,6 @@ export class CometCampaignParser extends CampaignParser {
                 bypassAppSheet: json.bypassAppSheet,
                 store: storeName,
                 adUnitStyle: this.parseAdUnitStyle(json.adUnitStyle),
-                downloadUrl: json.downloadUrl,
                 trackingUrls: response.getTrackingUrls()
             };
 
@@ -141,6 +140,9 @@ export class CometCampaignParser extends CampaignParser {
                 parameters.streamingPortraitVideo = new Video(this.validateAndEncodeUrl(json.trailerPortraitStreaming, session), session, undefined, json.portraitCreativeId);
             }
 
+            if(json.downloadUrl) {
+                parameters.downloadUrl = json.downloadUrl;
+            }
             return Promise.resolve(new PerformanceCampaign(parameters));
         }
     }

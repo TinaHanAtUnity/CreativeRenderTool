@@ -217,6 +217,7 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             'clickAttributionUrlFollowsRedirects': this.getClickAttributionUrlFollowsRedirects(),
             'bypassAppSheet': this.getBypassAppSheet(),
             'store': StoreName[this.getStore()].toLowerCase(),
+            'downloadUrl': this.getDownloadUrl(),
             'trackingUrls': this.getTrackingUrls()
         };
     }

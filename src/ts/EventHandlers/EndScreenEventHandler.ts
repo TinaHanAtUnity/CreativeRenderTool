@@ -116,15 +116,15 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     private handleClickAttribution(parameters: IEndScreenDownloadParameters) {
         const platform = this._nativeBridge.getPlatform();
 
-        if (parameters.clickAttributionUrlFollowsRedirects && parameters.clickAttributionUrl) {
+        if (parameters.store === StoreName.STANDALONE_APK && parameters.clickAttributionUrl && parameters.downloadUrl) {
+            this.handleAPKDownloadLink(parameters.downloadUrl, parameters.clickAttributionUrl);
+        } else if (parameters.clickAttributionUrlFollowsRedirects && parameters.clickAttributionUrl) {
             const apkDownloadLink = Url.getQueryParameter(parameters.clickAttributionUrl, 'apk_download_link');
             if (apkDownloadLink && platform === Platform.ANDROID) {
                 this.handleAPKDownloadLink(apkDownloadLink, parameters.clickAttributionUrl);
             } else {
                 this.handleClickAttributionWithRedirects(parameters.clickAttributionUrl, parameters.clickAttributionUrlFollowsRedirects);
             }
-        } else if (parameters.store === StoreName.STANDALONE_APK && parameters.clickAttributionUrl && parameters.downloadUrl) {
-            this.handleAPKDownloadLink(parameters.downloadUrl, parameters.clickAttributionUrl);
         } else if (parameters.clickAttributionUrl) {
             this._thirdPartyEventManager.clickAttributionEvent(parameters.clickAttributionUrl, false);
         }
