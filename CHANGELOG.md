@@ -1,3 +1,8 @@
+# Pending
+
+* Improve mraid caching time and add mraid parse time to diagnostics message
+* Collect mraid's average fps in group 16
+
 # Thu Aug 16 11:46:08 UTC 2018
 
 * Add Product type to promo tracking event urls
