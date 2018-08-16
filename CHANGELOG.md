@@ -1,4 +1,4 @@
-# Staged
+# Thu Aug 16 11:46:08 UTC 2018
 
 * Add Product type to promo tracking event urls
 * Reduce number of catalog refresh calls to IAP
