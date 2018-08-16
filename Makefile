@@ -235,3 +235,16 @@ start-server:
 
 stop-server:
 	@test -f server.pid && kill $$(cat server.pid) && rm server.pid || true
+
+deploy:
+ifeq ($(TRAVIS_PULL_REQUEST), false)
+	@mkdir -p deploy/release
+	@mkdir -p deploy/test
+	@cp build/release/index.html deploy/release/index.html
+	@cp build/release/config.json deploy/release/config.json
+	@cp build/test/index.html deploy/test/index.html
+	@cp build/test/config.json deploy/test/config.json
+	@tools/deploy.sh $(BRANCH) && node tools/purge.js
+else
+	@echo 'Skipping deployment for pull requests'
+endif
