@@ -1,5 +1,6 @@
 import MRAIDTemplate from 'html/MRAID.html';
 import MRAIDContainer from 'html/mraid/container.html';
+import MRAIDPerfContainer from 'html/mraid/container-perf.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
@@ -13,7 +14,8 @@ import { SdkStats } from 'Utilities/SdkStats';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { Diagnostics } from 'Utilities/Diagnostics';
-import { ABGroup } from 'Models/ABGroup';
+
+import { ABGroup, FPSCollectionTest } from 'Models/ABGroup';
 
 export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -89,7 +91,9 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         this._gdprBanner = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
         this._privacyButton = <HTMLElement>this._container.querySelector('.privacy-button');
 
-        this.createMRAID(MRAIDContainer).then(mraid => {
+        this.createMRAID(
+            FPSCollectionTest.isValid(this._abGroup) ? MRAIDPerfContainer : MRAIDContainer
+        ).then(mraid => {
             this._nativeBridge.Sdk.logDebug('setting iframe srcdoc (' + mraid.length + ')');
             SdkStats.setFrameSetStartTimestamp(this._placement.getId());
             this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' set iframe.src started ' + SdkStats.getFrameSetStartTimestamp(this._placement.getId()));

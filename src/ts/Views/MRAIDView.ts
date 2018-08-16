@@ -10,8 +10,7 @@ import { platform } from 'os';
 import { DOMUtils } from 'Utilities/DOMUtils';
 import { XHRequest } from 'Utilities/XHRequest';
 import { GDPREventHandler } from 'EventHandlers/GDPREventHandler';
-import { Diagnostics } from 'Utilities/Diagnostics';
-import { ABGroup, FPSCollectionTest } from 'Models/ABGroup';
+import { ABGroup } from 'Models/ABGroup';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
@@ -88,7 +87,6 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     public createMRAID(container: any): Promise<string> {
         const fetchingTimestamp = Date.now();
-        container = container.replace('IF_FPS_COLLECTION_ENABLED', FPSCollectionTest.isValid(this._abGroup).toString());
         return this.fetchMRAID().then(mraid => {
             if(mraid) {
                 const markup = this._campaign.getDynamicMarkup();
