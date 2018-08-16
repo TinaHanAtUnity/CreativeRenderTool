@@ -1,5 +1,7 @@
 const fs = require('fs');
 const puppeteer = require('puppeteer');
+const util = require('util');
+const exec = util.promisify(require('child_process').exec);
 
 if(process.argv.length < 3 || !process.argv[2]) {
     throw new Error('Missing test URL');
@@ -39,6 +41,9 @@ const coverage = process.argv[3];
             fs.writeFileSync('build/coverage/coverage.json', coverage);
         });
     }
+    page.exposeFunction('exec', async (command) => {
+        return await exec(command);
+    });
     const result = new Promise((resolve) => {
         page.exposeFunction('result', (failures) => {
             resolve(failures);
@@ -47,7 +52,7 @@ const coverage = process.argv[3];
     await page.goto(testUrl, {
         waitUntil: 'domcontentloaded'
     });
-    page.evaluate(() => {
+    await page.evaluate(() => {
         mocha.run((failures) => {
             if(window.writeCoverage && __coverage__) {
                 window.writeCoverage(JSON.stringify(__coverage__));
