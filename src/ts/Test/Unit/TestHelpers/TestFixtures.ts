@@ -119,10 +119,12 @@ export class TestFixtures {
         return parameters;
     }
 
-    public static getXPromoCampaignParams(json: any, storeName: StoreName): IXPromoCampaign {
+    public static getXPromoCampaignParams(json: any, storeName: StoreName, creativeId: string): IXPromoCampaign {
         const session = this.getSession();
+        const baseParams = this.getCometCampaignBaseParams(session, json.id, undefined);
+        baseParams.creativeId = creativeId;
         const parameters: IXPromoCampaign = {
-            ... this.getCometCampaignBaseParams(session, json.id, undefined),
+            ... baseParams,
             appStoreId: json.appStoreId,
             gameId: json.gameId,
             gameName: json.gameName,
@@ -361,7 +363,8 @@ export class TestFixtures {
     public static getXPromoCampaign(): XPromoCampaign {
         const json = JSON.parse(OnXPromoPlcCampaign);
         const xPromoJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
-        return new XPromoCampaign(this.getXPromoCampaignParams(xPromoJson, StoreName.GOOGLE));
+        const creativeId = json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].creativeId;
+        return new XPromoCampaign(this.getXPromoCampaignParams(xPromoJson, StoreName.GOOGLE, creativeId));
     }
 
     public static getPlayableMRAIDCampaignFollowsRedirects(): MRAIDCampaign {
