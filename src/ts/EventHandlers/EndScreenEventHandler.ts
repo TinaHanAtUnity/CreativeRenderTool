@@ -116,12 +116,8 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     private handleClickAttribution(parameters: IEndScreenDownloadParameters) {
         const platform = this._nativeBridge.getPlatform();
 
-        if (parameters.store === StoreName.STANDALONE_ANDROID && parameters.downloadUrl) {
-            if (parameters.clickAttributionUrl) {
-                this.handleAPKDownloadLink(parameters.downloadUrl, parameters.clickAttributionUrl);
-            } else {
-                this.handleAPKDownloadLink(parameters.downloadUrl);
-            }
+        if (parameters.store === StoreName.STANDALONE_ANDROID && parameters.downloadUrl && parameters.clickAttributionUrl) {
+            this.handleAPKDownloadLink(parameters.downloadUrl, parameters.clickAttributionUrl);
         } else if (parameters.clickAttributionUrlFollowsRedirects && parameters.clickAttributionUrl) {
             const apkDownloadLink = Url.getQueryParameter(parameters.clickAttributionUrl, 'apk_download_link');
             if (apkDownloadLink && platform === Platform.ANDROID) {
@@ -160,12 +156,10 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         });
     }
 
-    private handleAPKDownloadLink(apkDownloadLink: string, clickAttributionUrl?: string) {
-        if (clickAttributionUrl) {
-            this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, false).catch(error => {
-                this.triggerDiagnosticsError(error, clickAttributionUrl);
-            });
-        }
+    private handleAPKDownloadLink(apkDownloadLink: string, clickAttributionUrl: string) {
+        this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, false).catch(error => {
+            this.triggerDiagnosticsError(error, clickAttributionUrl);
+        });
 
         if (this._nativeBridge.getApiLevel() >= 21) {
             // Using WEB_SEARCH bypasses some security check for directly downloading .apk files
