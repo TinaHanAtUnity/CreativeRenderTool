@@ -8,7 +8,9 @@ if(process.argv.length < 3 || !process.argv[2]) {
 }
 const testUrl = process.argv[2];
 const coverage = process.argv[3];
+
 const debug = process.env.DEBUG;
+const testFilter = process.env.TEST_FILTER;
 
 (async () => {
     const browser = await puppeteer.launch({
@@ -42,7 +44,7 @@ const debug = process.env.DEBUG;
         });
     });
 
-    await page.goto(testUrl, {
+    await page.goto(testUrl + (testFilter ? '?grep=' + testFilter : ''), {
         waitUntil: 'domcontentloaded'
     });
 
