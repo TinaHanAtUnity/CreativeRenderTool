@@ -197,6 +197,7 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
     line-height: $new-video-overlay-styles.base-size * 1.31;
   }
 
+  .timer-container,
   .icon-container {
     line-height: $new-video-overlay-styles.base-size * 1.55;
   }
@@ -219,19 +220,9 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
     }
   }
 
-  .timer-container {
-    position: relative;
-    top: $new-video-overlay-styles.base-size * .27;
-    left: $new-video-overlay-styles.base-size * .5;
-    width: $new-video-overlay-styles.base-size * .9;
-    height: $new-video-overlay-styles.base-size * .9;
-    line-height: $new-video-overlay-styles.base-size * .92;
-  }
-
   .timer {
-    font-size: $new-video-overlay-styles.base-size * .5;
+    font-size: $new-video-overlay-styles.base-size * .6;
   }
-  
 
   .buffering-spinner {
     position: absolute;
@@ -347,7 +338,7 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
   */
   @media (orientation: landscape) {
     .content {
-      @media (max-width: 392) {
+      @media (max-width: 392px) {
         font-size: $new-video-overlay-styles.base-size * .6;
       }
 
@@ -355,15 +346,15 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
         font-size: $new-video-overlay-styles.base-size * 1.2;
       }
 
-      @media (min-width: 594px) and (max-width: 750px) {
+      @media (min-width: 594px) and (max-width: 792px) {
         font-size: $new-video-overlay-styles.base-size * 1.5;
       }
     
-      @media (min-width: 751px) and (max-width: 823px) {
+      @media (min-width: 792px) and (max-width: 840px) {
         font-size: $new-video-overlay-styles.base-size * 2;
       }
 
-      @media (min-width: 824px) and (max-width: 959px) {
+      @media (min-width: 840px) and (max-width: 959px) {
         font-size: $new-video-overlay-styles.base-size * 2.1;
       }
 
@@ -417,10 +408,10 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
 
     @media (orientation: landscape) {
       &.show-gdpr-banner .bottom-container .center .gdpr-pop-up {
-        width: 42%;
+        width: 40%;
 
         .gdpr-text {
-          font-size: $new-video-overlay-styles.base-size * .3;
+          font-size: $new-video-overlay-styles.base-size * .29;
         }
       }
 
@@ -435,9 +426,7 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
         }
       }
     }
-  }
 
-  @media only screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) {
     .bottom-container {
       margin-bottom: constant(safe-area-inset-bottom);
       // @stylint off
