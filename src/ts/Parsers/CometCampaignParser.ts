@@ -18,14 +18,14 @@ export enum ICometTrackingUrlEvents {
     IMPRESSION = 'impression', //
     START = 'start',
     CLICK = 'click',
-    ENDCARD_CLICK = 'EventVideoEndCardClick', //
+    ENDCARD_CLICK = 'videoEndCardClick', //
     FIRST_QUARTILE = 'firstQuartile',
     MIDPOINT = 'midpoint',
     THIRD_QUARTILE = 'thirdQuartile',
     ERROR = 'error',
-    STALLED = 'EventStalled', //
+    STALLED = 'stalled', //
     LOADED = 'loaded',
-    SHOW = 'EventShow', //
+    SHOW = 'show', //
     COMPLETE = 'complete',
     SKIP = 'skip'
 }
