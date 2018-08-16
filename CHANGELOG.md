@@ -1,3 +1,9 @@
+# Thu Aug 16 11:46:08 UTC 2018
+
+* Add Product type to promo tracking event urls
+* Reduce number of catalog refresh calls to IAP
+* Fix forcequit diagnostic sending error
+
 # Wed Aug 15 05:57:24 UTC 2018
 
 * Banner implementation merged to 3.0.0

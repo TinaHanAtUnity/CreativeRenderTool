@@ -39,7 +39,7 @@ export class PromoCampaignParser extends CampaignParser {
 
         let promise = Promise.resolve();
 
-        if (PurchasingUtilities.isInitialized()) {
+        if (PurchasingUtilities.isInitialized() && !PurchasingUtilities.isCatalogValid()) {
             promise = PurchasingUtilities.refreshCatalog();
         }
 
