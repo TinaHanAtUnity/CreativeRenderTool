@@ -1,3 +1,8 @@
+# Pending
+
+* Collect average fps for mraid
+* Improve caching time and add mraid parse time
+
 # Thu Aug 16 21:25:14 UTC 2018
 
 * Change comet tracking url names
