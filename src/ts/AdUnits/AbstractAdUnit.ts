@@ -16,6 +16,7 @@ import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/Program
 import { CampaignAssetInfo } from 'Utilities/CampaignAssetInfo';
 import { Observable0 } from 'Utilities/Observable';
 import { Request } from 'Utilities/Request';
+import { WebPlayerContainer } from 'Utilities/WebPlayer/WebPlayerContainer';
 
 export interface IAdUnitParameters<T extends Campaign> {
     forceOrientation: Orientation;
@@ -32,6 +33,7 @@ export interface IAdUnitParameters<T extends Campaign> {
     options: any;
     gdprManager: GdprManager;
     adMobSignalFactory?: AdMobSignalFactory;
+    webPlayerContainer?: WebPlayerContainer;
     programmaticTrackingService: ProgrammaticTrackingService;
 }
 
@@ -117,7 +119,9 @@ export abstract class AbstractAdUnit {
 
     public createForceQuitKey(): IForceQuitData {
         return {
-            adSession: this._baseCampaign.getSession()
+            campaignId: this._baseCampaign.getId(),
+            creativeId: this._baseCampaign.getCreativeId(),
+            adType: this.description()
         };
     }
 }

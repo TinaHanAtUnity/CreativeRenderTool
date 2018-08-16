@@ -39,6 +39,9 @@ import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFact
 import { GdprManager } from 'Managers/GdprManager';
 
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
+import { WebPlayerContainer } from 'Utilities/WebPlayer/WebPlayerContainer';
+import { Observable1, Observable2 } from 'Utilities/Observable';
+import { asStub } from '../TestHelpers/Functions';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 import { ForceQuitManager } from 'Managers/ForceQuitManager';
 import { MRAID } from 'Views/MRAID';
@@ -101,7 +104,13 @@ describe('AdUnitFactoryTest', () => {
 
         sandbox.stub(MoatViewabilityService, 'initMoat');
 
+        const webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
+        webPlayerContainer.onPageStarted = new Observable1<string>();
+        webPlayerContainer.shouldOverrideUrlLoading = new Observable2<string, string>();
+        asStub(webPlayerContainer.setSettings).resolves();
+        asStub(webPlayerContainer.clearSettings).resolves();
         adUnitParameters = {
+            webPlayerContainer: webPlayerContainer,
             forceOrientation: Orientation.LANDSCAPE,
             focusManager: focusManager,
             container: container,
@@ -350,6 +359,8 @@ describe('AdUnitFactoryTest', () => {
             sandbox.stub(operativeEventManager, 'sendView').returns(Promise.resolve());
             sandbox.stub(operativeEventManager, 'sendThirdQuartile').returns(Promise.resolve());
             sandbox.stub(operativeEventManager, 'sendSkip').returns(Promise.resolve());
+            sandbox.stub(PurchasingUtilities, 'isProductAvailable').returns(true);
+            sandbox.stub(PurchasingUtilities, 'getProductType').returns('NonConsumable');
 
             promoAdUnit = <PromoAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
         });

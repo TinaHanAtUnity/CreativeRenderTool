@@ -21,7 +21,6 @@ import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { Video } from 'Models/Assets/Video';
 import { GDPREventHandler } from 'EventHandlers/GDPREventHandler';
-import { Configuration } from 'Models/Configuration';
 
 export interface IEndScreenDownloadParameters {
     clickAttributionUrl: string | undefined;
@@ -35,13 +34,14 @@ export interface IEndScreenDownloadParameters {
 export abstract class EndScreenEventHandler<T extends Campaign, T2 extends AbstractAdUnit> extends GDPREventHandler implements IEndScreenHandler {
 
     protected _adUnit: T2;
-    private _nativeBridge: NativeBridge;
+    protected _campaign: T;
+    protected _thirdPartyEventManager: ThirdPartyEventManager;
+    protected _nativeBridge: NativeBridge;
+
     private _operativeEventManager: OperativeEventManager;
-    private _thirdPartyEventManager: ThirdPartyEventManager;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _placement: Placement;
-    private _campaign: T;
 
     constructor(nativeBridge: NativeBridge, adUnit: T2, parameters: IAdUnitParameters<T>) {
         super(parameters.gdprManager, parameters.configuration);

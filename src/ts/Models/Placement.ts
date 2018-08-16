@@ -32,6 +32,8 @@ interface IPlacement {
     previousState: PlacementState;
     placementStateChanged: boolean;
     currentCampaign: Campaign | undefined;
+    refreshDelay: number | undefined;
+    position: string | undefined;
 }
 
 export class Placement extends Model<IPlacement> {
@@ -52,7 +54,9 @@ export class Placement extends Model<IPlacement> {
             state: ['number'],
             previousState: ['number'],
             placementStateChanged: ['boolean'],
-            currentCampaign: ['object', 'undefined']
+            currentCampaign: ['object', 'undefined'],
+            refreshDelay: ['number', 'undefined'],
+            position: ['string', 'undefined']
         });
 
         this.set('id', data.id);
@@ -77,6 +81,8 @@ export class Placement extends Model<IPlacement> {
         this.set('adTypes', data.adTypes);
 
         this.set('state', PlacementState.NOT_AVAILABLE);
+        this.set('refreshDelay', data.refreshDelay);
+        this.set('position', data.position || 'bottomcenter');
     }
 
     public getId(): string {
@@ -157,6 +163,26 @@ export class Placement extends Model<IPlacement> {
 
     public setRealtimeData(value: string | undefined) {
         this.set('realtimeData', value);
+    }
+
+    public getRefreshDelay(): number | undefined {
+        return this.get('refreshDelay');
+    }
+
+    public getBannerStyle(): string | undefined {
+        return this.get('position');
+    }
+
+    public isBannerPlacement(): boolean {
+        const adTypes = this.getAdTypes();
+        if (adTypes) {
+            for (const adType of adTypes) {
+                if (adType === 'BANNER') {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public getDTO(): { [key: string]: any } {

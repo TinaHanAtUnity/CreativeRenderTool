@@ -1,4 +1,15 @@
-# Pending
+# Staged
+
+* Add Product type to promo tracking event urls
+* Reduce number of catalog refresh calls to IAP
+* Fix forcequit diagnostic sending error
+
+# Wed Aug 15 05:57:24 UTC 2018
+
+* Banner implementation merged to 3.0.0
+* Add tracking URL events for Performance Campaigns
+
+# Tue Aug 14 20:02:05 UTC 2018
 
 * Send a diagnostic event if the mraid creation fails
 * Reset the app sheet when closing the ad unit

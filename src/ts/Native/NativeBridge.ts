@@ -1,35 +1,37 @@
-import { INativeBridge } from 'Native/INativeBridge';
-import { BatchInvocation } from 'Native/BatchInvocation';
+import { EventCategory } from 'Constants/EventCategory';
+import { Platform } from 'Constants/Platform';
+import { AdsPropertiesApi } from 'Native/Api/AdsProperties';
+import { AndroidAdUnitApi } from 'Native/Api/AndroidAdUnit';
+import { AndroidPreferencesApi } from 'Native/Api/AndroidPreferences';
+import { AppSheetApi } from 'Native/Api/AppSheet';
+import { BannerApi } from 'Native/Api/Banner';
 import { BroadcastApi } from 'Native/Api/Broadcast';
 import { CacheApi } from 'Native/Api/Cache';
 import { ConnectivityApi } from 'Native/Api/Connectivity';
-import { RequestApi } from 'Native/Api/Request';
-import { VideoPlayerApi } from 'Native/Api/VideoPlayer';
-import { EventCategory } from 'Constants/EventCategory';
-import { ResolveApi } from 'Native/Api/Resolve';
-import { IntentApi } from 'Native/Api/Intent';
-import { ListenerApi } from 'Native/Api/Listener';
-import { PlacementApi } from 'Native/Api/Placement';
-import { SdkApi } from 'Native/Api/Sdk';
-import { StorageApi } from 'Native/Api/Storage';
 import { DeviceInfoApi } from 'Native/Api/DeviceInfo';
-import { AppSheetApi } from 'Native/Api/AppSheet';
-import { CallbackContainer } from 'Utilities/CallbackContainer';
-import { Platform } from 'Constants/Platform';
-import { AndroidAdUnitApi } from 'Native/Api/AndroidAdUnit';
+import { IntentApi } from 'Native/Api/Intent';
 import { IosAdUnitApi } from 'Native/Api/IosAdUnit';
-import { NotificationApi } from 'Native/Api/Notification';
-import { UrlSchemeApi } from 'Native/Api/UrlScheme';
-import { LifecycleApi } from 'Native/Api/Lifecycle';
-import { WebPlayerApi } from 'Native/Api/WebPlayer';
-import { AndroidPreferencesApi } from 'Native/Api/AndroidPreferences';
 import { IosPreferencesApi } from 'Native/Api/IosPreferences';
-import { SensorInfoApi } from 'Native/Api/SensorInfo';
+import { LifecycleApi } from 'Native/Api/Lifecycle';
+import { ListenerApi } from 'Native/Api/Listener';
+import { NotificationApi } from 'Native/Api/Notification';
+import { PlacementApi } from 'Native/Api/Placement';
 import { PurchasingApi } from 'Native/Api/Purchasing';
+import { RequestApi } from 'Native/Api/Request';
+import { ResolveApi } from 'Native/Api/Resolve';
+import { SdkApi } from 'Native/Api/Sdk';
+import { SensorInfoApi } from 'Native/Api/SensorInfo';
+import { StorageApi } from 'Native/Api/Storage';
+import { UrlSchemeApi } from 'Native/Api/UrlScheme';
+import { VideoPlayerApi } from 'Native/Api/VideoPlayer';
+import { WebPlayerApi } from 'Native/Api/WebPlayer';
 import { PermissionsApi } from 'Native/Api/Permissions';
 import { MainBundleApi } from 'Native/Api/MainBundle';
 import { ARApi } from 'Native/Api/AR';
-import { AdsPropertiesApi } from 'Native/Api/AdsProperties';
+import { BatchInvocation } from 'Native/BatchInvocation';
+import { INativeBridge } from 'Native/INativeBridge';
+import { CallbackContainer } from 'Utilities/CallbackContainer';
+import { BannerListenerApi } from './Api/UnityBannerListener';
 
 export enum CallbackStatus {
     OK,
@@ -79,6 +81,9 @@ export class NativeBridge implements INativeBridge {
     public WebPlayer: WebPlayerApi;
     public Permissions: PermissionsApi;
     public MainBundle: MainBundleApi;
+    public BannerPlayer: WebPlayerApi;
+    public Banner: BannerApi;
+    public BannerListener: BannerListenerApi;
     public AdsProperties: AdsPropertiesApi;
 
     private _callbackId: number = 1;
@@ -129,6 +134,8 @@ export class NativeBridge implements INativeBridge {
         this.WebPlayer = new WebPlayerApi(this);
         this.Permissions = new PermissionsApi(this);
         this.MainBundle = new MainBundleApi(this);
+        this.Banner = new BannerApi(this);
+        this.BannerListener = new BannerListenerApi(this);
         this.AdsProperties = new AdsPropertiesApi(this);
     }
 
@@ -265,6 +272,9 @@ export class NativeBridge implements INativeBridge {
                 }
                 break;
 
+            case EventCategory[EventCategory.BANNER]:
+                this.Banner.handleEvent(event, parameters);
+                break;
             default:
                 throw new Error('Unknown event category: ' + category);
         }

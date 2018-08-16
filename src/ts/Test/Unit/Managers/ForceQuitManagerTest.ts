@@ -26,7 +26,9 @@ describe('ForceQuitManagerTest', () => {
         getStub = sinon.stub(nativeBridge.Storage, 'get');
         deleteStub = sinon.stub(nativeBridge.Storage, 'delete');
         forceQuitData = {
-            adSession: TestFixtures.getSession()
+            campaignId: TestFixtures.getCampaign().getId(),
+            creativeId: TestFixtures.getCampaign().getCreativeId(),
+            adType: 'ad'
         };
 
     });
@@ -50,7 +52,13 @@ describe('ForceQuitManagerTest', () => {
             return forceQuitManager.getForceQuitData().then((data) => {
                 sinon.assert.calledOnce(getStub);
                 sinon.assert.calledWith(getStub, StorageType.PRIVATE, ForceQuitKey);
-                assert.deepEqual(forceQuitData, data, 'Returned data did not equal the force quit data');
+                if (data) {
+                    assert.equal(forceQuitData.campaignId, data.campaignId, 'Returned data did not equal the force quit data');
+                    assert.equal(forceQuitData.creativeId, data.creativeId, 'Returned data did not equal the force quit data');
+                    assert.equal(forceQuitData.adType, data.adType, 'Returned data did not equal the force quit data');
+                } else {
+                    assert.fail();
+                }
             });
         });
 
