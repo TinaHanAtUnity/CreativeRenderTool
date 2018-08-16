@@ -10,22 +10,11 @@ import { platform } from 'os';
 import { DOMUtils } from 'Utilities/DOMUtils';
 import { XHRequest } from 'Utilities/XHRequest';
 import { GDPREventHandler } from 'EventHandlers/GDPREventHandler';
-import { ABGroup } from 'Models/ABGroup';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
     forceOrientation: Orientation;
-}
-
-export interface IMRAIDStats {
-    totalTime: number;
-    playTime: number;
-    frameCount: number;
-}
-
-export interface IMRAIDFullStats extends IMRAIDStats {
-    averageFps: number;
-    averagePlayFps: number;
 }
 
 export interface IMRAIDViewHandler extends GDPREventHandler {
@@ -46,19 +35,13 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     protected _showGDPRBanner = false;
     protected _gdprPopupClicked = false;
 
-    protected _abGroup: ABGroup;
-
-    protected _stats: IMRAIDFullStats;
-
-    constructor(nativeBridge: NativeBridge, id: string, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup) {
+    constructor(nativeBridge: NativeBridge, id: string, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
         super(nativeBridge, id);
 
         this._placement = placement;
         this._campaign = campaign;
         this._privacy = privacy;
         this._showGDPRBanner = showGDPRBanner;
-
-        this._abGroup = abGroup;
 
         this._privacy.render();
         this._privacy.hide();
@@ -79,18 +62,11 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         if (this._showGDPRBanner && !this._gdprPopupClicked) {
             this._handlers.forEach(handler => handler.onGDPRPopupSkipped());
         }
-
-        if (this._stats !== undefined) {
-            this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(this._stats.averageFps, this._stats.averagePlayFps, 0, 'mraid_performance_stats', this._stats));
-        }
     }
 
     public createMRAID(container: any): Promise<string> {
         const fetchingTimestamp = Date.now();
-        let fetchingStopTimestamp = Date.now();
-        let mraidParseTimestamp = Date.now();
         return this.fetchMRAID().then(mraid => {
-            fetchingStopTimestamp = mraidParseTimestamp = Date.now();
             if(mraid) {
                 const markup = this._campaign.getDynamicMarkup();
                 if(markup) {
@@ -103,10 +79,9 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
             }
             throw new WebViewError('Unable to fetch MRAID');
         }).then((data) => {
-            const fetchingDuration = fetchingStopTimestamp - fetchingTimestamp;
-            const mraidParseDuration = Date.now() - mraidParseTimestamp;
+            const fetchingDuration = Date.now() - fetchingTimestamp;
 
-            this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(fetchingDuration, mraidParseDuration, 0, 'mraid_fetching_time', {}));
+            this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(fetchingDuration, 0, 0, 'mraid_fetching_time', {}));
 
             return data;
         });
@@ -139,14 +114,6 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     }
 
     protected abstract choosePrivacyShown(): void;
-
-    protected updateStats(stats: IMRAIDStats): void {
-        this._stats = {
-            ...stats,
-            averageFps: stats.frameCount / stats.totalTime,
-            averagePlayFps: stats.frameCount / stats.playTime
-        };
-    }
 
     private replaceMraidSources(mraid: string): string {
         // Workaround for https://jira.hq.unity3d.com/browse/ABT-333
