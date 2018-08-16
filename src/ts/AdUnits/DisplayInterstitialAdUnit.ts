@@ -42,8 +42,9 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
     private _shouldOverrideUrlLoadingObserver: IObserver2<string, string>;
     private _onPageStartedObserver: IObserver1<string>;
 
-    private readonly _closeAreaMinRatio = 0.05;
-    private readonly _closeAreaMinPixels = 50;
+    private _privacyShowing = false;
+    private _topWebViewAreaHeight: number;
+    private readonly _topWebViewAreaMinHeight = 60;
 
     constructor(nativeBridge: NativeBridge, parameters: IDisplayInterstitialAdUnitParameters) {
         super(nativeBridge, parameters);
@@ -61,6 +62,12 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
 
         this._options = parameters.options;
         this.setShowing(false);
+
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            this._topWebViewAreaHeight = Math.floor(this.getAndroidViewSize(this._topWebViewAreaMinHeight, this.getScreenDensity()));
+        } else {
+            this._topWebViewAreaHeight = this._topWebViewAreaMinHeight;
+        }
     }
 
     public show(): Promise<void> {
@@ -74,7 +81,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
             this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
             this.sendStartEvents();
             this._container.addEventHandler(this);
-
+            this.setupPrivacyObservers();
             // Display ads are always completed.
             this.setFinishState(FinishState.COMPLETED);
             return Promise.resolve();
@@ -126,7 +133,7 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
         ];
         Promise.all(promises).then(([screenWidth, screenHeight]) => {
             return this.setWebPlayerViewFrame(screenWidth, screenHeight)
-                .then(() => this.setWebViewViewFrame(screenWidth, screenHeight))
+                .then(() => this.setWebViewViewFrame(screenWidth, screenHeight, this._privacyShowing))
                 .then(() => this.setWebPlayerContent());
         });
     }
@@ -178,15 +185,12 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
         return this._container.setViewFrame('webplayer', xPos, yPos, creativeWidth, creativeHeight);
     }
 
-    private setWebViewViewFrame(screenWidth: number, screenHeight: number): Promise<void> {
-        let webviewAreaSize = Math.max(Math.min(screenWidth, screenHeight) * this._closeAreaMinRatio, this._closeAreaMinPixels);
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            const screenDensity = this.getScreenDensity();
-            webviewAreaSize = this.getAndroidViewSize(webviewAreaSize, screenDensity);
+    private setWebViewViewFrame(screenWidth: number, screenHeight: number, shouldFullScreen: boolean): Promise<void> {
+        if (shouldFullScreen) {
+            return this._container.setViewFrame('webview', 0, 0, screenWidth, screenHeight);
+        } else {
+            return this._container.setViewFrame('webview', 0, 0, screenWidth, this._topWebViewAreaHeight);
         }
-        const webviewXPos = screenWidth - webviewAreaSize;
-        const webviewYPos = 0;
-        return this._container.setViewFrame('webview', 0, 0, screenWidth, screenHeight);
     }
 
     private onPageStarted(url: string): void {
@@ -312,5 +316,25 @@ export class DisplayInterstitialAdUnit extends AbstractAdUnit implements IAdUnit
         return {
             placement: this._placement
         };
+    }
+
+    private setupPrivacyObservers(): void {
+        if (this._view.onPrivacyClosed) {
+            this._view.onPrivacyClosed.subscribe(() => {
+                this._privacyShowing = false;
+                Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
+                    this.setWebViewViewFrame(width, height, false);
+                });
+            });
+        }
+
+        if (this._view.onPrivacyOpened) {
+            this._view.onPrivacyOpened.subscribe(() => {
+                this._privacyShowing = true;
+                Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
+                    this.setWebViewViewFrame(width, height, true);
+                });
+            });
+        }
     }
 }
