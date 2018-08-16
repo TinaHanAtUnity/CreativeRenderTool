@@ -59,7 +59,7 @@ describe('CometCampaignParser', () => {
             case 'xiaomi':
                 return StoreName.XIAOMI;
             case 'standalone_android':
-                return StoreName.STANDALONE_ANDROID
+                return StoreName.STANDALONE_ANDROID;
             default:
                 throw new Error('Unknown store value "' + store + '"');
             }
