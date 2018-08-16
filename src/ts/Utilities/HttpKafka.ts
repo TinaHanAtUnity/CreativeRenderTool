@@ -43,7 +43,7 @@ export class HttpKafka {
                 return HttpKafka._request.post(HttpKafka.KafkaBaseUrl, rawData);
             } else {
                 // tslint:disable:no-console
-                console.dir(data);
+                console.log(JSON.stringify(data));
                 // tslint:enable:no-console
                 return Promise.resolve(<INativeResponse>{});
             }

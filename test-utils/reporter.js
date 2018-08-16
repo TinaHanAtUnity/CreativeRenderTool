@@ -3,7 +3,7 @@ HybridTestReporter = (function() {
 
     function Logger(platform) {
         this.timers = {};
-        this.level = 0;
+        this.level = 2;
         this.platform = platform;
     }
 
@@ -12,12 +12,13 @@ HybridTestReporter = (function() {
     };
 
     Logger.prototype.timeEnd = function(label) {
-        this.callNative('Sdk', 'logDebug', [(new Array(this.level)).join('\t') + label + ': ' + Date.now() - this.timers[label] + 'ms']);
+        this.callNative('Sdk', 'logDebug', [(new Array(this.level)).join('  ') + label + ': ' + (Date.now() - this.timers[label]) + 'ms']);
         delete this.timers[label];
     };
 
     Logger.prototype.group = function(label) {
-        this.callNative('Sdk', 'logDebug', [(new Array(this.level)).join('\t') + label]);
+        this.callNative('Sdk', 'logDebug', ['']);
+        this.callNative('Sdk', 'logDebug', [(new Array(this.level)).join('  ') + label]);
         this.level++;
     };
 
@@ -26,11 +27,11 @@ HybridTestReporter = (function() {
     };
 
     Logger.prototype.log = function(message) {
-        this.callNative('Sdk', 'logDebug', [(new Array(this.level)).join('\t') + message]);
+        this.callNative('Sdk', 'logDebug', [(new Array(this.level)).join('  ') + message]);
     };
 
     Logger.prototype.error = function(message) {
-        this.callNative('Sdk', 'logError', [(new Array(this.level)).join('\t') + message]);
+        this.callNative('Sdk', 'logError', [(new Array(this.level)).join('  ') + message]);
     };
 
     Logger.prototype.callNative = function(className, methodName, parameters) {
@@ -50,15 +51,24 @@ HybridTestReporter = (function() {
     };
 
     function BaseReporter(runner) {
-        if(!runner) return;
+        var stats = (this.stats = {
+            suites: 0,
+            tests: 0,
+            passes: 0,
+            pending: 0,
+            failures: 0
+        });
+        var failures = (this.failures = []);
 
-        var stats = this.stats = {suites: 0, tests: 0, passes: 0, pending: 0, failures: 0};
-        var failures = this.failures = [];
+        if (!runner) {
+            return;
+        }
+        this.runner = runner;
 
         runner.stats = stats;
 
         runner.on('start', function() {
-            stats.start = new Date;
+            stats.start = new Date();
         });
 
         runner.on('suite', function(suite) {
@@ -66,7 +76,7 @@ HybridTestReporter = (function() {
             suite.root || stats.suites++;
         });
 
-        runner.on('Test end', function(test) {
+        runner.on('test end', function() {
             stats.tests = stats.tests || 0;
             stats.tests++;
         });
@@ -74,12 +84,13 @@ HybridTestReporter = (function() {
         runner.on('pass', function(test) {
             stats.passes = stats.passes || 0;
 
-            var medium = test.slow() / 2;
-            test.speed = test.duration > test.slow()
-                ? 'slow'
-                : test.duration > medium
-                ? 'medium'
-                : 'fast';
+            if (test.duration > test.slow()) {
+                test.speed = 'slow';
+            } else if (test.duration > test.slow() / 2) {
+                test.speed = 'medium';
+            } else {
+                test.speed = 'fast';
+            }
 
             stats.passes++;
         });
@@ -91,9 +102,9 @@ HybridTestReporter = (function() {
             failures.push(test);
         });
 
-        runner.on('end', function() {
-            stats.end = new Date;
-            stats.duration = new Date - stats.start;
+        runner.once('end', function() {
+            stats.end = new Date();
+            stats.duration = stats.end - stats.start;
         });
 
         runner.on('pending', function() {
@@ -139,10 +150,10 @@ HybridTestReporter = (function() {
         });
 
         runner.on('pass', function(test) {
-            if('fast' == test.speed) {
+            if('fast' === test.speed) {
                 logger.log('passed: ' + test.title);
             }
-            else if('medium' == test.speed) {
+            else if('medium' === test.speed) {
                 logger.log('passed: ' + test.title + ' in: ' + test.duration);
             }
             else {
@@ -158,6 +169,7 @@ HybridTestReporter = (function() {
         var self = this;
         runner.on('end', function() {
             var stats = self.stats;
+            logger.log('');
 
             // duration
             logger.timeEnd('duration');
