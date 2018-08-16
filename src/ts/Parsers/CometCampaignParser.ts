@@ -140,8 +140,8 @@ export class CometCampaignParser extends CampaignParser {
                 parameters.streamingPortraitVideo = new Video(this.validateAndEncodeUrl(json.trailerPortraitStreaming, session), session, undefined, json.portraitCreativeId);
             }
 
-            if(json.downloadUrl) {
-                parameters.downloadUrl = json.downloadUrl;
+            if(json.gameDownloadUrl) {
+                parameters.gameDownloadUrl = json.gameDownloadUrl;
             }
             return Promise.resolve(new PerformanceCampaign(parameters));
         }

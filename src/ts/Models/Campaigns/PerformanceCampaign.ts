@@ -30,7 +30,7 @@ export interface IPerformanceCampaign extends ICampaign {
     bypassAppSheet: boolean;
     store: StoreName;
     adUnitStyle: AdUnitStyle | undefined;
-    downloadUrl?: string;
+    gameDownloadUrl?: string;
     trackingUrls: {[key: string]: string[]};
 }
 
@@ -57,7 +57,7 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             bypassAppSheet: ['boolean'],
             store: ['number'],
             adUnitStyle: ['object', 'undefined'],
-            downloadUrl: ['string', 'undefined'],
+            gameDownloadUrl: ['string', 'undefined'],
             trackingUrls: ['object', 'undefined']
         }, campaign);
     }
@@ -154,8 +154,8 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
         ];
     }
 
-    public getDownloadUrl() {
-        return this.get('downloadUrl');
+    public getGameDownloadUrl() {
+        return this.get('gameDownloadUrl');
     }
 
     public isConnectionNeeded(): boolean {
@@ -217,7 +217,7 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             'clickAttributionUrlFollowsRedirects': this.getClickAttributionUrlFollowsRedirects(),
             'bypassAppSheet': this.getBypassAppSheet(),
             'store': StoreName[this.getStore()].toLowerCase(),
-            'downloadUrl': this.getDownloadUrl(),
+            'gameDownloadUrl': this.getGameDownloadUrl(),
             'trackingUrls': this.getTrackingUrls()
         };
     }
