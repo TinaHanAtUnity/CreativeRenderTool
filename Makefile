@@ -68,7 +68,7 @@ INTEGRATION_TEST_TARGETS := $(addprefix $(BUILD_DIR)/, $(patsubst %.ts, %.js, $(
 BROWSER_BUILD_TARGETS := $(SOURCE_BUILD_DIR)/ts/BrowserBundle.js $(SOURCE_BUILD_DIR)/styl/main.css $(BUILD_DIR)/browser/index.html $(BUILD_DIR)/browser/iframe.html
 DEV_BUILD_TARGETS := $(SOURCE_BUILD_DIR)/ts/Bundle.js $(BUILD_DIR)/dev/index.html $(BUILD_DIR)/dev/config.json
 RELEASE_BUILD_TARGETS := $(SOURCE_BUILD_DIR)/ts/Bundle.min.js $(BUILD_DIR)/release/index.html $(BUILD_DIR)/release/config.json
-TEST_BUILD_TARGETS := $(TEST_BUILD_DIR)/HybridBundle.min.js $(BUILD_DIR)/test/index.html $(BUILD_DIR)/test/config.json
+TEST_BUILD_TARGETS := $(TEST_BUILD_DIR)/UnitBundle.min.js $(BUILD_DIR)/test/index.html $(BUILD_DIR)/test/config.json
 
 # Built-in targets
 
@@ -101,9 +101,9 @@ test-unit: start-server all build/test/UnitBundle.js build/test/unit-test.html
 test-integration: start-server all build/test/IntegrationBundle.js build/test/integration-test.html
 	@node test-utils/runner.js http://localhost:8000/build/test/integration-test.html
 
-test-coverage: start-server all build/test/UnitBundle.js build/test/unit-test.html
+test-coverage: start-server all build/test/CoverageBundle.js build/test/coverage-test.html
 	@mkdir -p build/coverage
-	@node test-utils/runner.js http://localhost:8000/build/test/unit-test.html true
+	@node test-utils/runner.js http://localhost:8000/build/test/coverage-test.html true
 	@$(REMAP_ISTANBUL) -i build/coverage/coverage.json -o build/coverage -t html
 	@$(REMAP_ISTANBUL) -i build/coverage/coverage.json -o build/coverage/summary -t text-summary
 	@cat build/coverage/summary && echo "\n"
@@ -185,23 +185,26 @@ $(TEST_BUILD_DIR)/Unit.js:
 $(TEST_BUILD_DIR)/UnitBundle.js: $(TEST_BUILD_DIR)/Unit.js $(UNIT_TEST_TARGETS)
 	@$(ROLLUP) --config rollup.config.test.unit.js
 
+$(TEST_BUILD_DIR)/UnitBundle.min.js: $(TEST_BUILD_DIR)/UnitBundle.js
+	@$(CC) $(shell cat .cc.opts | xargs) --js $(TEST_BUILD_DIR)/UnitBundle.js --js_output_file $(TEST_BUILD_DIR)/UnitBundle.min.js
+
 $(TEST_BUILD_DIR)/Integration.js:
 	@echo $(INTEGRATION_TESTS) | sed "s/test\\//import '/g" | sed "s/\.ts/';/g" > $@
 
 $(TEST_BUILD_DIR)/IntegrationBundle.js: $(TEST_BUILD_DIR)/Integration.js $(INTEGRATION_TEST_TARGETS)
 	@$(ROLLUP) --config rollup.config.test.integration.js
 
-$(TEST_BUILD_DIR)/HybridBundle.js: $(TEST_BUILD_DIR)/Unit.js $(UNIT_TEST_TARGETS)
-	@$(ROLLUP) --config rollup.config.test.hybrid.js
-
-$(TEST_BUILD_DIR)/HybridBundle.min.js: $(TEST_BUILD_DIR)/HybridBundle.js
-	@$(CC) $(shell cat .cc.opts | xargs) --js $(TEST_BUILD_DIR)/HybridBundle.js --js_output_file $(TEST_BUILD_DIR)/HybridBundle.min.js
+$(TEST_BUILD_DIR)/CoverageBundle.js: $(TEST_BUILD_DIR)/Unit.js $(UNIT_TEST_TARGETS)
+	@$(ROLLUP) --config rollup.config.test.coverage.js
 
 $(TEST_BUILD_DIR)/unit-test.html:
 	@cp $(SOURCE_DIR)/unit-test-index.html $@
 
 $(TEST_BUILD_DIR)/integration-test.html:
 	@cp $(SOURCE_DIR)/integration-test-index.html $@
+
+$(TEST_BUILD_DIR)/coverage-test.html:
+	@cp $(SOURCE_DIR)/coverage-test-index.html $@
 
 %::
 	$(warning No rule specified for target "$@")
@@ -221,11 +224,11 @@ setup: clean
 watch: all $(TEST_BUILD_DIR)/Unit.js $(TEST_BUILD_DIR)/Integration.js
 	parallel --ungroup --tty --jobs 0 ::: \
 		"$(TYPESCRIPT) --project tsconfig.json --watch --preserveWatchOutput" \
-		"$(ROLLUP) --watch --silent --config rollup.config.browser.js" \
 		"$(ROLLUP) --watch --silent --config rollup.config.device.js" \
-		"$(ROLLUP) --watch --silent --config rollup.config.test.hybrid.js" \
+		"$(ROLLUP) --watch --silent --config rollup.config.browser.js" \
+		"$(ROLLUP) --watch --silent --config rollup.config.test.unit.js" \
 		"$(ROLLUP) --watch --silent --config rollup.config.test.integration.js" \
-		"$(ROLLUP) --watch --silent --config rollup.config.test.unit.js"
+		"$(ROLLUP) --watch --silent --config rollup.config.test.coverage.js"
 
 start-server:
 	@test ! -f server.pid && { nohup python3 -m http.server 8000 >/dev/null 2>&1 & echo $$! > server.pid; } || true

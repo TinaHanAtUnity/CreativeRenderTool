@@ -8,10 +8,12 @@ if(process.argv.length < 3 || !process.argv[2]) {
 }
 const testUrl = process.argv[2];
 const coverage = process.argv[3];
+const debug = process.env.DEBUG;
 
 (async () => {
     const browser = await puppeteer.launch({
-        args: ['--no-sandbox']
+        args: ['--no-sandbox'],
+        devtools: !!debug
     });
     const page = await browser.newPage();
 
@@ -52,6 +54,12 @@ const coverage = process.argv[3];
     await page.goto(testUrl, {
         waitUntil: 'domcontentloaded'
     });
+    if(debug) {
+        page.waitFor(1000);
+        page.evaluate(() => {
+            debugger;
+        });
+    }
     await page.evaluate(() => {
         mocha.run((failures) => {
             if(window.writeCoverage && __coverage__) {

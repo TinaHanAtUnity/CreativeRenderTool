@@ -1,10 +1,11 @@
 import plugins from './rollup.config.plugins';
+import istanbul from 'rollup-plugin-istanbul';
 
 export default {
     input: 'build/test/Unit.js',
     output: {
-        name: 'Hybrid',
-        file: 'build/test/HybridBundle.js',
+        name: 'Unit',
+        file: 'build/test/CoverageBundle.js',
         format: 'iife',
         interop: false,
         globals: {
@@ -12,7 +13,13 @@ export default {
         },
         sourcemap: 'inline'
     },
-    plugins: plugins,
+    plugins: plugins.concat([
+        istanbul({
+            include: [
+                'build/src/ts/**/*.js'
+            ]
+        })
+    ]),
     external: [
         'mocha',
         'chai'

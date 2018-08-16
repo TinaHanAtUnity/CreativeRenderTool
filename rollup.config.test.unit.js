@@ -1,10 +1,9 @@
 import plugins from './rollup.config.plugins';
-import istanbul from 'rollup-plugin-istanbul';
 
 export default {
     input: 'build/test/Unit.js',
     output: {
-        name: 'Unit',
+        name: 'Hybrid',
         file: 'build/test/UnitBundle.js',
         format: 'iife',
         interop: false,
@@ -13,13 +12,7 @@ export default {
         },
         sourcemap: 'inline'
     },
-    plugins: plugins.concat([
-        istanbul({
-            include: [
-                'build/src/ts/**/*.js'
-            ]
-        })
-    ]),
+    plugins: plugins,
     external: [
         'mocha',
         'chai'
