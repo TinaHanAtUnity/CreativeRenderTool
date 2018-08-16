@@ -569,7 +569,7 @@ export class CampaignManager {
                 kafkaObject.backgroundTime = 0;
                 kafkaObject.auctionId = campaign.getSession().getId();
 
-                const resourceUrl = (<MRAIDCampaign>campaign).getResourceUrl();
+                const resourceUrl = campaign.getResourceUrl();
                 if(resourceUrl) {
                     kafkaObject.url = resourceUrl.getOriginalUrl();
                 }
