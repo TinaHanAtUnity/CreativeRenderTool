@@ -1,4 +1,4 @@
-# Pending
+# Fri Aug 17 11:23:03 UTC 2018
 
 * Fix force_quite deletion
 * Collect average fps for mraid
