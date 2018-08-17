@@ -65,6 +65,7 @@ export class VPAIDEndScreen extends View<IVPAIDEndScreenHandler> {
 
     public show(): void {
         super.show();
+        document.body.appendChild(this.container());
 
         this._handlers.forEach(handler => handler.onVPAIDEndScreenShow());
 
@@ -76,7 +77,7 @@ export class VPAIDEndScreen extends View<IVPAIDEndScreenHandler> {
     }
 
     public remove(): void {
-        this.container().parentElement!.removeChild(this.container());
+        document.body.removeChild(this.container());
     }
 
     private onCloseEvent(event: Event): void {

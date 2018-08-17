@@ -34,6 +34,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     private static _adLoadTimeout: number = 10 * 1000;
+    private _endScreen: VPAIDEndScreen;
     private _closer: Closer;
     private _placement: Placement;
     private _thirdPartyEventManager: ThirdPartyEventManager;
@@ -61,13 +62,17 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._webPlayerContainer = parameters.webPlayerContainer!;
         this._timer = new Timer(() => this.onAdUnitNotLoaded(), VPAIDAdUnit._adLoadTimeout);
 
+        if (parameters.endScreen) {
+            this._endScreen = parameters.endScreen;
+            this._endScreen.render();
+        }
+
         this._closer.render();
         this._closer.choosePrivacyShown();
     }
 
     public show(): Promise<void> {
         this.onShow();
-
         return this.setupWebPlayer().then(() => {
             this._urlLoadingObserver = this._webPlayerContainer.shouldOverrideUrlLoading.subscribe((url, method) => this.onUrlLoad(url));
             this.setupPrivacyObservers();
@@ -246,13 +251,17 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     private hideView() {
-        this._closer.hide();
+        this._view.mute();
         this._view.hide();
+        this._closer.hide();
+        if (this._endScreen) {
+            this._endScreen.remove();
+        }
     }
 
     private showCloser() {
         return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
-            return this._container.setViewFrame('webview', 0, 0, width, 200).then(() => {
+            return this._container.setViewFrame('webview', 0, 0, width, height).then(() => {
                 if (!this._closer.container().parentNode) {
                     document.body.appendChild(this._closer.container());
                 }
