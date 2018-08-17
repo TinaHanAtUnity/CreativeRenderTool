@@ -14,7 +14,7 @@ export interface IVastEndScreenHandler {
     onVastEndScreenClose(): void;
     onVastEndScreenShow(): void;
     onKeyEvent(keyCode: number): void;
-    onEndScreenPrivacy(url: string): void;
+    onOpenUrl(url: string): Promise<void>;
 }
 
 export class VastEndScreen extends View<IVastEndScreenHandler> implements IPrivacyHandler {
@@ -112,7 +112,7 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
     }
 
     public onPrivacy(url: string): void {
-        this._handlers.forEach(handler => handler.onEndScreenPrivacy(url));
+        this._handlers.forEach(handler => handler.onOpenUrl(url));
     }
 
     public onGDPROptOut(optOutEnabled: boolean) {

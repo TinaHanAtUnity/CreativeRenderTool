@@ -71,13 +71,6 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
 
         const clickThroughURL = this._vastAdUnit.getVideoClickThroughURL();
         if(clickThroughURL) {
-            if (CTAOpenUrlAbTest.isValid(this._abGroup)) {
-                return this.openUrl(clickThroughURL).then(() => {
-                    this.setCallButtonEnabled(true);
-                    this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId());
-                });
-            }
-
             return this._request.followRedirectChain(clickThroughURL).then(
                 (url: string) => {
                     return this.openUrl(url).then(() => {
