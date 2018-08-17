@@ -10,12 +10,16 @@ import { Template } from 'Utilities/Template';
 import { ENGINE_METHOD_DIGESTS } from 'constants';
 import { IPrivacyHandler, AbstractPrivacy } from 'Views/AbstractPrivacy';
 import { IGDPREventHandler } from 'EventHandlers/GDPREventHandler';
+import { Observable0 } from 'Utilities/Observable';
 
 export interface IDisplayInterstitialHandler extends IGDPREventHandler {
     onDisplayInterstitialClose(): void;
 }
 
 export class DisplayInterstitial extends View<IDisplayInterstitialHandler> implements IPrivacyHandler {
+
+    public readonly onPrivacyOpened: Observable0 = new Observable0();
+    public readonly onPrivacyClosed: Observable0 = new Observable0();
 
     private _placement: Placement;
     private _campaign: DisplayInterstitialCampaign;
@@ -101,6 +105,9 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
         if (this._showGDPRBanner && !this._gdprPopupClicked) {
             this._handlers.forEach(handler => handler.onGDPRPopupSkipped());
         }
+
+        this.onPrivacyClosed.unsubscribe();
+        this.onPrivacyOpened.unsubscribe();
     }
 
     public onPrivacy(url: string): void {
@@ -111,6 +118,8 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
         if (this._privacy) {
             this._privacy.hide();
         }
+
+        this.onPrivacyClosed.trigger();
     }
 
     public onGDPROptOut(optOutEnabled: boolean): void {
@@ -127,14 +136,6 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
             this._GDPRPopupElement.style.pointerEvents = '1';
             this._GDPRPopupElement.style.visibility = 'hidden';
         }
-    }
-
-    private clearTimer(handle: number) {
-        const indx = this._timers.indexOf(handle);
-        if (indx !== -1) {
-            this._timers.splice(indx, 1);
-        }
-        window.clearInterval(handle);
     }
 
     private updateProgressCircle(container: HTMLElement, progress: number) {
@@ -175,12 +176,14 @@ export class DisplayInterstitial extends View<IDisplayInterstitialHandler> imple
             this._gdprPopupClicked = true;
             this.choosePrivacyShown();
         }
+        this.onPrivacyOpened.trigger();
         this._privacy.show();
     }
 
     private onPrivacyEvent(event: Event) {
         event.preventDefault();
 
+        this.onPrivacyOpened.trigger();
         this._privacy.show();
     }
 

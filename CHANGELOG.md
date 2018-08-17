@@ -1,3 +1,23 @@
+# Pending
+
+* Fix display interstitial click area
+
+# Fri Aug 17 11:23:03 UTC 2018
+
+* Fix force_quite deletion
+* Collect average fps for mraid
+* Improve caching time and add mraid parse time
+
+# Thu Aug 16 21:25:14 UTC 2018
+
+* Change comet tracking url names
+
+# Thu Aug 16 11:46:08 UTC 2018
+
+* Add Product type to promo tracking event urls
+* Reduce number of catalog refresh calls to IAP
+* Fix forcequit diagnostic sending error
+
 # Wed Aug 15 05:57:24 UTC 2018
 
 * Banner implementation merged to 3.0.0

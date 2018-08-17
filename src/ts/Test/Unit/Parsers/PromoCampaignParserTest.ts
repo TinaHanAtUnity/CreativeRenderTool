@@ -73,6 +73,39 @@ describe('PromoCampaignParser', () => {
             });
         });
 
+        describe('should add product type to tracking url events', () => {
+            let campaign: PromoCampaign;
+            let sandbox: sinon.SinonSandbox;
+
+            const parse = (data: any) => {
+                const response = new AuctionResponse(placements, data, mediaId, correlationId);
+                return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
+                    campaign = <PromoCampaign>parsedCampaign;
+                });
+            };
+
+            beforeEach(() => {
+                sandbox = sinon.createSandbox();
+                sandbox.stub(PurchasingUtilities, 'getProductType').returns('nonConsumable');
+                return parse(JSON.parse(IAPPromoCampaign).campaign1);
+            });
+
+            afterEach(() => {
+                sandbox.restore();
+            });
+
+            it('should update tracking event urls for product type correctly', () => {
+                const expected: { [url: string]: string[]} = {
+                    'click': ['https://events.iap.unity3d.com/events/v1/click?fakeEvent=true&val=1.99&productType=nonConsumable', 'https://tracking.adsx.unityads.unity3d.com/operative?fakeEvent=true&val=1.99&productType=nonConsumable'],
+                    'complete': ['https://events.iap.unity3d.com/events/v1/complete?fakeEvent=true&val=1.99&productType=nonConsumable', 'https://tracking.adsx.unityads.unity3d.com/complete?fakeEvent=true&val=1.99&productType=nonConsumable'],
+                    'impression': ['https://events.iap.unity3d.com/events/v1/impression?fakeEvent=true&val=1.99&productType=nonConsumable', 'https://tracking.adsx.unityads.unity3d.com/impression?fakeEvent=truem&val=1.99&productType=nonConsumable'],
+                    'purchase': ['https://events.iap.unity3d.com/events/v1/purchase?fakeEvent=true&val=1.99&productType=nonConsumable','https://tracking.adsx.unityads.unity3d.com/operative?fakeEvent=true&val=1.99&productType=nonConsumable']
+                 };
+                const actual = campaign.getTrackingEventUrls();
+                assert.deepEqual(actual, expected);
+            });
+        });
+
         describe('With content that includes rewardedPromo as false', () => {
             let campaign: PromoCampaign;
             let sandbox: sinon.SinonSandbox;
@@ -146,19 +179,38 @@ describe('PromoCampaignParser', () => {
                 sandbox.restore();
             });
 
-            it('should refresh catalog and resolve campaign', () => {
+            context('should resolve campaign', () => {
+                it('with invalid catalog by refreshing catalog', () => {
 
-                sandbox.stub(PurchasingUtilities, 'refreshCatalog').returns(Promise.resolve());
+                    sandbox.stub(PurchasingUtilities, 'refreshCatalog').returns(Promise.resolve());
+                    sandbox.stub(PurchasingUtilities, 'isCatalogValid').returns(false);
 
-                const parse = (data: any) => {
-                    const response = new AuctionResponse(placements, data, mediaId, correlationId);
-                    return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
-                        campaign = <PromoCampaign>parsedCampaign;
-                        sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.refreshCatalog);
-                    });
-                };
+                    const parse = (data: any) => {
+                        const response = new AuctionResponse(placements, data, mediaId, correlationId);
+                        return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
+                            campaign = <PromoCampaign>parsedCampaign;
+                            sinon.assert.called(<sinon.SinonSpy>PurchasingUtilities.refreshCatalog);
+                        });
+                    };
 
-                return parse(JSON.parse(IAPPromoCampaign).campaign1);
+                    return parse(JSON.parse(IAPPromoCampaign).campaign1);
+                });
+
+                it('with valid catalog by not refreshing catalog', () => {
+
+                    sandbox.stub(PurchasingUtilities, 'refreshCatalog').returns(Promise.resolve());
+                    sandbox.stub(PurchasingUtilities, 'isCatalogValid').returns(true);
+
+                    const parse = (data: any) => {
+                        const response = new AuctionResponse(placements, data, mediaId, correlationId);
+                        return parser.parse(nativeBridge, request, response, session).then((parsedCampaign) => {
+                            campaign = <PromoCampaign>parsedCampaign;
+                            sinon.assert.notCalled(<sinon.SinonSpy>PurchasingUtilities.refreshCatalog);
+                        });
+                    };
+
+                    return parse(JSON.parse(IAPPromoCampaign).campaign1);
+                });
             });
         });
 
