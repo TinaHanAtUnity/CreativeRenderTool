@@ -7,6 +7,7 @@ addons:
   apt:
     packages:
       - libimage-exiftool-perl
+      - parallel
 
 install:
   - . $HOME/.nvm/nvm.sh
