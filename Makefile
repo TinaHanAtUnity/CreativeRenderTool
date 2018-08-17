@@ -149,10 +149,10 @@ $(BUILD_DIR)/test/coverage-test.html: $(SOURCE_DIR)/coverage-test-index.html
 
 # Implicit rules
 
-$(SOURCE_BUILD_DIR)/ts/BrowserBundle.js: all
+$(SOURCE_BUILD_DIR)/ts/BrowserBundle.js: $(TS_TARGETS) $(HTML_TARGETS) $(JSON_TARGETS) $(XML_TARGETS)
 	$(ROLLUP) --config rollup.config.browser.js
 
-$(SOURCE_BUILD_DIR)/ts/Bundle.js: all
+$(SOURCE_BUILD_DIR)/ts/Bundle.js: $(TS_TARGETS) $(HTML_TARGETS) $(JSON_TARGETS) $(XML_TARGETS)
 	$(ROLLUP) --config rollup.config.device.js
 
 $(SOURCE_BUILD_DIR)/ts/Bundle.min.js: $(SOURCE_BUILD_DIR)/ts/Bundle.js
