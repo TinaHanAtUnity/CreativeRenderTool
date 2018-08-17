@@ -229,6 +229,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
 
     private onGDPRPopupEvent(event: Event) {
         event.preventDefault();
+        event.stopPropagation();
         this._isPrivacyShowing = true;
         if (!this._gdprPopupClicked) {
             this._gdprPopupClicked = true;
@@ -243,6 +244,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private onPrivacyEvent(event: Event) {
         this._isPrivacyShowing = true;
         event.preventDefault();
+        event.stopPropagation();
         this._nativeBridge.VideoPlayer.pause();
         if (this._privacy) {
             this._privacy.show();
