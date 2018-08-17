@@ -1,5 +1,6 @@
 # Pending
 
+* Fix force_quite deletion
 * Collect average fps for mraid
 * Improve caching time and add mraid parse time
 
