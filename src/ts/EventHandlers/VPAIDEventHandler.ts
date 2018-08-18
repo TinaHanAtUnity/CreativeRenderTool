@@ -133,8 +133,13 @@ export class VPAIDEventHandler implements IVPAIDHandler {
     }
 
     private onAdStopped() {
-        if (this._vpaidCampaign.hasEndScreen() && this._vpaidEndScreen) {
-            this._vpaidEndScreen.show();
+        if (this._vpaidCampaign.hasEndScreen()) {
+            const shouldFullScreenWebview = true;
+            this._adUnit.setWebViewSize(shouldFullScreenWebview).then(() => {
+                if (this._vpaidEndScreen) {
+                    this._vpaidEndScreen.show();
+                }
+            });
         } else {
             this._adUnit.hide();
         }
