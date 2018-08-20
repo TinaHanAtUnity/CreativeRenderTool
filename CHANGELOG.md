@@ -1,9 +1,10 @@
-# Pending
+# Staged
 
 * Fix display interstitial click area
 * Rename comet tracking loaded event
 * Fix Vast Endscreen click delay
 * Fix VPAID click and Endscreen
+* Add creativeId and targetStoreId in XPromo Operative Events
 
 # Fri Aug 17 11:23:03 UTC 2018
 
