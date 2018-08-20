@@ -158,7 +158,7 @@ describe('VastEndScreenEventHandlersTest', () => {
             sinon.stub(nativeBridge.UrlScheme, 'open').resolves();
             vastEndScreenEventHandler.onVastEndScreenClick().then(() => {
                 mockEndScreen.verify();
-                assert.equal(expectationEndScreen.getCall(0).args[0], false, 'Should disable end screen CTA while');
+                assert.equal(expectationEndScreen.getCall(0).args[0], false, 'Should disable end screen CTA while processing click event');
                 assert.equal(expectationEndScreen.getCall(1).args[0], true, 'Should enable end screen CTA after processing click event');
             });
         });
