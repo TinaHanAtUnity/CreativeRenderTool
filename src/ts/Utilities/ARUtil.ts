@@ -1,4 +1,4 @@
-import { MRAIDCampaign } from '../Models/Campaigns/MRAIDCampaign';
+import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 
 export interface IARFrameTransform {
     a: number;
