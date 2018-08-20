@@ -34,29 +34,6 @@ export interface IARVideoFormat {
 }
 
 export class ARApi extends NativeApi {
-    private static calculateVideoScale(frameInfo: IARFrameInfo): IARFrameScale {
-        let videoRect: IARRect = {x: 0, y: 0, width: frameInfo.videoSize.width, height: frameInfo.videoSize.height};
-        videoRect = ARUtil.transformRect(videoRect, ARUtil.invertTransform(frameInfo.transform));
-
-        // Calculate scaling for aspect fill
-        const videoAspectRatio = videoRect.width / videoRect.height;
-        const drawableAspectRatio = frameInfo.drawableSize.width / frameInfo.drawableSize.height;
-
-        let dstWidth = frameInfo.drawableSize.width;
-        let dstHeight = frameInfo.drawableSize.height;
-
-        if(drawableAspectRatio > videoAspectRatio) {
-            dstHeight *= drawableAspectRatio * (1 / videoAspectRatio);
-        } else {
-            dstWidth *= (1 / drawableAspectRatio) * videoAspectRatio;
-        }
-
-        return {
-            scaleX: dstWidth / videoRect.width,
-            scaleY: dstHeight / videoRect.height
-        };
-    }
-
     public readonly onPlanesAdded = new Observable1<string>();
     public readonly onPlanesRemoved = new Observable1<string>();
     public readonly onPlanesUpdated = new Observable1<string>();
@@ -112,7 +89,7 @@ export class ARApi extends NativeApi {
 
         // Get frame info, calculate scaling and then call advanceFrame
         return this.getFrameInfo().then((frameInfo) => {
-            const scale = ARApi.calculateVideoScale(frameInfo);
+            const scale = ARUtil.calculateVideoScale(frameInfo);
             return this.setFrameScaling(scale).then(
                 () => this._nativeBridge.invoke<void>(this._fullApiClassName, 'advanceFrame')).catch(
                     (error) => this._nativeBridge.Sdk.logInfo('Cannot set scaling: ' + error));

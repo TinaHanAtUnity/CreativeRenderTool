@@ -40,6 +40,29 @@ export interface IARRect {
 }
 
 export class ARUtil {
+    public static calculateVideoScale(frameInfo: IARFrameInfo): IARFrameScale {
+        let videoRect: IARRect = {x: 0, y: 0, width: frameInfo.videoSize.width, height: frameInfo.videoSize.height};
+        videoRect = ARUtil.transformRect(videoRect, ARUtil.invertTransform(frameInfo.transform));
+
+        // Calculate scaling for aspect fill
+        const videoAspectRatio = videoRect.width / videoRect.height;
+        const drawableAspectRatio = frameInfo.drawableSize.width / frameInfo.drawableSize.height;
+
+        let dstWidth = frameInfo.drawableSize.width;
+        let dstHeight = frameInfo.drawableSize.height;
+
+        if(drawableAspectRatio > videoAspectRatio) {
+            dstHeight *= drawableAspectRatio * (1 / videoAspectRatio);
+        } else {
+            dstWidth *= (1 / drawableAspectRatio) * videoAspectRatio;
+        }
+
+        return {
+            scaleX: dstWidth / videoRect.width,
+            scaleY: dstHeight / videoRect.height
+        };
+    }
+
     public static invertTransform(transform: IARFrameTransform): IARFrameTransform {
         const t = transform;
         const determinant = t.a * t.d - t.b * t.c;
