@@ -31,7 +31,7 @@ export class PerformanceVideoEventHandler extends VideoEventHandler {
         if(TestEnvironment.get('debugOverlayEnabled') && overlay) {
             overlay.setDebugMessage('Performance Ad');
         }
-        this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.LOADED);
+        this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.LOADED_IMPRESSION);
     }
 
     protected handleVideoError(errorType?: string, errorData?: any): void {

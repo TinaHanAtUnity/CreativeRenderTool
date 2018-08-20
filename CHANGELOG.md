@@ -1,3 +1,8 @@
+# Pending
+
+* Fix display interstitial click area
+* Rename comet tracking loaded event
+
 # Fri Aug 17 11:23:03 UTC 2018
 
 * Fix force_quite deletion
