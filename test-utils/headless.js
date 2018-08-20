@@ -84,7 +84,9 @@ const evaluateSuccess = () => {
     return failedSteps;
 };
 
-puppeteer.launch().then(async (browser) => {
+puppeteer.launch({
+    args: ['--no-sandbox']
+}).then(async (browser) => {
     let testRunning = true;
     console.log("### Browser Tests ###");
 
