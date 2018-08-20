@@ -24,7 +24,7 @@ import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 export interface IVPAIDAdUnitParameters extends IAdUnitParameters<VPAIDCampaign> {
     vpaid: VPAID;
     closer: Closer;
-    endScreen?: VPAIDEndScreen;
+    endScreen?: VPAIDEndScreen | undefined;
     privacy: AbstractPrivacy;
 }
 
@@ -35,7 +35,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     private static _adLoadTimeout: number = 10 * 1000;
-    private _endScreen: VPAIDEndScreen;
+    private _endScreen: VPAIDEndScreen | undefined;
     private _closer: Closer;
     private _placement: Placement;
     private _thirdPartyEventManager: ThirdPartyEventManager;
@@ -65,9 +65,9 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._clientInfo = parameters.clientInfo;
         this._webPlayerContainer = parameters.webPlayerContainer!;
         this._timer = new Timer(() => this.onAdUnitNotLoaded(), VPAIDAdUnit._adLoadTimeout);
+        this._endScreen = parameters.endScreen;
 
-        if (parameters.endScreen) {
-            this._endScreen = parameters.endScreen;
+        if (this._endScreen) {
             this._endScreen.render();
         }
 

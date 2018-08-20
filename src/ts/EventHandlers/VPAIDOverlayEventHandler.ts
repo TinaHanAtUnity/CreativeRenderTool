@@ -13,7 +13,7 @@ export class VPAIDOverlayEventHandler extends GDPREventHandler implements IClose
     private _operativeEventManager: OperativeEventManager;
     private _campaign: VPAIDCampaign;
     private _placement: Placement;
-    private _endScreen: VPAIDEndScreen;
+    private _endScreen: VPAIDEndScreen | undefined;
 
     constructor(nativeBridge: NativeBridge, adUnit: VPAIDAdUnit, parameters: IVPAIDAdUnitParameters) {
         super(parameters.gdprManager, parameters.configuration);
@@ -21,10 +21,7 @@ export class VPAIDOverlayEventHandler extends GDPREventHandler implements IClose
         this._operativeEventManager = parameters.operativeEventManager;
         this._campaign = parameters.campaign;
         this._placement = parameters.placement;
-
-        if (parameters.endScreen) {
-            this._endScreen = parameters.endScreen;
-        }
+        this._endScreen = parameters.endScreen;
     }
 
     public onClose(skipped: boolean) {
