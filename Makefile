@@ -78,7 +78,7 @@ TEST_BUILD_TARGETS := $(TEST_BUILD_DIR)/UnitBundle.min.js $(BUILD_DIR)/test/inde
 
 # Built-in targets
 
-.PHONY: all static build-browser build-dev build-release build-test test test-unit test-integration test-coverage test-browser clean lint setup watch start-server stop-server deploy qr-code
+.PHONY: all static build-browser build-dev build-release build-test test test-unit test-integration test-coverage test-browser clean lint setup watch watch-test start-server stop-server deploy qr-code
 .NOTPARALLEL: $(TS_TARGETS) $(TEST_TARGETS)
 
 # Main targets
@@ -249,6 +249,14 @@ watch: all $(TEST_BUILD_DIR)/Unit.js $(TEST_BUILD_DIR)/Integration.js
 		"$(ROLLUP) --watch --config rollup.config.test.unit.js" \
 		"$(ROLLUP) --watch --config rollup.config.test.integration.js" \
 		"$(ROLLUP) --watch --config rollup.config.test.coverage.js"
+
+watch-test: all $(TEST_BUILD_DIR)/Unit.js $(TEST_BUILD_DIR)/Integration.js
+	parallel --ungroup --tty --jobs 0 ::: \
+		"$(TYPESCRIPT) --project tsconfig.json --watch --preserveWatchOutput" \
+		"$(ROLLUP) --watch --config rollup.config.test.unit.js" \
+		"$(ROLLUP) --watch --config rollup.config.test.integration.js" \
+		"watchman-make -p build/test/UnitBundle.js -t test-unit" \
+		"watchman-make -p build/test/IntegrationBundle.js -t test-integration"
 
 start-server:
 	test ! -f server.pid && { nohup python3 -m http.server 8000 >/dev/null 2>&1 & echo $$! > server.pid; } || true
