@@ -26,7 +26,6 @@ import { WebPlayerContainer } from 'Utilities/WebPlayer/WebPlayerContainer';
 import { asStub } from '../TestHelpers/Functions';
 import { Observable2, Observable1 } from 'Utilities/Observable';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
-import { ForceQuitManager } from 'Managers/ForceQuitManager';
 
 describe('DisplayInterstitialAdUnit', () => {
     let adUnit: DisplayInterstitialAdUnit;
@@ -43,7 +42,6 @@ describe('DisplayInterstitialAdUnit', () => {
     let clientInfo: ClientInfo;
     let webPlayerContainer: WebPlayerContainer;
     let displayInterstitialAdUnitParameters: IDisplayInterstitialAdUnitParameters;
-    let forceQuitManager: ForceQuitManager;
 
     describe('On static-interstial campaign', () => {
         adUnitTests();
@@ -53,7 +51,6 @@ describe('DisplayInterstitialAdUnit', () => {
         beforeEach(() => {
             campaign = TestFixtures.getDisplayInterstitialCampaign();
 
-            forceQuitManager = sinon.createStubInstance(ForceQuitManager);
             sandbox = sinon.sandbox.create();
             nativeBridge = TestFixtures.getNativeBridge(Platform.ANDROID);
             placement = TestFixtures.getPlacement();
@@ -63,7 +60,7 @@ describe('DisplayInterstitialAdUnit', () => {
             const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             const request = new Request(nativeBridge, wakeUpManager);
             const configuration = TestFixtures.getConfiguration();
-            container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo(), forceQuitManager);
+            container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
             sandbox.stub(container, 'open').returns(Promise.resolve());
             sandbox.stub(container, 'close').returns(Promise.resolve());
             clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
