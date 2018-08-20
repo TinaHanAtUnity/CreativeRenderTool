@@ -33,6 +33,8 @@ export class ForceQuitManager {
 
     public destroyForceQuitKey(): Promise<boolean> {
         return this._nativeBridge.Storage.delete(StorageType.PRIVATE, ForceQuitManager.ForceQuitKey).then(() => {
+            return this._nativeBridge.Storage.write(StorageType.PRIVATE);
+        }).then(() => {
             return true;
         }).catch(() => {
             return false;

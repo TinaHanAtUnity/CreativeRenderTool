@@ -15,7 +15,6 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 
 // Events marked with // are currently sent, but are unused - waiting for BI to confirm if they want them sent
 export enum ICometTrackingUrlEvents {
-    IMPRESSION = 'impression', //
     START = 'start',
     CLICK = 'click',
     ENDCARD_CLICK = 'videoEndCardClick', //
@@ -24,7 +23,7 @@ export enum ICometTrackingUrlEvents {
     THIRD_QUARTILE = 'thirdQuartile',
     ERROR = 'error',
     STALLED = 'stalled', //
-    LOADED = 'loaded',
+    LOADED_IMPRESSION = 'loaded',
     SHOW = 'show', //
     COMPLETE = 'complete',
     SKIP = 'skip'

@@ -1,7 +1,18 @@
 # Pending
 
-* Improve mraid caching time and add mraid parse time to diagnostics message
-* Collect mraid's average fps in group 16
+* Fix display interstitial click area
+* Rename comet tracking loaded event
+* Fix Vast Endscreen click delay
+
+# Fri Aug 17 11:23:03 UTC 2018
+
+* Fix force_quite deletion
+* Collect average fps for mraid
+* Improve caching time and add mraid parse time
+
+# Thu Aug 16 21:25:14 UTC 2018
+
+* Change comet tracking url names
 
 # Thu Aug 16 11:46:08 UTC 2018
 
