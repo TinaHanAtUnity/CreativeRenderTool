@@ -112,12 +112,13 @@ test-coverage: start-server build/test/CoverageBundle.js build/test/coverage-tes
 
 ifeq ($(TRAVIS_PULL_REQUEST), false)
 test-browser:
-	@echo "Skipping travis browser tests, this is not a PR"
+	echo "Skipping travis browser tests, this is not a PR"
 else ifneq ($(BRANCH), master)
 test-browser:
-	@echo "Skipping travis browser tests, the PR is not to master-branch it is for $(BRANCH)"
+	echo "Skipping travis browser tests, the PR is not to master-branch it is for $(BRANCH)"
 else
 test-browser: start-server build-browser
+	node test-utils/headless.js
 endif
 
 # VPaths
