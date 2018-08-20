@@ -109,7 +109,7 @@ puppeteer.launch({
         waitFor: 'domcontentloaded'
     }).catch( (e) => {
         console.log("## Failed to connect to server at " + SERVER_ADDRESS);
-        console.log("   Consider running `make clean build-browser start-nginx");
+        console.log("   Consider running `make clean build-browser start-server");
         process.exit(255);
     });
     console.log("## Page loaded");
