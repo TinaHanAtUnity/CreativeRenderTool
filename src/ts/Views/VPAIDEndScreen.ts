@@ -59,6 +59,7 @@ export class VPAIDEndScreen extends View<IVPAIDEndScreenHandler> {
         super.render();
         (<HTMLElement>this._container.querySelector('.game-background-portrait')).style.backgroundSize = '100%';
         (<HTMLElement>this._container.querySelector('.game-background-landscape')).style.backgroundSize = '100%';
+        this._container.style.zIndex = '2';
 
         if(this._isSwipeToCloseEnabled) {
             (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';

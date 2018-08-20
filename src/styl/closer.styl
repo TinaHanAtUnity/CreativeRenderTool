@@ -30,6 +30,7 @@
     position: absolute;
     top: 50%;
     left: 8px;
+    z-index: 1;
     width: 36px;
     height: 36px;
     transform: translate(0, -50%);
@@ -84,7 +85,7 @@
 
   .gdpr-pop-up {
       position: absolute;
-      bottom: 0;
+      top: 0;
       width: 100%;
       background-color: $dark-gdpr-banner;
       box-shadow: 0 0 15px 0 rgba(0, 0, 0, .1);
@@ -106,7 +107,8 @@
 
   .privacy-button {
     position: absolute;
-    bottom: 0;
+    top: 0;
+    margin: $default-size * $default-scale-size * .25 0 0 $default-size * $default-scale-size * .25;
     width: 100%;
 
     .icon-gdpr {
