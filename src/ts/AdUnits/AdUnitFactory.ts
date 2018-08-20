@@ -23,6 +23,7 @@ import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
 import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
 import { MRAID } from 'Views/MRAID';
 import { PlayableMRAID } from 'Views/PlayableMRAID';
+import { ARMRAID } from 'Views/ARMRAID';
 import { StreamType } from 'Constants/Android/StreamType';
 import { Video } from 'Models/Assets/Video';
 import { WebViewError } from 'Errors/WebViewError';
@@ -75,6 +76,7 @@ import { IEndScreenParameters } from 'Views/EndScreen';
 
 export class AdUnitFactory {
     private static _forcedPlayableMRAID: boolean = false;
+    private static _forcedARMRAID: boolean = false;
 
     public static createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractAdUnit {
 
@@ -104,6 +106,10 @@ export class AdUnitFactory {
 
     public static setForcedPlayableMRAID(value: boolean) {
         AdUnitFactory._forcedPlayableMRAID = value;
+    }
+
+    public static setForcedARMRAID(value: boolean) {
+        AdUnitFactory._forcedARMRAID = value;
     }
 
     private static createPerformanceAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PerformanceCampaign>): PerformanceAdUnit {
@@ -275,11 +281,10 @@ export class AdUnitFactory {
         let mraid: MRAIDView<IMRAIDViewHandler>;
         const showGDPRBanner = this.showGDPRBanner(parameters);
         const privacy = this.createPrivacy(nativeBridge, parameters);
-        const isMRAIDAR = parameters.campaign.getAdType() === 'MRAID-AR' || ARUtil.isARCreative(parameters.campaign);
-        // TODO: Remove /ar/ folder check once we have MRAID-AR type support on the server side
-        const isPlayable = (resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) || isMRAIDAR;
-        if(isPlayable || AdUnitFactory._forcedPlayableMRAID) {
+        if((resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) || AdUnitFactory._forcedPlayableMRAID) {
             mraid = new PlayableMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner, parameters.configuration.getAbGroup());
+        } else if (ARUtil.isARCreative(parameters.campaign) || AdUnitFactory._forcedARMRAID) {
+            mraid = new ARMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner);
         } else {
             mraid = new MRAID(nativeBridge, parameters.placement, parameters.campaign, privacy, showGDPRBanner);
         }

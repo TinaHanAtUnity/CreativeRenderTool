@@ -82,9 +82,8 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._container.addEventHandler(this);
 
         const views: string[] = ['webview'];
-        // TODO: Remove /ar/ folder check once we have MRAID-AR type support on the server side
         const isARURL = ARUtil.isARCreative(this._campaign);
-        if (this._campaign.getAdType() === 'MRAID-AR' || isARURL) {
+        if (isARURL) {
             views.unshift('arview');
         }
 

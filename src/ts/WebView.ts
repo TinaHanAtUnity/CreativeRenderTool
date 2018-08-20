@@ -649,6 +649,10 @@ export class WebView {
                 AdUnitFactory.setForcedPlayableMRAID(TestEnvironment.get('forcedPlayableMRAID'));
             }
 
+            if (TestEnvironment.get('forcedARMRAID')) {
+                AdUnitFactory.setForcedARMRAID(TestEnvironment.get('forcedARMRAID'));
+            }
+
             if(TestEnvironment.get('creativeUrl')) {
                 const creativeUrl = this._creativeUrl = TestEnvironment.get('creativeUrl');
                 if(this._nativeBridge.getPlatform() === Platform.ANDROID) {

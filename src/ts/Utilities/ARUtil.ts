@@ -86,8 +86,12 @@ export class ARUtil {
         };
     }
 
-    // FIXME: hack for telling AR creatives from other playables. Remove when there's proper server side support
+    // TODO: Remove /ar/ folder check once we have MRAID-AR type support on the server side
     public static isARCreative(campaign: MRAIDCampaign): boolean {
+        if (campaign.getAdType() && campaign.getAdType() === 'MRAID_AR') {
+            return true;
+        }
+
         const resourceUrl = campaign.getResourceUrl();
         if (resourceUrl && resourceUrl.getOriginalUrl().match(/\/ar\/|ducktales-ar/)) {
             return true;
