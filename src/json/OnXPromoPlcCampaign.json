@@ -9,6 +9,7 @@
       "contentType": "xpromo/video",
       "content": "{\"clickUrl\": \"https://test.click.url?gameId=12345\",\"videoEventUrls\":{\"third_quartile\": \"https://video.event.url/third_quartile\"},\"id\":\"582bb5e352e4c4abd7fab850\",\"store\":\"google\",\"appStoreId\":\"com.glu.stardomkim\",\"gameId\":1000,\"gameName\":\"\",\"gameIcon\":\"https://static.applifier.com/impact/11017/test_game_icon.png\",\"rating\":0,\"ratingCount\":0,\"clickAttributionUrl\":\"https://www.test.com\",\"endScreenLandscape\":\"https://unityads-cdn-origin-staging.s3.amazonaws.com/assets/74ed141a-e9ab-46c6-a0cf-d5ed31c395cd/qa_endcard_landscape_800x600.png\",\"endScreenPortrait\":\"https://unityads-cdn-origin-staging.s3.amazonaws.com/assets/74ed141a-e9ab-46c6-a0cf-d5ed31c395cd/qa_endcard_portrait_600x800.png\",\"trailerDownloadable\":\"http://unityads-cdn-origin-staging.s3.amazonaws.com/assets/59f8442d8f5a7b0011838615/m31-1000.mp4\",\"trailerDownloadableSize\":1112835,\"trailerPortraitDownloadable\":\"http://unityads-cdn-origin-staging.s3.amazonaws.com/assets/59f843bcd955480011346d80/m31-1000.mp4\",\"trailerPortraitDownloadableSize\":1104109,\"trailerStreaming\":\"http://unityads-cdn-origin-staging.s3.amazonaws.com/assets/59f8442d8f5a7b0011838615/b30-400.mp4\",\"trailerPortraitStreaming\":\"http://unityads-cdn-origin-staging.s3.amazonaws.com/assets/59f843bcd955480011346d80/b30-400.mp4\",\"bypassAppSheet\":false}",
       "trackingUrls": {},
+      "creativeId": "xpromo creative",
       "adType": "XPROMO"
     }
   }
