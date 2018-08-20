@@ -22,6 +22,7 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
     private _isSwipeToCloseEnabled: boolean = false;
     private _coppaCompliant: boolean;
     private _privacy: Privacy;
+    private _callButtonEnabled: boolean = true;
 
     constructor(nativeBridge: NativeBridge, coppaCompliant: boolean, campaign: VastCampaign, gameId: string) {
         super(nativeBridge, 'vast-end-screen');
@@ -119,12 +120,21 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
         // do nothing
     }
 
+    public setCallButtonEnabled(value: boolean) {
+        if (this._callButtonEnabled !== value) {
+            this._callButtonEnabled = value;
+        }
+    }
+
     private onCloseEvent(event: Event): void {
         event.preventDefault();
         this._handlers.forEach(handler => handler.onVastEndScreenClose());
     }
 
     private onClickEvent(event: Event): void {
+        if (!this._callButtonEnabled) {
+            return;
+        }
         event.preventDefault();
         this._handlers.forEach(handler => handler.onVastEndScreenClick());
     }

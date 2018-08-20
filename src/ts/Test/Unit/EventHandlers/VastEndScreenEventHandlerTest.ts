@@ -1,5 +1,6 @@
 import 'mocha';
 import * as sinon from 'sinon';
+import { assert } from 'chai';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
@@ -112,6 +113,7 @@ describe('VastEndScreenEventHandlersTest', () => {
         let vastAdUnit: VastAdUnit;
         let video: Video;
         let campaign: VastCampaign;
+        let vastEndScreen: VastEndScreen;
         let vastEndScreenEventHandler: VastEndScreenEventHandler;
         const vastXml = EventTestVast;
         const vastParser = TestFixtures.getVastParser();
@@ -124,7 +126,7 @@ describe('VastEndScreenEventHandlersTest', () => {
             vastAdUnitParameters.video = video;
             vastAdUnitParameters.campaign = campaign;
             vastAdUnitParameters.placement = TestFixtures.getPlacement();
-            const vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.configuration.isCoppaCompliant(), vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
+            vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.configuration.isCoppaCompliant(), vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
             vastAdUnitParameters.endScreen = vastEndScreen;
             vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
             vastEndScreenEventHandler = new VastEndScreenEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
@@ -136,6 +138,28 @@ describe('VastEndScreenEventHandlersTest', () => {
             sinon.stub(nativeBridge.UrlScheme, 'open').resolves();
             return vastEndScreenEventHandler.onVastEndScreenClick().then(() => {
                 sinon.assert.calledOnce(<sinon.SinonSpy>vastAdUnit.sendTrackingEvent);
+            });
+        });
+
+        it('should send second tracking event for vast video end card click after processing the first', () => {
+            sinon.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
+            sinon.stub(nativeBridge.UrlScheme, 'open').resolves();
+            return vastEndScreenEventHandler.onVastEndScreenClick().then(() => {
+                return vastEndScreenEventHandler.onVastEndScreenClick().then(() => {
+                    sinon.assert.calledTwice(<sinon.SinonSpy>vastAdUnit.sendTrackingEvent);
+                });
+            });
+        });
+
+        it('should ignore user clicks while processing the first click event', () => {
+            const mockEndScreen = sinon.mock(vastEndScreen);
+            const expectationEndScreen = sinon.mock(vastEndScreen).expects('setCallButtonEnabled').twice();
+            sinon.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
+            sinon.stub(nativeBridge.UrlScheme, 'open').resolves();
+            vastEndScreenEventHandler.onVastEndScreenClick().then(() => {
+                mockEndScreen.verify();
+                assert.equal(expectationEndScreen.getCall(0).args[0], false, 'Should disable end screen CTA while');
+                assert.equal(expectationEndScreen.getCall(1).args[0], true, 'Should enable end screen CTA after processing click event');
             });
         });
 
