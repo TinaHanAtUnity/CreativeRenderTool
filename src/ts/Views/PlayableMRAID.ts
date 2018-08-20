@@ -1,5 +1,6 @@
 import PlayableMRAIDTemplate from 'html/PlayableMRAID.html';
 import MRAIDContainer from 'html/mraid/container.html';
+import MRAIDPerfContainer from 'html/mraid/container-perf.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { Placement } from 'Models/Placement';
@@ -12,7 +13,7 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
 import { SdkStats } from 'Utilities/SdkStats';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
-import { ABGroup } from 'Models/ABGroup';
+import { ABGroup, FPSCollectionTest } from 'Models/ABGroup';
 
 export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -43,19 +44,16 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _backgroundTime: number = 0;
     private _backgroundTimestamp: number;
 
-    private _abGroup: ABGroup;
-
     private _configuration: any;
 
     constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup) {
-        super(nativeBridge, 'playable-mraid', placement, campaign, privacy, showGDPRBanner);
+        super(nativeBridge, 'playable-mraid', placement, campaign, privacy, showGDPRBanner, abGroup);
 
         this._placement = placement;
         this._campaign = campaign;
         this._localization = new Localization(language, 'loadingscreen');
 
         this._template = new Template(PlayableMRAIDTemplate, this._localization);
-        this._abGroup = abGroup;
 
         if(campaign) {
             this._templateData = {
@@ -108,7 +106,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         this._gdprBanner = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
         this._privacyButton = <HTMLElement>this._container.querySelector('.privacy-button');
 
-        let container = MRAIDContainer;
+        let container = FPSCollectionTest.isValid(this._abGroup) ? MRAIDPerfContainer : MRAIDContainer;
         const playableConfiguration = this._campaign.getPlayableConfiguration();
         if(playableConfiguration) {
             // check configuration based on the ab group
@@ -363,6 +361,13 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 break;
             case 'close':
                 this._handlers.forEach(handler => handler.onMraidClose());
+                break;
+            case 'sendStats':
+                this.updateStats({
+                    totalTime: event.data.totalTime,
+                    playTime: event.data.playTime,
+                    frameCount: event.data.frameCount
+                });
                 break;
             case 'orientation':
                 let forceOrientation = Orientation.NONE;

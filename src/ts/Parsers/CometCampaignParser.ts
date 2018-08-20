@@ -15,19 +15,19 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 
 // Events marked with // are currently sent, but are unused - waiting for BI to confirm if they want them sent
 export enum ICometTrackingUrlEvents {
-    IMPRESSION = 'EventImpression', //
-    START = 'EventStart',
-    CLICK = 'EventClick',
-    ENDCARD_CLICK = 'EventVideoEndCardClick', //
-    FIRST_QUARTILE = 'EventFirstQuartile',
-    MIDPOINT = 'EventMidpoint',
-    THIRD_QUARTILE = 'EventThirdQuartile',
-    ERROR = 'EventError',
-    STALLED = 'EventStalled', //
-    LOADED = 'EventLoaded',
-    SHOW = 'EventShow', //
-    COMPLETE = 'EventComplete',
-    SKIP = 'EventSkip'
+    IMPRESSION = 'impression', //
+    START = 'start',
+    CLICK = 'click',
+    ENDCARD_CLICK = 'videoEndCardClick', //
+    FIRST_QUARTILE = 'firstQuartile',
+    MIDPOINT = 'midpoint',
+    THIRD_QUARTILE = 'thirdQuartile',
+    ERROR = 'error',
+    STALLED = 'stalled', //
+    LOADED = 'loaded',
+    SHOW = 'show', //
+    COMPLETE = 'complete',
+    SKIP = 'skip'
 }
 
 export class CometCampaignParser extends CampaignParser {
