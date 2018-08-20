@@ -50,7 +50,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _webPlayerContainer: WebPlayerContainer;
     private _shouldFullScreenWebView = true;
     private _topWebViewAreaHeight: number;
-    private readonly _topWebViewAreaMinHeight = 60;
+    private readonly _topWebViewAreaMinHeight = 70;
 
     constructor(nativeBridge: NativeBridge, parameters: IVPAIDAdUnitParameters) {
         super(nativeBridge, parameters);
