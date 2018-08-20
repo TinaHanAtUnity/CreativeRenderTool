@@ -12,12 +12,7 @@
         <script inline src="/node_modules/mocha/mocha.js"></script>
         <script inline src="/node_modules/chai/chai.js"></script>
         <script inline src="/test-utils/reporter.js"></script>
-        <script>
-            mocha.setup({
-                ui: 'bdd',
-                reporter: HybridTestReporter
-            });
-        </script>
+        <script inline src="/test-utils/setup.js"></script>
         <script inline src="/build/test/UnitBundle.min.js"></script>
         <script>
             mocha.run(function(failures) {

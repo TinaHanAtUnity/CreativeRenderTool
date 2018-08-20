@@ -25,6 +25,7 @@ SOURCE_BUILD_DIR := $(BUILD_DIR)/$(SOURCE_DIR)
 TEST_BUILD_DIR := $(BUILD_DIR)/$(TEST_DIR)
 
 # Branch and commit id
+
 ifeq ($(TRAVIS), true)
 	BRANCH = $(TRAVIS_BRANCH)
 	COMMIT_ID = $(TRAVIS_COMMIT)
@@ -32,6 +33,10 @@ else
 	BRANCH = $(shell git symbolic-ref --short HEAD)
 	COMMIT_ID = $(shell git rev-parse HEAD)
 endif
+
+# Local IP address
+
+IP_ADDRESS := $(shell node -p '[].concat.apply([], Object.values(os.networkInterfaces()).map(iface => iface.filter(({family, internal}) => family === "IPv4" && !internal)))[0].address')
 
 # Sources
 
@@ -72,7 +77,7 @@ TEST_BUILD_TARGETS := $(TEST_BUILD_DIR)/UnitBundle.min.js $(BUILD_DIR)/test/inde
 
 # Built-in targets
 
-.PHONY: all static build-browser build-dev build-release build-test test test-unit test-integration test-coverage clean lint setup watch start-server stop-server deploy
+.PHONY: all static build-browser build-dev build-release build-test test test-unit test-integration test-coverage test-browser clean lint setup watch start-server stop-server deploy qr-code
 .NOTPARALLEL: $(TS_TARGETS) $(TEST_TARGETS)
 
 # Main targets
@@ -104,6 +109,16 @@ test-coverage: start-server build/test/CoverageBundle.js build/test/coverage-tes
 	$(REMAP_ISTANBUL) -i build/coverage/coverage.json -o build/coverage/summary -t text-summary
 	cat build/coverage/summary && echo "\n"
 
+ifeq ($(TRAVIS_PULL_REQUEST), false)
+test-browser:
+	@echo "Skipping travis browser tests, this is not a PR"
+else ifneq ($(BRANCH), master)
+test-browser:
+	@echo "Skipping travis browser tests, the PR is not to master-branch it is for $(BRANCH)"
+else
+test-browser: start-server build-browser
+endif
+
 # VPaths
 
 vpath %.ts $(SOURCE_DIR)/ts $(TEST_DIR)
@@ -124,7 +139,7 @@ $(BUILD_DIR)/dev/index.html: $(SOURCE_DIR)/dev-index.html
 	mkdir -p $(dir $@) && cp $< $@
 
 $(BUILD_DIR)/dev/config.json:
-	node tools/generate_dev_config.js
+	echo "{\"url\":\"http://$(IP_ADDRESS):8000/build/dev/index.html\",\"hash\":null}" > $@
 
 $(BUILD_DIR)/release/index.html: $(SOURCE_DIR)/prod-index.html
 	mkdir -p $(dir $@) && $(INLINE) $< $@
@@ -250,3 +265,6 @@ ifeq ($(TRAVIS_PULL_REQUEST), false)
 else
 	echo 'Skipping deployment for pull requests'
 endif
+
+qr-code:
+	segno "http://$(IP_ADDRESS):8000/build/dev/config.json"
