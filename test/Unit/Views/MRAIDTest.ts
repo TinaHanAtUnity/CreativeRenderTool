@@ -50,7 +50,7 @@ describe('MRAID', () => {
 
     it('should render', (done) => {
         const campaign = TestFixtures.getProgrammaticMRAIDCampaign();
-        const mraid = new MRAID(nativeBridge, placement, campaign, privacy, false);
+        const mraid = new MRAID(nativeBridge, placement, campaign, privacy, false, configuration.getAbGroup());
 
         mraid.render();
 
@@ -78,7 +78,7 @@ describe('MRAID', () => {
         params.dynamicMarkup = 'InjectMe';
         const campaign = new MRAIDCampaign(params);
 
-        const mraid = new MRAID(nativeBridge, placement, campaign, privacy, false);
+        const mraid = new MRAID(nativeBridge, placement, campaign, privacy, false, configuration.getAbGroup());
         return mraid.createMRAID(MRAIDContainer).then((mraidSrc) => {
             assert.notEqual(mraidSrc.indexOf('InjectMe'), -1);
         });
@@ -92,7 +92,7 @@ describe('MRAID', () => {
         params.resource = markup;
         params.dynamicMarkup = 'InjectMe';
         const campaign = new MRAIDCampaign(params);
-        const mraid = new MRAID(nativeBridge, placement, campaign, privacy, false);
+        const mraid = new MRAID(nativeBridge, placement, campaign, privacy, false, configuration.getAbGroup());
         return mraid.createMRAID(MRAIDContainer).then((src) => {
             const dom = new DOMParser().parseFromString(src, 'text/html');
             assert.isNotNull(dom);
@@ -107,7 +107,7 @@ describe('MRAID', () => {
         params.resource = '<script src="mraid.js"></script><script>{UNITY_DYNAMIC_MARKUP}</script><script>var test = "Hello $&"</script><div>Hello World</div>';
         params.dynamicMarkup = 'InjectMe';
         const campaign = new MRAIDCampaign(params);
-        const mraid = new MRAID(nativeBridge, placement, campaign, privacy, false);
+        const mraid = new MRAID(nativeBridge, placement, campaign, privacy, false, configuration.getAbGroup());
         return mraid.createMRAID(MRAIDContainer).then((mraidSrc) => {
             assert.notEqual(mraidSrc.indexOf('InjectMe'), -1);
             assert.notEqual(mraidSrc.indexOf('<script>var test = "Hello $&"</script>'), -1);

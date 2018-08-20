@@ -1,24 +1,21 @@
 import 'mocha';
 import * as sinon from 'sinon';
-import { assert } from 'chai';
 
-import VPAIDTestXML from 'xml/VPAIDWithAdParameters.xml';
-import VPAIDCampaignJson from 'json/OnProgrammaticVPAIDCampaign.json';
 import { VPAID as VPAIDModel } from 'Models/VPAID/VPAID';
 import { VPAID, IVPAIDHandler } from 'Views/VPAID';
 import { NativeBridge } from 'Native/NativeBridge';
 import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { WebPlayerApi } from 'Native/Api/WebPlayer';
 import { Observable1 } from 'Utilities/Observable';
 import { DeviceInfoApi } from 'Native/Api/DeviceInfo';
-import { setTimeout } from 'timers';
 import { Privacy } from 'Views/Privacy';
+import { WebPlayerContainer } from 'Utilities/WebPlayer/WebPlayerContainer';
 
 describe('VPAID View', () => {
     let nativeBridge: NativeBridge;
     let campaign: VPAIDCampaign;
     let eventHandler: IVPAIDHandler;
+    let webPlayerContainer: WebPlayerContainer;
     let view: VPAID;
 
     beforeEach(() => {
@@ -30,18 +27,17 @@ describe('VPAID View', () => {
         deviceInfo.getScreenHeight.returns(Promise.resolve(480));
         (<any>nativeBridge).DeviceInfo = deviceInfo;
 
-        const webPlayer = sinon.createStubInstance(WebPlayerApi);
-        webPlayer.onWebPlayerEvent = new Observable1<string>();
-        webPlayer.setData.returns(Promise.resolve());
-        webPlayer.sendEvent.returns(Promise.resolve());
-        (<any>nativeBridge).WebPlayer = webPlayer;
+        webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
+        (<any>webPlayerContainer).onWebPlayerEvent = new Observable1<string>();
+        (<sinon.SinonStub>webPlayerContainer.setData).resolves();
+        (<sinon.SinonStub>webPlayerContainer.sendEvent).resolves();
 
         const model = sinon.createStubInstance(VPAIDModel);
         model.getCreativeParameters.returns('{}');
         (<sinon.SinonStub>campaign.getVPAID).returns(model);
 
         const privacy = new Privacy(nativeBridge, true);
-        view = new VPAID(nativeBridge, campaign, TestFixtures.getPlacement());
+        view = new VPAID(nativeBridge, webPlayerContainer, campaign, TestFixtures.getPlacement());
 
         eventHandler = {
             onVPAIDCompanionClick: sinon.spy(),
@@ -60,7 +56,7 @@ describe('VPAID View', () => {
         });
 
         it('should call setData on the WebPlayer', () => {
-            sinon.assert.called(<sinon.SinonSpy>nativeBridge.WebPlayer.setData);
+            sinon.assert.called(<sinon.SinonSpy>webPlayerContainer.setData);
         });
     });
 
@@ -70,7 +66,7 @@ describe('VPAID View', () => {
             if (parameters) {
                 webPlayerParams.push(parameters);
             }
-            sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.WebPlayer.sendEvent, webPlayerParams);
+            sinon.assert.calledWith(<sinon.SinonSpy>webPlayerContainer.sendEvent, webPlayerParams);
         };
     };
 
@@ -82,7 +78,7 @@ describe('VPAID View', () => {
             }
             args.unshift(event);
 
-            nativeBridge.WebPlayer.onWebPlayerEvent.trigger(JSON.stringify(args));
+            webPlayerContainer.onWebPlayerEvent.trigger(JSON.stringify(args));
 
             return new Promise((res) => window.setTimeout(res));
         };

@@ -1,0 +1,275 @@
+<!-- DO NOT PUT A DOCTYPE HERE! iOS will go crazy -->
+<html lang="en">
+<head>
+    <title>Unity Ads MRAID WebView</title>
+
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+    <meta name="format-detection" content="telephone=no"/>
+
+    <script>
+        (function() {
+            var MRAID = function() {
+                var state = 'loading';
+
+                var listeners = {
+                    ready: [],
+                    error: [],
+                    stateChange: [],
+                    viewableChange: [],
+                    sizeChange: []
+                };
+
+                var viewable = false;
+
+                var orientationProperties = {
+                    allowOrientationChange: true,
+                    forceOrientation: 'none'
+                };
+
+                var trigger = function(event, parameters) {
+                    if(!parameters) {
+                        parameters = [];
+                    }
+                    if(event in listeners) {
+                        for (var len = listeners[event].length, i = len - 1; i >= 0; i--) {
+                            var listener = listeners[event][i];
+                            try {
+                                listener.apply(window, parameters);
+                            } catch (e) {
+                                console.log('Got error ', e);
+                                window.parent.postMessage({
+                                    type: 'diagnosticError',
+                                    error: {
+                                        message: e.message
+                                    }
+                                }, '*');
+                            }
+                        }
+                    }
+                };
+
+                var width = window.innerWidth;
+                var height = window.innerHeight;
+
+                var playableConfiguration = {};
+
+                var setState = function(newState) {
+                    state = newState;
+                    trigger('stateChange', [newState]);
+                };
+
+                window.addEventListener('message', function(event) {
+                    switch(event.data.type) {
+                        case 'viewable':
+                            viewable = event.data.value;
+                            trigger('viewableChange', [viewable]);
+                            break;
+
+                        case 'resize':
+                            window.innerWidth = width = event.data.width;
+                            window.innerHeight = height = event.data.height;
+                            trigger('sizeChange', [width, height]);
+                            break;
+
+                        default:
+                            break;
+                    }
+                }, false);
+
+                window.addEventListener('resize', function(e) {
+                    width = window.innerWidth;
+                    height = window.innerHeight;
+                    trigger('sizeChange', [width, height]);
+                });
+
+                window.addEventListener('DOMContentLoaded', function() {
+                    window.parent.postMessage({
+                        type: 'loaded'
+                    }, '*');
+                    setState('default');
+                    trigger('ready');
+                }, false);
+
+                this.addEventListener = function(event, listener) {
+                    if(event in listeners) {
+                        listeners[event].push(listener);
+                    }
+                };
+
+                this.createCalendarEvent = function() {
+                    trigger('error', ['not implemented', 'createCalendarEvent']);
+                };
+
+                this.close = function() {
+                    setState('hidden');
+                    window.parent.postMessage({
+                        type: 'close'
+                    }, '*');
+                };
+
+                this.expand = function() {
+                    trigger('error', ['not implemented', 'expand']);
+                };
+
+                this.getCurrentPosition = this.getDefaultPosition = function() {
+                    return {
+                        x: 0,
+                        y: 0,
+                        width: width,
+                        height: height
+                    };
+                };
+
+                this.getExpandProperties = function() {
+                    trigger('error', ['not implemented', 'getExpandProperties']);
+                };
+
+                this.getMaxSize = this.getScreenSize = function() {
+                    return {
+                        width: width,
+                        height: height
+                    };
+                };
+
+                this.getOrientationProperties = function() {
+                    return orientationProperties;
+                };
+
+                this.getPlacementType = function() {
+                    return 'interstitial';
+                };
+
+                this.getResizeProperties = function() {
+                    trigger('error', ['not implemented', 'getResizeProperties']);
+                };
+
+                this.getState = function() {
+                    return state;
+                };
+
+                this.getVersion = function() {
+                    return '2.0';
+                };
+
+                this.isViewable = function() {
+                    return viewable;
+                };
+
+                this.open = function(url) {
+                    window.parent.postMessage({
+                        type: 'open',
+                        url: url
+                    }, '*');
+                };
+
+                this.playVideo = function() {
+                    trigger('error', ['not implemented', 'playVideo']);
+                };
+
+                this.removeEventListener = function(event, listener) {
+                    if(event in listeners) {
+                        var index = listeners[event].indexOf(listener);
+                        if(index !== -1) {
+                            listeners[event].splice(index, 1);
+                        }
+                    }
+                };
+
+                this.resize = function() {
+                    trigger('error', ['not implemented', 'resize']);
+                };
+
+                this.setExpandProperties = function() {
+                    trigger('error', ['not implemented', 'setExpandProperties']);
+                };
+
+                this.setOrientationProperties = function(properties) {
+                    orientationProperties = properties;
+                    window.parent.postMessage({
+                        type: 'orientation',
+                        properties: properties
+                    }, '*');
+                };
+
+                this.setResizeProperties = function() {
+                    trigger('error', ['not implemented', 'setResizeProperties']);
+                };
+
+                this.storePicture = function() {
+                    trigger('error', ['not implemented', 'storePicture']);
+                };
+
+                this.useCustomClose = function() {
+                    trigger('error', ['not implemented', 'useCustomClose']);
+                };
+
+                this.sendAnalyticsEvent = function(event, eventData) {
+                    window.parent.postMessage({
+                        type: 'analyticsEvent',
+                        event: event,
+                        eventData: eventData
+                    }, '*');
+                };
+
+                this.setCustomMraidState = function(state) {
+                    window.parent.postMessage({
+                        type: 'customMraidState',
+                        state: state
+                    }, '*');
+                };
+
+                this.getConfiguration = function() {
+                    return playableConfiguration;
+                }
+            };
+
+            var frameCount = 0;
+            var playableStartTime = undefined;
+            var playableTime = 0;
+
+            var lastFrameTime = 0;
+            var originalRequestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame;
+
+            if (typeof originalRequestAnimationFrame === 'function') {
+
+                var sendStats = function() {
+                    if (playableStartTime !== undefined) {
+                        window.parent.postMessage({
+                            type: 'sendStats',
+                            frameCount: frameCount,
+                            playTime: playableTime / 1000,
+                            totalTime: (Date.now() - playableStartTime) / 1000,
+                        }, '*');
+                    }
+                };
+
+                window.requestAnimationFrame = window.webkitRequestAnimationFrame = function (callback) {
+                    if (playableStartTime === undefined) {
+                        playableStartTime = Date.now();
+                    }
+
+                    return originalRequestAnimationFrame((time) => {
+                        if (time - lastFrameTime > 16) {
+                            frameCount++;
+
+                            if (lastFrameTime !== 0) {
+                                playableTime += (time - lastFrameTime);
+                            }
+                        }
+                        lastFrameTime = time;
+                        callback(time);
+                    });
+                };
+
+                setInterval(sendStats, 500);
+            }
+
+            window.mraid = new MRAID();
+        })();
+    </script>
+</head>
+<body></body>
+</html>
