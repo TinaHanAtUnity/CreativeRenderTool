@@ -181,14 +181,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 onUnityAdsReady: (placement: string) => {
                     console.log('onUnityAdsReady: ' + placement);
                     const placementButton = <HTMLButtonElement>window.parent.document.getElementById(placement);
-                    const placementButtonlistener = (placementButtonEvent: Event) => {
-                        placementButtonEvent.preventDefault();
-                        placementButton.disabled = true;
-                        placementButton.removeEventListener('click', placementButtonlistener, false);
-                        UnityAds.show(placement);
-                    };
-                    placementButton.disabled = false;
-                    placementButton.addEventListener('click', placementButtonlistener, false);
+                    if(placementButton) {
+                        const placementButtonlistener = (placementButtonEvent: Event) => {
+                            placementButtonEvent.preventDefault();
+                            placementButton.disabled = true;
+                            placementButton.removeEventListener('click', placementButtonlistener, false);
+                            UnityAds.show(placement);
+                        };
+                        placementButton.disabled = false;
+                        placementButton.addEventListener('click', placementButtonlistener, false);
+                    }
                 },
                 onUnityAdsStart: (placement: string) => {
                     console.log('onUnityAdsStart: ' + placement);
