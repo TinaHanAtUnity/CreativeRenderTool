@@ -12,7 +12,6 @@ build
 src/**/*.js
 src/**/*.js.map
 src/**/*.css
-src/html/admob/AFMAContainer.html
 
 # Test
 test/**/*.js

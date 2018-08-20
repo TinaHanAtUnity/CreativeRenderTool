@@ -23,6 +23,7 @@ TEST_DIR := test
 BUILD_DIR := build
 SOURCE_BUILD_DIR := $(BUILD_DIR)/$(SOURCE_DIR)
 TEST_BUILD_DIR := $(BUILD_DIR)/$(TEST_DIR)
+ADMOB_CONTAINER_DIR := $(SOURCE_DIR)/html/admob
 
 # Branch and commit id
 
@@ -181,8 +182,13 @@ $(SOURCE_BUILD_DIR)/proto/unity_proto.js:
 	$(PBJS) -t static-module -w es6 --no-create --no-verify --no-convert --no-delimited --no-beautify -o $(SOURCE_BUILD_DIR)/proto/unity_proto.js src/proto/unity_proto.proto
 	$(PBTS) -o src/proto/unity_proto.d.ts $(SOURCE_BUILD_DIR)/proto/unity_proto.js
 
-$(SOURCE_BUILD_DIR)/html/admob/AFMAContainer.html:
-	cp src/html/admob/AFMAContainer-no-obfuscation.html $@
+$(SOURCE_BUILD_DIR)/html/admob/AFMAContainer.html: $(SOURCE_DIR)/html/admob/AFMAContainer.html
+	mkdir -p $(dir $@)
+	sed -e 's/<\/*script>//g' $< > $(ADMOB_CONTAINER_DIR)/admob_temp.js
+	echo '<script>' > $@
+	$(CC) --js $(ADMOB_CONTAINER_DIR)/admob_temp.js --formatting PRETTY_PRINT --rewrite_polyfills false >> $@
+	echo '</script>' >> $@
+	rm $(ADMOB_CONTAINER_DIR)/admob_temp.js
 
 $(SOURCE_BUILD_DIR)/html/%.html: %.html
 	mkdir -p $(dir $@) && cp $< $@
