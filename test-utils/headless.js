@@ -12,7 +12,7 @@ const REQUIRED_MESSAGES = [
         expected: 1,
         matchedMessages: []},
     {description: "Configuration Response",
-        regexp: new RegExp(/Received configuration with 2 placements for gamer /),
+        regexp: new RegExp(/Received configuration with . placements for token /),
         seen: 0,
         expected: 1,
         matchedMessages: []},
@@ -90,7 +90,22 @@ puppeteer.launch().then(async (browser) => {
 
     const page = await browser.newPage();
     await page.setViewport(SCREEN_VIEWPORT_PROP);
-    await page.goto(SERVER_ADDRESS).catch( (e) => {
+
+    page.on("console", (message) => {
+        console.log("* Browser output: " + message.text());
+        if(checkMessage(message.text())) {
+            if(!testRunning) {
+                return;
+            }
+            testRunning = false;
+            console.log("## Test end: All expected events have been seen");
+            allMessagesResolve();
+        }
+    });
+
+    await page.goto(SERVER_ADDRESS, {
+        waitFor: 'domcontentloaded'
+    }).catch( (e) => {
         console.log("## Failed to connect to server at " + SERVER_ADDRESS);
         console.log("   Consider running `make clean build-browser start-nginx");
         process.exit(255);
@@ -103,17 +118,7 @@ puppeteer.launch().then(async (browser) => {
         allMessagesResolve = resolve;
         setTimeout(reject, TEST_TIMEOUT);
     });
-    page.on("console", (message) => {
-        console.log("* Browser output: " + message.text);
-        if(checkMessage(message.text)) {
-            if(!testRunning) {
-                return;
-            }
-            testRunning = false;
-            console.log("## Test end: All expected events have been seen");
-            allMessagesResolve();
-        }
-    });
+
     await timeOutPromise.catch( () => {
         console.log("## Timeout after " + TEST_TIMEOUT + "ms, ");
     });
