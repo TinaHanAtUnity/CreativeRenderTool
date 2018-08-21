@@ -34,7 +34,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         VPAIDAdUnit._adLoadTimeout = timeout;
     }
 
-    private static _adLoadTimeout: number = 10 * 1000;
+    private static _adLoadTimeout: number = 7 * 1000;
     private _endScreen: VPAIDEndScreen | undefined;
     private _closer: Closer;
     private _placement: Placement;
@@ -65,6 +65,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._clientInfo = parameters.clientInfo;
         this._webPlayerContainer = parameters.webPlayerContainer!;
         this._timer = new Timer(() => this.onAdUnitNotLoaded(), VPAIDAdUnit._adLoadTimeout);
+        this._timer.start();
         this._endScreen = parameters.endScreen;
 
         if (this._endScreen) {
