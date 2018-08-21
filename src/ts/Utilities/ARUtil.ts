@@ -1,4 +1,5 @@
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
+import { IosARApi } from 'Native/Api/IosARApi';
 
 export interface IARFrameTransform {
     a: number;
@@ -61,6 +62,17 @@ export class ARUtil {
             scaleX: dstWidth / videoRect.width,
             scaleY: dstHeight / videoRect.height
         };
+    }
+
+    public static advanceFrameWithScale(api: IosARApi): Promise<void> {
+        // Get frame info, calculate scaling and then call advanceFrame
+        return api.getFrameInfo().then((frameInfo) => {
+            const scale = ARUtil.calculateVideoScale(frameInfo);
+            return api.setFrameScaling(scale).then(
+                () => api.advanceFrame().catch(
+                (error) => { throw new Error('Cannot set frame scale ' + error); })
+            );
+        }).catch((error) => { throw new Error('Cannot get frame info ' + error); });
     }
 
     public static invertTransform(transform: IARFrameTransform): IARFrameTransform {

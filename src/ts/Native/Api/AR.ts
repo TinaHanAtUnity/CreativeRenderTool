@@ -1,8 +1,9 @@
 import { ApiPackage, NativeApi } from 'Native/NativeApi';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Observable0, Observable1, Observable2 } from 'Utilities/Observable';
-import { ARUtil, IARFrameInfo, IARFrameScale, IARPoint, IARRect, IARSize } from 'Utilities/ARUtil';
-import { Platform } from 'Constants/Platform';
+import { IARSize } from 'Utilities/ARUtil';
+import { AndroidARApi } from 'Native/Api/AndroidARApi';
+import { IosARApi } from 'Native/Api/IosARApi';
 
 enum AREvent {
     AR_PLANES_ADDED,
@@ -34,6 +35,9 @@ export interface IARVideoFormat {
 }
 
 export class ARApi extends NativeApi {
+    public Android: AndroidARApi;
+    public Ios: IosARApi;
+
     public readonly onPlanesAdded = new Observable1<string>();
     public readonly onPlanesRemoved = new Observable1<string>();
     public readonly onPlanesUpdated = new Observable1<string>();
@@ -43,14 +47,15 @@ export class ARApi extends NativeApi {
     public readonly onError = new Observable1<number>();
     public readonly onSessionInterrupted = new Observable0();
     public readonly onSessionInterruptionEnded = new Observable0();
-    public readonly onAndroidEnumsReceived = new Observable1<any>();
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'AR', ApiPackage.AR);
-    }
 
-    public isARSupported(): Promise<boolean> {
-        return this._nativeBridge.invoke<boolean>(this._fullApiClassName, 'isARSupported', ['ARWorldTrackingConfiguration']);
+        if (nativeBridge.getPlatform() === Platform.ANDROID) {
+            this.Android = new AndroidARApi(nativeBridge);
+        } else if (nativeBridge.getPlatform() === Platform.IOS) {
+            this.Ios = new IosARApi(nativeBridge);
+        }
     }
 
     public restartSession(arRunProperties: IARRunProperties): Promise<void> {
@@ -81,43 +86,8 @@ export class ARApi extends NativeApi {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'removeAnchor', [identifier]);
     }
 
-    public advanceFrame(): Promise<void> {
-        // We don't have scaling logic in Android at the moment.
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            return this._nativeBridge.invoke<void>(this._fullApiClassName, 'advanceFrame');
-        }
-
-        // Get frame info, calculate scaling and then call advanceFrame
-        return this.getFrameInfo().then((frameInfo) => {
-            const scale = ARUtil.calculateVideoScale(frameInfo);
-            return this.setFrameScaling(scale).then(
-                () => this._nativeBridge.invoke<void>(this._fullApiClassName, 'advanceFrame')).catch(
-                    (error) => this._nativeBridge.Sdk.logInfo('Cannot set scaling: ' + error));
-        }).catch((error) => this._nativeBridge.Sdk.logInfo('Cannot get frame info: ' + error));
-    }
-
-    public getFrameInfo(): Promise<IARFrameInfo> {
-        return this._nativeBridge.invoke<IARFrameInfo>(this._fullApiClassName, 'getFrameInfo');
-    }
-
-    public setFrameScaling(scale: IARFrameScale): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setFrameScaling', [scale]);
-    }
-
     public getSupportedVideoFormats(): Promise<IARVideoFormat[]> {
         return this._nativeBridge.invoke<IARVideoFormat[]>(this._fullApiClassName, 'getSupportedVideoFormats');
-    }
-
-    public initAR(): Promise<void> {
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            return this._nativeBridge.invoke<any>(this._fullApiClassName, 'getAndroidConfigEnums').then((enums) => {
-                this.onAndroidEnumsReceived.trigger(enums);
-
-                return Promise.resolve();
-            });
-        }
-
-        return Promise.resolve();
     }
 
     public handleEvent(event: string, parameters: any[]): void {
