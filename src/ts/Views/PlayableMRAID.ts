@@ -14,7 +14,6 @@ import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
 import { IObserver0, IObserver1, IObserver2 } from 'Utilities/IObserver';
 import { SdkStats } from 'Utilities/SdkStats';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
-import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { ARUtil } from '../Utilities/ARUtil';
 
 import { CurrentPermission, PermissionTypes } from 'Native/Api/Permissions';

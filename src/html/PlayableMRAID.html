@@ -52,26 +52,30 @@
     </div>
     <div class="unityads-logo"></div>
 </div>
-<div id="camera-permission-panel" class="camera-permission-panel">
+<div class="camera-permission-panel">
     <div class="container">
         <div class="arads-logo"></div>
         <div class="permission-text">
             <p><%= data.t("This is an Augmented Reality Advertisement and is best viewed with your camera.") %></p>
             <p class="request-text"><%= data.t("Please grant camera access when your device asks for it.") %></p>
         </div>
-        <div>
+        <div class="permission-choice-buttons">
+            <div class="permission-decline-button">
+                <%= data.t("No Thanks") %>
+            </div>
             <div class="permission-accept-button">
                 <%= data.t("Begin") %>
             </div>
-            <div class="permission-decline-button">
-                <%= data.t("Don't turn my camera on") %>
-            </div>
         </div>
     </div>
-    <div class="show-learn-more-button">
+    <div class="gdpr-link">
         <span class="icon-gdpr"></span>
     </div>
+    <div class="show-learn-more-button">
+        <span class="icon-info"></span>
+    </div>
 </div>
+
 <div class="permissions-learn-more">
     <div class="container">
         <div class="hide-learn-more-button">

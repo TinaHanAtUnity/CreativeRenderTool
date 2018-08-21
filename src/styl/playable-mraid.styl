@@ -3,6 +3,7 @@
 
 $progress-bar-width = 60%;
 $filling-bar-width = $progress-bar-width * .3;
+$permissions-max-width = 300px;
 
 #playable-mraid {
 
@@ -292,7 +293,7 @@ $filling-bar-width = $progress-bar-width * .3;
     }
   }
 
-  #camera-permission-panel {
+  .camera-permission-panel {
     background: #fafafa;
     position: absolute;
     top: 100vw;
@@ -305,40 +306,70 @@ $filling-bar-width = $progress-bar-width * .3;
 
     .container {
       width: 80%;
-      max-width: 300px;
-      justify-content: space-around;
+      max-width: $permissions-max-width;
+      justify-content: flex-start;
     }
 
     .permission-text {
       font-size:4vw;
       text-align: center;
+      margin: 0 0 8px;
     }
 
     .arads-logo {
       width: 156px;
       height: 30px;
-      margin: 20px auto 0;
+      margin: 20px auto 5px;
       background-image: url("../img/adsar.png");
       background-position: center;
       background-size: cover;
     }
 
+    .permission-choice-buttons {
+      display: flex;
+      max-width: $permissions-max-width;
+      margin: 0 auto;
+
+      -webkit-box-orient: horizontal;
+      -webkit-box-direction: normal;
+      -webkit-box-pack: center;
+      -webkit-box-align: center;
+
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-around;
+    }
+
     .permission-accept-button {
-      $download-container-default($default-scale-size, true);
-      margin: 0 auto 8px;
+      $download-container-default($default-scale-size * .85, true);
+      flex: 1;
+      margin: 0 auto 8px 8px;
+      padding: .6375rem .35rem;
     }
 
     .permission-decline-button {
-      text-align: center;
-      font-size: 0.75rem;
-      margin-bottom: 16px;
-      color: $blue;
+      $download-container-default($default-scale-size * .85, true);
+      flex: 1;
+      margin: 0 0 8px;
+      padding: .6375rem .35rem;
+      color: $white;
+      background: $gray;
+    }
+
+    .gdpr-link {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
     }
 
     .show-learn-more-button {
       position: absolute;
       bottom: 10px;
-      left: 10px;
+      right: 10px;
+    }
+
+    .icon-gdpr,
+    .icon-info {
       color: $gray;
       font-size: 1.25rem;
     }
