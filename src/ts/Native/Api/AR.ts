@@ -4,6 +4,7 @@ import { Observable0, Observable1, Observable2 } from 'Utilities/Observable';
 import { IARSize } from 'Utilities/ARUtil';
 import { AndroidARApi } from 'Native/Api/AndroidARApi';
 import { IosARApi } from 'Native/Api/IosARApi';
+import { Platform } from 'Constants/Platform';
 
 enum AREvent {
     AR_PLANES_ADDED,
