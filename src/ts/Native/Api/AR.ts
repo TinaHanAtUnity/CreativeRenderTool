@@ -18,16 +18,22 @@ enum AREvent {
     AR_SESSION_INTERRUPTION_ENDED
 }
 
-export interface IARConfigurationProperties {
+export interface IIosARConfigurationProperties {
     configurationName: string;
     lightEstimationEnabled?: boolean;
     worldAlignment?: number;
     planeDetection?: number;
 }
 
-export interface IARRunProperties {
+export interface IIosARRunProperties {
     runOptions?: number;
-    configuration?: IARConfigurationProperties;
+    configuration?: IIosARConfigurationProperties;
+}
+
+export interface IAndroidARRunProperties {
+    lightEstimationMode?: string;
+    planeFindingMode?: string;
+    updateMode?: string;
 }
 
 export interface IARVideoFormat {
@@ -59,7 +65,7 @@ export class ARApi extends NativeApi {
         }
     }
 
-    public restartSession(arRunProperties: IARRunProperties): Promise<void> {
+    public restartSession(arRunProperties: IIosARRunProperties|IAndroidARRunProperties): Promise<void> {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'restartSession', [arRunProperties]);
     }
 
