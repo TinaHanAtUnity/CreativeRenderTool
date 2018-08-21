@@ -1,6 +1,7 @@
-# Pending
+# Staged
 
 * Remove force quit manager
+* Start the VPAID timeout timer to hide ad unit on bad ads
 
 # Tue Aug 21 06:56:04 UTC 2018
 
