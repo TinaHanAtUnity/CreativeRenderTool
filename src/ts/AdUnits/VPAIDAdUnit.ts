@@ -65,7 +65,6 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._clientInfo = parameters.clientInfo;
         this._webPlayerContainer = parameters.webPlayerContainer!;
         this._timer = new Timer(() => this.onAdUnitNotLoaded(), VPAIDAdUnit._adLoadTimeout);
-        this._timer.start();
         this._endScreen = parameters.endScreen;
 
         if (this._endScreen) {
@@ -255,6 +254,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     private onShow() {
+        this._timer.start();
         this.setShowing(true);
 
         this._container.addEventHandler(this);
