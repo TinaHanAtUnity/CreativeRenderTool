@@ -143,6 +143,13 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                     this.hideARPermissionLearnMore();
                 },
                 selector: '.hide-learn-more-button'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => {
+                    this.onPrivacyLinkClicked((<HTMLLinkElement>event.target).href);
+                },
+                selector: '.privacy-link'
             }
         ];
     }
@@ -599,6 +606,17 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private hideARPermissionLearnMore() {
         this._permissionLearnMorePanel.style.display = 'none';
         this._closeElement.style.display = 'block';
+    }
+
+    private onPrivacyLinkClicked(url: string) {
+        if (this._nativeBridge.getPlatform() === Platform.IOS) {
+            this._nativeBridge.UrlScheme.open(url);
+        } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            this._nativeBridge.Intent.launch({
+                'action': 'android.intent.action.VIEW',
+                'uri': url
+            });
+        }
     }
 
     /**

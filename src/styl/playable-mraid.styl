@@ -4,6 +4,7 @@
 $progress-bar-width = 60%;
 $filling-bar-width = $progress-bar-width * .3;
 $permissions-max-width = 300px;
+$permissions-gray = #a6a6a6;
 
 #playable-mraid {
 
@@ -227,69 +228,12 @@ $permissions-max-width = 300px;
   }
 
   .permissions-learn-more {
-    background: #fafafa;
-    position: absolute;
-    top: 0;
-    left: 0;
-    overflow: scroll;
-    height: 100vh;
-    width: 100vw;
+    $full-screen-pop-up-view($default-scale-size, 110);
     display: none;
-    z-index: 110;
 
-    .container {
-      padding: 60px 12px 12px;
-      font-size: 0.9rem;
-    }
-
-    .learn-more-header {
+    .centered-title {
+      display: block;
       text-align: center;
-      font-size: 1.1rem;
-    }
-
-    .hide-learn-more-button {
-      position: absolute;
-      top: 12px;
-      left: 12px;
-      font-size: 0.85rem;
-    }
-
-    .bottom-buttons {
-      display: flex;
-      margin: auto;
-
-      -webkit-box-orient: horizontal;
-      -webkit-box-direction: normal;
-      -webkit-box-pack: center;
-      -webkit-box-align: center;
-
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
-
-      padding-top: 30px;
-      padding-bottom: 16px;
-    }
-
-    .privacy-button {
-      position: relative;
-      top: 0;
-      left: 0;
-    }
-
-    .privacy-policy-button {
-      text-align: right;
-
-      a {
-        color: $black;
-        font-size: 1rem;
-        text-decoration: none;
-      }
-    }
-
-    .icon-gdpr {
-      color: $black;
-      font-size: 1.25rem;
     }
   }
 
@@ -353,7 +297,7 @@ $permissions-max-width = 300px;
       margin: 0 0 8px;
       padding: .6375rem .35rem;
       color: $white;
-      background: $gray;
+      background: $permissions-gray;
     }
 
     .gdpr-link {
@@ -370,10 +314,10 @@ $permissions-max-width = 300px;
 
     .icon-gdpr,
     .icon-info {
-      color: $gray;
+      color: $permissions-gray;
       font-size: 1.25rem;
     }
-}
+  }
 }
 
 @keyframes progress-bar-dynamic {
