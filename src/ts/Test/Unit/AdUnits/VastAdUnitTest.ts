@@ -27,7 +27,6 @@ import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFact
 import { GdprManager } from 'Managers/GdprManager';
 import { Privacy } from 'Views/Privacy';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
-import { ForceQuitManager } from 'Managers/ForceQuitManager';
 
 describe('VastAdUnit', () => {
 
@@ -40,7 +39,6 @@ describe('VastAdUnit', () => {
     let clientInfo: ClientInfo;
     let placement: Placement;
     let vastCampaign: VastCampaign;
-    let forceQuitManager: ForceQuitManager;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -65,13 +63,12 @@ describe('VastAdUnit', () => {
         });
 
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
-        forceQuitManager = sinon.createStubInstance(ForceQuitManager);
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
         const nativeBridge = TestFixtures.getNativeBridge();
         focusManager = new FocusManager(nativeBridge);
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         const request = new Request(nativeBridge, wakeUpManager);
-        const activity = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo(), forceQuitManager);
+        const activity = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         vastCampaign = TestFixtures.getEventVastCampaign();
         const video = vastCampaign.getVideo();
