@@ -1,4 +1,4 @@
-import { IMRAIDViewHandler, IOrientationProperties } from 'Views/MRAIDView';
+import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'Views/MRAIDView';
 import { HttpKafka, KafkaCommonObjectType } from 'Utilities/HttpKafka';
 import { NativeBridge } from 'Native/NativeBridge';
 import { OperativeEventManager, IOperativeEventParams } from 'Managers/OperativeEventManager';
@@ -24,6 +24,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _adUnit: MRAIDAdUnit;
+    private _mraidView: MRAIDView<IMRAIDViewHandler>;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _campaign: MRAIDCampaign;
@@ -37,6 +38,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._adUnit = adUnit;
+        this._mraidView = adUnit.getMRAIDView();
         this._clientInfo = parameters.clientInfo;
         this._deviceInfo = parameters.deviceInfo;
         this._campaign = parameters.campaign;
@@ -46,19 +48,34 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     }
 
     public onMraidClick(url: string): Promise<void> {
+        this.setCallButtonEnabled(false);
+
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
+        const clickAttributionUrl = this._campaign.getClickAttributionUrl();
 
-        if(this._campaign.getClickAttributionUrl()) {
-            this.handleClickAttribution();
+        if (clickAttributionUrl) {
+            this.handleClickAttribution(clickAttributionUrl);
             if(!this._campaign.getClickAttributionUrlFollowsRedirects()) {
-                this.openClickUrl(url);
+                return this.followUrl(url).then((storeUrl) => {
+                    return this.openUrl(storeUrl).then(() => {
+                        this.setCallButtonEnabled(true);
+                        this.sendTrackingEvents();
+                    }).catch((e) => {
+                        this.setCallButtonEnabled(true);
+                    });
+                });
             }
+            return Promise.resolve();
         } else {
-            this.openClickUrl(url);
+            return this.followUrl(url).then((storeUrl) => {
+                return this.openUrl(storeUrl).then(() => {
+                    this.setCallButtonEnabled(true);
+                    this.sendTrackingEvents();
+                }).catch((e) => {
+                    this.setCallButtonEnabled(true);
+                });
+            });
         }
-        this.sendTrackingEvents();
-
-        return Promise.resolve();
     }
 
     public onMraidReward(): void {
@@ -114,36 +131,67 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         }
     }
 
-    private handleClickAttribution() {
-        const clickAttributionUrl = this._campaign.getClickAttributionUrl();
+    // private handleClickAttribution() {
+    //     const clickAttributionUrl = this._campaign.getClickAttributionUrl();
+    //     const useWebViewUA = this._campaign.getUseWebViewUserAgentForTracking();
+    //     if(this._campaign.getClickAttributionUrlFollowsRedirects() && clickAttributionUrl) {
+    //         this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, true, useWebViewUA).then(response => {
+    //             const location = Request.getHeader(response.headers, 'location');
+    //             if(location) {
+    //                 this.openUrl(location);
+    //             } else {
+    //                 Diagnostics.trigger('mraid_click_attribution_misconfigured', {
+    //                     url: this._campaign.getClickAttributionUrl(),
+    //                     followsRedirects: this._campaign.getClickAttributionUrlFollowsRedirects(),
+    //                     response: response
+    //                 });
+    //             }
+    //         }).catch(error => {
+    //             if(error instanceof RequestError) {
+    //                 error = new DiagnosticError(new Error(error.message), {
+    //                     request: error.nativeRequest,
+    //                     auctionId: this._campaign.getSession().getId(),
+    //                     url: this._campaign.getClickAttributionUrl(),
+    //                     response: error.nativeResponse
+    //                 });
+    //             }
+    //             Diagnostics.trigger('mraid_click_attribution_failed', error);
+    //         });
+    //     } else {
+    //         if (clickAttributionUrl) {
+    //             this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, false, useWebViewUA);
+    //         }
+    //     }
+    // }
+
+    private handleClickAttribution(clickAttributionUrl: string) {
         const useWebViewUA = this._campaign.getUseWebViewUserAgentForTracking();
-        if(this._campaign.getClickAttributionUrlFollowsRedirects() && clickAttributionUrl) {
+        const hasClickAttributionUrlFollowsRedirects = this._campaign.getClickAttributionUrlFollowsRedirects();
+        if (hasClickAttributionUrlFollowsRedirects) {
             this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, true, useWebViewUA).then(response => {
                 const location = Request.getHeader(response.headers, 'location');
-                if(location) {
+                if (location) {
                     this.openUrl(location);
                 } else {
                     Diagnostics.trigger('mraid_click_attribution_misconfigured', {
                         url: this._campaign.getClickAttributionUrl(),
-                        followsRedirects: this._campaign.getClickAttributionUrlFollowsRedirects(),
+                        followsRedirects: true,
                         response: response
                     });
                 }
             }).catch(error => {
-                if(error instanceof RequestError) {
+                if (error instanceof RequestError) {
                     error = new DiagnosticError(new Error(error.message), {
                         request: error.nativeRequest,
                         auctionId: this._campaign.getSession().getId(),
-                        url: this._campaign.getClickAttributionUrl(),
+                        url: clickAttributionUrl,
                         response: error.nativeResponse
                     });
                 }
                 Diagnostics.trigger('mraid_click_attribution_failed', error);
             });
         } else {
-            if (clickAttributionUrl) {
-                this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, false, useWebViewUA);
-            }
+            this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, false, useWebViewUA);
         }
     }
 
@@ -160,12 +208,6 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         }
 
         this._adUnit.sendClick();
-    }
-
-    private openClickUrl(url: string): Promise<void> {
-        return this.followUrl(url).then((storeUrl) => {
-            return this.openUrl(storeUrl);
-        });
     }
 
     private openUrl(url: string): Promise<void> {
@@ -189,5 +231,9 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
             placement: this._placement,
             asset: this._campaign.getResourceUrl()
         };
+    }
+
+    private setCallButtonEnabled(enabled: boolean) {
+        this._mraidView.setCallButtonEnabled(enabled);
     }
 }

@@ -14,7 +14,6 @@ import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
 import { Platform } from 'Constants/Platform';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Activity } from 'AdUnits/Containers/Activity';
-import { MetaDataManager } from 'Managers/MetaDataManager';
 import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { MRAID } from 'Views/MRAID';
 import { Placement } from 'Models/Placement';
@@ -111,18 +110,21 @@ describe('MRAIDEventHandlersTest', () => {
         });
 
         it('should send a click with session manager', () => {
-            mraidEventHandler.onMraidClick('http://example.net');
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, { placement: placement, asset: mraidAdUnitParameters.campaign.getResourceUrl() });
+            mraidEventHandler.onMraidClick('http://example.net').then(() => {
+                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, { placement: placement, asset: mraidAdUnitParameters.campaign.getResourceUrl() });
+            });
         });
 
         it('should send a view with session manager', () => {
-            mraidEventHandler.onMraidClick('http://example.net');
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendView, { placement: placement, asset: mraidAdUnitParameters.campaign.getResourceUrl() });
+            mraidEventHandler.onMraidClick('http://example.net').then(() => {
+                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendView, { placement: placement, asset: mraidAdUnitParameters.campaign.getResourceUrl() });
+            });
         });
 
         it('should send a third quartile event with session manager', () => {
-            mraidEventHandler.onMraidClick('http://example.net');
-            sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile, { placement: placement, asset: mraidAdUnitParameters.campaign.getResourceUrl() });
+            mraidEventHandler.onMraidClick('http://example.net').then(() => {
+                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendThirdQuartile, { placement: placement, asset: mraidAdUnitParameters.campaign.getResourceUrl() });
+            });
         });
 
         it('should send a native click event', () => {

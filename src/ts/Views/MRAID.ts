@@ -268,7 +268,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
                 break;
 
             case 'open':
-                this._handlers.forEach(handler => handler.onMraidClick(event.data.url));
+                this.onMessageOpen(event.data.url);
                 break;
 
             case 'sendStats':
@@ -326,5 +326,12 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
             return undefined;
         }
         return timeInSeconds;
+    }
+
+    private onMessageOpen(url: string) {
+        if (!this._callButtonEnabled) {
+            return;
+        }
+        this._handlers.forEach(handler => handler.onMraidClick(url));
     }
 }
