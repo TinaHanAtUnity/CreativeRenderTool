@@ -3,6 +3,8 @@
 
 $progress-bar-width = 60%;
 $filling-bar-width = $progress-bar-width * .3;
+$permissions-max-width = 300px;
+$permissions-gray = #a6a6a6;
 
 #playable-mraid {
 
@@ -148,7 +150,8 @@ $filling-bar-width = $progress-bar-width * .3;
   }
 
   .loading-screen,
-  .loading-screen-ar {
+  .loading-screen-ar,
+  .camera-permission-panel {
     position: absolute;
     top: 0;
     left: 0;
@@ -220,6 +223,150 @@ $filling-bar-width = $progress-bar-width * .3;
         transform: translate3d(0, 0, 0);
         animation: progress-bar-dynamic 1s linear infinite;
         will-change: left;
+      }
+    }
+  }
+
+  .permissions-learn-more {
+    $full-screen-pop-up-view($default-scale-size, 110);
+    display: none;
+
+    .centered-title {
+      display: block;
+      text-align: center;
+    }
+  }
+
+  .camera-permission-panel {
+    background: #fafafa;
+    position: absolute;
+    top: 100vw;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: inherit;
+    width: 100vw;
+    z-index: 105;
+
+    .container {
+      width: 80%;
+      max-width: $permissions-max-width;
+      justify-content: flex-start;
+    }
+
+    .permission-text {
+      font-size:4vw;
+      text-align: center;
+      margin: 0 0 8px;
+    }
+
+    .arads-logo {
+      width: 156px;
+      height: 30px;
+      margin: 20px auto 15px;
+      background-image: url("../img/adsar.png");
+      background-position: center;
+      background-size: cover;
+    }
+
+    .permission-choice-buttons {
+      display: flex;
+      max-width: $permissions-max-width;
+      margin: 0 auto;
+
+      -webkit-box-orient: horizontal;
+      -webkit-box-direction: normal;
+      -webkit-box-pack: center;
+      -webkit-box-align: center;
+
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-around;
+    }
+
+    .permission-accept-button {
+      $download-container-default($default-scale-size * .85, true);
+      flex: 1;
+      margin: 0 auto 8px 8px;
+      padding: .6375rem .35rem;
+    }
+
+    .permission-decline-button {
+      $download-container-default($default-scale-size * .85, true);
+      flex: 1;
+      margin: 0 0 8px;
+      padding: .6375rem .35rem;
+      color: $white;
+      background: $permissions-gray;
+    }
+
+    .gdpr-link {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+    }
+
+    .show-learn-more-button {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+    }
+
+    .icon-gdpr,
+    .icon-info {
+      color: $permissions-gray;
+      font-size: 1.25rem;
+    }
+  }
+}
+
+.landscape {
+  #playable-mraid {
+    .camera-permission-panel {
+      position: absolute;
+      top: 0;
+      left: 100vh;
+      right: 0;
+      bottom: 0;
+      width: inherit;
+      height: inherit;
+
+      .container {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .arads-logo {
+        margin: 0px auto 5px;
+      }
+
+      .permission-text {
+        font-size: 2vw;
+        padding: 0 8px;
+      }
+
+      .permission-choice-buttons {
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: reverse;
+        -webkit-box-pack: center;
+        -webkit-box-align: center;
+
+        flex-direction: column-reverse;
+        align-items: center;
+        justify-content: space-around;
+      }
+
+      .gdpr-link {
+        display: none;
+      }
+
+      .show-learn-more-button {
+        bottom: 0;
+        right: 5px;
+      }
+
+      .permission-accept-button {
+        margin: 0 auto 8px;
       }
     }
   }

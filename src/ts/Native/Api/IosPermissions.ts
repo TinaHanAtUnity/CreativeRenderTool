@@ -2,10 +2,6 @@ import { ApiPackage, NativeApi } from 'Native/NativeApi';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Observable2 } from 'Utilities/Observable';
 
-enum PermissionsEvent {
-    PERMISSIONS_RESULT
-}
-
 export enum IosPermission {
     AVMediaTypeVideo = 'vide',
     AVMediaTypeAudio = 'soun'
@@ -18,22 +14,11 @@ export class IosPermissionsApi extends NativeApi {
         super(nativeBridge, 'Permissions', ApiPackage.CORE);
     }
 
-    public checkPermission(permission: IosPermission): Promise<boolean> {
-        return this._nativeBridge.invoke<boolean>(this._fullApiClassName, 'checkPermission', [permission]);
+    public checkPermission(permission: IosPermission | string): Promise<number> {
+        return this._nativeBridge.invoke<number>(this._fullApiClassName, 'checkPermission', [permission]);
     }
 
-    public requestPermission(permission: IosPermission): Promise<void> {
+    public requestPermission(permission: IosPermission | string): Promise<void> {
         return this._nativeBridge.invoke<void>(this._fullApiClassName, 'requestPermission', [permission]);
-    }
-
-    public handleEvent(event: string, parameters: any[]): void {
-        switch (event) {
-            case PermissionsEvent[PermissionsEvent.PERMISSIONS_RESULT]:
-                this.onPermissionsResult.trigger(parameters[0], parameters[1]);
-                break;
-
-            default:
-                super.handleEvent(event, parameters);
-        }
     }
 }

@@ -265,11 +265,7 @@ export class NativeBridge implements INativeBridge {
                 break;
 
             case EventCategory[EventCategory.PERMISSIONS]:
-                if(this.getPlatform() === Platform.ANDROID) {
-                    this.Permissions.Android.handleEvent(event, parameters);
-                } else {
-                    this.Permissions.Ios.handleEvent(event, parameters);
-                }
+                this.Permissions.handleEvent(event, parameters);
                 break;
 
             case EventCategory[EventCategory.BANNER]:

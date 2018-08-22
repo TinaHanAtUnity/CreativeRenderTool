@@ -19,7 +19,10 @@
                     error: [],
                     stateChange: [],
                     viewableChange: [],
-                    sizeChange: []
+                    sizeChange: [],
+                    permissionChange: [],
+                    showFallback: [],
+                    showAR: []
                 };
 
                 var viewable = false;
@@ -28,6 +31,8 @@
                     allowOrientationChange: true,
                     forceOrientation: 'none'
                 };
+
+                var permissions = {};
 
                 var trigger = function(event, parameters) {
                     if(!parameters) {
@@ -47,6 +52,16 @@
                                     }
                                 }, '*');
                             }
+                        }
+                    }
+                };
+
+                var triggerExperienceType = function(permissionType, status) {
+                    if (permissionType === 'Camera') {
+                        if (status === true) {
+                            trigger('showAR');
+                        } else {
+                            trigger('showFallback');
                         }
                     }
                 };
@@ -74,6 +89,11 @@
                             trigger('sizeChange', [width, height]);
                             break;
 
+                        case 'permission':
+                            permissions[event.data.value.type] = event.data.value.status;
+                            trigger('permissionChange', [event.data.value.type, event.data.value.status]);
+                            triggerExperienceType(event.data.value.type, event.data.value.status);
+                            break;
                         default:
                             break;
                     }
@@ -92,6 +112,22 @@
                     setState('default');
                     trigger('ready');
                 }, false);
+
+                this.onShowAR = function(listener) {
+                    if (permissions['Camera'] === true) {
+                        listener();
+                    } else {
+                        this.addEventListener('showAR', listener);
+                    }
+                };
+
+                this.onShowFallback = function(listener) {
+                    if (permissions['Camera'] === false) {
+                        listener();
+                    } else {
+                        this.addEventListener('showFallback', listener);
+                    }
+                }
 
                 this.addEventListener = function(event, listener) {
                     if(event in listeners) {
@@ -223,6 +259,10 @@
 
                 this.getConfiguration = function() {
                     return playableConfiguration;
+                }
+
+                this.getPermissionStatus = function(type) {
+                    return permissions[type];
                 }
             };
             window.mraid = new MRAID();
