@@ -25,7 +25,6 @@ import { Privacy } from 'Views/Privacy';
 import { GdprManager } from 'Managers/GdprManager';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 import { IEndScreenParameters } from 'Views/EndScreen';
-import { ForceQuitManager } from 'Managers/ForceQuitManager';
 
 describe('PerformanceVideoEventHandlersTest', () => {
 
@@ -37,7 +36,6 @@ describe('PerformanceVideoEventHandlersTest', () => {
     let video: Video;
     let performanceAdUnitParameters: IPerformanceAdUnitParameters;
     let performanceVideoEventHandler: PerformanceVideoEventHandler;
-    let forceQuitManager: ForceQuitManager;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -45,8 +43,7 @@ describe('PerformanceVideoEventHandlersTest', () => {
             handleCallback
         });
 
-        forceQuitManager = sinon.createStubInstance(ForceQuitManager);
-        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo(), forceQuitManager);
+        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
         video = new Video('', TestFixtures.getSession());
 
         const focusManager = new FocusManager(nativeBridge);

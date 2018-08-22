@@ -155,7 +155,7 @@ describe('ThirdPartyEventManagerTest', () => {
             ICometTrackingUrlEvents.MIDPOINT,
             ICometTrackingUrlEvents.THIRD_QUARTILE,
             ICometTrackingUrlEvents.ERROR,
-            ICometTrackingUrlEvents.LOADED,
+            ICometTrackingUrlEvents.LOADED_IMPRESSION,
             ICometTrackingUrlEvents.COMPLETE,
             ICometTrackingUrlEvents.SKIP
         ].forEach((event) =>
@@ -170,7 +170,6 @@ describe('ThirdPartyEventManagerTest', () => {
 
         // Currently unused events
         [
-            ICometTrackingUrlEvents.IMPRESSION,
             ICometTrackingUrlEvents.ENDCARD_CLICK,
             ICometTrackingUrlEvents.STALLED,
             ICometTrackingUrlEvents.SHOW

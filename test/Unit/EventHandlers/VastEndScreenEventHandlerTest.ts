@@ -1,5 +1,6 @@
 import 'mocha';
 import * as sinon from 'sinon';
+import { assert } from 'chai';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
@@ -24,7 +25,6 @@ import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFact
 import { GdprManager } from 'Managers/GdprManager';
 import { Privacy } from 'Views/Privacy';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
-import { ForceQuitManager } from 'Managers/ForceQuitManager';
 
 describe('VastEndScreenEventHandlersTest', () => {
     const handleInvocation = sinon.spy();
@@ -33,7 +33,6 @@ describe('VastEndScreenEventHandlersTest', () => {
     let container: AdUnitContainer;
     let request: Request;
     let vastAdUnitParameters: IVastAdUnitParameters;
-    let forceQuitManager: ForceQuitManager;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -44,8 +43,7 @@ describe('VastEndScreenEventHandlersTest', () => {
         const focusManager = new FocusManager(nativeBridge);
         const metaDataManager = new MetaDataManager(nativeBridge);
 
-        forceQuitManager = sinon.createStubInstance(ForceQuitManager);
-        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo(), forceQuitManager);
+        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
         request = new Request(nativeBridge, new WakeUpManager(nativeBridge, new FocusManager(nativeBridge)));
         sinon.stub(request, 'followRedirectChain').callsFake((url) => {
             return Promise.resolve(url);
@@ -112,10 +110,10 @@ describe('VastEndScreenEventHandlersTest', () => {
         let vastAdUnit: VastAdUnit;
         let video: Video;
         let campaign: VastCampaign;
+        let vastEndScreen: VastEndScreen;
         let vastEndScreenEventHandler: VastEndScreenEventHandler;
         const vastXml = EventTestVast;
         const vastParser = TestFixtures.getVastParser();
-        const vast = vastParser.parseVast(vastXml);
 
         beforeEach(() => {
 
@@ -125,26 +123,48 @@ describe('VastEndScreenEventHandlersTest', () => {
             vastAdUnitParameters.video = video;
             vastAdUnitParameters.campaign = campaign;
             vastAdUnitParameters.placement = TestFixtures.getPlacement();
-            const vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.configuration.isCoppaCompliant(), vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
+            vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.configuration.isCoppaCompliant(), vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
             vastAdUnitParameters.endScreen = vastEndScreen;
             vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
             vastEndScreenEventHandler = new VastEndScreenEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);
+            sinon.stub(vastAdUnit, 'sendTrackingEvent').returns(sinon.spy());
         });
 
         it('should send a tracking event for vast video end card click', () => {
-            sinon.stub(vastAdUnit, 'sendTrackingEvent');
-
+            sinon.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
+            sinon.stub(nativeBridge.UrlScheme, 'open').resolves();
             return vastEndScreenEventHandler.onVastEndScreenClick().then(() => {
-                sinon.assert.called(<sinon.SinonSpy>vastAdUnit.sendTrackingEvent);
+                sinon.assert.calledOnce(<sinon.SinonSpy>vastAdUnit.sendTrackingEvent);
+            });
+        });
+
+        it('should send second tracking event for vast video end card click after processing the first', () => {
+            sinon.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
+            sinon.stub(nativeBridge.UrlScheme, 'open').resolves();
+            return vastEndScreenEventHandler.onVastEndScreenClick().then(() => {
+                return vastEndScreenEventHandler.onVastEndScreenClick().then(() => {
+                    sinon.assert.calledTwice(<sinon.SinonSpy>vastAdUnit.sendTrackingEvent);
+                });
+            });
+        });
+
+        it('should ignore user clicks while processing the first click event', () => {
+            const mockEndScreen = sinon.mock(vastEndScreen);
+            const expectationEndScreen = sinon.mock(vastEndScreen).expects('setCallButtonEnabled').twice();
+            sinon.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
+            sinon.stub(nativeBridge.UrlScheme, 'open').resolves();
+            vastEndScreenEventHandler.onVastEndScreenClick().then(() => {
+                mockEndScreen.verify();
+                assert.equal(expectationEndScreen.getCall(0).args[0], false, 'Should disable end screen CTA while processing click event');
+                assert.equal(expectationEndScreen.getCall(1).args[0], true, 'Should enable end screen CTA after processing click event');
             });
         });
 
         it('should use video click through url when companion click url is not present', () => {
             sinon.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
-            sinon.stub(nativeBridge.UrlScheme, 'open');
+            sinon.stub(nativeBridge.UrlScheme, 'open').resolves();
             sinon.stub(vastAdUnit, 'getCompanionClickThroughUrl').returns(null);
             sinon.stub(vastAdUnit, 'getVideoClickThroughURL').returns('https://bar.com');
-
             return vastEndScreenEventHandler.onVastEndScreenClick().then(() => {
                 sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.UrlScheme.open, 'https://bar.com');
             });
@@ -152,9 +172,8 @@ describe('VastEndScreenEventHandlersTest', () => {
 
         it('should open click through link on iOS', () => {
             sinon.stub(nativeBridge, 'getPlatform').returns(Platform.IOS);
-            sinon.stub(nativeBridge.UrlScheme, 'open');
+            sinon.stub(nativeBridge.UrlScheme, 'open').resolves();
             sinon.stub(vastAdUnit, 'getCompanionClickThroughUrl').returns('https://foo.com');
-
             return vastEndScreenEventHandler.onVastEndScreenClick().then(() => {
                 sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.UrlScheme.open, 'https://foo.com');
             });
@@ -162,7 +181,7 @@ describe('VastEndScreenEventHandlersTest', () => {
 
         it('should open click through link on Android', () => {
             sinon.stub(nativeBridge, 'getPlatform').returns(Platform.ANDROID);
-            sinon.stub(nativeBridge.Intent, 'launch');
+            sinon.stub(nativeBridge.Intent, 'launch').resolves();
             sinon.stub(vastAdUnit, 'getCompanionClickThroughUrl').returns('https://foo.com');
 
             return vastEndScreenEventHandler.onVastEndScreenClick().then(() => {

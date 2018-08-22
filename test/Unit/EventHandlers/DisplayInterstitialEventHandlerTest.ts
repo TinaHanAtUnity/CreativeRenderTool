@@ -19,7 +19,6 @@ import { DisplayInterstitialEventHandler } from 'EventHandlers/DisplayInterstiti
 import { GdprManager } from 'Managers/GdprManager';
 import { Privacy } from 'Views/Privacy';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
-import { ForceQuitManager } from 'Managers/ForceQuitManager';
 
 describe('DisplayInterstitialEventHandler', () => {
     let view: DisplayInterstitial;
@@ -31,7 +30,6 @@ describe('DisplayInterstitialEventHandler', () => {
     let displayInterstitialAdUnit: DisplayInterstitialAdUnit;
     let displayInterstitialEventHandler: DisplayInterstitialEventHandler;
     let operativeEventManager: OperativeEventManager;
-    let forceQuitManager: ForceQuitManager;
 
     describe('on Display Interstitial Markup Campaign', () => {
         eventHandlerTests();
@@ -41,7 +39,6 @@ describe('DisplayInterstitialEventHandler', () => {
         beforeEach(() => {
             sandbox = sinon.sandbox.create();
             nativeBridge = TestFixtures.getNativeBridge();
-            forceQuitManager = sinon.createStubInstance(ForceQuitManager);
             placement = new Placement({
                 id: '123',
                 name: 'test',
@@ -57,7 +54,7 @@ describe('DisplayInterstitialEventHandler', () => {
 
             sandbox.stub(nativeBridge, 'getApiLevel').returns(16);
 
-            const container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo(), forceQuitManager);
+            const container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
             const focusManager = sinon.createStubInstance(FocusManager);
             const request = sinon.createStubInstance(Request);
             const clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);

@@ -72,6 +72,7 @@ describe('XPromoCampaignParser', () => {
 
                 assert.equal(campaign.getSession(), session, 'Session is not equal');
                 assert.equal(campaign.getMediaId(), mediaId, 'MediaID is not the equal');
+                assert.equal(campaign.getCreativeId(), json.creativeId, 'CreativeId is not the equal');
                 assert.equal(campaign.getId(), content.id, 'ID is not equal');
                 assert.equal(campaign.getMeta(), content.meta, 'Meta is not equal');
                 assert.equal(campaign.getClickAttributionUrl(), Url.encode(content.clickAttributionUrl), 'Click Attribution URL is not equal');
