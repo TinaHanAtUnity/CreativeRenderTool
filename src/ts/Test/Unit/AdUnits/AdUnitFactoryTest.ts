@@ -43,7 +43,6 @@ import { WebPlayerContainer } from 'Utilities/WebPlayer/WebPlayerContainer';
 import { Observable1, Observable2 } from 'Utilities/Observable';
 import { asStub } from '../TestHelpers/Functions';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
-import { ForceQuitManager } from 'Managers/ForceQuitManager';
 import { MRAID } from 'Views/MRAID';
 import { PlayableMRAID } from 'Views/PlayableMRAID';
 import { XHRequest } from 'Utilities/XHRequest';
@@ -64,7 +63,6 @@ describe('AdUnitFactoryTest', () => {
     let request: Request;
     let adUnitParameters: IAdUnitParameters<Campaign>;
     let wakeUpManager: WakeUpManager;
-    let forceQuitManager: ForceQuitManager;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -76,8 +74,7 @@ describe('AdUnitFactoryTest', () => {
         focusManager = new FocusManager(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
-        forceQuitManager = sinon.createStubInstance(ForceQuitManager);
-        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo(), forceQuitManager);
+        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
         sandbox.stub(container, 'close').returns(Promise.resolve());
         sandbox.stub(container, 'open').returns(Promise.resolve());
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);

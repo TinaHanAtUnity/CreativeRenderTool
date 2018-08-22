@@ -57,6 +57,9 @@ export class VPAIDEndScreen extends View<IVPAIDEndScreenHandler> {
 
     public render(): void {
         super.render();
+        (<HTMLElement>this._container.querySelector('.game-background-portrait')).style.backgroundSize = '100%';
+        (<HTMLElement>this._container.querySelector('.game-background-landscape')).style.backgroundSize = '100%';
+        this._container.style.zIndex = '2';
 
         if(this._isSwipeToCloseEnabled) {
             (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';
@@ -65,6 +68,7 @@ export class VPAIDEndScreen extends View<IVPAIDEndScreenHandler> {
 
     public show(): void {
         super.show();
+        document.body.appendChild(this.container());
 
         this._handlers.forEach(handler => handler.onVPAIDEndScreenShow());
 
@@ -76,7 +80,7 @@ export class VPAIDEndScreen extends View<IVPAIDEndScreenHandler> {
     }
 
     public remove(): void {
-        this.container().parentElement!.removeChild(this.container());
+        document.body.removeChild(this.container());
     }
 
     private onCloseEvent(event: Event): void {

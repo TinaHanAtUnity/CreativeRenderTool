@@ -25,7 +25,6 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { GDPRPrivacy } from 'Views/GDPRPrivacy';
 import { GdprManager } from 'Managers/GdprManager';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
-import { ForceQuitManager } from 'Managers/ForceQuitManager';
 
 describe('MRAIDEventHandlersTest', () => {
 
@@ -46,7 +45,6 @@ describe('MRAIDEventHandlersTest', () => {
     let mraidCampaign: MRAIDCampaign;
     let gdprManager: GdprManager;
     let programmaticTrackingService: ProgrammaticTrackingService;
-    let forceQuitManager: ForceQuitManager;
 
     describe('with onClick', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -60,10 +58,9 @@ describe('MRAIDEventHandlersTest', () => {
             sinon.spy(nativeBridge.Intent, 'launch');
             sinon.spy(nativeBridge.UrlScheme, 'open');
             sinon.spy(nativeBridge.Listener, 'sendClickEvent');
-            forceQuitManager = sinon.createStubInstance(ForceQuitManager);
 
             focusManager = new FocusManager(nativeBridge);
-            container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo(), forceQuitManager);
+            container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
             request = sinon.createStubInstance(Request);
             placement = TestFixtures.getPlacement();
 
