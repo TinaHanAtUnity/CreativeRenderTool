@@ -32,4 +32,9 @@ export class CustomFeatures {
         // Ad unit should be closed when going background on iOS
         return gameId === '1795561';
     }
+
+    public static isZyngaCSR2Racing(gameId: string) {
+        return gameId === '1475967'
+            || gameId === '1475968';
+    }
 }

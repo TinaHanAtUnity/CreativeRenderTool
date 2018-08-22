@@ -11,10 +11,12 @@ import { VastParser } from 'Utilities/VastParser';
 import { FileId } from 'Utilities/FileId';
 import { Platform } from 'Constants/Platform';
 import { Url } from 'Utilities/Url';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { CachedAdMobCampaign } from 'Models/Campaigns/CachedAdMobCampaign';
 
 export class ProgrammaticAdMobParser extends CampaignParser {
     public static ContentType = 'programmatic/admob-video';
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session): Promise<Campaign> {
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string): Promise<Campaign> {
         const markup = response.getContent();
         const cacheTTL = response.getCacheTTL();
         const platform = nativeBridge.getPlatform();
@@ -47,7 +49,11 @@ export class ProgrammaticAdMobParser extends CampaignParser {
                 video: video
             };
 
-            return Promise.resolve(new AdMobCampaign(adMobCampaignParams));
+            if (gameId && CustomFeatures.isZyngaCSR2Racing(gameId)) {
+                return Promise.resolve(new CachedAdMobCampaign(adMobCampaignParams));
+            } else {
+                return Promise.resolve(new AdMobCampaign(adMobCampaignParams));
+            }
         });
 
     }
