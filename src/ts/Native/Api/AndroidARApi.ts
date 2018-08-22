@@ -15,14 +15,10 @@ export class AndroidARApi extends NativeApi {
     }
 
     public initAR(): Promise<void> {
-        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            return this._nativeBridge.invoke<any>(this._fullApiClassName, 'getAndroidConfigEnums').then((enums) => {
-                this.onAndroidEnumsReceived.trigger(enums);
+        return this._nativeBridge.invoke<any>(this._fullApiClassName, 'getAndroidConfigEnums').then((enums) => {
+            this.onAndroidEnumsReceived.trigger(enums);
 
-                return Promise.resolve();
-            });
-        }
-
-        return Promise.resolve();
+            return Promise.resolve();
+        });
     }
 }
