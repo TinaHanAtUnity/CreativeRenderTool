@@ -16,6 +16,7 @@ import { Platform } from 'Constants/Platform';
 import { Template } from 'Utilities/Template';
 import { ABGroup } from 'Models/ABGroup';
 import { CurrentPermission, PermissionTypes } from 'Native/Api/Permissions';
+import { ARUtil } from 'Utilities/ARUtil';
 
 export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private static CloseLength = 30;
@@ -156,7 +157,9 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             this._arErrorObserver = this._nativeBridge.AR.onError.subscribe(errorCode => this.handleAREvent('error', JSON.stringify({errorCode})));
             this._arSessionInterruptedObserver = this._nativeBridge.AR.onSessionInterrupted.subscribe(() => this.handleAREvent('sessioninterrupted', ''));
             this._arSessionInterruptionEndedObserver = this._nativeBridge.AR.onSessionInterruptionEnded.subscribe(() => this.handleAREvent('sessioninterruptionended', ''));
-            this._arAndroidEnumsReceivedObserver = this._nativeBridge.AR.onAndroidEnumsReceived.subscribe((enums) => this.handleAREvent('androidenumsreceived', JSON.stringify(enums)));
+            if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                this._arAndroidEnumsReceivedObserver = this._nativeBridge.AR.Android.onAndroidEnumsReceived.subscribe((enums) => this.handleAREvent('androidenumsreceived', JSON.stringify(enums)));
+            }
             this._deviceorientationListener = (event: DeviceOrientationEvent) => this.handleDeviceOrientation(event);
             window.addEventListener('deviceorientation', this._deviceorientationListener, false);
         }).catch((err) => {
@@ -213,7 +216,9 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             this._nativeBridge.AR.onError.unsubscribe(this._arErrorObserver);
             this._nativeBridge.AR.onSessionInterrupted.unsubscribe(this._arSessionInterruptedObserver);
             this._nativeBridge.AR.onSessionInterruptionEnded.unsubscribe(this._arSessionInterruptionEndedObserver);
-            this._nativeBridge.AR.onAndroidEnumsReceived.unsubscribe(this._arAndroidEnumsReceivedObserver);
+            if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                this._nativeBridge.AR.Android.onAndroidEnumsReceived.unsubscribe(this._arAndroidEnumsReceivedObserver);
+            }
             window.removeEventListener('deviceorientation', this._deviceorientationListener, false);
 
             if (this._permissionResultObserver) {
@@ -466,13 +471,21 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 return this._nativeBridge.AR.removeAnchor(args[0]);
 
             case 'advanceFrame':
-                return this._nativeBridge.AR.advanceFrame();
+                if (this._nativeBridge.getPlatform() === Platform.IOS) {
+                    return ARUtil.advanceFrameWithScale(this._nativeBridge.AR.Ios);
+                } else {
+                    return Promise.resolve();
+                }
 
             case 'log':
                 return this._nativeBridge.Sdk.logDebug('NATIVELOG ' + JSON.stringify(args));
 
             case 'initAR':
-                return this._nativeBridge.AR.initAR();
+                if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                    return this._nativeBridge.AR.Android.initAR();
+                } else {
+                    return Promise.resolve();
+                }
 
             default:
                 throw new Error('Unknown AR message');

@@ -2,7 +2,6 @@ import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { FinishState } from 'Constants/FinishState';
 import { FocusManager } from 'Managers/FocusManager';
-import { IForceQuitData } from 'Managers/ForceQuitManager';
 import { GdprManager } from 'Managers/GdprManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
@@ -115,13 +114,5 @@ export abstract class AbstractAdUnit {
         if(this._finishState !== FinishState.COMPLETED) {
             this._finishState = finishState;
         }
-    }
-
-    public createForceQuitKey(): IForceQuitData {
-        return {
-            campaignId: this._baseCampaign.getId(),
-            creativeId: this._baseCampaign.getCreativeId(),
-            adType: this.description()
-        };
     }
 }

@@ -90,6 +90,8 @@ export class XPromoOperativeEventManager extends OperativeEventManager {
             infoJson.event_type = eventType;
             infoJson.sourceGameId = this._clientInfo.getGameId();
             infoJson.targetGameId = this._xPromoCampaign.getGameId().toString();
+            infoJson.creativePackId = this._xPromoCampaign.getCreativeId();
+            infoJson.targetStoreId = this._xPromoCampaign.getAppStoreId();
 
             return HttpKafka.sendEvent(kafkaType, KafkaCommonObjectType.PERSONAL, infoJson).catch(() => {
                 const sessionId = this._campaign.getSession().getId();

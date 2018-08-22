@@ -19,11 +19,12 @@ import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
 import { ClientInfo } from 'Models/ClientInfo';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { WebPlayerContainer } from 'Utilities/WebPlayer/WebPlayerContainer';
+import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 
 export interface IVPAIDAdUnitParameters extends IAdUnitParameters<VPAIDCampaign> {
     vpaid: VPAID;
     closer: Closer;
-    endScreen?: VPAIDEndScreen;
+    endScreen?: VPAIDEndScreen | undefined;
     privacy: AbstractPrivacy;
 }
 
@@ -33,7 +34,8 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         VPAIDAdUnit._adLoadTimeout = timeout;
     }
 
-    private static _adLoadTimeout: number = 10 * 1000;
+    private static _adLoadTimeout: number = 7000;
+    private _endScreen: VPAIDEndScreen | undefined;
     private _closer: Closer;
     private _placement: Placement;
     private _thirdPartyEventManager: ThirdPartyEventManager;
@@ -46,6 +48,9 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     private _privacyShowing = false;
     private _clientInfo: ClientInfo;
     private _webPlayerContainer: WebPlayerContainer;
+    private _shouldFullScreenWebView = true;
+    private _topWebViewAreaHeight: number;
+    private readonly _topWebViewAreaMinHeight = 70;
 
     constructor(nativeBridge: NativeBridge, parameters: IVPAIDAdUnitParameters) {
         super(nativeBridge, parameters);
@@ -60,6 +65,17 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._clientInfo = parameters.clientInfo;
         this._webPlayerContainer = parameters.webPlayerContainer!;
         this._timer = new Timer(() => this.onAdUnitNotLoaded(), VPAIDAdUnit._adLoadTimeout);
+        this._endScreen = parameters.endScreen;
+
+        if (this._endScreen) {
+            this._endScreen.render();
+        }
+
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            this._topWebViewAreaHeight = Math.floor(this.getAndroidViewSize(this._topWebViewAreaMinHeight, this.getScreenDensity()));
+        } else {
+            this._topWebViewAreaHeight = this._topWebViewAreaMinHeight;
+        }
 
         this._closer.render();
         this._closer.choosePrivacyShown();
@@ -67,7 +83,6 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     public show(): Promise<void> {
         this.onShow();
-
         return this.setupWebPlayer().then(() => {
             this._urlLoadingObserver = this._webPlayerContainer.shouldOverrideUrlLoading.subscribe((url, method) => this.onUrlLoad(url));
             this.setupPrivacyObservers();
@@ -164,15 +179,27 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         // EMPTY
     }
 
+    public setWebViewSize(shouldFullScreen: boolean) {
+        return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
+            if (shouldFullScreen) {
+                return this._container.setViewFrame('webview', 0, 0, width, height);
+            } else {
+                return this._container.setViewFrame('webview', 0, 0, width, this._topWebViewAreaHeight);
+            }
+        });
+    }
+
     private setupPrivacyObservers(): void {
         if (this._closer.onPrivacyClosed) {
             this._closer.onPrivacyClosed.subscribe(() => {
+                this.setWebViewSize(!this._shouldFullScreenWebView);
                 this._view.resumeAd();
                 this._privacyShowing = false;
             });
         }
         if (this._closer.onPrivacyOpened) {
             this._closer.onPrivacyOpened.subscribe(() => {
+                this.setWebViewSize(this._shouldFullScreenWebView);
                 this._view.pauseAd();
                 this._privacyShowing = true;
             });
@@ -227,6 +254,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     private onShow() {
+        this._timer.start();
         this.setShowing(true);
 
         this._container.addEventHandler(this);
@@ -246,18 +274,36 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
     }
 
     private hideView() {
-        this._closer.hide();
+        this._view.mute();
         this._view.hide();
+        this._closer.hide();
+        if (this._endScreen) {
+            this._endScreen.remove();
+        }
     }
 
     private showCloser() {
-        return Promise.all([this._deviceInfo.getScreenWidth(), this._deviceInfo.getScreenHeight()]).then(([width, height]) => {
-            return this._container.setViewFrame('webview', 0, 0, width, height).then(() => {
+        // When users background we dont want the endscreen to move to top of frame
+        if (document.body.querySelector('#end-screen')) {
+            return this.setWebViewSize(this._shouldFullScreenWebView);
+        } else {
+            return this.setWebViewSize(!this._shouldFullScreenWebView).then(() => {
                 if (!this._closer.container().parentNode) {
                     document.body.appendChild(this._closer.container());
                 }
             });
-        });
+        }
+    }
+
+    private getAndroidViewSize(size: number, density: number): number {
+        return size * (density / 160);
+    }
+
+    private getScreenDensity(): number {
+        if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+            return (<AndroidDeviceInfo>this._deviceInfo).getScreenDensity();
+        }
+        return 0;
     }
 
     private onUrlLoad(url: string) {
