@@ -49,7 +49,7 @@ export class ProgrammaticAdMobParser extends CampaignParser {
                 video: video
             };
 
-            if (gameId && CustomFeatures.isZyngaCSR2Racing(gameId)) {
+            if (gameId && CustomFeatures.isAdmobCachedVideoGame(gameId)) {
                 return Promise.resolve(new CachedAdMobCampaign(adMobCampaignParams));
             } else {
                 return Promise.resolve(new AdMobCampaign(adMobCampaignParams));

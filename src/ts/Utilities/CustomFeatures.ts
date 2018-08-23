@@ -33,8 +33,10 @@ export class CustomFeatures {
         return gameId === '1795561';
     }
 
-    public static isZyngaCSR2Racing(gameId: string) {
-        return gameId === '1475967'
-            || gameId === '1475968';
+    public static isAdmobCachedVideoGame(gameId: string) {
+        return gameId === '1475967' // CSR2 Racing iOS
+            || gameId === '1475968' // CSR2 Racing Android
+            || gameId === '1787178' // BrawlStars iOS
+            || gameId === '2391158'; // Brawlstars Android
     }
 }
