@@ -21,7 +21,7 @@ export class VPAID {
     }
 
     public hasEndScreen(): boolean {
-        return !!this.getCompanionLandscapeUrl() && !!this.getCompanionPortraitUrl();
+        return !!this.getCompanionLandscapeUrl() || !!this.getCompanionPortraitUrl();
     }
 
     public hasCompanionAd(): boolean {

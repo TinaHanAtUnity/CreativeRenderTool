@@ -30,6 +30,7 @@
     position: absolute;
     top: 50%;
     left: 8px;
+    z-index: 1;
     width: 36px;
     height: 36px;
     transform: translate(0, -50%);
@@ -83,7 +84,6 @@
   }
 
   .gdpr-pop-up {
-
       position: absolute;
       bottom: 0;
       width: 100%;
@@ -94,6 +94,7 @@
       .gdpr-text {
         z-index: 110;
         padding: $default-scale-size * $default-font-size * .5;
+        width:90%;
         color: $white;
         text-align: center;
         font-size: $default-scale-size * $default-font-size * .5;
@@ -101,12 +102,13 @@
         .gdpr-link {
           color: $blue;
         }
-    }
+      }
   }
 
   .privacy-button {
     position: absolute;
     bottom: 0;
+    margin: $default-size * $default-scale-size * .25 0 0 $default-size * $default-scale-size * .25;
     width: 100%;
 
     .icon-gdpr {
