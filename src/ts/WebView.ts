@@ -314,7 +314,9 @@ export class WebView {
             jaegerInitSpan.addAnnotation(error.message);
             jaegerInitSpan.addTag(JaegerTags.Error, 'true');
             jaegerInitSpan.addTag(JaegerTags.ErrorMessage, error.message);
-            this._jaegerManager.stop(jaegerInitSpan);
+            if (this._jaegerManager) {
+                this._jaegerManager.stop(jaegerInitSpan);
+            }
 
             if(error instanceof ConfigError) {
                 error = { 'message': error.message, 'name': error.name };
