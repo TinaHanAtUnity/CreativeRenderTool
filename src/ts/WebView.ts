@@ -314,7 +314,7 @@ export class WebView {
             jaegerInitSpan.addAnnotation(error.message);
             jaegerInitSpan.addTag(JaegerTags.Error, 'true');
             jaegerInitSpan.addTag(JaegerTags.ErrorMessage, error.message);
-            if (this._jaegerManager) { // this null check needs to be here because an error could be thrown and caught before JaegerManager is initialized
+            if (this._jaegerManager) {
                 this._jaegerManager.stop(jaegerInitSpan);
             }
 
