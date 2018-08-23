@@ -39,15 +39,13 @@ export class XPromoVideoEventHandler extends VideoEventHandler {
 
     protected handleStartEvent(progress: number): void {
         this._xpromoOperativeEventManager.sendStart(this.getXPromoOperativeEventParams()).then(() => {
-            const promises: Array<Promise<any>> = [];
-            const trackingUrls = this._xpromoCampaign.getTrackingUrlsForEvent('start');
-            for (const url of trackingUrls) {
-                promises.push(this._thirdPartyEventManager.sendEvent('xpromo start', this._xpromoCampaign.getSession().getId(), url));
-            }
-            Promise.all(promises).then(() => {
-                this._adUnit.onStartProcessed.trigger();
-            });
+            this._adUnit.onStartProcessed.trigger();
         });
+
+        const trackingUrls = this._xpromoCampaign.getTrackingUrlsForEvent('start');
+        for (const url of trackingUrls) {
+            this._thirdPartyEventManager.sendEvent('xpromo start', this._xpromoCampaign.getSession().getId(), url);
+        }
 
         this._nativeBridge.Listener.sendStartEvent(this._placement.getId());
     }
