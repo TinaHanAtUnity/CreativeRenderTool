@@ -201,10 +201,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     public hide() {
-        this._iframe.contentWindow!.postMessage({
-            type: 'viewable',
-            value: false
-        }, '*');
+        this.setViewableState(false);
 
         if (this._arFrameUpdatedObserver) {
             this._nativeBridge.AR.onFrameUpdated.unsubscribe(this._arFrameUpdatedObserver);
@@ -328,29 +325,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 }
             }, 1000);
         }
-
-        ['webkitTransitionEnd', 'transitionend'].forEach((e) => {
-            if(this._loadingScreen.style.display === 'none') {
-                return;
-            }
-
-            this._loadingScreen.addEventListener(e, () => {
-                this._closeElement.style.display = 'block';
-
-                this._playableStartTimestamp = Date.now();
-                const timeFromShow = ARMRAID.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
-                const backgroundTime = ARMRAID.checkIsValid(this._backgroundTime / 1000);
-                this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_start', undefined));
-                this._iframe.contentWindow!.postMessage({
-                    type: 'viewable',
-                    value: true
-                }, '*');
-
-                this._loadingScreen.style.display = 'none';
-            }, false);
-        });
-
-        this._loadingScreen.classList.add('hidden');
     }
 
     private updateProgressCircle(container: HTMLElement, value: number) {
@@ -557,6 +531,25 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
      * showARPermissionPanel needs to be shown before the timer starts
      */
     private showARPermissionPanel() {
+        ['webkitTransitionEnd', 'transitionend'].forEach((e) => {
+            if(this._loadingScreen.style.display === 'none') {
+                return;
+            }
+
+            this._loadingScreen.addEventListener(e, () => {
+                this._closeElement.style.display = 'block';
+
+                this._playableStartTimestamp = Date.now();
+                const timeFromShow = ARMRAID.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
+                const backgroundTime = ARMRAID.checkIsValid(this._backgroundTime / 1000);
+                this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_start', undefined));
+                this.setViewableState(true);
+
+                this._loadingScreen.style.display = 'none';
+            }, false);
+        });
+
+        this._loadingScreen.classList.add('hidden');
         this._nativeBridge.Permissions.checkPermissions(PermissionTypes.CAMERA).then(results => {
             const requestPermissionText = <HTMLElement>this._cameraPermissionPanel.querySelector('.request-text');
             if (results === CurrentPermission.DENIED) {
@@ -567,7 +560,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 }
                 this._cameraPermissionPanel.style.display = 'block';
             }
-            this._loadingScreen.classList.add('hidden');
         });
     }
 
