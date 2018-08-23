@@ -28,7 +28,6 @@ import { GdprManager } from 'Managers/GdprManager';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
 import { Privacy } from 'Views/Privacy';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
-import { ForceQuitManager } from 'Managers/ForceQuitManager';
 
 describe('VastOverlayEventHandlersTest', () => {
     let campaign: VastCampaign;
@@ -52,7 +51,6 @@ describe('VastOverlayEventHandlersTest', () => {
     let sandbox: sinon.SinonSandbox;
     let privacy: AbstractPrivacy;
     let programmaticTrackingService: ProgrammaticTrackingService;
-    let forceQuitManager: ForceQuitManager;
 
     before(() => {
         sandbox = sinon.sandbox.create();
@@ -64,14 +62,13 @@ describe('VastOverlayEventHandlersTest', () => {
             handleCallback
         });
 
-        forceQuitManager = sinon.createStubInstance(ForceQuitManager);
         focusManager = new FocusManager(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
         campaign = TestFixtures.getEventVastCampaign();
         clientInfo = TestFixtures.getClientInfo();
         privacy = new Privacy(nativeBridge, true);
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
-        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo(), forceQuitManager);
+        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);

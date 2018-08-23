@@ -1,5 +1,19 @@
-# Pending
+# Wed Aug 22 09:36:53 UTC 2018
 
+* Remove force quit manager
+* Start the VPAID timeout timer to hide ad unit on bad ads
+
+# Tue Aug 21 06:56:04 UTC 2018
+
+* Fix display interstitial click area
+* Rename comet tracking loaded event
+* Fix Vast Endscreen click delay
+* Fix VPAID click and Endscreen
+* Add creativeId and targetStoreId in XPromo Operative Events
+
+# Fri Aug 17 11:23:03 UTC 2018
+
+* Fix force_quite deletion
 * Collect average fps for mraid
 * Improve caching time and add mraid parse time
 

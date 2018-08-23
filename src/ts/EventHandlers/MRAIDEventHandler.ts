@@ -163,9 +163,6 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     }
 
     private openClickUrl(url: string): Promise<void> {
-        if (CTAOpenUrlAbTest.isValid(this._abGroup)) {
-            return this.openUrl(url);
-        }
         return this.followUrl(url).then((storeUrl) => {
             return this.openUrl(storeUrl);
         });
