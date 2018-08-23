@@ -12,7 +12,6 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
 
     private _spinnerEnabled: boolean = false;
 
-    private _skipVisible: boolean = false;
     private _skipEnabled: boolean;
 
     private _videoDurationEnabled: boolean = false;
@@ -24,7 +23,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _callButtonVisible: boolean = false;
     private _callButtonEnabled: boolean = true;
 
-    private _skipElement: HTMLElement;
+    private _skipButtonElement: HTMLElement;
     private _spinnerElement: HTMLElement;
     private _muteButtonElement: HTMLElement;
     private _debugMessageElement: HTMLElement;
@@ -121,14 +120,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
 
     public render(): void {
         super.render();
-
-        this._skipElement = <HTMLElement>this._container.querySelector('.skip-button');
-        this._skipElement.style.display = 'none';
-        this._spinnerElement = <HTMLElement>this._container.querySelector('.buffering-spinner');
-        this._muteButtonElement = <HTMLElement>this._container.querySelector('.mute-button');
-        this._debugMessageElement = <HTMLElement>this._container.querySelector('.debug-message-text');
-        this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
-        this._timerElement = <HTMLElement>this._container.querySelector('.timer');
+        this.setupElementReferences();
         this.choosePrivacyShown();
     }
 
@@ -142,7 +134,6 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     public setSkipEnabled(value: boolean): void {
         if (this._skipEnabled !== value) {
             this._skipEnabled = value;
-            this._skipElement.style.display = value ? 'block' : 'none';
         }
     }
 
@@ -165,12 +156,11 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         }
 
         this._videoProgress = value;
-        this.setSkipElementVisible(this._skipEnabled);
         this._skipRemaining = this._skipDuration - this._videoProgress;
         this._timerElement.innerText = String(Math.ceil((this._videoDuration - this._videoProgress) / 1000));
 
         if (this._skipRemaining <= 0) {
-            this._skipElement.classList.add('skip-button-enabled');
+            this.showSkipButton();
         }
     }
 
@@ -238,6 +228,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
 
     private onGDPRPopupEvent(event: Event) {
         event.preventDefault();
+        event.stopPropagation();
         this._isPrivacyShowing = true;
         if (!this._gdprPopupClicked) {
             this._gdprPopupClicked = true;
@@ -252,6 +243,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private onPrivacyEvent(event: Event) {
         this._isPrivacyShowing = true;
         event.preventDefault();
+        event.stopPropagation();
         this._nativeBridge.VideoPlayer.pause();
         if (this._privacy) {
             this._privacy.show();
@@ -307,14 +299,18 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         }
     }
 
-    private setSkipElementVisible(value: boolean) {
-        if (this._skipVisible !== value) {
-            this._skipVisible = value;
-            if (value) {
-                this._skipElement.style.display = 'block';
-            } else {
-                this._skipElement.style.display = 'none';
-            }
+    private setupElementReferences(): void {
+        this._skipButtonElement = <HTMLElement>this._container.querySelector('.skip-button');
+        this._spinnerElement = <HTMLElement>this._container.querySelector('.buffering-spinner');
+        this._muteButtonElement = <HTMLElement>this._container.querySelector('.mute-button');
+        this._debugMessageElement = <HTMLElement>this._container.querySelector('.debug-message-text');
+        this._callButtonElement = <HTMLElement>this._container.querySelector('.call-button');
+        this._timerElement = <HTMLElement>this._container.querySelector('.timer');
+    }
+
+    private showSkipButton() {
+        if (this._skipEnabled) {
+            this._skipButtonElement.classList.add('show-skip-button');
         }
     }
 

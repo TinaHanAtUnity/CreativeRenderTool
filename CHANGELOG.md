@@ -1,5 +1,11 @@
 # Staged
 
+* Make jaeger more robust on init
+* XPROMO: trigger onStartProcessed after the start event has been sent
+* New video overlay also enabled for VAST video ads in groups 18 & 19 
+
+# Wed Aug 22 09:36:53 UTC 2018
+
 * Remove force quit manager
 * Start the VPAID timeout timer to hide ad unit on bad ads
 
