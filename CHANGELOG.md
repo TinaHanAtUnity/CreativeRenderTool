@@ -1,4 +1,4 @@
-# Staged
+# Thu Aug 23 20:45:03 UTC 2018
 
 * Make jaeger more robust on init
 * XPROMO: trigger onStartProcessed after the start event has been sent
