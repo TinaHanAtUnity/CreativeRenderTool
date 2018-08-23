@@ -1,5 +1,6 @@
 # Staged
 
+* Make jaeger more robust on init
 * XPROMO: trigger onStartProcessed after the start event has been sent
 * New video overlay also enabled for VAST video ads in groups 18 & 19 
 
