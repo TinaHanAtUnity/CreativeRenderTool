@@ -42,7 +42,7 @@ describe('MRAIDEventHandlersTest', () => {
     let thirdPartyEventManager: ThirdPartyEventManager;
     let mraidAdUnitParameters: IMRAIDAdUnitParameters;
     let mraidEventHandler: MRAIDEventHandler;
-    let mraidCampaign: MRAIDCampaign;
+    let playableMraidCampaign: MRAIDCampaign;
     let gdprManager: GdprManager;
     let programmaticTrackingService: ProgrammaticTrackingService;
     let forceQuitManager: ForceQuitManager;
@@ -77,7 +77,7 @@ describe('MRAIDEventHandlersTest', () => {
 
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
 
-            mraidCampaign = TestFixtures.getPlayableMRAIDCampaign();
+            playableMraidCampaign = TestFixtures.getPlayableMRAIDCampaign();
             mraidView = sinon.createStubInstance(MRAID);
             (<sinon.SinonSpy>mraidView.container).restore();
             sinon.stub(mraidView, 'container').returns(document.createElement('div'));
@@ -93,7 +93,7 @@ describe('MRAIDEventHandlersTest', () => {
                 thirdPartyEventManager: thirdPartyEventManager,
                 operativeEventManager: operativeEventManager,
                 placement: TestFixtures.getPlacement(),
-                campaign: mraidCampaign,
+                campaign: playableMraidCampaign,
                 configuration: TestFixtures.getConfiguration(),
                 request: request,
                 options: {},
@@ -131,7 +131,7 @@ describe('MRAIDEventHandlersTest', () => {
 
         describe('with follow redirects', () => {
             it('with response that contains location, it should launch intent', () => {
-                mraidCampaign = TestFixtures.getPlayableMRAIDCampaignFollowsRedirects();
+                playableMraidCampaign = TestFixtures.getPlayableMRAIDCampaignFollowsRedirects();
                 (<sinon.SinonSpy>thirdPartyEventManager.clickAttributionEvent).restore();
                 sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').returns(Promise.resolve({
                     url: 'http://foo.url.com',
@@ -140,12 +140,12 @@ describe('MRAIDEventHandlersTest', () => {
                     headers: [['location', 'market://foobar.com']]
                 }));
 
-                mraidView = new MRAID(nativeBridge, placement, mraidCampaign, mraidAdUnitParameters.privacy, true, mraidAdUnitParameters.configuration.getAbGroup());
+                mraidView = new MRAID(nativeBridge, placement, playableMraidCampaign, mraidAdUnitParameters.privacy, true, mraidAdUnitParameters.configuration.getAbGroup());
                 sinon.stub(mraidView, 'createMRAID').callsFake(() => {
                     return Promise.resolve();
                 });
 
-                mraidAdUnitParameters.campaign = mraidCampaign;
+                mraidAdUnitParameters.campaign = playableMraidCampaign;
                 mraidAdUnitParameters.mraid = mraidView;
                 mraidAdUnitParameters.thirdPartyEventManager = thirdPartyEventManager;
 
@@ -164,11 +164,11 @@ describe('MRAIDEventHandlersTest', () => {
             });
 
             it('with response that does not contain location, it should not launch intent', () => {
-                mraidCampaign = TestFixtures.getPlayableMRAIDCampaignFollowsRedirects();
+                playableMraidCampaign = TestFixtures.getPlayableMRAIDCampaignFollowsRedirects();
                 (<sinon.SinonSpy>thirdPartyEventManager.clickAttributionEvent).restore();
                 sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').returns(Promise.resolve());
                 mraidAdUnitParameters.mraid = mraidView;
-                mraidAdUnitParameters.campaign = mraidCampaign;
+                mraidAdUnitParameters.campaign = playableMraidCampaign;
                 mraidAdUnitParameters.thirdPartyEventManager = thirdPartyEventManager;
                 (<sinon.SinonSpy>operativeEventManager.sendClick).restore();
                 const response = TestFixtures.getOkNativeResponse();
@@ -197,8 +197,8 @@ describe('MRAIDEventHandlersTest', () => {
             });
 
             beforeEach(() => {
-                mraidCampaign = TestFixtures.getPlayableMRAIDCampaign();
-                mraidAdUnitParameters.campaign = mraidCampaign;
+                playableMraidCampaign = TestFixtures.getPlayableMRAIDCampaign();
+                mraidAdUnitParameters.campaign = playableMraidCampaign;
                 sandbox.stub(HttpKafka, 'sendEvent');
             });
 
@@ -221,7 +221,7 @@ describe('MRAIDEventHandlersTest', () => {
                 kafkaObject.backgroundTime = 0;
                 kafkaObject.auctionId = '12345';
 
-                const resourceUrl = mraidCampaign.getResourceUrl();
+                const resourceUrl = playableMraidCampaign.getResourceUrl();
                 if(resourceUrl) {
                     kafkaObject.url = resourceUrl.getOriginalUrl();
                 }
@@ -243,7 +243,7 @@ describe('MRAIDEventHandlersTest', () => {
                 kafkaObject.backgroundTime = 5;
                 kafkaObject.auctionId = '12345';
 
-                const resourceUrl = mraidCampaign.getResourceUrl();
+                const resourceUrl = playableMraidCampaign.getResourceUrl();
                 if(resourceUrl) {
                     kafkaObject.url = resourceUrl.getOriginalUrl();
                 }

@@ -15,7 +15,6 @@ import { RequestError } from 'Errors/RequestError';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { FinishState } from 'Constants/FinishState';
 import { Placement } from 'Models/Placement';
-import { ABGroup, CTAOpenUrlAbTest } from 'Models/ABGroup';
 import { GDPREventHandler } from 'EventHandlers/GDPREventHandler';
 
 export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHandler {
@@ -30,7 +29,6 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     private _campaign: MRAIDCampaign;
     private _request: Request;
     private _placement: Placement;
-    private _abGroup: ABGroup;
 
     constructor(nativeBridge: NativeBridge, adUnit: MRAIDAdUnit, parameters: IMRAIDAdUnitParameters) {
         super(parameters.gdprManager, parameters.configuration);
@@ -44,7 +42,6 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         this._campaign = parameters.campaign;
         this._placement = parameters.placement;
         this._request = parameters.request;
-        this._abGroup = parameters.configuration.getAbGroup();
     }
 
     public onMraidClick(url: string): Promise<void> {
@@ -63,8 +60,10 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
             return this._request.followRedirectChain(url).then((storeUrl) => {
                 return this.openUrl(storeUrl).then(() => {
                     this.setCallButtonEnabled(true);
+                    this.sendTrackingEvents();
                 }).catch((e) => {
                     this.setCallButtonEnabled(true);
+                    this.sendTrackingEvents();
                 });
             });
         }
