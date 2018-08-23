@@ -48,34 +48,27 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     }
 
     public onMraidClick(url: string): Promise<void> {
-        this.setCallButtonEnabled(false);
-
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
-        const clickAttributionUrl = this._campaign.getClickAttributionUrl();
 
-        if (clickAttributionUrl) {
-            this.handleClickAttribution(clickAttributionUrl);
+        if (this._campaign.getClickAttributionUrl()) {  // Playable MRAID from Comet
+            this.sendTrackingEvents();
+            this.handleClickAttribution();
             if(!this._campaign.getClickAttributionUrlFollowsRedirects()) {
-                return this.followUrl(url).then((storeUrl) => {
-                    return this.openUrl(storeUrl).then(() => {
-                        this.setCallButtonEnabled(true);
-                        this.sendTrackingEvents();
-                    }).catch((e) => {
-                        this.setCallButtonEnabled(true);
-                    });
+                return this._request.followRedirectChain(url).then((storeUrl) => {
+                    this.openUrl(storeUrl);
                 });
             }
-            return Promise.resolve();
-        } else {
-            return this.followUrl(url).then((storeUrl) => {
+        } else {    // DSP MRAID
+            this.setCallButtonEnabled(false);
+            return this._request.followRedirectChain(url).then((storeUrl) => {
                 return this.openUrl(storeUrl).then(() => {
                     this.setCallButtonEnabled(true);
-                    this.sendTrackingEvents();
                 }).catch((e) => {
                     this.setCallButtonEnabled(true);
                 });
             });
         }
+        return Promise.resolve();
     }
 
     public onMraidReward(): void {
@@ -131,67 +124,36 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         }
     }
 
-    // private handleClickAttribution() {
-    //     const clickAttributionUrl = this._campaign.getClickAttributionUrl();
-    //     const useWebViewUA = this._campaign.getUseWebViewUserAgentForTracking();
-    //     if(this._campaign.getClickAttributionUrlFollowsRedirects() && clickAttributionUrl) {
-    //         this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, true, useWebViewUA).then(response => {
-    //             const location = Request.getHeader(response.headers, 'location');
-    //             if(location) {
-    //                 this.openUrl(location);
-    //             } else {
-    //                 Diagnostics.trigger('mraid_click_attribution_misconfigured', {
-    //                     url: this._campaign.getClickAttributionUrl(),
-    //                     followsRedirects: this._campaign.getClickAttributionUrlFollowsRedirects(),
-    //                     response: response
-    //                 });
-    //             }
-    //         }).catch(error => {
-    //             if(error instanceof RequestError) {
-    //                 error = new DiagnosticError(new Error(error.message), {
-    //                     request: error.nativeRequest,
-    //                     auctionId: this._campaign.getSession().getId(),
-    //                     url: this._campaign.getClickAttributionUrl(),
-    //                     response: error.nativeResponse
-    //                 });
-    //             }
-    //             Diagnostics.trigger('mraid_click_attribution_failed', error);
-    //         });
-    //     } else {
-    //         if (clickAttributionUrl) {
-    //             this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, false, useWebViewUA);
-    //         }
-    //     }
-    // }
-
-    private handleClickAttribution(clickAttributionUrl: string) {
+    private handleClickAttribution() {
+        const clickAttributionUrl = this._campaign.getClickAttributionUrl();
         const useWebViewUA = this._campaign.getUseWebViewUserAgentForTracking();
-        const hasClickAttributionUrlFollowsRedirects = this._campaign.getClickAttributionUrlFollowsRedirects();
-        if (hasClickAttributionUrlFollowsRedirects) {
+        if(this._campaign.getClickAttributionUrlFollowsRedirects() && clickAttributionUrl) {
             this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, true, useWebViewUA).then(response => {
                 const location = Request.getHeader(response.headers, 'location');
-                if (location) {
+                if(location) {
                     this.openUrl(location);
                 } else {
                     Diagnostics.trigger('mraid_click_attribution_misconfigured', {
                         url: this._campaign.getClickAttributionUrl(),
-                        followsRedirects: true,
+                        followsRedirects: this._campaign.getClickAttributionUrlFollowsRedirects(),
                         response: response
                     });
                 }
             }).catch(error => {
-                if (error instanceof RequestError) {
+                if(error instanceof RequestError) {
                     error = new DiagnosticError(new Error(error.message), {
                         request: error.nativeRequest,
                         auctionId: this._campaign.getSession().getId(),
-                        url: clickAttributionUrl,
+                        url: this._campaign.getClickAttributionUrl(),
                         response: error.nativeResponse
                     });
                 }
                 Diagnostics.trigger('mraid_click_attribution_failed', error);
             });
         } else {
-            this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, false, useWebViewUA);
+            if (clickAttributionUrl) {
+                this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, false, useWebViewUA);
+            }
         }
     }
 
@@ -219,11 +181,6 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
                 'uri': url // todo: these come from 3rd party sources, should be validated before general MRAID support
             });
         }
-    }
-
-    // Follows the redirects of a URL, returning the final location.
-    private followUrl(link: string): Promise<string> {
-        return this._request.followRedirectChain(link);
     }
 
     private getOperativeEventParams(): IOperativeEventParams {
