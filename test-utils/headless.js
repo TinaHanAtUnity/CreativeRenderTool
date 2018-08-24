@@ -84,9 +84,10 @@ const evaluateSuccess = () => {
     return failedSteps;
 };
 
-puppeteer.launch({
-    args: ['--no-sandbox']
-}).then(async (browser) => {
+(async () => { try {
+    const browser = await puppeteer.launch({
+        args: ['--no-sandbox']
+    });
     let testRunning = true;
     console.log("### Browser Tests ###");
 
@@ -131,4 +132,7 @@ puppeteer.launch({
 
     await browser.close();
     process.exit(evaluateSuccess())
-});
+} catch(error) {
+    console.error(error);
+    process.exit(1);
+}})();
