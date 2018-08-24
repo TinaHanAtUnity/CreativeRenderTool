@@ -1,3 +1,7 @@
+# Pending
+
+* Add Augmented Reality(AR) Ads Support
+
 # Thu Aug 23 22:15:10 UTC 2018
 
 * Make jaeger more robust on init
