@@ -25,7 +25,6 @@ import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFact
 import { GdprManager } from 'Managers/GdprManager';
 import { Privacy } from 'Views/Privacy';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
-import { ForceQuitManager } from 'Managers/ForceQuitManager';
 
 describe('VastEndScreenEventHandlersTest', () => {
     const handleInvocation = sinon.spy();
@@ -34,7 +33,6 @@ describe('VastEndScreenEventHandlersTest', () => {
     let container: AdUnitContainer;
     let request: Request;
     let vastAdUnitParameters: IVastAdUnitParameters;
-    let forceQuitManager: ForceQuitManager;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -45,8 +43,7 @@ describe('VastEndScreenEventHandlersTest', () => {
         const focusManager = new FocusManager(nativeBridge);
         const metaDataManager = new MetaDataManager(nativeBridge);
 
-        forceQuitManager = sinon.createStubInstance(ForceQuitManager);
-        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo(), forceQuitManager);
+        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
         request = new Request(nativeBridge, new WakeUpManager(nativeBridge, new FocusManager(nativeBridge)));
         sinon.stub(request, 'followRedirectChain').callsFake((url) => {
             return Promise.resolve(url);

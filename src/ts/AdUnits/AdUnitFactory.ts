@@ -23,6 +23,7 @@ import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
 import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
 import { MRAID } from 'Views/MRAID';
 import { PlayableMRAID } from 'Views/PlayableMRAID';
+import { ARMRAID } from 'Views/ARMRAID';
 import { StreamType } from 'Constants/Android/StreamType';
 import { Video } from 'Models/Assets/Video';
 import { WebViewError } from 'Errors/WebViewError';
@@ -68,12 +69,14 @@ import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
 import { GDPRPrivacy } from 'Views/GDPRPrivacy';
 import { PrivacyEventHandler } from 'EventHandlers/PrivacyEventHandler';
+import { ARUtil } from 'Utilities/ARUtil';
 import { NewVideoOverlayEnabledAbTest } from 'Models/ABGroup';
 import { NewVideoOverlay } from 'Views/NewVideoOverlay';
 import { IEndScreenParameters } from 'Views/EndScreen';
 
 export class AdUnitFactory {
     private static _forcedPlayableMRAID: boolean = false;
+    private static _forcedARMRAID: boolean = false;
 
     public static createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractAdUnit {
 
@@ -103,6 +106,10 @@ export class AdUnitFactory {
 
     public static setForcedPlayableMRAID(value: boolean) {
         AdUnitFactory._forcedPlayableMRAID = value;
+    }
+
+    public static setForcedARMRAID(value: boolean) {
+        AdUnitFactory._forcedARMRAID = value;
     }
 
     private static createPerformanceAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PerformanceCampaign>): PerformanceAdUnit {
@@ -276,6 +283,8 @@ export class AdUnitFactory {
         const privacy = this.createPrivacy(nativeBridge, parameters);
         if((resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) || AdUnitFactory._forcedPlayableMRAID) {
             mraid = new PlayableMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner, parameters.configuration.getAbGroup());
+        } else if (ARUtil.isARCreative(parameters.campaign) || AdUnitFactory._forcedARMRAID) {
+            mraid = new ARMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner, parameters.configuration.getAbGroup());
         } else {
             mraid = new MRAID(nativeBridge, parameters.placement, parameters.campaign, privacy, showGDPRBanner, parameters.configuration.getAbGroup());
         }
@@ -458,7 +467,7 @@ export class AdUnitFactory {
         if (parameters.placement.allowSkip() && parameters.placement.skipEndCardOnClose()) {
             overlay = new ClosableVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         } else {
-            if (isPerformanceCampaign && NewVideoOverlayEnabledAbTest.isValid(parameters.configuration.getAbGroup())) {
+            if (NewVideoOverlayEnabledAbTest.isValid(parameters.configuration.getAbGroup())) {
                 overlay = new NewVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, disablePrivacyDuringVideo);
             } else {
                 overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, disablePrivacyDuringVideo);

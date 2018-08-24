@@ -138,8 +138,8 @@ export class VPAIDEventHandler implements IVPAIDHandler {
             this._adUnit.setWebViewSize(shouldFullScreenWebview).then(() => {
                 if (this._vpaidEndScreen) {
                     this._vpaidEndScreen.show();
-                    (<HTMLElement>this._closer.container().querySelector('.close-region')).style.top = '100px';
-                    (<HTMLElement>this._closer.container().querySelector('.gdpr-pop-up')).style.bottom = '100px';
+                    (<HTMLElement>this._closer.container().querySelector('.close-region')).style.visibility = 'hidden';
+                    (<HTMLElement>this._closer.container().querySelector('.gdpr-pop-up')).style.visibility = 'hidden';
                 }
             });
         } else {

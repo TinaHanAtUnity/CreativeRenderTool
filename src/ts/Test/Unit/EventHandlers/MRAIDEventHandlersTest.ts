@@ -24,11 +24,9 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { GDPRPrivacy } from 'Views/GDPRPrivacy';
 import { GdprManager } from 'Managers/GdprManager';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
-import { ForceQuitManager } from 'Managers/ForceQuitManager';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { Configuration } from 'Models/Configuration';
-import { MRAIDView } from 'Views/MRAIDView';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
 describe('MRAIDEventHandlersTest', () => {
 
@@ -50,7 +48,6 @@ describe('MRAIDEventHandlersTest', () => {
     let programmaticMraidCampaign: MRAIDCampaign;
     let gdprManager: GdprManager;
     let programmaticTrackingService: ProgrammaticTrackingService;
-    let forceQuitManager: ForceQuitManager;
 
     describe('with onClick', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -64,10 +61,9 @@ describe('MRAIDEventHandlersTest', () => {
             sinon.spy(nativeBridge.Intent, 'launch');
             sinon.spy(nativeBridge.UrlScheme, 'open');
             sinon.spy(nativeBridge.Listener, 'sendClickEvent');
-            forceQuitManager = sinon.createStubInstance(ForceQuitManager);
 
             focusManager = new FocusManager(nativeBridge);
-            container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo(), forceQuitManager);
+            container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
             request = sinon.createStubInstance(Request);
             placement = TestFixtures.getPlacement();
             request = new Request(nativeBridge, new WakeUpManager(nativeBridge, new FocusManager(nativeBridge)));
@@ -270,7 +266,7 @@ describe('MRAIDEventHandlersTest', () => {
             }, Platform.ANDROID);
             focusManager = new FocusManager(nativeBridge);
             metaDataManager = new MetaDataManager(nativeBridge);
-            container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo(), forceQuitManager);
+            container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
             request = new Request(nativeBridge, new WakeUpManager(nativeBridge, focusManager));
             sinon.stub(request, 'followRedirectChain').resolves();
             placement = TestFixtures.getPlacement();

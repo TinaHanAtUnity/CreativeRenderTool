@@ -1,9 +1,22 @@
-# Pending
+# Thu Aug 23 22:15:10 UTC 2018
+
+* Make jaeger more robust on init
+* XPROMO: trigger onStartProcessed after the start event has been sent
+* New video overlay also enabled for VAST video ads in groups 18 & 19
+* Custom Feature for Admob Video Required Asset
+
+# Wed Aug 22 09:36:53 UTC 2018
+
+* Remove force quit manager
+* Start the VPAID timeout timer to hide ad unit on bad ads
+
+# Tue Aug 21 06:56:04 UTC 2018
 
 * Fix display interstitial click area
 * Rename comet tracking loaded event
 * Fix Vast Endscreen click delay
 * Fix VPAID click and Endscreen
+* Add creativeId and targetStoreId in XPromo Operative Events
 
 # Fri Aug 17 11:23:03 UTC 2018
 
