@@ -317,6 +317,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
                     }
                 }
                 break;
+
             default:
         }
     }

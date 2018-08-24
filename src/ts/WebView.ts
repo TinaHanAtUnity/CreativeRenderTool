@@ -634,13 +634,28 @@ export class WebView {
                 AdUnitFactory.setForcedPlayableMRAID(TestEnvironment.get('forcedPlayableMRAID'));
             }
 
+            let forcedARMRAID = false;
+            if (TestEnvironment.get('forcedARMRAID')) {
+                forcedARMRAID = TestEnvironment.get('forcedARMRAID');
+                AdUnitFactory.setForcedARMRAID(forcedARMRAID);
+            }
+
             if(TestEnvironment.get('creativeUrl')) {
                 const creativeUrl = this._creativeUrl = TestEnvironment.get('creativeUrl');
+                let response: string = '';
                 if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                    CampaignManager.setCampaignResponse(CreativeUrlResponseAndroid.replace('{CREATIVE_URL_PLACEHOLDER}', creativeUrl));
+                    response = CreativeUrlResponseAndroid.replace('{CREATIVE_URL_PLACEHOLDER}', creativeUrl);
                 } else if(this._nativeBridge.getPlatform() === Platform.IOS) {
-                    CampaignManager.setCampaignResponse(CreativeUrlResponseIos.replace('{CREATIVE_URL_PLACEHOLDER}', creativeUrl));
+                    response = CreativeUrlResponseIos.replace('{CREATIVE_URL_PLACEHOLDER}', creativeUrl);
                 }
+
+                if (forcedARMRAID) {
+                    response = response.replace('{AD_TYPE_PLACEHOLDER}', 'MRAID_AR');
+                } else {
+                    response = response.replace('{AD_TYPE_PLACEHOLDER}', 'MRAID');
+                }
+
+                CampaignManager.setCampaignResponse(response);
             }
         });
     }
