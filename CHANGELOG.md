@@ -1,8 +1,9 @@
-# Staged
+# Thu Aug 23 22:15:10 UTC 2018
 
 * Make jaeger more robust on init
 * XPROMO: trigger onStartProcessed after the start event has been sent
-* New video overlay also enabled for VAST video ads in groups 18 & 19 
+* New video overlay also enabled for VAST video ads in groups 18 & 19
+* Custom Feature for Admob Video Required Asset
 
 # Wed Aug 22 09:36:53 UTC 2018
 
