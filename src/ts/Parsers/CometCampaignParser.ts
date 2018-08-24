@@ -54,7 +54,7 @@ export class CometCampaignParser extends CampaignParser {
         const baseCampaignParams: ICampaign = {
             id: json.id,
             willExpireAt: undefined,
-            adType: response.getAdType() || undefined,
+            adType: undefined,
             correlationId: undefined,
             creativeId: undefined,
             seatId: undefined,
