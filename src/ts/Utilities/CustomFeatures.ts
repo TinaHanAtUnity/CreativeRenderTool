@@ -32,4 +32,11 @@ export class CustomFeatures {
         // Ad unit should be closed when going background on iOS
         return gameId === '1795561';
     }
+
+    public static isAdmobCachedVideoGame(gameId: string) {
+        return gameId === '1475967' // CSR2 Racing iOS
+            || gameId === '1475968' // CSR2 Racing Android
+            || gameId === '1787178' // BrawlStars iOS
+            || gameId === '2391158'; // Brawlstars Android
+    }
 }
