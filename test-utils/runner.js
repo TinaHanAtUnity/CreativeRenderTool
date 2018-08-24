@@ -12,7 +12,7 @@ const coverage = process.argv[3];
 const debug = process.env.DEBUG;
 const testFilter = process.env.TEST_FILTER;
 
-(async () => {
+(async () => { try {
     const browser = await puppeteer.launch({
         args: ['--no-sandbox'],
         devtools: !!debug
@@ -67,4 +67,7 @@ const testFilter = process.env.TEST_FILTER;
     if(failures) {
         process.exit(failures);
     }
-})();
+} catch(error) {
+    console.error(error);
+    process.exit(1);
+}})();
