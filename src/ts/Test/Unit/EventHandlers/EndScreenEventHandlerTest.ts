@@ -150,7 +150,7 @@ describe('EndScreenEventHandlerTest', () => {
         });
 
         describe('with standalone_android store type', () => {
-            it('with gameDownloadUrl and API is less than 21, it should launch view intent', () => {
+            it('with appDownloadUrl and API is less than 21, it should launch view intent', () => {
                 performanceAdUnitParameters.campaign = TestFixtures.getCampaignFollowsRedirects();
                 performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
 
@@ -168,7 +168,7 @@ describe('EndScreenEventHandlerTest', () => {
                     store: StoreName.STANDALONE_ANDROID,
                     clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
                     clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl(),
-                    gameDownloadUrl: 'https://cdn.apk.com'
+                    appDownloadUrl: 'https://cdn.apk.com'
                 });
 
                 return resolvedPromise.then(() => {
@@ -179,7 +179,7 @@ describe('EndScreenEventHandlerTest', () => {
                 });
             });
 
-            it('with gameDownloadUrl and API is greater than or equal to 21, it should launch web search intent', () => {
+            it('with appDownloadUrl and API is greater than or equal to 21, it should launch web search intent', () => {
                 performanceAdUnitParameters.campaign = TestFixtures.getCampaignFollowsRedirects();
                 performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
 
@@ -197,7 +197,7 @@ describe('EndScreenEventHandlerTest', () => {
                     store: StoreName.STANDALONE_ANDROID,
                     clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
                     clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl(),
-                    gameDownloadUrl: 'https://cdn.apk.com'
+                    appDownloadUrl: 'https://cdn.apk.com'
                 });
 
                 return resolvedPromise.then(() => {

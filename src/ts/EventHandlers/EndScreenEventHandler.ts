@@ -28,7 +28,7 @@ export interface IEndScreenDownloadParameters {
     bypassAppSheet: boolean | undefined;
     appStoreId: string | undefined;
     store: StoreName | undefined;
-    gameDownloadUrl?: string | undefined;
+    appDownloadUrl?: string | undefined;
     adUnitStyle?: AdUnitStyle;
 }
 
@@ -116,8 +116,8 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     private handleClickAttribution(parameters: IEndScreenDownloadParameters) {
         const platform = this._nativeBridge.getPlatform();
 
-        if (parameters.store === StoreName.STANDALONE_ANDROID && parameters.gameDownloadUrl && parameters.clickAttributionUrl) {
-            this.handleAPKDownloadLink(parameters.gameDownloadUrl, parameters.clickAttributionUrl);
+        if (parameters.store === StoreName.STANDALONE_ANDROID && parameters.appDownloadUrl && parameters.clickAttributionUrl) {
+            this.handleAPKDownloadLink(parameters.appDownloadUrl, parameters.clickAttributionUrl);
             return;
         }
 
