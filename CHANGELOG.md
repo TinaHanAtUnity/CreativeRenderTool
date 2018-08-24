@@ -1,6 +1,7 @@
 # Pending
 
 * Add Augmented Reality(AR) Ads Support
+* Prevent multiple CTA Clicks on MRAID
 
 # Thu Aug 23 22:15:10 UTC 2018
 
@@ -24,7 +25,7 @@
 
 # Fri Aug 17 11:23:03 UTC 2018
 
-* Fix force_quite deletion
+* Fix force_quit deletion
 * Collect average fps for mraid
 * Improve caching time and add mraid parse time
 
