@@ -21,14 +21,15 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
 
     private _isSwipeToCloseEnabled: boolean = false;
     private _coppaCompliant: boolean;
-    private _privacy: Privacy;
+    private _privacy: AbstractPrivacy;
     private _callButtonEnabled: boolean = true;
 
-    constructor(nativeBridge: NativeBridge, coppaCompliant: boolean, campaign: VastCampaign, gameId: string) {
+    constructor(nativeBridge: NativeBridge, coppaCompliant: boolean, campaign: VastCampaign, gameId: string, privacy: AbstractPrivacy) {
         super(nativeBridge, 'vast-end-screen');
 
         this._coppaCompliant = coppaCompliant;
         this._template = new Template(VastEndScreenTemplate);
+        this._privacy = privacy;
 
         if(campaign) {
             const landscape = campaign.getLandscape();
@@ -67,6 +68,11 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
                 selector: '.campaign-container, .game-background'
             });
         }
+
+        this._privacy.render();
+        this._privacy.hide();
+        document.body.appendChild(this._privacy.container());
+        this._privacy.addEventHandler(this);
     }
 
     public render(): void {
@@ -94,8 +100,6 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
 
         if (this._privacy) {
             this._privacy.hide();
-            this._privacy.container().parentElement!.removeChild(this._privacy.container());
-            delete this._privacy;
         }
     }
 
@@ -105,15 +109,12 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
 
     public onPrivacyClose(): void {
         if (this._privacy) {
-            this._privacy.removeEventHandler(this);
             this._privacy.hide();
-            this._privacy.container().parentElement!.removeChild(this._privacy.container());
-            delete this._privacy;
         }
     }
 
     public onPrivacy(url: string): void {
-        this._handlers.forEach(handler => handler.onOpenUrl(url));
+        // do nothing
     }
 
     public onGDPROptOut(optOutEnabled: boolean) {
@@ -141,10 +142,6 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
 
     private onPrivacyEvent(event: Event): void {
         event.preventDefault();
-        // todo: gdpr privacy
-        this._privacy = new Privacy(this._nativeBridge, this._coppaCompliant);
-        this._privacy.render();
-        document.body.appendChild(this._privacy.container());
-        this._privacy.addEventHandler(this);
+        this._privacy.show();
     }
 }

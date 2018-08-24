@@ -10,6 +10,7 @@ import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 import { StreamType } from 'Constants/Android/StreamType';
 import { Platform } from 'Constants/Platform';
 import { Placement } from 'Models/Placement';
+import { AbstractPrivacy } from 'Views/AbstractPrivacy';
 
 class DeviceOrientation {
     public static getDeviceOrientation(): Orientation {
@@ -24,10 +25,12 @@ class DeviceOrientation {
 
 export interface IVastAdUnitParameters extends IVideoAdUnitParameters<VastCampaign> {
     endScreen?: VastEndScreen;
+    endScreenPrivacy?: AbstractPrivacy;
 }
 
 export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     private _endScreen: VastEndScreen | null;
+    private _endScreenPrivacy?: AbstractPrivacy;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _moat?: MOAT;
     private _volume: number;
@@ -44,6 +47,7 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._vastCampaign = parameters.campaign;
         this._moat = MoatViewabilityService.getMoat();
+        this._endScreenPrivacy = parameters.endScreenPrivacy;
 
         if(this._endScreen) {
             this._endScreen.render();
@@ -78,6 +82,12 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         return new Promise((resolve, reject) => {
             setTimeout(resolve, 500);
         }).then(() => {
+
+            if(this._endScreenPrivacy) {
+                this._endScreenPrivacy.hide();
+                this._endScreenPrivacy.container().parentElement!.removeChild(this._endScreenPrivacy.container());
+            }
+
             const endScreen = this.getEndScreen();
             if (endScreen) {
                 endScreen.hide();

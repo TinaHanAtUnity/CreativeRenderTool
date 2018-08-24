@@ -214,7 +214,10 @@ export class AdUnitFactory {
         };
 
         if(parameters.campaign.hasEndscreen()) {
-            vastEndScreen = new VastEndScreen(nativeBridge, parameters.configuration.isCoppaCompliant(), parameters.campaign, parameters.clientInfo.getGameId());
+            const privacy = this.createPrivacy(nativeBridge, parameters);
+            vastAdUnitParameters.endScreenPrivacy = privacy;
+
+            vastEndScreen = new VastEndScreen(nativeBridge, parameters.configuration.isCoppaCompliant(), parameters.campaign, parameters.clientInfo.getGameId(), privacy);
             vastAdUnitParameters.endScreen = vastEndScreen;
         }
 
