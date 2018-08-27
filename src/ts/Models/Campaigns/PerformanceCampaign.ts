@@ -7,6 +7,7 @@ export enum StoreName {
     APPLE,
     GOOGLE,
     XIAOMI,
+    // for APK campaigns
     STANDALONE_ANDROID
 }
 
