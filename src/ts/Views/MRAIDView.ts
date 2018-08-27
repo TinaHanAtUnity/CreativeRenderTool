@@ -50,6 +50,8 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     protected _stats: IMRAIDFullStats;
 
+    protected _callButtonEnabled: boolean = true;
+
     constructor(nativeBridge: NativeBridge, id: string, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup) {
         super(nativeBridge, id);
 
@@ -124,6 +126,12 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
     public onGDPROptOut(optOutEnabled: boolean) {
         // do nothing
+    }
+
+    public setCallButtonEnabled(value: boolean) {
+        if (this._callButtonEnabled !== value) {
+            this._callButtonEnabled = value;
+        }
     }
 
     protected onPrivacyEvent(event: Event): void {
