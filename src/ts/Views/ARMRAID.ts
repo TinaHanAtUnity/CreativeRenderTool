@@ -447,6 +447,8 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             case 'advanceFrame':
                 if (this._nativeBridge.getPlatform() === Platform.IOS) {
                     return ARUtil.advanceFrameWithScale(this._nativeBridge.AR.Ios);
+                } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                    return this._nativeBridge.AR.Android.advanceFrame();
                 } else {
                     return Promise.resolve();
                 }
