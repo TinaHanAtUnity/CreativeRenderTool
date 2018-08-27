@@ -119,12 +119,12 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
         if (parameters.store === StoreName.STANDALONE_ANDROID) {
             if (parameters.appDownloadUrl && parameters.clickAttributionUrl) {
                 this.handleAPKDownloadLink(parameters.appDownloadUrl, parameters.clickAttributionUrl);
-                return;
             } else {
                 Diagnostics.trigger('standalone_android_misconfigured', {
                     message: 'missing appDownloadUrl or clickAttributionUrl'
                 });
             }
+            return;
         }
 
         // should be safe to remove after new Comet APK rule changes are deployed
