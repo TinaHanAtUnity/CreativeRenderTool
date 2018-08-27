@@ -6,10 +6,9 @@ import { Request } from 'Utilities/Request';
 import { Platform } from 'Constants/Platform';
 import { Url } from 'Utilities/Url';
 import { Diagnostics } from 'Utilities/Diagnostics';
-import { ABGroup } from 'Models/ABGroup';
 
 export abstract class CampaignParser {
-    public abstract parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string, abgroup?: ABGroup): Promise<Campaign>;
+    public abstract parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string): Promise<Campaign>;
 
     protected getProgrammaticCampaignId(nativeBridge: NativeBridge): string {
         switch (nativeBridge.getPlatform()) {
