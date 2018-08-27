@@ -13,10 +13,11 @@ import { Platform } from 'Constants/Platform';
 import { Url } from 'Utilities/Url';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { CachedAdMobCampaign } from 'Models/Campaigns/CachedAdMobCampaign';
+import { AdmobVideoRequiredAssetTest, ABGroup } from 'Models/ABGroup';
 
 export class ProgrammaticAdMobParser extends CampaignParser {
     public static ContentType = 'programmatic/admob-video';
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string): Promise<Campaign> {
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string, abGroup?: ABGroup): Promise<Campaign> {
         const markup = response.getContent();
         const cacheTTL = response.getCacheTTL();
         const platform = nativeBridge.getPlatform();
@@ -49,7 +50,7 @@ export class ProgrammaticAdMobParser extends CampaignParser {
                 video: video
             };
 
-            if (gameId && CustomFeatures.isAdmobCachedVideoGame(gameId)) {
+            if ((abGroup && AdmobVideoRequiredAssetTest.isValid(abGroup)) || (gameId && CustomFeatures.isAdmobCachedVideoGame(gameId))) {
                 return Promise.resolve(new CachedAdMobCampaign(adMobCampaignParams));
             } else {
                 return Promise.resolve(new AdMobCampaign(adMobCampaignParams));
