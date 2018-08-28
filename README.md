@@ -3,13 +3,13 @@
 ## Requirements
 
 - Node (`brew install node`) (Latest or at least Node 6+)
+- Parallel (`brew install parallel`) for running things in parallel
+- Python (`brew install python3`) for the local webserver
+- Watchman (`brew install watchman`) for watching tests
+- exiftool (`brew install exiftool`) for integration tests
 
 ### Optional
 
-- Python (`brew install python3`)
-- nginx (`brew install nginx`)
-- Watchman (`brew install watchman`)
-- exiftool (`brew install exiftool`) for integration tests
 - segno (`pip install segno`) for qr code generation
 
 ## IDE
@@ -47,7 +47,7 @@ Suggested testing browser is Google Chrome
 
 - `make build-dev`
 
-To build and test continuously (on file changes), use:
+To build continuously (on file changes), use:
 
 - `make watch`
 
@@ -58,13 +58,36 @@ To build and test continuously (on file changes), use:
  
   >**Android:** change the return url of `getDefaultConfigUrl()` in [SdkProperties.java](https://github.com/Applifier/unity-ads-android/blob/master/lib/src/main/java/com/unity3d/ads/properties/SdkProperties.java)
 - Change webview development config to point to local build (is done automagically by `make build-dev`) (`http://LOCAL_IP:LOCAL_PORT/build/dev/index.html`)
-- Start local web server in project root (`make start-nginx`)
+- Start local web server in project root (`make start-server`)
 
 ## Testing
 
 ### Local tests
 
-- `make test`
+- `make test` for both unit and integration tests
+- `make test-unit`
+- `make test-integration`
+
+To watch tests, use:
+
+- `make watch-test`
+- `TEST_FILTER=ObservableTest make watch-test`
+
+To debug tests (opens a browser running the tests and pauses it immediately), use:
+
+- `DEBUG=1 make test`
+
+To filter what tests are being run, use:
+
+- `TEST_FILTER=<RegExp> make test`
+
+Or combine both:
+
+- `DEBUG=1 TEST_FILTER=ObservableTest make test-unit`
+
+### Test coverage
+
+- `make test-coverage` will generate a coverage report at `build/coverage/index.html`
 
 ### Hybrid tests
 
@@ -73,29 +96,23 @@ To build and test continuously (on file changes), use:
 - `make build-test`
 - Run hybrid test suite from the SDK
 
+#### Automatic builds for Android
+
+http://qa-jenkins.us-east-1.applifier.info:8080/job/unity_ads_sdk2_android_hybrid_tests/
+
+#### Automatic builds for iOS
+
+http://qa-jenkins.us-east-1.applifier.info:8080/job/unity_ads_sdk2_ios_hybrid_tests/
+
 ### Browser build tests
 
-- `make clean build-browser start-nginx`
-- `make test-browser`
-
-#### Hybrid tests triggered with github webhook
-http://qa-jenkins.us-east-1.applifier.info:8080/job/unity-ads-sdk2-ios-hybrid-tests-webview-webhook/
-
-Tests can also be launched manually: http://qa-jenkins.us-east-1.applifier.info:8080/job/unity_ads_sdk2_ios_hybrid_tests/build
+- `make build-browser start-server`
+- `node test-utils/headless.js`
 
 ### Deployment tests
 
-#### Android
-http://qa-jenkins.us-east-1.applifier.info:8080/job/unity-ads-webview-deploy-test-android-api/
-
-Results: http://qa-jenkins.us-east-1.applifier.info:8080/job/unity-ads-sdk2-systests-android/
-
-
 #### iOS
-http://qa-jenkins.us-east-1.applifier.info:8080/job/unity-ads-webview-deploy-test-ios-api/
+http://qa-jenkins.us-east-1.applifier.info:8080/job/unity-ads-sdk2-systests-android-sans-webhook/
 
-Results: http://qa-jenkins.us-east-1.applifier.info:8080/job/unity-ads-sdk2-systests-iOS/
-
-#### Running deployment tests
-
-Follow the link for desired platform -> Build with Parameters -> Build. This job will start system test jobs, that run tests on real device in Testdroid cloud. The job iterates over all webview git branches with prefix 'origin/staging/', so staging branches must be deployed in order to run tests. Each found staging branch will result in a job under 'Results' link above.
+#### Android
+http://qa-jenkins.us-east-1.applifier.info:8080/job/unity-ads-sdk2-systests-ios-sans-webhook/

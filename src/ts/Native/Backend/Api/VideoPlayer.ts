@@ -14,7 +14,8 @@ export class VideoPlayer {
         if('exec' in window) {
             // tslint:disable:no-string-literal
             const exec = (<any>window)['exec'];
-            exec('curl -s "' + url + '" | exiftool -j -', (err: Error, stdout: string, stderr: string) => {
+            exec('curl -s "' + url + '" | exiftool -j -').then((result: any) => {
+                const stdout: string = result.stdout;
                 const stream = JSON.parse(stdout)[0];
                 const duration = VideoPlayer._duration = Math.round(parseFloat(stream.Duration) * 1000);
                 const splitImageSize = stream.ImageSize.split('x');
@@ -27,7 +28,7 @@ export class VideoPlayer {
         } else {
             let videoView = VideoPlayer._videoView = <HTMLVideoElement>window.parent.document.getElementById('videoView');
             if(!videoView) {
-                videoView = document.createElement('video');
+                videoView = VideoPlayer._videoView = document.createElement('video');
             }
             videoView.addEventListener('canplay', () => {
                 VideoPlayer._url = url;
