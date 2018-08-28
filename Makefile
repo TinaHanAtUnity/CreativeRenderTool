@@ -137,7 +137,7 @@ $(BUILD_DIR)/browser/index.html: $(SOURCE_DIR)/browser-index.html
 $(BUILD_DIR)/browser/iframe.html: $(SOURCE_DIR)/browser-iframe.html
 	mkdir -p $(dir $@) && cp $< $@
 
-$(BUILD_DIR)/dev/index.html: $(SOURCE_DIR)/dev-index.html
+$(BUILD_DIR)/dev/index.html: $(SOURCE_DIR)/dev-index.html $(SOURCE_BUILD_DIR)/ts/Bundle.js $(CSS_TARGETS)
 	mkdir -p $(dir $@) && $(INLINE) $< $@
 
 $(BUILD_DIR)/dev/config.json:
@@ -245,6 +245,7 @@ watch: all $(TEST_BUILD_DIR)/Unit.js $(TEST_BUILD_DIR)/Integration.js
 	parallel --ungroup --tty --jobs 0 ::: \
 		"$(TYPESCRIPT) --project tsconfig.json --watch --preserveWatchOutput" \
 		"$(STYLUS) --out $(SOURCE_BUILD_DIR)/styl --use autoprefixer-stylus --compress --inline --with '{limit: false}' --watch $(SOURCE_DIR)/styl/main.styl" \
+		"watchman-make -p build/src/ts/Bundle.js $(CSS_TARGETS) -t build-dev" \
 		"$(ROLLUP) --watch --config rollup.config.device.js" \
 		"$(ROLLUP) --watch --config rollup.config.browser.js" \
 		"$(ROLLUP) --watch --config rollup.config.test.unit.js" \
