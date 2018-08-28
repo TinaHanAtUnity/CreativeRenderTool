@@ -78,7 +78,7 @@ TEST_BUILD_TARGETS := $(TEST_BUILD_DIR)/UnitBundle.min.js $(BUILD_DIR)/test/inde
 
 # Built-in targets
 
-.PHONY: all static build-browser build-dev build-release build-test test test-unit test-integration test-coverage test-browser clean lint setup watch watch-test start-server stop-server deploy qr-code
+.PHONY: all static build-browser build-dev build-release build-test test test-unit test-integration test-coverage test-browser clean lint setup watch-dev watch-browser watch-test start-server stop-server deploy qr-code
 .NOTPARALLEL: $(TS_TARGETS) $(TEST_TARGETS)
 
 # Main targets
@@ -241,16 +241,18 @@ setup: clean
 	rm -rf node_modules
 	npm install
 
-watch: all $(TEST_BUILD_DIR)/Unit.js $(TEST_BUILD_DIR)/Integration.js
+watch-dev: build-dev
 	parallel --ungroup --tty --jobs 0 ::: \
 		"$(TYPESCRIPT) --project tsconfig.json --watch --preserveWatchOutput" \
 		"$(STYLUS) --out $(SOURCE_BUILD_DIR)/styl --use autoprefixer-stylus --compress --inline --with '{limit: false}' --watch $(SOURCE_DIR)/styl/main.styl" \
-		"watchman-make -p build/src/ts/Bundle.js $(CSS_TARGETS) -t build-dev" \
 		"$(ROLLUP) --watch --config rollup.config.device.js" \
-		"$(ROLLUP) --watch --config rollup.config.browser.js" \
-		"$(ROLLUP) --watch --config rollup.config.test.unit.js" \
-		"$(ROLLUP) --watch --config rollup.config.test.integration.js" \
-		"$(ROLLUP) --watch --config rollup.config.test.coverage.js"
+		"watchman-make -p build/src/ts/Bundle.js $(CSS_TARGETS) -t build-dev"
+
+watch-browser: build-browser
+	parallel --ungroup --tty --jobs 0 ::: \
+		"$(TYPESCRIPT) --project tsconfig.json --watch --preserveWatchOutput" \
+		"$(STYLUS) --out $(SOURCE_BUILD_DIR)/styl --use autoprefixer-stylus --compress --inline --with '{limit: false}' --watch $(SOURCE_DIR)/styl/main.styl" \
+		"$(ROLLUP) --watch --config rollup.config.browser.js"
 
 watch-test: all $(TEST_BUILD_DIR)/Unit.js $(TEST_BUILD_DIR)/Integration.js
 	parallel --ungroup --tty --jobs 0 ::: \
