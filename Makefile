@@ -138,7 +138,7 @@ $(BUILD_DIR)/browser/iframe.html: $(SOURCE_DIR)/browser-iframe.html
 	mkdir -p $(dir $@) && cp $< $@
 
 $(BUILD_DIR)/dev/index.html: $(SOURCE_DIR)/dev-index.html
-	mkdir -p $(dir $@) && cp $< $@
+	mkdir -p $(dir $@) && $(INLINE) $< $@
 
 $(BUILD_DIR)/dev/config.json:
 	echo "{\"url\":\"http://$(IP_ADDRESS):8000/build/dev/index.html\",\"hash\":null}" > $@
