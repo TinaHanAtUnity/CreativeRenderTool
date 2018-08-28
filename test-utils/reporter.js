@@ -79,11 +79,11 @@ var HybridTestReporter = (function () {
     }
 
     Logger.prototype.log = function() {
-        this.callNative('Sdk', 'logDebug', Array.prototype.slice.call(arguments).join(' '));
+        this.callNative('Sdk', 'logDebug', [Array.prototype.slice.call(arguments).join(' ')]);
     };
 
     Logger.prototype.error = function() {
-        this.callNative('Sdk', 'logError', Array.prototype.slice.call(arguments).join(' '));
+        this.callNative('Sdk', 'logError', [Array.prototype.slice.call(arguments).join(' ')]);
     };
 
     Logger.prototype.callNative = function(className, methodName, parameters) {
@@ -98,7 +98,7 @@ var HybridTestReporter = (function () {
                 xhr.send(JSON.stringify([['USRVApi' + className, methodName, parameters, 'null']]));
             }
         } else {
-            console.log(parameters);
+            console.log(parameters[0]);
         }
     };
 

@@ -149,7 +149,7 @@ $(BUILD_DIR)/release/index.html: $(SOURCE_DIR)/prod-index.html
 $(BUILD_DIR)/release/config.json:
 	INPUT=$(BUILD_DIR)/release/index.html OUTPUT=$(BUILD_DIR)/release/config.json BRANCH=$(BRANCH) COMMIT_ID=$(COMMIT_ID) TARGET=release node tools/generate_config.js
 
-$(BUILD_DIR)/test/index.html: $(SOURCE_DIR)/hybrid-test-index.html
+$(BUILD_DIR)/test/index.html: $(SOURCE_DIR)/hybrid-test-index.html test-utils/reporter.js test-utils/setup.js
 	mkdir -p $(dir $@) && $(INLINE) $< $@
 
 $(BUILD_DIR)/test/config.json:
