@@ -54,7 +54,7 @@ const resizeHandler = () => {
     }
 };
 
-resizeHandler();
+window.addEventListener('domcontentloaded', resizeHandler, false);
 window.addEventListener('resize', resizeHandler, false);
 
 // 'resize' event doesn't work when switching directly from one landscape orientation to another
@@ -86,7 +86,7 @@ const onChangeOrientation = () => {
     }
 };
 
-onChangeOrientation();
+window.addEventListener('domcontentloaded', onChangeOrientation, false);
 window.addEventListener('orientationchange', onChangeOrientation, false);
 
 if(typeof location !== 'undefined') {
