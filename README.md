@@ -43,13 +43,17 @@
 
 Suggested testing browser is Google Chrome
 
+To build continuously (on file changes), use:
+
+- `make watch-browser`
+
 ### Development Build
 
 - `make build-dev`
 
 To build continuously (on file changes), use:
 
-- `make watch`
+- `make watch-dev`
 
 ### Running development builds
 
