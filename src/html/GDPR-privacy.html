@@ -93,7 +93,9 @@
     </div>
     <div class="pop-up-content back-side">
         <% for (var k in data.buildInformation) { %>
-        <span class="build-information-key"><%= k %>:</span> <span class="build-information-value"> <%= (data.buildInformation[k] === null || typeof data.buildInformation[k] === "undefined") ? "N/A" : data.buildInformation[k] %></span>;
+            <p class="build-information-item">
+                <span class="build-information-key"><%= k %>:</span> <span class="build-information-value"> <%= (data.buildInformation[k] === null || typeof data.buildInformation[k] === "undefined") ? "N/A" : data.buildInformation[k] %></span>
+            </p>
         <% } %>
     </div>
     <div class="fade-out-gradient-separator"></div>
