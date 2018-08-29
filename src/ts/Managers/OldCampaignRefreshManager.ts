@@ -353,10 +353,10 @@ export class OldCampaignRefreshManager extends RefreshManager {
     }
 
     private onActivityResumed(activity: string): void {
-        if(activity !== 'com.unity3d.ads.adunit.AdUnitActivity' &&
-            activity !== 'com.unity3d.ads.adunit.AdUnitTransparentActivity' &&
-            activity !== 'com.unity3d.ads.adunit.AdUnitTransparentSoftwareActivity' &&
-            activity !== 'com.unity3d.ads.adunit.AdUnitSoftwareActivity') {
+        if(activity !== 'com.unity3d.services.ads.adunit.AdUnitActivity' &&
+            activity !== 'com.unity3d.services.ads.adunit.AdUnitTransparentActivity' &&
+            activity !== 'com.unity3d.services.ads.adunit.AdUnitTransparentSoftwareActivity' &&
+            activity !== 'com.unity3d.services.ads.adunit.AdUnitSoftwareActivity') {
             this.refresh();
         }
     }
