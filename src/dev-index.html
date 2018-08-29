@@ -9,67 +9,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
     <meta name="format-detection" content="telephone=no"/>
 
-    <script>{ES6_PROMISE}</script>
-    <script>{SYSTEM_JS}</script>
-    <script>
-        var origin = 'http://localhost:8000';
-        if(location.search.length > 0 && location.search.indexOf('?') !== -1) {
-            var queryString = location.search.split('?')[1].split('&');
-            var queryParams = {};
-            for(i = 0; i < queryString.length; i++) {
-                var param = queryString[i].split('=');
-                queryParams[param[0]] = param[1];
-            }
-            if('origin' in queryParams) {
-                var decodedOrigin = decodeURIComponent(queryParams['origin']);
-                var parser = document.createElement('a');
-                parser.href = decodedOrigin;
-                origin = parser.origin;
-            }
-        }
-
-        var style = document.createElement('link');
-        style.rel = 'stylesheet';
-        style.href = origin + '/build/dev/css/main.css';
-        document.head.appendChild(style);
-
-        var config = {
-            baseURL: origin + '/build/dev/js',
-            map: {
-                'es6-promise': '@empty',
-                'tslib': origin + '/node_modules/tslib/tslib.js',
-                'text': origin + '/node_modules/systemjs-plugin-text/text.js',
-                'long': origin + '/node_modules/long/dist/long.js',
-                'protobufjs/minimal': origin + '/node_modules/protobufjs/dist/minimal/protobuf.js'
-            },
-            meta: {
-                '*.html': {
-                    loader: 'text'
-                },
-                '*.xml': {
-                    loader: 'text'
-                },
-                '*.json': {
-                    loader: 'text'
-                },
-                '*.css': {
-                    loader: 'text'
-                }
-            },
-            packages: {},
-            paths: {
-                '*.html': origin + '/build/dev/*.html',
-                '*.xml': origin + '/build/dev/*.xml',
-                '*.json': origin + '/build/dev/*.json',
-                '*.css': origin + '/build/dev/*.css'
-            }
-        };
-        config.packages[origin] = {
-            defaultExtension: 'js'
-        };
-        System.config(config);
-        System.import('Device');
-    </script>
+    <link inline rel="stylesheet" href="/build/src/styl/main.css" />
+    <script inline src="/build/src/ts/Bundle.js"></script>
 </head>
 <body></body>
 </html>

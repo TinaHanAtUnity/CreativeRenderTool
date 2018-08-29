@@ -12,16 +12,16 @@ build
 src/**/*.js
 src/**/*.js.map
 src/**/*.css
-src/html/admob/AFMAContainer.html
 
-# nginx
-nginx/access.log
-nginx/error.log
-nginx/nginx.conf
-nginx/server.PID
+# Test
+test/**/*.js
+test/**/*.js.map
 
 # VS Code
 .vscode
 
 # MacOS
 .DS_Store
+
+# Server
+server.pid

@@ -1,7 +1,13 @@
-# Pending
+# Wed Aug 29 12:27:38 UTC 2018
+
+* Refactor build & test systems
+
+# Tue Aug 28 08:46:33 UTC 2018
 
 * Add Augmented Reality(AR) Ads Support
 * Prevent multiple CTA Clicks on MRAID
+* Add AB Test requiring Admob Video as a Required Asset
+* Replace URL Parameters correctly for Performance tracking urls
 
 # Thu Aug 23 22:15:10 UTC 2018
 

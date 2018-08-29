@@ -551,17 +551,30 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             }, false);
         });
 
-        this._loadingScreen.classList.add('hidden');
-        this._nativeBridge.Permissions.checkPermissions(PermissionTypes.CAMERA).then(results => {
-            const requestPermissionText = <HTMLElement>this._cameraPermissionPanel.querySelector('.request-text');
-            if (results === CurrentPermission.DENIED) {
+        const arSupported: Promise<boolean> =
+            this._nativeBridge.AR.Ios ? this._nativeBridge.AR.Ios.isARSupported() :
+                this._nativeBridge.AR.Android ? this._nativeBridge.AR.Android.isARSupported() :
+                    Promise.resolve<boolean>(false);
+
+        arSupported.then(supported => {
+            this._loadingScreen.classList.add('hidden');
+
+            if (!supported) {
                 this.onCameraPermissionEvent(false);
-            } else {
-                if (results === CurrentPermission.ACCEPTED) {
-                    requestPermissionText.style.display = 'none';
-                }
-                this._cameraPermissionPanel.style.display = 'block';
+                return;
             }
+
+            this._nativeBridge.Permissions.checkPermissions(PermissionTypes.CAMERA).then(results => {
+                const requestPermissionText = <HTMLElement>this._cameraPermissionPanel.querySelector('.request-text');
+                if (results === CurrentPermission.DENIED) {
+                    this.onCameraPermissionEvent(false);
+                } else {
+                    if (results === CurrentPermission.ACCEPTED) {
+                        requestPermissionText.style.display = 'none';
+                    }
+                    this._cameraPermissionPanel.style.display = 'block';
+                }
+            });
         });
     }
 
@@ -593,6 +606,5 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private onShowFallback() {
         this.onCameraPermissionEvent(false);
-        this.showMRAIDAd();
     }
 }
