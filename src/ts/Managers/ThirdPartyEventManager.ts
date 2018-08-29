@@ -84,7 +84,7 @@ export class ThirdPartyEventManager {
             // Object.keys... is Currently to protect against the integration tests FAB dependency on static performance configurations not including the tracking URLs
             if (urls && urls[event] && Object.keys(urls[event]).length !== 0) {
                 for (const eventUrl of urls[event]) {
-                    if (eventUrl && Url.isValid(eventUrl)) {
+                    if (eventUrl) {
                         this.sendEvent(event, campaign.getSession().getId(), eventUrl);
                     } else {
                         const error = {

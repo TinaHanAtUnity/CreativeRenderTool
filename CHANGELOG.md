@@ -1,3 +1,14 @@
+# Wed Aug 29 12:27:38 UTC 2018
+
+* Refactor build & test systems
+
+# Tue Aug 28 08:46:33 UTC 2018
+
+* Add Augmented Reality(AR) Ads Support
+* Prevent multiple CTA Clicks on MRAID
+* Add AB Test requiring Admob Video as a Required Asset
+* Replace URL Parameters correctly for Performance tracking urls
+
 # Thu Aug 23 22:15:10 UTC 2018
 
 * Make jaeger more robust on init
@@ -20,7 +31,7 @@
 
 # Fri Aug 17 11:23:03 UTC 2018
 
-* Fix force_quite deletion
+* Fix force_quit deletion
 * Collect average fps for mraid
 * Improve caching time and add mraid parse time
 

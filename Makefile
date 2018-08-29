@@ -1,405 +1,288 @@
-# Binaries
-BIN = node_modules/.bin
-CONCURRENTLY = $(BIN)/concurrently
-TYPESCRIPT = $(BIN)/tsc
-TSLINT = $(BIN)/tslint
-STYLUS = $(BIN)/stylus
-BABEL = $(BIN)/babel
-ROLLUP = $(BIN)/rollup
-ISTANBUL = $(BIN)/istanbul
-REMAP_ISTANBUL = $(BIN)/remap-istanbul
-STYLINT = $(BIN)/stylint
-PBJS = $(BIN)/pbjs
-PBTS = $(BIN)/pbts
-CC = java -jar node_modules/google-closure-compiler/compiler.jar
-ES6_PROMISE = node_modules/es6-promise/dist/es6-promise.auto.js
-SYSTEM_JS = node_modules/systemjs/dist/system.src.js
+# Options
 
-# Sources
-TS_SRC = src/ts
-STYL_SRC = src/styl
-PROD_INDEX_SRC = src/prod-index.html
-TEST_INDEX_SRC = src/test-index.html
-PROD_CONFIG_SRC = src/prod-config.json
-TEST_CONFIG_SRC = src/test-config.json
-ADMOB_CONTAINER_DIR = src/html/admob
-ADMOB_CONTAINER_SRC = $(ADMOB_CONTAINER_DIR)/AFMAContainer-no-obfuscation.html
-ADMOB_CONTAINER_GENERATED = $(ADMOB_CONTAINER_DIR)/AFMAContainer.html
+MAKEFLAGS += -rRs
+
+# Binaries
+
+BIN := node_modules/.bin
+TYPESCRIPT := $(BIN)/tsc
+REMAP_ISTANBUL := $(BIN)/remap-istanbul
+TSLINT := $(BIN)/tslint
+STYLUS := $(BIN)/stylus
+ROLLUP := $(BIN)/rollup
+STYLINT := $(BIN)/stylint
+PBJS := $(BIN)/pbjs
+PBTS := $(BIN)/pbts
+CC := java -jar node_modules/google-closure-compiler/compiler.jar
+INLINE := $(BIN)/inline-source
+
+# Directories
+
+SOURCE_DIR := src
+TEST_DIR := test
+BUILD_DIR := build
+SOURCE_BUILD_DIR := $(BUILD_DIR)/$(SOURCE_DIR)
+TEST_BUILD_DIR := $(BUILD_DIR)/$(TEST_DIR)
+ADMOB_CONTAINER_DIR := $(SOURCE_DIR)/html/admob
 
 # Branch and commit id
+
 ifeq ($(TRAVIS), true)
-    BRANCH = $(TRAVIS_BRANCH)
-    COMMIT_ID = $(TRAVIS_COMMIT)
+	BRANCH = $(TRAVIS_BRANCH)
+	COMMIT_ID = $(TRAVIS_COMMIT)
 else
-    BRANCH = $(shell git symbolic-ref --short HEAD)
-    COMMIT_ID = $(shell git rev-parse HEAD)
+	BRANCH = $(shell git symbolic-ref --short HEAD)
+	COMMIT_ID = $(shell git rev-parse HEAD)
 endif
 
+# Local IP address
+
+IP_ADDRESS := $(shell node -p '[].concat.apply([], Object.values(os.networkInterfaces()).map(iface => iface.filter(({family, internal}) => family === "IPv4" && !internal)))[0].address')
+
+# Sources
+
+SOURCES := $(shell find $(SOURCE_DIR) -mindepth 2 -type f -not -name '*.d.ts')
+TS_SOURCES := $(filter %.ts, $(SOURCES))
+HTML_SOURCES := $(filter %.html, $(SOURCES))
+JSON_SOURCES := $(filter %.json, $(SOURCES))
+XML_SOURCES := $(filter %.xml, $(SOURCES))
+
+TESTS := $(shell find $(TEST_DIR) -type f -name '*.ts' -and -not -name '*.d.ts')
+UNIT_TESTS := $(shell find $(TEST_DIR)/Unit -type f -name '*Test.ts' -and -not -name '*.d.ts')
+INTEGRATION_TESTS := $(shell find $(TEST_DIR)/Integration -type f -name '*Test.ts' -and -not -name '*.d.ts')
+
 # Targets
-BUILD_DIR = build
 
-# For platform specific operations
-OS := $(shell uname)
+TS_TARGETS := $(addprefix $(BUILD_DIR)/, $(patsubst %.ts, %.js, $(TS_SOURCES)))
+TS_TARGETS += $(SOURCE_BUILD_DIR)/proto/unity_proto.js
 
-.PHONY: build-browser build-dev build-release build-test build-dir build-ts build-js build-css build-static clean lint test test-unit test-integration test-coverage test-filter watch setup deploy build-dev-no-ts watch-fast qr-code
+CSS_TARGETS := $(SOURCE_BUILD_DIR)/styl/main.css
 
-build-browser: BUILD_DIR = build/browser
-build-browser: MODULE = system
-build-browser: TARGET = es5
-build-browser: build-dir build-static build-css build-proto build-ts
-	cp src/browser-index.html $(BUILD_DIR)/index.html
-	cp src/browser-iframe.html $(BUILD_DIR)/iframe.html
+HTML_TARGETS := $(addprefix $(BUILD_DIR)/, $(HTML_SOURCES))
+HTML_TARGETS += $(SOURCE_BUILD_DIR)/html/admob/AFMAContainer.html
 
-build-dev: BUILD_DIR = build/dev
-build-dev: MODULE = system
-build-dev: TARGET = es5
-build-dev: build-dir build-static build-css build-proto build-ts
-	echo "{\"url\":\"http://$(shell ifconfig |grep "inet" |fgrep -v "127.0.0.1"|grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}" |grep -v -E "^0|^127" -m 1):8000/build/dev/index.html\",\"hash\":null}" > $(BUILD_DIR)/config.json
-	cp src/dev-index.html $(BUILD_DIR)/index.html
-	node -e "\
-		var fs=require('fs');\
-		var o={encoding:'utf-8'};\
-		var p=fs.readFileSync('$(ES6_PROMISE)', o);\
-		var s=fs.readFileSync('$(SYSTEM_JS)', o);\
-		var i=fs.readFileSync('$(BUILD_DIR)/index.html', o);\
-		fs.writeFileSync('$(BUILD_DIR)/index.html', i.replace('{ES6_PROMISE}', p).replace('{SYSTEM_JS}', s), o);"
+JSON_TARGETS := $(addprefix $(BUILD_DIR)/, $(JSON_SOURCES))
 
-build-dev-no-ts: build-dir build-static build-css build-proto
+XML_TARGETS := $(addprefix $(BUILD_DIR)/, $(XML_SOURCES))
 
-build-release: BUILD_DIR = build/release
-build-release: MODULE = es2015
-build-release: TARGET = es5
-build-release: clean build-dir build-static build-css build-proto build-ts build-js
-	@echo
-	@echo Copying release index.html to build
-	@echo
+TEST_TARGETS := $(addprefix $(BUILD_DIR)/, $(patsubst %.ts, %.js, $(TESTS)))
+UNIT_TEST_TARGETS := $(addprefix $(BUILD_DIR)/, $(patsubst %.ts, %.js, $(UNIT_TESTS)))
+INTEGRATION_TEST_TARGETS := $(addprefix $(BUILD_DIR)/, $(patsubst %.ts, %.js, $(INTEGRATION_TESTS)))
 
-	cp $(PROD_INDEX_SRC) $(BUILD_DIR)/index.html
+# Build Targets
 
-	@echo
-	@echo Inlining CSS and JS
-	@echo
+BROWSER_BUILD_TARGETS := $(SOURCE_BUILD_DIR)/ts/BrowserBundle.js $(SOURCE_BUILD_DIR)/styl/main.css $(BUILD_DIR)/browser/index.html $(BUILD_DIR)/browser/iframe.html
+DEV_BUILD_TARGETS := $(SOURCE_BUILD_DIR)/ts/Bundle.js $(BUILD_DIR)/dev/index.html $(BUILD_DIR)/dev/config.json
+RELEASE_BUILD_TARGETS := $(SOURCE_BUILD_DIR)/ts/Bundle.min.js $(BUILD_DIR)/release/index.html $(BUILD_DIR)/release/config.json
+TEST_BUILD_TARGETS := $(TEST_BUILD_DIR)/UnitBundle.min.js $(BUILD_DIR)/test/index.html $(BUILD_DIR)/test/config.json
 
-	node -e "\
-		var fs=require('fs');\
-		var o={encoding:'utf-8'};\
-		var s=fs.readFileSync('$(BUILD_DIR)/css/main.css', o);\
-		var j=fs.readFileSync('$(BUILD_DIR)/bundle.min.js', o);\
-		var i=fs.readFileSync('$(BUILD_DIR)/index.html', o);\
-		var b=fs.readFileSync('node_modules/protobufjs/dist/minimal/protobuf.min.js', o);\
-		fs.writeFileSync('$(BUILD_DIR)/index.html', i.replace('{COMPILED_CSS}', s).replace('{COMPILED_JS}', j).replace('{PROTOBUF_JS}', b), o);"
+# Built-in targets
 
-	@echo
-	@echo Cleaning release build
-	@echo
+.PHONY: all static build-browser build-dev build-release build-test test test-unit test-integration test-coverage test-browser clean lint setup watch-dev watch-browser watch-test start-server stop-server deploy qr-code
+.NOTPARALLEL: $(TS_TARGETS) $(TEST_TARGETS)
 
-	rm -rf $(BUILD_DIR)/img $(BUILD_DIR)/css $(BUILD_DIR)/js $(BUILD_DIR)/html $(BUILD_DIR)/xml $(BUILD_DIR)/json $(BUILD_DIR)/proto $(BUILD_DIR)/bundle.js $(BUILD_DIR)/bundle.min.js
+# Main targets
 
-	@echo
-	@echo Copying release config.json to build
-	@echo
+all: $(TS_TARGETS) $(CSS_TARGETS) static $(TEST_TARGETS)
 
-	cp $(PROD_CONFIG_SRC) $(BUILD_DIR)/config.json
+static: $(HTML_TARGETS) $(JSON_TARGETS) $(XML_TARGETS)
 
-	@echo
-	@echo Computing build details to release config
-	@echo
+build-browser: all $(BROWSER_BUILD_TARGETS)
 
-	INPUT=$(BUILD_DIR)/index.html OUTPUT=$(BUILD_DIR)/config.json BRANCH=$(BRANCH) COMMIT_ID=$(COMMIT_ID) TARGET=release node tools/generate_config.js
+build-dev: all $(DEV_BUILD_TARGETS)
 
-	@echo
-	@echo Generating commit id based build directory
-	@echo
+build-release: all $(RELEASE_BUILD_TARGETS)
 
-	mkdir build/$(COMMIT_ID) | true
-	rsync -r build/release build/$(COMMIT_ID)
-	rm -rf build/$(COMMIT_ID)/$(COMMIT_ID)
-
-build-test: BUILD_DIR = build/test
-build-test: MODULE = system
-build-test: TARGET = es5
-build-test: clean build-dir build-css build-static build-proto build-ts
-	@echo
-	@echo Generating test runner
-	@echo
-
-	cp test-utils/runner.js $(BUILD_DIR)
-	BUILD_DIR=$(BUILD_DIR) node test-utils/generate_runner.js
-
-	@echo
-	@echo Copying test index.html to build
-	@echo
-
-	cp $(TEST_INDEX_SRC) $(BUILD_DIR)/index.html
-	node -e "\
-		var fs=require('fs');\
-		var o={encoding:'utf-8'};\
-		var p=fs.readFileSync('$(ES6_PROMISE)', o);\
-		var s=fs.readFileSync('$(SYSTEM_JS)', o);\
-		var i=fs.readFileSync('$(BUILD_DIR)/index.html', o);\
-		fs.writeFileSync('$(BUILD_DIR)/index.html', i.replace('{ES6_PROMISE}', p).replace('{SYSTEM_JS}', s), o);"
-
-	@echo
-	@echo Copying vendor libraries to build
-	@echo
-
-	mkdir -p $(BUILD_DIR)/vendor
-	cp \
-		node_modules/es6-promise/dist/es6-promise.auto.js \
-		node_modules/systemjs/dist/system.js \
-		node_modules/mocha/mocha.js \
-		node_modules/chai/chai.js \
-		node_modules/sinon/pkg/sinon.js \
-		node_modules/systemjs-plugin-text/text.js \
-		node_modules/long/dist/long.js \
-		node_modules/protobufjs/dist/minimal/protobuf.js \
-		node_modules/tslib/tslib.js \
-		test-utils/reporter.js \
-		$(BUILD_DIR)/vendor
-
-	@echo
-	@echo Copying test config to build
-	@echo
-
-	cp $(TEST_CONFIG_SRC) $(BUILD_DIR)/config.json
-
-	@echo
-	@echo Computing build details to test config
-	@echo
-
-	INPUT=$(BUILD_DIR)/index.html OUTPUT=$(BUILD_DIR)/config.json BRANCH=$(BRANCH) COMMIT_ID=$(COMMIT_ID) TARGET=test node tools/generate_config.js
-
-	@echo
-	@echo Generating commit id based build directory
-	@echo
-
-	mkdir build/$(COMMIT_ID) | true
-	rsync -r build/test build/$(COMMIT_ID)
-	rm -rf build/$(COMMIT_ID)/$(COMMIT_ID)
-
-build-dir:
-	@echo
-	@echo Creating build directory
-	@echo
-
-	mkdir -p $(BUILD_DIR)
-
-build-proto:
-	@echo
-	@echo Compiling .proto to .js and .d.ts
-	@echo
-
-	mkdir -p $(BUILD_DIR)/proto
-	$(PBJS) -t static-module -w $$(if [ $(MODULE) = es2015 ]; then echo es6; else echo commonjs; fi) --no-create --no-verify --no-convert --no-delimited --no-beautify -o src/proto/unity_proto.js src/proto/unity_proto.proto
-	$(PBTS) -o src/proto/unity_proto.d.ts src/proto/unity_proto.js
-	cp src/proto/unity_proto.js $(BUILD_DIR)/proto/unity_proto.js
-
-build-ts:
-build-ts: lint
-	@echo
-	@echo Transpiling .ts to .js
-	@echo
-
-	$(TYPESCRIPT) --project . --module $(MODULE) --target $(TARGET) --outDir $(BUILD_DIR)/js
-
-build-js:
-	@echo
-	@echo Bundling .js files
-	@echo
-
-	$(ROLLUP) -c rollup.js
-	$(CC) --js $(BUILD_DIR)/bundle.js --js_output_file $(BUILD_DIR)/bundle.min.js --formatting PRETTY_PRINT --assume_function_wrapper --rewrite_polyfills false
-
-build-css:
-	@echo
-	@echo Lint .styl
-	@echo
-
-	$(STYLINT) src/styl -c stylintrc.json
-
-	@echo
-	@echo Transpiling .styl to .css
-	@echo
-	mkdir -p $(BUILD_DIR)/css
-	$(STYLUS) -o $(BUILD_DIR)/css -u autoprefixer-stylus --compress --inline --with '{limit: false}' `find $(STYL_SRC) -name "*.styl" | xargs`
-
-build-static:
-	@echo
-	@echo Generating obfuscated container AdMob js
-	@echo
-
-	sed -e 's/<\/*script>//g' $(ADMOB_CONTAINER_SRC) > $(ADMOB_CONTAINER_DIR)/admob_temp.js
-	echo '<script>' > $(ADMOB_CONTAINER_GENERATED)
-	$(CC) --js $(ADMOB_CONTAINER_DIR)/admob_temp.js --formatting PRETTY_PRINT --rewrite_polyfills false >> $(ADMOB_CONTAINER_GENERATED)
-	echo '</script>' >> $(ADMOB_CONTAINER_GENERATED)
-	rm $(ADMOB_CONTAINER_DIR)/admob_temp.js
-
-	@echo
-	@echo Copying static files to build
-	@echo
-
-	cp -r src/img $(BUILD_DIR)
-	cp -r src/html $(BUILD_DIR)
-	cp -r src/xml $(BUILD_DIR)
-	cp -r src/json $(BUILD_DIR)
-
-clean:
-	@echo
-	@echo Cleaning $(BUILD_DIR)
-	@echo
-
-	rm -rf $(BUILD_DIR)
-	find $(TS_SRC) -type f -name "*.js" -or -name "*.map" | xargs rm -rf
-lint:
-	@echo
-	@echo Running linter
-	@echo
-
-	$(TSLINT) -c tslint.json --project tsconfig.json
+build-test: all $(TEST_BUILD_TARGETS)
 
 test: test-unit test-integration
 
-test-unit: MODULE = system
-test-unit: TARGET = es5
-test-unit: build-static build-proto
-	@echo
-	@echo Transpiling .ts to .js for local tests
-	@echo
+test-unit: start-server build/test/UnitBundle.js build/test/unit-test.html
+	TEST_LIST="$(UNIT_TESTS)" TEST_URL="http://localhost:8000/build/test/unit-test.html" node test-utils/runner.js
 
-	$(TYPESCRIPT) --project . --module $(MODULE) --target $(TARGET)
+test-integration: start-server build/test/IntegrationBundle.js build/test/integration-test.html
+	TEST_LIST="$(INTEGRATION_TESTS)" TEST_URL="http://localhost:8000/build/test/integration-test.html" ISOLATED=1 node test-utils/runner.js
 
-	@echo
-	@echo Running unit tests
-	@echo
-
-	TEST_FILTER=Test/Unit node --trace-warnings test-utils/node_runner.js
-
-test-unit-debug: MODULE = system
-test-unit-debug: TARGET = es5
-test-unit-debug: build-proto
-	@echo
-	@echo Transpiling .ts to .js for local tests
-	@echo
-
-	$(TYPESCRIPT) --project . --module $(MODULE) --target $(TARGET)
-
-	@echo
-	@echo Running unit tests
-	@echo
-
-	TEST_FILTER=Test/Unit node inspect --trace-warnings test-utils/node_runner.js
-
-
-
-test-integration: MODULE = system
-test-integration: TARGET = es5
-test-integration: build-proto
-	@echo
-	@echo Transpiling .ts to .js for local tests
-	@echo
-
-	$(TYPESCRIPT) --project . --module $(MODULE) --target $(TARGET)
-
-	@echo
-	@echo Running integration tests
-	@echo
-
-	ISOLATED=true TEST_FILTER=Test/Integration node test-utils/node_runner.js
-
-test-coverage: BUILD_DIR = build/coverage
-test-coverage: MODULE = system
-test-coverage: TARGET = es5
-test-coverage: build-dir build-proto build-static
-	@echo
-	@echo Transpiling .ts to .js for local tests
-	@echo
-
-	$(TYPESCRIPT) --project . --module $(MODULE) --target $(TARGET)
-
-	@echo
-	@echo Running unit tests with coverage
-	@echo
-
-	COVERAGE_DIR=$(BUILD_DIR) TEST_FILTER=Test/Unit node test-utils/node_runner.js
-	@$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage.json -o $(BUILD_DIR)/summary -t text-summary
-	@cat $(BUILD_DIR)/summary && echo \n
-	@$(REMAP_ISTANBUL) -i $(BUILD_DIR)/coverage.json -o $(BUILD_DIR)/report -t html
-
-test-browser: build-browser
-	@echo
-	@echo Running browser build tests
-	@echo
-	node test-utils/headless.js
-
-test-filter: MODULE = system
-test-filter: TARGET = es5
-ifeq ($(TEST_FILTER),)
-test-filter: TEST_FILTER = Test/Unit
-endif
-test-filter: build-proto
-	@echo
-	@echo Transpiling .ts to .js for local tests
-	@echo
-
-	$(TYPESCRIPT) --project . --module $(MODULE) --target $(TARGET)
-
-	@echo
-	@echo Running unit tests with filter: $(TEST_FILTER)
-	@echo
-
-	node --trace-warnings test-utils/node_runner.js
+test-coverage: start-server build/test/CoverageBundle.js build/test/coverage-test.html
+	mkdir -p build/coverage
+	TEST_LIST="$(UNIT_TESTS)" TEST_URL="http://localhost:8000/build/test/coverage-test.html" COVERAGE=1 node test-utils/runner.js
+	$(REMAP_ISTANBUL) -i build/coverage/coverage.json -o build/coverage -t html
+	$(REMAP_ISTANBUL) -i build/coverage/coverage.json -o build/coverage/summary -t text-summary
+	cat build/coverage/summary && echo "\n"
 
 ifeq ($(TRAVIS_PULL_REQUEST), false)
-travis-browser-test:
-	@echo "Skipping travis browser tests, this is not a PR"
+test-browser:
+	echo "Skipping travis browser tests, this is not a PR"
 else ifneq ($(BRANCH), master)
-travis-browser-test:
-	@echo "Skipping travis browser tests, the PR is not to master-branch it is for $(BRANCH)"
+test-browser:
+	echo "Skipping travis browser tests, the PR is not to master-branch it is for $(BRANCH)"
 else
-travis-browser-test: build-browser start-nginx test-browser stop-nginx
+test-browser: start-server build-browser
+	node test-utils/headless.js
 endif
 
-watch:
-	watchman-make -p 'src/index.html' 'src/ts/**/*.ts' 'src/styl/*.styl' 'src/html/*.html' -t build-dev -p 'src/ts/Test/**/*.ts' -t test
+# VPaths
 
-watch-fast: BUILD_DIR = build/dev
-watch-fast: MODULE = system
-watch-fast: TARGET = es5
-watch-fast: build-dev-no-ts
-	$(CONCURRENTLY) --names build,tsc,test \
-									--kill-others \
-									"watchman-make -p 'src/index.html' 'src/styl/*.styl' 'src/html/*.html' -t build-dev-no-ts" \
-									"$(TYPESCRIPT) --watch --preserveWatchOutput --project . --module $(MODULE) --target $(TARGET) --outDir $(BUILD_DIR)/js" \
-									"node test-utils/test-watcher.js"
+vpath %.ts $(SOURCE_DIR)/ts $(TEST_DIR)
+vpath %.html $(SOURCE_DIR)/html
+vpath %.json $(SOURCE_DIR)/json
+vpath %.styl $(SOURCE_DIR)/styl
+vpath %.xml $(SOURCE_DIR)/xml
+
+# Build target rules
+
+$(BUILD_DIR)/browser/index.html: $(SOURCE_DIR)/browser-index.html
+	mkdir -p $(dir $@) && cp $< $@
+
+$(BUILD_DIR)/browser/iframe.html: $(SOURCE_DIR)/browser-iframe.html
+	mkdir -p $(dir $@) && cp $< $@
+
+$(BUILD_DIR)/dev/index.html: $(SOURCE_DIR)/dev-index.html $(SOURCE_BUILD_DIR)/ts/Bundle.js $(CSS_TARGETS)
+	mkdir -p $(dir $@) && $(INLINE) $< $@
+
+$(BUILD_DIR)/dev/config.json:
+	echo "{\"url\":\"http://$(IP_ADDRESS):8000/build/dev/index.html\",\"hash\":null}" > $@
+
+$(BUILD_DIR)/release/index.html: $(SOURCE_DIR)/prod-index.html $(SOURCE_BUILD_DIR)/ts/Bundle.min.js $(CSS_TARGETS)
+	mkdir -p $(dir $@) && $(INLINE) $< $@
+
+$(BUILD_DIR)/release/config.json:
+	INPUT=$(BUILD_DIR)/release/index.html OUTPUT=$(BUILD_DIR)/release/config.json BRANCH=$(BRANCH) COMMIT_ID=$(COMMIT_ID) TARGET=release node tools/generate_config.js
+
+$(BUILD_DIR)/test/index.html: $(SOURCE_DIR)/hybrid-test-index.html $(TEST_BUILD_DIR)/UnitBundle.min.js test-utils/reporter.js test-utils/setup.js
+	mkdir -p $(dir $@) && $(INLINE) $< $@
+
+$(BUILD_DIR)/test/config.json:
+	INPUT=$(BUILD_DIR)/test/index.html OUTPUT=$(BUILD_DIR)/test/config.json BRANCH=$(BRANCH) COMMIT_ID=$(COMMIT_ID) TARGET=test node tools/generate_config.js
+
+$(BUILD_DIR)/test/unit-test.html: $(SOURCE_DIR)/unit-test-index.html
+	mkdir -p $(dir $@) && cp $< $@
+
+$(BUILD_DIR)/test/integration-test.html: $(SOURCE_DIR)/integration-test-index.html
+	mkdir -p $(dir $@) && cp $< $@
+
+$(BUILD_DIR)/test/coverage-test.html: $(SOURCE_DIR)/coverage-test-index.html
+	mkdir -p $(dir $@) && cp $< $@
+
+# Implicit rules
+
+$(SOURCE_BUILD_DIR)/ts/BrowserBundle.js: $(TS_TARGETS) $(HTML_TARGETS) $(JSON_TARGETS) $(XML_TARGETS)
+	$(ROLLUP) --config rollup.config.browser.js
+
+$(SOURCE_BUILD_DIR)/ts/Bundle.js: $(TS_TARGETS) $(HTML_TARGETS) $(JSON_TARGETS) $(XML_TARGETS)
+	$(ROLLUP) --config rollup.config.device.js
+
+$(SOURCE_BUILD_DIR)/ts/Bundle.min.js: $(SOURCE_BUILD_DIR)/ts/Bundle.js
+	$(CC) $(shell cat .cc.opts | xargs) --js $(SOURCE_BUILD_DIR)/ts/Bundle.js --js_output_file $(SOURCE_BUILD_DIR)/ts/Bundle.min.js
+
+$(SOURCE_BUILD_DIR)/ts/%.js: %.ts
+	$(TYPESCRIPT) --project tsconfig.json
+
+$(SOURCE_BUILD_DIR)/proto/unity_proto.js:
+	mkdir -p $(SOURCE_BUILD_DIR)/proto
+	$(PBJS) -t static-module -w es6 --no-create --no-verify --no-convert --no-delimited --no-beautify -o $(SOURCE_BUILD_DIR)/proto/unity_proto.js src/proto/unity_proto.proto
+	$(PBTS) -o src/proto/unity_proto.d.ts $(SOURCE_BUILD_DIR)/proto/unity_proto.js
+
+$(SOURCE_BUILD_DIR)/html/admob/AFMAContainer.html: $(SOURCE_DIR)/html/admob/AFMAContainer.html
+	mkdir -p $(dir $@)
+	sed -e 's/<\/*script>//g' $< > $(ADMOB_CONTAINER_DIR)/admob_temp.js
+	echo '<script>' > $@
+	$(CC) --js $(ADMOB_CONTAINER_DIR)/admob_temp.js --formatting PRETTY_PRINT --rewrite_polyfills false >> $@
+	echo '</script>' >> $@
+	rm $(ADMOB_CONTAINER_DIR)/admob_temp.js
+
+$(SOURCE_BUILD_DIR)/html/%.html: %.html
+	mkdir -p $(dir $@) && cp $< $@
+
+$(SOURCE_BUILD_DIR)/json/%.json: %.json
+	mkdir -p $(dir $@) && cp $< $@
+
+$(SOURCE_BUILD_DIR)/xml/%.xml: %.xml
+	mkdir -p $(dir $@) && cp $< $@
+
+$(SOURCE_BUILD_DIR)/styl/%.css: %.styl
+	mkdir -p $(dir $@) && $(STYLUS) --out $(SOURCE_BUILD_DIR)/styl --use autoprefixer-stylus --compress --inline --with '{limit: false}' $<
+
+$(TEST_BUILD_DIR)/%.js: %.ts
+	$(TYPESCRIPT) --project tsconfig.json
+
+$(TEST_BUILD_DIR)/Unit.js:
+	mkdir -p $(dir $@) && echo "import 'Workarounds';" $(UNIT_TESTS) | sed "s/test\\//import '/g" | sed "s/\.ts/';/g" > $@
+
+$(TEST_BUILD_DIR)/UnitBundle.js: $(TEST_BUILD_DIR)/Unit.js $(TS_TARGETS) $(HTML_TARGETS) $(JSON_TARGETS) $(XML_TARGETS) $(UNIT_TEST_TARGETS)
+	$(ROLLUP) --config rollup.config.test.unit.js
+
+$(TEST_BUILD_DIR)/UnitBundle.min.js: $(TEST_BUILD_DIR)/UnitBundle.js
+	$(CC) $(shell cat .cc.opts | xargs) --js $(TEST_BUILD_DIR)/UnitBundle.js --js_output_file $(TEST_BUILD_DIR)/UnitBundle.min.js
+
+$(TEST_BUILD_DIR)/Integration.js:
+	mkdir -p $(dir $@) && echo $(INTEGRATION_TESTS) | sed "s/test\\//import '/g" | sed "s/\.ts/';/g" > $@
+
+$(TEST_BUILD_DIR)/IntegrationBundle.js: $(TEST_BUILD_DIR)/Integration.js $(TS_TARGETS) $(HTML_TARGETS) $(JSON_TARGETS) $(XML_TARGETS) $(INTEGRATION_TEST_TARGETS)
+	$(ROLLUP) --config rollup.config.test.integration.js
+
+$(TEST_BUILD_DIR)/CoverageBundle.js: $(TEST_BUILD_DIR)/Unit.js $(TS_TARGETS) $(HTML_TARGETS) $(JSON_TARGETS) $(XML_TARGETS) $(UNIT_TEST_TARGETS)
+	$(ROLLUP) --config rollup.config.test.coverage.js
+
+%::
+	$(warning No rule specified for target "$@")
+
+# Helper targets
+
+clean:
+	rm -rf $(BUILD_DIR)/*
+
+lint:
+	parallel ::: \
+		"$(STYLINT) $(SOURCE_DIR)/styl -c stylintrc.json" \
+		"$(TSLINT) --project tsconfig.json $(TS_SOURCES) $(TESTS)"
 
 setup: clean
-	rm -rf node_modules && npm install
+	rm -rf node_modules
+	npm install
+
+watch-dev: build-dev
+	parallel --ungroup --tty --jobs 0 ::: \
+		"$(TYPESCRIPT) --project tsconfig.json --watch --preserveWatchOutput" \
+		"$(STYLUS) --out $(SOURCE_BUILD_DIR)/styl --use autoprefixer-stylus --compress --inline --with '{limit: false}' --watch $(SOURCE_DIR)/styl/main.styl" \
+		"$(ROLLUP) --watch --config rollup.config.device.js" \
+		"watchman-make -p build/src/ts/Bundle.js $(CSS_TARGETS) -t build-dev"
+
+watch-browser: build-browser
+	parallel --ungroup --tty --jobs 0 ::: \
+		"$(TYPESCRIPT) --project tsconfig.json --watch --preserveWatchOutput" \
+		"$(STYLUS) --out $(SOURCE_BUILD_DIR)/styl --use autoprefixer-stylus --compress --inline --with '{limit: false}' --watch $(SOURCE_DIR)/styl/main.styl" \
+		"$(ROLLUP) --watch --config rollup.config.browser.js"
+
+watch-test: all $(TEST_BUILD_DIR)/Unit.js $(TEST_BUILD_DIR)/Integration.js
+	parallel --ungroup --tty --jobs 0 ::: \
+		"$(TYPESCRIPT) --project tsconfig.json --watch --preserveWatchOutput" \
+		"$(ROLLUP) --watch --config rollup.config.test.unit.js" \
+		"$(ROLLUP) --watch --config rollup.config.test.integration.js" \
+		"watchman-make -p build/test/UnitBundle.js -t test-unit" \
+		"watchman-make -p build/test/IntegrationBundle.js -t test-integration"
+
+start-server:
+	test ! -f server.pid && { nohup python3 -m http.server 8000 >/dev/null 2>&1 & echo $$! > server.pid; } || true
+
+stop-server:
+	test -f server.pid && kill $$(cat server.pid) && rm server.pid || true
 
 deploy:
 ifeq ($(TRAVIS_PULL_REQUEST), false)
-	rm -rf build/coverage
-	find build/test/* -not -name "config.json" | xargs rm -rf
-	find build/release/* -not -name "config.json" | xargs rm -rf
+	mkdir -p deploy/release
+	mkdir -p deploy/test
+	mkdir -p deploy/$(COMMIT_ID)
+	cp build/release/index.html deploy/release/index.html
+	cp build/release/config.json deploy/release/config.json
+	cp build/test/index.html deploy/test/index.html
+	cp build/test/config.json deploy/test/config.json
+	rsync -r deploy/release deploy/$(COMMIT_ID)
+	rsync -r deploy/test deploy/$(COMMIT_ID)
 	tools/deploy.sh $(BRANCH) && node tools/purge.js
 else
-	@echo 'Skipping deployment for pull requests'
-endif
-
-start-nginx:
-ifeq ($(OS),Darwin)
-	sed -e "s#DEVELOPMENT_DIR#$(shell pwd)#g" nginx/nginx.conf.template > nginx/nginx.conf
-	nginx -c $(shell pwd)/nginx/nginx.conf
-else
-	python3 -m http.server 8000 & echo $$! > nginx/server.PID
-	@echo "Started Python static webserver"
-endif
-
-stop-nginx:
-ifeq ($(OS),Darwin)
-	nginx -s stop
-else
-	kill $$(cat nginx/server.PID)
+	echo 'Skipping deployment for pull requests'
 endif
 
 qr-code:
-	segno "http://$(shell ifconfig |grep "inet" |fgrep -v "127.0.0.1"|grep -E -o "([0-9]{1,3}[\.]){3}[0-9]{1,3}" |grep -v -E "^0|^127" -m 1):8000/build/dev/config.json"
+	segno "http://$(IP_ADDRESS):8000/build/dev/config.json"

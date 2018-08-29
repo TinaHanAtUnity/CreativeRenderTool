@@ -1,5 +1,4 @@
 import VPAIDContainerTemplate from 'html/vpaid/container.html';
-import VPAIDCss from 'css/vpaid-container.css';
 import VPAIDTemplate from 'html/vpaid/VPAID.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
@@ -77,8 +76,7 @@ export class VPAID extends View<IVPAIDHandler> {
             isCoppaCompliant: this._isCoppaCompliant
         };
 
-        let iframeSrcDoc = VPAIDContainerTemplate.replace('{COMPILED_CSS}', VPAIDCss);
-        iframeSrcDoc = new Template(iframeSrcDoc).render(templateData);
+        let iframeSrcDoc = new Template(VPAIDContainerTemplate).render(templateData);
 
         this._webplayerEventObserver = this._webPlayerContainer.onWebPlayerEvent.subscribe((args: string) => this.onWebPlayerEvent(JSON.parse(args)));
         iframeSrcDoc = this._nativeBridge.getPlatform() === Platform.ANDROID ? encodeURIComponent(iframeSrcDoc) : iframeSrcDoc;
