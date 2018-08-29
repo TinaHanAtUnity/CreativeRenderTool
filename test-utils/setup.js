@@ -3,5 +3,5 @@ mocha.setup({
     checkLeaks: true,
     fullTrace: true,
     reporter: HybridTestReporter,
-    globals: ['nativebridge', 'webviewbridge', 'webview']
+    globals: ['nativebridge', 'webviewbridge', 'webview', 'requestAnimationFrame', 'cancelAnimationFrame']
 });
