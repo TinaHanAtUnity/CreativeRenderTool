@@ -159,7 +159,7 @@ export class TestFixtures {
         const mraidJson = json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'];
         const session = this.getSession();
         return {
-            ... this.getCometCampaignBaseParams(session, mraidContentJson.id, undefined),
+            ... this.getCometCampaignBaseParams(session, mraidContentJson.id, undefined, 'PLAYABLE'),
             useWebViewUserAgentForTracking: mraidJson.useWebViewUserAgentForTracking,
             resourceAsset: mraidContentJson.resourceUrl ? new HTML(mraidContentJson.resourceUrl, session, mraidContentJson.creativeId) : undefined,
             resource: undefined,
@@ -197,13 +197,14 @@ export class TestFixtures {
         };
     }
 
-    public static getProgrammaticMRAIDCampaignParams(json: any, cacheTTL: number, campaignId: string): IMRAIDCampaign {
+    public static getProgrammaticMRAIDCampaignParams(json: any, cacheTTL: number, campaignId: string, customParams: Partial<ICampaign> = {}): IMRAIDCampaign {
         const mraidContentJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
         const mraidJson = json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'];
         const session = this.getSession();
 
         return {
             ... this.getProgrammaticMRAIDCampaignBaseParams(this.getSession(), campaignId, json),
+            ... customParams,
             willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
             resourceAsset: mraidContentJson.inlinedUrl ? new HTML(mraidContentJson.inlinedUrl, session) : undefined,
             resource: '<div>resource</div>',
@@ -377,9 +378,9 @@ export class TestFixtures {
         return new MRAIDCampaign(this.getPlayableMRAIDCampaignParams(json, StoreName.GOOGLE));
     }
 
-    public static getProgrammaticMRAIDCampaign(): MRAIDCampaign {
+    public static getProgrammaticMRAIDCampaign(customParams: Partial<ICampaign> = {}): MRAIDCampaign {
         const json = JSON.parse(OnProgrammaticMraidUrlPlcCampaign);
-        return new MRAIDCampaign(this.getProgrammaticMRAIDCampaignParams(json, 3600, 'testId'));
+        return new MRAIDCampaign(this.getProgrammaticMRAIDCampaignParams(json, 3600, 'testId', customParams));
     }
 
     public static getCompanionVastCampaign(): VastCampaign {
