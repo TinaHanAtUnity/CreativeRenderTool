@@ -21,4 +21,8 @@ export class AndroidARApi extends NativeApi {
             return Promise.resolve();
         });
     }
+
+    public advanceFrame(): Promise<void> {
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'advanceFrame');
+    }
 }

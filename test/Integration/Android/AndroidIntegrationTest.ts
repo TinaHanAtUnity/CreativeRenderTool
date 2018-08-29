@@ -9,9 +9,9 @@ import { CampaignManager } from 'Managers/CampaignManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ProgrammaticOperativeEventManager } from 'Managers/ProgrammaticOperativeEventManager';
 
-describe('VastTest', () => {
+describe('AndroidIntegrationTest', () => {
 
-    it('should handle happy path on iOS', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
+    it('should handle happy path on Android', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
         this.timeout(10000);
         let readyCount = 0;
         const listener: IUnityAdsListener = {
@@ -37,19 +37,19 @@ describe('VastTest', () => {
             }
         };
 
-        DeviceInfo.setAdvertisingTrackingId('DA276DED-8DFE-4C57-A75E-9D7F7BBF2D21');
-        DeviceInfo.setManufacturer('Apple');
-        DeviceInfo.setModel('iPhone7,2');
-        DeviceInfo.setOsVersion('10.1.1');
-        DeviceInfo.setScreenWidth(357);
-        DeviceInfo.setScreenHeight(647);
-        DeviceInfo.setTimeZone('+0200');
+        DeviceInfo.setAdvertisingTrackingId('78db88cb-2026-4423-bfe0-07e9ed2701c3');
+        DeviceInfo.setManufacturer('LGE');
+        DeviceInfo.setModel('Nexus 5');
+        DeviceInfo.setOsVersion('6.0.1');
+        DeviceInfo.setScreenWidth(1080);
+        DeviceInfo.setScreenHeight(1776);
+        DeviceInfo.setTimeZone('GMT+02:00');
 
         ConfigManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
         CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
         ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
 
-        UnityAds.initialize(Platform.IOS, '333', listener, true);
+        UnityAds.initialize(Platform.ANDROID, '456', listener, true);
     });
 
 });
