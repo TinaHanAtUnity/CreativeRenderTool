@@ -45,7 +45,7 @@ export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
             appVersion: clientInfo.getApplicationVersion(),
             creativeId: campaign.getCreativeId(),
             seatId: campaign.getSeatId(),
-            timestamp: `${date.toUTCString()}`
+            timestamp: date.toUTCString()
         };
     }
 
