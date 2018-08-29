@@ -142,6 +142,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     public show(): void {
         super.show();
         this._showTimestamp = Date.now();
+        this.sendMraidAnalyticsEvent('playable_show');
         this.showLoadingScreen();
     }
 
@@ -308,8 +309,8 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         this._loadingScreen.classList.add('hidden');
     }
 
-    private sendMraidAnalyticsEvent(eventName: string, timeFromPlayableStart: number = 0, eventData: any) {
-        const timeFromShow = this.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
+    private sendMraidAnalyticsEvent(eventName: string, timeFromPlayableStart: number = 0, eventData?: any) {
+        const timeFromShow = this._playableStartTimestamp ? this.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000) : 0;
         const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
         this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, eventName, eventData));
     }
