@@ -237,7 +237,6 @@ describe('EndScreenEventHandlerTest', () => {
                 });
             });
 
-
             it('with APK download link and API is greater than or equal to 21, it should launch web search intent', () => {
                 performanceAdUnitParameters.campaign = TestFixtures.getCampaignFollowsRedirects();
                 performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
@@ -289,7 +288,7 @@ describe('EndScreenEventHandlerTest', () => {
                 return resolvedPromise.then(() => {
                     sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
                         'action': 'android.intent.action.VIEW',
-                        'uri': 'https://cdn.apk.com'
+                        'uri': 'https://cdn.apk.com'e
                     });
                 });
             });
