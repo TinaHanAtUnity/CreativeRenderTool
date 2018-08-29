@@ -54,7 +54,7 @@ const resizeHandler = () => {
     }
 };
 
-resizeHandler();
+document.addEventListener('DOMContentLoaded', resizeHandler, false);
 window.addEventListener('resize', resizeHandler, false);
 
 // 'resize' event doesn't work when switching directly from one landscape orientation to another
@@ -86,7 +86,7 @@ const onChangeOrientation = () => {
     }
 };
 
-onChangeOrientation();
+document.addEventListener('DOMContentLoaded', onChangeOrientation, false);
 window.addEventListener('orientationchange', onChangeOrientation, false);
 
 if(typeof location !== 'undefined') {
@@ -112,5 +112,5 @@ if(typeof location !== 'undefined') {
     extWindow.nativebridge = nativeBridge;
     extWindow.webview = new WebView(nativeBridge);
 
-    extWindow.webview.initialize();
+    document.addEventListener('DOMContentLoaded', () => extWindow.webview.initialize(), false);
 }

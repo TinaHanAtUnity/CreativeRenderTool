@@ -1,0 +1,5 @@
+--language_out ECMASCRIPT5_STRICT
+--formatting PRETTY_PRINT
+--assume_function_wrapper
+--inject_libraries
+--rewrite_polyfills

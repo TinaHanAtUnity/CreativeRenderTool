@@ -1,21 +1,23 @@
 {
   "compilerOptions": {
-    "module": "system",
-    "target": "es5",
-    "inlineSourceMap": true,
-    "lib": [
-      "dom",
-      "es2015"
-    ],
-    "moduleResolution": "node",
-    "rootDir": "src/ts",
-    "baseUrl": "src/ts",
+    "module": "es6",
+    "target": "es6",
     "strict": true,
     "strictPropertyInitialization": false,
-    "importHelpers": true
+    "importHelpers": true,
+    "baseUrl": ".",
+    "paths": {
+      "*": [
+        "src/ts/*",
+        "test/*"
+      ]
+    },
+    "outDir": "build",
+    "moduleResolution": "node",
+    "inlineSourceMap": true
   },
   "include": [
     "src/ts/**/*.ts",
-    "src/proto/**/*.d.ts"
+    "test/**/*.ts"
   ]
 }

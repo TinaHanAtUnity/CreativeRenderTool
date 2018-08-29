@@ -7,6 +7,7 @@ addons:
   apt:
     packages:
       - libimage-exiftool-perl
+      - parallel
 
 install:
   - . $HOME/.nvm/nvm.sh
@@ -20,7 +21,7 @@ cache:
   directories:
     - node_modules
 
-script: make lint && make test-coverage && make test-integration && make build-test && make travis-browser-test && make build-release && make deploy
+script: make lint && make test-coverage && make test-integration && make build-test && make test-browser && make build-release && make deploy
 
 notifications:
   slack:
