@@ -9,7 +9,7 @@ import { CampaignManager } from 'Managers/CampaignManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ProgrammaticOperativeEventManager } from 'Managers/ProgrammaticOperativeEventManager';
 
-describe('MraidTest', () => {
+describe('IosMraidTest', () => {
 
     it('should handle happy path on iOS', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
         this.timeout(10000);
