@@ -143,13 +143,13 @@ $(BUILD_DIR)/dev/index.html: $(SOURCE_DIR)/dev-index.html $(SOURCE_BUILD_DIR)/ts
 $(BUILD_DIR)/dev/config.json:
 	echo "{\"url\":\"http://$(IP_ADDRESS):8000/build/dev/index.html\",\"hash\":null}" > $@
 
-$(BUILD_DIR)/release/index.html: $(SOURCE_DIR)/prod-index.html
+$(BUILD_DIR)/release/index.html: $(SOURCE_DIR)/prod-index.html $(SOURCE_BUILD_DIR)/ts/Bundle.min.js $(CSS_TARGETS)
 	mkdir -p $(dir $@) && $(INLINE) $< $@
 
 $(BUILD_DIR)/release/config.json:
 	INPUT=$(BUILD_DIR)/release/index.html OUTPUT=$(BUILD_DIR)/release/config.json BRANCH=$(BRANCH) COMMIT_ID=$(COMMIT_ID) TARGET=release node tools/generate_config.js
 
-$(BUILD_DIR)/test/index.html: $(SOURCE_DIR)/hybrid-test-index.html test-utils/reporter.js test-utils/setup.js
+$(BUILD_DIR)/test/index.html: $(SOURCE_DIR)/hybrid-test-index.html $(TEST_BUILD_DIR)/UnitBundle.min.js test-utils/reporter.js test-utils/setup.js
 	mkdir -p $(dir $@) && $(INLINE) $< $@
 
 $(BUILD_DIR)/test/config.json:
