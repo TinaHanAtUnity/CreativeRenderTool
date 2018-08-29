@@ -5,6 +5,7 @@ import { IARSize } from 'Utilities/ARUtil';
 import { AndroidARApi } from 'Native/Api/AndroidARApi';
 import { IosARApi } from 'Native/Api/IosARApi';
 import { Platform } from 'Constants/Platform';
+import { Double } from 'Utilities/Double';
 
 enum AREvent {
     AR_PLANES_ADDED,
@@ -70,11 +71,11 @@ export class ARApi extends NativeApi {
     }
 
     public setDepthFar(depth: number): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setDepthFar', [depth]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setDepthFar', [new Double(depth)]);
     }
 
     public setDepthNear(depth: number): Promise<void> {
-        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setDepthNear', [depth]);
+        return this._nativeBridge.invoke<void>(this._fullApiClassName, 'setDepthNear', [new Double(depth)]);
     }
 
     public showCameraFeed(): Promise<void> {

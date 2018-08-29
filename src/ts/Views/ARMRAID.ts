@@ -439,14 +439,16 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 return this._nativeBridge.AR.hideCameraFeed();
 
             case 'addAnchor':
-                return this._nativeBridge.AR.addAnchor(args[0], args[1]);
+                return this._nativeBridge.AR.addAnchor(String(args[0]), args[1]);
 
             case 'removeAnchor':
-                return this._nativeBridge.AR.removeAnchor(args[0]);
+                return this._nativeBridge.AR.removeAnchor(String(args[0]));
 
             case 'advanceFrame':
                 if (this._nativeBridge.getPlatform() === Platform.IOS) {
                     return ARUtil.advanceFrameWithScale(this._nativeBridge.AR.Ios);
+                } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                    return this._nativeBridge.AR.Android.advanceFrame();
                 } else {
                     return Promise.resolve();
                 }
