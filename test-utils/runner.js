@@ -67,7 +67,6 @@ const runTest = async (browser, testFilter) => {
         devtools: debug == 1
     });
     if(isolated == 1) {
-        console.log('ioslatead');
         const tests = testList.split(' ').map(testPath => path.parse(testPath).name);
         for(const test of tests) {
             const failures = await runTest(browser, test);
