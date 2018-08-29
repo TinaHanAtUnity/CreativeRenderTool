@@ -149,9 +149,9 @@ describe('EndScreenEventHandlerTest', () => {
             sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, params);
         });
 
-        describe('with standalone_android store type', () => {
-            it('with appDownloadUrl and API is less than 21, it should launch view intent', () => {
-                performanceAdUnitParameters.campaign = TestFixtures.getCampaignFollowsRedirects();
+        describe('with standalone_android store type and appDownloadUrl', () => {
+            it('and API is less than 21, it should launch view intent', () => {
+                performanceAdUnitParameters.campaign = TestFixtures.getCampaignStandaloneAndroid();
                 performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
 
                 sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').returns(Promise.resolve({
@@ -168,19 +168,19 @@ describe('EndScreenEventHandlerTest', () => {
                     store: StoreName.STANDALONE_ANDROID,
                     clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
                     clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl(),
-                    appDownloadUrl: 'https://cdn.apk.com'
+                    appDownloadUrl: performanceAdUnitParameters.campaign.getAppDownloadUrl()
                 });
 
                 return resolvedPromise.then(() => {
                     sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
                         'action': 'android.intent.action.VIEW',
-                        'uri': 'https://cdn.apk.com'
+                        'uri': performanceAdUnitParameters.campaign.getAppDownloadUrl()
                     });
                 });
             });
 
             it('with appDownloadUrl and API is greater than or equal to 21, it should launch web search intent', () => {
-                performanceAdUnitParameters.campaign = TestFixtures.getCampaignFollowsRedirects();
+                performanceAdUnitParameters.campaign = TestFixtures.getCampaignStandaloneAndroid();
                 performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
 
                 sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').returns(Promise.resolve({
@@ -197,7 +197,65 @@ describe('EndScreenEventHandlerTest', () => {
                     store: StoreName.STANDALONE_ANDROID,
                     clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
                     clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl(),
-                    appDownloadUrl: 'https://cdn.apk.com'
+                    appDownloadUrl: performanceAdUnitParameters.campaign.getAppDownloadUrl()
+                });
+
+                return resolvedPromise.then(() => {
+                    sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
+                        'action': 'android.intent.action.WEB_SEARCH',
+                        'extras': [{ key: 'query', value: performanceAdUnitParameters.campaign.getAppDownloadUrl()}]
+                    });
+                });
+            });
+        });
+
+        describe('with follow redirects', () => {
+            it('with response that contains location, it should launch intent', () => {
+                performanceAdUnitParameters.campaign = TestFixtures.getCampaignFollowsRedirects();
+                performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
+
+                sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').returns(Promise.resolve({
+                    url: 'http://foo.url.com',
+                    response: 'foo response',
+                    responseCode: 200,
+                    headers: [['location', 'market://foobar.com']]
+                }));
+
+                endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
+                    appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
+                    bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
+                    store: performanceAdUnitParameters.campaign.getStore(),
+                    clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
+                    clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
+                });
+
+                return resolvedPromise.then(() => {
+                    sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
+                        'action': 'android.intent.action.VIEW',
+                        'uri': 'market://foobar.com'
+                    });
+                });
+            });
+
+
+            it('with APK download link and API is greater than or equal to 21, it should launch web search intent', () => {
+                performanceAdUnitParameters.campaign = TestFixtures.getCampaignFollowsRedirects();
+                performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
+
+                sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').returns(Promise.resolve({
+                    url: 'http://foo.url.com',
+                    response: 'foo response',
+                    responseCode: 200
+                }));
+
+                sinon.stub(nativeBridge, 'getApiLevel').returns(21);
+
+                endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
+                    appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
+                    bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
+                    store: performanceAdUnitParameters.campaign.getStore(),
+                    clickAttributionUrlFollowsRedirects: true,
+                    clickAttributionUrl: 'https://blah.com?apk_download_link=https://cdn.apk.com'
                 });
 
                 return resolvedPromise.then(() => {
@@ -207,116 +265,56 @@ describe('EndScreenEventHandlerTest', () => {
                     });
                 });
             });
-        });
 
-        describe('with store type other than standalone_android (google, apple, xiaomi)', () => {
-            describe('with follow redirects', () => {
-                it('with response that contains location, it should launch intent', () => {
-                    performanceAdUnitParameters.campaign = TestFixtures.getCampaignFollowsRedirects();
-                    performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
+            it('with APK download link and API is less than 21, it should launch view intent', () => {
+                performanceAdUnitParameters.campaign = TestFixtures.getCampaignFollowsRedirects();
+                performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
 
-                    sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').returns(Promise.resolve({
-                        url: 'http://foo.url.com',
-                        response: 'foo response',
-                        responseCode: 200,
-                        headers: [['location', 'market://foobar.com']]
-                    }));
+                sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').returns(Promise.resolve({
+                    url: 'http://foo.url.com',
+                    response: 'foo response',
+                    responseCode: 200
+                }));
 
-                    endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
-                        appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
-                        bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
-                        store: performanceAdUnitParameters.campaign.getStore(),
-                        clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
-                        clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
-                    });
+                sinon.stub(nativeBridge, 'getApiLevel').returns(20);
 
-                    return resolvedPromise.then(() => {
-                        sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
-                            'action': 'android.intent.action.VIEW',
-                            'uri': 'market://foobar.com'
-                        });
-                    });
+                endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
+                    appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
+                    bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
+                    store: performanceAdUnitParameters.campaign.getStore(),
+                    clickAttributionUrlFollowsRedirects: true,
+                    clickAttributionUrl: 'https://blah.com?apk_download_link=https://cdn.apk.com'
                 });
 
-                it('with APK download link and API is greater than or equal to 21, it should launch web search intent', () => {
-                    performanceAdUnitParameters.campaign = TestFixtures.getCampaignFollowsRedirects();
-                    performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
-
-                    sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').returns(Promise.resolve({
-                        url: 'http://foo.url.com',
-                        response: 'foo response',
-                        responseCode: 200
-                    }));
-
-                sinon.stub(nativeBridge, 'getApiLevel').returns(21);
-
-                    endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
-                        appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
-                        bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
-                        store: performanceAdUnitParameters.campaign.getStore(),
-                        clickAttributionUrlFollowsRedirects: true,
-                        clickAttributionUrl: 'https://blah.com?apk_download_link=https://cdn.apk.com'
-                    });
-
-                    return resolvedPromise.then(() => {
-                        sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
-                            'action': 'android.intent.action.WEB_SEARCH',
-                            'extras': [{ key: 'query', value: 'https://cdn.apk.com' }]
-                        });
+                return resolvedPromise.then(() => {
+                    sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
+                        'action': 'android.intent.action.VIEW',
+                        'uri': 'https://cdn.apk.com'
                     });
                 });
+            });
 
-                it('with APK download link and API is less than 21, it should launch view intent', () => {
-                    performanceAdUnitParameters.campaign = TestFixtures.getCampaignFollowsRedirects();
-                    performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
+            it('with response that does not contain location, it should not launch intent', () => {
+                performanceAdUnitParameters.campaign = TestFixtures.getCampaignFollowsRedirects();
+                performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
 
-                    sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').returns(Promise.resolve({
-                        url: 'http://foo.url.com',
-                        response: 'foo response',
-                        responseCode: 200
-                    }));
+                const response = TestFixtures.getOkNativeResponse();
+                response.headers = [];
+                resolvedPromise = Promise.resolve(response);
+                (<sinon.SinonSpy>operativeEventManager.sendClick).restore();
+                sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
 
-                    sinon.stub(nativeBridge, 'getApiLevel').returns(20);
-
-                    endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
-                        appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
-                        bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
-                        store: performanceAdUnitParameters.campaign.getStore(),
-                        clickAttributionUrlFollowsRedirects: true,
-                        clickAttributionUrl: 'https://blah.com?apk_download_link=https://cdn.apk.com'
-                    });
-
-                    return resolvedPromise.then(() => {
-                        sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
-                            'action': 'android.intent.action.VIEW',
-                            'uri': 'https://cdn.apk.com'
-                        });
-                    });
+                endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
+                    appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
+                    bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
+                    store: performanceAdUnitParameters.campaign.getStore(),
+                    clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
+                    clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
                 });
 
-                it('with response that does not contain location, it should not launch intent', () => {
-                    performanceAdUnitParameters.campaign = TestFixtures.getCampaignFollowsRedirects();
-                    performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
-
-                    const response = TestFixtures.getOkNativeResponse();
-                    response.headers = [];
-                    resolvedPromise = Promise.resolve(response);
-                    (<sinon.SinonSpy>operativeEventManager.sendClick).restore();
-                    sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
-
-                    endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
-                        appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
-                        bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
-                        store: performanceAdUnitParameters.campaign.getStore(),
-                        clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
-                        clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
-                    });
-
-                    return resolvedPromise.then(() => {
-                        sinon.assert.notCalled(<sinon.SinonSpy>nativeBridge.Intent.launch);
-                    });
+                return resolvedPromise.then(() => {
+                    sinon.assert.notCalled(<sinon.SinonSpy>nativeBridge.Intent.launch);
                 });
-
             });
 
             describe('with no follow redirects', () => {
