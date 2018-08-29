@@ -38,12 +38,9 @@ export class OldCampaignRefreshManager extends RefreshManager {
     private _cache: Cache;
     private _refillTimestamp: number;
     private _needsRefill = true;
-    private _refreshAllowed = true;
     private _campaignCount: number;
     private _parsingErrorCount: number;
     private _noFills: number;
-    private _mustReinitialize: boolean = false;
-    private _configJsonCheckedAt: number;
 
     // constant value that determines the delay for refreshing ads after backend has processed a start event
     // set to five seconds because backend should usually process start event in less than one second but
@@ -67,7 +64,6 @@ export class OldCampaignRefreshManager extends RefreshManager {
         this._campaignCount = 0;
         this._parsingErrorCount = 0;
         this._noFills = 0;
-        this._configJsonCheckedAt = Date.now();
 
         this._campaignManager.onCampaign.subscribe((placementId, campaign) => this.onCampaign(placementId, campaign));
         this._campaignManager.onNoFill.subscribe((placementId) => this.onNoFill(placementId));
@@ -93,11 +89,6 @@ export class OldCampaignRefreshManager extends RefreshManager {
     }
 
     public setCurrentAdUnit(adUnit: AbstractAdUnit): void {
-        this.shouldReinitialize().then((reinitialize) => {
-            this._mustReinitialize = reinitialize;
-            this.setRefreshAllowed(!reinitialize);
-        });
-
         this._currentAdUnit = adUnit;
         const onStartObserver = this._currentAdUnit.onStart.subscribe(() => {
             this._currentAdUnit.onStart.unsubscribe(onStartObserver);
@@ -109,14 +100,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
         this._currentAdUnit.onFinish.subscribe(() => this.onAdUnitFinish());
     }
 
-    public setRefreshAllowed(bool: boolean) {
-        this._refreshAllowed = bool;
-    }
-
     public refresh(nofillRetry?: boolean): Promise<INativeResponse | void> {
-        if(!this._refreshAllowed) {
-            return Promise.resolve();
-        }
         if(this.shouldRefill(this._refillTimestamp)) {
             this.setPlacementStates(PlacementState.WAITING, this._configuration.getPlacementIds());
             this._refillTimestamp = 0;
@@ -131,10 +115,6 @@ export class OldCampaignRefreshManager extends RefreshManager {
     }
 
     public refreshFromCache(cachedResponse: INativeResponse, span: JaegerSpan): Promise<INativeResponse | void> {
-        if(!this._refreshAllowed) {
-            span.addAnnotation('refresh not allowed');
-            return Promise.resolve();
-        }
         if(this.shouldRefill(this._refillTimestamp)) {
             span.addAnnotation('should refill');
             this.setPlacementStates(PlacementState.WAITING, this._configuration.getPlacementIds());
@@ -395,12 +375,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
 
     private onAdUnitClose(): void {
         this._nativeBridge.Sdk.logInfo('Closing Unity Ads ad unit');
-        if(this._mustReinitialize) {
-            this._nativeBridge.Sdk.logDebug('Unity Ads webapp has been updated, reinitializing Unity Ads');
-            this.reinitialize();
-        } else {
-            this.refresh();
-        }
+        this.refresh();
     }
 
     private onAdUnitStartProcessed(): void {
@@ -414,43 +389,6 @@ export class OldCampaignRefreshManager extends RefreshManager {
     }
 
     /*
-     Reinit logic copied from WebView.ts
-     */
-
-    private reinitialize() {
-        // save caching pause state in case of reinit
-        if(this._cache.isPaused()) {
-            Promise.all([this._nativeBridge.Storage.set(StorageType.PUBLIC, 'caching.pause.value', true), this._nativeBridge.Storage.write(StorageType.PUBLIC)]).then(() => {
-                this._nativeBridge.Sdk.reinitialize();
-            }).catch(() => {
-                this._nativeBridge.Sdk.reinitialize();
-            });
-        } else {
-            this._nativeBridge.Sdk.reinitialize();
-        }
-    }
-
-    private getConfigJson(): Promise<INativeResponse> {
-        return this._request.get(this._clientInfo.getConfigUrl() + '?ts=' + Date.now() + '&sdkVersion=' + this._clientInfo.getSdkVersion());
-    }
-
-    private shouldReinitialize(): Promise<boolean> {
-        if(!this._clientInfo.getWebviewHash()) {
-            return Promise.resolve(false);
-        }
-        if(Date.now() - this._configJsonCheckedAt <= 15 * 60 * 1000) {
-            return Promise.resolve(false);
-        }
-        return this.getConfigJson().then(response => {
-            this._configJsonCheckedAt = Date.now();
-            const configJson = JsonParser.parse(response.response);
-            return configJson.hash !== this._clientInfo.getWebviewHash();
-        }).catch((error) => {
-            return false;
-        });
-    }
-
-    /*
      Connectivity handlers copied from WebView.ts
      */
 
@@ -458,19 +396,8 @@ export class OldCampaignRefreshManager extends RefreshManager {
         if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
             return;
         }
-        this.shouldReinitialize().then((reinitialize) => {
-            if(reinitialize) {
-                if(this._currentAdUnit && this._currentAdUnit.isShowing()) {
-                    this._mustReinitialize = true;
-                    this.setRefreshAllowed(false);
-                } else {
-                    this._nativeBridge.Sdk.logDebug('Unity Ads webapp has been updated, reinitializing Unity Ads');
-                    this.reinitialize();
-                }
-            } else {
-                this.refresh();
-                this._sessionManager.sendUnsentSessions();
-            }
-        });
+
+        this.refresh();
+        this._sessionManager.sendUnsentSessions();
     }
 }
