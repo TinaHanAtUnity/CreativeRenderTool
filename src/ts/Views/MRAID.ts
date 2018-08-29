@@ -162,12 +162,10 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
             }, 1000);
         }
 
-        if(CustomFeatures.isSonicPlayable(this._creativeId)) {
-            this._playableStartTimestamp = Date.now();
-            const timeFromShow = this.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
-            const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
-            this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_start', undefined));
-        }
+        this._playableStartTimestamp = Date.now();
+        const timeFromShow = this.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
+        const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
+        this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_start', undefined));
 
         if(this._loaded) {
             this.setViewableState(true);
@@ -250,10 +248,15 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
     private onCloseEvent(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
+        const timeFromShow = this.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
+        const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
+
         if(this._canSkip && !this._canClose) {
             this._handlers.forEach(handler => handler.onMraidSkip());
+            this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_skip', undefined));
         } else if(this._canClose) {
             this._handlers.forEach(handler => handler.onMraidClose());
+            this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_close', undefined));
         }
     }
 
@@ -302,12 +305,10 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
                 }));
                 break;
             case 'analyticsEvent':
-                if(CustomFeatures.isSonicPlayable(this._creativeId)) {
-                    const timeFromShow = this.checkIsValid((Date.now() - this._showTimestamp) / 1000);
-                    const timeFromPlayableStart = this.checkIsValid((Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000);
-                    const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
-                    this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, event.data.event, event.data.eventData));
-                }
+                const timeFromShow = this.checkIsValid((Date.now() - this._showTimestamp) / 1000);
+                const timeFromPlayableStart = this.checkIsValid((Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000);
+                const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
+                this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, event.data.event, event.data.eventData));
                 break;
 
             case 'customMraidState':

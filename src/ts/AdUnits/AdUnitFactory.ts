@@ -74,6 +74,7 @@ import { ARUtil } from 'Utilities/ARUtil';
 import { NewVideoOverlayEnabledAbTest } from 'Models/ABGroup';
 import { NewVideoOverlay } from 'Views/NewVideoOverlay';
 import { IEndScreenParameters } from 'Views/EndScreen';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
 
 export class AdUnitFactory {
     private static _forcedPlayableMRAID: boolean = false;
@@ -297,8 +298,11 @@ export class AdUnitFactory {
         };
 
         const mraidAdUnit: MRAIDAdUnit = new MRAIDAdUnit(nativeBridge, mraidAdUnitParameters);
+
         const isPlayable: boolean = parameters.campaign.getAdType() === 'PLAYABLE';
-        const EventHandler =  isPlayable ? PlayableEventHandler : MRAIDEventHandler;
+        const isSonicPlayable: boolean = CustomFeatures.isSonicPlayable(parameters.campaign.getCreativeId());
+        const EventHandler =  (isSonicPlayable || isPlayable) ? PlayableEventHandler : MRAIDEventHandler;
+
         const mraidEventHandler: IMRAIDViewHandler = new EventHandler(nativeBridge, mraidAdUnit, mraidAdUnitParameters);
         mraid.addEventHandler(mraidEventHandler);
 
