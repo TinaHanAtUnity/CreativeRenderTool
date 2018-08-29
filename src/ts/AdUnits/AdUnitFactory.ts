@@ -38,6 +38,7 @@ import { VPAIDEndScreenEventHandler } from 'EventHandlers/VPAIDEndScreenEventHan
 import { VPAIDEventHandler } from 'EventHandlers/VPAIDEventHandler';
 import { VPAIDOverlayEventHandler } from 'EventHandlers/VPAIDOverlayEventHandler';
 import { MRAIDEventHandler } from 'EventHandlers/MRAIDEventHandler';
+import { PlayableEventHandler } from 'EventHandlers/PlayableEventHandler';
 import { DisplayInterstitialEventHandler } from 'EventHandlers/DisplayInterstitialEventHandler';
 import { Campaign } from 'Models/Campaign';
 import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
@@ -295,8 +296,10 @@ export class AdUnitFactory {
             privacy: privacy
         };
 
-        const mraidAdUnit = new MRAIDAdUnit(nativeBridge, mraidAdUnitParameters);
-        const mraidEventHandler = new MRAIDEventHandler(nativeBridge, mraidAdUnit, mraidAdUnitParameters);
+        const mraidAdUnit: MRAIDAdUnit = new MRAIDAdUnit(nativeBridge, mraidAdUnitParameters);
+        const isPlayable: boolean = parameters.campaign.getAdType() === 'PLAYABLE';
+        const EventHandler =  isPlayable ? PlayableEventHandler : MRAIDEventHandler;
+        const mraidEventHandler: IMRAIDViewHandler = new EventHandler(nativeBridge, mraidAdUnit, mraidAdUnitParameters);
         mraid.addEventHandler(mraidEventHandler);
 
         return mraidAdUnit;
