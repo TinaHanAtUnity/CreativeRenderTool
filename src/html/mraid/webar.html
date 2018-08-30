@@ -1056,6 +1056,10 @@
                             // TODO: handle these
                             break;
                     }
+                } else if (message.data.type === 'permission') {
+                    if (message.data.value.type === 'Camera' && message.data.value.status === true) {
+                        installResizeHooks();
+                    }
                 }
             });
             nativeInitAR();
@@ -1245,28 +1249,7 @@
             rafCallbacks.push(callback);
         };
 
-        var resizeEventListeners = [];
-        var oldWindowAddEventListener = window.addEventListener;
-        window.addEventListener = function() {
-            var argumentsArray = Array.prototype.slice.call(arguments);
-            if (argumentsArray[0] === "resize") {
-                resizeEventListeners.push(argumentsArray[1]);
-            } else {
-                return oldWindowAddEventListener.apply(this, argumentsArray);
-            }
-        };
-        var oldWindowRemoveEventListener = window.removeEventListener;
-        window.removeEventListener = function() {
-            var argumentsArray = Array.prototype.slice.call(arguments);
-            if (argumentsArray[0] === "resize") {
-                var index = resizeEventListeners.indexOf(argumentsArray[1]);
-                if (index >= 0) {
-                    resizeEventListeners.splice(index, 1);
-                }
-            } else {
-                return oldWindowRemoveEventListener.apply(this, argumentsArray);
-            }
-        };
+
 
         function forceRedraw() {
             // Modify the DOM trivially to force a redraw.
@@ -1300,6 +1283,32 @@
             window.requestAnimationFrame = oldRequestAnimationFrame;
             windowHooksInstalled = false;
         };
+
+        var resizeEventListeners = [];
+        var oldWindowAddEventListener = window.addEventListener;
+        var oldWindowRemoveEventListener = window.removeEventListener;
+
+        function installResizeHooks() {
+            window.addEventListener = function() {
+                var argumentsArray = Array.prototype.slice.call(arguments);
+                if (argumentsArray[0] === "resize") {
+                    resizeEventListeners.push(argumentsArray[1]);
+                } else {
+                    return oldWindowAddEventListener.apply(this, argumentsArray);
+                }
+            };
+            window.removeEventListener = function() {
+                var argumentsArray = Array.prototype.slice.call(arguments);
+                if (argumentsArray[0] === "resize") {
+                    var index = resizeEventListeners.indexOf(argumentsArray[1]);
+                    if (index >= 0) {
+                        resizeEventListeners.splice(index, 1);
+                    }
+                } else {
+                    return oldWindowRemoveEventListener.apply(this, argumentsArray);
+                }
+            };
+        }
 
         window.androidAREnums = function() {
             return WebARonARKitVRDisplay.androidEnums;
