@@ -163,9 +163,6 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
             }, 1000);
         }
 
-        this._playableStartTimestamp = Date.now();
-        this.sendMraidAnalyticsEvent('playable_start');
-
         if(this._loaded) {
             this.setViewableState(true);
         } else {
@@ -263,14 +260,21 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         }
     }
 
+    private onLoadedEvent(event: Event): void {
+        this._loaded = true;
+        this.onLoaded.trigger();
+        const frameLoadDuration = Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId());
+        this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' iframe load duration ' + frameLoadDuration + ' ms');
+        this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(frameLoadDuration, 0, 0, 'mraid_loading_time_mraid', {}));
+
+        this._playableStartTimestamp = Date.now();
+        this.sendMraidAnalyticsEvent('playable_start');
+    }
+
     private onMessage(event: MessageEvent) {
         switch(event.data.type) {
             case 'loaded':
-                this._loaded = true;
-                this.onLoaded.trigger();
-                const frameLoadDuration = Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId());
-                this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' iframe load duration ' + frameLoadDuration + ' ms');
-                this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(frameLoadDuration, 0, 0, 'mraid_loading_time_mraid', {}));
+                this.onLoadedEvent(event);
                 break;
 
             case 'open':
