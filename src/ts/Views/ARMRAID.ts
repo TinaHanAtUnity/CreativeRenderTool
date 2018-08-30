@@ -553,7 +553,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         const arSupported: Promise<boolean> =
             this._nativeBridge.AR.Ios ? this._nativeBridge.AR.Ios.isARSupported() :
-                this._nativeBridge.AR.Android ? this._nativeBridge.AR.Android.isARSupported() :
+                this._nativeBridge.AR.Android ? ARUtil.isARSupportedAndroid(this._nativeBridge.AR.Android) :
                     Promise.resolve<boolean>(false);
 
         arSupported.then(supported => {

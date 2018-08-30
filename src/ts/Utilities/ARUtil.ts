@@ -1,5 +1,6 @@
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { IosARApi } from 'Native/Api/IosARApi';
+import { AndroidARApi } from 'Native/Api/AndroidARApi';
 
 export interface IARFrameTransform {
     a: number;
@@ -41,6 +42,8 @@ export interface IARRect {
 }
 
 export class ARUtil {
+    private static readonly ANDROID_AR_SUPPORTED_RETRY_WAIT = 300;
+
     public static calculateVideoScale(frameInfo: IARFrameInfo): IARFrameScale {
         let videoRect: IARRect = {x: 0, y: 0, width: frameInfo.videoSize.width, height: frameInfo.videoSize.height};
         videoRect = ARUtil.transformRect(videoRect, ARUtil.invertTransform(frameInfo.transform));
@@ -141,5 +144,18 @@ export class ARUtil {
         });
 
         return isAR;
+    }
+
+    public static isARSupportedAndroid(api: AndroidARApi): Promise<boolean> {
+        return api.isARSupported().then(([transient, supported]) => {
+            if (!transient) {
+                return supported;
+            }
+
+            const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+            return sleep(this.ANDROID_AR_SUPPORTED_RETRY_WAIT).then(() => {
+                return ARUtil.isARSupportedAndroid(api);
+            });
+        });
     }
 }
