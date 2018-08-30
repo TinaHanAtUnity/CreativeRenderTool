@@ -25,7 +25,7 @@ export interface IBuildInformation {
     appVersion: string;
     creativeId: string | undefined;
     seatId: number | undefined;
-    timestampUTC: string;
+    timestamp: string;
 }
 
 export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
@@ -45,7 +45,7 @@ export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
             appVersion: clientInfo.getApplicationVersion(),
             creativeId: campaign.getCreativeId(),
             seatId: campaign.getSeatId(),
-            timestampUTC: `${date.getUTCMonth()}/${date.getUTCDay()} - ${date.getUTCHours()}:${date.getUTCMinutes()}`
+            timestamp: date.toUTCString()
         };
     }
 
