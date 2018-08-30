@@ -560,7 +560,7 @@ export class CampaignManager {
                 const cachingDuration = Date.now() - cachingTimestamp;
 
                 const kafkaObject: any = {};
-                kafkaObject.type = 'mraid_caching_time';
+                kafkaObject.type = 'playable_caching_time';
                 kafkaObject.eventData = {
                     contentType: contentType
                 };

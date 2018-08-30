@@ -83,7 +83,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         }
 
         if (this._stats !== undefined) {
-            this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(this._stats.averageFps, this._stats.averagePlayFps, 0, 'mraid_performance_stats', this._stats));
+            this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(this._stats.averageFps, this._stats.averagePlayFps, 0, 'playable_performance_stats', this._stats));
         }
     }
 
@@ -108,7 +108,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
             const fetchingDuration = fetchingStopTimestamp - fetchingTimestamp;
             const mraidParseDuration = Date.now() - mraidParseTimestamp;
 
-            this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(fetchingDuration, mraidParseDuration, 0, 'mraid_fetching_time', {}));
+            this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(fetchingDuration, mraidParseDuration, 0, 'playable_fetching_time', {}));
 
             return data;
         });
