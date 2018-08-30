@@ -14,6 +14,7 @@ import { ClientInfo } from 'Models/ClientInfo';
 import { EventType } from 'Models/Session';
 import { Placement } from 'Models/Placement';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
+import { ARUtil } from 'Utilities/ARUtil';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 
 export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign> {
@@ -80,7 +81,13 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
         this._container.addEventHandler(this);
 
-        return this._container.open(this, ['webview'], this._orientationProperties.allowOrientationChange, this._orientationProperties.forceOrientation, true, false, true, false, this._options).then(() => {
+        const views: string[] = ['webview'];
+        const isARURL = ARUtil.isARCreative(this._campaign);
+        if (isARURL) {
+            views.unshift('arview');
+        }
+
+        return this._container.open(this, views, this._orientationProperties.allowOrientationChange, this._orientationProperties.forceOrientation, true, false, true, false, this._options).then(() => {
             this.onStart.trigger();
         });
     }
