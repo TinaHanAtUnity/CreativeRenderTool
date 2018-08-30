@@ -37,7 +37,7 @@ export class XPromoCampaignParser extends CampaignParser {
             willExpireAt: undefined,
             adType: undefined,
             correlationId: undefined,
-            creativeId: undefined,
+            creativeId: response.getCreativeId(),
             seatId: undefined,
             meta: json.meta,
             session: session,

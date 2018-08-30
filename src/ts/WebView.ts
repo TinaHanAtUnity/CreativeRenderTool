@@ -25,7 +25,6 @@ import { AssetManager } from 'Managers/AssetManager';
 import { CampaignManager } from 'Managers/CampaignManager';
 import { ConfigManager } from 'Managers/ConfigManager';
 import { FocusManager } from 'Managers/FocusManager';
-import { ForceQuitManager } from 'Managers/ForceQuitManager';
 import { GdprManager } from 'Managers/GdprManager';
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { MissedImpressionManager } from 'Managers/MissedImpressionManager';
@@ -101,7 +100,6 @@ export class WebView {
     private _jaegerManager: JaegerManager;
     private _interstitialWebPlayerContainer: WebPlayerContainer;
     private _programmaticTrackingService: ProgrammaticTrackingService;
-    private _forceQuitManager: ForceQuitManager;
 
     private _showing: boolean = false;
     private _initialized: boolean = false;
@@ -149,7 +147,6 @@ export class WebView {
             this._request = new Request(this._nativeBridge, this._wakeUpManager);
             this._cacheBookkeeping = new CacheBookkeeping(this._nativeBridge);
             this._programmaticTrackingService = new ProgrammaticTrackingService(this._request, this._clientInfo, this._deviceInfo);
-            this._forceQuitManager = new ForceQuitManager(this._nativeBridge);
             this._cache = new Cache(this._nativeBridge, this._wakeUpManager, this._request, this._cacheBookkeeping, this._programmaticTrackingService);
             this._resolve = new Resolve(this._nativeBridge);
             this._metadataManager = new MetaDataManager(this._nativeBridge);
@@ -175,7 +172,7 @@ export class WebView {
             if(this._clientInfo.getPlatform() === Platform.ANDROID && this._deviceInfo instanceof AndroidDeviceInfo) {
                 document.body.classList.add('android');
                 this._nativeBridge.setApiLevel(this._deviceInfo.getApiLevel());
-                this._container = new Activity(this._nativeBridge, this._deviceInfo, this._forceQuitManager);
+                this._container = new Activity(this._nativeBridge, this._deviceInfo);
             } else if(this._clientInfo.getPlatform() === Platform.IOS && this._deviceInfo instanceof IosDeviceInfo) {
                 const model = this._deviceInfo.getModel();
                 if(model.match(/iphone/i) || model.match(/ipod/i)) {
@@ -183,7 +180,7 @@ export class WebView {
                 } else if(model.match(/ipad/i)) {
                     document.body.classList.add('ipad');
                 }
-                this._container = new ViewController(this._nativeBridge, this._deviceInfo, this._focusManager, this._clientInfo, this._forceQuitManager);
+                this._container = new ViewController(this._nativeBridge, this._deviceInfo, this._focusManager, this._clientInfo);
             }
             HttpKafka.setDeviceInfo(this._deviceInfo);
             this._sessionManager = new SessionManager(this._nativeBridge, this._request);
@@ -313,25 +310,13 @@ export class WebView {
             } else {
                 this._nativeBridge.Request.setConcurrentRequestCount(1);
             }
-        }).then(() => {
-            // Send diagnostic events for abnormal ad termination
-            this._forceQuitManager.getForceQuitData().then((data) => {
-                if (data) {
-                    const error = {
-                        campaignId: data.campaignId,
-                        creativeId: data.creativeId,
-                        adType: data.adType,
-                        gameId: this._clientInfo.getGameId()
-                    };
-                    Diagnostics.trigger('force_quit', error);
-                    this._forceQuitManager.destroyForceQuitKey();
-                }
-            });
         }).catch(error => {
             jaegerInitSpan.addAnnotation(error.message);
             jaegerInitSpan.addTag(JaegerTags.Error, 'true');
             jaegerInitSpan.addTag(JaegerTags.ErrorMessage, error.message);
-            this._jaegerManager.stop(jaegerInitSpan);
+            if (this._jaegerManager) {
+                this._jaegerManager.stop(jaegerInitSpan);
+            }
 
             if(error instanceof ConfigError) {
                 error = { 'message': error.message, 'name': error.name };
@@ -649,13 +634,28 @@ export class WebView {
                 AdUnitFactory.setForcedPlayableMRAID(TestEnvironment.get('forcedPlayableMRAID'));
             }
 
+            let forcedARMRAID = false;
+            if (TestEnvironment.get('forcedARMRAID')) {
+                forcedARMRAID = TestEnvironment.get('forcedARMRAID');
+                AdUnitFactory.setForcedARMRAID(forcedARMRAID);
+            }
+
             if(TestEnvironment.get('creativeUrl')) {
                 const creativeUrl = this._creativeUrl = TestEnvironment.get('creativeUrl');
+                let response: string = '';
                 if(this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                    CampaignManager.setCampaignResponse(CreativeUrlResponseAndroid.replace('{CREATIVE_URL_PLACEHOLDER}', creativeUrl));
+                    response = CreativeUrlResponseAndroid.replace('{CREATIVE_URL_PLACEHOLDER}', creativeUrl);
                 } else if(this._nativeBridge.getPlatform() === Platform.IOS) {
-                    CampaignManager.setCampaignResponse(CreativeUrlResponseIos.replace('{CREATIVE_URL_PLACEHOLDER}', creativeUrl));
+                    response = CreativeUrlResponseIos.replace('{CREATIVE_URL_PLACEHOLDER}', creativeUrl);
                 }
+
+                if (forcedARMRAID) {
+                    response = response.replace('{AD_TYPE_PLACEHOLDER}', 'MRAID_AR');
+                } else {
+                    response = response.replace('{AD_TYPE_PLACEHOLDER}', 'MRAID');
+                }
+
+                CampaignManager.setCampaignResponse(response);
             }
         });
     }

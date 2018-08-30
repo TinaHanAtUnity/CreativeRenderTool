@@ -3,7 +3,6 @@ import { AdUnitContainer, AdUnitContainerSystemMessage, Orientation, ViewConfigu
 import { UIInterfaceOrientation } from 'Constants/iOS/UIInterfaceOrientation';
 import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
 import { FocusManager } from 'Managers/FocusManager';
-import { ForceQuitManager } from 'Managers/ForceQuitManager';
 import { ClientInfo } from 'Models/ClientInfo';
 import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 import { NativeBridge } from 'Native/NativeBridge';
@@ -29,7 +28,6 @@ export class ViewController extends AdUnitContainer {
     private _showing: boolean;
     private _options: IIosOptions;
     private _clientInfo: ClientInfo;
-    private _forceQuitManager: ForceQuitManager;
 
     private _onViewControllerDidAppearObserver: any;
     private _onViewControllerDidDisappearObserver: any;
@@ -38,14 +36,13 @@ export class ViewController extends AdUnitContainer {
     private _onAppBackgroundObserver: any;
     private _onAppForegroundObserver: any;
 
-    constructor(nativeBridge: NativeBridge, deviceInfo: IosDeviceInfo, focusManager: FocusManager, clientInfo: ClientInfo, forceQuitManager: ForceQuitManager) {
+    constructor(nativeBridge: NativeBridge, deviceInfo: IosDeviceInfo, focusManager: FocusManager, clientInfo: ClientInfo) {
         super();
 
         this._nativeBridge = nativeBridge;
         this._focusManager = focusManager;
         this._deviceInfo = deviceInfo;
         this._clientInfo = clientInfo;
-        this._forceQuitManager = forceQuitManager;
 
         this._onViewControllerDidDisappearObserver = this._nativeBridge.IosAdUnit.onViewControllerDidDisappear.subscribe(() => this.onViewDidDisappear());
         this._onViewControllerDidAppearObserver = this._nativeBridge.IosAdUnit.onViewControllerDidAppear.subscribe(() => this.onViewDidAppear());
@@ -82,8 +79,6 @@ export class ViewController extends AdUnitContainer {
             hideStatusBar = options.statusBarHidden;
         }
 
-        this._forceQuitManager.createForceQuitKey(adUnit.createForceQuitKey());
-
         return this._nativeBridge.IosAdUnit.open(nativeViews, this.getOrientation(options, allowRotation, this._lockedOrientation), hideStatusBar, allowRotation, isTransparent, withAnimation);
     }
 
@@ -99,11 +94,7 @@ export class ViewController extends AdUnitContainer {
         this._nativeBridge.Notification.removeAVNotificationObserver(ViewController._audioSessionInterrupt);
         this._nativeBridge.Notification.removeAVNotificationObserver(ViewController._audioSessionRouteChange);
 
-        return this._nativeBridge.IosAdUnit.close().then(() => {
-            this._forceQuitManager.destroyForceQuitKey();
-        }).catch(() => {
-            // Ignore because forcequit will send diagnostic next init
-        });
+        return this._nativeBridge.IosAdUnit.close();
     }
 
     public reconfigure(configuration: ViewConfiguration): Promise<any[]> {

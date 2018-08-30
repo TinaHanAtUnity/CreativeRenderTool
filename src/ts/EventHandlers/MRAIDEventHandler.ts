@@ -1,4 +1,4 @@
-import { IMRAIDViewHandler, IOrientationProperties } from 'Views/MRAIDView';
+import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'Views/MRAIDView';
 import { HttpKafka, KafkaCommonObjectType } from 'Utilities/HttpKafka';
 import { NativeBridge } from 'Native/NativeBridge';
 import { OperativeEventManager, IOperativeEventParams } from 'Managers/OperativeEventManager';
@@ -15,7 +15,6 @@ import { RequestError } from 'Errors/RequestError';
 import { DiagnosticError } from 'Errors/DiagnosticError';
 import { FinishState } from 'Constants/FinishState';
 import { Placement } from 'Models/Placement';
-import { ABGroup, CTAOpenUrlAbTest } from 'Models/ABGroup';
 import { GDPREventHandler } from 'EventHandlers/GDPREventHandler';
 
 export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHandler {
@@ -24,12 +23,12 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     private _operativeEventManager: OperativeEventManager;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _adUnit: MRAIDAdUnit;
+    private _mraidView: MRAIDView<IMRAIDViewHandler>;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _campaign: MRAIDCampaign;
     private _request: Request;
     private _placement: Placement;
-    private _abGroup: ABGroup;
 
     constructor(nativeBridge: NativeBridge, adUnit: MRAIDAdUnit, parameters: IMRAIDAdUnitParameters) {
         super(parameters.gdprManager, parameters.configuration);
@@ -37,27 +36,37 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._adUnit = adUnit;
+        this._mraidView = adUnit.getMRAIDView();
         this._clientInfo = parameters.clientInfo;
         this._deviceInfo = parameters.deviceInfo;
         this._campaign = parameters.campaign;
         this._placement = parameters.placement;
         this._request = parameters.request;
-        this._abGroup = parameters.configuration.getAbGroup();
     }
 
     public onMraidClick(url: string): Promise<void> {
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
 
-        if(this._campaign.getClickAttributionUrl()) {
+        if (this._campaign.getClickAttributionUrl()) {  // Playable MRAID from Comet
+            this.sendTrackingEvents();
             this.handleClickAttribution();
             if(!this._campaign.getClickAttributionUrlFollowsRedirects()) {
-                this.openClickUrl(url);
+                return this._request.followRedirectChain(url).then((storeUrl) => {
+                    this.openUrl(storeUrl);
+                });
             }
-        } else {
-            this.openClickUrl(url);
+        } else {    // DSP MRAID
+            this.setCallButtonEnabled(false);
+            return this._request.followRedirectChain(url).then((storeUrl) => {
+                return this.openUrl(storeUrl).then(() => {
+                    this.setCallButtonEnabled(true);
+                    this.sendTrackingEvents();
+                }).catch((e) => {
+                    this.setCallButtonEnabled(true);
+                    this.sendTrackingEvents();
+                });
+            });
         }
-        this.sendTrackingEvents();
-
         return Promise.resolve();
     }
 
@@ -162,15 +171,6 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         this._adUnit.sendClick();
     }
 
-    private openClickUrl(url: string): Promise<void> {
-        if (CTAOpenUrlAbTest.isValid(this._abGroup)) {
-            return this.openUrl(url);
-        }
-        return this.followUrl(url).then((storeUrl) => {
-            return this.openUrl(storeUrl);
-        });
-    }
-
     private openUrl(url: string): Promise<void> {
         if(this._nativeBridge.getPlatform() === Platform.IOS) {
             return this._nativeBridge.UrlScheme.open(url);
@@ -182,15 +182,14 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         }
     }
 
-    // Follows the redirects of a URL, returning the final location.
-    private followUrl(link: string): Promise<string> {
-        return this._request.followRedirectChain(link);
-    }
-
     private getOperativeEventParams(): IOperativeEventParams {
         return {
             placement: this._placement,
             asset: this._campaign.getResourceUrl()
         };
+    }
+
+    private setCallButtonEnabled(enabled: boolean) {
+        this._mraidView.setCallButtonEnabled(enabled);
     }
 }

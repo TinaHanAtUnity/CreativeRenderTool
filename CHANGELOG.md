@@ -1,10 +1,44 @@
-# Pending
+# Thu Aug 30 15:02:10 UTC 2018
+
+* Remove webview reinit logic
+* AR fixes
+* Isolate integration tests
+* Fix global leaks in hybrid tests
+
+# Wed Aug 29 12:27:38 UTC 2018
+
+* Refactor build & test systems
+
+# Tue Aug 28 08:46:33 UTC 2018
+
+* Add Augmented Reality(AR) Ads Support
+* Prevent multiple CTA Clicks on MRAID
+* Add AB Test requiring Admob Video as a Required Asset
+* Replace URL Parameters correctly for Performance tracking urls
+
+# Thu Aug 23 22:15:10 UTC 2018
+
+* Make jaeger more robust on init
+* XPROMO: trigger onStartProcessed after the start event has been sent
+* New video overlay also enabled for VAST video ads in groups 18 & 19
+* Custom Feature for Admob Video Required Asset
+
+# Wed Aug 22 09:36:53 UTC 2018
+
+* Remove force quit manager
+* Start the VPAID timeout timer to hide ad unit on bad ads
+
+# Tue Aug 21 06:56:04 UTC 2018
 
 * Fix display interstitial click area
+* Rename comet tracking loaded event
+* Fix Vast Endscreen click delay
+* Fix VPAID click and Endscreen
+* Add creativeId and targetStoreId in XPromo Operative Events
 
 # Fri Aug 17 11:23:03 UTC 2018
 
-* Fix force_quite deletion
+* Fix force_quit deletion
 * Collect average fps for mraid
 * Improve caching time and add mraid parse time
 

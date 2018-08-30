@@ -25,6 +25,9 @@ import { StorageApi } from 'Native/Api/Storage';
 import { UrlSchemeApi } from 'Native/Api/UrlScheme';
 import { VideoPlayerApi } from 'Native/Api/VideoPlayer';
 import { WebPlayerApi } from 'Native/Api/WebPlayer';
+import { PermissionsApi } from 'Native/Api/Permissions';
+import { MainBundleApi } from 'Native/Api/MainBundle';
+import { ARApi } from 'Native/Api/AR';
 import { BatchInvocation } from 'Native/BatchInvocation';
 import { INativeBridge } from 'Native/INativeBridge';
 import { CallbackContainer } from 'Utilities/CallbackContainer';
@@ -52,6 +55,7 @@ export class NativeBridge implements INativeBridge {
         }
     }
 
+    public AR: ARApi;
     public AppSheet: AppSheetApi;
     public AndroidAdUnit: AndroidAdUnitApi;
     public AndroidPreferences: AndroidPreferencesApi;
@@ -75,6 +79,8 @@ export class NativeBridge implements INativeBridge {
     public VideoPlayer: VideoPlayerApi;
     public UrlScheme: UrlSchemeApi;
     public WebPlayer: WebPlayerApi;
+    public Permissions: PermissionsApi;
+    public MainBundle: MainBundleApi;
     public BannerPlayer: WebPlayerApi;
     public Banner: BannerApi;
     public BannerListener: BannerListenerApi;
@@ -97,6 +103,7 @@ export class NativeBridge implements INativeBridge {
 
         this._platform = platform;
         this._backend = backend;
+        this.AR = new ARApi(this);
         this.AppSheet = new AppSheetApi(this);
 
         if(platform === Platform.IOS) {
@@ -125,6 +132,8 @@ export class NativeBridge implements INativeBridge {
         this.VideoPlayer = new VideoPlayerApi(this);
         this.UrlScheme = new UrlSchemeApi(this);
         this.WebPlayer = new WebPlayerApi(this);
+        this.Permissions = new PermissionsApi(this);
+        this.MainBundle = new MainBundleApi(this);
         this.Banner = new BannerApi(this);
         this.BannerListener = new BannerListenerApi(this);
         this.AdsProperties = new AdsPropertiesApi(this);
@@ -251,6 +260,14 @@ export class NativeBridge implements INativeBridge {
             case EventCategory[EventCategory.WEBPLAYER]:
                 this.WebPlayer.handleEvent(event, parameters);
                 break;
+            case EventCategory[EventCategory.AR]:
+                this.AR.handleEvent(event, parameters);
+                break;
+
+            case EventCategory[EventCategory.PERMISSIONS]:
+                this.Permissions.handleEvent(event, parameters);
+                break;
+
             case EventCategory[EventCategory.BANNER]:
                 this.Banner.handleEvent(event, parameters);
                 break;

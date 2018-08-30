@@ -14,7 +14,7 @@ export interface IVastEndScreenHandler {
     onVastEndScreenClose(): void;
     onVastEndScreenShow(): void;
     onKeyEvent(keyCode: number): void;
-    onEndScreenPrivacy(url: string): void;
+    onOpenUrl(url: string): Promise<void>;
 }
 
 export class VastEndScreen extends View<IVastEndScreenHandler> implements IPrivacyHandler {
@@ -22,6 +22,7 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
     private _isSwipeToCloseEnabled: boolean = false;
     private _coppaCompliant: boolean;
     private _privacy: Privacy;
+    private _callButtonEnabled: boolean = true;
 
     constructor(nativeBridge: NativeBridge, coppaCompliant: boolean, campaign: VastCampaign, gameId: string) {
         super(nativeBridge, 'vast-end-screen');
@@ -112,11 +113,17 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
     }
 
     public onPrivacy(url: string): void {
-        this._handlers.forEach(handler => handler.onEndScreenPrivacy(url));
+        this._handlers.forEach(handler => handler.onOpenUrl(url));
     }
 
     public onGDPROptOut(optOutEnabled: boolean) {
         // do nothing
+    }
+
+    public setCallButtonEnabled(value: boolean) {
+        if (this._callButtonEnabled !== value) {
+            this._callButtonEnabled = value;
+        }
     }
 
     private onCloseEvent(event: Event): void {
@@ -125,6 +132,9 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
     }
 
     private onClickEvent(event: Event): void {
+        if (!this._callButtonEnabled) {
+            return;
+        }
         event.preventDefault();
         this._handlers.forEach(handler => handler.onVastEndScreenClick());
     }
