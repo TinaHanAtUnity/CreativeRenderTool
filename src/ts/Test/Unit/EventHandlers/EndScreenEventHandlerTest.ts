@@ -288,7 +288,7 @@ describe('EndScreenEventHandlerTest', () => {
                 return resolvedPromise.then(() => {
                     sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
                         'action': 'android.intent.action.VIEW',
-                        'uri': 'https://cdn.apk.com'e
+                        'uri': 'https://cdn.apk.com'
                     });
                 });
             });
