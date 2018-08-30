@@ -1,3 +1,10 @@
+# Pending
+
+* Remove webview reinit logic
+* AR fixes
+* Isolate integration tests
+* Fix global leaks in hybrid tests
+
 # Wed Aug 29 12:27:38 UTC 2018
 
 * Refactor build & test systems
