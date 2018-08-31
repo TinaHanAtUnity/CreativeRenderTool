@@ -2,13 +2,9 @@ import 'mocha';
 
 import { BannerAdUnit } from 'Banners/AdUnits/BannerAdUnit';
 import { BannerCampaign, IBannerCampaign } from 'Banners/Models/Campaigns/BannerCampaign';
-import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { assert } from 'chai';
 import { Platform } from 'Common/Constants/Platform';
 import ValidBannerCampaignJSON from 'json/campaigns/banner/ValidBannerCampaign.json';
-import { FocusManager } from 'Core/Managers/FocusManager';
-import { GdprManager } from 'Ads/Managers/GdprManager';
-import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
@@ -18,11 +14,9 @@ import { BannerApi } from 'Banners/Native/Banner';
 import { IntentApi } from 'Common/Native/Api/Android/Intent';
 import { BannerListenerApi } from 'Banners/Native/UnityBannerListener';
 import { UrlSchemeApi } from 'Common/Native/Api/iOS/UrlScheme';
-import { WebPlayerApi } from 'Common/Native/Api/WebPlayer';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import * as sinon from 'sinon';
 import { Observable0, Observable1, Observable2 } from 'Core/Utilities/Observable';
-import { Request } from 'Core/Utilities/Request';
 import { Template } from 'Core/Utilities/Template';
 
 import { asSpy, asStub } from 'TestHelpers/Functions';

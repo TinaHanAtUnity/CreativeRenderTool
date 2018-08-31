@@ -6,7 +6,6 @@ import { IUnityAdsListener } from 'Backend/IUnityAdsListener';
 import { DeviceInfo } from 'Backend/Api/DeviceInfo';
 import { ConfigManager } from 'Core/Managers/ConfigManager';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
-import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOperativeEventManager';
 
 describe('AndroidMraidTest', () => {

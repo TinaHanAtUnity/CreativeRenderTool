@@ -1,4 +1,4 @@
-import { ISchema, Model } from '../../../Common/Models/Model';
+import { ISchema, Model } from 'Common/Models/Model';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { MetaData } from 'Core/Utilities/MetaData';
 

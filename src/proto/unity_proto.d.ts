@@ -1,4 +1,5 @@
-import * as $protobuf from "protobufjs";
+import * as $protobuf from 'protobufjs';
+
 /** Namespace unity_proto. */
 export namespace unity_proto {
 

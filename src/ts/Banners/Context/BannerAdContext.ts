@@ -6,7 +6,7 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { BannerAdUnitParametersFactory } from 'Banners/AdUnits/BannerAdUnitParametersFactory';
-import { BannerAdUnit } from '../AdUnits/BannerAdUnit';
+import { BannerAdUnit } from 'Banners/AdUnits/BannerAdUnit';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';

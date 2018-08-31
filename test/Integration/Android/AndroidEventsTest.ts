@@ -10,7 +10,6 @@ import { Request } from 'Backend/Api/Request';
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { ConfigManager } from 'Core/Managers/ConfigManager';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
-import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOperativeEventManager';
 
 describe('AndroidEventsTest', () => {

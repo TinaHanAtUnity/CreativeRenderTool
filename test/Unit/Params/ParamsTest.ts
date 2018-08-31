@@ -10,7 +10,7 @@ import { Platform } from 'Common/Constants/Platform';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { StorageApi, StorageType } from 'Common/Native/Api/Storage';
 import { RequestApi } from 'Common/Native/Api/Request';
-import { IEventSpec, ParamsTestData } from './ParamsTestData';
+import { IEventSpec, ParamsTestData } from 'Unit/Params/ParamsTestData';
 import { ConfigManager } from 'Core/Managers/ConfigManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { CacheMode, Configuration } from 'Core/Models/Configuration';

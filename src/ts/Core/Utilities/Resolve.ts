@@ -1,5 +1,5 @@
 import { NativeBridge } from 'Common/Native/NativeBridge';
-import { CallbackContainer } from '../../Common/Native/CallbackContainer';
+import { CallbackContainer } from 'Common/Native/CallbackContainer';
 
 export class Resolve {
 

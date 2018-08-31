@@ -18,7 +18,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { INativeResponse, Request } from 'Core/Utilities/Request';
-import { BannerAuctionRequest } from '../Utilities/BannerAuctionRequest';
+import { BannerAuctionRequest } from 'Banners/Utilities/BannerAuctionRequest';
 import { BannerCampaignParserFactory } from 'Banners/Parsers/BannerCampaignParserFactory';
 
 export class BannerCampaignManager {

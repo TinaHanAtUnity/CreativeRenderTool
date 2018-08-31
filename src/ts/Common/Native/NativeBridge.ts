@@ -31,7 +31,7 @@ import { ARApi } from 'AR/Native/AR';
 import { BatchInvocation } from 'Common/Native/BatchInvocation';
 import { INativeBridge } from 'Common/Native/INativeBridge';
 import { CallbackContainer } from 'Common/Native/CallbackContainer';
-import { BannerListenerApi } from '../../Banners/Native/UnityBannerListener';
+import { BannerListenerApi } from 'Banners/Native/UnityBannerListener';
 
 export enum CallbackStatus {
     OK,

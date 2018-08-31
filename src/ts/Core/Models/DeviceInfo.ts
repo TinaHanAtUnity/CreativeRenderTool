@@ -1,7 +1,7 @@
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { StreamType } from 'Common/Constants/Android/StreamType';
 import { BatteryStatus } from 'Common/Constants/Android/BatteryStatus';
-import { ISchema, Model } from '../../Common/Models/Model';
+import { ISchema, Model } from 'Common/Models/Model';
 import { Platform } from 'Common/Constants/Platform';
 
 export interface IDeviceInfo {
