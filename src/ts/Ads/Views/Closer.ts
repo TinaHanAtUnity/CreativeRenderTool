@@ -1,12 +1,12 @@
+import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
+import { Placement } from 'Ads/Models/Placement';
+import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { View } from 'Ads/Views/View';
 import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Placement } from 'Ads/Models/Placement';
+import { Observable0 } from 'Common/Utilities/Observable';
+import { Template } from 'Core/Utilities/Template';
 
 import CloserTemplate from 'html/closer.html';
-import { Template } from 'Core/Utilities/Template';
-import { Observable0 } from 'Common/Utilities/Observable';
-import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
-import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 
 export interface ICloseHandler extends IGDPREventHandler {
     onClose(skipped: boolean): void;

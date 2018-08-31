@@ -1,13 +1,13 @@
+import { ProgrammaticAdMobParser } from 'AdMob/Parsers/ProgrammaticAdMobParser';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { CometCampaignParser } from 'Ads/Parsers/CometCampaignParser';
-import { XPromoCampaignParser } from 'Ads/Parsers/XPromoCampaignParser';
-import { ProgrammaticVastParser } from 'Ads/Parsers/ProgrammaticVastParser';
-import { ProgrammaticMraidUrlParser } from 'Ads/Parsers/ProgrammaticMraidUrlParser';
 import { ProgrammaticMraidParser } from 'Ads/Parsers/ProgrammaticMraidParser';
-import { ProgrammaticStaticInterstitialParser } from 'Ads/Parsers/ProgrammaticStaticInterstitialParser';
-import { ProgrammaticAdMobParser } from 'Ads/Parsers/ProgrammaticAdMobParser';
-import { ProgrammaticVPAIDParser } from 'Ads/Parsers/ProgrammaticVPAIDParser';
-import { PromoCampaignParser } from 'Ads/Parsers/PromoCampaignParser';
+import { ProgrammaticMraidUrlParser } from 'Ads/Parsers/ProgrammaticMraidUrlParser';
+import { ProgrammaticStaticInterstitialParser } from 'Display/Parsers/ProgrammaticStaticInterstitialParser';
+import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
+import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
+import { ProgrammaticVPAIDParser } from 'VPAID/Parsers/ProgrammaticVPAIDParser';
+import { XPromoCampaignParser } from 'XPromo/Parsers/XPromoCampaignParser';
 
 export class CampaignParserFactory {
     public static getCampaignParser(contentType: string): CampaignParser {

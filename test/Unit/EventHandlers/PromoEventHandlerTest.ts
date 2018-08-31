@@ -2,11 +2,11 @@ import 'mocha';
 import * as sinon from 'sinon';
 
 import { NativeBridge } from 'Common/Native/NativeBridge';
-import { PromoAdUnit } from 'Ads/AdUnits/PromoAdUnit';
-import { PromoEventHandler } from 'Ads/EventHandlers/PromoEventHandler';
+import { PromoAdUnit } from 'Promo/AdUnits/PromoAdUnit';
+import { PromoEventHandler } from 'Promo/EventHandlers/PromoEventHandler';
 
 import DummyPromo from 'json/DummyPromoCampaign.json';
-import { PurchasingUtilities } from 'Ads/Utilities/PurchasingUtilities';
+import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { Configuration } from 'Core/Models/Configuration';
 import { ABGroupBuilder } from 'Core/Models/ABGroup';
 import { GdprManager } from 'Ads/Managers/GdprManager';

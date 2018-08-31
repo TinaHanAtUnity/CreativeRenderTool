@@ -1,6 +1,6 @@
 import { BatteryStatus } from 'Common/Constants/Android/BatteryStatus';
-import { Platform } from 'Common/Constants/Platform';
 import { UIUserInterfaceIdiom } from 'Common/Constants/iOS/UIUserInterfaceIdiom';
+import { Platform } from 'Common/Constants/Platform';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 

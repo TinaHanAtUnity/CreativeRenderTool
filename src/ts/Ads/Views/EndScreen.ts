@@ -1,17 +1,17 @@
-import EndScreenTemplate from 'html/EndScreen.html';
+import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
+import { IEndScreenDownloadParameters } from 'Ads/EventHandlers/EndScreenEventHandler';
+import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
+import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
+import { Campaign } from 'Ads/Models/Campaign';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
+import { View } from 'Ads/Views/View';
 
 import { NativeBridge } from 'Common/Native/NativeBridge';
-import { View } from 'Ads/Views/View';
-import { Template } from 'Core/Utilities/Template';
-import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
-import { Localization } from 'Core/Utilities/Localization';
-import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
-import { Campaign } from 'Ads/Models/Campaign';
-import { IEndScreenDownloadParameters } from 'Ads/EventHandlers/EndScreenEventHandler';
-import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { ABGroup } from 'Core/Models/ABGroup';
-import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
+import { Localization } from 'Core/Utilities/Localization';
+import { Template } from 'Core/Utilities/Template';
+import EndScreenTemplate from 'html/EndScreen.html';
 
 export interface IEndScreenParameters {
     nativeBridge: NativeBridge;

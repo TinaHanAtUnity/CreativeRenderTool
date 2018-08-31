@@ -1,22 +1,22 @@
-import { Request } from 'Core/Utilities/Request';
-import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
-import { CacheMode, Configuration } from 'Core/Models/Configuration';
-import { Placement } from 'Ads/Models/Placement';
-import { Campaign } from 'Ads/Models/Campaign';
-import { SessionManager } from 'Ads/Managers/SessionManager';
-import { PerformanceCampaign } from 'Ads/Models/Campaigns/PerformanceCampaign';
-import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
-import { VastCampaign } from 'Ads/Models/Vast/VastCampaign';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
+import { SessionManager } from 'Ads/Managers/SessionManager';
 import { Asset } from 'Ads/Models/Assets/Asset';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { IFileInfo } from 'Core/Native/Cache';
-import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
-import { DisplayInterstitialCampaign } from 'Ads/Models/Campaigns/DisplayInterstitialCampaign';
-import { VPAIDCampaign } from 'Ads/Models/VPAID/VPAIDCampaign';
-import { ClientInfo } from 'Core/Models/ClientInfo';
+import { Campaign } from 'Ads/Models/Campaign';
+import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
+import { PerformanceCampaign } from 'Ads/Models/Campaigns/PerformanceCampaign';
+import { Placement } from 'Ads/Models/Placement';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { CacheMode, Configuration } from 'Core/Models/Configuration';
+import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
+import { IFileInfo } from 'Core/Native/Cache';
+import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
+import { Request } from 'Core/Utilities/Request';
+import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
+import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 
 interface ISdkStatsEvent {
     eventTimestamp: number;

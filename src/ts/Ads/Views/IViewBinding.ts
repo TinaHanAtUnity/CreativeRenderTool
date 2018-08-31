@@ -1,5 +1,5 @@
-import { Tap } from 'Core/Utilities/Tap';
 import { Swipe } from 'Core/Utilities/Swipe';
+import { Tap } from 'Core/Utilities/Tap';
 
 type IViewListenerFunction = (event: Event) => void;
 

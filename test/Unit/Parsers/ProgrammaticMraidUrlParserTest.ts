@@ -1,18 +1,18 @@
-import 'mocha';
-import * as sinon from 'sinon';
+import { AuctionResponse } from 'Ads/Models/AuctionResponse';
+import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
+import { Session } from 'Ads/Models/Session';
+import { ProgrammaticMraidUrlParser } from 'Ads/Parsers/ProgrammaticMraidUrlParser';
 import { assert } from 'chai';
 
 import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Request } from 'Core/Utilities/Request';
-import { AuctionResponse } from 'Ads/Models/AuctionResponse';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Session } from 'Ads/Models/Session';
 import { SdkApi } from 'Core/Native/Sdk';
-import { ProgrammaticMraidUrlParser } from 'Ads/Parsers/ProgrammaticMraidUrlParser';
+import { Request } from 'Core/Utilities/Request';
+import { Url } from 'Core/Utilities/Url';
 
 import ProgrammaticMRAIDCampaign from 'json/campaigns/mraid/ProgrammaticMRAIDCampaign.json';
-import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
-import { Url } from 'Core/Utilities/Url';
+import 'mocha';
+import * as sinon from 'sinon';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('ProgrammaticMraidUrlParser', () => {
     const placements = ['TestPlacement'];

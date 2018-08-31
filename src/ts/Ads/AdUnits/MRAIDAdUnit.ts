@@ -1,22 +1,22 @@
-import { NativeBridge } from 'Common/Native/NativeBridge';
 import { AbstractAdUnit, IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
-import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
-import { FinishState } from 'Common/Constants/FinishState';
-import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'Ads/Views/MRAIDView';
 import {
     AdUnitContainerSystemMessage,
     IAdUnitContainerListener,
     Orientation
 } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { EndScreen } from 'Ads/Views/EndScreen';
 import { IOperativeEventParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { EventType } from 'Ads/Models/Session';
+import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
 import { Placement } from 'Ads/Models/Placement';
-import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
-import { ARUtil } from 'AR/Utilities/ARUtil';
+import { EventType } from 'Ads/Models/Session';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
+import { EndScreen } from 'Ads/Views/EndScreen';
+import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'Ads/Views/MRAIDView';
+import { ARUtil } from 'AR/Utilities/ARUtil';
+import { FinishState } from 'Common/Constants/FinishState';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { ClientInfo } from 'Core/Models/ClientInfo';
 
 export interface IMRAIDAdUnitParameters extends IAdUnitParameters<MRAIDCampaign> {
     mraid: MRAIDView<IMRAIDViewHandler>;

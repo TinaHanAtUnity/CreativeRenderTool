@@ -1,7 +1,7 @@
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { INativeResponse, Request } from 'Core/Utilities/Request';
 import { Configuration } from 'Core/Models/Configuration';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { INativeResponse, Request } from 'Core/Utilities/Request';
 
 export enum KafkaCommonObjectType {
     EMPTY,

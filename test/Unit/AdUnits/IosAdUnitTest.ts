@@ -1,12 +1,4 @@
-import 'mocha';
-import * as sinon from 'sinon';
-import { assert } from 'chai';
-
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Platform } from 'Common/Constants/Platform';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { TestAdUnit } from 'TestHelpers/TestAdUnit';
-import { UIInterfaceOrientationMask } from 'Common/Constants/iOS/UIInterfaceOrientationMask';
+import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import {
     AdUnitContainerSystemMessage,
     IAdUnitContainerListener,
@@ -14,17 +6,25 @@ import {
     ViewConfiguration
 } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
-import { FocusManager } from 'Core/Managers/FocusManager';
+import { GdprManager } from 'Ads/Managers/GdprManager';
+import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { Request } from 'Core/Utilities/Request';
-import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { PerformanceCampaign } from 'Ads/Models/Campaigns/PerformanceCampaign';
-import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
-import { GdprManager } from 'Ads/Managers/GdprManager';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { assert } from 'chai';
+import { UIInterfaceOrientationMask } from 'Common/Constants/iOS/UIInterfaceOrientationMask';
+import { Platform } from 'Common/Constants/Platform';
+
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { Request } from 'Core/Utilities/Request';
+import 'mocha';
+import * as sinon from 'sinon';
+import { TestAdUnit } from 'TestHelpers/TestAdUnit';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('IosAdUnitTest', () => {
     let nativeBridge: NativeBridge;

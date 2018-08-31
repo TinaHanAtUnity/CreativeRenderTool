@@ -1,5 +1,5 @@
-import { AuctionRequest, IAuctionRequestParams } from 'Banners/Utilities/AuctionRequest';
 import { Placement } from 'Ads/Models/Placement';
+import { AuctionRequest, IAuctionRequestParams } from 'Banners/Utilities/AuctionRequest';
 
 export class BannerAuctionRequest extends AuctionRequest {
 

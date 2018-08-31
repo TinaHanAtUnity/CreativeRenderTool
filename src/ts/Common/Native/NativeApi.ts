@@ -1,5 +1,5 @@
-import { NativeBridge } from 'Common/Native/NativeBridge';
 import { Platform } from 'Common/Constants/Platform';
+import { NativeBridge } from 'Common/Native/NativeBridge';
 
 export enum ApiPackage {
     CORE,

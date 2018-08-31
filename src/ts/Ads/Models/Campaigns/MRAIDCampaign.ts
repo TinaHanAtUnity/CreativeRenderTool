@@ -1,6 +1,6 @@
+import { Asset } from 'Ads/Models/Assets/Asset';
 import { HTML } from 'Ads/Models/Assets/HTML';
 import { Image } from 'Ads/Models/Assets/Image';
-import { Asset } from 'Ads/Models/Assets/Asset';
 import { StoreName } from 'Ads/Models/Campaigns/PerformanceCampaign';
 import { IProgrammaticCampaign, ProgrammaticCampaign } from 'Ads/Models/Campaigns/ProgrammaticCampaign';
 

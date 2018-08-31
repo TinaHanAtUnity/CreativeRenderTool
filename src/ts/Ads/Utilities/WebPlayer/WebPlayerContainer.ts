@@ -1,4 +1,3 @@
-import { NativeBridge } from 'Common/Native/NativeBridge';
 import {
     IWebPlayerEventSettings,
     IWebPlayerPlayerSettingsAndroid,
@@ -6,6 +5,7 @@ import {
     IWebPlayerWebSettingsIos,
     WebPlayerViewId
 } from 'Ads/Native/WebPlayer';
+import { NativeBridge } from 'Common/Native/NativeBridge';
 import { Observable1, Observable2 } from 'Common/Utilities/Observable';
 
 /**

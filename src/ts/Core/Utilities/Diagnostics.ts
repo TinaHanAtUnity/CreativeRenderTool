@@ -1,6 +1,6 @@
-import { INativeResponse } from 'Core/Utilities/Request';
-import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { Session } from 'Ads/Models/Session';
+import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
+import { INativeResponse } from 'Core/Utilities/Request';
 
 export class Diagnostics {
     public static trigger(type: string, error: {}, session?: Session): Promise<INativeResponse> {

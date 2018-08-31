@@ -1,16 +1,16 @@
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { BannerCampaign } from 'Banners/Models/Campaigns/BannerCampaign';
-import { Placement } from 'Ads/Models/Placement';
-import { ClientInfo } from 'Core/Models/ClientInfo';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { IObserver1, IObserver2 } from 'Common/Utilities/IObserver';
+import { Placement } from 'Ads/Models/Placement';
 import { IWebPlayerWebSettingsAndroid, IWebPlayerWebSettingsIos } from 'Ads/Native/WebPlayer';
-import { Platform } from 'Common/Constants/Platform';
-import { Promises } from 'Core/Utilities/Promises';
-import { BannerViewType } from 'Banners/Native/Banner';
-import BannerContainer from 'html/banner/BannerContainer.html';
-import { Template } from 'Core/Utilities/Template';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
+import { BannerCampaign } from 'Banners/Models/Campaigns/BannerCampaign';
+import { BannerViewType } from 'Banners/Native/Banner';
+import { Platform } from 'Common/Constants/Platform';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { IObserver1, IObserver2 } from 'Common/Utilities/IObserver';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { Promises } from 'Core/Utilities/Promises';
+import { Template } from 'Core/Utilities/Template';
+import BannerContainer from 'html/banner/BannerContainer.html';
 
 export interface IBannerAdUnitParameters {
     placement: Placement;

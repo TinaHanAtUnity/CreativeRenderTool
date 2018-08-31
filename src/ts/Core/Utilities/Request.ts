@@ -1,8 +1,8 @@
+import { Platform } from 'Common/Constants/Platform';
+import { RequestError } from 'Common/Errors/RequestError';
+import { CallbackContainer } from 'Common/Native/CallbackContainer';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { RequestError } from 'Common/Errors/RequestError';
-import { Platform } from 'Common/Constants/Platform';
-import { CallbackContainer } from 'Common/Native/CallbackContainer';
 
 const enum RequestStatus {
     COMPLETE,

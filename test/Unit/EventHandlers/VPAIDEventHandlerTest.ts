@@ -1,8 +1,8 @@
 import 'mocha';
 import * as sinon from 'sinon';
 
-import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'Ads/AdUnits/VPAIDAdUnit';
-import { VPAIDCampaign } from 'Ads/Models/VPAID/VPAIDCampaign';
+import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'VPAID/AdUnits/VPAIDAdUnit';
+import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { VPAID } from 'Ads/Views/VPAID';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
@@ -13,7 +13,7 @@ import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { Request } from 'Core/Utilities/Request';
-import { VPAIDEventHandler } from 'Ads/EventHandlers/VPAIDEventHandler';
+import { VPAIDEventHandler } from 'VPAID/EventHandlers/VPAIDEventHandler';
 import { FinishState } from 'Common/Constants/FinishState';
 import { VPAIDEndScreen } from 'Ads/Views/VPAIDEndScreen';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';

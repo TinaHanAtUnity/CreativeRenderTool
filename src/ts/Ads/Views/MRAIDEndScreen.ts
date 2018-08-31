@@ -1,5 +1,5 @@
-import { EndScreen, IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
+import { EndScreen, IEndScreenParameters } from 'Ads/Views/EndScreen';
 
 export class MRAIDEndScreen extends EndScreen {
     private _campaign: MRAIDCampaign;

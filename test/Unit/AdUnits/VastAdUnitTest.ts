@@ -1,31 +1,31 @@
-import 'mocha';
-import { assert } from 'chai';
-import * as sinon from 'sinon';
-
-import { IVastAdUnitParameters, VastAdUnit } from 'Ads/AdUnits/VastAdUnit';
-import { VastCampaign } from 'Ads/Models/Vast/VastCampaign';
-import { Overlay } from 'Ads/Views/Overlay';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Request } from 'Core/Utilities/Request';
-import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { Placement } from 'Ads/Models/Placement';
-import { Platform } from 'Common/Constants/Platform';
-import { VastEndScreen } from 'Ads/Views/VastEndScreen';
-import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'Ads/AdUnits/Containers/Activity';
-import { Video } from 'Ads/Models/Assets/Video';
-import { FocusManager } from 'Core/Managers/FocusManager';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { ClientInfo } from 'Core/Models/ClientInfo';
+import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { GdprManager } from 'Ads/Managers/GdprManager';
+import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { Video } from 'Ads/Models/Assets/Video';
+import { Placement } from 'Ads/Models/Placement';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { Overlay } from 'Ads/Views/Overlay';
+import { Privacy } from 'Ads/Views/Privacy';
+import { VastEndScreen } from 'Ads/Views/VastEndScreen';
+import { assert } from 'chai';
+import { Platform } from 'Common/Constants/Platform';
+import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { Request } from 'Core/Utilities/Request';
+import 'mocha';
+import * as sinon from 'sinon';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
+
+import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
+import { VastCampaign } from 'VAST/Models/VastCampaign';
 
 import EventTestVast from 'xml/EventTestVast.xml';
-import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
-import { GdprManager } from 'Ads/Managers/GdprManager';
-import { Privacy } from 'Ads/Views/Privacy';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 describe('VastAdUnit', () => {
 

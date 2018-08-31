@@ -1,7 +1,7 @@
-import { Campaign, ICampaign } from 'Ads/Models/Campaign';
-import { Video } from 'Ads/Models/Assets/Video';
-import { Image } from 'Ads/Models/Assets/Image';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
+import { Image } from 'Ads/Models/Assets/Image';
+import { Video } from 'Ads/Models/Assets/Video';
+import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 
 export enum StoreName {
     APPLE,

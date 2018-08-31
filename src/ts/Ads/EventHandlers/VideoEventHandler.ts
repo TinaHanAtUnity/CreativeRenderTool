@@ -1,18 +1,18 @@
-import { Double } from 'Core/Utilities/Double';
-import { FinishState } from 'Common/Constants/FinishState';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { DiagnosticError } from 'Common/Errors/DiagnosticError';
-import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
-import { Configuration } from 'Core/Models/Configuration';
-import { FileInfo } from 'Core/Utilities/FileInfo';
+import { VideoState } from 'Ads/AdUnits/VideoAdUnit';
+import { BaseVideoEventHandler, IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
 import { IOperativeEventParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { Placement } from 'Ads/Models/Placement';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
-import { IVideoEventHandler } from 'Ads/Native/VideoPlayer';
 import { Video } from 'Ads/Models/Assets/Video';
-import { BaseVideoEventHandler, IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
-import { VideoState } from 'Ads/AdUnits/VideoAdUnit';
+import { Placement } from 'Ads/Models/Placement';
+import { IVideoEventHandler } from 'Ads/Native/VideoPlayer';
+import { FinishState } from 'Common/Constants/FinishState';
+import { DiagnosticError } from 'Common/Errors/DiagnosticError';
+import { Configuration } from 'Core/Models/Configuration';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { Double } from 'Core/Utilities/Double';
+import { FileInfo } from 'Core/Utilities/FileInfo';
+import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 
 export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEventHandler {
 

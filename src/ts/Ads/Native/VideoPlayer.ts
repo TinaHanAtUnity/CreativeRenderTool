@@ -1,10 +1,10 @@
-import { Double } from 'Core/Utilities/Double';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Platform } from 'Common/Constants/Platform';
-import { IosVideoPlayerApi } from 'Ads/Native/iOS/IosVideoPlayer';
 import { AndroidVideoPlayerApi } from 'Ads/Native/Android/AndroidVideoPlayer';
-import { NativeApiWithEventHandlers } from 'Common/Native/NativeApiWithEventHandlers';
+import { IosVideoPlayerApi } from 'Ads/Native/iOS/IosVideoPlayer';
+import { Platform } from 'Common/Constants/Platform';
 import { ApiPackage } from 'Common/Native/NativeApi';
+import { NativeApiWithEventHandlers } from 'Common/Native/NativeApiWithEventHandlers';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Double } from 'Core/Utilities/Double';
 
 enum VideoPlayerEvent {
     PROGRESS,

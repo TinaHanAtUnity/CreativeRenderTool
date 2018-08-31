@@ -1,9 +1,9 @@
-import { NativeBridge } from 'Common/Native/NativeBridge';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Ads/AdUnits/PerformanceAdUnit';
 import { OverlayEventHandler } from 'Ads/EventHandlers/OverlayEventHandler';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { PerformanceCampaign } from 'Ads/Models/Campaigns/PerformanceCampaign';
 import { ICometTrackingUrlEvents } from 'Ads/Parsers/CometCampaignParser';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { NativeBridge } from 'Common/Native/NativeBridge';
 
 export class PerformanceOverlayEventHandler extends OverlayEventHandler<PerformanceCampaign> {
 

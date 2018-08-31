@@ -1,22 +1,22 @@
-import PlayableMRAIDTemplate from 'html/PlayableMRAID.html';
-import MRAIDContainer from 'html/mraid/container.html';
-import WebARScript from 'html/mraid/webar.html';
+import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
+import { Placement } from 'Ads/Models/Placement';
+import { SdkStats } from 'Ads/Utilities/SdkStats';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 
 import { IMRAIDViewHandler, MRAIDView } from 'Ads/Views/MRAIDView';
-import { IObserver0, IObserver1, IObserver2 } from 'Common/Utilities/IObserver';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Placement } from 'Ads/Models/Placement';
-import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
-import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
-import { Localization } from 'Core/Utilities/Localization';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { SdkStats } from 'Ads/Utilities/SdkStats';
-import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { ARUtil } from 'AR/Utilities/ARUtil';
 import { Platform } from 'Common/Constants/Platform';
-import { Template } from 'Core/Utilities/Template';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { IObserver0, IObserver1, IObserver2 } from 'Common/Utilities/IObserver';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { CurrentPermission, PermissionTypes } from 'Core/Native/Permissions';
-import { ARUtil } from 'AR/Utilities/ARUtil';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { Localization } from 'Core/Utilities/Localization';
+import { Template } from 'Core/Utilities/Template';
+import MRAIDContainer from 'html/mraid/container.html';
+import WebARScript from 'html/mraid/webar.html';
+import PlayableMRAIDTemplate from 'html/PlayableMRAID.html';
 
 export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private static CloseLength = 30;

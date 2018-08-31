@@ -1,10 +1,10 @@
+import { AndroidARApi } from 'AR/Native/Android/AndroidARApi';
+import { IosARApi } from 'AR/Native/iOS/IosARApi';
+import { IARSize } from 'AR/Utilities/ARUtil';
+import { Platform } from 'Common/Constants/Platform';
 import { ApiPackage, NativeApi } from 'Common/Native/NativeApi';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { Observable0, Observable1, Observable2 } from 'Common/Utilities/Observable';
-import { IARSize } from 'AR/Utilities/ARUtil';
-import { AndroidARApi } from 'AR/Native/Android/AndroidARApi';
-import { IosARApi } from 'AR/Native/iOS/IosARApi';
-import { Platform } from 'Common/Constants/Platform';
 import { Double } from 'Core/Utilities/Double';
 
 enum AREvent {

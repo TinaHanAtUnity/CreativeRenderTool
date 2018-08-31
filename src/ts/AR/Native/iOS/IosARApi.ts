@@ -1,5 +1,5 @@
-import { ApiPackage, NativeApi } from 'Common/Native/NativeApi';
 import { IARFrameInfo, IARFrameScale } from 'AR/Utilities/ARUtil';
+import { ApiPackage, NativeApi } from 'Common/Native/NativeApi';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 
 export class IosARApi extends NativeApi {

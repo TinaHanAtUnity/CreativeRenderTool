@@ -1,12 +1,12 @@
-import 'mocha';
-import * as sinon from 'sinon';
-import { assert } from 'chai';
-
-import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { VastEndScreen } from 'Ads/Views/VastEndScreen';
+import { assert } from 'chai';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 
 import VastEndScreenFixture from 'html/fixtures/VastEndScreenFixture.html';
+import 'mocha';
+import * as sinon from 'sinon';
+
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('VastEndScreen', () => {
     let handleInvocation: sinon.SinonSpy;

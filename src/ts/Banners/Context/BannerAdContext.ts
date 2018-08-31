@@ -1,14 +1,14 @@
-import { BannerAdUnitFactory } from 'Banners/AdUnits/BannerAdUnitFactory';
-import { BannerCampaignManager } from 'Banners/Managers/BannerCampaignManager';
-import { BannerPlacementManager } from 'Banners/Managers/BannerPlacementManager';
-import { AdUnitActivities, FocusManager } from 'Core/Managers/FocusManager';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { BannerAdUnitParametersFactory } from 'Banners/AdUnits/BannerAdUnitParametersFactory';
 import { BannerAdUnit } from 'Banners/AdUnits/BannerAdUnit';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { BannerAdUnitFactory } from 'Banners/AdUnits/BannerAdUnitFactory';
+import { BannerAdUnitParametersFactory } from 'Banners/AdUnits/BannerAdUnitParametersFactory';
+import { BannerCampaignManager } from 'Banners/Managers/BannerCampaignManager';
+import { BannerPlacementManager } from 'Banners/Managers/BannerPlacementManager';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { AdUnitActivities, FocusManager } from 'Core/Managers/FocusManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 
 const StandardRefreshDelay = 30;

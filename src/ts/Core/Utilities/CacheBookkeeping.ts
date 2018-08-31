@@ -1,8 +1,8 @@
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { NativeBridge } from 'Common/Native/NativeBridge';
 import { IFileInfo } from 'Core/Native/Cache';
 import { StorageType } from 'Core/Native/Storage';
-import { NativeBridge } from 'Common/Native/NativeBridge';
 import { ICacheCampaignsResponse } from 'Core/Utilities/Cache';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { FileId } from 'Core/Utilities/FileId';
 import { INativeResponse } from 'Core/Utilities/Request';
 

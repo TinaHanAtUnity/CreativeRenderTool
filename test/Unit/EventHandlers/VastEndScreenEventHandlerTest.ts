@@ -3,13 +3,13 @@ import * as sinon from 'sinon';
 import { assert } from 'chai';
 
 import { NativeBridge } from 'Common/Native/NativeBridge';
-import { VastCampaign } from 'Ads/Models/Vast/VastCampaign';
+import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Overlay } from 'Ads/Views/Overlay';
 import { Platform } from 'Common/Constants/Platform';
-import { IVastAdUnitParameters, VastAdUnit } from 'Ads/AdUnits/VastAdUnit';
+import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastEndScreen } from 'Ads/Views/VastEndScreen';
-import { VastEndScreenEventHandler } from 'Ads/EventHandlers/VastEndScreenEventHandler';
+import { VastEndScreenEventHandler } from 'VAST/EventHandlers/VastEndScreenEventHandler';
 import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { Activity } from 'Ads/AdUnits/Containers/Activity';
 import { Video } from 'Ads/Models/Assets/Video';

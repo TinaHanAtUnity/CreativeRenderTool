@@ -1,14 +1,14 @@
-import DisplayInterstitialTemplate from 'html/display/DisplayInterstitial.html';
+import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
+import { Placement } from 'Ads/Models/Placement';
+import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 
 import { View } from 'Ads/Views/View';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Placement } from 'Ads/Models/Placement';
-import { DisplayInterstitialCampaign } from 'Ads/Models/Campaigns/DisplayInterstitialCampaign';
 import { Platform } from 'Common/Constants/Platform';
-import { Template } from 'Core/Utilities/Template';
-import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
-import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
+import { NativeBridge } from 'Common/Native/NativeBridge';
 import { Observable0 } from 'Common/Utilities/Observable';
+import { Template } from 'Core/Utilities/Template';
+import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
+import DisplayInterstitialTemplate from 'html/display/DisplayInterstitial.html';
 
 export interface IDisplayInterstitialHandler extends IGDPREventHandler {
     onDisplayInterstitialClose(): void;

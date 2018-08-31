@@ -1,19 +1,19 @@
-import 'mocha';
+import { PlacementManager } from 'Ads/Managers/PlacementManager';
+import { Campaign } from 'Ads/Models/Campaign';
+import { PlacementState } from 'Ads/Models/Placement';
+import { ListenerApi } from 'Ads/Native/Listener';
+import { PlacementApi } from 'Ads/Native/Placement';
 import { assert, expect } from 'chai';
-import * as sinon from 'sinon';
 
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { Configuration } from 'Core/Models/Configuration';
-import { PlacementManager } from 'Ads/Managers/PlacementManager';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Campaign } from 'Ads/Models/Campaign';
-import { PlacementApi } from 'Ads/Native/Placement';
-import { ListenerApi } from 'Ads/Native/Listener';
-import { PlacementState } from 'Ads/Models/Placement';
 import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
-import { PromoCampaignParser } from 'Ads/Parsers/PromoCampaignParser';
-import { PromoCampaign } from 'Ads/Models/Campaigns/PromoCampaign';
+import 'mocha';
+import { PromoCampaign } from 'Promo/Models/PromoCampaign';
+import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
+import * as sinon from 'sinon';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('PlacementManagerTest', () => {
     let nativeBridge: NativeBridge;

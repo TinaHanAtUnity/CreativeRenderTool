@@ -1,22 +1,22 @@
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Configuration } from 'Core/Models/Configuration';
-import { AdMobSignalFactory } from 'Ads/AdMob/AdMobSignalFactory';
-import { INativeResponse, Request } from 'Core/Utilities/Request';
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { Url } from 'Core/Utilities/Url';
-import { Platform } from 'Common/Constants/Platform';
-import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
-import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
-import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
+import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { Placement } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
+import { Platform } from 'Common/Constants/Platform';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { Configuration } from 'Core/Models/Configuration';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
+import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
+import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { StorageType } from 'Core/Native/Storage';
+import { INativeResponse, Request } from 'Core/Utilities/Request';
+import { Url } from 'Core/Utilities/Url';
 
 export interface IAuctionResponse {
     correlationId: string;

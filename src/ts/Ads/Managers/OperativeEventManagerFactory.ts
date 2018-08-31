@@ -1,12 +1,12 @@
-import { IOperativeEventManagerParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
-import { PerformanceCampaign } from 'Ads/Models/Campaigns/PerformanceCampaign';
-import { PerformanceOperativeEventManager } from 'Ads/Managers/PerformanceOperativeEventManager';
-import { XPromoCampaign } from 'Ads/Models/Campaigns/XPromoCampaign';
-import { XPromoOperativeEventManager } from 'Ads/Managers/XPromoOperativeEventManager';
-import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
 import { MRAIDOperativeEventManager } from 'Ads/Managers/MRAIDOperativeEventManager';
-import { Campaign } from 'Ads/Models/Campaign';
+import { IOperativeEventManagerParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
+import { PerformanceOperativeEventManager } from 'Ads/Managers/PerformanceOperativeEventManager';
 import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOperativeEventManager';
+import { Campaign } from 'Ads/Models/Campaign';
+import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
+import { PerformanceCampaign } from 'Ads/Models/Campaigns/PerformanceCampaign';
+import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
+import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 
 export class OperativeEventManagerFactory {
     public static createOperativeEventManager(params: IOperativeEventManagerParams<Campaign>): OperativeEventManager {

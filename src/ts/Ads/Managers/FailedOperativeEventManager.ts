@@ -1,7 +1,7 @@
-import { StorageType } from 'Core/Native/Storage';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Request } from 'Core/Utilities/Request';
 import { SessionUtils } from 'Ads/Utilities/SessionUtils';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { StorageType } from 'Core/Native/Storage';
+import { Request } from 'Core/Utilities/Request';
 
 export class FailedOperativeEventManager {
 

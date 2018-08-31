@@ -1,10 +1,10 @@
+import { GdprManager } from 'Ads/Managers/GdprManager';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { Template } from 'Core/Utilities/Template';
 
 import GDPRPrivacyTemplate from 'html/GDPR-privacy.html';
-import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
-import { Template } from 'Core/Utilities/Template';
-import { GdprManager } from 'Ads/Managers/GdprManager';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 export class GDPRPrivacy extends AbstractPrivacy {
 

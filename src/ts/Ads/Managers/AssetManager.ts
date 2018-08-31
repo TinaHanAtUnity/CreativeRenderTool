@@ -1,16 +1,16 @@
-import { Cache, CacheStatus, ICacheDiagnostics } from 'Core/Utilities/Cache';
-import { Campaign } from 'Ads/Models/Campaign';
-import { CacheMode } from 'Core/Models/Configuration';
 import { Asset } from 'Ads/Models/Assets/Asset';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Video } from 'Ads/Models/Assets/Video';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { Campaign } from 'Ads/Models/Campaign';
 import { PerformanceCampaign } from 'Ads/Models/Campaigns/PerformanceCampaign';
 import { WebViewError } from 'Common/Errors/WebViewError';
-import { XPromoCampaign } from 'Ads/Models/Campaigns/XPromoCampaign';
-import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
-import { FileInfo } from 'Core/Utilities/FileInfo';
 import { NativeBridge } from 'Common/Native/NativeBridge';
+import { CacheMode } from 'Core/Models/Configuration';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { Cache, CacheStatus, ICacheDiagnostics } from 'Core/Utilities/Cache';
+import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { FileInfo } from 'Core/Utilities/FileInfo';
+import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 
 enum CacheType {
     REQUIRED,

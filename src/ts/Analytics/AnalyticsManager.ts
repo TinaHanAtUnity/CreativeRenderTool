@@ -1,12 +1,12 @@
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
-import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { INativeResponse, Request } from 'Core/Utilities/Request';
 import { AnalyticsProtocol, IAnalyticsCommonObject, IAnalyticsObject } from 'Analytics/AnalyticsProtocol';
+import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
+import { NativeBridge } from 'Common/Native/NativeBridge';
 import { FocusManager } from 'Core/Managers/FocusManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Configuration } from 'Core/Models/Configuration';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { INativeResponse, Request } from 'Core/Utilities/Request';
 
 export class AnalyticsManager {
     private _nativeBridge: NativeBridge;

@@ -1,8 +1,8 @@
+import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { Campaign } from 'Ads/Models/Campaign';
 import { PlacementState } from 'Ads/Models/Placement';
-import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
-import { INativeResponse } from 'Core/Utilities/Request';
 import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
+import { INativeResponse } from 'Core/Utilities/Request';
 
 export abstract class RefreshManager {
     public static NoFillDelay = 3600;

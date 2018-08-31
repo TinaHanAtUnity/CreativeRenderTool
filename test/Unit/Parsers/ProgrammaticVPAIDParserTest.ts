@@ -1,18 +1,18 @@
-import 'mocha';
-import * as sinon from 'sinon';
+import { AuctionResponse } from 'Ads/Models/AuctionResponse';
+import { Session } from 'Ads/Models/Session';
 import { assert } from 'chai';
 
 import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Request } from 'Core/Utilities/Request';
-import { AuctionResponse } from 'Ads/Models/AuctionResponse';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Session } from 'Ads/Models/Session';
 import { SdkApi } from 'Core/Native/Sdk';
-import { ProgrammaticVPAIDParser } from 'Ads/Parsers/ProgrammaticVPAIDParser';
+import { Request } from 'Core/Utilities/Request';
 
 import ProgrammaticVPAIDCampaign from 'json/campaigns/vpaid/ProgrammaticVPAIDCampaign.json';
-import { VastParser } from 'Ads/Utilities/VastParser';
-import { VPAIDCampaign } from 'Ads/Models/VPAID/VPAIDCampaign';
+import 'mocha';
+import * as sinon from 'sinon';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { VastParser } from 'VAST/Utilities/VastParser';
+import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
+import { ProgrammaticVPAIDParser } from 'VPAID/Parsers/ProgrammaticVPAIDParser';
 
 describe('ProgrammaticVPAIDParser', () => {
     const placements = ['TestPlacement'];

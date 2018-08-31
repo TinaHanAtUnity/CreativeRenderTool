@@ -1,25 +1,25 @@
-import { AdMobSignalFactory } from 'Ads/AdMob/AdMobSignalFactory';
-import { Platform } from 'Common/Constants/Platform';
-import { JaegerManager } from 'Core/Jaeger/JaegerManager';
-import { JaegerTags } from 'Core/Jaeger/JaegerSpan';
+import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { AssetManager } from 'Ads/Managers/AssetManager';
-import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign } from 'Ads/Models/Campaign';
+import { Placement } from 'Ads/Models/Placement';
+import { Session } from 'Ads/Models/Session';
+import { CampaignParser } from 'Ads/Parsers/CampaignParser';
+import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
+import { BannerCampaignParserFactory } from 'Banners/Parsers/BannerCampaignParserFactory';
+import { BannerAuctionRequest } from 'Banners/Utilities/BannerAuctionRequest';
+import { Platform } from 'Common/Constants/Platform';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { JaegerManager } from 'Core/Jaeger/JaegerManager';
+import { JaegerTags } from 'Core/Jaeger/JaegerSpan';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Configuration } from 'Core/Models/Configuration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { Placement } from 'Ads/Models/Placement';
-import { Session } from 'Ads/Models/Session';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { INativeResponse, Request } from 'Core/Utilities/Request';
-import { BannerAuctionRequest } from 'Banners/Utilities/BannerAuctionRequest';
-import { BannerCampaignParserFactory } from 'Banners/Parsers/BannerCampaignParserFactory';
 
 export class BannerCampaignManager {
     private _nativeBridge: NativeBridge;

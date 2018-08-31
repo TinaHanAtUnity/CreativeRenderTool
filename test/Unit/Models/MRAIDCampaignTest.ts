@@ -1,11 +1,11 @@
-import 'mocha';
-import { assert } from 'chai';
+import { HTML } from 'Ads/Models/Assets/HTML';
 
 import { IMRAIDCampaign, MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
-import { HTML } from 'Ads/Models/Assets/HTML';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { assert } from 'chai';
 
 import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCampaign.json';
+import 'mocha';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('MRAIDCampaign', () => {
 

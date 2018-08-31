@@ -1,6 +1,6 @@
-import 'mocha';
 import { assert } from 'chai';
 import { DiagnosticError } from 'Common/Errors/DiagnosticError';
+import 'mocha';
 
 describe('DiagnosticErrorTest', () => {
     describe('with existing error', () => {

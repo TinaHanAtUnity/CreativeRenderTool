@@ -1,15 +1,15 @@
-import VPAIDContainerTemplate from 'html/vpaid/container.html';
-import VPAIDTemplate from 'html/vpaid/VPAID.html';
+import { Placement } from 'Ads/Models/Placement';
+import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
+import { View } from 'Ads/Views/View';
+import { Platform } from 'Common/Constants/Platform';
 
 import { NativeBridge } from 'Common/Native/NativeBridge';
-import { View } from 'Ads/Views/View';
-import { Template } from 'Core/Utilities/Template';
-import { VPAIDCampaign } from 'Ads/Models/VPAID/VPAIDCampaign';
-import { Timer } from 'Core/Utilities/Timer';
-import { Placement } from 'Ads/Models/Placement';
 import { IObserver1 } from 'Common/Utilities/IObserver';
-import { Platform } from 'Common/Constants/Platform';
-import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
+import { Template } from 'Core/Utilities/Template';
+import { Timer } from 'Core/Utilities/Timer';
+import VPAIDContainerTemplate from 'html/vpaid/container.html';
+import VPAIDTemplate from 'html/vpaid/VPAID.html';
+import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 
 interface InitAdOptions {
     width: number;

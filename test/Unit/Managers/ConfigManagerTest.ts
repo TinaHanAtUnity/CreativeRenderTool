@@ -1,19 +1,19 @@
-import 'mocha';
 import { assert } from 'chai';
-import * as sinon from 'sinon';
+import { ConfigError } from 'Common/Errors/ConfigError';
+import { DiagnosticError } from 'Common/Errors/DiagnosticError';
+import { RequestError } from 'Common/Errors/RequestError';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
 
 import { ConfigManager } from 'Core/Managers/ConfigManager';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { StorageApi, StorageType } from 'Core/Native/Storage';
 import { INativeResponse } from 'Core/Utilities/Request';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
-import { RequestError } from 'Common/Errors/RequestError';
-import { ConfigError } from 'Common/Errors/ConfigError';
-import { DiagnosticError } from 'Common/Errors/DiagnosticError';
+import 'mocha';
+import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
 
 class TestStorageApi extends StorageApi {
 

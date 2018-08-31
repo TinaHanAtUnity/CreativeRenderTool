@@ -1,5 +1,5 @@
-import { ApiPackage, NativeApi } from 'Common/Native/NativeApi';
 import { Platform } from 'Common/Constants/Platform';
+import { ApiPackage, NativeApi } from 'Common/Native/NativeApi';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { Observable2 } from 'Common/Utilities/Observable';
 import { AndroidPermission, AndroidPermissionsApi } from 'Core/Native/Android/AndroidPermissions';

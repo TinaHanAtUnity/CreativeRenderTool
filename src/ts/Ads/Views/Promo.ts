@@ -1,14 +1,14 @@
-import PromoTpl from 'html/Promo.html';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { View } from 'Ads/Views/View';
-import { Template } from 'Core/Utilities/Template';
+import { Platform } from 'Common/Constants/Platform';
+import { NativeBridge } from 'Common/Native/NativeBridge';
 import { Observable0, Observable1 } from 'Common/Utilities/Observable';
 import { Localization } from 'Core/Utilities/Localization';
-import { PromoCampaign } from 'Ads/Models/Campaigns/PromoCampaign';
-import { PurchasingUtilities } from 'Ads/Utilities/PurchasingUtilities';
-import { Platform } from 'Common/Constants/Platform';
+import { Template } from 'Core/Utilities/Template';
 import { XHRequest } from 'Core/Utilities/XHRequest';
-import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
+import PromoTpl from 'html/Promo.html';
+import { PromoCampaign } from 'Promo/Models/PromoCampaign';
+import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 
 export class Promo extends View<{}> implements IPrivacyHandler {
 

@@ -1,21 +1,21 @@
-import { AdMobSignalFactory } from 'Ads/AdMob/AdMobSignalFactory';
+import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { FinishState } from 'Common/Constants/FinishState';
-import { FocusManager } from 'Core/Managers/FocusManager';
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Campaign } from 'Ads/Models/Campaign';
+import { Placement } from 'Ads/Models/Placement';
+import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
+import { FinishState } from 'Common/Constants/FinishState';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Observable0 } from 'Common/Utilities/Observable';
+import { FocusManager } from 'Core/Managers/FocusManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Configuration } from 'Core/Models/Configuration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { Placement } from 'Ads/Models/Placement';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
-import { Observable0 } from 'Common/Utilities/Observable';
 import { Request } from 'Core/Utilities/Request';
-import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 
 export interface IAdUnitParameters<T extends Campaign> {
     forceOrientation: Orientation;

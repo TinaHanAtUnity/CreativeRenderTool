@@ -1,8 +1,8 @@
+import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'Ads/AdUnits/MRAIDAdUnit';
 import { EndScreenEventHandler } from 'Ads/EventHandlers/EndScreenEventHandler';
 import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
-import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'Ads/AdUnits/MRAIDAdUnit';
-import { NativeBridge } from 'Common/Native/NativeBridge';
 import { KeyCode } from 'Common/Constants/Android/KeyCode';
+import { NativeBridge } from 'Common/Native/NativeBridge';
 
 export class MRAIDEndScreenEventHandler extends EndScreenEventHandler<MRAIDCampaign, MRAIDAdUnit> {
     constructor(nativeBridge: NativeBridge, adUnit: MRAIDAdUnit, parameters: IMRAIDAdUnitParameters) {

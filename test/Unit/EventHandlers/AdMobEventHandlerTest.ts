@@ -1,8 +1,8 @@
 import * as sinon from 'sinon';
 import { assert } from 'chai';
 
-import { AdMobEventHandler } from 'Ads/EventHandlers/AdmobEventHandler';
-import { AdMobAdUnit } from 'Ads/AdUnits/AdMobAdUnit';
+import { AdMobEventHandler } from 'AdMob/EventHandlers/AdmobEventHandler';
+import { AdMobAdUnit } from 'AdMob/AdUnits/AdMobAdUnit';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { IntentApi } from 'Core/Native/Android/Intent';
 import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
@@ -11,15 +11,15 @@ import { Request } from 'Core/Utilities/Request';
 import { Session } from 'Ads/Models/Session';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { AdMobSignalFactory } from 'Ads/AdMob/AdMobSignalFactory';
-import { AdMobSignal } from 'Ads/Models/AdMobSignal';
+import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
+import { AdMobSignal } from 'AdMob/Models/AdMobSignal';
 import { Url } from 'Core/Utilities/Url';
 
 import { unity_proto } from '../../../src/proto/unity_proto.js';
 import * as protobuf from 'protobufjs/minimal';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { ITouchInfo } from 'Ads/Views/AFMABridge';
-import { AdMobCampaign } from 'Ads/Models/Campaigns/AdMobCampaign';
+import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Configuration } from 'Core/Models/Configuration';
 import { GdprManager } from 'Ads/Managers/GdprManager';

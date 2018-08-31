@@ -1,31 +1,34 @@
-import 'mocha';
-import * as sinon from 'sinon';
-
-import { DisplayInterstitialAdUnit, IDisplayInterstitialAdUnitParameters } from 'Ads/AdUnits/DisplayInterstitialAdUnit';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { SessionManager } from 'Ads/Managers/SessionManager';
-import { Placement } from 'Ads/Models/Placement';
-import { Request } from 'Core/Utilities/Request';
-import { DisplayInterstitialCampaign } from 'Ads/Models/Campaigns/DisplayInterstitialCampaign';
-import { DisplayInterstitial } from 'Ads/Views/DisplayInterstitial';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Activity } from 'Ads/AdUnits/Containers/Activity';
-import { Platform } from 'Common/Constants/Platform';
+import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { GdprManager } from 'Ads/Managers/GdprManager';
+import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
+import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
+import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { Placement } from 'Ads/Models/Placement';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
+import { DisplayInterstitial } from 'Ads/Views/DisplayInterstitial';
+import { Privacy } from 'Ads/Views/Privacy';
+import { Platform } from 'Common/Constants/Platform';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Observable1, Observable2 } from 'Common/Utilities/Observable';
+import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { FocusManager } from 'Core/Managers/FocusManager';
-import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
-import { GdprManager } from 'Ads/Managers/GdprManager';
-import { Privacy } from 'Ads/Views/Privacy';
-import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { Request } from 'Core/Utilities/Request';
+
+import {
+    DisplayInterstitialAdUnit,
+    IDisplayInterstitialAdUnitParameters
+} from 'Display/AdUnits/DisplayInterstitialAdUnit';
+import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
+import 'mocha';
+import * as sinon from 'sinon';
 import { asStub } from 'TestHelpers/Functions';
-import { Observable1, Observable2 } from 'Common/Utilities/Observable';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('DisplayInterstitialAdUnit', () => {
     let adUnit: DisplayInterstitialAdUnit;

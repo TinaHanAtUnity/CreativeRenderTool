@@ -1,8 +1,8 @@
+import { UIUserInterfaceIdiom } from 'Common/Constants/iOS/UIUserInterfaceIdiom';
 import { ApiPackage, NativeApi } from 'Common/Native/NativeApi';
 import { NativeBridge } from 'Common/Native/NativeBridge';
-import { UIUserInterfaceIdiom } from 'Common/Constants/iOS/UIUserInterfaceIdiom';
-import { DeviceInfoEvent } from 'Core/Native/DeviceInfoEvent';
 import { Observable2 } from 'Common/Utilities/Observable';
+import { DeviceInfoEvent } from 'Core/Native/DeviceInfoEvent';
 
 export class IosDeviceInfoApi extends NativeApi {
     public readonly onVolumeChanged = new Observable2<number, number>();

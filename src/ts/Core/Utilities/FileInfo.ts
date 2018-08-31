@@ -1,12 +1,12 @@
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Platform } from 'Common/Constants/Platform';
-import { VideoMetadata } from 'Common/Constants/Android/VideoMetadata';
+import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
+import { VideoMetadata } from 'Common/Constants/Android/VideoMetadata';
+import { Platform } from 'Common/Constants/Platform';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { IFileInfo } from 'Core/Native/Cache';
+import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { FileId } from 'Core/Utilities/FileId';
-import { Video } from 'Ads/Models/Assets/Video';
-import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
-import { IFileInfo } from 'Core/Native/Cache';
 
 export class FileInfo {
     public static getVideoInfo(nativeBridge: NativeBridge, fileId: string): Promise<[number, number, number]> {

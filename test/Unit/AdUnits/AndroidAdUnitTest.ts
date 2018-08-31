@@ -1,14 +1,4 @@
-import 'mocha';
-import * as sinon from 'sinon';
-import { assert } from 'chai';
-
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Platform } from 'Common/Constants/Platform';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { TestAdUnit } from 'TestHelpers/TestAdUnit';
-import { ScreenOrientation } from 'Common/Constants/Android/ScreenOrientation';
-import { KeyCode } from 'Common/Constants/Android/KeyCode';
-import { SystemUiVisibility } from 'Common/Constants/Android/SystemUiVisibility';
+import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { Activity } from 'Ads/AdUnits/Containers/Activity';
 import {
     AdUnitContainerSystemMessage,
@@ -16,18 +6,28 @@ import {
     Orientation,
     ViewConfiguration
 } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { Rotation } from 'Common/Constants/Android/Rotation';
-import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
+import { GdprManager } from 'Ads/Managers/GdprManager';
+import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
+import { SessionManager } from 'Ads/Managers/SessionManager';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { PerformanceCampaign } from 'Ads/Models/Campaigns/PerformanceCampaign';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { assert } from 'chai';
+import { KeyCode } from 'Common/Constants/Android/KeyCode';
+import { Rotation } from 'Common/Constants/Android/Rotation';
+import { ScreenOrientation } from 'Common/Constants/Android/ScreenOrientation';
+import { SystemUiVisibility } from 'Common/Constants/Android/SystemUiVisibility';
+import { Platform } from 'Common/Constants/Platform';
+
+import { NativeBridge } from 'Common/Native/NativeBridge';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { SessionManager } from 'Ads/Managers/SessionManager';
 import { Request } from 'Core/Utilities/Request';
-import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
-import { GdprManager } from 'Ads/Managers/GdprManager';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import 'mocha';
+import * as sinon from 'sinon';
+import { TestAdUnit } from 'TestHelpers/TestAdUnit';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('AndroidAdUnitTest', () => {
     let nativeBridge: NativeBridge;

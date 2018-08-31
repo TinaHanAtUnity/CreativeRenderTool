@@ -1,11 +1,11 @@
-import VastEndScreenTemplate from 'html/VastEndScreen.html';
-
-import { View } from 'Ads/Views/View';
-import { Template } from 'Core/Utilities/Template';
-import { VPAIDCampaign } from 'Ads/Models/VPAID/VPAIDCampaign';
-import { NativeBridge } from 'Common/Native/NativeBridge';
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+
+import { View } from 'Ads/Views/View';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Template } from 'Core/Utilities/Template';
+import VastEndScreenTemplate from 'html/VastEndScreen.html';
+import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 
 export interface IVPAIDEndScreenHandler {
     onVPAIDEndScreenClick(): void;

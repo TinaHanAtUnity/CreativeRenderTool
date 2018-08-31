@@ -1,52 +1,49 @@
-import { Placement } from 'Ads/Models/Placement';
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { INativeResponse } from 'Core/Utilities/Request';
-import { Platform } from 'Common/Constants/Platform';
-import { VastParser } from 'Ads/Utilities/VastParser';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { IPerformanceCampaign, PerformanceCampaign, StoreName } from 'Ads/Models/Campaigns/PerformanceCampaign';
-import { IXPromoCampaign, XPromoCampaign } from 'Ads/Models/Campaigns/XPromoCampaign';
-import { IMRAIDCampaign, MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
-import { Configuration } from 'Core/Models/Configuration';
-import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
-import { ICacheDiagnostics } from 'Core/Utilities/Cache';
-import {
-    DisplayInterstitialCampaign,
-    IDisplayInterstitialCampaign
-} from 'Ads/Models/Campaigns/DisplayInterstitialCampaign';
-import { Session } from 'Ads/Models/Session';
-import { IVastCampaign, VastCampaign } from 'Ads/Models/Vast/VastCampaign';
-import { IPackageInfo } from 'Core/Native/Android/AndroidDeviceInfo';
-import { ICampaign } from 'Ads/Models/Campaign';
-import { Image } from 'Ads/Models/Assets/Image';
+import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { HTML } from 'Ads/Models/Assets/HTML';
+import { Image } from 'Ads/Models/Assets/Image';
 import { Video } from 'Ads/Models/Assets/Video';
-import { Vast } from 'Ads/Models/Vast/Vast';
-import { IVPAIDCampaign } from 'Ads/Models/VPAID/VPAIDCampaign';
-import { VPAID } from 'Ads/Models/VPAID/VPAID';
-import { IPromoCampaign, PromoCampaign } from 'Ads/Models/Campaigns/PromoCampaign';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
-import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
-import { FakeAndroidDeviceInfo } from 'TestHelpers/FakeAndroidDeviceInfo';
+import { ICampaign } from 'Ads/Models/Campaign';
+import { IMRAIDCampaign, MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
+import { IPerformanceCampaign, PerformanceCampaign, StoreName } from 'Ads/Models/Campaigns/PerformanceCampaign';
+import { Placement } from 'Ads/Models/Placement';
+import { Session } from 'Ads/Models/Session';
 import { RingerMode } from 'Common/Constants/Android/RingerMode';
 import { UIUserInterfaceIdiom } from 'Common/Constants/iOS/UIUserInterfaceIdiom';
-import { FakeIosDeviceInfo } from 'TestHelpers/FakeIosDeviceInfo';
-import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
-
-import DummyPromoCampaign from 'json/DummyPromoCampaign.json';
-import OnCometMraidPlcCampaignFollowsRedirects from 'json/OnCometMraidPlcCampaignFollowsRedirects.json';
-import OnCometMraidPlcCampaign from 'json/OnCometMraidPlcCampaign.json';
-import OnCometVideoPlcCampaignFollowsRedirects from 'json/OnCometVideoPlcCampaignFollowsRedirects.json';
-import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
-import OnXPromoPlcCampaign from 'json/OnXPromoPlcCampaign.json';
-import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCampaign.json';
+import { Platform } from 'Common/Constants/Platform';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { Configuration } from 'Core/Models/Configuration';
+import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
+import { IPackageInfo } from 'Core/Native/Android/AndroidDeviceInfo';
+import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
+import { ICacheDiagnostics } from 'Core/Utilities/Cache';
+import { INativeResponse } from 'Core/Utilities/Request';
+import { DisplayInterstitialCampaign, IDisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
-import VastCompanionXml from 'xml/VastCompanionAd.xml';
-import EventTestVast from 'xml/EventTestVast.xml';
-import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xml';
+
+import DummyPromoCampaign from 'json/DummyPromoCampaign.json';
+import OnCometMraidPlcCampaign from 'json/OnCometMraidPlcCampaign.json';
+import OnCometMraidPlcCampaignFollowsRedirects from 'json/OnCometMraidPlcCampaignFollowsRedirects.json';
+import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
+import OnCometVideoPlcCampaignFollowsRedirects from 'json/OnCometVideoPlcCampaignFollowsRedirects.json';
+import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCampaign.json';
+import OnXPromoPlcCampaign from 'json/OnXPromoPlcCampaign.json';
+import { IPromoCampaign, PromoCampaign } from 'Promo/Models/PromoCampaign';
 
 import * as sinon from 'sinon';
+import { FakeAndroidDeviceInfo } from 'TestHelpers/FakeAndroidDeviceInfo';
+import { FakeIosDeviceInfo } from 'TestHelpers/FakeIosDeviceInfo';
+import { Vast } from 'VAST/Models/Vast';
+import { IVastCampaign, VastCampaign } from 'VAST/Models/VastCampaign';
+import { VastParser } from 'VAST/Utilities/VastParser';
+import { VPAID } from 'VPAID/Models/VPAID';
+import { IVPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
+import EventTestVast from 'xml/EventTestVast.xml';
+import VastCompanionXml from 'xml/VastCompanionAd.xml';
+import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xml';
+import { IXPromoCampaign, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {

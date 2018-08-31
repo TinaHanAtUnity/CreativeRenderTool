@@ -1,15 +1,15 @@
-import 'mocha';
-import * as sinon from 'sinon';
-
-import { VPAID as VPAIDModel } from 'Ads/Models/VPAID/VPAID';
+import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
+import { Privacy } from 'Ads/Views/Privacy';
 import { IVPAIDHandler, VPAID } from 'Ads/Views/VPAID';
 import { NativeBridge } from 'Common/Native/NativeBridge';
-import { VPAIDCampaign } from 'Ads/Models/VPAID/VPAIDCampaign';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Observable1 } from 'Common/Utilities/Observable';
 import { DeviceInfoApi } from 'Core/Native/DeviceInfo';
-import { Privacy } from 'Ads/Views/Privacy';
-import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
+import 'mocha';
+import * as sinon from 'sinon';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
+
+import { VPAID as VPAIDModel } from 'VPAID/Models/VPAID';
+import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 
 describe('VPAID View', () => {
     let nativeBridge: NativeBridge;

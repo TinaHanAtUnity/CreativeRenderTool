@@ -1,16 +1,16 @@
-import { IOverlayHandler } from 'Ads/Views/AbstractVideoOverlay';
-import { NativeBridge } from 'Common/Native/NativeBridge';
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
-import { IOperativeSkipEventParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ViewConfiguration } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { VideoAdUnit, VideoState } from 'Ads/AdUnits/VideoAdUnit';
-import { FinishState } from 'Common/Constants/FinishState';
-import { Double } from 'Core/Utilities/Double';
-import { Campaign } from 'Ads/Models/Campaign';
 import { PerformanceAdUnit } from 'Ads/AdUnits/PerformanceAdUnit';
-import { Placement } from 'Ads/Models/Placement';
-import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
+import { VideoAdUnit, VideoState } from 'Ads/AdUnits/VideoAdUnit';
 import { GDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
+import { IOperativeSkipEventParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
+import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
+import { Campaign } from 'Ads/Models/Campaign';
+import { Placement } from 'Ads/Models/Placement';
+import { IOverlayHandler } from 'Ads/Views/AbstractVideoOverlay';
+import { FinishState } from 'Common/Constants/FinishState';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Double } from 'Core/Utilities/Double';
 
 export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler implements IOverlayHandler {
     protected _placement: Placement;

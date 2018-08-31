@@ -1,11 +1,11 @@
-import NewVideoOverlayTemplate from 'html/NewVideoOverlay.html';
-
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Template } from 'Core/Utilities/Template';
-import { Localization } from 'Core/Utilities/Localization';
-import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
+import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
+
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Localization } from 'Core/Utilities/Localization';
+import { Template } from 'Core/Utilities/Template';
+import NewVideoOverlayTemplate from 'html/NewVideoOverlay.html';
 
 export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHandler {
     private _localization: Localization;

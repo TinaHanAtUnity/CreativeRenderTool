@@ -1,11 +1,11 @@
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
-import { Configuration } from 'Core/Models/Configuration';
-import { Campaign } from 'Ads/Models/Campaign';
-import { Platform } from 'Common/Constants/Platform';
-import { Placement } from 'Ads/Models/Placement';
 import { GDPREventAction, GDPREventSource, GdprManager } from 'Ads/Managers/GdprManager';
+import { Campaign } from 'Ads/Models/Campaign';
+import { Placement } from 'Ads/Models/Placement';
+import { IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
+import { Platform } from 'Common/Constants/Platform';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Configuration } from 'Core/Models/Configuration';
 
 export class PrivacyEventHandler implements IPrivacyHandler {
 

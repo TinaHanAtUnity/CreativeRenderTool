@@ -1,12 +1,12 @@
-import { NativeBridge } from 'Common/Native/NativeBridge';
 import { Campaign } from 'Ads/Models/Campaign';
-import { MOAT } from 'Ads/Views/MOAT';
-import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Placement } from 'Ads/Models/Placement';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { MOAT } from 'Ads/Views/MOAT';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Configuration } from 'Core/Models/Configuration';
-import { VastCampaign } from 'Ads/Models/Vast/VastCampaign';
-import { VPAIDCampaign } from 'Ads/Models/VPAID/VPAIDCampaign';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 
 export interface IMoatIds {
     level1: number | undefined;

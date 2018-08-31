@@ -1,22 +1,22 @@
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Request } from 'Core/Utilities/Request';
-import { Url } from 'Core/Utilities/Url';
-import { Configuration } from 'Core/Models/Configuration';
-import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { AdapterMetaData } from 'Core/Models/MetaData/AdapterMetaData';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { JsonParser } from 'Core/Utilities/JsonParser';
-import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
+import { Platform } from 'Common/Constants/Platform';
 import { ConfigError } from 'Common/Errors/ConfigError';
 import { RequestError } from 'Common/Errors/RequestError';
-import { StorageType } from 'Core/Native/Storage';
-import { Platform } from 'Common/Constants/Platform';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { NativeBridge } from 'Common/Native/NativeBridge';
 import { JaegerSpan, JaegerTags } from 'Core/Jaeger/JaegerSpan';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { ABGroup } from 'Core/Models/ABGroup';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { Configuration } from 'Core/Models/Configuration';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { AdapterMetaData } from 'Core/Models/MetaData/AdapterMetaData';
+import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
+import { StorageType } from 'Core/Native/Storage';
+import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { JsonParser } from 'Core/Utilities/JsonParser';
+import { Request } from 'Core/Utilities/Request';
+import { Url } from 'Core/Utilities/Url';
 
 export class ConfigManager {
 

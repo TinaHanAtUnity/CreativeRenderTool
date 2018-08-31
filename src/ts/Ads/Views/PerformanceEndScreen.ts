@@ -1,5 +1,5 @@
-import { EndScreen, IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { PerformanceCampaign } from 'Ads/Models/Campaigns/PerformanceCampaign';
+import { EndScreen, IEndScreenParameters } from 'Ads/Views/EndScreen';
 
 export class PerformanceEndScreen extends EndScreen {
     private _campaign: PerformanceCampaign;

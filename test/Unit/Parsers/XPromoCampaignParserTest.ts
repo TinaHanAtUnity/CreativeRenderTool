@@ -1,19 +1,19 @@
-import 'mocha';
-import * as sinon from 'sinon';
+import { AuctionResponse } from 'Ads/Models/AuctionResponse';
+import { StoreName } from 'Ads/Models/Campaigns/PerformanceCampaign';
+import { Session } from 'Ads/Models/Session';
 import { assert } from 'chai';
 
 import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Request } from 'Core/Utilities/Request';
-import { AuctionResponse } from 'Ads/Models/AuctionResponse';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Session } from 'Ads/Models/Session';
 import { SdkApi } from 'Core/Native/Sdk';
-import { XPromoCampaignParser } from 'Ads/Parsers/XPromoCampaignParser';
+import { Request } from 'Core/Utilities/Request';
+import { Url } from 'Core/Utilities/Url';
 
 import XPromoCampaignJSON from 'json/campaigns/xpromo/XPromoCampaign.json';
-import { XPromoCampaign } from 'Ads/Models/Campaigns/XPromoCampaign';
-import { Url } from 'Core/Utilities/Url';
-import { StoreName } from 'Ads/Models/Campaigns/PerformanceCampaign';
+import 'mocha';
+import * as sinon from 'sinon';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { XPromoCampaignParser } from 'XPromo/Parsers/XPromoCampaignParser';
 
 describe('XPromoCampaignParser', () => {
     const placements = ['TestPlacement'];

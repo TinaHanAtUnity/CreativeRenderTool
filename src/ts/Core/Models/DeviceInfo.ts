@@ -1,8 +1,8 @@
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { StreamType } from 'Common/Constants/Android/StreamType';
 import { BatteryStatus } from 'Common/Constants/Android/BatteryStatus';
-import { ISchema, Model } from 'Common/Models/Model';
+import { StreamType } from 'Common/Constants/Android/StreamType';
 import { Platform } from 'Common/Constants/Platform';
+import { ISchema, Model } from 'Common/Models/Model';
+import { NativeBridge } from 'Common/Native/NativeBridge';
 
 export interface IDeviceInfo {
     advertisingIdentifier: string | undefined | null;

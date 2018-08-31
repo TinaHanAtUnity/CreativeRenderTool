@@ -1,13 +1,13 @@
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { INativeResponse, Request } from 'Core/Utilities/Request';
-import { DiagnosticError } from 'Common/Errors/DiagnosticError';
-import { Analytics } from 'Ads/Utilities/Analytics';
-import { RequestError } from 'Common/Errors/RequestError';
-import { Url } from 'Core/Utilities/Url';
-import { ICometTrackingUrlEvents } from 'Ads/Parsers/CometCampaignParser';
 import { Campaign } from 'Ads/Models/Campaign';
 import { PerformanceCampaign } from 'Ads/Models/Campaigns/PerformanceCampaign';
+import { ICometTrackingUrlEvents } from 'Ads/Parsers/CometCampaignParser';
+import { Analytics } from 'Ads/Utilities/Analytics';
+import { DiagnosticError } from 'Common/Errors/DiagnosticError';
+import { RequestError } from 'Common/Errors/RequestError';
+import { NativeBridge } from 'Common/Native/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { INativeResponse, Request } from 'Core/Utilities/Request';
+import { Url } from 'Core/Utilities/Url';
 
 export class ThirdPartyEventManager {
 

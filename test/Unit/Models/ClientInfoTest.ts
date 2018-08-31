@@ -1,8 +1,8 @@
-import 'mocha';
 import { assert } from 'chai';
 
 import { Platform } from 'Common/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
+import 'mocha';
 
 describe('ClientInfoTest', () => {
 

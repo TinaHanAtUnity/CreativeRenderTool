@@ -1,6 +1,6 @@
-import { NativeBridge } from 'Common/Native/NativeBridge';
 import { PlacementState } from 'Ads/Models/Placement';
 import { ApiPackage, NativeApi } from 'Common/Native/NativeApi';
+import { NativeBridge } from 'Common/Native/NativeBridge';
 
 export class PlacementApi extends NativeApi {
 

@@ -1,12 +1,12 @@
-import { Campaign } from 'Ads/Models/Campaign';
-import { PerformanceCampaign } from 'Ads/Models/Campaigns/PerformanceCampaign';
-import { XPromoCampaign } from 'Ads/Models/Campaigns/XPromoCampaign';
-import { VastCampaign } from 'Ads/Models/Vast/VastCampaign';
-import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
-import { Video } from 'Ads/Models/Assets/Video';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { PromoCampaign } from 'Ads/Models/Campaigns/PromoCampaign';
 import { Asset } from 'Ads/Models/Assets/Asset';
+import { Video } from 'Ads/Models/Assets/Video';
+import { Campaign } from 'Ads/Models/Campaign';
+import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
+import { PerformanceCampaign } from 'Ads/Models/Campaigns/PerformanceCampaign';
+import { PromoCampaign } from 'Promo/Models/PromoCampaign';
+import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 
 export enum VideoType {
     CACHE,

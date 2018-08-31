@@ -1,9 +1,9 @@
-import { CacheMode, Configuration, IConfiguration } from 'Core/Models/Configuration';
 import { Placement } from 'Ads/Models/Placement';
-import { ABGroupBuilder } from 'Core/Models/ABGroup';
-import { MixedPlacementUtility } from 'Ads/Utilities/MixedPlacementUtility';
-import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { MixedPlacementUtility } from 'Ads/Utilities/MixedPlacementUtility';
+import { ABGroupBuilder } from 'Core/Models/ABGroup';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { CacheMode, Configuration, IConfiguration } from 'Core/Models/Configuration';
 
 export class ConfigurationParser {
     public static parse(configJson: any, clientInfo?: ClientInfo): Configuration {

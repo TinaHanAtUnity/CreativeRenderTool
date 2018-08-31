@@ -1,17 +1,17 @@
+import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
+import { HTML } from 'Ads/Models/Assets/HTML';
+import { Image } from 'Ads/Models/Assets/Image';
+import { Video } from 'Ads/Models/Assets/Video';
+import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
-import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { IMRAIDCampaign, MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
 import { IPerformanceCampaign, PerformanceCampaign, StoreName } from 'Ads/Models/Campaigns/PerformanceCampaign';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Request } from 'Core/Utilities/Request';
-import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Session } from 'Ads/Models/Session';
-import { Video } from 'Ads/Models/Assets/Video';
-import { Image } from 'Ads/Models/Assets/Image';
-import { HTML } from 'Ads/Models/Assets/HTML';
-import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
+import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { NativeBridge } from 'Common/Native/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { Request } from 'Core/Utilities/Request';
 
 // Events marked with // are currently sent, but are unused - waiting for BI to confirm if they want them sent
 export enum ICometTrackingUrlEvents {

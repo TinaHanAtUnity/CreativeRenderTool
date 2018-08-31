@@ -1,6 +1,6 @@
 import { NativeBridge } from 'Common/Native/NativeBridge';
-import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { StorageType } from 'Core/Native/Storage';
+import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 
 export class MissedImpressionManager {
     private _nativeBridge: NativeBridge;

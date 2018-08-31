@@ -1,15 +1,15 @@
-import { View } from 'Ads/Views/View';
-import { Placement } from 'Ads/Models/Placement';
-import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { WebViewError } from 'Common/Errors/WebViewError';
-import { Platform } from 'Common/Constants/Platform';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { GDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
+import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
+import { Placement } from 'Ads/Models/Placement';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
+import { View } from 'Ads/Views/View';
+import { Platform } from 'Common/Constants/Platform';
+import { WebViewError } from 'Common/Errors/WebViewError';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { ABGroup } from 'Core/Models/ABGroup';
 import { DOMUtils } from 'Core/Utilities/DOMUtils';
 import { XHRequest } from 'Core/Utilities/XHRequest';
-import { GDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
-import { ABGroup } from 'Core/Models/ABGroup';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;

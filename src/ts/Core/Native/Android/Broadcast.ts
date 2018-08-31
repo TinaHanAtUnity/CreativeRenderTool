@@ -1,6 +1,6 @@
 import { ApiPackage, NativeApi } from 'Common/Native/NativeApi';
-import { Observable4 } from 'Common/Utilities/Observable';
 import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Observable4 } from 'Common/Utilities/Observable';
 
 enum BroadcastEvent {
     ACTION

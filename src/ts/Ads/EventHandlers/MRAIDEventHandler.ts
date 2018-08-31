@@ -1,21 +1,21 @@
-import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'Ads/Views/MRAIDView';
-import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'Ads/AdUnits/MRAIDAdUnit';
+import { GDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { IOperativeEventParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
+import { Placement } from 'Ads/Models/Placement';
+import { EventType } from 'Ads/Models/Session';
+import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'Ads/Views/MRAIDView';
+import { FinishState } from 'Common/Constants/FinishState';
+import { Platform } from 'Common/Constants/Platform';
+import { DiagnosticError } from 'Common/Errors/DiagnosticError';
+import { RequestError } from 'Common/Errors/RequestError';
+import { NativeBridge } from 'Common/Native/NativeBridge';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { EventType } from 'Ads/Models/Session';
-import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
-import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'Ads/AdUnits/MRAIDAdUnit';
-import { Request } from 'Core/Utilities/Request';
-import { Platform } from 'Common/Constants/Platform';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { RequestError } from 'Common/Errors/RequestError';
-import { DiagnosticError } from 'Common/Errors/DiagnosticError';
-import { FinishState } from 'Common/Constants/FinishState';
-import { Placement } from 'Ads/Models/Placement';
-import { GDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
+import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
+import { Request } from 'Core/Utilities/Request';
 
 export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHandler {
 

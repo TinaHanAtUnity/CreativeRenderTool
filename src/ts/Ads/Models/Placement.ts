@@ -1,5 +1,5 @@
-import { Model } from 'Common/Models/Model';
 import { Campaign } from 'Ads/Models/Campaign';
+import { Model } from 'Common/Models/Model';
 
 export enum PlacementState {
     READY,

@@ -1,13 +1,13 @@
+import { Platform } from 'Common/Constants/Platform';
+import { NativeBridge } from 'Common/Native/NativeBridge';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Configuration } from 'Core/Models/Configuration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { StorageType } from 'Core/Native/Storage';
-import { NativeBridge } from 'Common/Native/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { Request } from 'Core/Utilities/Request';
-import { Platform } from 'Common/Constants/Platform';
-import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 
 export interface IGdprPersonalProperties {
     deviceModel: string;

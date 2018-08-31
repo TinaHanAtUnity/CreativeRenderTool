@@ -1,6 +1,6 @@
-import { DeviceInfo, IDeviceInfo } from 'Core/Models/DeviceInfo';
 import { UIUserInterfaceIdiom } from 'Common/Constants/iOS/UIUserInterfaceIdiom';
 import { NativeBridge } from 'Common/Native/NativeBridge';
+import { DeviceInfo, IDeviceInfo } from 'Core/Models/DeviceInfo';
 
 export interface IIosDeviceInfo extends IDeviceInfo {
     userInterfaceIdiom: UIUserInterfaceIdiom;

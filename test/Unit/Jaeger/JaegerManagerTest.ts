@@ -1,9 +1,9 @@
-import 'mocha';
-import * as sinon from 'sinon';
 import { assert } from 'chai';
 import { JaegerManager } from 'Core/Jaeger/JaegerManager';
-import { Request } from 'Core/Utilities/Request';
 import { IJaegerSpan, JaegerSpan } from 'Core/Jaeger/JaegerSpan';
+import { Request } from 'Core/Utilities/Request';
+import 'mocha';
+import * as sinon from 'sinon';
 
 describe('JaegerManager', () => {
 

@@ -1,9 +1,9 @@
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Campaign } from 'Ads/Models/Campaign';
 import { View } from 'Ads/Views/View';
+import { Platform } from 'Common/Constants/Platform';
+import { NativeBridge } from 'Common/Native/NativeBridge';
 
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Campaign } from 'Ads/Models/Campaign';
-import { Platform } from 'Common/Constants/Platform';
 import { Configuration } from 'Core/Models/Configuration';
 
 export interface IPrivacyHandler {

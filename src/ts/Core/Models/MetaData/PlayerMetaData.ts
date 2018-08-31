@@ -1,5 +1,5 @@
-import { BaseMetaData, IMetaData } from 'Core/Models/MetaData/BaseMetaData';
 import { NativeBridge } from 'Common/Native/NativeBridge';
+import { BaseMetaData, IMetaData } from 'Core/Models/MetaData/BaseMetaData';
 import { StorageType } from 'Core/Native/Storage';
 
 interface IPlayerMetaData extends IMetaData {

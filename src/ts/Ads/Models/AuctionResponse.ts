@@ -1,5 +1,5 @@
-import { JsonParser } from 'Core/Utilities/JsonParser';
 import { Model } from 'Common/Models/Model';
+import { JsonParser } from 'Core/Utilities/JsonParser';
 
 export interface IAuctionResponse {
     placements: string[];

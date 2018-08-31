@@ -1,5 +1,5 @@
-import { Request } from 'Core/Utilities/Request';
 import { IJaegerSpan, JaegerSpan } from 'Core/Jaeger/JaegerSpan';
+import { Request } from 'Core/Utilities/Request';
 
 export class JaegerManager {
 

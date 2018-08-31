@@ -1,19 +1,19 @@
-import 'mocha';
-import * as sinon from 'sinon';
+import { AuctionResponse } from 'Ads/Models/AuctionResponse';
+import { Session } from 'Ads/Models/Session';
 import { assert } from 'chai';
 
 import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Request } from 'Core/Utilities/Request';
-import { AuctionResponse } from 'Ads/Models/AuctionResponse';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Session } from 'Ads/Models/Session';
 import { SdkApi } from 'Core/Native/Sdk';
-import { ProgrammaticVPAIDParser } from 'Ads/Parsers/ProgrammaticVPAIDParser';
+import { Request } from 'Core/Utilities/Request';
+import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
+import { ProgrammaticStaticInterstitialParser } from 'Display/Parsers/ProgrammaticStaticInterstitialParser';
 
 import DisplayStaticInterstitialCampaignHTML from 'json/campaigns/display/DisplayStaticInterstitialCampaignHTML.json';
 import DisplayStaticInterstitialCampaignJS from 'json/campaigns/display/DisplayStaticInterstitialCampaignJS.json';
-import { DisplayInterstitialCampaign } from 'Ads/Models/Campaigns/DisplayInterstitialCampaign';
-import { ProgrammaticStaticInterstitialParser } from 'Ads/Parsers/ProgrammaticStaticInterstitialParser';
+import 'mocha';
+import * as sinon from 'sinon';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { ProgrammaticVPAIDParser } from 'VPAID/Parsers/ProgrammaticVPAIDParser';
 
 describe('ProgrammaticVPAIDParser', () => {
     const placements = ['TestPlacement'];

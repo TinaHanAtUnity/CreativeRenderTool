@@ -1,30 +1,30 @@
-import 'mocha';
+import { IOperativeEventManagerParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
+import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
+import { SessionManager } from 'Ads/Managers/SessionManager';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { Campaign } from 'Ads/Models/Campaign';
+import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
+import { PerformanceCampaign } from 'Ads/Models/Campaigns/PerformanceCampaign';
+import { Placement } from 'Ads/Models/Placement';
+import { Session } from 'Ads/Models/Session';
 import { assert } from 'chai';
-import * as sinon from 'sinon';
+import { Platform } from 'Common/Constants/Platform';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { DeviceInfoApi } from 'Core/Native/DeviceInfo';
+import { RequestApi } from 'Core/Native/Request';
+import { StorageApi, StorageType } from 'Core/Native/Storage';
+import { HttpKafka } from 'Core/Utilities/HttpKafka';
 
 import { Request } from 'Core/Utilities/Request';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { StorageApi, StorageType } from 'Core/Native/Storage';
-import { RequestApi } from 'Core/Native/Request';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { FocusManager } from 'Core/Managers/FocusManager';
-import { IOperativeEventManagerParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
-import { ClientInfo } from 'Core/Models/ClientInfo';
+import 'mocha';
+import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Platform } from 'Common/Constants/Platform';
-import { SessionManager } from 'Ads/Managers/SessionManager';
-import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { Session } from 'Ads/Models/Session';
-import { Placement } from 'Ads/Models/Placement';
-import { Campaign } from 'Ads/Models/Campaign';
-import { DeviceInfoApi } from 'Core/Native/DeviceInfo';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
-import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
-import { PerformanceCampaign } from 'Ads/Models/Campaigns/PerformanceCampaign';
-import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
-import { XPromoOperativeEventManager } from 'Ads/Managers/XPromoOperativeEventManager';
-import { HttpKafka } from 'Core/Utilities/HttpKafka';
+import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
 
 class TestStorageApi extends StorageApi {
 

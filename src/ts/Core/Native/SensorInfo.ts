@@ -1,6 +1,6 @@
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { ApiPackage, NativeApi } from 'Common/Native/NativeApi';
 import { Platform } from 'Common/Constants/Platform';
+import { ApiPackage, NativeApi } from 'Common/Native/NativeApi';
+import { NativeBridge } from 'Common/Native/NativeBridge';
 import { AndroidSensorInfoApi } from 'Core/Native/Android/AndroidSensorInfo';
 import { IosSensorInfoApi } from 'Core/Native/iOS/IosSensorInfo';
 

@@ -1,21 +1,21 @@
-import 'mocha';
-import * as sinon from 'sinon';
-import { assert } from 'chai';
-import { CometCampaignParser } from 'Ads/Parsers/CometCampaignParser';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Session } from 'Ads/Models/Session';
-import { SdkApi } from 'Core/Native/Sdk';
-import { Request } from 'Core/Utilities/Request';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
-import { PerformanceCampaign, StoreName } from 'Ads/Models/Campaigns/PerformanceCampaign';
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
-import { Url } from 'Core/Utilities/Url';
+import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
+import { PerformanceCampaign, StoreName } from 'Ads/Models/Campaigns/PerformanceCampaign';
+import { Session } from 'Ads/Models/Session';
+import { CometCampaignParser } from 'Ads/Parsers/CometCampaignParser';
+import { assert } from 'chai';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { SdkApi } from 'Core/Native/Sdk';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { Request } from 'Core/Utilities/Request';
+import { Url } from 'Core/Utilities/Url';
 
 import OnCometMraidPlcCampaign from 'json/campaigns/performance/CometMraidUrlCampaign.json';
 import OnCometVideoPlcCampaign from 'json/campaigns/performance/CometVideoCampaign.json';
+import 'mocha';
+import * as sinon from 'sinon';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('CometCampaignParser', () => {
     const placements = ['TestPlacement'];
@@ -80,10 +80,10 @@ describe('CometCampaignParser', () => {
             assert.equal(campaign.getClickUrl(), Url.encode(content.clickUrl), 'Click Url is not equal');
             assert.deepEqual(campaign.getVideoEventUrls(), encodeVideoUrls(content.videoEventUrls), 'Video Event URLs is not equal');
             assert.equal(campaign.getGameName(), content.gameName, 'Game Name is equal');
-            assert.equal(campaign.getGameIcon().getUrl(), Url.encode(content.gameIcon), 'Game Icon is not equal');
+            assert.equal(campaign.getGameIcon()!.getUrl(), Url.encode(content.gameIcon), 'Game Icon is not equal');
             assert.equal(campaign.getRating(), content.rating, 'Rating is not the same');
-            assert.equal(campaign.getLandscape().getOriginalUrl(), Url.encode(content.endScreenLandscape), 'Landscape URL is not equal');
-            assert.equal(campaign.getPortrait().getOriginalUrl(), Url.encode(content.endScreenPortrait), 'Portrait URL is not equal');
+            assert.equal(campaign.getLandscape()!.getOriginalUrl(), Url.encode(content.endScreenLandscape), 'Landscape URL is not equal');
+            assert.equal(campaign.getPortrait()!.getOriginalUrl(), Url.encode(content.endScreenPortrait), 'Portrait URL is not equal');
             assert.equal(campaign.getBypassAppSheet(), content.bypassAppSheet, 'Bypass App Sheet is not equal');
             assert.equal(campaign.getStore(), getStore(content.store), 'Store is not equal');
             assert.equal(campaign.getAppStoreId(), content.appStoreId, 'App Store ID is not equal');

@@ -12,7 +12,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { PerformanceOperativeEventManager } from 'Ads/Managers/PerformanceOperativeEventManager';
-import { XPromoOperativeEventManager } from 'Ads/Managers/XPromoOperativeEventManager';
+import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
 import { MRAIDOperativeEventManager } from 'Ads/Managers/MRAIDOperativeEventManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { Configuration } from 'Core/Models/Configuration';

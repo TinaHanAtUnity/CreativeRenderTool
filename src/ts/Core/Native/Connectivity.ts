@@ -1,6 +1,6 @@
-import { Observable0, Observable2 } from 'Common/Utilities/Observable';
-import { NativeBridge } from 'Common/Native/NativeBridge';
 import { ApiPackage, NativeApi } from 'Common/Native/NativeApi';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Observable0, Observable2 } from 'Common/Utilities/Observable';
 
 enum ConnectivityEvent {
     CONNECTED,

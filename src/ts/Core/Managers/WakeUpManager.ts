@@ -1,5 +1,5 @@
-import { Observable0 } from 'Common/Utilities/Observable';
 import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Observable0 } from 'Common/Utilities/Observable';
 import { FocusManager } from 'Core/Managers/FocusManager';
 
 export class WakeUpManager {

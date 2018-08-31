@@ -1,21 +1,21 @@
-import MRAIDTemplate from 'html/MRAID.html';
-import MRAIDContainer from 'html/mraid/container.html';
-import MRAIDPerfContainer from 'html/mraid/container-perf.html';
-
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { IMRAIDViewHandler, MRAIDView } from 'Ads/Views/MRAIDView';
-import { Observable0 } from 'Common/Utilities/Observable';
-import { Placement } from 'Ads/Models/Placement';
-import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
-import { Platform } from 'Common/Constants/Platform';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { Template } from 'Core/Utilities/Template';
+import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
+import { Placement } from 'Ads/Models/Placement';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
-import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { IMRAIDViewHandler, MRAIDView } from 'Ads/Views/MRAIDView';
+import { Platform } from 'Common/Constants/Platform';
+
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Observable0 } from 'Common/Utilities/Observable';
 
 import { ABGroup, FPSCollectionTest } from 'Core/Models/ABGroup';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { Template } from 'Core/Utilities/Template';
+import MRAIDTemplate from 'html/MRAID.html';
+import MRAIDPerfContainer from 'html/mraid/container-perf.html';
+import MRAIDContainer from 'html/mraid/container.html';
 
 export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 

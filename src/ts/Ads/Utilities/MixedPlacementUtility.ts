@@ -1,7 +1,7 @@
-import { Configuration } from 'Core/Models/Configuration';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
-import { PromoCampaign } from 'Ads/Models/Campaigns/PromoCampaign';
+import { Configuration } from 'Core/Models/Configuration';
+import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 
 export const enum MixedPlacementTypes {
     NON_REWARDED = '',

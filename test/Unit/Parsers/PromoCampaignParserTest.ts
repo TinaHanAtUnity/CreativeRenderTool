@@ -1,18 +1,18 @@
-import 'mocha';
-import * as sinon from 'sinon';
+import { AuctionResponse } from 'Ads/Models/AuctionResponse';
+import { Session } from 'Ads/Models/Session';
 import { assert } from 'chai';
 
 import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Request } from 'Core/Utilities/Request';
-import { AuctionResponse } from 'Ads/Models/AuctionResponse';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Session } from 'Ads/Models/Session';
 import { SdkApi } from 'Core/Native/Sdk';
+import { Request } from 'Core/Utilities/Request';
 
 import IAPPromoCampaign from 'json/campaigns/promo/PromoCampaign.json';
-import { PromoCampaignParser } from 'Ads/Parsers/PromoCampaignParser';
-import { PromoCampaign } from 'Ads/Models/Campaigns/PromoCampaign';
-import { PurchasingUtilities } from 'Ads/Utilities/PurchasingUtilities';
+import 'mocha';
+import { PromoCampaign } from 'Promo/Models/PromoCampaign';
+import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
+import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import * as sinon from 'sinon';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('PromoCampaignParser', () => {
     const placements = ['TestPlacement'];

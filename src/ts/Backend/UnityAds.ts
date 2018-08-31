@@ -1,9 +1,9 @@
-import { IUnityAdsListener } from 'Backend/IUnityAdsListener';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Platform } from 'Common/Constants/Platform';
-import { Backend } from 'Backend/Backend';
-import { WebView } from 'WebView';
 import { Sdk } from 'Backend/Api/Sdk';
+import { Backend } from 'Backend/Backend';
+import { IUnityAdsListener } from 'Backend/IUnityAdsListener';
+import { Platform } from 'Common/Constants/Platform';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { WebView } from 'WebView';
 
 export class UnityAds {
 

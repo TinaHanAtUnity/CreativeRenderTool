@@ -9,7 +9,7 @@ import { FocusManager } from 'Core/Managers/FocusManager';
 import { FailedOperativeEventManager } from 'Ads/Managers/FailedOperativeEventManager';
 import { StorageType } from 'Core/Native/Storage';
 import { HttpKafka } from 'Core/Utilities/HttpKafka';
-import { FailedXpromoOperativeEventManager } from 'Ads/Managers/FailedXpromoOperativeEventManager';
+import { FailedXpromoOperativeEventManager } from 'XPromo/Managers/FailedXpromoOperativeEventManager';
 
 describe('FailedOperativeEventManagerTest', () => {
     const handleInvocation = sinon.spy();

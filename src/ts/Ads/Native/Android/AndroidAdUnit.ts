@@ -1,10 +1,10 @@
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Observable1, Observable2, Observable5 } from 'Common/Utilities/Observable';
+import { KeyCode } from 'Common/Constants/Android/KeyCode';
+import { MotionEventAction } from 'Common/Constants/Android/MotionEventAction';
 import { ScreenOrientation } from 'Common/Constants/Android/ScreenOrientation';
 import { SystemUiVisibility } from 'Common/Constants/Android/SystemUiVisibility';
-import { KeyCode } from 'Common/Constants/Android/KeyCode';
 import { ApiPackage, NativeApi } from 'Common/Native/NativeApi';
-import { MotionEventAction } from 'Common/Constants/Android/MotionEventAction';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Observable1, Observable2, Observable5 } from 'Common/Utilities/Observable';
 
 enum AdUnitEvent {
     ON_START,

@@ -1,7 +1,7 @@
-import { Configuration } from 'Core/Models/Configuration';
 import { Placement, PlacementState } from 'Ads/Models/Placement';
-import { NativeBridge } from 'Common/Native/NativeBridge';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Configuration } from 'Core/Models/Configuration';
 
 interface IPlacementMap {
     [id: string]: Placement;

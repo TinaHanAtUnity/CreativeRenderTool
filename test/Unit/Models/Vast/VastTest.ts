@@ -2,11 +2,11 @@ import 'mocha';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
 
-import { Vast } from 'Ads/Models/Vast/Vast';
-import { VastAd } from 'Ads/Models/Vast/VastAd';
-import { VastCreativeLinear } from 'Ads/Models/Vast/VastCreativeLinear';
-import { VastMediaFile } from 'Ads/Models/Vast/VastMediaFile';
-import { VastCreativeCompanionAd } from 'Ads/Models/Vast/VastCreativeCompanionAd';
+import { Vast } from 'VAST/Models/Vast';
+import { VastAd } from 'VAST/Models/VastAd';
+import { VastCreativeLinear } from 'VAST/Models/VastCreativeLinear';
+import { VastMediaFile } from 'VAST/Models/VastMediaFile';
+import { VastCreativeCompanionAd } from 'VAST/Models/VastCreativeCompanionAd';
 
 describe('Vast', () => {
     let vastCreative: VastCreativeLinear;

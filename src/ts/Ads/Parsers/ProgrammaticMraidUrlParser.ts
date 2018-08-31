@@ -1,12 +1,12 @@
-import { CampaignParser } from 'Ads/Parsers/CampaignParser';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Campaign, ICampaign } from 'Ads/Models/Campaign';
-import { DiagnosticError } from 'Common/Errors/DiagnosticError';
-import { IMRAIDCampaign, MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
-import { Request } from 'Core/Utilities/Request';
-import { AuctionResponse } from 'Ads/Models/AuctionResponse';
-import { Session } from 'Ads/Models/Session';
 import { HTML } from 'Ads/Models/Assets/HTML';
+import { AuctionResponse } from 'Ads/Models/AuctionResponse';
+import { Campaign, ICampaign } from 'Ads/Models/Campaign';
+import { IMRAIDCampaign, MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
+import { Session } from 'Ads/Models/Session';
+import { CampaignParser } from 'Ads/Parsers/CampaignParser';
+import { DiagnosticError } from 'Common/Errors/DiagnosticError';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Request } from 'Core/Utilities/Request';
 
 export class ProgrammaticMraidUrlParser extends CampaignParser {
     public static ContentType = 'programmatic/mraid-url';

@@ -4,8 +4,8 @@ import { KeyCode } from 'Common/Constants/Android/KeyCode';
 import { Rotation } from 'Common/Constants/Android/Rotation';
 import { ScreenOrientation } from 'Common/Constants/Android/ScreenOrientation';
 import { SystemUiVisibility } from 'Common/Constants/Android/SystemUiVisibility';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { NativeBridge } from 'Common/Native/NativeBridge';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 
 interface IAndroidOptions {
     requestedOrientation: ScreenOrientation;

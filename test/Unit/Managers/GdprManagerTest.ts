@@ -1,19 +1,19 @@
-import 'mocha';
-import { assert } from 'chai';
-import * as sinon from 'sinon';
-import { Configuration } from 'Core/Models/Configuration';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { ClientInfo } from 'Core/Models/ClientInfo';
 import { GDPREventAction, GDPREventSource, GdprManager } from 'Ads/Managers/GdprManager';
-import { StorageApi, StorageType } from 'Core/Native/Storage';
-import { Request } from 'Core/Utilities/Request';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { Observable2 } from 'Common/Utilities/Observable';
-import { SdkApi } from 'Core/Native/Sdk';
-import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
-import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
+import { assert } from 'chai';
 import { Platform } from 'Common/Constants/Platform';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Observable2 } from 'Common/Utilities/Observable';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { Configuration } from 'Core/Models/Configuration';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { SdkApi } from 'Core/Native/Sdk';
+import { StorageApi, StorageType } from 'Core/Native/Storage';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
+import { Request } from 'Core/Utilities/Request';
+import 'mocha';
+import * as sinon from 'sinon';
 
 describe('GdprManagerTest', () => {
     const testGameId = '12345';

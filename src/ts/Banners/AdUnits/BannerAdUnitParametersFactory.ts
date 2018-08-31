@@ -1,22 +1,22 @@
-import { AdMobSignalFactory } from 'Ads/AdMob/AdMobSignalFactory';
+import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { AnalyticsManager } from 'Analytics/AnalyticsManager';
-import { FocusManager } from 'Core/Managers/FocusManager';
 import { GdprManager } from 'Ads/Managers/GdprManager';
-import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Campaign } from 'Ads/Models/Campaign';
+import { Placement } from 'Ads/Models/Placement';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
+import { AnalyticsManager } from 'Analytics/AnalyticsManager';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Configuration } from 'Core/Models/Configuration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { Placement } from 'Ads/Models/Placement';
-import { NativeBridge } from 'Common/Native/NativeBridge';
 import { Request } from 'Core/Utilities/Request';
-import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 export class BannerAdUnitParametersFactory {
 

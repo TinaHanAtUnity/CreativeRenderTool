@@ -1,27 +1,27 @@
-import { NativeBridge } from 'Common/Native/NativeBridge';
 import { AbstractAdUnit, IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
-import { FinishState } from 'Common/Constants/FinishState';
-import { Double } from 'Core/Utilities/Double';
-import { Video } from 'Ads/Models/Assets/Video';
-import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
-import { IosUtils } from 'Ads/Utilities/IosUtils';
-import { Platform } from 'Common/Constants/Platform';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { DiagnosticError } from 'Common/Errors/DiagnosticError';
-import { PerformanceCampaign } from 'Ads/Models/Campaigns/PerformanceCampaign';
-import { WebViewError } from 'Common/Errors/WebViewError';
 import {
     AdUnitContainerSystemMessage,
     IAdUnitContainerListener,
     Orientation
 } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
+import { PerformanceCampaign } from 'Ads/Models/Campaigns/PerformanceCampaign';
 import { Placement } from 'Ads/Models/Placement';
 import { CampaignAssetInfo, VideoType } from 'Ads/Utilities/CampaignAssetInfo';
-import { XPromoCampaign } from 'Ads/Models/Campaigns/XPromoCampaign';
-import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { IosUtils } from 'Ads/Utilities/IosUtils';
+import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
+import { FinishState } from 'Common/Constants/FinishState';
+import { Platform } from 'Common/Constants/Platform';
+import { DiagnosticError } from 'Common/Errors/DiagnosticError';
+import { WebViewError } from 'Common/Errors/WebViewError';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { Double } from 'Core/Utilities/Double';
+import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 
 export interface IVideoAdUnitParameters<T extends Campaign> extends IAdUnitParameters<T> {
     video: Video;
