@@ -18,6 +18,7 @@ import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
+import { PerformanceMRAIDCampaign } from 'Models/Campaigns/PerformanceMRAIDCampaign';
 import { FinishState } from 'Constants/FinishState';
 import { FocusManager } from 'Managers/FocusManager';
 
@@ -137,9 +138,9 @@ describe('AdUnitFactoryTest', () => {
     });
 
     describe('MRAID AdUnit Factory', () => {
-        let campaign: MRAIDCampaign;
+        describe('basic MRAID functionality', () => {
+            let campaign: MRAIDCampaign;
 
-        describe('basic functionality', () => {
             beforeEach(() => {
                 campaign = TestFixtures.getProgrammaticMRAIDCampaign();
                 const resourceUrl = campaign.getResourceUrl();
@@ -154,6 +155,11 @@ describe('AdUnitFactoryTest', () => {
                 AdUnitFactory.setForcedPlayableMRAID(false);
             });
 
+            it('should create MRAID view', () => {
+                const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+                assert.isTrue(adUnit.getMRAIDView() instanceof MRAID, 'view should be MRAID');
+            });
+
             it('should create PlayableMRAID view', () => {
                 AdUnitFactory.setForcedPlayableMRAID(false);
 
@@ -164,11 +170,6 @@ describe('AdUnitFactoryTest', () => {
 
                 const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
                 assert.isTrue(adUnit.getMRAIDView() instanceof PlayableMRAID, 'view should be PlayableMRAID');
-            });
-
-            it('should create MRAID view', () => {
-                const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
-                assert.isTrue(adUnit.getMRAIDView() instanceof MRAID, 'view should be MRAID');
             });
 
             it('should be forced to create PlayableMRAID view', () => {
@@ -189,24 +190,24 @@ describe('AdUnitFactoryTest', () => {
                 httpKafkaStub.restore();
             });
 
-            it('should not send onMraidAnalyticsEvent on showif ad type isn’t playable', () => {
-                campaign = TestFixtures.getProgrammaticMRAIDCampaign();
+            it('should not send onMraidAnalyticsEvent for MRAIDCampaign', () => {
+                const campaign = TestFixtures.getProgrammaticMRAIDCampaign();
                 adUnitParameters.campaign = campaign;
                 const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
                 adUnit.show();
                 assert.isFalse(httpKafkaStub.called);
             });
 
-            it('should send onMraidAnalyticsEvent on show if ad type is playable', () => {
-                campaign = TestFixtures.getPlayableMRAIDCampaign();
+            it('should send onMraidAnalyticsEvent on show if ad is Sonic Playable', () => {
+                const campaign = TestFixtures.getProgrammaticMRAIDCampaign({ creativeId: '109455881' });
                 adUnitParameters.campaign = campaign;
                 const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
                 adUnit.show();
                 assert.isTrue(httpKafkaStub.called);
             });
 
-            it('should send onMraidAnalyticsEvent on show if ad is Sonic Playable', () => {
-                campaign = TestFixtures.getProgrammaticMRAIDCampaign({ creativeId: '109455881' });
+            it('should send onMraidAnalyticsEvent for PerformanceMRAIDCampaign', () => {
+                const campaign = TestFixtures.getPerformanceMRAIDCampaign();
                 adUnitParameters.campaign = campaign;
                 const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
                 adUnit.show();

@@ -39,7 +39,7 @@ import { ABGroup } from 'Models/ABGroup';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { MixedPlacementUtility } from 'Utilities/MixedPlacementUtility';
 import { HttpKafka, KafkaCommonObjectType } from 'Utilities/HttpKafka';
-import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
+import { PerformanceMRAIDCampaign } from 'Models/Campaigns/PerformanceMRAIDCampaign';
 
 export class CampaignManager {
 
@@ -556,7 +556,7 @@ export class CampaignManager {
                 }, session);
             }
 
-            if (campaign instanceof MRAIDCampaign) {
+            if (campaign instanceof PerformanceMRAIDCampaign) {
                 const cachingDuration = Date.now() - cachingTimestamp;
 
                 const kafkaObject: any = {};

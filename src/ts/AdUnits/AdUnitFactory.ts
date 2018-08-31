@@ -75,6 +75,7 @@ import { NewVideoOverlayEnabledAbTest } from 'Models/ABGroup';
 import { NewVideoOverlay } from 'Views/NewVideoOverlay';
 import { IEndScreenParameters } from 'Views/EndScreen';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { PerformanceMRAIDCampaign } from 'Models/Campaigns/PerformanceMRAIDCampaign';
 
 export class AdUnitFactory {
     private static _forcedPlayableMRAID: boolean = false;
@@ -299,7 +300,8 @@ export class AdUnitFactory {
 
         const mraidAdUnit: MRAIDAdUnit = new MRAIDAdUnit(nativeBridge, mraidAdUnitParameters);
 
-        const isPlayable: boolean = parameters.campaign.getAdType() === 'PLAYABLE';
+        // NOTE: When content type is correct for playables we want to change this to content type check.
+        const isPlayable: boolean = parameters.campaign instanceof PerformanceMRAIDCampaign;
         const isSonicPlayable: boolean = CustomFeatures.isSonicPlayable(parameters.campaign.getCreativeId());
         const EventHandler =  (isSonicPlayable || isPlayable) ? PlayableEventHandler : MRAIDEventHandler;
         const mraidEventHandler: IMRAIDViewHandler = new EventHandler(nativeBridge, mraidAdUnit, mraidAdUnitParameters);
