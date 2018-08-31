@@ -47,7 +47,7 @@ import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/Program
 import { MRAID } from 'Views/MRAID';
 import { PlayableMRAID } from 'Views/PlayableMRAID';
 import { XHRequest } from 'Utilities/XHRequest';
-import { HttpKafka } from 'Utilities/HttpKafka';
+import { HttpKafka, KafkaCommonObjectType } from 'Utilities/HttpKafka';
 
 describe('AdUnitFactoryTest', () => {
 
@@ -203,7 +203,8 @@ describe('AdUnitFactoryTest', () => {
                 adUnitParameters.campaign = campaign;
                 const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
                 adUnit.show();
-                assert.isTrue(httpKafkaStub.called);
+                sinon.assert.calledWith(<sinon.SinonSpy>httpKafkaStub, 'ads.sdk2.events.playable.json', KafkaCommonObjectType.ANONYMOUS, sinon.match.has('type', 'playable_show'));
+                sinon.assert.calledOnce(httpKafkaStub);
             });
 
             it('should send onMraidAnalyticsEvent for PerformanceMRAIDCampaign', () => {
@@ -211,7 +212,8 @@ describe('AdUnitFactoryTest', () => {
                 adUnitParameters.campaign = campaign;
                 const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
                 adUnit.show();
-                assert.isTrue(httpKafkaStub.called);
+                sinon.assert.calledWith(<sinon.SinonSpy>httpKafkaStub, 'ads.sdk2.events.playable.json', KafkaCommonObjectType.ANONYMOUS, sinon.match.has('type', 'playable_show'));
+                sinon.assert.calledOnce(httpKafkaStub);
             });
         });
     });
