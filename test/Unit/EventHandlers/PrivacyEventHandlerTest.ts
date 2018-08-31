@@ -1,30 +1,30 @@
 import 'mocha';
 import * as sinon from 'sinon';
 
-import { NativeBridge } from 'Native/NativeBridge';
-import { Overlay } from 'Views/Overlay';
-import { DeviceInfo } from 'Models/DeviceInfo';
-import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { Request } from 'Utilities/Request';
-import { Platform } from 'Constants/Platform';
-import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
-import { ViewController } from 'AdUnits/Containers/ViewController';
-import { Video } from 'Models/Assets/Video';
-import { FocusManager } from 'Managers/FocusManager';
-import { ClientInfo } from 'Models/ClientInfo';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
-import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
-import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
-import { PrivacyEventHandler } from 'EventHandlers/PrivacyEventHandler';
-import { Configuration } from 'Models/Configuration';
-import { SdkApi } from 'Native/Api/Sdk';
-import { UrlSchemeApi } from 'Native/Api/UrlScheme';
-import { IntentApi } from 'Native/Api/Intent';
-import { GDPRPrivacy } from 'Views/GDPRPrivacy';
-import { Placement } from 'Models/Placement';
-import { GdprManager, GDPREventSource } from 'Managers/GdprManager';
-import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Overlay } from 'Ads/Views/Overlay';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { Request } from 'Core/Utilities/Request';
+import { Platform } from 'Common/Constants/Platform';
+import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
+import { Video } from 'Ads/Models/Assets/Video';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
+import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Ads/AdUnits/PerformanceAdUnit';
+import { PerformanceEndScreen } from 'Ads/Views/PerformanceEndScreen';
+import { PerformanceCampaign } from 'Ads/Models/Campaigns/PerformanceCampaign';
+import { PrivacyEventHandler } from 'Ads/EventHandlers/PrivacyEventHandler';
+import { Configuration } from 'Core/Models/Configuration';
+import { SdkApi } from 'Common/Native/Api/Sdk';
+import { UrlSchemeApi } from 'Common/Native/Api/iOS/UrlScheme';
+import { IntentApi } from 'Common/Native/Api/Android/Intent';
+import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
+import { Placement } from 'Ads/Models/Placement';
+import { GDPREventSource, GdprManager } from 'Ads/Managers/GdprManager';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 describe('PrivacyEventHandlerTest', () => {
 

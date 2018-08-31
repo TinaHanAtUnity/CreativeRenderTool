@@ -2,18 +2,18 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
 
-import { NativeBridge } from 'Native/NativeBridge';
+import { NativeBridge } from 'Common/Native/NativeBridge';
 import { AnalyticsManager } from 'Analytics/AnalyticsManager';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { WakeUpManager } from 'Managers/WakeUpManager';
-import { Request } from 'Utilities/Request';
-import { ClientInfo } from 'Models/ClientInfo';
-import { DeviceInfo } from 'Models/DeviceInfo';
-import { StorageApi, StorageType, StorageError } from 'Native/Api/Storage';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { Request } from 'Core/Utilities/Request';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { StorageApi, StorageError, StorageType } from 'Common/Native/Api/Storage';
 import { IAnalyticsObject } from 'Analytics/AnalyticsProtocol';
-import { RequestApi } from 'Native/Api/Request';
-import { FocusManager } from 'Managers/FocusManager';
-import { Configuration } from 'Models/Configuration';
+import { RequestApi } from 'Common/Native/Api/Request';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { Configuration } from 'Core/Models/Configuration';
 
 class FakeStorageApi extends StorageApi {
     private _values: { [key: string]: any } = {};

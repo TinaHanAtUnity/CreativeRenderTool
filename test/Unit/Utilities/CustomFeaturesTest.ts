@@ -1,6 +1,6 @@
 import 'mocha';
 import { assert } from 'chai';
-import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 
 describe('CustomFeatures', () => {
 

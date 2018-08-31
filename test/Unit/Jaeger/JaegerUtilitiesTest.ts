@@ -1,7 +1,7 @@
 import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
-import { JaegerUtilities } from 'Jaeger/JaegerUtilities';
+import { JaegerUtilities } from 'Core/Jaeger/JaegerUtilities';
 
 describe('JaegerUtilitiesTest', () => {
     const stubbedDateTimestamp: number = 3333;

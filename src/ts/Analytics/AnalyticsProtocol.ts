@@ -1,10 +1,10 @@
-import { ClientInfo } from 'Models/ClientInfo';
-import { DeviceInfo } from 'Models/DeviceInfo';
-import { Platform } from 'Constants/Platform';
-import { Configuration } from 'Models/Configuration';
-import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
-import { NativeBridge } from 'Native/NativeBridge';
-import { IosDeviceInfo } from 'Models/IosDeviceInfo';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { Platform } from 'Common/Constants/Platform';
+import { Configuration } from 'Core/Models/Configuration';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 
 export interface IAnalyticsObject {
     type: string;

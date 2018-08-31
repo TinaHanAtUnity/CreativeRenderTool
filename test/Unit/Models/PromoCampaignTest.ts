@@ -2,7 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 
 import DummyPromo from 'json/DummyPromoCampaign.json';
-import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
+import { PromoCampaign } from 'Ads/Models/Campaigns/PromoCampaign';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('PromoCampaign', () => {

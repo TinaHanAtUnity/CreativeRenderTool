@@ -1,8 +1,8 @@
 import 'mocha';
 import { assert } from 'chai';
 
-import { Url } from 'Utilities/Url';
-import { Platform } from 'Constants/Platform';
+import { Url } from 'Core/Utilities/Url';
+import { Platform } from 'Common/Constants/Platform';
 
 describe('UrlTest', () => {
 

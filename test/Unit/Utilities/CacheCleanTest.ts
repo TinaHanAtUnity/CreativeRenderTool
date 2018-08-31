@@ -2,17 +2,17 @@ import 'mocha';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
 
-import { CacheApi, IFileInfo, CacheError } from 'Native/Api/Cache';
-import { StorageApi, StorageType, StorageError } from 'Native/Api/Storage';
-import { NativeBridge } from 'Native/NativeBridge';
+import { CacheApi, CacheError, IFileInfo } from 'Common/Native/Api/Cache';
+import { StorageApi, StorageError, StorageType } from 'Common/Native/Api/Storage';
+import { NativeBridge } from 'Common/Native/NativeBridge';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Cache } from 'Utilities/Cache';
-import { WakeUpManager } from 'Managers/WakeUpManager';
-import { Request } from 'Utilities/Request';
+import { Cache } from 'Core/Utilities/Cache';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { Request } from 'Core/Utilities/Request';
 import { FakeSdkApi } from 'TestHelpers/FakeSdkApi';
-import { FocusManager } from 'Managers/FocusManager';
-import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
-import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 class TestCacheApi extends CacheApi {
     private _files: IFileInfo[];

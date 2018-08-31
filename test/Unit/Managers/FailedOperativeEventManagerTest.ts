@@ -2,14 +2,14 @@ import 'mocha';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
 
-import { NativeBridge } from 'Native/NativeBridge';
-import { Request } from 'Utilities/Request';
-import { WakeUpManager } from 'Managers/WakeUpManager';
-import { FocusManager } from 'Managers/FocusManager';
-import { FailedOperativeEventManager } from 'Managers/FailedOperativeEventManager';
-import { StorageType } from 'Native/Api/Storage';
-import { HttpKafka } from 'Utilities/HttpKafka';
-import { FailedXpromoOperativeEventManager } from 'Managers/FailedXpromoOperativeEventManager';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Request } from 'Core/Utilities/Request';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { FailedOperativeEventManager } from 'Ads/Managers/FailedOperativeEventManager';
+import { StorageType } from 'Common/Native/Api/Storage';
+import { HttpKafka } from 'Core/Utilities/HttpKafka';
+import { FailedXpromoOperativeEventManager } from 'Ads/Managers/FailedXpromoOperativeEventManager';
 
 describe('FailedOperativeEventManagerTest', () => {
     const handleInvocation = sinon.spy();

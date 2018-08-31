@@ -1,24 +1,23 @@
 import 'mocha';
 import * as sinon from 'sinon';
-import { assert } from 'chai';
-import { DisplayInterstitial } from 'Views/DisplayInterstitial';
-import { NativeBridge } from 'Native/NativeBridge';
-import { Placement } from 'Models/Placement';
-import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
+import { DisplayInterstitial } from 'Ads/Views/DisplayInterstitial';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Placement } from 'Ads/Models/Placement';
+import { DisplayInterstitialCampaign } from 'Ads/Models/Campaigns/DisplayInterstitialCampaign';
 
-import { Platform } from 'Constants/Platform';
+import { Platform } from 'Common/Constants/Platform';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { FocusManager } from 'Managers/FocusManager';
-import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { Request } from 'Utilities/Request';
-import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
-import { DisplayInterstitialAdUnit, IDisplayInterstitialAdUnitParameters } from 'AdUnits/DisplayInterstitialAdUnit';
-import { Activity } from 'AdUnits/Containers/Activity';
-import { DisplayInterstitialEventHandler } from 'EventHandlers/DisplayInterstitialEventHandler';
-import { GdprManager } from 'Managers/GdprManager';
-import { Privacy } from 'Views/Privacy';
-import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
+import { Request } from 'Core/Utilities/Request';
+import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { DisplayInterstitialAdUnit, IDisplayInterstitialAdUnitParameters } from 'Ads/AdUnits/DisplayInterstitialAdUnit';
+import { Activity } from 'Ads/AdUnits/Containers/Activity';
+import { DisplayInterstitialEventHandler } from 'Ads/EventHandlers/DisplayInterstitialEventHandler';
+import { GdprManager } from 'Ads/Managers/GdprManager';
+import { Privacy } from 'Ads/Views/Privacy';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 describe('DisplayInterstitialEventHandler', () => {
     let view: DisplayInterstitial;

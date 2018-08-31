@@ -1,30 +1,30 @@
 import 'mocha';
 import * as sinon from 'sinon';
 
-import { NativeBridge } from 'Native/NativeBridge';
+import { NativeBridge } from 'Common/Native/NativeBridge';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Overlay } from 'Views/Overlay';
-import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
-import { PerformanceVideoEventHandler } from 'EventHandlers/PerformanceVideoEventHandler';
-import { Platform } from 'Constants/Platform';
-import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
-import { Activity } from 'AdUnits/Containers/Activity';
-import { Video } from 'Models/Assets/Video';
-import { Request } from 'Utilities/Request';
-import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { SessionManager } from 'Managers/SessionManager';
-import { MetaDataManager } from 'Managers/MetaDataManager';
-import { FocusManager } from 'Managers/FocusManager';
-import { WakeUpManager } from 'Managers/WakeUpManager';
-import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
-import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
-import { IVideoEventHandlerParams } from 'EventHandlers/BaseVideoEventHandler';
-import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
-import { VideoState } from 'AdUnits/VideoAdUnit';
-import { Privacy } from 'Views/Privacy';
-import { GdprManager } from 'Managers/GdprManager';
-import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
-import { IEndScreenParameters } from 'Views/EndScreen';
+import { Overlay } from 'Ads/Views/Overlay';
+import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Ads/AdUnits/PerformanceAdUnit';
+import { PerformanceVideoEventHandler } from 'Ads/EventHandlers/PerformanceVideoEventHandler';
+import { Platform } from 'Common/Constants/Platform';
+import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { Activity } from 'Ads/AdUnits/Containers/Activity';
+import { Video } from 'Ads/Models/Assets/Video';
+import { Request } from 'Core/Utilities/Request';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { SessionManager } from 'Ads/Managers/SessionManager';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { PerformanceEndScreen } from 'Ads/Views/PerformanceEndScreen';
+import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
+import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
+import { PerformanceCampaign } from 'Ads/Models/Campaigns/PerformanceCampaign';
+import { VideoState } from 'Ads/AdUnits/VideoAdUnit';
+import { Privacy } from 'Ads/Views/Privacy';
+import { GdprManager } from 'Ads/Managers/GdprManager';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 
 describe('PerformanceVideoEventHandlersTest', () => {
 

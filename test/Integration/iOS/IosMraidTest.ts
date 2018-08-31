@@ -1,13 +1,12 @@
 import 'mocha';
 
-import { Platform } from 'Constants/Platform';
-import { UnityAds } from 'Native/Backend/UnityAds';
-import { IUnityAdsListener } from 'Native/Backend/IUnityAdsListener';
-import { DeviceInfo } from 'Native/Backend/Api/DeviceInfo';
-import { ConfigManager } from 'Managers/ConfigManager';
-import { CampaignManager } from 'Managers/CampaignManager';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { ProgrammaticOperativeEventManager } from 'Managers/ProgrammaticOperativeEventManager';
+import { Platform } from 'Common/Constants/Platform';
+import { UnityAds } from 'Backend/UnityAds';
+import { IUnityAdsListener } from 'Backend/IUnityAdsListener';
+import { DeviceInfo } from 'Backend/Api/DeviceInfo';
+import { ConfigManager } from 'Core/Managers/ConfigManager';
+import { CampaignManager } from 'Ads/Managers/CampaignManager';
+import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOperativeEventManager';
 
 describe('IosMraidTest', () => {
 

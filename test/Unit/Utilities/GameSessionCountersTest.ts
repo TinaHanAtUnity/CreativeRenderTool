@@ -1,7 +1,7 @@
 import 'mocha';
 import { assert } from 'chai';
 
-import { GameSessionCounters } from 'Utilities/GameSessionCounters';
+import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import * as sinon from 'sinon';
 

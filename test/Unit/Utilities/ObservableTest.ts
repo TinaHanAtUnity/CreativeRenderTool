@@ -1,7 +1,7 @@
 import 'mocha';
 import { assert } from 'chai';
 
-import { Observable1 } from 'Utilities/Observable';
+import { Observable1 } from 'Core/Utilities/Observable';
 
 describe('ObservableTest', () => {
     it('should unsubscribe', () => {

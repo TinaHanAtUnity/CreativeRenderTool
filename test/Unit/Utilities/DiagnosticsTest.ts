@@ -1,17 +1,16 @@
 import 'mocha';
 import * as sinon from 'sinon';
 
-import { Request, INativeResponse } from 'Utilities/Request';
-import { Diagnostics } from 'Utilities/Diagnostics';
-import { ClientInfo } from 'Models/ClientInfo';
-import { NativeBridge } from 'Native/NativeBridge';
-import { WakeUpManager } from 'Managers/WakeUpManager';
-import { Platform } from 'Constants/Platform';
-import { HttpKafka } from 'Utilities/HttpKafka';
-import { Configuration } from 'Models/Configuration';
-import { ConfigurationParser } from 'Parsers/ConfigurationParser';
+import { INativeResponse, Request } from 'Core/Utilities/Request';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { Platform } from 'Common/Constants/Platform';
+import { HttpKafka } from 'Core/Utilities/HttpKafka';
+import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { FocusManager } from 'Managers/FocusManager';
+import { FocusManager } from 'Core/Managers/FocusManager';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 

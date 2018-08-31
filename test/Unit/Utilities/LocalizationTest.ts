@@ -1,7 +1,7 @@
 import 'mocha';
 import { assert } from 'chai';
 
-import { Localization } from 'Utilities/Localization';
+import { Localization } from 'Core/Utilities/Localization';
 
 describe('LocalizationTest', () => {
 

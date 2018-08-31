@@ -2,18 +2,18 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
 
-import { NativeBridge } from 'Native/NativeBridge';
-import { Request } from 'Utilities/Request';
-import { AuctionResponse } from 'Models/AuctionResponse';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Request } from 'Core/Utilities/Request';
+import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Session } from 'Models/Session';
-import { SdkApi } from 'Native/Api/Sdk';
-import { XPromoCampaignParser } from 'Parsers/XPromoCampaignParser';
+import { Session } from 'Ads/Models/Session';
+import { SdkApi } from 'Common/Native/Api/Sdk';
+import { XPromoCampaignParser } from 'Ads/Parsers/XPromoCampaignParser';
 
 import XPromoCampaignJSON from 'json/campaigns/xpromo/XPromoCampaign.json';
-import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
-import { Url } from 'Utilities/Url';
-import { StoreName } from 'Models/Campaigns/PerformanceCampaign';
+import { XPromoCampaign } from 'Ads/Models/Campaigns/XPromoCampaign';
+import { Url } from 'Core/Utilities/Url';
+import { StoreName } from 'Ads/Models/Campaigns/PerformanceCampaign';
 
 describe('XPromoCampaignParser', () => {
     const placements = ['TestPlacement'];

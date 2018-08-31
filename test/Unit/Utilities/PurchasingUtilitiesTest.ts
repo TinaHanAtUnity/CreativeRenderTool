@@ -2,17 +2,17 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
 
-import { PurchasingUtilities, IPromoPayload, IPromoRequest } from 'Utilities/PurchasingUtilities';
-import { NativeBridge } from 'Native/NativeBridge';
-import { PurchasingApi } from 'Native/Api/Purchasing';
-import { Observable1 } from 'Utilities/Observable';
-import { SdkApi } from 'Native/Api/Sdk';
-import { ConfigurationParser } from 'Parsers/ConfigurationParser';
-import { ClientInfo } from 'Models/ClientInfo';
+import { IPromoPayload, IPromoRequest, PurchasingUtilities } from 'Ads/Utilities/PurchasingUtilities';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { PurchasingApi } from 'Common/Native/Api/Purchasing';
+import { Observable1 } from 'Core/Utilities/Observable';
+import { SdkApi } from 'Common/Native/Api/Sdk';
+import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
+import { ClientInfo } from 'Core/Models/ClientInfo';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
-import { PlacementManager } from 'Managers/PlacementManager';
-import { PlacementState } from 'Models/Placement';
+import { PlacementManager } from 'Ads/Managers/PlacementManager';
+import { PlacementState } from 'Ads/Models/Placement';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import IapPromoCatalog from 'json/IapPromoCatalog.json';
 

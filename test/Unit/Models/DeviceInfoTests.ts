@@ -2,15 +2,15 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
 
-import { NativeBridge } from 'Native/NativeBridge';
-import { Platform } from 'Constants/Platform';
-import { EventCategory } from 'Constants/EventCategory';
-import { DeviceInfoApi } from 'Native/Api/DeviceInfo';
-import { StreamType } from 'Constants/Android/StreamType';
-import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
-import { IosDeviceInfo } from 'Models/IosDeviceInfo';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Platform } from 'Common/Constants/Platform';
+import { EventCategory } from 'Common/Constants/EventCategory';
+import { DeviceInfoApi } from 'Common/Native/Api/DeviceInfo';
+import { StreamType } from 'Common/Constants/Android/StreamType';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { DeviceInfoEvent } from 'Native/Api/DeviceInfoEvent';
+import { DeviceInfoEvent } from 'Common/Native/Api/DeviceInfoEvent';
 
 describe('DeviceInfoTest', () => {
 

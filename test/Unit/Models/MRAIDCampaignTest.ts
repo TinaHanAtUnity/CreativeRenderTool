@@ -1,8 +1,8 @@
 import 'mocha';
 import { assert } from 'chai';
 
-import { IMRAIDCampaign, MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
-import { HTML } from 'Models/Assets/HTML';
+import { IMRAIDCampaign, MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
+import { HTML } from 'Ads/Models/Assets/HTML';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCampaign.json';

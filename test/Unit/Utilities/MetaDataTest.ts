@@ -2,9 +2,9 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
 
-import { NativeBridge } from 'Native/NativeBridge';
-import { StorageType, StorageError } from 'Native/Api/Storage';
-import { MetaData } from 'Utilities/MetaData';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { StorageError, StorageType } from 'Common/Native/Api/Storage';
+import { MetaData } from 'Core/Utilities/MetaData';
 
 describe('MetaDataTest', () => {
     const handleInvocation = sinon.spy();

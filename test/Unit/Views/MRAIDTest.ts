@@ -3,17 +3,17 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
 
-import { NativeBridge } from 'Native/NativeBridge';
-import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
-import { Placement } from 'Models/Placement';
-import { MRAID } from 'Views/MRAID';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
+import { Placement } from 'Ads/Models/Placement';
+import { MRAID } from 'Ads/Views/MRAID';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Configuration } from 'Models/Configuration';
-import { GDPRPrivacy } from 'Views/GDPRPrivacy';
+import { Configuration } from 'Core/Models/Configuration';
+import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
 import MRAIDContainer from 'html/mraid/container.html';
 
 import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCampaign.json';
-import { GdprManager } from 'Managers/GdprManager';
+import { GdprManager } from 'Ads/Managers/GdprManager';
 
 describe('MRAID', () => {
     let handleInvocation: sinon.SinonSpy;

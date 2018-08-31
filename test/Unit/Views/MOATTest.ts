@@ -1,12 +1,12 @@
 import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
-import { NativeBridge } from 'Native/NativeBridge';
-import { MOAT } from 'Views/MOAT';
-import { IMoatData, IMoatIds } from 'Utilities/MoatViewabilityService';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { MOAT } from 'Ads/Views/MOAT';
+import { IMoatData, IMoatIds } from 'Ads/Utilities/MoatViewabilityService';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Diagnostics } from 'Utilities/Diagnostics';
-import { SdkApi } from 'Native/Api/Sdk';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { SdkApi } from 'Common/Native/Api/Sdk';
 
 describe('MOAT', () => {
     describe('onMessage', () => {

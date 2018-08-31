@@ -2,18 +2,18 @@ import 'mocha';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
 
-import { Cache, CacheStatus } from 'Utilities/Cache';
-import { IFileInfo, CacheApi, CacheEvent, CacheError } from 'Native/Api/Cache';
-import { StorageApi, StorageType } from 'Native/Api/Storage';
-import { NativeBridge } from 'Native/NativeBridge';
-import { WakeUpManager } from 'Managers/WakeUpManager';
-import { Request } from 'Utilities/Request';
+import { Cache, CacheStatus } from 'Core/Utilities/Cache';
+import { CacheApi, CacheError, CacheEvent, IFileInfo } from 'Common/Native/Api/Cache';
+import { StorageApi, StorageType } from 'Common/Native/Api/Storage';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { Request } from 'Core/Utilities/Request';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { FocusManager } from 'Managers/FocusManager';
-import { FileId } from 'Utilities/FileId';
-import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
-import { FileInfo } from 'Utilities/FileInfo';
-import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { FileId } from 'Core/Utilities/FileId';
+import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
+import { FileInfo } from 'Core/Utilities/FileInfo';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 class TestCacheApi extends CacheApi {
 

@@ -2,20 +2,20 @@ import 'mocha';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
 
-import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
-import { NativeBridge } from 'Native/NativeBridge';
-import { Platform } from 'Constants/Platform';
-import { Request } from 'Utilities/Request';
-import { MetaDataManager } from 'Managers/MetaDataManager';
-import { SessionManager } from 'Managers/SessionManager';
-import { ClientInfo } from 'Models/ClientInfo';
-import { DeviceInfo } from 'Models/DeviceInfo';
+import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Platform } from 'Common/Constants/Platform';
+import { Request } from 'Core/Utilities/Request';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { SessionManager } from 'Ads/Managers/SessionManager';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { PerformanceOperativeEventManager } from 'Managers/PerformanceOperativeEventManager';
-import { XPromoOperativeEventManager } from 'Managers/XPromoOperativeEventManager';
-import { MRAIDOperativeEventManager } from 'Managers/MRAIDOperativeEventManager';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { Configuration } from 'Models/Configuration';
+import { PerformanceOperativeEventManager } from 'Ads/Managers/PerformanceOperativeEventManager';
+import { XPromoOperativeEventManager } from 'Ads/Managers/XPromoOperativeEventManager';
+import { MRAIDOperativeEventManager } from 'Ads/Managers/MRAIDOperativeEventManager';
+import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
+import { Configuration } from 'Core/Models/Configuration';
 
 describe('OperativeEventManagerFactoryTest', () => {
     const handleInvocation = sinon.spy();

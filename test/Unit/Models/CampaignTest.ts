@@ -1,9 +1,9 @@
 import 'mocha';
 import { assert } from 'chai';
 
-import { VastCampaign } from 'Models/Vast/VastCampaign';
+import { VastCampaign } from 'Ads/Models/Vast/VastCampaign';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { PerformanceCampaign, StoreName } from 'Models/Campaigns/PerformanceCampaign';
+import { PerformanceCampaign, StoreName } from 'Ads/Models/Campaigns/PerformanceCampaign';
 
 import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
 import SimpleVast from 'xml/SimpleVast.xml';

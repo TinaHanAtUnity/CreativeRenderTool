@@ -1,4 +1,4 @@
-import { SdkApi } from 'Native/Api/Sdk';
+import { SdkApi } from 'Common/Native/Api/Sdk';
 
 // mock of SDK API to ignore native logging calls in tests
 export class FakeSdkApi extends SdkApi {

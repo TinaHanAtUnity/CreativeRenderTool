@@ -2,22 +2,22 @@ import 'mocha';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
 
-import { AssetManager } from 'Managers/AssetManager';
-import { Cache, CacheStatus } from 'Utilities/Cache';
-import { NativeBridge } from 'Native/NativeBridge';
-import { WakeUpManager } from 'Managers/WakeUpManager';
-import { CacheMode } from 'Models/Configuration';
-import { Campaign, ICampaign } from 'Models/Campaign';
-import { Asset } from 'Models/Assets/Asset';
-import { StorageType, StorageApi } from 'Native/Api/Storage';
-import { CacheError, IFileInfo, CacheEvent, CacheApi } from 'Native/Api/Cache';
-import { Request } from 'Utilities/Request';
-import { HTML } from 'Models/Assets/HTML';
-import { DeviceInfo } from 'Models/DeviceInfo';
+import { AssetManager } from 'Ads/Managers/AssetManager';
+import { Cache, CacheStatus } from 'Core/Utilities/Cache';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { CacheMode } from 'Core/Models/Configuration';
+import { Campaign, ICampaign } from 'Ads/Models/Campaign';
+import { Asset } from 'Ads/Models/Assets/Asset';
+import { StorageApi, StorageType } from 'Common/Native/Api/Storage';
+import { CacheApi, CacheError, CacheEvent, IFileInfo } from 'Common/Native/Api/Cache';
+import { Request } from 'Core/Utilities/Request';
+import { HTML } from 'Ads/Models/Assets/HTML';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { FocusManager } from 'Managers/FocusManager';
-import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
-import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 class TestCacheApi extends CacheApi {
 

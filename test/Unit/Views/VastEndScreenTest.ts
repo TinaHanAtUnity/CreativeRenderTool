@@ -3,8 +3,8 @@ import * as sinon from 'sinon';
 import { assert } from 'chai';
 
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { VastEndScreen } from 'Views/VastEndScreen';
-import { NativeBridge } from 'Native/NativeBridge';
+import { VastEndScreen } from 'Ads/Views/VastEndScreen';
+import { NativeBridge } from 'Common/Native/NativeBridge';
 
 import VastEndScreenFixture from 'html/fixtures/VastEndScreenFixture.html';
 

@@ -2,16 +2,16 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
 
-import { NativeBridge } from 'Native/NativeBridge';
-import { Request } from 'Utilities/Request';
-import { AuctionResponse } from 'Models/AuctionResponse';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Request } from 'Core/Utilities/Request';
+import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Session } from 'Models/Session';
-import { SdkApi } from 'Native/Api/Sdk';
-import { ProgrammaticMraidParser } from 'Parsers/ProgrammaticMraidParser';
+import { Session } from 'Ads/Models/Session';
+import { SdkApi } from 'Common/Native/Api/Sdk';
+import { ProgrammaticMraidParser } from 'Ads/Parsers/ProgrammaticMraidParser';
 
 import ProgrammaticMRAIDCampaign from 'json/campaigns/mraid/ProgrammaticMRAIDCampaign.json';
-import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
+import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
 
 describe('ProgrammaticMraidParser', () => {
     const placements = ['TestPlacement'];

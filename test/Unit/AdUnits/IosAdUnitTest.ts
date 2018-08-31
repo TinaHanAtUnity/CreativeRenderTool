@@ -2,27 +2,29 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
 
-import { NativeBridge } from 'Native/NativeBridge';
-import { Platform } from 'Constants/Platform';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Platform } from 'Common/Constants/Platform';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { TestAdUnit } from 'TestHelpers/TestAdUnit';
-import { UIInterfaceOrientationMask } from 'Constants/iOS/UIInterfaceOrientationMask';
+import { UIInterfaceOrientationMask } from 'Common/Constants/iOS/UIInterfaceOrientationMask';
 import {
-    AdUnitContainerSystemMessage, IAdUnitContainerListener, Orientation,
+    AdUnitContainerSystemMessage,
+    IAdUnitContainerListener,
+    Orientation,
     ViewConfiguration
-} from 'AdUnits/Containers/AdUnitContainer';
-import { ViewController } from 'AdUnits/Containers/ViewController';
-import { FocusManager } from 'Managers/FocusManager';
-import { SessionManager } from 'Managers/SessionManager';
-import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { WakeUpManager } from 'Managers/WakeUpManager';
-import { MetaDataManager } from 'Managers/MetaDataManager';
-import { Request } from 'Utilities/Request';
-import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
-import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
-import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
-import { GdprManager } from 'Managers/GdprManager';
-import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+} from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { SessionManager } from 'Ads/Managers/SessionManager';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { Request } from 'Core/Utilities/Request';
+import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
+import { PerformanceCampaign } from 'Ads/Models/Campaigns/PerformanceCampaign';
+import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
+import { GdprManager } from 'Ads/Managers/GdprManager';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 describe('IosAdUnitTest', () => {
     let nativeBridge: NativeBridge;

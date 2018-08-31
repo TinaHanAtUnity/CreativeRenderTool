@@ -2,16 +2,16 @@ import 'mocha';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
 
-import { Request } from 'Utilities/Request';
-import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { RequestApi } from 'Native/Api/Request';
-import { NativeBridge } from 'Native/NativeBridge';
-import { WakeUpManager } from 'Managers/WakeUpManager';
-import { FocusManager } from 'Managers/FocusManager';
-import { MetaDataManager } from 'Managers/MetaDataManager';
+import { Request } from 'Core/Utilities/Request';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { RequestApi } from 'Common/Native/Api/Request';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
-import { ICometTrackingUrlEvents } from 'Parsers/CometCampaignParser';
+import { PerformanceCampaign } from 'Ads/Models/Campaigns/PerformanceCampaign';
+import { ICometTrackingUrlEvents } from 'Ads/Parsers/CometCampaignParser';
 
 class TestRequestApi extends RequestApi {
 

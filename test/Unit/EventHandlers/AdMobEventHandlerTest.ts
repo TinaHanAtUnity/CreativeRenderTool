@@ -1,28 +1,28 @@
 import * as sinon from 'sinon';
 import { assert } from 'chai';
 
-import { AdMobEventHandler } from 'EventHandlers/AdmobEventHandler';
-import { AdMobAdUnit } from 'AdUnits/AdMobAdUnit';
-import { NativeBridge } from 'Native/NativeBridge';
-import { IntentApi } from 'Native/Api/Intent';
-import { UrlSchemeApi } from 'Native/Api/UrlScheme';
-import { Platform } from 'Constants/Platform';
-import { Request } from 'Utilities/Request';
-import { Session } from 'Models/Session';
-import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { AdMobEventHandler } from 'Ads/EventHandlers/AdmobEventHandler';
+import { AdMobAdUnit } from 'Ads/AdUnits/AdMobAdUnit';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { IntentApi } from 'Common/Native/Api/Android/Intent';
+import { UrlSchemeApi } from 'Common/Native/Api/iOS/UrlScheme';
+import { Platform } from 'Common/Constants/Platform';
+import { Request } from 'Core/Utilities/Request';
+import { Session } from 'Ads/Models/Session';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
-import { AdMobSignal } from 'Models/AdMobSignal';
-import { Url } from 'Utilities/Url';
+import { AdMobSignalFactory } from 'Ads/AdMob/AdMobSignalFactory';
+import { AdMobSignal } from 'Ads/Models/AdMobSignal';
+import { Url } from 'Core/Utilities/Url';
 
 import { unity_proto } from '../../../src/proto/unity_proto.js';
 import * as protobuf from 'protobufjs/minimal';
-import { SdkStats } from 'Utilities/SdkStats';
-import { ITouchInfo } from 'Views/AFMABridge';
-import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
-import { ClientInfo } from 'Models/ClientInfo';
-import { Configuration } from 'Models/Configuration';
-import { GdprManager } from 'Managers/GdprManager';
+import { SdkStats } from 'Ads/Utilities/SdkStats';
+import { ITouchInfo } from 'Ads/Views/AFMABridge';
+import { AdMobCampaign } from 'Ads/Models/Campaigns/AdMobCampaign';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { Configuration } from 'Core/Models/Configuration';
+import { GdprManager } from 'Ads/Managers/GdprManager';
 
 const resolveAfter = (timeout: number): Promise<void> => {
     return new Promise((resolve, reject) => setTimeout(resolve, timeout));

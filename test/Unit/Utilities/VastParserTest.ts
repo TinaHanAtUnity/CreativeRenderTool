@@ -3,12 +3,12 @@ import * as sinon from 'sinon';
 import { assert } from 'chai';
 
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Request } from 'Utilities/Request';
-import { NativeBridge } from 'Native/NativeBridge';
-import { WakeUpManager } from 'Managers/WakeUpManager';
-import { Observable1, Observable2, Observable4 } from 'Utilities/Observable';
-import { Platform } from 'Constants/Platform';
-import { FocusManager } from 'Managers/FocusManager';
+import { Request } from 'Core/Utilities/Request';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { Observable1, Observable2, Observable4 } from 'Core/Utilities/Observable';
+import { Platform } from 'Common/Constants/Platform';
+import { FocusManager } from 'Core/Managers/FocusManager';
 
 import VastRaw from 'xml/VastRaw.xml';
 import RootVastClean from 'xml/RootVastClean.xml';

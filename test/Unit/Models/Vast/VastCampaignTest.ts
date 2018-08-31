@@ -1,7 +1,7 @@
 import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
-import { Vast } from 'Models/Vast/Vast';
+import { Vast } from 'Ads/Models/Vast/Vast';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('VastCampaignTest', () => {

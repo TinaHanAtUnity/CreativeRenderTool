@@ -2,9 +2,9 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
 
-import { Resolve } from 'Utilities/Resolve';
-import { NativeBridge } from 'Native/NativeBridge';
-import { ResolveApi } from 'Native/Api/Resolve';
+import { Resolve } from 'Core/Utilities/Resolve';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { ResolveApi } from 'Common/Native/Api/Resolve';
 
 class TestResolveApi extends ResolveApi {
 

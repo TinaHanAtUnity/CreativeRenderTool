@@ -1,5 +1,5 @@
-import { NativeBridge } from 'Native/NativeBridge';
-import { StorageType, StorageError } from 'Native/Api/Storage';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { StorageError, StorageType } from 'Common/Native/Api/Storage';
 
 export interface IIAPInstrumentation {
     price: number;

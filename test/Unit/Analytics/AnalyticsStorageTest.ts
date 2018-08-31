@@ -2,10 +2,10 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
 
-import { NativeBridge } from 'Native/NativeBridge';
+import { NativeBridge } from 'Common/Native/NativeBridge';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { AnalyticsStorage, IIAPInstrumentation } from 'Analytics/AnalyticsStorage';
-import { StorageType } from 'Native/Api/Storage';
+import { StorageType } from 'Common/Native/Api/Storage';
 
 describe('AnalyticsStorageTest', () => {
     let nativeBridge: NativeBridge;

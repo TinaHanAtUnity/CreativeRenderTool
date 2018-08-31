@@ -1,13 +1,18 @@
 import 'mocha';
 import * as sinon from 'sinon';
 import { assert } from 'chai';
-import { ProgrammaticTrackingService, ProgrammaticTrackingError, ProgrammaticTrackingMetric, IProgrammaticTrackingMetricData } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
-import { Request } from 'Utilities/Request';
-import { ClientInfo } from 'Models/ClientInfo';
-import { DeviceInfo } from 'Models/DeviceInfo';
-import { Platform } from 'Constants/Platform';
+import {
+    IProgrammaticTrackingMetricData,
+    ProgrammaticTrackingError,
+    ProgrammaticTrackingMetric,
+    ProgrammaticTrackingService
+} from 'Ads/Utilities/ProgrammaticTrackingService';
+import { Request } from 'Core/Utilities/Request';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { Platform } from 'Common/Constants/Platform';
 
-describe('ProgrammaticTrackingService', () => {
+describe('Ads/Utilities', () => {
 
     let programmaticTrackingService: ProgrammaticTrackingService;
     let platformStub: sinon.SinonStub;

@@ -2,10 +2,10 @@ import 'mocha';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
 
-import { NativeBridge } from 'Native/NativeBridge';
-import { MetaDataManager } from 'Managers/MetaDataManager';
-import { StorageApi, StorageType } from 'Native/Api/Storage';
-import { AdapterMetaData } from 'Models/MetaData/AdapterMetaData';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { StorageApi, StorageType } from 'Common/Native/Api/Storage';
+import { AdapterMetaData } from 'Core/Models/MetaData/AdapterMetaData';
 
 class TestStorageApi extends StorageApi {
 

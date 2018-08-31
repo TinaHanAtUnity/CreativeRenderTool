@@ -1,9 +1,8 @@
 import 'mocha';
 import { assert } from 'chai';
 
-import { Platform } from 'Constants/Platform';
-import { ClientInfo } from 'Models/ClientInfo';
-import { UnityAdsError } from 'Constants/UnityAdsError';
+import { Platform } from 'Common/Constants/Platform';
+import { ClientInfo } from 'Core/Models/ClientInfo';
 
 describe('ClientInfoTest', () => {
 

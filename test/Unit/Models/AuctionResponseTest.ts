@@ -1,6 +1,6 @@
 import 'mocha';
 import { assert } from 'chai';
-import { AuctionResponse } from 'Models/AuctionResponse';
+import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 
 import OnProgrammaticMraidPlcCampaign from 'json/OnProgrammaticMraidPlcCampaign.json';
 

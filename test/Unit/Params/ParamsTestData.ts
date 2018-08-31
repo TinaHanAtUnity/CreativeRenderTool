@@ -4,6 +4,7 @@ import VideoEventSpec from 'json/events/VideoEvents.json';
 import ClickEventSpec from 'json/events/ClickEvent.json';
 import ParameterSpec from 'json/events/Parameters.json';
 import RealtimeAdsRequestSpec from 'json/events/RealtimeAdRequest.json';
+
 export interface IEventParameter {
     parameter: string;
     required: string;
