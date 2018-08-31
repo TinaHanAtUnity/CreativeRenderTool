@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import { assert } from 'chai';
 
 import { NativeBridge } from 'Common/Native/NativeBridge';
-import { StorageError, StorageType } from 'Common/Native/Api/Storage';
+import { StorageError, StorageType } from 'Core/Native/Storage';
 import { MetaData } from 'Core/Utilities/MetaData';
 
 describe('MetaDataTest', () => {

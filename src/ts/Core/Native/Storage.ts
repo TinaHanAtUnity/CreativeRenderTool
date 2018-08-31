@@ -1,6 +1,6 @@
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { ApiPackage, NativeApi } from 'Common/Native/NativeApi';
-import { Observable2 } from 'Core/Utilities/Observable';
+import { Observable2 } from 'Common/Utilities/Observable';
 
 export enum StorageType {
     PRIVATE,

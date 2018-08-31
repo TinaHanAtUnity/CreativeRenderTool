@@ -1,4 +1,4 @@
-import { CacheError, IFileInfo } from 'Common/Native/Api/Cache';
+import { CacheError, IFileInfo } from 'Core/Native/Cache';
 import { Backend } from 'Backend/Backend';
 import { VideoMetadata } from 'Common/Constants/Android/VideoMetadata';
 

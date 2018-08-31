@@ -9,7 +9,7 @@ import { IOperativeEventParams, OperativeEventManager } from 'Ads/Managers/Opera
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
-import { IVideoEventHandler } from 'Common/Native/Api/VideoPlayer';
+import { IVideoEventHandler } from 'Ads/Native/VideoPlayer';
 import { Video } from 'Ads/Models/Assets/Video';
 import { BaseVideoEventHandler, IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
 import { VideoState } from 'Ads/AdUnits/VideoAdUnit';

@@ -4,7 +4,7 @@ import * as sinon from 'sinon';
 
 import { ConfigManager } from 'Core/Managers/ConfigManager';
 import { NativeBridge } from 'Common/Native/NativeBridge';
-import { StorageApi, StorageType } from 'Common/Native/Api/Storage';
+import { StorageApi, StorageType } from 'Core/Native/Storage';
 import { INativeResponse } from 'Core/Utilities/Request';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';

@@ -2,7 +2,7 @@ import { Platform } from 'Common/Constants/Platform';
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { AdMobCampaign } from 'Ads/Models/Campaigns/AdMobCampaign';
 import { Session } from 'Ads/Models/Session';
-import { SdkApi } from 'Common/Native/Api/Sdk';
+import { SdkApi } from 'Core/Native/Sdk';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { ProgrammaticAdMobParser } from 'Ads/Parsers/ProgrammaticAdMobParser';
 import { Request } from 'Core/Utilities/Request';

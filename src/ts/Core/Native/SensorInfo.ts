@@ -1,8 +1,8 @@
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { ApiPackage, NativeApi } from 'Common/Native/NativeApi';
 import { Platform } from 'Common/Constants/Platform';
-import { AndroidSensorInfoApi } from 'Common/Native/Api/Android/AndroidSensorInfo';
-import { IosSensorInfoApi } from 'Common/Native/Api/iOS/IosSensorInfo';
+import { AndroidSensorInfoApi } from 'Core/Native/Android/AndroidSensorInfo';
+import { IosSensorInfoApi } from 'Core/Native/iOS/IosSensorInfo';
 
 export interface IAccelerometerData {
     x: number;

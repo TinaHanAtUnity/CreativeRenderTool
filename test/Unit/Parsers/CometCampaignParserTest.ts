@@ -4,7 +4,7 @@ import { assert } from 'chai';
 import { CometCampaignParser } from 'Ads/Parsers/CometCampaignParser';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { Session } from 'Ads/Models/Session';
-import { SdkApi } from 'Common/Native/Api/Sdk';
+import { SdkApi } from 'Core/Native/Sdk';
 import { Request } from 'Core/Utilities/Request';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';

@@ -1,6 +1,6 @@
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { ApiPackage, NativeApi } from 'Common/Native/NativeApi';
-import { Observable1 } from 'Core/Utilities/Observable';
+import { Observable1 } from 'Common/Utilities/Observable';
 
 export enum LifecycleError {
     APPLICATION_NULL,

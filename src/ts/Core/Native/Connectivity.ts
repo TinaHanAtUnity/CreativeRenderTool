@@ -1,4 +1,4 @@
-import { Observable0, Observable2 } from 'Core/Utilities/Observable';
+import { Observable0, Observable2 } from 'Common/Utilities/Observable';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { ApiPackage, NativeApi } from 'Common/Native/NativeApi';
 

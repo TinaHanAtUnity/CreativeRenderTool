@@ -1,5 +1,5 @@
 import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Observable0 } from 'Core/Utilities/Observable';
+import { Observable0 } from 'Common/Utilities/Observable';
 import { ApiPackage, NativeApi } from 'Common/Native/NativeApi';
 import { UIInterfaceOrientationMask } from 'Common/Constants/iOS/UIInterfaceOrientationMask';
 import { Double } from 'Core/Utilities/Double';

@@ -5,8 +5,8 @@ import {
     IWebPlayerWebSettingsAndroid,
     IWebPlayerWebSettingsIos,
     WebPlayerViewId
-} from 'Common/Native/Api/WebPlayer';
-import { Observable1, Observable2 } from 'Core/Utilities/Observable';
+} from 'Ads/Native/WebPlayer';
+import { Observable1, Observable2 } from 'Common/Utilities/Observable';
 
 /**
  * The WebPlayerContainer wraps the WebPlayerApi in a way that can be used without needing

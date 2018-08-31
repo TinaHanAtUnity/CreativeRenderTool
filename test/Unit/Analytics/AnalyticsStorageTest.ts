@@ -5,7 +5,7 @@ import { assert } from 'chai';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { AnalyticsStorage, IIAPInstrumentation } from 'Analytics/AnalyticsStorage';
-import { StorageType } from 'Common/Native/Api/Storage';
+import { StorageType } from 'Core/Native/Storage';
 
 describe('AnalyticsStorageTest', () => {
     let nativeBridge: NativeBridge;

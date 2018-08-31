@@ -1,4 +1,4 @@
-import { StorageType } from 'Common/Native/Api/Storage';
+import { StorageType } from 'Core/Native/Storage';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { Request } from 'Core/Utilities/Request';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';

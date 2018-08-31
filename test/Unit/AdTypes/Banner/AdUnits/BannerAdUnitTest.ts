@@ -11,12 +11,12 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Placement } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
 import { BannerApi } from 'Banners/Native/Banner';
-import { IntentApi } from 'Common/Native/Api/Android/Intent';
+import { IntentApi } from 'Core/Native/Android/Intent';
 import { BannerListenerApi } from 'Banners/Native/UnityBannerListener';
-import { UrlSchemeApi } from 'Common/Native/Api/iOS/UrlScheme';
+import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import * as sinon from 'sinon';
-import { Observable0, Observable1, Observable2 } from 'Core/Utilities/Observable';
+import { Observable0, Observable1, Observable2 } from 'Common/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
 
 import { asSpy, asStub } from 'TestHelpers/Functions';

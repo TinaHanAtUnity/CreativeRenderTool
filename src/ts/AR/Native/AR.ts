@@ -1,6 +1,6 @@
 import { ApiPackage, NativeApi } from 'Common/Native/NativeApi';
 import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Observable0, Observable1, Observable2 } from 'Core/Utilities/Observable';
+import { Observable0, Observable1, Observable2 } from 'Common/Utilities/Observable';
 import { IARSize } from 'AR/Utilities/ARUtil';
 import { AndroidARApi } from 'AR/Native/Android/AndroidARApi';
 import { IosARApi } from 'AR/Native/iOS/IosARApi';

@@ -4,8 +4,8 @@ import * as sinon from 'sinon';
 
 import { Request } from 'Core/Utilities/Request';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { StorageApi, StorageType } from 'Common/Native/Api/Storage';
-import { RequestApi } from 'Common/Native/Api/Request';
+import { StorageApi, StorageType } from 'Core/Native/Storage';
+import { RequestApi } from 'Core/Native/Request';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { FocusManager } from 'Core/Managers/FocusManager';

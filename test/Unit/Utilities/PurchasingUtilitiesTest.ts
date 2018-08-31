@@ -4,9 +4,9 @@ import { assert } from 'chai';
 
 import { IPromoPayload, IPromoRequest, PurchasingUtilities } from 'Ads/Utilities/PurchasingUtilities';
 import { NativeBridge } from 'Common/Native/NativeBridge';
-import { PurchasingApi } from 'Common/Native/Api/Purchasing';
-import { Observable1 } from 'Core/Utilities/Observable';
-import { SdkApi } from 'Common/Native/Api/Sdk';
+import { PurchasingApi } from 'Ads/Native/Purchasing';
+import { Observable1 } from 'Common/Utilities/Observable';
+import { SdkApi } from 'Core/Native/Sdk';
 import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';

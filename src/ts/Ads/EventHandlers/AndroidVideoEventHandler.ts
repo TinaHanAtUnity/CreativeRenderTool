@@ -1,4 +1,4 @@
-import { IAndroidVideoEventHandler } from 'Common/Native/Api/Android/AndroidVideoPlayer';
+import { IAndroidVideoEventHandler } from 'Ads/Native/Android/AndroidVideoPlayer';
 import { BaseVideoEventHandler, IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
 
 export class AndroidVideoEventHandler extends BaseVideoEventHandler implements IAndroidVideoEventHandler {

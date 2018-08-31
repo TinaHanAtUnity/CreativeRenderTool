@@ -16,7 +16,7 @@ import {
 } from 'Ads/Models/Campaigns/DisplayInterstitialCampaign';
 import { Session } from 'Ads/Models/Session';
 import { IVastCampaign, VastCampaign } from 'Ads/Models/Vast/VastCampaign';
-import { IPackageInfo } from 'Common/Native/Api/Android/AndroidDeviceInfo';
+import { IPackageInfo } from 'Core/Native/Android/AndroidDeviceInfo';
 import { ICampaign } from 'Ads/Models/Campaign';
 import { Image } from 'Ads/Models/Assets/Image';
 import { HTML } from 'Ads/Models/Assets/HTML';

@@ -2,8 +2,8 @@ import 'mocha';
 import { assert } from 'chai';
 import * as sinon from 'sinon';
 
-import { CacheApi, CacheError, IFileInfo } from 'Common/Native/Api/Cache';
-import { StorageApi, StorageError, StorageType } from 'Common/Native/Api/Storage';
+import { CacheApi, CacheError, IFileInfo } from 'Core/Native/Cache';
+import { StorageApi, StorageError, StorageType } from 'Core/Native/Storage';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Cache } from 'Core/Utilities/Cache';

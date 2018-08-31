@@ -6,7 +6,7 @@ import {
     IObserver4,
     IObserver5,
     IObserver6
-} from 'Core/Utilities/IObserver';
+} from 'Common/Utilities/IObserver';
 
 export abstract class Observable<T> {
 

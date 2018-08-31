@@ -40,7 +40,7 @@ import { GdprManager } from 'Ads/Managers/GdprManager';
 
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
-import { Observable1, Observable2 } from 'Core/Utilities/Observable';
+import { Observable1, Observable2 } from 'Common/Utilities/Observable';
 import { asStub } from 'TestHelpers/Functions';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { MRAID } from 'Ads/Views/MRAID';

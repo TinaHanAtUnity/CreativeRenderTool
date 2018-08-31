@@ -1,7 +1,7 @@
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { AbstractAdUnit, IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { FinishState } from 'Common/Constants/FinishState';
-import { IObserver1, IObserver2 } from 'Core/Utilities/IObserver';
+import { IObserver1, IObserver2 } from 'Common/Utilities/IObserver';
 import { DisplayInterstitialCampaign } from 'Ads/Models/Campaigns/DisplayInterstitialCampaign';
 import { DisplayInterstitial } from 'Ads/Views/DisplayInterstitial';
 import { IOperativeEventParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
@@ -11,7 +11,7 @@ import { Placement } from 'Ads/Models/Placement';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { DiagnosticError } from 'Common/Errors/DiagnosticError';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { IWebPlayerWebSettingsAndroid, IWebPlayerWebSettingsIos } from 'Common/Native/Api/WebPlayer';
+import { IWebPlayerWebSettingsAndroid, IWebPlayerWebSettingsIos } from 'Ads/Native/WebPlayer';
 import { Url } from 'Core/Utilities/Url';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { AdUnitContainerSystemMessage, IAdUnitContainerListener } from 'Ads/AdUnits/Containers/AdUnitContainer';

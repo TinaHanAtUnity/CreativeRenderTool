@@ -9,7 +9,7 @@ import { Platform } from 'Common/Constants/Platform';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { Video } from 'Ads/Models/Assets/Video';
 import { VideoMetadata } from 'Common/Constants/Android/VideoMetadata';
-import { CacheError } from 'Common/Native/Api/Cache';
+import { CacheError } from 'Core/Native/Cache';
 import { Request } from 'Core/Utilities/Request';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';

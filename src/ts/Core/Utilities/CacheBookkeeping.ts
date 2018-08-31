@@ -1,6 +1,6 @@
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { IFileInfo } from 'Common/Native/Api/Cache';
-import { StorageType } from 'Common/Native/Api/Storage';
+import { IFileInfo } from 'Core/Native/Cache';
+import { StorageType } from 'Core/Native/Storage';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { ICacheCampaignsResponse } from 'Core/Utilities/Cache';
 import { FileId } from 'Core/Utilities/FileId';

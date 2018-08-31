@@ -1,5 +1,5 @@
 import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Observable1, Observable2, Observable5 } from 'Core/Utilities/Observable';
+import { Observable1, Observable2, Observable5 } from 'Common/Utilities/Observable';
 import { ScreenOrientation } from 'Common/Constants/Android/ScreenOrientation';
 import { SystemUiVisibility } from 'Common/Constants/Android/SystemUiVisibility';
 import { KeyCode } from 'Common/Constants/Android/KeyCode';

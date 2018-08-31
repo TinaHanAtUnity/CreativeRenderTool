@@ -8,7 +8,7 @@ import { FocusManager } from 'Core/Managers/FocusManager';
 import { ITouchInfo } from 'Ads/Views/AFMABridge';
 import { AdMobAdUnit } from 'Ads/AdUnits/AdMobAdUnit';
 import { MotionEventAction } from 'Common/Constants/Android/MotionEventAction';
-import { IMotionEvent } from 'Common/Native/Api/Android/AndroidAdUnit';
+import { IMotionEvent } from 'Ads/Native/Android/AndroidAdUnit';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { AdMobOptionalSignal } from 'Ads/Models/AdMobOptionalSignal';

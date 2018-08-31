@@ -6,7 +6,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Request } from 'Core/Utilities/Request';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { Observable1, Observable2, Observable4 } from 'Core/Utilities/Observable';
+import { Observable1, Observable2, Observable4 } from 'Common/Utilities/Observable';
 import { Platform } from 'Common/Constants/Platform';
 import { FocusManager } from 'Core/Managers/FocusManager';
 

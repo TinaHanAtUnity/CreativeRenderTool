@@ -4,7 +4,7 @@ import { Placement } from 'Ads/Models/Placement';
 
 import CloserTemplate from 'html/closer.html';
 import { Template } from 'Core/Utilities/Template';
-import { Observable0 } from 'Core/Utilities/Observable';
+import { Observable0 } from 'Common/Utilities/Observable';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 

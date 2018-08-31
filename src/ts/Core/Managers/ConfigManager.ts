@@ -11,7 +11,7 @@ import { JsonParser } from 'Core/Utilities/JsonParser';
 import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
 import { ConfigError } from 'Common/Errors/ConfigError';
 import { RequestError } from 'Common/Errors/RequestError';
-import { StorageType } from 'Common/Native/Api/Storage';
+import { StorageType } from 'Core/Native/Storage';
 import { Platform } from 'Common/Constants/Platform';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';

@@ -6,7 +6,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { FileId } from 'Core/Utilities/FileId';
 import { Video } from 'Ads/Models/Assets/Video';
 import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
-import { IFileInfo } from 'Common/Native/Api/Cache';
+import { IFileInfo } from 'Core/Native/Cache';
 
 export class FileInfo {
     public static getVideoInfo(nativeBridge: NativeBridge, fileId: string): Promise<[number, number, number]> {

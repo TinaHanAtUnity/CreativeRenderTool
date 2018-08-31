@@ -4,7 +4,7 @@ import * as sinon from 'sinon';
 
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { StorageApi, StorageType } from 'Common/Native/Api/Storage';
+import { StorageApi, StorageType } from 'Core/Native/Storage';
 import { PlayerMetaData } from 'Core/Models/MetaData/PlayerMetaData';
 
 class TestStorageApi extends StorageApi {

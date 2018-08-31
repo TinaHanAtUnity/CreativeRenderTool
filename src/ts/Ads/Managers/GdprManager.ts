@@ -1,7 +1,7 @@
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Configuration } from 'Core/Models/Configuration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { StorageType } from 'Common/Native/Api/Storage';
+import { StorageType } from 'Core/Native/Storage';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { JsonParser } from 'Core/Utilities/JsonParser';

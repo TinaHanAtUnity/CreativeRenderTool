@@ -16,7 +16,7 @@ import { Placement } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
-import { StorageType } from 'Common/Native/Api/Storage';
+import { StorageType } from 'Core/Native/Storage';
 
 export interface IAuctionResponse {
     correlationId: string;

@@ -7,7 +7,7 @@ import { Request } from 'Core/Utilities/Request';
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Session } from 'Ads/Models/Session';
-import { SdkApi } from 'Common/Native/Api/Sdk';
+import { SdkApi } from 'Core/Native/Sdk';
 import { ProgrammaticMraidUrlParser } from 'Ads/Parsers/ProgrammaticMraidUrlParser';
 
 import ProgrammaticMRAIDCampaign from 'json/campaigns/mraid/ProgrammaticMRAIDCampaign.json';

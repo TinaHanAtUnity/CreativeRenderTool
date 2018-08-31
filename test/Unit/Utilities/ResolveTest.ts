@@ -4,7 +4,7 @@ import { assert } from 'chai';
 
 import { Resolve } from 'Core/Utilities/Resolve';
 import { NativeBridge } from 'Common/Native/NativeBridge';
-import { ResolveApi } from 'Common/Native/Api/Resolve';
+import { ResolveApi } from 'Core/Native/Resolve';
 
 class TestResolveApi extends ResolveApi {
 

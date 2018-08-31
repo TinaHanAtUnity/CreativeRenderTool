@@ -1,6 +1,6 @@
 import { Session } from 'Ads/Models/Session';
 import { NativeBridge } from 'Common/Native/NativeBridge';
-import { StorageType } from 'Common/Native/Api/Storage';
+import { StorageType } from 'Core/Native/Storage';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Request } from 'Core/Utilities/Request';
 import { FailedOperativeEventManager } from 'Ads/Managers/FailedOperativeEventManager';

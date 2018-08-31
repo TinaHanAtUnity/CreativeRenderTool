@@ -1,4 +1,4 @@
-import { Observable0 } from 'Core/Utilities/Observable';
+import { Observable0 } from 'Common/Utilities/Observable';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { FocusManager } from 'Core/Managers/FocusManager';
 

@@ -1,12 +1,12 @@
 import { NativeBridge } from 'Common/Native/NativeBridge';
-import { CacheError } from 'Common/Native/Api/Cache';
-import { StorageType } from 'Common/Native/Api/Storage';
+import { CacheError } from 'Core/Native/Cache';
+import { StorageType } from 'Core/Native/Storage';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { DiagnosticError } from 'Common/Errors/DiagnosticError';
 import { Request } from 'Core/Utilities/Request';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
-import { Observable0 } from 'Core/Utilities/Observable';
+import { Observable0 } from 'Common/Utilities/Observable';
 import { FileInfo } from 'Core/Utilities/FileInfo';
 import { Campaign } from 'Ads/Models/Campaign';
 import { SdkStats } from 'Ads/Utilities/SdkStats';

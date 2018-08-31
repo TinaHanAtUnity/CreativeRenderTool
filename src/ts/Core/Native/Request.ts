@@ -1,8 +1,8 @@
 import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Observable3, Observable5 } from 'Core/Utilities/Observable';
+import { Observable3, Observable5 } from 'Common/Utilities/Observable';
 import { ApiPackage, NativeApi } from 'Common/Native/NativeApi';
 import { Platform } from 'Common/Constants/Platform';
-import { AndroidRequestApi } from 'Common/Native/Api/Android/AndroidRequestApi';
+import { AndroidRequestApi } from 'Core/Native/Android/AndroidRequestApi';
 
 export enum RequestEvent {
     COMPLETE,

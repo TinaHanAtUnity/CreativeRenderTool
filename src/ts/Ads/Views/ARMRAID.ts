@@ -3,7 +3,7 @@ import MRAIDContainer from 'html/mraid/container.html';
 import WebARScript from 'html/mraid/webar.html';
 
 import { IMRAIDViewHandler, MRAIDView } from 'Ads/Views/MRAIDView';
-import { IObserver0, IObserver1, IObserver2 } from 'Core/Utilities/IObserver';
+import { IObserver0, IObserver1, IObserver2 } from 'Common/Utilities/IObserver';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { Placement } from 'Ads/Models/Placement';
 import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
@@ -15,7 +15,7 @@ import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { Platform } from 'Common/Constants/Platform';
 import { Template } from 'Core/Utilities/Template';
 import { ABGroup } from 'Core/Models/ABGroup';
-import { CurrentPermission, PermissionTypes } from 'Common/Native/Api/Permissions';
+import { CurrentPermission, PermissionTypes } from 'Core/Native/Permissions';
 import { ARUtil } from 'AR/Utilities/ARUtil';
 
 export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {

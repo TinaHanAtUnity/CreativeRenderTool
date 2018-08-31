@@ -1,5 +1,5 @@
 import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Observable0, Observable1 } from 'Core/Utilities/Observable';
+import { Observable0, Observable1 } from 'Common/Utilities/Observable';
 import { ApiPackage, NativeApi } from 'Common/Native/NativeApi';
 
 enum BannerEvents {

@@ -8,7 +8,7 @@ import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { PerformanceCampaign } from 'Ads/Models/Campaigns/PerformanceCampaign';
-import { Observable0, Observable1, Observable2, Observable4 } from 'Core/Utilities/Observable';
+import { Observable0, Observable1, Observable2, Observable4 } from 'Common/Utilities/Observable';
 import { Platform } from 'Common/Constants/Platform';
 import { INativeResponse, Request } from 'Core/Utilities/Request';
 import { TestFixtures } from 'TestHelpers/TestFixtures';

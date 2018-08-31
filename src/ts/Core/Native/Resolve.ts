@@ -1,5 +1,5 @@
 import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Observable3, Observable4 } from 'Core/Utilities/Observable';
+import { Observable3, Observable4 } from 'Common/Utilities/Observable';
 import { ApiPackage, NativeApi } from 'Common/Native/NativeApi';
 
 export enum ResolveEvent {

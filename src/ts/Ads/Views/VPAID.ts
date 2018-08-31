@@ -7,7 +7,7 @@ import { Template } from 'Core/Utilities/Template';
 import { VPAIDCampaign } from 'Ads/Models/VPAID/VPAIDCampaign';
 import { Timer } from 'Core/Utilities/Timer';
 import { Placement } from 'Ads/Models/Placement';
-import { IObserver1 } from 'Core/Utilities/IObserver';
+import { IObserver1 } from 'Common/Utilities/IObserver';
 import { Platform } from 'Common/Constants/Platform';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 

@@ -13,7 +13,7 @@ import { Placement } from 'Ads/Models/Placement';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
-import { Observable0 } from 'Core/Utilities/Observable';
+import { Observable0 } from 'Common/Utilities/Observable';
 import { Request } from 'Core/Utilities/Request';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 

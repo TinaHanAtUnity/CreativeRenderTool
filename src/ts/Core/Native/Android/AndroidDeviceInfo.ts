@@ -1,8 +1,8 @@
 import { ApiPackage, NativeApi } from 'Common/Native/NativeApi';
 import { StreamType } from 'Common/Constants/Android/StreamType';
 import { NativeBridge } from 'Common/Native/NativeBridge';
-import { DeviceInfoEvent } from 'Common/Native/Api/DeviceInfoEvent';
-import { Observable3 } from 'Core/Utilities/Observable';
+import { DeviceInfoEvent } from 'Core/Native/DeviceInfoEvent';
+import { Observable3 } from 'Common/Utilities/Observable';
 
 export enum StorageType {
     EXTERNAL,

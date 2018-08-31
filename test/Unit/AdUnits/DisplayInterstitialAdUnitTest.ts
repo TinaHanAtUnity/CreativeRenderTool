@@ -24,7 +24,7 @@ import { GdprManager } from 'Ads/Managers/GdprManager';
 import { Privacy } from 'Ads/Views/Privacy';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { asStub } from 'TestHelpers/Functions';
-import { Observable1, Observable2 } from 'Core/Utilities/Observable';
+import { Observable1, Observable2 } from 'Common/Utilities/Observable';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 describe('DisplayInterstitialAdUnit', () => {

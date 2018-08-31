@@ -9,9 +9,9 @@ import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { Request } from 'Core/Utilities/Request';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { StorageApi, StorageError, StorageType } from 'Common/Native/Api/Storage';
+import { StorageApi, StorageError, StorageType } from 'Core/Native/Storage';
 import { IAnalyticsObject } from 'Analytics/AnalyticsProtocol';
-import { RequestApi } from 'Common/Native/Api/Request';
+import { RequestApi } from 'Core/Native/Request';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { Configuration } from 'Core/Models/Configuration';
 

@@ -3,8 +3,8 @@ import { assert } from 'chai';
 import * as sinon from 'sinon';
 
 import { Cache, CacheStatus } from 'Core/Utilities/Cache';
-import { CacheApi, CacheError, CacheEvent, IFileInfo } from 'Common/Native/Api/Cache';
-import { StorageApi, StorageType } from 'Common/Native/Api/Storage';
+import { CacheApi, CacheError, CacheEvent, IFileInfo } from 'Core/Native/Cache';
+import { StorageApi, StorageType } from 'Core/Native/Storage';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { Request } from 'Core/Utilities/Request';

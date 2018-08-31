@@ -1,5 +1,5 @@
 import { BaseVideoEventHandler, IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
-import { IIosVideoEventHandler } from 'Common/Native/Api/iOS/IosVideoPlayer';
+import { IIosVideoEventHandler } from 'Ads/Native/iOS/IosVideoPlayer';
 import { VideoState } from 'Ads/AdUnits/VideoAdUnit';
 
 export class IosVideoEventHandler extends BaseVideoEventHandler implements IIosVideoEventHandler {

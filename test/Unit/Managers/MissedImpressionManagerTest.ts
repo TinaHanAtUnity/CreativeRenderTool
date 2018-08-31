@@ -6,7 +6,7 @@ import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { MissedImpressionManager } from 'Ads/Managers/MissedImpressionManager';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { StorageApi, StorageType } from 'Common/Native/Api/Storage';
+import { StorageApi, StorageType } from 'Core/Native/Storage';
 
 describe('MissedImpressionManagerTest', () => {
     let missedImpressionManager: MissedImpressionManager;

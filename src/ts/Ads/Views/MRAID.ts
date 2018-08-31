@@ -4,7 +4,7 @@ import MRAIDPerfContainer from 'html/mraid/container-perf.html';
 
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { IMRAIDViewHandler, MRAIDView } from 'Ads/Views/MRAIDView';
-import { Observable0 } from 'Core/Utilities/Observable';
+import { Observable0 } from 'Common/Utilities/Observable';
 import { Placement } from 'Ads/Models/Placement';
 import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
 import { Platform } from 'Common/Constants/Platform';

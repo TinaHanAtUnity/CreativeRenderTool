@@ -10,7 +10,7 @@ import { VastCampaign } from 'Ads/Models/Vast/VastCampaign';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { Asset } from 'Ads/Models/Assets/Asset';
 import { NativeBridge } from 'Common/Native/NativeBridge';
-import { IFileInfo } from 'Common/Native/Api/Cache';
+import { IFileInfo } from 'Core/Native/Cache';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { DisplayInterstitialCampaign } from 'Ads/Models/Campaigns/DisplayInterstitialCampaign';

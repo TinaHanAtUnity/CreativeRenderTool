@@ -8,7 +8,7 @@ import { Platform } from 'Common/Constants/Platform';
 import { Template } from 'Core/Utilities/Template';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
-import { Observable0 } from 'Core/Utilities/Observable';
+import { Observable0 } from 'Common/Utilities/Observable';
 
 export interface IDisplayInterstitialHandler extends IGDPREventHandler {
     onDisplayInterstitialClose(): void;

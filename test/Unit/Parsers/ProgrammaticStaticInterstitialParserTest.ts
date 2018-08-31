@@ -7,7 +7,7 @@ import { Request } from 'Core/Utilities/Request';
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Session } from 'Ads/Models/Session';
-import { SdkApi } from 'Common/Native/Api/Sdk';
+import { SdkApi } from 'Core/Native/Sdk';
 import { ProgrammaticVPAIDParser } from 'Ads/Parsers/ProgrammaticVPAIDParser';
 
 import DisplayStaticInterstitialCampaignHTML from 'json/campaigns/display/DisplayStaticInterstitialCampaignHTML.json';

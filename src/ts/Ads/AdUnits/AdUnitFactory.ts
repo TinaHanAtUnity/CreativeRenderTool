@@ -54,7 +54,7 @@ import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { Closer } from 'Ads/Views/Closer';
 import { Privacy } from 'Ads/Views/Privacy';
 import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
-import { IObserver2, IObserver3 } from 'Core/Utilities/IObserver';
+import { IObserver2, IObserver3 } from 'Common/Utilities/IObserver';
 import { PromoCampaign } from 'Ads/Models/Campaigns/PromoCampaign';
 import { Promo } from 'Ads/Views/Promo';
 import { PromoAdUnit } from 'Ads/AdUnits/PromoAdUnit';

@@ -5,12 +5,12 @@ import { assert } from 'chai';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { Platform } from 'Common/Constants/Platform';
 import { EventCategory } from 'Common/Constants/EventCategory';
-import { DeviceInfoApi } from 'Common/Native/Api/DeviceInfo';
+import { DeviceInfoApi } from 'Core/Native/DeviceInfo';
 import { StreamType } from 'Common/Constants/Android/StreamType';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { DeviceInfoEvent } from 'Common/Native/Api/DeviceInfoEvent';
+import { DeviceInfoEvent } from 'Core/Native/DeviceInfoEvent';
 
 describe('DeviceInfoTest', () => {
 

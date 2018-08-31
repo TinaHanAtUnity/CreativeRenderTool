@@ -3,11 +3,11 @@ import * as sinon from 'sinon';
 
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { ConnectivityApi } from 'Common/Native/Api/Connectivity';
-import { BroadcastApi } from 'Common/Native/Api/Android/Broadcast';
+import { ConnectivityApi } from 'Core/Native/Connectivity';
+import { BroadcastApi } from 'Core/Native/Android/Broadcast';
 import { Platform } from 'Common/Constants/Platform';
-import { NotificationApi } from 'Common/Native/Api/iOS/Notification';
-import { LifecycleApi } from 'Common/Native/Api/Android/Lifecycle';
+import { NotificationApi } from 'Core/Native/iOS/Notification';
+import { LifecycleApi } from 'Core/Native/Android/Lifecycle';
 import { FocusManager } from 'Core/Managers/FocusManager';
 
 class TestConnectivityApi extends ConnectivityApi {

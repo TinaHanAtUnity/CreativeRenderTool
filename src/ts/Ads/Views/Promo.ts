@@ -2,7 +2,7 @@ import PromoTpl from 'html/Promo.html';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { View } from 'Ads/Views/View';
 import { Template } from 'Core/Utilities/Template';
-import { Observable0, Observable1 } from 'Core/Utilities/Observable';
+import { Observable0, Observable1 } from 'Common/Utilities/Observable';
 import { Localization } from 'Core/Utilities/Localization';
 import { PromoCampaign } from 'Ads/Models/Campaigns/PromoCampaign';
 import { PurchasingUtilities } from 'Ads/Utilities/PurchasingUtilities';

@@ -6,7 +6,7 @@ import { MOAT } from 'Ads/Views/MOAT';
 import { IMoatData, IMoatIds } from 'Ads/Utilities/MoatViewabilityService';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { SdkApi } from 'Common/Native/Api/Sdk';
+import { SdkApi } from 'Core/Native/Sdk';
 
 describe('MOAT', () => {
     describe('onMessage', () => {

@@ -1,8 +1,8 @@
 import { Double } from 'Core/Utilities/Double';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { Platform } from 'Common/Constants/Platform';
-import { IosVideoPlayerApi } from 'Common/Native/Api/iOS/IosVideoPlayer';
-import { AndroidVideoPlayerApi } from 'Common/Native/Api/Android/AndroidVideoPlayer';
+import { IosVideoPlayerApi } from 'Ads/Native/iOS/IosVideoPlayer';
+import { AndroidVideoPlayerApi } from 'Ads/Native/Android/AndroidVideoPlayer';
 import { NativeApiWithEventHandlers } from 'Common/Native/NativeApiWithEventHandlers';
 import { ApiPackage } from 'Common/Native/NativeApi';
 
