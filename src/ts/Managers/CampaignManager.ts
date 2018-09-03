@@ -564,7 +564,7 @@ export class CampaignManager {
                 kafkaObject.eventData = {
                     contentType: contentType
                 };
-                kafkaObject.timeFromShow = cachingDuration;
+                kafkaObject.timeFromShow = cachingDuration / 1000;
                 kafkaObject.timeFromPlayableStart = 0;
                 kafkaObject.backgroundTime = 0;
                 kafkaObject.auctionId = campaign.getSession().getId();

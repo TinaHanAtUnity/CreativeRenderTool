@@ -105,8 +105,8 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
             }
             throw new WebViewError('Unable to fetch MRAID');
         }).then((data) => {
-            const fetchingDuration = fetchingStopTimestamp - fetchingTimestamp;
-            const mraidParseDuration = Date.now() - mraidParseTimestamp;
+            const fetchingDuration = (fetchingStopTimestamp - fetchingTimestamp) / 1000;
+            const mraidParseDuration = (Date.now() - mraidParseTimestamp) / 1000;
 
             this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(fetchingDuration, mraidParseDuration, 0, 'playable_fetching_time', {}));
 
