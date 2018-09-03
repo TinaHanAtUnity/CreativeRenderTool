@@ -15,6 +15,7 @@ import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
+import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
@@ -42,6 +43,7 @@ import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialC
 import { DisplayInterstitial } from 'Display/Views/DisplayInterstitial';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { MRAIDEventHandler } from 'MRAID/EventHandlers/MRAIDEventHandler';
+import { PlayableEventHandler } from 'MRAID/EventHandlers/PlayableEventHandler';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { MRAID } from 'MRAID/Views/MRAID';
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
@@ -51,6 +53,7 @@ import { PerformanceEndScreenEventHandler } from 'Performance/EventHandlers/Perf
 import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/PerformanceOverlayEventHandler';
 import { PerformanceVideoEventHandler } from 'Performance/EventHandlers/PerformanceVideoEventHandler';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
+import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import { PromoAdUnit } from 'Promo/AdUnits/PromoAdUnit';
 import { PromoEventHandler } from 'Promo/EventHandlers/PromoEventHandler';
@@ -298,8 +301,13 @@ export class AdUnitFactory {
             privacy: privacy
         };
 
-        const mraidAdUnit = new MRAIDAdUnit(nativeBridge, mraidAdUnitParameters);
-        const mraidEventHandler = new MRAIDEventHandler(nativeBridge, mraidAdUnit, mraidAdUnitParameters);
+        const mraidAdUnit: MRAIDAdUnit = new MRAIDAdUnit(nativeBridge, mraidAdUnitParameters);
+
+        // NOTE: When content type is correct for playables we want to change this to content type check.
+        const isPlayable: boolean = parameters.campaign instanceof PerformanceMRAIDCampaign;
+        const isSonicPlayable: boolean = CustomFeatures.isSonicPlayable(parameters.campaign.getCreativeId());
+        const EventHandler =  (isSonicPlayable || isPlayable) ? PlayableEventHandler : MRAIDEventHandler;
+        const mraidEventHandler: IMRAIDViewHandler = new EventHandler(nativeBridge, mraidAdUnit, mraidAdUnitParameters);
         mraid.addEventHandler(mraidEventHandler);
 
         return mraidAdUnit;

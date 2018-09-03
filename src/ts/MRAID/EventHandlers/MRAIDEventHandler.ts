@@ -11,7 +11,6 @@ import { NativeBridge } from 'Common/Native/NativeBridge';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { Request } from 'Core/Utilities/Request';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
@@ -26,9 +25,9 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     private _mraidView: MRAIDView<IMRAIDViewHandler>;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
-    private _campaign: MRAIDCampaign;
     private _request: Request;
     private _placement: Placement;
+    protected _campaign: MRAIDCampaign;
 
     constructor(nativeBridge: NativeBridge, adUnit: MRAIDAdUnit, parameters: IMRAIDAdUnitParameters) {
         super(parameters.gdprManager, parameters.configuration);
@@ -97,21 +96,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     }
 
     public onMraidAnalyticsEvent(timeFromShow: number, timeFromPlayableStart: number, backgroundTime: number, event: string, eventData: any): void {
-        const kafkaObject: any = {};
-        kafkaObject.type = event;
-        kafkaObject.eventData = eventData;
-        kafkaObject.timeFromShow = timeFromShow;
-        kafkaObject.timeFromPlayableStart = timeFromPlayableStart;
-        kafkaObject.backgroundTime = backgroundTime;
-
-        const resourceUrl = this._campaign.getResourceUrl();
-        if(resourceUrl) {
-            kafkaObject.url = resourceUrl.getOriginalUrl();
-        }
-
-        kafkaObject.auctionId = this._campaign.getSession().getId();
-
-        HttpKafka.sendEvent('ads.sdk2.events.playable.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
+        // no-op
     }
 
     public onMraidShowEndScreen(): void {

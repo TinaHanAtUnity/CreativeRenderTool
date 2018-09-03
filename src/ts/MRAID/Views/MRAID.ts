@@ -118,6 +118,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         super.show();
         this.choosePrivacyShown();
         this._showTimestamp = Date.now();
+        this.sendMraidAnalyticsEvent('playable_show');
 
         if(this._placement.allowSkip()) {
             const skipLength = this._placement.allowSkipInSeconds();
@@ -160,13 +161,6 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
                     this.updateProgressCircle(this._closeElement, 1);
                 }
             }, 1000);
-        }
-
-        if(CustomFeatures.isSonicPlayable(this._creativeId)) {
-            this._playableStartTimestamp = Date.now();
-            const timeFromShow = this.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
-            const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
-            this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_start', undefined));
         }
 
         if(this._loaded) {
@@ -222,6 +216,12 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         }
     }
 
+    private sendMraidAnalyticsEvent(eventName: string, timeFromPlayableStart: number = 0, eventData?: any) {
+        const timeFromShow = this._playableStartTimestamp ? this.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000) : 0;
+        const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
+        this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, eventName, eventData));
+    }
+
     private updateProgressCircle(container: HTMLElement, value: number) {
         const wrapperElement = <HTMLElement>container.querySelector('.progress-wrapper');
 
@@ -250,21 +250,31 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
     private onCloseEvent(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
+
         if(this._canSkip && !this._canClose) {
             this._handlers.forEach(handler => handler.onMraidSkip());
+            this.sendMraidAnalyticsEvent('playable_skip');
         } else if(this._canClose) {
             this._handlers.forEach(handler => handler.onMraidClose());
+            this.sendMraidAnalyticsEvent('playable_close');
         }
+    }
+
+    private onLoadedEvent(event: Event): void {
+        this._loaded = true;
+        this.onLoaded.trigger();
+        const frameLoadDuration = Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId());
+        this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' iframe load duration ' + frameLoadDuration + ' ms');
+        this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(frameLoadDuration, 0, 0, 'mraid_loading_time_mraid', {}));
+
+        this._playableStartTimestamp = Date.now();
+        this.sendMraidAnalyticsEvent('playable_start');
     }
 
     private onMessage(event: MessageEvent) {
         switch(event.data.type) {
             case 'loaded':
-                this._loaded = true;
-                this.onLoaded.trigger();
-                const frameLoadDuration = Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId());
-                this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' iframe load duration ' + frameLoadDuration + ' ms');
-                this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(frameLoadDuration, 0, 0, 'mraid_loading_time_mraid', {}));
+                this.onLoadedEvent(event);
                 break;
 
             case 'open':
@@ -302,12 +312,8 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
                 }));
                 break;
             case 'analyticsEvent':
-                if(CustomFeatures.isSonicPlayable(this._creativeId)) {
-                    const timeFromShow = this.checkIsValid((Date.now() - this._showTimestamp) / 1000);
-                    const timeFromPlayableStart = this.checkIsValid((Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000);
-                    const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
-                    this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, event.data.event, event.data.eventData));
-                }
+                const timeFromPlayableStart = this.checkIsValid((Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000);
+                this.sendMraidAnalyticsEvent(event.data.event, timeFromPlayableStart, event.data.eventData);
                 break;
 
             case 'customMraidState':

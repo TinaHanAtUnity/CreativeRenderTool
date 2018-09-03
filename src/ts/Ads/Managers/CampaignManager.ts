@@ -38,7 +38,7 @@ import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { INativeResponse, Request } from 'Core/Utilities/Request';
 import { Url } from 'Core/Utilities/Url';
-import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 
 export class CampaignManager {
@@ -556,7 +556,7 @@ export class CampaignManager {
                 }, session);
             }
 
-            if (campaign instanceof MRAIDCampaign) {
+            if (campaign instanceof PerformanceMRAIDCampaign) {
                 const cachingDuration = Date.now() - cachingTimestamp;
 
                 const kafkaObject: any = {};

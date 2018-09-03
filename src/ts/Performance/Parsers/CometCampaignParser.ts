@@ -10,8 +10,9 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Request } from 'Core/Utilities/Request';
-import { IMRAIDCampaign, MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { IMRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IPerformanceCampaign, PerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCampaign';
+import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 
 // Events marked with // are currently sent, but are unused - waiting for BI to confirm if they want them sent
 export enum ICometTrackingUrlEvents {
@@ -87,7 +88,7 @@ export class CometCampaignParser extends CampaignParser {
                 playableConfiguration: undefined
             };
 
-            const mraidCampaign = new MRAIDCampaign(parameters);
+            const mraidCampaign = new PerformanceMRAIDCampaign(parameters);
 
             if (CustomFeatures.isPlayableConfigurationEnabled(json.mraidUrl)) {
                 const playableConfigurationUrl = json.mraidUrl.replace(/index\.html/, 'configuration.json');

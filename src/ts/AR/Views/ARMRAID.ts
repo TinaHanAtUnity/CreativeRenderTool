@@ -197,6 +197,8 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     public show(): void {
         super.show();
         this._showTimestamp = Date.now();
+        const backgroundTime = ARMRAID.checkIsValid(this._backgroundTime / 1000);
+        this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(0, 0, backgroundTime, 'playable_show', {}));
         this.showLoadingScreen();
     }
 

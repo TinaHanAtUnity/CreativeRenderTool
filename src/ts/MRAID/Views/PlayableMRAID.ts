@@ -12,8 +12,8 @@ import { Template } from 'Core/Utilities/Template';
 import MRAIDPerfContainer from 'html/mraid/container-perf.html';
 import MRAIDContainer from 'html/mraid/container.html';
 import PlayableMRAIDTemplate from 'html/PlayableMRAID.html';
-import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
+import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 
 export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -46,7 +46,9 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private _configuration: any;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup) {
+    protected _campaign: PerformanceMRAIDCampaign;
+
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: PerformanceMRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup) {
         super(nativeBridge, 'playable-mraid', placement, campaign, privacy, showGDPRBanner, abGroup);
 
         this._placement = placement;
@@ -142,6 +144,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     public show(): void {
         super.show();
         this._showTimestamp = Date.now();
+        this.sendMraidAnalyticsEvent('playable_show');
         this.showLoadingScreen();
     }
 
@@ -214,10 +217,6 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         const frameLoadDuration = Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId());
         this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' iframe load duration ' + frameLoadDuration + ' ms');
-
-        const timeFromShow = this.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
-        const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
-
         this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(frameLoadDuration, 0, 0, 'mraid_loading_time_playable', {}));
     }
 
@@ -299,9 +298,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 this._closeElement.style.display = 'block';
 
                 this._playableStartTimestamp = Date.now();
-                const timeFromShow = this.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
-                const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
-                this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_start', undefined));
+                this.sendMraidAnalyticsEvent('playable_start');
                 this._iframe.contentWindow!.postMessage({
                     type: 'viewable',
                     value: true
@@ -312,6 +309,12 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         });
 
         this._loadingScreen.classList.add('hidden');
+    }
+
+    private sendMraidAnalyticsEvent(eventName: string, timeFromPlayableStart: number = 0, eventData?: any) {
+        const timeFromShow = this._playableStartTimestamp ? this.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000) : 0;
+        const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
+        this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, eventName, eventData));
     }
 
     private updateProgressCircle(container: HTMLElement, value: number) {
@@ -342,15 +345,13 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private onCloseEvent(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
-        const timeFromShow = this.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
-        const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
 
         if (this._canSkip && !this._canClose) {
             this._handlers.forEach(handler => handler.onMraidSkip());
-            this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_skip', undefined));
+            this.sendMraidAnalyticsEvent('playable_skip');
         } else if (this._canClose) {
             this._handlers.forEach(handler => handler.onMraidClose());
-            this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_close', undefined));
+            this.sendMraidAnalyticsEvent('playable_close');
         }
     }
 
@@ -388,10 +389,8 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 }));
                 break;
             case 'analyticsEvent':
-                const timeFromShow = this.checkIsValid((Date.now() - this._showTimestamp) / 1000);
                 const timeFromPlayableStart = this.checkIsValid((Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000);
-                const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
-                this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, event.data.event, event.data.eventData));
+                this.sendMraidAnalyticsEvent(event.data.event, timeFromPlayableStart, event.data.eventData);
                 break;
             case 'customMraidState':
                 switch(event.data.state) {
