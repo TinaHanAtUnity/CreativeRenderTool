@@ -392,7 +392,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         const timeFromShow = ARMRAID.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
         const backgroundTime = ARMRAID.checkIsValid(this._backgroundTime / 1000);
 
-        this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(frameLoadDuration, timeFromShow, backgroundTime, 'playable_loading_time_playable', {}));
+        this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(frameLoadDuration, timeFromShow, backgroundTime, 'playable_loading_time', {}));
     }
 
     private handleAREvent(event: string, parameters: string) {
