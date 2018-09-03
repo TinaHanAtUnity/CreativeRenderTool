@@ -14,6 +14,8 @@ export class CampaignParserFactory {
     public static getCampaignParser(contentType: string): CampaignParser {
         switch (contentType) {
             case CometCampaignParser.ContentType:
+            case CometCampaignParser.ContentTypeVideo:
+            case CometCampaignParser.ContentTypeMRAID:
                 return new CometCampaignParser();
             case XPromoCampaignParser.ContentType:
                 return new XPromoCampaignParser();
