@@ -1,5 +1,9 @@
 # Pending
 
+* Reformat build informatino in privacy objects
+
+# Thu Aug 30 15:02:10 UTC 2018
+
 * Remove webview reinit logic
 * AR fixes
 * Isolate integration tests
