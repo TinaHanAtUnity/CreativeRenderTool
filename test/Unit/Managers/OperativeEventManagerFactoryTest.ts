@@ -1,4 +1,4 @@
-import { MRAIDOperativeEventManager } from 'Ads/Managers/MRAIDOperativeEventManager';
+import { MRAIDOperativeEventManager } from 'MRAID/Managers/MRAIDOperativeEventManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';

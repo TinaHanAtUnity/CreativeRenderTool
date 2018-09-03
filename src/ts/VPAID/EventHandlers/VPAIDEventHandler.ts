@@ -2,8 +2,8 @@ import { IOperativeEventParams, OperativeEventManager } from 'Ads/Managers/Opera
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
 import { Closer } from 'Ads/Views/Closer';
-import { IVPAIDHandler } from 'Ads/Views/VPAID';
-import { VPAIDEndScreen } from 'Ads/Views/VPAIDEndScreen';
+import { IVPAIDHandler } from 'VPAID/Views/VPAID';
+import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
 import { FinishState } from 'Common/Constants/FinishState';
 import { DiagnosticError } from 'Common/Errors/DiagnosticError';
 import { NativeBridge } from 'Common/Native/NativeBridge';

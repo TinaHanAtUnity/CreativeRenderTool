@@ -8,7 +8,7 @@ import { GdprManager } from 'Ads/Managers/GdprManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Session } from 'Ads/Models/Session';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
-import { ITouchInfo } from 'Ads/Views/AFMABridge';
+import { ITouchInfo } from 'AdMob/Views/AFMABridge';
 import { assert } from 'chai';
 import { Platform } from 'Common/Constants/Platform';
 import { NativeBridge } from 'Common/Native/NativeBridge';

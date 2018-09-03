@@ -3,7 +3,7 @@ import { IVideoAdUnitParameters, VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
 import { MOAT } from 'Ads/Views/MOAT';
-import { VastEndScreen } from 'Ads/Views/VastEndScreen';
+import { VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { StreamType } from 'Common/Constants/Android/StreamType';
 import { Platform } from 'Common/Constants/Platform';
 import { NativeBridge } from 'Common/Native/NativeBridge';

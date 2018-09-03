@@ -1,5 +1,5 @@
 import { Campaign } from 'Ads/Models/Campaign';
-import { PerformanceCampaign } from 'Ads/Models/Campaigns/PerformanceCampaign';
+import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 
 export class GameSessionCounters {

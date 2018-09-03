@@ -2,7 +2,7 @@ import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
-import { BannerCampaign, IBannerCampaign } from 'Banners/Models/Campaigns/BannerCampaign';
+import { BannerCampaign, IBannerCampaign } from 'Banners/Models/BannerCampaign';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { Request } from 'Core/Utilities/Request';
 

@@ -3,7 +3,7 @@ import {
     IOperativeEventParams,
     OperativeEventManager
 } from 'Ads/Managers/OperativeEventManager';
-import { PerformanceCampaign } from 'Ads/Models/Campaigns/PerformanceCampaign';
+import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { Url } from 'Core/Utilities/Url';
 
 export class PerformanceOperativeEventManager extends OperativeEventManager {

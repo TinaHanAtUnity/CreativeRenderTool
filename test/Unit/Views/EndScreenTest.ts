@@ -1,5 +1,5 @@
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { PerformanceEndScreen } from 'Ads/Views/PerformanceEndScreen';
+import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import { Privacy } from 'Ads/Views/Privacy';
 import { assert } from 'chai';
 

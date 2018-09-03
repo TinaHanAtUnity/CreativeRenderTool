@@ -5,7 +5,7 @@ import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { IOperativeEventParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
-import { PerformanceCampaign } from 'Ads/Models/Campaigns/PerformanceCampaign';
+import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { Placement } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
 import { AndroidAdUnitApi } from 'Ads/Native/Android/AndroidAdUnit';

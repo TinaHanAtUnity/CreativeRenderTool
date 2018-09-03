@@ -1,12 +1,12 @@
 import { AbstractAdUnit, IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
-import { PerformanceAdUnit } from 'Ads/AdUnits/PerformanceAdUnit';
+import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { GDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { IOperativeEventParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
-import { StoreName } from 'Ads/Models/Campaigns/PerformanceCampaign';
+import { StoreName } from 'Performance/Models/PerformanceCampaign';
 import { Placement } from 'Ads/Models/Placement';
 import { IosUtils } from 'Ads/Utilities/IosUtils';
 import { IEndScreenHandler } from 'Ads/Views/EndScreen';

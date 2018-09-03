@@ -8,8 +8,8 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { Closer } from 'Ads/Views/Closer';
 import { Privacy } from 'Ads/Views/Privacy';
-import { VPAID } from 'Ads/Views/VPAID';
-import { VPAIDEndScreen } from 'Ads/Views/VPAIDEndScreen';
+import { VPAID } from 'VPAID/Views/VPAID';
+import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
 import { assert } from 'chai';
 import { FinishState } from 'Common/Constants/FinishState';
 import { Platform } from 'Common/Constants/Platform';

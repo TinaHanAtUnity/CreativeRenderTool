@@ -1,7 +1,7 @@
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
-import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
+import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { Session } from 'Ads/Models/Session';
-import { ProgrammaticMraidParser } from 'Ads/Parsers/ProgrammaticMraidParser';
+import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
 import { assert } from 'chai';
 
 import { NativeBridge } from 'Common/Native/NativeBridge';

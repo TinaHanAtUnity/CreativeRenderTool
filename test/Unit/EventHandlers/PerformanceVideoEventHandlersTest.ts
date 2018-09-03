@@ -1,19 +1,19 @@
 import { Activity } from 'Ads/AdUnits/Containers/Activity';
 import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Ads/AdUnits/PerformanceAdUnit';
+import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { VideoState } from 'Ads/AdUnits/VideoAdUnit';
 import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
-import { PerformanceVideoEventHandler } from 'Ads/EventHandlers/PerformanceVideoEventHandler';
+import { PerformanceVideoEventHandler } from 'Performance/EventHandlers/PerformanceVideoEventHandler';
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Video } from 'Ads/Models/Assets/Video';
-import { PerformanceCampaign } from 'Ads/Models/Campaigns/PerformanceCampaign';
+import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { Overlay } from 'Ads/Views/Overlay';
-import { PerformanceEndScreen } from 'Ads/Views/PerformanceEndScreen';
+import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Platform } from 'Common/Constants/Platform';
 

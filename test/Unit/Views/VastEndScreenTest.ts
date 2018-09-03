@@ -1,4 +1,4 @@
-import { VastEndScreen } from 'Ads/Views/VastEndScreen';
+import { VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { assert } from 'chai';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 

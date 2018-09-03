@@ -1,10 +1,10 @@
-import { MRAIDOperativeEventManager } from 'Ads/Managers/MRAIDOperativeEventManager';
+import { MRAIDOperativeEventManager } from 'MRAID/Managers/MRAIDOperativeEventManager';
 import { IOperativeEventManagerParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { PerformanceOperativeEventManager } from 'Ads/Managers/PerformanceOperativeEventManager';
 import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOperativeEventManager';
 import { Campaign } from 'Ads/Models/Campaign';
-import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
-import { PerformanceCampaign } from 'Ads/Models/Campaigns/PerformanceCampaign';
+import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 

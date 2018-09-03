@@ -1,6 +1,6 @@
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Session } from 'Ads/Models/Session';
-import { BannerCampaign } from 'Banners/Models/Campaigns/BannerCampaign';
+import { BannerCampaign } from 'Banners/Models/BannerCampaign';
 import { BannerCampaignParser } from 'Banners/Parsers/BannerCampaignParser';
 import { assert } from 'chai';
 import { NativeBridge } from 'Common/Native/NativeBridge';

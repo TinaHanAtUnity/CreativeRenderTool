@@ -8,7 +8,7 @@ import { Placement } from 'Ads/Models/Placement';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { UserCountData } from 'Ads/Utilities/UserCountData';
-import { IClickSignalResponse, IOpenableIntentsResponse } from 'Ads/Views/AFMABridge';
+import { IClickSignalResponse, IOpenableIntentsResponse } from 'AdMob/Views/AFMABridge';
 import { KeyCode } from 'Common/Constants/Android/KeyCode';
 import { SensorDelay } from 'Common/Constants/Android/SensorDelay';
 import { FinishState } from 'Common/Constants/FinishState';

@@ -1,4 +1,4 @@
-import { IVPAIDEndScreenHandler } from 'Ads/Views/VPAIDEndScreen';
+import { IVPAIDEndScreenHandler } from 'VPAID/Views/VPAIDEndScreen';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'VPAID/AdUnits/VPAIDAdUnit';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';

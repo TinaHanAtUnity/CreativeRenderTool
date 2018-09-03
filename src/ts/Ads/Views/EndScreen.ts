@@ -5,7 +5,7 @@ import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Campaign } from 'Ads/Models/Campaign';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
-import { View } from 'Ads/Views/View';
+import { View } from 'Common/Views/View';
 
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { ABGroup } from 'Core/Models/ABGroup';

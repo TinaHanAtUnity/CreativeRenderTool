@@ -10,9 +10,9 @@ import {
     IOpenableIntentsRequest,
     IOpenableIntentsResponse,
     ITouchInfo
-} from 'Ads/Views/AFMABridge';
-import { MRAIDBridge } from 'Ads/Views/MRAIDBridge';
-import { View } from 'Ads/Views/View';
+} from 'AdMob/Views/AFMABridge';
+import { MRAIDBridge } from 'MRAID/Views/MRAIDBridge';
+import { View } from 'Common/Views/View';
 
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { Template } from 'Core/Utilities/Template';

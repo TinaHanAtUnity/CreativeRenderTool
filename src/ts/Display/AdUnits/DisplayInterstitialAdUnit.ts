@@ -6,7 +6,7 @@ import { Placement } from 'Ads/Models/Placement';
 import { IWebPlayerWebSettingsAndroid, IWebPlayerWebSettingsIos } from 'Ads/Native/WebPlayer';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
-import { DisplayInterstitial } from 'Ads/Views/DisplayInterstitial';
+import { DisplayInterstitial } from 'Display/Views/DisplayInterstitial';
 import { FinishState } from 'Common/Constants/FinishState';
 import { Platform } from 'Common/Constants/Platform';
 import { DiagnosticError } from 'Common/Errors/DiagnosticError';

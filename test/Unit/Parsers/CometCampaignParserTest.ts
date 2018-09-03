@@ -1,9 +1,9 @@
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
-import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
-import { PerformanceCampaign, StoreName } from 'Ads/Models/Campaigns/PerformanceCampaign';
+import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { PerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCampaign';
 import { Session } from 'Ads/Models/Session';
-import { CometCampaignParser } from 'Ads/Parsers/CometCampaignParser';
+import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
 import { assert } from 'chai';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { SdkApi } from 'Core/Native/Sdk';

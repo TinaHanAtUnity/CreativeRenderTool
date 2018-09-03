@@ -1,4 +1,4 @@
-import { PerformanceCampaign, StoreName } from 'Ads/Models/Campaigns/PerformanceCampaign';
+import { PerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCampaign';
 import { assert } from 'chai';
 
 import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';

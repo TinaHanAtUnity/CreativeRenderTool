@@ -6,7 +6,7 @@ import {
 } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
-import { PerformanceCampaign } from 'Ads/Models/Campaigns/PerformanceCampaign';
+import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { Placement } from 'Ads/Models/Placement';
 import { CampaignAssetInfo, VideoType } from 'Ads/Utilities/CampaignAssetInfo';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';

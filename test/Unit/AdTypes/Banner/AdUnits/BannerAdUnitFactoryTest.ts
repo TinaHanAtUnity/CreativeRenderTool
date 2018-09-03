@@ -1,7 +1,7 @@
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { BannerAdUnit } from 'Banners/AdUnits/BannerAdUnit';
 import { BannerAdUnitFactory } from 'Banners/AdUnits/BannerAdUnitFactory';
-import { BannerCampaign } from 'Banners/Models/Campaigns/BannerCampaign';
+import { BannerCampaign } from 'Banners/Models/BannerCampaign';
 import { assert } from 'chai';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import 'mocha';

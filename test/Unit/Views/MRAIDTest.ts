@@ -1,8 +1,8 @@
 import { GdprManager } from 'Ads/Managers/GdprManager';
-import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
+import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { Placement } from 'Ads/Models/Placement';
 import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
-import { MRAID } from 'Ads/Views/MRAID';
+import { MRAID } from 'MRAID/Views/MRAID';
 import { assert } from 'chai';
 
 import { NativeBridge } from 'Common/Native/NativeBridge';

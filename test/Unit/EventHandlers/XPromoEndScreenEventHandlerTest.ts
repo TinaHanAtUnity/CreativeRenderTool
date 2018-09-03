@@ -14,7 +14,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { Overlay } from 'Ads/Views/Overlay';
 import { Privacy } from 'Ads/Views/Privacy';
-import { XPromoEndScreen } from 'Ads/Views/XPromoEndScreen';
+import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
 import { Platform } from 'Common/Constants/Platform';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { FocusManager } from 'Core/Managers/FocusManager';

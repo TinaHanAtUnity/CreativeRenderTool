@@ -4,7 +4,7 @@ import { Session } from 'Ads/Models/Session';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 
 import { BannerAdUnit } from 'Banners/AdUnits/BannerAdUnit';
-import { BannerCampaign, IBannerCampaign } from 'Banners/Models/Campaigns/BannerCampaign';
+import { BannerCampaign, IBannerCampaign } from 'Banners/Models/BannerCampaign';
 import { BannerApi } from 'Banners/Native/Banner';
 import { BannerListenerApi } from 'Banners/Native/UnityBannerListener';
 import { assert } from 'chai';

@@ -5,7 +5,7 @@ import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign } from 'Ads/Models/Campaign';
-import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
+import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { Placement } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';

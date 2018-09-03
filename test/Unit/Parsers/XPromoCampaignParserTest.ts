@@ -1,5 +1,5 @@
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
-import { StoreName } from 'Ads/Models/Campaigns/PerformanceCampaign';
+import { StoreName } from 'Performance/Models/PerformanceCampaign';
 import { Session } from 'Ads/Models/Session';
 import { assert } from 'chai';
 

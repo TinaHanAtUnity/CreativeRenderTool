@@ -1,7 +1,7 @@
 import { Asset } from 'Ads/Models/Assets/Asset';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
-import { PerformanceCampaign } from 'Ads/Models/Campaigns/PerformanceCampaign';
+import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { WebViewError } from 'Common/Errors/WebViewError';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { CacheMode } from 'Core/Models/Configuration';

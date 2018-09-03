@@ -2,7 +2,7 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
 import { IWebPlayerWebSettingsAndroid, IWebPlayerWebSettingsIos } from 'Ads/Native/WebPlayer';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
-import { BannerCampaign } from 'Banners/Models/Campaigns/BannerCampaign';
+import { BannerCampaign } from 'Banners/Models/BannerCampaign';
 import { BannerViewType } from 'Banners/Native/Banner';
 import { Platform } from 'Common/Constants/Platform';
 import { NativeBridge } from 'Common/Native/NativeBridge';

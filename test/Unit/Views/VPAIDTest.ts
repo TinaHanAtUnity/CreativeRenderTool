@@ -1,6 +1,6 @@
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { Privacy } from 'Ads/Views/Privacy';
-import { IVPAIDHandler, VPAID } from 'Ads/Views/VPAID';
+import { IVPAIDHandler, VPAID } from 'VPAID/Views/VPAID';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { Observable1 } from 'Common/Utilities/Observable';
 import { DeviceInfoApi } from 'Core/Native/DeviceInfo';

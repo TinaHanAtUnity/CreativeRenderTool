@@ -13,7 +13,7 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { MOAT } from 'Ads/Views/MOAT';
 import { Overlay } from 'Ads/Views/Overlay';
 import { Privacy } from 'Ads/Views/Privacy';
-import { VastEndScreen } from 'Ads/Views/VastEndScreen';
+import { VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { assert } from 'chai';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { FocusManager } from 'Core/Managers/FocusManager';

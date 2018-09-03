@@ -1,5 +1,5 @@
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
-import { IVastEndScreenHandler, VastEndScreen } from 'Ads/Views/VastEndScreen';
+import { IVastEndScreenHandler, VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { KeyCode } from 'Common/Constants/Android/KeyCode';
 import { Platform } from 'Common/Constants/Platform';
 import { NativeBridge } from 'Common/Native/NativeBridge';

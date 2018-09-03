@@ -1,6 +1,6 @@
 import { Campaign } from 'Ads/Models/Campaign';
-import { PerformanceCampaign } from 'Ads/Models/Campaigns/PerformanceCampaign';
-import { ICometTrackingUrlEvents } from 'Ads/Parsers/CometCampaignParser';
+import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
+import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
 import { Analytics } from 'Ads/Utilities/Analytics';
 import { DiagnosticError } from 'Common/Errors/DiagnosticError';
 import { RequestError } from 'Common/Errors/RequestError';

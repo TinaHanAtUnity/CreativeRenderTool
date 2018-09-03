@@ -9,7 +9,7 @@ import { GDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Session } from 'Ads/Models/Session';
-import { IOpenableIntentsRequest, ITouchInfo } from 'Ads/Views/AFMABridge';
+import { IOpenableIntentsRequest, ITouchInfo } from 'AdMob/Views/AFMABridge';
 import { FinishState } from 'Common/Constants/FinishState';
 import { Platform } from 'Common/Constants/Platform';
 import { NativeBridge } from 'Common/Native/NativeBridge';

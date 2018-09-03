@@ -8,7 +8,7 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
-import { DisplayInterstitial } from 'Ads/Views/DisplayInterstitial';
+import { DisplayInterstitial } from 'Display/Views/DisplayInterstitial';
 import { Privacy } from 'Ads/Views/Privacy';
 import { Platform } from 'Common/Constants/Platform';
 import { NativeBridge } from 'Common/Native/NativeBridge';

@@ -9,7 +9,7 @@ import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Overlay } from 'Ads/Views/Overlay';
 import { Privacy } from 'Ads/Views/Privacy';
-import { VastEndScreen } from 'Ads/Views/VastEndScreen';
+import { VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { assert } from 'chai';
 import { Platform } from 'Common/Constants/Platform';
 import { FocusManager } from 'Core/Managers/FocusManager';
