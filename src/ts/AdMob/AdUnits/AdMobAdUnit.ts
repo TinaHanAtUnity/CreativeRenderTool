@@ -1,5 +1,6 @@
 import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
 import { AdMobView } from 'AdMob/Views/AdMobView';
+import { IClickSignalResponse, IOpenableIntentsResponse } from 'AdMob/Views/AFMABridge';
 import { AbstractAdUnit, IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { AdUnitContainerSystemMessage, IAdUnitContainerListener } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { IOperativeEventParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
@@ -8,7 +9,6 @@ import { Placement } from 'Ads/Models/Placement';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { UserCountData } from 'Ads/Utilities/UserCountData';
-import { IClickSignalResponse, IOpenableIntentsResponse } from 'AdMob/Views/AFMABridge';
 import { KeyCode } from 'Common/Constants/Android/KeyCode';
 import { SensorDelay } from 'Common/Constants/Android/SensorDelay';
 import { FinishState } from 'Common/Constants/FinishState';

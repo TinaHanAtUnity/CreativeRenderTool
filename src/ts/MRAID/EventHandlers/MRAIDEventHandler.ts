@@ -1,11 +1,8 @@
-import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { GDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { IOperativeEventParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { Placement } from 'Ads/Models/Placement';
 import { EventType } from 'Ads/Models/Session';
-import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { FinishState } from 'Common/Constants/FinishState';
 import { Platform } from 'Common/Constants/Platform';
 import { DiagnosticError } from 'Common/Errors/DiagnosticError';
@@ -16,6 +13,9 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { Request } from 'Core/Utilities/Request';
+import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
+import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
 
 export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHandler {
 

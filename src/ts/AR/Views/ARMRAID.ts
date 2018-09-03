@@ -1,10 +1,7 @@
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { Placement } from 'Ads/Models/Placement';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
-
-import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { ARUtil } from 'AR/Utilities/ARUtil';
 import { Platform } from 'Common/Constants/Platform';
 import { NativeBridge } from 'Common/Native/NativeBridge';
@@ -17,6 +14,9 @@ import { Template } from 'Core/Utilities/Template';
 import MRAIDContainer from 'html/mraid/container.html';
 import WebARScript from 'html/mraid/webar.html';
 import PlayableMRAIDTemplate from 'html/PlayableMRAID.html';
+import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+
+import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 
 export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private static CloseLength = 30;

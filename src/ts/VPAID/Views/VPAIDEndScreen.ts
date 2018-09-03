@@ -1,8 +1,8 @@
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
+import { NativeBridge } from 'Common/Native/NativeBridge';
 
 import { View } from 'Common/Views/View';
-import { NativeBridge } from 'Common/Native/NativeBridge';
 import { Template } from 'Core/Utilities/Template';
 import VastEndScreenTemplate from 'html/VastEndScreen.html';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';

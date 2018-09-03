@@ -1,7 +1,7 @@
-import { IVPAIDEndScreenHandler } from 'VPAID/Views/VPAIDEndScreen';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'VPAID/AdUnits/VPAIDAdUnit';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
+import { IVPAIDEndScreenHandler } from 'VPAID/Views/VPAIDEndScreen';
 
 export class VPAIDEndScreenEventHandler implements IVPAIDEndScreenHandler {
     private _adUnit: VPAIDAdUnit;

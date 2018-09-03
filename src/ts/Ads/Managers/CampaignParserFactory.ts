@@ -1,9 +1,9 @@
 import { ProgrammaticAdMobParser } from 'AdMob/Parsers/ProgrammaticAdMobParser';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
-import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
+import { ProgrammaticStaticInterstitialParser } from 'Display/Parsers/ProgrammaticStaticInterstitialParser';
 import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
 import { ProgrammaticMraidUrlParser } from 'MRAID/Parsers/ProgrammaticMraidUrlParser';
-import { ProgrammaticStaticInterstitialParser } from 'Display/Parsers/ProgrammaticStaticInterstitialParser';
+import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
 import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
 import { ProgrammaticVastParser } from 'VAST/Parsers/ProgrammaticVastParser';
 import { ProgrammaticVPAIDParser } from 'VPAID/Parsers/ProgrammaticVPAIDParser';

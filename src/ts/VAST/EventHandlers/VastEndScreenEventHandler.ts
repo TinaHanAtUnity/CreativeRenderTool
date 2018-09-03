@@ -1,5 +1,4 @@
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
-import { IVastEndScreenHandler, VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { KeyCode } from 'Common/Constants/Android/KeyCode';
 import { Platform } from 'Common/Constants/Platform';
 import { NativeBridge } from 'Common/Native/NativeBridge';
@@ -7,6 +6,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Request } from 'Core/Utilities/Request';
 import { VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { IVastEndScreenHandler, VastEndScreen } from 'VAST/Views/VastEndScreen';
 
 export class VastEndScreenEventHandler implements IVastEndScreenHandler {
     private _nativeBridge: NativeBridge;

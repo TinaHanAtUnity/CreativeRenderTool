@@ -1,6 +1,4 @@
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
-import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
 import { assert } from 'chai';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { FocusManager } from 'Core/Managers/FocusManager';
@@ -10,6 +8,8 @@ import { RequestApi } from 'Core/Native/Request';
 
 import { Request } from 'Core/Utilities/Request';
 import 'mocha';
+import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
+import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 

@@ -1,10 +1,8 @@
 import { Activity } from 'Ads/AdUnits/Containers/Activity';
 import { AdUnitContainer, Orientation, ViewConfiguration } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { VideoState } from 'Ads/AdUnits/VideoAdUnit';
 import { AndroidVideoEventHandler } from 'Ads/EventHandlers/AndroidVideoEventHandler';
 import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
-import { PerformanceVideoEventHandler } from 'Performance/EventHandlers/PerformanceVideoEventHandler';
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import {
     IOperativeEventManagerParams,
@@ -16,14 +14,11 @@ import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
-import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { Overlay } from 'Ads/Views/Overlay';
-import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import { Privacy } from 'Ads/Views/Privacy';
-import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
 import { assert } from 'chai';
 import { FinishState } from 'Common/Constants/FinishState';
 import { Platform } from 'Common/Constants/Platform';
@@ -39,6 +34,10 @@ import { Double } from 'Core/Utilities/Double';
 import { Request } from 'Core/Utilities/Request';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import 'mocha';
+import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
+import { PerformanceVideoEventHandler } from 'Performance/EventHandlers/PerformanceVideoEventHandler';
+import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
+import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
@@ -49,6 +48,7 @@ import { IXPromoAdUnitParameters, XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUn
 import { XPromoVideoEventHandler } from 'XPromo/EventHandlers/XPromoVideoEventHandler';
 import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
 
 describe('VideoEventHandlersTest', () => {
 

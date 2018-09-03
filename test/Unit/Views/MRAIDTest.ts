@@ -1,8 +1,6 @@
 import { GdprManager } from 'Ads/Managers/GdprManager';
-import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { Placement } from 'Ads/Models/Placement';
 import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
-import { MRAID } from 'MRAID/Views/MRAID';
 import { assert } from 'chai';
 
 import { NativeBridge } from 'Common/Native/NativeBridge';
@@ -11,6 +9,8 @@ import MRAIDContainer from 'html/mraid/container.html';
 
 import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCampaign.json';
 import 'mocha';
+import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { MRAID } from 'MRAID/Views/MRAID';
 
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';

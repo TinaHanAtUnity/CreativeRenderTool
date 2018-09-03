@@ -2,8 +2,6 @@ import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { Asset } from 'Ads/Models/Assets/Asset';
 import { Campaign } from 'Ads/Models/Campaign';
-import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
-import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { Placement } from 'Ads/Models/Placement';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { NativeBridge } from 'Common/Native/NativeBridge';
@@ -15,6 +13,8 @@ import { IFileInfo } from 'Core/Native/Cache';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { Request } from 'Core/Utilities/Request';
 import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
+import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 

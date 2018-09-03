@@ -1,9 +1,6 @@
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
-import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
-import { PerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCampaign';
 import { Session } from 'Ads/Models/Session';
-import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
 import { assert } from 'chai';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { SdkApi } from 'Core/Native/Sdk';
@@ -14,6 +11,9 @@ import { Url } from 'Core/Utilities/Url';
 import OnCometMraidPlcCampaign from 'json/campaigns/performance/CometMraidUrlCampaign.json';
 import OnCometVideoPlcCampaign from 'json/campaigns/performance/CometVideoCampaign.json';
 import 'mocha';
+import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { PerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCampaign';
+import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 

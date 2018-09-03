@@ -1,5 +1,5 @@
-import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IosARApi } from 'AR/Native/iOS/IosARApi';
+import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 
 export interface IARFrameTransform {
     a: number;

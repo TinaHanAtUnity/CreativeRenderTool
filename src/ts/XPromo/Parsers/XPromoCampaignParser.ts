@@ -2,11 +2,11 @@ import { Image } from 'Ads/Models/Assets/Image';
 import { Video } from 'Ads/Models/Assets/Video';
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
-import { StoreName } from 'Performance/Models/PerformanceCampaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { Request } from 'Core/Utilities/Request';
+import { StoreName } from 'Performance/Models/PerformanceCampaign';
 import { IXPromoCampaign, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 
 export class XPromoCampaignParser extends CampaignParser {

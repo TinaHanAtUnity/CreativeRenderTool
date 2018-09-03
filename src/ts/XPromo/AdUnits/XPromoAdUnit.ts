@@ -1,9 +1,9 @@
 import { IVideoAdUnitParameters, VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
-import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
 
 export interface IXPromoAdUnitParameters extends IVideoAdUnitParameters<XPromoCampaign> {
     endScreen: XPromoEndScreen;

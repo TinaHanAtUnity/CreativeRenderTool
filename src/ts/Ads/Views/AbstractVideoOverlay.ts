@@ -1,6 +1,6 @@
 import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
-import { View } from 'Common/Views/View';
 import { NativeBridge } from 'Common/Native/NativeBridge';
+import { View } from 'Common/Views/View';
 
 export interface IOverlayHandler extends IGDPREventHandler {
     onOverlaySkip(position: number): void;

@@ -1,7 +1,6 @@
 import { Asset } from 'Ads/Models/Assets/Asset';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
-import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { WebViewError } from 'Common/Errors/WebViewError';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { CacheMode } from 'Core/Models/Configuration';
@@ -10,6 +9,7 @@ import { Cache, CacheStatus, ICacheDiagnostics } from 'Core/Utilities/Cache';
 import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { FileInfo } from 'Core/Utilities/FileInfo';
+import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 
 enum CacheType {

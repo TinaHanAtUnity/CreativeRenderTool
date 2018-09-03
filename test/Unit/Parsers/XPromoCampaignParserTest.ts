@@ -1,5 +1,4 @@
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
-import { StoreName } from 'Performance/Models/PerformanceCampaign';
 import { Session } from 'Ads/Models/Session';
 import { assert } from 'chai';
 
@@ -10,6 +9,7 @@ import { Url } from 'Core/Utilities/Url';
 
 import XPromoCampaignJSON from 'json/campaigns/xpromo/XPromoCampaign.json';
 import 'mocha';
+import { StoreName } from 'Performance/Models/PerformanceCampaign';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';

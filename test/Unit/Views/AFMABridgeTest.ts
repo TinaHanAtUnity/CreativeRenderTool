@@ -1,5 +1,5 @@
-import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { AFMABridge, AFMAEvents, IAFMAHandler } from 'AdMob/Views/AFMABridge';
+import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import 'mocha';
 import * as sinon from 'sinon';

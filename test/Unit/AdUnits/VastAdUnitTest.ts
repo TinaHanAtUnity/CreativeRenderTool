@@ -9,7 +9,6 @@ import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Overlay } from 'Ads/Views/Overlay';
 import { Privacy } from 'Ads/Views/Privacy';
-import { VastEndScreen } from 'VAST/Views/VastEndScreen';
 import { assert } from 'chai';
 import { Platform } from 'Common/Constants/Platform';
 import { FocusManager } from 'Core/Managers/FocusManager';
@@ -24,6 +23,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { VastEndScreen } from 'VAST/Views/VastEndScreen';
 
 import EventTestVast from 'xml/EventTestVast.xml';
 

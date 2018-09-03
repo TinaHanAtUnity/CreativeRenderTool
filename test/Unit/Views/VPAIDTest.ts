@@ -1,6 +1,5 @@
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { Privacy } from 'Ads/Views/Privacy';
-import { IVPAIDHandler, VPAID } from 'VPAID/Views/VPAID';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { Observable1 } from 'Common/Utilities/Observable';
 import { DeviceInfoApi } from 'Core/Native/DeviceInfo';
@@ -10,6 +9,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 import { VPAID as VPAIDModel } from 'VPAID/Models/VPAID';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
+import { IVPAIDHandler, VPAID } from 'VPAID/Views/VPAID';
 
 describe('VPAID View', () => {
     let nativeBridge: NativeBridge;

@@ -1,6 +1,5 @@
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { ViewConfiguration } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { VideoAdUnit, VideoState } from 'Ads/AdUnits/VideoAdUnit';
 import { GDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { IOperativeSkipEventParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
@@ -11,6 +10,7 @@ import { IOverlayHandler } from 'Ads/Views/AbstractVideoOverlay';
 import { FinishState } from 'Common/Constants/FinishState';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { Double } from 'Core/Utilities/Double';
+import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 
 export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler implements IOverlayHandler {
     protected _placement: Placement;

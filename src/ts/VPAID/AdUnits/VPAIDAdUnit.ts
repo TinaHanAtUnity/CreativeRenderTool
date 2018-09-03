@@ -7,8 +7,6 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { Closer } from 'Ads/Views/Closer';
-import { VPAID } from 'VPAID/Views/VPAID';
-import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
 import { FinishState } from 'Common/Constants/FinishState';
 import { Platform } from 'Common/Constants/Platform';
 import { DiagnosticError } from 'Common/Errors/DiagnosticError';
@@ -20,6 +18,8 @@ import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Timer } from 'Core/Utilities/Timer';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
+import { VPAID } from 'VPAID/Views/VPAID';
+import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
 
 export interface IVPAIDAdUnitParameters extends IAdUnitParameters<VPAIDCampaign> {
     vpaid: VPAID;

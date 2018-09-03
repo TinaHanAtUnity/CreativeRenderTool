@@ -1,9 +1,9 @@
-import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { EndScreenEventHandler, IEndScreenDownloadParameters } from 'Ads/EventHandlers/EndScreenEventHandler';
-import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
-import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
 import { KeyCode } from 'Common/Constants/Android/KeyCode';
 import { NativeBridge } from 'Common/Native/NativeBridge';
+import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
+import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
+import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
 
 export class PerformanceEndScreenEventHandler extends EndScreenEventHandler<PerformanceCampaign, PerformanceAdUnit> {
 

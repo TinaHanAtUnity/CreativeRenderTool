@@ -1,7 +1,7 @@
 import { IBuildInformation } from 'Ads/Views/AbstractPrivacy';
-import { IViewBinding } from 'Common/Views/IViewBinding';
 import { Platform } from 'Common/Constants/Platform';
 import { NativeBridge } from 'Common/Native/NativeBridge';
+import { IViewBinding } from 'Common/Views/IViewBinding';
 import { Swipe } from 'Core/Utilities/Swipe';
 import { Tap } from 'Core/Utilities/Tap';
 import { Template } from 'Core/Utilities/Template';

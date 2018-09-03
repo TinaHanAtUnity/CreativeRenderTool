@@ -1,13 +1,13 @@
 import { GDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { IOperativeEventParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { Placement } from 'Ads/Models/Placement';
-import { IDisplayInterstitialHandler } from 'Display/Views/DisplayInterstitial';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import {
     DisplayInterstitialAdUnit,
     IDisplayInterstitialAdUnitParameters
 } from 'Display/AdUnits/DisplayInterstitialAdUnit';
 import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
+import { IDisplayInterstitialHandler } from 'Display/Views/DisplayInterstitial';
 
 export class DisplayInterstitialEventHandler extends GDPREventHandler implements IDisplayInterstitialHandler {
     private _nativeBridge: NativeBridge;

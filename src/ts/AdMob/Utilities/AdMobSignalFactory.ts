@@ -1,10 +1,10 @@
 import { AdMobAdUnit } from 'AdMob/AdUnits/AdMobAdUnit';
 import { AdMobOptionalSignal } from 'AdMob/Models/AdMobOptionalSignal';
 import { AdMobSignal } from 'AdMob/Models/AdMobSignal';
+import { ITouchInfo } from 'AdMob/Views/AFMABridge';
 import { IMotionEvent } from 'Ads/Native/Android/AndroidAdUnit';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { UserCountData } from 'Ads/Utilities/UserCountData';
-import { ITouchInfo } from 'AdMob/Views/AFMABridge';
 import { MotionEventAction } from 'Common/Constants/Android/MotionEventAction';
 import { Platform } from 'Common/Constants/Platform';
 import { NativeBridge } from 'Common/Native/NativeBridge';

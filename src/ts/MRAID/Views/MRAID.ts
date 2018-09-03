@@ -1,10 +1,8 @@
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { Placement } from 'Ads/Models/Placement';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
-import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 import { Platform } from 'Common/Constants/Platform';
 
 import { NativeBridge } from 'Common/Native/NativeBridge';
@@ -16,6 +14,8 @@ import { Template } from 'Core/Utilities/Template';
 import MRAIDTemplate from 'html/MRAID.html';
 import MRAIDPerfContainer from 'html/mraid/container-perf.html';
 import MRAIDContainer from 'html/mraid/container.html';
+import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
 
 export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 

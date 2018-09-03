@@ -1,5 +1,4 @@
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import { Privacy } from 'Ads/Views/Privacy';
 import { assert } from 'chai';
 
@@ -9,6 +8,7 @@ import { Localization } from 'Core/Utilities/Localization';
 
 import EndScreenFixture from 'html/fixtures/EndScreenFixture.html';
 import 'mocha';
+import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 

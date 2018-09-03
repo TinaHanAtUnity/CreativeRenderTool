@@ -7,12 +7,12 @@ import {
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
-import { Promo } from 'Promo/Views/Promo';
 import { KeyCode } from 'Common/Constants/Android/KeyCode';
 import { FinishState } from 'Common/Constants/FinishState';
 import { Platform } from 'Common/Constants/Platform';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
+import { Promo } from 'Promo/Views/Promo';
 
 export interface IPromoAdUnitParameters extends IAdUnitParameters<PromoCampaign> {
     view: Promo;

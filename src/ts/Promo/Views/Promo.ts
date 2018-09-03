@@ -1,8 +1,8 @@
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
-import { View } from 'Common/Views/View';
 import { Platform } from 'Common/Constants/Platform';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { Observable0, Observable1 } from 'Common/Utilities/Observable';
+import { View } from 'Common/Views/View';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 import { XHRequest } from 'Core/Utilities/XHRequest';

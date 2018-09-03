@@ -2,11 +2,11 @@ import { GDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { Placement } from 'Ads/Models/Placement';
 import { ICloseHandler } from 'Ads/Views/Closer';
-import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
 import { FinishState } from 'Common/Constants/FinishState';
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'VPAID/AdUnits/VPAIDAdUnit';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
+import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
 
 export class VPAIDOverlayEventHandler extends GDPREventHandler implements ICloseHandler {
     private _adUnit: VPAIDAdUnit;

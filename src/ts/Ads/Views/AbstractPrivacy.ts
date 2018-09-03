@@ -1,7 +1,7 @@
 import { Campaign } from 'Ads/Models/Campaign';
-import { View } from 'Common/Views/View';
 import { Platform } from 'Common/Constants/Platform';
 import { NativeBridge } from 'Common/Native/NativeBridge';
+import { View } from 'Common/Views/View';
 
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Configuration } from 'Core/Models/Configuration';

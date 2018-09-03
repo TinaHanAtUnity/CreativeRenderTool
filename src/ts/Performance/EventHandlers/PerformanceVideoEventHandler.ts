@@ -1,8 +1,8 @@
-import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
 import { VideoEventHandler } from 'Ads/EventHandlers/VideoEventHandler';
-import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
+import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
+import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
 
 export class PerformanceVideoEventHandler extends VideoEventHandler {
 

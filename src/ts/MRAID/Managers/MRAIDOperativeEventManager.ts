@@ -1,7 +1,7 @@
 import { IOperativeEventManagerParams, IOperativeEventParams } from 'Ads/Managers/OperativeEventManager';
 import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOperativeEventManager';
-import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { Url } from 'Core/Utilities/Url';
+import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 
 export class MRAIDOperativeEventManager extends ProgrammaticOperativeEventManager {
     private _mraidCampaign: MRAIDCampaign;

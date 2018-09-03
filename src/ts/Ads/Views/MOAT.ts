@@ -1,8 +1,8 @@
 import { IMoatData, IMoatIds } from 'Ads/Utilities/MoatViewabilityService';
-import { View } from 'Common/Views/View';
 import { Platform } from 'Common/Constants/Platform';
 
 import { NativeBridge } from 'Common/Native/NativeBridge';
+import { View } from 'Common/Views/View';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Template } from 'Core/Utilities/Template';
 import MOATTemplate from 'html/MOAT.html';

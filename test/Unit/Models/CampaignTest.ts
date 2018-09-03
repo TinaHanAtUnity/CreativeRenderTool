@@ -1,8 +1,8 @@
-import { PerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCampaign';
 import { assert } from 'chai';
 
 import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
 import 'mocha';
+import { PerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCampaign';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 import { VastCampaign } from 'VAST/Models/VastCampaign';

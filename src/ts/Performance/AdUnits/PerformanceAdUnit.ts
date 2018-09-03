@@ -1,10 +1,10 @@
 import { IVideoAdUnitParameters, VideoAdUnit } from 'Ads/AdUnits/VideoAdUnit';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
-import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
-import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import { NativeBridge } from 'Common/Native/NativeBridge';
+import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
+import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 
 export interface IPerformanceAdUnitParameters extends IVideoAdUnitParameters<PerformanceCampaign> {
     endScreen: PerformanceEndScreen;

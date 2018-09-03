@@ -4,19 +4,15 @@ import { AdUnitFactory } from 'Ads/AdUnits/AdUnitFactory';
 
 import { Activity } from 'Ads/AdUnits/Containers/Activity';
 import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Campaign } from 'Ads/Models/Campaign';
-import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
-import { MRAID } from 'MRAID/Views/MRAID';
-import { PlayableMRAID } from 'MRAID/Views/PlayableMRAID';
 import { assert } from 'chai';
 import { FinishState } from 'Common/Constants/FinishState';
 import { Platform } from 'Common/Constants/Platform';
@@ -38,6 +34,10 @@ import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialC
 
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
 import 'mocha';
+import { MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
+import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { MRAID } from 'MRAID/Views/MRAID';
+import { PlayableMRAID } from 'MRAID/Views/PlayableMRAID';
 import { PromoAdUnit } from 'Promo/AdUnits/PromoAdUnit';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';

@@ -1,9 +1,5 @@
 import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
 import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
-import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
-import { ProgrammaticTrackingMetric, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import {
     AFMABridge,
     IClickSignalResponse,
@@ -11,14 +7,18 @@ import {
     IOpenableIntentsResponse,
     ITouchInfo
 } from 'AdMob/Views/AFMABridge';
-import { MRAIDBridge } from 'MRAID/Views/MRAIDBridge';
-import { View } from 'Common/Views/View';
+import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
+import { ProgrammaticTrackingMetric, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 
 import { NativeBridge } from 'Common/Native/NativeBridge';
+import { View } from 'Common/Views/View';
 import { Template } from 'Core/Utilities/Template';
 import AdMobContainer from 'html/admob/AdMobContainer.html';
 import AFMAContainer from 'html/admob/AFMAContainer.html';
 import MRAIDContainer from 'html/admob/MRAIDContainer.html';
+import { MRAIDBridge } from 'MRAID/Views/MRAIDBridge';
 
 export interface IAdMobEventHandler extends IGDPREventHandler {
     onClose(): void;

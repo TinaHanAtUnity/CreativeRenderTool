@@ -1,7 +1,5 @@
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
-import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { Session } from 'Ads/Models/Session';
-import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
 import { assert } from 'chai';
 
 import { NativeBridge } from 'Common/Native/NativeBridge';
@@ -10,6 +8,8 @@ import { Request } from 'Core/Utilities/Request';
 
 import ProgrammaticMRAIDCampaign from 'json/campaigns/mraid/ProgrammaticMRAIDCampaign.json';
 import 'mocha';
+import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { ProgrammaticMraidParser } from 'MRAID/Parsers/ProgrammaticMraidParser';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 

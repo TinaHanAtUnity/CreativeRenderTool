@@ -2,9 +2,9 @@ import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { Privacy } from 'Ads/Views/Privacy';
-import { View } from 'Common/Views/View';
 
 import { NativeBridge } from 'Common/Native/NativeBridge';
+import { View } from 'Common/Views/View';
 import { Template } from 'Core/Utilities/Template';
 import VastEndScreenTemplate from 'html/VastEndScreen.html';
 import { VastCampaign } from 'VAST/Models/VastCampaign';

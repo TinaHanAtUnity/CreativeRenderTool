@@ -8,8 +8,6 @@ import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { HTML } from 'Ads/Models/Assets/HTML';
 import { Campaign } from 'Ads/Models/Campaign';
-import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
-import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { IPlacementRequestMap, MixedPlacementUtility } from 'Ads/Utilities/MixedPlacementUtility';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { assert } from 'chai';
@@ -65,6 +63,8 @@ import OnStaticInterstitialDisplayHtmlCampaign from 'json/OnStaticInterstitialDi
 import OnStaticInterstitialDisplayJsCampaign from 'json/OnStaticInterstitialDisplayJsCampaign.json';
 import OnXPromoPlcCampaignJson from 'json/OnXPromoPlcCampaign.json';
 import 'mocha';
+import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
