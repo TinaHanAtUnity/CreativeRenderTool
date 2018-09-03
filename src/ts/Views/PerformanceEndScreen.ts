@@ -36,13 +36,13 @@ export class PerformanceEndScreen extends EndScreen {
                     const closeRegion = <HTMLElement>this._container.querySelector('.btn-close-region');
                     const closeIcon = <HTMLElement>this._container.querySelector('span.icon-close');
                     this._createCanvas().then(() => {
-                        const canvas = <HTMLCanvasElement>this._canvas;
+                        const canvas = this._canvas;
                         const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
                         const data = ctx.getImageData(closeIcon.offsetLeft, closeIcon.offsetTop, closeIcon.offsetWidth, closeIcon.offsetHeight).data;
 
                         this._calculateWeightedAverageColor(data).then(res => {
                             const {weightedR, weightedG, weightedB} = res;
-                            console.log(res);
+
                             if (PerformanceEndScreen._isDark(weightedR, weightedG, weightedB)) {
                                 closeRegion.classList.add('light');
                             } else {
