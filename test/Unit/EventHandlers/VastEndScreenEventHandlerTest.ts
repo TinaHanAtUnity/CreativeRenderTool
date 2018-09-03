@@ -1,30 +1,30 @@
-import 'mocha';
-import * as sinon from 'sinon';
+import { Activity } from 'Ads/AdUnits/Containers/Activity';
+import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { GdprManager } from 'Ads/Managers/GdprManager';
+import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
+import { SessionManager } from 'Ads/Managers/SessionManager';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { Video } from 'Ads/Models/Assets/Video';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { Overlay } from 'Ads/Views/Overlay';
+import { Privacy } from 'Ads/Views/Privacy';
+import { VastEndScreen } from 'Ads/Views/VastEndScreen';
 import { assert } from 'chai';
+import { Platform } from 'Common/Constants/Platform';
 
 import { NativeBridge } from 'Common/Native/NativeBridge';
-import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Overlay } from 'Ads/Views/Overlay';
-import { Platform } from 'Common/Constants/Platform';
-import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
-import { VastEndScreen } from 'Ads/Views/VastEndScreen';
-import { VastEndScreenEventHandler } from 'VAST/EventHandlers/VastEndScreenEventHandler';
-import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { Activity } from 'Ads/AdUnits/Containers/Activity';
-import { Video } from 'Ads/Models/Assets/Video';
-import { Request } from 'Core/Utilities/Request';
 import { FocusManager } from 'Core/Managers/FocusManager';
-import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { SessionManager } from 'Ads/Managers/SessionManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { Request } from 'Core/Utilities/Request';
+import 'mocha';
+import * as sinon from 'sinon';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
+import { VastEndScreenEventHandler } from 'VAST/EventHandlers/VastEndScreenEventHandler';
+import { VastCampaign } from 'VAST/Models/VastCampaign';
 
 import EventTestVast from 'xml/EventTestVast.xml';
-import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
-import { GdprManager } from 'Ads/Managers/GdprManager';
-import { Privacy } from 'Ads/Views/Privacy';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 
 describe('VastEndScreenEventHandlersTest', () => {
     const handleInvocation = sinon.spy();

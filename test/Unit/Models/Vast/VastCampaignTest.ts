@@ -1,8 +1,8 @@
+import { assert } from 'chai';
 import 'mocha';
 import * as sinon from 'sinon';
-import { assert } from 'chai';
-import { Vast } from 'VAST/Models/Vast';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { Vast } from 'VAST/Models/Vast';
 
 describe('VastCampaignTest', () => {
     it('should return default cache TTL of 1 hour represented in seconds', () => {

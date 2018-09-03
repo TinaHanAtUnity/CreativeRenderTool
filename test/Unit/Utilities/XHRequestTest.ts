@@ -1,7 +1,7 @@
-import 'mocha';
 import { assert } from 'chai';
-import * as sinon from 'sinon';
 import { XHRequest } from 'Core/Utilities/XHRequest';
+import 'mocha';
+import * as sinon from 'sinon';
 
 describe('XHRequestTest', () => {
 

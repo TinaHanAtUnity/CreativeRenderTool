@@ -1,30 +1,30 @@
-import 'mocha';
-import * as sinon from 'sinon';
-
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Overlay } from 'Ads/Views/Overlay';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { Request } from 'Core/Utilities/Request';
-import { Platform } from 'Common/Constants/Platform';
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
+import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Ads/AdUnits/PerformanceAdUnit';
+import { PrivacyEventHandler } from 'Ads/EventHandlers/PrivacyEventHandler';
+import { GDPREventSource, GdprManager } from 'Ads/Managers/GdprManager';
+import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Video } from 'Ads/Models/Assets/Video';
+import { PerformanceCampaign } from 'Ads/Models/Campaigns/PerformanceCampaign';
+import { Placement } from 'Ads/Models/Placement';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
+import { Overlay } from 'Ads/Views/Overlay';
+import { PerformanceEndScreen } from 'Ads/Views/PerformanceEndScreen';
+import { Platform } from 'Common/Constants/Platform';
+
+import { NativeBridge } from 'Common/Native/NativeBridge';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
-import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Ads/AdUnits/PerformanceAdUnit';
-import { PerformanceEndScreen } from 'Ads/Views/PerformanceEndScreen';
-import { PerformanceCampaign } from 'Ads/Models/Campaigns/PerformanceCampaign';
-import { PrivacyEventHandler } from 'Ads/EventHandlers/PrivacyEventHandler';
 import { Configuration } from 'Core/Models/Configuration';
-import { SdkApi } from 'Core/Native/Sdk';
-import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IntentApi } from 'Core/Native/Android/Intent';
-import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
-import { Placement } from 'Ads/Models/Placement';
-import { GDPREventSource, GdprManager } from 'Ads/Managers/GdprManager';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
+import { SdkApi } from 'Core/Native/Sdk';
+import { Request } from 'Core/Utilities/Request';
+import 'mocha';
+import * as sinon from 'sinon';
 
 describe('PrivacyEventHandlerTest', () => {
 

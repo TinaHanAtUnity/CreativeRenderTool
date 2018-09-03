@@ -1,7 +1,7 @@
-import 'mocha';
 import { assert } from 'chai';
 
 import { DOMUtils } from 'Core/Utilities/DOMUtils';
+import 'mocha';
 
 describe('DOMUtilsTest', () => {
     it('should parse xml correctly', () => {

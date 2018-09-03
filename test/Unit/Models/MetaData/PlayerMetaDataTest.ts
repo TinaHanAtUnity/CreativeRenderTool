@@ -1,11 +1,11 @@
-import 'mocha';
 import { assert } from 'chai';
-import * as sinon from 'sinon';
 
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { StorageApi, StorageType } from 'Core/Native/Storage';
 import { PlayerMetaData } from 'Core/Models/MetaData/PlayerMetaData';
+import { StorageApi, StorageType } from 'Core/Native/Storage';
+import 'mocha';
+import * as sinon from 'sinon';
 
 class TestStorageApi extends StorageApi {
 

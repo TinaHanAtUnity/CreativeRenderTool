@@ -1,11 +1,11 @@
+import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
+import { BannerAdUnit } from 'Banners/AdUnits/BannerAdUnit';
+import { BannerAdUnitFactory } from 'Banners/AdUnits/BannerAdUnitFactory';
+import { BannerCampaign } from 'Banners/Models/Campaigns/BannerCampaign';
+import { assert } from 'chai';
+import { NativeBridge } from 'Common/Native/NativeBridge';
 import 'mocha';
 import * as sinon from 'sinon';
-import { assert } from 'chai';
-import { BannerCampaign } from 'Banners/Models/Campaigns/BannerCampaign';
-import { BannerAdUnitFactory } from 'Banners/AdUnits/BannerAdUnitFactory';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { BannerAdUnit } from 'Banners/AdUnits/BannerAdUnit';
-import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 
 describe('BannerAdUnitFactoryTest', () => {
     describe('when creating an ad unit for a BannerCampaign', () => {

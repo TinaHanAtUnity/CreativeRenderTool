@@ -1,20 +1,20 @@
-import 'mocha';
+import { Video } from 'Ads/Models/Assets/Video';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { assert } from 'chai';
-import * as sinon from 'sinon';
+import { VideoMetadata } from 'Common/Constants/Android/VideoMetadata';
+import { Platform } from 'Common/Constants/Platform';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { CacheError } from 'Core/Native/Cache';
 
 import { Cache } from 'Core/Utilities/Cache';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Platform } from 'Common/Constants/Platform';
-import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { Video } from 'Ads/Models/Assets/Video';
-import { VideoMetadata } from 'Common/Constants/Android/VideoMetadata';
-import { CacheError } from 'Core/Native/Cache';
-import { Request } from 'Core/Utilities/Request';
-import { FocusManager } from 'Core/Managers/FocusManager';
 import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
 import { FileInfo } from 'Core/Utilities/FileInfo';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { Request } from 'Core/Utilities/Request';
+import 'mocha';
+import * as sinon from 'sinon';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('VideoMetadataTest', () => {
     const validVideo: string = 'https://www.example.net/valid.mp4';

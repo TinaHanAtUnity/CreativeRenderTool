@@ -1,28 +1,28 @@
-import * as sinon from 'sinon';
-import { assert } from 'chai';
+import { AdMobAdUnit } from 'AdMob/AdUnits/AdMobAdUnit';
 
 import { AdMobEventHandler } from 'AdMob/EventHandlers/AdmobEventHandler';
-import { AdMobAdUnit } from 'AdMob/AdUnits/AdMobAdUnit';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { IntentApi } from 'Core/Native/Android/Intent';
-import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
-import { Platform } from 'Common/Constants/Platform';
-import { Request } from 'Core/Utilities/Request';
-import { Session } from 'Ads/Models/Session';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
+import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
 import { AdMobSignal } from 'AdMob/Models/AdMobSignal';
-import { Url } from 'Core/Utilities/Url';
-
-import { unity_proto } from '../../../src/proto/unity_proto.js';
-import * as protobuf from 'protobufjs/minimal';
+import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
+import { GdprManager } from 'Ads/Managers/GdprManager';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { Session } from 'Ads/Models/Session';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { ITouchInfo } from 'Ads/Views/AFMABridge';
-import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
+import { assert } from 'chai';
+import { Platform } from 'Common/Constants/Platform';
+import { NativeBridge } from 'Common/Native/NativeBridge';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Configuration } from 'Core/Models/Configuration';
-import { GdprManager } from 'Ads/Managers/GdprManager';
+import { IntentApi } from 'Core/Native/Android/Intent';
+import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
+import { Request } from 'Core/Utilities/Request';
+import { Url } from 'Core/Utilities/Url';
+import * as protobuf from 'protobufjs/minimal';
+import * as sinon from 'sinon';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
+
+import { unity_proto } from '../../../src/proto/unity_proto.js';
 
 const resolveAfter = (timeout: number): Promise<void> => {
     return new Promise((resolve, reject) => setTimeout(resolve, timeout));

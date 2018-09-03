@@ -1,21 +1,21 @@
-import 'mocha';
-import { assert } from 'chai';
-import * as sinon from 'sinon';
-
-import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Platform } from 'Common/Constants/Platform';
-import { Request } from 'Core/Utilities/Request';
-import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { SessionManager } from 'Ads/Managers/SessionManager';
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { PerformanceOperativeEventManager } from 'Ads/Managers/PerformanceOperativeEventManager';
-import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
 import { MRAIDOperativeEventManager } from 'Ads/Managers/MRAIDOperativeEventManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
+
+import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
+import { PerformanceOperativeEventManager } from 'Ads/Managers/PerformanceOperativeEventManager';
+import { SessionManager } from 'Ads/Managers/SessionManager';
+import { assert } from 'chai';
+import { Platform } from 'Common/Constants/Platform';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Configuration } from 'Core/Models/Configuration';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { Request } from 'Core/Utilities/Request';
+import 'mocha';
+import * as sinon from 'sinon';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
 
 describe('OperativeEventManagerFactoryTest', () => {
     const handleInvocation = sinon.spy();

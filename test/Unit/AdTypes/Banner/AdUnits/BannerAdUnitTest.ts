@@ -1,29 +1,29 @@
-import 'mocha';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { Placement } from 'Ads/Models/Placement';
+import { Session } from 'Ads/Models/Session';
+import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 
 import { BannerAdUnit } from 'Banners/AdUnits/BannerAdUnit';
 import { BannerCampaign, IBannerCampaign } from 'Banners/Models/Campaigns/BannerCampaign';
+import { BannerApi } from 'Banners/Native/Banner';
+import { BannerListenerApi } from 'Banners/Native/UnityBannerListener';
 import { assert } from 'chai';
 import { Platform } from 'Common/Constants/Platform';
-import ValidBannerCampaignJSON from 'json/campaigns/banner/ValidBannerCampaign.json';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Observable0, Observable1, Observable2 } from 'Common/Utilities/Observable';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { Placement } from 'Ads/Models/Placement';
-import { Session } from 'Ads/Models/Session';
-import { BannerApi } from 'Banners/Native/Banner';
 import { IntentApi } from 'Core/Native/Android/Intent';
-import { BannerListenerApi } from 'Banners/Native/UnityBannerListener';
 import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import * as sinon from 'sinon';
-import { Observable0, Observable1, Observable2 } from 'Common/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
+
+import BannerContainer from 'html/banner/BannerContainer.html';
+import ValidBannerCampaignJSON from 'json/campaigns/banner/ValidBannerCampaign.json';
+import 'mocha';
+import * as sinon from 'sinon';
 
 import { asSpy, asStub } from 'TestHelpers/Functions';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-
-import BannerContainer from 'html/banner/BannerContainer.html';
-import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 
 describe('BannerAdUnit', () => {
 

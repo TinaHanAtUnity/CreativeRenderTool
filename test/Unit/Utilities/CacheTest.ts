@@ -1,19 +1,19 @@
-import 'mocha';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { assert } from 'chai';
-import * as sinon from 'sinon';
-
-import { Cache, CacheStatus } from 'Core/Utilities/Cache';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { CacheApi, CacheError, CacheEvent, IFileInfo } from 'Core/Native/Cache';
 import { StorageApi, StorageType } from 'Core/Native/Storage';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { Request } from 'Core/Utilities/Request';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { FocusManager } from 'Core/Managers/FocusManager';
-import { FileId } from 'Core/Utilities/FileId';
+
+import { Cache, CacheStatus } from 'Core/Utilities/Cache';
 import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
+import { FileId } from 'Core/Utilities/FileId';
 import { FileInfo } from 'Core/Utilities/FileInfo';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { Request } from 'Core/Utilities/Request';
+import 'mocha';
+import * as sinon from 'sinon';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 class TestCacheApi extends CacheApi {
 

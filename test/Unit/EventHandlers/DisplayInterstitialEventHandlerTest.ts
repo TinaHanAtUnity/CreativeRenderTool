@@ -1,23 +1,26 @@
-import 'mocha';
-import * as sinon from 'sinon';
-import { DisplayInterstitial } from 'Ads/Views/DisplayInterstitial';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Activity } from 'Ads/AdUnits/Containers/Activity';
+import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { GdprManager } from 'Ads/Managers/GdprManager';
+import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
-import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { DisplayInterstitial } from 'Ads/Views/DisplayInterstitial';
+import { Privacy } from 'Ads/Views/Privacy';
 
 import { Platform } from 'Common/Constants/Platform';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { NativeBridge } from 'Common/Native/NativeBridge';
 import { FocusManager } from 'Core/Managers/FocusManager';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { Request } from 'Core/Utilities/Request';
-import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { DisplayInterstitialAdUnit, IDisplayInterstitialAdUnitParameters } from 'Display/AdUnits/DisplayInterstitialAdUnit';
-import { Activity } from 'Ads/AdUnits/Containers/Activity';
+import {
+    DisplayInterstitialAdUnit,
+    IDisplayInterstitialAdUnitParameters
+} from 'Display/AdUnits/DisplayInterstitialAdUnit';
 import { DisplayInterstitialEventHandler } from 'Display/EventHandlers/DisplayInterstitialEventHandler';
-import { GdprManager } from 'Ads/Managers/GdprManager';
-import { Privacy } from 'Ads/Views/Privacy';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
+import 'mocha';
+import * as sinon from 'sinon';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('DisplayInterstitialEventHandler', () => {
     let view: DisplayInterstitial;

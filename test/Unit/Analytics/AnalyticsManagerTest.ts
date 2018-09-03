@@ -1,19 +1,19 @@
-import 'mocha';
-import * as sinon from 'sinon';
+import { AnalyticsManager } from 'Analytics/AnalyticsManager';
+import { IAnalyticsObject } from 'Analytics/AnalyticsProtocol';
 import { assert } from 'chai';
 
 import { NativeBridge } from 'Common/Native/NativeBridge';
-import { AnalyticsManager } from 'Analytics/AnalyticsManager';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { Request } from 'Core/Utilities/Request';
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { StorageApi, StorageError, StorageType } from 'Core/Native/Storage';
-import { IAnalyticsObject } from 'Analytics/AnalyticsProtocol';
-import { RequestApi } from 'Core/Native/Request';
 import { FocusManager } from 'Core/Managers/FocusManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Configuration } from 'Core/Models/Configuration';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { RequestApi } from 'Core/Native/Request';
+import { StorageApi, StorageError, StorageType } from 'Core/Native/Storage';
+import { Request } from 'Core/Utilities/Request';
+import 'mocha';
+import * as sinon from 'sinon';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 class FakeStorageApi extends StorageApi {
     private _values: { [key: string]: any } = {};

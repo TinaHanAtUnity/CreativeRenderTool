@@ -1,30 +1,30 @@
-import 'mocha';
-import * as sinon from 'sinon';
-import { assert } from 'chai';
-
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Overlay } from 'Ads/Views/Overlay';
+import { Activity } from 'Ads/AdUnits/Containers/Activity';
+import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Ads/AdUnits/PerformanceAdUnit';
 import { PerformanceOverlayEventHandler } from 'Ads/EventHandlers/PerformanceOverlayEventHandler';
-import { Platform } from 'Common/Constants/Platform';
-import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { Activity } from 'Ads/AdUnits/Containers/Activity';
-import { Video } from 'Ads/Models/Assets/Video';
-import { Request } from 'Core/Utilities/Request';
-import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { FocusManager } from 'Core/Managers/FocusManager';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { SessionManager } from 'Ads/Managers/SessionManager';
-import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { PerformanceEndScreen } from 'Ads/Views/PerformanceEndScreen';
-import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
-import { Privacy } from 'Ads/Views/Privacy';
 import { GdprManager } from 'Ads/Managers/GdprManager';
+import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
+import { SessionManager } from 'Ads/Managers/SessionManager';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { Video } from 'Ads/Models/Assets/Video';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
+import { Overlay } from 'Ads/Views/Overlay';
+import { PerformanceEndScreen } from 'Ads/Views/PerformanceEndScreen';
+import { Privacy } from 'Ads/Views/Privacy';
+import { assert } from 'chai';
+import { Platform } from 'Common/Constants/Platform';
+
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { Request } from 'Core/Utilities/Request';
+import 'mocha';
+import * as sinon from 'sinon';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('PerformanceOverlayEventHandlerTest', () => {
 

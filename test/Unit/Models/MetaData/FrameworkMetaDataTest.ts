@@ -1,11 +1,11 @@
-import 'mocha';
 import { assert } from 'chai';
-import * as sinon from 'sinon';
 
 import { NativeBridge } from 'Common/Native/NativeBridge';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { StorageApi, StorageType } from 'Core/Native/Storage';
 import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
+import { StorageApi, StorageType } from 'Core/Native/Storage';
+import 'mocha';
+import * as sinon from 'sinon';
 
 class TestStorageApi extends StorageApi {
 

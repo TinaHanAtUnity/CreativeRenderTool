@@ -1,33 +1,33 @@
-import 'mocha';
-import * as sinon from 'sinon';
-import { assert } from 'chai';
-
-import { MRAIDEventHandler } from 'Ads/EventHandlers/MRAIDEventHandler';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { SessionManager } from 'Ads/Managers/SessionManager';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { INativeResponse, Request } from 'Core/Utilities/Request';
-import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'Ads/AdUnits/MRAIDAdUnit';
-import { Platform } from 'Common/Constants/Platform';
-import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
 import { Activity } from 'Ads/AdUnits/Containers/Activity';
 import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { MRAID } from 'Ads/Views/MRAID';
-import { Placement } from 'Ads/Models/Placement';
-import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
-import { FocusManager } from 'Core/Managers/FocusManager';
-import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
+import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'Ads/AdUnits/MRAIDAdUnit';
+
+import { MRAIDEventHandler } from 'Ads/EventHandlers/MRAIDEventHandler';
 import { GdprManager } from 'Ads/Managers/GdprManager';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
-import { Configuration } from 'Core/Models/Configuration';
+import { SessionManager } from 'Ads/Managers/SessionManager';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
+import { Placement } from 'Ads/Models/Placement';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
+import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
+import { MRAID } from 'Ads/Views/MRAID';
+import { assert } from 'chai';
+import { Platform } from 'Common/Constants/Platform';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { Configuration } from 'Core/Models/Configuration';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
+import { INativeResponse, Request } from 'Core/Utilities/Request';
+import 'mocha';
+import * as sinon from 'sinon';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('MRAIDEventHandlersTest', () => {
 

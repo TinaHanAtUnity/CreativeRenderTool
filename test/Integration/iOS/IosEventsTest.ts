@@ -1,16 +1,16 @@
-import 'mocha';
-import { assert } from 'chai';
-
-import { Platform } from 'Common/Constants/Platform';
-import { UnityAds } from 'Backend/UnityAds';
-import { IUnityAdsListener } from 'Backend/IUnityAdsListener';
-import { FinishState } from 'Common/Constants/FinishState';
-import { DeviceInfo } from 'Backend/Api/DeviceInfo';
-import { Request } from 'Backend/Api/Request';
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
-import { ConfigManager } from 'Core/Managers/ConfigManager';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOperativeEventManager';
+import { DeviceInfo } from 'Backend/Api/DeviceInfo';
+import { Request } from 'Backend/Api/Request';
+import { IUnityAdsListener } from 'Backend/IUnityAdsListener';
+import { UnityAds } from 'Backend/UnityAds';
+import { assert } from 'chai';
+import { FinishState } from 'Common/Constants/FinishState';
+
+import { Platform } from 'Common/Constants/Platform';
+import { ConfigManager } from 'Core/Managers/ConfigManager';
+import 'mocha';
 
 describe('IosEventsTest', () => {
 

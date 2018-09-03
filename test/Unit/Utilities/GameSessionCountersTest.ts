@@ -1,9 +1,8 @@
-import 'mocha';
-import { assert } from 'chai';
-
 import { GameSessionCounters } from 'Ads/Utilities/GameSessionCounters';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { assert } from 'chai';
+import 'mocha';
 import * as sinon from 'sinon';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('GameSessionCountersTest', () => {
 

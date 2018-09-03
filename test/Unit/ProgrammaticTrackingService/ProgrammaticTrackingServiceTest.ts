@@ -1,16 +1,16 @@
-import 'mocha';
-import * as sinon from 'sinon';
-import { assert } from 'chai';
 import {
     IProgrammaticTrackingMetricData,
     ProgrammaticTrackingError,
     ProgrammaticTrackingMetric,
     ProgrammaticTrackingService
 } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { Request } from 'Core/Utilities/Request';
+import { assert } from 'chai';
+import { Platform } from 'Common/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { Platform } from 'Common/Constants/Platform';
+import { Request } from 'Core/Utilities/Request';
+import 'mocha';
+import * as sinon from 'sinon';
 
 describe('Ads/Utilities', () => {
 

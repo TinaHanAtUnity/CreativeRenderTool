@@ -1,18 +1,18 @@
-import 'mocha';
-import * as sinon from 'sinon';
+import { Platform } from 'Common/Constants/Platform';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { HttpKafka } from 'Core/Utilities/HttpKafka';
 
 import { INativeResponse, Request } from 'Core/Utilities/Request';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { Platform } from 'Common/Constants/Platform';
-import { HttpKafka } from 'Core/Utilities/HttpKafka';
-import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { FocusManager } from 'Core/Managers/FocusManager';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
+import 'mocha';
+import * as sinon from 'sinon';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('DiagnosticsTest', () => {
     const handleInvocation = sinon.spy();

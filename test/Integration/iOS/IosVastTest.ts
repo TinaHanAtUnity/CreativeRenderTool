@@ -1,12 +1,12 @@
-import 'mocha';
-
-import { Platform } from 'Common/Constants/Platform';
-import { UnityAds } from 'Backend/UnityAds';
-import { IUnityAdsListener } from 'Backend/IUnityAdsListener';
-import { DeviceInfo } from 'Backend/Api/DeviceInfo';
-import { ConfigManager } from 'Core/Managers/ConfigManager';
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOperativeEventManager';
+import { DeviceInfo } from 'Backend/Api/DeviceInfo';
+import { IUnityAdsListener } from 'Backend/IUnityAdsListener';
+import { UnityAds } from 'Backend/UnityAds';
+
+import { Platform } from 'Common/Constants/Platform';
+import { ConfigManager } from 'Core/Managers/ConfigManager';
+import 'mocha';
 
 describe('IosVastTest', () => {
 

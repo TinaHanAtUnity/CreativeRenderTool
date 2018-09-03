@@ -1,14 +1,14 @@
-import 'mocha';
+import { FailedOperativeEventManager } from 'Ads/Managers/FailedOperativeEventManager';
 import { assert } from 'chai';
-import * as sinon from 'sinon';
 
 import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Request } from 'Core/Utilities/Request';
-import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
-import { FailedOperativeEventManager } from 'Ads/Managers/FailedOperativeEventManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { StorageType } from 'Core/Native/Storage';
 import { HttpKafka } from 'Core/Utilities/HttpKafka';
+import { Request } from 'Core/Utilities/Request';
+import 'mocha';
+import * as sinon from 'sinon';
 import { FailedXpromoOperativeEventManager } from 'XPromo/Managers/FailedXpromoOperativeEventManager';
 
 describe('FailedOperativeEventManagerTest', () => {

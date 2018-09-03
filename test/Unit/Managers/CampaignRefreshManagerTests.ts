@@ -1,54 +1,54 @@
-import 'mocha';
-import * as sinon from 'sinon';
-import { assert } from 'chai';
-
-import { CacheMode, Configuration } from 'Core/Models/Configuration';
-import { CampaignManager } from 'Ads/Managers/CampaignManager';
-import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { RefreshManager } from 'Ads/Managers/RefreshManager';
-import { PerformanceCampaign } from 'Ads/Models/Campaigns/PerformanceCampaign';
-import { Observable0, Observable1, Observable2, Observable4 } from 'Common/Utilities/Observable';
-import { Platform } from 'Common/Constants/Platform';
-import { INativeResponse, Request } from 'Core/Utilities/Request';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { ClientInfo } from 'Core/Models/ClientInfo';
-import { VastParser } from 'VAST/Utilities/VastParser';
-import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { AdMobOptionalSignal } from 'AdMob/Models/AdMobOptionalSignal';
+import { AdMobSignal } from 'AdMob/Models/AdMobSignal';
+import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
+import { AbstractAdUnit, IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
+import { AdUnitContainer, Orientation, ViewConfiguration } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { AssetManager } from 'Ads/Managers/AssetManager';
-import { Cache, CacheStatus } from 'Core/Utilities/Cache';
-import { Placement, PlacementState } from 'Ads/Models/Placement';
+import { CampaignManager } from 'Ads/Managers/CampaignManager';
+import { GdprManager } from 'Ads/Managers/GdprManager';
+import { OldCampaignRefreshManager } from 'Ads/Managers/OldCampaignRefreshManager';
+import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
+import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
+import { PlacementManager } from 'Ads/Managers/PlacementManager';
+import { RefreshManager } from 'Ads/Managers/RefreshManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { AdUnitContainer, Orientation, ViewConfiguration } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { AbstractAdUnit, IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
-import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
-import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
-import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { FocusManager } from 'Core/Managers/FocusManager';
 import { Campaign } from 'Ads/Models/Campaign';
+import { MRAIDCampaign } from 'Ads/Models/Campaigns/MRAIDCampaign';
+import { PerformanceCampaign } from 'Ads/Models/Campaigns/PerformanceCampaign';
+import { Placement, PlacementState } from 'Ads/Models/Placement';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { assert } from 'chai';
+import { Platform } from 'Common/Constants/Platform';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Observable0, Observable1, Observable2, Observable4 } from 'Common/Utilities/Observable';
+import { JaegerManager } from 'Core/Jaeger/JaegerManager';
+import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+
+import { CacheMode, Configuration } from 'Core/Models/Configuration';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
+import { Cache, CacheStatus } from 'Core/Utilities/Cache';
+import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
+
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { INativeResponse, Request } from 'Core/Utilities/Request';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
 import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
-
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
-import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
-import { AdMobSignal } from 'AdMob/Models/AdMobSignal';
-import { AdMobOptionalSignal } from 'AdMob/Models/AdMobOptionalSignal';
-import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
-import { OldCampaignRefreshManager } from 'Ads/Managers/OldCampaignRefreshManager';
-import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
-import { JaegerManager } from 'Core/Jaeger/JaegerManager';
-import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
-import { GdprManager } from 'Ads/Managers/GdprManager';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import 'mocha';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
-import { PlacementManager } from 'Ads/Managers/PlacementManager';
+import * as sinon from 'sinon';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { VastParser } from 'VAST/Utilities/VastParser';
+import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 
 export class TestContainer extends AdUnitContainer {
     public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, options: any): Promise<void> {

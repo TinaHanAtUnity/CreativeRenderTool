@@ -1,12 +1,12 @@
-import 'mocha';
+import { MissedImpressionManager } from 'Ads/Managers/MissedImpressionManager';
 import { assert } from 'chai';
-import * as sinon from 'sinon';
+import { NativeBridge } from 'Common/Native/NativeBridge';
+import { StorageApi, StorageType } from 'Core/Native/Storage';
 
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
-import { MissedImpressionManager } from 'Ads/Managers/MissedImpressionManager';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import 'mocha';
+import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { StorageApi, StorageType } from 'Core/Native/Storage';
 
 describe('MissedImpressionManagerTest', () => {
     let missedImpressionManager: MissedImpressionManager;
