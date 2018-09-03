@@ -188,7 +188,7 @@ describe('MRAIDEventHandlersTest', () => {
             });
         });
 
-        describe('with onMraidAnalyticsEvent', () => {
+        describe('with onPlayableAnalyticsEvent', () => {
             let sandbox: sinon.SinonSandbox;
 
             before(() => {
@@ -211,7 +211,7 @@ describe('MRAIDEventHandlersTest', () => {
                     sinon.stub(mraidAdUnit, 'sendClick');
                     mraidEventHandler = new MRAIDEventHandler(nativeBridge, mraidAdUnit, playableMraidAdUnitParams);
 
-                    mraidEventHandler.onMraidAnalyticsEvent(15, 12, 0, 'win_screen', { 'level': 2 });
+                    mraidEventHandler.onPlayableAnalyticsEvent(15, 12, 0, 'win_screen', { 'level': 2 });
                     sinon.assert.notCalled(<sinon.SinonStub>HttpKafka.sendEvent);
                 });
             });
@@ -222,7 +222,7 @@ describe('MRAIDEventHandlersTest', () => {
                     sinon.stub(mraidAdUnit, 'sendClick');
                     mraidEventHandler = new PlayableEventHandler(nativeBridge, mraidAdUnit, playableMraidAdUnitParams);
 
-                    mraidEventHandler.onMraidAnalyticsEvent(15, 12, 0, 'win_screen', {'level': 2});
+                    mraidEventHandler.onPlayableAnalyticsEvent(15, 12, 0, 'win_screen', {'level': 2});
 
                     const kafkaObject: any = {};
                     kafkaObject.type = 'win_screen';
@@ -244,7 +244,7 @@ describe('MRAIDEventHandlersTest', () => {
                     sinon.stub(mraidAdUnit, 'sendClick');
                     mraidEventHandler = new PlayableEventHandler(nativeBridge, mraidAdUnit, playableMraidAdUnitParams);
 
-                    mraidEventHandler.onMraidAnalyticsEvent(15, 12, 5, 'win_screen', undefined);
+                    mraidEventHandler.onPlayableAnalyticsEvent(15, 12, 5, 'win_screen', undefined);
 
                     const kafkaObject: any = {};
                     kafkaObject.type = 'win_screen';
