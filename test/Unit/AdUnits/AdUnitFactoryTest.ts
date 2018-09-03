@@ -18,6 +18,7 @@ import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer
 import { MetaDataManager } from 'Managers/MetaDataManager';
 import { MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
+import { PerformanceMRAIDCampaign } from 'Models/Campaigns/PerformanceMRAIDCampaign';
 import { FinishState } from 'Constants/FinishState';
 import { FocusManager } from 'Managers/FocusManager';
 
@@ -46,6 +47,7 @@ import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/Program
 import { MRAID } from 'Views/MRAID';
 import { PlayableMRAID } from 'Views/PlayableMRAID';
 import { XHRequest } from 'Utilities/XHRequest';
+import { HttpKafka, KafkaCommonObjectType } from 'Utilities/HttpKafka';
 
 describe('AdUnitFactoryTest', () => {
 
@@ -136,43 +138,83 @@ describe('AdUnitFactoryTest', () => {
     });
 
     describe('MRAID AdUnit Factory', () => {
-        let campaign: MRAIDCampaign;
+        describe('basic MRAID functionality', () => {
+            let campaign: MRAIDCampaign;
 
-        beforeEach(() => {
-            campaign = TestFixtures.getProgrammaticMRAIDCampaign();
-            const resourceUrl = campaign.getResourceUrl();
-            if(resourceUrl) {
-                resourceUrl.setFileId('1234');
-            }
+            beforeEach(() => {
+                campaign = TestFixtures.getProgrammaticMRAIDCampaign();
+                const resourceUrl = campaign.getResourceUrl();
+                if (resourceUrl) {
+                    resourceUrl.setFileId('1234');
+                }
 
-            adUnitParameters.campaign = campaign;
+                adUnitParameters.campaign = campaign;
+            });
+
+            after(() => {
+                AdUnitFactory.setForcedPlayableMRAID(false);
+            });
+
+            it('should create MRAID view', () => {
+                const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+                assert.isTrue(adUnit.getMRAIDView() instanceof MRAID, 'view should be MRAID');
+            });
+
+            it('should create PlayableMRAID view', () => {
+                AdUnitFactory.setForcedPlayableMRAID(false);
+
+                const resourceUrl = campaign.getResourceUrl();
+                if (resourceUrl) {
+                    resourceUrl.set('url', 'https://cdn.unityads.unity3d.com/playables/production/unity/xinstall.html');
+                }
+
+                const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+                assert.isTrue(adUnit.getMRAIDView() instanceof PlayableMRAID, 'view should be PlayableMRAID');
+            });
+
+            it('should be forced to create PlayableMRAID view', () => {
+                AdUnitFactory.setForcedPlayableMRAID(true);
+                const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+                assert.isTrue(adUnit.getMRAIDView() instanceof PlayableMRAID, 'view should be PlayableMRAID');
+            });
         });
 
-        after(() => {
-            AdUnitFactory.setForcedPlayableMRAID(false);
-        });
+        describe('eventhandler functionality', () => {
+            let httpKafkaStub: any;
 
-        it('should create PlayableMRAID view', () => {
-            AdUnitFactory.setForcedPlayableMRAID(false);
+            beforeEach(() => {
+                httpKafkaStub = sinon.stub(HttpKafka, 'sendEvent').resolves();
+            });
 
-            const resourceUrl = campaign.getResourceUrl();
-            if(resourceUrl) {
-                resourceUrl.set('url', 'https://cdn.unityads.unity3d.com/playables/production/unity/xinstall.html');
-            }
+            afterEach(() => {
+                httpKafkaStub.restore();
+            });
 
-            const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
-            assert.isTrue(adUnit.getMRAIDView() instanceof PlayableMRAID, 'view should be PlayableMRAID');
-        });
+            it('should not send onMraidAnalyticsEvent for MRAIDCampaign', () => {
+                const campaign = TestFixtures.getProgrammaticMRAIDCampaign();
+                adUnitParameters.campaign = campaign;
+                const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+                adUnit.show();
+                assert.isFalse(httpKafkaStub.called);
+            });
 
-        it('should create MRAID view', () => {
-            const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
-            assert.isTrue(adUnit.getMRAIDView() instanceof MRAID, 'view should be MRAID');
-        });
+            it('should send onMraidAnalyticsEvent on show if ad is Sonic Playable', () => {
+                const campaign = TestFixtures.getProgrammaticMRAIDCampaign({ creativeId: '109455881' });
+                adUnitParameters.campaign = campaign;
+                const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+                adUnit.show();
+                sinon.assert.calledWith(<sinon.SinonSpy>httpKafkaStub, 'ads.sdk2.events.playable.json', KafkaCommonObjectType.ANONYMOUS, sinon.match.has('type', 'playable_show'));
+                sinon.assert.calledOnce(httpKafkaStub);
+            });
 
-        it('should be forced to create PlayableMRAID view', () => {
-            AdUnitFactory.setForcedPlayableMRAID(true);
-            const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
-            assert.isTrue(adUnit.getMRAIDView() instanceof PlayableMRAID, 'view should be PlayableMRAID');
+            it('should send onMraidAnalyticsEvent for PerformanceMRAIDCampaign', () => {
+                const campaign = TestFixtures.getPerformanceMRAIDCampaign();
+                adUnitParameters.campaign = campaign;
+                const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
+                adUnit.show();
+                sinon.assert.calledWith(<sinon.SinonSpy>httpKafkaStub, 'ads.sdk2.events.playable.json', KafkaCommonObjectType.ANONYMOUS, sinon.match.has('type', 'playable_show'));
+                sinon.assert.calledOnce(httpKafkaStub);
+            });
         });
     });
 
