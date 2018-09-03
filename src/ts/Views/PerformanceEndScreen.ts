@@ -38,11 +38,11 @@ export class PerformanceEndScreen extends EndScreen {
                     this._createCanvas().then(() => {
                         const canvas = this._canvas;
                         const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
-                        const data = ctx.getImageData(closeIcon.offsetLeft, closeIcon.offsetTop, closeIcon.offsetWidth, closeIcon.offsetHeight).data;
+
+                        const data = ctx.getImageData(closeRegion.offsetLeft + closeIcon.offsetLeft, closeRegion.offsetTop + closeIcon.offsetTop, closeIcon.offsetWidth, closeIcon.offsetHeight).data;
 
                         this._calculateWeightedAverageColor(data).then(res => {
                             const {weightedR, weightedG, weightedB} = res;
-
                             if (PerformanceEndScreen._isDark(weightedR, weightedG, weightedB)) {
                                 closeRegion.classList.add('light');
                             } else {
