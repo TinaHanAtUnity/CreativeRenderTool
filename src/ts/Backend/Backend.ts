@@ -45,7 +45,7 @@ export class Backend implements IWebViewBridge {
         // tslint:enable:no-string-literal
     }
 
-    private static _apiMap: { [key: string]: any } = {
+    private _apiMap: { [key: string]: any } = {
         '.*AdUnit': AdUnit,
         '.*AppSheet': AppSheet,
         '.*Broadcast': Broadcast,
@@ -88,9 +88,9 @@ export class Backend implements IWebViewBridge {
 
     private executeInvocation(invocation: IInvocation): IResult {
         const api = (() => {
-            for(const apiKey in Backend._apiMap) {
-                if(Backend._apiMap.hasOwnProperty(apiKey) && invocation.className.match(apiKey)) {
-                    return Backend._apiMap[apiKey];
+            for(const apiKey in this._apiMap) {
+                if(this._apiMap.hasOwnProperty(apiKey) && invocation.className.match(apiKey)) {
+                    return this._apiMap[apiKey];
                 }
             }
         })();
