@@ -1,24 +1,16 @@
-import SmartButtonEndScreen from 'html/SmartButtonEndScreen.html';
-
 import { EndScreen, IEndScreenParameters } from 'Views/EndScreen';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
-import { Template } from 'Utilities/Template';
+import { Platform } from 'Constants/Platform';
 
 import { SmartCloseButtonTest } from 'Models/ABGroup';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class PerformanceEndScreen extends EndScreen {
     private _campaign: PerformanceCampaign;
     private _canvas: HTMLCanvasElement;
-    private readonly _portraitImageUrl: string;
 
     constructor(parameters: IEndScreenParameters, campaign: PerformanceCampaign) {
         super(parameters);
-
-        this._portraitImageUrl = campaign.getPortrait().getUrl();
-
-        if (SmartCloseButtonTest.isValid(parameters.abGroup)) {
-            this._template = new Template(SmartButtonEndScreen);
-        }
 
         const adjustedRating: number = campaign.getRating() * 20;
         this._templateData = {
@@ -26,7 +18,7 @@ export class PerformanceEndScreen extends EndScreen {
             'gameIcon': campaign.getGameIcon().getUrl(),
             // NOTE! Landscape orientation should use a portrait image and portrait orientation should use a landscape image
             'endScreenLandscape': campaign.getPortrait().getUrl(),
-            'endScreenPortrait': this._portraitImageUrl,
+            'endScreenPortrait': campaign.getLandscape().getUrl(),
             'rating': adjustedRating.toString(),
             'ratingCount': this._localization.abbreviate(campaign.getRatingCount()),
             'endscreenAlt': this.getEndscreenAlt(campaign)
@@ -38,28 +30,34 @@ export class PerformanceEndScreen extends EndScreen {
     public show(): void {
         super.show();
 
-        try {
-            if (typeof this._canvas === 'undefined') {
-                const closeRegion = <HTMLElement>this._container.querySelector('.btn-close-region');
-                const closeIcon = <HTMLElement>this._container.querySelector('span.icon-close');
-                this._createCanvas().then(() => {
-                    const canvas = <HTMLCanvasElement>this._canvas;
-                    const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
-                    const data = ctx.getImageData(closeIcon.offsetLeft, closeIcon.offsetTop, closeIcon.offsetWidth, closeIcon.offsetHeight).data;
+        if (SmartCloseButtonTest.isValid(this._abGroup)) {
+            try {
+                if (typeof this._canvas === 'undefined') {
+                    const closeRegion = <HTMLElement>this._container.querySelector('.btn-close-region');
+                    const closeIcon = <HTMLElement>this._container.querySelector('span.icon-close');
+                    this._createCanvas().then(() => {
+                        const canvas = <HTMLCanvasElement>this._canvas;
+                        const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
+                        const data = ctx.getImageData(closeIcon.offsetLeft, closeIcon.offsetTop, closeIcon.offsetWidth, closeIcon.offsetHeight).data;
 
-                    this._calculateWeightedAverageColor(data).then(res => {
-                        const {weightedR, weightedG, weightedB} = res;
-                        if (PerformanceEndScreen._isDark(weightedR, weightedG, weightedB)) {
-                            closeRegion.classList.add('light');
-                        } else {
-                            closeRegion.classList.add('dark');
-                        }
+                        this._calculateWeightedAverageColor(data).then(res => {
+                            const {weightedR, weightedG, weightedB} = res;
+                            console.log(res);
+                            if (PerformanceEndScreen._isDark(weightedR, weightedG, weightedB)) {
+                                closeRegion.classList.add('light');
+                            } else {
+                                closeRegion.classList.add('dark');
+                            }
+                        });
                     });
+                }
+            } catch (e) {
+                this._nativeBridge.Sdk.logError('smart color button failed: ' + e);
+
+                Diagnostics.trigger('smart_color_button_failed', {
+                    message: e.message
                 });
             }
-
-        } catch (e) {
-            /* TODO: Send diagnostic */
         }
     }
 
@@ -110,6 +108,10 @@ export class PerformanceEndScreen extends EndScreen {
                     coverRatio = canvasWidth / targetWidth;
                 }
 
+                if (Math.abs(coverRatio - 1) < 1e-14 && targetHeight < canvasHeight) {
+                    coverRatio = canvasHeight / targetHeight;
+                }
+
                 targetWidth *= coverRatio;
                 targetHeight *= coverRatio;
 
@@ -132,9 +134,17 @@ export class PerformanceEndScreen extends EndScreen {
                 resolve();
             };
 
+            /* Canvas CORS fix */
             img.crossOrigin = 'Anonymous';
-            img.src = this._portraitImageUrl.replace('file://', '');
 
+            let sampleImage = this._campaign.getLandscape().getUrl();
+
+            /* On iOS cached images cannot passed CORS, so we use original URL */
+            if (this._nativeBridge.getPlatform() === Platform.IOS) {
+                sampleImage = this._campaign.getLandscape().getOriginalUrl();
+            }
+
+            img.src = sampleImage.replace('file://', '');
             this._container.appendChild(this._canvas);
         });
     }
