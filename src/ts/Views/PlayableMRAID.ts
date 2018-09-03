@@ -217,7 +217,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         const frameLoadDuration = Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId());
         this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' iframe load duration ' + frameLoadDuration + ' ms');
-        this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(frameLoadDuration, 0, 0, 'playable_loading_time', {}));
+        this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(frameLoadDuration, 0, 0, 'playable_loading_time', {}));
     }
 
     private showLoadingScreen() {
@@ -314,7 +314,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private sendMraidAnalyticsEvent(eventName: string, timeFromPlayableStart: number = 0, eventData?: any) {
         const timeFromShow = this._playableStartTimestamp ? this.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000) : 0;
         const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
-        this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, eventName, eventData));
+        this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, eventName, eventData));
     }
 
     private updateProgressCircle(container: HTMLElement, value: number) {

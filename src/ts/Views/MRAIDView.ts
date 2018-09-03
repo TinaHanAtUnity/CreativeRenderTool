@@ -34,7 +34,7 @@ export interface IMRAIDViewHandler extends GDPREventHandler {
     onMraidSkip(): void;
     onMraidClose(): void;
     onMraidOrientationProperties(orientationProperties: IOrientationProperties): void;
-    onMraidAnalyticsEvent(timeFromShow: number|undefined, timeFromPlayableStart: number|undefined, backgroundTime: number|undefined, event: string, eventData: any): void;
+    onPlayableAnalyticsEvent(timeFromShow: number|undefined, timeFromPlayableStart: number|undefined, backgroundTime: number|undefined, event: string, eventData: any): void;
     onMraidShowEndScreen(): void;
 }
 
@@ -83,7 +83,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         }
 
         if (this._stats !== undefined) {
-            this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(this._stats.averageFps, this._stats.averagePlayFps, 0, 'playable_performance_stats', this._stats));
+            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(this._stats.averageFps, this._stats.averagePlayFps, 0, 'playable_performance_stats', this._stats));
         }
     }
 
@@ -108,7 +108,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
             const fetchingDuration = fetchingStopTimestamp - fetchingTimestamp;
             const mraidParseDuration = Date.now() - mraidParseTimestamp;
 
-            this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(fetchingDuration, mraidParseDuration, 0, 'playable_fetching_time', {}));
+            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(fetchingDuration, mraidParseDuration, 0, 'playable_fetching_time', {}));
 
             return data;
         });
