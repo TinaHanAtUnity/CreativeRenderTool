@@ -42,7 +42,7 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
-import { VastVideoEventHandler } from 'Vast/EventHandlers/VastVideoEventHandler';
+import { VastVideoEventHandler } from 'VAST/EventHandlers/VastVideoEventHandler';
 import { Vast } from 'VAST/Models/Vast';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { IXPromoAdUnitParameters, XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
