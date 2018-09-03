@@ -189,7 +189,7 @@ describe('AdUnitFactoryTest', () => {
                 httpKafkaStub.restore();
             });
 
-            it('should not send onMraidAnalyticsEvent for MRAIDCampaign', () => {
+            it('should not send onPlayableAnalyticsEvent for MRAIDCampaign', () => {
                 const campaign = TestFixtures.getProgrammaticMRAIDCampaign();
                 adUnitParameters.campaign = campaign;
                 const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
@@ -197,7 +197,7 @@ describe('AdUnitFactoryTest', () => {
                 assert.isFalse(httpKafkaStub.called);
             });
 
-            it('should send onMraidAnalyticsEvent on show if ad is Sonic Playable', () => {
+            it('should send onPlayableAnalyticsEvent on show if ad is Sonic Playable', () => {
                 const campaign = TestFixtures.getProgrammaticMRAIDCampaign({ creativeId: '109455881' });
                 adUnitParameters.campaign = campaign;
                 const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
@@ -206,7 +206,7 @@ describe('AdUnitFactoryTest', () => {
                 sinon.assert.calledOnce(httpKafkaStub);
             });
 
-            it('should send onMraidAnalyticsEvent for PerformanceMRAIDCampaign', () => {
+            it('should send onPlayableAnalyticsEvent for PerformanceMRAIDCampaign', () => {
                 const campaign = TestFixtures.getPerformanceMRAIDCampaign();
                 adUnitParameters.campaign = campaign;
                 const adUnit = <MRAIDAdUnit>AdUnitFactory.createAdUnit(nativeBridge, adUnitParameters);
