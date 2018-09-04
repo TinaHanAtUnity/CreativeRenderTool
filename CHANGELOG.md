@@ -1,4 +1,4 @@
-# Pending
+# Tue Sep  4 09:16:55 UTC 2018
 
 * Fix playable analytics naming
 * Fix playable ads KPI metrics
