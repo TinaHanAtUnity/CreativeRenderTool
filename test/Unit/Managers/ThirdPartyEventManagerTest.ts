@@ -1,9 +1,9 @@
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { assert } from 'chai';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { RequestApi } from 'Core/Native/Request';
 
 import { Request } from 'Core/Utilities/Request';

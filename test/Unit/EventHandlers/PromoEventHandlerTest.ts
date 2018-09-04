@@ -1,9 +1,9 @@
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { FinishState } from 'Core/Constants/FinishState';
-
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { ABGroupBuilder } from 'Core/Models/ABGroup';
 import { Configuration } from 'Core/Models/Configuration';
+
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 import DummyPromo from 'json/DummyPromoCampaign.json';
 import 'mocha';

@@ -1,13 +1,13 @@
 import { AnalyticsManager } from 'Analytics/AnalyticsManager';
 import { IAnalyticsObject } from 'Analytics/AnalyticsProtocol';
 import { assert } from 'chai';
-
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Configuration } from 'Core/Models/Configuration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
+
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { RequestApi } from 'Core/Native/Request';
 import { StorageApi, StorageError, StorageType } from 'Core/Native/Storage';
 import { Request } from 'Core/Utilities/Request';

@@ -1,11 +1,11 @@
 import { PlacementManager } from 'Ads/Managers/PlacementManager';
 import { PlacementState } from 'Ads/Models/Placement';
 import { assert } from 'chai';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Observable1 } from 'Core/Utilities/Observable';
 import { ClientInfo } from 'Core/Models/ClientInfo';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { SdkApi } from 'Core/Native/Sdk';
 import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
+import { Observable1 } from 'Core/Utilities/Observable';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
 import IapPromoCatalog from 'json/IapPromoCatalog.json';

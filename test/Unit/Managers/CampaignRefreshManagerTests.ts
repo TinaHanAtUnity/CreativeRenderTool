@@ -18,8 +18,6 @@ import { Placement, PlacementState } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Observable0, Observable1, Observable2, Observable4 } from 'Core/Utilities/Observable';
 import { JaegerManager } from 'Core/Jaeger/JaegerManager';
 import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
 import { FocusManager } from 'Core/Managers/FocusManager';
@@ -29,11 +27,13 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 
 import { CacheMode, Configuration } from 'Core/Models/Configuration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
 import { Cache, CacheStatus } from 'Core/Utilities/Cache';
 import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
 
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { Observable0, Observable1, Observable2, Observable4 } from 'Core/Utilities/Observable';
 import { INativeResponse, Request } from 'Core/Utilities/Request';
 
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';

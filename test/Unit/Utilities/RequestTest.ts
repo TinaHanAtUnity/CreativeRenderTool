@@ -1,8 +1,8 @@
 import { assert } from 'chai';
 import { RequestError } from 'Core/Errors/RequestError';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 import { RequestApi } from 'Core/Native/Request';
 import { Request } from 'Core/Utilities/Request';

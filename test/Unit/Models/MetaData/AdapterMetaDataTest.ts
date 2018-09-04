@@ -1,8 +1,8 @@
 import { assert } from 'chai';
-
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { AdapterMetaData } from 'Core/Models/MetaData/AdapterMetaData';
+
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { StorageApi, StorageType } from 'Core/Native/Storage';
 import 'mocha';
 import * as sinon from 'sinon';

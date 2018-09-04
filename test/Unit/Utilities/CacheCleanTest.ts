@@ -1,8 +1,8 @@
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { assert } from 'chai';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 import { CacheApi, CacheError, IFileInfo } from 'Core/Native/Cache';
 import { StorageApi, StorageError, StorageType } from 'Core/Native/Storage';

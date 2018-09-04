@@ -9,12 +9,12 @@ import { BannerApi } from 'Banners/Native/Banner';
 import { BannerListenerApi } from 'Banners/Native/UnityBannerListener';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Observable0, Observable1, Observable2 } from 'Core/Utilities/Observable';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IntentApi } from 'Core/Native/Android/Intent';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
+import { Observable0, Observable1, Observable2 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
 
 import BannerContainer from 'html/banner/BannerContainer.html';

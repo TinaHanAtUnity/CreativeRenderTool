@@ -5,11 +5,11 @@ import { PerformanceOperativeEventManager } from 'Ads/Managers/PerformanceOperat
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Configuration } from 'Core/Models/Configuration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Request } from 'Core/Utilities/Request';
 import 'mocha';
 import { MRAIDOperativeEventManager } from 'MRAID/Managers/MRAIDOperativeEventManager';
