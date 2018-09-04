@@ -31,6 +31,8 @@ export class PermissionsApi extends NativeApi {
     private _ios: IosPermissionsApi;
     private _currentPlatform: Platform;
 
+    private static readonly ANDROID_PERMISSIONS_ASKED_KEY = 'unity-ads-permissions-asked';
+
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'Permissions', ApiPackage.CORE);
         const currentPlatform = nativeBridge.getPlatform();
@@ -56,6 +58,8 @@ export class PermissionsApi extends NativeApi {
         }
 
         if (this._currentPlatform === Platform.ANDROID) {
+            this._nativeBridge.AndroidPreferences.setBoolean(PermissionsApi.ANDROID_PERMISSIONS_ASKED_KEY, permission.toString(), true);
+
             this.permissionRequestCode += 1;
             // Subscribe for the results
             this._android.onPermissionsResult.subscribe(this.onAndroidPermissionsResult);
@@ -124,9 +128,18 @@ export class PermissionsApi extends NativeApi {
             this._android.checkPermission(androidPermission).then(results => {
                 if (results === 0) { // Granted = 0
                     resolve(CurrentPermission.ACCEPTED);
+                    return;
                 }
-                // Denied = -1
-                resolve(CurrentPermission.DENIED);
+
+                // Emulate the behaviour on iOS because Android doesn't have an unknown state. We return UNKNOWN if we
+                // haven't asked for the permission already.
+                this._nativeBridge.AndroidPreferences.hasKey(PermissionsApi.ANDROID_PERMISSIONS_ASKED_KEY, permission.toString()).then(asked => {
+                    if (asked) {
+                        resolve(CurrentPermission.DENIED);
+                    } else {
+                        resolve(CurrentPermission.UNKNOWN);
+                    }
+                });
             }).catch(() => {
                 // If there are any errors, default to unknown
                 resolve(CurrentPermission.UNKNOWN);
