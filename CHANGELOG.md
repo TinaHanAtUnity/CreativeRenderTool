@@ -1,4 +1,17 @@
-# Tue Aug 28 21:13:41 UTC 2018
+# Tue Sep  4 09:16:55 UTC 2018
+
+* Fix playable analytics naming
+* Fix playable ads KPI metrics
+* Reformat build information in privacy objects
+
+# Thu Aug 30 15:02:10 UTC 2018
+
+* Remove webview reinit logic
+* AR fixes
+* Isolate integration tests
+* Fix global leaks in hybrid tests
+
+# Wed Aug 29 12:27:38 UTC 2018
 
 * Refactor build & test systems
 
@@ -15,6 +28,7 @@
 * XPROMO: trigger onStartProcessed after the start event has been sent
 * New video overlay also enabled for VAST video ads in groups 18 & 19
 * Custom Feature for Admob Video Required Asset
+* Remove iPhone X end screen test (groups 18 & 19)
 
 # Wed Aug 22 09:36:53 UTC 2018
 

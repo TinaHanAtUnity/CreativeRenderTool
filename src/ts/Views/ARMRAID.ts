@@ -197,6 +197,8 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     public show(): void {
         super.show();
         this._showTimestamp = Date.now();
+        const backgroundTime = ARMRAID.checkIsValid(this._backgroundTime / 1000);
+        this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(0, 0, backgroundTime, 'playable_show', {}));
         this.showLoadingScreen();
     }
 
@@ -361,10 +363,10 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         if(this._canSkip && !this._canClose) {
             this._handlers.forEach(handler => handler.onMraidSkip());
-            this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, 'playable_skip', undefined));
+            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, 'playable_skip', undefined));
         } else if(this._canClose) {
             this._handlers.forEach(handler => handler.onMraidClose());
-            this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, 'playable_close', undefined));
+            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, 'playable_close', undefined));
         }
     }
 
@@ -390,7 +392,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         const timeFromShow = ARMRAID.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
         const backgroundTime = ARMRAID.checkIsValid(this._backgroundTime / 1000);
 
-        this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(frameLoadDuration, timeFromShow, backgroundTime, 'mraid_loading_time_playable', {}));
+        this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(frameLoadDuration, timeFromShow, backgroundTime, 'playable_loading_time', {}));
     }
 
     private handleAREvent(event: string, parameters: string) {
@@ -439,14 +441,16 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 return this._nativeBridge.AR.hideCameraFeed();
 
             case 'addAnchor':
-                return this._nativeBridge.AR.addAnchor(args[0], args[1]);
+                return this._nativeBridge.AR.addAnchor(String(args[0]), args[1]);
 
             case 'removeAnchor':
-                return this._nativeBridge.AR.removeAnchor(args[0]);
+                return this._nativeBridge.AR.removeAnchor(String(args[0]));
 
             case 'advanceFrame':
                 if (this._nativeBridge.getPlatform() === Platform.IOS) {
                     return ARUtil.advanceFrameWithScale(this._nativeBridge.AR.Ios);
+                } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                    return this._nativeBridge.AR.Android.advanceFrame();
                 } else {
                     return Promise.resolve();
                 }
@@ -496,7 +500,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 const timeFromShow = ARMRAID.checkIsValid((Date.now() - this._showTimestamp) / 1000);
                 const timeFromPlayableStart = ARMRAID.checkIsValid((Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000);
                 const backgroundTime = ARMRAID.checkIsValid(this._backgroundTime / 1000);
-                this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, event.data.event, event.data.eventData));
+                this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, event.data.event, event.data.eventData));
                 break;
             case 'customMraidState':
                 switch(event.data.state) {
@@ -542,24 +546,37 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 this._playableStartTimestamp = Date.now();
                 const timeFromShow = ARMRAID.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
                 const backgroundTime = ARMRAID.checkIsValid(this._backgroundTime / 1000);
-                this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_start', undefined));
+                this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_start', undefined));
                 this.setViewableState(true);
 
                 this._loadingScreen.style.display = 'none';
             }, false);
         });
 
-        this._loadingScreen.classList.add('hidden');
-        this._nativeBridge.Permissions.checkPermissions(PermissionTypes.CAMERA).then(results => {
-            const requestPermissionText = <HTMLElement>this._cameraPermissionPanel.querySelector('.request-text');
-            if (results === CurrentPermission.DENIED) {
+        const arSupported: Promise<boolean> =
+            this._nativeBridge.AR.Ios ? this._nativeBridge.AR.Ios.isARSupported() :
+                this._nativeBridge.AR.Android ? this._nativeBridge.AR.Android.isARSupported() :
+                    Promise.resolve<boolean>(false);
+
+        arSupported.then(supported => {
+            this._loadingScreen.classList.add('hidden');
+
+            if (!supported) {
                 this.onCameraPermissionEvent(false);
-            } else {
-                if (results === CurrentPermission.ACCEPTED) {
-                    requestPermissionText.style.display = 'none';
-                }
-                this._cameraPermissionPanel.style.display = 'block';
+                return;
             }
+
+            this._nativeBridge.Permissions.checkPermissions(PermissionTypes.CAMERA).then(results => {
+                const requestPermissionText = <HTMLElement>this._cameraPermissionPanel.querySelector('.request-text');
+                if (results === CurrentPermission.DENIED) {
+                    this.onCameraPermissionEvent(false);
+                } else {
+                    if (results === CurrentPermission.ACCEPTED) {
+                        requestPermissionText.style.display = 'none';
+                    }
+                    this._cameraPermissionPanel.style.display = 'block';
+                }
+            });
         });
     }
 
@@ -591,6 +608,5 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private onShowFallback() {
         this.onCameraPermissionEvent(false);
-        this.showMRAIDAd();
     }
 }

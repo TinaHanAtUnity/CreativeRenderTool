@@ -1,6 +1,7 @@
 import { Campaign, ICampaign } from 'Models/Campaign';
 import { CampaignParser } from 'Parsers/CampaignParser';
 import { IMRAIDCampaign, MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
+import { PerformanceMRAIDCampaign } from 'Models/Campaigns/PerformanceMRAIDCampaign';
 import { IPerformanceCampaign, PerformanceCampaign, StoreName } from 'Models/Campaigns/PerformanceCampaign';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Request } from 'Utilities/Request';
@@ -87,7 +88,7 @@ export class CometCampaignParser extends CampaignParser {
                 playableConfiguration: undefined
             };
 
-            const mraidCampaign = new MRAIDCampaign(parameters);
+            const mraidCampaign = new PerformanceMRAIDCampaign(parameters);
 
             if (CustomFeatures.isPlayableConfigurationEnabled(json.mraidUrl)) {
                 const playableConfigurationUrl = json.mraidUrl.replace(/index\.html/, 'configuration.json');

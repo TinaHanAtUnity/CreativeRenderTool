@@ -9,14 +9,14 @@ import { CampaignManager } from 'Managers/CampaignManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ProgrammaticOperativeEventManager } from 'Managers/ProgrammaticOperativeEventManager';
 
-describe('VastTest', () => {
+describe('AndroidMraidTest', () => {
 
     it('should handle happy path on Android', function(this: Mocha.ITestCallbackContext, done: MochaDone) {
         this.timeout(10000);
         let readyCount = 0;
         const listener: IUnityAdsListener = {
             onUnityAdsReady: (placement: string) => {
-                if (++readyCount === 1) {
+                if (++readyCount === 2) {
                     done();
                 }
             },
@@ -49,7 +49,7 @@ describe('VastTest', () => {
         CampaignManager.setBaseUrl('https://fake-ads-backend.applifier.info');
         ProgrammaticOperativeEventManager.setTestBaseUrl('https://fake-ads-backend.applifier.info');
 
-        UnityAds.initialize(Platform.ANDROID, '333', listener, true);
+        UnityAds.initialize(Platform.ANDROID, '444', listener, true);
     });
 
 });

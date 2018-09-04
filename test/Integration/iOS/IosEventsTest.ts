@@ -13,7 +13,7 @@ import { CampaignManager } from 'Managers/CampaignManager';
 import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { ProgrammaticOperativeEventManager } from 'Managers/ProgrammaticOperativeEventManager';
 
-describe('EventsTest', () => {
+describe('IosEventsTest', () => {
 
     let currentGameId: number;
     const videoEvents = ['video_start', 'first_quartile', 'midpoint', 'third_quartile', 'video_end'];
