@@ -48,6 +48,9 @@ export class PerformanceEndScreen extends EndScreen {
                             } else {
                                 closeRegion.classList.add('dark');
                             }
+
+                            /* Clean up */
+                            (<HTMLElement>this._canvas.parentElement).removeChild(this._canvas);
                         });
                     });
                 }
@@ -154,7 +157,6 @@ export class PerformanceEndScreen extends EndScreen {
             let totalR = 0;
             let totalG = 0;
             let totalB = 0;
-            let totalA = 0;
             let weightedR = 0;
             let weightedG = 0;
             let weightedB = 0;
@@ -171,7 +173,6 @@ export class PerformanceEndScreen extends EndScreen {
                 totalR += r;
                 totalG += g;
                 totalB += b;
-                totalA += a;
 
                 const alphaWeight = a / 255;
                 weightedR += r * alphaWeight;
