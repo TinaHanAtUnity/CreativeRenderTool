@@ -78,7 +78,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         return new Promise((resolve, reject) => {
             setTimeout(resolve, 500);
         }).then(() => {
-
             const endScreen = this.getEndScreen();
             if (endScreen) {
                 endScreen.hide();
