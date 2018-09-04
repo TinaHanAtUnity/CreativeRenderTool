@@ -39,7 +39,7 @@ import { ABGroup } from 'Models/ABGroup';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { MixedPlacementUtility } from 'Utilities/MixedPlacementUtility';
 import { HttpKafka, KafkaCommonObjectType } from 'Utilities/HttpKafka';
-import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
+import { PerformanceMRAIDCampaign } from 'Models/Campaigns/PerformanceMRAIDCampaign';
 
 export class CampaignManager {
 
@@ -556,15 +556,15 @@ export class CampaignManager {
                 }, session);
             }
 
-            if (campaign instanceof MRAIDCampaign) {
+            if (campaign instanceof PerformanceMRAIDCampaign) {
                 const cachingDuration = Date.now() - cachingTimestamp;
 
                 const kafkaObject: any = {};
-                kafkaObject.type = 'mraid_caching_time';
+                kafkaObject.type = 'playable_caching_time';
                 kafkaObject.eventData = {
                     contentType: contentType
                 };
-                kafkaObject.timeFromShow = cachingDuration;
+                kafkaObject.timeFromShow = cachingDuration / 1000;
                 kafkaObject.timeFromPlayableStart = 0;
                 kafkaObject.backgroundTime = 0;
                 kafkaObject.auctionId = campaign.getSession().getId();
