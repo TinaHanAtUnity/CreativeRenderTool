@@ -163,7 +163,9 @@ export class PerformanceEndScreen extends EndScreen {
             let weightTotal = 0;
             const pixels = data.length;
 
-            for (let i = 0; i < pixels; i += 4) {
+            let i;
+
+            for (i = 0; i < pixels; i += 4) {
                 // [r1, g1, b1, a1, r2, g2, b2, a2, r3 ...]
                 const r = data[i];
                 const g = data[i + 1];
@@ -179,16 +181,14 @@ export class PerformanceEndScreen extends EndScreen {
                 weightedG += g * alphaWeight;
                 weightedB += b * alphaWeight;
                 weightTotal += alphaWeight;
-
-                // Resolve promise once we are done with all pixels
-                if (i + 4 >= pixels) {
-                    weightedR = weightedR / weightTotal | 0;
-                    weightedG = weightedG / weightTotal | 0;
-                    weightedB = weightedB / weightTotal | 0;
-
-                    resolve({weightedR, weightedG, weightedB});
-                }
             }
+
+            // Resolve promise once we are done with all pixels
+            weightedR = weightedR / weightTotal | 0;
+            weightedG = weightedG / weightTotal | 0;
+            weightedB = weightedB / weightTotal | 0;
+
+            resolve({weightedR, weightedG, weightedB});
         });
     }
 
