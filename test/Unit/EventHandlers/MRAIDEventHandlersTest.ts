@@ -98,7 +98,7 @@ describe('MRAIDEventHandlersTest', () => {
                 options: {},
                 mraid: mraidView,
                 endScreen: undefined,
-                privacy: new GDPRPrivacy(nativeBridge, gdprManager, false, true),
+                privacy: new GDPRPrivacy(nativeBridge, gdprManager, false),
                 gdprManager: gdprManager,
                 programmaticTrackingService: programmaticTrackingService
             };
@@ -285,7 +285,7 @@ describe('MRAIDEventHandlersTest', () => {
             sinon.stub(request, 'followRedirectChain').resolves();
             placement = TestFixtures.getPlacement();
             gdprManager = sinon.createStubInstance(GdprManager);
-            privacy = new GDPRPrivacy(nativeBridge, gdprManager, false, true);
+            privacy = new GDPRPrivacy(nativeBridge, gdprManager, false);
 
             clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
             deviceInfo = TestFixtures.getAndroidDeviceInfo();
@@ -321,7 +321,7 @@ describe('MRAIDEventHandlersTest', () => {
                 options: {},
                 mraid: mraidView,
                 endScreen: undefined,
-                privacy: new GDPRPrivacy(nativeBridge, gdprManager, false, true),
+                privacy: new GDPRPrivacy(nativeBridge, gdprManager, false),
                 gdprManager: gdprManager,
                 programmaticTrackingService: programmaticTrackingService
             };
