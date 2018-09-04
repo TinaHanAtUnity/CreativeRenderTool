@@ -7,6 +7,7 @@ import { VastEndScreen } from 'Views/VastEndScreen';
 import { NativeBridge } from 'Native/NativeBridge';
 
 import VastEndScreenFixture from 'html/fixtures/VastEndScreenFixture.html';
+import { Privacy } from 'Views/Privacy';
 
 describe('VastEndScreen', () => {
     let handleInvocation: sinon.SinonSpy;
@@ -24,7 +25,7 @@ describe('VastEndScreen', () => {
 
     it('should render', () => {
         const vastCampaign = TestFixtures.getCompanionVastCampaign();
-        const endScreen = new VastEndScreen(nativeBridge, false, vastCampaign, 'testGameId');
+        const endScreen = new VastEndScreen(nativeBridge, vastCampaign, 'testGameId', new Privacy(nativeBridge, false));
         endScreen.render();
         assert.equal(endScreen.container().innerHTML, VastEndScreenFixture);
     });

@@ -25,7 +25,6 @@ import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
 import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 import { IVideoEventHandlerParams } from 'EventHandlers/BaseVideoEventHandler';
-import { Vast } from 'Models/Vast/Vast';
 import { VideoState } from 'AdUnits/VideoAdUnit';
 import { GdprManager } from 'Managers/GdprManager';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
@@ -304,7 +303,8 @@ describe('VastVideoEventHandler tests', () => {
         let vastAdUnit: VastAdUnit;
         beforeEach(() => {
             sandbox.restore();
-            vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.configuration.isCoppaCompliant(), vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
+            const endScreenPrivacy = new Privacy(nativeBridge, false);
+            vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId(), endScreenPrivacy);
             sinon.spy(vastEndScreen, 'show');
             vastAdUnitParameters.endScreen = vastEndScreen;
             vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);

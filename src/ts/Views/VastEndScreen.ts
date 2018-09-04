@@ -6,7 +6,6 @@ import { Template } from 'Utilities/Template';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { IPrivacyHandler, AbstractPrivacy } from 'Views/AbstractPrivacy';
-import { Privacy } from 'Views/Privacy';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 
 export interface IVastEndScreenHandler {
@@ -20,14 +19,12 @@ export interface IVastEndScreenHandler {
 export class VastEndScreen extends View<IVastEndScreenHandler> implements IPrivacyHandler {
 
     private _isSwipeToCloseEnabled: boolean = false;
-    private _coppaCompliant: boolean;
     private _privacy: AbstractPrivacy;
     private _callButtonEnabled: boolean = true;
 
-    constructor(nativeBridge: NativeBridge, coppaCompliant: boolean, campaign: VastCampaign, gameId: string, privacy: AbstractPrivacy) {
+    constructor(nativeBridge: NativeBridge, campaign: VastCampaign, gameId: string, privacy: AbstractPrivacy) {
         super(nativeBridge, 'vast-end-screen');
 
-        this._coppaCompliant = coppaCompliant;
         this._template = new Template(VastEndScreenTemplate);
         this._privacy = privacy;
 
@@ -104,6 +101,8 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
     }
 
     public remove(): void {
+        this._privacy.removeEventHandler(this);
+        this._privacy.container().parentElement!.removeChild(this._privacy.container());
         this.container().parentElement!.removeChild(this.container());
     }
 

@@ -221,10 +221,8 @@ export class AdUnitFactory {
         };
 
         if(parameters.campaign.hasEndscreen()) {
-            const privacy = this.createPrivacy(nativeBridge, parameters);
-            vastAdUnitParameters.endScreenPrivacy = privacy;
-
-            vastEndScreen = new VastEndScreen(nativeBridge, parameters.configuration.isCoppaCompliant(), parameters.campaign, parameters.clientInfo.getGameId(), privacy);
+            const endScreenPrivacy = this.createPrivacy(nativeBridge, parameters);
+            vastEndScreen = new VastEndScreen(nativeBridge, parameters.campaign, parameters.clientInfo.getGameId(), endScreenPrivacy);
             vastAdUnitParameters.endScreen = vastEndScreen;
         }
 
