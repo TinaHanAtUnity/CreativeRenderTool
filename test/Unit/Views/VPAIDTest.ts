@@ -1,8 +1,8 @@
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { Privacy } from 'Ads/Views/Privacy';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Observable1 } from 'Common/Utilities/Observable';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { DeviceInfoApi } from 'Core/Native/DeviceInfo';
+import { Observable1 } from 'Core/Utilities/Observable';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';

@@ -1,8 +1,8 @@
-import { RingerMode } from 'Common/Constants/Android/RingerMode';
-import { StreamType } from 'Common/Constants/Android/StreamType';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { RingerMode } from 'Core/Constants/Android/RingerMode';
+import { StreamType } from 'Core/Constants/Android/StreamType';
 import { DeviceInfo, IDeviceInfo } from 'Core/Models/DeviceInfo';
 import { ISensorInfo, StorageType } from 'Core/Native/Android/AndroidDeviceInfo';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 export interface IAndroidDeviceInfo extends IDeviceInfo {
     androidId: string;

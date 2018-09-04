@@ -3,7 +3,7 @@ import { DeviceInfo } from 'Backend/Api/DeviceInfo';
 import { Sdk } from 'Backend/Api/Sdk';
 import { IUnityAdsListener } from 'Backend/IUnityAdsListener';
 import { UnityAds } from 'Backend/UnityAds';
-import { Platform } from 'Common/Constants/Platform';
+import { Platform } from 'Core/Constants/Platform';
 import 'Workarounds';
 
 document.addEventListener('DOMContentLoaded', () => {

@@ -15,8 +15,8 @@ import { Sdk } from 'Backend/Api/Sdk';
 import { Storage } from 'Backend/Api/Storage';
 import { UrlScheme } from 'Backend/Api/UrlScheme';
 import { VideoPlayer } from 'Backend/Api/VideoPlayer';
-import { Platform } from 'Common/Constants/Platform';
-import { CallbackStatus } from 'Common/Native/NativeBridge';
+import { Platform } from 'Core/Constants/Platform';
+import { CallbackStatus } from 'Core/Native/Bridge/NativeBridge';
 
 interface IInvocation {
     className: string;

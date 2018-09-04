@@ -4,9 +4,9 @@ import { PlacementState } from 'Ads/Models/Placement';
 import { ListenerApi } from 'Ads/Native/Listener';
 import { PlacementApi } from 'Ads/Native/Placement';
 import { assert, expect } from 'chai';
-
-import { NativeBridge } from 'Common/Native/NativeBridge';
 import { Configuration } from 'Core/Models/Configuration';
+
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
 import 'mocha';

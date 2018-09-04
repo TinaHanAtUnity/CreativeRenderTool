@@ -3,9 +3,9 @@ import { GDPREventAction, GDPREventSource, GdprManager } from 'Ads/Managers/Gdpr
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
-import { Platform } from 'Common/Constants/Platform';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Platform } from 'Core/Constants/Platform';
 import { Configuration } from 'Core/Models/Configuration';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 export class PrivacyEventHandler implements IPrivacyHandler {
 

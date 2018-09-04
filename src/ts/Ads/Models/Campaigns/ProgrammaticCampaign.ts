@@ -1,5 +1,5 @@
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
-import { ISchema } from 'Common/Models/Model';
+import { ISchema } from 'Core/Models/Model';
 
 export interface IProgrammaticCampaign extends ICampaign {
     useWebViewUserAgentForTracking: boolean | undefined;

@@ -7,8 +7,8 @@ import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Privacy } from 'Ads/Views/Privacy';
 
-import { Platform } from 'Common/Constants/Platform';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Platform } from 'Core/Constants/Platform';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { Request } from 'Core/Utilities/Request';
 import {

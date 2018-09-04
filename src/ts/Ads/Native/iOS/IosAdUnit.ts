@@ -1,8 +1,8 @@
-import { UIInterfaceOrientationMask } from 'Common/Constants/iOS/UIInterfaceOrientationMask';
-import { ApiPackage, NativeApi } from 'Common/Native/NativeApi';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Observable0 } from 'Common/Utilities/Observable';
+import { UIInterfaceOrientationMask } from 'Core/Constants/iOS/UIInterfaceOrientationMask';
+import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Double } from 'Core/Utilities/Double';
+import { Observable0 } from 'Core/Utilities/Observable';
 
 enum AdUnitEvent {
     VIEW_CONTROLLER_INIT,

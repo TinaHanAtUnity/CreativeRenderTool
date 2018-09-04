@@ -1,4 +1,4 @@
-import { Model } from 'Common/Models/Model';
+import { Model } from 'Core/Models/Model';
 import { VastAd } from 'VAST/Models/VastAd';
 import { VastCreativeCompanionAd } from 'VAST/Models/VastCreativeCompanionAd';
 

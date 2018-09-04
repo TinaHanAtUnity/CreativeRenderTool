@@ -1,4 +1,4 @@
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 export class FileId {
     public static getFileId(url: string, nativeBridge: NativeBridge): Promise<string> {

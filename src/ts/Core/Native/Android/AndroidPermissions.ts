@@ -1,6 +1,6 @@
-import { ApiPackage, NativeApi } from 'Common/Native/NativeApi';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Observable1, Observable3 } from 'Common/Utilities/Observable';
+import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Observable1, Observable3 } from 'Core/Utilities/Observable';
 
 export enum AndroidPermission {
     CAMERA = 'android.permission.CAMERA',

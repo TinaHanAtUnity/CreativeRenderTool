@@ -3,13 +3,13 @@ import { IOperativeEventParams, OperativeEventManager } from 'Ads/Managers/Opera
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
 import { EventType } from 'Ads/Models/Session';
-import { FinishState } from 'Common/Constants/FinishState';
-import { Platform } from 'Common/Constants/Platform';
-import { DiagnosticError } from 'Common/Errors/DiagnosticError';
-import { RequestError } from 'Common/Errors/RequestError';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { FinishState } from 'Core/Constants/FinishState';
+import { Platform } from 'Core/Constants/Platform';
+import { DiagnosticError } from 'Core/Errors/DiagnosticError';
+import { RequestError } from 'Core/Errors/RequestError';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Request } from 'Core/Utilities/Request';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';

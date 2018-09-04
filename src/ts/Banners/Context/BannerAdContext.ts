@@ -5,11 +5,11 @@ import { BannerAdUnitFactory } from 'Banners/AdUnits/BannerAdUnitFactory';
 import { BannerAdUnitParametersFactory } from 'Banners/AdUnits/BannerAdUnitParametersFactory';
 import { BannerCampaignManager } from 'Banners/Managers/BannerCampaignManager';
 import { BannerPlacementManager } from 'Banners/Managers/BannerPlacementManager';
-import { NativeBridge } from 'Common/Native/NativeBridge';
 import { AdUnitActivities, FocusManager } from 'Core/Managers/FocusManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 const StandardRefreshDelay = 30;
 

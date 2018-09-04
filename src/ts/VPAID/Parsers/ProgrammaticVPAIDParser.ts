@@ -1,7 +1,7 @@
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Request } from 'Core/Utilities/Request';
 import { Vast } from 'VAST/Models/Vast';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';

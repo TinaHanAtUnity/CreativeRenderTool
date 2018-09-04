@@ -1,4 +1,4 @@
-import { Platform } from 'Common/Constants/Platform';
+import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { INativeResponse, Request } from 'Core/Utilities/Request';

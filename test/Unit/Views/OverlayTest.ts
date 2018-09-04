@@ -3,7 +3,7 @@ import { Overlay } from 'Ads/Views/Overlay';
 import { Privacy } from 'Ads/Views/Privacy';
 import { assert } from 'chai';
 
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
 import * as sinon from 'sinon';
 

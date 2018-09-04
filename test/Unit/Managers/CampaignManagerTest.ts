@@ -11,11 +11,8 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { IPlacementRequestMap, MixedPlacementUtility } from 'Ads/Utilities/MixedPlacementUtility';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { assert } from 'chai';
-import { Platform } from 'Common/Constants/Platform';
-import { WebViewError } from 'Common/Errors/WebViewError';
-
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Observable0, Observable1, Observable2, Observable4 } from 'Common/Utilities/Observable';
+import { Platform } from 'Core/Constants/Platform';
+import { WebViewError } from 'Core/Errors/WebViewError';
 import { JaegerManager } from 'Core/Jaeger/JaegerManager';
 import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
 import { FocusManager } from 'Core/Managers/FocusManager';
@@ -27,9 +24,12 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode, Configuration } from 'Core/Models/Configuration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { StorageType } from 'Core/Native/Android/AndroidDeviceInfo';
+
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
 import { Cache } from 'Core/Utilities/Cache';
 import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
+import { Observable0, Observable1, Observable2, Observable4 } from 'Core/Utilities/Observable';
 import { INativeResponse, Request } from 'Core/Utilities/Request';
 import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 

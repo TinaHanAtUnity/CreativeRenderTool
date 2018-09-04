@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { Observable1 } from 'Common/Utilities/Observable';
+import { Observable1 } from 'Core/Utilities/Observable';
 import 'mocha';
 
 describe('ObservableTest', () => {

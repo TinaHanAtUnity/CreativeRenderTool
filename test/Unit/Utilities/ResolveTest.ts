@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { ResolveApi } from 'Core/Native/Resolve';
 
 import { Resolve } from 'Core/Utilities/Resolve';

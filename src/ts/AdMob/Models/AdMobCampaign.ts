@@ -1,7 +1,7 @@
 import { Asset } from 'Ads/Models/Assets/Asset';
 import { Video } from 'Ads/Models/Assets/Video';
 import { IProgrammaticCampaign, ProgrammaticCampaign } from 'Ads/Models/Campaigns/ProgrammaticCampaign';
-import { Model } from 'Common/Models/Model';
+import { Model } from 'Core/Models/Model';
 
 export interface IAdMobVideo {
     mediaFileURL: string;

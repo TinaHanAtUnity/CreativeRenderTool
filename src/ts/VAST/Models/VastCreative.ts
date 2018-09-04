@@ -1,4 +1,4 @@
-import { ISchema, Model } from 'Common/Models/Model';
+import { ISchema, Model } from 'Core/Models/Model';
 import { VastMediaFile } from 'VAST/Models/VastMediaFile';
 
 export interface IVastCreative {

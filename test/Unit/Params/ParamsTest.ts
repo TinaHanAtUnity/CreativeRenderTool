@@ -11,9 +11,7 @@ import { AndroidAdUnitApi } from 'Ads/Native/Android/AndroidAdUnit';
 import { IosAdUnitApi } from 'Ads/Native/iOS/IosAdUnit';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { assert } from 'chai';
-import { Platform } from 'Common/Constants/Platform';
-
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Platform } from 'Core/Constants/Platform';
 import { JaegerManager } from 'Core/Jaeger/JaegerManager';
 import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
 import { ConfigManager } from 'Core/Managers/ConfigManager';
@@ -24,6 +22,8 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode, Configuration } from 'Core/Models/Configuration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AndroidDeviceInfoApi, IPackageInfo } from 'Core/Native/Android/AndroidDeviceInfo';
+
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { DeviceInfoApi } from 'Core/Native/DeviceInfo';
 import { RequestApi } from 'Core/Native/Request';
 import { StorageApi, StorageType } from 'Core/Native/Storage';

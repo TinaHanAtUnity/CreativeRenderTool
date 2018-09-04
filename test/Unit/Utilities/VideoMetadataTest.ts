@@ -1,9 +1,9 @@
 import { Video } from 'Ads/Models/Assets/Video';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { assert } from 'chai';
-import { VideoMetadata } from 'Common/Constants/Android/VideoMetadata';
-import { Platform } from 'Common/Constants/Platform';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { VideoMetadata } from 'Core/Constants/Android/VideoMetadata';
+import { Platform } from 'Core/Constants/Platform';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { CacheError } from 'Core/Native/Cache';

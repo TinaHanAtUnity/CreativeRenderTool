@@ -12,9 +12,9 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { EndScreen } from 'Ads/Views/EndScreen';
 import { ARUtil } from 'AR/Utilities/ARUtil';
-import { FinishState } from 'Common/Constants/FinishState';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { FinishState } from 'Core/Constants/FinishState';
 import { ClientInfo } from 'Core/Models/ClientInfo';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
 

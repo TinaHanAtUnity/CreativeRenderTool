@@ -1,4 +1,4 @@
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'VPAID/AdUnits/VPAIDAdUnit';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { IVPAIDEndScreenHandler } from 'VPAID/Views/VPAIDEndScreen';

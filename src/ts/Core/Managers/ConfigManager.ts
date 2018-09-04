@@ -1,7 +1,6 @@
-import { Platform } from 'Common/Constants/Platform';
-import { ConfigError } from 'Common/Errors/ConfigError';
-import { RequestError } from 'Common/Errors/RequestError';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Platform } from 'Core/Constants/Platform';
+import { ConfigError } from 'Core/Errors/ConfigError';
+import { RequestError } from 'Core/Errors/RequestError';
 import { JaegerSpan, JaegerTags } from 'Core/Jaeger/JaegerSpan';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { ABGroup } from 'Core/Models/ABGroup';
@@ -11,6 +10,7 @@ import { Configuration } from 'Core/Models/Configuration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AdapterMetaData } from 'Core/Models/MetaData/AdapterMetaData';
 import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { StorageType } from 'Core/Native/Storage';
 import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';

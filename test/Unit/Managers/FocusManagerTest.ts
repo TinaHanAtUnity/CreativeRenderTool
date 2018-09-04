@@ -1,11 +1,11 @@
 import { assert } from 'chai';
-import { Platform } from 'Common/Constants/Platform';
-
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Platform } from 'Core/Constants/Platform';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { BroadcastApi } from 'Core/Native/Android/Broadcast';
 import { LifecycleApi } from 'Core/Native/Android/Lifecycle';
+
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { ConnectivityApi } from 'Core/Native/Connectivity';
 import { NotificationApi } from 'Core/Native/iOS/Notification';
 import 'mocha';

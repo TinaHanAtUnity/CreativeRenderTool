@@ -1,4 +1,4 @@
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 type NativeInvocation = [string, string, any[], string];
 

@@ -9,12 +9,12 @@ import { Placement } from 'Ads/Models/Placement';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { UserCountData } from 'Ads/Utilities/UserCountData';
-import { KeyCode } from 'Common/Constants/Android/KeyCode';
-import { SensorDelay } from 'Common/Constants/Android/SensorDelay';
-import { FinishState } from 'Common/Constants/FinishState';
-import { Platform } from 'Common/Constants/Platform';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { KeyCode } from 'Core/Constants/Android/KeyCode';
+import { SensorDelay } from 'Core/Constants/Android/SensorDelay';
+import { FinishState } from 'Core/Constants/FinishState';
+import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Double } from 'Core/Utilities/Double';
 

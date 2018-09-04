@@ -1,5 +1,5 @@
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Observable0, Observable1 } from 'Common/Utilities/Observable';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Observable0, Observable1 } from 'Core/Utilities/Observable';
 
 export const AdUnitActivities = ['com.unity3d.ads.adunit.AdUnitActivity', 'com.unity3d.ads.adunit.AdUnitTransparentActivity', 'com.unity3d.ads.adunit.AdUnitTransparentSoftwareActivity', 'com.unity3d.ads.adunit.AdUnitSoftwareActivity'];
 export class FocusManager {

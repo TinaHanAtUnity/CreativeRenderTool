@@ -2,10 +2,10 @@ import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { Placement } from 'Ads/Models/Placement';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
-import { Platform } from 'Common/Constants/Platform';
-
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Platform } from 'Core/Constants/Platform';
 import { ABGroup, FPSCollectionTest } from 'Core/Models/ABGroup';
+
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';

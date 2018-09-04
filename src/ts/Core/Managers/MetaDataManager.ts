@@ -1,5 +1,5 @@
-import { NativeBridge } from 'Common/Native/NativeBridge';
 import { BaseMetaData } from 'Core/Models/MetaData/BaseMetaData';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 export class MetaDataManager {
     private _metaDataCache: { [key: string]: any } = {};

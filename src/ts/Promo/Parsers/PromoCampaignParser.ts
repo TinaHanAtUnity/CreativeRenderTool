@@ -3,7 +3,7 @@ import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { Request } from 'Core/Utilities/Request';
 import { IPromoCampaign, PromoCampaign } from 'Promo/Models/PromoCampaign';

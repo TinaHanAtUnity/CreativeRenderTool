@@ -3,9 +3,9 @@ import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { Privacy } from 'Ads/Views/Privacy';
 
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { View } from 'Common/Views/View';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Template } from 'Core/Utilities/Template';
+import { View } from 'Core/Views/View';
 import VastEndScreenTemplate from 'html/VastEndScreen.html';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 

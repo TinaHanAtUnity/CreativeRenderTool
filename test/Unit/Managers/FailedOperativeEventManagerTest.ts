@@ -1,7 +1,7 @@
 import { FailedOperativeEventManager } from 'Ads/Managers/FailedOperativeEventManager';
 import { assert } from 'chai';
 
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { StorageType } from 'Core/Native/Storage';

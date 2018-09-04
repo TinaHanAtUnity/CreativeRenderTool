@@ -9,9 +9,9 @@ import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
 import { Overlay } from 'Ads/Views/Overlay';
-import { Platform } from 'Common/Constants/Platform';
+import { Platform } from 'Core/Constants/Platform';
 
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Configuration } from 'Core/Models/Configuration';

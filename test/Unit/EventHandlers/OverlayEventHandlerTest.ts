@@ -13,10 +13,10 @@ import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { Overlay } from 'Ads/Views/Overlay';
 import { Privacy } from 'Ads/Views/Privacy';
 import { assert } from 'chai';
-import { FinishState } from 'Common/Constants/FinishState';
-import { Platform } from 'Common/Constants/Platform';
+import { FinishState } from 'Core/Constants/FinishState';
+import { Platform } from 'Core/Constants/Platform';
 
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';

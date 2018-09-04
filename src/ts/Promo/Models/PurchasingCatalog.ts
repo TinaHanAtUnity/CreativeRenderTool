@@ -1,4 +1,4 @@
-import { Model } from 'Common/Models/Model';
+import { Model } from 'Core/Models/Model';
 import { IProductData, Product } from 'Promo/Models/Product';
 
 interface IPurchasingCatalog {

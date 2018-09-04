@@ -1,9 +1,9 @@
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { Privacy } from 'Ads/Views/Privacy';
 import { assert } from 'chai';
-
-import { NativeBridge } from 'Common/Native/NativeBridge';
 import { Configuration } from 'Core/Models/Configuration';
+
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Localization } from 'Core/Utilities/Localization';
 
 import EndScreenFixture from 'html/fixtures/EndScreenFixture.html';

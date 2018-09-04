@@ -1,9 +1,9 @@
-import { Platform } from 'Common/Constants/Platform';
-import { ApiPackage, NativeApi } from 'Common/Native/NativeApi';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Observable2 } from 'Common/Utilities/Observable';
+import { Platform } from 'Core/Constants/Platform';
 import { AndroidPermission, AndroidPermissionsApi } from 'Core/Native/Android/AndroidPermissions';
+import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IosPermission, IosPermissionsApi } from 'Core/Native/iOS/IosPermissions';
+import { Observable2 } from 'Core/Utilities/Observable';
 
 enum PermissionsEvent {
     PERMISSIONS_RESULT,

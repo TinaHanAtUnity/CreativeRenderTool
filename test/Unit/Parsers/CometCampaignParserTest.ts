@@ -2,7 +2,7 @@ import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Session } from 'Ads/Models/Session';
 import { assert } from 'chai';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { SdkApi } from 'Core/Native/Sdk';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Request } from 'Core/Utilities/Request';

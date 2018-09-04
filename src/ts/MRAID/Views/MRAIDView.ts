@@ -2,13 +2,13 @@ import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { GDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { Placement } from 'Ads/Models/Placement';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
-import { Platform } from 'Common/Constants/Platform';
-import { WebViewError } from 'Common/Errors/WebViewError';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { View } from 'Common/Views/View';
+import { Platform } from 'Core/Constants/Platform';
+import { WebViewError } from 'Core/Errors/WebViewError';
 import { ABGroup } from 'Core/Models/ABGroup';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { DOMUtils } from 'Core/Utilities/DOMUtils';
 import { XHRequest } from 'Core/Utilities/XHRequest';
+import { View } from 'Core/Views/View';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 
 export interface IOrientationProperties {

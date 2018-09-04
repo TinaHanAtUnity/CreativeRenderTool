@@ -1,8 +1,8 @@
 import { Campaign } from 'Ads/Models/Campaign';
 import { Analytics } from 'Ads/Utilities/Analytics';
-import { DiagnosticError } from 'Common/Errors/DiagnosticError';
-import { RequestError } from 'Common/Errors/RequestError';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { DiagnosticError } from 'Core/Errors/DiagnosticError';
+import { RequestError } from 'Core/Errors/RequestError';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { INativeResponse, Request } from 'Core/Utilities/Request';
 import { Url } from 'Core/Utilities/Url';

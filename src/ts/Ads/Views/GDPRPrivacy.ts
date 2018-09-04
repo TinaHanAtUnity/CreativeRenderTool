@@ -1,6 +1,6 @@
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Template } from 'Core/Utilities/Template';
 

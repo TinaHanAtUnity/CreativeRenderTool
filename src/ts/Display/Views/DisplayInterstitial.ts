@@ -1,12 +1,12 @@
 import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { Placement } from 'Ads/Models/Placement';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
-import { Platform } from 'Common/Constants/Platform';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Observable0 } from 'Common/Utilities/Observable';
-
-import { View } from 'Common/Views/View';
+import { Platform } from 'Core/Constants/Platform';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Observable0 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
+
+import { View } from 'Core/Views/View';
 import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 import DisplayInterstitialTemplate from 'html/display/DisplayInterstitial.html';
 

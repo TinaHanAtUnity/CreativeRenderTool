@@ -3,7 +3,7 @@ import { Session } from 'Ads/Models/Session';
 import { BannerCampaign } from 'Banners/Models/BannerCampaign';
 import { BannerCampaignParser } from 'Banners/Parsers/BannerCampaignParser';
 import { assert } from 'chai';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { ABGroupBuilder } from 'Core/Models/ABGroup';
 import { Request } from 'Core/Utilities/Request';
 

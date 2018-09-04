@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import { Platform } from 'Common/Constants/Platform';
+import { Platform } from 'Core/Constants/Platform';
 
 import { Url } from 'Core/Utilities/Url';
 import 'mocha';

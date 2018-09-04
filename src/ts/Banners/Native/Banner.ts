@@ -1,6 +1,6 @@
-import { ApiPackage, NativeApi } from 'Common/Native/NativeApi';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Observable0, Observable1 } from 'Common/Utilities/Observable';
+import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Observable0, Observable1 } from 'Core/Utilities/Observable';
 
 enum BannerEvents {
     BannerEventResized          = 'BANNER_RESIZED',

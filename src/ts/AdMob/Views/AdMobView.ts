@@ -12,9 +12,9 @@ import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { ProgrammaticTrackingMetric, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { View } from 'Common/Views/View';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Template } from 'Core/Utilities/Template';
+import { View } from 'Core/Views/View';
 import AdMobContainer from 'html/admob/AdMobContainer.html';
 import AFMAContainer from 'html/admob/AFMAContainer.html';
 import MRAIDContainer from 'html/admob/MRAIDContainer.html';

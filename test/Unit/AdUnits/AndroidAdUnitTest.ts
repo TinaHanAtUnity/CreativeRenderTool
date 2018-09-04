@@ -12,16 +12,16 @@ import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { assert } from 'chai';
-import { KeyCode } from 'Common/Constants/Android/KeyCode';
-import { Rotation } from 'Common/Constants/Android/Rotation';
-import { ScreenOrientation } from 'Common/Constants/Android/ScreenOrientation';
-import { SystemUiVisibility } from 'Common/Constants/Android/SystemUiVisibility';
-import { Platform } from 'Common/Constants/Platform';
-
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { KeyCode } from 'Core/Constants/Android/KeyCode';
+import { Rotation } from 'Core/Constants/Android/Rotation';
+import { ScreenOrientation } from 'Core/Constants/Android/ScreenOrientation';
+import { SystemUiVisibility } from 'Core/Constants/Android/SystemUiVisibility';
+import { Platform } from 'Core/Constants/Platform';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Request } from 'Core/Utilities/Request';
 import 'mocha';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';

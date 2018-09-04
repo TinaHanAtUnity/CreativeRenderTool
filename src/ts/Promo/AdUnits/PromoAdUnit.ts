@@ -7,10 +7,10 @@ import {
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
-import { KeyCode } from 'Common/Constants/Android/KeyCode';
-import { FinishState } from 'Common/Constants/FinishState';
-import { Platform } from 'Common/Constants/Platform';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { KeyCode } from 'Core/Constants/Android/KeyCode';
+import { FinishState } from 'Core/Constants/FinishState';
+import { Platform } from 'Core/Constants/Platform';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { Promo } from 'Promo/Views/Promo';
 

@@ -1,5 +1,5 @@
-import { Platform } from 'Common/Constants/Platform';
-import { Model } from 'Common/Models/Model';
+import { Platform } from 'Core/Constants/Platform';
+import { Model } from 'Core/Models/Model';
 
 interface IClientInfo {
     gameId: string;

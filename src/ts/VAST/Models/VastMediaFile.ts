@@ -1,4 +1,4 @@
-import { Model } from 'Common/Models/Model';
+import { Model } from 'Core/Models/Model';
 
 interface IVastMediaFile {
     fileURL: string | null;

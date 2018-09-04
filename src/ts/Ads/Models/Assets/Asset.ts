@@ -1,6 +1,6 @@
 import { Session } from 'Ads/Models/Session';
-import { WebViewError } from 'Common/Errors/WebViewError';
-import { ISchema, Model } from 'Common/Models/Model';
+import { WebViewError } from 'Core/Errors/WebViewError';
+import { ISchema, Model } from 'Core/Models/Model';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 export interface IAsset {

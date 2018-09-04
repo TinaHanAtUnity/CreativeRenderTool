@@ -1,7 +1,7 @@
 import { FailedOperativeEventManager } from 'Ads/Managers/FailedOperativeEventManager';
 import { Session } from 'Ads/Models/Session';
 import { SessionUtils } from 'Ads/Utilities/SessionUtils';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { StorageType } from 'Core/Native/Storage';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Request } from 'Core/Utilities/Request';

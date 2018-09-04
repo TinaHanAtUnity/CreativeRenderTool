@@ -1,6 +1,6 @@
-import { ApiPackage, NativeApi } from 'Common/Native/NativeApi';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Observable2, Observable3 } from 'Common/Utilities/Observable';
+import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Observable2, Observable3 } from 'Core/Utilities/Observable';
 
 // Platform specific, first three are available on both Android & iOS. The rest are Android only.
 export enum WebplayerEvent {

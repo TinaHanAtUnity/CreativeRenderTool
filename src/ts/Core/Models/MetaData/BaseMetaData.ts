@@ -1,5 +1,5 @@
-import { ISchema, Model } from 'Common/Models/Model';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { ISchema, Model } from 'Core/Models/Model';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { MetaData } from 'Core/Utilities/MetaData';
 
 export interface IMetaData {

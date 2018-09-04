@@ -3,8 +3,8 @@ import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
-import { DiagnosticError } from 'Common/Errors/DiagnosticError';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { DiagnosticError } from 'Core/Errors/DiagnosticError';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Request } from 'Core/Utilities/Request';
 import { IMRAIDCampaign, MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 

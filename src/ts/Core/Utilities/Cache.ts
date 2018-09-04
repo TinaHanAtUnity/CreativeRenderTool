@@ -2,10 +2,9 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { ProgrammaticTrackingError, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
-import { DiagnosticError } from 'Common/Errors/DiagnosticError';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Observable0 } from 'Common/Utilities/Observable';
+import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { CacheError } from 'Core/Native/Cache';
 import { StorageType } from 'Core/Native/Storage';
 import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
@@ -13,6 +12,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { FileId } from 'Core/Utilities/FileId';
 import { FileInfo } from 'Core/Utilities/FileInfo';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
+import { Observable0 } from 'Core/Utilities/Observable';
 import { Request } from 'Core/Utilities/Request';
 
 export enum CacheStatus {

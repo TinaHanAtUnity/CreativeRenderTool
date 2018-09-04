@@ -1,4 +1,4 @@
-import { WebViewError } from 'Common/Errors/WebViewError';
+import { WebViewError } from 'Core/Errors/WebViewError';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 export type SchemaType = 'string' | 'number' | 'integer' | 'boolean' | 'array' | 'object' | 'undefined' | 'null';

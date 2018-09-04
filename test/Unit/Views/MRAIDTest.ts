@@ -2,9 +2,9 @@ import { GdprManager } from 'Ads/Managers/GdprManager';
 import { Placement } from 'Ads/Models/Placement';
 import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
 import { assert } from 'chai';
-
-import { NativeBridge } from 'Common/Native/NativeBridge';
 import { Configuration } from 'Core/Models/Configuration';
+
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import MRAIDContainer from 'html/mraid/container.html';
 
 import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCampaign.json';

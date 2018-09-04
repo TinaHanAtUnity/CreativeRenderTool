@@ -1,8 +1,8 @@
 import { PlacementManager } from 'Ads/Managers/PlacementManager';
 import { PlacementState } from 'Ads/Models/Placement';
 import { assert } from 'chai';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Observable1 } from 'Common/Utilities/Observable';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Observable1 } from 'Core/Utilities/Observable';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { SdkApi } from 'Core/Native/Sdk';
 import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';

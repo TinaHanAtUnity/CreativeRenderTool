@@ -6,9 +6,9 @@ import { Request } from 'Backend/Api/Request';
 import { IUnityAdsListener } from 'Backend/IUnityAdsListener';
 import { UnityAds } from 'Backend/UnityAds';
 import { assert } from 'chai';
-import { FinishState } from 'Common/Constants/FinishState';
+import { FinishState } from 'Core/Constants/FinishState';
 
-import { Platform } from 'Common/Constants/Platform';
+import { Platform } from 'Core/Constants/Platform';
 import { ConfigManager } from 'Core/Managers/ConfigManager';
 import 'mocha';
 

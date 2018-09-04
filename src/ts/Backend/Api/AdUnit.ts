@@ -1,5 +1,5 @@
 import { Backend } from 'Backend/Backend';
-import { Platform } from 'Common/Constants/Platform';
+import { Platform } from 'Core/Constants/Platform';
 
 export class AdUnit {
 

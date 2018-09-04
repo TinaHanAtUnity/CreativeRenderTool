@@ -2,7 +2,7 @@ import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { Campaign } from 'Ads/Models/Campaign';
 import { BannerAdUnit, IBannerAdUnitParameters } from 'Banners/AdUnits/BannerAdUnit';
 import { BannerCampaign } from 'Banners/Models/BannerCampaign';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 export class BannerAdUnitFactory {
     public static createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): BannerAdUnit {

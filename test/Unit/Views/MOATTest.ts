@@ -1,7 +1,7 @@
 import { IMoatData, IMoatIds } from 'Ads/Utilities/MoatViewabilityService';
 import { MOAT } from 'Ads/Views/MOAT';
 import { assert } from 'chai';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { SdkApi } from 'Core/Native/Sdk';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import 'mocha';

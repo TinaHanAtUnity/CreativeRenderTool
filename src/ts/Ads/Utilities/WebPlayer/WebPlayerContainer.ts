@@ -5,8 +5,8 @@ import {
     IWebPlayerWebSettingsIos,
     WebPlayerViewId
 } from 'Ads/Native/WebPlayer';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Observable1, Observable2 } from 'Common/Utilities/Observable';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Observable1, Observable2 } from 'Core/Utilities/Observable';
 
 /**
  * The WebPlayerContainer wraps the WebPlayerApi in a way that can be used without needing

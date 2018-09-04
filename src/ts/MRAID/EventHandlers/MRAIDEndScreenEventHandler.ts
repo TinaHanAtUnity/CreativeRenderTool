@@ -1,6 +1,6 @@
 import { EndScreenEventHandler } from 'Ads/EventHandlers/EndScreenEventHandler';
-import { KeyCode } from 'Common/Constants/Android/KeyCode';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { KeyCode } from 'Core/Constants/Android/KeyCode';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 

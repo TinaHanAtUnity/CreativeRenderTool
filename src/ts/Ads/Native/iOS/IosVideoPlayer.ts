@@ -1,6 +1,6 @@
-import { ApiPackage } from 'Common/Native/NativeApi';
-import { NativeApiWithEventHandlers } from 'Common/Native/NativeApiWithEventHandlers';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { ApiPackage } from 'Core/Native/Bridge/NativeApi';
+import { NativeApiWithEventHandlers } from 'Core/Native/Bridge/NativeApiWithEventHandlers';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 export enum IosVideoPlayerEvent {
     LIKELY_TO_KEEP_UP,

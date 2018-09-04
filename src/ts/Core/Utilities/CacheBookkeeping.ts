@@ -1,4 +1,4 @@
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IFileInfo } from 'Core/Native/Cache';
 import { StorageType } from 'Core/Native/Storage';
 import { ICacheCampaignsResponse } from 'Core/Utilities/Cache';

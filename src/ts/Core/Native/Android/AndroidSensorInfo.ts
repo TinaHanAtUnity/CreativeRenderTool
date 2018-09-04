@@ -1,6 +1,6 @@
-import { SensorDelay } from 'Common/Constants/Android/SensorDelay';
-import { ApiPackage, NativeApi } from 'Common/Native/NativeApi';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { SensorDelay } from 'Core/Constants/Android/SensorDelay';
+import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 export class AndroidSensorInfoApi extends NativeApi {
     constructor(nativeBridge: NativeBridge) {

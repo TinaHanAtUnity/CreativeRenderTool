@@ -1,5 +1,5 @@
-import { DiagnosticError } from 'Common/Errors/DiagnosticError';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { DiagnosticError } from 'Core/Errors/DiagnosticError';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Request } from 'Core/Utilities/Request';
 import { Vast } from 'VAST/Models/Vast';
 import { VastAd } from 'VAST/Models/VastAd';

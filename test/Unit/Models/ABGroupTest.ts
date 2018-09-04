@@ -1,8 +1,8 @@
 import { assert } from 'chai';
-import { NativeBridge } from 'Common/Native/NativeBridge';
 import { ConfigManager } from 'Core/Managers/ConfigManager';
 
 import { ABGroupBuilder } from 'Core/Models/ABGroup';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import 'mocha';
 import * as sinon from 'sinon';

@@ -1,6 +1,6 @@
 import { MixedPlacementUtility } from 'Ads/Utilities/MixedPlacementUtility';
 import { assert } from 'chai';
-import { Platform } from 'Common/Constants/Platform';
+import { Platform } from 'Core/Constants/Platform';
 import { ABGroupBuilder } from 'Core/Models/ABGroup';
 
 import { CacheMode, Configuration } from 'Core/Models/Configuration';

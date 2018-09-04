@@ -14,19 +14,19 @@ import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { assert } from 'chai';
-import { FinishState } from 'Common/Constants/FinishState';
-import { Platform } from 'Common/Constants/Platform';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Observable1, Observable2 } from 'Common/Utilities/Observable';
+import { FinishState } from 'Core/Constants/FinishState';
+import { Platform } from 'Core/Constants/Platform';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Configuration } from 'Core/Models/Configuration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
+import { Observable1, Observable2 } from 'Core/Utilities/Observable';
 import { Request } from 'Core/Utilities/Request';
 import { XHRequest } from 'Core/Utilities/XHRequest';
 

@@ -3,7 +3,7 @@ import { BannerAdUnit } from 'Banners/AdUnits/BannerAdUnit';
 import { BannerAdUnitFactory } from 'Banners/AdUnits/BannerAdUnitFactory';
 import { BannerCampaign } from 'Banners/Models/BannerCampaign';
 import { assert } from 'chai';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
 import * as sinon from 'sinon';
 

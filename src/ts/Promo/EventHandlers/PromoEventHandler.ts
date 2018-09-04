@@ -1,5 +1,5 @@
 import { GDPREventAction, GdprManager } from 'Ads/Managers/GdprManager';
-import { FinishState } from 'Common/Constants/FinishState';
+import { FinishState } from 'Core/Constants/FinishState';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { Configuration } from 'Core/Models/Configuration';
 import { PromoAdUnit } from 'Promo/AdUnits/PromoAdUnit';

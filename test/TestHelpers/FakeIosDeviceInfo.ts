@@ -1,8 +1,8 @@
-import { BatteryStatus } from 'Common/Constants/Android/BatteryStatus';
-import { UIUserInterfaceIdiom } from 'Common/Constants/iOS/UIUserInterfaceIdiom';
-import { Platform } from 'Common/Constants/Platform';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { BatteryStatus } from 'Core/Constants/Android/BatteryStatus';
+import { UIUserInterfaceIdiom } from 'Core/Constants/iOS/UIUserInterfaceIdiom';
+import { Platform } from 'Core/Constants/Platform';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 import IosDefaults from 'json/FakeIosDeviceInfo.json';
 

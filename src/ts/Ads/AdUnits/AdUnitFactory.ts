@@ -28,12 +28,12 @@ import { Overlay } from 'Ads/Views/Overlay';
 import { Privacy } from 'Ads/Views/Privacy';
 import { ARUtil } from 'AR/Utilities/ARUtil';
 import { ARMRAID } from 'AR/Views/ARMRAID';
-import { StreamType } from 'Common/Constants/Android/StreamType';
-import { Platform } from 'Common/Constants/Platform';
-import { WebViewError } from 'Common/Errors/WebViewError';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { IObserver2, IObserver3 } from 'Common/Utilities/IObserver';
+import { StreamType } from 'Core/Constants/Android/StreamType';
+import { Platform } from 'Core/Constants/Platform';
+import { WebViewError } from 'Core/Errors/WebViewError';
 import { NewVideoOverlayEnabledAbTest } from 'Core/Models/ABGroup';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { IObserver2, IObserver3 } from 'Core/Utilities/IObserver';
 import {
     DisplayInterstitialAdUnit,
     IDisplayInterstitialAdUnitParameters

@@ -1,6 +1,6 @@
 import { assert } from 'chai';
-import { RequestError } from 'Common/Errors/RequestError';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { RequestError } from 'Core/Errors/RequestError';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 

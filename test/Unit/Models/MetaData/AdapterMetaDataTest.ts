@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { AdapterMetaData } from 'Core/Models/MetaData/AdapterMetaData';
 import { StorageApi, StorageType } from 'Core/Native/Storage';

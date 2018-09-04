@@ -5,12 +5,12 @@ import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Campaign } from 'Ads/Models/Campaign';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
-
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { View } from 'Common/Views/View';
 import { ABGroup } from 'Core/Models/ABGroup';
+
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
+import { View } from 'Core/Views/View';
 import EndScreenTemplate from 'html/EndScreen.html';
 
 export interface IEndScreenParameters {

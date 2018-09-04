@@ -1,7 +1,7 @@
-import { Platform } from 'Common/Constants/Platform';
-import { ApiPackage, NativeApi } from 'Common/Native/NativeApi';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Platform } from 'Core/Constants/Platform';
 import { AndroidDeviceInfoApi } from 'Core/Native/Android/AndroidDeviceInfo';
+import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IosDeviceInfoApi } from 'Core/Native/iOS/IosDeviceInfo';
 
 export class DeviceInfoApi extends NativeApi {

@@ -6,11 +6,11 @@ import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
-import { FinishState } from 'Common/Constants/FinishState';
-import { UnityAdsError } from 'Common/Constants/UnityAdsError';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { FinishState } from 'Core/Constants/FinishState';
+import { UnityAdsError } from 'Core/Constants/UnityAdsError';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Configuration } from 'Core/Models/Configuration';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 export interface IVideoEventHandlerParams<T extends VideoAdUnit = VideoAdUnit, T2 extends Campaign = Campaign, T3 extends OperativeEventManager = OperativeEventManager> {

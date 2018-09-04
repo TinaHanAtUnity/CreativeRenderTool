@@ -1,9 +1,9 @@
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
-import { Platform } from 'Common/Constants/Platform';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Platform } from 'Core/Constants/Platform';
 import { ABGroup } from 'Core/Models/ABGroup';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Request } from 'Core/Utilities/Request';
 import { Url } from 'Core/Utilities/Url';

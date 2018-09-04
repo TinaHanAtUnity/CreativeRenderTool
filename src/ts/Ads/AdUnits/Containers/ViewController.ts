@@ -6,12 +6,12 @@ import {
     ViewConfiguration
 } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { UIInterfaceOrientation } from 'Common/Constants/iOS/UIInterfaceOrientation';
-import { UIInterfaceOrientationMask } from 'Common/Constants/iOS/UIInterfaceOrientationMask';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { UIInterfaceOrientation } from 'Core/Constants/iOS/UIInterfaceOrientation';
+import { UIInterfaceOrientationMask } from 'Core/Constants/iOS/UIInterfaceOrientationMask';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Double } from 'Core/Utilities/Double';
 
 interface IIosOptions {

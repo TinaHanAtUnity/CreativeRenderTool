@@ -1,10 +1,10 @@
 import { IGDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { Placement } from 'Ads/Models/Placement';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Observable0 } from 'Common/Utilities/Observable';
-import { View } from 'Common/Views/View';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Observable0 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
+import { View } from 'Core/Views/View';
 
 import CloserTemplate from 'html/closer.html';
 

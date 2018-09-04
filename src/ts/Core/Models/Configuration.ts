@@ -1,6 +1,6 @@
 import { Placement } from 'Ads/Models/Placement';
-import { ISchema, Model } from 'Common/Models/Model';
 import { ABGroup } from 'Core/Models/ABGroup';
+import { ISchema, Model } from 'Core/Models/Model';
 
 export enum CacheMode {
     FORCED,

@@ -2,7 +2,7 @@ import { AnalyticsManager } from 'Analytics/AnalyticsManager';
 import { IAnalyticsObject } from 'Analytics/AnalyticsProtocol';
 import { assert } from 'chai';
 
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';

@@ -1,7 +1,7 @@
 import { GDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { IOperativeEventParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { Placement } from 'Ads/Models/Placement';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import {
     DisplayInterstitialAdUnit,
     IDisplayInterstitialAdUnitParameters

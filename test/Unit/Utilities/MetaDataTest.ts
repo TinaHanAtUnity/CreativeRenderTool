@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { StorageError, StorageType } from 'Core/Native/Storage';
 import { MetaData } from 'Core/Utilities/MetaData';
 import 'mocha';

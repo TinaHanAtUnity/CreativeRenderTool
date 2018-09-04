@@ -1,8 +1,8 @@
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
-import { VideoMetadata } from 'Common/Constants/Android/VideoMetadata';
-import { Platform } from 'Common/Constants/Platform';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { VideoMetadata } from 'Core/Constants/Android/VideoMetadata';
+import { Platform } from 'Core/Constants/Platform';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IFileInfo } from 'Core/Native/Cache';
 import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';

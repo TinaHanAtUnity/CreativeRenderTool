@@ -1,12 +1,12 @@
 import { assert } from 'chai';
-import { ConfigError } from 'Common/Errors/ConfigError';
-import { DiagnosticError } from 'Common/Errors/DiagnosticError';
-import { RequestError } from 'Common/Errors/RequestError';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { ConfigError } from 'Core/Errors/ConfigError';
+import { DiagnosticError } from 'Core/Errors/DiagnosticError';
+import { RequestError } from 'Core/Errors/RequestError';
 import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
 
 import { ConfigManager } from 'Core/Managers/ConfigManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { StorageApi, StorageType } from 'Core/Native/Storage';
 import { INativeResponse } from 'Core/Utilities/Request';
 

@@ -3,7 +3,7 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { CampaignParser } from 'Ads/Parsers/CampaignParser';
 import { BannerCampaign, IBannerCampaign } from 'Banners/Models/BannerCampaign';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Request } from 'Core/Utilities/Request';
 
 export class BannerCampaignParser extends CampaignParser {

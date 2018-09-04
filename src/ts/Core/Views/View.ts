@@ -1,10 +1,10 @@
 import { IBuildInformation } from 'Ads/Views/AbstractPrivacy';
-import { Platform } from 'Common/Constants/Platform';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { IViewBinding } from 'Common/Views/IViewBinding';
+import { Platform } from 'Core/Constants/Platform';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Swipe } from 'Core/Utilities/Swipe';
 import { Tap } from 'Core/Utilities/Tap';
 import { Template } from 'Core/Utilities/Template';
+import { IViewBinding } from 'Core/Views/IViewBinding';
 
 export abstract class View<T extends object> {
 

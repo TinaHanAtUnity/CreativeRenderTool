@@ -4,8 +4,8 @@ import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManager
 import { PerformanceOperativeEventManager } from 'Ads/Managers/PerformanceOperativeEventManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { assert } from 'chai';
-import { Platform } from 'Common/Constants/Platform';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Platform } from 'Core/Constants/Platform';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Configuration } from 'Core/Models/Configuration';

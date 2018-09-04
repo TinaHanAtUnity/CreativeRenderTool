@@ -1,4 +1,4 @@
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { StorageError, StorageType } from 'Core/Native/Storage';
 
 export class MetaData {

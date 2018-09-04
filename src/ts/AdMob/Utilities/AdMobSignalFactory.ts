@@ -5,14 +5,14 @@ import { ITouchInfo } from 'AdMob/Views/AFMABridge';
 import { IMotionEvent } from 'Ads/Native/Android/AndroidAdUnit';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { UserCountData } from 'Ads/Utilities/UserCountData';
-import { MotionEventAction } from 'Common/Constants/Android/MotionEventAction';
-import { Platform } from 'Common/Constants/Platform';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { MotionEventAction } from 'Core/Constants/Android/MotionEventAction';
+import { Platform } from 'Core/Constants/Platform';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 export class AdMobSignalFactory {

@@ -1,11 +1,11 @@
 import { assert } from 'chai';
-import { StreamType } from 'Common/Constants/Android/StreamType';
-import { EventCategory } from 'Common/Constants/EventCategory';
-import { Platform } from 'Common/Constants/Platform';
-
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { StreamType } from 'Core/Constants/Android/StreamType';
+import { EventCategory } from 'Core/Constants/EventCategory';
+import { Platform } from 'Core/Constants/Platform';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
+
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { DeviceInfoApi } from 'Core/Native/DeviceInfo';
 import { DeviceInfoEvent } from 'Core/Native/DeviceInfoEvent';
 import 'mocha';

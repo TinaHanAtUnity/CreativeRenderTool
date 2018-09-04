@@ -1,7 +1,7 @@
 import { assert } from 'chai';
-import { Platform } from 'Common/Constants/Platform';
+import { Platform } from 'Core/Constants/Platform';
 
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
 import * as sinon from 'sinon';
 

@@ -7,8 +7,8 @@ import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { IOverlayHandler } from 'Ads/Views/AbstractVideoOverlay';
-import { FinishState } from 'Common/Constants/FinishState';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { FinishState } from 'Core/Constants/FinishState';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Double } from 'Core/Utilities/Double';
 import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 

@@ -1,7 +1,7 @@
 import { Placement } from 'Ads/Models/Placement';
 import { MixedPlacementUtility } from 'Ads/Utilities/MixedPlacementUtility';
 import { assert } from 'chai';
-import { Platform } from 'Common/Constants/Platform';
+import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Configuration } from 'Core/Models/Configuration';
 import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';

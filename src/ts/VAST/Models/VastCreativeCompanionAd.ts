@@ -1,4 +1,4 @@
-import { Model } from 'Common/Models/Model';
+import { Model } from 'Core/Models/Model';
 
 interface IVastCreativeCompanionAd {
     id: string | null;

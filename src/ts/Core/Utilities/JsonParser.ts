@@ -1,4 +1,4 @@
-import { DiagnosticError } from 'Common/Errors/DiagnosticError';
+import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 
 export class JsonParser {
 

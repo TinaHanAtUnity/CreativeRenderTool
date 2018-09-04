@@ -1,6 +1,6 @@
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Observable0 } from 'Common/Utilities/Observable';
 import { FocusManager } from 'Core/Managers/FocusManager';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Observable0 } from 'Core/Utilities/Observable';
 
 export class WakeUpManager {
     public readonly onNetworkConnected = new Observable0();

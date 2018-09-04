@@ -1,6 +1,6 @@
 import { OverlayEventHandler } from 'Ads/EventHandlers/OverlayEventHandler';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';

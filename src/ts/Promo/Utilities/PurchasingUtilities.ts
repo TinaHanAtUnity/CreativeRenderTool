@@ -1,8 +1,8 @@
 import { PlacementManager } from 'Ads/Managers/PlacementManager';
 import { PlacementState } from 'Ads/Models/Placement';
-import { NativeBridge } from 'Common/Native/NativeBridge';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Configuration } from 'Core/Models/Configuration';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingCatalog } from 'Promo/Models/PurchasingCatalog';

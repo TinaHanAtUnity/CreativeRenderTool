@@ -1,6 +1,6 @@
 import { AbstractAdUnit, IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { Campaign } from 'Ads/Models/Campaign';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 export class TestAdUnit extends AbstractAdUnit {
 

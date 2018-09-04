@@ -5,7 +5,7 @@ import {
     ProgrammaticTrackingService
 } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { assert } from 'chai';
-import { Platform } from 'Common/Constants/Platform';
+import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Request } from 'Core/Utilities/Request';

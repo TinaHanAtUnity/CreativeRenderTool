@@ -1,9 +1,9 @@
-import { Platform } from 'Common/Constants/Platform';
-import { ApiPackage, NativeApi } from 'Common/Native/NativeApi';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Observable3, Observable5, Observable6 } from 'Common/Utilities/Observable';
+import { Platform } from 'Core/Constants/Platform';
 import { AndroidCacheApi } from 'Core/Native/Android/AndroidCache';
+import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IosCacheApi } from 'Core/Native/iOS/IosCache';
+import { Observable3, Observable5, Observable6 } from 'Core/Utilities/Observable';
 
 export enum CacheError {
     FILE_IO_ERROR,

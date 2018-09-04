@@ -3,13 +3,13 @@ import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManager
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { assert } from 'chai';
-import { Platform } from 'Common/Constants/Platform';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Platform } from 'Core/Constants/Platform';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { RequestApi } from 'Core/Native/Request';
 import { StorageApi, StorageType } from 'Core/Native/Storage';
 

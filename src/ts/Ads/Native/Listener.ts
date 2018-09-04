@@ -1,6 +1,6 @@
-import { FinishState } from 'Common/Constants/FinishState';
-import { ApiPackage, NativeApi } from 'Common/Native/NativeApi';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { FinishState } from 'Core/Constants/FinishState';
+import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 export class ListenerApi extends NativeApi {
 

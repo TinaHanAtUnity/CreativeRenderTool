@@ -1,9 +1,9 @@
 import { AndroidVideoPlayerApi } from 'Ads/Native/Android/AndroidVideoPlayer';
 import { IosVideoPlayerApi } from 'Ads/Native/iOS/IosVideoPlayer';
-import { Platform } from 'Common/Constants/Platform';
-import { ApiPackage } from 'Common/Native/NativeApi';
-import { NativeApiWithEventHandlers } from 'Common/Native/NativeApiWithEventHandlers';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Platform } from 'Core/Constants/Platform';
+import { ApiPackage } from 'Core/Native/Bridge/NativeApi';
+import { NativeApiWithEventHandlers } from 'Core/Native/Bridge/NativeApiWithEventHandlers';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Double } from 'Core/Utilities/Double';
 
 enum VideoPlayerEvent {

@@ -1,7 +1,7 @@
 import { AnalyticsStorage, IIAPInstrumentation } from 'Analytics/AnalyticsStorage';
 import { assert } from 'chai';
 
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { StorageType } from 'Core/Native/Storage';
 import 'mocha';
 import * as sinon from 'sinon';

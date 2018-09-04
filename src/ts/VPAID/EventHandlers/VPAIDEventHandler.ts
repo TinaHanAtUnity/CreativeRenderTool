@@ -2,9 +2,9 @@ import { IOperativeEventParams, OperativeEventManager } from 'Ads/Managers/Opera
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
 import { Closer } from 'Ads/Views/Closer';
-import { FinishState } from 'Common/Constants/FinishState';
-import { DiagnosticError } from 'Common/Errors/DiagnosticError';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { FinishState } from 'Core/Constants/FinishState';
+import { DiagnosticError } from 'Core/Errors/DiagnosticError';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'VPAID/AdUnits/VPAIDAdUnit';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';

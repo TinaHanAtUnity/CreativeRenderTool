@@ -1,8 +1,8 @@
 import { Placement } from 'Ads/Models/Placement';
 import { Privacy } from 'Ads/Views/Privacy';
 import { assert } from 'chai';
-import { Platform } from 'Common/Constants/Platform';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { Platform } from 'Core/Constants/Platform';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 import { DisplayInterstitial } from 'Display/Views/DisplayInterstitial';
 

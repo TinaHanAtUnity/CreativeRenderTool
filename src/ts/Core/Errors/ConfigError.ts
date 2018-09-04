@@ -1,4 +1,4 @@
-import { WebViewError } from 'Common/Errors/WebViewError';
+import { WebViewError } from 'Core/Errors/WebViewError';
 
 export class ConfigError extends WebViewError {
 

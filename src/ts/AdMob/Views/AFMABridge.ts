@@ -1,6 +1,6 @@
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { NativeBridge } from 'Common/Native/NativeBridge';
 import { IntentData } from 'Core/Native/Android/Intent';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 export interface IOpenableIntentsRequest {
     id: string;

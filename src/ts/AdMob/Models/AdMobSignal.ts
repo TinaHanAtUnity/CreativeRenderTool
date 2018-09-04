@@ -1,4 +1,4 @@
-import { Model } from 'Common/Models/Model';
+import { Model } from 'Core/Models/Model';
 import * as protobuf from 'protobufjs/minimal';
 import { unity_proto } from '../../../proto/unity_proto.js';
 

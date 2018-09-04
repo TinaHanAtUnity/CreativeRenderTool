@@ -1,6 +1,6 @@
-import { ApiPackage, NativeApi } from 'Common/Native/NativeApi';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { Observable2 } from 'Common/Utilities/Observable';
+import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Observable2 } from 'Core/Utilities/Observable';
 
 enum NotificationEvent {
     ACTION

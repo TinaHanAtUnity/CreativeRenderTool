@@ -1,5 +1,5 @@
 import { SessionUtils } from 'Ads/Utilities/SessionUtils';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { StorageType } from 'Core/Native/Storage';
 import { Request } from 'Core/Utilities/Request';
 

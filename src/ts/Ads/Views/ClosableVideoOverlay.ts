@@ -1,6 +1,6 @@
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
 import InterstitialOverlayTemplate from 'html/InterstitialOverlay.html';

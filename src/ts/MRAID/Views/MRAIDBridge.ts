@@ -1,5 +1,5 @@
 import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 export enum MRAIDEvents {
     ORIENTATION         = 'orientation'

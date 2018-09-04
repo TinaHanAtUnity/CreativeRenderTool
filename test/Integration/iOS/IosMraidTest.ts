@@ -4,7 +4,7 @@ import { DeviceInfo } from 'Backend/Api/DeviceInfo';
 import { IUnityAdsListener } from 'Backend/IUnityAdsListener';
 import { UnityAds } from 'Backend/UnityAds';
 
-import { Platform } from 'Common/Constants/Platform';
+import { Platform } from 'Core/Constants/Platform';
 import { ConfigManager } from 'Core/Managers/ConfigManager';
 import 'mocha';
 

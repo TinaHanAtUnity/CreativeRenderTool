@@ -1,7 +1,7 @@
-import { Platform } from 'Common/Constants/Platform';
-import { NativeBridge } from 'Common/Native/NativeBridge';
-import { UIWebViewBridge } from 'Common/Native/UIWebViewBridge';
-import { WKWebViewBridge } from 'Common/Native/WKWebViewBridge';
+import { Platform } from 'Core/Constants/Platform';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { UIWebViewBridge } from 'Core/Native/Bridge/UIWebViewBridge';
+import { WKWebViewBridge } from 'Core/Native/Bridge/WKWebViewBridge';
 import { Url } from 'Core/Utilities/Url';
 import { WebView } from 'WebView';
 import 'Workarounds';

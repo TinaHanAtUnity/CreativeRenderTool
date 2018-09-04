@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 import VastEndScreenFixture from 'html/fixtures/VastEndScreenFixture.html';
 import 'mocha';

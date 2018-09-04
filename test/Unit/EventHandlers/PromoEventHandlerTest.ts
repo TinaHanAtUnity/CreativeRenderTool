@@ -1,7 +1,7 @@
 import { GdprManager } from 'Ads/Managers/GdprManager';
-import { FinishState } from 'Common/Constants/FinishState';
+import { FinishState } from 'Core/Constants/FinishState';
 
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { ABGroupBuilder } from 'Core/Models/ABGroup';
 import { Configuration } from 'Core/Models/Configuration';
 

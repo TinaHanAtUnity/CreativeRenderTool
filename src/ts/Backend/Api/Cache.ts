@@ -1,5 +1,5 @@
 import { Backend } from 'Backend/Backend';
-import { VideoMetadata } from 'Common/Constants/Android/VideoMetadata';
+import { VideoMetadata } from 'Core/Constants/Android/VideoMetadata';
 import { CacheError, IFileInfo } from 'Core/Native/Cache';
 
 export class Cache {

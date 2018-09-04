@@ -1,6 +1,6 @@
 import { MissedImpressionManager } from 'Ads/Managers/MissedImpressionManager';
 import { assert } from 'chai';
-import { NativeBridge } from 'Common/Native/NativeBridge';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { StorageApi, StorageType } from 'Core/Native/Storage';
 
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
