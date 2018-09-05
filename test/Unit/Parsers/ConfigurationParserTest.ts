@@ -1,15 +1,15 @@
-import 'mocha';
+import { MixedPlacementUtility } from 'Ads/Utilities/MixedPlacementUtility';
 import { assert } from 'chai';
-import * as sinon from 'sinon';
+import { Platform } from 'Core/Constants/Platform';
+import { ABGroupBuilder } from 'Core/Models/ABGroup';
 
-import { Configuration, CacheMode } from 'Models/Configuration';
-import { ConfigurationParser } from 'Parsers/ConfigurationParser';
+import { CacheMode, Configuration } from 'Core/Models/Configuration';
+import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
 
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
-import { ABGroupBuilder } from 'Models/ABGroup';
-import { Platform } from 'Constants/Platform';
-import { MixedPlacementUtility } from 'Utilities/MixedPlacementUtility';
+import 'mocha';
+import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('configurationParserTest', () => {

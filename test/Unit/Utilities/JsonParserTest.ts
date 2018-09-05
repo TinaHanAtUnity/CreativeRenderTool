@@ -1,7 +1,7 @@
-import 'mocha';
 import { assert } from 'chai';
 
-import { JsonParser } from 'Utilities/JsonParser';
+import { JsonParser } from 'Core/Utilities/JsonParser';
+import 'mocha';
 
 describe('JsonParserTest', () => {
     it('should contain diagnostic fields', () => {

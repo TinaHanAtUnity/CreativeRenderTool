@@ -1,19 +1,19 @@
-import 'mocha';
-
-import * as sinon from 'sinon';
+import { GdprManager } from 'Ads/Managers/GdprManager';
+import { Placement } from 'Ads/Models/Placement';
+import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
 import { assert } from 'chai';
+import { Configuration } from 'Core/Models/Configuration';
 
-import { NativeBridge } from 'Native/NativeBridge';
-import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
-import { Placement } from 'Models/Placement';
-import { MRAID } from 'Views/MRAID';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Configuration } from 'Models/Configuration';
-import { GDPRPrivacy } from 'Views/GDPRPrivacy';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import MRAIDContainer from 'html/mraid/container.html';
 
 import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCampaign.json';
-import { GdprManager } from 'Managers/GdprManager';
+import 'mocha';
+import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { MRAID } from 'MRAID/Views/MRAID';
+
+import * as sinon from 'sinon';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('MRAID', () => {
     let handleInvocation: sinon.SinonSpy;

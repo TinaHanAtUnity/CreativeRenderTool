@@ -1,28 +1,28 @@
-import * as sinon from 'sinon';
-import { assert } from 'chai';
+import { AdMobAdUnit } from 'AdMob/AdUnits/AdMobAdUnit';
 
-import { AdMobEventHandler } from 'EventHandlers/AdmobEventHandler';
-import { AdMobAdUnit } from 'AdUnits/AdMobAdUnit';
-import { NativeBridge } from 'Native/NativeBridge';
-import { IntentApi } from 'Native/Api/Intent';
-import { UrlSchemeApi } from 'Native/Api/UrlScheme';
-import { Platform } from 'Constants/Platform';
-import { Request } from 'Utilities/Request';
-import { Session } from 'Models/Session';
-import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { AdMobEventHandler } from 'AdMob/EventHandlers/AdmobEventHandler';
+import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
+import { AdMobSignal } from 'AdMob/Models/AdMobSignal';
+import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
+import { ITouchInfo } from 'AdMob/Views/AFMABridge';
+import { GdprManager } from 'Ads/Managers/GdprManager';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { Session } from 'Ads/Models/Session';
+import { SdkStats } from 'Ads/Utilities/SdkStats';
+import { assert } from 'chai';
+import { Platform } from 'Core/Constants/Platform';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { Configuration } from 'Core/Models/Configuration';
+import { IntentApi } from 'Core/Native/Android/Intent';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
+import { Request } from 'Core/Utilities/Request';
+import { Url } from 'Core/Utilities/Url';
+import * as protobuf from 'protobufjs/minimal';
+import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
-import { AdMobSignal } from 'Models/AdMobSignal';
-import { Url } from 'Utilities/Url';
 
 import { unity_proto } from '../../../src/proto/unity_proto.js';
-import * as protobuf from 'protobufjs/minimal';
-import { SdkStats } from 'Utilities/SdkStats';
-import { ITouchInfo } from 'Views/AFMABridge';
-import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
-import { ClientInfo } from 'Models/ClientInfo';
-import { Configuration } from 'Models/Configuration';
-import { GdprManager } from 'Managers/GdprManager';
 
 const resolveAfter = (timeout: number): Promise<void> => {
     return new Promise((resolve, reject) => setTimeout(resolve, timeout));
