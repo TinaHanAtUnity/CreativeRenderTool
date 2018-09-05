@@ -99,7 +99,13 @@
         <% } %>
     </div>
     <div class="pop-up-content report-side">
-        <span class="report-info">Bazinga, report this ad lmao</span>
+        <span header="report-header">Report Advertisement</header>
+        <ul class="report-dropdown">
+            <% for (var k in data.badAdReasons) { %>
+                <input id="report-choice-radio" name="report-radio-group" type="radio">
+                <label for="report-choice-radio"><%= (data.badAdReasons[k] === null || typeof data.badAdReasons[k] === "undefined") ? "N/A" : data.badAdReasons[k] %></label>
+            <% } %>
+        </ul>
     </div>
     <div class="fade-out-gradient-separator"></div>
     <div class="pop-up-footer">

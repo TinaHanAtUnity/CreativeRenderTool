@@ -1,26 +1,26 @@
 import { Campaign } from 'Models/Campaign';
 import { ProgrammaticTrackingService, ProgrammaticTrackingMetric } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export enum BadAdReason {
-    BLACK_SCREEN,
-    SOUND_NOT_MUTED,
-    OFFENSIVE,
-    VIDEO_NOT_REWARDING,
-    OTHER
+    BLACK_SCREEN = 'Adverstisement is showing a black screen',
+    SOUND_NOT_MUTED = 'Advertisement was not muted when it should have been',
+    OFFENSIVE = 'Advertisement was offensive',
+    VIDEO_NOT_REWARDING = 'Advertisement was watched, but a reward was not granted',
+    OTHER = 'Other'
 }
 
 export class BadAdsReporting {
 
-    public static onUserReport(pts: ProgrammaticTrackingService, campaign: Campaign, reason: BadAdReason, explanation: string): void {
+    public static onUserReport(campaign: Campaign, reason: BadAdReason, explanation: string): void {
 
-        const data: string = JSON.stringify({
+        const error = {
             creativeId: campaign.getCreativeId(),
             auctionId: campaign.getSession().getId(),
             reason: reason,
             explanation: explanation
-        });
+        };
 
-        // This does not work, currently
-        pts.reportMetric(<ProgrammaticTrackingMetric>data);
+        Diagnostics.trigger(reason, error);
     }
 }

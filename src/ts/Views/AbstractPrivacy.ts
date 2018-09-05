@@ -1,14 +1,10 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { View } from 'Views/View';
-
 import { ClientInfo } from 'Models/ClientInfo';
 import { Campaign } from 'Models/Campaign';
 import { Platform } from 'Constants/Platform';
-<<<<<<< HEAD
-import { BadAdReason } from 'Test/Unit/Utilities/BadAdsReporting'; //Move this file
-=======
 import { Configuration } from 'Models/Configuration';
->>>>>>> master
+import { BadAdReason } from 'Test/Unit/Utilities/BadAdsReporting';
 
 export interface IPrivacyHandler {
     onPrivacy(url: string): void;
@@ -36,8 +32,6 @@ export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
 
     public static createBuildInformation(clientInfo: ClientInfo, campaign: Campaign, nativeBridge: NativeBridge, configuration: Configuration) {
         const date = new Date();
-        const minutes = date.getMinutes() < 10 ? `0${date.getSeconds()}` : date.getMinutes();
-        const seconds = date.getSeconds() < 10 ? `0${date.getSeconds()}` : date.getSeconds();
         AbstractPrivacy.buildInformation = {
             userAgent: window.navigator.userAgent,
             platform: clientInfo.getPlatform() === Platform.IOS ? 'iOS' : 'Android',
@@ -56,14 +50,13 @@ export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
     }
 
     private static buildInformation: IBuildInformation;
-    private static badAdReasons: BadAdReason;
 
     constructor(nativeBridge: NativeBridge, isCoppaCompliant: boolean, id: string) {
         super(nativeBridge, id);
-
         this._templateData = {
             'isCoppaCompliant': isCoppaCompliant,
-            'buildInformation': AbstractPrivacy.buildInformation
+            'buildInformation': AbstractPrivacy.buildInformation,
+            'badAdReasons': Object.values(BadAdReason)
         };
     }
 
