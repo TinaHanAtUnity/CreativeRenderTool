@@ -4,6 +4,7 @@ import { Platform } from 'Constants/Platform';
 
 import { SmartCloseButtonTest } from 'Models/ABGroup';
 import { Diagnostics } from 'Utilities/Diagnostics';
+import { IFileInfo } from 'Native/Api/Cache';
 
 export class PerformanceEndScreen extends EndScreen {
     private _campaign: PerformanceCampaign;
@@ -137,18 +138,47 @@ export class PerformanceEndScreen extends EndScreen {
                 resolve();
             };
 
-            /* Canvas CORS fix */
-            img.crossOrigin = 'Anonymous';
+            this._getImageSrc().then((src) => {
+                /* Canvas CORS fix if we get HTTP URL instead of Base64 */
+                img.crossOrigin = 'Anonymous';
+                img.src = src;
 
-            let sampleImage = this._campaign.getLandscape().getUrl();
+                this._container.appendChild(this._canvas);
+            });
+        });
+    }
 
-            /* On iOS cached images cannot passed CORS, so we use original URL */
-            if (this._nativeBridge.getPlatform() === Platform.IOS) {
-                sampleImage = this._campaign.getLandscape().getOriginalUrl();
+    private _getImageSrc(): Promise<string> {
+        return new Promise((resolve) => {
+            const platform = this._nativeBridge.getPlatform();
+            const originalUrl = this._campaign.getLandscape().getOriginalUrl().replace('file://', '');
+            let src = this._campaign.getLandscape().getUrl().replace('file://', '');
+
+            const imageExt = originalUrl.split('.').pop();
+
+            /* Make sure we get original URL on iOS if there is nothing cached, cached url won't wont on ios */
+            if (platform === Platform.IOS) {
+                src = originalUrl;
             }
 
-            img.src = sampleImage.replace('file://', '');
-            this._container.appendChild(this._canvas);
+            const id = this._campaign.getLandscape().getFileId();
+
+            /* Try this in browser -> time out */
+            if (typeof id === 'string' && !window.location.href.indexOf('/build/browser')) {
+                this._nativeBridge.Cache.getFileInfo(id).then((data: IFileInfo) => {
+                    if (data.found) {
+                        this._nativeBridge.Cache.getFileContent(id, 'Base64').then((res) => {
+                            resolve(`data:image/${imageExt};base64,${res}`);
+                        }).catch(() => {
+                            resolve(src);
+                        });
+                    } else {
+                        resolve(src);
+                    }
+                });
+            } else {
+                resolve(src);
+            }
         });
     }
 
