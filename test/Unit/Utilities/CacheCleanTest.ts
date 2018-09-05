@@ -1,18 +1,18 @@
-import 'mocha';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { assert } from 'chai';
-import * as sinon from 'sinon';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
-import { CacheApi, IFileInfo, CacheError } from 'Native/Api/Cache';
-import { StorageApi, StorageType, StorageError } from 'Native/Api/Storage';
-import { NativeBridge } from 'Native/NativeBridge';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Cache } from 'Utilities/Cache';
-import { WakeUpManager } from 'Managers/WakeUpManager';
-import { Request } from 'Utilities/Request';
+import { CacheApi, CacheError, IFileInfo } from 'Core/Native/Cache';
+import { StorageApi, StorageError, StorageType } from 'Core/Native/Storage';
+import { Cache } from 'Core/Utilities/Cache';
+import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
+import { Request } from 'Core/Utilities/Request';
+import 'mocha';
+import * as sinon from 'sinon';
 import { FakeSdkApi } from 'TestHelpers/FakeSdkApi';
-import { FocusManager } from 'Managers/FocusManager';
-import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
-import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 class TestCacheApi extends CacheApi {
     private _files: IFileInfo[];

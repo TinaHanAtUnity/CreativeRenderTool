@@ -1,26 +1,26 @@
-import 'mocha';
-import * as sinon from 'sinon';
+import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
+import { OverlayEventHandler } from 'Ads/EventHandlers/OverlayEventHandler';
+import { GDPREventAction, GdprManager } from 'Ads/Managers/GdprManager';
+import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { Video } from 'Ads/Models/Assets/Video';
+import { Placement } from 'Ads/Models/Placement';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
+import { Overlay } from 'Ads/Views/Overlay';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
-import { NativeBridge } from 'Native/NativeBridge';
-import { Overlay } from 'Views/Overlay';
-import { DeviceInfo } from 'Models/DeviceInfo';
-import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { Request } from 'Utilities/Request';
-import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
-import { ViewController } from 'AdUnits/Containers/ViewController';
-import { Video } from 'Models/Assets/Video';
-import { FocusManager } from 'Managers/FocusManager';
-import { ClientInfo } from 'Models/ClientInfo';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
-import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
-import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
-import { GDPRPrivacy } from 'Views/GDPRPrivacy';
-import { Placement } from 'Models/Placement';
-import { GdprManager, GDPREventAction } from 'Managers/GdprManager';
-import { OverlayEventHandler } from 'EventHandlers/OverlayEventHandler';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Request } from 'Core/Utilities/Request';
+import 'mocha';
+import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
+import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
+import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
+import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 describe('GDPREventHandlerTest', () => {
 

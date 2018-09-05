@@ -1,11 +1,11 @@
-import 'mocha';
-import * as sinon from 'sinon';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
+import { Overlay } from 'Ads/Views/Overlay';
+import { Privacy } from 'Ads/Views/Privacy';
 import { assert } from 'chai';
 
-import { NativeBridge } from 'Native/NativeBridge';
-import { Overlay } from 'Views/Overlay';
-import { AbstractPrivacy } from 'Views/AbstractPrivacy';
-import { Privacy } from 'Views/Privacy';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import 'mocha';
+import * as sinon from 'sinon';
 
 describe('Overlay', () => {
     let handleInvocation: sinon.SinonSpy;

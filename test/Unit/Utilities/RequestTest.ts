@@ -1,13 +1,13 @@
+import { assert } from 'chai';
+import { RequestError } from 'Core/Errors/RequestError';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+
+import { RequestApi } from 'Core/Native/Request';
+import { Request } from 'Core/Utilities/Request';
 import 'mocha';
 import * as sinon from 'sinon';
-import { assert } from 'chai';
-
-import { RequestApi } from 'Native/Api/Request';
-import { Request } from 'Utilities/Request';
-import { NativeBridge } from 'Native/NativeBridge';
-import { WakeUpManager } from 'Managers/WakeUpManager';
-import { RequestError } from 'Errors/RequestError';
-import { FocusManager } from 'Managers/FocusManager';
 
 class TestRequestApi extends RequestApi {
     private _retryCount: number = 0;
