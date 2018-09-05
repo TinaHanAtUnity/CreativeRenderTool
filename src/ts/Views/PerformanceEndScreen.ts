@@ -156,14 +156,14 @@ export class PerformanceEndScreen extends EndScreen {
 
             const imageExt = originalUrl.split('.').pop();
 
-            /* Make sure we get original URL on iOS if there is nothing cached, cached url won't wont on ios */
+            /* Make sure we get original URL on iOS if there is nothing cached, cached url won't work on ios */
             if (platform === Platform.IOS) {
                 src = originalUrl;
             }
 
             const id = this._campaign.getLandscape().getFileId();
 
-            /* Try this in browser -> time out */
+            /* Gets timed out */
             if (typeof id === 'string' && !window.location.href.indexOf('/build/browser')) {
                 this._nativeBridge.Cache.getFileInfo(id).then((data: IFileInfo) => {
                     if (data.found) {
