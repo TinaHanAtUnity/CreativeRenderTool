@@ -12,5 +12,8 @@ export enum EventCategory {
     LIFECYCLE,
     DEVICEINFO,
     WEBPLAYER,
-    PURCHASING
+    PURCHASING,
+    PERMISSIONS,
+    AR,
+    BANNER
 }

@@ -1,9 +1,10 @@
 import PlayableMRAIDTemplate from 'html/PlayableMRAID.html';
 import MRAIDContainer from 'html/mraid/container.html';
+import MRAIDPerfContainer from 'html/mraid/container-perf.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { Placement } from 'Models/Placement';
-import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
+import { PerformanceMRAIDCampaign } from 'Models/Campaigns/PerformanceMRAIDCampaign';
 import { Platform } from 'Constants/Platform';
 import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Template } from 'Utilities/Template';
@@ -12,7 +13,7 @@ import { Diagnostics } from 'Utilities/Diagnostics';
 import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
 import { SdkStats } from 'Utilities/SdkStats';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
-import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { ABGroup, FPSCollectionTest } from 'Models/ABGroup';
 
 export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -45,8 +46,10 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     private _configuration: any;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
-        super(nativeBridge, 'playable-mraid', placement, campaign, privacy, showGDPRBanner);
+    protected _campaign: PerformanceMRAIDCampaign;
+
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: PerformanceMRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup) {
+        super(nativeBridge, 'playable-mraid', placement, campaign, privacy, showGDPRBanner, abGroup);
 
         this._placement = placement;
         this._campaign = campaign;
@@ -105,11 +108,11 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         this._gdprBanner = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
         this._privacyButton = <HTMLElement>this._container.querySelector('.privacy-button');
 
-        let container = MRAIDContainer;
+        let container = FPSCollectionTest.isValid(this._abGroup) ? MRAIDPerfContainer : MRAIDContainer;
         const playableConfiguration = this._campaign.getPlayableConfiguration();
         if(playableConfiguration) {
             // check configuration based on the ab group
-            const groupKey = 'group' + this._campaign.getAbGroup();
+            const groupKey = 'group' + this._abGroup.toNumber();
             if(playableConfiguration[groupKey]) {
                 this._configuration = playableConfiguration[groupKey];
             } else if (playableConfiguration.default) {
@@ -124,6 +127,12 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
             SdkStats.setFrameSetStartTimestamp(this._placement.getId());
             this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' set iframe.src started ' + SdkStats.getFrameSetStartTimestamp(this._placement.getId()));
             iframe.srcdoc = mraid;
+        }).catch((err) => {
+            this._nativeBridge.Sdk.logError('failed to create mraid: ' + err);
+
+            Diagnostics.trigger('create_mraid_error', {
+                message: err.message
+            }, this._campaign.getSession());
         });
 
         this._messageListener = (event: MessageEvent) => this.onMessage(event);
@@ -135,6 +144,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     public show(): void {
         super.show();
         this._showTimestamp = Date.now();
+        this.sendMraidAnalyticsEvent('playable_show');
         this.showLoadingScreen();
     }
 
@@ -205,8 +215,9 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
             this.showMRAIDAd();
         }
 
-        const frameLoadDuration = Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId());
+        const frameLoadDuration = this.checkIsValid((Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId())) / 1000);
         this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' iframe load duration ' + frameLoadDuration + ' ms');
+        this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(frameLoadDuration, 0, 0, 'playable_loading_time', {}));
     }
 
     private showLoadingScreen() {
@@ -287,9 +298,7 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 this._closeElement.style.display = 'block';
 
                 this._playableStartTimestamp = Date.now();
-                const timeFromShow = this.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
-                const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
-                this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_start', undefined));
+                this.sendMraidAnalyticsEvent('playable_start');
                 this._iframe.contentWindow!.postMessage({
                     type: 'viewable',
                     value: true
@@ -300,6 +309,12 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
         });
 
         this._loadingScreen.classList.add('hidden');
+    }
+
+    private sendMraidAnalyticsEvent(eventName: string, timeFromPlayableStart: number = 0, eventData?: any) {
+        const timeFromShow = this.checkIsValid((Date.now() - this._showTimestamp) / 1000);
+        const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
+        this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, eventName, eventData));
     }
 
     private updateProgressCircle(container: HTMLElement, value: number) {
@@ -330,10 +345,13 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     private onCloseEvent(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
-        if(this._canSkip && !this._canClose) {
+
+        if (this._canSkip && !this._canClose) {
             this._handlers.forEach(handler => handler.onMraidSkip());
-        } else if(this._canClose) {
+            this.sendMraidAnalyticsEvent('playable_skip');
+        } else if (this._canClose) {
             this._handlers.forEach(handler => handler.onMraidClose());
+            this.sendMraidAnalyticsEvent('playable_close');
         }
     }
 
@@ -344,6 +362,13 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 break;
             case 'close':
                 this._handlers.forEach(handler => handler.onMraidClose());
+                break;
+            case 'sendStats':
+                this.updateStats({
+                    totalTime: event.data.totalTime,
+                    playTime: event.data.playTime,
+                    frameCount: event.data.frameCount
+                });
                 break;
             case 'orientation':
                 let forceOrientation = Orientation.NONE;
@@ -364,10 +389,8 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
                 }));
                 break;
             case 'analyticsEvent':
-                const timeFromShow = this.checkIsValid((Date.now() - this._showTimestamp) / 1000);
                 const timeFromPlayableStart = this.checkIsValid((Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000);
-                const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
-                this._handlers.forEach(handler => handler.onMraidAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, event.data.event, event.data.eventData));
+                this.sendMraidAnalyticsEvent(event.data.event, timeFromPlayableStart, event.data.eventData);
                 break;
             case 'customMraidState':
                 switch(event.data.state) {

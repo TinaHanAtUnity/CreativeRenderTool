@@ -9,48 +9,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
     <meta name="format-detection" content="telephone=no"/>
 
-    <link rel="stylesheet" href="css/main.css"/>
-    <script src="/node_modules/systemjs/dist/system.js"></script>
-    <script>
-        System.config({
-            baseURL: 'js',
-            map: {
-                'es6-promise': '@empty',
-                'tslib': '/node_modules/tslib/tslib.js',
-                'text': '/node_modules/systemjs-plugin-text/text.js',
-                'long': '/node_modules/protobufjs/node_modules/long/dist/long.js',
-                'protobufjs/minimal': '/node_modules/protobufjs/dist/minimal/protobuf.js'
-            },
-            meta: {
-                '*.html': {
-                    loader: 'text'
-                },
-                '*.xml': {
-                    loader: 'text'
-                },
-                '*.json': {
-                    loader: 'text'
-                },
-                '*.css': {
-                    loader: 'text'
-                }
-            },
-            packages: {
-                '.': {
-                    defaultExtension: 'js'
-                }
-            },
-            paths: {
-                '*.html': './*.html',
-                '*.xml': './*.xml',
-                '*.json': './*.json',
-                '*.css': './*.css'
-            }
-        });
-        System.import('Browser').then(() => {
-            window.parent.document.getElementById('initialize').disabled = false;
-        });
-    </script>
+    <link inline rel="stylesheet" href="/build/src/styl/main.css" />
+    <script inline src="/build/src/ts/BrowserBundle.js"></script>
 </head>
 <body></body>
 </html>

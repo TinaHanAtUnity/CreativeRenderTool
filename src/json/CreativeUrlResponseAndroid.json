@@ -11,7 +11,7 @@
       "trackingUrls": {},
       "campaignId": "000000000000000000000000",
       "seatId": 9000,
-      "adType": "MRAID"
+      "adType": "{AD_TYPE_PLACEHOLDER}"
     }
   },
   "auctionId": "a15a4fb6-f9ce-4b09-a0cc-0672f1de4d20"

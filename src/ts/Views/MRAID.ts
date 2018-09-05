@@ -1,9 +1,10 @@
 import MRAIDTemplate from 'html/MRAID.html';
 import MRAIDContainer from 'html/mraid/container.html';
+import MRAIDPerfContainer from 'html/mraid/container-perf.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
 import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
-import { Observable0 } from 'Utilities/Observable';
+import { Observable0, Observable2 } from 'Utilities/Observable';
 import { Placement } from 'Models/Placement';
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { Platform } from 'Constants/Platform';
@@ -11,6 +12,10 @@ import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { Template } from 'Utilities/Template';
 import { SdkStats } from 'Utilities/SdkStats';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { Diagnostics } from 'Utilities/Diagnostics';
+
+import { ABGroup, FPSCollectionTest } from 'Models/ABGroup';
 
 export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -34,11 +39,18 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
     private _showTimestamp: number;
     private _updateInterval: any;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean) {
-        super(nativeBridge, 'mraid', placement, campaign, privacy, showGDPRBanner);
+    // analytics data
+    private _playableStartTimestamp: number;
+    private _backgroundTime: number = 0;
+    private _backgroundTimestamp: number;
+    private _creativeId: string | undefined;
+
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup) {
+        super(nativeBridge, 'mraid', placement, campaign, privacy, showGDPRBanner, abGroup);
 
         this._placement = placement;
         this._campaign = campaign;
+        this._creativeId = campaign.getCreativeId();
 
         this._template = new Template(MRAIDTemplate);
 
@@ -79,12 +91,24 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         this._gdprBanner = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
         this._privacyButton = <HTMLElement>this._container.querySelector('.privacy-button');
 
-        this.createMRAID(MRAIDContainer).then(mraid => {
+        this.createMRAID(
+            FPSCollectionTest.isValid(this._abGroup) ? MRAIDPerfContainer : MRAIDContainer
+        ).then(mraid => {
             this._nativeBridge.Sdk.logDebug('setting iframe srcdoc (' + mraid.length + ')');
             SdkStats.setFrameSetStartTimestamp(this._placement.getId());
             this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' set iframe.src started ' + SdkStats.getFrameSetStartTimestamp(this._placement.getId()));
             iframe.srcdoc = mraid;
-        }).catch(e => this._nativeBridge.Sdk.logError('failed to create mraid: ' + e));
+
+            if (CustomFeatures.isSonicPlayable(this._creativeId)) {
+                iframe.sandbox = 'allow-scripts allow-same-origin';
+            }
+        }).catch(e => {
+            this._nativeBridge.Sdk.logError('failed to create mraid: ' + e);
+
+            Diagnostics.trigger('create_mraid_error', {
+                message: e.message
+            }, this._campaign.getSession());
+        });
 
         this._messageListener = (event: MessageEvent) => this.onMessage(event);
         window.addEventListener('message', this._messageListener, false);
@@ -94,6 +118,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         super.show();
         this.choosePrivacyShown();
         this._showTimestamp = Date.now();
+        this.sendMraidAnalyticsEvent('playable_show');
 
         if(this._placement.allowSkip()) {
             const skipLength = this._placement.allowSkipInSeconds();
@@ -168,6 +193,15 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
                 value: viewable
             }, '*');
         }
+
+        // background time for analytics
+        if(!viewable) {
+            this._backgroundTimestamp = Date.now();
+        } else {
+            if (this._backgroundTimestamp) {
+                this._backgroundTime += Date.now() - this._backgroundTimestamp;
+            }
+        }
     }
 
     protected choosePrivacyShown(): void {
@@ -180,6 +214,12 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
             this._gdprBanner.style.pointerEvents = '1';
             this._gdprBanner.style.visibility = 'hidden';
         }
+    }
+
+    private sendMraidAnalyticsEvent(eventName: string, timeFromPlayableStart: number = 0, eventData?: any) {
+        const timeFromShow = this.checkIsValid((Date.now() - this._showTimestamp) / 1000);
+        const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
+        this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, eventName, eventData));
     }
 
     private updateProgressCircle(container: HTMLElement, value: number) {
@@ -210,24 +250,43 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
     private onCloseEvent(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
+
         if(this._canSkip && !this._canClose) {
             this._handlers.forEach(handler => handler.onMraidSkip());
+            this.sendMraidAnalyticsEvent('playable_skip');
         } else if(this._canClose) {
             this._handlers.forEach(handler => handler.onMraidClose());
+            this.sendMraidAnalyticsEvent('playable_close');
         }
+    }
+
+    private onLoadedEvent(event: Event): void {
+        this._loaded = true;
+        this.onLoaded.trigger();
+        const frameLoadDuration = this.checkIsValid((Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId())) / 1000);
+        this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' iframe load duration ' + frameLoadDuration + ' s');
+        this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(frameLoadDuration, 0, 0, 'playable_loading_time', {}));
+
+        this._playableStartTimestamp = Date.now();
+        this.sendMraidAnalyticsEvent('playable_start');
     }
 
     private onMessage(event: MessageEvent) {
         switch(event.data.type) {
             case 'loaded':
-                this._loaded = true;
-                this.onLoaded.trigger();
-                const frameLoadDuration = Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId());
-                this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' iframe load duration ' + frameLoadDuration + ' ms');
+                this.onLoadedEvent(event);
                 break;
 
             case 'open':
-                this._handlers.forEach(handler => handler.onMraidClick(event.data.url));
+                this.onMessageOpen(event.data.url);
+                break;
+
+            case 'sendStats':
+                this.updateStats({
+                    totalTime: event.data.totalTime,
+                    playTime: event.data.playTime,
+                    frameCount: event.data.frameCount
+                });
                 break;
 
             case 'close':
@@ -252,6 +311,11 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
                     forceOrientation: forceOrientation
                 }));
                 break;
+            case 'analyticsEvent':
+                const timeFromPlayableStart = this.checkIsValid((Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000);
+                this.sendMraidAnalyticsEvent(event.data.event, timeFromPlayableStart, event.data.eventData);
+                break;
+
             case 'customMraidState':
                 if(event.data.state === 'completed') {
                     if(!this._placement.allowSkip() && this._closeRemaining > 5) {
@@ -259,7 +323,22 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
                     }
                 }
                 break;
+
             default:
         }
+    }
+
+    private checkIsValid(timeInSeconds: number): number | undefined {
+        if (timeInSeconds < 0 || timeInSeconds > 600) {
+            return undefined;
+        }
+        return timeInSeconds;
+    }
+
+    private onMessageOpen(url: string) {
+        if (!this._callButtonEnabled) {
+            return;
+        }
+        this._handlers.forEach(handler => handler.onMraidClick(url));
     }
 }

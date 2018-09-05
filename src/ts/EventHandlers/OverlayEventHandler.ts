@@ -15,9 +15,10 @@ import { GDPREventHandler } from 'EventHandlers/GDPREventHandler';
 export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler implements IOverlayHandler {
     protected _placement: Placement;
     protected _nativeBridge: NativeBridge;
+    protected _campaign: T;
+
     private _adUnit: VideoAdUnit<T>;
     private _operativeEventManager: OperativeEventManager;
-    private _campaign: T;
     private _adUnitStyle?: AdUnitStyle;
 
     constructor(nativeBridge: NativeBridge, adUnit: VideoAdUnit<T>, parameters: IAdUnitParameters<T>, adUnitStyle?: AdUnitStyle) {
@@ -47,7 +48,7 @@ export class OverlayEventHandler<T extends Campaign> extends GDPREventHandler im
     }
 
     public onOverlayMute(isMuted: boolean): void {
-        this._nativeBridge.VideoPlayer.setVolume(new Double(isMuted ? 0.0 : 1.0));
+        this._nativeBridge.VideoPlayer.setVolume(new Double(isMuted ? 0 : 1));
     }
 
     public onOverlayCallButton(): void {

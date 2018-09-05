@@ -1,7 +1,6 @@
 import { NativeBridge } from 'Native/NativeBridge';
 import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
 import { VastAdUnit } from 'AdUnits/VastAdUnit';
-import { ClientInfo } from 'Models/ClientInfo';
 import { Platform } from 'Constants/Platform';
 import { Request } from 'Utilities/Request';
 import { VastCampaign } from 'Models/Vast/VastCampaign';
@@ -9,31 +8,23 @@ import { OverlayEventHandler } from 'EventHandlers/OverlayEventHandler';
 import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
 import { MOAT } from 'Views/MOAT';
 import { AbstractVideoOverlay } from 'Views/AbstractVideoOverlay';
-import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { ABGroup, CTAOpenUrlAbTest } from 'Models/ABGroup';
 
 export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
     private _vastAdUnit: VastAdUnit;
-    private _clientInfo: ClientInfo;
     private _request: Request;
     private _vastCampaign: VastCampaign;
     private _moat?: MOAT;
     private _vastOverlay?: AbstractVideoOverlay;
-    private _thirdPartyEventManager: ThirdPartyEventManager;
-    private _abGroup: ABGroup;
 
     constructor(nativeBridge: NativeBridge, adUnit: VastAdUnit, parameters: IAdUnitParameters<VastCampaign>) {
         super(nativeBridge, adUnit, parameters);
 
         this._vastAdUnit = adUnit;
         this._request = parameters.request;
-        this._clientInfo = parameters.clientInfo;
         this._vastCampaign = parameters.campaign;
         this._placement = parameters.placement;
         this._moat = MoatViewabilityService.getMoat();
         this._vastOverlay = this._vastAdUnit.getOverlay();
-        this._thirdPartyEventManager = parameters.thirdPartyEventManager;
-        this._abGroup = parameters.configuration.getAbGroup();
     }
 
     public onOverlaySkip(position: number): void {
@@ -68,25 +59,22 @@ export class VastOverlayEventHandler extends OverlayEventHandler<VastCampaign> {
 
         this.setCallButtonEnabled(false);
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
-        this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId());
 
         const clickThroughURL = this._vastAdUnit.getVideoClickThroughURL();
         if(clickThroughURL) {
-            if (CTAOpenUrlAbTest.isValid(this._abGroup)) {
-                return this.openUrl(clickThroughURL).then(() => {
-                    this.setCallButtonEnabled(true);
-                });
-            }
-
             return this._request.followRedirectChain(clickThroughURL).then(
                 (url: string) => {
                     return this.openUrl(url).then(() => {
                         this.setCallButtonEnabled(true);
+                        this._vastAdUnit.sendVideoClickTrackingEvent(this._vastCampaign.getSession().getId());
+                    }).catch((e) => {
+                        this.setCallButtonEnabled(true);
                     });
                 }
             );
+        } else {
+            return Promise.reject(new Error('No clickThroughURL was defined'));
         }
-        return Promise.reject(new Error('No clickThroughURL was defined'));
     }
 
     private openUrl(url: string): Promise<void> {

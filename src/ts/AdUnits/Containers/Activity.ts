@@ -1,11 +1,11 @@
-import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
-import { KeyCode } from 'Constants/Android/KeyCode';
-import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
-import { NativeBridge } from 'Native/NativeBridge';
 import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
 import { AdUnitContainer, Orientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
+import { KeyCode } from 'Constants/Android/KeyCode';
 import { Rotation } from 'Constants/Android/Rotation';
+import { ScreenOrientation } from 'Constants/Android/ScreenOrientation';
+import { SystemUiVisibility } from 'Constants/Android/SystemUiVisibility';
 import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
+import { NativeBridge } from 'Native/NativeBridge';
 
 interface IAndroidOptions {
     requestedOrientation: ScreenOrientation;

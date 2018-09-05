@@ -41,7 +41,6 @@ const changeOrientation = () => {
 };
 
 const resizeHandler = () => {
-
     if (runningResizeEvent) {
         return;
     }
@@ -55,8 +54,40 @@ const resizeHandler = () => {
     }
 };
 
-resizeHandler();
+document.addEventListener('DOMContentLoaded', resizeHandler, false);
 window.addEventListener('resize', resizeHandler, false);
+
+// 'resize' event doesn't work when switching directly from one landscape orientation to another
+// so we need to utilize 'orientationchange' event.
+const onChangeOrientation = () => {
+    if (typeof window.orientation === 'undefined' || platform !== 'ios' || isIOS7) {
+        return;
+    }
+
+    let iosOrientation = '';
+    switch(window.orientation) {
+        case 180:
+            iosOrientation = 'ios-portrait-upside-down';
+            break;
+        case 90:
+            iosOrientation  = 'ios-landscape-left';
+            break;
+        case -90:
+            iosOrientation = 'ios-landscape-right';
+            break;
+        default:
+            iosOrientation = 'ios-portrait';
+    }
+
+    document.body.classList.remove(...['ios-landscape-left', 'ios-landscape-right', 'ios-portrait-upside-down']);
+
+    if(iosOrientation) {
+        document.body.classList.add(iosOrientation);
+    }
+};
+
+document.addEventListener('DOMContentLoaded', onChangeOrientation, false);
+window.addEventListener('orientationchange', onChangeOrientation, false);
 
 if(typeof location !== 'undefined') {
     let nativeBridge: NativeBridge;
@@ -81,5 +112,5 @@ if(typeof location !== 'undefined') {
     extWindow.nativebridge = nativeBridge;
     extWindow.webview = new WebView(nativeBridge);
 
-    extWindow.webview.initialize();
+    document.addEventListener('DOMContentLoaded', () => extWindow.webview.initialize(), false);
 }

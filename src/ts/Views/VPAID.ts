@@ -1,5 +1,4 @@
 import VPAIDContainerTemplate from 'html/vpaid/container.html';
-import VPAIDCss from 'css/vpaid-container.css';
 import VPAIDTemplate from 'html/vpaid/VPAID.html';
 
 import { NativeBridge } from 'Native/NativeBridge';
@@ -10,6 +9,7 @@ import { Timer } from 'Utilities/Timer';
 import { Placement } from 'Models/Placement';
 import { IObserver1 } from 'Utilities/IObserver';
 import { Platform } from 'Constants/Platform';
+import { WebPlayerContainer } from 'Utilities/WebPlayer/WebPlayerContainer';
 
 interface InitAdOptions {
     width: number;
@@ -50,11 +50,13 @@ export class VPAID extends View<IVPAIDHandler> {
     private _isLoaded = false;
     private _webplayerEventObserver: IObserver1<string>;
     private _isCoppaCompliant: boolean;
+    private _webPlayerContainer: WebPlayerContainer;
 
-    constructor(nativeBridge: NativeBridge, campaign: VPAIDCampaign, placement: Placement) {
+    constructor(nativeBridge: NativeBridge, webPlayerContainer: WebPlayerContainer, campaign: VPAIDCampaign, placement: Placement) {
         super(nativeBridge, 'vpaid');
 
         this._template = new Template(VPAIDTemplate);
+        this._webPlayerContainer = webPlayerContainer;
         this._campaign = campaign;
         this._placement = placement;
         this._stuckTimer = new Timer(() => this._handlers.forEach(handler => handler.onVPAIDStuck()), VPAID.stuckDelay);
@@ -74,13 +76,12 @@ export class VPAID extends View<IVPAIDHandler> {
             isCoppaCompliant: this._isCoppaCompliant
         };
 
-        let iframeSrcDoc = VPAIDContainerTemplate.replace('{COMPILED_CSS}', VPAIDCss);
-        iframeSrcDoc = new Template(iframeSrcDoc).render(templateData);
+        let iframeSrcDoc = new Template(VPAIDContainerTemplate).render(templateData);
 
-        this._webplayerEventObserver = this._nativeBridge.WebPlayer.onWebPlayerEvent.subscribe((args: string) => this.onWebPlayerEvent(JSON.parse(args)));
+        this._webplayerEventObserver = this._webPlayerContainer.onWebPlayerEvent.subscribe((args: string) => this.onWebPlayerEvent(JSON.parse(args)));
         iframeSrcDoc = this._nativeBridge.getPlatform() === Platform.ANDROID ? encodeURIComponent(iframeSrcDoc) : iframeSrcDoc;
         this._isLoaded = true;
-        return this._nativeBridge.WebPlayer.setData(iframeSrcDoc, 'text/html', 'UTF-8');
+        return this._webPlayerContainer.setData(iframeSrcDoc, 'text/html', 'UTF-8');
     }
 
     public isLoaded(): boolean {
@@ -90,7 +91,7 @@ export class VPAID extends View<IVPAIDHandler> {
     public hide() {
         this.sendEvent('destroy');
         this._stuckTimer.stop();
-        this._nativeBridge.WebPlayer.onWebPlayerEvent.unsubscribe(this._webplayerEventObserver);
+        this._webPlayerContainer.onWebPlayerEvent.unsubscribe(this._webplayerEventObserver);
     }
 
     public showAd() {
@@ -144,7 +145,7 @@ export class VPAID extends View<IVPAIDHandler> {
         if (parameters) {
             webPlayerParams.push(parameters);
         }
-        return this._nativeBridge.WebPlayer.sendEvent(webPlayerParams);
+        return this._webPlayerContainer.sendEvent(webPlayerParams);
     }
 
     private onWebPlayerEvent(args: any[]) {

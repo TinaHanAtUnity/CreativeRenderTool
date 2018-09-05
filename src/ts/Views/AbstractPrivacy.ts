@@ -4,7 +4,11 @@ import { View } from 'Views/View';
 import { ClientInfo } from 'Models/ClientInfo';
 import { Campaign } from 'Models/Campaign';
 import { Platform } from 'Constants/Platform';
+<<<<<<< HEAD
 import { BadAdReason } from 'Test/Unit/Utilities/BadAdsReporting'; //Move this file
+=======
+import { Configuration } from 'Models/Configuration';
+>>>>>>> master
 
 export interface IPrivacyHandler {
     onPrivacy(url: string): void;
@@ -25,13 +29,12 @@ export interface IBuildInformation {
     appVersion: string;
     creativeId: string | undefined;
     seatId: number | undefined;
-    timestampUTC: string;
-    dateUTC: string;
+    timestamp: string;
 }
 
 export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
 
-    public static createBuildInformation(clientInfo: ClientInfo, campaign: Campaign, nativeBridge: NativeBridge) {
+    public static createBuildInformation(clientInfo: ClientInfo, campaign: Campaign, nativeBridge: NativeBridge, configuration: Configuration) {
         const date = new Date();
         const minutes = date.getMinutes() < 10 ? `0${date.getSeconds()}` : date.getMinutes();
         const seconds = date.getSeconds() < 10 ? `0${date.getSeconds()}` : date.getSeconds();
@@ -40,7 +43,7 @@ export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
             platform: clientInfo.getPlatform() === Platform.IOS ? 'iOS' : 'Android',
             campaign: campaign.getId(),
             apiLevel: nativeBridge.getApiLevel(),
-            group: campaign.getAbGroup().toNumber(),
+            group: configuration.getAbGroup().toNumber(),
             sdk: clientInfo.getSdkVersionName(),
             webview: clientInfo.getWebviewVersion(),
             webviewHash: clientInfo.getWebviewHash(),
@@ -48,8 +51,7 @@ export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
             appVersion: clientInfo.getApplicationVersion(),
             creativeId: campaign.getCreativeId(),
             seatId: campaign.getSeatId(),
-            timestampUTC: `${date.getHours()}:${minutes}:${seconds}`,
-            dateUTC: `${date.getUTCMonth()}/${date.getUTCDay()}/${date.getFullYear()}`
+            timestamp: date.toUTCString()
         };
     }
 

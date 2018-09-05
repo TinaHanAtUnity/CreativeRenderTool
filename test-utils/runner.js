@@ -1,28 +1,87 @@
-Promise.all({TEST_LIST}.map(function(testPath) {
-    return System.import(testPath);
-})).then(function() {
-    window.runner.run(function(failures) {
-        var platform = (function() {
-            var queryString = window.location.search.split('?')[1].split('&');
-            for(var i = 0; i < queryString.length; i++) {
-                var queryParam = queryString[i].split('=');
-                if(queryParam[0] === 'platform') {
-                    return queryParam[1];
-                }
-            }
-            return undefined;
-        })();
-        if(platform === 'android') {
-            window.webviewbridge.handleInvocation(JSON.stringify([['com.unity3d.ads.test.hybrid.HybridTest', 'onTestResult', [failures], 'null']]));
-        } else if(platform === 'ios') {
-            if(window.webkit) {
-                window.webkit.messageHandlers.handleInvocation.postMessage(JSON.stringify([['UADSHybridTest', 'onTestResult', [failures], 'null']]));
-            } else {
-                var xhr = new XMLHttpRequest();
-                xhr.open('POST', 'https://webviewbridge.unityads.unity3d.com/handleInvocation', false);
-                xhr.send(JSON.stringify([['UADSHybridTest', 'onTestResult', [failures], 'null']]));
-            }
+const fs = require('fs');
+const puppeteer = require('puppeteer');
+const util = require('util');
+const exec = util.promisify(require('child_process').exec);
+const path = require('path');
+
+const testUrl = process.env.TEST_URL;
+const testList = process.env.TEST_LIST;
+const testFilter = process.env.TEST_FILTER;
+
+const coverage = process.env.COVERAGE;
+const isolated = process.env.ISOLATED;
+const debug = process.env.DEBUG;
+
+const runTest = async (browser, testFilter) => {
+    const page = await browser.newPage();
+
+    page.on('console', (message) => {
+        let type = message.type();
+        if(type in console) {
+            console[type](message.text());
+        } else {
+            console.dir(message);
         }
     });
-});
 
+    if(coverage) {
+        page.exposeFunction('writeCoverage', (coverage) => {
+            fs.writeFileSync('build/coverage/coverage.json', coverage);
+        });
+    }
+
+    page.exposeFunction('exec', async (command) => {
+        return await exec(command);
+    });
+
+    const result = new Promise((resolve) => {
+        page.exposeFunction('result', (failures) => {
+            resolve(failures);
+        });
+    });
+
+    await page.goto(testUrl + (testFilter ? '?grep=' + testFilter : ''), {
+        waitUntil: 'domcontentloaded'
+    });
+
+    if(debug) {
+        page.waitFor(1000);
+        page.evaluate(() => {
+            debugger;
+        });
+    }
+    await page.evaluate(() => {
+        mocha.run((failures) => {
+            if(window.writeCoverage && __coverage__) {
+                window.writeCoverage(JSON.stringify(__coverage__));
+            }
+            window.result(failures);
+        });
+    });
+    return await result;
+};
+
+(async () => { try {
+    const browser = await puppeteer.launch({
+        args: ['--no-sandbox'],
+        devtools: debug == 1
+    });
+    if(isolated == 1) {
+        const tests = testList.split(' ').map(testPath => path.parse(testPath).name);
+        for(const test of tests) {
+            const failures = await runTest(browser, test);
+            if(failures) {
+                process.exit(failures);
+            }
+        }
+    } else {
+        const failures = await runTest(browser, testFilter);
+        if(failures) {
+            process.exit(failures);
+        }
+    }
+    await browser.close();
+} catch(error) {
+    console.error(error);
+    process.exit(1);
+}})();

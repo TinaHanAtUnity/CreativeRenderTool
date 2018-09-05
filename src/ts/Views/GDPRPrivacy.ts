@@ -124,10 +124,11 @@ export class GDPRPrivacy extends AbstractPrivacy {
 
     private editPopupPerUser() {
         if (this._isCoppaCompliant) {
-            document.getElementById('coppaTag1')!.innerHTML = 'Per request of this app’s publisher, we do not combine the data from this app with data from any other apps.';
-            document.getElementById('coppaTag2')!.innerHTML = 'While these partners generally collect information about your advertising ID from sources other than Unity, Unity does not provide your advertising ID to these third-parties for ads served in this app.';
+            document.getElementById('coppaTag1')!.innerHTML = 'By request of this app’s publisher, we do not combine the data from this app with data from any other apps.';
+            document.getElementById('coppaTag2')!.innerHTML = 'While these partners generally collect information about your advertising ID from sources other than Unity, Unity does not provide your advertising ID to these third parties for ads served in this app.';
+            document.getElementById('coppaTag3')!.innerHTML = 'This will also opt you out of personalized ad experiences.';
         } else {
-            // Add nothing for coppaTag1
+            // Add nothing for coppaTag1 and coppaTag3
             document.getElementById('coppaTag2')!.innerHTML = 'These partners may collect information about your advertising ID from sources other than Unity to further personalize the ads you see. Please visit the privacy policies of these third parties to review the compiled data they may have.';
         }
 

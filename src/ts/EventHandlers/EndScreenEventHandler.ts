@@ -28,20 +28,20 @@ export interface IEndScreenDownloadParameters {
     bypassAppSheet: boolean | undefined;
     appStoreId: string | undefined;
     store: StoreName | undefined;
-    gamerId: string;
     adUnitStyle?: AdUnitStyle;
 }
 
 export abstract class EndScreenEventHandler<T extends Campaign, T2 extends AbstractAdUnit> extends GDPREventHandler implements IEndScreenHandler {
 
     protected _adUnit: T2;
-    private _nativeBridge: NativeBridge;
+    protected _campaign: T;
+    protected _thirdPartyEventManager: ThirdPartyEventManager;
+    protected _nativeBridge: NativeBridge;
+
     private _operativeEventManager: OperativeEventManager;
-    private _thirdPartyEventManager: ThirdPartyEventManager;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _placement: Placement;
-    private _campaign: T;
 
     constructor(nativeBridge: NativeBridge, adUnit: T2, parameters: IAdUnitParameters<T>) {
         super(parameters.gdprManager, parameters.configuration);
@@ -263,7 +263,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
             case StoreName.GOOGLE:
                 return 'market://details?id=' + parameters.appStoreId;
             case StoreName.XIAOMI:
-                return 'migamecenter://details?pkgname=' + parameters.appStoreId + '&channel=unityAds&from=' + packageName + '&trace=' + parameters.gamerId;
+                return 'migamecenter://details?pkgname=' + parameters.appStoreId + '&channel=unityAds&from=' + packageName + '&trace=' + this._configuration.getToken();
             default:
                 return '';
         }

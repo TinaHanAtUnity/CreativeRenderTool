@@ -18,7 +18,7 @@ class DeviceOrientation {
             height = 1;
         }
         const aspectRatio = window.innerWidth / height;
-        return aspectRatio >= 1.0 ? Orientation.LANDSCAPE : Orientation.PORTRAIT;
+        return aspectRatio >= 1 ? Orientation.LANDSCAPE : Orientation.PORTRAIT;
     }
 }
 
@@ -32,9 +32,8 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
     private _moat?: MOAT;
     private _volume: number;
     private _muted: boolean = false;
-    private _events: Array<[number, string]> = [[0.0, 'AdVideoStart'], [0.25, 'AdVideoFirstQuartile'], [0.5, 'AdVideoMidpoint'], [0.75, 'AdVideoThirdQuartile']];
+    private _events: Array<[number, string]> = [[0, 'AdVideoStart'], [0.25, 'AdVideoFirstQuartile'], [0.5, 'AdVideoMidpoint'], [0.75, 'AdVideoThirdQuartile']];
     private _vastCampaign: VastCampaign;
-    private _vastPlacement: Placement;
 
     constructor(nativeBridge: NativeBridge, parameters: IVastAdUnitParameters) {
         super(nativeBridge, parameters);
@@ -44,7 +43,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         this._endScreen = parameters.endScreen || null;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._vastCampaign = parameters.campaign;
-        this._vastPlacement = parameters.placement;
         this._moat = MoatViewabilityService.getMoat();
 
         if(this._endScreen) {
@@ -126,6 +124,10 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         return this._muted;
     }
 
+    public getEndScreen(): VastEndScreen | null {
+        return this._endScreen;
+    }
+
     public sendTrackingEvent(eventName: string, sessionId: string): void {
         const trackingEventUrls = this._vastCampaign.getVast().getTrackingEventUrls(eventName);
         if (trackingEventUrls) {
@@ -153,17 +155,10 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         }
     }
 
-    public getEndScreen(): VastEndScreen | null {
-        return this._endScreen;
-    }
-
     public sendCompanionTrackingEvent(sessionId: string): void {
-        const companion = this.getCompanionForOrientation();
-        if (companion) {
-            const urls = companion.getEventTrackingUrls('creativeView');
-            for (const url of urls) {
-                this._thirdPartyEventManager.sendEvent('companion', sessionId, url);
-            }
+        const companionTrackingUrls = this._vastCampaign.getVast().getCompanionCreativeViewTrackingUrls();
+        for (const url of companionTrackingUrls) {
+            this._thirdPartyEventManager.sendEvent('companion', sessionId, url);
         }
     }
 
@@ -190,21 +185,6 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         super.onContainerForeground();
         if (this.isShowing() && this.canShowVideo() && this._moat) {
             this._moat.play(this.getVolume());
-        }
-    }
-
-    private getCompanionForOrientation(): VastCreativeCompanionAd | null {
-        let orientation = DeviceOrientation.getDeviceOrientation();
-        if (this._forceOrientation === Orientation.LANDSCAPE) {
-            orientation = Orientation.LANDSCAPE;
-        } else if (this._forceOrientation === Orientation.PORTRAIT) {
-            orientation = Orientation.PORTRAIT;
-        }
-
-        if (orientation === Orientation.LANDSCAPE) {
-            return this._vastCampaign.getVast().getLandscapeOrientedCompanionAd();
-        } else {
-            return this._vastCampaign.getVast().getPortraitOrientedCompanionAd();
         }
     }
 

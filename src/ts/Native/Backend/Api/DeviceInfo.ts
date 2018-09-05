@@ -82,6 +82,10 @@ export class DeviceInfo {
         DeviceInfo._networkOperatorName = value;
     }
 
+    public static setNetworkMetered(value: boolean) {
+        DeviceInfo._networkMetered = value;
+    }
+
     public static setHeadset(value: boolean) {
         DeviceInfo._headset = value;
     }
@@ -286,6 +290,10 @@ export class DeviceInfo {
         return DeviceInfo._networkOperatorName;
     }
 
+    public static getNetworkMetered() {
+        return DeviceInfo._networkMetered;
+    }
+
     public static getHeadset() {
         return DeviceInfo._headset;
     }
@@ -458,6 +466,7 @@ export class DeviceInfo {
     private static _networkType: number = 0;
     private static _networkOperator: string = '24412';
     private static _networkOperatorName: string = 'DNA';
+    private static _networkMetered: boolean = false;
     private static _headset: boolean = false;
     private static _deviceVolume: number = 1;
     private static _screenBrightness: number = 1;

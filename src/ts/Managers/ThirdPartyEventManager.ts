@@ -4,6 +4,10 @@ import { DiagnosticError } from 'Errors/DiagnosticError';
 import { Analytics } from 'Utilities/Analytics';
 import { RequestError } from 'Errors/RequestError';
 import { Url } from 'Utilities/Url';
+import { ICometTrackingUrlEvents } from 'Parsers/CometCampaignParser';
+import { Campaign } from 'Models/Campaign';
+import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
+import { Diagnostics } from 'Utilities/Diagnostics';
 
 export class ThirdPartyEventManager {
 
@@ -72,6 +76,27 @@ export class ThirdPartyEventManager {
 
     public setTemplateValue(key: string, value: string): void {
         this._templateValues[key] = value;
+    }
+
+    public sendPerformanceTrackingEvent(campaign: Campaign, event: ICometTrackingUrlEvents): Promise<void> {
+        if (campaign instanceof PerformanceCampaign) {
+            const urls = campaign.getTrackingUrls();
+            // Object.keys... is Currently to protect against the integration tests FAB dependency on static performance configurations not including the tracking URLs
+            if (urls && urls[event] && Object.keys(urls[event]).length !== 0) {
+                for (const eventUrl of urls[event]) {
+                    if (eventUrl) {
+                        this.sendEvent(event, campaign.getSession().getId(), eventUrl);
+                    } else {
+                        const error = {
+                            eventUrl: eventUrl,
+                            event: event
+                        };
+                        Diagnostics.trigger('invalid_tracking_url', error, campaign.getSession());
+                    }
+                }
+            }
+        }
+        return Promise.resolve();
     }
 
     private getUrl(url: string): string {

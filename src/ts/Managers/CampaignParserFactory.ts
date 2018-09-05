@@ -8,6 +8,7 @@ import { ProgrammaticStaticInterstitialParser } from 'Parsers/ProgrammaticStatic
 import { ProgrammaticAdMobParser } from 'Parsers/ProgrammaticAdMobParser';
 import { ProgrammaticVPAIDParser } from 'Parsers/ProgrammaticVPAIDParser';
 import { PromoCampaignParser } from 'Parsers/PromoCampaignParser';
+import { BannerCampaignParser } from 'AdTypes/Banner/Parsers/BannerCampaignParser';
 
 export class CampaignParserFactory {
     public static getCampaignParser(contentType: string): CampaignParser {

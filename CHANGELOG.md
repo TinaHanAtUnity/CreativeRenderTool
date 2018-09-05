@@ -1,4 +1,122 @@
-# Pending
+# Tue Sep  4 09:16:55 UTC 2018
+
+* Fix playable analytics naming
+* Fix playable ads KPI metrics
+* Reformat build information in privacy objects
+
+# Thu Aug 30 15:02:10 UTC 2018
+
+* Remove webview reinit logic
+* AR fixes
+* Isolate integration tests
+* Fix global leaks in hybrid tests
+
+# Wed Aug 29 12:27:38 UTC 2018
+
+* Refactor build & test systems
+
+# Tue Aug 28 08:46:33 UTC 2018
+
+* Add Augmented Reality(AR) Ads Support
+* Prevent multiple CTA Clicks on MRAID
+* Add AB Test requiring Admob Video as a Required Asset
+* Replace URL Parameters correctly for Performance tracking urls
+
+# Thu Aug 23 22:15:10 UTC 2018
+
+* Make jaeger more robust on init
+* XPROMO: trigger onStartProcessed after the start event has been sent
+* New video overlay also enabled for VAST video ads in groups 18 & 19
+* Custom Feature for Admob Video Required Asset
+* Remove iPhone X end screen test (groups 18 & 19)
+
+# Wed Aug 22 09:36:53 UTC 2018
+
+* Remove force quit manager
+* Start the VPAID timeout timer to hide ad unit on bad ads
+
+# Tue Aug 21 06:56:04 UTC 2018
+
+* Fix display interstitial click area
+* Rename comet tracking loaded event
+* Fix Vast Endscreen click delay
+* Fix VPAID click and Endscreen
+* Add creativeId and targetStoreId in XPromo Operative Events
+
+# Fri Aug 17 11:23:03 UTC 2018
+
+* Fix force_quit deletion
+* Collect average fps for mraid
+* Improve caching time and add mraid parse time
+
+# Thu Aug 16 21:25:14 UTC 2018
+
+* Change comet tracking url names
+
+# Thu Aug 16 11:46:08 UTC 2018
+
+* Add Product type to promo tracking event urls
+* Reduce number of catalog refresh calls to IAP
+* Fix forcequit diagnostic sending error
+
+# Wed Aug 15 05:57:24 UTC 2018
+
+* Banner implementation merged to 3.0.0
+* Add tracking URL events for Performance Campaigns
+
+# Tue Aug 14 20:02:05 UTC 2018
+
+* Send a diagnostic event if the mraid creation fails
+* Reset the app sheet when closing the ad unit
+* Merge out changes related to modularization refactoring
+* Fix tests if XHRequest is used to fetch MRAIDs
+
+# Thu Aug  9 23:04:44 UTC 2018
+
+* Send creativeView tracking event for companionAd using Vast model api
+
+# Wed Aug  8 08:40:08 UTC 2018
+
+* Destroy Forcequit Key only after container cleanly closes
+* Remove ComScore Completely
+* Encode Impression tracking urls of Programmatic VAST
+* Added the field latestCampaignsStarts in gameSessionCounters
+* Send close and skip events for playable mraid
+
+# Tue Aug  7 13:23:57 UTC 2018
+
+* Update Dependencies
+
+# Thu Aug  2 23:00:48 UTC 2018
+
+* Remove ability to seek in Admob videos
+* Add diagnostic message if a user attempts to seek in Admob
+* Remove GamerID from source code
+
+# Thu Aug  2 10:32:18 UTC 2018
+
+* iPhone X Endscreen test on ABGroups 18 and 19
+* Forcequit Manager added to track abnormal ad termination
+* Remove ABGroup from Campaign model
+* Tslint prefer-method-signature
+* Revert CustomFeature change for Uken Games
+* Align Admob start events for rewarded and interstitial videos
+* Use segno to create QR code for local Webview
+* Refactor Endscreen constructor parameter list
+
+# Mon Jul 30 21:52:01 UTC 2018
+
+* Fix GDPR Privacy width for iPhone X in landscape
+* Sending unity internal tracking events for clicks after followRedirectChain
+* Tslint number-literal-format
+* Sonic Creative temporary creative ID Whitelist
+
+# Wed Jul 25 20:12:52 UTC 2018
+
+* New GDPR legal text
+* Fixed issues with backup campaign, expired campaigns were shown, VAST had issues
+
+# Tue Jul 24 20:57:31 UTC 2018
 
 * Add a fixed version of the new video overlay
 * Send Admob impression when ad loads

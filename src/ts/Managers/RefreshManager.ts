@@ -11,7 +11,6 @@ export abstract class RefreshManager {
 
     public abstract getCampaign(placementId: string): Campaign | undefined;
     public abstract setCurrentAdUnit(adUnit: AbstractAdUnit): void;
-    public abstract setRefreshAllowed(bool: boolean): void;
     public abstract refresh(nofillRetry?: boolean): Promise<INativeResponse | void>;
     public abstract refreshFromCache(cachedResponse: INativeResponse, span: JaegerSpan): Promise<INativeResponse | void>;
     public abstract shouldRefill(timestamp: number): boolean;

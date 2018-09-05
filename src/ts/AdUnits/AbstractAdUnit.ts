@@ -1,20 +1,21 @@
-import { Placement } from 'Models/Placement';
-import { Campaign } from 'Models/Campaign';
-import { Observable0 } from 'Utilities/Observable';
-import { NativeBridge } from 'Native/NativeBridge';
+import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
 import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
 import { FinishState } from 'Constants/FinishState';
-import { DeviceInfo } from 'Models/DeviceInfo';
-import { ClientInfo } from 'Models/ClientInfo';
-import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { Configuration } from 'Models/Configuration';
-import { Request } from 'Utilities/Request';
 import { FocusManager } from 'Managers/FocusManager';
-import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
-import { CampaignAssetInfo } from 'Utilities/CampaignAssetInfo';
 import { GdprManager } from 'Managers/GdprManager';
+import { OperativeEventManager } from 'Managers/OperativeEventManager';
+import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
+import { Campaign } from 'Models/Campaign';
+import { ClientInfo } from 'Models/ClientInfo';
+import { Configuration } from 'Models/Configuration';
+import { DeviceInfo } from 'Models/DeviceInfo';
+import { Placement } from 'Models/Placement';
+import { NativeBridge } from 'Native/NativeBridge';
 import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { CampaignAssetInfo } from 'Utilities/CampaignAssetInfo';
+import { Observable0 } from 'Utilities/Observable';
+import { Request } from 'Utilities/Request';
+import { WebPlayerContainer } from 'Utilities/WebPlayer/WebPlayerContainer';
 
 export interface IAdUnitParameters<T extends Campaign> {
     forceOrientation: Orientation;
@@ -31,6 +32,7 @@ export interface IAdUnitParameters<T extends Campaign> {
     options: any;
     gdprManager: GdprManager;
     adMobSignalFactory?: AdMobSignalFactory;
+    webPlayerContainer?: WebPlayerContainer;
     programmaticTrackingService: ProgrammaticTrackingService;
 }
 

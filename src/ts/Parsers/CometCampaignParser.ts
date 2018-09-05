@@ -1,6 +1,7 @@
 import { Campaign, ICampaign } from 'Models/Campaign';
 import { CampaignParser } from 'Parsers/CampaignParser';
 import { IMRAIDCampaign, MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
+import { PerformanceMRAIDCampaign } from 'Models/Campaigns/PerformanceMRAIDCampaign';
 import { IPerformanceCampaign, PerformanceCampaign, StoreName } from 'Models/Campaigns/PerformanceCampaign';
 import { NativeBridge } from 'Native/NativeBridge';
 import { Request } from 'Utilities/Request';
@@ -12,11 +13,27 @@ import { HTML } from 'Models/Assets/HTML';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
 import { CustomFeatures } from 'Utilities/CustomFeatures';
 import { Diagnostics } from 'Utilities/Diagnostics';
-import { ABGroup } from 'Models/ABGroup';
+
+// Events marked with // are currently sent, but are unused - waiting for BI to confirm if they want them sent
+export enum ICometTrackingUrlEvents {
+    START = 'start',
+    CLICK = 'click',
+    ENDCARD_CLICK = 'videoEndCardClick', //
+    FIRST_QUARTILE = 'firstQuartile',
+    MIDPOINT = 'midpoint',
+    THIRD_QUARTILE = 'thirdQuartile',
+    ERROR = 'error',
+    STALLED = 'stalled', //
+    LOADED_IMPRESSION = 'loaded',
+    SHOW = 'show', //
+    COMPLETE = 'complete',
+    SKIP = 'skip'
+}
 
 export class CometCampaignParser extends CampaignParser {
     public static ContentType = 'comet/campaign';
-    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, gamerId: string, abGroup: ABGroup): Promise<Campaign> {
+
+    public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, osVersion?: string): Promise<Campaign> {
         const json = response.getJsonContent();
 
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';
@@ -37,8 +54,6 @@ export class CometCampaignParser extends CampaignParser {
 
         const baseCampaignParams: ICampaign = {
             id: json.id,
-            gamerId: gamerId,
-            abGroup: abGroup,
             willExpireAt: undefined,
             adType: undefined,
             correlationId: undefined,
@@ -73,9 +88,9 @@ export class CometCampaignParser extends CampaignParser {
                 playableConfiguration: undefined
             };
 
-            const mraidCampaign = new MRAIDCampaign(parameters);
+            const mraidCampaign = new PerformanceMRAIDCampaign(parameters);
 
-            if(CustomFeatures.isPlayableConfigurationEnabled(json.mraidUrl)) {
+            if (CustomFeatures.isPlayableConfigurationEnabled(json.mraidUrl)) {
                 const playableConfigurationUrl = json.mraidUrl.replace(/index\.html/, 'configuration.json');
                 request.get(playableConfigurationUrl).then(configurationResponse => {
                     try {
@@ -108,7 +123,8 @@ export class CometCampaignParser extends CampaignParser {
                 videoEventUrls: this.validateAndEncodeVideoEventUrls(json.videoEventUrls, session),
                 bypassAppSheet: json.bypassAppSheet,
                 store: storeName,
-                adUnitStyle: this.parseAdUnitStyle(json.adUnitStyle)
+                adUnitStyle: this.parseAdUnitStyle(json.adUnitStyle),
+                trackingUrls: response.getTrackingUrls()
             };
 
             if(json.trailerDownloadable && json.trailerDownloadableSize && json.trailerStreaming) {

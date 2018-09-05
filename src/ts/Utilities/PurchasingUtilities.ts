@@ -86,6 +86,13 @@ export class PurchasingUtilities {
         throw new Error('Attempted to get price of invalid product: ' + productId);
     }
 
+    public static getProductType(productId: string): string | undefined {
+        if (this.isProductAvailable(productId)) {
+            return this._catalog.getProducts()[productId].getProductType();
+        }
+        return undefined;
+    }
+
     public static isProductAvailable(productId: string): boolean {
         if (this.isCatalogValid()) {
             return (productId in this._catalog.getProducts());
@@ -107,6 +114,10 @@ export class PurchasingUtilities {
         } else {
             return Promise.reject(this.logIssue('handle_send_event_failure', 'IAP Payload is incorrect'));
         }
+    }
+
+    public static isCatalogValid(): boolean {
+        return (this._catalog !== undefined && this._catalog.getProducts() !== undefined && this._catalog.getSize() !== 0);
     }
 
     private static _catalog: PurchasingCatalog = new PurchasingCatalog([]);
@@ -189,10 +200,6 @@ export class PurchasingUtilities {
             return ((parseInt(promoVersionSplit[0], 10) >= 2) || ((parseInt(promoVersionSplit[0], 10) >= 1 && parseInt(promoVersionSplit[1], 10) >= 16)));
         }
         return false;
-    }
-
-    private static isCatalogValid(): boolean {
-        return (this._catalog !== undefined && this._catalog.getProducts() !== undefined && this._catalog.getSize() !== 0);
     }
 
     private static getInitializationPayload(): IPromoPayload {

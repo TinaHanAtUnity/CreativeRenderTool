@@ -23,6 +23,7 @@ import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
 import { IMRAIDViewHandler, MRAIDView } from 'Views/MRAIDView';
 import { MRAID } from 'Views/MRAID';
 import { PlayableMRAID } from 'Views/PlayableMRAID';
+import { ARMRAID } from 'Views/ARMRAID';
 import { StreamType } from 'Constants/Android/StreamType';
 import { Video } from 'Models/Assets/Video';
 import { WebViewError } from 'Errors/WebViewError';
@@ -37,11 +38,10 @@ import { VPAIDEndScreenEventHandler } from 'EventHandlers/VPAIDEndScreenEventHan
 import { VPAIDEventHandler } from 'EventHandlers/VPAIDEventHandler';
 import { VPAIDOverlayEventHandler } from 'EventHandlers/VPAIDOverlayEventHandler';
 import { MRAIDEventHandler } from 'EventHandlers/MRAIDEventHandler';
+import { PlayableEventHandler } from 'EventHandlers/PlayableEventHandler';
 import { DisplayInterstitialEventHandler } from 'EventHandlers/DisplayInterstitialEventHandler';
 import { Campaign } from 'Models/Campaign';
 import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
-import { MRAIDEndScreen } from 'Views/MRAIDEndScreen';
-import { MRAIDEndScreenEventHandler } from 'EventHandlers/MRAIDEndScreenEventHandler';
 import { PerformanceEndScreenEventHandler } from 'EventHandlers/PerformanceEndScreenEventHandler';
 import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
 import { XPromoEndScreen } from 'Views/XPromoEndScreen';
@@ -61,7 +61,6 @@ import { Promo } from 'Views/Promo';
 import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
 import { PromoEventHandler } from 'EventHandlers/PromoEventHandler';
 import { AdUnitStyle } from 'Models/AdUnitStyle';
-import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
 import { CampaignAssetInfo } from 'Utilities/CampaignAssetInfo';
 import { IVideoEventHandlerParams } from 'EventHandlers/BaseVideoEventHandler';
 import { AndroidVideoEventHandler } from 'EventHandlers/AndroidVideoEventHandler';
@@ -71,14 +70,20 @@ import { OperativeEventManager } from 'Managers/OperativeEventManager';
 import { AbstractPrivacy } from 'Views/AbstractPrivacy';
 import { GDPRPrivacy } from 'Views/GDPRPrivacy';
 import { PrivacyEventHandler } from 'EventHandlers/PrivacyEventHandler';
+import { ARUtil } from 'Utilities/ARUtil';
 import { NewVideoOverlayEnabledAbTest } from 'Models/ABGroup';
 import { NewVideoOverlay } from 'Views/NewVideoOverlay';
+import { IEndScreenParameters } from 'Views/EndScreen';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
+import { PerformanceMRAIDCampaign } from 'Models/Campaigns/PerformanceMRAIDCampaign';
 
 export class AdUnitFactory {
+    private static _forcedPlayableMRAID: boolean = false;
+    private static _forcedARMRAID: boolean = false;
 
     public static createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractAdUnit {
 
-        Privacy.createBuildInformation(parameters.clientInfo, parameters.campaign, nativeBridge);
+        Privacy.createBuildInformation(parameters.clientInfo, parameters.campaign, nativeBridge, parameters.configuration);
 
         // todo: select ad unit based on placement
         if (parameters.campaign instanceof VastCampaign) {
@@ -102,14 +107,27 @@ export class AdUnitFactory {
         }
     }
 
+    public static setForcedPlayableMRAID(value: boolean) {
+        AdUnitFactory._forcedPlayableMRAID = value;
+    }
+
+    public static setForcedARMRAID(value: boolean) {
+        AdUnitFactory._forcedARMRAID = value;
+    }
+
     private static createPerformanceAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PerformanceCampaign>): PerformanceAdUnit {
         const overlay = this.createOverlay(nativeBridge, parameters);
 
         const adUnitStyle: AdUnitStyle = parameters.campaign.getAdUnitStyle() || AdUnitStyle.getDefaultAdUnitStyle();
 
-        const showGDPRBanner = this.showGDPRBanner(parameters);
         const privacy = this.createPrivacy(nativeBridge, parameters);
-        const endScreen = new PerformanceEndScreen(nativeBridge, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, parameters.deviceInfo.getOsVersion(), adUnitStyle);
+        const endScreenParameters: IEndScreenParameters = {
+            ... this.createEndScreenParameters(nativeBridge, privacy, parameters.campaign.getGameName(), parameters),
+            adUnitStyle: adUnitStyle,
+            campaignId: parameters.campaign.getId(),
+            osVersion: parameters.deviceInfo.getOsVersion()
+        };
+        const endScreen = new PerformanceEndScreen(endScreenParameters, parameters.campaign);
         const video = this.getVideo(parameters.campaign, parameters.forceOrientation);
 
         const performanceAdUnitParameters: IPerformanceAdUnitParameters = {
@@ -142,12 +160,28 @@ export class AdUnitFactory {
         return performanceAdUnit;
     }
 
+    private static createEndScreenParameters(nativeBridge: NativeBridge, privacy: AbstractPrivacy, targetGameName: string | undefined, parameters: IAdUnitParameters<Campaign>): IEndScreenParameters {
+        const showGDPRBanner = this.showGDPRBanner(parameters);
+        return {
+            nativeBridge: nativeBridge,
+            language: parameters.deviceInfo.getLanguage(),
+            gameId: parameters.clientInfo.getGameId(),
+            targetGameName: targetGameName,
+            abGroup: parameters.configuration.getAbGroup(),
+            privacy: privacy,
+            showGDPRBanner: showGDPRBanner,
+            adUnitStyle: undefined,
+            campaignId: undefined,
+            osVersion: undefined
+        };
+    }
+
     private static createXPromoAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<XPromoCampaign>): XPromoAdUnit {
         const overlay = this.createOverlay(nativeBridge, parameters);
 
-        const showGDPRBanner = this.showGDPRBanner(parameters);
         const privacy = this.createPrivacy(nativeBridge, parameters);
-        const endScreen = new XPromoEndScreen(nativeBridge, parameters.campaign, parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner);
+        const endScreenParameters = this.createEndScreenParameters(nativeBridge, privacy, parameters.campaign.getGameName(), parameters);
+        const endScreen = new XPromoEndScreen(endScreenParameters, parameters.campaign);
         const video = this.getVideo(parameters.campaign, parameters.forceOrientation);
 
         const xPromoAdUnitParameters: IXPromoAdUnitParameters = {
@@ -250,10 +284,12 @@ export class AdUnitFactory {
         let mraid: MRAIDView<IMRAIDViewHandler>;
         const showGDPRBanner = this.showGDPRBanner(parameters);
         const privacy = this.createPrivacy(nativeBridge, parameters);
-        if(resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) {
-            mraid = new PlayableMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner);
+        if((resourceUrl && resourceUrl.getOriginalUrl().match(/playables\/production\/unity/)) || AdUnitFactory._forcedPlayableMRAID) {
+            mraid = new PlayableMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner, parameters.configuration.getAbGroup());
+        } else if (ARUtil.isARCreative(parameters.campaign) || AdUnitFactory._forcedARMRAID) {
+            mraid = new ARMRAID(nativeBridge, parameters.placement, parameters.campaign, parameters.deviceInfo.getLanguage(), privacy, showGDPRBanner, parameters.configuration.getAbGroup());
         } else {
-            mraid = new MRAID(nativeBridge, parameters.placement, parameters.campaign, privacy, showGDPRBanner);
+            mraid = new MRAID(nativeBridge, parameters.placement, parameters.campaign, privacy, showGDPRBanner, parameters.configuration.getAbGroup());
         }
 
         const mraidAdUnitParameters: IMRAIDAdUnitParameters = {
@@ -262,18 +298,28 @@ export class AdUnitFactory {
             privacy: privacy
         };
 
-        const mraidAdUnit = new MRAIDAdUnit(nativeBridge, mraidAdUnitParameters);
-        const mraidEventHandler = new MRAIDEventHandler(nativeBridge, mraidAdUnit, mraidAdUnitParameters);
+        const mraidAdUnit: MRAIDAdUnit = new MRAIDAdUnit(nativeBridge, mraidAdUnitParameters);
+
+        // NOTE: When content type is correct for playables we want to change this to content type check.
+        const isPlayable: boolean = parameters.campaign instanceof PerformanceMRAIDCampaign;
+        const isSonicPlayable: boolean = CustomFeatures.isSonicPlayable(parameters.campaign.getCreativeId());
+        const EventHandler =  (isSonicPlayable || isPlayable) ? PlayableEventHandler : MRAIDEventHandler;
+        const mraidEventHandler: IMRAIDViewHandler = new EventHandler(nativeBridge, mraidAdUnit, mraidAdUnitParameters);
         mraid.addEventHandler(mraidEventHandler);
 
         return mraidAdUnit;
     }
 
     private static createVPAIDAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<VPAIDCampaign>): AbstractAdUnit {
+        // WebPlayerContainer will always be defined, checking and throwing just to remove the undefined type.
+        if (!parameters.webPlayerContainer) {
+            throw new Error('is undefined, should not get here.');
+        }
+
         const privacy = this.createPrivacy(nativeBridge, parameters);
         const showGDPRBanner = this.showGDPRBanner(parameters);
         const closer = new Closer(nativeBridge, parameters.placement, privacy, showGDPRBanner);
-        const vpaid = new VPAID(nativeBridge, parameters.campaign, parameters.placement);
+        const vpaid = new VPAID(nativeBridge, parameters.webPlayerContainer, parameters.campaign, parameters.placement);
         let endScreen: VPAIDEndScreen | undefined;
 
         const vpaidAdUnitParameters: IVPAIDAdUnitParameters = {
@@ -318,7 +364,7 @@ export class AdUnitFactory {
         document.body.appendChild(promoView.container());
 
         promoView.onGDPRPopupSkipped.subscribe(() => PromoEventHandler.onGDPRPopupSkipped(parameters.configuration, parameters.gdprManager));
-        promoView.onClose.subscribe(() => PromoEventHandler.onClose(promoAdUnit, parameters.configuration.getToken(), parameters.clientInfo.getGameId(), parameters.campaign.getAbGroup(), parameters.campaign.getTrackingUrlsForEvent('purchase'), parameters.configuration.isOptOutEnabled()));
+        promoView.onClose.subscribe(() => PromoEventHandler.onClose(promoAdUnit, parameters.configuration.getToken(), parameters.clientInfo.getGameId(), parameters.configuration.getAbGroup(), parameters.campaign.getTrackingUrlsForEvent('purchase'), parameters.configuration.isOptOutEnabled()));
         promoView.onPromo.subscribe((productId) => PromoEventHandler.onPromo(promoAdUnit, productId, parameters.campaign.getTrackingUrlsForEvent('purchase')));
 
         return promoAdUnit;
@@ -429,7 +475,7 @@ export class AdUnitFactory {
         if (parameters.placement.allowSkip() && parameters.placement.skipEndCardOnClose()) {
             overlay = new ClosableVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         } else {
-            if (isPerformanceCampaign && NewVideoOverlayEnabledAbTest.isValid(parameters.campaign.getAbGroup())) {
+            if (NewVideoOverlayEnabledAbTest.isValid(parameters.configuration.getAbGroup())) {
                 overlay = new NewVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, disablePrivacyDuringVideo);
             } else {
                 overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, disablePrivacyDuringVideo);

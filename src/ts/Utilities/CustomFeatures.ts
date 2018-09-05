@@ -16,6 +16,13 @@ export class CustomFeatures {
                gameId === '1543513';
     }
 
+    public static isSonicPlayable(creativeId: string | undefined) {
+        return  creativeId === '109455881' ||
+                creativeId === '109455877' ||
+                creativeId === '109091853' ||
+                creativeId === '109091754';
+    }
+
     public static isPlayableConfigurationEnabled(originalResourceUrl: string) {
         return originalResourceUrl.match(/playables\/production\/unity/);
     }
@@ -26,12 +33,12 @@ export class CustomFeatures {
         return gameId === '1795561';
     }
 
-    public static isCacheUpdateDisabledApp(gameId: string): boolean {
-        // Uken game id to disable cache change PR https://github.com/Applifier/unity-ads-webview/pull/4755
-        // ABT-466 black screen issue
-        return gameId === '1000671' ||
-               gameId === '1000670' ||
-               gameId === '1557353' ||
-               gameId === '1557354';
+    public static isAdmobCachedVideoGame(gameId: string) {
+        return gameId === '1475967' // CSR2 Racing iOS
+            || gameId === '1475968' // CSR2 Racing Android
+            || gameId === '1787178' // BrawlStars iOS
+            || gameId === '2391158' // Brawlstars Android
+            || gameId === '1782301' // Hayday iOS
+            || gameId === '1782302';// Hayday Android
     }
 }
