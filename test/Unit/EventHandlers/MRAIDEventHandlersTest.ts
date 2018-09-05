@@ -3,6 +3,7 @@ import * as sinon from 'sinon';
 import { assert } from 'chai';
 
 import { MRAIDEventHandler } from 'EventHandlers/MRAIDEventHandler';
+import { PlayableEventHandler } from 'EventHandlers/PlayableEventHandler';
 import { NativeBridge } from 'Native/NativeBridge';
 import { SessionManager } from 'Managers/SessionManager';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
@@ -187,7 +188,7 @@ describe('MRAIDEventHandlersTest', () => {
             });
         });
 
-        describe('with onAnalyticsEvent', () => {
+        describe('with onPlayableAnalyticsEvent', () => {
             let sandbox: sinon.SinonSandbox;
 
             before(() => {
@@ -204,48 +205,61 @@ describe('MRAIDEventHandlersTest', () => {
                 sandbox.restore();
             });
 
-            it('should send a analytics event', () => {
-                mraidAdUnit = new MRAIDAdUnit(nativeBridge, playableMraidAdUnitParams);
-                sinon.stub(mraidAdUnit, 'sendClick');
-                mraidEventHandler = new MRAIDEventHandler(nativeBridge, mraidAdUnit, playableMraidAdUnitParams);
+            describe('MRAIDEventHandler', () => {
+                it('should not send a analytics event', () => {
+                    mraidAdUnit = new MRAIDAdUnit(nativeBridge, playableMraidAdUnitParams);
+                    sinon.stub(mraidAdUnit, 'sendClick');
+                    mraidEventHandler = new MRAIDEventHandler(nativeBridge, mraidAdUnit, playableMraidAdUnitParams);
 
-                mraidEventHandler.onMraidAnalyticsEvent(15, 12, 0, 'win_screen', {'level': 2});
-
-                const kafkaObject: any = {};
-                kafkaObject.type = 'win_screen';
-                kafkaObject.eventData = {'level': 2};
-                kafkaObject.timeFromShow = 15;
-                kafkaObject.timeFromPlayableStart = 12;
-                kafkaObject.backgroundTime = 0;
-                kafkaObject.auctionId = '12345';
-
-                const resourceUrl = playableMraidCampaign.getResourceUrl();
-                if(resourceUrl) {
-                    kafkaObject.url = resourceUrl.getOriginalUrl();
-                }
-                sinon.assert.calledWith(<sinon.SinonStub>HttpKafka.sendEvent, 'ads.sdk2.events.playable.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
+                    mraidEventHandler.onPlayableAnalyticsEvent(15, 12, 0, 'win_screen', { 'level': 2 });
+                    sinon.assert.notCalled(<sinon.SinonStub>HttpKafka.sendEvent);
+                });
             });
 
-            it('should send a analytics event without extra event data', () => {
-                mraidAdUnit = new MRAIDAdUnit(nativeBridge, playableMraidAdUnitParams);
-                sinon.stub(mraidAdUnit, 'sendClick');
-                mraidEventHandler = new MRAIDEventHandler(nativeBridge, mraidAdUnit, playableMraidAdUnitParams);
+            describe('PlayableEventHandler', () => {
+                it('should send a analytics event', () => {
+                    mraidAdUnit = new MRAIDAdUnit(nativeBridge, playableMraidAdUnitParams);
+                    sinon.stub(mraidAdUnit, 'sendClick');
+                    mraidEventHandler = new PlayableEventHandler(nativeBridge, mraidAdUnit, playableMraidAdUnitParams);
 
-                mraidEventHandler.onMraidAnalyticsEvent(15, 12, 5, 'win_screen', undefined);
+                    mraidEventHandler.onPlayableAnalyticsEvent(15, 12, 0, 'win_screen', {'level': 2});
 
-                const kafkaObject: any = {};
-                kafkaObject.type = 'win_screen';
-                kafkaObject.eventData = undefined;
-                kafkaObject.timeFromShow = 15;
-                kafkaObject.timeFromPlayableStart = 12;
-                kafkaObject.backgroundTime = 5;
-                kafkaObject.auctionId = '12345';
+                    const kafkaObject: any = {};
+                    kafkaObject.type = 'win_screen';
+                    kafkaObject.eventData = {'level': 2};
+                    kafkaObject.timeFromShow = 15;
+                    kafkaObject.timeFromPlayableStart = 12;
+                    kafkaObject.backgroundTime = 0;
+                    kafkaObject.auctionId = '12345';
 
-                const resourceUrl = playableMraidCampaign.getResourceUrl();
-                if(resourceUrl) {
-                    kafkaObject.url = resourceUrl.getOriginalUrl();
-                }
-                sinon.assert.calledWith(<sinon.SinonStub>HttpKafka.sendEvent, 'ads.sdk2.events.playable.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
+                    const resourceUrl = playableMraidCampaign.getResourceUrl();
+                    if(resourceUrl) {
+                        kafkaObject.url = resourceUrl.getOriginalUrl();
+                    }
+                    sinon.assert.calledWith(<sinon.SinonStub>HttpKafka.sendEvent, 'ads.sdk2.events.playable.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
+                });
+
+                it('should send a analytics event without extra event data', () => {
+                    mraidAdUnit = new MRAIDAdUnit(nativeBridge, playableMraidAdUnitParams);
+                    sinon.stub(mraidAdUnit, 'sendClick');
+                    mraidEventHandler = new PlayableEventHandler(nativeBridge, mraidAdUnit, playableMraidAdUnitParams);
+
+                    mraidEventHandler.onPlayableAnalyticsEvent(15, 12, 5, 'win_screen', undefined);
+
+                    const kafkaObject: any = {};
+                    kafkaObject.type = 'win_screen';
+                    kafkaObject.eventData = undefined;
+                    kafkaObject.timeFromShow = 15;
+                    kafkaObject.timeFromPlayableStart = 12;
+                    kafkaObject.backgroundTime = 5;
+                    kafkaObject.auctionId = '12345';
+
+                    const resourceUrl = playableMraidCampaign.getResourceUrl();
+                    if(resourceUrl) {
+                        kafkaObject.url = resourceUrl.getOriginalUrl();
+                    }
+                    sinon.assert.calledWith(<sinon.SinonStub>HttpKafka.sendEvent, 'ads.sdk2.events.playable.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
+                });
             });
         });
     });

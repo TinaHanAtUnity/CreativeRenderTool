@@ -51,6 +51,10 @@ To build continuously (on file changes), use:
 
 - `make build-dev`
 
+If you need to develop on legacy devices that do not support ES6, use the following:
+
+- `MINIFY=1 make build-dev`
+
 To build continuously (on file changes), use:
 
 - `make watch-dev`
