@@ -135,39 +135,43 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         this._gdprBanner = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
         this._privacyButton = <HTMLElement>this._container.querySelector('.privacy-button');
 
-        let container = MRAIDContainer;
-        container = container.replace('<script id=\"webar\"></script>', WebARScript);
-        iframe.classList.add('fullscreen');
-
-        this.createMRAID(container).then(mraid => {
-            iframe.onload = () => this.onIframeLoaded();
-            SdkStats.setFrameSetStartTimestamp(this._placement.getId());
-            this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' set iframe.src started ' + SdkStats.getFrameSetStartTimestamp(this._placement.getId()));
-            iframe.srcdoc = mraid;
-
-            this._arFrameUpdatedObserver = this._nativeBridge.AR.onFrameUpdated.subscribe(parameters => this.handleAREvent('frameupdate', parameters));
-            this._arPlanesAddedObserver = this._nativeBridge.AR.onPlanesAdded.subscribe(parameters => this.handleAREvent('planesadded', parameters));
-            this._arPlanesUpdatedObserver = this._nativeBridge.AR.onPlanesUpdated.subscribe(parameters => this.handleAREvent('planesupdated', parameters));
-            this._arPlanesRemovedObserver = this._nativeBridge.AR.onPlanesRemoved.subscribe(parameters => this.handleAREvent('planesremoved', parameters));
-            this._arAnchorsUpdatedObserver = this._nativeBridge.AR.onAnchorsUpdated.subscribe(parameters => this.handleAREvent('anchorsupdated', parameters));
-            this._arWindowResizedObserver = this._nativeBridge.AR.onWindowResized.subscribe((width, height) => this.handleAREvent('windowresized', JSON.stringify({
-                width,
-                height
-            })));
-            this._arErrorObserver = this._nativeBridge.AR.onError.subscribe(errorCode => this.handleAREvent('error', JSON.stringify({errorCode})));
-            this._arSessionInterruptedObserver = this._nativeBridge.AR.onSessionInterrupted.subscribe(() => this.handleAREvent('sessioninterrupted', ''));
-            this._arSessionInterruptionEndedObserver = this._nativeBridge.AR.onSessionInterruptionEnded.subscribe(() => this.handleAREvent('sessioninterruptionended', ''));
-            if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-                this._arAndroidEnumsReceivedObserver = this._nativeBridge.AR.Android.onAndroidEnumsReceived.subscribe((enums) => this.handleAREvent('androidenumsreceived', JSON.stringify(enums)));
+        ARUtil.isARSupported(this._nativeBridge).then(arSupported => {
+            let container = MRAIDContainer;
+            if (arSupported) {
+                container = container.replace('<script id=\"webar\"></script>', WebARScript);
+                iframe.classList.add('fullscreen');
             }
-            this._deviceorientationListener = (event: DeviceOrientationEvent) => this.handleDeviceOrientation(event);
-            window.addEventListener('deviceorientation', this._deviceorientationListener, false);
-        }).catch((err) => {
-            this._nativeBridge.Sdk.logError('failed to create mraid: ' + err);
 
-            Diagnostics.trigger('create_mraid_error', {
-                message: err.message
-            }, this._campaign.getSession());
+            this.createMRAID(container).then(mraid => {
+                iframe.onload = () => this.onIframeLoaded();
+                SdkStats.setFrameSetStartTimestamp(this._placement.getId());
+                this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' set iframe.src started ' + SdkStats.getFrameSetStartTimestamp(this._placement.getId()));
+                iframe.srcdoc = mraid;
+
+                this._arFrameUpdatedObserver = this._nativeBridge.AR.onFrameUpdated.subscribe(parameters => this.handleAREvent('frameupdate', parameters));
+                this._arPlanesAddedObserver = this._nativeBridge.AR.onPlanesAdded.subscribe(parameters => this.handleAREvent('planesadded', parameters));
+                this._arPlanesUpdatedObserver = this._nativeBridge.AR.onPlanesUpdated.subscribe(parameters => this.handleAREvent('planesupdated', parameters));
+                this._arPlanesRemovedObserver = this._nativeBridge.AR.onPlanesRemoved.subscribe(parameters => this.handleAREvent('planesremoved', parameters));
+                this._arAnchorsUpdatedObserver = this._nativeBridge.AR.onAnchorsUpdated.subscribe(parameters => this.handleAREvent('anchorsupdated', parameters));
+                this._arWindowResizedObserver = this._nativeBridge.AR.onWindowResized.subscribe((width, height) => this.handleAREvent('windowresized', JSON.stringify({
+                    width,
+                    height
+                })));
+                this._arErrorObserver = this._nativeBridge.AR.onError.subscribe(errorCode => this.handleAREvent('error', JSON.stringify({errorCode})));
+                this._arSessionInterruptedObserver = this._nativeBridge.AR.onSessionInterrupted.subscribe(() => this.handleAREvent('sessioninterrupted', ''));
+                this._arSessionInterruptionEndedObserver = this._nativeBridge.AR.onSessionInterruptionEnded.subscribe(() => this.handleAREvent('sessioninterruptionended', ''));
+                if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
+                    this._arAndroidEnumsReceivedObserver = this._nativeBridge.AR.Android.onAndroidEnumsReceived.subscribe((enums) => this.handleAREvent('androidenumsreceived', JSON.stringify(enums)));
+                }
+                this._deviceorientationListener = (event: DeviceOrientationEvent) => this.handleDeviceOrientation(event);
+                window.addEventListener('deviceorientation', this._deviceorientationListener, false);
+            }).catch((err) => {
+                this._nativeBridge.Sdk.logError('failed to create mraid: ' + err);
+
+                Diagnostics.trigger('create_mraid_error', {
+                    message: err.message
+                }, this._campaign.getSession());
+            });
         });
 
         this._messageListener = (event: MessageEvent) => this.onMessage(event);
@@ -553,12 +557,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             }, false);
         });
 
-        const arSupported: Promise<boolean> =
-            this._nativeBridge.AR.Ios ? this._nativeBridge.AR.Ios.isARSupported() :
-                this._nativeBridge.AR.Android ? ARUtil.isARSupportedAndroid(this._nativeBridge.AR.Android) :
-                    Promise.resolve<boolean>(false);
-
-        arSupported.then(supported => {
+        ARUtil.isARSupported(this._nativeBridge).then(supported => {
             this._loadingScreen.classList.add('hidden');
 
             if (!supported) {

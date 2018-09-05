@@ -82,13 +82,18 @@ export class MRAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._container.addEventHandler(this);
 
         const views: string[] = ['webview'];
-        const isARURL = ARUtil.isARCreative(this._campaign);
-        if (isARURL) {
-            views.unshift('arview');
-        }
 
-        return this._container.open(this, views, this._orientationProperties.allowOrientationChange, this._orientationProperties.forceOrientation, true, false, true, false, this._options).then(() => {
-            this.onStart.trigger();
+        const isARCreative = ARUtil.isARCreative(this._campaign);
+        const isARSupported = isARCreative ? ARUtil.isARSupported(this._nativeBridge) : Promise.resolve<boolean>(false);
+
+        return isARSupported.then(arSupported => {
+            if (arSupported) {
+                views.unshift('arview');
+            }
+
+            return this._container.open(this, views, this._orientationProperties.allowOrientationChange, this._orientationProperties.forceOrientation, true, false, true, false, this._options).then(() => {
+                this.onStart.trigger();
+            });
         });
     }
 

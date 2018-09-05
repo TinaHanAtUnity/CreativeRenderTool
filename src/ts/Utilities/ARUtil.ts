@@ -1,6 +1,7 @@
 import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
 import { IosARApi } from 'Native/Api/IosARApi';
 import { AndroidARApi } from 'Native/Api/AndroidARApi';
+import { NativeBridge } from 'Native/NativeBridge';
 
 export interface IARFrameTransform {
     a: number;
@@ -146,7 +147,13 @@ export class ARUtil {
         return isAR;
     }
 
-    public static isARSupportedAndroid(api: AndroidARApi): Promise<boolean> {
+    public static isARSupported(nativeBridge: NativeBridge): Promise<boolean> {
+        return nativeBridge.AR.Ios ? nativeBridge.AR.Ios.isARSupported() :
+            nativeBridge.AR.Android ? ARUtil.isARSupportedAndroid(nativeBridge.AR.Android) :
+                Promise.resolve<boolean>(false);
+    }
+
+    private static isARSupportedAndroid(api: AndroidARApi): Promise<boolean> {
         return api.isARSupported().then(([transient, supported]) => {
             if (!transient) {
                 return supported;
