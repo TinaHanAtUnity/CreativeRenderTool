@@ -43,6 +43,8 @@ IP_ADDRESS := $(shell node -p '[].concat.apply([], Object.values(os.networkInter
 
 SOURCES := $(shell find $(SOURCE_DIR) -mindepth 2 -type f -not -name '*.d.ts')
 TS_SOURCES := $(filter %.ts, $(SOURCES))
+STYL_MAIN_SOURCE := $(SOURCE_DIR)/styl/main.styl
+STYL_SOURCES := $(filter %.styl, $(SOURCES))
 HTML_SOURCES := $(filter %.html, $(SOURCES))
 JSON_SOURCES := $(filter %.json, $(SOURCES))
 XML_SOURCES := $(filter %.xml, $(SOURCES))
@@ -79,6 +81,7 @@ TEST_BUILD_TARGETS := $(TEST_BUILD_DIR)/UnitBundle.min.js $(BUILD_DIR)/test/inde
 # Built-in targets
 
 .PHONY: all static build-browser build-dev build-release build-test test test-unit test-integration test-coverage test-browser clean lint setup watch-dev watch-browser watch-test start-server stop-server deploy qr-code
+.PHONY: $(BUILD_DIR)/dev/index.html $(BUILD_DIR)/dev/config.json
 .NOTPARALLEL: $(TS_TARGETS) $(TEST_TARGETS)
 
 # Main targets
@@ -137,8 +140,13 @@ $(BUILD_DIR)/browser/index.html: $(SOURCE_DIR)/browser-index.html
 $(BUILD_DIR)/browser/iframe.html: $(SOURCE_DIR)/browser-iframe.html
 	mkdir -p $(dir $@) && cp $< $@
 
+ifeq ($(MINIFY), 1)
+$(BUILD_DIR)/dev/index.html: $(SOURCE_DIR)/dev-legacy-index.html $(SOURCE_BUILD_DIR)/ts/Bundle.min.js $(CSS_TARGETS)
+	mkdir -p $(dir $@) && $(INLINE) $< $@
+else
 $(BUILD_DIR)/dev/index.html: $(SOURCE_DIR)/dev-index.html $(SOURCE_BUILD_DIR)/ts/Bundle.js $(CSS_TARGETS)
 	mkdir -p $(dir $@) && $(INLINE) $< $@
+endif
 
 $(BUILD_DIR)/dev/config.json:
 	echo "{\"url\":\"http://$(IP_ADDRESS):8000/build/dev/index.html\",\"hash\":null}" > $@
@@ -200,8 +208,8 @@ $(SOURCE_BUILD_DIR)/json/%.json: %.json
 $(SOURCE_BUILD_DIR)/xml/%.xml: %.xml
 	mkdir -p $(dir $@) && cp $< $@
 
-$(SOURCE_BUILD_DIR)/styl/%.css: %.styl
-	mkdir -p $(dir $@) && $(STYLUS) --out $(SOURCE_BUILD_DIR)/styl --use autoprefixer-stylus --compress --inline --with '{limit: false}' $<
+$(CSS_TARGETS): $(STYL_SOURCES)
+	mkdir -p $(dir $@) && $(STYLUS) --out $(SOURCE_BUILD_DIR)/styl --use autoprefixer-stylus --compress --inline --with '{limit: false}' $(STYL_MAIN_SOURCE)
 
 $(TEST_BUILD_DIR)/%.js: %.ts
 	$(TYPESCRIPT) --project tsconfig.json
