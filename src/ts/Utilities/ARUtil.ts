@@ -153,7 +153,11 @@ export class ARUtil {
                 Promise.resolve<boolean>(false);
     }
 
-    private static isARSupportedAndroid(api: AndroidARApi): Promise<boolean> {
+    private static isARSupportedAndroid(api: AndroidARApi, retry: number = 1): Promise<boolean> {
+        if (retry > 5) {
+            return Promise.resolve<boolean>(false);
+        }
+
         return api.isARSupported().then(([transient, supported]) => {
             if (!transient) {
                 return supported;
@@ -161,7 +165,7 @@ export class ARUtil {
 
             const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
             return sleep(this.ANDROID_AR_SUPPORTED_RETRY_WAIT).then(() => {
-                return ARUtil.isARSupportedAndroid(api);
+                return ARUtil.isARSupportedAndroid(api, retry + 1);
             });
         });
     }
