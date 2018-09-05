@@ -1,5 +1,4 @@
 import { Campaign } from 'Models/Campaign';
-import { ProgrammaticTrackingService, ProgrammaticTrackingMetric } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 import { Diagnostics } from 'Utilities/Diagnostics';
 
 export enum BadAdReason {

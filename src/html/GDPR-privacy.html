@@ -99,11 +99,13 @@
         <% } %>
     </div>
     <div class="pop-up-content report-side">
-        <span header="report-header">Report Advertisement</header>
-        <ul class="report-dropdown">
+        <span class="title centered-title">Report Advertisement</span>
+        <ul class="radio-group-container">
             <% for (var k in data.badAdReasons) { %>
-                <input id="report-choice-radio" name="report-radio-group" type="radio">
-                <label for="report-choice-radio"><%= (data.badAdReasons[k] === null || typeof data.badAdReasons[k] === "undefined") ? "N/A" : data.badAdReasons[k] %></label>
+                <div class="radio-item-container">
+                    <input id="<%= k %>" class="report-choice-radio" name="bad-ad-reason" type="radio">
+                    <label for="<%= k %>"><%= (data.badAdReasons[k] === null || typeof data.badAdReasons[k] === "undefined") ? "N/A" : data.badAdReasons[k] %></label>
+                </div>
             <% } %>
         </ul>
     </div>
