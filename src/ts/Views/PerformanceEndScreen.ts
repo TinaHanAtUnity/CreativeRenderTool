@@ -36,15 +36,15 @@ export class PerformanceEndScreen extends EndScreen {
                 if (typeof this._canvas === 'undefined') {
                     const closeRegion = <HTMLElement>this._container.querySelector('.btn-close-region');
                     const closeIcon = <HTMLElement>this._container.querySelector('span.icon-close');
-                    this._createCanvas().then(() => {
+                    this.createCnavas().then(() => {
                         const canvas = this._canvas;
                         const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
 
                         const data = ctx.getImageData(closeRegion.offsetLeft + closeIcon.offsetLeft, closeRegion.offsetTop + closeIcon.offsetTop, closeIcon.offsetWidth, closeIcon.offsetHeight).data;
 
-                        this._calculateWeightedAverageColor(data).then(res => {
+                        this.calculateWeightedAverageColor(data).then(res => {
                             const {weightedR, weightedG, weightedB} = res;
-                            if (PerformanceEndScreen._isDark(weightedR, weightedG, weightedB)) {
+                            if (PerformanceEndScreen.isDark(weightedR, weightedG, weightedB)) {
                                 closeRegion.classList.add('light');
                             } else {
                                 closeRegion.classList.add('dark');
@@ -77,7 +77,7 @@ export class PerformanceEndScreen extends EndScreen {
         }));
     }
 
-    private _createCanvas(): Promise<void> {
+    private createCnavas(): Promise<void> {
         return new Promise((resolve) => {
             const backgroundImage = <HTMLElement>this._container.querySelector('.game-background-portrait');
 
@@ -182,7 +182,7 @@ export class PerformanceEndScreen extends EndScreen {
         });
     }
 
-    private _calculateWeightedAverageColor(data: Uint8ClampedArray): Promise<{ weightedR: number; weightedG: number; weightedB: number }> {
+    private calculateWeightedAverageColor(data: Uint8ClampedArray): Promise<{ weightedR: number; weightedG: number; weightedB: number }> {
         return new Promise((resolve) => {
             let totalR = 0;
             let totalG = 0;
@@ -222,11 +222,11 @@ export class PerformanceEndScreen extends EndScreen {
         });
     }
 
-    private static _isDark(r: number, g: number, b: number) {
-        return PerformanceEndScreen._getBrightness(r, g, b) < 128;
+    private static isDark(r: number, g: number, b: number) {
+        return PerformanceEndScreen.getBrightness(r, g, b) < 220;
     }
 
-    private static _getBrightness(r: number, g: number, b: number) {
+    private static getBrightness(r: number, g: number, b: number) {
         // http://www.w3.org/TR/AERT#color-contrast
         return (r * 299 + g * 587 + b * 114) / 1000;
     }
