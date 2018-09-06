@@ -1,6 +1,6 @@
 import { ApiPackage } from 'Core/Native/Bridge/NativeApi';
-import { NativeApiWithEventHandlers } from 'Core/Native/Bridge/NativeApiWithEventHandlers';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { EventedNativeApi } from 'Core/Native/Bridge/EventedNativeApi';
 
 enum AndroidVideoPlayerEvent {
     INFO
@@ -25,7 +25,7 @@ export interface IAndroidVideoEventHandler {
     onIllegalStateError(url: string, isPlaying: boolean): void;
 }
 
-export class AndroidVideoPlayerApi extends NativeApiWithEventHandlers<IAndroidVideoEventHandler> {
+export class AndroidVideoPlayerApi extends EventedNativeApi<IAndroidVideoEventHandler> {
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'VideoPlayer', ApiPackage.ADS);

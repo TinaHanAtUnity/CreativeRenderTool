@@ -1,6 +1,6 @@
 import { ApiPackage } from 'Core/Native/Bridge/NativeApi';
-import { NativeApiWithEventHandlers } from 'Core/Native/Bridge/NativeApiWithEventHandlers';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { EventedNativeApi } from 'Core/Native/Bridge/EventedNativeApi';
 
 export enum IosVideoPlayerEvent {
     LIKELY_TO_KEEP_UP,
@@ -17,7 +17,7 @@ export interface IIosVideoEventHandler {
     onGenericError(url: string, description: string): void;
 }
 
-export class IosVideoPlayerApi extends NativeApiWithEventHandlers<IIosVideoEventHandler> {
+export class IosVideoPlayerApi extends EventedNativeApi<IIosVideoEventHandler> {
 
     constructor(nativeBridge: NativeBridge) {
         super(nativeBridge, 'VideoPlayer', ApiPackage.ADS);

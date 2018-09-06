@@ -2,9 +2,9 @@ import { AndroidVideoPlayerApi } from 'Ads/Native/Android/AndroidVideoPlayer';
 import { IosVideoPlayerApi } from 'Ads/Native/iOS/IosVideoPlayer';
 import { Platform } from 'Core/Constants/Platform';
 import { ApiPackage } from 'Core/Native/Bridge/NativeApi';
-import { NativeApiWithEventHandlers } from 'Core/Native/Bridge/NativeApiWithEventHandlers';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Double } from 'Core/Utilities/Double';
+import { EventedNativeApi } from 'Core/Native/Bridge/EventedNativeApi';
 
 enum VideoPlayerEvent {
     PROGRESS,
@@ -28,7 +28,7 @@ export interface IVideoEventHandler {
     onStop(url: string): void;
 }
 
-export class VideoPlayerApi extends NativeApiWithEventHandlers<IVideoEventHandler> {
+export class VideoPlayerApi extends EventedNativeApi<IVideoEventHandler> {
 
     public Ios: IosVideoPlayerApi;
     public Android: AndroidVideoPlayerApi;

@@ -9,6 +9,7 @@ export enum ApiPackage {
 }
 
 export abstract class NativeApi {
+
     private static _apiPackageMapping = {
         [ApiPackage.CORE]: {android: 'com.unity3d.services.core.api', ios: 'USRVApi'},
         [ApiPackage.ADS]: {android: 'com.unity3d.services.ads.api', ios: 'UADSApi'},
@@ -21,7 +22,7 @@ export abstract class NativeApi {
     protected _apiPackage: ApiPackage;
     protected _fullApiClassName: string;
 
-    constructor(nativeBridge: NativeBridge, apiClass: string, apiPackage: ApiPackage) {
+    protected constructor(nativeBridge: NativeBridge, apiClass: string, apiPackage: ApiPackage) {
         this._nativeBridge = nativeBridge;
         this._apiClass = apiClass;
         this._apiPackage = apiPackage;

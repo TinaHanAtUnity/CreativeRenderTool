@@ -1,10 +1,11 @@
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
-export abstract class NativeApiWithEventHandlers<T extends object> extends NativeApi {
+export abstract class EventedNativeApi<T extends object> extends NativeApi {
+
     protected _handlers: T[] = [];
 
-    constructor(nativeBridge: NativeBridge, apiClass: string, apiPackage: ApiPackage) {
+    protected constructor(nativeBridge: NativeBridge, apiClass: string, apiPackage: ApiPackage) {
         super(nativeBridge, apiClass, apiPackage);
     }
 
@@ -22,4 +23,5 @@ export abstract class NativeApiWithEventHandlers<T extends object> extends Nativ
             }
         }
     }
+
 }
