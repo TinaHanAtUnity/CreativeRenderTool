@@ -80,7 +80,9 @@ export class VPAIDEndScreen extends View<IVPAIDEndScreenHandler> {
     }
 
     public remove(): void {
-        document.body.removeChild(this.container());
+        if (document.body.querySelector('#end-screen')) {
+            document.body.removeChild(this.container());
+        }
     }
 
     private onCloseEvent(event: Event): void {

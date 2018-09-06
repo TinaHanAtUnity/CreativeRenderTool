@@ -277,7 +277,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
         this._view.mute();
         this._view.hide();
         this._closer.hide();
-        if (this._endScreen && document.body.querySelector('#end-screen')) {
+        if (this._endScreen) {
             this._endScreen.remove();
         }
     }
