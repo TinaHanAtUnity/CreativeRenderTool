@@ -1,21 +1,21 @@
-import 'mocha';
-import * as sinon from 'sinon';
+import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
+import { AuctionResponse } from 'Ads/Models/AuctionResponse';
+import { Session } from 'Ads/Models/Session';
 import { assert } from 'chai';
-import { CometCampaignParser } from 'Parsers/CometCampaignParser';
-import { NativeBridge } from 'Native/NativeBridge';
-import { Session } from 'Models/Session';
-import { SdkApi } from 'Native/Api/Sdk';
-import { Request } from 'Utilities/Request';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
-import { AdUnitStyle } from 'Models/AdUnitStyle';
-import { PerformanceCampaign, StoreName } from 'Models/Campaigns/PerformanceCampaign';
-import { AuctionResponse } from 'Models/AuctionResponse';
-import { Url } from 'Utilities/Url';
-import { Diagnostics } from 'Utilities/Diagnostics';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { SdkApi } from 'Core/Native/Sdk';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { Request } from 'Core/Utilities/Request';
+import { Url } from 'Core/Utilities/Url';
 
 import OnCometMraidPlcCampaign from 'json/campaigns/performance/CometMraidUrlCampaign.json';
 import OnCometVideoPlcCampaign from 'json/campaigns/performance/CometVideoCampaign.json';
+import 'mocha';
+import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { PerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCampaign';
+import { CometCampaignParser } from 'Performance/Parsers/CometCampaignParser';
+import * as sinon from 'sinon';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('CometCampaignParser', () => {
     const placements = ['TestPlacement'];

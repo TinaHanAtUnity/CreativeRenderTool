@@ -1,5 +1,5 @@
-import { Campaign } from 'Models/Campaign';
-import { Diagnostics } from 'Utilities/Diagnostics';
+import { Campaign } from 'Ads/Models/Campaign';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 export enum BadAdReason {
     BLACK_SCREEN = 'Showing only a black screen',

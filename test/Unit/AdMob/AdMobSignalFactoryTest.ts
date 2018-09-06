@@ -1,15 +1,14 @@
-import 'mocha';
+import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { assert } from 'chai';
-
-import { AdMobSignalFactory } from 'AdMob/AdMobSignalFactory';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { ClientInfo } from 'Models/ClientInfo';
-import { FocusManager } from 'Managers/FocusManager';
-import { NativeBridge } from 'Native/NativeBridge';
-import { unity_proto } from '../../../src/proto/unity_proto.js';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import 'mocha';
 import * as protobuf from 'protobufjs/minimal';
-import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
-import { MetaDataManager } from 'Managers/MetaDataManager';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { unity_proto } from '../../../src/proto/unity_proto.js';
 
 describe('AdMobSignalFactoryTest', () => {
     xit('basic test', () => {

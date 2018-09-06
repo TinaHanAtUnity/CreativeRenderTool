@@ -1,8 +1,8 @@
-import { BatteryStatus } from 'Constants/Android/BatteryStatus';
-import { RingerMode } from 'Constants/Android/RingerMode';
-import { Platform } from 'Constants/Platform';
-import { NativeBridge } from 'Native/NativeBridge';
-import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
+import { BatteryStatus } from 'Core/Constants/Android/BatteryStatus';
+import { RingerMode } from 'Core/Constants/Android/RingerMode';
+import { Platform } from 'Core/Constants/Platform';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 import AndroidDefaults from 'json/FakeAndroidDeviceInfo.json';
 

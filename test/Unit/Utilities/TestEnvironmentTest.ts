@@ -1,10 +1,10 @@
-import 'mocha';
-import * as sinon from 'sinon';
 import { assert } from 'chai';
 
-import { MetaData } from 'Utilities/MetaData';
+import { MetaData } from 'Core/Utilities/MetaData';
+import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
+import 'mocha';
+import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { TestEnvironment } from 'Utilities/TestEnvironment';
 
 describe('MetaDataTest', () => {
     let metaData: MetaData;

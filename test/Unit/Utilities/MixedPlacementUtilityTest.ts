@@ -1,16 +1,16 @@
-import 'mocha';
+import { Placement } from 'Ads/Models/Placement';
+import { MixedPlacementUtility } from 'Ads/Utilities/MixedPlacementUtility';
 import { assert } from 'chai';
-import { MixedPlacementUtility } from 'Utilities/MixedPlacementUtility';
-import { Configuration } from 'Models/Configuration';
-import { ConfigurationParser } from 'Parsers/ConfigurationParser';
-import MixedPlacementAuctionResponse from 'json/MixedPlacementAuctionResponse.json';
+import { Platform } from 'Core/Constants/Platform';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { Configuration } from 'Core/Models/Configuration';
+import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
+import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
+import MixedPlacementAuctionResponse from 'json/MixedPlacementAuctionResponse.json';
+import 'mocha';
+import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
-import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
-import { ClientInfo } from 'Models/ClientInfo';
-import { Platform } from 'Constants/Platform';
-import { Placement } from 'Models/Placement';
 
 describe('MixedPlacementUtilities', () => {
 

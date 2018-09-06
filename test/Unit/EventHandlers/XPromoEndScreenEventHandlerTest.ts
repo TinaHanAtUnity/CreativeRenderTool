@@ -1,35 +1,35 @@
+import { Activity } from 'Ads/AdUnits/Containers/Activity';
+import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { ViewController } from 'Ads/AdUnits/Containers/ViewController';
+
+import { IEndScreenDownloadParameters } from 'Ads/EventHandlers/EndScreenEventHandler';
+import { GdprManager } from 'Ads/Managers/GdprManager';
+import { IOperativeEventParams } from 'Ads/Managers/OperativeEventManager';
+import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
+import { SessionManager } from 'Ads/Managers/SessionManager';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { Video } from 'Ads/Models/Assets/Video';
+import { Placement } from 'Ads/Models/Placement';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { IEndScreenParameters } from 'Ads/Views/EndScreen';
+import { Overlay } from 'Ads/Views/Overlay';
+import { Privacy } from 'Ads/Views/Privacy';
+import { Platform } from 'Core/Constants/Platform';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { INativeResponse, Request } from 'Core/Utilities/Request';
 import 'mocha';
 import * as sinon from 'sinon';
-
-import { IEndScreenDownloadParameters } from 'EventHandlers/EndScreenEventHandler';
-import { NativeBridge } from 'Native/NativeBridge';
-import { Overlay } from 'Views/Overlay';
-import { SessionManager } from 'Managers/SessionManager';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { DeviceInfo } from 'Models/DeviceInfo';
-import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { Request, INativeResponse } from 'Utilities/Request';
-import { WakeUpManager } from 'Managers/WakeUpManager';
-import { Platform } from 'Constants/Platform';
-import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
-import { Activity } from 'AdUnits/Containers/Activity';
-import { ViewController } from 'AdUnits/Containers/ViewController';
-import { XPromoCampaign, StoreName } from 'Models/Campaigns/XPromoCampaign';
-import { MetaDataManager } from 'Managers/MetaDataManager';
-import { Video } from 'Models/Assets/Video';
-import { FocusManager } from 'Managers/FocusManager';
-import { ClientInfo } from 'Models/ClientInfo';
-import { XPromoEndScreen } from 'Views/XPromoEndScreen';
-import { Placement } from 'Models/Placement';
-import { XPromoEndScreenEventHandler } from 'EventHandlers/XPromoEndScreenEventHandler';
-import { IXPromoAdUnitParameters, XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
-import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
-import { XPromoOperativeEventManager } from 'Managers/XPromoOperativeEventManager';
-import { Privacy } from 'Views/Privacy';
-import { GdprManager } from 'Managers/GdprManager';
-import { IOperativeEventParams } from 'Managers/OperativeEventManager';
-import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
-import { IEndScreenParameters } from 'Views/EndScreen';
+import { IXPromoAdUnitParameters, XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
+import { XPromoEndScreenEventHandler } from 'XPromo/EventHandlers/XPromoEndScreenEventHandler';
+import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
+import { StoreName, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
 
 describe('XPromoEndScreenEventHandlerTest', () => {
 
