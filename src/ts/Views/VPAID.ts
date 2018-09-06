@@ -134,10 +134,16 @@ export class VPAID extends View<IVPAIDHandler> {
                     bitrate: 500,
                     viewMode: 'normal',
                     creativeData: {
-                        AdParameters: this._campaign.getVPAID().getCreativeParameters()
+                        AdParameters: this.decodeHTMLEntityChars(this._campaign.getVPAID().getCreativeParameters())
                     }
                 };
             });
+    }
+
+    private decodeHTMLEntityChars(data: string): string {
+        const textArea = document.createElement('textarea');
+        textArea.innerHTML = data;
+        return textArea.value;
     }
 
     private sendEvent(event: string, parameters?: any[]): Promise<void> {
