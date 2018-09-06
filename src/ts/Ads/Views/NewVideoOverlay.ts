@@ -1,10 +1,10 @@
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
-
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Localization } from 'Core/Utilities/Localization';
 import { Template } from 'Core/Utilities/Template';
+
 import NewVideoOverlayTemplate from 'html/NewVideoOverlay.html';
 
 export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHandler {
@@ -15,13 +15,13 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _skipEnabled: boolean;
 
     private _videoDurationEnabled: boolean = false;
-    private _videoProgress: number;
+    protected _videoProgress: number;
 
     private _muteEnabled: boolean = false;
 
     private _debugMessageVisible: boolean = false;
     private _callButtonVisible: boolean = false;
-    private _callButtonEnabled: boolean = true;
+    protected _callButtonEnabled: boolean = true;
 
     private _skipButtonElement: HTMLElement;
     private _spinnerElement: HTMLElement;
@@ -292,7 +292,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._handlers.forEach(handler => handler.onOverlayMute(this._muted));
     }
 
-    private onCallButtonEvent(event: Event): void {
+    protected onCallButtonEvent(event: Event): void {
         if (!this._callButtonEnabled) {
             return;
         }

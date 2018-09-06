@@ -45,6 +45,7 @@ import { PlayableMRAID } from 'MRAID/Views/PlayableMRAID';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { PerformanceEndScreenEventHandler } from 'Performance/EventHandlers/PerformanceEndScreenEventHandler';
 import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/PerformanceOverlayEventHandler';
+import { PerformanceOverlayEventHandlerWithCTAButton } from 'Performance/EventHandlers/PerformanceOverlayWithCTAButtonEventHandler';
 import { PerformanceVideoEventHandler } from 'Performance/EventHandlers/PerformanceVideoEventHandler';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
@@ -73,6 +74,8 @@ import { XPromoVideoEventHandler } from 'XPromo/EventHandlers/XPromoVideoEventHa
 import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
+import { PerformanceVideoOverlayCTAButtonTest } from 'Core/Models/ABGroup';
+import { PerformanceVideoOverlayWithCTAButton } from 'Ads/Views/PerformanceVideoOverlayWithCTAButton';
 
 export class AdUnitFactory {
     private static _forcedPlayableMRAID: boolean = false;
@@ -143,7 +146,15 @@ export class AdUnitFactory {
         };
 
         const performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
-        const performanceOverlayEventHandler = new PerformanceOverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
+
+        let performanceOverlayEventHandler;
+        // TODO: Or check the overlay type?
+        if (PerformanceVideoOverlayCTAButtonTest.isValid(parameters.coreConfig.getAbGroup())) {
+            performanceOverlayEventHandler = new PerformanceOverlayEventHandlerWithCTAButton(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
+        } else {
+            performanceOverlayEventHandler = new PerformanceOverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
+        }
+
         overlay.addEventHandler(performanceOverlayEventHandler);
         const endScreenEventHandler = new PerformanceEndScreenEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
         endScreen.addEventHandler(endScreenEventHandler);
@@ -513,6 +524,8 @@ export class AdUnitFactory {
 
         if (parameters.placement.allowSkip() && parameters.placement.skipEndCardOnClose()) {
             overlay = new ClosableVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
+        } else if (parameters.campaign instanceof PerformanceCampaign && PerformanceVideoOverlayCTAButtonTest.isValid(parameters.configuration.getAbGroup())) {
+            overlay = new PerformanceVideoOverlayWithCTAButton(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, parameters.campaign, disablePrivacyDuringVideo);
         } else {
             overlay = new NewVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, showPrivacyDuringVideo, parameters.campaign.getSeatId());
         }
