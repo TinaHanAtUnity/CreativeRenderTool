@@ -1,10 +1,11 @@
 import { GdprManager } from 'Ads/Managers/GdprManager';
+import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Template } from 'Core/Utilities/Template';
-
 import GDPRPrivacyTemplate from 'html/GDPR-privacy.html';
+import { BadAdsReporting } from 'Test/Unit/Utilities/BadAdsReporting';
 
 export class GDPRPrivacy extends AbstractPrivacy {
 
@@ -14,13 +15,15 @@ export class GDPRPrivacy extends AbstractPrivacy {
     private _personalInfoObtained: boolean = false;
     private _dataDeletionConfirmation: boolean = false;
     private _currentState : number = -1;
+    private _campaign: Campaign;
 
-    constructor(nativeBridge: NativeBridge, gdprManager: GdprManager, isCoppaCompliant: boolean, optOutEnabled: boolean) {
+    constructor(nativeBridge: NativeBridge, campaign: Campaign, gdprManager: GdprManager, isCoppaCompliant: boolean, optOutEnabled: boolean) {
         super(nativeBridge, isCoppaCompliant, 'gdpr-privacy');
 
         this._template = new Template(GDPRPrivacyTemplate);
         this._gdprManager = gdprManager;
         this._isCoppaCompliant = isCoppaCompliant;
+        this._campaign = campaign;
 
         this._optOutEnabled = optOutEnabled;
 
@@ -57,7 +60,7 @@ export class GDPRPrivacy extends AbstractPrivacy {
             },
             {
                 event: 'click',
-                listener: (event: Event) => this.onReportAd(event),
+                listener: (event: Event) => this.onReportAd(),
                 selector: '.report-button'
             }
         ];
@@ -158,52 +161,72 @@ export class GDPRPrivacy extends AbstractPrivacy {
         this.setCardState(isLeftClick);
     }
 
-    private onReportAd(event: Event): void {
-        // Do stuff
+    private onReportAd(): void {
+        BadAdsReporting.onUserReport(this._campaign, 0);
     }
 
     // State 0: Privacy info - Left: Build info - Middle: Report Ad
     // State 1: Build info - Left: Privacy info - Middle: Report Ad
     // State 2: Report Ad - Left: Privacy info - Middle: Build info
-    private setCardState(leftClick: boolean) {
+    private setCardState(isLeftClick: boolean) {
 
         const leftEl = <HTMLDivElement>this._container.querySelector('.left-side-link');
         const middleEl = <HTMLDivElement>this._container.querySelector('.middle-link');
         const classList = this._container.classList;
+        const rCard = 'Report Ad ⚑';
+        const pCard = 'Privacy info';
+        const bCard = 'Build info';
 
         switch(this._currentState) {
 
             // Privacy info showing
             case 0: {
-                this._currentState = leftClick ? 1 : 2;
-                leftEl.innerText = 'Privacy info';
-                middleEl.innerText = leftClick ? 'Report Ad ⚑': 'Build info';
-                leftClick ? classList.add('build') : classList.add('report');
+                leftEl.innerText = pCard;
+                if (isLeftClick) {
+                    this._currentState = 1;
+                    middleEl.innerText = rCard;
+                    classList.add('build');
+                } else {
+                    this._currentState = 2;
+                    middleEl.innerText = bCard;
+                    classList.add('report');
+                }
                 break;
             }
             // Build info showing
             case 1: {
                 classList.remove('build');
-                this._currentState = leftClick ? 0 : 2;
-                leftEl.innerText = leftClick ? 'Build info' : 'Privacy info';
-                middleEl.innerText = leftClick ? 'Report Ad ⚑': 'Build info';
-                if (!leftClick) { classList.add('report'); }
+                if (isLeftClick) {
+                    this._currentState = 0;
+                    leftEl.innerText = bCard;
+                    middleEl.innerText = rCard;
+                } else {
+                    this._currentState = 2;
+                    leftEl.innerText = pCard;
+                    middleEl.innerText = bCard;
+                    classList.add('report');
+                }
                 break;
             }
             // Report Ad showing
             case 2: {
                 classList.remove('report');
-                this._currentState = leftClick ? 0 : 1;
-                leftEl.innerText = leftClick ? 'Build info' : 'Privacy info';
-                middleEl.innerText = 'Report Ad ⚑';
-                if (!leftClick) { classList.add('build'); }
+                middleEl.innerText = rCard;
+                if (isLeftClick) {
+                    this._currentState = 0;
+                    leftEl.innerText = bCard;
+                } else {
+                    this._currentState = 1;
+                    leftEl.innerText = pCard;
+                    classList.add('build');
+                }
                 break;
             }
             // For initial configuration
             default: {
                 this._currentState = 0;
-                leftEl.innerText = 'Build info';
-                middleEl.innerText = 'Report Ad ⚑';
+                leftEl.innerText = bCard;
+                middleEl.innerText = rCard;
             }
         }
     }

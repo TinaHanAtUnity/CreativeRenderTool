@@ -14,6 +14,7 @@ import { MRAID } from 'MRAID/Views/MRAID';
 
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { Campaign } from 'Ads/Models/Campaign';
 
 describe('MRAID', () => {
     let handleInvocation: sinon.SinonSpy;
@@ -23,6 +24,7 @@ describe('MRAID', () => {
     let configuration: Configuration;
     let privacy: GDPRPrivacy;
     let gdprManager: GdprManager;
+    let fakeCampaign: Campaign;
 
     beforeEach(() => {
         handleInvocation = sinon.spy();
@@ -45,7 +47,8 @@ describe('MRAID', () => {
 
         configuration = TestFixtures.getConfiguration();
         gdprManager = sinon.createStubInstance(GdprManager);
-        privacy = new GDPRPrivacy(nativeBridge, gdprManager, true, true);
+        fakeCampaign = sinon.createStubInstance(Campaign);
+        privacy = new GDPRPrivacy(nativeBridge, fakeCampaign, gdprManager, true, true);
     });
 
     it('should render', (done) => {

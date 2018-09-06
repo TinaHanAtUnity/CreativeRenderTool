@@ -98,7 +98,7 @@ describe('MRAIDEventHandlersTest', () => {
                 options: {},
                 mraid: mraidView,
                 endScreen: undefined,
-                privacy: new GDPRPrivacy(nativeBridge, gdprManager, false, true),
+                privacy: new GDPRPrivacy(nativeBridge, playableMraidCampaign, gdprManager, false, true),
                 gdprManager: gdprManager,
                 programmaticTrackingService: programmaticTrackingService
             };
@@ -285,7 +285,6 @@ describe('MRAIDEventHandlersTest', () => {
             sinon.stub(request, 'followRedirectChain').resolves();
             placement = TestFixtures.getPlacement();
             gdprManager = sinon.createStubInstance(GdprManager);
-            privacy = new GDPRPrivacy(nativeBridge, gdprManager, false, true);
 
             clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
             deviceInfo = TestFixtures.getAndroidDeviceInfo();
@@ -293,6 +292,8 @@ describe('MRAIDEventHandlersTest', () => {
             sessionManager = new SessionManager(nativeBridge, request);
             configuration = TestFixtures.getConfiguration();
             programmaticMraidCampaign = TestFixtures.getProgrammaticMRAIDCampaign();
+            privacy = new GDPRPrivacy(nativeBridge, programmaticMraidCampaign, gdprManager, false, true);
+
             mraidView = new MRAID(nativeBridge, placement, programmaticMraidCampaign, privacy, true, configuration.getAbGroup());
 
             operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
@@ -321,7 +322,7 @@ describe('MRAIDEventHandlersTest', () => {
                 options: {},
                 mraid: mraidView,
                 endScreen: undefined,
-                privacy: new GDPRPrivacy(nativeBridge, gdprManager, false, true),
+                privacy: new GDPRPrivacy(nativeBridge, programmaticMraidCampaign, gdprManager, false, true),
                 gdprManager: gdprManager,
                 programmaticTrackingService: programmaticTrackingService
             };
