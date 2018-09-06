@@ -23,21 +23,21 @@
     "protobufjs": "6.8.8",
     "puppeteer": "1.7.0",
     "remap-istanbul": "0.11.1",
-    "rollup": "0.65.0",
+    "rollup": "0.65.2",
     "rollup-plugin-alias": "1.4.0",
     "rollup-plugin-commonjs": "9.1.6",
     "rollup-plugin-html": "0.2.1",
     "rollup-plugin-includepaths": "0.2.3",
     "rollup-plugin-istanbul": "2.0.1",
-    "rollup-plugin-node-resolve": "3.3.0",
+    "rollup-plugin-node-resolve": "3.4.0",
     "rollup-plugin-sourcemaps": "0.4.2",
     "rollup-plugin-string": "2.0.2",
-    "sinon": "6.1.5",
+    "sinon": "6.2.0",
     "stylint": "1.5.9",
     "stylus": "0.54.5",
     "tslib": "1.9.3",
     "tslint": "5.11.0",
     "tslint-microsoft-contrib": "5.2.1",
-    "typescript": "3.0.1"
+    "typescript": "3.0.3"
   }
 }
