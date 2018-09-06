@@ -43,6 +43,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     private _gdprPopupClicked: boolean = false;
     private _showGDPRBanner: boolean = false;
     private _disablePrivacyDuringVideo: boolean | undefined;
+    private _gameId: string;
 
     constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, disablePrivacyDuringVideo?: boolean) {
         super(nativeBridge, 'overlay', muted);
@@ -51,6 +52,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
         this._privacy = privacy;
         this._showGDPRBanner = showGDPRBanner;
         this._disablePrivacyDuringVideo = disablePrivacyDuringVideo;
+        this._gameId = gameId;
 
         this._templateData = {
             muted
@@ -133,7 +135,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
         this._privacyButtonElement = <HTMLElement>this._container.querySelector('.privacy-button');
         this.choosePrivacyShown();
 
-        if(CustomFeatures.isCloseIconSkipApp('')) {
+        if(CustomFeatures.isCloseIconSkipApp(this._gameId)) {
             const skipIconElement = <HTMLElement>this._container.querySelector('.skip');
             skipIconElement.classList.add('close-icon-skip');
         }
