@@ -29,7 +29,8 @@
     display: none;
   }
 
-  #data-deletion-container {
+  #data-deletion-container,
+  #report-confirmed-text {
     padding: $default-size * $default-scale-size * .75 0;
     .page-link {
       pointer-events: none;
@@ -42,7 +43,8 @@
   }
 
   #data-deletion-container,
-  #data-deletion-request-container {
+  #data-deletion-request-container,
+  #report-confirmed-text {
     display: block;
     text-align: center;
     opacity: 0;
@@ -69,9 +71,36 @@
   }
 
   &.report {
+    .report-title {
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+
     .report-side {
       display: block;
       word-wrap: break-word;
+    }
+
+    .report-container {
+      .report-button {
+        float: right;
+        display: inline-block;
+        margin: .5rem;
+        margin-bottom: 1.5rem;
+        padding: .75rem 1.5rem;
+        border-radius: .25rem;
+        background: $privacy-green;
+        color: $white;
+        font-size: .8125rem;
+      }
+
+      .report-confirmed-text {
+        font-size: $default-size * $default-font-size * .75;
+        width: 50%;
+        text-align: center;
+        margin-bottom: 1.5rem;
+      }
     }
 
     .pop-up-content:not(.report-side) {

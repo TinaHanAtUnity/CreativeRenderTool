@@ -99,7 +99,8 @@
         <% } %>
     </div>
     <div class="pop-up-content report-side">
-        <span class="title centered-title">Report Advertisement</span>
+        <span class="report-title centered-title">Report Advertisement</span>
+        <span class="report-dialog">The Advertisement attempting to be shown is...</span>
         <ul class="radio-group-container">
             <% for (var k in data.badAdReasons) { %>
                 <div class="radio-item-container">
@@ -108,7 +109,11 @@
                 </div>
             <% } %>
         </ul>
-    </div>
+        <div class="report-container">
+            <div class="report-button">Report</div>
+            <div class="report-confirmed-text">Thank you for taking the time to improve Unity Ads. Your Ad experience will close shortly.</div>
+        </div>
+        </div>
     <div class="fade-out-gradient-separator"></div>
     <div class="pop-up-footer">
         <div class="left-side-link"></div>

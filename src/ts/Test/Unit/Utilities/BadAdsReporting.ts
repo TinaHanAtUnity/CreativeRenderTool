@@ -2,11 +2,13 @@ import { Campaign } from 'Models/Campaign';
 import { Diagnostics } from 'Utilities/Diagnostics';
 
 export enum BadAdReason {
-    BLACK_SCREEN = 'Adverstisement is showing a black screen',
-    SOUND_NOT_MUTED = 'Advertisement was not muted when it should have been',
-    OFFENSIVE = 'Advertisement was offensive',
-    VIDEO_NOT_REWARDING = 'Advertisement was watched, but a reward was not granted',
-    OTHER = 'Other'
+    BLACK_SCREEN = 'Showing only a black screen',
+    BLACK_SCREEN_PARTIAL = 'Showing a mostly black screen with some surrounding pictures',
+    SOUND_NOT_MUTED = 'Not respecting my device\'s mute status',
+    OFFENSIVE = 'Very offensive to me',
+    VIDEO_NOT_REWARDING = 'Not rewarding me after I watch it',
+    DISLIKE_ADS = 'Annoying because I dislike ads',
+    OTHER = 'Being reported for a different reason than the options above'
 }
 
 export class BadAdsReporting {

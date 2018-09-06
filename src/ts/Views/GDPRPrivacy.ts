@@ -54,6 +54,11 @@ export class GDPRPrivacy extends AbstractPrivacy {
                 event: 'click',
                 listener: (event: Event) => this.onStateClick(event, false),
                 selector: '.middle-link'
+            },
+            {
+                event: 'click',
+                listener: (event: Event) => this.onReportAd(event),
+                selector: '.report-button'
             }
         ];
     }
@@ -148,9 +153,13 @@ export class GDPRPrivacy extends AbstractPrivacy {
         }
     }
 
-    private onStateClick(event: Event, leftClick: boolean): void {
+    private onStateClick(event: Event, isLeftClick: boolean): void {
         event.preventDefault();
-        this.setCardState(leftClick);
+        this.setCardState(isLeftClick);
+    }
+
+    private onReportAd(event: Event): void {
+        // Do stuff
     }
 
     // State 0: Privacy info - Left: Build info - Middle: Report Ad
