@@ -1,38 +1,37 @@
+import { Activity } from 'Ads/AdUnits/Containers/Activity';
+import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { VideoState } from 'Ads/AdUnits/VideoAdUnit';
+import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
+import { GdprManager } from 'Ads/Managers/GdprManager';
+import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
+import { SessionManager } from 'Ads/Managers/SessionManager';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { Placement } from 'Ads/Models/Placement';
+import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
+import { MOAT } from 'Ads/Views/MOAT';
+import { Overlay } from 'Ads/Views/Overlay';
+import { Privacy } from 'Ads/Views/Privacy';
+import { assert } from 'chai';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Request } from 'Core/Utilities/Request';
 import 'mocha';
 import * as sinon from 'sinon';
-import { assert } from 'chai';
-
-import { VastVideoEventHandler } from 'EventHandlers/VastVideoEventHandler';
-import { NativeBridge } from 'Native/NativeBridge';
-import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { SessionManager } from 'Managers/SessionManager';
-import { VastCampaign } from 'Models/Vast/VastCampaign';
-import { Placement } from 'Models/Placement';
-import { ClientInfo } from 'Models/ClientInfo';
-import { DeviceInfo } from 'Models/DeviceInfo';
-import { Request } from 'Utilities/Request';
-import { IVastAdUnitParameters, VastAdUnit } from 'AdUnits/VastAdUnit';
-import { WakeUpManager } from 'Managers/WakeUpManager';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Overlay } from 'Views/Overlay';
-import { VastEndScreen } from 'Views/VastEndScreen';
-import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
-import { Activity } from 'AdUnits/Containers/Activity';
-import { MetaDataManager } from 'Managers/MetaDataManager';
-import { FocusManager } from 'Managers/FocusManager';
-import { MOAT } from 'Views/MOAT';
-import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
-import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
-import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
-import { IVideoEventHandlerParams } from 'EventHandlers/BaseVideoEventHandler';
-import { Vast } from 'Models/Vast/Vast';
-import { VideoState } from 'AdUnits/VideoAdUnit';
-import { GdprManager } from 'Managers/GdprManager';
-import { AbstractPrivacy } from 'Views/AbstractPrivacy';
-import { Privacy } from 'Views/Privacy';
+import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
+
+import { VastVideoEventHandler } from 'VAST/EventHandlers/VastVideoEventHandler';
+import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { VastEndScreen } from 'VAST/Views/VastEndScreen';
 
 import EventTestVast from 'xml/EventTestVast.xml';
-import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 describe('VastVideoEventHandler tests', () => {
     const handleInvocation = sinon.spy();

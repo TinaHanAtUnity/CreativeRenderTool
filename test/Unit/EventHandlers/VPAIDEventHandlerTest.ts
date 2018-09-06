@@ -1,31 +1,31 @@
+import { Activity } from 'Ads/AdUnits/Containers/Activity';
+import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { GdprManager } from 'Ads/Managers/GdprManager';
+import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { Closer } from 'Ads/Views/Closer';
+import { Privacy } from 'Ads/Views/Privacy';
+import { FinishState } from 'Core/Constants/FinishState';
+import { Platform } from 'Core/Constants/Platform';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { Configuration } from 'Core/Models/Configuration';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { IntentApi } from 'Core/Native/Android/Intent';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
+import { SdkApi } from 'Core/Native/Sdk';
+import { Request } from 'Core/Utilities/Request';
 import 'mocha';
 import * as sinon from 'sinon';
-
-import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'AdUnits/VPAIDAdUnit';
-import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
-import { VPAID } from 'Views/VPAID';
-import { NativeBridge } from 'Native/NativeBridge';
-import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
-import { Activity } from 'AdUnits/Containers/Activity';
-import { Platform } from 'Constants/Platform';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { FocusManager } from 'Managers/FocusManager';
-import { Request } from 'Utilities/Request';
-import { VPAIDEventHandler } from 'EventHandlers/VPAIDEventHandler';
-import { FinishState } from 'Constants/FinishState';
-import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
-import { DeviceInfo } from 'Models/DeviceInfo';
-import { ClientInfo } from 'Models/ClientInfo';
-import { Configuration } from 'Models/Configuration';
-import { UrlSchemeApi } from 'Native/Api/UrlScheme';
-import { IntentApi } from 'Native/Api/Intent';
-import { SdkApi } from 'Native/Api/Sdk';
-import { Closer } from 'Views/Closer';
-import { GdprManager } from 'Managers/GdprManager';
-import { Privacy } from 'Views/Privacy';
-import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+
+import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'VPAID/AdUnits/VPAIDAdUnit';
+import { VPAIDEventHandler } from 'VPAID/EventHandlers/VPAIDEventHandler';
+import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
+import { VPAID } from 'VPAID/Views/VPAID';
+import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
 
 describe('VPAIDEventHandlerTest', () => {
     let eventHandler: VPAIDEventHandler;

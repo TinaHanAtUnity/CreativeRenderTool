@@ -1,13 +1,13 @@
-import 'mocha';
 import { assert } from 'chai';
 
-import { VastCampaign } from 'Models/Vast/VastCampaign';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { PerformanceCampaign, StoreName } from 'Models/Campaigns/PerformanceCampaign';
-
 import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
-import SimpleVast from 'xml/SimpleVast.xml';
+import 'mocha';
+import { PerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCampaign';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
+
+import { VastCampaign } from 'VAST/Models/VastCampaign';
 import CacheSimpleVast from 'xml/CacheSimpleVast.xml';
+import SimpleVast from 'xml/SimpleVast.xml';
 
 describe('PerformanceCampaign', () => {
 
