@@ -1,10 +1,10 @@
+import { assert } from 'chai';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { ResolveApi } from 'Core/Native/Resolve';
+
+import { Resolve } from 'Core/Utilities/Resolve';
 import 'mocha';
 import * as sinon from 'sinon';
-import { assert } from 'chai';
-
-import { Resolve } from 'Utilities/Resolve';
-import { NativeBridge } from 'Native/NativeBridge';
-import { ResolveApi } from 'Native/Api/Resolve';
 
 class TestResolveApi extends ResolveApi {
 

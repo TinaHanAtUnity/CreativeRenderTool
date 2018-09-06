@@ -1,16 +1,16 @@
+import { assert } from 'chai';
+import { StreamType } from 'Core/Constants/Android/StreamType';
+import { EventCategory } from 'Core/Constants/EventCategory';
+import { Platform } from 'Core/Constants/Platform';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
+
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { DeviceInfoApi } from 'Core/Native/DeviceInfo';
+import { DeviceInfoEvent } from 'Core/Native/DeviceInfoEvent';
 import 'mocha';
 import * as sinon from 'sinon';
-import { assert } from 'chai';
-
-import { NativeBridge } from 'Native/NativeBridge';
-import { Platform } from 'Constants/Platform';
-import { EventCategory } from 'Constants/EventCategory';
-import { DeviceInfoApi } from 'Native/Api/DeviceInfo';
-import { StreamType } from 'Constants/Android/StreamType';
-import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
-import { IosDeviceInfo } from 'Models/IosDeviceInfo';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { DeviceInfoEvent } from 'Native/Api/DeviceInfoEvent';
 
 describe('DeviceInfoTest', () => {
 

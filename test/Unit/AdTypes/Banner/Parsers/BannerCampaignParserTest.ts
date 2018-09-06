@@ -1,16 +1,16 @@
-import 'mocha';
-import * as sinon from 'sinon';
+import { AuctionResponse } from 'Ads/Models/AuctionResponse';
+import { Session } from 'Ads/Models/Session';
+import { BannerCampaign } from 'Banners/Models/BannerCampaign';
+import { BannerCampaignParser } from 'Banners/Parsers/BannerCampaignParser';
 import { assert } from 'chai';
-import { BannerCampaignParser } from 'AdTypes/Banner/Parsers/BannerCampaignParser';
-import { NativeBridge } from 'Native/NativeBridge';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Session } from 'Models/Session';
-import { AuctionResponse } from 'Models/AuctionResponse';
-import { BannerCampaign } from 'AdTypes/Banner/Models/Campaigns/BannerCampaign';
-import { Request } from 'Utilities/Request';
+import { ABGroupBuilder } from 'Core/Models/ABGroup';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Request } from 'Core/Utilities/Request';
 
 import BannerCampaignJSON from 'json/campaigns/banner/ValidBannerCampaign.json';
-import { ABGroupBuilder } from 'Models/ABGroup';
+import 'mocha';
+import * as sinon from 'sinon';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('BannerCampaignParser', () => {
     const placements = ['TestPlacement'];

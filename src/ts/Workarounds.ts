@@ -1,4 +1,4 @@
-import { DOMUtils } from 'Utilities/DOMUtils';
+import { DOMUtils } from 'Core/Utilities/DOMUtils';
 
 // In certain versions of Android, we found that DOMParser might not support
 // parsing text/html mime types.

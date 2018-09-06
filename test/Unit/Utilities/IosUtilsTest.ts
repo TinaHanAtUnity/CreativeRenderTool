@@ -1,7 +1,6 @@
-import 'mocha';
+import { IosUtils } from 'Ads/Utilities/IosUtils';
 import { assert } from 'chai';
-
-import { IosUtils } from 'Utilities/IosUtils';
+import 'mocha';
 
 describe('IosUtilsTest', () => {
     it('isAppSheetBroken should return true with strings 8.0, 8.1, 8.2 and 8.3', () => {

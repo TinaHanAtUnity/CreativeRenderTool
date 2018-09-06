@@ -1,21 +1,21 @@
-import 'mocha';
-import { assert } from 'chai';
-import * as sinon from 'sinon';
+import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 
-import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
-import { NativeBridge } from 'Native/NativeBridge';
-import { Platform } from 'Constants/Platform';
-import { Request } from 'Utilities/Request';
-import { MetaDataManager } from 'Managers/MetaDataManager';
-import { SessionManager } from 'Managers/SessionManager';
-import { ClientInfo } from 'Models/ClientInfo';
-import { DeviceInfo } from 'Models/DeviceInfo';
+import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
+import { PerformanceOperativeEventManager } from 'Ads/Managers/PerformanceOperativeEventManager';
+import { SessionManager } from 'Ads/Managers/SessionManager';
+import { assert } from 'chai';
+import { Platform } from 'Core/Constants/Platform';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { Configuration } from 'Core/Models/Configuration';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Request } from 'Core/Utilities/Request';
+import 'mocha';
+import { MRAIDOperativeEventManager } from 'MRAID/Managers/MRAIDOperativeEventManager';
+import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { PerformanceOperativeEventManager } from 'Managers/PerformanceOperativeEventManager';
-import { XPromoOperativeEventManager } from 'Managers/XPromoOperativeEventManager';
-import { MRAIDOperativeEventManager } from 'Managers/MRAIDOperativeEventManager';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { Configuration } from 'Models/Configuration';
+import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
 
 describe('OperativeEventManagerFactoryTest', () => {
     const handleInvocation = sinon.spy();
