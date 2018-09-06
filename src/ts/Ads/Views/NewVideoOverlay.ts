@@ -122,6 +122,10 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         super.render();
         this.setupElementReferences();
         this.choosePrivacyShown();
+
+        if(CustomFeatures.isCloseIconSkipApp('')) {
+            this._skipButtonElement.classList.add('close-icon-skip');
+        }
     }
 
     public setSpinnerEnabled(value: boolean): void {

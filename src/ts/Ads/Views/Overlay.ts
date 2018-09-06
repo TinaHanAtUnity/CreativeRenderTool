@@ -132,6 +132,11 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
         this._GDPRPopupElement = <HTMLElement>this._container.querySelector('.gdpr-pop-up');
         this._privacyButtonElement = <HTMLElement>this._container.querySelector('.privacy-button');
         this.choosePrivacyShown();
+
+        if(CustomFeatures.isCloseIconSkipApp('')) {
+            const skipIconElement = <HTMLElement>this._container.querySelector('.skip');
+            skipIconElement.classList.add('close-icon-skip');
+        }
     }
 
     public setSpinnerEnabled(value: boolean): void {
@@ -347,6 +352,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
         if(this._skipVisible !== value) {
             this._skipVisible = value;
             const skipIconElement = <HTMLElement>this._container.querySelector('.skip');
+
             if(value) {
                 skipIconElement.classList.add('enabled');
             } else {

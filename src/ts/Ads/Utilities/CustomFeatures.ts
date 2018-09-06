@@ -41,4 +41,9 @@ export class CustomFeatures {
             || gameId === '1782301' // Hayday iOS
             || gameId === '1782302';// Hayday Android
     }
+
+    public static isCloseIconSkipApp(gameId: string) {
+        // Clean master (Cheetah)
+        return gameId === '1196341';
+    }
 }
