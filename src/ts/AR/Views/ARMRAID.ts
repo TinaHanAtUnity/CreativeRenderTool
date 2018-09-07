@@ -186,14 +186,14 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 type: 'viewable',
                 value: viewable
             }, '*');
+        }
 
-            // background time for analytics
-            if(!viewable) {
-                this._backgroundTimestamp = Date.now();
-            } else {
-                if (this._backgroundTimestamp) {
-                    this._backgroundTime += Date.now() - this._backgroundTimestamp;
-                }
+        // background time for analytics
+        if(!viewable) {
+            this._backgroundTimestamp = Date.now();
+        } else {
+            if (this._backgroundTimestamp) {
+                this._backgroundTime += Date.now() - this._backgroundTimestamp;
             }
         }
     }
