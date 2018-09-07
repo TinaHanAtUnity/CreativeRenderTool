@@ -156,7 +156,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     }
 
     protected checkIsValid(timeInSeconds: number): number | undefined {
-        if (timeInSeconds < 0) {
+        if (isNaN(timeInSeconds) || timeInSeconds < 0) {
             return 0;
         } else if (timeInSeconds > 3600) {
             return 3600;

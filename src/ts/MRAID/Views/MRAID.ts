@@ -216,9 +216,11 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         }
     }
 
-    private sendMraidAnalyticsEvent(eventName: string, timeFromPlayableStart: number = 0, eventData?: any) {
+    private sendMraidAnalyticsEvent(eventName: string, eventData?: any) {
         const timeFromShow = this.checkIsValid((Date.now() - this._showTimestamp - this._backgroundTime) / 1000);
         const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
+        const playableStartTime = this._playableStartTimestamp || 0;
+        const timeFromPlayableStart = this.checkIsValid((Date.now() - playableStartTime - this._backgroundTime) / 1000);
         this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, eventName, eventData));
     }
 
@@ -312,8 +314,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
                 }));
                 break;
             case 'analyticsEvent':
-                const timeFromPlayableStart = this.checkIsValid((Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000);
-                this.sendMraidAnalyticsEvent(event.data.event, timeFromPlayableStart, event.data.eventData);
+                this.sendMraidAnalyticsEvent(event.data.event, event.data.eventData);
                 break;
 
             case 'customMraidState':
