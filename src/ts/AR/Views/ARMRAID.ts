@@ -361,8 +361,8 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private onCloseEvent(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
-        const timeFromShow = ARMRAID.checkIsValid((Date.now() - this._showTimestamp) / 1000);
-        const timeFromPlayableStart = ARMRAID.checkIsValid((Date.now() - this._playableStartTimestamp) / 1000);
+        const timeFromShow = ARMRAID.checkIsValid((Date.now() - this._showTimestamp - this._backgroundTime) / 1000);
+        const timeFromPlayableStart = ARMRAID.checkIsValid((Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000);
         const backgroundTime = ARMRAID.checkIsValid(this._backgroundTime / 1000);
 
         if(this._canSkip && !this._canClose) {
@@ -393,7 +393,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         const frameLoadDuration = Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId());
         this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' iframe load duration ' + frameLoadDuration + ' ms');
 
-        const timeFromShow = ARMRAID.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
+        const timeFromShow = ARMRAID.checkIsValid((this._playableStartTimestamp - this._showTimestamp - this._backgroundTime) / 1000);
         const backgroundTime = ARMRAID.checkIsValid(this._backgroundTime / 1000);
 
         this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(frameLoadDuration, timeFromShow, backgroundTime, 'playable_loading_time', {}));
@@ -501,7 +501,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 }));
                 break;
             case 'analyticsEvent':
-                const timeFromShow = ARMRAID.checkIsValid((Date.now() - this._showTimestamp) / 1000);
+                const timeFromShow = ARMRAID.checkIsValid((Date.now() - this._showTimestamp - this._backgroundTime) / 1000);
                 const timeFromPlayableStart = ARMRAID.checkIsValid((Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000);
                 const backgroundTime = ARMRAID.checkIsValid(this._backgroundTime / 1000);
                 this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, event.data.event, event.data.eventData));
@@ -548,7 +548,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 this._closeElement.style.display = 'block';
 
                 this._playableStartTimestamp = Date.now();
-                const timeFromShow = ARMRAID.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
+                const timeFromShow = ARMRAID.checkIsValid((this._playableStartTimestamp - this._showTimestamp - this._backgroundTime) / 1000);
                 const backgroundTime = ARMRAID.checkIsValid(this._backgroundTime / 1000);
                 this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_start', undefined));
                 this.setViewableState(true);
