@@ -36,16 +36,30 @@ export class PerformanceEndScreen extends EndScreen {
                 if (typeof this._canvas === 'undefined') {
                     const closeRegion = <HTMLElement>this._container.querySelector('.btn-close-region');
                     const closeIcon = <HTMLElement>this._container.querySelector('span.icon-close');
-                    this.createCnavas().then(() => {
-                        const canvas = this._canvas;
-                        const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
+                    const backgroundImage = <HTMLElement>this._container.querySelector('.game-background-portrait');
+
+                    this._canvas = document.createElement('canvas');
+
+                    this._canvas.width = backgroundImage.offsetWidth;
+                    this._canvas.height = backgroundImage.offsetHeight;
+                    this._canvas.style.top = '0';
+                    this._canvas.style.position = 'absolute';
+                    this._canvas.style.pointerEvents = 'none';
+                    this._canvas.style.visibility = 'hidden';
+
+                    const img = new Image();
+
+                    img.onload = () => {
+                        this.drawImage(img);
+
+                        const ctx = <CanvasRenderingContext2D>this._canvas.getContext('2d');
 
                         const data = ctx.getImageData(closeRegion.offsetLeft + closeIcon.offsetLeft, closeRegion.offsetTop + closeIcon.offsetTop, closeIcon.offsetWidth, closeIcon.offsetHeight).data;
 
                         this.calculateWeightedAverageColor(data).then(res => {
                             const {weightedR, weightedG, weightedB} = res;
                             if (PerformanceEndScreen.isDark(weightedR, weightedG, weightedB)) {
-                                closeRegion.classList.add('light');
+                                closeRegion.classList.add('dark');
                             } else {
                                 closeRegion.classList.add('dark');
                             }
@@ -53,6 +67,14 @@ export class PerformanceEndScreen extends EndScreen {
                             /* Clean up */
                             (<HTMLElement>this._canvas.parentElement).removeChild(this._canvas);
                         });
+                    };
+
+                    this.getImageSrc().then((src) => {
+                        /* Canvas CORS fix if we get HTTP URL instead of Base64 */
+                        img.crossOrigin = 'Anonymous';
+                        img.src = src;
+
+                        this._container.appendChild(this._canvas);
                     });
                 }
             } catch (e) {
@@ -77,78 +99,7 @@ export class PerformanceEndScreen extends EndScreen {
         }));
     }
 
-    private createCnavas(): Promise<void> {
-        return new Promise((resolve) => {
-            const backgroundImage = <HTMLElement>this._container.querySelector('.game-background-portrait');
-
-            const img = new Image();
-
-            this._canvas = document.createElement('canvas');
-
-            this._canvas.width = backgroundImage.offsetWidth;
-            this._canvas.height = backgroundImage.offsetHeight;
-            this._canvas.style.top = '0';
-            this._canvas.style.position = 'absolute';
-            this._canvas.style.pointerEvents = 'none';
-            this._canvas.style.visibility = 'hidden';
-
-            const ctx = <CanvasRenderingContext2D>this._canvas.getContext('2d');
-
-            img.onload = () => {
-                const canvasWidth = ctx.canvas.width;
-                const canvasHeight = ctx.canvas.height;
-
-                const imageWidth = img.width;
-                const imageHeight = img.height;
-
-                const ratio = Math.min(canvasWidth / imageWidth, canvasHeight / imageHeight);
-
-                let targetWidth = imageWidth * ratio;
-                let targetHeight = imageHeight * ratio;
-
-                let coverRatio = 1;
-
-                if (targetWidth < canvasWidth) {
-                    coverRatio = canvasWidth / targetWidth;
-                }
-
-                if (Math.abs(coverRatio - 1) < 1e-14 && targetHeight < canvasHeight) {
-                    coverRatio = canvasHeight / targetHeight;
-                }
-
-                targetWidth *= coverRatio;
-                targetHeight *= coverRatio;
-
-                let imageSubWidth = imageWidth / (targetWidth / canvasWidth);
-                let imageSubHeight = imageHeight / (targetHeight / canvasHeight);
-
-                if (imageSubWidth > imageWidth) {
-                    imageSubWidth = imageWidth;
-                }
-
-                if (imageSubHeight > imageHeight) {
-                    imageSubHeight = imageHeight;
-                }
-
-                // Always center image in container
-                const offsetX = (imageWidth - imageSubWidth) * 0.5;
-                const offsetY = (imageHeight - imageSubHeight) * 0.5;
-
-                ctx.drawImage(img, offsetX, offsetY, imageSubWidth, imageSubHeight, 0, 0, canvasWidth, canvasHeight);
-                resolve();
-            };
-
-            this._getImageSrc().then((src) => {
-                /* Canvas CORS fix if we get HTTP URL instead of Base64 */
-                img.crossOrigin = 'Anonymous';
-                img.src = src;
-
-                this._container.appendChild(this._canvas);
-            });
-        });
-    }
-
-    private _getImageSrc(): Promise<string> {
+    private getImageSrc(): Promise<string> {
         return new Promise((resolve) => {
             const platform = this._nativeBridge.getPlatform();
             const originalUrl = this._campaign.getLandscape().getOriginalUrl().replace('file://', '');
@@ -180,6 +131,51 @@ export class PerformanceEndScreen extends EndScreen {
                 resolve(src);
             }
         });
+    }
+
+    private drawImage(img: HTMLImageElement): void {
+        const ctx = <CanvasRenderingContext2D>this._canvas.getContext('2d');
+
+        const canvasWidth = ctx.canvas.width;
+        const canvasHeight = ctx.canvas.height;
+
+        const imageWidth = img.width;
+        const imageHeight = img.height;
+
+        const ratio = Math.min(canvasWidth / imageWidth, canvasHeight / imageHeight);
+
+        let targetWidth = imageWidth * ratio;
+        let targetHeight = imageHeight * ratio;
+
+        let coverRatio = 1;
+
+        if (targetWidth < canvasWidth) {
+            coverRatio = canvasWidth / targetWidth;
+        }
+
+        if (Math.abs(coverRatio - 1) < 1e-14 && targetHeight < canvasHeight) {
+            coverRatio = canvasHeight / targetHeight;
+        }
+
+        targetWidth *= coverRatio;
+        targetHeight *= coverRatio;
+
+        let imageSubWidth = imageWidth / (targetWidth / canvasWidth);
+        let imageSubHeight = imageHeight / (targetHeight / canvasHeight);
+
+        if (imageSubWidth > imageWidth) {
+            imageSubWidth = imageWidth;
+        }
+
+        if (imageSubHeight > imageHeight) {
+            imageSubHeight = imageHeight;
+        }
+
+        // Always center image in container
+        const offsetX = (imageWidth - imageSubWidth) * 0.5;
+        const offsetY = (imageHeight - imageSubHeight) * 0.5;
+
+        ctx.drawImage(img, offsetX, offsetY, imageSubWidth, imageSubHeight, 0, 0, canvasWidth, canvasHeight);
     }
 
     private calculateWeightedAverageColor(data: Uint8ClampedArray): Promise<{ weightedR: number; weightedG: number; weightedB: number }> {
