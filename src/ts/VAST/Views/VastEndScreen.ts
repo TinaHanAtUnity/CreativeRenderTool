@@ -1,7 +1,6 @@
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
-import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
+import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Template } from 'Core/Utilities/Template';
