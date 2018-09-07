@@ -5,6 +5,7 @@ import { Configuration } from 'Core/Models/Configuration';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { View } from 'Core/Views/View';
 import { BadAdReason } from 'Ads/Utilities/BadAdsReporting';
+import { IGdprPersonalProperties, GdprManager } from 'Ads/Managers/GdprManager';
 
 export interface IPrivacyHandler {
     onPrivacy(url: string): void;
@@ -31,6 +32,7 @@ export interface IBuildInformation {
 export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
 
     private static buildInformation: IBuildInformation;
+    private static userInformation: IGdprPersonalProperties;
 
     constructor(nativeBridge: NativeBridge, isCoppaCompliant: boolean, isGDPREnabled: boolean, id: string) {
         super(nativeBridge, id);
@@ -39,7 +41,8 @@ export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
             'isGDPREnabled': isGDPREnabled,
             'buildInformation': AbstractPrivacy.buildInformation,
             'badAdKeys': Object.keys(BadAdReason),
-            'badAdReasons': (<string[]>(<any>Object).values(BadAdReason))
+            'badAdReasons': (<string[]>(<any>Object).values(BadAdReason)),
+            'userInformation': AbstractPrivacy.userInformation
         };
     }
 
@@ -60,6 +63,12 @@ export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
             seatId: campaign.getSeatId(),
             timestamp: date.toUTCString()
         };
+    }
+
+    public static setUserInformation(gdprManager: GdprManager) {
+        gdprManager.retrievePersonalInformation().then((personalProperties) => {
+            AbstractPrivacy.userInformation = personalProperties;
+        }).catch(); // Intentional
     }
 
     protected abstract onCloseEvent(event: Event): void;

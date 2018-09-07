@@ -79,6 +79,7 @@ import { XPromoVideoEventHandler } from 'XPromo/EventHandlers/XPromoVideoEventHa
 import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
+import { GdprManager } from 'Ads/Managers/GdprManager';
 
 export class AdUnitFactory {
     private static _forcedPlayableMRAID: boolean = false;
@@ -86,7 +87,7 @@ export class AdUnitFactory {
 
     public static createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractAdUnit {
 
-        Privacy.createBuildInformation(parameters.clientInfo, parameters.campaign, nativeBridge, parameters.configuration);
+        AbstractPrivacy.createBuildInformation(parameters.clientInfo, parameters.campaign, nativeBridge, parameters.configuration);
 
         // todo: select ad unit based on placement
         if (parameters.campaign instanceof VastCampaign) {
@@ -519,6 +520,9 @@ export class AdUnitFactory {
     private static createPrivacy(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractPrivacy {
         const privacy = new GDPRPrivacy(nativeBridge, parameters.campaign, parameters.gdprManager, parameters.configuration.isGDPREnabled(), parameters.configuration.isCoppaCompliant(), parameters.configuration.isOptOutEnabled());
         const privacyEventHandler = new PrivacyEventHandler(nativeBridge, parameters);
+        if (parameters.configuration.isGDPREnabled()) {
+            AbstractPrivacy.setUserInformation(parameters.gdprManager);
+        }
         privacy.addEventHandler(privacyEventHandler);
         return privacy;
     }

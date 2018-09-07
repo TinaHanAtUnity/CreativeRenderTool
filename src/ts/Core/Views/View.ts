@@ -5,6 +5,7 @@ import { Swipe } from 'Core/Utilities/Swipe';
 import { Tap } from 'Core/Utilities/Tap';
 import { Template } from 'Core/Utilities/Template';
 import { IViewBinding } from 'Core/Views/IViewBinding';
+import { IGdprPersonalProperties } from 'Ads/Managers/GdprManager';
 
 export abstract class View<T extends object> {
 
@@ -22,7 +23,7 @@ export abstract class View<T extends object> {
     protected _nativeBridge: NativeBridge;
 
     protected _template: Template;
-    protected _templateData: { [key: string]: string | number | boolean | undefined | IBuildInformation | string[]};
+    protected _templateData: { [key: string]: string | number | boolean | undefined | IBuildInformation | string[] | IGdprPersonalProperties};
     protected _bindings: IViewBinding[];
     protected _container: HTMLElement;
     protected _handlers: T[] = [];

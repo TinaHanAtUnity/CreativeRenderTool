@@ -11,7 +11,6 @@ export class GDPRPrivacy extends AbstractPrivacy {
 
     private _optOutEnabled: boolean;
     private _gdprManager: GdprManager;
-    private _personalInfoObtained: boolean = false;
     private _dataDeletionConfirmation: boolean = false;
     private _currentState : number = -1;
     private _campaign: Campaign;
@@ -68,8 +67,6 @@ export class GDPRPrivacy extends AbstractPrivacy {
 
     public show(): void {
         super.show();
-        this.editPopupPerUser();
-
         const agreeRadioButton = <HTMLInputElement>this._container.querySelector('#gdpr-agree-radio');
         agreeRadioButton.onclick = () => {
             const confirmationContainer = <HTMLSpanElement>document.getElementById('data-deletion-container');
@@ -132,23 +129,6 @@ export class GDPRPrivacy extends AbstractPrivacy {
 
         const activeRadioButton = <HTMLInputElement>this._container.querySelector('#gdpr-refuse-radio');
         activeRadioButton.checked = true;
-    }
-
-    private editPopupPerUser() {
-        if (this._gdprEnabled && !this._personalInfoObtained) {
-            this._gdprManager.retrievePersonalInformation().then((personalProperties) => {
-                this._personalInfoObtained = true;
-                document.getElementById('sorry-message')!.innerHTML = ''; // Clear sorry message on previous failed request
-                document.getElementById('phone-type')!.innerHTML = ` - Using ${personalProperties.deviceModel}.`;
-                document.getElementById('country')!.innerHTML = ` - Playing in ${personalProperties.country}.`;
-                document.getElementById('game-plays-this-week')!.innerHTML = ` - Played this game ${personalProperties.gamePlaysThisWeek} times this week.`;
-                document.getElementById('ads-seen-in-game')!.innerHTML = ` - Seen ${personalProperties.adsSeenInGameThisWeek} ads in this game.`;
-                document.getElementById('games-installed-from-ads')!.innerHTML = ` - Installed ${personalProperties.installsFromAds} games based on those ads.`;
-            }).catch(error => {
-                Diagnostics.trigger('gdpr_personal_info_failed', error);
-                document.getElementById('sorry-message')!.innerHTML = 'Sorry. We were unable to deliver our collected information at this time.';
-            });
-        }
     }
 
     private onStateClick(event: Event, isLeftClick: boolean): void {
