@@ -5,7 +5,7 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Template } from 'Core/Utilities/Template';
 import GDPRPrivacyTemplate from 'html/GDPR-privacy.html';
-import { BadAdsReporting } from 'Test/Unit/Utilities/BadAdsReporting';
+import { BadAdsReporting } from 'Ads/Utilities/BadAdsReporting';
 
 export class GDPRPrivacy extends AbstractPrivacy {
 

@@ -4,7 +4,7 @@ import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Configuration } from 'Core/Models/Configuration';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { View } from 'Core/Views/View';
-import { BadAdReason } from 'Test/Unit/Utilities/BadAdsReporting';
+import { BadAdReason } from 'Ads/Utilities/BadAdsReporting';
 
 export interface IPrivacyHandler {
     onPrivacy(url: string): void;
