@@ -59,7 +59,7 @@ export class PerformanceEndScreen extends EndScreen {
                         this.calculateWeightedAverageColor(data).then(res => {
                             const {weightedR, weightedG, weightedB} = res;
                             if (PerformanceEndScreen.isDark(weightedR, weightedG, weightedB)) {
-                                closeRegion.classList.add('dark');
+                                closeRegion.classList.add('light');
                             } else {
                                 closeRegion.classList.add('dark');
                             }
