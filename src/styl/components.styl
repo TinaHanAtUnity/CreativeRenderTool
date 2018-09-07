@@ -247,6 +247,43 @@ $full-screen-pop-up-view($scale-size, z-index = auto, $with-styles = true) {
         }
       }
 
+    .report-title {
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+
+    .report-container {
+      height: 150px;
+
+      .report-button {
+        display: inline-block;
+        float: left;
+        margin: .5rem;
+        margin-bottom: 1.5rem;
+        padding: .75rem 1.5rem;
+        border-radius: .25rem;
+        background: $privacy-green;
+        color: $white;
+        font-size: .8125rem;
+      }
+
+      .report-confirmed-text {
+        display: block;
+        float: right;
+        margin-bottom: 1.5rem;
+        width: 50%;
+        text-align: center;
+        font-size: $default-size * $default-font-size * .75;
+        opacity: 0;
+        transition: opacity 250ms ease-in;
+
+        &.active {
+          opacity: 1;
+        }
+      }
+    }
+
       .radio-group-container {
         $radio-group-container($scale-size, $pop-up-font-size);
 
