@@ -1,17 +1,16 @@
-import 'mocha';
-import { assert } from 'chai';
-import * as sinon from 'sinon';
+import { GdprManager } from 'Ads/Managers/GdprManager';
+import { FinishState } from 'Core/Constants/FinishState';
+import { ABGroupBuilder } from 'Core/Models/ABGroup';
+import { Configuration } from 'Core/Models/Configuration';
 
-import { NativeBridge } from 'Native/NativeBridge';
-import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
-import { PromoEventHandler } from 'EventHandlers/PromoEventHandler';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 import DummyPromo from 'json/DummyPromoCampaign.json';
-import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
-import { Configuration } from 'Models/Configuration';
-import { ABGroupBuilder } from 'Models/ABGroup';
-import { GdprManager } from 'Managers/GdprManager';
-import { FinishState } from 'Constants/FinishState';
+import 'mocha';
+import { PromoAdUnit } from 'Promo/AdUnits/PromoAdUnit';
+import { PromoEventHandler } from 'Promo/EventHandlers/PromoEventHandler';
+import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import * as sinon from 'sinon';
 
 describe('PromoEventHandlersTest', () => {
     const handleInvocation = sinon.spy();

@@ -1,6 +1,6 @@
-import 'mocha';
 import { assert } from 'chai';
-import { VastCreativeCompanionAd } from 'Models/Vast/VastCreativeCompanionAd';
+import 'mocha';
+import { VastCreativeCompanionAd } from 'VAST/Models/VastCreativeCompanionAd';
 
 describe('VastCreativeCompanionAd', () => {
     it('should have the correct data', () => {

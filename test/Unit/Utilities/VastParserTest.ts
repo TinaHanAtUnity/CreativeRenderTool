@@ -1,23 +1,23 @@
+import { assert } from 'chai';
+import { Platform } from 'Core/Constants/Platform';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Observable1, Observable2, Observable4 } from 'Core/Utilities/Observable';
+import { Request } from 'Core/Utilities/Request';
 import 'mocha';
 import * as sinon from 'sinon';
-import { assert } from 'chai';
 
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Request } from 'Utilities/Request';
-import { NativeBridge } from 'Native/NativeBridge';
-import { WakeUpManager } from 'Managers/WakeUpManager';
-import { Observable1, Observable2, Observable4 } from 'Utilities/Observable';
-import { Platform } from 'Constants/Platform';
-import { FocusManager } from 'Managers/FocusManager';
+import RootVastClean from 'xml/RootVastClean.xml';
+import RootVastDirty from 'xml/RootVastDirty.xml';
+import VastCompanionAd from 'xml/VastCompanionAd.xml';
+import VastCompanionAdWithoutClickThrough from 'xml/VastCompanionAdWithoutClickThrough.xml';
+import VastCompanionAdWithoutImages from 'xml/VastCompanionAdWithoutImages.xml';
 
 import VastRaw from 'xml/VastRaw.xml';
-import RootVastClean from 'xml/RootVastClean.xml';
-import WrappedVast from 'xml/WrappedVast.xml';
-import RootVastDirty from 'xml/RootVastDirty.xml';
 import VastWithSpaces from 'xml/VastWithSpaces.xml';
-import VastCompanionAd from 'xml/VastCompanionAd.xml';
-import VastCompanionAdWithoutImages from 'xml/VastCompanionAdWithoutImages.xml';
-import VastCompanionAdWithoutClickThrough from 'xml/VastCompanionAdWithoutClickThrough.xml';
+import WrappedVast from 'xml/WrappedVast.xml';
 
 describe('VastParser', () => {
     let request: Request;

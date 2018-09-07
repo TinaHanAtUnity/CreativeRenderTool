@@ -1,10 +1,10 @@
-import 'Workarounds';
-import { NativeBridge } from 'Native/NativeBridge';
+import { Platform } from 'Core/Constants/Platform';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { UIWebViewBridge } from 'Core/Native/Bridge/UIWebViewBridge';
+import { WKWebViewBridge } from 'Core/Native/Bridge/WKWebViewBridge';
+import { Url } from 'Core/Utilities/Url';
 import { WebView } from 'WebView';
-import { WKWebViewBridge } from 'Native/WKWebViewBridge';
-import { Platform } from 'Constants/Platform';
-import { Url } from 'Utilities/Url';
-import { UIWebViewBridge } from 'Native/UIWebViewBridge';
+import 'Workarounds';
 
 interface IExtendedWindow extends Window {
     nativebridge: NativeBridge;

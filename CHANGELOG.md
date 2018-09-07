@@ -1,3 +1,11 @@
+# Pending
+
+* Add gameids for Mixed Placement experiment
+
+# Thu Sep  6 09:26:17 UTC 2018
+
+* Restructure codebase
+
 # Tue Sep  4 09:16:55 UTC 2018
 
 * Fix playable analytics naming
