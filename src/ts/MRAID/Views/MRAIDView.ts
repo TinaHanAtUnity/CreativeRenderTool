@@ -155,6 +155,15 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         };
     }
 
+    protected checkIsValid(timeInSeconds: number): number | undefined {
+        if (timeInSeconds < 0) {
+            return 0;
+        } else if (timeInSeconds > 3600) {
+            return 3600;
+        }
+        return timeInSeconds;
+    }
+
     private replaceMraidSources(mraid: string): string {
         // Workaround for https://jira.hq.unity3d.com/browse/ABT-333
         // On certain versions of the webview on iOS (2.0.2 - 2.0.8) there seems

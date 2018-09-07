@@ -328,13 +328,6 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         }
     }
 
-    private checkIsValid(timeInSeconds: number): number | undefined {
-        if (timeInSeconds < 0 || timeInSeconds > 600) {
-            return undefined;
-        }
-        return timeInSeconds;
-    }
-
     private onMessageOpen(url: string) {
         if (!this._callButtonEnabled) {
             return;
