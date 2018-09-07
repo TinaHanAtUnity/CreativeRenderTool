@@ -56,6 +56,7 @@ export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
         this._templateData = {
             'isCoppaCompliant': isCoppaCompliant,
             'buildInformation': AbstractPrivacy.buildInformation,
+            'badAdKeys': Object.keys(BadAdReason),
             'badAdReasons': (<string[]>(<any>Object).values(BadAdReason))
         };
     }

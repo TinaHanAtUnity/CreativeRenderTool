@@ -29,8 +29,7 @@
     display: none;
   }
 
-  #data-deletion-container,
-  #report-confirmed-text {
+  #data-deletion-container {
     padding: $default-size * $default-scale-size * .75 0;
     .page-link {
       pointer-events: none;
@@ -43,8 +42,7 @@
   }
 
   #data-deletion-container,
-  #data-deletion-request-container,
-  #report-confirmed-text {
+  #data-deletion-request-container {
     display: block;
     text-align: center;
     opacity: 0;
@@ -83,9 +81,11 @@
     }
 
     .report-container {
+      height: 150px;
+
       .report-button {
         display: inline-block;
-        float: right;
+        float: left;
         margin: .5rem;
         margin-bottom: 1.5rem;
         padding: .75rem 1.5rem;
@@ -96,10 +96,18 @@
       }
 
       .report-confirmed-text {
+        display: block;
+        float: right;
         margin-bottom: 1.5rem;
         width: 50%;
         text-align: center;
         font-size: $default-size * $default-font-size * .75;
+        opacity: 0;
+        transition: opacity 250ms ease-in;
+
+        &.active {
+          opacity: 1;
+        }
       }
     }
 

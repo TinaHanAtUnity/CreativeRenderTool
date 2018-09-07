@@ -104,14 +104,14 @@
         <ul class="radio-group-container">
             <% for (var k in data.badAdReasons) { %>
                 <div class="radio-item-container">
-                    <input id="<%= k %>" class="report-choice-radio" name="bad-ad-reason" type="radio">
-                    <label for="<%= k %>"><%= (data.badAdReasons[k] === null || typeof data.badAdReasons[k] === "undefined") ? "N/A" : data.badAdReasons[k] %></label>
+                    <input id="<%= data.badAdKeys[k] %>" class="report-choice-radio" name="bad-ad-reason" type="radio">
+                    <label for="<%= data.badAdKeys[k] %>"><%= (data.badAdReasons[k] === null || typeof data.badAdReasons[k] === "undefined") ? "N/A" : data.badAdReasons[k] %></label>
                 </div>
             <% } %>
         </ul>
         <div class="report-container">
             <div class="report-button">Report</div>
-            <div class="report-confirmed-text">Thank you for taking the time to improve Unity Ads. Your Ad experience will close shortly.</div>
+            <span class="report-confirmed-text"></span>
         </div>
         </div>
     <div class="fade-out-gradient-separator"></div>

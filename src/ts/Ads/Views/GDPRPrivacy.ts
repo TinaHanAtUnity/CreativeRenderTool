@@ -5,7 +5,7 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Template } from 'Core/Utilities/Template';
 import GDPRPrivacyTemplate from 'html/GDPR-privacy.html';
-import { BadAdsReporting } from 'Test/Unit/Utilities/BadAdsReporting';
+import { BadAdsReporting, BadAdReason } from 'Test/Unit/Utilities/BadAdsReporting';
 
 export class GDPRPrivacy extends AbstractPrivacy {
 
@@ -16,6 +16,7 @@ export class GDPRPrivacy extends AbstractPrivacy {
     private _dataDeletionConfirmation: boolean = false;
     private _currentState : number = -1;
     private _campaign: Campaign;
+    private _reportSent: boolean = false;
 
     constructor(nativeBridge: NativeBridge, campaign: Campaign, gdprManager: GdprManager, isCoppaCompliant: boolean, optOutEnabled: boolean) {
         super(nativeBridge, isCoppaCompliant, 'gdpr-privacy');
@@ -162,7 +163,31 @@ export class GDPRPrivacy extends AbstractPrivacy {
     }
 
     private onReportAd(): void {
-        BadAdsReporting.onUserReport(this._campaign, 0);
+        if (!this._reportSent) {
+            const checkedReportButton = <HTMLElement>this._container.querySelector('.report-choice-radio:checked');
+            const reportText = this._container.querySelector('.report-confirmed-text');
+            if (checkedReportButton && checkedReportButton.id) {
+                this._reportSent = true;
+                this.handleReportText(true, reportText);
+                BadAdsReporting.onUserReport(this._campaign, checkedReportButton.id);
+            } else {
+                this.handleReportText(false, reportText);
+            }
+        }
+    }
+
+    private handleReportText(checked: boolean, reportText: Element | null) {
+        if (reportText) {
+            if (checked) {
+                reportText.innerHTML = 'Thank you for taking the time to improve Unity Ads. Your Ad Experience will close shortly.';
+                if (!reportText.classList.contains('active')) {
+                    reportText.classList.toggle('active');
+                }
+            } else {
+                reportText.innerHTML = 'Please select an option from the list above.';
+                reportText.classList.toggle('active');
+            }
+        }
     }
 
     // State 0: Privacy info - Left: Build info - Middle: Report Ad
@@ -222,7 +247,7 @@ export class GDPRPrivacy extends AbstractPrivacy {
                 }
                 break;
             }
-            // For initial configuration
+            // Initial Configuration
             default: {
                 this._currentState = 0;
                 leftEl.innerText = bCard;

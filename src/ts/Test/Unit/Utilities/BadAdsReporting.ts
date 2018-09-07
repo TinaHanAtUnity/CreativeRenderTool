@@ -13,14 +13,14 @@ export enum BadAdReason {
 
 export class BadAdsReporting {
 
-    public static onUserReport(campaign: Campaign, reasonIndex: number): void {
+    public static onUserReport(campaign: Campaign, reasonKey: string): void {
 
-        const reportSummary = {
+        const error = {
             creativeId: campaign.getCreativeId(),
             auctionId: campaign.getSession().getId(),
-            reason: BadAdReason[reasonIndex]
+            reason: reasonKey
         };
 
-        Diagnostics.trigger('reported_ad', reportSummary);
+        Diagnostics.trigger('reported_ad', error);
     }
 }
