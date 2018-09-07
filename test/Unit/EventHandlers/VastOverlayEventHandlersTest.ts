@@ -9,7 +9,6 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { MOAT } from 'Ads/Views/MOAT';
 import { Overlay } from 'Ads/Views/Overlay';
-import { Privacy } from 'Ads/Views/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
@@ -26,6 +25,7 @@ import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastOverlayEventHandler } from 'VAST/EventHandlers/VastOverlayEventHandler';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastEndScreen } from 'VAST/Views/VastEndScreen';
+import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
 
 describe('VastOverlayEventHandlersTest', () => {
     let campaign: VastCampaign;
@@ -64,7 +64,7 @@ describe('VastOverlayEventHandlersTest', () => {
         metaDataManager = new MetaDataManager(nativeBridge);
         campaign = TestFixtures.getEventVastCampaign();
         clientInfo = TestFixtures.getClientInfo();
-        privacy = new Privacy(nativeBridge, true);
+        privacy = sinon.createStubInstance(GDPRPrivacy);
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
         container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
@@ -138,7 +138,7 @@ describe('VastOverlayEventHandlersTest', () => {
 
         describe('When ad unit has an endscreen', () => {
             it('should hide endcard', () => {
-                const vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.configuration.isCoppaCompliant(), vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
+                const vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters);
                 sinon.spy(vastEndScreen, 'show');
                 vastAdUnitParameters.endScreen = vastEndScreen;
                 vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);

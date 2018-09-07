@@ -8,7 +8,6 @@ import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
-import { Privacy } from 'Ads/Views/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
@@ -29,6 +28,7 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { asStub } from 'TestHelpers/Functions';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
 
 describe('DisplayInterstitialAdUnit', () => {
     let adUnit: DisplayInterstitialAdUnit;
@@ -83,7 +83,7 @@ describe('DisplayInterstitialAdUnit', () => {
                 campaign: campaign
             });
 
-            const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+            const privacy = sinon.createStubInstance(GDPRPrivacy);
 
             webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
             (<any>webPlayerContainer).onPageStarted = new Observable1<string>();

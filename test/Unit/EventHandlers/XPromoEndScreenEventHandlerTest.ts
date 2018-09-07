@@ -13,7 +13,6 @@ import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { Overlay } from 'Ads/Views/Overlay';
-import { Privacy } from 'Ads/Views/Privacy';
 import { Platform } from 'Core/Constants/Platform';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
@@ -30,6 +29,7 @@ import { XPromoEndScreenEventHandler } from 'XPromo/EventHandlers/XPromoEndScree
 import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
 import { StoreName, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
+import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
 
 describe('XPromoEndScreenEventHandlerTest', () => {
 
@@ -89,7 +89,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             sinon.spy(nativeBridge.Intent, 'launch');
 
             const video = new Video('', TestFixtures.getSession());
-            const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+            const privacy = sinon.createStubInstance(GDPRPrivacy);
             const endScreenParams : IEndScreenParameters = {
                 nativeBridge: nativeBridge,
                 language : deviceInfo.getLanguage(),
@@ -185,7 +185,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             sinon.stub(deviceInfo, 'getOsVersion').returns('9.0');
             const video = new Video('', TestFixtures.getSession());
 
-            const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+            const privacy = sinon.createStubInstance(GDPRPrivacy);
             const endScreenParams : IEndScreenParameters = {
                 nativeBridge: nativeBridge,
                 language : deviceInfo.getLanguage(),

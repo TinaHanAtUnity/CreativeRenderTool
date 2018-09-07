@@ -8,7 +8,6 @@ import { Video } from 'Ads/Models/Assets/Video';
 import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Overlay } from 'Ads/Views/Overlay';
-import { Privacy } from 'Ads/Views/Privacy';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { FocusManager } from 'Core/Managers/FocusManager';
@@ -26,6 +25,7 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastEndScreen } from 'VAST/Views/VastEndScreen';
 
 import EventTestVast from 'xml/EventTestVast.xml';
+import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
 
 describe('VastAdUnit', () => {
 
@@ -92,9 +92,9 @@ describe('VastAdUnit', () => {
             campaign: vastCampaign
         });
 
-        const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
-        const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
         const gdprManager = sinon.createStubInstance(GdprManager);
+        const privacy = sinon.createStubInstance(GDPRPrivacy);
+        const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
         vastAdUnitParameters = {
@@ -128,7 +128,7 @@ describe('VastAdUnit', () => {
             vastCampaign = TestFixtures.getEventVastCampaign();
             sinon.stub(vastCampaign, 'getVideo').returns(video);
             const nativeBridge = TestFixtures.getNativeBridge();
-            const privacy = new Privacy(nativeBridge, false);
+            const privacy = sinon.createStubInstance(GDPRPrivacy);
             const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
             vastAdUnitParameters.overlay = overlay;
             vastAdUnitParameters.campaign = vastCampaign;
@@ -193,9 +193,9 @@ describe('VastAdUnit', () => {
             vastCampaign = TestFixtures.getCompanionVastCampaign();
             sinon.stub(vastCampaign, 'getVideo').returns(video);
             const nativeBridge = TestFixtures.getNativeBridge();
-            const privacy = new Privacy(nativeBridge, false);
+            const privacy = sinon.createStubInstance(GDPRPrivacy);
             const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
-            vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.configuration.isCoppaCompliant(), vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
+            vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters);
             vastAdUnitParameters.overlay = overlay;
             vastAdUnitParameters.campaign = vastCampaign;
             vastAdUnitParameters.endScreen = vastEndScreen;

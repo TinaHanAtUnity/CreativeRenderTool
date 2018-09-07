@@ -8,7 +8,6 @@ import { Video } from 'Ads/Models/Assets/Video';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { Overlay } from 'Ads/Views/Overlay';
-import { Privacy } from 'Ads/Views/Privacy';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { FocusManager } from 'Core/Managers/FocusManager';
@@ -25,6 +24,7 @@ import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/Perfor
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
 
 describe('PerformanceOverlayEventHandlerTest', () => {
 
@@ -71,8 +71,8 @@ describe('PerformanceOverlayEventHandlerTest', () => {
             campaign: campaign
         });
 
-        const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
-        const endScreenParams : IEndScreenParameters = {
+        const privacy = sinon.createStubInstance(GDPRPrivacy);
+                const endScreenParams : IEndScreenParameters = {
             nativeBridge: nativeBridge,
             language : deviceInfo.getLanguage(),
             gameId: clientInfo.getGameId(),

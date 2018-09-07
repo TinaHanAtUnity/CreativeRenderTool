@@ -1,13 +1,13 @@
-import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
+import { AbstractAdUnit, IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
-import { Privacy } from 'Ads/Views/Privacy';
-
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Template } from 'Core/Utilities/Template';
 import { View } from 'Core/Views/View';
 import VastEndScreenTemplate from 'html/VastEndScreen.html';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
+import { GdprManager } from 'Ads/Managers/GdprManager';
 
 export interface IVastEndScreenHandler {
     onVastEndScreenClick(): void;
@@ -21,18 +21,26 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
 
     private _isSwipeToCloseEnabled: boolean = false;
     private _coppaCompliant: boolean;
-    private _privacy: Privacy;
+    private _privacy: GDPRPrivacy;
     private _callButtonEnabled: boolean = true;
+    private _campaign: VastCampaign;
+    private _gdprManager: GdprManager;
+    private _isGDPREnabled: boolean;
+    private _optOutEnabled: boolean;
 
-    constructor(nativeBridge: NativeBridge, coppaCompliant: boolean, campaign: VastCampaign, gameId: string) {
+    constructor(nativeBridge: NativeBridge, parameters: IAdUnitParameters<VastCampaign>) {
         super(nativeBridge, 'vast-end-screen');
 
-        this._coppaCompliant = coppaCompliant;
+        this._coppaCompliant = parameters.configuration.isCoppaCompliant();
+        this._gdprManager = parameters.gdprManager;
+        this._campaign = parameters.campaign;
+        this._isGDPREnabled = parameters.configuration.isGDPREnabled();
+        this._optOutEnabled = parameters.configuration.isOptOutEnabled();
         this._template = new Template(VastEndScreenTemplate);
 
-        if(campaign) {
-            const landscape = campaign.getLandscape();
-            const portrait = campaign.getPortrait();
+        if(this._campaign) {
+            const landscape = this._campaign.getLandscape();
+            const portrait = this._campaign.getPortrait();
 
             this._templateData = {
                 'endScreenLandscape': (landscape ? landscape.getUrl() : (portrait ? portrait.getUrl() : undefined)),
@@ -58,7 +66,7 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
             }
         ];
 
-        if(CustomFeatures.isTimehopApp(gameId)) {
+        if(CustomFeatures.isTimehopApp(parameters.clientInfo.getGameId())) {
             this._isSwipeToCloseEnabled = true;
 
             this._bindings.push({
@@ -142,7 +150,7 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
     private onPrivacyEvent(event: Event): void {
         event.preventDefault();
         // todo: gdpr privacy
-        this._privacy = new Privacy(this._nativeBridge, this._coppaCompliant);
+        this._privacy = new GDPRPrivacy(this._nativeBridge, this._campaign, this._gdprManager, this._isGDPREnabled, this._coppaCompliant, this._optOutEnabled);
         this._privacy.render();
         document.body.appendChild(this._privacy.container());
         this._privacy.addEventHandler(this);

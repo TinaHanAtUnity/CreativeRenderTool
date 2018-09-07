@@ -17,7 +17,10 @@ export class GDPRPrivacy extends AbstractPrivacy {
     private _reportSent: boolean = false;
     private _gdprEnabled: boolean = false;
 
-    constructor(nativeBridge: NativeBridge, campaign: Campaign, gdprManager: GdprManager, gdprEnabled: boolean, isCoppaCompliant: boolean, optOutEnabled: boolean) {
+    constructor(nativeBridge: NativeBridge, campaign: Campaign,
+                gdprManager: GdprManager, gdprEnabled: boolean,
+                isCoppaCompliant: boolean, optOutEnabled: boolean) {
+
         super(nativeBridge, isCoppaCompliant, gdprEnabled, 'gdpr-privacy');
 
         this._template = new Template(GDPRPrivacyTemplate);
