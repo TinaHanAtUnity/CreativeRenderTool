@@ -20,6 +20,7 @@ import { INativeResponse } from 'Core/Utilities/Request';
 import { DisplayInterstitialCampaign, IDisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
+import OnProgrammaticVPAIDPlcCampaign from 'json/OnProgrammaticVPAIDPlcCampaign.json';
 
 import DummyPromoCampaign from 'json/DummyPromoCampaign.json';
 import OnCometMraidPlcCampaign from 'json/OnCometMraidPlcCampaign.json';
@@ -39,12 +40,14 @@ import { Vast } from 'VAST/Models/Vast';
 import { IVastCampaign, VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastParser } from 'VAST/Utilities/VastParser';
 import { VPAID } from 'VPAID/Models/VPAID';
-import { IVPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
+import { IVPAIDCampaign, VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import EventTestVast from 'xml/EventTestVast.xml';
 import VastCompanionXml from 'xml/VastCompanionAd.xml';
 import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xml';
+import VPAIDCompanionAdWithAdParameters from 'xml/VPAIDCompanionAdWithAdParameters.xml';
 import { IXPromoCampaign, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
-import { PerformanceMRAIDCampaign } from '../../src/ts/Performance/Models/PerformanceMRAIDCampaign';
+import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
+import { VPAIDParser } from 'VPAID/Utilities/VPAIDParser';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -393,6 +396,13 @@ export class TestFixtures {
         const vastParser = TestFixtures.getVastParser();
         const vast = vastParser.parseVast(VastCompanionXml);
         return new VastCampaign(this.getVastCampaignParams(vast, 3600, '12345'));
+    }
+
+    public static getCompanionVPAIDCampaign(): VPAIDCampaign {
+        const vpaidParser = new VPAIDParser();
+        const vpaid = vpaidParser.parse(VPAIDCompanionAdWithAdParameters);
+        const json = JSON.parse(OnProgrammaticVPAIDPlcCampaign);
+        return new VPAIDCampaign(this.getVPAIDCampaignParams(json, vpaid));
     }
 
     public static getEventVastCampaign(): VastCampaign {
