@@ -1,8 +1,8 @@
-import 'mocha';
+import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { assert } from 'chai';
-import { AuctionResponse } from 'Models/AuctionResponse';
 
 import OnProgrammaticMraidPlcCampaign from 'json/OnProgrammaticMraidPlcCampaign.json';
+import 'mocha';
 
 describe('AuctionResponse', () => {
     describe('when created with response json', () => {

@@ -1,20 +1,20 @@
-import 'mocha';
+import { Video } from 'Ads/Models/Assets/Video';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { assert } from 'chai';
-import * as sinon from 'sinon';
+import { VideoMetadata } from 'Core/Constants/Android/VideoMetadata';
+import { Platform } from 'Core/Constants/Platform';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { CacheError } from 'Core/Native/Cache';
 
-import { Cache } from 'Utilities/Cache';
-import { NativeBridge } from 'Native/NativeBridge';
+import { Cache } from 'Core/Utilities/Cache';
+import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
+import { FileInfo } from 'Core/Utilities/FileInfo';
+import { Request } from 'Core/Utilities/Request';
+import 'mocha';
+import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Platform } from 'Constants/Platform';
-import { WakeUpManager } from 'Managers/WakeUpManager';
-import { Video } from 'Models/Assets/Video';
-import { VideoMetadata } from 'Constants/Android/VideoMetadata';
-import { CacheError } from 'Native/Api/Cache';
-import { Request } from 'Utilities/Request';
-import { FocusManager } from 'Managers/FocusManager';
-import { CacheBookkeeping } from 'Utilities/CacheBookkeeping';
-import { FileInfo } from 'Utilities/FileInfo';
-import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 describe('VideoMetadataTest', () => {
     const validVideo: string = 'https://www.example.net/valid.mp4';

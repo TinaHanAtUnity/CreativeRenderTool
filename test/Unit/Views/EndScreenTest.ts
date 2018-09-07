@@ -1,16 +1,16 @@
-import 'mocha';
-import * as sinon from 'sinon';
+import { IEndScreenParameters } from 'Ads/Views/EndScreen';
+import { Privacy } from 'Ads/Views/Privacy';
 import { assert } from 'chai';
+import { Configuration } from 'Core/Models/Configuration';
 
-import { NativeBridge } from 'Native/NativeBridge';
-import { Localization } from 'Utilities/Localization';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
-import { Privacy } from 'Views/Privacy';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Localization } from 'Core/Utilities/Localization';
 
 import EndScreenFixture from 'html/fixtures/EndScreenFixture.html';
-import { IEndScreenParameters } from 'Views/EndScreen';
-import { Configuration } from 'Models/Configuration';
+import 'mocha';
+import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
+import * as sinon from 'sinon';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('EndScreen', () => {
     let handleInvocation: sinon.SinonSpy;

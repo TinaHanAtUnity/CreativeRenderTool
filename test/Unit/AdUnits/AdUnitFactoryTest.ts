@@ -1,53 +1,52 @@
-import 'mocha';
-import * as sinon from 'sinon';
+import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
+
+import { AdUnitFactory } from 'Ads/AdUnits/AdUnitFactory';
+
+import { Activity } from 'Ads/AdUnits/Containers/Activity';
+import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { GdprManager } from 'Ads/Managers/GdprManager';
+import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
+import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
+import { SessionManager } from 'Ads/Managers/SessionManager';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { Campaign } from 'Ads/Models/Campaign';
+import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { assert } from 'chai';
+import { FinishState } from 'Core/Constants/FinishState';
+import { Platform } from 'Core/Constants/Platform';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { Configuration } from 'Core/Models/Configuration';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
-import { AdUnitFactory } from 'AdUnits/AdUnitFactory';
-import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Request } from 'Utilities/Request';
-import { WakeUpManager } from 'Managers/WakeUpManager';
-import { Platform } from 'Constants/Platform';
-import { Configuration } from 'Models/Configuration';
-import { DeviceInfo } from 'Models/DeviceInfo';
-import { SessionManager } from 'Managers/SessionManager';
-import { NativeBridge } from 'Native/NativeBridge';
+import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
+import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
+import { Observable1, Observable2 } from 'Core/Utilities/Observable';
+import { Request } from 'Core/Utilities/Request';
+import { XHRequest } from 'Core/Utilities/XHRequest';
 
-import { Activity } from 'AdUnits/Containers/Activity';
-import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
-import { MetaDataManager } from 'Managers/MetaDataManager';
-import { MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
-import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
-import { PerformanceMRAIDCampaign } from 'Models/Campaigns/PerformanceMRAIDCampaign';
-import { FinishState } from 'Constants/FinishState';
-import { FocusManager } from 'Managers/FocusManager';
-
-import { DisplayInterstitialAdUnit } from 'AdUnits/DisplayInterstitialAdUnit';
-import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { ClientInfo } from 'Models/ClientInfo';
-import { IAdUnitParameters } from 'AdUnits/AbstractAdUnit';
-import { Campaign } from 'Models/Campaign';
-
-import { ConfigurationParser } from 'Parsers/ConfigurationParser';
-import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
-import { XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
-import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
-import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
-import { PromoAdUnit } from 'AdUnits/PromoAdUnit';
-import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
-import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
-import { GdprManager } from 'Managers/GdprManager';
+import { DisplayInterstitialAdUnit } from 'Display/AdUnits/DisplayInterstitialAdUnit';
+import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
-import { WebPlayerContainer } from 'Utilities/WebPlayer/WebPlayerContainer';
-import { Observable1, Observable2 } from 'Utilities/Observable';
+import 'mocha';
+import { MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
+import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { MRAID } from 'MRAID/Views/MRAID';
+import { PlayableMRAID } from 'MRAID/Views/PlayableMRAID';
+import { PromoAdUnit } from 'Promo/AdUnits/PromoAdUnit';
+import { PromoCampaign } from 'Promo/Models/PromoCampaign';
+import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import * as sinon from 'sinon';
 import { asStub } from 'TestHelpers/Functions';
-import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
-import { MRAID } from 'Views/MRAID';
-import { PlayableMRAID } from 'Views/PlayableMRAID';
-import { XHRequest } from 'Utilities/XHRequest';
-import { HttpKafka, KafkaCommonObjectType } from 'Utilities/HttpKafka';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
+import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 
 describe('AdUnitFactoryTest', () => {
 
