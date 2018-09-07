@@ -1,5 +1,4 @@
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { Privacy } from 'Ads/Views/Privacy';
 import { assert } from 'chai';
 import { Configuration } from 'Core/Models/Configuration';
 
@@ -11,6 +10,7 @@ import 'mocha';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
 
 describe('EndScreen', () => {
     let handleInvocation: sinon.SinonSpy;
@@ -32,7 +32,7 @@ describe('EndScreen', () => {
     });
 
     const createEndScreen = (language : string) : PerformanceEndScreen => {
-        const privacy = new Privacy(nativeBridge, false);
+        const privacy = sinon.createStubInstance(GDPRPrivacy);
         const params : IEndScreenParameters = {
             nativeBridge,
             language,

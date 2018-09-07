@@ -1,11 +1,11 @@
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { Overlay } from 'Ads/Views/Overlay';
-import { Privacy } from 'Ads/Views/Privacy';
 import { assert } from 'chai';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
 import * as sinon from 'sinon';
+import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
 
 describe('Overlay', () => {
     let handleInvocation: sinon.SinonSpy;
@@ -20,7 +20,7 @@ describe('Overlay', () => {
             handleInvocation,
             handleCallback
         });
-        privacy = new Privacy(nativeBridge, true);
+        privacy = sinon.createStubInstance(GDPRPrivacy);
     });
 
     it('should render', () => {

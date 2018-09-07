@@ -25,7 +25,6 @@ import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
 import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
 import { Overlay } from 'Ads/Views/Overlay';
-import { Privacy } from 'Ads/Views/Privacy';
 import { ARUtil } from 'AR/Utilities/ARUtil';
 import { ARMRAID } from 'AR/Views/ARMRAID';
 import { StreamType } from 'Core/Constants/Android/StreamType';
@@ -86,7 +85,7 @@ export class AdUnitFactory {
 
     public static createAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractAdUnit {
 
-        Privacy.createBuildInformation(parameters.clientInfo, parameters.campaign, nativeBridge, parameters.configuration);
+        AbstractPrivacy.createBuildInformation(parameters.clientInfo, parameters.campaign, nativeBridge, parameters.configuration);
 
         // todo: select ad unit based on placement
         if (parameters.campaign instanceof VastCampaign) {
@@ -227,7 +226,7 @@ export class AdUnitFactory {
         };
 
         if(parameters.campaign.hasEndscreen()) {
-            vastEndScreen = new VastEndScreen(nativeBridge, parameters.configuration.isCoppaCompliant(), parameters.campaign, parameters.clientInfo.getGameId());
+            vastEndScreen = new VastEndScreen(nativeBridge, parameters);
             vastAdUnitParameters.endScreen = vastEndScreen;
         }
 

@@ -7,7 +7,6 @@ import { ListenerApi } from 'Ads/Native/Listener';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { Closer } from 'Ads/Views/Closer';
-import { Privacy } from 'Ads/Views/Privacy';
 import { assert } from 'chai';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
@@ -27,6 +26,7 @@ import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'VPAID/AdUnits/VPAIDAdUnit';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { VPAID } from 'VPAID/Views/VPAID';
 import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
+import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
 
 describe('VPAIDAdUnit', () => {
     let nativeBridge: NativeBridge;
@@ -57,7 +57,7 @@ describe('VPAIDAdUnit', () => {
             container: sinon.createStubInstance(Activity),
             configuration: sinon.createStubInstance(Configuration),
             request: sinon.createStubInstance(Request),
-            privacy: sinon.createStubInstance(Privacy),
+            privacy: sinon.createStubInstance(GDPRPrivacy),
             forceOrientation: Orientation.NONE,
             options: {},
             gdprManager: sinon.createStubInstance(GdprManager),
