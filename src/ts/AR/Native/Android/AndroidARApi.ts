@@ -9,8 +9,8 @@ export class AndroidARApi extends NativeApi {
         super(nativeBridge, 'AR', ApiPackage.AR);
     }
 
-    public isARSupported(): Promise<boolean> {
-        return this._nativeBridge.invoke<boolean>(this._fullApiClassName, 'isARSupported');
+    public isARSupported(): Promise<[boolean, boolean]> {
+        return this._nativeBridge.invoke<[boolean, boolean]>(this._fullApiClassName, 'isARSupported');
     }
 
     public initAR(): Promise<void> {
