@@ -3,7 +3,7 @@ import { NativeBridge } from 'Native/NativeBridge';
 
 export class MainBundleApi extends NativeApi {
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'MainBundle', ApiPackage.AR);
+        super(nativeBridge, 'MainBundle', ApiPackage.CORE);
     }
 
     public getDataForKeysContaining(containsString: string): Promise<{ [key: string]: any }> {
