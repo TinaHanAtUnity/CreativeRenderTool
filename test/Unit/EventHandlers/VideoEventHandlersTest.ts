@@ -115,7 +115,8 @@ describe('VideoEventHandlersTest', () => {
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
         video = new Video('', TestFixtures.getSession());
         placement = TestFixtures.getPlacement();
-        const privacy = sinon.createStubInstance(GDPRPrivacy);
+        const gdprManager = sinon.createStubInstance(GdprManager);
+        const privacy = new GDPRPrivacy(nativeBridge, vastCampaign, gdprManager, false, false, false);
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
 
         const endScreenParams : IEndScreenParameters = {
@@ -128,7 +129,6 @@ describe('VideoEventHandlersTest', () => {
             targetGameName: performanceCampaign.getGameName()
         };
         endScreen = new PerformanceEndScreen(endScreenParams, performanceCampaign);
-        const gdprManager = sinon.createStubInstance(GdprManager);
 
         vastAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,
@@ -171,8 +171,8 @@ describe('VideoEventHandlersTest', () => {
             programmaticTrackingService: programmaticTrackingService
         };
 
-        const xpromoPrivacy = sinon.createStubInstance(GDPRPrivacy);
         xPromoCampaign = TestFixtures.getXPromoCampaign();
+        const xpromoPrivacy = new GDPRPrivacy(nativeBridge, xPromoCampaign, gdprManager, false, false, false);
         const xpromoEndScreenParams : IEndScreenParameters = {
             nativeBridge: nativeBridge,
             language : 'en',

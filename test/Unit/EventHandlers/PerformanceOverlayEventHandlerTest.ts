@@ -71,8 +71,9 @@ describe('PerformanceOverlayEventHandlerTest', () => {
             campaign: campaign
         });
 
-        const privacy = sinon.createStubInstance(GDPRPrivacy);
-                const endScreenParams : IEndScreenParameters = {
+        const gdprManager = sinon.createStubInstance(GdprManager);
+        const privacy = new GDPRPrivacy(nativeBridge, campaign, gdprManager, false, false, false);
+        const endScreenParams : IEndScreenParameters = {
             nativeBridge: nativeBridge,
             language : deviceInfo.getLanguage(),
             gameId: clientInfo.getGameId(),
@@ -83,7 +84,6 @@ describe('PerformanceOverlayEventHandlerTest', () => {
         };
         endScreen = new PerformanceEndScreen(endScreenParams, campaign);
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
-        const gdprManager = sinon.createStubInstance(GdprManager);
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
         performanceAdUnitParameters = {

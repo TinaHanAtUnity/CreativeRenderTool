@@ -27,7 +27,7 @@ import { VastEndScreen } from 'VAST/Views/VastEndScreen';
 import EventTestVast from 'xml/EventTestVast.xml';
 import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
 
-describe('VastAdUnit', () => {
+describe('VastAdUnitTest', () => {
 
     let sandbox: sinon.SinonSandbox;
     let thirdPartyEventManager: ThirdPartyEventManager;
@@ -93,7 +93,7 @@ describe('VastAdUnit', () => {
         });
 
         const gdprManager = sinon.createStubInstance(GdprManager);
-        const privacy = sinon.createStubInstance(GDPRPrivacy);
+        const privacy = new GDPRPrivacy(nativeBridge, vastCampaign, gdprManager, false, false, false);
         const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
@@ -128,7 +128,8 @@ describe('VastAdUnit', () => {
             vastCampaign = TestFixtures.getEventVastCampaign();
             sinon.stub(vastCampaign, 'getVideo').returns(video);
             const nativeBridge = TestFixtures.getNativeBridge();
-            const privacy = sinon.createStubInstance(GDPRPrivacy);
+            const gdprManager = sinon.createStubInstance(GdprManager);
+            const privacy = new GDPRPrivacy(nativeBridge, vastCampaign, gdprManager, false, false, false);
             const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
             vastAdUnitParameters.overlay = overlay;
             vastAdUnitParameters.campaign = vastCampaign;
@@ -193,7 +194,8 @@ describe('VastAdUnit', () => {
             vastCampaign = TestFixtures.getCompanionVastCampaign();
             sinon.stub(vastCampaign, 'getVideo').returns(video);
             const nativeBridge = TestFixtures.getNativeBridge();
-            const privacy = sinon.createStubInstance(GDPRPrivacy);
+            const gdprManager = sinon.createStubInstance(GdprManager);
+            const privacy = new GDPRPrivacy(nativeBridge, vastCampaign, gdprManager, false, false, false);
             const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
             vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters);
             vastAdUnitParameters.overlay = overlay;

@@ -74,7 +74,8 @@ describe('VastVideoEventHandler tests', () => {
         metaDataManager = new MetaDataManager(nativeBridge);
         campaign = TestFixtures.getEventVastCampaign();
         clientInfo = TestFixtures.getClientInfo();
-        privacy = sinon.createStubInstance(GDPRPrivacy);
+        container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
+        privacy = new GDPRPrivacy(nativeBridge, campaign, gdprManager, false, false, false);
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 

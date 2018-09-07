@@ -64,7 +64,8 @@ describe('VastOverlayEventHandlersTest', () => {
         metaDataManager = new MetaDataManager(nativeBridge);
         campaign = TestFixtures.getEventVastCampaign();
         clientInfo = TestFixtures.getClientInfo();
-        privacy = sinon.createStubInstance(GDPRPrivacy);
+        const gdprManager = sinon.createStubInstance(GdprManager);
+        privacy = new GDPRPrivacy(nativeBridge, campaign, gdprManager, false, false, false);
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
         container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
@@ -91,8 +92,6 @@ describe('VastOverlayEventHandlersTest', () => {
             configuration: configuration,
             campaign: campaign
         });
-
-        const gdprManager = sinon.createStubInstance(GdprManager);
 
         vastAdUnitParameters = {
             forceOrientation: Orientation.LANDSCAPE,

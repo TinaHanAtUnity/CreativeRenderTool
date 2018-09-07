@@ -10,10 +10,11 @@ import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
+import { GdprManager } from 'Ads/Managers/GdprManager';
 
 const json = JSON.parse(DummyDisplayInterstitialCampaign);
 
-describe('DisplayInterstitial View', () => {
+describe('DisplayInterstitialTest', () => {
     let view: DisplayInterstitial;
     let nativeBridge: NativeBridge;
     let placement: Placement;
@@ -39,8 +40,8 @@ describe('DisplayInterstitial View', () => {
                 muteVideo: false
             });
             campaign = TestFixtures.getDisplayInterstitialCampaign();
-
-            const privacy = sinon.createStubInstance(GDPRPrivacy);
+            const gdprManager = sinon.createStubInstance(GdprManager);
+            const privacy = new GDPRPrivacy(nativeBridge, campaign, gdprManager, false, false, false);
 
             view = new DisplayInterstitial(nativeBridge, placement, campaign, privacy, false);
 

@@ -89,7 +89,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             sinon.spy(nativeBridge.Intent, 'launch');
 
             const video = new Video('', TestFixtures.getSession());
-            const privacy = sinon.createStubInstance(GDPRPrivacy);
+            const gdprManager = sinon.createStubInstance(GdprManager);
+            const privacy = new GDPRPrivacy(nativeBridge, campaign, gdprManager, false, false, false);
             const endScreenParams : IEndScreenParameters = {
                 nativeBridge: nativeBridge,
                 language : deviceInfo.getLanguage(),
@@ -102,7 +103,6 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             endScreen = new XPromoEndScreen(endScreenParams, TestFixtures.getXPromoCampaign());
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
             placement = TestFixtures.getPlacement();
-            const gdprManager = sinon.createStubInstance(GdprManager);
 
             xPromoAdUnitParameters = {
                 forceOrientation: Orientation.LANDSCAPE,
@@ -184,8 +184,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             sinon.stub(operativeEventManager, 'sendHttpKafkaEvent').returns(resolvedPromise);
             sinon.stub(deviceInfo, 'getOsVersion').returns('9.0');
             const video = new Video('', TestFixtures.getSession());
-
-            const privacy = sinon.createStubInstance(GDPRPrivacy);
+            const gdprManager = sinon.createStubInstance(GdprManager);
+            const privacy = new GDPRPrivacy(nativeBridge, campaign, gdprManager, false, false, false);
             const endScreenParams : IEndScreenParameters = {
                 nativeBridge: nativeBridge,
                 language : deviceInfo.getLanguage(),
@@ -197,7 +197,6 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             };
             endScreen = new XPromoEndScreen(endScreenParams, campaign);
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
-            const gdprManager = sinon.createStubInstance(GdprManager);
 
             xPromoAdUnitParameters = {
                 forceOrientation: Orientation.LANDSCAPE,

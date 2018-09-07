@@ -30,7 +30,7 @@ import { asStub } from 'TestHelpers/Functions';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
 
-describe('DisplayInterstitialAdUnit', () => {
+describe('DisplayInterstitialAdUnitTest', () => {
     let adUnit: DisplayInterstitialAdUnit;
     let nativeBridge: NativeBridge;
     let container: AdUnitContainer;
@@ -83,7 +83,7 @@ describe('DisplayInterstitialAdUnit', () => {
                 campaign: campaign
             });
 
-            const privacy = sinon.createStubInstance(GDPRPrivacy);
+            const privacy = new GDPRPrivacy(nativeBridge, campaign, gdprManager, false, false, false);
 
             webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
             (<any>webPlayerContainer).onPageStarted = new Observable1<string>();

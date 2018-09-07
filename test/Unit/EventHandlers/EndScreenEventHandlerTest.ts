@@ -86,8 +86,8 @@ describe('EndScreenEventHandlerTest', () => {
             sinon.spy(nativeBridge.Intent, 'launch');
 
             const video = new Video('', TestFixtures.getSession());
-
-            const privacy = sinon.createStubInstance(GDPRPrivacy);
+            const gdprManager = sinon.createStubInstance(GdprManager);
+            const privacy = new GDPRPrivacy(nativeBridge, campaign, gdprManager, false, false, false);
             const endScreenParams : IEndScreenParameters = {
                 nativeBridge: nativeBridge,
                 language : deviceInfo.getLanguage(),
@@ -100,7 +100,6 @@ describe('EndScreenEventHandlerTest', () => {
             endScreen = new PerformanceEndScreen(endScreenParams, TestFixtures.getCampaign());
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
             placement = TestFixtures.getPlacement();
-            const gdprManager = sinon.createStubInstance(GdprManager);
             const programmticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
             performanceAdUnitParameters = {
@@ -325,8 +324,8 @@ describe('EndScreenEventHandlerTest', () => {
             });
 
             sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
-
-            const privacy = sinon.createStubInstance(GDPRPrivacy);
+            const gdprManager = sinon.createStubInstance(GdprManager);
+            const privacy = new GDPRPrivacy(nativeBridge, campaign, gdprManager, false, false, false);
             const endScreenParams : IEndScreenParameters = {
                 nativeBridge: nativeBridge,
                 language : deviceInfo.getLanguage(),
@@ -338,7 +337,6 @@ describe('EndScreenEventHandlerTest', () => {
             };
             endScreen = new PerformanceEndScreen(endScreenParams, campaign);
             overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
-            const gdprManager = sinon.createStubInstance(GdprManager);
             const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
             performanceAdUnitParameters = {

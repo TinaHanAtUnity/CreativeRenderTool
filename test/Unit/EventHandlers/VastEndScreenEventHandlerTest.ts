@@ -26,7 +26,7 @@ import { VastEndScreen } from 'VAST/Views/VastEndScreen';
 import EventTestVast from 'xml/EventTestVast.xml';
 import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
 
-describe('VastEndScreenEventHandlersTest', () => {
+describe('VastEndScreenEventHandlerTest', () => {
     const handleInvocation = sinon.spy();
     const handleCallback = sinon.spy();
     let nativeBridge: NativeBridge;
@@ -65,11 +65,10 @@ describe('VastEndScreenEventHandlersTest', () => {
             configuration: configuration,
             campaign: campaign
         });
-
-        const privacy = sinon.createStubInstance(GDPRPrivacy);
+        const gdprManager = sinon.createStubInstance(GdprManager);
+        const privacy = new GDPRPrivacy(nativeBridge, campaign, gdprManager, false, false, false);
         const video = new Video('', TestFixtures.getSession());
         const overlay = new Overlay(nativeBridge, true, 'en', 'testGameId', privacy, false);
-        const gdprManager = sinon.createStubInstance(GdprManager);
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
         vastAdUnitParameters = {

@@ -65,7 +65,7 @@ describe('DisplayInterstitialEventHandler', () => {
             const gdprManager = sinon.createStubInstance(GdprManager);
             const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
 
-            const privacy = sinon.createStubInstance(GDPRPrivacy);
+            const privacy = new GDPRPrivacy(nativeBridge, campaign, gdprManager, false, false, false);
             view = new DisplayInterstitial(nativeBridge, placement, campaign, privacy, false);
 
             displayInterstitialAdUnitParameters = {
