@@ -303,7 +303,8 @@ describe('VastVideoEventHandler tests', () => {
         let vastAdUnit: VastAdUnit;
         beforeEach(() => {
             sandbox.restore();
-            vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.configuration.isCoppaCompliant(), vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
+            const endScreenPrivacy = new Privacy(nativeBridge, false);
+            vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId(), endScreenPrivacy);
             sinon.spy(vastEndScreen, 'show');
             vastAdUnitParameters.endScreen = vastEndScreen;
             vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
