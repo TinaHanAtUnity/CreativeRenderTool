@@ -13,7 +13,11 @@ export class CustomFeatures {
                gameId === '1042745' ||
                gameId === '1783249' ||
                gameId === '1783250' ||
-               gameId === '1543513';
+               gameId === '1543513' ||
+               gameId === '1458550' || // Kefir
+               gameId === '1432611' || // Kefir
+               gameId === '1783091' || // Guild of Heroes
+               gameId === '1783092';   // Guild of Heroes
     }
 
     public static isSonicPlayable(creativeId: string | undefined) {
@@ -40,5 +44,10 @@ export class CustomFeatures {
             || gameId === '2391158' // Brawlstars Android
             || gameId === '1782301' // Hayday iOS
             || gameId === '1782302';// Hayday Android
+    }
+
+    public static isCloseIconSkipApp(gameId: string) {
+        // Clean master (Cheetah)
+        return gameId === '1196341';
     }
 }

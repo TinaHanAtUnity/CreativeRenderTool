@@ -1,3 +1,7 @@
+# Pending
+
+* Add gameids for Mixed Placement experiment
+
 # Thu Sep  6 09:26:17 UTC 2018
 
 * Restructure codebase

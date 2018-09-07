@@ -72,12 +72,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
             {
                 event: 'click',
                 listener: (event: Event) => this.onPrivacyEvent(event),
-                selector: '.privacy-button'
-            },
-            {
-                event: 'click',
-                listener: (event: Event) => this.onPrivacyEvent(event),
-                selector: '.gdpr-link'
+                selector: '.privacy-button, .gdpr-link, .icon-gdpr'
             }
         ];
 
@@ -182,7 +177,9 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
 
         if (this._showGDPRBanner) {
             this._gdprPopupClicked = true;
+            this._container.classList.remove('show-gdpr-banner');
         }
+
         this._privacy.show();
     }
 
