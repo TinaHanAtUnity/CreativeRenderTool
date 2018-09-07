@@ -7,7 +7,7 @@ import PrivacyTemplate from 'html/Privacy.html';
 export class Privacy extends AbstractPrivacy {
 
     constructor(nativeBridge: NativeBridge, isCoppaCompliant: boolean) {
-        super(nativeBridge, isCoppaCompliant, 'privacy');
+        super(nativeBridge, isCoppaCompliant, false, 'privacy');
 
         this._template = new Template(PrivacyTemplate);
 

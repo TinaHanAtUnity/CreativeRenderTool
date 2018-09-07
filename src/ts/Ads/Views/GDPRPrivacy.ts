@@ -5,27 +5,26 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Template } from 'Core/Utilities/Template';
 import GDPRPrivacyTemplate from 'html/GDPR-privacy.html';
-import { BadAdsReporting, BadAdReason } from 'Test/Unit/Utilities/BadAdsReporting';
+import { BadAdsReporting } from 'Test/Unit/Utilities/BadAdsReporting';
 
 export class GDPRPrivacy extends AbstractPrivacy {
 
     private _optOutEnabled: boolean;
     private _gdprManager: GdprManager;
-    private _isCoppaCompliant: boolean;
     private _personalInfoObtained: boolean = false;
     private _dataDeletionConfirmation: boolean = false;
     private _currentState : number = -1;
     private _campaign: Campaign;
     private _reportSent: boolean = false;
+    private _gdprEnabled: boolean = false;
 
-    constructor(nativeBridge: NativeBridge, campaign: Campaign, gdprManager: GdprManager, isCoppaCompliant: boolean, optOutEnabled: boolean) {
-        super(nativeBridge, isCoppaCompliant, 'gdpr-privacy');
+    constructor(nativeBridge: NativeBridge, campaign: Campaign, gdprManager: GdprManager, gdprEnabled: boolean, isCoppaCompliant: boolean, optOutEnabled: boolean) {
+        super(nativeBridge, isCoppaCompliant, gdprEnabled, 'gdpr-privacy');
 
         this._template = new Template(GDPRPrivacyTemplate);
         this._gdprManager = gdprManager;
-        this._isCoppaCompliant = isCoppaCompliant;
         this._campaign = campaign;
-
+        this._gdprEnabled = gdprEnabled;
         this._optOutEnabled = optOutEnabled;
 
         this._bindings = [
@@ -86,10 +85,12 @@ export class GDPRPrivacy extends AbstractPrivacy {
     public render(): void {
         super.render();
 
-        const elId = this._optOutEnabled ? 'gdpr-refuse-radio' : 'gdpr-agree-radio';
+        if (this._gdprEnabled) {
+            const elId = this._optOutEnabled ? 'gdpr-refuse-radio' : 'gdpr-agree-radio';
 
-        const activeRadioButton = <HTMLInputElement>this._container.querySelector(`#${elId}`);
-        activeRadioButton.checked = true;
+            const activeRadioButton = <HTMLInputElement>this._container.querySelector(`#${elId}`);
+            activeRadioButton.checked = true;
+        }
 
         this.setCardState(false);
     }
@@ -97,7 +98,9 @@ export class GDPRPrivacy extends AbstractPrivacy {
     protected onCloseEvent(event: Event): void {
         event.preventDefault();
         const gdprReduceRadioButton = <HTMLInputElement>this._container.querySelector('#gdpr-refuse-radio');
-        this._handlers.forEach(handler => handler.onGDPROptOut(gdprReduceRadioButton.checked || this._dataDeletionConfirmation));
+        if (this._gdprEnabled) {
+            this._handlers.forEach(handler => handler.onGDPROptOut(gdprReduceRadioButton.checked || this._dataDeletionConfirmation));
+        }
         this._handlers.forEach(handler => handler.onPrivacyClose());
     }
 
@@ -132,16 +135,7 @@ export class GDPRPrivacy extends AbstractPrivacy {
     }
 
     private editPopupPerUser() {
-        if (this._isCoppaCompliant) {
-            document.getElementById('coppaTag1')!.innerHTML = 'By request of this app’s publisher, we do not combine the data from this app with data from any other apps.';
-            document.getElementById('coppaTag2')!.innerHTML = 'While these partners generally collect information about your advertising ID from sources other than Unity, Unity does not provide your advertising ID to these third parties for ads served in this app.';
-            document.getElementById('coppaTag3')!.innerHTML = 'This will also opt you out of personalized ad experiences.';
-        } else {
-            // Add nothing for coppaTag1 and coppaTag3
-            document.getElementById('coppaTag2')!.innerHTML = 'These partners may collect information about your advertising ID from sources other than Unity to further personalize the ads you see. Please visit the privacy policies of these third parties to review the compiled data they may have.';
-        }
-
-        if (!this._personalInfoObtained) {
+        if (this._gdprEnabled && !this._personalInfoObtained) {
             this._gdprManager.retrievePersonalInformation().then((personalProperties) => {
                 this._personalInfoObtained = true;
                 document.getElementById('sorry-message')!.innerHTML = ''; // Clear sorry message on previous failed request
