@@ -564,7 +564,18 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 return;
             }
 
-            this._nativeBridge.Permissions.checkPermissions(PermissionTypes.CAMERA).then(results => {
+            this._nativeBridge.Permissions.checkPermissionsAvailable(PermissionTypes.CAMERA).then(results => {
+                if (!results) {
+                    this.onCameraPermissionEvent(false);
+                }
+                return results;
+            }).then((available: boolean) => {
+                this._nativeBridge.Sdk.logDebug('available? ' + available);
+                if (!available) {
+                    return CurrentPermission.DENIED;
+                }
+                return this._nativeBridge.Permissions.checkPermissions(PermissionTypes.CAMERA);
+            }).then((results: CurrentPermission) => {
                 const requestPermissionText = <HTMLElement>this._cameraPermissionPanel.querySelector('.request-text');
                 if (results === CurrentPermission.DENIED) {
                     this.onCameraPermissionEvent(false);

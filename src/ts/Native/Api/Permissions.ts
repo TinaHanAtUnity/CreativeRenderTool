@@ -42,6 +42,14 @@ export class PermissionsApi extends NativeApi {
         this._currentPlatform = currentPlatform;
     }
 
+    public checkPermissionsAvailable(permission: PermissionTypes): Promise<boolean> {
+        const platformPermission = this.getPlatformPermission(permission);
+        if (this._currentPlatform === Platform.ANDROID) {
+            return Promise.resolve(true);
+        }
+        return this._ios.checkPermissionsInManifest(platformPermission);
+    }
+
     public checkPermissions(permission: PermissionTypes): Promise<CurrentPermission> {
         if (this._currentPlatform === Platform.ANDROID) {
             return this.checkAndroidPermission(permission);
