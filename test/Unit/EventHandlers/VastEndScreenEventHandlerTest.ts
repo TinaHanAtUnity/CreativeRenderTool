@@ -94,7 +94,8 @@ describe('VastEndScreenEventHandlerTest', () => {
 
     describe('when calling onClose', () => {
         it('should hide endcard', () => {
-            const vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters);
+            const privacy = new GDPRPrivacy(nativeBridge, vastAdUnitParameters.campaign, vastAdUnitParameters.gdprManager, true, false, true);
+            const vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters, privacy);
             vastAdUnitParameters.endScreen = vastEndScreen;
             const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
             sinon.stub(vastAdUnit, 'hide').returns(sinon.spy());
@@ -122,7 +123,8 @@ describe('VastEndScreenEventHandlerTest', () => {
             vastAdUnitParameters.video = video;
             vastAdUnitParameters.campaign = campaign;
             vastAdUnitParameters.placement = TestFixtures.getPlacement();
-            vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters);
+            const privacy = new GDPRPrivacy(nativeBridge, vastAdUnitParameters.campaign, vastAdUnitParameters.gdprManager, true, false, true);
+            vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters, privacy);
             vastAdUnitParameters.endScreen = vastEndScreen;
             vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
             vastEndScreenEventHandler = new VastEndScreenEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);

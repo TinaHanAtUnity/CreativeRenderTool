@@ -41,6 +41,24 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
     display: block;
   }
 
+  .skip-button:not(.close-icon-skip) {
+    .icon-skip {
+      display: block;
+    }
+    .icon-close {
+      display: none;
+    }
+  }
+
+  .skip-button.close-icon-skip {
+    .icon-skip {
+      display: none;
+    }
+    .icon-close {
+      display: block;
+    }
+  }
+
   .button {
     width: $new-video-overlay-styles.touchable-area-width;
     height: $new-video-overlay-styles.touchable-area-height;

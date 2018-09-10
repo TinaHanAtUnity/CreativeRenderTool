@@ -227,7 +227,8 @@ export class AdUnitFactory {
         };
 
         if(parameters.campaign.hasEndscreen()) {
-            vastEndScreen = new VastEndScreen(nativeBridge, parameters);
+            const endScreenPrivacy = this.createPrivacy(nativeBridge, vastAdUnitParameters);
+            vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters, endScreenPrivacy);
             vastAdUnitParameters.endScreen = vastEndScreen;
         }
 

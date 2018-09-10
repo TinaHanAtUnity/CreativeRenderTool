@@ -66,7 +66,7 @@ export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
     }
 
     public static setUserInformation(gdprManager: GdprManager) {
-        gdprManager.retrievePersonalInformation().then((personalProperties) => {
+        return gdprManager.retrievePersonalInformation().then((personalProperties) => {
             AbstractPrivacy.userInformation = personalProperties;
         }).catch(); // Intentional
     }

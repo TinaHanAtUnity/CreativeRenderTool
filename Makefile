@@ -81,7 +81,7 @@ TEST_BUILD_TARGETS := $(TEST_BUILD_DIR)/UnitBundle.min.js $(BUILD_DIR)/test/inde
 # Built-in targets
 
 .PHONY: all static build-browser build-dev build-release build-test test test-unit test-integration test-coverage test-browser clean lint setup watch-dev watch-browser watch-test start-server stop-server deploy qr-code
-.PHONY: $(BUILD_DIR)/dev/index.html $(BUILD_DIR)/dev/config.json
+.PHONY: $(BUILD_DIR)/dev/index.html $(BUILD_DIR)/dev/config.json $(TEST_BUILD_DIR)/Unit.js $(TEST_BUILD_DIR)/Integration.js
 .NOTPARALLEL: $(TS_TARGETS) $(TEST_TARGETS)
 
 # Main targets

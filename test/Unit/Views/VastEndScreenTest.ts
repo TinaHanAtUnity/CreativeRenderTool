@@ -20,6 +20,7 @@ import { Activity } from 'Ads/AdUnits/Containers/Activity';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { Video } from 'Ads/Models/Assets/Video';
+import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
 
 describe('VastEndScreen', () => {
     let handleInvocation: sinon.SinonSpy;
@@ -57,7 +58,8 @@ describe('VastEndScreen', () => {
     });
 
     it('should render', () => {
-        const endScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters);
+        const privacy = new GDPRPrivacy(nativeBridge, vastAdUnitParameters.campaign, vastAdUnitParameters.gdprManager, true, false, true);
+        const endScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters, privacy);
         endScreen.render();
         assert.equal(endScreen.container().innerHTML, VastEndScreenFixture);
     });

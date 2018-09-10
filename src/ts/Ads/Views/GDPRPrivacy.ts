@@ -2,20 +2,19 @@ import { GdprManager } from 'Ads/Managers/GdprManager';
 import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Template } from 'Core/Utilities/Template';
 import GDPRPrivacyTemplate from 'html/GDPR-privacy.html';
 import { BadAdsReporting } from 'Ads/Utilities/BadAdsReporting';
 
 export class GDPRPrivacy extends AbstractPrivacy {
 
-    private _optOutEnabled: boolean;
     private _gdprManager: GdprManager;
     private _dataDeletionConfirmation: boolean = false;
     private _currentState : number = -1;
     private _campaign: Campaign;
     private _reportSent: boolean = false;
     private _gdprEnabled: boolean = false;
+    private _optOutEnabled: boolean;
 
     constructor(nativeBridge: NativeBridge, campaign: Campaign,
                 gdprManager: GdprManager, gdprEnabled: boolean,
@@ -70,6 +69,13 @@ export class GDPRPrivacy extends AbstractPrivacy {
 
     public show(): void {
         super.show();
+        if (this._gdprEnabled) {
+            const elId = this._optOutEnabled ? 'gdpr-refuse-radio' : 'gdpr-agree-radio';
+
+            const activeRadioButton = <HTMLInputElement>this._container.querySelector(`#${elId}`);
+            activeRadioButton.checked = true;
+        }
+
         const agreeRadioButton = <HTMLInputElement>this._container.querySelector('#gdpr-agree-radio');
         agreeRadioButton.onclick = () => {
             const confirmationContainer = <HTMLSpanElement>document.getElementById('data-deletion-container');
@@ -84,14 +90,6 @@ export class GDPRPrivacy extends AbstractPrivacy {
 
     public render(): void {
         super.render();
-
-        if (this._gdprEnabled) {
-            const elId = this._optOutEnabled ? 'gdpr-refuse-radio' : 'gdpr-agree-radio';
-
-            const activeRadioButton = <HTMLInputElement>this._container.querySelector(`#${elId}`);
-            activeRadioButton.checked = true;
-        }
-
         this.setCardState(false);
     }
 

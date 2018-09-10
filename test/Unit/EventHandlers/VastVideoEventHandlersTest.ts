@@ -303,7 +303,7 @@ describe('VastVideoEventHandler tests', () => {
         let vastAdUnit: VastAdUnit;
         beforeEach(() => {
             sandbox.restore();
-            vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters);
+            vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters, privacy);
             sinon.spy(vastEndScreen, 'show');
             vastAdUnitParameters.endScreen = vastEndScreen;
             vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
