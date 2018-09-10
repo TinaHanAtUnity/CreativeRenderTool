@@ -8,20 +8,17 @@ import GDPRPrivacyTemplate from 'html/GDPR-privacy.html';
 
 export class GDPRPrivacy extends AbstractPrivacy {
 
-    private _optOutEnabled: boolean;
     private _gdprManager: GdprManager;
     private _isCoppaCompliant: boolean;
     private _personalInfoObtained: boolean = false;
     private _dataDeletionConfirmation: boolean = false;
 
-    constructor(nativeBridge: NativeBridge, gdprManager: GdprManager, isCoppaCompliant: boolean, optOutEnabled: boolean) {
+    constructor(nativeBridge: NativeBridge, gdprManager: GdprManager, isCoppaCompliant: boolean) {
         super(nativeBridge, isCoppaCompliant, 'gdpr-privacy');
 
         this._template = new Template(GDPRPrivacyTemplate);
         this._gdprManager = gdprManager;
         this._isCoppaCompliant = isCoppaCompliant;
-
-        this._optOutEnabled = optOutEnabled;
 
         this._bindings = [
             {
@@ -56,6 +53,10 @@ export class GDPRPrivacy extends AbstractPrivacy {
         super.show();
         this.editPopupPerUser();
         this.setCardState();
+        const elId = this._gdprManager.isOptOutEnabled() ? 'gdpr-refuse-radio' : 'gdpr-agree-radio';
+
+        const activeRadioButton = <HTMLInputElement>this._container.querySelector(`#${elId}`);
+        activeRadioButton.checked = true;
 
         const agreeRadioButton = <HTMLInputElement>this._container.querySelector('#gdpr-agree-radio');
         agreeRadioButton.onclick = () => {
@@ -71,11 +72,6 @@ export class GDPRPrivacy extends AbstractPrivacy {
 
     public render(): void {
         super.render();
-
-        const elId = this._optOutEnabled ? 'gdpr-refuse-radio' : 'gdpr-agree-radio';
-
-        const activeRadioButton = <HTMLInputElement>this._container.querySelector(`#${elId}`);
-        activeRadioButton.checked = true;
 
         this.setCardState();
     }

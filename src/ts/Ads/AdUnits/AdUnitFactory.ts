@@ -227,7 +227,8 @@ export class AdUnitFactory {
         };
 
         if(parameters.campaign.hasEndscreen()) {
-            vastEndScreen = new VastEndScreen(nativeBridge, parameters.configuration.isCoppaCompliant(), parameters.campaign, parameters.clientInfo.getGameId());
+            const endScreenPrivacy = this.createPrivacy(nativeBridge, parameters);
+            vastEndScreen = new VastEndScreen(nativeBridge, parameters.campaign, parameters.clientInfo.getGameId(), endScreenPrivacy);
             vastAdUnitParameters.endScreen = vastEndScreen;
         }
 
@@ -519,7 +520,7 @@ export class AdUnitFactory {
     private static createPrivacy(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractPrivacy {
         let privacy: AbstractPrivacy;
         if (parameters.configuration.isGDPREnabled()) {
-            privacy = new GDPRPrivacy(nativeBridge, parameters.gdprManager, parameters.configuration.isCoppaCompliant(), parameters.configuration.isOptOutEnabled());
+            privacy = new GDPRPrivacy(nativeBridge, parameters.gdprManager, parameters.configuration.isCoppaCompliant());
         } else {
             privacy = new Privacy(nativeBridge, parameters.configuration.isCoppaCompliant());
         }
