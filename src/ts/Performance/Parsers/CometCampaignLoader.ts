@@ -46,6 +46,13 @@ export class CometCampaignLoader extends CampaignLoader {
             campaign.streamingPortraitVideo = this.loadVideo(campaign.streamingPortraitVideo, campaign.session);
         }
 
-        return new PerformanceCampaign(campaign);
+        let performanceCampaign;
+        try {
+            performanceCampaign = new PerformanceCampaign(campaign);
+        } catch(e) {
+            return undefined;
+        }
+
+        return performanceCampaign;
     }
 }
