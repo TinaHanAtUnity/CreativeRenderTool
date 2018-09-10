@@ -10,7 +10,7 @@ import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'CoreConfiguration.ts';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IntentApi } from 'Core/Native/Android/Intent';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
@@ -47,7 +47,7 @@ describe('VPAIDEventHandlerTest', () => {
             operativeEventManager: sinon.createStubInstance(OperativeEventManager),
             placement: TestFixtures.getPlacement(),
             container: sinon.createStubInstance(Activity),
-            configuration: sinon.createStubInstance(Configuration),
+            configuration: sinon.createStubInstance(CoreConfiguration),
             request: sinon.createStubInstance(Request),
             privacy: sinon.createStubInstance(Privacy),
             forceOrientation: Orientation.NONE,

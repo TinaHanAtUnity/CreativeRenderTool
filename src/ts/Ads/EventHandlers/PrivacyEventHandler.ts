@@ -4,14 +4,14 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'CoreConfiguration.ts';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 export class PrivacyEventHandler implements IPrivacyHandler {
 
     private _nativeBridge: NativeBridge;
     private _gdprManager: GdprManager;
-    private _configuration: Configuration;
+    private _configuration: CoreConfiguration;
     private _placement: Placement;
 
     constructor(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>) {

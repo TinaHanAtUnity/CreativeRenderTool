@@ -1,7 +1,7 @@
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { CacheApi } from 'Core/Native/Cache';
 
 export class FileId {
-    public static getFileId(url: string, nativeBridge: NativeBridge): Promise<string> {
+    public static getFileId(url: string, cache: CacheApi): Promise<string> {
         if(url in this._fileIds) {
             return Promise.resolve(this._fileIds[url]);
         }
@@ -21,7 +21,7 @@ export class FileId {
             extension = fileExtensions[fileExtensions.length - 1];
         }
 
-        return nativeBridge.Cache.getHash(url).then(hash => {
+        return cache.getHash(url).then(hash => {
             let fileId: string;
             if(extension) {
                 fileId = this._fileIds[url] = hash + '.' + extension;
@@ -42,8 +42,8 @@ export class FileId {
         return fileIdSplit[1];
     }
 
-    public static getFileUrl(fileId: string, nativeBridge: NativeBridge): Promise<string> {
-        return nativeBridge.Cache.getFilePath(fileId).then(filePath => {
+    public static getFileUrl(fileId: string, cache: CacheApi): Promise<string> {
+        return cache.getFilePath(fileId).then(filePath => {
             return 'file://' + filePath;
         });
     }

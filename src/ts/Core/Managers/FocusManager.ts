@@ -1,4 +1,6 @@
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { BroadcastApi } from 'Core/Native/Android/Broadcast';
+import { LifecycleApi } from 'Core/Native/Android/Lifecycle';
+import { NotificationApi } from 'Core/Native/iOS/Notification';
 import { Observable0, Observable1 } from 'Core/Utilities/Observable';
 
 export const AdUnitActivities = ['com.unity3d.ads.adunit.AdUnitActivity', 'com.unity3d.ads.adunit.AdUnitTransparentActivity', 'com.unity3d.ads.adunit.AdUnitTransparentSoftwareActivity', 'com.unity3d.ads.adunit.AdUnitSoftwareActivity'];
@@ -14,52 +16,57 @@ export class FocusManager {
     public readonly onScreenOn = new Observable0();
     public readonly onScreenOff = new Observable0();
 
-    private _nativeBridge: NativeBridge;
+    private readonly _broadcast: BroadcastApi;
+    private readonly _notification: NotificationApi;
+    private readonly _lifecycle: LifecycleApi;
+
     private _appForeground: boolean;
     private _topActivity: string;
     private _screenListener: string = 'screenListener';
     private ACTION_SCREEN_ON: string = 'android.intent.action.SCREEN_ON';
     private ACTION_SCREEN_OFF: string = 'android.intent.action.SCREEN_OFF';
 
-    constructor(nativeBridge: NativeBridge) {
-        this._nativeBridge = nativeBridge;
+    constructor(broadcast: BroadcastApi, notification: NotificationApi, lifecycle: LifecycleApi) {
         this._appForeground = true;
-        this._nativeBridge.Broadcast.onBroadcastAction.subscribe((name, action, data, extra) => this.onBroadcastAction(name, action, data, extra));
-        this._nativeBridge.Notification.onNotification.subscribe((event, parameters) => this.onNotification(event, parameters));
-        this._nativeBridge.Lifecycle.onActivityResumed.subscribe((activity) => this.onResume(activity));
-        this._nativeBridge.Lifecycle.onActivityPaused.subscribe((activity) => this.onPause(activity));
-        this._nativeBridge.Lifecycle.onActivityDestroyed.subscribe((activity) => this.onDestroyed(activity));
+        this._broadcast = broadcast;
+        this._notification = notification;
+        this._lifecycle = lifecycle;
+        this._broadcast.onBroadcastAction.subscribe((name, action, data, extra) => this.onBroadcastAction(name, action, data, extra));
+        this._notification.onNotification.subscribe((event, parameters) => this.onNotification(event, parameters));
+        this._lifecycle.onActivityResumed.subscribe((activity) => this.onResume(activity));
+        this._lifecycle.onActivityPaused.subscribe((activity) => this.onPause(activity));
+        this._lifecycle.onActivityDestroyed.subscribe((activity) => this.onDestroyed(activity));
     }
 
     public setListenAppForeground(status: boolean): Promise<void> {
         if(status) {
-            return this._nativeBridge.Notification.addNotificationObserver(FocusManager._appForegroundNotification, []);
+            return this._notification.addNotificationObserver(FocusManager._appForegroundNotification, []);
         } else {
-            return this._nativeBridge.Notification.removeNotificationObserver(FocusManager._appForegroundNotification);
+            return this._notification.removeNotificationObserver(FocusManager._appForegroundNotification);
         }
     }
 
     public setListenAppBackground(status: boolean): Promise<void> {
         if(status) {
-            return this._nativeBridge.Notification.addNotificationObserver(FocusManager._appBackgroundNotification, []);
+            return this._notification.addNotificationObserver(FocusManager._appBackgroundNotification, []);
         } else {
-            return this._nativeBridge.Notification.removeNotificationObserver(FocusManager._appBackgroundNotification);
+            return this._notification.removeNotificationObserver(FocusManager._appBackgroundNotification);
         }
     }
 
     public setListenAndroidLifecycle(status: boolean): Promise<void> {
         if(status) {
-            return this._nativeBridge.Lifecycle.register(['onActivityResumed', 'onActivityPaused']);
+            return this._lifecycle.register(['onActivityResumed', 'onActivityPaused']);
         } else {
-            return this._nativeBridge.Lifecycle.unregister();
+            return this._lifecycle.unregister();
         }
     }
 
     public setListenScreen(status: boolean): Promise<void> {
         if(status) {
-            return this._nativeBridge.Broadcast.addBroadcastListener(this._screenListener, [this.ACTION_SCREEN_ON, this.ACTION_SCREEN_OFF]);
+            return this._broadcast.addBroadcastListener(this._screenListener, [this.ACTION_SCREEN_ON, this.ACTION_SCREEN_OFF]);
         } else {
-            return this._nativeBridge.Broadcast.removeBroadcastListener(this._screenListener);
+            return this._broadcast.removeBroadcastListener(this._screenListener);
         }
     }
 

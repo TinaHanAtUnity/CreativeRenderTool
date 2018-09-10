@@ -2,7 +2,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { RequestError } from 'Core/Errors/RequestError';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { CallbackContainer } from 'Core/Native/Bridge/CallbackContainer';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { RequestApi } from 'Core/Native/Request';
 
 const enum RequestStatus {
     COMPLETE,
@@ -81,15 +81,19 @@ export class Request {
         };
     }
 
-    private _nativeBridge: NativeBridge;
+    private _platform: Platform;
+    private _apiLevel: number;
+    private _request: RequestApi;
     private _wakeUpManager: WakeUpManager;
 
-    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager) {
-        this._nativeBridge = nativeBridge;
+    constructor(platform: Platform, apiLevel: number, request: RequestApi, wakeUpManager: WakeUpManager) {
+        this._platform = platform;
+        this._apiLevel = apiLevel;
+        this._request = request;
         this._wakeUpManager = wakeUpManager;
 
-        this._nativeBridge.Request.onComplete.subscribe((rawId, url, response, responseCode, headers) => this.onRequestComplete(rawId, url, response, responseCode, headers));
-        this._nativeBridge.Request.onFailed.subscribe((rawId, url, error) => this.onRequestFailed(rawId, url, error));
+        this._request.onComplete.subscribe((rawId, url, response, responseCode, headers) => this.onRequestComplete(rawId, url, response, responseCode, headers));
+        this._request.onFailed.subscribe((rawId, url, error) => this.onRequestFailed(rawId, url, error));
         this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
     }
 
@@ -136,7 +140,7 @@ export class Request {
         }
 
         // fix for Android 4.0 and older, https://code.google.com/p/android/issues/detail?id=24672
-        if(this._nativeBridge.getPlatform() === Platform.ANDROID && this._nativeBridge.getApiLevel() < 16) {
+        if(this._platform === Platform.ANDROID && this._apiLevel < 16) {
             headers.push(['Accept-Encoding', '']);
         }
 
@@ -206,13 +210,13 @@ export class Request {
         Request._requests[id] = nativeRequest;
         switch(nativeRequest.method) {
             case RequestMethod.GET:
-                return this._nativeBridge.Request.get(id.toString(), nativeRequest.url, nativeRequest.headers, connectTimeout, readTimeout);
+                return this._request.get(id.toString(), nativeRequest.url, nativeRequest.headers, connectTimeout, readTimeout);
 
             case RequestMethod.POST:
-                return this._nativeBridge.Request.post(id.toString(), nativeRequest.url, nativeRequest.data || '', nativeRequest.headers, connectTimeout, readTimeout);
+                return this._request.post(id.toString(), nativeRequest.url, nativeRequest.data || '', nativeRequest.headers, connectTimeout, readTimeout);
 
             case RequestMethod.HEAD:
-                return this._nativeBridge.Request.head(id.toString(), nativeRequest.url, nativeRequest.headers, connectTimeout, readTimeout);
+                return this._request.head(id.toString(), nativeRequest.url, nativeRequest.headers, connectTimeout, readTimeout);
 
             default:
                 throw new Error('Unsupported request method "' + nativeRequest.method + '"');

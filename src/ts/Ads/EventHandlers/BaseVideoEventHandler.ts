@@ -9,7 +9,7 @@ import { Placement } from 'Ads/Models/Placement';
 import { FinishState } from 'Core/Constants/FinishState';
 import { UnityAdsError } from 'Core/Constants/UnityAdsError';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'CoreConfiguration.ts';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
@@ -19,7 +19,7 @@ export interface IVideoEventHandlerParams<T extends VideoAdUnit = VideoAdUnit, T
     campaign: T2;
     operativeEventManager: T3;
     thirdPartyEventManager: ThirdPartyEventManager;
-    configuration: Configuration;
+    configuration: CoreConfiguration;
     placement: Placement;
     video: Video;
     adUnitStyle?: AdUnitStyle;

@@ -1,5 +1,5 @@
 import { GDPREventAction, GdprManager } from 'Ads/Managers/GdprManager';
-import { Configuration } from 'Core/Models/Configuration';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 
 export interface IGDPREventHandler {
     onGDPRPopupSkipped(): void;
@@ -8,9 +8,9 @@ export interface IGDPREventHandler {
 export abstract class GDPREventHandler implements IGDPREventHandler {
 
     private _gdprManager: GdprManager;
-    protected _configuration: Configuration;
+    protected _configuration: AdsConfiguration;
 
-    constructor(gdprManager: GdprManager, configuration: Configuration) {
+    constructor(gdprManager: GdprManager, configuration: AdsConfiguration) {
         this._gdprManager = gdprManager;
         this._configuration = configuration;
     }

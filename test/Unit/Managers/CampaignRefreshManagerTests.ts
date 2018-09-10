@@ -25,10 +25,10 @@ import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 
-import { CacheMode, Configuration } from 'Core/Models/Configuration';
+import { CacheMode, CoreConfiguration } from 'CoreConfiguration.ts';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
+import { CoreConfigurationParser } from 'CoreConfigurationParser.ts';
 import { Cache, CacheStatus } from 'Core/Utilities/Cache';
 import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
 
@@ -96,7 +96,7 @@ describe('CampaignRefreshManager', () => {
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
     let vastParser: VastParser;
-    let configuration: Configuration;
+    let configuration: CoreConfiguration;
     let campaignManager: CampaignManager;
     let wakeUpManager: WakeUpManager;
     let nativeBridge: NativeBridge;
@@ -247,7 +247,7 @@ describe('CampaignRefreshManager', () => {
 
     describe('PLC campaigns', () => {
         beforeEach(() => {
-            configuration = ConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
+            configuration = CoreConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
             campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
             campaignRefreshManager = new OldCampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration, focusManager, sessionManager, clientInfo, request, cache);
         });
@@ -647,7 +647,7 @@ describe('CampaignRefreshManager', () => {
         beforeEach(() => {
             sandbox = sinon.createSandbox();
             const clientInfoPromoGame = TestFixtures.getClientInfo(Platform.ANDROID, '00000');
-            configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            configuration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfoPromoGame, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
             campaignRefreshManager = new OldCampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration, focusManager, sessionManager, clientInfoPromoGame, request, cache);
         });
@@ -696,7 +696,7 @@ describe('CampaignRefreshManager', () => {
         beforeEach(() => {
             sandbox = sinon.createSandbox();
             const clientInfoPromoGame = TestFixtures.getClientInfo(Platform.ANDROID, '1003628');
-            configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            configuration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfoPromoGame, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
             campaignRefreshManager = new OldCampaignRefreshManager(nativeBridge, wakeUpManager, campaignManager, configuration, focusManager, sessionManager, clientInfoPromoGame, request, cache);
         });

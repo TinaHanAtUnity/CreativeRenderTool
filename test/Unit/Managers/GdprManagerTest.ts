@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'CoreConfiguration.ts';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { SdkApi } from 'Core/Native/Sdk';
@@ -22,7 +22,7 @@ describe('GdprManagerTest', () => {
     let nativeBridge: NativeBridge;
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
-    let configuration: Configuration;
+    let configuration: CoreConfiguration;
     let gdprManager: GdprManager;
     let request: Request;
 
@@ -49,7 +49,7 @@ describe('GdprManagerTest', () => {
 
         clientInfo = sinon.createStubInstance(ClientInfo);
         deviceInfo = sinon.createStubInstance(AndroidDeviceInfo);
-        configuration = sinon.createStubInstance(Configuration);
+        configuration = sinon.createStubInstance(CoreConfiguration);
         request = sinon.createStubInstance(Request);
 
         onSetStub = sinon.stub(nativeBridge.Storage.onSet, 'subscribe');

@@ -2,7 +2,7 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { Platform } from 'Core/Constants/Platform';
 
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { View } from 'Core/Views/View';
 
@@ -30,7 +30,7 @@ export interface IBuildInformation {
 
 export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
 
-    public static createBuildInformation(clientInfo: ClientInfo, campaign: Campaign, nativeBridge: NativeBridge, configuration: Configuration) {
+    public static createBuildInformation(clientInfo: ClientInfo, campaign: Campaign, nativeBridge: NativeBridge, configuration: CoreConfiguration) {
         const date = new Date();
         AbstractPrivacy.buildInformation = {
             userAgent: window.navigator.userAgent,
@@ -55,8 +55,7 @@ export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
         super(nativeBridge, id);
 
         this._templateData = {
-            'isCoppaCompliant': isCoppaCompliant,
-            'buildInformation': AbstractPrivacy.buildInformation
+            'isCoppaCompliant': isCoppaCompliant
         };
     }
 

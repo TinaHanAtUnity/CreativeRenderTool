@@ -8,7 +8,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'CoreConfiguration.ts';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
@@ -46,7 +46,7 @@ export interface IPlacementMedia {
 
 export interface IAuctionRequestParams {
     nativeBridge: NativeBridge;
-    configuration: Configuration;
+    configuration: CoreConfiguration;
     adMobSignalFactory: AdMobSignalFactory;
     metaDataManager: MetaDataManager;
     request: Request;
@@ -100,7 +100,7 @@ export class AuctionRequest {
 
     protected _nativeBridge: NativeBridge;
     protected _response: INativeResponse;
-    private _configuration: Configuration;
+    private _configuration: CoreConfiguration;
     private _adMobSignalFactory: AdMobSignalFactory;
     private _metaDataManager: MetaDataManager;
     private _request: Request;

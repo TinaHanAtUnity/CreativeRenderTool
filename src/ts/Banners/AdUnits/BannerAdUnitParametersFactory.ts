@@ -13,7 +13,7 @@ import { AnalyticsManager } from 'Analytics/AnalyticsManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'CoreConfiguration.ts';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Request } from 'Core/Utilities/Request';
@@ -23,7 +23,7 @@ export class BannerAdUnitParametersFactory {
     private _nativeBridge: NativeBridge;
     private _request: Request;
     private _metadataManager: MetaDataManager;
-    private _configuration: Configuration;
+    private _configuration: CoreConfiguration;
     private _container: AdUnitContainer;
     private _deviceInfo: DeviceInfo;
     private _clientInfo: ClientInfo;
@@ -34,7 +34,7 @@ export class BannerAdUnitParametersFactory {
     private _gdprManager: GdprManager;
     private _programmaticTrackingService: ProgrammaticTrackingService;
 
-    constructor(nativeBridge: NativeBridge, request: Request, metadataManager: MetaDataManager, configuration: Configuration, container: AdUnitContainer, deviceInfo: DeviceInfo, clientInfo: ClientInfo, sessionManager: SessionManager, focusManager: FocusManager, analyticsManager: AnalyticsManager, adMobSignalFactory: AdMobSignalFactory, gdprManager: GdprManager, webPlayerContainer: WebPlayerContainer, programmaticTrackingService: ProgrammaticTrackingService) {
+    constructor(nativeBridge: NativeBridge, request: Request, metadataManager: MetaDataManager, configuration: CoreConfiguration, container: AdUnitContainer, deviceInfo: DeviceInfo, clientInfo: ClientInfo, sessionManager: SessionManager, focusManager: FocusManager, analyticsManager: AnalyticsManager, adMobSignalFactory: AdMobSignalFactory, gdprManager: GdprManager, webPlayerContainer: WebPlayerContainer, programmaticTrackingService: ProgrammaticTrackingService) {
         this._nativeBridge = nativeBridge;
         this._request = request;
         this._metadataManager = metadataManager;

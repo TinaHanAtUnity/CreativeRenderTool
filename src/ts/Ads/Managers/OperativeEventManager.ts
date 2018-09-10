@@ -12,7 +12,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
@@ -20,16 +20,17 @@ import { PlayerMetaData } from 'Core/Models/MetaData/PlayerMetaData';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
-import { INativeResponse, Request } from 'Core/Utilities/Request';
+import { INativeResponse, Request } from 'Core/Managers/Request';
+import { StorageApi } from '../../Core/Native/Storage';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {
-    nativeBridge: NativeBridge;
+    storage: StorageApi;
     request: Request;
     metaDataManager: MetaDataManager;
     sessionManager: SessionManager;
     clientInfo: ClientInfo;
     deviceInfo: DeviceInfo;
-    configuration: Configuration;
+    configuration: AdsConfiguration;
     campaign: T;
 }
 
@@ -73,13 +74,13 @@ export class OperativeEventManager {
     protected _clientInfo: ClientInfo;
     protected _campaign: Campaign;
     protected _metaDataManager: MetaDataManager;
-    protected _nativeBridge: NativeBridge;
+    protected _storage: StorageApi;
     private _deviceInfo: DeviceInfo;
     private _request: Request;
-    private _configuration: Configuration;
+    private _configuration: AdsConfiguration;
 
     constructor(params: IOperativeEventManagerParams<Campaign>) {
-        this._nativeBridge = params.nativeBridge;
+        this._storage = params.storage;
         this._metaDataManager = params.metaDataManager;
         this._sessionManager = params.sessionManager;
         this._clientInfo = params.clientInfo;
@@ -257,7 +258,7 @@ export class OperativeEventManager {
             followRedirects: false,
             retryWithConnectionEvents: false
         }).catch(() => {
-            new FailedOperativeEventManager(sessionId, eventId).storeFailedEvent(this._nativeBridge, {
+            new FailedOperativeEventManager(this._storage, sessionId, eventId).storeFailedEvent({
                url: url,
                data: data
             });
@@ -282,7 +283,7 @@ export class OperativeEventManager {
     }
 
     protected createUniqueEventMetadata(params: IOperativeEventParams, gameSession: number, gamerSid?: string, previousPlacementId?: string): Promise<[string, any]> {
-        return this._nativeBridge.DeviceInfo.getUniqueEventId().then(id => {
+        return this._deviceInfo.getUniqueEventId().then(id => {
             return this.getInfoJson(params, id, gameSession, gamerSid, previousPlacementId);
         });
     }

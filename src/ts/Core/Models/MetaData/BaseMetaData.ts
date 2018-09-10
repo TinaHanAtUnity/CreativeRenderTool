@@ -1,5 +1,5 @@
+import { StorageApi } from 'Core/Native/Storage';
 import { ISchema, Model } from 'Core/Models/Model';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { MetaData } from 'Core/Utilities/MetaData';
 
 export interface IMetaData {
@@ -25,7 +25,7 @@ export abstract class BaseMetaData<T extends IMetaData = IMetaData> extends Mode
         return this.get('keys');
     }
 
-    public fetch(nativeBridge: NativeBridge, keys?: string[]): Promise<boolean> {
+    public fetch(storage: StorageApi, keys?: string[]): Promise<boolean> {
         let finalKeys: string[] = [];
         if (!keys) {
             finalKeys = this.getKeys();
@@ -33,7 +33,7 @@ export abstract class BaseMetaData<T extends IMetaData = IMetaData> extends Mode
             finalKeys = keys;
         }
 
-        return this.getValues(nativeBridge, finalKeys).then((data) => {
+        return this.getValues(storage, finalKeys).then((data) => {
             return this.setValues(data);
         });
     }
@@ -55,9 +55,9 @@ export abstract class BaseMetaData<T extends IMetaData = IMetaData> extends Mode
         return success;
     }
 
-    private getValues(nativeBridge: NativeBridge, keys: string[]): Promise<{}> {
+    private getValues(storage: StorageApi, keys: string[]): Promise<{}> {
         const returnObject: { [key: string]: any } = {};
-        const metaData: MetaData = new MetaData(nativeBridge);
+        const metaData: MetaData = new MetaData(storage);
         return metaData.hasCategory(this.getCategory()).then(exists => {
             if(!exists) {
                 return Promise.resolve([]);

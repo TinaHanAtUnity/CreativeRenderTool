@@ -1,13 +1,13 @@
 import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { StorageType } from 'Core/Native/Storage';
+import { StorageApi, StorageType } from 'Core/Native/Storage';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
-import { Request } from 'Core/Utilities/Request';
+import { Request } from 'Core/Managers/Request';
+import { AdsConfiguration } from '../Models/AdsConfiguration';
 
 export interface IGdprPersonalProperties {
     deviceModel: string;
@@ -34,20 +34,20 @@ export class GdprManager {
     private static GdprLastConsentValueStorageKey = 'gdpr.consentlastsent';
     private static GdprConsentStorageKey = 'gdpr.consent.value';
 
-    private _nativeBridge: NativeBridge;
+    private _storage: StorageApi;
     private _deviceInfo: DeviceInfo;
     private _clientInfo: ClientInfo;
-    private _configuration: Configuration;
+    private _configuration: AdsConfiguration;
     private _request: Request;
 
-    constructor(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, clientInfo: ClientInfo, configuration: Configuration, request: Request) {
-        this._nativeBridge = nativeBridge;
+    constructor(nativeBridge: NativeBridge, deviceInfo: DeviceInfo, clientInfo: ClientInfo, configuration: AdsConfiguration, request: Request, storage: StorageApi) {
+        this._storage = storage;
         this._deviceInfo = deviceInfo;
         this._clientInfo = clientInfo;
         this._configuration = configuration;
         this._request = request;
 
-        this._nativeBridge.Storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, data));
+        this._storage.onSet.subscribe((eventType, data) => this.onStorageSet(eventType, data));
     }
 
     public sendGDPREvent(action: GDPREventAction, source?: GDPREventSource): Promise<void> {
@@ -112,7 +112,7 @@ export class GdprManager {
 
     private pushConsent(consent: boolean): Promise<void> {
         // get last state of gdpr consent
-        return this._nativeBridge.Storage.get(StorageType.PRIVATE, GdprManager.GdprLastConsentValueStorageKey).then((consentLastSentToKafka) => {
+        return this._storage.get(StorageType.PRIVATE, GdprManager.GdprLastConsentValueStorageKey).then((consentLastSentToKafka) => {
             // only if consent has changed push to kafka
             if (consentLastSentToKafka !== consent) {
                 return this.sendGdprConsentEvent(consent);
@@ -126,7 +126,7 @@ export class GdprManager {
     }
 
     private getConsent(): Promise<boolean> {
-        return this._nativeBridge.Storage.get(StorageType.PUBLIC, GdprManager.GdprConsentStorageKey).then((data: any) => {
+        return this._storage.get(StorageType.PUBLIC, GdprManager.GdprConsentStorageKey).then((data: any) => {
             const value: boolean | undefined = this.getConsentTypeHack(data);
             if(typeof(value) !== 'undefined') {
                 return Promise.resolve(value);
@@ -181,8 +181,8 @@ export class GdprManager {
             sendEvent = this.sendGDPREvent(GDPREventAction.OPTOUT, GDPREventSource.METADATA);
         }
         return sendEvent.then(() => {
-            return this._nativeBridge.Storage.set(StorageType.PRIVATE, GdprManager.GdprLastConsentValueStorageKey, consent).then(() => {
-                return this._nativeBridge.Storage.write(StorageType.PRIVATE);
+            return this._storage.set(StorageType.PRIVATE, GdprManager.GdprLastConsentValueStorageKey, consent).then(() => {
+                return this._storage.write(StorageType.PRIVATE);
             });
         });
     }

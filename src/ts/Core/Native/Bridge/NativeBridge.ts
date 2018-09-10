@@ -1,37 +1,8 @@
-import { AdsPropertiesApi } from 'Ads/Native/AdsProperties';
-import { AndroidAdUnitApi } from 'Ads/Native/Android/AndroidAdUnit';
-import { AppSheetApi } from 'Ads/Native/iOS/AppSheet';
-import { IosAdUnitApi } from 'Ads/Native/iOS/IosAdUnit';
-import { ListenerApi } from 'Ads/Native/Listener';
-import { PlacementApi } from 'Ads/Native/Placement';
-import { VideoPlayerApi } from 'Ads/Native/VideoPlayer';
-import { WebPlayerApi } from 'Ads/Native/WebPlayer';
-import { ARApi } from 'AR/Native/AR';
-import { BannerApi } from 'Banners/Native/Banner';
-import { BannerListenerApi } from 'Banners/Native/UnityBannerListener';
-import { EventCategory } from 'Core/Constants/EventCategory';
 import { Platform } from 'Core/Constants/Platform';
-import { AndroidPreferencesApi } from 'Core/Native/Android/AndroidPreferences';
-import { BroadcastApi } from 'Core/Native/Android/Broadcast';
-import { IntentApi } from 'Core/Native/Android/Intent';
-import { LifecycleApi } from 'Core/Native/Android/Lifecycle';
 import { BatchInvocation } from 'Core/Native/Bridge/BatchInvocation';
 import { CallbackContainer } from 'Core/Native/Bridge/CallbackContainer';
 import { INativeBridge } from 'Core/Native/Bridge/INativeBridge';
-import { CacheApi } from 'Core/Native/Cache';
-import { ConnectivityApi } from 'Core/Native/Connectivity';
-import { DeviceInfoApi } from 'Core/Native/DeviceInfo';
-import { IosPreferencesApi } from 'Core/Native/iOS/IosPreferences';
-import { MainBundleApi } from 'Core/Native/iOS/MainBundle';
-import { NotificationApi } from 'Core/Native/iOS/Notification';
-import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
-import { PermissionsApi } from 'Core/Native/Permissions';
-import { RequestApi } from 'Core/Native/Request';
-import { ResolveApi } from 'Core/Native/Resolve';
-import { SdkApi } from 'Core/Native/Sdk';
-import { SensorInfoApi } from 'Core/Native/SensorInfo';
-import { StorageApi } from 'Core/Native/Storage';
-import { PurchasingApi } from 'Promo/Native/Purchasing';
+import { NativeApi } from 'Core/Native/Bridge/NativeApi';
 
 export enum CallbackStatus {
     OK,
@@ -55,37 +26,6 @@ export class NativeBridge implements INativeBridge {
         }
     }
 
-    public AR: ARApi;
-    public AppSheet: AppSheetApi;
-    public AndroidAdUnit: AndroidAdUnitApi;
-    public AndroidPreferences: AndroidPreferencesApi;
-    public Broadcast: BroadcastApi;
-    public Cache: CacheApi;
-    public Connectivity: ConnectivityApi;
-    public DeviceInfo: DeviceInfoApi;
-    public Intent: IntentApi;
-    public IosAdUnit: IosAdUnitApi;
-    public IosPreferences: IosPreferencesApi;
-    public Listener: ListenerApi;
-    public Lifecycle: LifecycleApi;
-    public Notification: NotificationApi;
-    public Placement: PlacementApi;
-    public Purchasing: PurchasingApi;
-    public Request: RequestApi;
-    public Resolve: ResolveApi;
-    public Sdk: SdkApi;
-    public SensorInfo: SensorInfoApi;
-    public Storage: StorageApi;
-    public VideoPlayer: VideoPlayerApi;
-    public UrlScheme: UrlSchemeApi;
-    public WebPlayer: WebPlayerApi;
-    public Permissions: PermissionsApi;
-    public MainBundle: MainBundleApi;
-    public BannerPlayer: WebPlayerApi;
-    public Banner: BannerApi;
-    public BannerListener: BannerListenerApi;
-    public AdsProperties: AdsPropertiesApi;
-
     private _callbackId: number = 1;
     private _callbackTable: {[key: number]: CallbackContainer<any>} = {};
 
@@ -95,48 +35,15 @@ export class NativeBridge implements INativeBridge {
 
     private _autoBatchEnabled: boolean;
     private _autoBatch: BatchInvocation;
-    private _autoBatchTimer: any; // todo: should be number but causes naming clash with nodejs Timer
+    private _autoBatchTimer: number;
     private _autoBatchInterval = 1;
 
+    private _eventHandlers: { [key: string]: NativeApi } = {};
+
     constructor(backend: IWebViewBridge, platform: Platform = Platform.TEST, autoBatch = true) {
-        this._autoBatchEnabled = autoBatch;
-
-        this._platform = platform;
         this._backend = backend;
-        this.AR = new ARApi(this);
-        this.AppSheet = new AppSheetApi(this);
-
-        if(platform === Platform.IOS) {
-            this.IosAdUnit = new IosAdUnitApi(this);
-            this.IosPreferences = new IosPreferencesApi(this);
-        } else {
-            this.AndroidAdUnit = new AndroidAdUnitApi(this);
-            this.AndroidPreferences = new AndroidPreferencesApi(this);
-        }
-
-        this.Broadcast = new BroadcastApi(this);
-        this.Cache = new CacheApi(this);
-        this.Connectivity = new ConnectivityApi(this);
-        this.DeviceInfo = new DeviceInfoApi(this);
-        this.Intent = new IntentApi(this);
-        this.Listener = new ListenerApi(this);
-        this.Lifecycle = new LifecycleApi(this);
-        this.Notification = new NotificationApi(this);
-        this.Placement = new PlacementApi(this);
-        this.Purchasing = new PurchasingApi(this);
-        this.Request = new RequestApi(this);
-        this.Resolve = new ResolveApi(this);
-        this.Sdk = new SdkApi(this);
-        this.SensorInfo = new SensorInfoApi(this);
-        this.Storage = new StorageApi(this);
-        this.VideoPlayer = new VideoPlayerApi(this);
-        this.UrlScheme = new UrlSchemeApi(this);
-        this.WebPlayer = new WebPlayerApi(this);
-        this.Permissions = new PermissionsApi(this);
-        this.MainBundle = new MainBundleApi(this);
-        this.Banner = new BannerApi(this);
-        this.BannerListener = new BannerListenerApi(this);
-        this.AdsProperties = new AdsPropertiesApi(this);
+        this._platform = platform;
+        this._autoBatchEnabled = autoBatch;
     }
 
     public registerCallback<T>(resolve: (value?: T | PromiseLike<T>) => void, reject: (reason?: any) => void): number {
@@ -152,10 +59,10 @@ export class NativeBridge implements INativeBridge {
             }
             const promise = this._autoBatch.queue<T>(className, methodName, parameters);
             if(!this._autoBatchTimer) {
-                this._autoBatchTimer = setTimeout(() => {
+                this._autoBatchTimer = window.setTimeout(() => {
                     this.invokeBatch(this._autoBatch);
                     delete this._autoBatch;
-                    this._autoBatchTimer = null;
+                    delete this._autoBatchTimer;
                 }, this._autoBatchInterval);
             }
             return promise;
@@ -193,86 +100,20 @@ export class NativeBridge implements INativeBridge {
         });
     }
 
+    public addEventHandler(nativeApi: NativeApi) {
+        const eventCategory = nativeApi.getEventCategory();
+        if(eventCategory && !(eventCategory in this._eventHandlers)) {
+            this._eventHandlers[eventCategory] = nativeApi;
+        }
+    }
+
     public handleEvent(parameters: any[]): void {
         const category: string = parameters.shift();
         const event: string = parameters.shift();
-        switch(category) {
-            case EventCategory[EventCategory.APPSHEET]:
-                this.AppSheet.handleEvent(event, parameters);
-                break;
-
-            case EventCategory[EventCategory.ADUNIT]:
-                if(this.getPlatform() === Platform.IOS) {
-                    this.IosAdUnit.handleEvent(event, parameters);
-                } else {
-                    this.AndroidAdUnit.handleEvent(event, parameters);
-                }
-                break;
-
-            case EventCategory[EventCategory.BROADCAST]:
-                this.Broadcast.handleEvent(event, parameters);
-                break;
-
-            case EventCategory[EventCategory.CACHE]:
-                this.Cache.handleEvent(event, parameters);
-                break;
-
-            case EventCategory[EventCategory.CONNECTIVITY]:
-                this.Connectivity.handleEvent(event, parameters);
-                break;
-
-            case EventCategory[EventCategory.NOTIFICATION]:
-                this.Notification.handleEvent(event, parameters);
-                break;
-
-            case EventCategory[EventCategory.LIFECYCLE]:
-                this.Lifecycle.handleEvent(event, parameters);
-                break;
-
-            case EventCategory[EventCategory.REQUEST]:
-                this.Request.handleEvent(event, parameters);
-                break;
-
-            case EventCategory[EventCategory.RESOLVE]:
-                this.Resolve.handleEvent(event, parameters);
-                break;
-
-            case EventCategory[EventCategory.VIDEOPLAYER]:
-                this.VideoPlayer.handleEvent(event, parameters);
-                break;
-
-            case EventCategory[EventCategory.STORAGE]:
-                this.Storage.handleEvent(event, parameters);
-                break;
-
-            case EventCategory[EventCategory.PURCHASING]:
-                this.Purchasing.handleEvent(event, parameters);
-                break;
-
-            case EventCategory[EventCategory.DEVICEINFO]:
-                if(this.getPlatform() === Platform.IOS) {
-                    this.DeviceInfo.Ios.handleEvent(event, parameters);
-                } else {
-                    this.DeviceInfo.Android.handleEvent(event, parameters);
-                }
-                break;
-
-            case EventCategory[EventCategory.WEBPLAYER]:
-                this.WebPlayer.handleEvent(event, parameters);
-                break;
-            case EventCategory[EventCategory.AR]:
-                this.AR.handleEvent(event, parameters);
-                break;
-
-            case EventCategory[EventCategory.PERMISSIONS]:
-                this.Permissions.handleEvent(event, parameters);
-                break;
-
-            case EventCategory[EventCategory.BANNER]:
-                this.Banner.handleEvent(event, parameters);
-                break;
-            default:
-                throw new Error('Unknown event category: ' + category);
+        if(category && category in this._eventHandlers) {
+            this._eventHandlers[category].handleEvent(event, parameters);
+        } else {
+            throw new Error('Unknown event category: ' + category);
         }
     }
 

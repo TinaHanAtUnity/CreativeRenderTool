@@ -1,10 +1,10 @@
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { IFileInfo } from 'Core/Native/Cache';
-import { StorageType } from 'Core/Native/Storage';
-import { ICacheCampaignsResponse } from 'Core/Utilities/Cache';
+import { ICacheCampaignsResponse } from 'Core/Managers/CacheManager';
+import { INativeResponse } from 'Core/Managers/Request';
+import { CacheApi, IFileInfo } from 'Core/Native/Cache';
+import { StorageApi, StorageType } from 'Core/Native/Storage';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { FileId } from 'Core/Utilities/FileId';
-import { INativeResponse } from 'Core/Utilities/Request';
+import { Logger } from 'Core/Utilities/Logger';
 
 export interface IFileBookkeepingInfo {
     fullyDownloaded: boolean;
@@ -20,15 +20,17 @@ enum CacheKey {
 }
 
 export class CacheBookkeeping {
-    private _nativeBridge: NativeBridge;
+    private _cache: CacheApi;
+    private _storage: StorageApi;
     private _rootKey: string = 'cache';
 
-    constructor(nativeBridge: NativeBridge) {
-        this._nativeBridge = nativeBridge;
+    constructor(cache: CacheApi, storage: StorageApi) {
+        this._cache = cache;
+        this._storage = storage;
     }
 
     public cleanCache(): Promise<any[]> {
-        return Promise.all([this.getFilesKeys(), this._nativeBridge.Cache.getFiles(), this.getCacheCampaigns()]).then(([keys, files, campaigns]: [string[], IFileInfo[], object]): Promise<any> => {
+        return Promise.all([this.getFilesKeys(), this._cache.getFiles(), this.getCacheCampaigns()]).then(([keys, files, campaigns]: [string[], IFileInfo[], object]): Promise<any> => {
             if (!files || !files.length) {
                 let campaignCount = 0;
                 if (campaigns) {
@@ -74,25 +76,25 @@ export class CacheBookkeeping {
                 }
 
                 if (deleteFiles.length > 0) {
-                    this._nativeBridge.Sdk.logDebug('Unity Ads cache: Deleting ' + deleteFiles.length + ' old files (' + (deleteSize / 1024) + 'kB), keeping ' + keepFiles.length + ' cached files (' + (keepSize / 1024) + 'kB)');
+                    Logger.Debug('Unity Ads cache: Deleting ' + deleteFiles.length + ' old files (' + (deleteSize / 1024) + 'kB), keeping ' + keepFiles.length + ' cached files (' + (keepSize / 1024) + 'kB)');
                 } else {
-                    this._nativeBridge.Sdk.logDebug('Unity Ads cache: Keeping ' + keepFiles.length + ' cached files (' + (keepSize / 1024) + 'kB)');
+                    Logger.Debug('Unity Ads cache: Keeping ' + keepFiles.length + ' cached files (' + (keepSize / 1024) + 'kB)');
                 }
 
                 let dirty: boolean = false;
 
                 deleteFiles.map(file => {
                     if (keys.indexOf(FileId.getFileIdHash(file)) !== -1) {
-                        promises.push(this._nativeBridge.Storage.delete(StorageType.PRIVATE, this.makeCacheKey(CacheKey.FILES, FileId.getFileIdHash(file))).catch((error) => {
-                            this._nativeBridge.Sdk.logDebug('Error while removing file storage entry');
+                        promises.push(this._storage.delete(StorageType.PRIVATE, this.makeCacheKey(CacheKey.FILES, FileId.getFileIdHash(file))).catch((error) => {
+                            Logger.Debug('Error while removing file storage entry');
                         }));
                         dirty = true;
                     }
-                    promises.push(this._nativeBridge.Cache.deleteFile(file));
+                    promises.push(this._cache.deleteFile(file));
                 });
 
                 if (dirty) {
-                    promises.push(this._nativeBridge.Storage.write(StorageType.PRIVATE));
+                    promises.push(this._storage.write(StorageType.PRIVATE));
                 }
 
                 // check consistency of kept files so that bookkeeping and files on device match
@@ -104,24 +106,24 @@ export class CacheBookkeeping {
                         } else {
                             // file not fully downloaded, deleting it
                             return Promise.all([
-                                this._nativeBridge.Sdk.logDebug('Unity ads cache: Deleting partial download ' + file),
-                                this._nativeBridge.Storage.delete(StorageType.PRIVATE, this.makeCacheKey(CacheKey.FILES, FileId.getFileIdHash(file))).catch((error) => {
-                                    this._nativeBridge.Sdk.logDebug('Error while removing file storage entry for partially downloaded file');
+                                Logger.Debug('Unity ads cache: Deleting partial download ' + file),
+                                this._storage.delete(StorageType.PRIVATE, this.makeCacheKey(CacheKey.FILES, FileId.getFileIdHash(file))).catch((error) => {
+                                    Logger.Debug('Error while removing file storage entry for partially downloaded file');
                                 }),
-                                this._nativeBridge.Storage.write(StorageType.PRIVATE),
-                                this._nativeBridge.Cache.deleteFile(file)
+                                this._storage.write(StorageType.PRIVATE),
+                                this._cache.deleteFile(file)
                             ]);
                         }
                     }).catch(() => {
                         // entry not found in bookkeeping so delete file
                         return Promise.all([
-                            this._nativeBridge.Sdk.logDebug('Unity ads cache: Deleting desynced download ' + file),
-                            this._nativeBridge.Cache.deleteFile(file)
+                            Logger.Debug('Unity ads cache: Deleting desynced download ' + file),
+                            this._cache.deleteFile(file)
                         ]);
                     }));
                 });
 
-                return Promise.all([this._nativeBridge.Cache.getFiles(), this.getCacheCampaigns()]).then(([cacheFilesLeft, campaignsLeft]: [IFileInfo[], { [key: string]: any }]) => {
+                return Promise.all([this._cache.getFiles(), this.getCacheCampaigns()]).then(([cacheFilesLeft, campaignsLeft]: [IFileInfo[], { [key: string]: any }]) => {
                     const cacheFilesLeftIds: string[] = [];
                     cacheFilesLeft.map(currentFile => {
                         cacheFilesLeftIds.push(FileId.getFileIdHash(currentFile.id));
@@ -133,7 +135,7 @@ export class CacheBookkeeping {
                             for (const currentFileId in campaignsLeft[campaignId]) {
                                 if (campaignsLeft[campaignId].hasOwnProperty(currentFileId)) {
                                     if (cacheFilesLeftIds.indexOf(currentFileId) === -1) {
-                                        promises.push(this._nativeBridge.Storage.delete(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGNS, campaignId)).catch((error) => {
+                                        promises.push(this._storage.delete(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGNS, campaignId)).catch((error) => {
                                             Diagnostics.trigger('clean_cache_delete_storage_entry_failed', {
                                                 cleanCacheError: error,
                                                 cleanCacheKey: this.makeCacheKey(CacheKey.CAMPAIGNS, campaignId),
@@ -149,7 +151,7 @@ export class CacheBookkeeping {
                     }
 
                     if (campaignsDirty) {
-                        promises.push(this._nativeBridge.Storage.write(StorageType.PRIVATE));
+                        promises.push(this._storage.write(StorageType.PRIVATE));
                     }
                 }).then(() => {
                     return Promise.all(promises);
@@ -159,8 +161,8 @@ export class CacheBookkeeping {
     }
 
     public writeFileForCampaign(campaignId: string, fileId: string): Promise<void> {
-        return this._nativeBridge.Storage.set(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGNS, campaignId, FileId.getFileIdHash(fileId)), {extension: FileId.getFileIdExtension(fileId)}).then(() => {
-            this._nativeBridge.Storage.write(StorageType.PRIVATE);
+        return this._storage.set(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGNS, campaignId, FileId.getFileIdHash(fileId)), {extension: FileId.getFileIdExtension(fileId)}).then(() => {
+            this._storage.write(StorageType.PRIVATE);
         }).catch(() => {
             return Promise.resolve();
         });
@@ -176,22 +178,22 @@ export class CacheBookkeeping {
     }
 
     public getFileInfo(fileId: string): Promise<IFileBookkeepingInfo> {
-        return this._nativeBridge.Storage.get<IFileBookkeepingInfo>(StorageType.PRIVATE, this.makeCacheKey(CacheKey.FILES, FileId.getFileIdHash(fileId)));
+        return this._storage.get<IFileBookkeepingInfo>(StorageType.PRIVATE, this.makeCacheKey(CacheKey.FILES, FileId.getFileIdHash(fileId)));
     }
 
     public writeFileEntry(fileId: string, cacheResponse: IFileBookkeepingInfo): void {
-        this._nativeBridge.Storage.set(StorageType.PRIVATE, this.makeCacheKey(CacheKey.FILES, FileId.getFileIdHash(fileId)), cacheResponse);
-        this._nativeBridge.Storage.write(StorageType.PRIVATE);
+        this._storage.set(StorageType.PRIVATE, this.makeCacheKey(CacheKey.FILES, FileId.getFileIdHash(fileId)), cacheResponse);
+        this._storage.write(StorageType.PRIVATE);
     }
 
     public removeFileEntry(fileId: string): void {
-        this._nativeBridge.Storage.delete(StorageType.PRIVATE, this.makeCacheKey(CacheKey.FILES, FileId.getFileIdHash(fileId)));
-        this._nativeBridge.Storage.write(StorageType.PRIVATE);
+        this._storage.delete(StorageType.PRIVATE, this.makeCacheKey(CacheKey.FILES, FileId.getFileIdHash(fileId)));
+        this._storage.write(StorageType.PRIVATE);
     }
 
     public getCachedCampaignResponse(): Promise<INativeResponse | undefined> {
-        const cacheCampaignUrlPromise = this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGN, 'url'));
-        const cachedCampaignResponsePromise = this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGN, 'response'));
+        const cacheCampaignUrlPromise = this._storage.get<string>(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGN, 'url'));
+        const cachedCampaignResponsePromise = this._storage.get<string>(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGN, 'response'));
 
         return Promise.all([cacheCampaignUrlPromise, cachedCampaignResponsePromise]).then(([requestUrl, cachedResponse]) =>
             (<INativeResponse>{
@@ -206,26 +208,26 @@ export class CacheBookkeeping {
     }
 
     public setCachedCampaignResponse(response: INativeResponse): Promise<any> {
-        const cacheCampaignUrlPromise = this._nativeBridge.Storage.set<string>(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGN, 'url'), response.url);
-        const cachedCampaignResponsePromise = this._nativeBridge.Storage.set<string>(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGN, 'response'), response.response);
+        const cacheCampaignUrlPromise = this._storage.set<string>(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGN, 'url'), response.url);
+        const cachedCampaignResponsePromise = this._storage.set<string>(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGN, 'response'), response.response);
 
-        return Promise.all([cacheCampaignUrlPromise, cachedCampaignResponsePromise]).then(() => this._nativeBridge.Storage.write(StorageType.PRIVATE)).catch(() => {
+        return Promise.all([cacheCampaignUrlPromise, cachedCampaignResponsePromise]).then(() => this._storage.write(StorageType.PRIVATE)).catch(() => {
             // ignore error
         });
     }
 
     public deleteCachedCampaignResponse(): Promise<any> {
-        const cacheCampaignUrlPromise = this._nativeBridge.Storage.delete(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGN, 'url'));
-        const cachedCampaignResponsePromise = this._nativeBridge.Storage.delete(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGN, 'response'));
+        const cacheCampaignUrlPromise = this._storage.delete(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGN, 'url'));
+        const cachedCampaignResponsePromise = this._storage.delete(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGN, 'response'));
 
-        return Promise.all([cacheCampaignUrlPromise, cachedCampaignResponsePromise]).then(() => this._nativeBridge.Storage.write(StorageType.PRIVATE)).catch(error => {
+        return Promise.all([cacheCampaignUrlPromise, cachedCampaignResponsePromise]).then(() => this._storage.write(StorageType.PRIVATE)).catch(error => {
             // ignore error
         });
     }
 
     private deleteCacheBookKeepingData(): Promise<void> {
-        return this._nativeBridge.Storage.delete(StorageType.PRIVATE, this._rootKey).then(() => {
-            return this._nativeBridge.Storage.write(StorageType.PRIVATE);
+        return this._storage.delete(StorageType.PRIVATE, this._rootKey).then(() => {
+            return this._storage.write(StorageType.PRIVATE);
         }).catch(() => {
             return Promise.resolve();
         });
@@ -235,13 +237,13 @@ export class CacheBookkeeping {
         return this.getKeys().then((cacheKeys) => {
             const promises: Array<Promise<any>> = cacheKeys
                 .filter(cacheKey => cacheKey && !(cacheKey.toUpperCase() in CacheKey))
-                .map(cacheKey => this._nativeBridge.Storage.delete(StorageType.PRIVATE, this._rootKey + '.' + cacheKey));
+                .map(cacheKey => this._storage.delete(StorageType.PRIVATE, this._rootKey + '.' + cacheKey));
 
             if(promises.length > 0) {
                 return Promise.all(promises).catch(() => {
                     return Promise.resolve();
                 }).then(() => {
-                    return this._nativeBridge.Storage.write(StorageType.PRIVATE);
+                    return this._storage.write(StorageType.PRIVATE);
                 }).catch(() => {
                     return Promise.resolve();
                 });
@@ -254,7 +256,7 @@ export class CacheBookkeeping {
     }
 
     private getKeysForKey(key: string, recursive: boolean): Promise<string[]> {
-        return this._nativeBridge.Storage.getKeys(StorageType.PRIVATE, key, recursive).then(keys => {
+        return this._storage.getKeys(StorageType.PRIVATE, key, recursive).then(keys => {
             return keys;
         }).catch(() => {
             return [];
@@ -279,7 +281,7 @@ export class CacheBookkeeping {
     }
 
     private getCacheCampaigns(): Promise<object> {
-        return this._nativeBridge.Storage.get<ICacheCampaignsResponse>(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGNS)).then(campaigns => {
+        return this._storage.get<ICacheCampaignsResponse>(StorageType.PRIVATE, this.makeCacheKey(CacheKey.CAMPAIGNS)).then(campaigns => {
             return campaigns;
         }).catch(() => {
             return {};

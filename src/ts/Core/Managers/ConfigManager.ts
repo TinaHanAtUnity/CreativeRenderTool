@@ -3,42 +3,42 @@ import { ConfigError } from 'Core/Errors/ConfigError';
 import { RequestError } from 'Core/Errors/RequestError';
 import { JaegerSpan, JaegerTags } from 'Core/Jaeger/JaegerSpan';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { Request } from 'Core/Managers/Request';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AdapterMetaData } from 'Core/Models/MetaData/AdapterMetaData';
 import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { StorageType } from 'Core/Native/Storage';
-import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
+import { StorageApi, StorageType } from 'Core/Native/Storage';
+import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { JsonParser } from 'Core/Utilities/JsonParser';
-import { Request } from 'Core/Utilities/Request';
+import { Logger } from 'Core/Utilities/Logger';
 import { Url } from 'Core/Utilities/Url';
 
 export class ConfigManager {
 
-    public static fetch(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, jaegerSpan: JaegerSpan): Promise<Configuration> {
+    public static fetch(platform: Platform, storage: StorageApi, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, jaegerSpan: JaegerSpan): Promise<CoreConfiguration> {
         return Promise.all([
             metaDataManager.fetch(FrameworkMetaData),
             metaDataManager.fetch(AdapterMetaData),
-            ConfigManager.fetchGamerToken(nativeBridge)
+            ConfigManager.fetchGamerToken(storage)
         ]).then(([framework, adapter, storedGamerToken]) => {
             let gamerToken: string | undefined;
 
-            if(nativeBridge.getPlatform() === Platform.IOS && deviceInfo.getLimitAdTracking()) {
+            if(platform === Platform.IOS && deviceInfo.getLimitAdTracking()) {
                 // only use stored gamerToken for iOS when ad tracking is limited
                 gamerToken = storedGamerToken;
             } else if(storedGamerToken) {
                 // delete saved token from all other devices, for example when user has toggled limit ad tracking flag to false
-                ConfigManager.deleteGamerToken(nativeBridge);
+                ConfigManager.deleteGamerToken(storage);
             }
 
             const url: string = ConfigManager.createConfigUrl(clientInfo, deviceInfo, framework, adapter, gamerToken);
-            jaegerSpan.addTag(JaegerTags.DeviceType, Platform[nativeBridge.getPlatform()]);
-            nativeBridge.Sdk.logInfo('Requesting configuration from ' + url);
+            jaegerSpan.addTag(JaegerTags.DeviceType, Platform[platform]);
+            Logger.Info('Requesting configuration from ' + url);
             return request.get(url, [], {
                 retries: 2,
                 retryDelay: 10000,
@@ -48,11 +48,11 @@ export class ConfigManager {
                 jaegerSpan.addTag(JaegerTags.StatusCode, response.responseCode.toString());
                 try {
                     const configJson = JsonParser.parse(response.response);
-                    const config: Configuration = ConfigurationParser.parse(configJson, clientInfo);
-                    nativeBridge.Sdk.logInfo('Received configuration with ' + config.getPlacementCount() + ' placements for token ' + config.getToken() + ' (A/B group ' + config.getAbGroup() + ')');
+                    const config: CoreConfiguration = CoreConfigurationParser.parse(configJson);
+                    Logger.Info('Received configuration for token ' + config.getToken() + ' (A/B group ' + config.getAbGroup() + ')');
                     if(config.getToken()) {
-                        if(nativeBridge.getPlatform() === Platform.IOS && deviceInfo.getLimitAdTracking()) {
-                            ConfigManager.storeGamerToken(nativeBridge, config.getToken());
+                        if(platform === Platform.IOS && deviceInfo.getLimitAdTracking()) {
+                            ConfigManager.storeGamerToken(storage, config.getToken());
                         }
                     } else {
                         Diagnostics.trigger('config_failure', {
@@ -62,19 +62,13 @@ export class ConfigManager {
 
                         throw new Error('gamer token missing in PLC config');
                     }
-                    if(!config.getDefaultPlacement()) {
-                        Diagnostics.trigger('missing_default_placement', {
-                            configUrl: url,
-                            configResponse: response.response
-                        });
-                    }
                     return config;
                 } catch(error) {
                     Diagnostics.trigger('config_parsing_failed', {
                         configUrl: url,
                         configResponse: response.response
                     });
-                    nativeBridge.Sdk.logError('Config request failed ' + error);
+                    Logger.Error('Config request failed ' + error);
                     throw new Error(error);
                 }
             }).catch(error => {
@@ -161,37 +155,37 @@ export class ConfigManager {
         return url;
     }
 
-    private static fetchValue(nativeBridge: NativeBridge, key: string): Promise<string | undefined> {
-        return nativeBridge.Storage.get<string>(StorageType.PRIVATE, key).then(value => {
+    private static fetchValue(storage: StorageApi, key: string): Promise<string | undefined> {
+        return storage.get<string>(StorageType.PRIVATE, key).then(value => {
             return value;
         }).catch(error => {
             return undefined;
         });
     }
 
-    private static storeValue(nativeBridge: NativeBridge, key: string, value: string): Promise<void[]> {
+    private static storeValue(storage: StorageApi, key: string, value: string): Promise<void[]> {
         return Promise.all([
-            nativeBridge.Storage.set(StorageType.PRIVATE, key, value),
-            nativeBridge.Storage.write(StorageType.PRIVATE)
+            storage.set(StorageType.PRIVATE, key, value),
+            storage.write(StorageType.PRIVATE)
         ]);
     }
 
-    private static deleteValue(nativeBridge: NativeBridge, key: string): Promise<void[]> {
+    private static deleteValue(storage: StorageApi, key: string): Promise<void[]> {
         return Promise.all([
-            nativeBridge.Storage.delete(StorageType.PRIVATE, key),
-            nativeBridge.Storage.write(StorageType.PRIVATE)
+            storage.delete(StorageType.PRIVATE, key),
+            storage.write(StorageType.PRIVATE)
         ]);
     }
 
-    private static fetchGamerToken(nativeBridge: NativeBridge): Promise<string | undefined> {
-        return this.fetchValue(nativeBridge, 'gamerToken');
+    private static fetchGamerToken(storage: StorageApi): Promise<string | undefined> {
+        return this.fetchValue(storage, 'gamerToken');
     }
 
-    private static storeGamerToken(nativeBridge: NativeBridge, gamerToken: string): Promise<void[]> {
-        return this.storeValue(nativeBridge, 'gamerToken', gamerToken);
+    private static storeGamerToken(storage: StorageApi, gamerToken: string): Promise<void[]> {
+        return this.storeValue(storage, 'gamerToken', gamerToken);
     }
 
-    private static deleteGamerToken(nativeBridge: NativeBridge): Promise<void[]> {
-        return this.deleteValue(nativeBridge, 'gamerToken');
+    private static deleteGamerToken(storage: StorageApi): Promise<void[]> {
+        return this.deleteValue(storage, 'gamerToken');
     }
 }

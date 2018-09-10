@@ -3,8 +3,8 @@ import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { ABGroupBuilder } from 'Core/Models/ABGroup';
 
-import { CacheMode, Configuration } from 'Core/Models/Configuration';
-import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
+import { CacheMode, CoreConfiguration } from 'CoreConfiguration.ts';
+import { CoreConfigurationParser } from 'CoreConfigurationParser.ts';
 
 import ConfigurationJson from 'json/ConfigurationAuctionPlc.json';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
@@ -14,11 +14,11 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('configurationParserTest', () => {
 
-    let configuration: Configuration;
+    let configuration: CoreConfiguration;
 
     describe('Parsing json to configuration', () => {
         beforeEach(() => {
-            configuration = ConfigurationParser.parse(JSON.parse(ConfigurationJson));
+            configuration = CoreConfigurationParser.parse(JSON.parse(ConfigurationJson));
         });
 
         it('should have enabled parameter from configuration', () => {
@@ -108,7 +108,7 @@ describe('configurationParserTest', () => {
 
         it('should only call createMixedPlacements if created placement is mixed and gameid is in mixed placement experiment', () => {
             const clientInfoPromoGame = TestFixtures.getClientInfo(Platform.ANDROID, '1003628');
-            configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements), clientInfoPromoGame);
+            configuration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements), clientInfoPromoGame);
             sandbox.assert.called(<sinon.SinonStub>MixedPlacementUtility.createMixedPlacements);
         });
     });

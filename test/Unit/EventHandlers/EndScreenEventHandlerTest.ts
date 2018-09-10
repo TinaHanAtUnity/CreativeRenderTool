@@ -19,7 +19,7 @@ import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'CoreConfiguration.ts';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { INativeResponse, Request } from 'Core/Utilities/Request';
@@ -48,7 +48,7 @@ describe('EndScreenEventHandlerTest', () => {
     let endScreenEventHandler: PerformanceEndScreenEventHandler;
     let campaign: PerformanceCampaign;
     let placement: Placement;
-    let configuration: Configuration;
+    let configuration: CoreConfiguration;
 
     describe('with onDownloadAndroid', () => {
         let resolvedPromise: Promise<INativeResponse>;

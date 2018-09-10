@@ -11,11 +11,10 @@ import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { FinishState } from 'Core/Constants/FinishState';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable0 } from 'Core/Utilities/Observable';
-import { Request } from 'Core/Utilities/Request';
+import { Request } from 'Core/Managers/Request';
 
 export interface IAdUnitParameters<T extends Campaign> {
     forceOrientation: Orientation;
@@ -27,7 +26,7 @@ export interface IAdUnitParameters<T extends Campaign> {
     operativeEventManager: OperativeEventManager;
     placement: Placement;
     campaign: T;
-    configuration: Configuration;
+    configuration: CoreConfiguration;
     request: Request;
     options: any;
     gdprManager: GdprManager;
@@ -63,7 +62,6 @@ export abstract class AbstractAdUnit {
     public readonly onClose = new Observable0();
     public readonly onError = new Observable0();
 
-    protected readonly _nativeBridge: NativeBridge;
     protected readonly _forceOrientation: Orientation;
     protected readonly _container: AdUnitContainer;
 
@@ -71,8 +69,7 @@ export abstract class AbstractAdUnit {
     private _finishState: FinishState;
     private _baseCampaign: Campaign;
 
-    constructor(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>) {
-        this._nativeBridge = nativeBridge;
+    constructor(parameters: IAdUnitParameters<Campaign>) {
         this._forceOrientation = parameters.forceOrientation;
         this._container = parameters.container;
         this._showing = false;

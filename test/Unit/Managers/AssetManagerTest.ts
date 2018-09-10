@@ -6,7 +6,7 @@ import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingS
 import { assert } from 'chai';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { CacheMode } from 'Core/Models/Configuration';
+import { CacheMode } from 'CoreConfiguration.ts';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { CacheApi, CacheError, CacheEvent, IFileInfo } from 'Core/Native/Cache';
@@ -191,7 +191,7 @@ describe('AssetManagerTest', () => {
         focusManager = new FocusManager(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
-        cacheApi = nativeBridge.Cache = new TestCacheApi(nativeBridge);
+        cacheApi = nativeBridge.CacheManager = new TestCacheApi(nativeBridge);
         storageApi = nativeBridge.Storage = new TestStorageApi(nativeBridge);
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
         cacheBookkeeping = new CacheBookkeeping(nativeBridge);

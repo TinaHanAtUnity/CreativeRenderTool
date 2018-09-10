@@ -39,7 +39,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { UnityAdsError } from 'Core/Constants/UnityAdsError';
 import { ConfigError } from 'Core/Errors/ConfigError';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
-import { JaegerManager } from 'Core/Jaeger/JaegerManager';
+import { JaegerManager } from 'Core/Managers/JaegerManager';
 import { JaegerSpan, JaegerTags } from 'Core/Jaeger/JaegerSpan';
 import { ConfigManager } from 'Core/Managers/ConfigManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
@@ -48,20 +48,20 @@ import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ABGroupBuilder } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { CacheMode, Configuration } from 'Core/Models/Configuration';
+import { CacheMode, CoreConfiguration } from 'CoreConfiguration.ts';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { CallbackStatus, INativeCallback, NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
-import { Cache } from 'Core/Utilities/Cache';
-import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
+import { CoreConfigurationParser } from 'CoreConfigurationParser.ts';
+import { CacheManager } from 'CacheManager.ts';
+import { CacheBookkeeping } from 'Core/Managers/CacheBookkeeping';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { MetaData } from 'Core/Utilities/MetaData';
 import { Promises, TimeoutError } from 'Core/Utilities/Promises';
-import { INativeResponse, Request } from 'Core/Utilities/Request';
-import { Resolve } from 'Core/Utilities/Resolve';
+import { INativeResponse, Request } from 'Core/Managers/Request';
+import { Resolve } from 'Core/Managers/Resolve';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import CreativeUrlConfiguration from 'json/CreativeUrlConfiguration.json';
 import CreativeUrlResponseAndroid from 'json/CreativeUrlResponseAndroid.json';
@@ -79,12 +79,12 @@ export class WebView {
 
     private _request: Request;
     private _resolve: Resolve;
-    private _configuration: Configuration;
+    private _configuration: CoreConfiguration;
 
     private _campaignManager: CampaignManager;
     private _refreshManager: RefreshManager;
     private _assetManager: AssetManager;
-    private _cache: Cache;
+    private _cache: CacheManager;
     private _cacheBookkeeping: CacheBookkeeping;
     private _container: AdUnitContainer;
 
@@ -147,7 +147,7 @@ export class WebView {
             this._request = new Request(this._nativeBridge, this._wakeUpManager);
             this._cacheBookkeeping = new CacheBookkeeping(this._nativeBridge);
             this._programmaticTrackingService = new ProgrammaticTrackingService(this._request, this._clientInfo, this._deviceInfo);
-            this._cache = new Cache(this._nativeBridge, this._wakeUpManager, this._request, this._cacheBookkeeping, this._programmaticTrackingService);
+            this._cache = new CacheManager(this._nativeBridge, this._wakeUpManager, this._request, this._cacheBookkeeping, this._programmaticTrackingService);
             this._resolve = new Resolve(this._nativeBridge);
             this._metadataManager = new MetaDataManager(this._nativeBridge);
             this._adMobSignalFactory = new AdMobSignalFactory(this._nativeBridge, this._clientInfo, this._deviceInfo, this._focusManager);
@@ -202,7 +202,7 @@ export class WebView {
             const configSpan = this._jaegerManager.startSpan('FetchConfiguration', jaegerInitSpan.id, jaegerInitSpan.traceId);
             let configPromise;
             if(this._creativeUrl) {
-                configPromise = Promise.resolve(ConfigurationParser.parse(JsonParser.parse(CreativeUrlConfiguration)));
+                configPromise = Promise.resolve(CoreConfigurationParser.parse(JsonParser.parse(CreativeUrlConfiguration)));
             } else {
                 configPromise = ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, this._metadataManager, configSpan);
             }

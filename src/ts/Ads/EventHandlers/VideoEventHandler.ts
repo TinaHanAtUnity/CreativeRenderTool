@@ -8,7 +8,7 @@ import { Placement } from 'Ads/Models/Placement';
 import { IVideoEventHandler } from 'Ads/Native/VideoPlayer';
 import { FinishState } from 'Core/Constants/FinishState';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'CoreConfiguration.ts';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Double } from 'Core/Utilities/Double';
 import { FileInfo } from 'Core/Utilities/FileInfo';
@@ -18,7 +18,7 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
 
     protected _operativeEventManager: OperativeEventManager;
     protected _thirdPartyEventManager: ThirdPartyEventManager;
-    protected _configuration: Configuration;
+    protected _configuration: CoreConfiguration;
     protected _placement: Placement;
     protected _adUnitStyle: AdUnitStyle | undefined;
     protected _video: Video;

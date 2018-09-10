@@ -1,6 +1,4 @@
-import { IBuildInformation } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Swipe } from 'Core/Utilities/Swipe';
 import { Tap } from 'Core/Utilities/Tap';
 import { Template } from 'Core/Utilities/Template';
@@ -19,18 +17,17 @@ export abstract class View<T extends object> {
         element.addEventListener(binding.event, binding.listener, false);
     }
 
-    protected _nativeBridge: NativeBridge;
-
+    protected _platform: Platform;
     protected _template: Template;
-    protected _templateData: { [key: string]: string | number | boolean | undefined | IBuildInformation };
+    protected _templateData: { [key: string]: string | number | boolean | undefined };
     protected _bindings: IViewBinding[];
     protected _container: HTMLElement;
     protected _handlers: T[] = [];
 
     protected _id: string;
 
-    constructor(nativeBridge: NativeBridge, id: string) {
-        this._nativeBridge = nativeBridge;
+    constructor(platform: Platform, id: string) {
+        this._platform = platform;
         this._id = id;
     }
 
@@ -54,7 +51,7 @@ export abstract class View<T extends object> {
         this._container.id = this._id;
         this._container.innerHTML = this._template.render(this._templateData ? this._templateData : {});
 
-        const attachTap = this._nativeBridge.getPlatform() === Platform.IOS;
+        const attachTap = this._platform === Platform.IOS;
 
         this._bindings.forEach((binding: IViewBinding) => {
             if(binding.selector) {

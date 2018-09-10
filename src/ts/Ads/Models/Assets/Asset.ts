@@ -78,7 +78,7 @@ export abstract class Asset<T extends IAsset = IAsset> extends Model<T> {
     }
 
     protected handleError(error: WebViewError) {
-        Diagnostics.trigger('set_model_value_failed', error, this.getSession());
+        Diagnostics.trigger('set_model_value_failed', error);
         throw error;
     }
 }

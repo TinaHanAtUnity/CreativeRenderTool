@@ -169,7 +169,7 @@ describe('CacheTest', () => {
             handleCallback
         });
 
-        cacheApi = nativeBridge.Cache = new TestCacheApi(nativeBridge);
+        cacheApi = nativeBridge.CacheManager = new TestCacheApi(nativeBridge);
         storageApi = nativeBridge.Storage = new TestStorageApi(nativeBridge);
         const focusManager = new FocusManager(nativeBridge);
         wakeUpManager = new WakeUpManager(nativeBridge, focusManager);

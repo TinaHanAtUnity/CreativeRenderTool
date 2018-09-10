@@ -7,7 +7,7 @@ import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'CoreConfiguration.ts';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Request } from 'Core/Utilities/Request';
@@ -27,7 +27,7 @@ describe('OperativeEventManagerFactoryTest', () => {
     let sessionManager: SessionManager;
     let clientInfo: ClientInfo;
     let deviceInfo: DeviceInfo;
-    let configuration: Configuration;
+    let configuration: CoreConfiguration;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({

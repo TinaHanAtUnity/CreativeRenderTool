@@ -1,12 +1,12 @@
 import { PlacementManager } from 'Ads/Managers/PlacementManager';
 import { PlacementState } from 'Ads/Models/Placement';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingCatalog } from 'Promo/Models/PurchasingCatalog';
 import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
+import { PurchasingApi } from '../Native/Purchasing';
 
 export enum IPromoRequest {
     SETIDS = 'setids',
@@ -29,10 +29,10 @@ export class PurchasingUtilities {
 
     public static placementManager: PlacementManager;
 
-    public static initialize(clientInfo: ClientInfo, configuration: Configuration, nativeBridge: NativeBridge, placementManager: PlacementManager) {
+    public static initialize(clientInfo: ClientInfo, configuration: AdsConfiguration, purchasing: PurchasingApi, placementManager: PlacementManager) {
         this._clientInfo = clientInfo;
         this._configuration = configuration;
-        this._nativeBridge = nativeBridge;
+        this._purchasing = purchasing;
         this.placementManager = placementManager;
     }
 
@@ -63,8 +63,8 @@ export class PurchasingUtilities {
 
     public static refreshCatalog(): Promise<void> {
         return new Promise((resolve, reject) => {
-            const observer = this._nativeBridge.Purchasing.onGetPromoCatalog.subscribe((promoCatalogJSON) => {
-                this._nativeBridge.Purchasing.onGetPromoCatalog.unsubscribe(observer);
+            const observer = this._purchasing.onGetPromoCatalog.subscribe((promoCatalogJSON) => {
+                this._purchasing.onGetPromoCatalog.unsubscribe(observer);
                 try {
                     this._catalog = new PurchasingCatalog(JSON.parse(promoCatalogJSON));
                     resolve();
@@ -72,8 +72,8 @@ export class PurchasingUtilities {
                     reject(this.logIssue('catalog_json_parse_failure', 'Promo catalog JSON failed to parse'));
                 }
             });
-            this._nativeBridge.Purchasing.getPromoCatalog().catch((e) => {
-                this._nativeBridge.Purchasing.onGetPromoCatalog.unsubscribe(observer);
+            this._purchasing.getPromoCatalog().catch((e) => {
+                this._purchasing.onGetPromoCatalog.unsubscribe(observer);
                 reject(this.logIssue('catalog_refresh_failed', 'Purchasing Catalog failed to refresh'));
             });
         });
@@ -122,8 +122,8 @@ export class PurchasingUtilities {
 
     private static _catalog: PurchasingCatalog = new PurchasingCatalog([]);
     private static _clientInfo: ClientInfo;
-    private static _configuration: Configuration;
-    private static _nativeBridge: NativeBridge;
+    private static _configuration: AdsConfiguration;
+    private static _purchasing: PurchasingApi;
     private static _isInitialized = false;
 
     private static setProductPlacementStates(): void {
@@ -142,16 +142,16 @@ export class PurchasingUtilities {
 
     private static initializeIAPPromo(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            const observer = this._nativeBridge.Purchasing.onInitialize.subscribe((isReady) => {
-                this._nativeBridge.Purchasing.onInitialize.unsubscribe(observer);
+            const observer = this._purchasing.onInitialize.subscribe((isReady) => {
+                this._purchasing.onInitialize.unsubscribe(observer);
                 if (isReady !== 'True') {
                     reject(this.logIssue('promo_not_ready', 'IAP Promo was not ready'));
                 } else {
                     resolve();
                 }
             });
-            this._nativeBridge.Purchasing.initializePurchasing().catch(() => {
-                this._nativeBridge.Purchasing.onInitialize.unsubscribe(observer);
+            this._purchasing.initializePurchasing().catch(() => {
+                this._purchasing.onInitialize.unsubscribe(observer);
                 reject(this.logIssue('purchase_initialization_failed', 'Purchase initialization failed'));
             });
         });
@@ -159,16 +159,16 @@ export class PurchasingUtilities {
 
     private static checkPromoVersion(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            const promoVersionObserver = this._nativeBridge.Purchasing.onGetPromoVersion.subscribe((promoVersion) => {
-                this._nativeBridge.Purchasing.onGetPromoVersion.unsubscribe(promoVersionObserver);
+            const promoVersionObserver = this._purchasing.onGetPromoVersion.subscribe((promoVersion) => {
+                this._purchasing.onGetPromoVersion.unsubscribe(promoVersionObserver);
                 if(!this.isPromoVersionSupported(promoVersion)) {
                     reject(this.logIssue('promo_version_not_supported', `Promo version: ${promoVersion} is not supported`));
                 } else {
                     resolve();
                 }
             });
-            this._nativeBridge.Purchasing.getPromoVersion().catch(() => {
-                this._nativeBridge.Purchasing.onGetPromoVersion.unsubscribe(promoVersionObserver);
+            this._purchasing.getPromoVersion().catch(() => {
+                this._purchasing.onGetPromoVersion.unsubscribe(promoVersionObserver);
                 reject(this.logIssue('promo_version_check_failed', 'Promo version check failed'));
             });
         });
@@ -176,7 +176,7 @@ export class PurchasingUtilities {
 
     private static sendPurchasingCommand(iapPayload: IPromoPayload): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            const observer = this._nativeBridge.Purchasing.onCommandResult.subscribe((isCommandSuccessful) => {
+            const observer = this._purchasing.onCommandResult.subscribe((isCommandSuccessful) => {
                 if (isCommandSuccessful === 'True') {
                     if (iapPayload.request === IPromoRequest.SETIDS) {
                         this._isInitialized = true;
@@ -186,8 +186,8 @@ export class PurchasingUtilities {
                     reject(this.logIssue('purchase_command_attempt_failed', `Purchase command attempt failed with command ${isCommandSuccessful}`));
                 }
             });
-            this._nativeBridge.Purchasing.initiatePurchasingCommand(JSON.stringify(iapPayload)).catch(() => {
-                this._nativeBridge.Purchasing.onCommandResult.unsubscribe(observer);
+            this._purchasing.initiatePurchasingCommand(JSON.stringify(iapPayload)).catch(() => {
+                this._purchasing.onCommandResult.unsubscribe(observer);
                 reject(this.logIssue('send_purchase_event_failed', 'Purchase event failed to send'));
             });
         });

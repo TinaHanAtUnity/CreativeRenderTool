@@ -5,7 +5,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { Request } from 'Core/Utilities/Request';
+import { Request } from 'Core/Managers/Request';
 import { Url } from 'Core/Utilities/Url';
 
 export abstract class CampaignParser {
@@ -29,7 +29,7 @@ export abstract class CampaignParser {
 
         Diagnostics.trigger('invalid_url', {
             url: url
-        }, session);
+        });
 
         throw new Error('Invalid url: ' + url);
     }

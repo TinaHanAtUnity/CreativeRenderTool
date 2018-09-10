@@ -4,7 +4,7 @@ import { assert } from 'chai';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'CoreConfiguration.ts';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
@@ -68,7 +68,7 @@ describe('AnalyticsManagerTest', () => {
     let request: Request;
     let clientInfo: ClientInfo;
     let deviceInfo: DeviceInfo;
-    let configuration: Configuration;
+    let configuration: CoreConfiguration;
     let storage: FakeStorageApi;
     let analyticsManager: AnalyticsManager;
     let focusManager: FocusManager;

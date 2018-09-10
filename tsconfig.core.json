@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "module": "es6",
+    "target": "es6",
+    "strict": true,
+    "strictPropertyInitialization": false,
+    "importHelpers": true,
+    "baseUrl": "src/ts",
+    "outDir": "build",
+    "moduleResolution": "node",
+    "inlineSourceMap": true
+  },
+  "include": [
+    "src/ts/Core/**/*.ts"
+  ]
+}

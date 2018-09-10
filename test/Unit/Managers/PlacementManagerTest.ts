@@ -4,10 +4,10 @@ import { PlacementState } from 'Ads/Models/Placement';
 import { ListenerApi } from 'Ads/Native/Listener';
 import { PlacementApi } from 'Ads/Native/Placement';
 import { assert, expect } from 'chai';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'CoreConfiguration.ts';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
+import { CoreConfigurationParser } from 'CoreConfigurationParser.ts';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
 import 'mocha';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
@@ -17,7 +17,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('PlacementManagerTest', () => {
     let nativeBridge: NativeBridge;
-    let configuration: Configuration;
+    let configuration: CoreConfiguration;
 
     beforeEach(() => {
         nativeBridge = TestFixtures.getNativeBridge();
@@ -86,7 +86,7 @@ describe('PlacementManagerTest', () => {
         });
 
         it('should set placement state of the passed placementId', () => {
-            configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            configuration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             placementManager = new PlacementManager(nativeBridge, configuration);
             assert.equal(configuration.getPlacement('promoPlacement').getState(), PlacementState.NOT_AVAILABLE);
             placementManager.setPlacementReady('promoPlacement', campaign);
@@ -94,7 +94,7 @@ describe('PlacementManagerTest', () => {
         });
 
         it('should set the campaign of the placement to passed campaign', () => {
-            configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            configuration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             placementManager = new PlacementManager(nativeBridge, configuration);
             assert.equal(configuration.getPlacement('promoPlacement').getCurrentCampaign(), undefined);
             placementManager.setPlacementReady('promoPlacement', campaign);
@@ -102,7 +102,7 @@ describe('PlacementManagerTest', () => {
         });
 
         it('should not change placement state to ready if placement doesnt exist in config', () => {
-            configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            configuration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             placementManager = new PlacementManager(nativeBridge, configuration);
 
             sandbox.stub(configuration, 'getPlacement').returns(undefined);

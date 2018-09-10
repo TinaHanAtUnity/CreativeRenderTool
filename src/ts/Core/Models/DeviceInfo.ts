@@ -1,8 +1,7 @@
 import { BatteryStatus } from 'Core/Constants/Android/BatteryStatus';
-import { StreamType } from 'Core/Constants/Android/StreamType';
-import { Platform } from 'Core/Constants/Platform';
 import { ISchema, Model } from 'Core/Models/Model';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { DeviceInfoApi } from 'Core/Native/DeviceInfo';
+import { Logger } from 'Core/Utilities/Logger';
 
 export interface IDeviceInfo {
     advertisingIdentifier: string | undefined | null;
@@ -62,29 +61,28 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
         headset: ['boolean']
     };
 
-    protected _nativeBridge: NativeBridge;
+    protected _deviceInfo: DeviceInfoApi;
 
-    constructor(name: string, schema: ISchema<T>, nativeBridge: NativeBridge) {
+    constructor(name: string, schema: ISchema<T>, deviceInfo: DeviceInfoApi) {
         super('DeviceInfo', schema);
-
-        this._nativeBridge = nativeBridge;
+        this._deviceInfo = deviceInfo;
     }
 
     public fetch(): Promise<any[]> {
         const promises: Array<Promise<any>> = [];
 
-        promises.push(this._nativeBridge.DeviceInfo.getAdvertisingTrackingId().then(advertisingIdentifier => this.set('advertisingIdentifier', advertisingIdentifier)).catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this._nativeBridge.DeviceInfo.getLimitAdTrackingFlag().then(limitAdTracking => this.set('limitAdTracking', limitAdTracking)).catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this._nativeBridge.DeviceInfo.getOsVersion().then(osVersion => this.set('osVersion', osVersion)).catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this._nativeBridge.DeviceInfo.getModel().then(model => this.set('model', model)).catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this._nativeBridge.DeviceInfo.getScreenWidth().then(screenWidth => this.set('screenWidth', Math.floor(screenWidth))).catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this._nativeBridge.DeviceInfo.getScreenHeight().then(screenHeight => this.set('screenHeight', Math.floor(screenHeight))).catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this._nativeBridge.DeviceInfo.getSystemLanguage().then(language => this.set('language', language)).catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this._nativeBridge.DeviceInfo.isRooted().then(rooted => this.set('rooted', rooted)).catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this._nativeBridge.DeviceInfo.getTimeZone(false).then(timeZone => this.set('timeZone', timeZone)).catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this._nativeBridge.DeviceInfo.getTotalMemory().then(totalMemory => this.set('totalMemory', totalMemory)).catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this._nativeBridge.DeviceInfo.getCPUCount().then(cpuCount => this.set('cpuCount', cpuCount)).catch(err => this.handleDeviceInfoError(err)));
-        promises.push(this._nativeBridge.DeviceInfo.getGLVersion().then(glVersion => this.set('glVersion', glVersion)).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._deviceInfo.getAdvertisingTrackingId().then(advertisingIdentifier => this.set('advertisingIdentifier', advertisingIdentifier)).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._deviceInfo.getLimitAdTrackingFlag().then(limitAdTracking => this.set('limitAdTracking', limitAdTracking)).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._deviceInfo.getOsVersion().then(osVersion => this.set('osVersion', osVersion)).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._deviceInfo.getModel().then(model => this.set('model', model)).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._deviceInfo.getScreenWidth().then(screenWidth => this.set('screenWidth', Math.floor(screenWidth))).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._deviceInfo.getScreenHeight().then(screenHeight => this.set('screenHeight', Math.floor(screenHeight))).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._deviceInfo.getSystemLanguage().then(language => this.set('language', language)).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._deviceInfo.isRooted().then(rooted => this.set('rooted', rooted)).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._deviceInfo.getTimeZone(false).then(timeZone => this.set('timeZone', timeZone)).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._deviceInfo.getTotalMemory().then(totalMemory => this.set('totalMemory', totalMemory)).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._deviceInfo.getCPUCount().then(cpuCount => this.set('cpuCount', cpuCount)).catch(err => this.handleDeviceInfoError(err)));
+        promises.push(this._deviceInfo.getGLVersion().then(glVersion => this.set('glVersion', glVersion)).catch(err => this.handleDeviceInfoError(err)));
 
         return Promise.all(promises);
     }
@@ -104,32 +102,24 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
     }
 
     public getNetworkType(): Promise<number> {
-        return this._nativeBridge.DeviceInfo.getNetworkType().then(networkType => {
+        return this._deviceInfo.getNetworkType().then(networkType => {
             this.set('networkType', networkType);
             return this.get('networkType');
         });
     }
 
     public getNetworkOperator(): Promise<string | null> {
-        if (this._nativeBridge.getPlatform() === Platform.IOS || this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            return this._nativeBridge.DeviceInfo.getNetworkOperator().then(networkOperator => {
-                this.set('networkOperator', networkOperator);
-                return this.get('networkOperator');
-            });
-        } else {
-            return Promise.resolve(this.get('networkOperator'));
-        }
+        return this._deviceInfo.getNetworkOperator().then(networkOperator => {
+            this.set('networkOperator', networkOperator);
+            return this.get('networkOperator');
+        });
     }
 
     public getNetworkOperatorName(): Promise<string | null> {
-        if (this._nativeBridge.getPlatform() === Platform.IOS || this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            return this._nativeBridge.DeviceInfo.getNetworkOperatorName().then(networkOperatorName => {
-                this.set('networkOperatorName', networkOperatorName);
-                return this.get('networkOperatorName');
-            });
-        } else {
-            return Promise.resolve(this.get('networkOperatorName'));
-        }
+        return this._deviceInfo.getNetworkOperatorName().then(networkOperatorName => {
+            this.set('networkOperatorName', networkOperatorName);
+            return this.get('networkOperatorName');
+        });
     }
 
     public getOsVersion(): string {
@@ -137,7 +127,7 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
     }
 
     public getScreenWidth(): Promise<number> {
-        return this._nativeBridge.DeviceInfo.getScreenWidth().then(screenWidth => {
+        return this._deviceInfo.getScreenWidth().then(screenWidth => {
             const adjustedScreenWidth = Math.floor(screenWidth);
             this.set('screenWidth', adjustedScreenWidth);
             return adjustedScreenWidth;
@@ -145,7 +135,7 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
     }
 
     public getScreenHeight(): Promise<number> {
-        return this._nativeBridge.DeviceInfo.getScreenHeight().then(screenHeight => {
+        return this._deviceInfo.getScreenHeight().then(screenHeight => {
             const adjustedScreenHeight = Math.floor(screenHeight);
             this.set('screenHeight', adjustedScreenHeight);
             return adjustedScreenHeight;
@@ -157,7 +147,7 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
     }
 
     public getConnectionType(): Promise<string> {
-        return this._nativeBridge.DeviceInfo.getConnectionType().then(connectionType => {
+        return this._deviceInfo.getConnectionType().then(connectionType => {
             this.set('connectionType', connectionType);
             return this.get('connectionType');
         });
@@ -178,51 +168,35 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
     }
 
     public getHeadset(): Promise<boolean> {
-        return this._nativeBridge.DeviceInfo.getHeadset().then(headset => {
+        return this._deviceInfo.getHeadset().then(headset => {
             this.set('headset', headset);
             return this.get('headset');
         });
     }
 
-    public getDeviceVolume(streamType: StreamType = StreamType.STREAM_SYSTEM): Promise<number> {
-        if (this._nativeBridge.getPlatform()  === Platform.IOS) {
-            return this._nativeBridge.DeviceInfo.Ios.getDeviceVolume().then(volume => {
-                this.set('volume', volume);
-                return this.get('volume');
-            });
-        } else if (this._nativeBridge.getPlatform() === Platform.ANDROID) {
-            return this._nativeBridge.DeviceInfo.Android.getDeviceVolume(streamType).then(volume => {
-                this.set('volume', volume);
-                return this.get('volume');
-            });
-        } else {
-            return Promise.resolve(this.get('volume'));
-        }
-    }
-
     public getScreenBrightness(): Promise<number> {
-        return this._nativeBridge.DeviceInfo.getScreenBrightness().then(brightness => {
+        return this._deviceInfo.getScreenBrightness().then(brightness => {
             this.set('screenBrightness', brightness);
             return this.get('screenBrightness');
         });
     }
 
     public getBatteryLevel(): Promise<number> {
-        return this._nativeBridge.DeviceInfo.getBatteryLevel().then(level => {
+        return this._deviceInfo.getBatteryLevel().then(level => {
             this.set('batteryLevel', level);
             return this.get('batteryLevel');
         });
     }
 
     public getBatteryStatus(): Promise<BatteryStatus> {
-        return this._nativeBridge.DeviceInfo.getBatteryStatus().then(batteryStatus => {
+        return this._deviceInfo.getBatteryStatus().then(batteryStatus => {
             this.set('batteryStatus', batteryStatus);
             return this.get('batteryStatus');
         });
     }
 
     public getFreeMemory(): Promise<number> {
-        return this._nativeBridge.DeviceInfo.getFreeMemory().then(freeMemory => {
+        return this._deviceInfo.getFreeMemory().then(freeMemory => {
             this.set('freeMemory', freeMemory);
             return this.get('freeMemory');
         });
@@ -250,7 +224,6 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
             this.getNetworkOperator().catch(err => this.handleDeviceInfoError(err)),
             this.getNetworkOperatorName().catch(err => this.handleDeviceInfoError(err)),
             this.getHeadset().catch(err => this.handleDeviceInfoError(err)),
-            this.getDeviceVolume().catch(err => this.handleDeviceInfoError(err)),
             this.getScreenWidth().catch(err => this.handleDeviceInfoError(err)),
             this.getScreenHeight().catch(err => this.handleDeviceInfoError(err)),
             this.getScreenBrightness().catch(err => this.handleDeviceInfoError(err)),
@@ -264,7 +237,6 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
             networkOperator,
             networkOperatorName,
             headset,
-            deviceVolume,
             screenWidth,
             screenHeight,
             screenBrightness,
@@ -285,7 +257,6 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
                 'timeZone': this.getTimeZone(),
                 'headset': headset,
                 'language': this.getLanguage(),
-                'deviceVolume': deviceVolume,
                 'screenBrightness': screenBrightness,
                 'freeSpaceInternal': freeSpace,
                 'totalSpaceInternal': this.getTotalSpace(),
@@ -322,6 +293,6 @@ export abstract class DeviceInfo<T extends IDeviceInfo = IDeviceInfo> extends Mo
     }
 
     protected handleDeviceInfoError(error: any) {
-        this._nativeBridge.Sdk.logWarning(JSON.stringify(error));
+        Logger.Warning(JSON.stringify(error));
     }
 }

@@ -14,7 +14,7 @@ import { JaegerManager } from 'Core/Jaeger/JaegerManager';
 import { JaegerTags } from 'Core/Jaeger/JaegerSpan';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'CoreConfiguration.ts';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
@@ -24,7 +24,7 @@ import { INativeResponse, Request } from 'Core/Utilities/Request';
 export class BannerCampaignManager {
     private _nativeBridge: NativeBridge;
     private _assetManager: AssetManager;
-    private _configuration: Configuration;
+    private _configuration: CoreConfiguration;
     private _clientInfo: ClientInfo;
     private _adMobSignalFactory: AdMobSignalFactory;
     private _sessionManager: SessionManager;
@@ -36,7 +36,7 @@ export class BannerCampaignManager {
 
     private _promise: Promise<Campaign> | null;
 
-    constructor(nativeBridge: NativeBridge, configuration: Configuration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, jaegerManager: JaegerManager) {
+    constructor(nativeBridge: NativeBridge, configuration: CoreConfiguration, assetManager: AssetManager, sessionManager: SessionManager, adMobSignalFactory: AdMobSignalFactory, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, jaegerManager: JaegerManager) {
         this._nativeBridge = nativeBridge;
         this._configuration = configuration;
         this._assetManager = assetManager;

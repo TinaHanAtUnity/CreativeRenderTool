@@ -1,9 +1,8 @@
 import { FailedOperativeEventManager } from 'Ads/Managers/FailedOperativeEventManager';
 import { SessionUtils } from 'Ads/Utilities/SessionUtils';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { StorageType } from 'Core/Native/Storage';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
-import { Request } from 'Core/Utilities/Request';
+import { Request } from 'Core/Managers/Request';
 
 export class FailedXpromoOperativeEventManager extends FailedOperativeEventManager {
 
@@ -11,15 +10,15 @@ export class FailedXpromoOperativeEventManager extends FailedOperativeEventManag
         return SessionUtils.getSessionStorageKey(this._sessionId) + '.xpromooperative';
     }
 
-    public sendFailedEvent(nativeBridge: NativeBridge, request: Request, writeStorage?: boolean): Promise<void> {
-        return nativeBridge.Storage.get<{ [key: string]: any }>(StorageType.PRIVATE, this.getEventStorageKey()).then((eventData) => {
+    public sendFailedEvent(request: Request, writeStorage?: boolean): Promise<void> {
+        return this._storage.get<{ [key: string]: any }>(StorageType.PRIVATE, this.getEventStorageKey()).then((eventData) => {
             const kafkaType = eventData.kafkaType;
             const data = eventData.data;
             return HttpKafka.sendEvent(kafkaType, KafkaCommonObjectType.PERSONAL, JSON.parse(data));
         }).then(() => {
-            return this.deleteFailedEvent(nativeBridge).then(() => {
+            return this.deleteFailedEvent().then(() => {
                 if(writeStorage) {
-                    this.writeStorage(nativeBridge);
+                    this.writeStorage();
                 }
             });
         }).catch((error) => {
@@ -27,11 +26,11 @@ export class FailedXpromoOperativeEventManager extends FailedOperativeEventManag
         });
     }
 
-    protected getPromisesForFailedEvents(nativeBridge: NativeBridge, request: Request, keys: string[]): Array<Promise<any>> {
+    protected getPromisesForFailedEvents(request: Request, keys: string[]): Array<Promise<any>> {
         const promises: Array<Promise<any>> = [];
         keys.map(eventId => {
-            const manager = new FailedXpromoOperativeEventManager(this._sessionId, eventId);
-            promises.push(manager.sendFailedEvent(nativeBridge, request));
+            const manager = new FailedXpromoOperativeEventManager(this._storage, this._sessionId, eventId);
+            promises.push(manager.sendFailedEvent(request));
         });
 
         return promises;

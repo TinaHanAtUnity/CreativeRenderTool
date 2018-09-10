@@ -1,20 +1,23 @@
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement, PlacementState } from 'Ads/Models/Placement';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
-import { Configuration } from 'Core/Models/Configuration';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { ListenerApi } from '../Native/Listener';
+import { PlacementApi } from '../Native/Placement';
 
 export interface IPlacementIdMap<T> {
     [placementId: string]: T;
 }
 
 export class PlacementManager {
-    private _nativeBridge: NativeBridge;
-    private _configuration: Configuration;
+    private _placement: PlacementApi;
+    private _listener: ListenerApi;
+    private _configuration: AdsConfiguration;
     private _placementCampaignMap: IPlacementIdMap<Campaign>;
 
-    constructor(nativeBridge: NativeBridge, configuration: Configuration) {
-        this._nativeBridge = nativeBridge;
+    constructor(placement: PlacementApi, listener: ListenerApi, configuration: AdsConfiguration) {
+        this._placement = placement;
+        this._listener = listener;
         this._configuration = configuration;
         this._placementCampaignMap = {};
     }
@@ -88,11 +91,11 @@ export class PlacementManager {
 
     private sendPlacementStateChange(placementId: string, oldState: PlacementState, newState: PlacementState) {
         if(oldState !== newState) {
-            this._nativeBridge.Placement.setPlacementState(placementId, newState);
-            this._nativeBridge.Listener.sendPlacementStateChangedEvent(placementId, PlacementState[oldState], PlacementState[newState]);
+            this._placement.setPlacementState(placementId, newState);
+            this._listener.sendPlacementStateChangedEvent(placementId, PlacementState[oldState], PlacementState[newState]);
 
             if(newState === PlacementState.READY) {
-                this._nativeBridge.Listener.sendReadyEvent(placementId);
+                this._listener.sendReadyEvent(placementId);
                 SdkStats.setReadyEventTimestamp(placementId);
                 SdkStats.sendReadyEvent(placementId);
             }

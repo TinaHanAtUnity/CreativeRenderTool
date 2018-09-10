@@ -91,7 +91,7 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
     public abstract isConnectionNeeded(): boolean;
 
     protected handleError(error: WebViewError) {
-        Diagnostics.trigger('set_model_value_failed', error, this.getSession());
+        Diagnostics.trigger('set_model_value_failed', error);
         throw error;
     }
 

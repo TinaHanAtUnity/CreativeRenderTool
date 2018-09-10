@@ -9,9 +9,9 @@ import { PlacementApi } from 'Ads/Native/Placement';
 import { VideoPlayerApi } from 'Ads/Native/VideoPlayer';
 import { WebPlayerApi } from 'Ads/Native/WebPlayer';
 import { Platform } from 'Core/Constants/Platform';
-import { Core, CoreModule } from 'Core/Core';
+import { CoreModule } from 'Core/Core';
 import { IApi, IApiModule, IModuleApi } from 'Core/Modules/ApiModule';
-import { NativeBridge } from '../Core/Native/Bridge/NativeBridge';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 export interface IAdsAndroidApi extends IApi {
     AdUnit: AndroidAdUnitApi;
@@ -36,7 +36,7 @@ export interface IAdsApi extends IModuleApi {
 
 export class Ads extends CoreModule implements IApiModule<IAdsApi> {
 
-    public readonly Api: IAdsApi;
+    public Api: IAdsApi;
 
     public load(nativeBridge: NativeBridge) {
         const api: IAdsApi = {
@@ -61,7 +61,7 @@ export class Ads extends CoreModule implements IApiModule<IAdsApi> {
             };
         }
 
-        return api;
+        this.Api = api;
     }
 
 }

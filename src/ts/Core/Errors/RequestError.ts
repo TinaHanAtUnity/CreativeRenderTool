@@ -1,5 +1,5 @@
 import { WebViewError } from 'Core/Errors/WebViewError';
-import { INativeResponse } from 'Core/Utilities/Request';
+import { INativeResponse } from 'Core/Managers/Request';
 
 export class RequestError extends WebViewError {
 

@@ -13,7 +13,7 @@ import { Session } from 'Ads/Models/Session';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'CoreConfiguration.ts';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Promises } from 'Core/Utilities/Promises';
@@ -30,7 +30,7 @@ export interface IAdMobEventHandlerParameters {
     adMobSignalFactory: AdMobSignalFactory;
     clientInfo: ClientInfo;
     campaign: AdMobCampaign;
-    configuration: Configuration;
+    configuration: CoreConfiguration;
     gdprManager: GdprManager;
 }
 

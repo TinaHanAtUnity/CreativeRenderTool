@@ -12,6 +12,7 @@ export interface IModuleApi {
 }
 
 export interface IApiModule<T extends IModuleApi> {
-    readonly Api: T;
-    load(nativeBridge: NativeBridge): IModuleApi;
+    Api: T;
+    load(nativeBridge: NativeBridge): void;
+    initialize(nativeBridge: NativeBridge): void;
 }

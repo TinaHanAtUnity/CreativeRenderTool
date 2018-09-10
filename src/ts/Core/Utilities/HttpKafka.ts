@@ -1,7 +1,7 @@
+import { INativeResponse, Request } from 'Core/Managers/Request';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { INativeResponse, Request } from 'Core/Utilities/Request';
 
 export enum KafkaCommonObjectType {
     EMPTY,
@@ -22,7 +22,7 @@ export class HttpKafka {
         HttpKafka._deviceInfo = deviceInfo;
     }
 
-    public static setConfiguration(configuration?: Configuration) {
+    public static setConfiguration(configuration?: CoreConfiguration) {
         HttpKafka._configuration = configuration;
     }
 
@@ -58,10 +58,10 @@ export class HttpKafka {
     private static _request: Request | undefined;
     private static _clientInfo: ClientInfo | undefined;
     private static _deviceInfo: DeviceInfo | undefined;
-    private static _configuration: Configuration | undefined;
+    private static _configuration: CoreConfiguration | undefined;
     private static _deviceInfoUpdating: boolean = false;
 
-    private static createCommonObject(objectType: KafkaCommonObjectType, clientInfo?: ClientInfo, deviceInfo?: DeviceInfo, configuration?: Configuration): Promise<any> {
+    private static createCommonObject(objectType: KafkaCommonObjectType, clientInfo?: ClientInfo, deviceInfo?: DeviceInfo, configuration?: CoreConfiguration): Promise<any> {
         if(objectType === KafkaCommonObjectType.EMPTY) {
             const emptyCommon: any = {
                 'common': {
