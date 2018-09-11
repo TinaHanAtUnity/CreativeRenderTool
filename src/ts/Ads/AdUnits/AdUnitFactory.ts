@@ -116,11 +116,11 @@ export class AdUnitFactory {
     }
 
     private static createPerformanceAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PerformanceCampaign>): PerformanceAdUnit {
-        const overlay = this.createOverlay(nativeBridge, parameters);
+        const privacy = this.createPrivacy(nativeBridge, parameters);
+        const overlay = this.createOverlay(nativeBridge, parameters, privacy, !parameters.placement.skipEndCardOnClose());
 
         const adUnitStyle: AdUnitStyle = parameters.campaign.getAdUnitStyle() || AdUnitStyle.getDefaultAdUnitStyle();
 
-        const privacy = this.createPrivacy(nativeBridge, parameters);
         const endScreenParameters: IEndScreenParameters = {
             ... this.createEndScreenParameters(nativeBridge, privacy, parameters.campaign.getGameName(), parameters),
             adUnitStyle: adUnitStyle,
@@ -178,9 +178,9 @@ export class AdUnitFactory {
     }
 
     private static createXPromoAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<XPromoCampaign>): XPromoAdUnit {
-        const overlay = this.createOverlay(nativeBridge, parameters);
-
         const privacy = this.createPrivacy(nativeBridge, parameters);
+        const overlay = this.createOverlay(nativeBridge, parameters, privacy, !parameters.placement.skipEndCardOnClose());
+
         const endScreenParameters = this.createEndScreenParameters(nativeBridge, privacy, parameters.campaign.getGameName(), parameters);
         const endScreen = new XPromoEndScreen(endScreenParameters, parameters.campaign);
         const video = this.getVideo(parameters.campaign, parameters.forceOrientation);
@@ -216,7 +216,8 @@ export class AdUnitFactory {
     }
 
     private static createVastAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<VastCampaign>): VastAdUnit {
-        const overlay = this.createOverlay(nativeBridge, parameters);
+        const privacy = this.createPrivacy(nativeBridge, parameters);
+        const overlay = this.createOverlay(nativeBridge, parameters, privacy, parameters.campaign.hasEndscreen());
         let vastEndScreen: VastEndScreen | undefined;
 
         const vastAdUnitParameters: IVastAdUnitParameters = {
@@ -225,10 +226,8 @@ export class AdUnitFactory {
             overlay: overlay
         };
 
-        let endscreenPrivacy;
         if(parameters.campaign.hasEndscreen()) {
-            endscreenPrivacy = this.createPrivacy(nativeBridge, vastAdUnitParameters);
-            vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters, endscreenPrivacy);
+            vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters, privacy);
             vastAdUnitParameters.endScreen = vastEndScreen;
         }
 
@@ -279,9 +278,7 @@ export class AdUnitFactory {
             }
         });
 
-        if (endscreenPrivacy) {
-            BadAdsReporting.setupReportListener(endscreenPrivacy, vastAdUnit);
-        }
+        BadAdsReporting.setupReportListener(privacy, vastAdUnit);
 
         return vastAdUnit;
     }
@@ -477,20 +474,17 @@ export class AdUnitFactory {
         return adUnit;
     }
 
-    private static createOverlay(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractVideoOverlay {
-        const privacy = this.createPrivacy(nativeBridge, parameters);
+    private static createOverlay(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>, privacy: GDPRPrivacy, hidePrivacyInVideo: boolean | undefined): AbstractVideoOverlay {
         const showGDPRBanner = (parameters.campaign instanceof VastCampaign) ? this.showGDPRBanner(parameters) : false;
-        const isPerformanceCampaign = parameters.campaign instanceof PerformanceCampaign;
-        const disablePrivacyDuringVideo = (isPerformanceCampaign || parameters.campaign instanceof XPromoCampaign) && !parameters.placement.skipEndCardOnClose();
         let overlay: AbstractVideoOverlay;
 
         if (parameters.placement.allowSkip() && parameters.placement.skipEndCardOnClose()) {
             overlay = new ClosableVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         } else {
             if (NewVideoOverlayEnabledAbTest.isValid(parameters.configuration.getAbGroup())) {
-                overlay = new NewVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, disablePrivacyDuringVideo);
+                overlay = new NewVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, hidePrivacyInVideo);
             } else {
-                overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, disablePrivacyDuringVideo);
+                overlay = new Overlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, hidePrivacyInVideo);
             }
         }
 

@@ -3,6 +3,7 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 
 export enum BadAdReason {
     OFFENSIVE = 'Ad is very offensive',
@@ -23,23 +24,27 @@ export class BadAdsReporting {
         Diagnostics.trigger('reported_ad', error);
     }
 
-    public static setupReportListener(privacy: GDPRPrivacy, adunit: AbstractAdUnit): void {
+    public static setupReportListener(privacy: GDPRPrivacy, ad: AbstractAdUnit | AbstractVideoOverlay): void {
         if (privacy._onReport) {
             privacy._onReport.subscribe((reportSent) => {
                 if (reportSent) {
                     privacy._onReport.unsubscribe();
-                    this.timeoutAd(adunit);
+                    this.timeoutAd(ad);
                 }
             });
         }
     }
 
     // Timeout after four seconds
-    private static timeoutAd(adunit: AbstractAdUnit): Promise<void> {
+    private static timeoutAd(ad: AbstractAdUnit | AbstractVideoOverlay): Promise<void> {
         return new Promise(resolve => {
             setTimeout(() => {
-                adunit.setFinishState(FinishState.SKIPPED, true);
-                adunit.hide();
+                if (ad instanceof AbstractAdUnit) {
+                    ad.setFinishState(FinishState.SKIPPED, true);
+                    ad.hide();
+                } else if (ad instanceof AbstractVideoOverlay) {
+                    ad.hide();
+                }
                 resolve();
             }, 4000);
         });

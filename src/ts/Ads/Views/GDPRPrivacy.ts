@@ -80,15 +80,17 @@ export class GDPRPrivacy extends AbstractPrivacy {
         }
 
         const agreeRadioButton = <HTMLInputElement>this._container.querySelector('#gdpr-agree-radio');
-        agreeRadioButton.onclick = () => {
-            const confirmationContainer = <HTMLSpanElement>document.getElementById('data-deletion-container');
-            confirmationContainer.classList.remove('active');
+        if (agreeRadioButton) {
+            agreeRadioButton.onclick = () => {
+                const confirmationContainer = <HTMLSpanElement>document.getElementById('data-deletion-container');
+                confirmationContainer.classList.remove('active');
 
-            const requestContainer = <HTMLSpanElement>document.getElementById('data-deletion-request-container');
-            requestContainer.classList.remove('active');
+                const requestContainer = <HTMLSpanElement>document.getElementById('data-deletion-request-container');
+                requestContainer.classList.remove('active');
 
-            this._dataDeletionConfirmation = false;
-        };
+                this._dataDeletionConfirmation = false;
+            };
+        }
     }
 
     public render(): void {
