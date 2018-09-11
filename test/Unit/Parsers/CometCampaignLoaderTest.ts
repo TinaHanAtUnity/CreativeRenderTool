@@ -1,6 +1,5 @@
 import 'mocha';
 import { assert } from 'chai';
-import * as sinon from 'sinon';
 
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
