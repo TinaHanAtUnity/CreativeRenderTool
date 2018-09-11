@@ -1,13 +1,17 @@
+# Pending
+
+* Hellfest Creative temporary creative ID Whitelist [#6296](https://github.com/Applifier/unity-ads-webview/pull/6296)
+
 # Tue Sep 11 11:48:04 UTC 2018
 
-* Disable Request.setConcurrentRequestCount on iOS SDK 2.3.0 to prevent crashes with iOS 12
+* Disable Request.setConcurrentRequestCount on iOS SDK 2.3.0 to prevent crashes with iOS 12 [#6299](https://github.com/Applifier/unity-ads-webview/pull/6299)
 
 # Mon Sep 10 09:54:48 UTC 2018
 
-* Replace the skip icon with the close icon for Cheetah's Clean Master
-* Show GDPR Privacy on the VAST end screen if GDPR enabled
-* Hide GDPR banner after click on performance end screen. Make gdpr icon clickable in banner
-* Add gameids for Mixed Placement experiment
+* Replace the skip icon with the close icon for Cheetah's Clean Master [#6268](https://github.com/Applifier/unity-ads-webview/pull/6268)
+* Show GDPR Privacy on the VAST end screen if GDPR enabled [#6246](https://github.com/Applifier/unity-ads-webview/pull/6246)
+* Hide GDPR banner after click on performance end screen. Make gdpr icon clickable in banner [#6270](https://github.com/Applifier/unity-ads-webview/pull/6270)
+* Add gameids for Mixed Placement experiment [#6243](https://github.com/Applifier/unity-ads-webview/pull/6243)
 
 # Thu Sep  6 09:26:17 UTC 2018
 
