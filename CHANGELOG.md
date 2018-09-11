@@ -1,3 +1,7 @@
+# Tue Sep 11 11:48:04 UTC 2018
+
+* Disable Request.setConcurrentRequestCount on iOS SDK 2.3.0 to prevent crashes with iOS 12
+
 # Mon Sep 10 09:54:48 UTC 2018
 
 * Replace the skip icon with the close icon for Cheetah's Clean Master
