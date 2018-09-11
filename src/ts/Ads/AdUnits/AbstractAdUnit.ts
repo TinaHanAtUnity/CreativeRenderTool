@@ -110,8 +110,8 @@ export abstract class AbstractAdUnit {
         return this._finishState;
     }
 
-    public setFinishState(finishState: FinishState) {
-        if(this._finishState !== FinishState.COMPLETED) {
+    public setFinishState(finishState: FinishState, override?: boolean) {
+        if(this._finishState !== FinishState.COMPLETED || override) {
             this._finishState = finishState;
         }
     }

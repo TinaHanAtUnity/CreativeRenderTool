@@ -14,6 +14,7 @@ import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
+import { BadAdsReporting } from 'Ads/Utilities/BadAdsReporting';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
@@ -33,10 +34,7 @@ import { WebViewError } from 'Core/Errors/WebViewError';
 import { NewVideoOverlayEnabledAbTest } from 'Core/Models/ABGroup';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IObserver2, IObserver3 } from 'Core/Utilities/IObserver';
-import {
-    DisplayInterstitialAdUnit,
-    IDisplayInterstitialAdUnitParameters
-} from 'Display/AdUnits/DisplayInterstitialAdUnit';
+import { DisplayInterstitialAdUnit, IDisplayInterstitialAdUnitParameters } from 'Display/AdUnits/DisplayInterstitialAdUnit';
 import { DisplayInterstitialEventHandler } from 'Display/EventHandlers/DisplayInterstitialEventHandler';
 import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 import { DisplayInterstitial } from 'Display/Views/DisplayInterstitial';
@@ -78,7 +76,6 @@ import { XPromoVideoEventHandler } from 'XPromo/EventHandlers/XPromoVideoEventHa
 import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
-import { GdprManager } from 'Ads/Managers/GdprManager';
 
 export class AdUnitFactory {
     private static _forcedPlayableMRAID: boolean = false;
@@ -159,6 +156,7 @@ export class AdUnitFactory {
                 }
             });
         }
+        BadAdsReporting.setupReportListener(privacy, performanceAdUnit);
 
         return performanceAdUnit;
     }
@@ -212,6 +210,7 @@ export class AdUnitFactory {
                 }
             });
         }
+        BadAdsReporting.setupReportListener(privacy, xPromoAdUnit);
 
         return xPromoAdUnit;
     }
@@ -226,9 +225,10 @@ export class AdUnitFactory {
             overlay: overlay
         };
 
+        let endscreenPrivacy;
         if(parameters.campaign.hasEndscreen()) {
-            const endScreenPrivacy = this.createPrivacy(nativeBridge, vastAdUnitParameters);
-            vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters, endScreenPrivacy);
+            endscreenPrivacy = this.createPrivacy(nativeBridge, vastAdUnitParameters);
+            vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters, endscreenPrivacy);
             vastAdUnitParameters.endScreen = vastEndScreen;
         }
 
@@ -279,6 +279,10 @@ export class AdUnitFactory {
             }
         });
 
+        if (endscreenPrivacy) {
+            BadAdsReporting.setupReportListener(endscreenPrivacy, vastAdUnit);
+        }
+
         return vastAdUnit;
     }
 
@@ -310,7 +314,7 @@ export class AdUnitFactory {
         const EventHandler =  (isSonicPlayable || isPlayable) ? PlayableEventHandler : MRAIDEventHandler;
         const mraidEventHandler: IMRAIDViewHandler = new EventHandler(nativeBridge, mraidAdUnit, mraidAdUnitParameters);
         mraid.addEventHandler(mraidEventHandler);
-
+        BadAdsReporting.setupReportListener(privacy, mraidAdUnit);
         return mraidAdUnit;
     }
 
@@ -349,6 +353,7 @@ export class AdUnitFactory {
             const endScreenEventHandler = new VPAIDEndScreenEventHandler(nativeBridge, vpaidAdUnit, vpaidAdUnitParameters);
             endScreen.addEventHandler(endScreenEventHandler);
         }
+        BadAdsReporting.setupReportListener(privacy, vpaidAdUnit);
 
         return vpaidAdUnit;
     }
@@ -370,6 +375,7 @@ export class AdUnitFactory {
         promoView.onGDPRPopupSkipped.subscribe(() => PromoEventHandler.onGDPRPopupSkipped(parameters.configuration, parameters.gdprManager));
         promoView.onClose.subscribe(() => PromoEventHandler.onClose(promoAdUnit, parameters.configuration.getToken(), parameters.clientInfo.getGameId(), parameters.configuration.getAbGroup(), parameters.campaign.getTrackingUrlsForEvent('purchase'), parameters.configuration.isOptOutEnabled()));
         promoView.onPromo.subscribe((productId) => PromoEventHandler.onPromo(promoAdUnit, productId, parameters.campaign.getTrackingUrlsForEvent('purchase')));
+        BadAdsReporting.setupReportListener(privacy, promoAdUnit);
 
         return promoAdUnit;
     }
@@ -387,6 +393,7 @@ export class AdUnitFactory {
         const displayInterstitialAdUnit = new DisplayInterstitialAdUnit(nativeBridge, displayInterstitialParameters);
         const displayInterstitialEventHandler = new DisplayInterstitialEventHandler(nativeBridge, displayInterstitialAdUnit, displayInterstitialParameters);
         view.addEventHandler(displayInterstitialEventHandler);
+        BadAdsReporting.setupReportListener(privacy, displayInterstitialAdUnit);
 
         return displayInterstitialAdUnit;
     }
@@ -465,6 +472,7 @@ export class AdUnitFactory {
             gdprManager: parameters.gdprManager
         });
         view.addEventHandler(eventHandler);
+        BadAdsReporting.setupReportListener(privacy, adUnit);
 
         return adUnit;
     }
@@ -517,11 +525,11 @@ export class AdUnitFactory {
         return video;
     }
 
-    private static createPrivacy(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractPrivacy {
+    private static createPrivacy(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): GDPRPrivacy {
         const privacy = new GDPRPrivacy(nativeBridge, parameters.campaign, parameters.gdprManager, parameters.configuration.isGDPREnabled(), parameters.configuration.isCoppaCompliant(), parameters.configuration.isOptOutEnabled());
         const privacyEventHandler = new PrivacyEventHandler(nativeBridge, parameters);
         if (parameters.configuration.isGDPREnabled()) {
-            AbstractPrivacy.setUserInformation(parameters.gdprManager);
+            // AbstractPrivacy.setUserInformation(parameters.gdprManager);
         }
         privacy.addEventHandler(privacyEventHandler);
         return privacy;
