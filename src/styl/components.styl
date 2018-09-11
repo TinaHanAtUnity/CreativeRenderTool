@@ -265,8 +265,22 @@ $full-screen-pop-up-view($scale-size, z-index = auto, $with-styles = true) {
       font-size: 1rem;
     }
 
+    .report-dialog {
+      display: block;
+      text-align: center;
+      font-style: italic;
+    }
+
+    .report-disclaimer {
+        display: block;
+        margin-top: .5rem;
+        margin-bottom: .5rem;
+        text-align: center;
+        font-size: .4rem;
+    }
+
     .report-container {
-      height: 150px;
+      height: 100px;
 
       .report-button {
         display: inline-block;
@@ -295,10 +309,11 @@ $full-screen-pop-up-view($scale-size, z-index = auto, $with-styles = true) {
       .report-confirmed-text {
         display: block;
         float: right;
+        margin-top: .5rem;
         margin-bottom: 1.5rem;
         width: 50%;
         text-align: center;
-        font-size: $default-size * $default-font-size * .75;
+        font-size: $default-size * $default-font-size * .65;
         opacity: 0;
         transition: opacity 250ms ease-in;
 

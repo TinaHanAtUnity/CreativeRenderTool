@@ -2,7 +2,7 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 export enum BadAdReason {
-    OFFENSIVE = 'Very offensive',
+    OFFENSIVE = 'Ad is very offensive',
     NEVER_STARTED = 'Ad did not start',
     WONT_END = 'Ad will not close',
     MALFORMED = 'Ad does not look right',
