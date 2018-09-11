@@ -67,6 +67,11 @@ export abstract class BaseVideoEventHandler {
 
             this.updateViewsOnVideoError();
 
+            const overlay = this._adUnit.getOverlay();
+            if(overlay) {
+                overlay.hide();
+            }
+
             this._adUnit.onError.trigger();
             this._adUnit.onFinish.trigger();
 

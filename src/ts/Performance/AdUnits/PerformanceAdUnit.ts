@@ -59,11 +59,6 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
     }
 
     public onVideoError(): void {
-        const overlay = this.getOverlay();
-        if(overlay) {
-            overlay.hide();
-        }
-
         const endScreen = this.getEndScreen();
         if(endScreen) {
             endScreen.show();

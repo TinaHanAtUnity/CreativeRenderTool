@@ -50,11 +50,6 @@ export class XPromoAdUnit extends VideoAdUnit<XPromoCampaign> {
     }
 
     public onVideoError(): void {
-        const overlay = this.getOverlay();
-        if(overlay) {
-            overlay.hide();
-        }
-
         const endScreen = this.getEndScreen();
         if (endScreen) {
             endScreen.show();
