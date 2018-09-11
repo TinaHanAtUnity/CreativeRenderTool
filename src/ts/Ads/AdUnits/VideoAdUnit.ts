@@ -75,6 +75,8 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         this.prepareOverlay();
     }
 
+    public abstract onVideoError(): void;
+
     public show(): Promise<void> {
         this.setShowing(true);
         this.setActive(true);

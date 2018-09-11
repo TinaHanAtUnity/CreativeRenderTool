@@ -67,11 +67,6 @@ export abstract class BaseVideoEventHandler {
 
             this.updateViewsOnVideoError();
 
-            const overlay = this._adUnit.getOverlay();
-            if(overlay) {
-                overlay.hide();
-            }
-
             this._adUnit.onError.trigger();
             this._adUnit.onFinish.trigger();
 
@@ -79,6 +74,7 @@ export abstract class BaseVideoEventHandler {
                 this._adUnit.hide();
                 this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.VIDEO_PLAYER_ERROR], 'Video player prepare error');
             } else {
+                this._adUnit.onVideoError();
                 this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.VIDEO_PLAYER_ERROR], 'Video player error');
             }
         }

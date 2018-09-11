@@ -49,6 +49,18 @@ export class XPromoAdUnit extends VideoAdUnit<XPromoCampaign> {
         return this._endScreen;
     }
 
+    public onVideoError(): void {
+        const overlay = this.getOverlay();
+        if(overlay) {
+            overlay.hide();
+        }
+
+        const endScreen = this.getEndScreen();
+        if (endScreen) {
+            endScreen.show();
+        }
+    }
+
     protected unsetReferences() {
         super.unsetReferences();
         delete this._endScreen;

@@ -5,6 +5,8 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
+import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 
 export interface IPerformanceAdUnitParameters extends IVideoAdUnitParameters<PerformanceCampaign> {
     endScreen: PerformanceEndScreen;
@@ -16,6 +18,8 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
 
     private _endScreen: PerformanceEndScreen;
     private _privacy: AbstractPrivacy;
+    private _performanceCampaign: PerformanceCampaign;
+    private _thirdPartyEventManager: ThirdPartyEventManager;
 
     constructor(nativeBridge: NativeBridge, parameters: IPerformanceAdUnitParameters) {
         super(nativeBridge, parameters);
@@ -28,6 +32,8 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
         document.body.appendChild(this._endScreen.container());
 
         this._privacy = parameters.privacy;
+        this._performanceCampaign = parameters.campaign;
+        this._thirdPartyEventManager = parameters.thirdPartyEventManager;
     }
 
     public hide(): Promise<void> {
@@ -50,6 +56,19 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
 
     public getEndScreen(): PerformanceEndScreen | undefined {
         return this._endScreen;
+    }
+
+    public onVideoError(): void {
+        const overlay = this.getOverlay();
+        if(overlay) {
+            overlay.hide();
+        }
+
+        const endScreen = this.getEndScreen();
+        if(endScreen) {
+            endScreen.show();
+        }
+        this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._performanceCampaign, ICometTrackingUrlEvents.ERROR);
     }
 
     protected unsetReferences() {

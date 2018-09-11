@@ -186,6 +186,20 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         }
     }
 
+    public onVideoError(): void {
+        const overlay = this.getOverlay();
+        if(overlay) {
+            overlay.hide();
+        }
+
+        const endScreen = this.getEndScreen();
+        if(endScreen) {
+            endScreen.show();
+        } else {
+            this.hide();
+        }
+    }
+
     private isValidURL(url: string | null): boolean {
         const reg = new RegExp('^(https?)://.+$');
         return !!url && reg.test(url);
