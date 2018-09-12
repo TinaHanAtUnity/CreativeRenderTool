@@ -26,11 +26,9 @@ export class BadAdsReporting {
 
     public static setupReportListener(privacy: GDPRPrivacy, ad: AbstractAdUnit | AbstractVideoOverlay): void {
         if (privacy._onReport) {
-            privacy._onReport.subscribe((reportSent) => {
-                if (reportSent) {
-                    privacy._onReport.unsubscribe();
-                    this.timeoutAd(ad);
-                }
+            privacy._onReport.subscribe(() => {
+                privacy._onReport.unsubscribe();
+                this.timeoutAd(ad);
             });
         }
     }

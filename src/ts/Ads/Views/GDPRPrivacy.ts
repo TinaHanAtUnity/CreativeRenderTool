@@ -5,11 +5,11 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Template } from 'Core/Utilities/Template';
 import GDPRPrivacyTemplate from 'html/GDPR-privacy.html';
 import { BadAdsReporting } from 'Ads/Utilities/BadAdsReporting';
-import { Observable1 } from 'Core/Utilities/Observable';
+import { Observable0 } from 'Core/Utilities/Observable';
 
 export class GDPRPrivacy extends AbstractPrivacy {
 
-    public readonly _onReport: Observable1<boolean> = new Observable1();
+    public readonly _onReport: Observable0 = new Observable0();
 
     private _gdprManager: GdprManager;
     private _dataDeletionConfirmation: boolean = false;
@@ -150,7 +150,7 @@ export class GDPRPrivacy extends AbstractPrivacy {
                 this._reportSent = true;
                 this.handleReportText(true, reportText);
                 BadAdsReporting.onUserReport(this._campaign, checkedReportButton.id);
-                this._onReport.trigger(this._reportSent);
+                this._onReport.trigger();
             } else {
                 this.handleReportText(false, reportText);
             }
