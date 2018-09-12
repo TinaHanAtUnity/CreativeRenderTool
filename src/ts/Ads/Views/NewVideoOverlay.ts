@@ -36,6 +36,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _gdprPopupClicked: boolean = false;
     private _showGDPRBanner: boolean = false;
     private _disablePrivacyDuringVideo: boolean | undefined;
+    private _gameId: string;
 
     constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, disablePrivacyDuringVideo?: boolean) {
         super(nativeBridge, 'new-video-overlay', muted);
@@ -44,6 +45,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._privacy = privacy;
         this._showGDPRBanner = showGDPRBanner;
         this._disablePrivacyDuringVideo = disablePrivacyDuringVideo;
+        this._gameId = gameId;
         this._template = new Template(NewVideoOverlayTemplate, this._localization);
 
         this._templateData = {
@@ -122,6 +124,10 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         super.render();
         this.setupElementReferences();
         this.choosePrivacyShown();
+
+        if(CustomFeatures.isCloseIconSkipApp(this._gameId)) {
+            this._skipButtonElement.classList.add('close-icon-skip');
+        }
     }
 
     public setSpinnerEnabled(value: boolean): void {
