@@ -6,8 +6,6 @@ import { Template } from 'Core/Utilities/Template';
 import { View } from 'Core/Views/View';
 import VastEndScreenTemplate from 'html/VastEndScreen.html';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
-import { GdprManager } from 'Ads/Managers/GdprManager';
 
 export interface IVastEndScreenHandler {
     onVastEndScreenClick(): void;
@@ -20,22 +18,14 @@ export interface IVastEndScreenHandler {
 export class VastEndScreen extends View<IVastEndScreenHandler> implements IPrivacyHandler {
 
     private _isSwipeToCloseEnabled: boolean = false;
-    private _coppaCompliant: boolean;
     private _privacy: AbstractPrivacy;
     private _callButtonEnabled: boolean = true;
     private _campaign: VastCampaign;
-    private _gdprManager: GdprManager;
-    private _isGDPREnabled: boolean;
-    private _optOutEnabled: boolean;
 
     constructor(nativeBridge: NativeBridge, parameters: IAdUnitParameters<VastCampaign>, privacy: AbstractPrivacy) {
         super(nativeBridge, 'vast-end-screen');
 
-        this._coppaCompliant = parameters.configuration.isCoppaCompliant();
-        this._gdprManager = parameters.gdprManager;
         this._campaign = parameters.campaign;
-        this._isGDPREnabled = parameters.configuration.isGDPREnabled();
-        this._optOutEnabled = parameters.configuration.isOptOutEnabled();
         this._template = new Template(VastEndScreenTemplate);
         this._privacy = privacy;
 

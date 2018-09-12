@@ -22,7 +22,7 @@ describe('OverlayTest', () => {
             handleInvocation,
             handleCallback
         });
-        privacy = new GDPRPrivacy(nativeBridge, TestFixtures.getCampaign(), sinon.createStubInstance(GdprManager), false, false, false);
+        privacy = new GDPRPrivacy(nativeBridge, TestFixtures.getCampaign(), sinon.createStubInstance(GdprManager), false, false);
     });
 
     it('should render', () => {

@@ -6,27 +6,32 @@ import { Template } from 'Core/Utilities/Template';
 import GDPRPrivacyTemplate from 'html/GDPR-privacy.html';
 import { BadAdsReporting } from 'Ads/Utilities/BadAdsReporting';
 
+export enum GDPRCardState {
+    INITIAL,
+    PRIVACY,
+    BUILD,
+    REPORT
+}
+
 export class GDPRPrivacy extends AbstractPrivacy {
 
-    private _gdprManager: GdprManager;
     private _dataDeletionConfirmation: boolean = false;
     private _currentState : number = -1;
     private _campaign: Campaign;
     private _reportSent: boolean = false;
     private _gdprEnabled: boolean = false;
-    private _optOutEnabled: boolean;
+    private _gdprManager: GdprManager;
 
     constructor(nativeBridge: NativeBridge, campaign: Campaign,
                 gdprManager: GdprManager, gdprEnabled: boolean,
-                isCoppaCompliant: boolean, optOutEnabled: boolean) {
+                isCoppaCompliant: boolean) {
 
         super(nativeBridge, isCoppaCompliant, gdprEnabled, 'gdpr-privacy');
 
         this._template = new Template(GDPRPrivacyTemplate);
-        this._gdprManager = gdprManager;
         this._campaign = campaign;
         this._gdprEnabled = gdprEnabled;
-        this._optOutEnabled = optOutEnabled;
+        this._gdprManager = gdprManager;
 
         this._bindings = [
             {
@@ -70,7 +75,7 @@ export class GDPRPrivacy extends AbstractPrivacy {
     public show(): void {
         super.show();
         if (this._gdprEnabled) {
-            const elId = this._optOutEnabled ? 'gdpr-refuse-radio' : 'gdpr-agree-radio';
+            const elId = this._gdprManager.isOptOutEnabled() ? 'gdpr-refuse-radio' : 'gdpr-agree-radio';
 
             const activeRadioButton = <HTMLInputElement>this._container.querySelector(`#${elId}`);
             activeRadioButton.checked = true;
@@ -165,9 +170,6 @@ export class GDPRPrivacy extends AbstractPrivacy {
         }
     }
 
-    // State 0: Privacy info - Left: Build info - Middle: Report Ad
-    // State 1: Build info - Left: Privacy info - Middle: Report Ad
-    // State 2: Report Ad - Left: Privacy info - Middle: Build info
     private setCardState(isLeftClick: boolean) {
 
         const leftEl = <HTMLDivElement>this._container.querySelector('.left-side-link');
@@ -180,28 +182,28 @@ export class GDPRPrivacy extends AbstractPrivacy {
         switch(this._currentState) {
 
             // Privacy info showing
-            case 0: {
+            case GDPRCardState.PRIVACY: {
                 leftEl.innerText = pCard;
                 if (isLeftClick) {
-                    this._currentState = 1;
+                    this._currentState = GDPRCardState.BUILD;
                     middleEl.innerText = rCard;
                     classList.add('build');
                 } else {
-                    this._currentState = 2;
+                    this._currentState = GDPRCardState.REPORT;
                     middleEl.innerText = bCard;
                     classList.add('report');
                 }
                 break;
             }
             // Build info showing
-            case 1: {
+            case GDPRCardState.BUILD: {
                 classList.remove('build');
                 if (isLeftClick) {
-                    this._currentState = 0;
+                    this._currentState = GDPRCardState.PRIVACY;
                     leftEl.innerText = bCard;
                     middleEl.innerText = rCard;
                 } else {
-                    this._currentState = 2;
+                    this._currentState = GDPRCardState.REPORT;
                     leftEl.innerText = pCard;
                     middleEl.innerText = bCard;
                     classList.add('report');
@@ -209,14 +211,14 @@ export class GDPRPrivacy extends AbstractPrivacy {
                 break;
             }
             // Report Ad showing
-            case 2: {
+            case GDPRCardState.REPORT: {
                 classList.remove('report');
                 middleEl.innerText = rCard;
                 if (isLeftClick) {
-                    this._currentState = 0;
+                    this._currentState = GDPRCardState.PRIVACY;
                     leftEl.innerText = bCard;
                 } else {
-                    this._currentState = 1;
+                    this._currentState = GDPRCardState.BUILD;
                     leftEl.innerText = pCard;
                     classList.add('build');
                 }
@@ -224,7 +226,7 @@ export class GDPRPrivacy extends AbstractPrivacy {
             }
             // Initial Configuration
             default: {
-                this._currentState = 0;
+                this._currentState = GDPRCardState.PRIVACY;
                 leftEl.innerText = bCard;
                 middleEl.innerText = rCard;
             }

@@ -230,8 +230,8 @@ $full-screen-pop-up-view($scale-size, z-index = auto, $with-styles = true) {
       .icon-gdpr {
         display: block;
         text-align: center;
-        font-size: 2.5rem;
-        opacity: .41;
+        font-size: $default-size * $default-font-size * 2.5;
+        opacity: .4;
       }
 
     .centered-title {
@@ -260,23 +260,24 @@ $full-screen-pop-up-view($scale-size, z-index = auto, $with-styles = true) {
       }
 
     .report-title {
-      margin-top: 1rem;
-      margin-bottom: 1rem;
-      font-size: 1rem;
+      margin-top: $pop-up-size;
+      margin-bottom: $pop-up-size;
+      font-size: $pop-up-font-size * 1.5;
     }
 
     .report-dialog {
       display: block;
       text-align: center;
       font-style: italic;
+      font-size: $pop-up-font-size * 1.25;
     }
 
     .report-disclaimer {
         display: block;
-        margin-top: .5rem;
-        margin-bottom: .5rem;
+        margin-top: $pop-up-size * .5;
+        margin-bottom: $pop-up-size * .5;
         text-align: center;
-        font-size: .4rem;
+        font-size: $pop-up-font-size * .4;
     }
 
     .report-container {
@@ -285,37 +286,25 @@ $full-screen-pop-up-view($scale-size, z-index = auto, $with-styles = true) {
       .report-button {
         display: inline-block;
         float: left;
-        margin: .5rem;
-        margin-bottom: 1.5rem;
-        padding: .75rem 1.5rem;
-        border-radius: .25rem;
+        margin: $pop-up-size * .5;
+        margin-bottom: $pop-up-size * 1.5;
+        padding: $pop-up-size * .75 $pop-up-size * 1.5;
+        border-radius: $pop-up-size * .25;
         background: $privacy-green;
         color: $white;
-        font-size: .8125rem;
-      }
-
-      .report-button {
-        display: inline-block;
-        float: left;
-        margin: .5rem;
-        margin-bottom: 1.5rem;
-        padding: .75rem 1.5rem;
-        border-radius: .25rem;
-        background: $privacy-green;
-        color: $white;
-        font-size: .8125rem;
+        font-size: $pop-up-font-size;
       }
 
       .report-confirmed-text {
         display: block;
         float: right;
-        margin-top: .5rem;
-        margin-bottom: 1.5rem;
+        margin-top: $pop-up-size * .5;
+        margin-bottom: $pop-up-size * 1.5;
         width: 50%;
         text-align: center;
         font-size: $default-size * $default-font-size * .65;
         opacity: 0;
-        transition: opacity 250ms ease-in;
+        transition: opacity $default-transition-ts ease-in;
 
         &.active {
           opacity: 1;
@@ -377,4 +366,3 @@ $full-screen-pop-up-view($scale-size, z-index = auto, $with-styles = true) {
     }
   }
 }
-

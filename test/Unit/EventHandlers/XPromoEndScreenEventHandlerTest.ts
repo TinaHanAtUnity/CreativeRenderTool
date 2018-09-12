@@ -90,7 +90,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
 
             const video = new Video('', TestFixtures.getSession());
             const gdprManager = sinon.createStubInstance(GdprManager);
-            const privacy = new GDPRPrivacy(nativeBridge, campaign, gdprManager, false, false, false);
+            const privacy = new GDPRPrivacy(nativeBridge, campaign, gdprManager, false, false);
             const endScreenParams : IEndScreenParameters = {
                 nativeBridge: nativeBridge,
                 language : deviceInfo.getLanguage(),
@@ -185,7 +185,7 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             sinon.stub(deviceInfo, 'getOsVersion').returns('9.0');
             const video = new Video('', TestFixtures.getSession());
             const gdprManager = sinon.createStubInstance(GdprManager);
-            const privacy = new GDPRPrivacy(nativeBridge, campaign, gdprManager, false, false, false);
+            const privacy = new GDPRPrivacy(nativeBridge, campaign, gdprManager, false, false);
             const endScreenParams : IEndScreenParameters = {
                 nativeBridge: nativeBridge,
                 language : deviceInfo.getLanguage(),

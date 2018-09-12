@@ -34,7 +34,7 @@ describe('EndScreenTest', () => {
 
     const createEndScreen = (language : string) : PerformanceEndScreen => {
         const gdprManager = sinon.createStubInstance(GdprManager);
-        const privacy = new GDPRPrivacy(nativeBridge, TestFixtures.getCampaign(), gdprManager, false, false, false);
+        const privacy = new GDPRPrivacy(nativeBridge, TestFixtures.getCampaign(), gdprManager, false, false);
         const params : IEndScreenParameters = {
             nativeBridge,
             language,

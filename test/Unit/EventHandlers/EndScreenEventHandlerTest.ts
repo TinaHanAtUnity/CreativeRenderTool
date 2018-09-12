@@ -87,7 +87,7 @@ describe('EndScreenEventHandlerTest', () => {
 
             const video = new Video('', TestFixtures.getSession());
             const gdprManager = sinon.createStubInstance(GdprManager);
-            const privacy = new GDPRPrivacy(nativeBridge, campaign, gdprManager, false, false, false);
+            const privacy = new GDPRPrivacy(nativeBridge, campaign, gdprManager, false, false);
             const endScreenParams : IEndScreenParameters = {
                 nativeBridge: nativeBridge,
                 language : deviceInfo.getLanguage(),
@@ -325,7 +325,7 @@ describe('EndScreenEventHandlerTest', () => {
 
             sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
             const gdprManager = sinon.createStubInstance(GdprManager);
-            const privacy = new GDPRPrivacy(nativeBridge, campaign, gdprManager, false, false, false);
+            const privacy = new GDPRPrivacy(nativeBridge, campaign, gdprManager, false, false);
             const endScreenParams : IEndScreenParameters = {
                 nativeBridge: nativeBridge,
                 language : deviceInfo.getLanguage(),
