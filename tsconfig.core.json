@@ -5,12 +5,20 @@
     "strict": true,
     "strictPropertyInitialization": false,
     "importHelpers": true,
-    "baseUrl": "src/ts",
+    "baseUrl": ".",
+    "paths": {
+      "*": [
+        "src/ts/*",
+        "test/*"
+      ]
+    },
     "outDir": "build",
     "moduleResolution": "node",
     "inlineSourceMap": true
   },
   "include": [
-    "src/ts/Core/**/*.ts"
+    "src/ts/Backend/**/*.ts",
+    "src/ts/Core/**/*.ts",
+    "test/Module/**/*.ts"
   ]
 }

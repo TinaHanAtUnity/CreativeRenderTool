@@ -293,6 +293,7 @@ describe('CacheTest', () => {
 
         cacheApi.addPreviouslyDownloadedFile(testUrl);
 
+
         return cacheManager.cache(testUrl, TestFixtures.getCacheDiagnostics(), TestFixtures.getCampaign()).then(([fileId, fileUrl]) => {
             assert.equal(fileId, '-960478764.mp4', 'Cache fileId did not match');
             assert.equal(testFileUrl, fileUrl, 'Local file url does not match');

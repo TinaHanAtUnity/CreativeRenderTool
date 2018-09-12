@@ -1,4 +1,4 @@
-import { Sdk } from 'Backend/Api/Sdk';
+/*import { Sdk } from 'Backend/Api/Sdk';
 import { Backend } from 'Backend/Backend';
 import { IUnityAdsListener } from 'Backend/IUnityAdsListener';
 import { Platform } from 'Core/Constants/Platform';
@@ -49,4 +49,4 @@ export class UnityAds {
 
     private static _listener: IUnityAdsListener | undefined;
 
-}
+}*/

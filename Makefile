@@ -52,6 +52,7 @@ XML_SOURCES := $(filter %.xml, $(SOURCES))
 TESTS := $(shell find $(TEST_DIR) -type f -name '*.ts' -and -not -name '*.d.ts')
 UNIT_TESTS := $(shell find $(TEST_DIR)/Unit -type f -name '*Test.ts' -and -not -name '*.d.ts')
 INTEGRATION_TESTS := $(shell find $(TEST_DIR)/Integration -type f -name '*Test.ts' -and -not -name '*.d.ts')
+MODULE_TESTS := $(shell find $(TEST_DIR)/Module -type f -name '*Test.ts' -and -not -name '*.d.ts')
 
 # Targets
 
@@ -70,6 +71,7 @@ XML_TARGETS := $(addprefix $(BUILD_DIR)/, $(XML_SOURCES))
 TEST_TARGETS := $(addprefix $(BUILD_DIR)/, $(patsubst %.ts, %.js, $(TESTS)))
 UNIT_TEST_TARGETS := $(addprefix $(BUILD_DIR)/, $(patsubst %.ts, %.js, $(UNIT_TESTS)))
 INTEGRATION_TEST_TARGETS := $(addprefix $(BUILD_DIR)/, $(patsubst %.ts, %.js, $(INTEGRATION_TESTS)))
+MODULE_TEST_TARGETS := $(addprefix $(BUILD_DIR)/, $(patsubst %.ts, %.js, $(MODULE_TESTS)))
 
 # Build Targets
 
@@ -105,6 +107,13 @@ test-unit: start-server build/test/UnitBundle.js build/test/unit-test.html
 
 test-integration: start-server build/test/IntegrationBundle.js build/test/integration-test.html
 	TEST_LIST="$(INTEGRATION_TESTS)" TEST_URL="http://localhost:8000/build/test/integration-test.html" ISOLATED=1 node test-utils/runner.js
+
+test-module: start-server build/test/ModuleBundle.js build/test/module-test.html
+	mkdir -p build/coverage
+	TEST_LIST="$(MODULE_TESTS)" TEST_URL="http://localhost:8000/build/test/module-test.html" COVERAGE=1 node test-utils/runner.js
+	$(REMAP_ISTANBUL) -i build/coverage/coverage.json -o build/coverage -t html
+	$(REMAP_ISTANBUL) -i build/coverage/coverage.json -o build/coverage/summary -t text-summary
+	cat build/coverage/summary && echo "\n"
 
 test-coverage: start-server build/test/CoverageBundle.js build/test/coverage-test.html
 	mkdir -p build/coverage
@@ -172,6 +181,9 @@ $(BUILD_DIR)/test/integration-test.html: $(SOURCE_DIR)/integration-test-index.ht
 $(BUILD_DIR)/test/coverage-test.html: $(SOURCE_DIR)/coverage-test-index.html
 	mkdir -p $(dir $@) && cp $< $@
 
+$(BUILD_DIR)/test/module-test.html: $(SOURCE_DIR)/module-test-index.html
+	mkdir -p $(dir $@) && cp $< $@
+
 # Implicit rules
 
 $(SOURCE_BUILD_DIR)/ts/BrowserBundle.js: $(TS_TARGETS) $(HTML_TARGETS) $(JSON_TARGETS) $(XML_TARGETS)
@@ -184,7 +196,7 @@ $(SOURCE_BUILD_DIR)/ts/Bundle.min.js: $(SOURCE_BUILD_DIR)/ts/Bundle.js
 	$(CC) $(shell cat .cc.opts | xargs) --js $(SOURCE_BUILD_DIR)/ts/Bundle.js --js_output_file $(SOURCE_BUILD_DIR)/ts/Bundle.min.js
 
 $(SOURCE_BUILD_DIR)/ts/%.js: %.ts
-	$(TYPESCRIPT) --project tsconfig.json
+	$(TYPESCRIPT) --project tsconfig.core.json
 
 $(SOURCE_BUILD_DIR)/proto/unity_proto.js:
 	mkdir -p $(SOURCE_BUILD_DIR)/proto
@@ -212,13 +224,19 @@ $(CSS_TARGETS): $(STYL_SOURCES)
 	mkdir -p $(dir $@) && $(STYLUS) --out $(SOURCE_BUILD_DIR)/styl --use autoprefixer-stylus --compress --inline --with '{limit: false}' $(STYL_MAIN_SOURCE)
 
 $(TEST_BUILD_DIR)/%.js: %.ts
-	$(TYPESCRIPT) --project tsconfig.json
+	$(TYPESCRIPT) --project tsconfig.core.json
 
 $(TEST_BUILD_DIR)/Unit.js:
 	mkdir -p $(dir $@) && echo "import 'Workarounds';" $(UNIT_TESTS) | sed "s/test\\//import '/g" | sed "s/\.ts/';/g" > $@
 
 $(TEST_BUILD_DIR)/UnitBundle.js: $(TEST_BUILD_DIR)/Unit.js $(TS_TARGETS) $(HTML_TARGETS) $(JSON_TARGETS) $(XML_TARGETS) $(UNIT_TEST_TARGETS)
 	$(ROLLUP) --config rollup.config.test.unit.js
+
+$(TEST_BUILD_DIR)/Module.js:
+	mkdir -p $(dir $@) && echo $(MODULE_TESTS) | sed "s/test\\//import '/g" | sed "s/\.ts/';/g" > $@
+
+$(TEST_BUILD_DIR)/ModuleBundle.js: $(TEST_BUILD_DIR)/Module.js $(MODULE_TEST_TARGETS)
+	$(ROLLUP) --config rollup.config.test.module.js
 
 $(TEST_BUILD_DIR)/UnitBundle.min.js: $(TEST_BUILD_DIR)/UnitBundle.js
 	$(CC) $(shell cat .cc.opts | xargs) --js $(TEST_BUILD_DIR)/UnitBundle.js --js_output_file $(TEST_BUILD_DIR)/UnitBundle.min.js

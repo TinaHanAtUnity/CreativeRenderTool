@@ -4,6 +4,7 @@ import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IosCacheApi } from 'Core/Native/iOS/IosCache';
 import { Observable3, Observable5, Observable6 } from 'Core/Utilities/Observable';
+import { EventCategory } from '../Constants/EventCategory';
 
 export enum CacheError {
     FILE_IO_ERROR,
@@ -44,13 +45,15 @@ export class CacheApi extends NativeApi {
     public readonly onDownloadError = new Observable3<string, string, string>();
 
     constructor(nativeBridge: NativeBridge) {
-        super(nativeBridge, 'Cache', ApiPackage.CORE);
+        super(nativeBridge, 'Cache', ApiPackage.CORE, EventCategory[EventCategory.CACHE]);
 
         if(nativeBridge.getPlatform() === Platform.IOS) {
             this.Ios = new IosCacheApi(nativeBridge);
         } else {
             this.Android = new AndroidCacheApi(nativeBridge);
         }
+
+        nativeBridge.addEventHandler(this);
     }
 
     public download(url: string, fileId: string, headers: Array<[string, string]>, append: boolean): Promise<void> {

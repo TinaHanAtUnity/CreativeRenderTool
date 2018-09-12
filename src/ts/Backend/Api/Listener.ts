@@ -1,47 +1,29 @@
-import { UnityAds } from 'Backend/UnityAds';
+// import { UnityAds } from 'Backend/UnityAds';
 
 export class Listener {
 
     public static sendReadyEvent(placement: string) {
-        const listener = UnityAds.getListener();
-        if(listener) {
-            listener.onUnityAdsReady(placement);
-        }
+        return;
     }
 
     public static sendStartEvent(placement: string) {
-        const listener = UnityAds.getListener();
-        if(listener) {
-            listener.onUnityAdsStart(placement);
-        }
+        return;
     }
 
     public static sendFinishEvent(placement: string, state: string) {
-        const listener = UnityAds.getListener();
-        if(listener) {
-            listener.onUnityAdsFinish(placement, state);
-        }
+        return;
     }
 
     public static sendErrorEvent(error: string, message: string) {
-        const listener = UnityAds.getListener();
-        if(listener) {
-            listener.onUnityAdsError(error, message);
-        }
+        return;
     }
 
     public static sendClickEvent(placement: string) {
-        const listener = UnityAds.getListener();
-        if(listener) {
-            listener.onUnityAdsClick(placement);
-        }
+        return;
     }
 
     public static sendPlacementStateChangedEvent(placement: string, oldState: string, newState: string) {
-        const listener = UnityAds.getListener();
-        if(listener) {
-            listener.onUnityAdsPlacementStateChanged(placement, oldState, newState);
-        }
+        return;
     }
 
 }

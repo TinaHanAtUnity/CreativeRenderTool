@@ -1,26 +1,23 @@
-import { FocusManager } from 'Core/Managers/FocusManager';
-import { ConnectivityApi } from 'Core/Native/Connectivity';
 import { Logger } from 'Core/Utilities/Logger';
 import { Observable0 } from 'Core/Utilities/Observable';
+import { Core } from 'Core/Core';
 
 export class WakeUpManager {
     public readonly onNetworkConnected = new Observable0();
 
-    private _connectivity: ConnectivityApi;
-    private _focusManager: FocusManager;
+    private _core: Core;
     private _firstConnection: number;
     private _connectionEvents: number;
 
-    constructor(connectivity: ConnectivityApi, focusManager: FocusManager) {
-        this._connectivity = connectivity;
-        this._focusManager = focusManager;
+    constructor(core: Core) {
+        this._core = core;
         this._firstConnection = Date.now();
         this._connectionEvents = 0;
-        this._connectivity.onConnected.subscribe((wifi, networkType) => this.onConnected(wifi, networkType));
+        this._core.Api.Connectivity.onConnected.subscribe((wifi, networkType) => this.onConnected(wifi, networkType));
     }
 
     public setListenConnectivity(status: boolean): Promise<void> {
-        return this._connectivity.setListeningStatus(status);
+        return this._core.Api.Connectivity.setListeningStatus(status);
     }
 
     private onConnected(wifi: boolean, networkType: number) {

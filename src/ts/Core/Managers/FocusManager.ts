@@ -1,7 +1,6 @@
-import { BroadcastApi } from 'Core/Native/Android/Broadcast';
-import { LifecycleApi } from 'Core/Native/Android/Lifecycle';
-import { NotificationApi } from 'Core/Native/iOS/Notification';
+import { Core } from 'Core/Core';
 import { Observable0, Observable1 } from 'Core/Utilities/Observable';
+import { Platform } from '../Constants/Platform';
 
 export const AdUnitActivities = ['com.unity3d.ads.adunit.AdUnitActivity', 'com.unity3d.ads.adunit.AdUnitTransparentActivity', 'com.unity3d.ads.adunit.AdUnitTransparentSoftwareActivity', 'com.unity3d.ads.adunit.AdUnitSoftwareActivity'];
 export class FocusManager {
@@ -16,9 +15,7 @@ export class FocusManager {
     public readonly onScreenOn = new Observable0();
     public readonly onScreenOff = new Observable0();
 
-    private readonly _broadcast: BroadcastApi;
-    private readonly _notification: NotificationApi;
-    private readonly _lifecycle: LifecycleApi;
+    private readonly _core: Core;
 
     private _appForeground: boolean;
     private _topActivity: string;
@@ -26,47 +23,49 @@ export class FocusManager {
     private ACTION_SCREEN_ON: string = 'android.intent.action.SCREEN_ON';
     private ACTION_SCREEN_OFF: string = 'android.intent.action.SCREEN_OFF';
 
-    constructor(broadcast: BroadcastApi, notification: NotificationApi, lifecycle: LifecycleApi) {
+    constructor(core: Core) {
+        this._core = core;
         this._appForeground = true;
-        this._broadcast = broadcast;
-        this._notification = notification;
-        this._lifecycle = lifecycle;
-        this._broadcast.onBroadcastAction.subscribe((name, action, data, extra) => this.onBroadcastAction(name, action, data, extra));
-        this._notification.onNotification.subscribe((event, parameters) => this.onNotification(event, parameters));
-        this._lifecycle.onActivityResumed.subscribe((activity) => this.onResume(activity));
-        this._lifecycle.onActivityPaused.subscribe((activity) => this.onPause(activity));
-        this._lifecycle.onActivityDestroyed.subscribe((activity) => this.onDestroyed(activity));
+        if(core.getPlatform() === Platform.ANDROID) {
+            this._core.Api.Android!.Broadcast.onBroadcastAction.subscribe((name, action, data, extra) => this.onBroadcastAction(name, action, data, extra));
+            this._core.Api.Android!.Lifecycle.onActivityResumed.subscribe((activity) => this.onResume(activity));
+            this._core.Api.Android!.Lifecycle.onActivityPaused.subscribe((activity) => this.onPause(activity));
+            this._core.Api.Android!.Lifecycle.onActivityDestroyed.subscribe((activity) => this.onDestroyed(activity));
+        } else if(core.getPlatform() === Platform.IOS) {
+            this._core.Api.iOS!.Notification.onNotification.subscribe((event, parameters) => this.onNotification(event, parameters));
+        }
+
     }
 
     public setListenAppForeground(status: boolean): Promise<void> {
         if(status) {
-            return this._notification.addNotificationObserver(FocusManager._appForegroundNotification, []);
+            return this._core.Api.iOS!.Notification.addNotificationObserver(FocusManager._appForegroundNotification, []);
         } else {
-            return this._notification.removeNotificationObserver(FocusManager._appForegroundNotification);
+            return this._core.Api.iOS!.Notification.removeNotificationObserver(FocusManager._appForegroundNotification);
         }
     }
 
     public setListenAppBackground(status: boolean): Promise<void> {
         if(status) {
-            return this._notification.addNotificationObserver(FocusManager._appBackgroundNotification, []);
+            return this._core.Api.iOS!.Notification.addNotificationObserver(FocusManager._appBackgroundNotification, []);
         } else {
-            return this._notification.removeNotificationObserver(FocusManager._appBackgroundNotification);
+            return this._core.Api.iOS!.Notification.removeNotificationObserver(FocusManager._appBackgroundNotification);
         }
     }
 
     public setListenAndroidLifecycle(status: boolean): Promise<void> {
         if(status) {
-            return this._lifecycle.register(['onActivityResumed', 'onActivityPaused']);
+            return this._core.Api.Android!.Lifecycle.register(['onActivityResumed', 'onActivityPaused']);
         } else {
-            return this._lifecycle.unregister();
+            return this._core.Api.Android!.Lifecycle.unregister();
         }
     }
 
     public setListenScreen(status: boolean): Promise<void> {
         if(status) {
-            return this._broadcast.addBroadcastListener(this._screenListener, [this.ACTION_SCREEN_ON, this.ACTION_SCREEN_OFF]);
+            return this._core.Api.Android!.Broadcast.addBroadcastListener(this._screenListener, [this.ACTION_SCREEN_ON, this.ACTION_SCREEN_OFF]);
         } else {
-            return this._broadcast.removeBroadcastListener(this._screenListener);
+            return this._core.Api.Android!.Broadcast.removeBroadcastListener(this._screenListener);
         }
     }
 

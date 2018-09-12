@@ -1,12 +1,12 @@
 import { BaseMetaData } from 'Core/Models/MetaData/BaseMetaData';
-import { StorageApi } from 'Core/Native/Storage';
+import { Core } from '../Core';
 
 export class MetaDataManager {
     private _metaDataCache: { [key: string]: any } = {};
-    private _storage: StorageApi;
+    private _core: Core;
 
-    constructor(storage: StorageApi) {
-        this._storage = storage;
+    constructor(core: Core) {
+        this._core = core;
     }
 
     public fetch<T extends BaseMetaData>(MetaDataConstructor: { new(): T}, cache: boolean = true, keys?: string[]): Promise<T | undefined> {
@@ -19,7 +19,7 @@ export class MetaDataManager {
             }
         }
 
-        return metaData.fetch(this._storage, keys).then((success) => {
+        return metaData.fetch(this._core.Api.Storage, keys).then((success) => {
             if (success) {
                 if(cache) {
                     this._metaDataCache[metaData.getCategory()] = metaData;

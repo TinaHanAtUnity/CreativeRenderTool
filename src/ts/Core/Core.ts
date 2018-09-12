@@ -56,19 +56,22 @@ export interface ICoreApi extends IModuleApi {
 
 export class Core implements IApiModule<ICoreApi> {
 
-    public Api: ICoreApi;
+    public readonly Api: ICoreApi;
 
-    public CacheManager: CacheManager;
-    public CacheBookkeeping: CacheBookkeeping;
+    public readonly CacheManager: CacheManager;
+    public readonly CacheBookkeeping: CacheBookkeeping;
     // public ConfigManager: ConfigManager;
-    public FocusManager: FocusManager;
-    public JaegerManager: JaegerManager;
-    public MetaDataManager: MetaDataManager;
-    public Request: Request;
-    public Resolve: Resolve;
-    public WakeUpManager: WakeUpManager;
+    public readonly FocusManager: FocusManager;
+    public readonly JaegerManager: JaegerManager;
+    public readonly MetaDataManager: MetaDataManager;
+    public readonly Request: Request;
+    public readonly Resolve: Resolve;
+    public readonly WakeUpManager: WakeUpManager;
 
-    public load(nativeBridge: NativeBridge): void {
+    private readonly _platform: Platform;
+    private _apiLevel?: number;
+
+    constructor(nativeBridge: NativeBridge) {
         const api: ICoreApi = {
             Cache: new CacheApi(nativeBridge),
             Connectivity: new ConnectivityApi(nativeBridge),
@@ -98,19 +101,30 @@ export class Core implements IApiModule<ICoreApi> {
         }
 
         this.Api = api;
+
+        Logger.setSdk(this.Api.Sdk);
+
+        this.FocusManager = new FocusManager(this);
+        this.MetaDataManager = new MetaDataManager(this);
+        this.WakeUpManager = new WakeUpManager(this);
+        this.Request = new Request(this, this.WakeUpManager);
+        this.CacheBookkeeping = new CacheBookkeeping(this);
+        this.CacheManager = new CacheManager(this);
+        this.Resolve = new Resolve(this);
+        this.MetaDataManager = new MetaDataManager(this);
+        this.JaegerManager = new JaegerManager(this);
     }
 
-    public initialize(nativeBridge: NativeBridge) {
-        Logger.setSdk(this.Api.Sdk);
-        this.FocusManager = new FocusManager(this.Api.Android!.Broadcast, this.Api.iOS!.Notification, this.Api.Android!.Lifecycle);
-        this.MetaDataManager = new MetaDataManager(this.Api.Storage);
-        this.WakeUpManager = new WakeUpManager(this.Api.Connectivity, this.FocusManager);
-        this.Request = new Request(nativeBridge.getPlatform(), nativeBridge.getApiLevel(), this.Api.Request, this.WakeUpManager);
-        this.CacheBookkeeping = new CacheBookkeeping(this.Api.Cache, this.Api.Storage);
-        this.CacheManager = new CacheManager(this.Api.Cache, this.Api.Storage, this.WakeUpManager, this.Request, this.CacheBookkeeping);
-        this.Resolve = new Resolve(this.Api.Resolve);
-        this.MetaDataManager = new MetaDataManager(this.Api.Storage);
-        this.JaegerManager = new JaegerManager(this.Request);
+    public setApiLevel(apiLevel: number) {
+        this._apiLevel = apiLevel;
+    }
+
+    public getApiLevel(): number | undefined {
+        return this._apiLevel;
+    }
+
+    public getPlatform(): Platform {
+        return this._platform;
     }
 
 }
