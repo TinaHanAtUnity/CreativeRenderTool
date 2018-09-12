@@ -171,9 +171,6 @@ export class GDPRPrivacy extends AbstractPrivacy {
         }
     }
 
-    // State 0: Privacy info - Left: Build info - Middle: Report Ad
-    // State 1: Build info - Left: Privacy info - Middle: Report Ad
-    // State 2: Report Ad - Left: Privacy info - Middle: Build info
     private setCardState(isLeftClick: boolean) {
 
         const leftEl = <HTMLDivElement>this._container.querySelector('.left-side-link');
