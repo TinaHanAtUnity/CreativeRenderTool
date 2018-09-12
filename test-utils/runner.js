@@ -56,6 +56,7 @@ const runTest = async (browser, isolated, testFilter) => {
             debugger;
         });
     }
+
     await page.evaluate(() => {
         mocha.run((failures) => {
             if(window.writeCoverage && __coverage__) {
@@ -75,16 +76,10 @@ const runTest = async (browser, isolated, testFilter) => {
     if(isolated == 1) {
         const tests = testList.split(' ').map(testPath => path.parse(testPath).name);
         for(const test of tests) {
-            const failures = await runTest(browser, isolated, test);
-            if(failures) {
-                process.exit(failures);
-            }
+            process.exitCode = await runTest(browser, isolated, test);
         }
     } else {
-        const failures = await runTest(browser, isolated, testFilter);
-        if(failures) {
-            process.exit(failures);
-        }
+        process.exitCode = await runTest(browser, isolated, testFilter);
     }
     await browser.close();
 } catch(error) {

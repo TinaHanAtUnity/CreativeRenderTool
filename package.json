@@ -33,7 +33,7 @@
     "rollup-plugin-sourcemaps": "0.4.2",
     "rollup-plugin-string": "2.0.2",
     "sinon": "6.2.0",
-    "source-map-support": "0.5.9",
+    "stacktrace-js": "2.0.0",
     "stylint": "1.5.9",
     "stylus": "0.54.5",
     "tslib": "1.9.3",

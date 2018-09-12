@@ -116,6 +116,7 @@ var HybridTestReporter = (function () {
             return;
         }
         this.logger = new Logger(getPlatform());
+        this.mappings = [];
 
         runner.stats = stats;
 
@@ -162,6 +163,18 @@ var HybridTestReporter = (function () {
         runner.on('pending', function() {
             stats.pending++;
         });
+
+        var self = this;
+        this.done = function(failures, done) {
+            if(self.mappings.length > 0) {
+                self.logger.log('Waiting for mappings...');
+                Promise.all(self.mappings).then(() => {
+                    done(failures);
+                });
+            } else {
+                done(failures);
+            }
+        }
     }
 
     Base.prototype.epilogue = function() {
@@ -189,7 +202,8 @@ var HybridTestReporter = (function () {
     Base.prototype.listFailures = function() {
         var failures = this.failures;
         var logger = this.logger;
-        failures.forEach(function(test, i) {
+
+        var printFailure = function(test, i, mappedStack) {
             // msg
             var msg;
             var err = test.err;
@@ -201,7 +215,7 @@ var HybridTestReporter = (function () {
             } else {
                 message = '';
             }
-            var stack = err.stack || message;
+            var stack = (mappedStack ? mappedStack.map(function(sf) { return sf.toString(); }).join('\n') : err.stack) || message;
             var index = message ? stack.indexOf(message) : -1;
 
             if (index === -1) {
@@ -238,6 +252,17 @@ var HybridTestReporter = (function () {
             logger.error(color('error title', errorTitle));
             logger.error(color('error message', '     ' + msg));
             logger.error(color('error stack', stack));
+        };
+
+        var self = this;
+        failures.forEach(function(test, i) {
+            if(StackTrace) {
+                self.mappings.push(StackTrace.fromError(test.err).then(function(mappedStack) {
+                    printFailure(test, i, mappedStack);
+                }));
+            } else {
+                printFailure(test, i);
+            }
         });
     };
 
