@@ -165,6 +165,9 @@ var HybridTestReporter = (function () {
         });
 
         var self = this;
+        // If this done method is defined in the reporter, Mocha calls this as an intercept to the mocha.run([done])
+        // The done parameter in this method is the done callback passed to mocha.run
+        // See: https://github.com/mochajs/mocha/issues/2368#issuecomment-231641801
         this.done = function(failures, done) {
             if(self.mappings.length > 0) {
                 self.logger.log('Waiting for mappings...');
