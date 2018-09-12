@@ -1,31 +1,34 @@
+import { Activity } from 'Ads/AdUnits/Containers/Activity';
+import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { GdprManager } from 'Ads/Managers/GdprManager';
+import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
+import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
+import { SessionManager } from 'Ads/Managers/SessionManager';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { Placement } from 'Ads/Models/Placement';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
+import { Privacy } from 'Ads/Views/Privacy';
+import { Platform } from 'Core/Constants/Platform';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Observable1, Observable2 } from 'Core/Utilities/Observable';
+import { Request } from 'Core/Utilities/Request';
+
+import {
+    DisplayInterstitialAdUnit,
+    IDisplayInterstitialAdUnitParameters
+} from 'Display/AdUnits/DisplayInterstitialAdUnit';
+import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
+import { DisplayInterstitial } from 'Display/Views/DisplayInterstitial';
 import 'mocha';
 import * as sinon from 'sinon';
-
-import { DisplayInterstitialAdUnit, IDisplayInterstitialAdUnitParameters } from 'AdUnits/DisplayInterstitialAdUnit';
-import { NativeBridge } from 'Native/NativeBridge';
-import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
-import { SessionManager } from 'Managers/SessionManager';
-import { Placement } from 'Models/Placement';
-import { Request } from 'Utilities/Request';
-import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
-import { DisplayInterstitial } from 'Views/DisplayInterstitial';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Activity } from 'AdUnits/Containers/Activity';
-import { Platform } from 'Constants/Platform';
-import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { DeviceInfo } from 'Models/DeviceInfo';
-import { MetaDataManager } from 'Managers/MetaDataManager';
-import { WakeUpManager } from 'Managers/WakeUpManager';
-import { FocusManager } from 'Managers/FocusManager';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { ClientInfo } from 'Models/ClientInfo';
-import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
-import { GdprManager } from 'Managers/GdprManager';
-import { Privacy } from 'Views/Privacy';
-import { WebPlayerContainer } from 'Utilities/WebPlayer/WebPlayerContainer';
 import { asStub } from 'TestHelpers/Functions';
-import { Observable2, Observable1 } from 'Utilities/Observable';
-import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('DisplayInterstitialAdUnit', () => {
     let adUnit: DisplayInterstitialAdUnit;

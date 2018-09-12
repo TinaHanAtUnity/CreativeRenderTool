@@ -1,33 +1,31 @@
+import { Activity } from 'Ads/AdUnits/Containers/Activity';
+import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { GdprManager } from 'Ads/Managers/GdprManager';
+import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
+import { SessionManager } from 'Ads/Managers/SessionManager';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { MoatViewabilityService } from 'Ads/Utilities/MoatViewabilityService';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
+import { MOAT } from 'Ads/Views/MOAT';
+import { Overlay } from 'Ads/Views/Overlay';
+import { Privacy } from 'Ads/Views/Privacy';
+import { Platform } from 'Core/Constants/Platform';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Request } from 'Core/Utilities/Request';
 import 'mocha';
 import * as sinon from 'sinon';
-
-import { NativeBridge } from 'Native/NativeBridge';
-import { VastCampaign } from 'Models/Vast/VastCampaign';
-import { SessionManager } from 'Managers/SessionManager';
-import { VastOverlayEventHandler } from 'EventHandlers/VastOverlayEventHandler';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Overlay } from 'Views/Overlay';
-import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { DeviceInfo } from 'Models/DeviceInfo';
-import { WakeUpManager } from 'Managers/WakeUpManager';
-import { Platform } from 'Constants/Platform';
-import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
-import { Activity } from 'AdUnits/Containers/Activity';
-
-import { Placement } from 'Models/Placement';
-import { ClientInfo } from 'Models/ClientInfo';
-import { IVastAdUnitParameters, VastAdUnit } from 'AdUnits/VastAdUnit';
-import { VastEndScreen } from 'Views/VastEndScreen';
-import { MetaDataManager } from 'Managers/MetaDataManager';
-import { FocusManager } from 'Managers/FocusManager';
-import { Request } from 'Utilities/Request';
-import { MOAT } from 'Views/MOAT';
-import { MoatViewabilityService } from 'Utilities/MoatViewabilityService';
-import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
-import { GdprManager } from 'Managers/GdprManager';
-import { AbstractPrivacy } from 'Views/AbstractPrivacy';
-import { Privacy } from 'Views/Privacy';
-import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
+import { VastOverlayEventHandler } from 'VAST/EventHandlers/VastOverlayEventHandler';
+import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { VastEndScreen } from 'VAST/Views/VastEndScreen';
 
 describe('VastOverlayEventHandlersTest', () => {
     let campaign: VastCampaign;
@@ -140,7 +138,8 @@ describe('VastOverlayEventHandlersTest', () => {
 
         describe('When ad unit has an endscreen', () => {
             it('should hide endcard', () => {
-                const vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.configuration.isCoppaCompliant(), vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
+                const endScreenPrivacy = new Privacy(nativeBridge, false);
+                const vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId(), endScreenPrivacy);
                 sinon.spy(vastEndScreen, 'show');
                 vastAdUnitParameters.endScreen = vastEndScreen;
                 vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);

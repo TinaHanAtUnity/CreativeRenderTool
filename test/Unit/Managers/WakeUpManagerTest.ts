@@ -1,14 +1,14 @@
+import { Platform } from 'Core/Constants/Platform';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { BroadcastApi } from 'Core/Native/Android/Broadcast';
+import { LifecycleApi } from 'Core/Native/Android/Lifecycle';
+
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { ConnectivityApi } from 'Core/Native/Connectivity';
+import { NotificationApi } from 'Core/Native/iOS/Notification';
 import 'mocha';
 import * as sinon from 'sinon';
-
-import { NativeBridge } from 'Native/NativeBridge';
-import { WakeUpManager } from 'Managers/WakeUpManager';
-import { ConnectivityApi } from 'Native/Api/Connectivity';
-import { BroadcastApi } from 'Native/Api/Broadcast';
-import { Platform } from 'Constants/Platform';
-import { NotificationApi } from 'Native/Api/Notification';
-import { LifecycleApi } from 'Native/Api/Lifecycle';
-import { FocusManager } from 'Managers/FocusManager';
 
 class TestConnectivityApi extends ConnectivityApi {
     public setListeningStatus(status: boolean): Promise<void> {
