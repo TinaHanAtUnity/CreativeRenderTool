@@ -168,7 +168,7 @@ var HybridTestReporter = (function () {
         this.done = function(failures, done) {
             if(self.mappings.length > 0) {
                 self.logger.log('Waiting for mappings...');
-                Promise.all(self.mappings).then(() => {
+                Promise.all(self.mappings).then(function() {
                     done(failures);
                 });
             } else {
