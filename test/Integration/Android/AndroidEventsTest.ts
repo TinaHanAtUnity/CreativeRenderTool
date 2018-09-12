@@ -1,17 +1,16 @@
-import 'mocha';
+import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
+import { CampaignManager } from 'Ads/Managers/CampaignManager';
+import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOperativeEventManager';
+import { DeviceInfo } from 'Backend/Api/DeviceInfo';
+import { Request } from 'Backend/Api/Request';
+import { IUnityAdsListener } from 'Backend/IUnityAdsListener';
+import { UnityAds } from 'Backend/UnityAds';
 import { assert } from 'chai';
+import { FinishState } from 'Core/Constants/FinishState';
 
-import { Platform } from 'Constants/Platform';
-import { UnityAds } from 'Native/Backend/UnityAds';
-import { IUnityAdsListener } from 'Native/Backend/IUnityAdsListener';
-import { FinishState } from 'Constants/FinishState';
-import { DeviceInfo } from 'Native/Backend/Api/DeviceInfo';
-import { Request } from 'Native/Backend/Api/Request';
-import { AbstractAdUnit } from 'AdUnits/AbstractAdUnit';
-import { ConfigManager } from 'Managers/ConfigManager';
-import { CampaignManager } from 'Managers/CampaignManager';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { ProgrammaticOperativeEventManager } from 'Managers/ProgrammaticOperativeEventManager';
+import { Platform } from 'Core/Constants/Platform';
+import { ConfigManager } from 'Core/Managers/ConfigManager';
+import 'mocha';
 
 describe('AndroidEventsTest', () => {
 

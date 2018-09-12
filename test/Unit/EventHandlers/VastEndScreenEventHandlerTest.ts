@@ -1,30 +1,30 @@
+import { Activity } from 'Ads/AdUnits/Containers/Activity';
+import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { GdprManager } from 'Ads/Managers/GdprManager';
+import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
+import { SessionManager } from 'Ads/Managers/SessionManager';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { Video } from 'Ads/Models/Assets/Video';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { Overlay } from 'Ads/Views/Overlay';
+import { Privacy } from 'Ads/Views/Privacy';
+import { assert } from 'chai';
+import { Platform } from 'Core/Constants/Platform';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Request } from 'Core/Utilities/Request';
 import 'mocha';
 import * as sinon from 'sinon';
-import { assert } from 'chai';
-
-import { NativeBridge } from 'Native/NativeBridge';
-import { VastCampaign } from 'Models/Vast/VastCampaign';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Overlay } from 'Views/Overlay';
-import { Platform } from 'Constants/Platform';
-import { IVastAdUnitParameters, VastAdUnit } from 'AdUnits/VastAdUnit';
-import { VastEndScreen } from 'Views/VastEndScreen';
-import { VastEndScreenEventHandler } from 'EventHandlers/VastEndScreenEventHandler';
-import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
-import { Activity } from 'AdUnits/Containers/Activity';
-import { Video } from 'Models/Assets/Video';
-import { Request } from 'Utilities/Request';
-import { FocusManager } from 'Managers/FocusManager';
-import { WakeUpManager } from 'Managers/WakeUpManager';
-import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { MetaDataManager } from 'Managers/MetaDataManager';
-import { SessionManager } from 'Managers/SessionManager';
+import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
+import { VastEndScreenEventHandler } from 'VAST/EventHandlers/VastEndScreenEventHandler';
+import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { VastEndScreen } from 'VAST/Views/VastEndScreen';
 
 import EventTestVast from 'xml/EventTestVast.xml';
-import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
-import { GdprManager } from 'Managers/GdprManager';
-import { Privacy } from 'Views/Privacy';
-import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
 
 describe('VastEndScreenEventHandlersTest', () => {
     const handleInvocation = sinon.spy();
@@ -95,7 +95,8 @@ describe('VastEndScreenEventHandlersTest', () => {
 
     describe('when calling onClose', () => {
         it('should hide endcard', () => {
-            const vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.configuration.isCoppaCompliant(), vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
+            const endScreenPrivacy = new Privacy(nativeBridge, false);
+            const vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId(), endScreenPrivacy);
             vastAdUnitParameters.endScreen = vastEndScreen;
             const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
             sinon.stub(vastAdUnit, 'hide').returns(sinon.spy());
@@ -123,7 +124,8 @@ describe('VastEndScreenEventHandlersTest', () => {
             vastAdUnitParameters.video = video;
             vastAdUnitParameters.campaign = campaign;
             vastAdUnitParameters.placement = TestFixtures.getPlacement();
-            vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.configuration.isCoppaCompliant(), vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId());
+            const endScreenPrivacy = new Privacy(nativeBridge, false);
+            vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters.campaign, vastAdUnitParameters.clientInfo.getGameId(), endScreenPrivacy);
             vastAdUnitParameters.endScreen = vastEndScreen;
             vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
             vastEndScreenEventHandler = new VastEndScreenEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);

@@ -1,13 +1,12 @@
-import 'mocha';
 import { assert } from 'chai';
-import * as sinon from 'sinon';
+import { ConfigManager } from 'Core/Managers/ConfigManager';
 
-import { ABGroupBuilder } from 'Models/ABGroup';
+import { ABGroupBuilder } from 'Core/Models/ABGroup';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
+import 'mocha';
+import * as sinon from 'sinon';
 import { WebView } from 'WebView';
-import { NativeBridge } from 'Native/NativeBridge';
-import { TestEnvironment } from 'Utilities/TestEnvironment';
-import { ConfigManager } from 'Managers/ConfigManager';
-import { CampaignManager } from 'Managers/CampaignManager';
 
 describe('ABGroupBuilder tests', () => {
     describe('getAbGroup', () => {

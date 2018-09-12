@@ -1,22 +1,22 @@
-import 'mocha';
+import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
+import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
+import { SessionManager } from 'Ads/Managers/SessionManager';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { assert } from 'chai';
-import * as sinon from 'sinon';
+import { Platform } from 'Core/Constants/Platform';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { RequestApi } from 'Core/Native/Request';
+import { StorageApi, StorageType } from 'Core/Native/Storage';
 
-import { Request } from 'Utilities/Request';
-import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { StorageApi, StorageType } from 'Native/Api/Storage';
-import { RequestApi } from 'Native/Api/Request';
-import { NativeBridge } from 'Native/NativeBridge';
-import { WakeUpManager } from 'Managers/WakeUpManager';
-import { FocusManager } from 'Managers/FocusManager';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { ClientInfo } from 'Models/ClientInfo';
+import { Request } from 'Core/Utilities/Request';
+import 'mocha';
+import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Platform } from 'Constants/Platform';
-import { SessionManager } from 'Managers/SessionManager';
-import { MetaDataManager } from 'Managers/MetaDataManager';
-import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
-import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
 
 class TestStorageApi extends StorageApi {
 

@@ -1,15 +1,16 @@
-import 'mocha';
-import * as sinon from 'sinon';
+import { Placement } from 'Ads/Models/Placement';
+import { Privacy } from 'Ads/Views/Privacy';
 import { assert } from 'chai';
-import { DisplayInterstitial } from 'Views/DisplayInterstitial';
-import { NativeBridge } from 'Native/NativeBridge';
-import { Placement } from 'Models/Placement';
-import { DisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
+import { Platform } from 'Core/Constants/Platform';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
+import { DisplayInterstitial } from 'Display/Views/DisplayInterstitial';
 
 import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
-import { Platform } from 'Constants/Platform';
+import 'mocha';
+import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Privacy } from 'Views/Privacy';
+
 const json = JSON.parse(DummyDisplayInterstitialCampaign);
 
 describe('DisplayInterstitial View', () => {
