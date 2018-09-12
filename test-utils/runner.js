@@ -12,9 +12,14 @@ const coverage = process.env.COVERAGE;
 const isolated = process.env.ISOLATED;
 const debug = process.env.DEBUG;
 
-const runTest = async (browser, testFilter) => {
-    const pages = await browser.pages();
-    const page = pages[0];
+const runTest = async (browser, isolated, testFilter) => {
+    let page;
+    if(!isolated) {
+        const pages = await browser.pages();
+        page = pages[0];
+    } else {
+        page = await browser.newPage();
+    }
 
     page.on('console', (message) => {
         let type = message.type();
@@ -70,13 +75,13 @@ const runTest = async (browser, testFilter) => {
     if(isolated == 1) {
         const tests = testList.split(' ').map(testPath => path.parse(testPath).name);
         for(const test of tests) {
-            const failures = await runTest(browser, test);
+            const failures = await runTest(browser, isolated, test);
             if(failures) {
                 process.exit(failures);
             }
         }
     } else {
-        const failures = await runTest(browser, testFilter);
+        const failures = await runTest(browser, isolated, testFilter);
         if(failures) {
             process.exit(failures);
         }
