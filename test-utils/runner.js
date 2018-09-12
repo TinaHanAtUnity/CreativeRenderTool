@@ -13,7 +13,8 @@ const isolated = process.env.ISOLATED;
 const debug = process.env.DEBUG;
 
 const runTest = async (browser, testFilter) => {
-    const page = await browser.newPage();
+    const pages = await browser.pages();
+    const page = pages[0];
 
     page.on('console', (message) => {
         let type = message.type();
@@ -45,8 +46,8 @@ const runTest = async (browser, testFilter) => {
     });
 
     if(debug) {
-        page.waitFor(1000);
-        page.evaluate(() => {
+        await page.waitFor(1000);
+        await page.evaluate(() => {
             debugger;
         });
     }
