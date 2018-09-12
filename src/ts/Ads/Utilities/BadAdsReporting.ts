@@ -40,7 +40,7 @@ export class BadAdsReporting {
         return new Promise(resolve => {
             setTimeout(() => {
                 if (ad instanceof AbstractAdUnit) {
-                    ad.setFinishState(FinishState.SKIPPED, true);
+                    ad.markAsSkipped();
                     ad.hide();
                 } else if (ad instanceof AbstractVideoOverlay) {
                     ad.hide();

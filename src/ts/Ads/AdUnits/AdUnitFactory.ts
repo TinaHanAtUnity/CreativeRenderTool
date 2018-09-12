@@ -117,7 +117,8 @@ export class AdUnitFactory {
 
     private static createPerformanceAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PerformanceCampaign>): PerformanceAdUnit {
         const privacy = this.createPrivacy(nativeBridge, parameters);
-        const overlay = this.createOverlay(nativeBridge, parameters, privacy, !parameters.placement.skipEndCardOnClose());
+        const showEndcard = !parameters.placement.skipEndCardOnClose();
+        const overlay = this.createOverlay(nativeBridge, parameters, privacy, showEndcard);
 
         const adUnitStyle: AdUnitStyle = parameters.campaign.getAdUnitStyle() || AdUnitStyle.getDefaultAdUnitStyle();
 
@@ -179,7 +180,8 @@ export class AdUnitFactory {
 
     private static createXPromoAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<XPromoCampaign>): XPromoAdUnit {
         const privacy = this.createPrivacy(nativeBridge, parameters);
-        const overlay = this.createOverlay(nativeBridge, parameters, privacy, !parameters.placement.skipEndCardOnClose());
+        const showEndcard = !parameters.placement.skipEndCardOnClose();
+        const overlay = this.createOverlay(nativeBridge, parameters, privacy, showEndcard);
 
         const endScreenParameters = this.createEndScreenParameters(nativeBridge, privacy, parameters.campaign.getGameName(), parameters);
         const endScreen = new XPromoEndScreen(endScreenParameters, parameters.campaign);
