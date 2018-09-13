@@ -44,7 +44,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     private _showGDPRBanner: boolean = false;
     private _disablePrivacyDuringVideo: boolean | undefined;
     private _gameId: string;
-    private _tencentAd: boolean = false;
+    private _seatId: number | undefined;
 
     constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, disablePrivacyDuringVideo?: boolean, seatId?: number) {
         super(nativeBridge, 'overlay', muted);
@@ -54,7 +54,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
         this._showGDPRBanner = showGDPRBanner;
         this._disablePrivacyDuringVideo = disablePrivacyDuringVideo;
         this._gameId = gameId;
-        this._tencentAd = CustomFeatures.isTencentAdvertisement(seatId);
+        this._seatId = seatId;
 
         this._templateData = {
             muted
@@ -128,7 +128,7 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     public render(): void {
         super.render();
 
-        if (this._tencentAd) {
+        if (CustomFeatures.isTencentAdvertisement(this._seatId)) {
             const tencentAdTag = <HTMLElement>this._container.querySelector('.tencent-advertisement');
             if (tencentAdTag) {
                 tencentAdTag.innerText = '广告';

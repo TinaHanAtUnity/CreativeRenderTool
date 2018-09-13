@@ -228,7 +228,7 @@ export class AdUnitFactory {
 
         if(parameters.campaign.hasEndscreen()) {
             const endScreenPrivacy = this.createPrivacy(nativeBridge, parameters);
-            vastEndScreen = new VastEndScreen(nativeBridge, parameters.campaign, parameters.clientInfo.getGameId(), endScreenPrivacy);
+            vastEndScreen = new VastEndScreen(nativeBridge, parameters.campaign, parameters.clientInfo.getGameId(), endScreenPrivacy, parameters.campaign.getSeatId());
             vastAdUnitParameters.endScreen = vastEndScreen;
         }
 
