@@ -217,9 +217,9 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     private sendMraidAnalyticsEvent(eventName: string, eventData?: any) {
-        const timeFromShow = this.checkIsValid((Date.now() - this._showTimestamp - this._backgroundTime) / 1000);
-        const backgroundTime = this.checkIsValid(this._backgroundTime / 1000);
-        const timeFromPlayableStart = this._playableStartTimestamp ? this.checkIsValid((Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000) : 0;
+        const timeFromShow = this.clampTime((Date.now() - this._showTimestamp - this._backgroundTime) / 1000);
+        const backgroundTime = this.clampTime(this._backgroundTime / 1000);
+        const timeFromPlayableStart = this._playableStartTimestamp ? this.clampTime((Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000) : 0;
         this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, eventName, eventData));
     }
 
@@ -264,7 +264,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
     private onLoadedEvent(event: Event): void {
         this._loaded = true;
         this.onLoaded.trigger();
-        const frameLoadDuration = this.checkIsValid((Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId()) - this._backgroundTime) / 1000);
+        const frameLoadDuration = this.clampTime((Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId()) - this._backgroundTime) / 1000);
         this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' iframe load duration ' + frameLoadDuration + ' s');
         this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(frameLoadDuration, 0, 0, 'playable_loading_time', {}));
 
