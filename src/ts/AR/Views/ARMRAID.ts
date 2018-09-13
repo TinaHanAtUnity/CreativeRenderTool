@@ -17,6 +17,7 @@ import PlayableMRAIDTemplate from 'html/PlayableMRAID.html';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private static CloseLength = 30;
@@ -168,7 +169,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             }).catch((err) => {
                 this._nativeBridge.Sdk.logError('failed to create mraid: ' + err);
 
-                Diagnostics.trigger('create_mraid_error', {
+                SessionDiagnostics.trigger('create_mraid_error', {
                     message: err.message
                 }, this._campaign.getSession());
             });
@@ -277,7 +278,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                     this.updateProgressCircle(this._closeElement, 1);
 
                     const resourceUrl = this._campaign.getResourceUrl();
-                    Diagnostics.trigger('playable_prepare_timeout', {
+                    SessionDiagnostics.trigger('playable_prepare_timeout', {
                         'url': resourceUrl ? resourceUrl.getOriginalUrl() : ''
                     }, this._campaign.getSession());
 

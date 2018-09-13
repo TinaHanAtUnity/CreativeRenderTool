@@ -40,6 +40,7 @@ import { INativeResponse, Request } from 'Core/Utilities/Request';
 import { Url } from 'Core/Utilities/Url';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 export class CampaignManager {
 
@@ -522,7 +523,7 @@ export class CampaignManager {
         let parser: CampaignParser;
 
         if((this._sessionManager.getGameSessionId() % 1000 === 99) && backupCampaign === false) {
-            Diagnostics.trigger('ad_received', {
+            SessionDiagnostics.trigger('ad_received', {
                 contentType: response.getContentType()
             }, session);
         }
@@ -551,7 +552,7 @@ export class CampaignManager {
         const cachingTimestamp = Date.now();
         return this._assetManager.setup(campaign).then(() => {
             if((this._sessionManager.getGameSessionId() % 1000 === 99) && backupCampaign === false) {
-                Diagnostics.trigger('ad_ready', {
+                SessionDiagnostics.trigger('ad_ready', {
                     contentType: contentType
                 }, session);
             }

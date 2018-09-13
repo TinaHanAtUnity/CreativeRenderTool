@@ -20,6 +20,7 @@ import { Timer } from 'Core/Utilities/Timer';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { VPAID } from 'VPAID/Views/VPAID';
 import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 export interface IVPAIDAdUnitParameters extends IAdUnitParameters<VPAIDCampaign> {
     vpaid: VPAID;
@@ -247,7 +248,7 @@ export class VPAIDAdUnit extends AbstractAdUnit implements IAdUnitContainerListe
 
     private onAdUnitNotLoaded() {
         this.setFinishState(FinishState.ERROR);
-        Diagnostics.trigger('vpaid_load_timeout', new DiagnosticError(new Error('VPAID failed to load within timeout'), {
+        SessionDiagnostics.trigger('vpaid_load_timeout', new DiagnosticError(new Error('VPAID failed to load within timeout'), {
             id: this._vpaidCampaign.getId()
         }), this._vpaidCampaign.getSession());
         this.hide();

@@ -21,6 +21,7 @@ import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { StoreName } from 'Performance/Models/PerformanceCampaign';
 import { XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 export interface IEndScreenDownloadParameters {
     clickAttributionUrl: string | undefined;
@@ -190,7 +191,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
                 response: error.nativeResponse
             });
         }
-        Diagnostics.trigger('click_attribution_failed', error, currentSession);
+        SessionDiagnostics.trigger('click_attribution_failed', error, currentSession);
     }
 
     private openAppStore(parameters: IEndScreenDownloadParameters, isAppSheetBroken?: boolean) {

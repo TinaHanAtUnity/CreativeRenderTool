@@ -8,6 +8,7 @@ import { INativeResponse, Request } from 'Core/Utilities/Request';
 import { Url } from 'Core/Utilities/Url';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 export class ThirdPartyEventManager {
 
@@ -91,7 +92,7 @@ export class ThirdPartyEventManager {
                             eventUrl: eventUrl,
                             event: event
                         };
-                        Diagnostics.trigger('invalid_tracking_url', error, campaign.getSession());
+                        SessionDiagnostics.trigger('invalid_tracking_url', error, campaign.getSession());
                     }
                 }
             }

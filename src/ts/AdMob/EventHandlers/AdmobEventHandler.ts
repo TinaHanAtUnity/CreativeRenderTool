@@ -20,6 +20,7 @@ import { Promises } from 'Core/Utilities/Promises';
 import { Request } from 'Core/Utilities/Request';
 import { Timer } from 'Core/Utilities/Timer';
 import { Url } from 'Core/Utilities/Url';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 export interface IAdMobEventHandlerParameters {
     adUnit: AdMobAdUnit;
@@ -135,7 +136,7 @@ export class AdMobEventHandler extends GDPREventHandler implements IAdMobEventHa
     public onTrackingEvent(event: string, data?: any) {
         this._adUnit.sendTrackingEvent(event);
         if (event === 'error') {
-            Diagnostics.trigger('admob_ad_error', data, this._campaign.getSession());
+            SessionDiagnostics.trigger('admob_ad_error', data, this._campaign.getSession());
         }
     }
 

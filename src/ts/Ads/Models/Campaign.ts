@@ -3,6 +3,7 @@ import { Session } from 'Ads/Models/Session';
 import { WebViewError } from 'Core/Errors/WebViewError';
 import { ISchema, Model } from 'Core/Models/Model';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 export interface ICampaign {
     id: string;
@@ -91,7 +92,7 @@ export abstract class Campaign<T extends ICampaign = ICampaign> extends Model<T>
     public abstract isConnectionNeeded(): boolean;
 
     protected handleError(error: WebViewError) {
-        Diagnostics.trigger('set_model_value_failed', error, this.getSession());
+        SessionDiagnostics.trigger('set_model_value_failed', error, this.getSession());
         throw error;
     }
 

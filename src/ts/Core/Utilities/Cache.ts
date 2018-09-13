@@ -1,7 +1,3 @@
-import { Campaign } from 'Ads/Models/Campaign';
-import { Session } from 'Ads/Models/Session';
-import { ProgrammaticTrackingError, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
@@ -11,23 +7,13 @@ import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { FileId } from 'Core/Utilities/FileId';
 import { FileInfo } from 'Core/Utilities/FileInfo';
-import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
-import { Observable0 } from 'Core/Utilities/Observable';
+import { Observable0, Observable1, Observable2 } from 'Core/Utilities/Observable';
 import { Request } from 'Core/Utilities/Request';
 
 export enum CacheStatus {
     OK,
     STOPPED,
     FAILED
-}
-
-enum CacheDiagnosticEvent {
-    STARTED,
-    RESUMED,
-    STOPPED,
-    FINISHED,
-    REDIRECTED,
-    ERROR
 }
 
 export interface ICacheOptions {
@@ -52,7 +38,7 @@ export interface ICacheCampaignsResponse {
 type ICallbackResolveFunction = (value?: [CacheStatus, string]) => void;
 type ICallbackRejectFunction = (reason?: any) => void;
 
-interface ICallbackObject {
+export interface ICallbackObject {
     fileId: string;
     networkRetry: boolean;
     retryCount: number;
@@ -70,7 +56,15 @@ interface ICallbackObject {
 }
 
 export class Cache {
-    public onFastConnectionDetected: Observable0 = new Observable0();
+
+    public readonly onFastConnectionDetected = new Observable0();
+
+    public readonly onStart = new Observable2<ICallbackObject, number>();
+    public readonly onFinish = new Observable2<ICallbackObject, boolean>();
+    public readonly onStop = new Observable1<ICallbackObject>();
+    public readonly onError = new Observable1<ICallbackObject>();
+
+    public readonly onTooLargeFile = new Observable1<ICallbackObject>();
 
     private _nativeBridge: NativeBridge;
     private _wakeUpManager: WakeUpManager;
@@ -127,7 +121,7 @@ export class Cache {
         });
     }
 
-    public cache(url: string, diagnostics: ICacheDiagnostics, campaign: Campaign): Promise<string[]> {
+    public cache(url: string): Promise<string[]> {
         return Promise.all<boolean, string>([
             FileInfo.isCached(this._nativeBridge, this._cacheBookkeeping, url),
             FileId.getFileId(url, this._nativeBridge)
@@ -275,16 +269,15 @@ export class Cache {
         if(callback) {
             callback.startTimestamp = Date.now();
             callback.contentLength = totalSize;
+            this.onStart.trigger(callback, size);
             if(size === 0) {
                 this._cacheBookkeeping.writeFileEntry(callback.fileId, this._cacheBookkeeping.createFileInfo(false, size, totalSize, FileId.getFileIdExtension(callback.fileId)));
-                this.sendDiagnostic(CacheDiagnosticEvent.STARTED, callback);
                 SdkStats.setCachingStartTimestamp(callback.fileId);
-            } else {
-                this.sendDiagnostic(CacheDiagnosticEvent.RESUMED, callback);
             }
             // reject all files larger than 20 megabytes
             if(totalSize > this._maxFileSize) {
                 this._nativeBridge.Cache.stop();
+                this.onTooLargeFile.trigger(callback);
                 Diagnostics.trigger('too_large_file', {
                     url: url,
                     size: size,
@@ -325,12 +318,12 @@ export class Cache {
         if(callback) {
             if(Request.AllowedResponseCodes.exec(responseCode.toString())) {
                 this._cacheBookkeeping.writeFileEntry(callback.fileId, this._cacheBookkeeping.createFileInfo(true, size, totalSize, FileId.getFileIdExtension(callback.fileId)));
-                this.sendDiagnostic(CacheDiagnosticEvent.FINISHED, callback);
                 this.fulfillCallback(url, CacheStatus.OK);
+                this.onFinish.trigger(callback, false);
                 SdkStats.setCachingFinishTimestamp(callback.fileId);
                 return;
             } else if(Request.RedirectResponseCodes.exec(responseCode.toString())) {
-                this.sendDiagnostic(CacheDiagnosticEvent.REDIRECTED, callback);
+                this.onFinish.trigger(callback, true);
                 this._cacheBookkeeping.removeFileEntry(callback.fileId);
                 this._nativeBridge.Cache.deleteFile(callback.fileId);
                 const location = Request.getHeader(headers, 'location');
@@ -346,12 +339,12 @@ export class Cache {
                     return;
                 }
             } else if(responseCode === 416) {
-                this.sendDiagnostic(CacheDiagnosticEvent.ERROR, callback);
+                this.onError.trigger(callback);
                 this.handleRequestRangeError(callback, url);
                 return;
             }
 
-            this.sendDiagnostic(CacheDiagnosticEvent.ERROR, callback);
+            this.onError.trigger(callback);
 
             const error: DiagnosticError = new DiagnosticError(new Error('HTTP ' + responseCode), {
                 url: url,
@@ -378,7 +371,7 @@ export class Cache {
         const callback = this._callbacks[url];
         if(callback) {
             this._cacheBookkeeping.writeFileEntry(callback.fileId, this._cacheBookkeeping.createFileInfo(false, size, totalSize, FileId.getFileIdExtension(callback.fileId)));
-            this.sendDiagnostic(CacheDiagnosticEvent.STOPPED, callback);
+            this.onStop.trigger(callback);
             if(callback.contentLength > this._maxFileSize) {
                 // files larger than 20 megabytes should be handled as failures
                 this.fulfillCallback(url, CacheStatus.FAILED);
@@ -391,7 +384,7 @@ export class Cache {
     private onDownloadError(error: string, url: string, message: string): void {
         const callback = this._callbacks[url];
         if(callback) {
-            this.sendDiagnostic(CacheDiagnosticEvent.ERROR, callback);
+            this.onError.trigger(callback);
 
             switch (error) {
                 case CacheError[CacheError.NETWORK_ERROR]:
@@ -437,27 +430,9 @@ export class Cache {
             const contentLength = Request.getHeader(response.headers, 'Content-Length');
 
             if(response.responseCode === 200 && fileInfo.found && contentLength && fileInfo.size === parseInt(contentLength, 10) && fileInfo.size > 0) {
-                Diagnostics.trigger('cache_desync_fixed', {
-                    url: url,
-                    responseCode: response.responseCode,
-                    fileFound: fileInfo.found,
-                    fileSize: fileInfo.size,
-                    contentLength: parseInt(contentLength, 10)
-                }, callback.session);
                 this._cacheBookkeeping.writeFileEntry(callback.fileId, this._cacheBookkeeping.createFileInfo(true, fileInfo.size, fileInfo.size, FileId.getFileIdExtension(callback.fileId)));
                 this.fulfillCallback(url, CacheStatus.OK);
             } else {
-                let parsedContentLength;
-                if (contentLength) {
-                    parsedContentLength = parseInt(contentLength, 10);
-                }
-                Diagnostics.trigger('cache_desync_failure', {
-                    url: url,
-                    responseCode: response.responseCode,
-                    fileFound: fileInfo.found,
-                    fileSize: fileInfo.size,
-                    contentLength: parsedContentLength
-                }, callback.session);
                 this._cacheBookkeeping.removeFileEntry(callback.fileId);
                 if(fileInfo.found) {
                     this._nativeBridge.Cache.deleteFile(callback.fileId);
@@ -465,10 +440,6 @@ export class Cache {
                 this.fulfillCallback(url, CacheStatus.FAILED);
             }
         }).catch((error) => {
-            Diagnostics.trigger('cache_desync_failure', {
-                url: url,
-                error: error
-            }, callback.session);
             this._cacheBookkeeping.removeFileEntry(callback.fileId);
             this.fulfillCallback(url, CacheStatus.FAILED);
         });
@@ -556,21 +527,6 @@ export class Cache {
         } else {
             this._currentDownloadPosition = position;
             this._lastProgressEvent = Date.now();
-        }
-    }
-
-    private sendDiagnostic(event: CacheDiagnosticEvent, callback: ICallbackObject) {
-        if(this._sendDiagnosticEvents) {
-            const msg: any = {
-                eventTimestamp: Date.now(),
-                eventType: CacheDiagnosticEvent[event],
-                creativeType: callback.diagnostics.creativeType,
-                size: callback.contentLength,
-                downloadStartTimestamp: callback.startTimestamp,
-                targetGameId: callback.diagnostics.targetGameId,
-                targetCampaignId: callback.diagnostics.targetCampaignId
-            };
-            HttpKafka.sendEvent('ads.sdk2.events.creativedownload.json', KafkaCommonObjectType.ANONYMOUS, msg);
         }
     }
 }

@@ -13,6 +13,8 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Double } from 'Core/Utilities/Double';
 import { FileInfo } from 'Core/Utilities/FileInfo';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
+import { VideoFileInfo } from 'Ads/Utilities/VideoFileInfo';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEventHandler {
 
@@ -64,7 +66,7 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
                     lastPosition: lastPosition,
                     duration: this._video.getDuration()
                 });
-                Diagnostics.trigger('video_player_too_large_progress', error, this._campaign.getSession());
+                SessionDiagnostics.trigger('video_player_too_large_progress', error, this._campaign.getSession());
 
                 return;
             }
@@ -94,7 +96,7 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
                         this._nativeBridge.Cache.getFileInfo(fileId).then((fileInfo) => {
                             error.fileInfo = fileInfo;
                             if(fileInfo.found) {
-                                return FileInfo.getVideoInfo(this._nativeBridge, fileId).then(([width, height, duration]) => {
+                                return VideoFileInfo.getVideoInfo(this._nativeBridge, fileId).then(([width, height, duration]) => {
                                     const videoInfo: any = {
                                         width: width,
                                         height: height,
@@ -172,7 +174,7 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
                 url: url,
                 originalUrl: originalUrl
             });
-            Diagnostics.trigger('video_too_long', error, this._campaign.getSession());
+            SessionDiagnostics.trigger('video_too_long', error, this._campaign.getSession());
             this.handleVideoError('video_too_long_error');
             return;
         }

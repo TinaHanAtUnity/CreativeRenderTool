@@ -22,6 +22,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { INativeResponse, Request } from 'Core/Utilities/Request';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 export class OldCampaignRefreshManager extends RefreshManager {
     private _nativeBridge: NativeBridge;
@@ -228,9 +229,15 @@ export class OldCampaignRefreshManager extends RefreshManager {
             error = { 'message': error.message, 'name': error.name, 'stack': error.stack };
         }
 
-        Diagnostics.trigger(diagnosticsType, {
-            error: error
-        }, session);
+        if(session) {
+            SessionDiagnostics.trigger(diagnosticsType, {
+                error: error
+            }, session);
+        } else {
+            Diagnostics.trigger(diagnosticsType, {
+                error: error
+            });
+        }
         this._nativeBridge.Sdk.logError(JSON.stringify(error));
 
         const minimumRefreshTimestamp = Date.now() + RefreshManager.ErrorRefillDelay * 1000;

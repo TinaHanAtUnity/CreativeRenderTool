@@ -11,6 +11,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { FileInfo } from 'Core/Utilities/FileInfo';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { VideoFileInfo } from 'Ads/Utilities/VideoFileInfo';
 
 enum CacheType {
     REQUIRED,
@@ -254,6 +255,7 @@ export class AssetManager {
             if(currentAsset) {
                 const asset: IAssetQueueObject = currentAsset;
                 this._caching = true;
+                this._cache.onTooLargeFile.subscribe()
                 this._cache.cache(asset.url, asset.diagnostics, campaign).then(([fileId, fileUrl]) => {
                     asset.resolve([fileId, fileUrl]);
                     this._caching = false;
@@ -271,7 +273,7 @@ export class AssetManager {
         const promises = [];
         for(const asset of assets) {
             if(asset instanceof Video) {
-                promises.push(FileInfo.isVideoValid(this._nativeBridge, asset, campaign).then(valid => {
+                promises.push(VideoFileInfo.isVideoValid(this._nativeBridge, asset, campaign).then(valid => {
                     if(!valid) {
                         throw new Error('Video failed to validate: ' + asset.getOriginalUrl());
                     }

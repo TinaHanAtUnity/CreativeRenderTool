@@ -69,6 +69,7 @@ import CreativeUrlResponseIos from 'json/CreativeUrlResponseIos.json';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 export class WebView {
 
@@ -366,7 +367,7 @@ export class WebView {
                 id: campaign.getId(),
                 willExpireAt: campaign.getWillExpireAt()
             });
-            Diagnostics.trigger('campaign_expired', error, campaign.getSession());
+            SessionDiagnostics.trigger('campaign_expired', error, campaign.getSession());
             return;
         }
 
@@ -387,7 +388,7 @@ export class WebView {
                     placement.setCurrentCampaign(realtimeCampaign);
                     this.showAd(placement, realtimeCampaign, options);
                 } else {
-                    Diagnostics.trigger('realtime_no_fill', {}, campaign.getSession());
+                    SessionDiagnostics.trigger('realtime_no_fill', {}, campaign.getSession());
                     this._nativeBridge.Sdk.logInfo('Unity Ads received no new fill for placement ' + placement.getId() + ', opening old ad unit');
                     this.showAd(placement, campaign, options);
                 }
@@ -446,7 +447,7 @@ export class WebView {
                 const error = new DiagnosticError(new Error('No connection is available'), {
                     id: campaign.getId()
                 });
-                Diagnostics.trigger('mraid_no_connection', error, campaign.getSession());
+                SessionDiagnostics.trigger('mraid_no_connection', error, campaign.getSession());
                 return;
             }
 

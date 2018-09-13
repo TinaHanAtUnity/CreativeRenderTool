@@ -16,6 +16,7 @@ import MRAIDPerfContainer from 'html/mraid/container-perf.html';
 import MRAIDContainer from 'html/mraid/container.html';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, MRAIDView } from 'MRAID/Views/MRAIDView';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 export class MRAID extends MRAIDView<IMRAIDViewHandler> {
 
@@ -105,7 +106,7 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
         }).catch(e => {
             this._nativeBridge.Sdk.logError('failed to create mraid: ' + e);
 
-            Diagnostics.trigger('create_mraid_error', {
+            SessionDiagnostics.trigger('create_mraid_error', {
                 message: e.message
             }, this._campaign.getSession());
         });
