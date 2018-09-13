@@ -5,6 +5,7 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Template } from 'Core/Utilities/Template';
 import GDPRPrivacyTemplate from 'html/GDPR-privacy.html';
 import { BadAdsReporting } from 'Ads/Utilities/BadAdsReporting';
+import { Observable0 } from 'Core/Utilities/Observable';
 
 export enum GDPRCardState {
     INITIAL,
@@ -15,12 +16,14 @@ export enum GDPRCardState {
 
 export class GDPRPrivacy extends AbstractPrivacy {
 
+    public readonly _onReport: Observable0 = new Observable0();
+
+    private _gdprManager: GdprManager;
     private _dataDeletionConfirmation: boolean = false;
     private _currentState : number = -1;
     private _campaign: Campaign;
     private _reportSent: boolean = false;
     private _gdprEnabled: boolean = false;
-    private _gdprManager: GdprManager;
 
     constructor(nativeBridge: NativeBridge, campaign: Campaign,
                 gdprManager: GdprManager, gdprEnabled: boolean,
@@ -31,7 +34,6 @@ export class GDPRPrivacy extends AbstractPrivacy {
         this._template = new Template(GDPRPrivacyTemplate);
         this._campaign = campaign;
         this._gdprEnabled = gdprEnabled;
-        this._gdprManager = gdprManager;
 
         this._bindings = [
             {
@@ -82,15 +84,17 @@ export class GDPRPrivacy extends AbstractPrivacy {
         }
 
         const agreeRadioButton = <HTMLInputElement>this._container.querySelector('#gdpr-agree-radio');
-        agreeRadioButton.onclick = () => {
-            const confirmationContainer = <HTMLSpanElement>document.getElementById('data-deletion-container');
-            confirmationContainer.classList.remove('active');
+        if (agreeRadioButton) {
+            agreeRadioButton.onclick = () => {
+                const confirmationContainer = <HTMLSpanElement>document.getElementById('data-deletion-container');
+                confirmationContainer.classList.remove('active');
 
-            const requestContainer = <HTMLSpanElement>document.getElementById('data-deletion-request-container');
-            requestContainer.classList.remove('active');
+                const requestContainer = <HTMLSpanElement>document.getElementById('data-deletion-request-container');
+                requestContainer.classList.remove('active');
 
-            this._dataDeletionConfirmation = false;
-        };
+                this._dataDeletionConfirmation = false;
+            };
+        }
     }
 
     public render(): void {
@@ -150,6 +154,7 @@ export class GDPRPrivacy extends AbstractPrivacy {
                 this._reportSent = true;
                 this.handleReportText(true, reportText);
                 BadAdsReporting.onUserReport(this._campaign, checkedReportButton.id);
+                this._onReport.trigger();
             } else {
                 this.handleReportText(false, reportText);
             }

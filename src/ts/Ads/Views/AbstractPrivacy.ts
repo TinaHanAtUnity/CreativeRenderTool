@@ -1,11 +1,11 @@
+import { GdprManager, IGdprPersonalProperties } from 'Ads/Managers/GdprManager';
 import { Campaign } from 'Ads/Models/Campaign';
+import { BadAdReason } from 'Ads/Utilities/BadAdsReporting';
 import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Configuration } from 'Core/Models/Configuration';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { View } from 'Core/Views/View';
-import { BadAdReason } from 'Ads/Utilities/BadAdsReporting';
-import { IGdprPersonalProperties, GdprManager } from 'Ads/Managers/GdprManager';
 
 export interface IPrivacyHandler {
     onPrivacy(url: string): void;

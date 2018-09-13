@@ -42,7 +42,6 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         super(nativeBridge, 'new-video-overlay', muted);
 
         this._localization = new Localization(language, 'overlay');
-        this._privacy = privacy;
         this._showGDPRBanner = showGDPRBanner;
         this._disablePrivacyDuringVideo = disablePrivacyDuringVideo;
         this._gameId = gameId;
@@ -96,10 +95,13 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
             });
         }
 
-        this._privacy.render();
-        this._privacy.hide();
-        document.body.appendChild(this._privacy.container());
-        this._privacy.addEventHandler(this);
+        if (!disablePrivacyDuringVideo) {
+            this._privacy = privacy;
+            this._privacy.render();
+            this._privacy.hide();
+            document.body.appendChild(this._privacy.container());
+            this._privacy.addEventHandler(this);
+        }
 
         setTimeout(() => {
             this.fadeIn();
