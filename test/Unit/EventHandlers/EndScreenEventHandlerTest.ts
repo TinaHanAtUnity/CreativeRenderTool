@@ -147,10 +147,34 @@ describe('EndScreenEventHandlerTest', () => {
         });
 
         describe('with standalone_android store type and appDownloadUrl', () => {
-            it('and API is less than 21, it should launch view intent', () => {
+            let downloadParameters: IEndScreenDownloadParameters;
+
+            beforeEach(() => {
                 performanceAdUnitParameters.campaign = TestFixtures.getCampaignStandaloneAndroid();
                 performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
 
+                downloadParameters = <IEndScreenDownloadParameters>{
+                    appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
+                    bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
+                    gameId: performanceAdUnitParameters.campaign.getGameId(),
+                    store: performanceAdUnitParameters.campaign.getStore(),
+                    clickAttributionUrlFollowsRedirects: true,
+                    clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl(),
+                    appDownloadUrl: performanceAdUnitParameters.campaign.getAppDownloadUrl()
+                };
+            });
+
+            it('should call click attribution if clickAttributionUrl is present', () => {
+                sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').resolves();
+
+                endScreenEventHandler.onEndScreenDownload(downloadParameters);
+
+                return resolvedPromise.then(() => {
+                    sinon.assert.calledOnce(<sinon.SinonSpy>thirdPartyEventManager.clickAttributionEvent);
+                });
+            });
+
+            it('and API is less than 21, it should launch view intent', () => {
                 sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').returns(Promise.resolve({
                     url: 'http://foo.url.com',
                     response: 'foo response',
@@ -159,14 +183,7 @@ describe('EndScreenEventHandlerTest', () => {
 
                 sinon.stub(nativeBridge, 'getApiLevel').returns(20);
 
-                endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
-                    appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
-                    bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
-                    store: StoreName.STANDALONE_ANDROID,
-                    clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
-                    clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl(),
-                    appDownloadUrl: performanceAdUnitParameters.campaign.getAppDownloadUrl()
-                });
+                endScreenEventHandler.onEndScreenDownload(downloadParameters);
 
                 return resolvedPromise.then(() => {
                     sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
@@ -177,9 +194,6 @@ describe('EndScreenEventHandlerTest', () => {
             });
 
             it('with appDownloadUrl and API is greater than or equal to 21, it should launch web search intent', () => {
-                performanceAdUnitParameters.campaign = TestFixtures.getCampaignStandaloneAndroid();
-                performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
-
                 sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').returns(Promise.resolve({
                     url: 'http://foo.url.com',
                     response: 'foo response',
@@ -188,14 +202,7 @@ describe('EndScreenEventHandlerTest', () => {
 
                 sinon.stub(nativeBridge, 'getApiLevel').returns(21);
 
-                endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
-                    appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
-                    bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
-                    store: StoreName.STANDALONE_ANDROID,
-                    clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
-                    clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl(),
-                    appDownloadUrl: performanceAdUnitParameters.campaign.getAppDownloadUrl()
-                });
+                endScreenEventHandler.onEndScreenDownload(downloadParameters);
 
                 return resolvedPromise.then(() => {
                     sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
