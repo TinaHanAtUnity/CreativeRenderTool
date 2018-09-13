@@ -5,6 +5,7 @@ $progress-bar-width = 60%;
 $filling-bar-width = $progress-bar-width * .3;
 $permissions-max-width = 300px;
 $permissions-gray = #a6a6a6;
+$camera-permission-panel-color = #fafafa;
 
 #playable-mraid {
 
@@ -238,32 +239,32 @@ $permissions-gray = #a6a6a6;
   }
 
   .camera-permission-panel {
-    background: #fafafa;
     position: absolute;
     top: 100vw;
+    right: 0;
     bottom: 0;
     left: 0;
-    right: 0;
-    height: inherit;
-    width: 100vw;
     z-index: 105;
+    width: 100vw;
+    height: inherit;
+    background: $camera-permission-panel-color;
 
     .container {
-      width: 80%;
       max-width: $permissions-max-width;
+      width: 80%;
       justify-content: flex-start;
     }
 
     .permission-text {
-      font-size:4vw;
-      text-align: center;
       margin: 0 0 8px;
+      text-align: center;
+      font-size:4vw;
     }
 
     .arads-logo {
+      margin: 20px auto 15px;
       width: 156px;
       height: 30px;
-      margin: 20px auto 15px;
       background-image: url("../img/adsar.png");
       background-position: center;
       background-size: cover;
@@ -271,8 +272,8 @@ $permissions-gray = #a6a6a6;
 
     .permission-choice-buttons {
       display: flex;
-      max-width: $permissions-max-width;
       margin: 0 auto;
+      max-width: $permissions-max-width;
 
       -webkit-box-orient: horizontal;
       -webkit-box-direction: normal;
@@ -296,8 +297,8 @@ $permissions-gray = #a6a6a6;
       flex: 1;
       margin: 0 0 8px;
       padding: .6375rem .35rem;
-      color: $white;
       background: $permissions-gray;
+      color: $white;
     }
 
     .gdpr-link {
@@ -308,8 +309,8 @@ $permissions-gray = #a6a6a6;
 
     .show-learn-more-button {
       position: absolute;
-      bottom: 10px;
       right: 10px;
+      bottom: 10px;
     }
 
     .icon-gdpr,
@@ -325,9 +326,9 @@ $permissions-gray = #a6a6a6;
     .camera-permission-panel {
       position: absolute;
       top: 0;
-      left: 100vh;
       right: 0;
       bottom: 0;
+      left: 100vh;
       width: inherit;
       height: inherit;
 
@@ -337,12 +338,12 @@ $permissions-gray = #a6a6a6;
       }
 
       .arads-logo {
-        margin: 0px auto 5px;
+        margin: 0 auto 5px;
       }
 
       .permission-text {
-        font-size: 2vw;
         padding: 0 8px;
+        font-size: 2vw;
       }
 
       .permission-choice-buttons {
@@ -361,8 +362,8 @@ $permissions-gray = #a6a6a6;
       }
 
       .show-learn-more-button {
-        bottom: 0;
         right: 5px;
+        bottom: 0;
       }
 
       .permission-accept-button {

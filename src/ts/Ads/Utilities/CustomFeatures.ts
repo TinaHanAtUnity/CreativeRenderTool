@@ -24,7 +24,9 @@ export class CustomFeatures {
         return  creativeId === '109455881' ||
                 creativeId === '109455877' ||
                 creativeId === '109091853' ||
-                creativeId === '109091754';
+                creativeId === '109091754' ||
+                creativeId === '114617576' || // Hellfest
+                creativeId === '114617336';   // Hellfest
     }
 
     public static isPlayableConfigurationEnabled(originalResourceUrl: string) {
