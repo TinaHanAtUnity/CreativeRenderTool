@@ -6,6 +6,7 @@ import { Template } from 'Core/Utilities/Template';
 import { View } from 'Core/Views/View';
 import VastEndScreenTemplate from 'html/VastEndScreen.html';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { ClientInfo } from 'Core/Models/ClientInfo';
 
 export interface IVastEndScreenHandler {
     onVastEndScreenClick(): void;
@@ -15,6 +16,11 @@ export interface IVastEndScreenHandler {
     onOpenUrl(url: string): Promise<void>;
 }
 
+export interface IVastEndscreenParameters {
+    campaign: VastCampaign;
+    clientInfo: ClientInfo;
+}
+
 export class VastEndScreen extends View<IVastEndScreenHandler> implements IPrivacyHandler {
 
     private _isSwipeToCloseEnabled: boolean = false;
@@ -22,7 +28,7 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
     private _callButtonEnabled: boolean = true;
     private _campaign: VastCampaign;
 
-    constructor(nativeBridge: NativeBridge, parameters: IAdUnitParameters<VastCampaign>, privacy: AbstractPrivacy) {
+    constructor(nativeBridge: NativeBridge, parameters: IVastEndscreenParameters, privacy: AbstractPrivacy) {
         super(nativeBridge, 'vast-end-screen');
 
         this._campaign = parameters.campaign;
