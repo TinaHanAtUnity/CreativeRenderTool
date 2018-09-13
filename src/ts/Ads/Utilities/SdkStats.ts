@@ -17,6 +17,7 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
+import { Cache } from 'Core/Utilities/Cache';
 
 interface ISdkStatsEvent {
     eventTimestamp: number;
@@ -74,7 +75,7 @@ interface IEventInfo {
 }
 
 export class SdkStats {
-    public static initialize(nativeBridge: NativeBridge, request: Request, configuration: Configuration, sessionManager: SessionManager, campaignManager: CampaignManager, metaDataManager: MetaDataManager, clientInfo: ClientInfo) {
+    public static initialize(nativeBridge: NativeBridge, request: Request, configuration: Configuration, sessionManager: SessionManager, campaignManager: CampaignManager, metaDataManager: MetaDataManager, clientInfo: ClientInfo, cache: Cache) {
         SdkStats._nativeBridge = nativeBridge;
         SdkStats._request = request;
         SdkStats._configuration = configuration;
@@ -82,6 +83,13 @@ export class SdkStats {
         SdkStats._campaignManager = campaignManager;
         SdkStats._metaDataManager = metaDataManager;
         SdkStats._clientInfo = clientInfo;
+
+        cache.onFinish.subscribe((callback) => SdkStats.setCachingFinishTimestamp(callback.fileId));
+        cache.onStart.subscribe((callback, size) => {
+            if(size === 0) {
+                SdkStats.setCachingStartTimestamp(callback.fileId);
+            }
+        });
 
         SdkStats._initialized = true;
     }
@@ -166,6 +174,7 @@ export class SdkStats {
     private static _campaignManager: CampaignManager;
     private static _metaDataManager: MetaDataManager;
     private static _clientInfo: ClientInfo;
+    private static _cache: Cache;
     private static _topic: string = 'ads.sdk2.events.sdktimeline.json';
 
     private static _initialized: boolean = false;

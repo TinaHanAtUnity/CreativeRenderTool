@@ -29,7 +29,6 @@ describe('VideoMetadataTest', () => {
     let nativeBridge: NativeBridge;
     let wakeUpManager: WakeUpManager;
     let request: Request;
-    let programmaticTrackingService: ProgrammaticTrackingService;
     let cache: Cache;
     let focusManager: FocusManager;
     let cacheBookkeeping: CacheBookkeeping;
@@ -43,8 +42,7 @@ describe('VideoMetadataTest', () => {
             wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             request = new Request(nativeBridge, wakeUpManager);
             cacheBookkeeping = new CacheBookkeeping(nativeBridge);
-            programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
-            cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService);
+            cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping);
         });
 
         it('should validate valid video', () => {
@@ -79,8 +77,7 @@ describe('VideoMetadataTest', () => {
             wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             request = new Request(nativeBridge, wakeUpManager);
             cacheBookkeeping = new CacheBookkeeping(nativeBridge);
-            programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
-            cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService);
+            cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping);
         });
 
         it('should validate valid video', () => {
