@@ -520,9 +520,6 @@ export class AdUnitFactory {
     private static createPrivacy(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractPrivacy {
         const privacy = new GDPRPrivacy(nativeBridge, parameters.campaign, parameters.gdprManager, parameters.configuration.isGDPREnabled(), parameters.configuration.isCoppaCompliant());
         const privacyEventHandler = new PrivacyEventHandler(nativeBridge, parameters);
-        if (parameters.configuration.isGDPREnabled()) {
-            AbstractPrivacy.setUserInformation(parameters.gdprManager);
-        }
         privacy.addEventHandler(privacyEventHandler);
         return privacy;
     }

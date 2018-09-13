@@ -176,8 +176,8 @@ export class GDPRPrivacy extends AbstractPrivacy {
         const middleEl = <HTMLDivElement>this._container.querySelector('.middle-link');
         const classList = this._container.classList;
         const rCard = 'Report Ad ⚑';
-        const pCard = 'Privacy info';
-        const bCard = 'Build info';
+        const pCard = 'Privacy info 👁';
+        const bCard = 'Build info ⚙';
 
         switch(this._currentState) {
 
