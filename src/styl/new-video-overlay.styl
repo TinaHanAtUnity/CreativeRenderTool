@@ -447,59 +447,43 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
 
     .bottom-container {
       margin-bottom: constant(safe-area-inset-bottom);
-      // @stylint off
-      margin-bottom: env(safe-area-inset-bottom);
-      // @stylint on
+      margin-bottom: env(safe-area-inset-bottom); // @stylint ignore;
     }
 
     .top-container {
       margin-top: calc(constant(safe-area-inset-top));
-      // @stylint off
-      margin-top: calc(env(safe-area-inset-top));
-      // @stylint on
+      margin-top: calc(env(safe-area-inset-top)); // @stylint ignore;
     }
 
     .button-left .tab {
       padding-left: constant(safe-area-inset-left);
-      // @stylint off
-      padding-left: env(safe-area-inset-left);
-      // @stylint on
+      padding-left: env(safe-area-inset-left); // @stylint ignore;
     }
 
     .button-left {
       width: "calc(constant(safe-area-inset-left) + %s)" % $new-video-overlay-styles.touchable-area-width;
-      // @stylint off
-      width: "calc(env(safe-area-inset-left) + %s)" % $new-video-overlay-styles.touchable-area-width;
-      // @stylint on
+      width: "calc(env(safe-area-inset-left) + %s)" % $new-video-overlay-styles.touchable-area-width; // @stylint ignore;
     }
 
     .button-right .tab {
       padding-right: constant(safe-area-inset-right);
-      // @stylint off
-      padding-right: env(safe-area-inset-right);
-      // @stylint on
+      padding-right: env(safe-area-inset-right); // @stylint ignore;
     }
 
     .button-right {
       width: "calc(constant(safe-area-inset-right) + %s)" % $new-video-overlay-styles.touchable-area-width;
-      // @stylint off
-      width: "calc(env(safe-area-inset-right) + %s)" % $new-video-overlay-styles.touchable-area-width;
-      // @stylint on
+      width: "calc(env(safe-area-inset-right) + %s)" % $new-video-overlay-styles.touchable-area-width; // @stylint ignore;
     }
 
 
     .call-button {
       width: "calc(constant(safe-area-inset-right) + %s)" % $new-video-overlay-styles.call-button-width;
-      // @stylint off
-      width: "calc(env(safe-area-inset-right) + %s)" % $new-video-overlay-styles.call-button-width;
-      // @stylint on
+      width: "calc(env(safe-area-inset-right) + %s)" % $new-video-overlay-styles.call-button-width; // @stylint ignore;
     }
 
     .gdpr-button {
       left: "calc(%s + constant(safe-area-inset-left))" % $new-video-overlay-styles.touchable-area-width;
-      // @stylint off
-      left: "calc(%s + env(safe-area-inset-left))" % $new-video-overlay-styles.touchable-area-width;
-      // @ stylint on
+      left: "calc(%s + env(safe-area-inset-left))" % $new-video-overlay-styles.touchable-area-width; // @stylint ignore;
     }
   }
 }
