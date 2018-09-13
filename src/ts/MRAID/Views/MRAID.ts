@@ -264,7 +264,8 @@ export class MRAID extends MRAIDView<IMRAIDViewHandler> {
     private onLoadedEvent(event: Event): void {
         this._loaded = true;
         this.onLoaded.trigger();
-        const frameLoadDuration = this.clampTime((Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId()) - this._backgroundTime) / 1000);
+
+        const frameLoadDuration = this.clampTime((Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId())) / 1000);
         this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' iframe load duration ' + frameLoadDuration + ' s');
         this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(frameLoadDuration, 0, 0, 'playable_loading_time', {}));
 
