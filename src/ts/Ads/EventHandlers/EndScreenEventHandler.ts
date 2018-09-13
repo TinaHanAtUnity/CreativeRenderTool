@@ -186,7 +186,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     }
 
     private handleAppDownloadUrl(appDownloadUrl: string) {
-        appDownloadUrl = decodeURIComponent(appDownloadUrl)
+        appDownloadUrl = decodeURIComponent(appDownloadUrl);
 
         if (this._nativeBridge.getApiLevel() >= 21) {
             // Using WEB_SEARCH bypasses some security check for directly downloading .apk files
