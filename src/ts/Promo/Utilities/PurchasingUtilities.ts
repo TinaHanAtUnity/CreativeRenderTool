@@ -1,12 +1,13 @@
 import { PlacementManager } from 'Ads/Managers/PlacementManager';
 import { PlacementState } from 'Ads/Models/Placement';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingCatalog } from 'Promo/Models/PurchasingCatalog';
 import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
+import { CoreConfiguration } from '../../Core/Models/CoreConfiguration';
 
 export enum IPromoRequest {
     SETIDS = 'setids',
@@ -29,9 +30,10 @@ export class PurchasingUtilities {
 
     public static placementManager: PlacementManager;
 
-    public static initialize(clientInfo: ClientInfo, configuration: Configuration, nativeBridge: NativeBridge, placementManager: PlacementManager) {
+    public static initialize(clientInfo: ClientInfo, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, nativeBridge: NativeBridge, placementManager: PlacementManager) {
         this._clientInfo = clientInfo;
-        this._configuration = configuration;
+        this._coreConfig = coreConfig;
+        this._adsConfig = adsConfig;
         this._nativeBridge = nativeBridge;
         this.placementManager = placementManager;
     }
@@ -122,7 +124,8 @@ export class PurchasingUtilities {
 
     private static _catalog: PurchasingCatalog = new PurchasingCatalog([]);
     private static _clientInfo: ClientInfo;
-    private static _configuration: Configuration;
+    private static _coreConfig: CoreConfiguration;
+    private static _adsConfig: AdsConfiguration;
     private static _nativeBridge: NativeBridge;
     private static _isInitialized = false;
 
@@ -206,10 +209,10 @@ export class PurchasingUtilities {
 
         return <IPromoPayload>{
             iapPromo: true,
-            abGroup: this._configuration.getAbGroup().toNumber(),
-            gameId: this._clientInfo.getGameId() + '|' + this._configuration.getToken(),
-            trackingOptOut: this._configuration.isOptOutEnabled(),
-            gamerToken: this._configuration.getToken(),
+            abGroup: this._coreConfig.getAbGroup().toNumber(),
+            gameId: this._clientInfo.getGameId() + '|' + this._coreConfig.getToken(),
+            trackingOptOut: this._adsConfig.isOptOutEnabled(),
+            gamerToken: this._coreConfig.getToken(),
             request: IPromoRequest.SETIDS
         };
     }
@@ -221,9 +224,9 @@ export class PurchasingUtilities {
     }
 
     private static configurationIncludesPromoPlacement(): boolean {
-        if (this._configuration) {
-            const placements = this._configuration.getPlacements();
-            const placementIds = this._configuration.getPlacementIds();
+        if (this._adsConfig) {
+            const placements = this._adsConfig.getPlacements();
+            const placementIds = this._adsConfig.getPlacementIds();
             for (const placementId of placementIds) {
                 const adTypes = placements[placementId].getAdTypes();
                 if (adTypes && adTypes.indexOf('IAP') > -1) {

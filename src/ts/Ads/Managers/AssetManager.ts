@@ -2,7 +2,7 @@ import { Asset } from 'Ads/Models/Assets/Asset';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
 import { WebViewError } from 'Core/Errors/WebViewError';
-import { CacheMode } from 'Core/Models/Configuration';
+import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Cache, CacheStatus } from 'Core/Utilities/Cache';

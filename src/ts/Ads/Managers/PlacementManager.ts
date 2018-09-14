@@ -1,7 +1,7 @@
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement, PlacementState } from 'Ads/Models/Placement';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
-import { Configuration } from 'Core/Models/Configuration';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 export interface IPlacementIdMap<T> {
@@ -10,10 +10,10 @@ export interface IPlacementIdMap<T> {
 
 export class PlacementManager {
     private _nativeBridge: NativeBridge;
-    private _configuration: Configuration;
+    private _configuration: AdsConfiguration;
     private _placementCampaignMap: IPlacementIdMap<Campaign>;
 
-    constructor(nativeBridge: NativeBridge, configuration: Configuration) {
+    constructor(nativeBridge: NativeBridge, configuration: AdsConfiguration) {
         this._nativeBridge = nativeBridge;
         this._configuration = configuration;
         this._placementCampaignMap = {};

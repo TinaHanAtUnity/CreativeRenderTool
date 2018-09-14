@@ -10,11 +10,11 @@ import { UIUserInterfaceIdiom } from 'Core/Constants/iOS/UIUserInterfaceIdiom';
 import { Platform } from 'Core/Constants/Platform';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'CoreConfiguration.ts';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { IPackageInfo } from 'Core/Native/Android/AndroidDeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
+import { CoreConfigurationParser } from 'CoreConfigurationParser.ts';
 import { ICacheDiagnostics } from 'Core/Utilities/Cache';
 import { INativeResponse } from 'Core/Utilities/Request';
 import { DisplayInterstitialCampaign, IDisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
@@ -479,9 +479,9 @@ export class TestFixtures {
         return new NativeBridge(backend, platform);
     }
 
-    public static getConfiguration(): Configuration {
+    public static getConfiguration(): CoreConfiguration {
         const json = JSON.parse(ConfigurationAuctionPlc);
-        return ConfigurationParser.parse(json);
+        return CoreConfigurationParser.parse(json);
     }
 
     public static getCacheDiagnostics(): ICacheDiagnostics {

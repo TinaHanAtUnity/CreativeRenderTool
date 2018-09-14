@@ -15,7 +15,7 @@ import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'CoreConfiguration.ts';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
@@ -268,7 +268,7 @@ describe('MRAIDEventHandlersTest', () => {
         let programmaticMraidAdUnitParams: IMRAIDAdUnitParameters;
         let metaDataManager: MetaDataManager;
         let sessionManager: SessionManager;
-        let configuration: Configuration;
+        let configuration: CoreConfiguration;
         let programmaticMraidAdUnit: MRAIDAdUnit;
         let programmaticMraidEventHandler: MRAIDEventHandler;
         let privacy: AbstractPrivacy;

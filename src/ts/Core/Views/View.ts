@@ -8,7 +8,7 @@ import { IViewBinding } from 'Core/Views/IViewBinding';
 export type TemplateDataType = string | number | boolean | null | undefined;
 
 export interface ITemplateData {
-    [key: string]: string | number | boolean | null | undefined;
+    [key: string]: TemplateDataType;
 }
 
 export abstract class View<T extends object> {

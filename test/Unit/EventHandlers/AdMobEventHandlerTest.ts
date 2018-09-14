@@ -12,7 +12,7 @@ import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'CoreConfiguration.ts';
 import { IntentApi } from 'Core/Native/Android/Intent';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
@@ -53,7 +53,7 @@ describe('AdMobEventHandler', () => {
         nativeBridge.UrlScheme = sinon.createStubInstance(UrlSchemeApi);
         campaign = sinon.createStubInstance(AdMobCampaign);
         (<sinon.SinonStub>campaign.getSession).returns(TestFixtures.getSession());
-        configuration = sinon.createStubInstance(Configuration);
+        configuration = sinon.createStubInstance(CoreConfiguration);
         gdprManager = sinon.createStubInstance(GdprManager);
 
         clientInfo = sinon.createStubInstance(ClientInfo);

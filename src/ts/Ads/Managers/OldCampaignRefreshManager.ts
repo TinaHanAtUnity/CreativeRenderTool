@@ -15,7 +15,7 @@ import { JaegerSpan } from 'Core/Jaeger/JaegerSpan';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Cache } from 'Core/Utilities/Cache';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
@@ -28,7 +28,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
     private _nativeBridge: NativeBridge;
     private _wakeUpManager: WakeUpManager;
     private _campaignManager: CampaignManager;
-    private _configuration: Configuration;
+    private _configuration: AdsConfiguration;
     private _currentAdUnit: AbstractAdUnit;
     private _focusManager: FocusManager;
     private _sessionManager: SessionManager;
@@ -47,7 +47,7 @@ export class OldCampaignRefreshManager extends RefreshManager {
     // this constant is intentionally named "magic" constant because the value is only a best guess and not a real technical constant
     private _startRefreshMagicConstant: number = 5000;
 
-    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, campaignManager: CampaignManager, configuration: Configuration, focusManager: FocusManager, sessionManager: SessionManager, clientInfo: ClientInfo, request: Request, cache: Cache) {
+    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, campaignManager: CampaignManager, configuration: AdsConfiguration, focusManager: FocusManager, sessionManager: SessionManager, clientInfo: ClientInfo, request: Request, cache: Cache) {
         super();
 
         this._nativeBridge = nativeBridge;

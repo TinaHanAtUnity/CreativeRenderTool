@@ -45,7 +45,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
     private _placement: Placement;
 
     constructor(nativeBridge: NativeBridge, adUnit: T2, parameters: IAdUnitParameters<T>) {
-        super(parameters.gdprManager, parameters.configuration);
+        super(parameters.gdprManager, parameters.coreConfig, parameters.adsConfig);
         this._nativeBridge = nativeBridge;
         this._operativeEventManager = parameters.operativeEventManager;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
@@ -264,7 +264,7 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
             case StoreName.GOOGLE:
                 return 'market://details?id=' + parameters.appStoreId;
             case StoreName.XIAOMI:
-                return 'migamecenter://details?pkgname=' + parameters.appStoreId + '&channel=unityAds&from=' + packageName + '&trace=' + this._configuration.getToken();
+                return 'migamecenter://details?pkgname=' + parameters.appStoreId + '&channel=unityAds&from=' + packageName + '&trace=' + this._coreConfig.getToken();
             default:
                 return '';
         }

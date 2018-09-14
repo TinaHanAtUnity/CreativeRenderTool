@@ -19,7 +19,7 @@ import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { CacheMode, Configuration } from 'Core/Models/Configuration';
+import { CacheMode, CoreConfiguration } from 'CoreConfiguration.ts';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AndroidDeviceInfoApi, IPackageInfo } from 'Core/Native/Android/AndroidDeviceInfo';
 
@@ -282,7 +282,7 @@ describe('Event parameters should match specifications', () => {
     });
 
     describe('with ad request', () => {
-        let configuration: Configuration;
+        let configuration: CoreConfiguration;
 
         beforeEach(() => {
             configuration = TestFixtures.getConfiguration();
@@ -595,7 +595,7 @@ describe('Event parameters should match specifications', () => {
     });
 
     describe('with realtime ad request', () => {
-        let configuration: Configuration;
+        let configuration: CoreConfiguration;
         let realtimePlacement: Placement;
 
         beforeEach(() => {

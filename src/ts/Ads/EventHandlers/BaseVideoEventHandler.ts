@@ -9,10 +9,11 @@ import { Placement } from 'Ads/Models/Placement';
 import { FinishState } from 'Core/Constants/FinishState';
 import { UnityAdsError } from 'Core/Constants/UnityAdsError';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
+import { CoreConfiguration } from '../../Core/Models/CoreConfiguration';
 
 export interface IVideoEventHandlerParams<T extends VideoAdUnit = VideoAdUnit, T2 extends Campaign = Campaign, T3 extends OperativeEventManager = OperativeEventManager> {
     nativeBrige: NativeBridge;
@@ -20,7 +21,8 @@ export interface IVideoEventHandlerParams<T extends VideoAdUnit = VideoAdUnit, T
     campaign: T2;
     operativeEventManager: T3;
     thirdPartyEventManager: ThirdPartyEventManager;
-    configuration: Configuration;
+    coreConfig: CoreConfiguration;
+    adsConfig: AdsConfiguration;
     placement: Placement;
     video: Video;
     adUnitStyle?: AdUnitStyle;

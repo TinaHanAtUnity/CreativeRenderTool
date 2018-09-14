@@ -12,7 +12,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
@@ -21,6 +21,7 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { INativeResponse, Request } from 'Core/Utilities/Request';
+import { CoreConfiguration } from '../../Core/Models/CoreConfiguration';
 
 export interface IOperativeEventManagerParams<T extends Campaign> {
     nativeBridge: NativeBridge;
@@ -29,7 +30,8 @@ export interface IOperativeEventManagerParams<T extends Campaign> {
     sessionManager: SessionManager;
     clientInfo: ClientInfo;
     deviceInfo: DeviceInfo;
-    configuration: Configuration;
+    coreConfig: CoreConfiguration;
+    adsConfig: AdsConfiguration;
     campaign: T;
 }
 
@@ -76,7 +78,8 @@ export class OperativeEventManager {
     protected _nativeBridge: NativeBridge;
     private _deviceInfo: DeviceInfo;
     private _request: Request;
-    private _configuration: Configuration;
+    private _coreConfig: CoreConfiguration;
+    private _adsConfig: AdsConfiguration;
 
     constructor(params: IOperativeEventManagerParams<Campaign>) {
         this._nativeBridge = params.nativeBridge;
@@ -85,7 +88,8 @@ export class OperativeEventManager {
         this._clientInfo = params.clientInfo;
         this._deviceInfo = params.deviceInfo;
         this._request = params.request;
-        this._configuration = params.configuration;
+        this._coreConfig = params.coreConfig;
+        this._adsConfig = params.adsConfig;
         this._campaign = params.campaign;
     }
 
@@ -310,10 +314,10 @@ export class OperativeEventManager {
             'language': this._deviceInfo.getLanguage(),
             'cached': CampaignAssetInfo.isCached(this._campaign),
             'cachedOrientation': CampaignAssetInfo.getCachedVideoOrientation(this._campaign),
-            'token': this._configuration.getToken(),
-            'gdprEnabled': this._configuration.isGDPREnabled(),
-            'optOutEnabled': this._configuration.isOptOutEnabled(),
-            'optOutRecorded': this._configuration.isOptOutRecorded(),
+            'token': this._coreConfig.getToken(),
+            'gdprEnabled': this._adsConfig.isGDPREnabled(),
+            'optOutEnabled': this._adsConfig.isOptOutEnabled(),
+            'optOutRecorded': this._adsConfig.isOptOutRecorded(),
             'gameSessionCounters': GameSessionCounters.getDTO()
         };
 

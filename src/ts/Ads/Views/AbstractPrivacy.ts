@@ -2,9 +2,9 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { Platform } from 'Core/Constants/Platform';
 
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { View, ITemplateData } from 'Core/Views/View';
+import { CoreConfiguration } from '../../Core/Models/CoreConfiguration';
 
 export interface IPrivacyHandler {
     onPrivacy(url: string): void;
@@ -30,7 +30,7 @@ export interface IBuildInformation extends ITemplateData {
 
 export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
 
-    public static createBuildInformation(clientInfo: ClientInfo, campaign: Campaign, nativeBridge: NativeBridge, configuration: Configuration) {
+    public static createBuildInformation(clientInfo: ClientInfo, campaign: Campaign, nativeBridge: NativeBridge, configuration: CoreConfiguration) {
         const date = new Date();
         AbstractPrivacy.buildInformation = {
             userAgent: window.navigator.userAgent,

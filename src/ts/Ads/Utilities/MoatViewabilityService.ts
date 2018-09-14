@@ -2,11 +2,11 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { MOAT } from 'Ads/Views/MOAT';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
+import { CoreConfiguration } from '../../Core/Models/CoreConfiguration';
 
 export interface IMoatIds {
     level1: number | undefined;
@@ -29,7 +29,7 @@ export interface IMoatData {
 
 export class MoatViewabilityService {
 
-    public static initMoat(nativeBridge: NativeBridge, campaign: Campaign, clientInfo: ClientInfo, placement: Placement, deviceInfo: DeviceInfo, configuration: Configuration) {
+    public static initMoat(nativeBridge: NativeBridge, campaign: Campaign, clientInfo: ClientInfo, placement: Placement, deviceInfo: DeviceInfo, configuration: CoreConfiguration) {
         this._moat = new MOAT(nativeBridge);
         this._moat.render();
         this._moat.addMessageListener();

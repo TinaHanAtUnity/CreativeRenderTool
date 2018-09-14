@@ -2,7 +2,7 @@ import { GdprManager } from 'Ads/Managers/GdprManager';
 import { Placement } from 'Ads/Models/Placement';
 import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
 import { assert } from 'chai';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'CoreConfiguration.ts';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import MRAIDContainer from 'html/mraid/container.html';
@@ -20,7 +20,7 @@ describe('MRAID', () => {
     let handleCallback: sinon.SinonSpy;
     let nativeBridge: NativeBridge;
     let placement: Placement;
-    let configuration: Configuration;
+    let configuration: CoreConfiguration;
     let privacy: GDPRPrivacy;
     let gdprManager: GdprManager;
 

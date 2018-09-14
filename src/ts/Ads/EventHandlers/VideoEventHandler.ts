@@ -8,19 +8,21 @@ import { Placement } from 'Ads/Models/Placement';
 import { IVideoEventHandler } from 'Ads/Native/VideoPlayer';
 import { FinishState } from 'Core/Constants/FinishState';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
-import { Configuration } from 'Core/Models/Configuration';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Double } from 'Core/Utilities/Double';
 import { FileInfo } from 'Core/Utilities/FileInfo';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { VideoFileInfo } from 'Ads/Utilities/VideoFileInfo';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
+import { CoreConfiguration } from '../../Core/Models/CoreConfiguration';
 
 export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEventHandler {
 
     protected _operativeEventManager: OperativeEventManager;
     protected _thirdPartyEventManager: ThirdPartyEventManager;
-    protected _configuration: Configuration;
+    protected _coreConfig: CoreConfiguration;
+    protected _adsConfig: AdsConfiguration;
     protected _placement: Placement;
     protected _adUnitStyle: AdUnitStyle | undefined;
     protected _video: Video;
@@ -30,7 +32,8 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
 
         this._operativeEventManager = params.operativeEventManager;
         this._thirdPartyEventManager = params.thirdPartyEventManager;
-        this._configuration = params.configuration;
+        this._coreConfig = params.coreConfig;
+        this._adsConfig = params.adsConfig;
         this._placement = params.placement;
         this._adUnitStyle = params.adUnitStyle;
         this._video = params.video;
@@ -86,7 +89,7 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
                         url: this._video.getUrl(),
                         originalUrl: this._video.getOriginalUrl(),
                         cached: this._video.isCached(),
-                        cacheMode: this._configuration.getCacheMode(),
+                        cacheMode: this._coreConfig.getCacheMode(),
                         lowMemory: this._adUnit.isLowMemory()
                     };
 

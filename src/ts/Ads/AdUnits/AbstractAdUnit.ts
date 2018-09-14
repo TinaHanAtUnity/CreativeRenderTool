@@ -11,11 +11,12 @@ import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
 import { FinishState } from 'Core/Constants/FinishState';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable0 } from 'Core/Utilities/Observable';
 import { Request } from 'Core/Utilities/Request';
+import { CoreConfiguration } from '../../Core/Models/CoreConfiguration';
 
 export interface IAdUnitParameters<T extends Campaign> {
     forceOrientation: Orientation;
@@ -27,7 +28,8 @@ export interface IAdUnitParameters<T extends Campaign> {
     operativeEventManager: OperativeEventManager;
     placement: Placement;
     campaign: T;
-    configuration: Configuration;
+    coreConfig: CoreConfiguration;
+    adsConfig: AdsConfiguration;
     request: Request;
     options: any;
     gdprManager: GdprManager;

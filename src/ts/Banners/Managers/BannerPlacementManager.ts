@@ -1,7 +1,8 @@
 import { Placement, PlacementState } from 'Ads/Models/Placement';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { AdsConfiguration } from '../../Ads/Models/AdsConfiguration';
 
 interface IPlacementMap {
     [id: string]: Placement;
@@ -11,7 +12,7 @@ export class BannerPlacementManager {
     private _nativeBridge: NativeBridge;
     private _placements: IPlacementMap;
 
-    constructor(nativeBridge: NativeBridge, configuration: Configuration) {
+    constructor(nativeBridge: NativeBridge, configuration: AdsConfiguration) {
         this._nativeBridge = nativeBridge;
         this._placements = this.getPlacements(configuration);
         configuration.removePlacements(Object.keys(this._placements));
@@ -56,7 +57,7 @@ export class BannerPlacementManager {
         }
     }
 
-    private getPlacements(configuration: Configuration) {
+    private getPlacements(configuration: AdsConfiguration) {
         const placements = configuration.getPlacements();
         const banners: IPlacementMap = {};
         Object.keys(placements).forEach((placementId) => {

@@ -48,11 +48,11 @@ import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ABGroupBuilder } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { CacheMode, Configuration } from 'Core/Models/Configuration';
+import { CacheMode, CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { CallbackStatus, INativeCallback, NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
+import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
 import { Cache } from 'Core/Utilities/Cache';
 import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
@@ -70,6 +70,8 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
+import { AdsConfiguration } from './Ads/Models/AdsConfiguration';
+import { AdsConfigurationParser } from './Ads/Parsers/AdsConfigurationParser';
 
 export class WebView {
 
@@ -80,7 +82,8 @@ export class WebView {
 
     private _request: Request;
     private _resolve: Resolve;
-    private _configuration: Configuration;
+    private _coreConfig: CoreConfiguration;
+    private _adsConfig: AdsConfiguration;
 
     private _campaignManager: CampaignManager;
     private _refreshManager: RefreshManager;
@@ -203,7 +206,7 @@ export class WebView {
             const configSpan = this._jaegerManager.startSpan('FetchConfiguration', jaegerInitSpan.id, jaegerInitSpan.traceId);
             let configPromise;
             if(this._creativeUrl) {
-                configPromise = Promise.resolve(ConfigurationParser.parse(JsonParser.parse(CreativeUrlConfiguration)));
+                configPromise = Promise.resolve(JsonParser.parse(CreativeUrlConfiguration));
             } else {
                 configPromise = ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, this._metadataManager, configSpan);
             }
@@ -225,26 +228,28 @@ export class WebView {
 
             return Promise.all([configPromise, cachedCampaignResponsePromise, cachePromise]);
         }).then(([configuration, cachedCampaignResponse]) => {
-            this._gdprManager = new GdprManager(this._nativeBridge, this._deviceInfo, this._clientInfo, configuration, this._request);
-            this._configuration = configuration;
-            this._cachedCampaignResponse = cachedCampaignResponse;
-            HttpKafka.setConfiguration(this._configuration);
-            this._jaegerManager.setJaegerTracingEnabled(this._configuration.isJaegerTracingEnabled());
+            this._coreConfig = CoreConfigurationParser.parse(configuration);
+            this._adsConfig = AdsConfigurationParser.parse(configuration);
 
-            const placementManager = new PlacementManager(this._nativeBridge, this._configuration);
-            PurchasingUtilities.initialize(this._clientInfo, this._configuration, this._nativeBridge, placementManager);
+            this._gdprManager = new GdprManager(this._nativeBridge, this._deviceInfo, this._clientInfo, this._coreConfig, this._adsConfig, this._request);
+            this._cachedCampaignResponse = cachedCampaignResponse;
+            HttpKafka.setConfiguration(this._coreConfig);
+            this._jaegerManager.setJaegerTracingEnabled(this._coreConfig.isJaegerTracingEnabled());
+
+            const placementManager = new PlacementManager(this._nativeBridge, this._adsConfig);
+            PurchasingUtilities.initialize(this._clientInfo, this._coreConfig, this._adsConfig, this._nativeBridge, placementManager);
             PurchasingUtilities.sendPurchaseInitializationEvent();
             this._nativeBridge.Purchasing.onIAPSendEvent.subscribe((iapPayload) => PurchasingUtilities.handleSendIAPEvent(iapPayload));
 
-            if (!this._configuration.isEnabled()) {
+            if (!this._coreConfig.isEnabled()) {
                 const error = new Error('Game with ID ' + this._clientInfo.getGameId() +  ' is not enabled');
                 error.name = 'DisabledGame';
                 throw error;
             }
 
             let analyticsPromise;
-            if(this._configuration.isAnalyticsEnabled() || CustomFeatures.isExampleGameId(this._clientInfo.getGameId())) {
-                this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo, this._configuration, this._focusManager);
+            if(this._coreConfig.isAnalyticsEnabled() || CustomFeatures.isExampleGameId(this._clientInfo.getGameId())) {
+                this._analyticsManager = new AnalyticsManager(this._nativeBridge, this._wakeUpManager, this._request, this._clientInfo, this._deviceInfo, this._coreConfig, this._focusManager);
                 analyticsPromise = this._analyticsManager.init().then(() => {
                     this._sessionManager.setGameSessionId(this._analyticsManager.getGameSessionId());
                 });
@@ -265,22 +270,22 @@ export class WebView {
                 this._assetManager.setDiagnostics(true);
             }
 
-            const defaultPlacement = this._configuration.getDefaultPlacement();
+            const defaultPlacement = this._adsConfig.getDefaultPlacement();
             this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
 
-            this._assetManager = new AssetManager(this._cache, this._configuration.getCacheMode(), this._deviceInfo, this._cacheBookkeeping, this._programmaticTrackingService, this._nativeBridge);
-            this._campaignManager = new CampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._adMobSignalFactory, this._request, this._clientInfo, this._deviceInfo, this._metadataManager, this._cacheBookkeeping, this._jaegerManager);
-            this._refreshManager = new OldCampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._configuration, this._focusManager, this._sessionManager, this._clientInfo, this._request, this._cache);
+            this._assetManager = new AssetManager(this._cache, this._coreConfig.getCacheMode(), this._deviceInfo, this._cacheBookkeeping, this._programmaticTrackingService, this._nativeBridge);
+            this._campaignManager = new CampaignManager(this._nativeBridge, this._coreConfig, this._adsConfig, this._assetManager, this._sessionManager, this._adMobSignalFactory, this._request, this._clientInfo, this._deviceInfo, this._metadataManager, this._cacheBookkeeping, this._jaegerManager);
+            this._refreshManager = new OldCampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._adsConfig, this._focusManager, this._sessionManager, this._clientInfo, this._request, this._cache);
 
-            const bannerPlacementManager = new BannerPlacementManager(this._nativeBridge, this._configuration);
+            const bannerPlacementManager = new BannerPlacementManager(this._nativeBridge, this._adsConfig);
             bannerPlacementManager.sendBannersReady();
 
-            const bannerCampaignManager = new BannerCampaignManager(this._nativeBridge, this._configuration, this._assetManager, this._sessionManager, this._adMobSignalFactory, this._request, this._clientInfo, this._deviceInfo, this._metadataManager, this._jaegerManager);
+            const bannerCampaignManager = new BannerCampaignManager(this._nativeBridge, this._coreConfig, this._adsConfig, this._assetManager, this._sessionManager, this._adMobSignalFactory, this._request, this._clientInfo, this._deviceInfo, this._metadataManager, this._jaegerManager);
             const bannerWebPlayerContainer = new BannerWebPlayerContainer(this._nativeBridge);
-            const bannerAdUnitParametersFactory = new BannerAdUnitParametersFactory(this._nativeBridge, this._request, this._metadataManager, this._configuration, this._container, this._deviceInfo, this._clientInfo, this._sessionManager, this._focusManager, this._analyticsManager, this._adMobSignalFactory, this._gdprManager, bannerWebPlayerContainer, this._programmaticTrackingService);
+            const bannerAdUnitParametersFactory = new BannerAdUnitParametersFactory(this._nativeBridge, this._request, this._metadataManager, this._coreConfig, this._adsConfig, this._container, this._deviceInfo, this._clientInfo, this._sessionManager, this._focusManager, this._analyticsManager, this._adMobSignalFactory, this._gdprManager, bannerWebPlayerContainer, this._programmaticTrackingService);
             this._bannerAdContext = new BannerAdContext(this._nativeBridge, bannerAdUnitParametersFactory, bannerCampaignManager, bannerPlacementManager, this._focusManager, this._deviceInfo);
 
-            SdkStats.initialize(this._nativeBridge, this._request, this._configuration, this._sessionManager, this._campaignManager, this._metadataManager, this._clientInfo, this._cache);
+            SdkStats.initialize(this._nativeBridge, this._request, this._coreConfig, this._adsConfig, this._sessionManager, this._campaignManager, this._metadataManager, this._clientInfo, this._cache);
 
             const refreshSpan = this._jaegerManager.startSpan('Refresh', jaegerInitSpan.id, jaegerInitSpan.traceId);
             refreshSpan.addTag(JaegerTags.DeviceType, Platform[this._nativeBridge.getPlatform()]);
@@ -344,7 +349,7 @@ export class WebView {
             return;
         }
 
-        const placement: Placement = this._configuration.getPlacement(placementId);
+        const placement: Placement = this._adsConfig.getPlacement(placementId);
         if(!placement) {
             this.showError(true, placementId, 'No such placement: ' + placementId);
             return;
@@ -426,12 +431,12 @@ export class WebView {
     }
 
     private showAd(placement: Placement, campaign: Campaign, options: any) {
-        const testGroup = this._configuration.getAbGroup();
+        const testGroup = this._coreConfig.getAbGroup();
         const start = Date.now();
 
         this._showing = true;
 
-        if(this._configuration.getCacheMode() !== CacheMode.DISABLED) {
+        if(this._coreConfig.getCacheMode() !== CacheMode.DISABLED) {
             this._assetManager.stopCaching();
         }
 
@@ -469,12 +474,14 @@ export class WebView {
                     sessionManager: this._sessionManager,
                     clientInfo: this._clientInfo,
                     deviceInfo: this._deviceInfo,
-                    configuration: this._configuration,
+                    coreConfig: this._coreConfig,
+                    adsConfig: this._adsConfig,
                     campaign: campaign
                 }),
                 placement: placement,
                 campaign: campaign,
-                configuration: this._configuration,
+                coreConfig: this._coreConfig,
+                adsConfig: this._adsConfig,
                 request: this._request,
                 options: options,
                 gdprManager: this._gdprManager,

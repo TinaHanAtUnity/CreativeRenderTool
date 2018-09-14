@@ -12,7 +12,7 @@ import { Overlay } from 'Ads/Views/Overlay';
 import { Platform } from 'Core/Constants/Platform';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'CoreConfiguration.ts';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IntentApi } from 'Core/Native/Android/Intent';
 
@@ -45,7 +45,7 @@ describe('PrivacyEventHandlerTest', () => {
             operativeEventManager: sinon.createStubInstance(OperativeEventManager),
             placement: sinon.createStubInstance(Placement),
             campaign: sinon.createStubInstance(PerformanceCampaign),
-            configuration: sinon.createStubInstance(Configuration),
+            configuration: sinon.createStubInstance(CoreConfiguration),
             request: sinon.createStubInstance(Request),
             options: {},
             endScreen: sinon.createStubInstance(PerformanceEndScreen),
