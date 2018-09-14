@@ -25,6 +25,7 @@ import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/Perfor
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import Test = Mocha.Test;
 
 describe('PerformanceOverlayEventHandlerTest', () => {
 
@@ -50,7 +51,8 @@ describe('PerformanceOverlayEventHandlerTest', () => {
 
         const metaDataManager = new MetaDataManager(nativeBridge);
         const campaign = TestFixtures.getCampaign();
-        const configuration = TestFixtures.getConfiguration();
+        const coreConfig = TestFixtures.getCoreConfiguration();
+        const adsConfig = TestFixtures.getAdsConfiguration();
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
         const focusManager = new FocusManager(nativeBridge);
@@ -67,18 +69,19 @@ describe('PerformanceOverlayEventHandlerTest', () => {
             sessionManager: sessionManager,
             clientInfo: clientInfo,
             deviceInfo: deviceInfo,
-            configuration: configuration,
+            coreConfig: coreConfig,
+            adsConfig: adsConfig,
             campaign: campaign
         });
 
-        const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+        const privacy = new Privacy(nativeBridge, coreConfig.isCoppaCompliant());
         const endScreenParams : IEndScreenParameters = {
             nativeBridge: nativeBridge,
             language : deviceInfo.getLanguage(),
             gameId: clientInfo.getGameId(),
             privacy: privacy,
             showGDPRBanner: true,
-            abGroup: configuration.getAbGroup(),
+            abGroup: coreConfig.getAbGroup(),
             targetGameName: campaign.getGameName()
         };
         endScreen = new PerformanceEndScreen(endScreenParams, campaign);
@@ -96,7 +99,8 @@ describe('PerformanceOverlayEventHandlerTest', () => {
             operativeEventManager: operativeEventManager,
             placement: TestFixtures.getPlacement(),
             campaign: campaign,
-            configuration: configuration,
+            coreConfig: coreConfig,
+            adsConfig: adsConfig,
             request: request,
             options: {},
             endScreen: endScreen,

@@ -4,28 +4,32 @@ import { PlacementState } from 'Ads/Models/Placement';
 import { ListenerApi } from 'Ads/Native/Listener';
 import { PlacementApi } from 'Ads/Native/Placement';
 import { assert, expect } from 'chai';
-import { CoreConfiguration } from 'CoreConfiguration.ts';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { CoreConfigurationParser } from 'CoreConfigurationParser.ts';
+import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
 import 'mocha';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { AdsConfiguration } from '../../../src/ts/Ads/Models/AdsConfiguration';
+import { AdsConfigurationParser } from '../../../src/ts/Ads/Parsers/AdsConfigurationParser';
 
 describe('PlacementManagerTest', () => {
     let nativeBridge: NativeBridge;
-    let configuration: CoreConfiguration;
+    let coreConfig: CoreConfiguration;
+    let adsConfig: AdsConfiguration;
 
     beforeEach(() => {
         nativeBridge = TestFixtures.getNativeBridge();
-        configuration = TestFixtures.getConfiguration();
+        coreConfig = TestFixtures.getCoreConfiguration();
+        adsConfig = TestFixtures.getAdsConfiguration();
     });
 
     describe('addCampaignPlacementIds', () => {
-        const placementManager = new PlacementManager(nativeBridge, configuration);
+        const placementManager = new PlacementManager(nativeBridge, adsConfig);
         const campaign: PromoCampaign = TestFixtures.getPromoCampaign();
         sinon.stub(campaign, 'getAdType').returns('purchasing/iap');
 
@@ -36,7 +40,7 @@ describe('PlacementManagerTest', () => {
     });
 
     describe('getPlacementCampaignMap', () => {
-        const placementManager = new PlacementManager(nativeBridge, configuration);
+        const placementManager = new PlacementManager(nativeBridge, adsConfig);
 
         const campaign1 = TestFixtures.getPromoCampaign();
         const campaign2 = TestFixtures.getXPromoCampaign();
@@ -58,7 +62,7 @@ describe('PlacementManagerTest', () => {
     });
 
     describe('clear', () => {
-        const placementManager = new PlacementManager(nativeBridge, configuration);
+        const placementManager = new PlacementManager(nativeBridge, adsConfig);
         const campaign: PromoCampaign = TestFixtures.getPromoCampaign();
         sinon.stub(campaign, 'getAdType').returns('purchasing/iap');
 
@@ -86,26 +90,29 @@ describe('PlacementManagerTest', () => {
         });
 
         it('should set placement state of the passed placementId', () => {
-            configuration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            placementManager = new PlacementManager(nativeBridge, configuration);
-            assert.equal(configuration.getPlacement('promoPlacement').getState(), PlacementState.NOT_AVAILABLE);
+            coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            placementManager = new PlacementManager(nativeBridge, adsConfig);
+            assert.equal(adsConfig.getPlacement('promoPlacement').getState(), PlacementState.NOT_AVAILABLE);
             placementManager.setPlacementReady('promoPlacement', campaign);
-            assert.equal(configuration.getPlacement('promoPlacement').getState(), PlacementState.READY);
+            assert.equal(adsConfig.getPlacement('promoPlacement').getState(), PlacementState.READY);
         });
 
         it('should set the campaign of the placement to passed campaign', () => {
-            configuration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            placementManager = new PlacementManager(nativeBridge, configuration);
-            assert.equal(configuration.getPlacement('promoPlacement').getCurrentCampaign(), undefined);
+            coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            placementManager = new PlacementManager(nativeBridge, adsConfig);
+            assert.equal(adsConfig.getPlacement('promoPlacement').getCurrentCampaign(), undefined);
             placementManager.setPlacementReady('promoPlacement', campaign);
-            assert.equal(configuration.getPlacement('promoPlacement').getCurrentCampaign(), campaign);
+            assert.equal(adsConfig.getPlacement('promoPlacement').getCurrentCampaign(), campaign);
         });
 
         it('should not change placement state to ready if placement doesnt exist in config', () => {
-            configuration = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            placementManager = new PlacementManager(nativeBridge, configuration);
+            coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            placementManager = new PlacementManager(nativeBridge, adsConfig);
 
-            sandbox.stub(configuration, 'getPlacement').returns(undefined);
+            sandbox.stub(adsConfig, 'getPlacement').returns(undefined);
             sandbox.stub(placementManager, 'setPlacementState');
 
             placementManager.setPlacementReady('promoPlacement', campaign);
@@ -114,7 +121,7 @@ describe('PlacementManagerTest', () => {
     });
 
     it('should get and set campaign for known placement', () => {
-        const placementManager = new PlacementManager(nativeBridge, configuration);
+        const placementManager = new PlacementManager(nativeBridge, adsConfig);
         const testCampaign = TestFixtures.getCampaign();
 
         assert.isUndefined(placementManager.getCampaign('video'), 'uninitialized video campaign was not undefined');
@@ -125,7 +132,7 @@ describe('PlacementManagerTest', () => {
     });
 
     it('should not get or set campaign for unknown placement', () => {
-        const placementManager = new PlacementManager(nativeBridge, configuration);
+        const placementManager = new PlacementManager(nativeBridge, adsConfig);
         const testCampaign = TestFixtures.getCampaign();
 
         assert.isUndefined(placementManager.getCampaign('unknown'), 'unknown placement did not return undefined campaign');
@@ -136,7 +143,7 @@ describe('PlacementManagerTest', () => {
     });
 
     it('should clear campaigns', () => {
-        const placementManager = new PlacementManager(nativeBridge, configuration);
+        const placementManager = new PlacementManager(nativeBridge, adsConfig);
         const testCampaign = TestFixtures.getCampaign();
 
         placementManager.setCampaign('premium', testCampaign);
@@ -157,7 +164,7 @@ describe('PlacementManagerTest', () => {
         const placementSpy = sinon.spy(nativeBridge.Placement, 'setPlacementState');
         const listenerSpy = sinon.spy(nativeBridge.Listener, 'sendPlacementStateChangedEvent');
 
-        const placementManager = new PlacementManager(nativeBridge, configuration);
+        const placementManager = new PlacementManager(nativeBridge, adsConfig);
 
         placementManager.setPlacementState('video', PlacementState.WAITING);
 
@@ -169,7 +176,7 @@ describe('PlacementManagerTest', () => {
         nativeBridge.Placement = new PlacementApi(nativeBridge);
         nativeBridge.Listener = new ListenerApi(nativeBridge);
 
-        const placementManager = new PlacementManager(nativeBridge, configuration);
+        const placementManager = new PlacementManager(nativeBridge, adsConfig);
 
         placementManager.setPlacementState('video', PlacementState.WAITING);
 
@@ -186,7 +193,7 @@ describe('PlacementManagerTest', () => {
         nativeBridge.Placement = new PlacementApi(nativeBridge);
         nativeBridge.Listener = new ListenerApi(nativeBridge);
 
-        const placementManager = new PlacementManager(nativeBridge, configuration);
+        const placementManager = new PlacementManager(nativeBridge, adsConfig);
 
         placementManager.setPlacementState('video', PlacementState.WAITING);
 
@@ -200,14 +207,14 @@ describe('PlacementManagerTest', () => {
     });
 
     it('should set all placements to no fill state', () => {
-        const placementManager = new PlacementManager(nativeBridge, configuration);
+        const placementManager = new PlacementManager(nativeBridge, adsConfig);
 
         placementManager.setPlacementState('premium', PlacementState.WAITING);
         placementManager.setPlacementState('video', PlacementState.WAITING);
 
         placementManager.setAllPlacementStates(PlacementState.NO_FILL);
 
-        assert.equal(configuration.getPlacement('premium').getState(), PlacementState.NO_FILL, 'premium placement was not set to no fill');
-        assert.equal(configuration.getPlacement('video').getState(), PlacementState.NO_FILL, 'video placement was not set to no fill');
+        assert.equal(adsConfig.getPlacement('premium').getState(), PlacementState.NO_FILL, 'premium placement was not set to no fill');
+        assert.equal(adsConfig.getPlacement('video').getState(), PlacementState.NO_FILL, 'video placement was not set to no fill');
     });
 });

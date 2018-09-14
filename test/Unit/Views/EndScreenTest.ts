@@ -1,7 +1,7 @@
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
 import { Privacy } from 'Ads/Views/Privacy';
 import { assert } from 'chai';
-import { CoreConfiguration } from 'CoreConfiguration.ts';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Localization } from 'Core/Utilities/Localization';
@@ -28,7 +28,7 @@ describe('EndScreen', () => {
         Localization.setLanguageMap('fi.*', 'endscreen', {
             'Download For Free': 'Lataa ilmaiseksi'
         });
-        configuration = TestFixtures.getConfiguration();
+        configuration = TestFixtures.getCoreConfiguration();
     });
 
     const createEndScreen = (language : string) : PerformanceEndScreen => {

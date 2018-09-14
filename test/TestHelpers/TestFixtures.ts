@@ -10,12 +10,11 @@ import { UIUserInterfaceIdiom } from 'Core/Constants/iOS/UIUserInterfaceIdiom';
 import { Platform } from 'Core/Constants/Platform';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { CoreConfiguration } from 'CoreConfiguration.ts';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
 import { IPackageInfo } from 'Core/Native/Android/AndroidDeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { CoreConfigurationParser } from 'CoreConfigurationParser.ts';
-import { ICacheDiagnostics } from 'Core/Utilities/Cache';
+import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
 import { INativeResponse } from 'Core/Utilities/Request';
 import { DisplayInterstitialCampaign, IDisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
@@ -44,6 +43,9 @@ import EventTestVast from 'xml/EventTestVast.xml';
 import VastCompanionXml from 'xml/VastCompanionAd.xml';
 import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xml';
 import { IXPromoCampaign, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { AdsConfiguration } from '../../src/ts/Ads/Models/AdsConfiguration';
+import { AdsConfigurationParser } from '../../src/ts/Ads/Parsers/AdsConfigurationParser';
+import { ICacheDiagnostics } from '../../src/ts/Ads/Utilities/CacheDiagnostics';
 import { PerformanceMRAIDCampaign } from '../../src/ts/Performance/Models/PerformanceMRAIDCampaign';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
@@ -479,9 +481,14 @@ export class TestFixtures {
         return new NativeBridge(backend, platform);
     }
 
-    public static getConfiguration(): CoreConfiguration {
+    public static getCoreConfiguration(): CoreConfiguration {
         const json = JSON.parse(ConfigurationAuctionPlc);
         return CoreConfigurationParser.parse(json);
+    }
+
+    public static getAdsConfiguration(): AdsConfiguration {
+        const json = JSON.parse(ConfigurationAuctionPlc);
+        return AdsConfigurationParser.parse(json);
     }
 
     public static getCacheDiagnostics(): ICacheDiagnostics {

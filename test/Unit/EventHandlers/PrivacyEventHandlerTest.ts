@@ -12,7 +12,7 @@ import { Overlay } from 'Ads/Views/Overlay';
 import { Platform } from 'Core/Constants/Platform';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { CoreConfiguration } from 'CoreConfiguration.ts';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IntentApi } from 'Core/Native/Android/Intent';
 
@@ -25,6 +25,7 @@ import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdU
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
+import { AdsConfiguration } from '../../../src/ts/Ads/Models/AdsConfiguration';
 
 describe('PrivacyEventHandlerTest', () => {
 
@@ -45,7 +46,8 @@ describe('PrivacyEventHandlerTest', () => {
             operativeEventManager: sinon.createStubInstance(OperativeEventManager),
             placement: sinon.createStubInstance(Placement),
             campaign: sinon.createStubInstance(PerformanceCampaign),
-            configuration: sinon.createStubInstance(CoreConfiguration),
+            coreConfig: sinon.createStubInstance(CoreConfiguration),
+            adsConfig: sinon.createStubInstance(AdsConfiguration),
             request: sinon.createStubInstance(Request),
             options: {},
             endScreen: sinon.createStubInstance(PerformanceEndScreen),
@@ -92,7 +94,7 @@ describe('PrivacyEventHandlerTest', () => {
     describe('on onGDPROptOut', () => {
 
         it('should send operative event with action `optout`', () => {
-            (<sinon.SinonStub>adUnitParameters.configuration.isOptOutEnabled).returns(false);
+            (<sinon.SinonStub>adUnitParameters.adsConfig.isOptOutEnabled).returns(false);
 
             privacyEventHandler.onGDPROptOut(true);
 
@@ -100,8 +102,8 @@ describe('PrivacyEventHandlerTest', () => {
         });
 
         it('should send operative event with action `optin`', () => {
-            (<sinon.SinonStub>adUnitParameters.configuration.isOptOutEnabled).returns(true);
-            (<sinon.SinonStub>adUnitParameters.configuration.isOptOutRecorded).returns(true);
+            (<sinon.SinonStub>adUnitParameters.adsConfig.isOptOutEnabled).returns(true);
+            (<sinon.SinonStub>adUnitParameters.adsConfig.isOptOutRecorded).returns(true);
 
             privacyEventHandler.onGDPROptOut(false);
 
@@ -109,8 +111,8 @@ describe('PrivacyEventHandlerTest', () => {
         });
 
         it('should send operative event with action `skip`', () => {
-            (<sinon.SinonStub>adUnitParameters.configuration.isOptOutEnabled).returns(true);
-            (<sinon.SinonStub>adUnitParameters.configuration.isOptOutRecorded).returns(false);
+            (<sinon.SinonStub>adUnitParameters.adsConfig.isOptOutEnabled).returns(true);
+            (<sinon.SinonStub>adUnitParameters.adsConfig.isOptOutRecorded).returns(false);
 
             privacyEventHandler.onGDPROptOut(false);
 

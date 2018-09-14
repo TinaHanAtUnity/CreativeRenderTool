@@ -19,7 +19,7 @@ import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { CoreConfiguration } from 'CoreConfiguration.ts';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { INativeResponse, Request } from 'Core/Utilities/Request';
@@ -30,6 +30,7 @@ import { PerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCa
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { AdsConfiguration } from '../../../src/ts/Ads/Models/AdsConfiguration';
 
 describe('EndScreenEventHandlerTest', () => {
 
@@ -48,7 +49,8 @@ describe('EndScreenEventHandlerTest', () => {
     let endScreenEventHandler: PerformanceEndScreenEventHandler;
     let campaign: PerformanceCampaign;
     let placement: Placement;
-    let configuration: CoreConfiguration;
+    let coreConfig: CoreConfiguration;
+    let adsConfig: AdsConfiguration;
 
     describe('with onDownloadAndroid', () => {
         let resolvedPromise: Promise<INativeResponse>;
@@ -69,7 +71,8 @@ describe('EndScreenEventHandlerTest', () => {
             deviceInfo = TestFixtures.getAndroidDeviceInfo();
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
             sessionManager = new SessionManager(nativeBridge, request);
-            configuration = TestFixtures.getConfiguration();
+            coreConfig = TestFixtures.getCoreConfiguration();
+            adsConfig = TestFixtures.getAdsConfiguration();
             operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
                 nativeBridge: nativeBridge,
                 request: request,
@@ -77,7 +80,8 @@ describe('EndScreenEventHandlerTest', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
-                configuration: configuration,
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
                 campaign: campaign
             });
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
@@ -87,7 +91,7 @@ describe('EndScreenEventHandlerTest', () => {
 
             const video = new Video('', TestFixtures.getSession());
 
-            const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+            const privacy = new Privacy(nativeBridge, coreConfig.isCoppaCompliant());
 
             const endScreenParams : IEndScreenParameters = {
                 nativeBridge: nativeBridge,
@@ -95,7 +99,7 @@ describe('EndScreenEventHandlerTest', () => {
                 gameId: clientInfo.getGameId(),
                 privacy: privacy,
                 showGDPRBanner: false,
-                abGroup: configuration.getAbGroup(),
+                abGroup: coreConfig.getAbGroup(),
                 targetGameName: TestFixtures.getCampaign().getGameName()
             };
             endScreen = new PerformanceEndScreen(endScreenParams, TestFixtures.getCampaign());
@@ -114,7 +118,8 @@ describe('EndScreenEventHandlerTest', () => {
                 operativeEventManager: operativeEventManager,
                 placement: placement,
                 campaign: campaign,
-                configuration: configuration,
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
                 request: request,
                 options: {},
                 endScreen: endScreen,
@@ -321,20 +326,21 @@ describe('EndScreenEventHandlerTest', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
-                configuration: configuration,
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
                 campaign: campaign
             });
 
             sinon.stub(operativeEventManager, 'sendClick').returns(resolvedPromise);
 
-            const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+            const privacy = new Privacy(nativeBridge, coreConfig.isCoppaCompliant());
             const endScreenParams : IEndScreenParameters = {
                 nativeBridge: nativeBridge,
                 language : deviceInfo.getLanguage(),
                 gameId: clientInfo.getGameId(),
                 privacy: privacy,
                 showGDPRBanner: false,
-                abGroup: configuration.getAbGroup(),
+                abGroup: coreConfig.getAbGroup(),
                 targetGameName: campaign.getGameName()
             };
             endScreen = new PerformanceEndScreen(endScreenParams, campaign);
@@ -352,7 +358,8 @@ describe('EndScreenEventHandlerTest', () => {
                 operativeEventManager: operativeEventManager,
                 placement: TestFixtures.getPlacement(),
                 campaign: campaign,
-                configuration: configuration,
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
                 request: request,
                 options: {},
                 endScreen: endScreen,

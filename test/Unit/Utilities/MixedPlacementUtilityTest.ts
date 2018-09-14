@@ -3,18 +3,20 @@ import { MixedPlacementUtility } from 'Ads/Utilities/MixedPlacementUtility';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { CoreConfiguration } from 'CoreConfiguration.ts';
-import { CoreConfigurationParser } from 'CoreConfigurationParser.ts';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
+import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
 import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
 import MixedPlacementAuctionResponse from 'json/MixedPlacementAuctionResponse.json';
 import 'mocha';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { AdsConfiguration } from '../../../src/ts/Ads/Models/AdsConfiguration';
+import { AdsConfigurationParser } from '../../../src/ts/Ads/Parsers/AdsConfigurationParser';
 
 describe('MixedPlacementUtilities', () => {
 
-    let configuration: CoreConfiguration;
+    let configuration: AdsConfiguration;
     let promoSkippableCampaign: PromoCampaign;
     let promoNonSkippableCampaign: PromoCampaign;
     let interstitialCampaign: DisplayInterstitialCampaign;
@@ -25,7 +27,7 @@ describe('MixedPlacementUtilities', () => {
     beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID, '1543512');
         configurationPromoPlacementsJson = JSON.parse(ConfigurationPromoPlacements);
-        configuration = CoreConfigurationParser.parse(configurationPromoPlacementsJson, clientInfo);
+        configuration = AdsConfigurationParser.parse(configurationPromoPlacementsJson, clientInfo);
         interstitialCampaign = TestFixtures.getDisplayInterstitialCampaign();
         promoSkippableCampaign = TestFixtures.getPromoCampaign('purchasing/iap', true);
         promoNonSkippableCampaign = TestFixtures.getPromoCampaign('purchasing/iap', false);

@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { CoreConfiguration } from 'CoreConfiguration.ts';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { SdkApi } from 'Core/Native/Sdk';
@@ -14,6 +14,7 @@ import { Observable2 } from 'Core/Utilities/Observable';
 import { Request } from 'Core/Utilities/Request';
 import 'mocha';
 import * as sinon from 'sinon';
+import { AdsConfiguration } from '../../../src/ts/Ads/Models/AdsConfiguration';
 
 describe('GdprManagerTest', () => {
     const testGameId = '12345';
@@ -22,7 +23,8 @@ describe('GdprManagerTest', () => {
     let nativeBridge: NativeBridge;
     let deviceInfo: DeviceInfo;
     let clientInfo: ClientInfo;
-    let configuration: CoreConfiguration;
+    let coreConfig: CoreConfiguration;
+    let adsConfig: AdsConfiguration;
     let gdprManager: GdprManager;
     let request: Request;
 
@@ -49,7 +51,8 @@ describe('GdprManagerTest', () => {
 
         clientInfo = sinon.createStubInstance(ClientInfo);
         deviceInfo = sinon.createStubInstance(AndroidDeviceInfo);
-        configuration = sinon.createStubInstance(CoreConfiguration);
+        coreConfig = sinon.createStubInstance(CoreConfiguration);
+        adsConfig = sinon.createStubInstance(AdsConfiguration);
         request = sinon.createStubInstance(Request);
 
         onSetStub = sinon.stub(nativeBridge.Storage.onSet, 'subscribe');
@@ -60,8 +63,8 @@ describe('GdprManagerTest', () => {
         (<sinon.SinonStub>clientInfo.getPlatform).returns(Platform.TEST);
         (<sinon.SinonStub>clientInfo.getGameId).returns(testGameId);
         (<sinon.SinonStub>deviceInfo.getAdvertisingIdentifier).returns(testAdvertisingId);
-        (<sinon.SinonStub>configuration.getUnityProjectId).returns(testUnityProjectId);
-        (<sinon.SinonStub>configuration.isGDPREnabled).callsFake(() => {
+        (<sinon.SinonStub>coreConfig.getUnityProjectId).returns(testUnityProjectId);
+        (<sinon.SinonStub>adsConfig.isGDPREnabled).callsFake(() => {
             return isGDPREnabled;
         });
 
@@ -76,7 +79,7 @@ describe('GdprManagerTest', () => {
         onSetStub.callsFake((fun) => {
             storageTrigger = fun;
         });
-        gdprManager = new GdprManager(nativeBridge, deviceInfo, clientInfo, configuration, request);
+        gdprManager = new GdprManager(nativeBridge, deviceInfo, clientInfo, coreConfig, adsConfig, request);
         sendGDPREventStub = sinon.spy(gdprManager, 'sendGDPREvent');
     });
 
@@ -136,8 +139,8 @@ describe('GdprManagerTest', () => {
                         }
                         sinon.assert.calledWith(setStub, StorageType.PRIVATE, 'gdpr.consentlastsent', t.storedConsent);
                         sinon.assert.calledWith(writeStub, StorageType.PRIVATE);
-                        sinon.assert.calledWith(<sinon.SinonStub>configuration.setOptOutEnabled, t.optOutEnabled);
-                        sinon.assert.calledWith(<sinon.SinonStub>configuration.setOptOutRecorded, t.optOutRecorded);
+                        sinon.assert.calledWith(<sinon.SinonStub>adsConfig.setOptOutEnabled, t.optOutEnabled);
+                        sinon.assert.calledWith(<sinon.SinonStub>adsConfig.setOptOutRecorded, t.optOutRecorded);
                     });
                 });
             });
@@ -154,8 +157,8 @@ describe('GdprManagerTest', () => {
                 sinon.assert.notCalled(sendGDPREventStub);
                 sinon.assert.notCalled(setStub);
                 sinon.assert.notCalled(writeStub);
-                sinon.assert.notCalled(<sinon.SinonStub>configuration.setOptOutEnabled);
-                sinon.assert.notCalled(<sinon.SinonStub>configuration.setOptOutRecorded);
+                sinon.assert.notCalled(<sinon.SinonStub>adsConfig.setOptOutEnabled);
+                sinon.assert.notCalled(<sinon.SinonStub>adsConfig.setOptOutRecorded);
             });
         });
 
@@ -167,9 +170,9 @@ describe('GdprManagerTest', () => {
                 sinon.assert.notCalled(sendGDPREventStub);
                 sinon.assert.notCalled(setStub);
                 sinon.assert.notCalled(writeStub);
-                sinon.assert.notCalled(<sinon.SinonStub>configuration.setGDPREnabled);
-                sinon.assert.notCalled(<sinon.SinonStub>configuration.setOptOutEnabled);
-                sinon.assert.notCalled(<sinon.SinonStub>configuration.setOptOutRecorded);
+                sinon.assert.notCalled(<sinon.SinonStub>adsConfig.setGDPREnabled);
+                sinon.assert.notCalled(<sinon.SinonStub>adsConfig.setOptOutEnabled);
+                sinon.assert.notCalled(<sinon.SinonStub>adsConfig.setOptOutRecorded);
             });
         });
 
@@ -183,8 +186,8 @@ describe('GdprManagerTest', () => {
                         sinon.assert.calledWith(getStub, StorageType.PRIVATE, 'gdpr.consentlastsent');
                         return (<Promise<void>>getStub.firstCall.returnValue).then(() => {
                             sinon.assert.notCalled(sendGDPREventStub);
-                            sinon.assert.calledWith(<sinon.SinonStub>configuration.setOptOutEnabled, !b);
-                            sinon.assert.calledWith(<sinon.SinonStub>configuration.setOptOutRecorded, true);
+                            sinon.assert.calledWith(<sinon.SinonStub>adsConfig.setOptOutEnabled, !b);
+                            sinon.assert.calledWith(<sinon.SinonStub>adsConfig.setOptOutRecorded, true);
                         });
                     });
                 });
@@ -199,9 +202,9 @@ describe('GdprManagerTest', () => {
                 return gdprManager.getConsentAndUpdateConfiguration().then(() => {
                     assert.fail('should throw');
                 }).catch(() => {
-                    sinon.assert.notCalled(<sinon.SinonStub>configuration.setGDPREnabled);
-                    sinon.assert.notCalled(<sinon.SinonStub>configuration.setOptOutEnabled);
-                    sinon.assert.notCalled(<sinon.SinonStub>configuration.setOptOutRecorded);
+                    sinon.assert.notCalled(<sinon.SinonStub>adsConfig.setGDPREnabled);
+                    sinon.assert.notCalled(<sinon.SinonStub>adsConfig.setOptOutEnabled);
+                    sinon.assert.notCalled(<sinon.SinonStub>adsConfig.setOptOutRecorded);
                 });
             });
         });
@@ -262,8 +265,8 @@ describe('GdprManagerTest', () => {
                             }
                             sinon.assert.calledWith(setStub, StorageType.PRIVATE, 'gdpr.consentlastsent', t.storedConsent);
                             sinon.assert.calledWith(writeStub, StorageType.PRIVATE);
-                            sinon.assert.calledWith(<sinon.SinonStub>configuration.setOptOutEnabled, t.optOutEnabled);
-                            sinon.assert.calledWith(<sinon.SinonStub>configuration.setOptOutRecorded, t.optOutRecorded);
+                            sinon.assert.calledWith(<sinon.SinonStub>adsConfig.setOptOutEnabled, t.optOutEnabled);
+                            sinon.assert.calledWith(<sinon.SinonStub>adsConfig.setOptOutRecorded, t.optOutRecorded);
                         });
                     });
                 });
@@ -285,8 +288,8 @@ describe('GdprManagerTest', () => {
                         sinon.assert.notCalled(sendGDPREventStub);
                         sinon.assert.notCalled(setStub);
                         sinon.assert.notCalled(writeStub);
-                        sinon.assert.notCalled(<sinon.SinonStub>configuration.setOptOutEnabled);
-                        sinon.assert.notCalled(<sinon.SinonStub>configuration.setOptOutRecorded);
+                        sinon.assert.notCalled(<sinon.SinonStub>adsConfig.setOptOutEnabled);
+                        sinon.assert.notCalled(<sinon.SinonStub>adsConfig.setOptOutRecorded);
                     });
                 });
             });
@@ -309,8 +312,8 @@ describe('GdprManagerTest', () => {
                         sinon.assert.notCalled(sendGDPREventStub);
                         sinon.assert.notCalled(setStub);
                         sinon.assert.notCalled(writeStub);
-                        sinon.assert.notCalled(<sinon.SinonStub>configuration.setOptOutEnabled);
-                        sinon.assert.notCalled(<sinon.SinonStub>configuration.setOptOutRecorded);
+                        sinon.assert.notCalled(<sinon.SinonStub>adsConfig.setOptOutEnabled);
+                        sinon.assert.notCalled(<sinon.SinonStub>adsConfig.setOptOutRecorded);
                     });
                 });
             });
@@ -370,8 +373,8 @@ describe('GdprManagerTest', () => {
             (<sinon.SinonStub>deviceInfo.getAdvertisingIdentifier).returns(adId);
             (<sinon.SinonStub>deviceInfo.getStores).returns(stores);
             (<sinon.SinonStub>deviceInfo.getModel).returns(model);
-            (<sinon.SinonStub>configuration.getUnityProjectId).returns(projectId);
-            (<sinon.SinonStub>configuration.getCountry).returns(countryCode);
+            (<sinon.SinonStub>coreConfig.getUnityProjectId).returns(projectId);
+            (<sinon.SinonStub>coreConfig.getCountry).returns(countryCode);
         });
 
         afterEach(() => {

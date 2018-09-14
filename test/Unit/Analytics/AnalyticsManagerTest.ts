@@ -4,7 +4,7 @@ import { assert } from 'chai';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { CoreConfiguration } from 'CoreConfiguration.ts';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
@@ -80,7 +80,7 @@ describe('AnalyticsManagerTest', () => {
         request = new Request(nativeBridge, wakeUpManager);
         clientInfo = TestFixtures.getClientInfo();
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
-        configuration = TestFixtures.getConfiguration();
+        configuration = TestFixtures.getCoreConfiguration();
 
         sinon.stub(nativeBridge.DeviceInfo, 'getUniqueEventId').returns(Promise.resolve('6c7fa2c0-4333-47be-8de2-2f24e33e710c'));
         storage = new FakeStorageApi(nativeBridge);

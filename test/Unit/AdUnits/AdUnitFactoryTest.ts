@@ -20,11 +20,11 @@ import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { CoreConfiguration } from 'CoreConfiguration.ts';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
-import { CoreConfigurationParser } from 'CoreConfigurationParser.ts';
+import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { Observable1, Observable2 } from 'Core/Utilities/Observable';
 import { Request } from 'Core/Utilities/Request';
@@ -47,6 +47,8 @@ import { asStub } from 'TestHelpers/Functions';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { AdsConfiguration } from '../../../src/ts/Ads/Models/AdsConfiguration';
+import { AdsConfigurationParser } from '../../../src/ts/Ads/Parsers/AdsConfigurationParser';
 
 describe('AdUnitFactoryTest', () => {
 
@@ -58,7 +60,8 @@ describe('AdUnitFactoryTest', () => {
     let clientInfo: ClientInfo;
     let sessionManager: SessionManager;
     let operativeEventManager: OperativeEventManager;
-    let config: CoreConfiguration;
+    let coreConfig: CoreConfiguration;
+    let adsConfig: AdsConfiguration;
     let metaDataManager: MetaDataManager;
     let thirdPartyEventManager: ThirdPartyEventManager;
     let request: Request;
@@ -80,7 +83,8 @@ describe('AdUnitFactoryTest', () => {
         sandbox.stub(container, 'open').returns(Promise.resolve());
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         const placement = TestFixtures.getPlacement();
-        config = CoreConfigurationParser.parse(JSON.parse(ConfigurationJson));
+        coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationJson));
+        adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationJson));
         deviceInfo = <DeviceInfo>{getLanguage: () => 'en', getAdvertisingIdentifier: () => '000', getLimitAdTracking: () => false, getOsVersion: () => '8.0'};
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         thirdPartyEventManager.setTemplateValues({ '%ZONE%': placement.getId(), '%SDK_VERSION%': clientInfo.getSdkVersion().toString() });
@@ -96,7 +100,8 @@ describe('AdUnitFactoryTest', () => {
             sessionManager: sessionManager,
             clientInfo: clientInfo,
             deviceInfo: deviceInfo,
-            configuration: config,
+            coreConfig: coreConfig,
+            adsConfig: adsConfig,
             campaign: campaign
         });
 
@@ -118,7 +123,8 @@ describe('AdUnitFactoryTest', () => {
             operativeEventManager: operativeEventManager,
             placement: placement,
             campaign: campaign,
-            configuration: config,
+            coreConfig: coreConfig,
+            adsConfig: adsConfig,
             request: request,
             options: {},
             gdprManager: gdprManager,
@@ -240,7 +246,8 @@ describe('AdUnitFactoryTest', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
-                configuration: config,
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
                 campaign: campaign
             });
 
@@ -347,7 +354,8 @@ describe('AdUnitFactoryTest', () => {
                     sessionManager: sessionManager,
                     clientInfo: clientInfo,
                     deviceInfo: deviceInfo,
-                    configuration: config,
+                    coreConfig: coreConfig,
+                    adsConfig: adsConfig,
                     campaign: campaign
                 });
 
@@ -389,7 +397,8 @@ describe('AdUnitFactoryTest', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
-                configuration: config,
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
                 campaign: campaign
             });
 
@@ -438,7 +447,8 @@ describe('AdUnitFactoryTest', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
-                configuration: config,
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
                 campaign: campaign
             });
 

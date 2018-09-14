@@ -12,7 +12,7 @@ import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { CoreConfiguration } from 'CoreConfiguration.ts';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { IntentApi } from 'Core/Native/Android/Intent';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { UrlSchemeApi } from 'Core/Native/iOS/UrlScheme';
@@ -23,6 +23,7 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 import { unity_proto } from '../../../src/proto/unity_proto.js';
+import { AdsConfiguration } from '../../../src/ts/Ads/Models/AdsConfiguration';
 
 const resolveAfter = (timeout: number): Promise<void> => {
     return new Promise((resolve, reject) => setTimeout(resolve, timeout));
@@ -39,7 +40,8 @@ describe('AdMobEventHandler', () => {
     let campaign: AdMobCampaign;
     let clientInfo: ClientInfo;
     const testTimeout = 250;
-    let configuration;
+    let coreConfig;
+    let adsConfig;
     let gdprManager;
 
     beforeEach(() => {
@@ -53,7 +55,8 @@ describe('AdMobEventHandler', () => {
         nativeBridge.UrlScheme = sinon.createStubInstance(UrlSchemeApi);
         campaign = sinon.createStubInstance(AdMobCampaign);
         (<sinon.SinonStub>campaign.getSession).returns(TestFixtures.getSession());
-        configuration = sinon.createStubInstance(CoreConfiguration);
+        coreConfig = sinon.createStubInstance(CoreConfiguration);
+        adsConfig = sinon.createStubInstance(AdsConfiguration);
         gdprManager = sinon.createStubInstance(GdprManager);
 
         clientInfo = sinon.createStubInstance(ClientInfo);
@@ -68,7 +71,8 @@ describe('AdMobEventHandler', () => {
             adMobSignalFactory: adMobSignalFactory,
             campaign: campaign,
             clientInfo: clientInfo,
-            configuration: configuration,
+            coreConfig: coreConfig,
+            adsConfig: adsConfig,
             gdprManager: gdprManager
         });
     });

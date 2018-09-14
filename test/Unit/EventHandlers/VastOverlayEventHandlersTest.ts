@@ -26,6 +26,7 @@ import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastOverlayEventHandler } from 'VAST/EventHandlers/VastOverlayEventHandler';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastEndScreen } from 'VAST/Views/VastEndScreen';
+import Test = Mocha.Test;
 
 describe('VastOverlayEventHandlersTest', () => {
     let campaign: VastCampaign;
@@ -80,7 +81,8 @@ describe('VastOverlayEventHandlersTest', () => {
             return Promise.resolve(url);
         });
 
-        const configuration = TestFixtures.getConfiguration();
+        const coreConfig = TestFixtures.getCoreConfiguration();
+        const adsConfig = TestFixtures.getAdsConfiguration();
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             nativeBridge: nativeBridge,
             request: request,
@@ -88,7 +90,8 @@ describe('VastOverlayEventHandlersTest', () => {
             sessionManager: sessionManager,
             clientInfo: clientInfo,
             deviceInfo: deviceInfo,
-            configuration: configuration,
+            coreConfig: coreConfig,
+            adsConfig: adsConfig,
             campaign: campaign
         });
 
@@ -104,7 +107,8 @@ describe('VastOverlayEventHandlersTest', () => {
             operativeEventManager: operativeEventManager,
             placement: TestFixtures.getPlacement(),
             campaign: campaign,
-            configuration: configuration,
+            coreConfig: coreConfig,
+            adsConfig: adsConfig,
             request: request,
             options: {},
             endScreen: undefined,

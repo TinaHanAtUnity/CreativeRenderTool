@@ -39,7 +39,7 @@ describe('DisplayInterstitial View', () => {
                 muteVideo: false
             });
             campaign = TestFixtures.getDisplayInterstitialCampaign();
-            const configuration = TestFixtures.getConfiguration();
+            const configuration = TestFixtures.getCoreConfiguration();
 
             const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
 

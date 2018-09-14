@@ -1,7 +1,7 @@
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { FinishState } from 'Core/Constants/FinishState';
 import { ABGroupBuilder } from 'Core/Models/ABGroup';
-import { CoreConfiguration } from 'CoreConfiguration.ts';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 

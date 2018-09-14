@@ -2,7 +2,7 @@ import { GdprManager } from 'Ads/Managers/GdprManager';
 import { Placement } from 'Ads/Models/Placement';
 import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
 import { assert } from 'chai';
-import { CoreConfiguration } from 'CoreConfiguration.ts';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import MRAIDContainer from 'html/mraid/container.html';
@@ -43,7 +43,7 @@ describe('MRAID', () => {
             muteVideo: false
         });
 
-        configuration = TestFixtures.getConfiguration();
+        configuration = TestFixtures.getCoreConfiguration();
         gdprManager = sinon.createStubInstance(GdprManager);
         privacy = new GDPRPrivacy(nativeBridge, gdprManager, true);
     });
