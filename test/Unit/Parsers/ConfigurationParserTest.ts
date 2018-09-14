@@ -115,7 +115,7 @@ describe('configurationParserTest', () => {
 
         it('should only call createMixedPlacements if created placement is mixed and gameid is in mixed placement experiment', () => {
             const clientInfoPromoGame = TestFixtures.getClientInfo(Platform.ANDROID, '1003628');
-            coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements), clientInfoPromoGame);
             sandbox.assert.called(<sinon.SinonStub>MixedPlacementUtility.createMixedPlacements);
         });
     });

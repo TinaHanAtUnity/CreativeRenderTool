@@ -1503,6 +1503,7 @@ describe('CampaignManager', () => {
             });
 
             coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
             assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, nativeBridge);
             campaignManager = new CampaignManager(nativeBridge, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
         });
