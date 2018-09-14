@@ -82,6 +82,7 @@ export abstract class BaseVideoEventHandler {
                 this._adUnit.hide();
                 this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.VIDEO_PLAYER_ERROR], 'Video player prepare error');
             } else {
+                this._adUnit.onVideoError();
                 this._nativeBridge.Listener.sendErrorEvent(UnityAdsError[UnityAdsError.VIDEO_PLAYER_ERROR], 'Video player error');
             }
         }

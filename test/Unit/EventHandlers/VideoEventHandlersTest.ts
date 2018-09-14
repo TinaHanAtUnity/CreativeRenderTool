@@ -653,6 +653,8 @@ describe('VideoEventHandlersTest', () => {
             sinon.stub(performanceAdUnit, 'hide');
             sinon.spy(container, 'reconfigure');
             sinon.spy(overlay, 'hide');
+            sinon.spy(endScreen, 'show');
+            sinon.spy(performanceAdUnit, 'onVideoError');
         });
 
         afterEach(() => {
@@ -675,6 +677,8 @@ describe('VideoEventHandlersTest', () => {
 
             sinon.assert.calledWith(<sinon.SinonSpy>container.reconfigure, ViewConfiguration.ENDSCREEN);
             sinon.assert.notCalled(<sinon.SinonSpy>performanceAdUnit.hide);
+            sinon.assert.called(<sinon.SinonSpy>performanceAdUnit.onVideoError);
+            sinon.assert.called(<sinon.SinonSpy>endScreen.show);
         });
 
         it('should set video to inactive and video to finish state to error, video not started', () => {
