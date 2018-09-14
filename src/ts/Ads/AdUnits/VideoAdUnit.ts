@@ -281,7 +281,9 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
 
         if(overlay) {
             overlay.hide();
-            overlay.container().parentElement!.removeChild(overlay.container());
+            if(overlay.container().parentElement) {
+                overlay.container().parentElement!.removeChild(overlay.container());
+            }
         }
     }
 

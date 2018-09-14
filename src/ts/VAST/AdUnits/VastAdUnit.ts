@@ -84,7 +84,9 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
 
             if(this._moat) {
                 this._moat.removeMessageListener();
-                this._moat.container().parentElement!.removeChild(this._moat.container());
+                if (this._moat.container().parentElement) {
+                    this._moat.container().parentElement!.removeChild(this._moat.container());
+                }
             }
 
             return super.hide();
