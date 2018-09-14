@@ -43,10 +43,11 @@
                     device’s advertising ID
                     (<span class="gdpr-text-ios">Apple’s Advertising Identifier</span><span class="gdpr-text-android">Google
                         Ad Identifier</span>) and your IP address.
-                </span>
+                
                 <% if(!data.isCoppaCompliant) { %>
-                <span id="coppaTag1">'By request of this app’s publisher, we do not combine the data from this app with data from any other apps.'</span>
+                <span id="coppaTag1">By request of this app’s publisher, we do not combine the data from this app with data from any other apps.</span>
                 <% } %>
+                </span>
             </p>
 
             <p>
@@ -67,27 +68,27 @@
 
             <% if(data.userInformation) { %>
             <p>
-                <span id='phone-type'> - Using <% data.userInformation.deviceModel %>.</span>
+                <span id="phone-type"> - Using <% data.userInformation.deviceModel %>.</span>
             </p>
 
             <p>
-                <span id='country'> - Playing in <% data.userInformation.country %>.</span>
+                <span id="country"> - Playing in <% data.userInformation.country %>.</span>
             </p>
 
             <p>
-                <span id='game-plays-this-week'> - Played this game <% data.userInformation.gamePlaysThisWeek %> times this week.</span>
+                <span id="game-plays-this-week"> - Played this game <% data.userInformation.gamePlaysThisWeek %> times this week.</span>
             </p>
 
             <p>
-                <span id='ads-seen-in-game'> - Seen <% data.userInformation.adsSeenInGameThisWeek %> ads in this game.</span>
+                <span id="ads-seen-in-game"> - Seen <% data.userInformation.adsSeenInGameThisWeek %> ads in this game.</span>
             </p>
 
             <p>
-                <span id='games-installed-from-ads'> - Installed <% data.userInformation.installsFromAds %> games based on those ads.</span>
+                <span id="games-installed-from-ads"> - Installed <% data.userInformation.installsFromAds %> games based on those ads.</span>
             </p>
             <% } else { %>
             <p>
-                <span id='sorry-message'>Sorry. We were unable to deliver our collected information at this time.</span>
+                <span id="sorry-message">Sorry. We were unable to deliver our collected information at this time.</span>
             </p>
             <% } %>
 
