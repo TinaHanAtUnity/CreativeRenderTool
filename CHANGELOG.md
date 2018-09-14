@@ -1,3 +1,8 @@
+# Staged
+
+* Enable new video overlay for all
+* Fix: VAST end screen not visible after video errors (black screen)
+
 # Wed Sep 12 21:48:07 UTC 2018
 
 * Hellfest Creative temporary creative ID Whitelist [#6296](https://github.com/Applifier/unity-ads-webview/pull/6296)
