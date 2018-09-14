@@ -172,7 +172,10 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
 
         this._videoProgress = value;
         this._skipRemaining = this._skipDuration - this._videoProgress;
-        this._timerElement.innerText = String(Math.ceil((this._videoDuration - this._videoProgress) / 1000));
+        const timerCount = Math.ceil((this._videoDuration - this._videoProgress) / 1000);
+        if (typeof timerCount === 'number' && !isNaN(timerCount)) {
+            this._timerElement.innerText = timerCount.toString();
+        }
 
         if (this._skipRemaining <= 0) {
             this.showSkipButton();

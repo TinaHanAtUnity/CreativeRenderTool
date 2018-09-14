@@ -34,16 +34,6 @@ export class PerformanceVideoEventHandler extends VideoEventHandler {
         this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.LOADED_IMPRESSION);
     }
 
-    protected handleVideoError(errorType?: string, errorData?: any): void {
-        super.handleVideoError(errorType, errorData);
-
-        const endScreen = this._performanceAdUnit.getEndScreen();
-        if(endScreen) {
-            endScreen.show();
-        }
-        this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.ERROR);
-    }
-
     protected getVideoOrientation(): string | undefined {
         return this._performanceAdUnit.getVideoOrientation();
     }
