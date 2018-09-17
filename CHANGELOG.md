@@ -1,4 +1,4 @@
-# Staged
+# Mon Sep 17 08:00:27 UTC 2018
 
 * Enable new video overlay for all
 * Fix: VAST end screen not visible after video errors (black screen)
