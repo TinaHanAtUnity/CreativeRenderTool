@@ -1,3 +1,4 @@
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { HTML } from 'Ads/Models/Assets/HTML';
 import { Image } from 'Ads/Models/Assets/Image';
@@ -5,6 +6,8 @@ import { Video } from 'Ads/Models/Assets/Video';
 import { ICampaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
+import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
+import { ICacheDiagnostics } from 'Ads/Utilities/CacheDiagnostics';
 import { RingerMode } from 'Core/Constants/Android/RingerMode';
 import { UIUserInterfaceIdiom } from 'Core/Constants/iOS/UIUserInterfaceIdiom';
 import { Platform } from 'Core/Constants/Platform';
@@ -29,6 +32,7 @@ import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCam
 import OnXPromoPlcCampaign from 'json/OnXPromoPlcCampaign.json';
 import { IMRAIDCampaign, MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IPerformanceCampaign, PerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCampaign';
+import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { IPromoCampaign, PromoCampaign } from 'Promo/Models/PromoCampaign';
 
 import * as sinon from 'sinon';
@@ -43,10 +47,6 @@ import EventTestVast from 'xml/EventTestVast.xml';
 import VastCompanionXml from 'xml/VastCompanionAd.xml';
 import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xml';
 import { IXPromoCampaign, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
-import { AdsConfiguration } from '../../src/ts/Ads/Models/AdsConfiguration';
-import { AdsConfigurationParser } from '../../src/ts/Ads/Parsers/AdsConfigurationParser';
-import { ICacheDiagnostics } from '../../src/ts/Ads/Utilities/CacheDiagnostics';
-import { PerformanceMRAIDCampaign } from '../../src/ts/Performance/Models/PerformanceMRAIDCampaign';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {

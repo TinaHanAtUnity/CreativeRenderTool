@@ -1,6 +1,6 @@
 import { Cache, ICallbackObject } from 'Core/Utilities/Cache';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
-import { IObserver2, IObserver1, IObserver3 } from 'Core/Utilities/IObserver';
+import { IObserver1, IObserver2, IObserver3 } from 'Core/Utilities/IObserver';
 
 enum CacheDiagnosticEvent {
     STARTED,

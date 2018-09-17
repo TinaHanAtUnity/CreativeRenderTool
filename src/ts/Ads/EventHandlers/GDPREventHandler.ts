@@ -1,6 +1,6 @@
 import { GDPREventAction, GdprManager } from 'Ads/Managers/GdprManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { CoreConfiguration } from '../../Core/Models/CoreConfiguration';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 
 export interface IGDPREventHandler {
     onGDPRPopupSkipped(): void;

@@ -1,6 +1,7 @@
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { StorageType } from 'Core/Native/Storage';
@@ -8,7 +9,6 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { Request } from 'Core/Utilities/Request';
-import { CoreConfiguration } from '../../Core/Models/CoreConfiguration';
 
 export interface IGdprPersonalProperties {
     deviceModel: string;

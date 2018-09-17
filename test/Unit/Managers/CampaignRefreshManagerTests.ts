@@ -49,8 +49,8 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastParser } from 'VAST/Utilities/VastParser';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
-import { AdsConfiguration } from '../../../src/ts/Ads/Models/AdsConfiguration';
-import { AdsConfigurationParser } from '../../../src/ts/Ads/Parsers/AdsConfigurationParser';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 
 export class TestContainer extends AdUnitContainer {
     public open(adUnit: AbstractAdUnit, views: string[], allowRotation: boolean, forceOrientation: Orientation, disableBackbutton: boolean, options: any): Promise<void> {

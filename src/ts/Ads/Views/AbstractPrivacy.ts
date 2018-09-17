@@ -2,9 +2,9 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { Platform } from 'Core/Constants/Platform';
 
 import { ClientInfo } from 'Core/Models/ClientInfo';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { View, ITemplateData } from 'Core/Views/View';
-import { CoreConfiguration } from '../../Core/Models/CoreConfiguration';
+import { ITemplateData, View } from 'Core/Views/View';
 
 export interface IPrivacyHandler {
     onPrivacy(url: string): void;

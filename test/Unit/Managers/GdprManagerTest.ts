@@ -14,7 +14,7 @@ import { Observable2 } from 'Core/Utilities/Observable';
 import { Request } from 'Core/Utilities/Request';
 import 'mocha';
 import * as sinon from 'sinon';
-import { AdsConfiguration } from '../../../src/ts/Ads/Models/AdsConfiguration';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 
 describe('GdprManagerTest', () => {
     const testGameId = '12345';

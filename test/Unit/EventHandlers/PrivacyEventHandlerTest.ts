@@ -25,7 +25,7 @@ import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdU
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
-import { AdsConfiguration } from '../../../src/ts/Ads/Models/AdsConfiguration';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 
 describe('PrivacyEventHandlerTest', () => {
 

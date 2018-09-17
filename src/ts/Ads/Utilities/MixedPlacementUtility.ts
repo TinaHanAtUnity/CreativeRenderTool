@@ -1,6 +1,6 @@
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 
 export const enum MixedPlacementTypes {

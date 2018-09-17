@@ -79,8 +79,8 @@ import WrappedVast1 from 'xml/WrappedVast1.xml';
 import WrappedVast2 from 'xml/WrappedVast2.xml';
 import WrappedVast3 from 'xml/WrappedVast3.xml';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
-import { AdsConfiguration } from '../../../src/ts/Ads/Models/AdsConfiguration';
-import { AdsConfigurationParser } from '../../../src/ts/Ads/Parsers/AdsConfigurationParser';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;

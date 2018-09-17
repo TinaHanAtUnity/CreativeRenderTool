@@ -7,6 +7,7 @@ import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { IosUtils } from 'Ads/Utilities/IosUtils';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { IEndScreenHandler } from 'Ads/Views/EndScreen';
 import { Platform } from 'Core/Constants/Platform';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
@@ -21,7 +22,6 @@ import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { StoreName } from 'Performance/Models/PerformanceCampaign';
 import { XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
-import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 export interface IEndScreenDownloadParameters {
     clickAttributionUrl: string | undefined;

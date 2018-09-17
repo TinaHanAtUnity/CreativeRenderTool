@@ -1,8 +1,7 @@
 import { Session } from 'Ads/Models/Session';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { WebViewError } from 'Core/Errors/WebViewError';
 import { ISchema, Model } from 'Core/Models/Model';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 export interface IAsset {
     url: string;

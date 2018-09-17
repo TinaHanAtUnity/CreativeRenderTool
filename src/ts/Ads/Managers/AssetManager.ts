@@ -1,6 +1,10 @@
 import { Asset } from 'Ads/Models/Assets/Asset';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
+import { CacheDiagnostics, ICacheDiagnostics } from 'Ads/Utilities/CacheDiagnostics';
+import { ProgrammaticTrackingError, ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
+import { VideoFileInfo } from 'Ads/Utilities/VideoFileInfo';
 import { WebViewError } from 'Core/Errors/WebViewError';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
@@ -10,10 +14,6 @@ import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
-import { VideoFileInfo } from 'Ads/Utilities/VideoFileInfo';
-import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
-import { ProgrammaticTrackingService, ProgrammaticTrackingError } from 'Ads/Utilities/ProgrammaticTrackingService';
-import { CacheDiagnostics, ICacheDiagnostics } from 'Ads/Utilities/CacheDiagnostics';
 
 enum CacheType {
     REQUIRED,

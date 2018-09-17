@@ -30,7 +30,7 @@ import { PerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCa
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { AdsConfiguration } from '../../../src/ts/Ads/Models/AdsConfiguration';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 
 describe('EndScreenEventHandlerTest', () => {
 

@@ -1,15 +1,17 @@
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Asset } from 'Ads/Models/Assets/Asset';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { CacheMode, CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { IFileInfo } from 'Core/Native/Cache';
+import { Cache } from 'Core/Utilities/Cache';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { Request } from 'Core/Utilities/Request';
 import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
@@ -17,8 +19,6 @@ import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
-import { Cache } from 'Core/Utilities/Cache';
-import { CacheMode, CoreConfiguration } from '../../Core/Models/CoreConfiguration';
 
 interface ISdkStatsEvent {
     eventTimestamp: number;

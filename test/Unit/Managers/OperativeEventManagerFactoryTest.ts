@@ -16,7 +16,7 @@ import { MRAIDOperativeEventManager } from 'MRAID/Managers/MRAIDOperativeEventMa
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
-import { AdsConfiguration } from '../../../src/ts/Ads/Models/AdsConfiguration';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 
 describe('OperativeEventManagerFactoryTest', () => {
     const handleInvocation = sinon.spy();

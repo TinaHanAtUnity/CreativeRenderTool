@@ -1,14 +1,13 @@
 import { Campaign } from 'Ads/Models/Campaign';
 import { Analytics } from 'Ads/Utilities/Analytics';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
 import { RequestError } from 'Core/Errors/RequestError';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { INativeResponse, Request } from 'Core/Utilities/Request';
 import { Url } from 'Core/Utilities/Url';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
-import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 export class ThirdPartyEventManager {
 

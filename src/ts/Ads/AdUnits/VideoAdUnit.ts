@@ -10,6 +10,7 @@ import { Placement } from 'Ads/Models/Placement';
 import { CampaignAssetInfo, VideoType } from 'Ads/Utilities/CampaignAssetInfo';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { IosUtils } from 'Ads/Utilities/IosUtils';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
@@ -18,11 +19,9 @@ import { WebViewError } from 'Core/Errors/WebViewError';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Double } from 'Core/Utilities/Double';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
-import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 export interface IVideoAdUnitParameters<T extends Campaign> extends IAdUnitParameters<T> {
     video: Video;

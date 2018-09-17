@@ -1,13 +1,12 @@
 import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { Platform } from 'Core/Constants/Platform';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Request } from 'Core/Utilities/Request';
 import { Url } from 'Core/Utilities/Url';
-import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 
 export abstract class CampaignParser {
     public abstract parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string, abgroup?: ABGroup): Promise<Campaign>;

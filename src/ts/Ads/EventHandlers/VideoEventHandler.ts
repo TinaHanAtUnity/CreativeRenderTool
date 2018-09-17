@@ -2,20 +2,18 @@ import { VideoState } from 'Ads/AdUnits/VideoAdUnit';
 import { BaseVideoEventHandler, IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
 import { IOperativeEventParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Placement } from 'Ads/Models/Placement';
 import { IVideoEventHandler } from 'Ads/Native/VideoPlayer';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
+import { VideoFileInfo } from 'Ads/Utilities/VideoFileInfo';
 import { FinishState } from 'Core/Constants/FinishState';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { Double } from 'Core/Utilities/Double';
-import { FileInfo } from 'Core/Utilities/FileInfo';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
-import { VideoFileInfo } from 'Ads/Utilities/VideoFileInfo';
-import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
-import { CoreConfiguration } from '../../Core/Models/CoreConfiguration';
 
 export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEventHandler {
 

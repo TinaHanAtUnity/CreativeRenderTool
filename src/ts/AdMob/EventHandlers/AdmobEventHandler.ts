@@ -9,18 +9,18 @@ import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { GDPREventHandler } from 'Ads/EventHandlers/GDPREventHandler';
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Session } from 'Ads/Models/Session';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Promises } from 'Core/Utilities/Promises';
 import { Request } from 'Core/Utilities/Request';
 import { Timer } from 'Core/Utilities/Timer';
 import { Url } from 'Core/Utilities/Url';
-import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
-import { AdsConfiguration } from '../../Ads/Models/AdsConfiguration';
-import { CoreConfiguration } from '../../Core/Models/CoreConfiguration';
 
 export interface IAdMobEventHandlerParameters {
     adUnit: AdMobAdUnit;

@@ -1,13 +1,13 @@
 import { PlacementManager } from 'Ads/Managers/PlacementManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { PlacementState } from 'Ads/Models/Placement';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingCatalog } from 'Promo/Models/PurchasingCatalog';
 import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
-import { CoreConfiguration } from '../../Core/Models/CoreConfiguration';
 
 export enum IPromoRequest {
     SETIDS = 'setids',

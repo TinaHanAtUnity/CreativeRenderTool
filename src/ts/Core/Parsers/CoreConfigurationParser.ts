@@ -1,8 +1,5 @@
 import { ABGroupBuilder } from 'Core/Models/ABGroup';
 import { CacheMode, CoreConfiguration, ICoreConfiguration } from 'Core/Models/CoreConfiguration';
-import { Platform } from '../Constants/Platform';
-import { ConfigManager } from '../Managers/ConfigManager';
-import { Diagnostics } from '../Utilities/Diagnostics';
 
 export class CoreConfigurationParser {
     public static parse(configJson: any): CoreConfiguration {

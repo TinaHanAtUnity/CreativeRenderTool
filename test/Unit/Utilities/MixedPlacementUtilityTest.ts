@@ -11,8 +11,8 @@ import MixedPlacementAuctionResponse from 'json/MixedPlacementAuctionResponse.js
 import 'mocha';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { AdsConfiguration } from '../../../src/ts/Ads/Models/AdsConfiguration';
-import { AdsConfigurationParser } from '../../../src/ts/Ads/Parsers/AdsConfigurationParser';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 
 describe('MixedPlacementUtilities', () => {
 

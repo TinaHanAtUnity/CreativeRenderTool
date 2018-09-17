@@ -1,8 +1,8 @@
+import { AdsConfiguration, IAdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Placement } from 'Ads/Models/Placement';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { MixedPlacementUtility } from 'Ads/Utilities/MixedPlacementUtility';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { AdsConfiguration, IAdsConfiguration } from 'Ads/Models/AdsConfiguration';
 
 export class AdsConfigurationParser {
     public static parse(configJson: any, clientInfo?: ClientInfo): AdsConfiguration {

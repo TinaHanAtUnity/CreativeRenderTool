@@ -1,11 +1,10 @@
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Platform } from 'Core/Constants/Platform';
-import { VideoMetadata } from 'Core/Constants/Android/VideoMetadata';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
-import { FileId } from 'Core/Utilities/FileId';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
+import { VideoMetadata } from 'Core/Constants/Android/VideoMetadata';
+import { Platform } from 'Core/Constants/Platform';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { FileId } from 'Core/Utilities/FileId';
 
 export class VideoFileInfo {
 

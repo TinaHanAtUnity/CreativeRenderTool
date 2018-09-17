@@ -1,4 +1,4 @@
-    import { ABGroup } from 'Core/Models/ABGroup';
+import { ABGroup } from 'Core/Models/ABGroup';
 import { ISchema, Model } from 'Core/Models/Model';
 
 export enum CacheMode {

@@ -15,7 +15,7 @@ import { PurchasingApi } from 'Promo/Native/Purchasing';
 import { IPromoPayload, IPromoRequest, PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { AdsConfigurationParser } from '../../../src/ts/Ads/Parsers/AdsConfigurationParser';
+import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 
 describe('PurchasingUtilitiesTest', () => {
     let nativeBridge: NativeBridge;

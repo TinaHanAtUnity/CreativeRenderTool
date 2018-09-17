@@ -11,7 +11,7 @@ import { PromoAdUnit } from 'Promo/AdUnits/PromoAdUnit';
 import { PromoEventHandler } from 'Promo/EventHandlers/PromoEventHandler';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import * as sinon from 'sinon';
-import { AdsConfiguration } from '../../../src/ts/Ads/Models/AdsConfiguration';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 
 describe('PromoEventHandlersTest', () => {
     const handleInvocation = sinon.spy();

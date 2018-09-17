@@ -2,18 +2,17 @@ import { ViewConfiguration } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { VideoAdUnit, VideoState } from 'Ads/AdUnits/VideoAdUnit';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { FinishState } from 'Core/Constants/FinishState';
 import { UnityAdsError } from 'Core/Constants/UnityAdsError';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
-import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
-import { CoreConfiguration } from '../../Core/Models/CoreConfiguration';
 
 export interface IVideoEventHandlerParams<T extends VideoAdUnit = VideoAdUnit, T2 extends Campaign = Campaign, T3 extends OperativeEventManager = OperativeEventManager> {
     nativeBrige: NativeBridge;

@@ -47,8 +47,8 @@ import { asStub } from 'TestHelpers/Functions';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
-import { AdsConfiguration } from '../../../src/ts/Ads/Models/AdsConfiguration';
-import { AdsConfigurationParser } from '../../../src/ts/Ads/Parsers/AdsConfigurationParser';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 
 describe('AdUnitFactoryTest', () => {
 
