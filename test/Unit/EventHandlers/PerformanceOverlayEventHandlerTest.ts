@@ -72,7 +72,7 @@ describe('PerformanceOverlayEventHandlerTest', () => {
         });
 
         const gdprManager = sinon.createStubInstance(GdprManager);
-        const privacy = new GDPRPrivacy(nativeBridge, campaign, gdprManager, false, false);
+        const privacy = new GDPRPrivacy(nativeBridge, gdprManager, false);
         const endScreenParams : IEndScreenParameters = {
             nativeBridge: nativeBridge,
             language : deviceInfo.getLanguage(),

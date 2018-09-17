@@ -98,7 +98,7 @@ describe('MRAIDEventHandlersTest', () => {
                 options: {},
                 mraid: mraidView,
                 endScreen: undefined,
-                privacy: new GDPRPrivacy(nativeBridge, playableMraidCampaign, gdprManager, true, false),
+                privacy: new GDPRPrivacy(nativeBridge, gdprManager, false),
                 gdprManager: gdprManager,
                 programmaticTrackingService: programmaticTrackingService
             };
@@ -292,7 +292,7 @@ describe('MRAIDEventHandlersTest', () => {
             sessionManager = new SessionManager(nativeBridge, request);
             configuration = TestFixtures.getConfiguration();
             programmaticMraidCampaign = TestFixtures.getProgrammaticMRAIDCampaign();
-            privacy = new GDPRPrivacy(nativeBridge, programmaticMraidCampaign, gdprManager, true, false);
+            privacy = new GDPRPrivacy(nativeBridge, gdprManager, false);
 
             mraidView = new MRAID(nativeBridge, placement, programmaticMraidCampaign, privacy, true, configuration.getAbGroup());
 
@@ -322,7 +322,7 @@ describe('MRAIDEventHandlersTest', () => {
                 options: {},
                 mraid: mraidView,
                 endScreen: undefined,
-                privacy: new GDPRPrivacy(nativeBridge, programmaticMraidCampaign, gdprManager, true, false),
+                privacy: new GDPRPrivacy(nativeBridge, gdprManager, false),
                 gdprManager: gdprManager,
                 programmaticTrackingService: programmaticTrackingService
             };

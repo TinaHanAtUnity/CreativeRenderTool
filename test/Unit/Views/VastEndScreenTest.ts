@@ -36,7 +36,7 @@ describe('VastEndScreen', () => {
     });
 
     it('should render', () => {
-        const privacy = new GDPRPrivacy(nativeBridge, vastEndscreenParameters.campaign, gdprManager, true, false);
+        const privacy = new GDPRPrivacy(nativeBridge, gdprManager, false);
         const endScreen = new VastEndScreen(nativeBridge, vastEndscreenParameters, privacy);
         endScreen.render();
         assert.equal(endScreen.container().innerHTML, VastEndScreenFixture);

@@ -41,7 +41,7 @@ describe('DisplayInterstitialTest', () => {
             });
             campaign = TestFixtures.getDisplayInterstitialCampaign();
             const gdprManager = sinon.createStubInstance(GdprManager);
-            const privacy = new GDPRPrivacy(nativeBridge, campaign, gdprManager, false, false);
+            const privacy = new GDPRPrivacy(nativeBridge, gdprManager, false);
 
             view = new DisplayInterstitial(nativeBridge, placement, campaign, privacy, false);
 

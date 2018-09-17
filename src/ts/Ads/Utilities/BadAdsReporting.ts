@@ -3,6 +3,7 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { ReportingPrivacy } from 'Ads/Views/ReportingPrivacy';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 
 export enum BadAdReason {
     OFFENSIVE = 'Ad is very offensive',
@@ -23,12 +24,14 @@ export class BadAdsReporting {
         Diagnostics.trigger('reported_ad', error);
     }
 
-    public static setupReportListener(privacy: ReportingPrivacy, ad: AbstractAdUnit | AbstractVideoOverlay): void {
-        if (privacy._onReport) {
-            privacy._onReport.subscribe(() => {
-                privacy._onReport.unsubscribe();
-                this.timeoutAd(ad);
-            });
+    public static setupReportListener(privacy: AbstractPrivacy, ad: AbstractAdUnit | AbstractVideoOverlay): void {
+        if (privacy instanceof ReportingPrivacy) {
+            if (privacy._onReport) {
+                privacy._onReport.subscribe(() => {
+                    privacy._onReport.unsubscribe();
+                    this.timeoutAd(ad);
+                });
+            }
         }
     }
 

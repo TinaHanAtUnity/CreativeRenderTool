@@ -48,7 +48,7 @@ describe('MRAID', () => {
         configuration = TestFixtures.getConfiguration();
         gdprManager = sinon.createStubInstance(GdprManager);
         fakeCampaign = sinon.createStubInstance(Campaign);
-        privacy = new GDPRPrivacy(nativeBridge, fakeCampaign, gdprManager, true, true);
+        privacy = new GDPRPrivacy(nativeBridge, gdprManager, true);
     });
 
     it('should render', (done) => {

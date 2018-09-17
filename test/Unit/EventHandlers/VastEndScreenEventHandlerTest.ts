@@ -67,7 +67,7 @@ describe('VastEndScreenEventHandlerTest', () => {
             campaign: campaign
         });
         const gdprManager = sinon.createStubInstance(GdprManager);
-        const privacy = new GDPRPrivacy(nativeBridge, campaign, gdprManager, false, false);
+        const privacy = new GDPRPrivacy(nativeBridge, gdprManager, false);
         const video = new Video('', TestFixtures.getSession());
         const overlay = new Overlay(nativeBridge, true, 'en', 'testGameId', privacy, false);
         const programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
@@ -101,7 +101,7 @@ describe('VastEndScreenEventHandlerTest', () => {
 
     describe('when calling onClose', () => {
         it('should hide endcard', () => {
-            const privacy = new GDPRPrivacy(nativeBridge, vastAdUnitParameters.campaign, vastAdUnitParameters.gdprManager, true, false);
+            const privacy = new GDPRPrivacy(nativeBridge, vastAdUnitParameters.gdprManager, false);
             const vastEndScreen = new VastEndScreen(nativeBridge, vastEndScreenParameters, privacy);
             vastAdUnitParameters.endScreen = vastEndScreen;
             const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
@@ -130,7 +130,7 @@ describe('VastEndScreenEventHandlerTest', () => {
             vastAdUnitParameters.video = video;
             vastAdUnitParameters.campaign = campaign;
             vastAdUnitParameters.placement = TestFixtures.getPlacement();
-            const privacy = new GDPRPrivacy(nativeBridge, vastAdUnitParameters.campaign, vastAdUnitParameters.gdprManager, true, false);
+            const privacy = new GDPRPrivacy(nativeBridge, vastAdUnitParameters.gdprManager, false);
             vastEndScreen = new VastEndScreen(nativeBridge, vastEndScreenParameters, privacy);
             vastAdUnitParameters.endScreen = vastEndScreen;
             vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);

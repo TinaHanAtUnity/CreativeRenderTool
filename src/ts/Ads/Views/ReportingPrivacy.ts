@@ -1,11 +1,11 @@
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { Campaign } from 'Ads/Models/Campaign';
-import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Template } from 'Core/Utilities/Template';
-import ReportingPrivacyTemplate from 'html/Reporting-privacy.html';
+import ReportingPrivacyTemplate from 'html/reporting-privacy.html';
 import { BadAdsReporting } from 'Ads/Utilities/BadAdsReporting';
 import { Observable0 } from 'Core/Utilities/Observable';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 
 export enum PrivacyCardState {
     INITIAL,
@@ -29,7 +29,7 @@ export class ReportingPrivacy extends AbstractPrivacy {
                 gdprManager: GdprManager, gdprEnabled: boolean,
                 isCoppaCompliant: boolean) {
 
-        super(nativeBridge, isCoppaCompliant, gdprEnabled, 'gdpr-privacy');
+        super(nativeBridge, isCoppaCompliant, gdprEnabled, 'reporting-privacy');
 
         this._template = new Template(ReportingPrivacyTemplate);
         this._campaign = campaign;

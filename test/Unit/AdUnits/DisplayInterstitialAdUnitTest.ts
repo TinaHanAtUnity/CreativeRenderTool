@@ -83,7 +83,7 @@ describe('DisplayInterstitialAdUnitTest', () => {
                 campaign: campaign
             });
 
-            const privacy = new GDPRPrivacy(nativeBridge, campaign, gdprManager, false, false);
+            const privacy = new GDPRPrivacy(nativeBridge, gdprManager, false);
 
             webPlayerContainer = sinon.createStubInstance(WebPlayerContainer);
             (<any>webPlayerContainer).onPageStarted = new Observable1<string>();

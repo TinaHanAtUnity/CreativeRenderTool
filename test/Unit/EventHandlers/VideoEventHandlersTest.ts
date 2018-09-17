@@ -116,7 +116,7 @@ describe('VideoEventHandlersTest', () => {
         video = new Video('', TestFixtures.getSession());
         placement = TestFixtures.getPlacement();
         const gdprManager = sinon.createStubInstance(GdprManager);
-        const privacy = new GDPRPrivacy(nativeBridge, vastCampaign, gdprManager, false, false);
+        const privacy = new GDPRPrivacy(nativeBridge, gdprManager, false);
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
 
         const endScreenParams : IEndScreenParameters = {
@@ -172,7 +172,7 @@ describe('VideoEventHandlersTest', () => {
         };
 
         xPromoCampaign = TestFixtures.getXPromoCampaign();
-        const xpromoPrivacy = new GDPRPrivacy(nativeBridge, xPromoCampaign, gdprManager, false, false);
+        const xpromoPrivacy = new GDPRPrivacy(nativeBridge, gdprManager, false);
         const xpromoEndScreenParams : IEndScreenParameters = {
             nativeBridge: nativeBridge,
             language : 'en',
