@@ -36,7 +36,7 @@ export class CoreConfiguration extends Model<ICoreConfiguration> {
         projectId: ['string'],
         token: ['string'],
         jaegerTracing: ['boolean'],
-        organizationId: ['string', 'undefined'],
+        organizationId: ['string', 'undefined']
     };
 
     constructor(data: ICoreConfiguration) {
