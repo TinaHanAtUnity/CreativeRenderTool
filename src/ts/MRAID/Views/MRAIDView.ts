@@ -155,7 +155,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         };
     }
 
-    protected clampTime(timeInSeconds: number): number | undefined {
+    protected clampTime(timeInSeconds: number): number {
         if (isNaN(timeInSeconds) || timeInSeconds < 0) {
             return 0;
         } else if (timeInSeconds > 3600) {
