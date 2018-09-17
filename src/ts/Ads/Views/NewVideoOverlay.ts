@@ -129,7 +129,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this.setupElementReferences();
         this.choosePrivacyShown();
 
-        if (CustomFeatures.isTencentAdvertisement(this._seatId) || true) {
+        if (CustomFeatures.isTencentAdvertisement(this._seatId)) {
             const tencentAdTag = <HTMLElement>this._container.querySelector('.tencent-advertisement');
             if (tencentAdTag) {
                 tencentAdTag.innerText = '广告';

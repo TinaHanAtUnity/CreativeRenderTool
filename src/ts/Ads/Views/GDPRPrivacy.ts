@@ -34,6 +34,7 @@ export class GDPRPrivacy extends AbstractPrivacy {
         this._template = new Template(GDPRPrivacyTemplate);
         this._campaign = campaign;
         this._gdprEnabled = gdprEnabled;
+        this._gdprManager = gdprManager;
 
         this._bindings = [
             {

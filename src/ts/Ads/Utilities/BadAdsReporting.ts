@@ -33,7 +33,7 @@ export class BadAdsReporting {
         }
     }
 
-    // Timeout after four seconds
+    // After the report, wait four seconds and close the ad
     private static timeoutAd(ad: AbstractAdUnit | AbstractVideoOverlay): Promise<void> {
         return new Promise(resolve => {
             setTimeout(() => {
