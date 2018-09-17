@@ -22,7 +22,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { VastEndScreen } from 'VAST/Views/VastEndScreen';
+import { VastEndScreen, IVastEndscreenParameters } from 'VAST/Views/VastEndScreen';
 
 import EventTestVast from 'xml/EventTestVast.xml';
 import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
@@ -188,8 +188,16 @@ describe('VastAdUnitTest', () => {
 
     describe('with companion ad', () => {
         let vastEndScreen: VastEndScreen;
+        let vastEndScreenParameters: IVastEndscreenParameters;
 
         beforeEach(() => {
+
+            vastEndScreenParameters = {
+                campaign: vastAdUnitParameters.campaign,
+                clientInfo: vastAdUnitParameters.clientInfo,
+                seatId: vastAdUnitParameters.campaign.getSeatId()
+            };
+
             const video = new Video('', TestFixtures.getSession());
             vastCampaign = TestFixtures.getCompanionVastCampaign();
             sinon.stub(vastCampaign, 'getVideo').returns(video);
@@ -197,7 +205,7 @@ describe('VastAdUnitTest', () => {
             const gdprManager = sinon.createStubInstance(GdprManager);
             const privacy = new GDPRPrivacy(nativeBridge, vastCampaign, gdprManager, false, false);
             const overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
-            vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters, privacy);
+            vastEndScreen = new VastEndScreen(nativeBridge, vastEndScreenParameters, privacy);
             vastAdUnitParameters.overlay = overlay;
             vastAdUnitParameters.campaign = vastCampaign;
             vastAdUnitParameters.endScreen = vastEndScreen;

@@ -229,7 +229,8 @@ export class AdUnitFactory {
         if(parameters.campaign.hasEndscreen()) {
             const vastEndscreenParameters: IVastEndscreenParameters = {
                 campaign: vastAdUnitParameters.campaign,
-                clientInfo: vastAdUnitParameters.clientInfo
+                clientInfo: vastAdUnitParameters.clientInfo,
+                seatId: vastAdUnitParameters.campaign.getSeatId()
             };
 
             vastEndScreen = new VastEndScreen(nativeBridge, vastEndscreenParameters, privacy);
@@ -486,7 +487,7 @@ export class AdUnitFactory {
         if (parameters.placement.allowSkip() && parameters.placement.skipEndCardOnClose()) {
             overlay = new ClosableVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         } else {
-            overlay = new NewVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, hidePrivacyInVideo);
+            overlay = new NewVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, hidePrivacyInVideo, parameters.campaign.getSeatId());
         }
 
         if (parameters.placement.disableVideoControlsFade()) {

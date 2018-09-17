@@ -28,7 +28,7 @@ import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 
 import { VastVideoEventHandler } from 'VAST/EventHandlers/VastVideoEventHandler';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { VastEndScreen } from 'VAST/Views/VastEndScreen';
+import { VastEndScreen, IVastEndscreenParameters } from 'VAST/Views/VastEndScreen';
 
 import EventTestVast from 'xml/EventTestVast.xml';
 import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
@@ -301,9 +301,16 @@ describe('VastVideoEventHandler tests', () => {
 
     describe('with companion ad', () => {
         let vastAdUnit: VastAdUnit;
+        let vastEndScreenParameters: IVastEndscreenParameters;
+
         beforeEach(() => {
             sandbox.restore();
-            vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters, privacy);
+            vastEndScreenParameters = {
+                campaign: vastAdUnitParameters.campaign,
+                clientInfo: vastAdUnitParameters.clientInfo,
+                seatId: vastAdUnitParameters.campaign.getSeatId()
+            };
+            vastEndScreen = new VastEndScreen(nativeBridge, vastEndScreenParameters, privacy);
             sinon.spy(vastEndScreen, 'show');
             vastAdUnitParameters.endScreen = vastEndScreen;
             vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);

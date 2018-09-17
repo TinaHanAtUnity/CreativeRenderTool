@@ -21,7 +21,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastEndScreenEventHandler } from 'VAST/EventHandlers/VastEndScreenEventHandler';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { VastEndScreen } from 'VAST/Views/VastEndScreen';
+import { VastEndScreen, IVastEndscreenParameters } from 'VAST/Views/VastEndScreen';
 
 import EventTestVast from 'xml/EventTestVast.xml';
 import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
@@ -33,6 +33,7 @@ describe('VastEndScreenEventHandlerTest', () => {
     let container: AdUnitContainer;
     let request: Request;
     let vastAdUnitParameters: IVastAdUnitParameters;
+    let vastEndScreenParameters: IVastEndscreenParameters;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -90,12 +91,18 @@ describe('VastEndScreenEventHandlerTest', () => {
             gdprManager: gdprManager,
             programmaticTrackingService: programmaticTrackingService
         };
+
+        vastEndScreenParameters = {
+            campaign: vastAdUnitParameters.campaign,
+            clientInfo: vastAdUnitParameters.clientInfo,
+            seatId: vastAdUnitParameters.campaign.getSeatId()
+        };
     });
 
     describe('when calling onClose', () => {
         it('should hide endcard', () => {
             const privacy = new GDPRPrivacy(nativeBridge, vastAdUnitParameters.campaign, vastAdUnitParameters.gdprManager, true, false);
-            const vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters, privacy);
+            const vastEndScreen = new VastEndScreen(nativeBridge, vastEndScreenParameters, privacy);
             vastAdUnitParameters.endScreen = vastEndScreen;
             const vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
             sinon.stub(vastAdUnit, 'hide').returns(sinon.spy());
@@ -124,7 +131,7 @@ describe('VastEndScreenEventHandlerTest', () => {
             vastAdUnitParameters.campaign = campaign;
             vastAdUnitParameters.placement = TestFixtures.getPlacement();
             const privacy = new GDPRPrivacy(nativeBridge, vastAdUnitParameters.campaign, vastAdUnitParameters.gdprManager, true, false);
-            vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters, privacy);
+            vastEndScreen = new VastEndScreen(nativeBridge, vastEndScreenParameters, privacy);
             vastAdUnitParameters.endScreen = vastEndScreen;
             vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);
             vastEndScreenEventHandler = new VastEndScreenEventHandler(nativeBridge, vastAdUnit, vastAdUnitParameters);

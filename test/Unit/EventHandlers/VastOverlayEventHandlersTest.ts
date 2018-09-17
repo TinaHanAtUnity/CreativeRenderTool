@@ -24,7 +24,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastOverlayEventHandler } from 'VAST/EventHandlers/VastOverlayEventHandler';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
-import { VastEndScreen } from 'VAST/Views/VastEndScreen';
+import { VastEndScreen, IVastEndscreenParameters } from 'VAST/Views/VastEndScreen';
 import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
 
 describe('VastOverlayEventHandlersTest', () => {
@@ -137,7 +137,12 @@ describe('VastOverlayEventHandlersTest', () => {
 
         describe('When ad unit has an endscreen', () => {
             it('should hide endcard', () => {
-                const vastEndScreen = new VastEndScreen(nativeBridge, vastAdUnitParameters, privacy);
+                const vastEndScreenParameters: IVastEndscreenParameters = {
+                    campaign: vastAdUnitParameters.campaign,
+                    clientInfo: vastAdUnitParameters.clientInfo,
+                    seatId: vastAdUnitParameters.campaign.getSeatId()
+                };
+                const vastEndScreen = new VastEndScreen(nativeBridge, vastEndScreenParameters, privacy);
                 sinon.spy(vastEndScreen, 'show');
                 vastAdUnitParameters.endScreen = vastEndScreen;
                 vastAdUnit = new VastAdUnit(nativeBridge, vastAdUnitParameters);

@@ -44,14 +44,16 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
     private _showGDPRBanner: boolean = false;
     private _disablePrivacyDuringVideo: boolean | undefined;
     private _gameId: string;
+    private _seatId: number | undefined;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, disablePrivacyDuringVideo?: boolean) {
+    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, disablePrivacyDuringVideo?: boolean, seatId?: number) {
         super(nativeBridge, 'overlay', muted);
 
         this._localization = new Localization(language, 'overlay');
         this._showGDPRBanner = showGDPRBanner;
         this._disablePrivacyDuringVideo = disablePrivacyDuringVideo;
         this._gameId = gameId;
+        this._seatId = seatId;
 
         this._templateData = {
             muted
@@ -127,6 +129,14 @@ export class Overlay extends AbstractVideoOverlay implements IPrivacyHandler {
 
     public render(): void {
         super.render();
+
+        if (CustomFeatures.isTencentAdvertisement(this._seatId)) {
+            const tencentAdTag = <HTMLElement>this._container.querySelector('.tencent-advertisement');
+            if (tencentAdTag) {
+                tencentAdTag.innerText = '广告';
+            }
+        }
+
         this._skipElement = <HTMLElement>this._container.querySelector('.skip-hit-area');
         this._spinnerElement = <HTMLElement>this._container.querySelector('.buffering-spinner');
         this._muteButtonElement = <HTMLElement>this._container.querySelector('.mute-button');
