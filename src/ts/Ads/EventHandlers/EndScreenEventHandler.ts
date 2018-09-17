@@ -82,16 +82,17 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
 
         if (parameters.store === StoreName.STANDALONE_ANDROID) {
             this.handleStandaloneAndroid(parameters);
-        } else {
-            if (parameters.clickAttributionUrl) {
-                this.handleClickAttribution(parameters);
+            return;
+        }
 
-                if (!parameters.clickAttributionUrlFollowsRedirects) {
-                    this.openAppStore(parameters);
-                }
-            } else {
+        if (parameters.clickAttributionUrl) {
+            this.handleClickAttribution(parameters);
+
+            if (!parameters.clickAttributionUrlFollowsRedirects) {
                 this.openAppStore(parameters);
             }
+        } else {
+            this.openAppStore(parameters);
         }
     }
 
@@ -149,7 +150,6 @@ export abstract class EndScreenEventHandler<T extends Campaign, T2 extends Abstr
 
         if (parameters.clickAttributionUrl) {
             this._thirdPartyEventManager.clickAttributionEvent(parameters.clickAttributionUrl, false);
-            return;
         }
     }
 

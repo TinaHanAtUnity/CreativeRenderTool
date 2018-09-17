@@ -175,12 +175,7 @@ describe('EndScreenEventHandlerTest', () => {
             });
 
             it('and API is less than 21, it should launch view intent', () => {
-                sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').returns(Promise.resolve({
-                    url: 'http://foo.url.com',
-                    response: 'foo response',
-                    responseCode: 200
-                }));
-
+                sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').resolves();
                 sinon.stub(nativeBridge, 'getApiLevel').returns(20);
 
                 endScreenEventHandler.onEndScreenDownload(downloadParameters);
@@ -194,12 +189,7 @@ describe('EndScreenEventHandlerTest', () => {
             });
 
             it('with appDownloadUrl and API is greater than or equal to 21, it should launch web search intent', () => {
-                sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').returns(Promise.resolve({
-                    url: 'http://foo.url.com',
-                    response: 'foo response',
-                    responseCode: 200
-                }));
-
+                sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').resolves();
                 sinon.stub(nativeBridge, 'getApiLevel').returns(21);
 
                 endScreenEventHandler.onEndScreenDownload(downloadParameters);
@@ -319,37 +309,35 @@ describe('EndScreenEventHandlerTest', () => {
                     sinon.assert.notCalled(<sinon.SinonSpy>nativeBridge.Intent.launch);
                 });
             });
+        });
 
-            describe('with no follow redirects', () => {
-                beforeEach(() => {
-                    sinon.stub(campaign, 'getClickAttributionUrlFollowsRedirects').returns(false);
-                    sinon.stub(campaign, 'getStore').returns(StoreName.GOOGLE);
-                    endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
-                        appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
-                        bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
-                        store: performanceAdUnitParameters.campaign.getStore(),
-                        clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
-                        clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
-                    });
-
+        describe('with no follow redirects', () => {
+            beforeEach(() => {
+                sinon.stub(campaign, 'getClickAttributionUrlFollowsRedirects').returns(false);
+                sinon.stub(campaign, 'getStore').returns(StoreName.GOOGLE);
+                endScreenEventHandler.onEndScreenDownload(<IEndScreenDownloadParameters>{
+                    appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
+                    bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
+                    store: performanceAdUnitParameters.campaign.getStore(),
+                    clickAttributionUrlFollowsRedirects: false,
+                    clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
                 });
+            });
 
-                it('should send a click with session manager', () => {
-                    const params: IOperativeEventParams = { placement: placement,
-                        videoOrientation: 'landscape',
-                        adUnitStyle: undefined,
-                        asset: performanceAdUnit.getVideo()
-                    };
-                    sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, params);
+            it('should send a click with session manager', () => {
+                const params: IOperativeEventParams = { placement: placement,
+                    videoOrientation: 'landscape',
+                    adUnitStyle: undefined,
+                    asset: performanceAdUnit.getVideo()
+                };
+                sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, params);
+            });
+
+            it('should launch market view', () => {
+                sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
+                    'action': 'android.intent.action.VIEW',
+                    'uri': 'market://details?id=com.iUnity.angryBots'
                 });
-
-                it('should launch market view', () => {
-                    sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
-                        'action': 'android.intent.action.VIEW',
-                        'uri': 'market://details?id=com.iUnity.angryBots'
-                    });
-                });
-
             });
         });
 
