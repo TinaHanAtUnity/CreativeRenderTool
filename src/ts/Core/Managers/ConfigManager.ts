@@ -51,6 +51,7 @@ export class ConfigManager {
                         if(nativeBridge.getPlatform() === Platform.IOS && deviceInfo.getLimitAdTracking()) {
                             ConfigManager.storeGamerToken(nativeBridge, configJson.token);
                         }
+                        return configJson;
                     } else {
                         Diagnostics.trigger('config_failure', {
                             configUrl: url,
