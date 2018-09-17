@@ -103,4 +103,3 @@ class ABTest {
 
 export const AdmobVideoRequiredAssetTest = new ABTest(GroupEleven, GroupTwelve);
 export const FPSCollectionTest = new ABTest(GroupSixteen);
-export const NewVideoOverlayEnabledAbTest = new ABTest(GroupEighteen, GroupNineteen);

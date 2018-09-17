@@ -147,17 +147,6 @@ export class VastVideoEventHandler extends VideoEventHandler {
         this.sendThirdPartyTrackingEvent('thirdQuartile');
     }
 
-    protected handleVideoError(errorType?: string, errorData?: any) {
-        super.handleVideoError(errorType, errorData);
-
-        const endScreen = this._vastAdUnit.getEndScreen();
-        if(endScreen) {
-            endScreen.show();
-        } else {
-            this._vastAdUnit.hide();
-        }
-    }
-
     protected handleCompleteEvent(url: string): void {
         super.handleCompleteEvent(url);
         this.sendThirdPartyTrackingEvent('complete');

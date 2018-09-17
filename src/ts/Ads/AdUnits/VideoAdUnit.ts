@@ -75,6 +75,8 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
         this.prepareOverlay();
     }
 
+    public abstract onVideoError(): void;
+
     public show(): Promise<void> {
         this.setShowing(true);
         this.setActive(true);
@@ -279,7 +281,9 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
 
         if(overlay) {
             overlay.hide();
-            overlay.container().parentElement!.removeChild(overlay.container());
+            if(overlay.container().parentElement) {
+                overlay.container().parentElement!.removeChild(overlay.container());
+            }
         }
     }
 
