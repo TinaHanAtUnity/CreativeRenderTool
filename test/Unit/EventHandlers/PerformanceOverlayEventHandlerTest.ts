@@ -25,7 +25,6 @@ import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/Perfor
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import Test = Mocha.Test;
 
 describe('PerformanceOverlayEventHandlerTest', () => {
 

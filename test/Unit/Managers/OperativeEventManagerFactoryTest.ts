@@ -3,6 +3,7 @@ import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { PerformanceOperativeEventManager } from 'Ads/Managers/PerformanceOperativeEventManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
@@ -16,7 +17,6 @@ import { MRAIDOperativeEventManager } from 'MRAID/Managers/MRAIDOperativeEventMa
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 
 describe('OperativeEventManagerFactoryTest', () => {
     const handleInvocation = sinon.spy();

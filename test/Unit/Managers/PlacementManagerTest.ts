@@ -1,8 +1,10 @@
 import { PlacementManager } from 'Ads/Managers/PlacementManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign } from 'Ads/Models/Campaign';
 import { PlacementState } from 'Ads/Models/Placement';
 import { ListenerApi } from 'Ads/Native/Listener';
 import { PlacementApi } from 'Ads/Native/Placement';
+import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { assert, expect } from 'chai';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 
@@ -14,8 +16,6 @@ import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 
 describe('PlacementManagerTest', () => {
     let nativeBridge: NativeBridge;

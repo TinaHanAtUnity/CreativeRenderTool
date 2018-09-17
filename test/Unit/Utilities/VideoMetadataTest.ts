@@ -1,5 +1,5 @@
 import { Video } from 'Ads/Models/Assets/Video';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { VideoFileInfo } from 'Ads/Utilities/VideoFileInfo';
 import { assert } from 'chai';
 import { VideoMetadata } from 'Core/Constants/Android/VideoMetadata';
 import { Platform } from 'Core/Constants/Platform';
@@ -10,12 +10,10 @@ import { CacheError } from 'Core/Native/Cache';
 
 import { Cache } from 'Core/Utilities/Cache';
 import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
-import { FileInfo } from 'Core/Utilities/FileInfo';
 import { Request } from 'Core/Utilities/Request';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { VideoFileInfo } from 'Ads/Utilities/VideoFileInfo';
 
 describe('VideoMetadataTest', () => {
     const validVideo: string = 'https://www.example.net/valid.mp4';

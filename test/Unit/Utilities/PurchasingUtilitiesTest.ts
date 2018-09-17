@@ -1,5 +1,6 @@
 import { PlacementManager } from 'Ads/Managers/PlacementManager';
 import { PlacementState } from 'Ads/Models/Placement';
+import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { assert } from 'chai';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
@@ -15,7 +16,6 @@ import { PurchasingApi } from 'Promo/Native/Purchasing';
 import { IPromoPayload, IPromoRequest, PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 
 describe('PurchasingUtilitiesTest', () => {
     let nativeBridge: NativeBridge;

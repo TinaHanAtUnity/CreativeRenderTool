@@ -13,7 +13,6 @@ import { FileInfo } from 'Core/Utilities/FileInfo';
 import { Request } from 'Core/Utilities/Request';
 import 'mocha';
 import * as sinon from 'sinon';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 class TestCacheApi extends CacheApi {
 

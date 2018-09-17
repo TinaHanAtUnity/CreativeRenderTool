@@ -1,7 +1,7 @@
 import { GdprManager } from 'Ads/Managers/GdprManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { FinishState } from 'Core/Constants/FinishState';
 import { ABGroupBuilder } from 'Core/Models/ABGroup';
-import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
@@ -11,7 +11,6 @@ import { PromoAdUnit } from 'Promo/AdUnits/PromoAdUnit';
 import { PromoEventHandler } from 'Promo/EventHandlers/PromoEventHandler';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
 import * as sinon from 'sinon';
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 
 describe('PromoEventHandlersTest', () => {
     const handleInvocation = sinon.spy();

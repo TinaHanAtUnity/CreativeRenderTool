@@ -1,3 +1,5 @@
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { MixedPlacementUtility } from 'Ads/Utilities/MixedPlacementUtility';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
@@ -11,8 +13,6 @@ import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 
 describe('configurationParserTest', () => {
 

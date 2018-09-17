@@ -26,7 +26,6 @@ import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
 import { VastOverlayEventHandler } from 'VAST/EventHandlers/VastOverlayEventHandler';
 import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastEndScreen } from 'VAST/Views/VastEndScreen';
-import Test = Mocha.Test;
 
 describe('VastOverlayEventHandlersTest', () => {
     let campaign: VastCampaign;

@@ -3,6 +3,7 @@ import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { ListenerApi } from 'Ads/Native/Listener';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
@@ -27,7 +28,6 @@ import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'VPAID/AdUnits/VPAIDAdUnit';
 import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
 import { VPAID } from 'VPAID/Views/VPAID';
 import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 
 describe('VPAIDAdUnit', () => {
     let nativeBridge: NativeBridge;

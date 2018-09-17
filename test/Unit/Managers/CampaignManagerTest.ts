@@ -6,8 +6,10 @@ import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { PlacementManager } from 'Ads/Managers/PlacementManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { HTML } from 'Ads/Models/Assets/HTML';
 import { Campaign } from 'Ads/Models/Campaign';
+import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { IPlacementRequestMap, MixedPlacementUtility } from 'Ads/Utilities/MixedPlacementUtility';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { assert } from 'chai';
@@ -79,8 +81,6 @@ import WrappedVast1 from 'xml/WrappedVast1.xml';
 import WrappedVast2 from 'xml/WrappedVast2.xml';
 import WrappedVast3 from 'xml/WrappedVast3.xml';
 import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 
 describe('CampaignManager', () => {
     let deviceInfo: DeviceInfo;

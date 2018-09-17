@@ -25,7 +25,6 @@ import { VastCampaign } from 'VAST/Models/VastCampaign';
 import { VastEndScreen } from 'VAST/Views/VastEndScreen';
 
 import EventTestVast from 'xml/EventTestVast.xml';
-import Test = Mocha.Test;
 
 describe('VastEndScreenEventHandlersTest', () => {
     const handleInvocation = sinon.spy();

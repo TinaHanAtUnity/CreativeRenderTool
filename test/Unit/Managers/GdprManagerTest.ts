@@ -1,4 +1,5 @@
 import { GDPREventAction, GDPREventSource, GdprManager } from 'Ads/Managers/GdprManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
@@ -14,7 +15,6 @@ import { Observable2 } from 'Core/Utilities/Observable';
 import { Request } from 'Core/Utilities/Request';
 import 'mocha';
 import * as sinon from 'sinon';
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 
 describe('GdprManagerTest', () => {
     const testGameId = '12345';

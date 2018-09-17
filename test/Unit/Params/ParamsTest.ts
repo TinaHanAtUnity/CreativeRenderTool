@@ -5,6 +5,7 @@ import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { IOperativeEventParams, OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Placement } from 'Ads/Models/Placement';
 import { Session } from 'Ads/Models/Session';
 import { AndroidAdUnitApi } from 'Ads/Native/Android/AndroidAdUnit';
@@ -37,7 +38,6 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { IEventSpec, ParamsTestData } from 'Unit/Params/ParamsTestData';
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 
 class TestStorageApi extends StorageApi {
     public get<T>(storageType: StorageType, key: string): Promise<T> {

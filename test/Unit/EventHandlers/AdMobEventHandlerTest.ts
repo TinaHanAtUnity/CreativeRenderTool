@@ -7,6 +7,7 @@ import { AdMobSignalFactory } from 'AdMob/Utilities/AdMobSignalFactory';
 import { ITouchInfo } from 'AdMob/Views/AFMABridge';
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Session } from 'Ads/Models/Session';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
 import { assert } from 'chai';
@@ -23,7 +24,6 @@ import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 import { unity_proto } from '../../../src/proto/unity_proto.js';
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 
 const resolveAfter = (timeout: number): Promise<void> => {
     return new Promise((resolve, reject) => setTimeout(resolve, timeout));
