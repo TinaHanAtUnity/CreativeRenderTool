@@ -84,7 +84,9 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
 
             if(this._moat) {
                 this._moat.removeMessageListener();
-                this._moat.container().parentElement!.removeChild(this._moat.container());
+                if (this._moat.container().parentElement) {
+                    this._moat.container().parentElement!.removeChild(this._moat.container());
+                }
             }
 
             return super.hide();
@@ -183,6 +185,15 @@ export class VastAdUnit extends VideoAdUnit<VastCampaign> {
         super.onContainerForeground();
         if (this.isShowing() && this.canShowVideo() && this._moat) {
             this._moat.play(this.getVolume());
+        }
+    }
+
+    public onVideoError(): void {
+        const endScreen = this.getEndScreen();
+        if(endScreen) {
+            endScreen.show();
+        } else {
+            this.hide();
         }
     }
 
