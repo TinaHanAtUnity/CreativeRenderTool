@@ -14,8 +14,6 @@ export class CustomFeatures {
                gameId === '1783249' ||
                gameId === '1783250' ||
                gameId === '1543513' ||
-               gameId === '1458550' || // Kefir
-               gameId === '1432611' || // Kefir
                gameId === '1783091' || // Guild of Heroes
                gameId === '1783092';   // Guild of Heroes
     }
@@ -24,7 +22,13 @@ export class CustomFeatures {
         return  creativeId === '109455881' ||
                 creativeId === '109455877' ||
                 creativeId === '109091853' ||
-                creativeId === '109091754';
+                creativeId === '109091754' ||
+                creativeId === '114617576' || // Hellfest
+                creativeId === '114617336';   // Hellfest
+    }
+
+    public static isTencentAdvertisement(seatId: number | undefined) {
+        return seatId === 9107;
     }
 
     public static isPlayableConfigurationEnabled(originalResourceUrl: string) {
