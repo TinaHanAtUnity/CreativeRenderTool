@@ -6,7 +6,7 @@ import { ARUtil } from 'AR/Utilities/ARUtil';
 import { Platform } from 'Core/Constants/Platform';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { CurrentPermission, PermissionTypes } from 'Core/Native/Permissions';
+import { PermissionsUtil, PermissionTypes, CurrentPermission } from 'Core/Utilities/Permissions';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { IObserver0, IObserver1, IObserver2 } from 'Core/Utilities/IObserver';
 import { Localization } from 'Core/Utilities/Localization';
@@ -565,7 +565,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 return;
             }
 
-            this._nativeBridge.Permissions.checkPermissions(PermissionTypes.CAMERA).then(results => {
+            PermissionsUtil.checkPermissions(this._nativeBridge, PermissionTypes.CAMERA).then(results => {
                 const requestPermissionText = <HTMLElement>this._cameraPermissionPanel.querySelector('.request-text');
                 if (results === CurrentPermission.DENIED) {
                     this.onCameraPermissionEvent(false);
@@ -600,7 +600,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             }
         });
 
-        this._nativeBridge.Permissions.requestPermission(PermissionTypes.CAMERA).then(() => {
+        PermissionsUtil.requestPermission(this._nativeBridge, PermissionTypes.CAMERA).then(() => {
             this._nativeBridge.Sdk.logDebug('Required permission for showing camera');
         });
     }

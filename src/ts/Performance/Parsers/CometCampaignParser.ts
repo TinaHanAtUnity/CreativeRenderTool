@@ -32,6 +32,8 @@ export enum ICometTrackingUrlEvents {
 
 export class CometCampaignParser extends CampaignParser {
     public static ContentType = 'comet/campaign';
+    public static ContentTypeVideo = 'comet/video';
+    public static ContentTypeMRAID = 'comet/mraid-url';
 
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, osVersion?: string): Promise<Campaign> {
         const json = response.getJsonContent();

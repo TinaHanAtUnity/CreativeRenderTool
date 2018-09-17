@@ -21,12 +21,14 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
     private _isSwipeToCloseEnabled: boolean = false;
     private _privacy: AbstractPrivacy;
     private _callButtonEnabled: boolean = true;
+    private _seatId: number | undefined;
 
-    constructor(nativeBridge: NativeBridge, campaign: VastCampaign, gameId: string, privacy: AbstractPrivacy) {
+    constructor(nativeBridge: NativeBridge, campaign: VastCampaign, gameId: string, privacy: AbstractPrivacy, seatId?: number) {
         super(nativeBridge, 'vast-end-screen');
 
         this._template = new Template(VastEndScreenTemplate);
         this._privacy = privacy;
+        this._seatId = seatId;
 
         if(campaign) {
             const landscape = campaign.getLandscape();
@@ -75,6 +77,13 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
     public render(): void {
         super.render();
 
+        if (CustomFeatures.isTencentAdvertisement(this._seatId)) {
+            const tencentAdTag = <HTMLElement>this._container.querySelector('.tencent-advertisement');
+            if (tencentAdTag) {
+                tencentAdTag.innerText = '广告';
+            }
+        }
+
         if(this._isSwipeToCloseEnabled) {
             (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';
         }
@@ -101,9 +110,16 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
     }
 
     public remove(): void {
-        this._privacy.removeEventHandler(this);
-        this._privacy.container().parentElement!.removeChild(this._privacy.container());
-        this.container().parentElement!.removeChild(this.container());
+        if (this._privacy) {
+            this._privacy.removeEventHandler(this);
+            if (this._privacy.container().parentElement) {
+                this._privacy.container().parentElement!.removeChild(this._privacy.container());
+            }
+        }
+
+        if (this.container().parentElement) {
+            this.container().parentElement!.removeChild(this.container());
+        }
     }
 
     public onPrivacyClose(): void {
