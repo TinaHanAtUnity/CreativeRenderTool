@@ -99,7 +99,10 @@ describe('configurationParserTest', () => {
     describe('Parsing mixed placement json to configuration', () => {
 
         const sandbox = sinon.createSandbox();
-        sandbox.stub(MixedPlacementUtility, 'createMixedPlacements');
+
+        beforeEach(() => {
+            sandbox.stub(MixedPlacementUtility, 'createMixedPlacements');
+        });
 
         afterEach(() => {
             MixedPlacementUtility.originalPlacements = {};
