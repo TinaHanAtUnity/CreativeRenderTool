@@ -63,8 +63,8 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _hasCameraPermission = false;
     private _permissionResultObserver: IObserver2<string, boolean>;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup) {
-        super(nativeBridge, 'playable-mraid', placement, campaign, privacy, showGDPRBanner, abGroup);
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId: number) {
+        super(nativeBridge, 'playable-mraid', placement, campaign, privacy, showGDPRBanner, abGroup, gameSessionId);
 
         this._placement = placement;
         this._campaign = campaign;
@@ -201,8 +201,14 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     public show(): void {
         super.show();
         this._showTimestamp = Date.now();
-        const backgroundTime = this.clampTime(this._backgroundTime / 1000);
-        this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(0, 0, backgroundTime, 'playable_show', {}));
+        const backgroundTime = this._backgroundTime / 1000;
+
+        if (this.validateKPITime({backgroundTime}, 'ar_playable_show')) {
+            if (typeof backgroundTime === 'number') {
+                this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(0, 0, backgroundTime, 'playable_show', {}));
+            }
+        }
+
         this.showLoadingScreen();
     }
 
@@ -361,16 +367,22 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private onCloseEvent(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
-        const timeFromShow = this.clampTime((Date.now() - this._showTimestamp - this._backgroundTime) / 1000);
-        const timeFromPlayableStart = this.clampTime((Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000);
-        const backgroundTime = this.clampTime(this._backgroundTime / 1000);
 
-        if(this._canSkip && !this._canClose) {
+        const skip = this._canSkip && !this._canClose;
+        const eventName = skip ? 'playable_skip' : 'playable_close';
+
+        const timeFromShow = (Date.now() - this._showTimestamp - this._backgroundTime) / 1000;
+        const timeFromPlayableStart = (Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000;
+        const backgroundTime = this._backgroundTime / 1000;
+
+        if (skip) {
             this._handlers.forEach(handler => handler.onMraidSkip());
-            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, 'playable_skip', undefined));
-        } else if(this._canClose) {
+        } else {
             this._handlers.forEach(handler => handler.onMraidClose());
-            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, 'playable_close', undefined));
+        }
+
+        if (this.validateKPITime({timeFromShow, timeFromPlayableStart, backgroundTime}, 'ar_' + eventName)) {
+            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, eventName, undefined));
         }
     }
 
@@ -386,10 +398,12 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         const frameLoadDuration = Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId());
         this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' iframe load duration ' + frameLoadDuration + ' ms');
 
-        const timeFromShow = this.clampTime((this._playableStartTimestamp - this._showTimestamp - this._backgroundTime) / 1000);
-        const backgroundTime = this.clampTime(this._backgroundTime / 1000);
+        const timeFromShow = (this._playableStartTimestamp - this._showTimestamp - this._backgroundTime) / 1000;
+        const backgroundTime = this._backgroundTime / 1000;
 
-        this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(frameLoadDuration, timeFromShow, backgroundTime, 'playable_loading_time', {}));
+        if (this.validateKPITime({timeFromShow, backgroundTime}, 'ar_playable_loading_time')) {
+            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(frameLoadDuration, timeFromShow, backgroundTime, 'playable_loading_time', {}));
+        }
     }
 
     private handleAREvent(event: string, parameters: string) {
@@ -494,10 +508,13 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 }));
                 break;
             case 'analyticsEvent':
-                const timeFromShow = this.clampTime((Date.now() - this._showTimestamp - this._backgroundTime) / 1000);
-                const timeFromPlayableStart = this.clampTime((Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000);
-                const backgroundTime = this.clampTime(this._backgroundTime / 1000);
-                this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, event.data.event, event.data.eventData));
+                const timeFromShow = (Date.now() - this._showTimestamp - this._backgroundTime) / 1000;
+                const timeFromPlayableStart = (Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000;
+                const backgroundTime = this._backgroundTime / 1000;
+
+                if (this.validateKPITime({timeFromShow, timeFromPlayableStart, backgroundTime}, event.data.event)) {
+                    this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, event.data.event, event.data.eventData));
+                }
                 break;
             case 'customMraidState':
                 switch(event.data.state) {
@@ -541,9 +558,13 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 this._closeElement.style.display = 'block';
 
                 this._playableStartTimestamp = Date.now();
-                const timeFromShow = this.clampTime((this._playableStartTimestamp - this._showTimestamp - this._backgroundTime) / 1000);
-                const backgroundTime = this.clampTime(this._backgroundTime / 1000);
-                this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_start', undefined));
+                const timeFromShow = (this._playableStartTimestamp - this._showTimestamp - this._backgroundTime) / 1000;
+                const backgroundTime = this._backgroundTime / 1000;
+
+                if (this.validateKPITime({timeFromShow, backgroundTime}, 'ar_playable_start')) {
+                    this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_start', undefined));
+                }
+
                 this.setViewableState(true);
 
                 this._loadingScreen.style.display = 'none';

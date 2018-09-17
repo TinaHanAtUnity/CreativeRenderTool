@@ -48,8 +48,8 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
 
     protected _campaign: PerformanceMRAIDCampaign;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: PerformanceMRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup) {
-        super(nativeBridge, 'playable-mraid', placement, campaign, privacy, showGDPRBanner, abGroup);
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: PerformanceMRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId: number) {
+        super(nativeBridge, 'playable-mraid', placement, campaign, privacy, showGDPRBanner, abGroup, gameSessionId);
 
         this._placement = placement;
         this._campaign = campaign;
@@ -215,9 +215,12 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
             this.showMRAIDAd();
         }
 
-        const frameLoadDuration = this.clampTime((Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId())) / 1000);
+        const frameLoadDuration = (Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId())) / 1000;
         this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' iframe load duration ' + frameLoadDuration + ' ms');
-        this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(frameLoadDuration, 0, 0, 'playable_loading_time', {}));
+
+        if (this.validateKPITime({frameLoadDuration}, 'playable_mraid_playable_loading_time')) {
+            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(frameLoadDuration, 0, 0, 'playable_loading_time', {}));
+        }
     }
 
     private showLoadingScreen() {
@@ -312,10 +315,16 @@ export class PlayableMRAID extends MRAIDView<IMRAIDViewHandler> {
     }
 
     private sendMraidAnalyticsEvent(eventName: string, eventData?: any) {
-        const timeFromShow = this.clampTime((Date.now() - this._showTimestamp - this._backgroundTime) / 1000);
-        const backgroundTime = this.clampTime(this._backgroundTime / 1000);
-        const timeFromPlayableStart = this._playableStartTimestamp ? this.clampTime((Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000) : 0;
-        this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, eventName, eventData));
+        const timeFromShow = (Date.now() - this._showTimestamp - this._backgroundTime) / 1000;
+        const backgroundTime = this._backgroundTime / 1000;
+        const timeFromPlayableStart = this._playableStartTimestamp ? (Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000 : 0;
+        if (this.validateKPITime({
+            timeFromShow,
+            backgroundTime,
+            timeFromPlayableStart
+        }, 'playable_mraid_' + eventName)) {
+            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, eventName, eventData));
+        }
     }
 
     private updateProgressCircle(container: HTMLElement, value: number) {

@@ -36,6 +36,8 @@ export class CometCampaignParser extends CampaignParser {
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, osVersion?: string): Promise<Campaign> {
         const json = response.getJsonContent();
 
+        json.mraidUrl = 'http://10.35.32.136:8000/';
+
         const campaignStore = typeof json.store !== 'undefined' ? json.store : '';
         let storeName: StoreName;
         switch(campaignStore) {
