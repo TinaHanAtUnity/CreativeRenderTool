@@ -177,6 +177,14 @@ $radio-group-container($scale-size = $default-scale-size, $context-font-size = 1
 
 }
 
+$tencent-overlay($scale-size = $default-scale-size) {
+  position: fixed;
+  top: $default-scale-size * 2rem;
+  padding: $default-scale-size * .7rem;
+  color: $white;
+  font-size: $default-scale-size * $default-font-size * .75;
+}
+
 $full-screen-pop-up-view($scale-size, z-index = auto, $with-styles = true) {
   $pop-up-size = $scale-size * $default-size;
   $pop-up-font-size = $scale-size * $default-font-size * .65;
