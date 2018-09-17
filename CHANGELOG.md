@@ -1,7 +1,11 @@
-# Staged
+# Mon Sep 17 08:00:27 UTC 2018
 
 * Enable new video overlay for all
 * Fix: VAST end screen not visible after video errors (black screen)
+
+# Fri Sep 14 17:45:45 UTC 2018
+
+* Remove Kefir gameIDs from Personalized Placement Experiement
 
 # Wed Sep 12 21:48:07 UTC 2018
 
