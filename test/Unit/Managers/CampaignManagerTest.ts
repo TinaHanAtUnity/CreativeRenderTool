@@ -1502,10 +1502,11 @@ describe('CampaignManager', () => {
                 return Promise.resolve();
             });
 
+            const clientInfoMixedExperiment = TestFixtures.getClientInfo(Platform.ANDROID, '1003628');
             coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements), clientInfoMixedExperiment);
             assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, programmaticTrackingService, nativeBridge);
-            campaignManager = new CampaignManager(nativeBridge, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
+            campaignManager = new CampaignManager(nativeBridge, coreConfig, adsConfig, assetManager, sessionManager, adMobSignalFactory, request, clientInfoMixedExperiment, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager);
         });
 
         afterEach(() => {
