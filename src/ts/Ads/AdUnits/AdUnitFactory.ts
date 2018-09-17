@@ -23,7 +23,7 @@ import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { ClosableVideoOverlay } from 'Ads/Views/ClosableVideoOverlay';
 import { Closer } from 'Ads/Views/Closer';
 import { IEndScreenParameters } from 'Ads/Views/EndScreen';
-import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
+import { ReportingPrivacy, GDPRPrivacy } from 'Ads/Views/ReportingPrivacy';
 import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
 import { ARUtil } from 'AR/Utilities/ARUtil';
 import { ARMRAID } from 'AR/Views/ARMRAID';
@@ -522,7 +522,14 @@ export class AdUnitFactory {
     }
 
     private static createPrivacy(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): GDPRPrivacy {
-        const privacy = new GDPRPrivacy(nativeBridge, parameters.campaign, parameters.gdprManager, parameters.configuration.isGDPREnabled(), parameters.configuration.isCoppaCompliant());
+
+        let privacy: AbstractPrivacy;
+        // TODO: Add AB Test group check
+        if (CustomFeatures.isTencentAdvertisement(0) || true) {
+            privacy = new ReportingPrivacy(nativeBridge, parameters.campaign, parameters.gdprManager, parameters.configuration.isGDPREnabled(), parameters.configuration.isCoppaCompliant());
+        } else {
+            privacy = new GDPRPrivacy(nativeBridge, parameters.campaign, parameters.gdprManager, parameters.configuration.isGDPREnabled(), parameters.configuration.isCoppaCompliant());
+        }
         const privacyEventHandler = new PrivacyEventHandler(nativeBridge, parameters);
         privacy.addEventHandler(privacyEventHandler);
         return privacy;

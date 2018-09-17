@@ -1,7 +1,6 @@
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { Campaign } from 'Ads/Models/Campaign';
-import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
-import { FinishState } from 'Core/Constants/FinishState';
+import { ReportingPrivacy } from 'Ads/Views/ReportingPrivacy';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 
@@ -24,7 +23,7 @@ export class BadAdsReporting {
         Diagnostics.trigger('reported_ad', error);
     }
 
-    public static setupReportListener(privacy: GDPRPrivacy, ad: AbstractAdUnit | AbstractVideoOverlay): void {
+    public static setupReportListener(privacy: ReportingPrivacy, ad: AbstractAdUnit | AbstractVideoOverlay): void {
         if (privacy._onReport) {
             privacy._onReport.subscribe(() => {
                 privacy._onReport.unsubscribe();

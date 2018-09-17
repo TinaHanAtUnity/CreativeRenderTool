@@ -279,7 +279,7 @@
     slide-animation(.4s, ease-in, 250%);
   }
 
-  #gdpr-privacy {
+  #gdpr-privacy, #reporting-privacy {
     top: constant(safe-area-inset-top);
     top: env(safe-area-inset-top);
 
@@ -288,7 +288,7 @@
   }
 
   body {
-    &.landscape   #gdpr-privacy {
+    &.landscape   #gdpr-privacy, #reporting-privacy {
       left: calc(constant(safe-area-inset-left) / 2);
       left: calc(env(safe-area-inset-left) / 2);
       width: calc(100% - (constant(safe-area-inset-left) / 2));

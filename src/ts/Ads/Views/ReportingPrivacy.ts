@@ -3,18 +3,18 @@ import { Campaign } from 'Ads/Models/Campaign';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Template } from 'Core/Utilities/Template';
-import GDPRPrivacyTemplate from 'html/GDPR-privacy.html';
+import ReportingPrivacyTemplate from 'html/Reporting-privacy.html';
 import { BadAdsReporting } from 'Ads/Utilities/BadAdsReporting';
 import { Observable0 } from 'Core/Utilities/Observable';
 
-export enum GDPRCardState {
+export enum PrivacyCardState {
     INITIAL,
     PRIVACY,
     BUILD,
     REPORT
 }
 
-export class GDPRPrivacy extends AbstractPrivacy {
+export class ReportingPrivacy extends AbstractPrivacy {
 
     public readonly _onReport: Observable0 = new Observable0();
 
@@ -31,7 +31,7 @@ export class GDPRPrivacy extends AbstractPrivacy {
 
         super(nativeBridge, isCoppaCompliant, gdprEnabled, 'gdpr-privacy');
 
-        this._template = new Template(GDPRPrivacyTemplate);
+        this._template = new Template(ReportingPrivacyTemplate);
         this._campaign = campaign;
         this._gdprEnabled = gdprEnabled;
         this._gdprManager = gdprManager;
@@ -188,28 +188,28 @@ export class GDPRPrivacy extends AbstractPrivacy {
         switch(this._currentState) {
 
             // Privacy info showing
-            case GDPRCardState.PRIVACY: {
+            case PrivacyCardState.PRIVACY: {
                 leftEl.innerText = pCard;
                 if (isLeftClick) {
-                    this._currentState = GDPRCardState.BUILD;
+                    this._currentState = PrivacyCardState.BUILD;
                     middleEl.innerText = rCard;
                     classList.add('build');
                 } else {
-                    this._currentState = GDPRCardState.REPORT;
+                    this._currentState = PrivacyCardState.REPORT;
                     middleEl.innerText = bCard;
                     classList.add('report');
                 }
                 break;
             }
             // Build info showing
-            case GDPRCardState.BUILD: {
+            case PrivacyCardState.BUILD: {
                 classList.remove('build');
                 if (isLeftClick) {
-                    this._currentState = GDPRCardState.PRIVACY;
+                    this._currentState = PrivacyCardState.PRIVACY;
                     leftEl.innerText = bCard;
                     middleEl.innerText = rCard;
                 } else {
-                    this._currentState = GDPRCardState.REPORT;
+                    this._currentState = PrivacyCardState.REPORT;
                     leftEl.innerText = pCard;
                     middleEl.innerText = bCard;
                     classList.add('report');
@@ -217,14 +217,14 @@ export class GDPRPrivacy extends AbstractPrivacy {
                 break;
             }
             // Report Ad showing
-            case GDPRCardState.REPORT: {
+            case PrivacyCardState.REPORT: {
                 classList.remove('report');
                 middleEl.innerText = rCard;
                 if (isLeftClick) {
-                    this._currentState = GDPRCardState.PRIVACY;
+                    this._currentState = PrivacyCardState.PRIVACY;
                     leftEl.innerText = bCard;
                 } else {
-                    this._currentState = GDPRCardState.BUILD;
+                    this._currentState = PrivacyCardState.BUILD;
                     leftEl.innerText = pCard;
                     classList.add('build');
                 }
@@ -232,7 +232,7 @@ export class GDPRPrivacy extends AbstractPrivacy {
             }
             // Initial Configuration
             default: {
-                this._currentState = GDPRCardState.PRIVACY;
+                this._currentState = PrivacyCardState.PRIVACY;
                 leftEl.innerText = bCard;
                 middleEl.innerText = rCard;
             }
