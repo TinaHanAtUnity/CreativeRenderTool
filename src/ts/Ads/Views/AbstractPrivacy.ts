@@ -1,6 +1,5 @@
 import { GdprManager, IGdprPersonalProperties } from 'Ads/Managers/GdprManager';
 import { Campaign } from 'Ads/Models/Campaign';
-import { BadAdReason } from 'Ads/Utilities/BadAdsReporting';
 import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { Configuration } from 'Core/Models/Configuration';
@@ -40,8 +39,6 @@ export abstract class AbstractPrivacy extends View<IPrivacyHandler> {
             'isCoppaCompliant': isCoppaCompliant,
             'isGDPREnabled': isGDPREnabled,
             'buildInformation': AbstractPrivacy.buildInformation,
-            'badAdKeys': Object.keys(BadAdReason),
-            'badAdReasons': (<string[]>(<any>Object).values(BadAdReason)),
             'userInformation': AbstractPrivacy.userInformation
         };
     }
