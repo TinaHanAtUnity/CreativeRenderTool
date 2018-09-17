@@ -1,13 +1,12 @@
-import 'mocha';
+import { CampaignManager } from 'Ads/Managers/CampaignManager';
+import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOperativeEventManager';
+import { DeviceInfo } from 'Backend/Api/DeviceInfo';
+import { IUnityAdsListener } from 'Backend/IUnityAdsListener';
+import { UnityAds } from 'Backend/UnityAds';
 
-import { Platform } from 'Constants/Platform';
-import { UnityAds } from 'Native/Backend/UnityAds';
-import { IUnityAdsListener } from 'Native/Backend/IUnityAdsListener';
-import { DeviceInfo } from 'Native/Backend/Api/DeviceInfo';
-import { ConfigManager } from 'Managers/ConfigManager';
-import { CampaignManager } from 'Managers/CampaignManager';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { ProgrammaticOperativeEventManager } from 'Managers/ProgrammaticOperativeEventManager';
+import { Platform } from 'Core/Constants/Platform';
+import { ConfigManager } from 'Core/Managers/ConfigManager';
+import 'mocha';
 
 describe('AndroidMraidTest', () => {
 

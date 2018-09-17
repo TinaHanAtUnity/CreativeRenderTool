@@ -1,9 +1,9 @@
+import { assert } from 'chai';
+import { Platform } from 'Core/Constants/Platform';
+
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
 import * as sinon from 'sinon';
-import { assert } from 'chai';
-
-import { NativeBridge } from 'Native/NativeBridge';
-import { Platform } from 'Constants/Platform';
 
 describe('ConnectivityApi', () => {
     const handleInvocation = sinon.spy();

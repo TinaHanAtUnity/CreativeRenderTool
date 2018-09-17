@@ -1,8 +1,8 @@
+import { assert } from 'chai';
+import { Platform } from 'Core/Constants/Platform';
+import { JaegerSpan, JaegerTags } from 'Core/Jaeger/JaegerSpan';
 import 'mocha';
 import * as sinon from 'sinon';
-import { assert } from 'chai';
-import { JaegerSpan, JaegerTags } from 'Jaeger/JaegerSpan';
-import { Platform } from 'Constants/Platform';
 
 describe('JaegerSpan', () => {
 

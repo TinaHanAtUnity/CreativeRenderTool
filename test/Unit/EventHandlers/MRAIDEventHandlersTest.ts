@@ -1,33 +1,34 @@
-import 'mocha';
-import * as sinon from 'sinon';
+import { Activity } from 'Ads/AdUnits/Containers/Activity';
+import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { GdprManager } from 'Ads/Managers/GdprManager';
+import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
+import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
+import { SessionManager } from 'Ads/Managers/SessionManager';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { Placement } from 'Ads/Models/Placement';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
+import { GDPRPrivacy } from 'Ads/Views/GDPRPrivacy';
 import { assert } from 'chai';
-
-import { MRAIDEventHandler } from 'EventHandlers/MRAIDEventHandler';
-import { NativeBridge } from 'Native/NativeBridge';
-import { SessionManager } from 'Managers/SessionManager';
+import { Platform } from 'Core/Constants/Platform';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { Configuration } from 'Core/Models/Configuration';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
+import { INativeResponse, Request } from 'Core/Utilities/Request';
+import 'mocha';
+import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
+import { MRAIDEventHandler } from 'MRAID/EventHandlers/MRAIDEventHandler';
+import { PlayableEventHandler } from 'MRAID/EventHandlers/PlayableEventHandler';
+import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { MRAID } from 'MRAID/Views/MRAID';
+import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { DeviceInfo } from 'Models/DeviceInfo';
-import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { Request, INativeResponse } from 'Utilities/Request';
-import { WakeUpManager } from 'Managers/WakeUpManager';
-import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'AdUnits/MRAIDAdUnit';
-import { Platform } from 'Constants/Platform';
-import { MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
-import { Activity } from 'AdUnits/Containers/Activity';
-import { AdUnitContainer, Orientation } from 'AdUnits/Containers/AdUnitContainer';
-import { MRAID } from 'Views/MRAID';
-import { Placement } from 'Models/Placement';
-import { HttpKafka, KafkaCommonObjectType } from 'Utilities/HttpKafka';
-import { FocusManager } from 'Managers/FocusManager';
-import { OperativeEventManager } from 'Managers/OperativeEventManager';
-import { ClientInfo } from 'Models/ClientInfo';
-import { GDPRPrivacy } from 'Views/GDPRPrivacy';
-import { GdprManager } from 'Managers/GdprManager';
-import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
-import { MetaDataManager } from 'Managers/MetaDataManager';
-import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
-import { Configuration } from 'Models/Configuration';
-import { AbstractPrivacy } from 'Views/AbstractPrivacy';
+
 describe('MRAIDEventHandlersTest', () => {
 
     const handleInvocation = sinon.spy();
@@ -97,7 +98,7 @@ describe('MRAIDEventHandlersTest', () => {
                 options: {},
                 mraid: mraidView,
                 endScreen: undefined,
-                privacy: new GDPRPrivacy(nativeBridge, gdprManager, false, true),
+                privacy: new GDPRPrivacy(nativeBridge, gdprManager, false),
                 gdprManager: gdprManager,
                 programmaticTrackingService: programmaticTrackingService
             };
@@ -187,7 +188,7 @@ describe('MRAIDEventHandlersTest', () => {
             });
         });
 
-        describe('with onAnalyticsEvent', () => {
+        describe('with onPlayableAnalyticsEvent', () => {
             let sandbox: sinon.SinonSandbox;
 
             before(() => {
@@ -204,48 +205,61 @@ describe('MRAIDEventHandlersTest', () => {
                 sandbox.restore();
             });
 
-            it('should send a analytics event', () => {
-                mraidAdUnit = new MRAIDAdUnit(nativeBridge, playableMraidAdUnitParams);
-                sinon.stub(mraidAdUnit, 'sendClick');
-                mraidEventHandler = new MRAIDEventHandler(nativeBridge, mraidAdUnit, playableMraidAdUnitParams);
+            describe('MRAIDEventHandler', () => {
+                it('should not send a analytics event', () => {
+                    mraidAdUnit = new MRAIDAdUnit(nativeBridge, playableMraidAdUnitParams);
+                    sinon.stub(mraidAdUnit, 'sendClick');
+                    mraidEventHandler = new MRAIDEventHandler(nativeBridge, mraidAdUnit, playableMraidAdUnitParams);
 
-                mraidEventHandler.onMraidAnalyticsEvent(15, 12, 0, 'win_screen', {'level': 2});
-
-                const kafkaObject: any = {};
-                kafkaObject.type = 'win_screen';
-                kafkaObject.eventData = {'level': 2};
-                kafkaObject.timeFromShow = 15;
-                kafkaObject.timeFromPlayableStart = 12;
-                kafkaObject.backgroundTime = 0;
-                kafkaObject.auctionId = '12345';
-
-                const resourceUrl = playableMraidCampaign.getResourceUrl();
-                if(resourceUrl) {
-                    kafkaObject.url = resourceUrl.getOriginalUrl();
-                }
-                sinon.assert.calledWith(<sinon.SinonStub>HttpKafka.sendEvent, 'ads.sdk2.events.playable.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
+                    mraidEventHandler.onPlayableAnalyticsEvent(15, 12, 0, 'win_screen', { 'level': 2 });
+                    sinon.assert.notCalled(<sinon.SinonStub>HttpKafka.sendEvent);
+                });
             });
 
-            it('should send a analytics event without extra event data', () => {
-                mraidAdUnit = new MRAIDAdUnit(nativeBridge, playableMraidAdUnitParams);
-                sinon.stub(mraidAdUnit, 'sendClick');
-                mraidEventHandler = new MRAIDEventHandler(nativeBridge, mraidAdUnit, playableMraidAdUnitParams);
+            describe('PlayableEventHandler', () => {
+                it('should send a analytics event', () => {
+                    mraidAdUnit = new MRAIDAdUnit(nativeBridge, playableMraidAdUnitParams);
+                    sinon.stub(mraidAdUnit, 'sendClick');
+                    mraidEventHandler = new PlayableEventHandler(nativeBridge, mraidAdUnit, playableMraidAdUnitParams);
 
-                mraidEventHandler.onMraidAnalyticsEvent(15, 12, 5, 'win_screen', undefined);
+                    mraidEventHandler.onPlayableAnalyticsEvent(15, 12, 0, 'win_screen', {'level': 2});
 
-                const kafkaObject: any = {};
-                kafkaObject.type = 'win_screen';
-                kafkaObject.eventData = undefined;
-                kafkaObject.timeFromShow = 15;
-                kafkaObject.timeFromPlayableStart = 12;
-                kafkaObject.backgroundTime = 5;
-                kafkaObject.auctionId = '12345';
+                    const kafkaObject: any = {};
+                    kafkaObject.type = 'win_screen';
+                    kafkaObject.eventData = {'level': 2};
+                    kafkaObject.timeFromShow = 15;
+                    kafkaObject.timeFromPlayableStart = 12;
+                    kafkaObject.backgroundTime = 0;
+                    kafkaObject.auctionId = '12345';
 
-                const resourceUrl = playableMraidCampaign.getResourceUrl();
-                if(resourceUrl) {
-                    kafkaObject.url = resourceUrl.getOriginalUrl();
-                }
-                sinon.assert.calledWith(<sinon.SinonStub>HttpKafka.sendEvent, 'ads.sdk2.events.playable.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
+                    const resourceUrl = playableMraidCampaign.getResourceUrl();
+                    if(resourceUrl) {
+                        kafkaObject.url = resourceUrl.getOriginalUrl();
+                    }
+                    sinon.assert.calledWith(<sinon.SinonStub>HttpKafka.sendEvent, 'ads.sdk2.events.playable.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
+                });
+
+                it('should send a analytics event without extra event data', () => {
+                    mraidAdUnit = new MRAIDAdUnit(nativeBridge, playableMraidAdUnitParams);
+                    sinon.stub(mraidAdUnit, 'sendClick');
+                    mraidEventHandler = new PlayableEventHandler(nativeBridge, mraidAdUnit, playableMraidAdUnitParams);
+
+                    mraidEventHandler.onPlayableAnalyticsEvent(15, 12, 5, 'win_screen', undefined);
+
+                    const kafkaObject: any = {};
+                    kafkaObject.type = 'win_screen';
+                    kafkaObject.eventData = undefined;
+                    kafkaObject.timeFromShow = 15;
+                    kafkaObject.timeFromPlayableStart = 12;
+                    kafkaObject.backgroundTime = 5;
+                    kafkaObject.auctionId = '12345';
+
+                    const resourceUrl = playableMraidCampaign.getResourceUrl();
+                    if(resourceUrl) {
+                        kafkaObject.url = resourceUrl.getOriginalUrl();
+                    }
+                    sinon.assert.calledWith(<sinon.SinonStub>HttpKafka.sendEvent, 'ads.sdk2.events.playable.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
+                });
             });
         });
     });
@@ -271,7 +285,7 @@ describe('MRAIDEventHandlersTest', () => {
             sinon.stub(request, 'followRedirectChain').resolves();
             placement = TestFixtures.getPlacement();
             gdprManager = sinon.createStubInstance(GdprManager);
-            privacy = new GDPRPrivacy(nativeBridge, gdprManager, false, true);
+            privacy = new GDPRPrivacy(nativeBridge, gdprManager, false);
 
             clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
             deviceInfo = TestFixtures.getAndroidDeviceInfo();
@@ -307,7 +321,7 @@ describe('MRAIDEventHandlersTest', () => {
                 options: {},
                 mraid: mraidView,
                 endScreen: undefined,
-                privacy: new GDPRPrivacy(nativeBridge, gdprManager, false, true),
+                privacy: new GDPRPrivacy(nativeBridge, gdprManager, false),
                 gdprManager: gdprManager,
                 programmaticTrackingService: programmaticTrackingService
             };

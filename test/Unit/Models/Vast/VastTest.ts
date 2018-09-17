@@ -1,12 +1,12 @@
-import 'mocha';
 import { assert } from 'chai';
+import 'mocha';
 import * as sinon from 'sinon';
 
-import { Vast } from 'Models/Vast/Vast';
-import { VastAd } from 'Models/Vast/VastAd';
-import { VastCreativeLinear } from 'Models/Vast/VastCreativeLinear';
-import { VastMediaFile } from 'Models/Vast/VastMediaFile';
-import { VastCreativeCompanionAd } from 'Models/Vast/VastCreativeCompanionAd';
+import { Vast } from 'VAST/Models/Vast';
+import { VastAd } from 'VAST/Models/VastAd';
+import { VastCreativeCompanionAd } from 'VAST/Models/VastCreativeCompanionAd';
+import { VastCreativeLinear } from 'VAST/Models/VastCreativeLinear';
+import { VastMediaFile } from 'VAST/Models/VastMediaFile';
 
 describe('Vast', () => {
     let vastCreative: VastCreativeLinear;

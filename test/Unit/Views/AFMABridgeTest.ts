@@ -1,8 +1,8 @@
+import { AFMABridge, AFMAEvents, IAFMAHandler } from 'AdMob/Views/AFMABridge';
+import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import 'mocha';
 import * as sinon from 'sinon';
-import { IAFMAHandler, AFMABridge, AFMAEvents } from 'Views/AFMABridge';
-import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
-import { NativeBridge } from 'Native/NativeBridge';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('AFMABridge', () => {
