@@ -527,9 +527,9 @@ export class AdUnitFactory {
     private static createPrivacy(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>): AbstractPrivacy {
 
         let privacy: AbstractPrivacy;
-        if (ReportAdTest.isValid(parameters.configuration.getAbGroup())|| true) {
+        if (ReportAdTest.isValid(parameters.configuration.getAbGroup())) {
             privacy = new ReportingPrivacy(nativeBridge, parameters.campaign, parameters.gdprManager, parameters.configuration.isGDPREnabled(), parameters.configuration.isCoppaCompliant());
-        } else if (parameters.configuration.isGDPREnabled() || true) {
+        } else if (parameters.configuration.isGDPREnabled()) {
             privacy = new GDPRPrivacy(nativeBridge, parameters.gdprManager, parameters.configuration.isCoppaCompliant());
         } else {
             privacy = new Privacy(nativeBridge, parameters.configuration.isCoppaCompliant());

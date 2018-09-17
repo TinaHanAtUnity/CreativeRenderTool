@@ -305,7 +305,7 @@ export class WebView {
 
             return this._sessionManager.sendUnsentSessions();
         }).then(() => {
-            if ((ReportAdTest.isValid(this._configuration.getAbGroup()) && this._configuration.isGDPREnabled()) || true) {
+            if ((ReportAdTest.isValid(this._configuration.getAbGroup()) && this._configuration.isGDPREnabled())) {
                 return AbstractPrivacy.setUserInformation(this._gdprManager).catch(() => {
                     this._nativeBridge.Sdk.logInfo('Failed to set up privacy information.');
                 });
