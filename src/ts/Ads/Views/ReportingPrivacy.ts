@@ -167,7 +167,7 @@ export class ReportingPrivacy extends AbstractPrivacy {
     private handleReportText(checked: boolean, reportText: Element | null) {
         if (reportText) {
             if (checked) {
-                reportText.innerHTML = 'Thank you for taking the time to improve Unity Ads. Your Ad Experience will close shortly.';
+                reportText.innerHTML = 'Thank you for your help. Your Ad will close shortly.';
                 if (!reportText.classList.contains('active')) {
                     reportText.classList.toggle('active');
                 }

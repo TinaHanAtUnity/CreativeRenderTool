@@ -45,7 +45,7 @@ import { ConfigManager } from 'Core/Managers/ConfigManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { ABGroupBuilder } from 'Core/Models/ABGroup';
+import { ABGroupBuilder, ReportAdTest } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode, Configuration } from 'Core/Models/Configuration';
@@ -305,7 +305,7 @@ export class WebView {
 
             return this._sessionManager.sendUnsentSessions();
         }).then(() => {
-            if (this._configuration.isGDPREnabled()) {
+            if ((ReportAdTest.isValid(this._configuration.getAbGroup()) && this._configuration.isGDPREnabled()) || true) {
                 return AbstractPrivacy.setUserInformation(this._gdprManager).catch(() => {
                     this._nativeBridge.Sdk.logInfo('Failed to set up privacy information.');
                 });
