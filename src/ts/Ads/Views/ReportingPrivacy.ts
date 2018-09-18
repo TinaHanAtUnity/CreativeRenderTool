@@ -1,23 +1,32 @@
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { Campaign } from 'Ads/Models/Campaign';
-import { BadAdReason, BadAdsReporting } from 'Ads/Utilities/BadAdsReporting';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable0 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
 import ReportingPrivacyTemplate from 'html/Reporting-privacy.html';
+import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
+import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
-export enum PrivacyCardState {
+enum PrivacyCardState {
     INITIAL,
     PRIVACY,
     BUILD,
     REPORT
 }
 
+enum BadAdReason {
+    OFFENSIVE = 'Ad is very offensive',
+    NEVER_STARTED = 'Ad did not start',
+    WONT_END = 'Ad will not close',
+    MALFORMED = 'Ad does not look right',
+    OTHER = 'Other'
+}
+
 export class ReportingPrivacy extends AbstractPrivacy {
 
-    public readonly _onReport: Observable0 = new Observable0();
-
+    private _onReport: Observable0 = new Observable0();
     private _gdprManager: GdprManager;
     private _dataDeletionConfirmation: boolean = false;
     private _currentState : number = -1;
@@ -156,7 +165,7 @@ export class ReportingPrivacy extends AbstractPrivacy {
             if (checkedReportButton && checkedReportButton.id) {
                 this._reportSent = true;
                 this.handleReportText(true, reportText);
-                BadAdsReporting.onUserReport(this._campaign, checkedReportButton.id);
+                this.onUserReport(this._campaign, checkedReportButton.id);
                 this._onReport.trigger();
             } else {
                 this.handleReportText(false, reportText);
@@ -237,6 +246,38 @@ export class ReportingPrivacy extends AbstractPrivacy {
                 this._currentState = PrivacyCardState.PRIVACY;
                 leftEl.innerText = bCard;
                 middleEl.innerText = rCard;
+            }
+        }
+    }
+
+    private onUserReport(campaign: Campaign, reasonKey: string): void {
+        const error = {
+            creativeId: campaign.getCreativeId(),
+            auctionId: campaign.getSession().getId(),
+            reason: reasonKey
+        };
+        Diagnostics.trigger('reported_ad', error);
+    }
+
+    // After the report, wait four seconds and close the ad
+    private static timeoutAd(ad: AbstractAdUnit | AbstractVideoOverlay): Promise<void> {
+        return new Promise(() => {
+            setTimeout(() => {
+                if (ad instanceof AbstractAdUnit) {
+                    ad.markAsSkipped();
+                }
+                return ad.hide();
+            }, 4000);
+        });
+    }
+
+    public static setupReportListener(privacy: AbstractPrivacy, ad: AbstractAdUnit | AbstractVideoOverlay): void {
+        if (privacy instanceof ReportingPrivacy) {
+            if (privacy._onReport) {
+                privacy._onReport.subscribe(() => {
+                    privacy._onReport.unsubscribe();
+                    this.timeoutAd(ad);
+                });
             }
         }
     }
