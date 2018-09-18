@@ -2,9 +2,10 @@ import { EndScreen, IEndScreenParameters } from 'Views/EndScreen';
 import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
 import { Platform } from 'Constants/Platform';
 
-import { SmartCloseButtonTest } from 'Models/ABGroup';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { IFileInfo } from 'Native/Api/Cache';
+
+import {CustomFeatures} from 'Utilities/CustomFeatures';
 
 export class PerformanceEndScreen extends EndScreen {
     private _campaign: PerformanceCampaign;
@@ -31,7 +32,7 @@ export class PerformanceEndScreen extends EndScreen {
     public show(): void {
         super.show();
 
-        if (SmartCloseButtonTest.isValid(this._abGroup)) {
+        if (CustomFeatures.isSmartCloseButtonEnabled(this._abGroup, this._campaign.getId())) {
             try {
                 if (typeof this._canvas === 'undefined') {
                     const closeRegion = <HTMLElement>this._container.querySelector('.btn-close-region');

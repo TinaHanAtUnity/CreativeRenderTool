@@ -1,3 +1,5 @@
+import { SmartCloseButtonTest, ABGroup } from 'Models/ABGroup';
+
 export class CustomFeatures {
     public static isExampleGameId(gameId: string): boolean {
         return gameId === '14850' || gameId === '14851';
@@ -40,5 +42,14 @@ export class CustomFeatures {
             || gameId === '2391158' // Brawlstars Android
             || gameId === '1782301' // Hayday iOS
             || gameId === '1782302';// Hayday Android
+    }
+
+    public static isSmartCloseButtonEnabled(abGroup: ABGroup, campaignId: string): boolean {
+        const targetCampaignIds = [
+            'TBD',
+            'TBD'
+        ];
+
+        return SmartCloseButtonTest.isValid(abGroup) && targetCampaignIds.indexOf(campaignId) !== -1;
     }
 }
