@@ -7,11 +7,6 @@ export enum IosPermission {
     AVMediaTypeAudio = 'soun'
 }
 
-enum BundleKeys {
-    Camera = 'NSCameraUsageDescription',
-    Audio = 'NSMicrophoneUsageDescription'
-}
-
 export class IosPermissionsApi extends NativeApi {
     public readonly onPermissionsResult = new Observable2<string, boolean>();
 
