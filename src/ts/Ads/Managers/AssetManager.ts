@@ -266,7 +266,6 @@ export class AssetManager {
                 const asset: IAssetQueueObject = currentAsset;
                 this._caching = true;
                 const tooLargeFileObserver = this._cache.onTooLargeFile.subscribe((callback, size, totalSize, responseCode, headers) => {
-                    this._cache.onTooLargeFile.unsubscribe(tooLargeFileObserver);
                     SessionDiagnostics.trigger('too_large_file', {
                         url: asset.url,
                         size: size,
