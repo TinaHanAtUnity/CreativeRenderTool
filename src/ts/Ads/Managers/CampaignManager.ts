@@ -357,6 +357,8 @@ export class CampaignManager {
                         } else {
                             fill[mediaId] = [placement];
                         }
+
+                        this._backupCampaignManager.storePlacement(this._configuration.getPlacement(placement), mediaId);
                     } else {
                         noFill.push(placement);
                     }

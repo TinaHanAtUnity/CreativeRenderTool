@@ -240,7 +240,7 @@ describe('CampaignManager', () => {
                 response: OnProgrammaticVastPlcCampaignJson
             }));
 
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge, backupCampaignManager);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
             let triggeredCampaign: Campaign;
             let triggeredError: any;
@@ -276,7 +276,7 @@ describe('CampaignManager', () => {
 
             vastParser.setMaxWrapperDepth(1);
 
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge, backupCampaignManager);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
             let triggeredCampaign: VastCampaign;
             campaignManager.onCampaign.subscribe((placementId: string, campaign: Campaign) => {
@@ -354,7 +354,7 @@ describe('CampaignManager', () => {
 
             vastParser.setMaxWrapperDepth(2);
 
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge, backupCampaignManager);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
             let triggeredCampaign: VastCampaign;
             campaignManager.onError.subscribe((error) => {
@@ -464,7 +464,7 @@ describe('CampaignManager', () => {
                 response: nonWrappedVAST
             }));
 
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge, backupCampaignManager);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
             campaignManager.onError.subscribe((err: WebViewError) => {
                 assert.equal(err.message, 'VAST wrapper depth exceeded');
@@ -480,7 +480,7 @@ describe('CampaignManager', () => {
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve(response));
 
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge, backupCampaignManager);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
             let triggeredError: any;
             campaignManager.onError.subscribe((error: WebViewError) => {
@@ -501,7 +501,7 @@ describe('CampaignManager', () => {
             mockRequest.expects('post').returns(Promise.resolve(response));
             mockRequest.expects('get').withArgs(wrappedUrl, [], {retries: 2, retryDelay: 10000, followRedirects: true, retryWithConnectionEvents: false}).returns(wrappedResponse);
 
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge, backupCampaignManager);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
             let triggeredError: WebViewError | Error;
             const verify = () => {
@@ -594,7 +594,7 @@ describe('CampaignManager', () => {
                 const mockRequest = sinon.mock(request);
                 mockRequest.expects('post').returns(Promise.resolve(response));
 
-                const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+                const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge, backupCampaignManager);
                 const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
                 let noFillTriggered = false;
                 let triggeredError: any;
@@ -640,7 +640,7 @@ describe('CampaignManager', () => {
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve(response));
 
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge, backupCampaignManager);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
             let triggeredCampaign: VastCampaign;
             let triggeredError: any;
@@ -699,7 +699,7 @@ describe('CampaignManager', () => {
                 response: OnProgrammaticVastPlcCampaignCustomTracking
             }));
 
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge, backupCampaignManager);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
             let triggeredCampaign: VastCampaign;
             let triggeredError: any;
@@ -751,7 +751,7 @@ describe('CampaignManager', () => {
             const json = JSON.parse(OnProgrammaticMraidUrlPlcCampaignJson);
             const content = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
 
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge, backupCampaignManager);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
             let triggeredCampaign: MRAIDCampaign;
             let triggeredError: any;
@@ -795,7 +795,7 @@ describe('CampaignManager', () => {
             const json = JSON.parse(OnProgrammaticMraidPlcCampaignJson);
             const content = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
 
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge, backupCampaignManager);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
             let triggeredCampaign: MRAIDCampaign;
             let triggeredError: any;
@@ -835,7 +835,7 @@ describe('CampaignManager', () => {
 
             let doneCalled = false;
 
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge, backupCampaignManager);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
             let triggeredError: any;
             campaignManager.onNoFill.subscribe(() => {
@@ -862,7 +862,7 @@ describe('CampaignManager', () => {
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve(response));
 
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge, backupCampaignManager);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
             let triggeredError: any;
 
@@ -884,7 +884,7 @@ describe('CampaignManager', () => {
             const mockRequest = sinon.mock(request);
             mockRequest.expects('post').returns(Promise.resolve(response));
 
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge, backupCampaignManager);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
             let triggeredError: any;
 
@@ -906,7 +906,7 @@ describe('CampaignManager', () => {
                 response: OnStaticInterstitialDisplayHtmlCampaign
             }));
 
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge, backupCampaignManager);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
             let triggeredCampaign: DisplayInterstitialCampaign;
             let triggeredError: any;
@@ -935,7 +935,7 @@ describe('CampaignManager', () => {
                 response: OnStaticInterstitialDisplayJsCampaign
             }));
 
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge, backupCampaignManager);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
             let triggeredCampaign: DisplayInterstitialCampaign;
             let triggeredError: any;
@@ -967,7 +967,7 @@ describe('CampaignManager', () => {
         const ConfigurationAuctionPlcJson = JSON.parse(ConfigurationAuctionPlc);
 
         beforeEach(() => {
-            assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+            assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge, backupCampaignManager);
             campaignManager = new CampaignManager(nativeBridge, ConfigurationParser.parse(ConfigurationAuctionPlcJson), assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
 
             campaignManager.onCampaign.subscribe((placement: string, campaign: Campaign) => {
@@ -1121,7 +1121,7 @@ describe('CampaignManager', () => {
                     return Platform.ANDROID;
                 };
 
-                assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+                assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge, backupCampaignManager);
                 campaignManager = new CampaignManager(nativeBridge, ConfigurationParser.parse(ConfigurationAuctionPlcJson), assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
 
                 campaignManager.onCampaign.subscribe((placement: string, campaign: Campaign) => {
@@ -1151,7 +1151,7 @@ describe('CampaignManager', () => {
                     return Platform.IOS;
                 };
 
-                assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+                assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge, backupCampaignManager);
                 campaignManager = new CampaignManager(nativeBridge, ConfigurationParser.parse(ConfigurationAuctionPlcJson), assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
 
                 campaignManager.onCampaign.subscribe((placement: string, campaign: Campaign) => {
@@ -1179,7 +1179,7 @@ describe('CampaignManager', () => {
     });
 
     it('test previous campaign', () => {
-        const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+        const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge, backupCampaignManager);
         const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
         let previousCampaign = campaignManager.getPreviousPlacementId();
 
@@ -1210,7 +1210,7 @@ describe('CampaignManager', () => {
                 return Promise.resolve();
             });
 
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge, backupCampaignManager);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
 
             return campaignManager.request().then(() => {
@@ -1235,7 +1235,7 @@ describe('CampaignManager', () => {
                 return Promise.resolve();
             });
 
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge, backupCampaignManager);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
 
             const now = new Date(Date.now());
@@ -1252,7 +1252,7 @@ describe('CampaignManager', () => {
         });
 
         it('should request from cached response', () => {
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge, backupCampaignManager);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
 
             let triggeredCampaign: MRAIDCampaign;
@@ -1276,7 +1276,7 @@ describe('CampaignManager', () => {
         });
 
         it('should ignore cached response if game id mismatch', () => {
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge, backupCampaignManager);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
 
             let triggeredCampaign: MRAIDCampaign;
@@ -1299,7 +1299,7 @@ describe('CampaignManager', () => {
         });
 
         it('should ignore cached response if campaign expired', () => {
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge, backupCampaignManager);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
 
             nowStub.reset();
@@ -1332,7 +1332,7 @@ describe('CampaignManager', () => {
         });
 
         it('should ignore expired placements', () => {
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge, backupCampaignManager);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
 
             nowStub.reset();
@@ -1365,7 +1365,7 @@ describe('CampaignManager', () => {
         });
 
         it('should request from cached response even with different connection type and network', () => {
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge, backupCampaignManager);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
 
             let triggeredCampaign: MRAIDCampaign;
@@ -1388,7 +1388,7 @@ describe('CampaignManager', () => {
         });
 
         it('should request from cached response, no fill', () => {
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge, backupCampaignManager);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
 
             let triggeredCampaign: MRAIDCampaign;
@@ -1423,7 +1423,7 @@ describe('CampaignManager', () => {
         });
 
         it('should request from cached response, error', () => {
-            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+            const assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge, backupCampaignManager);
             const campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
 
             let triggeredCampaign: MRAIDCampaign;
@@ -1468,7 +1468,7 @@ describe('CampaignManager', () => {
                 requestData = data;
                 return Promise.resolve();
             });
-            assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+            assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge, backupCampaignManager);
             campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfo, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
         });
         it('should be in request body when defined in config response', () => {
@@ -1503,7 +1503,7 @@ describe('CampaignManager', () => {
 
             const clientInfoMixedExperiment = TestFixtures.getClientInfo(Platform.ANDROID, '1003628');
             configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements), clientInfoMixedExperiment);
-            assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge);
+            assetManager = new AssetManager(new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService), CacheMode.DISABLED, deviceInfo, cacheBookkeeping, nativeBridge, backupCampaignManager);
             campaignManager = new CampaignManager(nativeBridge, configuration, assetManager, sessionManager, adMobSignalFactory, request, clientInfoMixedExperiment, deviceInfo, metaDataManager, cacheBookkeeping, jaegerManager, backupCampaignManager);
         });
 

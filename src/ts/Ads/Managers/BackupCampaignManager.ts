@@ -52,6 +52,7 @@ export class BackupCampaignManager {
 
                         if(loader && Date.now() < willexpireat) {
                             return loader.load(data);
+                            // todo: add cache check for all required and optional assets
                         }
                     }
 
