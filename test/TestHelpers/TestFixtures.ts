@@ -26,6 +26,7 @@ import DummyPromoCampaign from 'json/DummyPromoCampaign.json';
 import OnCometMraidPlcCampaign from 'json/OnCometMraidPlcCampaign.json';
 import OnCometMraidPlcCampaignFollowsRedirects from 'json/OnCometMraidPlcCampaignFollowsRedirects.json';
 import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
+import OnCometVideoPlcCampaignStandaloneAndroid from 'json/OnCometVideoPlcCampaignStandaloneAndroid.json';
 import OnCometVideoPlcCampaignFollowsRedirects from 'json/OnCometVideoPlcCampaignFollowsRedirects.json';
 import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCampaign.json';
 import OnXPromoPlcCampaign from 'json/OnXPromoPlcCampaign.json';
@@ -97,6 +98,7 @@ export class TestFixtures {
             bypassAppSheet: json.bypassAppSheet,
             store: storeName,
             adUnitStyle: new AdUnitStyle(json.adUnitStyle),
+            appDownloadUrl: json.appDownloadUrl,
             trackingUrls: {
                 'start': ['http://localhost:5000/operative?abGroup=0&adType=VIDEO&apiLevel=0&auctionId=&bidBundle=&bundleId=&buyerID=&campaignId=&connectionType=&country=&creativeId=&dealCode=&deviceMake=&deviceModel=&dspId=comet&eventType=start&frameworkName=&frameworkVersion=&gameId=&limitedAdTracking=false&mediationName=&mediationOrdinal=0&mediationVersion=&networkType=0&osVersion=&platform=&screenDensity=0&screenHeight=0&screenSize=0&screenWidth=0&sdkVersion=0&seatId=9000&token=&webviewUa=a'],
                 'click': ['http://localhost:5000/operative?abGroup=0&adType=VIDEO&apiLevel=0&auctionId=&bidBundle=&bundleId=&buyerID=&campaignId=&connectionType=&country=&creativeId=&dealCode=&deviceMake=&deviceModel=&dspId=comet&eventType=click&frameworkName=&frameworkVersion=&gameId=&limitedAdTracking=false&mediationName=&mediationOrdinal=0&mediationVersion=&networkType=0&osVersion=&platform=&screenDensity=0&screenHeight=0&screenSize=0&screenWidth=0&sdkVersion=0&seatId=9000&token=&webviewUa=a'],
@@ -357,6 +359,12 @@ export class TestFixtures {
         const json = JSON.parse(OnCometVideoPlcCampaignFollowsRedirects);
         const performanceJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
         return new PerformanceCampaign(this.getPerformanceCampaignParams(performanceJson, StoreName.GOOGLE));
+    }
+
+    public static getCampaignStandaloneAndroid(): PerformanceCampaign {
+        const json = JSON.parse(OnCometVideoPlcCampaignStandaloneAndroid);
+        const performanceJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
+        return new PerformanceCampaign(this.getPerformanceCampaignParams(performanceJson, StoreName.STANDALONE_ANDROID));
     }
 
     public static getCampaign(): PerformanceCampaign {

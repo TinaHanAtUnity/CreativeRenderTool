@@ -1,4 +1,8 @@
-# Staged
+# Pending
+
+* Recognize standalone_android store type and appDownloadUrl parameter from Auction [#6029](https://github.com/Applifier/unity-ads-webview/pull/6029)
+
+# Mon Sep 17 20:48:18 UTC 2018
 
 * Remove Admob Video Caching AB Test
 * Add 广告 to Overlays for Tencent Ads
