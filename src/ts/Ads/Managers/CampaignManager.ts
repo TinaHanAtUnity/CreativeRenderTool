@@ -207,6 +207,7 @@ export class CampaignManager {
 
         this._assetManager.enableCaching();
         this._assetManager.checkFreeSpace();
+        this._backupCampaignManager.deleteBackupCampaigns();
 
         this._requesting = true;
 
