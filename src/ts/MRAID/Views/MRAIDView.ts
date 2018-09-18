@@ -10,6 +10,7 @@ import { DOMUtils } from 'Core/Utilities/DOMUtils';
 import { XHRequest } from 'Core/Utilities/XHRequest';
 import { View } from 'Core/Views/View';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 export interface IOrientationProperties {
     allowOrientationChange: boolean;
@@ -45,13 +46,14 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
     protected _showGDPRBanner = false;
     protected _gdprPopupClicked = false;
 
+    protected _gameSessionId: number;
     protected _abGroup: ABGroup;
 
     protected _stats: IMRAIDFullStats;
 
     protected _callButtonEnabled: boolean = true;
 
-    constructor(nativeBridge: NativeBridge, id: string, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup) {
+    constructor(nativeBridge: NativeBridge, id: string, placement: Placement, campaign: MRAIDCampaign, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId?: number) {
         super(nativeBridge, id);
 
         this._placement = placement;
@@ -65,6 +67,8 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         this._privacy.hide();
         document.body.appendChild(this._privacy.container());
         this._privacy.addEventHandler(this);
+
+        this._gameSessionId = gameSessionId || 0;
     }
 
     public abstract setViewableState(viewable: boolean): void;
@@ -111,6 +115,28 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
 
             return data;
         });
+    }
+
+    protected isKPIDataValid(values: { [key: string]: number }, kpi: string): boolean {
+
+        let valid = true;
+
+        Object.keys(values).forEach((key) => {
+            const time = values[key];
+            if (typeof time !== 'number' || isNaN(time) || time < 0 || time > 3600) {
+                valid = false;
+            }
+        });
+
+        if (!valid && this._gameSessionId % 1000 === 999) {
+            Diagnostics.trigger('playable_kpi_time_value_error', {
+                message: 'Time value for KPI looks unreasonable',
+                kpi,
+                ...values
+            });
+        }
+
+        return valid;
     }
 
     public onPrivacyClose(): void {
