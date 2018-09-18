@@ -139,12 +139,15 @@ export class OldCampaignRefreshManager extends RefreshManager {
 
         const promises = [];
 
+        const placements = this._configuration.getPlacements();
         for(const placement in this._configuration.getPlacements()) {
-            promises.push(backupCampaignManager.loadCampaign(this._configuration.getPlacement(placement)).then(campaign => {
-                if(campaign) {
-                    this.setPlacementReady(placement, campaign);
-                }
-            }));
+            if(placements.hasOwnProperty(placement)) {
+                promises.push(backupCampaignManager.loadCampaign(this._configuration.getPlacement(placement)).then(campaign => {
+                    if(campaign) {
+                        this.setPlacementReady(placement, campaign);
+                    }
+                }));
+            }
         }
 
         return Promise.all(promises).then(() => {
