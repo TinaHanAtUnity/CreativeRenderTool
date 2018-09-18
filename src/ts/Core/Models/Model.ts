@@ -21,6 +21,10 @@ export abstract class Model<T extends object> {
 
     public abstract getDTO(): { [key: string]: any };
 
+    public toJSON(): string {
+        return JSON.stringify(this._data);
+    }
+
     public set<K extends keyof T>(key: K, value: T[K]): void {
         if(!(key in this._schema)) {
             this.handleError(new WebViewError('model: ' + this._name + ' key:' + key + ' not in schema', 'SchemaError'));

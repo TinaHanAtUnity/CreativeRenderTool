@@ -1,3 +1,12 @@
+# Mon Sep 17 20:48:18 UTC 2018
+
+* Remove Admob Video Caching AB Test
+* Add 广告 to Overlays for Tencent Ads
+* Move platform logic away from API class
+* Serializable campaign models
+* Parse new comet content types
+* Use a longer safeguard timeout for showCameraFeed
+
 # Mon Sep 17 08:00:27 UTC 2018
 
 * Enable new video overlay for all

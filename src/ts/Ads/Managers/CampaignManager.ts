@@ -538,7 +538,7 @@ export class CampaignManager {
         }
 
         const parseTimestamp = Date.now();
-        return parser.parse(this._nativeBridge, this._request, response, session, this._deviceInfo.getOsVersion(), this._clientInfo.getGameId(), this._coreConfig.getAbGroup()).then((campaign) => {
+        return parser.parse(this._nativeBridge, this._request, response, session, this._deviceInfo.getOsVersion(), this._clientInfo.getGameId()).then((campaign) => {
             const parseDuration = Date.now() - parseTimestamp;
             for(const placement of response.getPlacements()) {
                 PurchasingUtilities.placementManager.addCampaignPlacementIds(placement, campaign);
