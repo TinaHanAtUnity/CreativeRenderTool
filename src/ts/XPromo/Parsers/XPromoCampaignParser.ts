@@ -27,8 +27,7 @@ export class XPromoCampaignParser extends CampaignParser {
                 storeName = StoreName.XIAOMI;
                 break;
             case 'standalone_android':
-                storeName = StoreName.STANDALONE_ANDROID;
-                break;
+                throw new Error('Android APK not supported on cross promotion.');
             default:
                 throw new Error('Unknown store value "' + json.store + '"');
         }
