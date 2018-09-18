@@ -12,8 +12,14 @@ const coverage = process.env.COVERAGE;
 const isolated = process.env.ISOLATED;
 const debug = process.env.DEBUG;
 
-const runTest = async (browser, testFilter) => {
-    const page = await browser.newPage();
+const runTest = async (browser, isolated, testFilter) => {
+    let page;
+    if(!isolated) {
+        const pages = await browser.pages();
+        page = pages[0];
+    } else {
+        page = await browser.newPage();
+    }
 
     page.on('console', (message) => {
         let type = message.type();
@@ -45,11 +51,12 @@ const runTest = async (browser, testFilter) => {
     });
 
     if(debug) {
-        page.waitFor(1000);
-        page.evaluate(() => {
+        await page.waitFor(1000);
+        await page.evaluate(() => {
             debugger;
         });
     }
+
     await page.evaluate(() => {
         mocha.run((failures) => {
             if(window.writeCoverage && __coverage__) {
@@ -69,16 +76,10 @@ const runTest = async (browser, testFilter) => {
     if(isolated == 1) {
         const tests = testList.split(' ').map(testPath => path.parse(testPath).name);
         for(const test of tests) {
-            const failures = await runTest(browser, test);
-            if(failures) {
-                process.exit(failures);
-            }
+            process.exitCode = await runTest(browser, isolated, test);
         }
     } else {
-        const failures = await runTest(browser, testFilter);
-        if(failures) {
-            process.exit(failures);
-        }
+        process.exitCode = await runTest(browser, isolated, testFilter);
     }
     await browser.close();
 } catch(error) {

@@ -1,3 +1,40 @@
+# Mon Sep 17 20:48:18 UTC 2018
+
+* Remove Admob Video Caching AB Test
+* Add 广告 to Overlays for Tencent Ads
+* Move platform logic away from API class
+* Serializable campaign models
+* Parse new comet content types
+* Use a longer safeguard timeout for showCameraFeed
+
+# Mon Sep 17 08:00:27 UTC 2018
+
+* Enable new video overlay for all
+* Fix: VAST end screen not visible after video errors (black screen)
+
+# Fri Sep 14 17:45:45 UTC 2018
+
+* Remove Kefir gameIDs from Personalized Placement Experiement
+
+# Wed Sep 12 21:48:07 UTC 2018
+
+* Hellfest Creative temporary creative ID Whitelist [#6296](https://github.com/Applifier/unity-ads-webview/pull/6296)
+
+# Tue Sep 11 11:48:04 UTC 2018
+
+* Disable Request.setConcurrentRequestCount on iOS SDK 2.3.0 to prevent crashes with iOS 12 [#6299](https://github.com/Applifier/unity-ads-webview/pull/6299)
+
+# Mon Sep 10 09:54:48 UTC 2018
+
+* Replace the skip icon with the close icon for Cheetah's Clean Master [#6268](https://github.com/Applifier/unity-ads-webview/pull/6268)
+* Show GDPR Privacy on the VAST end screen if GDPR enabled [#6246](https://github.com/Applifier/unity-ads-webview/pull/6246)
+* Hide GDPR banner after click on performance end screen. Make gdpr icon clickable in banner [#6270](https://github.com/Applifier/unity-ads-webview/pull/6270)
+* Add gameids for Mixed Placement experiment [#6243](https://github.com/Applifier/unity-ads-webview/pull/6243)
+
+# Thu Sep  6 09:26:17 UTC 2018
+
+* Restructure codebase
+
 # Tue Sep  4 09:16:55 UTC 2018
 
 * Fix playable analytics naming

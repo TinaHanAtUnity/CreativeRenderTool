@@ -1,17 +1,17 @@
-import { Platform } from 'Constants/Platform';
-import { AuctionResponse } from 'Models/AuctionResponse';
-import { AdMobCampaign } from 'Models/Campaigns/AdMobCampaign';
-import { Session } from 'Models/Session';
-import { SdkApi } from 'Native/Api/Sdk';
-import { NativeBridge } from 'Native/NativeBridge';
-import { ProgrammaticAdMobParser } from 'Parsers/ProgrammaticAdMobParser';
-import { Request } from 'Utilities/Request';
+import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
+import { ProgrammaticAdMobParser } from 'AdMob/Parsers/ProgrammaticAdMobParser';
+import { AuctionResponse } from 'Ads/Models/AuctionResponse';
+import { Session } from 'Ads/Models/Session';
 import { assert } from 'chai';
+import { Platform } from 'Core/Constants/Platform';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { SdkApi } from 'Core/Native/Sdk';
+import { FileId } from 'Core/Utilities/FileId';
+import { Request } from 'Core/Utilities/Request';
 import ValidAdMobCampaign from 'json/campaigns/admob/ValidAdMobCampaign.json';
 import 'mocha';
 import * as sinon from 'sinon';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { FileId } from 'Utilities/FileId';
 
 describe('ProgrammaticAdMobParser', () => {
     const placements = ['TestPlacement'];

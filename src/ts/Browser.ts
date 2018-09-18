@@ -1,10 +1,10 @@
+import { CampaignManager } from 'Ads/Managers/CampaignManager';
+import { DeviceInfo } from 'Backend/Api/DeviceInfo';
+import { Sdk } from 'Backend/Api/Sdk';
+import { IUnityAdsListener } from 'Backend/IUnityAdsListener';
+import { UnityAds } from 'Backend/UnityAds';
+import { Platform } from 'Core/Constants/Platform';
 import 'Workarounds';
-import { Platform } from 'Constants/Platform';
-import { UnityAds } from 'Native/Backend/UnityAds';
-import { IUnityAdsListener } from 'Native/Backend/IUnityAdsListener';
-import { Sdk } from 'Native/Backend/Api/Sdk';
-import { DeviceInfo } from 'Native/Backend/Api/DeviceInfo';
-import { CampaignManager } from 'Managers/CampaignManager';
 
 document.addEventListener('DOMContentLoaded', () => {
     const resizeHandler = (event?: Event) => {

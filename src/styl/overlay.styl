@@ -27,6 +27,7 @@
     height: 36px;
   }
 
+  .close-icon,
   .skip-icon {
     position: absolute;
     top: 50%;
@@ -43,6 +44,7 @@
       border: 4px solid $overlay-gray;
     }
 
+    .close-icon,
     .skip-icon {
       color: $overlay-gray;
     }
@@ -54,8 +56,27 @@
       border: 4px solid $white;
     }
 
+    .close-icon,
     .skip-icon {
       color: $white;
+    }
+  }
+
+  .skip:not(.close-icon-skip) {
+    .skip-icon {
+      display: block;
+    }
+    .close-icon {
+      display: none;
+    }
+  }
+
+  .skip.close-icon-skip {
+    .skip-icon {
+      display: none;
+    }
+    .close-icon {
+      display: block;
     }
   }
 
@@ -239,6 +260,10 @@
     .icon-gdpr {
       color: white;
     }
+  }
+
+  .tencent-advertisement {
+    $tencent-overlay($default-scale-size);
   }
 }
 

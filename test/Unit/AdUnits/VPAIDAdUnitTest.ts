@@ -1,32 +1,32 @@
-import 'mocha';
+import { Activity } from 'Ads/AdUnits/Containers/Activity';
+import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { GdprManager } from 'Ads/Managers/GdprManager';
+import { ProgrammaticOperativeEventManager } from 'Ads/Managers/ProgrammaticOperativeEventManager';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { ListenerApi } from 'Ads/Native/Listener';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { WebPlayerContainer } from 'Ads/Utilities/WebPlayer/WebPlayerContainer';
+import { Closer } from 'Ads/Views/Closer';
+import { Privacy } from 'Ads/Views/Privacy';
 import { assert } from 'chai';
+import { FinishState } from 'Core/Constants/FinishState';
+import { Platform } from 'Core/Constants/Platform';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { Configuration } from 'Core/Models/Configuration';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { IObserver0 } from 'Core/Utilities/IObserver';
+import { Observable0, Observable2 } from 'Core/Utilities/Observable';
+import { Request } from 'Core/Utilities/Request';
+import 'mocha';
 import * as sinon from 'sinon';
-
-import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'AdUnits/VPAIDAdUnit';
-import { VPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
-import { VPAID } from 'Views/VPAID';
-import { NativeBridge } from 'Native/NativeBridge';
-import { Orientation } from 'AdUnits/Containers/AdUnitContainer';
-import { VPAIDEndScreen } from 'Views/VPAIDEndScreen';
-import { FocusManager } from 'Managers/FocusManager';
-import { ClientInfo } from 'Models/ClientInfo';
-import { DeviceInfo } from 'Models/DeviceInfo';
-import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { Configuration } from 'Models/Configuration';
-import { Observable0, Observable2 } from 'Utilities/Observable';
-import { IObserver0 } from 'Utilities/IObserver';
-import { Request } from 'Utilities/Request';
-import { Activity } from 'AdUnits/Containers/Activity';
-import { ListenerApi } from 'Native/Api/Listener';
-import { FinishState } from 'Constants/FinishState';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Closer } from 'Views/Closer';
-import { Platform } from 'Constants/Platform';
-import { ProgrammaticOperativeEventManager } from 'Managers/ProgrammaticOperativeEventManager';
-import { GdprManager } from 'Managers/GdprManager';
-import { Privacy } from 'Views/Privacy';
-import { WebPlayerContainer } from 'Utilities/WebPlayer/WebPlayerContainer';
-import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
+
+import { IVPAIDAdUnitParameters, VPAIDAdUnit } from 'VPAID/AdUnits/VPAIDAdUnit';
+import { VPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
+import { VPAID } from 'VPAID/Views/VPAID';
+import { VPAIDEndScreen } from 'VPAID/Views/VPAIDEndScreen';
 
 describe('VPAIDAdUnit', () => {
     let nativeBridge: NativeBridge;
