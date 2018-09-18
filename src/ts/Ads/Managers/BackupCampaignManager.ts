@@ -29,8 +29,14 @@ export class BackupCampaignManager {
 
         // ignore non-serializable campaigns
         if(campaignType) {
+            let willExpireAt: number | undefined = campaign.getWillExpireAt();
+            if(!willExpireAt) {
+                willExpireAt = Date.now() + 7 * 24 * 3600 * 1000;
+            }
+
             this._nativeBridge.Storage.set(StorageType.PRIVATE, rootKey + '.type', campaignType);
             this._nativeBridge.Storage.set(StorageType.PRIVATE, rootKey + '.data', campaign.toJSON());
+            this._nativeBridge.Storage.set(StorageType.PRIVATE, rootKey + '.willexpireat', willExpireAt);
             this._nativeBridge.Storage.write(StorageType.PRIVATE);
         }
     }
@@ -40,11 +46,11 @@ export class BackupCampaignManager {
         return Promise.all([this.getString(placementRootKey + '.mediaid'), this.getString(placementRootKey + '.adtypes')]).then(([mediaId, adTypes]) => {
             if(mediaId && adTypes) {
                 const campaignRootKey: string = 'backupcampaign.campaign.' + mediaId;
-                return Promise.all([this.getString(campaignRootKey + '.type'), this.getString(campaignRootKey + '.data')]).then(([type, data]) => {
-                    if(type && data) {
+                return Promise.all([this.getString(campaignRootKey + '.type'), this.getString(campaignRootKey + '.data'), this.getNumber(campaignRootKey + '.willexpireat')]).then(([type, data, willexpireat]) => {
+                    if(type && data && willexpireat) {
                         const loader: CampaignLoader | undefined = this.getCampaignLoader(type);
 
-                        if(loader) {
+                        if(loader && Date.now() < willexpireat) {
                             return loader.load(data);
                         }
                     }
@@ -87,6 +93,14 @@ export class BackupCampaignManager {
 
     private getString(key: string): Promise<string | undefined> {
         return this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, key).then(value => {
+            return value;
+        }).catch(() => {
+            return undefined;
+        });
+    }
+
+    private getNumber(key: string): Promise<number | undefined> {
+        return this._nativeBridge.Storage.get<number>(StorageType.PRIVATE, key).then(value => {
             return value;
         }).catch(() => {
             return undefined;
