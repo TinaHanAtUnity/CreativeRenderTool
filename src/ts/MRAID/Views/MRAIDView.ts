@@ -117,7 +117,7 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
         });
     }
 
-    protected validateKPITime(values: { [key: string]: number }, kpi: string): boolean {
+    protected isKPIDataValid(values: { [key: string]: number }, kpi: string): boolean {
 
         let valid = true;
 
@@ -128,14 +128,12 @@ export abstract class MRAIDView<T extends IMRAIDViewHandler> extends View<T> imp
             }
         });
 
-        if (!valid) {
-            if (this._gameSessionId % 1000 === 999) {
-                Diagnostics.trigger('playable_kpi_time_value_error', {
-                    message: 'Time value for KPI looks unreasonable',
-                    kpi,
-                    ...values
-                });
-            }
+        if (!valid && this._gameSessionId % 1000 === 999) {
+            Diagnostics.trigger('playable_kpi_time_value_error', {
+                message: 'Time value for KPI looks unreasonable',
+                kpi,
+                ...values
+            });
         }
 
         return valid;

@@ -203,10 +203,8 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         this._showTimestamp = Date.now();
         const backgroundTime = this._backgroundTime / 1000;
 
-        if (this.validateKPITime({backgroundTime}, 'ar_playable_show')) {
-            if (typeof backgroundTime === 'number') {
-                this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(0, 0, backgroundTime, 'playable_show', {}));
-            }
+        if (this.isKPIDataValid({backgroundTime}, 'ar_playable_show')) {
+            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(0, 0, backgroundTime, 'playable_show', {}));
         }
 
         this.showLoadingScreen();
@@ -377,11 +375,11 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
 
         if (skip) {
             this._handlers.forEach(handler => handler.onMraidSkip());
-        } else {
+        } else if (this._canClose) {
             this._handlers.forEach(handler => handler.onMraidClose());
         }
 
-        if (this.validateKPITime({timeFromShow, timeFromPlayableStart, backgroundTime}, 'ar_' + eventName)) {
+        if (this.isKPIDataValid({timeFromShow, timeFromPlayableStart, backgroundTime}, 'ar_' + eventName)) {
             this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, eventName, undefined));
         }
     }
@@ -401,7 +399,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
         const timeFromShow = (this._playableStartTimestamp - this._showTimestamp - this._backgroundTime) / 1000;
         const backgroundTime = this._backgroundTime / 1000;
 
-        if (this.validateKPITime({timeFromShow, backgroundTime}, 'ar_playable_loading_time')) {
+        if (this.isKPIDataValid({timeFromShow, backgroundTime}, 'ar_playable_loading_time')) {
             this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(frameLoadDuration, timeFromShow, backgroundTime, 'playable_loading_time', {}));
         }
     }
@@ -512,7 +510,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 const timeFromPlayableStart = (Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000;
                 const backgroundTime = this._backgroundTime / 1000;
 
-                if (this.validateKPITime({timeFromShow, timeFromPlayableStart, backgroundTime}, event.data.event)) {
+                if (this.isKPIDataValid({timeFromShow, timeFromPlayableStart, backgroundTime}, event.data.event)) {
                     this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, event.data.event, event.data.eventData));
                 }
                 break;
@@ -561,7 +559,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 const timeFromShow = (this._playableStartTimestamp - this._showTimestamp - this._backgroundTime) / 1000;
                 const backgroundTime = this._backgroundTime / 1000;
 
-                if (this.validateKPITime({timeFromShow, backgroundTime}, 'ar_playable_start')) {
+                if (this.isKPIDataValid({timeFromShow, backgroundTime}, 'ar_playable_start')) {
                     this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_start', undefined));
                 }
 
