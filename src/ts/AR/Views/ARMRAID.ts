@@ -566,7 +566,6 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             }
 
             PermissionsUtil.checkPermissionInManifest(this._nativeBridge, PermissionTypes.CAMERA).then((available: boolean) => {
-                this._nativeBridge.Sdk.logDebug('available? ' + available);
                 if (!available) {
                     return CurrentPermission.DENIED;
                 }
@@ -605,10 +604,7 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 this.onCameraPermissionEvent(granted);
             }
         });
-
-        PermissionsUtil.requestPermission(this._nativeBridge, PermissionTypes.CAMERA).then(() => {
-            this._nativeBridge.Sdk.logDebug('Required permission for showing camera');
-        });
+        PermissionsUtil.requestPermission(this._nativeBridge, PermissionTypes.CAMERA);
     }
 
     private onShowFallback() {
