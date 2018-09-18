@@ -5,7 +5,8 @@ import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 export enum StoreName {
     APPLE,
     GOOGLE,
-    XIAOMI
+    XIAOMI,
+    STANDALONE_ANDROID
 }
 
 export interface IXPromoCampaign extends ICampaign {

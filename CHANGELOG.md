@@ -1,3 +1,9 @@
+# Staged
+
+* Recognize standalone_android store type and appDownloadUrl parameter from Auction [#6029](https://github.com/Applifier/unity-ads-webview/pull/6029)
+* Fix playable KPI background time [#6275](https://github.com/Applifier/unity-ads-webview/pull/6275)
+* Check if VPAID Endcard exists in DOM before attempting to remove it [#6266](https://github.com/Applifier/unity-ads-webview/pull/6266)
+
 # Mon Sep 17 20:48:18 UTC 2018
 
 * Remove Admob Video Caching AB Test

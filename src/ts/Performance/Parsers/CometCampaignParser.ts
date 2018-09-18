@@ -50,6 +50,9 @@ export class CometCampaignParser extends CampaignParser {
             case 'xiaomi':
                 storeName = StoreName.XIAOMI;
                 break;
+            case 'standalone_android':
+                storeName = StoreName.STANDALONE_ANDROID;
+                break;
             default:
                 throw new Error('Unknown store value "' + json.store + '"');
         }
@@ -139,6 +142,9 @@ export class CometCampaignParser extends CampaignParser {
                 parameters.streamingPortraitVideo = new Video(this.validateAndEncodeUrl(json.trailerPortraitStreaming, session), session, undefined, json.portraitCreativeId);
             }
 
+            if(json.appDownloadUrl) {
+                parameters.appDownloadUrl = json.appDownloadUrl;
+            }
             return Promise.resolve(new PerformanceCampaign(parameters));
         }
     }

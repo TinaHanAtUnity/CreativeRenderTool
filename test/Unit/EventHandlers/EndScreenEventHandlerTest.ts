@@ -144,6 +144,63 @@ describe('EndScreenEventHandlerTest', () => {
             sinon.assert.calledWith(<sinon.SinonSpy>operativeEventManager.sendClick, params);
         });
 
+        describe('with standalone_android store type and appDownloadUrl', () => {
+            let downloadParameters: IEndScreenDownloadParameters;
+
+            beforeEach(() => {
+                performanceAdUnitParameters.campaign = TestFixtures.getCampaignStandaloneAndroid();
+                performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
+
+                downloadParameters = <IEndScreenDownloadParameters>{
+                    appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
+                    bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
+                    gameId: performanceAdUnitParameters.campaign.getGameId(),
+                    store: performanceAdUnitParameters.campaign.getStore(),
+                    clickAttributionUrlFollowsRedirects: true,
+                    clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl(),
+                    appDownloadUrl: performanceAdUnitParameters.campaign.getAppDownloadUrl()
+                };
+            });
+
+            it('should call click attribution if clickAttributionUrl is present', () => {
+                sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').resolves();
+
+                endScreenEventHandler.onEndScreenDownload(downloadParameters);
+
+                return resolvedPromise.then(() => {
+                    sinon.assert.calledOnce(<sinon.SinonSpy>thirdPartyEventManager.clickAttributionEvent);
+                });
+            });
+
+            it('and API is less than 21, it should launch view intent', () => {
+                sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').resolves();
+                sinon.stub(nativeBridge, 'getApiLevel').returns(20);
+
+                endScreenEventHandler.onEndScreenDownload(downloadParameters);
+
+                return resolvedPromise.then(() => {
+                    sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
+                        'action': 'android.intent.action.VIEW',
+                        'uri': performanceAdUnitParameters.campaign.getAppDownloadUrl()
+                    });
+                });
+            });
+
+            it('with appDownloadUrl and API is greater than or equal to 21, it should launch web search intent', () => {
+                sinon.stub(thirdPartyEventManager, 'clickAttributionEvent').resolves();
+                sinon.stub(nativeBridge, 'getApiLevel').returns(21);
+
+                endScreenEventHandler.onEndScreenDownload(downloadParameters);
+
+                return resolvedPromise.then(() => {
+                    sinon.assert.calledWith(<sinon.SinonSpy>nativeBridge.Intent.launch, {
+                        'action': 'android.intent.action.WEB_SEARCH',
+                        'extras': [{ key: 'query', value: performanceAdUnitParameters.campaign.getAppDownloadUrl()}]
+                    });
+                });
+            });
+        });
+
         describe('with follow redirects', () => {
             it('with response that contains location, it should launch intent', () => {
                 performanceAdUnitParameters.campaign = TestFixtures.getCampaignFollowsRedirects();
@@ -250,7 +307,6 @@ describe('EndScreenEventHandlerTest', () => {
                     sinon.assert.notCalled(<sinon.SinonSpy>nativeBridge.Intent.launch);
                 });
             });
-
         });
 
         describe('with no follow redirects', () => {
@@ -261,10 +317,9 @@ describe('EndScreenEventHandlerTest', () => {
                     appStoreId: performanceAdUnitParameters.campaign.getAppStoreId(),
                     bypassAppSheet: performanceAdUnitParameters.campaign.getBypassAppSheet(),
                     store: performanceAdUnitParameters.campaign.getStore(),
-                    clickAttributionUrlFollowsRedirects: performanceAdUnitParameters.campaign.getClickAttributionUrlFollowsRedirects(),
+                    clickAttributionUrlFollowsRedirects: false,
                     clickAttributionUrl: performanceAdUnitParameters.campaign.getClickAttributionUrl()
                 });
-
             });
 
             it('should send a click with session manager', () => {
@@ -282,7 +337,6 @@ describe('EndScreenEventHandlerTest', () => {
                     'uri': 'market://details?id=com.iUnity.angryBots'
                 });
             });
-
         });
 
     });

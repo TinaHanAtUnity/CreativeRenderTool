@@ -486,7 +486,8 @@ export class WebView {
                 gdprManager: this._gdprManager,
                 adMobSignalFactory: this._adMobSignalFactory,
                 programmaticTrackingService: this._programmaticTrackingService,
-                webPlayerContainer: this._interstitialWebPlayerContainer
+                webPlayerContainer: this._interstitialWebPlayerContainer,
+                gameSessionId: this._sessionManager.getGameSessionId()
             });
             this._refreshManager.setCurrentAdUnit(this._currentAdUnit);
             this._currentAdUnit.onClose.subscribe(() => this.onAdUnitClose());
