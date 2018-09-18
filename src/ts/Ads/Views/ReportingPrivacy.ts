@@ -5,7 +5,7 @@ import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Observable0 } from 'Core/Utilities/Observable';
 import { Template } from 'Core/Utilities/Template';
-import ReportingPrivacyTemplate from 'html/Reporting-privacy.html';
+import ReportingPrivacyTemplate from 'html/reporting-privacy.html';
 
 export enum PrivacyCardState {
     INITIAL,
