@@ -56,7 +56,7 @@ export class AssetManager {
     private _queueId: number;
     private _nativeBridge: NativeBridge;
 
-    private _sendDiagnostics = false;
+    private _sendCacheDiagnostics = false;
 
     constructor(cache: Cache, cacheMode: CacheMode, deviceInfo: DeviceInfo, cacheBookkeeping: CacheBookkeeping, pts: ProgrammaticTrackingService, nativeBridge: NativeBridge) {
         this._cache = cache;
@@ -78,8 +78,8 @@ export class AssetManager {
         }
     }
 
-    public setDiagnostics(value: boolean) {
-        this._sendDiagnostics = value;
+    public setCacheDiagnostics(value: boolean) {
+        this._sendCacheDiagnostics = value;
     }
 
     public setup(campaign: Campaign): Promise<Campaign> {
@@ -385,7 +385,7 @@ export class AssetManager {
     }
 
     private getCacheDiagnostics(asset: Asset, campaign: Campaign): ICacheDiagnostics | undefined {
-        if(this._sendDiagnostics) {
+        if(this._sendCacheDiagnostics) {
             return {
                 creativeType: asset.getDescription(),
                 targetGameId: campaign instanceof PerformanceCampaign ? campaign.getGameId() : 0,

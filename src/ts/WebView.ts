@@ -267,7 +267,7 @@ export class WebView {
             return Promise.all([analyticsPromise, gdprConsentPromise]);
         }).then(() => {
             if(this._sessionManager.getGameSessionId() % 10000 === 0) {
-                this._assetManager.setDiagnostics(true);
+                this._assetManager.setCacheDiagnostics(true);
             }
 
             const defaultPlacement = this._adsConfig.getDefaultPlacement();
