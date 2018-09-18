@@ -1,20 +1,20 @@
-import 'mocha';
-import * as sinon from 'sinon';
+import { PlacementManager } from 'Ads/Managers/PlacementManager';
+import { PlacementState } from 'Ads/Models/Placement';
 import { assert } from 'chai';
-
-import { PurchasingUtilities, IPromoPayload, IPromoRequest } from 'Utilities/PurchasingUtilities';
-import { NativeBridge } from 'Native/NativeBridge';
-import { PurchasingApi } from 'Native/Api/Purchasing';
-import { Observable1 } from 'Utilities/Observable';
-import { SdkApi } from 'Native/Api/Sdk';
-import { ConfigurationParser } from 'Parsers/ConfigurationParser';
-import { ClientInfo } from 'Models/ClientInfo';
-import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { SdkApi } from 'Core/Native/Sdk';
+import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
+import { Observable1 } from 'Core/Utilities/Observable';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
-import { PlacementManager } from 'Managers/PlacementManager';
-import { PlacementState } from 'Models/Placement';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
+import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
 import IapPromoCatalog from 'json/IapPromoCatalog.json';
+import 'mocha';
+import { PurchasingApi } from 'Promo/Native/Purchasing';
+
+import { IPromoPayload, IPromoRequest, PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import * as sinon from 'sinon';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('PurchasingUtilitiesTest', () => {
     let nativeBridge: NativeBridge;

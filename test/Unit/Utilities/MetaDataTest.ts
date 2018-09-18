@@ -1,10 +1,10 @@
-import 'mocha';
-import * as sinon from 'sinon';
 import { assert } from 'chai';
 
-import { NativeBridge } from 'Native/NativeBridge';
-import { StorageType, StorageError } from 'Native/Api/Storage';
-import { MetaData } from 'Utilities/MetaData';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { StorageError, StorageType } from 'Core/Native/Storage';
+import { MetaData } from 'Core/Utilities/MetaData';
+import 'mocha';
+import * as sinon from 'sinon';
 
 describe('MetaDataTest', () => {
     const handleInvocation = sinon.spy();

@@ -1,14 +1,9 @@
+import { assert } from 'chai';
+import { JaegerManager } from 'Core/Jaeger/JaegerManager';
+import { IJaegerSpan, JaegerSpan } from 'Core/Jaeger/JaegerSpan';
+import { Request } from 'Core/Utilities/Request';
 import 'mocha';
 import * as sinon from 'sinon';
-import { assert } from 'chai';
-import { JaegerManager } from 'Jaeger/JaegerManager';
-import { Request } from 'Utilities/Request';
-import { JaegerSpan, IJaegerSpan } from 'Jaeger/JaegerSpan';
-import { Platform } from 'Constants/Platform';
-import { AssertionError } from 'assert';
-import { platform } from 'os';
-import { NativeBridge } from 'Native/NativeBridge';
-import { WakeUpManager } from 'Managers/WakeUpManager';
 
 describe('JaegerManager', () => {
 

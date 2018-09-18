@@ -1,49 +1,50 @@
-import { Placement } from 'Models/Placement';
-import { ClientInfo } from 'Models/ClientInfo';
-import { INativeResponse } from 'Utilities/Request';
-import { Platform } from 'Constants/Platform';
-import { VastParser } from 'Utilities/VastParser';
-import { NativeBridge } from 'Native/NativeBridge';
-import { IPerformanceCampaign, PerformanceCampaign, StoreName } from 'Models/Campaigns/PerformanceCampaign';
-import { IXPromoCampaign, XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
-import { IMRAIDCampaign, MRAIDCampaign } from 'Models/Campaigns/MRAIDCampaign';
-import { Configuration } from 'Models/Configuration';
-import { ConfigurationParser } from 'Parsers/ConfigurationParser';
-import { ICacheDiagnostics } from 'Utilities/Cache';
-import { DisplayInterstitialCampaign, IDisplayInterstitialCampaign } from 'Models/Campaigns/DisplayInterstitialCampaign';
-import { Session } from 'Models/Session';
-import { IVastCampaign, VastCampaign } from 'Models/Vast/VastCampaign';
-import { IPackageInfo } from 'Native/Api/AndroidDeviceInfo';
-import { ICampaign } from 'Models/Campaign';
-import { Image } from 'Models/Assets/Image';
-import { HTML } from 'Models/Assets/HTML';
-import { Video } from 'Models/Assets/Video';
-import { Vast } from 'Models/Vast/Vast';
-import { IVPAIDCampaign } from 'Models/VPAID/VPAIDCampaign';
-import { VPAID } from 'Models/VPAID/VPAID';
-import { IPromoCampaign, PromoCampaign } from 'Models/Campaigns/PromoCampaign';
-import { AndroidDeviceInfo } from 'Models/AndroidDeviceInfo';
-import { IosDeviceInfo } from 'Models/IosDeviceInfo';
-import { FakeAndroidDeviceInfo } from 'TestHelpers/FakeAndroidDeviceInfo';
-import { RingerMode } from 'Constants/Android/RingerMode';
-import { UIUserInterfaceIdiom } from 'Constants/iOS/UIUserInterfaceIdiom';
-import { FakeIosDeviceInfo } from 'TestHelpers/FakeIosDeviceInfo';
-import { AdUnitStyle } from 'Models/AdUnitStyle';
-
-import DummyPromoCampaign from 'json/DummyPromoCampaign.json';
-import OnCometMraidPlcCampaignFollowsRedirects from 'json/OnCometMraidPlcCampaignFollowsRedirects.json';
-import OnCometMraidPlcCampaign from 'json/OnCometMraidPlcCampaign.json';
-import OnCometVideoPlcCampaignFollowsRedirects from 'json/OnCometVideoPlcCampaignFollowsRedirects.json';
-import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
-import OnXPromoPlcCampaign from 'json/OnXPromoPlcCampaign.json';
-import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCampaign.json';
+import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
+import { HTML } from 'Ads/Models/Assets/HTML';
+import { Image } from 'Ads/Models/Assets/Image';
+import { Video } from 'Ads/Models/Assets/Video';
+import { ICampaign } from 'Ads/Models/Campaign';
+import { Placement } from 'Ads/Models/Placement';
+import { Session } from 'Ads/Models/Session';
+import { RingerMode } from 'Core/Constants/Android/RingerMode';
+import { UIUserInterfaceIdiom } from 'Core/Constants/iOS/UIUserInterfaceIdiom';
+import { Platform } from 'Core/Constants/Platform';
+import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { Configuration } from 'Core/Models/Configuration';
+import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
+import { IPackageInfo } from 'Core/Native/Android/AndroidDeviceInfo';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
+import { ICacheDiagnostics } from 'Core/Utilities/Cache';
+import { INativeResponse } from 'Core/Utilities/Request';
+import { DisplayInterstitialCampaign, IDisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import DummyDisplayInterstitialCampaign from 'json/DummyDisplayInterstitialCampaign.json';
-import VastCompanionXml from 'xml/VastCompanionAd.xml';
-import EventTestVast from 'xml/EventTestVast.xml';
-import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xml';
+
+import DummyPromoCampaign from 'json/DummyPromoCampaign.json';
+import OnCometMraidPlcCampaign from 'json/OnCometMraidPlcCampaign.json';
+import OnCometMraidPlcCampaignFollowsRedirects from 'json/OnCometMraidPlcCampaignFollowsRedirects.json';
+import OnCometVideoPlcCampaign from 'json/OnCometVideoPlcCampaign.json';
+import OnCometVideoPlcCampaignFollowsRedirects from 'json/OnCometVideoPlcCampaignFollowsRedirects.json';
+import OnProgrammaticMraidUrlPlcCampaign from 'json/OnProgrammaticMraidUrlPlcCampaign.json';
+import OnXPromoPlcCampaign from 'json/OnXPromoPlcCampaign.json';
+import { IMRAIDCampaign, MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
+import { IPerformanceCampaign, PerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCampaign';
+import { IPromoCampaign, PromoCampaign } from 'Promo/Models/PromoCampaign';
 
 import * as sinon from 'sinon';
+import { FakeAndroidDeviceInfo } from 'TestHelpers/FakeAndroidDeviceInfo';
+import { FakeIosDeviceInfo } from 'TestHelpers/FakeIosDeviceInfo';
+import { Vast } from 'VAST/Models/Vast';
+import { IVastCampaign, VastCampaign } from 'VAST/Models/VastCampaign';
+import { VastParser } from 'VAST/Utilities/VastParser';
+import { VPAID } from 'VPAID/Models/VPAID';
+import { IVPAIDCampaign } from 'VPAID/Models/VPAIDCampaign';
+import EventTestVast from 'xml/EventTestVast.xml';
+import VastCompanionXml from 'xml/VastCompanionAd.xml';
+import VastCompanionAdWithoutImagesXml from 'xml/VastCompanionAdWithoutImages.xml';
+import { IXPromoCampaign, XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { PerformanceMRAIDCampaign } from '../../src/ts/Performance/Models/PerformanceMRAIDCampaign';
 
 const TestMediaID = 'beefcace-abcdefg-deadbeef';
 export class TestFixtures {
@@ -159,7 +160,7 @@ export class TestFixtures {
         const mraidJson = json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'];
         const session = this.getSession();
         return {
-            ... this.getCometCampaignBaseParams(session, mraidContentJson.id, undefined),
+            ... this.getCometCampaignBaseParams(session, mraidContentJson.id, undefined, 'PLAYABLE'),
             useWebViewUserAgentForTracking: mraidJson.useWebViewUserAgentForTracking,
             resourceAsset: mraidContentJson.resourceUrl ? new HTML(mraidContentJson.resourceUrl, session, mraidContentJson.creativeId) : undefined,
             resource: undefined,
@@ -197,13 +198,14 @@ export class TestFixtures {
         };
     }
 
-    public static getProgrammaticMRAIDCampaignParams(json: any, cacheTTL: number, campaignId: string): IMRAIDCampaign {
+    public static getProgrammaticMRAIDCampaignParams(json: any, cacheTTL: number, campaignId: string, customParams: Partial<ICampaign> = {}): IMRAIDCampaign {
         const mraidContentJson = JSON.parse(json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'].content);
         const mraidJson = json.media['UX-47c9ac4c-39c5-4e0e-685e-52d4619dcb85'];
         const session = this.getSession();
 
         return {
             ... this.getProgrammaticMRAIDCampaignBaseParams(this.getSession(), campaignId, json),
+            ... customParams,
             willExpireAt: cacheTTL ? Date.now() + cacheTTL * 1000 : undefined,
             resourceAsset: mraidContentJson.inlinedUrl ? new HTML(mraidContentJson.inlinedUrl, session) : undefined,
             resource: '<div>resource</div>',
@@ -377,9 +379,14 @@ export class TestFixtures {
         return new MRAIDCampaign(this.getPlayableMRAIDCampaignParams(json, StoreName.GOOGLE));
     }
 
-    public static getProgrammaticMRAIDCampaign(): MRAIDCampaign {
+    public static getProgrammaticMRAIDCampaign(customParams: Partial<ICampaign> = {}): MRAIDCampaign {
         const json = JSON.parse(OnProgrammaticMraidUrlPlcCampaign);
-        return new MRAIDCampaign(this.getProgrammaticMRAIDCampaignParams(json, 3600, 'testId'));
+        return new MRAIDCampaign(this.getProgrammaticMRAIDCampaignParams(json, 3600, 'testId', customParams));
+    }
+
+    public static getPerformanceMRAIDCampaign(customParams: Partial<ICampaign> = {}): PerformanceMRAIDCampaign {
+        const json = JSON.parse(OnProgrammaticMraidUrlPlcCampaign);
+        return new PerformanceMRAIDCampaign(this.getProgrammaticMRAIDCampaignParams(json, 3600, 'testId', customParams));
     }
 
     public static getCompanionVastCampaign(): VastCampaign {

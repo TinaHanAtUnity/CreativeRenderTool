@@ -1,53 +1,54 @@
-import 'mocha';
-import * as sinon from 'sinon';
-import { assert } from 'chai';
-
-import { Double } from 'Utilities/Double';
-import { IVastAdUnitParameters, VastAdUnit } from 'AdUnits/VastAdUnit';
-import { VastCampaign } from 'Models/Vast/VastCampaign';
-import { Vast } from 'Models/Vast/Vast';
-import { FinishState } from 'Constants/FinishState';
-import { NativeBridge } from 'Native/NativeBridge';
-import { SessionManager } from 'Managers/SessionManager';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { DeviceInfo } from 'Models/DeviceInfo';
-import { ThirdPartyEventManager } from 'Managers/ThirdPartyEventManager';
-import { Request } from 'Utilities/Request';
-import { Overlay } from 'Views/Overlay';
-import { WakeUpManager } from 'Managers/WakeUpManager';
-import { Diagnostics } from 'Utilities/Diagnostics';
-import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'AdUnits/PerformanceAdUnit';
-import { Platform } from 'Constants/Platform';
-import { AdUnitContainer, Orientation, ViewConfiguration } from 'AdUnits/Containers/AdUnitContainer';
-import { Activity } from 'AdUnits/Containers/Activity';
-import { Video } from 'Models/Assets/Video';
-import { TestEnvironment } from 'Utilities/TestEnvironment';
-import { MetaDataManager } from 'Managers/MetaDataManager';
-import { FocusManager } from 'Managers/FocusManager';
+import { Activity } from 'Ads/AdUnits/Containers/Activity';
+import { AdUnitContainer, Orientation, ViewConfiguration } from 'Ads/AdUnits/Containers/AdUnitContainer';
+import { VideoState } from 'Ads/AdUnits/VideoAdUnit';
+import { AndroidVideoEventHandler } from 'Ads/EventHandlers/AndroidVideoEventHandler';
+import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
+import { GdprManager } from 'Ads/Managers/GdprManager';
 import {
-    IOperativeEventManagerParams, IOperativeEventParams,
+    IOperativeEventManagerParams,
+    IOperativeEventParams,
     OperativeEventManager
-} from 'Managers/OperativeEventManager';
-import { ClientInfo } from 'Models/ClientInfo';
-import { PerformanceEndScreen } from 'Views/PerformanceEndScreen';
-import { Placement } from 'Models/Placement';
-import { PerformanceCampaign } from 'Models/Campaigns/PerformanceCampaign';
-import { XPromoCampaign } from 'Models/Campaigns/XPromoCampaign';
-import { IXPromoAdUnitParameters, XPromoAdUnit } from 'AdUnits/XPromoAdUnit';
-import { XPromoEndScreen } from 'Views/XPromoEndScreen';
-import { OperativeEventManagerFactory } from 'Managers/OperativeEventManagerFactory';
-import { Campaign } from 'Models/Campaign';
-import { XPromoOperativeEventManager } from 'Managers/XPromoOperativeEventManager';
-import { IVideoEventHandlerParams } from 'EventHandlers/BaseVideoEventHandler';
-import { PerformanceVideoEventHandler } from 'EventHandlers/PerformanceVideoEventHandler';
-import { XPromoVideoEventHandler } from 'EventHandlers/XPromoVideoEventHandler';
-import { VastVideoEventHandler } from 'EventHandlers/VastVideoEventHandler';
-import { AndroidVideoEventHandler } from 'EventHandlers/AndroidVideoEventHandler';
-import { VideoState } from 'AdUnits/VideoAdUnit';
-import { Privacy } from 'Views/Privacy';
-import { GdprManager } from 'Managers/GdprManager';
-import { ProgrammaticTrackingService } from 'ProgrammaticTrackingService/ProgrammaticTrackingService';
-import { IEndScreenParameters } from 'Views/EndScreen';
+} from 'Ads/Managers/OperativeEventManager';
+import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
+import { SessionManager } from 'Ads/Managers/SessionManager';
+import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { Video } from 'Ads/Models/Assets/Video';
+import { Campaign } from 'Ads/Models/Campaign';
+import { Placement } from 'Ads/Models/Placement';
+import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { IEndScreenParameters } from 'Ads/Views/EndScreen';
+import { Overlay } from 'Ads/Views/Overlay';
+import { Privacy } from 'Ads/Views/Privacy';
+import { assert } from 'chai';
+import { FinishState } from 'Core/Constants/FinishState';
+import { Platform } from 'Core/Constants/Platform';
+import { FocusManager } from 'Core/Managers/FocusManager';
+import { MetaDataManager } from 'Core/Managers/MetaDataManager';
+import { WakeUpManager } from 'Core/Managers/WakeUpManager';
+import { ClientInfo } from 'Core/Models/ClientInfo';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { Diagnostics } from 'Core/Utilities/Diagnostics';
+
+import { Double } from 'Core/Utilities/Double';
+import { Request } from 'Core/Utilities/Request';
+import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
+import 'mocha';
+import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
+import { PerformanceVideoEventHandler } from 'Performance/EventHandlers/PerformanceVideoEventHandler';
+import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
+import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
+import * as sinon from 'sinon';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
+import { IVastAdUnitParameters, VastAdUnit } from 'VAST/AdUnits/VastAdUnit';
+import { VastVideoEventHandler } from 'VAST/EventHandlers/VastVideoEventHandler';
+import { Vast } from 'VAST/Models/Vast';
+import { VastCampaign } from 'VAST/Models/VastCampaign';
+import { IXPromoAdUnitParameters, XPromoAdUnit } from 'XPromo/AdUnits/XPromoAdUnit';
+import { XPromoVideoEventHandler } from 'XPromo/EventHandlers/XPromoVideoEventHandler';
+import { XPromoOperativeEventManager } from 'XPromo/Managers/XPromoOperativeEventManager';
+import { XPromoCampaign } from 'XPromo/Models/XPromoCampaign';
+import { XPromoEndScreen } from 'XPromo/Views/XPromoEndScreen';
 
 describe('VideoEventHandlersTest', () => {
 
@@ -646,6 +647,8 @@ describe('VideoEventHandlersTest', () => {
             sinon.stub(performanceAdUnit, 'hide');
             sinon.spy(container, 'reconfigure');
             sinon.spy(overlay, 'hide');
+            sinon.spy(endScreen, 'show');
+            sinon.spy(performanceAdUnit, 'onVideoError');
         });
 
         afterEach(() => {
@@ -668,6 +671,8 @@ describe('VideoEventHandlersTest', () => {
 
             sinon.assert.calledWith(<sinon.SinonSpy>container.reconfigure, ViewConfiguration.ENDSCREEN);
             sinon.assert.notCalled(<sinon.SinonSpy>performanceAdUnit.hide);
+            sinon.assert.called(<sinon.SinonSpy>performanceAdUnit.onVideoError);
+            sinon.assert.called(<sinon.SinonSpy>endScreen.show);
         });
 
         it('should set video to inactive and video to finish state to error, video not started', () => {

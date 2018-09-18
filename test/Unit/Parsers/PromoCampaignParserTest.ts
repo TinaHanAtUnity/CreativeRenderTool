@@ -1,18 +1,18 @@
-import 'mocha';
-import * as sinon from 'sinon';
+import { AuctionResponse } from 'Ads/Models/AuctionResponse';
+import { Session } from 'Ads/Models/Session';
 import { assert } from 'chai';
 
-import { NativeBridge } from 'Native/NativeBridge';
-import { Request } from 'Utilities/Request';
-import { AuctionResponse } from 'Models/AuctionResponse';
-import { TestFixtures } from 'TestHelpers/TestFixtures';
-import { Session } from 'Models/Session';
-import { SdkApi } from 'Native/Api/Sdk';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { SdkApi } from 'Core/Native/Sdk';
+import { Request } from 'Core/Utilities/Request';
 
 import IAPPromoCampaign from 'json/campaigns/promo/PromoCampaign.json';
-import { PromoCampaignParser } from 'Parsers/PromoCampaignParser';
-import { PromoCampaign } from 'Models/Campaigns/PromoCampaign';
-import { PurchasingUtilities } from 'Utilities/PurchasingUtilities';
+import 'mocha';
+import { PromoCampaign } from 'Promo/Models/PromoCampaign';
+import { PromoCampaignParser } from 'Promo/Parsers/PromoCampaignParser';
+import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import * as sinon from 'sinon';
+import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('PromoCampaignParser', () => {
     const placements = ['TestPlacement'];
