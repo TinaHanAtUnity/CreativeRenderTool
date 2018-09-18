@@ -5,7 +5,7 @@ import { Platform } from 'Constants/Platform';
 import { Diagnostics } from 'Utilities/Diagnostics';
 import { IFileInfo } from 'Native/Api/Cache';
 
-import {CustomFeatures} from 'Utilities/CustomFeatures';
+import { CustomFeatures } from 'Utilities/CustomFeatures';
 
 export class PerformanceEndScreen extends EndScreen {
     private _campaign: PerformanceCampaign;
