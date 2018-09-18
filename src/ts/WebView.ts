@@ -287,11 +287,14 @@ export class WebView {
             const refreshSpan = this._jaegerManager.startSpan('Refresh', jaegerInitSpan.id, jaegerInitSpan.traceId);
             refreshSpan.addTag(JaegerTags.DeviceType, Platform[this._nativeBridge.getPlatform()]);
             let refreshPromise;
+            /*
             if (this._cachedCampaignResponse !== undefined) {
                 refreshPromise = this._refreshManager.refreshFromCache(this._cachedCampaignResponse, refreshSpan);
             } else {
                 refreshPromise = this._refreshManager.refresh();
             }
+            */
+            refreshPromise = this._refreshManager.refreshWithBackupCampaigns(this._backupCampaignManager); // todo: do not merge to master
             return refreshPromise.then((resp) => {
                 this._jaegerManager.stop(refreshSpan);
                 return resp;

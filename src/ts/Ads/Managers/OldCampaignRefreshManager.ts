@@ -22,6 +22,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { INativeResponse, Request } from 'Core/Utilities/Request';
 import { PromoCampaign } from 'Promo/Models/PromoCampaign';
 import { PurchasingUtilities } from 'Promo/Utilities/PurchasingUtilities';
+import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 
 export class OldCampaignRefreshManager extends RefreshManager {
     private _nativeBridge: NativeBridge;
@@ -128,6 +129,27 @@ export class OldCampaignRefreshManager extends RefreshManager {
         }
 
         return Promise.resolve();
+    }
+
+    public refreshWithBackupCampaigns(backupCampaignManager: BackupCampaignManager): Promise<INativeResponse | void> {
+        this.setPlacementStates(PlacementState.WAITING, this._configuration.getPlacementIds());
+        this._refillTimestamp = 0;
+        this.invalidateCampaigns(false, this._configuration.getPlacementIds());
+        this._campaignCount = 0;
+
+        const promises = [];
+
+        for(const placement in this._configuration.getPlacements()) {
+            promises.push(backupCampaignManager.loadCampaign(this._configuration.getPlacement(placement)).then(campaign => {
+                if(campaign) {
+                    this.setPlacementReady(placement, campaign);
+                }
+            }));
+        }
+
+        return Promise.all(promises).then(() => {
+            return this._campaignManager.request();
+        });
     }
 
     public shouldRefill(timestamp: number): boolean {

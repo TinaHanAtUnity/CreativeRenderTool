@@ -44,7 +44,7 @@ export class BackupCampaignManager {
     public loadCampaign(placement: Placement): Promise<Campaign | undefined> {
         const placementRootKey: string = 'backupcampaign.placement.' + placement.getId();
         return Promise.all([this.getString(placementRootKey + '.mediaid'), this.getString(placementRootKey + '.adtypes')]).then(([mediaId, adTypes]) => {
-            if(mediaId && adTypes) {
+            if(mediaId && adTypes && adTypes === JSON.stringify(placement.getAdTypes())) {
                 const campaignRootKey: string = 'backupcampaign.campaign.' + mediaId;
                 return Promise.all([this.getString(campaignRootKey + '.type'), this.getString(campaignRootKey + '.data'), this.getNumber(campaignRootKey + '.willexpireat')]).then(([type, data, willexpireat]) => {
                     if(type && data && willexpireat) {
