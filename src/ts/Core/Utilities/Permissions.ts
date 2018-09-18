@@ -81,12 +81,10 @@ export class PermissionsUtil {
     }
 
     private static checkAndroidPermissionInManifest(nativeBridge: NativeBridge, permission: string): Promise<boolean> {
-        return new Promise<boolean>((resolve) => {
-            nativeBridge.Permissions.Android.getPermissions()
-                .then((permissions: string[]) => permissions.some((key: string) => key === permission))
-                .then((exists: boolean) => resolve(exists))
-                .catch(() => resolve(false));
-        });
+        return nativeBridge.Permissions.Android.getPermissions()
+            .then((permissions: string[]) => permissions.some((key: string) => key === permission))
+            .then((exists: boolean) => exists)
+            .catch(() => false);
     }
 
     private static checkIosPermissionInManifest(nativeBridge: NativeBridge, permission: string): Promise<boolean> {
@@ -96,11 +94,9 @@ export class PermissionsUtil {
         } else if (permission === IosPermission.AVMediaTypeAudio) {
             key = IosBundleKeys.Audio;
         }
-        return new Promise<boolean>((resolve) => {
-            nativeBridge.MainBundle.getDataForKey(key)
-                .then((value: string | any) => resolve(value !== ''))
-                .catch(() => resolve(false));
-        });
+        return nativeBridge.MainBundle.getDataForKey(key)
+            .then((value: string | any) => value !== '')
+            .catch(() => false);
     }
 
     private static checkAndroidPermission(nativeBridge: NativeBridge, permission: PermissionTypes): Promise<CurrentPermission> {
