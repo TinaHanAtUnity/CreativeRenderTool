@@ -30,6 +30,7 @@ export class PerformanceEndScreen extends EndScreen {
             bypassAppSheet: this._campaign.getBypassAppSheet(),
             appStoreId: this._campaign.getAppStoreId(),
             store: this._campaign.getStore(),
+            appDownloadUrl: this._campaign.getAppDownloadUrl(),
             adUnitStyle: this._adUnitStyle
         }));
     }
