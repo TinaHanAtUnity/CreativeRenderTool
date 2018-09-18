@@ -66,15 +66,6 @@ export class XPromoVideoEventHandler extends VideoEventHandler {
         }
     }
 
-    protected handleVideoError(errorType?: string, errorData?: any): void {
-        super.handleVideoError(errorType, errorData);
-
-        const endScreen = this._xpromoAdUnit.getEndScreen();
-        if (endScreen) {
-            endScreen.show();
-        }
-    }
-
     protected getVideoOrientation(): string | undefined {
         return this._xpromoAdUnit.getVideoOrientation();
     }
