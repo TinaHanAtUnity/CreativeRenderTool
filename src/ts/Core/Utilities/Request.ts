@@ -71,7 +71,7 @@ export class Request {
     private static _callbackId: number = 1;
     private static _callbacks: { [key: number]: CallbackContainer<INativeResponse> } = {};
     private static _requests: { [key: number]: INativeRequest } = {};
-    private static _cookies: Map<RegExp, string> = new Map<RegExp, string>();
+    private static _cookies: Array<{ host: RegExp; cookies: string }> = [];
 
     private static getDefaultRequestOptions(): IRequestOptions {
         return {
@@ -95,22 +95,25 @@ export class Request {
     }
 
     public static addCookiesForHost(hostRegex: string, cookies: string) {
-        Request._cookies.set(new RegExp(hostRegex), cookies);
+        Request._cookies.push({
+            host: new RegExp(hostRegex),
+            cookies: cookies.trim(),
+        });
     }
 
     public static resetCookiesForHost() {
-        Request._cookies.clear();
+        Request._cookies = [];
     }
 
     public static applyCookies(url: string, headers: Array<[string, string]> = []): Array<[string, string]> {
         let cookies = '';
 
         for (const pair of Request._cookies) {
-            if (pair['0'].test(url)) {
+            if (pair.host.test(url)) {
                 if (cookies.length !== 0) {
                     cookies += '; ';
                 }
-                cookies += pair['1'].trim();
+                cookies += pair.cookies;
             }
         }
 

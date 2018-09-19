@@ -437,6 +437,21 @@ describe('RequestTest', () => {
             });
         });
 
+        it('get trim cookies string', () => {
+            const successUrl: string = 'http://www.example.org/cookies';
+            const expectedCookies = 'key1=value1; key3=value3';
+
+            Request.addCookiesForHost('www.example.org', '   key1=value1  ');
+            Request.addCookiesForHost('www.example.org', ' key3=value3 ');
+
+            return request.get(successUrl).then((response) => {
+                assert.equal(expectedCookies, response.response, 'Did not receive correct response');
+            }).catch(error => {
+                error = <RequestError>error;
+                throw new Error('Get without headers failed: ' + error.message);
+            });
+        });
+
         it('get ignore host', () => {
             const successUrl: string = 'http://www.example.org/cookies';
             const expectedCookies = 'key1=value1';
