@@ -45,21 +45,7 @@ export class ConfigManager {
             }).then(response => {
                 jaegerSpan.addTag(JaegerTags.StatusCode, response.responseCode.toString());
                 try {
-                    const configJson = JsonParser.parse(response.response);
-                    if(configJson.token) {
-                        nativeBridge.Sdk.logInfo('Received configuration for token ' + configJson.token + ' (A/B group ' + configJson.abGroup + ')');
-                        if(nativeBridge.getPlatform() === Platform.IOS && deviceInfo.getLimitAdTracking()) {
-                            ConfigManager.storeGamerToken(nativeBridge, configJson.token);
-                        }
-                        return configJson;
-                    } else {
-                        Diagnostics.trigger('config_failure', {
-                            configUrl: url,
-                            configResponse: response.response
-                        });
-
-                        throw new Error('gamer token missing in PLC config');
-                    }
+                    return JsonParser.parse(response.response);
                 } catch(error) {
                     Diagnostics.trigger('config_parsing_failed', {
                         configUrl: url,
@@ -79,9 +65,6 @@ export class ConfigManager {
                         error = new ConfigError((new Error(responseObj.error)));
                     }
                 }
-                jaegerSpan.addTag(JaegerTags.Error, 'true');
-                jaegerSpan.addTag(JaegerTags.ErrorMessage, error.message);
-                jaegerSpan.addAnnotation(error.message);
                 throw error;
             });
         });
@@ -178,7 +161,7 @@ export class ConfigManager {
         return this.fetchValue(nativeBridge, 'gamerToken');
     }
 
-    private static storeGamerToken(nativeBridge: NativeBridge, gamerToken: string): Promise<void[]> {
+    public static storeGamerToken(nativeBridge: NativeBridge, gamerToken: string): Promise<void[]> {
         return this.storeValue(nativeBridge, 'gamerToken', gamerToken);
     }
 

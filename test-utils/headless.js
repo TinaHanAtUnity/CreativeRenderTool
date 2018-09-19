@@ -12,7 +12,7 @@ const REQUIRED_MESSAGES = [
         expected: 1,
         matchedMessages: []},
     {description: "Configuration Response",
-        regexp: new RegExp(/Received configuration for token /),
+        regexp: new RegExp(/Received configuration with . placements for token /),
         seen: 0,
         expected: 1,
         matchedMessages: []},

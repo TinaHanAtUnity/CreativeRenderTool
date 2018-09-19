@@ -210,10 +210,19 @@ export class WebView {
             } else {
                 configPromise = ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, this._metadataManager, configSpan);
             }
-            configPromise.then((configuration) => {
+            configPromise = configPromise.then((configJson) => {
+                const coreConfig = CoreConfigurationParser.parse(configJson);
+                const adsConfig = AdsConfigurationParser.parse(configJson);
+                this._nativeBridge.Sdk.logInfo('Received configuration with ' + adsConfig.getPlacementCount() + ' placements for token ' + coreConfig.getToken() + ' (A/B group ' + coreConfig.getAbGroup() + ')');
+                if(this._nativeBridge.getPlatform() === Platform.IOS && this._deviceInfo.getLimitAdTracking()) {
+                    ConfigManager.storeGamerToken(this._nativeBridge, configJson.token);
+                }
                 this._jaegerManager.stop(configSpan);
-                return configuration;
+                return [coreConfig, adsConfig];
             }).catch((error) => {
+                configSpan.addTag(JaegerTags.Error, 'true');
+                configSpan.addTag(JaegerTags.ErrorMessage, error.message);
+                configSpan.addAnnotation(error.message);
                 this._jaegerManager.stop(configSpan);
                 throw new Error(error);
             });
@@ -227,12 +236,12 @@ export class WebView {
             const cachedCampaignResponsePromise = this._cacheBookkeeping.getCachedCampaignResponse();
 
             return Promise.all([configPromise, cachedCampaignResponsePromise, cachePromise]);
-        }).then(([configuration, cachedCampaignResponse]) => {
-            this._coreConfig = CoreConfigurationParser.parse(configuration);
-            this._adsConfig = AdsConfigurationParser.parse(configuration);
+        }).then(([[coreConfig, adsConfig], cachedCampaignResponse]) => {
+            this._coreConfig = <CoreConfiguration>coreConfig;
+            this._adsConfig = <AdsConfiguration>adsConfig;
 
             this._gdprManager = new GdprManager(this._nativeBridge, this._deviceInfo, this._clientInfo, this._coreConfig, this._adsConfig, this._request);
-            this._cachedCampaignResponse = cachedCampaignResponse;
+            this._cachedCampaignResponse = <any>cachedCampaignResponse;
             HttpKafka.setConfiguration(this._coreConfig);
             this._jaegerManager.setJaegerTracingEnabled(this._coreConfig.isJaegerTracingEnabled());
 

@@ -18,7 +18,12 @@ export class CoreConfigurationParser {
             organizationId: configJson.organizationId
         };
 
-        return new CoreConfiguration(configurationParams);
+        const coreConfig = new CoreConfiguration(configurationParams);
+        if(coreConfig.getToken()) {
+            return coreConfig;
+        } else {
+            throw new Error('gamer token missing in PLC config');
+        }
     }
 
     private static parseCacheMode(configJson: any): CacheMode {
