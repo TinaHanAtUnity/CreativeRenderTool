@@ -50,7 +50,6 @@ export class PerformanceOverlayEventHandlerWithCTAButton extends OverlayEventHan
 
     public onOverlayDownload(parameters: IVideoOverlayDownloadParameters): void {
         this.setCallButtonEnabled(false);
-        parameters = <IVideoOverlayDownloadParameters> parameters;
         this._nativeBridge.Listener.sendClickEvent(this._placement.getId());
         this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.CLICK);
 
