@@ -1,4 +1,4 @@
-import { Cache, ICallbackObject } from 'Core/Utilities/Cache';
+import { Cache, ICacheEvent } from 'Core/Utilities/Cache';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { IObserver1, IObserver2, IObserver3 } from 'Core/Utilities/IObserver';
 
@@ -22,17 +22,17 @@ export class CacheDiagnostics {
     private readonly _cache: Cache;
     private readonly _data: ICacheDiagnostics;
 
-    private readonly _startObserver: IObserver2<ICallbackObject, number>;
-    private readonly _finishObserver: IObserver2<ICallbackObject, boolean>;
-    private readonly _stopObserver: IObserver1<ICallbackObject>;
-    private readonly _errorObserver: IObserver3<ICallbackObject, string, string>;
+    private readonly _startObserver: IObserver2<ICacheEvent, number>;
+    private readonly _finishObserver: IObserver2<ICacheEvent, boolean>;
+    private readonly _stopObserver: IObserver1<ICacheEvent>;
+    private readonly _errorObserver: IObserver3<ICacheEvent, string, string>;
 
     constructor(cache: Cache, data: ICacheDiagnostics) {
         this._data = data;
-        this._startObserver = cache.onStart.subscribe((callback, size) => this.sendDiagnostic(size === 0 ? CacheDiagnosticEvent.STARTED : CacheDiagnosticEvent.RESUMED, callback));
-        this._finishObserver = cache.onFinish.subscribe((callback, redirect) => this.sendDiagnostic(redirect ? CacheDiagnosticEvent.REDIRECTED : CacheDiagnosticEvent.FINISHED, callback));
-        this._stopObserver = cache.onStop.subscribe((callback) => this.sendDiagnostic(CacheDiagnosticEvent.STOPPED, callback));
-        this._errorObserver = cache.onError.subscribe((callback) => this.sendDiagnostic(CacheDiagnosticEvent.ERROR, callback));
+        this._startObserver = cache.onStart.subscribe((event, size) => this.sendDiagnostic(size === 0 ? CacheDiagnosticEvent.STARTED : CacheDiagnosticEvent.RESUMED, event));
+        this._finishObserver = cache.onFinish.subscribe((event, redirect) => this.sendDiagnostic(redirect ? CacheDiagnosticEvent.REDIRECTED : CacheDiagnosticEvent.FINISHED, event));
+        this._stopObserver = cache.onStop.subscribe((event) => this.sendDiagnostic(CacheDiagnosticEvent.STOPPED, event));
+        this._errorObserver = cache.onError.subscribe((event) => this.sendDiagnostic(CacheDiagnosticEvent.ERROR, event));
     }
 
     public stop() {
@@ -42,13 +42,13 @@ export class CacheDiagnostics {
         this._cache.onError.unsubscribe(this._errorObserver);
     }
 
-    private sendDiagnostic(event: CacheDiagnosticEvent, callback: ICallbackObject) {
+    private sendDiagnostic(event: CacheDiagnosticEvent, cacheEvent: ICacheEvent) {
         const msg: any = {
             eventTimestamp: Date.now(),
             eventType: CacheDiagnosticEvent[event],
             creativeType: this._data.creativeType,
-            size: callback.contentLength,
-            downloadStartTimestamp: callback.startTimestamp,
+            size: cacheEvent.contentLength,
+            downloadStartTimestamp: cacheEvent.contentLength,
             targetGameId: this._data.targetGameId,
             targetCampaignId: this._data.targetCampaignId
         };

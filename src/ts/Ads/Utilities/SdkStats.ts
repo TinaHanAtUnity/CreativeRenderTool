@@ -86,10 +86,10 @@ export class SdkStats {
         SdkStats._metaDataManager = metaDataManager;
         SdkStats._clientInfo = clientInfo;
 
-        cache.onFinish.subscribe((callback) => SdkStats.setCachingFinishTimestamp(callback.fileId));
-        cache.onStart.subscribe((callback, size) => {
+        cache.onFinish.subscribe((event) => SdkStats.setCachingFinishTimestamp(event.fileId));
+        cache.onStart.subscribe((event, size) => {
             if(size === 0) {
-                SdkStats.setCachingStartTimestamp(callback.fileId);
+                SdkStats.setCachingStartTimestamp(event.fileId);
             }
         });
 
