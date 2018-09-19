@@ -15,7 +15,6 @@ import { IOperativeEventParams } from 'Ads/Managers/OperativeEventManager';
 import { RequestError } from 'Core/Errors/RequestError';
 import { Video } from 'Ads/Models/Assets/Video';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
-import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { IosUtils } from 'Ads/Utilities/IosUtils';
 
 export interface IVideoOverlayDownloadParameters extends IEndScreenDownloadParameters {
@@ -59,10 +58,6 @@ export class PerformanceOverlayEventHandlerWithCTAButton extends OverlayEventHan
 
         const operativeEventParameters = this.getOperativeEventParams(parameters);
         this._operativeEventManager.sendClick(operativeEventParameters);
-        const kafkaObject: any = {
-            type: 'performance_overlay_cta_click'
-        };
-        HttpKafka.sendEvent('ads.sdk2.events.performancevideooverlayclicks.json', KafkaCommonObjectType.ANONYMOUS, kafkaObject);
 
         if (this._nativeBridge.getPlatform() === Platform.IOS) {
             this.onDownloadIos(parameters);
