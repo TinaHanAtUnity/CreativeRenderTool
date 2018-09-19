@@ -1,4 +1,4 @@
-# Staged
+# Wed Sep 19 06:56:59 UTC 2018
 
 * Recognize standalone_android store type and appDownloadUrl parameter from Auction [#6029](https://github.com/Applifier/unity-ads-webview/pull/6029)
 * Fix playable KPI background time [#6275](https://github.com/Applifier/unity-ads-webview/pull/6275)
