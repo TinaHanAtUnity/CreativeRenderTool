@@ -198,7 +198,7 @@ describe('AssetManagerTest', () => {
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
         cacheBookkeeping = new CacheBookkeeping(nativeBridge);
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
-        backupCampaignManager = new BackupCampaignManager(nativeBridge);
+        backupCampaignManager = new BackupCampaignManager(nativeBridge, TestFixtures.getConfiguration());
     });
 
     it('should not cache anything when cache mode is disabled', () => {

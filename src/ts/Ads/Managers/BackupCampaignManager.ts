@@ -7,15 +7,26 @@ import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
 import { CometCampaignLoader } from 'Performance/Parsers/CometCampaignLoader';
 import { ProgrammaticAdMobLoader } from 'AdMob/Parsers/ProgrammaticAdMobLoader';
 import { CampaignLoader } from 'Ads/Parsers/CampaignLoader';
+import { Configuration } from 'Core/Models/Configuration';
+import { Asset } from 'Ads/Models/Assets/Asset';
+import { IFileInfo } from 'Core/Native/Cache';
+import { Video } from 'Ads/Models/Assets/Video';
 
 export class BackupCampaignManager {
     private _nativeBridge: NativeBridge;
+    private _configuration: Configuration;
 
-    constructor(nativeBridge: NativeBridge) {
+    constructor(nativeBridge: NativeBridge, configuration: Configuration) {
         this._nativeBridge = nativeBridge;
+        this._configuration = configuration;
     }
 
     public storePlacement(placement: Placement, mediaId: string) {
+        // never store data when in test mode
+        if(this._configuration.getTestMode()) {
+            return;
+        }
+
         const rootKey: string = 'backupcampaign.placement.' + placement.getId();
 
         this._nativeBridge.Storage.set(StorageType.PRIVATE, rootKey + '.mediaid', mediaId);
@@ -24,6 +35,11 @@ export class BackupCampaignManager {
     }
 
     public storeCampaign(campaign: Campaign) {
+        // never store data when in test mode
+        if(this._configuration.getTestMode()) {
+            return;
+        }
+
         const rootKey: string = 'backupcampaign.campaign.' + campaign.getMediaId();
         const campaignType: string | undefined = this.getCampaignType(campaign);
 
@@ -42,6 +58,11 @@ export class BackupCampaignManager {
     }
 
     public loadCampaign(placement: Placement): Promise<Campaign | undefined> {
+        // test mode should never use stored production campaigns even when they would be available in storage
+        if(this._configuration.getTestMode()) {
+            return Promise.resolve(undefined);
+        }
+
         const placementRootKey: string = 'backupcampaign.placement.' + placement.getId();
         return Promise.all([this.getString(placementRootKey + '.mediaid'), this.getString(placementRootKey + '.adtypes')]).then(([mediaId, adTypes]) => {
             if(mediaId && adTypes && adTypes === JSON.stringify(placement.getAdTypes())) {
@@ -106,5 +127,65 @@ export class BackupCampaignManager {
         }).catch(() => {
             return undefined;
         });
+    }
+
+    private verifyCachedFiles(campaign: Campaign): Promise<boolean> {
+        const requiredAssets = campaign.getRequiredAssets();
+        const optionalAssets = campaign.getOptionalAssets();
+
+        if(requiredAssets.length === 0 && optionalAssets.length === 0) {
+            return Promise.resolve(true);
+        }
+
+        const promises = [];
+
+        // unfortunately PerformanceCampaign does not strictly follow requiredAssets and optionalAssets pattern
+        // it needs either video (landscape) or portraitVideo cached so this special logic is necessary
+        if(campaign instanceof PerformanceCampaign) {
+            const video = campaign.getVideo();
+            const portraitVideo = campaign.getPortraitVideo();
+            if(video && video.isCached()) {
+                promises.push(this.verifyCachedAsset(video));
+            } else if(portraitVideo && portraitVideo.isCached()) {
+                promises.push(this.verifyCachedAsset(portraitVideo));
+            } else {
+                return Promise.resolve(false);
+            }
+        }
+
+        for(const requiredAsset of requiredAssets) {
+            promises.push(this.verifyCachedAsset(requiredAsset));
+        }
+
+        for(const optionalAsset of optionalAssets) {
+            promises.push(this.verifyCachedAsset(optionalAsset));
+        }
+
+        return Promise.all(promises).then((values: boolean[]) => {
+            // just one non-cached asset is enough to make entire campaign not cached
+            for(const value of values) {
+                if(value === false) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
+    }
+
+    private verifyCachedAsset(asset: Asset): Promise<boolean> {
+        const fileId = asset.getFileId();
+
+        if(asset.isCached() && fileId) {
+            return this._nativeBridge.Cache.getFileInfo(fileId).then((fileInfo: IFileInfo) => {
+                if(fileInfo.found && fileInfo.size > 0) {
+                    return true;
+                }
+
+                return false;
+            });
+        } else {
+            return Promise.resolve(false);
+        }
     }
 }

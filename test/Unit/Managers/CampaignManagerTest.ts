@@ -228,7 +228,7 @@ describe('CampaignManager', () => {
         placementManager = sinon.createStubInstance(PlacementManager);
         PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, placementManager);
         programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
-        backupCampaignManager = new BackupCampaignManager(nativeBridge);
+        backupCampaignManager = new BackupCampaignManager(nativeBridge, configuration);
     });
 
     describe('on VAST campaign', () => {
