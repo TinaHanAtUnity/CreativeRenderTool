@@ -210,6 +210,13 @@ export class WebView {
             } else {
                 configPromise = ConfigManager.fetch(this._nativeBridge, this._request, this._clientInfo, this._deviceInfo, this._metadataManager, configSpan);
             }
+
+            configPromise.then(() => {
+                this._jaegerManager.stop(configSpan);
+            }).catch(() => {
+                this._jaegerManager.stop(configSpan);
+            });
+
             configPromise = configPromise.then((configJson) => {
                 const coreConfig = CoreConfigurationParser.parse(configJson);
                 const adsConfig = AdsConfigurationParser.parse(configJson);
@@ -217,13 +224,11 @@ export class WebView {
                 if(this._nativeBridge.getPlatform() === Platform.IOS && this._deviceInfo.getLimitAdTracking()) {
                     ConfigManager.storeGamerToken(this._nativeBridge, configJson.token);
                 }
-                this._jaegerManager.stop(configSpan);
                 return [coreConfig, adsConfig];
             }).catch((error) => {
                 configSpan.addTag(JaegerTags.Error, 'true');
                 configSpan.addTag(JaegerTags.ErrorMessage, error.message);
                 configSpan.addAnnotation(error.message);
-                this._jaegerManager.stop(configSpan);
                 throw new Error(error);
             });
 
