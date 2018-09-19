@@ -12,7 +12,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
 
     private _spinnerEnabled: boolean = false;
 
-    private _skipEnabled: boolean;
+    protected _skipEnabled: boolean;
 
     private _videoDurationEnabled: boolean = false;
     protected _videoProgress: number;
@@ -23,7 +23,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _callButtonVisible: boolean = false;
     protected _callButtonEnabled: boolean = true;
 
-    private _skipButtonElement: HTMLElement;
+    protected _skipButtonElement: HTMLElement;
     private _spinnerElement: HTMLElement;
     private _muteButtonElement: HTMLElement;
     private _debugMessageElement: HTMLElement;
@@ -31,7 +31,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _timerElement: HTMLElement;
 
     private _fadeTimer: any;
-    private _areControlsVisible: boolean = false;
+    protected _areControlsVisible: boolean = false;
     private _privacy: AbstractPrivacy;
     private _gdprPopupClicked: boolean = false;
     private _showGDPRBanner: boolean = false;
@@ -328,7 +328,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._timerElement = <HTMLElement>this._container.querySelector('.timer');
     }
 
-    private showSkipButton() {
+    protected showSkipButton() {
         if (this._skipEnabled) {
             this._skipButtonElement.classList.add('show-skip-button');
         }
@@ -341,7 +341,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         }
     }
 
-    private showCallButton() {
+    protected showCallButton() {
         if (!this._areControlsVisible) {
             return;
         }
@@ -349,7 +349,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         this._callButtonElement.classList.add('show-go-text');
     }
 
-    private fadeIn() {
+    protected fadeIn() {
         this._container.classList.add('fade-in');
         this._areControlsVisible = true;
         setTimeout(() => {

@@ -3,8 +3,6 @@ import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { NewVideoOverlay } from 'Ads/Views/NewVideoOverlay';
 import { Campaign } from 'Ads/Models/Campaign';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
-import { ABGroup } from 'Core/Models/ABGroup';
-import { IVideoOverlayDownloadParameters } from 'Performance/EventHandlers/PerformanceOverlayWithCTAButtonEventHandler';
 
 export class PerformanceVideoOverlayWithCTAButton extends NewVideoOverlay implements IPrivacyHandler {
     private _showPerformanceAdCTAButton: boolean = false;
@@ -15,6 +13,18 @@ export class PerformanceVideoOverlayWithCTAButton extends NewVideoOverlay implem
 
         this._campaign = campaign;
         this._templateData.gameIcon = campaign.getGameIcon() ? campaign.getGameIcon().getUrl() : '';
+    }
+
+    protected showSkipButton() {
+        if (this._skipEnabled) {
+            this._skipButtonElement.classList.add('show-skip-button');
+            this.showCallButton();
+        }
+    }
+
+    protected fadeIn() {
+        this._container.classList.add('fade-in');
+        this._areControlsVisible = true;
     }
 
     protected onCallButtonEvent(event: Event): void {
