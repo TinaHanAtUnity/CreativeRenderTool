@@ -63,8 +63,8 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private _hasCameraPermission = false;
     private _permissionResultObserver: IObserver2<string, boolean>;
 
-    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup) {
-        super(nativeBridge, 'playable-mraid', placement, campaign, privacy, showGDPRBanner, abGroup);
+    constructor(nativeBridge: NativeBridge, placement: Placement, campaign: MRAIDCampaign, language: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, abGroup: ABGroup, gameSessionId: number) {
+        super(nativeBridge, 'playable-mraid', placement, campaign, privacy, showGDPRBanner, abGroup, gameSessionId);
 
         this._placement = placement;
         this._campaign = campaign;
@@ -186,14 +186,14 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 type: 'viewable',
                 value: viewable
             }, '*');
+        }
 
-            // background time for analytics
-            if(!viewable) {
-                this._backgroundTimestamp = Date.now();
-            } else {
-                if (this._backgroundTimestamp) {
-                    this._backgroundTime += Date.now() - this._backgroundTimestamp;
-                }
+        // background time for analytics
+        if(!viewable) {
+            this._backgroundTimestamp = Date.now();
+        } else {
+            if (this._backgroundTimestamp) {
+                this._backgroundTime += Date.now() - this._backgroundTimestamp;
             }
         }
     }
@@ -201,8 +201,12 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     public show(): void {
         super.show();
         this._showTimestamp = Date.now();
-        const backgroundTime = ARMRAID.checkIsValid(this._backgroundTime / 1000);
-        this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(0, 0, backgroundTime, 'playable_show', {}));
+        const backgroundTime = this._backgroundTime / 1000;
+
+        if (this.isKPIDataValid({backgroundTime}, 'ar_playable_show')) {
+            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(0, 0, backgroundTime, 'playable_show', {}));
+        }
+
         this.showLoadingScreen();
     }
 
@@ -361,24 +365,23 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
     private onCloseEvent(event: Event): void {
         event.preventDefault();
         event.stopPropagation();
-        const timeFromShow = ARMRAID.checkIsValid((Date.now() - this._showTimestamp) / 1000);
-        const timeFromPlayableStart = ARMRAID.checkIsValid((Date.now() - this._playableStartTimestamp) / 1000);
-        const backgroundTime = ARMRAID.checkIsValid(this._backgroundTime / 1000);
 
-        if(this._canSkip && !this._canClose) {
+        const skip = this._canSkip && !this._canClose;
+        const eventName = skip ? 'playable_skip' : 'playable_close';
+
+        const timeFromShow = (Date.now() - this._showTimestamp - this._backgroundTime) / 1000;
+        const timeFromPlayableStart = (Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000;
+        const backgroundTime = this._backgroundTime / 1000;
+
+        if (skip) {
             this._handlers.forEach(handler => handler.onMraidSkip());
-            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, 'playable_skip', undefined));
-        } else if(this._canClose) {
+        } else if (this._canClose) {
             this._handlers.forEach(handler => handler.onMraidClose());
-            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, 'playable_close', undefined));
         }
-    }
 
-    private static checkIsValid(timeInSeconds: number): number | undefined {
-        if (timeInSeconds < 0 || timeInSeconds > 600) {
-            return undefined;
+        if (this.isKPIDataValid({timeFromShow, timeFromPlayableStart, backgroundTime}, 'ar_' + eventName)) {
+            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, eventName, undefined));
         }
-        return timeInSeconds;
     }
 
     private onIframeLoaded() {
@@ -390,13 +393,15 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
             this.showARPermissionPanel();
         }
 
-        const frameLoadDuration = Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId());
-        this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' iframe load duration ' + frameLoadDuration + ' ms');
+        const frameLoadDuration = (Date.now() - SdkStats.getFrameSetStartTimestamp(this._placement.getId()) / 1000);
+        this._nativeBridge.Sdk.logDebug('Unity Ads placement ' + this._placement.getId() + ' iframe load duration ' + frameLoadDuration + ' s');
 
-        const timeFromShow = ARMRAID.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
-        const backgroundTime = ARMRAID.checkIsValid(this._backgroundTime / 1000);
+        const timeFromShow = (this._playableStartTimestamp - this._showTimestamp - this._backgroundTime) / 1000;
+        const backgroundTime = this._backgroundTime / 1000;
 
-        this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(frameLoadDuration, timeFromShow, backgroundTime, 'playable_loading_time', {}));
+        if (this.isKPIDataValid({timeFromShow, backgroundTime}, 'ar_playable_loading_time')) {
+            this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(frameLoadDuration, timeFromShow, backgroundTime, 'playable_loading_time', {}));
+        }
     }
 
     private handleAREvent(event: string, parameters: string) {
@@ -501,10 +506,13 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 }));
                 break;
             case 'analyticsEvent':
-                const timeFromShow = ARMRAID.checkIsValid((Date.now() - this._showTimestamp) / 1000);
-                const timeFromPlayableStart = ARMRAID.checkIsValid((Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000);
-                const backgroundTime = ARMRAID.checkIsValid(this._backgroundTime / 1000);
-                this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, event.data.event, event.data.eventData));
+                const timeFromShow = (Date.now() - this._showTimestamp - this._backgroundTime) / 1000;
+                const timeFromPlayableStart = (Date.now() - this._playableStartTimestamp - this._backgroundTime) / 1000;
+                const backgroundTime = this._backgroundTime / 1000;
+
+                if (this.isKPIDataValid({timeFromShow, timeFromPlayableStart, backgroundTime}, event.data.event)) {
+                    this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, timeFromPlayableStart, backgroundTime, event.data.event, event.data.eventData));
+                }
                 break;
             case 'customMraidState':
                 switch(event.data.state) {
@@ -548,9 +556,13 @@ export class ARMRAID extends MRAIDView<IMRAIDViewHandler> {
                 this._closeElement.style.display = 'block';
 
                 this._playableStartTimestamp = Date.now();
-                const timeFromShow = ARMRAID.checkIsValid((this._playableStartTimestamp - this._showTimestamp) / 1000);
-                const backgroundTime = ARMRAID.checkIsValid(this._backgroundTime / 1000);
-                this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_start', undefined));
+                const timeFromShow = (this._playableStartTimestamp - this._showTimestamp - this._backgroundTime) / 1000;
+                const backgroundTime = this._backgroundTime / 1000;
+
+                if (this.isKPIDataValid({timeFromShow, backgroundTime}, 'ar_playable_start')) {
+                    this._handlers.forEach(handler => handler.onPlayableAnalyticsEvent(timeFromShow, 0, backgroundTime, 'playable_start', undefined));
+                }
+
                 this.setViewableState(true);
 
                 this._loadingScreen.style.display = 'none';
