@@ -6,6 +6,7 @@ import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
 import { Request } from 'Core/Utilities/Request';
 import { ClientInfo } from 'Core/Models/ClientInfo';
+import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { Platform } from 'Core/Constants/Platform';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { DiagnosticError } from 'Core/Errors/DiagnosticError';
@@ -15,6 +16,7 @@ import { RequestError } from 'Core/Errors/RequestError';
 import { Video } from 'Ads/Models/Assets/Video';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
+import { IosUtils } from 'Ads/Utilities/IosUtils';
 
 export interface IVideoOverlayDownloadParameters extends IEndScreenDownloadParameters {
     videoProgress: number;
@@ -25,6 +27,7 @@ export class PerformanceOverlayEventHandlerWithCTAButton extends OverlayEventHan
     private _performanceAdUnit: PerformanceAdUnit;
     private _thirdPartyEventManager: ThirdPartyEventManager;
     private _clientInfo: ClientInfo;
+    private _deviceInfo: DeviceInfo;
     private _performanceOverlay?: AbstractVideoOverlay;
 
     constructor(nativeBridge: NativeBridge, adUnit: PerformanceAdUnit, parameters: IPerformanceAdUnitParameters) {
@@ -32,6 +35,7 @@ export class PerformanceOverlayEventHandlerWithCTAButton extends OverlayEventHan
         this._performanceAdUnit = adUnit;
         this._thirdPartyEventManager = parameters.thirdPartyEventManager;
         this._clientInfo = parameters.clientInfo;
+        this._deviceInfo = parameters.deviceInfo;
         this._adUnit = adUnit;
         this._performanceOverlay = this._performanceAdUnit.getOverlay();
     }
@@ -160,7 +164,34 @@ export class PerformanceOverlayEventHandlerWithCTAButton extends OverlayEventHan
                 'uri': appStoreUrl
             });
         } else if (platform === Platform.IOS) {
-            this._nativeBridge.UrlScheme.open(appStoreUrl);
+            const isAppSheetBroken = IosUtils.isAppSheetBroken(this._deviceInfo.getOsVersion(), this._deviceInfo.getModel());
+            if (isAppSheetBroken || parameters.bypassAppSheet) {
+                this._nativeBridge.UrlScheme.open(appStoreUrl);
+            } else {
+                this._nativeBridge.AppSheet.canOpen().then(canOpenAppSheet => {
+                    if (canOpenAppSheet) {
+                        if (!parameters.appStoreId) {
+                            Diagnostics.trigger('no_appstore_id', {
+                                message: 'trying to open ios appstore without appstore id'
+                            });
+                            return;
+                        }
+
+                        const options = {
+                            id: parseInt(parameters.appStoreId, 10)
+                        };
+                        this._nativeBridge.AppSheet.present(options).then(() => {
+                            this._nativeBridge.AppSheet.destroy(options);
+                        }).catch(([error]) => {
+                            if (error === 'APPSHEET_NOT_FOUND') {
+                                this._nativeBridge.UrlScheme.open(appStoreUrl);
+                            }
+                        });
+                    } else {
+                        this._nativeBridge.UrlScheme.open(appStoreUrl);
+                    }
+                });
+            }
         }
 
         this.onOverlaySkip(parameters.videoProgress);
