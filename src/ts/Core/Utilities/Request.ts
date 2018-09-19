@@ -97,15 +97,19 @@ export class Request {
     public static addCookiesForHost(hostRegex: string, cookies: string) {
         Request._cookies.push({
             host: new RegExp(hostRegex),
-            cookies: cookies.trim(),
+            cookies: cookies.trim()
         });
     }
 
-    public static resetCookiesForHost() {
+    public static clearCookies() {
         Request._cookies = [];
     }
 
     public static applyCookies(url: string, headers: Array<[string, string]> = []): Array<[string, string]> {
+        if (this._cookies.length === 0) {
+            return headers;
+        }
+
         let cookies = '';
 
         for (const pair of Request._cookies) {
@@ -120,7 +124,7 @@ export class Request {
         if (cookies.length !== 0) {
             return [
                 ...headers,
-                ['COOKIES', cookies]
+                ['Cookie', cookies]
             ];
         }
 
