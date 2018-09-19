@@ -71,6 +71,7 @@ export class Request {
     private static _callbackId: number = 1;
     private static _callbacks: { [key: number]: CallbackContainer<INativeResponse> } = {};
     private static _requests: { [key: number]: INativeRequest } = {};
+    private static _cookies: Map<RegExp, string> = new Map<RegExp, string>();
 
     private static getDefaultRequestOptions(): IRequestOptions {
         return {
@@ -93,6 +94,36 @@ export class Request {
         this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
     }
 
+    public static addCookiesForHost(hostRegex: string, cookies: string) {
+        Request._cookies.set(new RegExp(hostRegex), cookies);
+    }
+
+    public static resetCookiesForHost() {
+        Request._cookies.clear();
+    }
+
+    public static applyCookies(url: string, headers: Array<[string, string]> = []): Array<[string, string]> {
+        let cookies = '';
+
+        for (const pair of Request._cookies) {
+            if (pair['0'].test(url)) {
+                if (cookies.length !== 0) {
+                    cookies += '; ';
+                }
+                cookies += pair['1'].trim();
+            }
+        }
+
+        if (cookies.length !== 0) {
+            return [
+                ...headers,
+                ['COOKIES', cookies]
+            ];
+        }
+
+        return headers;
+    }
+
     public get(url: string, headers: Array<[string, string]> = [], options?: IRequestOptions): Promise<INativeResponse> {
         if(typeof options === 'undefined') {
             options = Request.getDefaultRequestOptions();
@@ -103,7 +134,7 @@ export class Request {
         this.invokeRequest(id, {
             method: RequestMethod.GET,
             url: url,
-            headers: headers,
+            headers: Request.applyCookies(url, headers),
             retryCount: 0,
             options: options
         });

@@ -635,6 +635,16 @@ export class WebView {
                 AdUnitFactory.setForcedPlayableMRAID(TestEnvironment.get('forcedPlayableMRAID'));
             }
 
+            if(TestEnvironment.get('forceCookies')) {
+                // Example: fake-ads-backend.applifier.com|key1=value1; key2=value2|fake-ads-backend.applifier.com|key1=value1; key2=value2
+                const value = TestEnvironment.get('forceCookies');
+                const params = value.split('|');
+
+                for (let i = 0; i < params.length; i += 2) {
+                    Request.addCookiesForHost(params[i + 0], params[i + 1]);
+                }
+            }
+
             let forcedARMRAID = false;
             if (TestEnvironment.get('forcedARMRAID')) {
                 forcedARMRAID = TestEnvironment.get('forcedARMRAID');
