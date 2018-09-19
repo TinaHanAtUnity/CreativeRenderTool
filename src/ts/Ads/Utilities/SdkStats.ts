@@ -177,7 +177,6 @@ export class SdkStats {
     private static _campaignManager: CampaignManager;
     private static _metaDataManager: MetaDataManager;
     private static _clientInfo: ClientInfo;
-    private static _cache: Cache;
     private static _topic: string = 'ads.sdk2.events.sdktimeline.json';
 
     private static _initialized: boolean = false;

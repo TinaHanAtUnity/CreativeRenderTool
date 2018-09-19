@@ -57,7 +57,8 @@ export class Cache {
     public readonly onFastConnectionDetected = new Observable0();
 
     public readonly onStart = new Observable2<ICacheEvent, number>();
-    public readonly onFinish = new Observable2<ICacheEvent, boolean>();
+    public readonly onRedirect = new Observable1<ICacheEvent>();
+    public readonly onFinish = new Observable1<ICacheEvent>();
     public readonly onStop = new Observable1<ICacheEvent>();
     public readonly onError = new Observable3<ICacheEvent, string, string>();
     public readonly onFinishError = new Observable5<ICacheEvent, number, number, number, HeadersType>();
@@ -285,10 +286,10 @@ export class Cache {
             if(Request.AllowedResponseCodes.exec(responseCode.toString())) {
                 this._cacheBookkeeping.writeFileEntry(callback.fileId, this._cacheBookkeeping.createFileInfo(true, size, totalSize, FileId.getFileIdExtension(callback.fileId)));
                 this.fulfillCallback(url, CacheStatus.OK);
-                this.onFinish.trigger(Cache.getCacheEvent(callback), false);
+                this.onFinish.trigger(Cache.getCacheEvent(callback));
                 return;
             } else if(Request.RedirectResponseCodes.exec(responseCode.toString())) {
-                this.onFinish.trigger(Cache.getCacheEvent(callback), true);
+                this.onRedirect.trigger(Cache.getCacheEvent(callback));
                 this._cacheBookkeeping.removeFileEntry(callback.fileId);
                 this._nativeBridge.Cache.deleteFile(callback.fileId);
                 const location = Request.getHeader(headers, 'location');

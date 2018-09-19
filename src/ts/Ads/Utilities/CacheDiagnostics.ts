@@ -23,20 +23,23 @@ export class CacheDiagnostics {
     private readonly _data: ICacheDiagnostics;
 
     private readonly _startObserver: IObserver2<ICacheEvent, number>;
-    private readonly _finishObserver: IObserver2<ICacheEvent, boolean>;
+    private readonly _redirectObserver: IObserver1<ICacheEvent>;
+    private readonly _finishObserver: IObserver1<ICacheEvent>;
     private readonly _stopObserver: IObserver1<ICacheEvent>;
     private readonly _errorObserver: IObserver3<ICacheEvent, string, string>;
 
     constructor(cache: Cache, data: ICacheDiagnostics) {
         this._data = data;
         this._startObserver = cache.onStart.subscribe((event, size) => this.sendDiagnostic(size === 0 ? CacheDiagnosticEvent.STARTED : CacheDiagnosticEvent.RESUMED, event));
-        this._finishObserver = cache.onFinish.subscribe((event, redirect) => this.sendDiagnostic(redirect ? CacheDiagnosticEvent.REDIRECTED : CacheDiagnosticEvent.FINISHED, event));
+        this._redirectObserver = cache.onRedirect.subscribe((event) => this.sendDiagnostic(CacheDiagnosticEvent.REDIRECTED, event));
+        this._finishObserver = cache.onFinish.subscribe((event) => this.sendDiagnostic(CacheDiagnosticEvent.FINISHED, event));
         this._stopObserver = cache.onStop.subscribe((event) => this.sendDiagnostic(CacheDiagnosticEvent.STOPPED, event));
         this._errorObserver = cache.onError.subscribe((event) => this.sendDiagnostic(CacheDiagnosticEvent.ERROR, event));
     }
 
     public stop() {
         this._cache.onStart.unsubscribe(this._startObserver);
+        this._cache.onRedirect.unsubscribe(this._redirectObserver);
         this._cache.onFinish.unsubscribe(this._finishObserver);
         this._cache.onStop.unsubscribe(this._stopObserver);
         this._cache.onError.unsubscribe(this._errorObserver);
