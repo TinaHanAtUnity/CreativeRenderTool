@@ -61,8 +61,7 @@ export class CustomFeatures {
             'TBD'
         ];
 
-        return true ||
-            targetCampaignIds.indexOf(campaignId) !== -1;
+        return targetCampaignIds.indexOf(campaignId) !== -1;
     }
 
     public static getScreenshotsUrls(campaignId: string): string[] {
