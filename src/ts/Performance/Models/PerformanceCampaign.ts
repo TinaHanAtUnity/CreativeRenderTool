@@ -6,7 +6,9 @@ import { Campaign, ICampaign } from 'Ads/Models/Campaign';
 export enum StoreName {
     APPLE,
     GOOGLE,
-    XIAOMI
+    XIAOMI,
+    // for APK campaigns
+    STANDALONE_ANDROID
 }
 
 export interface IPerformanceCampaign extends ICampaign {
@@ -29,6 +31,7 @@ export interface IPerformanceCampaign extends ICampaign {
     bypassAppSheet: boolean;
     store: StoreName;
     adUnitStyle: AdUnitStyle | undefined;
+    appDownloadUrl?: string;
     trackingUrls: {[key: string]: string[]};
 }
 
@@ -55,6 +58,7 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             bypassAppSheet: ['boolean'],
             store: ['number'],
             adUnitStyle: ['object', 'undefined'],
+            appDownloadUrl: ['string', 'undefined'],
             trackingUrls: ['object', 'undefined']
         }, campaign);
     }
@@ -151,6 +155,10 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
         ];
     }
 
+    public getAppDownloadUrl() {
+        return this.get('appDownloadUrl');
+    }
+
     public isConnectionNeeded(): boolean {
         return false;
     }
@@ -210,6 +218,7 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             'clickAttributionUrlFollowsRedirects': this.getClickAttributionUrlFollowsRedirects(),
             'bypassAppSheet': this.getBypassAppSheet(),
             'store': StoreName[this.getStore()].toLowerCase(),
+            'appDownloadUrl': this.getAppDownloadUrl(),
             'trackingUrls': this.getTrackingUrls()
         };
     }

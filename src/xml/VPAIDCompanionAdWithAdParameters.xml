@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<VAST version="2.0">
+    <Ad id="1h41kg">
+        <InLine>
+            <AdSystem>Innovid Ads</AdSystem>
+            <AdTitle><![CDATA[Certification Testing VPAID - MRAID - Click on Main copy (5/20/2016)]]></AdTitle>
+            <Impression><![CDATA[about:blank]]></Impression>
+            <Creatives>
+                <Creative>
+                    <Linear>
+                        <Duration>00:00:15</Duration>
+                        <MediaFiles>
+                            <MediaFile delivery="progressive" width="16" height="9" type="application/javascript" apiFramework="VPAID"><![CDATA[http://vpaid.unityads.unity3d.com/js/vpaid.js]]></MediaFile>
+                        </MediaFiles>
+                        <TrackingEvents>
+                            <Tracking event="error"><![CDATA[http://tracking.unityads.unity3d.com/error]]></Tracking>
+                            <Tracking event="resume"><![CDATA[http://tracking.unityads.unity3d.com/resume]]></Tracking>
+                            <Tracking event="creativeView"><![CDATA[http://tracking.unityads.unity3d.com/creativeView]]></Tracking>
+                            <Tracking event="impression"><![CDATA[http://tracking.unityads.unity3d.com/impression]]></Tracking>
+                            <Tracking event="start"><![CDATA[http://tracking.unityads.unity3d.com/start]]></Tracking>
+                            <Tracking event="firstQuartile"><![CDATA[http://tracking.unityads.unity3d.com/firstQuartile]]></Tracking>
+                            <Tracking event="midpoint"><![CDATA[http://tracking.unityads.unity3d.com/midpoint]]></Tracking>
+                            <Tracking event="thirdQuartile"><![CDATA[http://tracking.unityads.unity3d.com/thirdQuartile]]></Tracking>
+                            <Tracking event="complete"><![CDATA[http://tracking.unityads.unity3d.com/complete]]></Tracking>
+                            <Tracking event="paused"><![CDATA[http://tracking.unityads.unity3d.com/paused]]></Tracking>
+                            <Tracking event="skip"><![CDATA[http://tracking.unityads.unity3d.com/skip]]></Tracking>
+                        </TrackingEvents>
+                        <VideoClicks>
+                            <ClickThrough><![CDATA[http://learnmore.unityads.unity3d.com]]></ClickThrough>
+                            <ClickTracking><![CDATA[http://trackiing.unityads.unity3d.com/click]]></ClickTracking>
+                        </VideoClicks>
+                        <AdParameters>
+                            <![CDATA[{
+                                "foo": "bar\"
+                            }]]>
+                        </AdParameters>
+                    </Linear>
+                </Creative>
+                <Creative id="unity_companion" sequence="0">
+                    <CompanionAds>
+                        <Companion id="unity_brand_endcard_portrait" width="2500" height="3500">
+                            <StaticResource creativeType="image/png"><![CDATA[http://unity.com/portrait.jpg]]></StaticResource>
+                            <TrackingEvents>
+                                <Tracking event="creativeView"><![CDATA[https://test.com/clicktracking]]></Tracking>
+                            </TrackingEvents>
+                            <CompanionClickThrough><![CDATA[https://test.com/companionClickThrough]]></CompanionClickThrough>
+                        </Companion>
+                        <Companion id="unity_brand_endcard_landscape" width="3500" height="2500">
+                            <StaticResource creativeType="image/png"><![CDATA[http://unity.com/landscape.jpg]]></StaticResource>
+                            <TrackingEvents>
+                                <Tracking event="creativeView"><![CDATA[https://pixel.mathtag.com/video/img?cb=8541700239826312192&mt_uuid=83d5ca41-447b-4650-a4a1-745fa218e1e1&mt_cmid=1&mt_aid=123&event=companionImpression&mt_id=3203937&mt_exid=brx&mt_adid=152931&mt_stid=111666111]]></Tracking>
+                            </TrackingEvents>
+                            <CompanionClickThrough><![CDATA[https://test.com/companionClickThrough]]></CompanionClickThrough>
+                        </Companion>
+                    </CompanionAds>
+                </Creative>
+            </Creatives>
+        </InLine>
+    </Ad>
+</VAST>
