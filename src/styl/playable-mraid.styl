@@ -236,6 +236,15 @@ $camera-permission-panel-color = #fafafa;
       display: block;
       text-align: center;
     }
+
+    .meta-link {
+      font-size: $default-font-size * .85;
+      display: inline-block;
+
+      &+.meta-link {
+        margin-left: 15pt;
+      }
+    }
   }
 
   .camera-permission-panel {
@@ -273,6 +282,7 @@ $camera-permission-panel-color = #fafafa;
     .permission-choice-buttons {
       display: flex;
       margin: 0 auto;
+      width: 90%;
       max-width: $permissions-max-width;
 
       -webkit-box-orient: horizontal;
