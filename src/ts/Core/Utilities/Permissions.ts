@@ -92,6 +92,8 @@ export class PermissionsUtil {
             key = IosBundleKeys.Camera;
         } else if (permission === IosPermission.AVMediaTypeAudio) {
             key = IosBundleKeys.Audio;
+        } else {
+            return Promise.resolve(false);
         }
         return nativeBridge.MainBundle.getDataForKey(key)
             .then((value: string | any) => value !== '')
