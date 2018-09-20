@@ -183,7 +183,7 @@ export abstract class EndScreen extends View<IEndScreenHandler> implements IPriv
         this._privacy.show();
     }
 
-    private getTemplate() {
+    protected getTemplate() {
         return EndScreenTemplate;
     }
 }
