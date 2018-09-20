@@ -121,6 +121,15 @@ describe('BackupCampaignManagerTest', () => {
 
         assert.equal(setSpy.callCount, 0, 'campaign data was set to storage when test mode is active');
         assert.equal(writeSpy.callCount, 0, 'campaign data was written to storage when test mode is active');
+    });
 
+    it('should not load campaigns when test mode is active', () => {
+        const configuration = TestFixtures.getConfiguration();
+        sinon.stub(configuration, 'getTestMode').returns(true);
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(TestFixtures.getNativeBridge(), configuration);
+
+        return backupCampaignManager.loadCampaign(TestFixtures.getPlacement()).then(campaign => {
+            assert.isUndefined(campaign, 'campaign was loaded when test mode is active');
+        });
     });
 });

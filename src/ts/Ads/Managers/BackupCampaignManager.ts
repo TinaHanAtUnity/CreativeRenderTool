@@ -68,24 +68,33 @@ export class BackupCampaignManager {
             if(mediaId && adTypes && adTypes === JSON.stringify(placement.getAdTypes())) {
                 const campaignRootKey: string = 'backupcampaign.campaign.' + mediaId;
                 return Promise.all([this.getString(campaignRootKey + '.type'), this.getString(campaignRootKey + '.data'), this.getNumber(campaignRootKey + '.willexpireat')]).then(([type, data, willexpireat]) => {
-                    if(type && data && willexpireat) {
+                    if(type && data && willexpireat && Date.now() < willexpireat) {
                         const loader: CampaignLoader | undefined = this.getCampaignLoader(type);
 
-                        if(loader && Date.now() < willexpireat) {
-                            return loader.load(data);
-                            // todo: add cache check for all required and optional assets
+                        if(loader) {
+                            const campaign = loader.load(data);
+
+                            if(campaign) {
+                                return this.verifyCachedFiles(campaign).then(cached => {
+                                    if(cached) {
+                                        return campaign;
+                                    } else {
+                                        return undefined;
+                                    }
+                                });
+                            }
                         }
                     }
 
                     return undefined;
                 }).catch(() => {
-                    return undefined; // todo: this should never get executed so add some diagnostics here
+                    return undefined;
                 });
             } else {
                 return undefined;
             }
         }).catch(() => {
-            return undefined; // todo: this should never get executed so add some diagnostics here
+            return undefined;
         });
     }
 
