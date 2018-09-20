@@ -136,7 +136,7 @@ describe('BackupCampaignManagerTest', () => {
     it('should not load campaign when storage is empty', () => {
         const nativeBridge: NativeBridge = <NativeBridge><any>{
             Storage: {
-                get: sinon.stub().returns(Promise.reject(StorageError.COULDNT_GET_VALUE)),
+                get: sinon.stub().returns(Promise.reject(StorageError.COULDNT_GET_VALUE))
             }
         };
 
@@ -145,5 +145,5 @@ describe('BackupCampaignManagerTest', () => {
         return backupCampaignManager.loadCampaign(TestFixtures.getPlacement()).then(campaign => {
             assert.isUndefined(campaign, 'campaign was loaded when storage is empty');
         });
-    })
+    });
 });
