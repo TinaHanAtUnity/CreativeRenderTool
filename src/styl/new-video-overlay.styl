@@ -28,7 +28,8 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
     transition: transform .4s ease-in;
   }
 
-  .content {
+  .top-container,
+  .bottom-container {
     display: none;
   }
 
@@ -38,7 +39,8 @@ $new-video-overlay-styles.tab-vertical-margin = $new-video-overlay-styles.base-s
   }
 
   &.fade-in {
-    .content {
+    .top-container,
+    .bottom-container {
       display: block;
     }
 
