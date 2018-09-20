@@ -2,6 +2,7 @@ import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Image } from 'Ads/Models/Assets/Image';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign, ICampaign } from 'Ads/Models/Campaign';
+import { Asset } from 'Ads/Models/Assets/Asset';
 
 export enum StoreName {
     APPLE,
@@ -30,6 +31,7 @@ export interface IPerformanceCampaign extends ICampaign {
     store: StoreName;
     adUnitStyle: AdUnitStyle | undefined;
     trackingUrls: {[key: string]: string[]};
+    screenshots?: Image[];
 }
 
 export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
@@ -55,7 +57,8 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
             bypassAppSheet: ['boolean'],
             store: ['number'],
             adUnitStyle: ['object', 'undefined'],
-            trackingUrls: ['object', 'undefined']
+            trackingUrls: ['object', 'undefined'],
+            screenshots: ['array', 'undefined']
         }, campaign);
     }
 
@@ -139,7 +142,7 @@ export class PerformanceCampaign extends Campaign<IPerformanceCampaign> {
         return 0;
     }
 
-    public getRequiredAssets() {
+    public getRequiredAssets(): Asset[] {
         return [];
     }
 

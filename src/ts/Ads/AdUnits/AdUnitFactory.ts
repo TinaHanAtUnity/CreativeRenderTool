@@ -51,6 +51,8 @@ import { PerformanceEndScreenEventHandler } from 'Performance/EventHandlers/Perf
 import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/PerformanceOverlayEventHandler';
 import { PerformanceVideoEventHandler } from 'Performance/EventHandlers/PerformanceVideoEventHandler';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
+import { SliderPerformanceCampaign } from 'Performance/Models/SliderPerformanceCampaign';
+import { SliderPerformanceEndScreen } from 'Performance/Views/SliderPerformanceEndScreen';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import { PromoAdUnit } from 'Promo/AdUnits/PromoAdUnit';
@@ -91,8 +93,10 @@ export class AdUnitFactory {
             return this.createVastAdUnit(nativeBridge, <IAdUnitParameters<VastCampaign>>parameters);
         } else if(parameters.campaign instanceof MRAIDCampaign) {
             return this.createMRAIDAdUnit(nativeBridge, <IAdUnitParameters<MRAIDCampaign>>parameters);
-        } else if(parameters.campaign instanceof PerformanceCampaign) {
-            return this.createPerformanceAdUnit(nativeBridge, <IAdUnitParameters<PerformanceCampaign>>parameters);
+        } else if (parameters.campaign instanceof SliderPerformanceCampaign) {
+            return this.createPerformanceAdUnit(nativeBridge, <IAdUnitParameters<SliderPerformanceCampaign>>parameters);
+        } else if (parameters.campaign instanceof PerformanceCampaign) {
+                return this.createPerformanceAdUnit(nativeBridge, <IAdUnitParameters<PerformanceCampaign>>parameters);
         } else if (parameters.campaign instanceof DisplayInterstitialCampaign) {
             return this.createDisplayInterstitialAdUnit(nativeBridge, <IAdUnitParameters<DisplayInterstitialCampaign>>parameters);
         } else if (parameters.campaign instanceof VPAIDCampaign) {
@@ -116,7 +120,7 @@ export class AdUnitFactory {
         AdUnitFactory._forcedARMRAID = value;
     }
 
-    private static createPerformanceAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PerformanceCampaign>): PerformanceAdUnit {
+    private static createPerformanceAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<PerformanceCampaign | SliderPerformanceCampaign>): PerformanceAdUnit {
         const overlay = this.createOverlay(nativeBridge, parameters);
 
         const adUnitStyle: AdUnitStyle = parameters.campaign.getAdUnitStyle() || AdUnitStyle.getDefaultAdUnitStyle();
@@ -128,7 +132,15 @@ export class AdUnitFactory {
             campaignId: parameters.campaign.getId(),
             osVersion: parameters.deviceInfo.getOsVersion()
         };
-        const endScreen = new PerformanceEndScreen(endScreenParameters, parameters.campaign);
+
+        let endScreen;
+
+        if(parameters.campaign instanceof SliderPerformanceCampaign) {
+            endScreen = new SliderPerformanceEndScreen(endScreenParameters, parameters.campaign);
+        } else {
+            endScreen = new PerformanceEndScreen(endScreenParameters, parameters.campaign);
+        }
+
         const video = this.getVideo(parameters.campaign, parameters.forceOrientation);
 
         const performanceAdUnitParameters: IPerformanceAdUnitParameters = {

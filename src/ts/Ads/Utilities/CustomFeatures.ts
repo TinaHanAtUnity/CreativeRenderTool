@@ -54,4 +54,28 @@ export class CustomFeatures {
         // Clean master (Cheetah)
         return gameId === '1196341';
     }
+
+    public static isSliderEndscreenEnabled(campaignId: string): boolean {
+        const targetCampaignIds = [
+            'TBD',
+            'TBD'
+        ];
+
+        return true ||
+            targetCampaignIds.indexOf(campaignId) !== -1;
+    }
+
+    public static getScreenshotsUrls(campaignId: string): string[] {
+        campaignId = 'test';
+        const screenshots: { [key: string]: string[] } = {
+            'test': [
+                'https://lh3.googleusercontent.com/r9Lop-rvoj5NJepnt6DFe2qrGiVEEc05D-1mB6XUb49tf4FrnVSIEdh6Pi7tBzsIFnI=w1739-h1170-rw',
+                'https://lh3.googleusercontent.com/hUEuMju1dhqANA_7g6xOtR9A6SVbj3YxSvwAo5vq7-vBJ8sarDn1IRwQYff5vgjIL88_=w1739-h1170-rw',
+                'https://lh3.googleusercontent.com/P4nGXQPqTS_eJ0jSiKp0e1xUYLrE365PTlxrJaeZoJlS321xom-LiZCdXoJOaRxbDQ=w1739-h1170-rw',
+                'https://lh3.googleusercontent.com/pHOAqc-gMT4e2jND7X96mw1Tm4JnelLjtTLtqXvBOQnOZjcXuKKwrVvOYNJeHXlrfm5m=w1739-h1170-rw',
+                'https://lh3.googleusercontent.com/c4356hfvZwsqAHstmamvYU2O9zFNSxwpTqpNic8BhF0Vj9ashpOOxiDBNWJpwr64t4w=w1739-h1170-rw'
+            ]
+        };
+        return screenshots[campaignId];
+    }
 }

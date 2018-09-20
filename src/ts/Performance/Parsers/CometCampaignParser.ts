@@ -12,6 +12,7 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Request } from 'Core/Utilities/Request';
 import { IMRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IPerformanceCampaign, PerformanceCampaign, StoreName } from 'Performance/Models/PerformanceCampaign';
+import { SliderPerformanceCampaign } from 'Performance/Models/SliderPerformanceCampaign';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
 
 // Events marked with // are currently sent, but are unused - waiting for BI to confirm if they want them sent
@@ -139,7 +140,17 @@ export class CometCampaignParser extends CampaignParser {
                 parameters.streamingPortraitVideo = new Video(this.validateAndEncodeUrl(json.trailerPortraitStreaming, session), session, undefined, json.portraitCreativeId);
             }
 
-            return Promise.resolve(new PerformanceCampaign(parameters));
+            let promise;
+
+            if (CustomFeatures.isSliderEndscreenEnabled(parameters.id)) {
+                const screenshotsUrls = CustomFeatures.getScreenshotsUrls(parameters.id);
+                parameters.screenshots = screenshotsUrls.map(url => new Image(this.validateAndEncodeUrl(url, session), session));
+                promise = Promise.resolve(new SliderPerformanceCampaign(parameters));
+            } else {
+                promise = Promise.resolve(new PerformanceCampaign(parameters));
+            }
+
+            return promise;
         }
     }
 

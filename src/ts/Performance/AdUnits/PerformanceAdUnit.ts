@@ -7,16 +7,17 @@ import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceEndScreen } from 'Performance/Views/PerformanceEndScreen';
 import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { SliderPerformanceEndScreen } from 'Performance/Views/SliderPerformanceEndScreen';
 
 export interface IPerformanceAdUnitParameters extends IVideoAdUnitParameters<PerformanceCampaign> {
-    endScreen: PerformanceEndScreen;
+    endScreen: PerformanceEndScreen | SliderPerformanceEndScreen;
     adUnitStyle?: AdUnitStyle;
     privacy: AbstractPrivacy;
 }
 
 export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
 
-    private _endScreen: PerformanceEndScreen;
+    private _endScreen: PerformanceEndScreen | SliderPerformanceEndScreen;
     private _privacy: AbstractPrivacy;
     private _performanceCampaign: PerformanceCampaign;
     private _thirdPartyEventManager: ThirdPartyEventManager;
@@ -54,7 +55,7 @@ export class PerformanceAdUnit extends VideoAdUnit<PerformanceCampaign> {
         return 'performance';
     }
 
-    public getEndScreen(): PerformanceEndScreen | undefined {
+    public getEndScreen(): PerformanceEndScreen | SliderPerformanceEndScreen | undefined {
         return this._endScreen;
     }
 
