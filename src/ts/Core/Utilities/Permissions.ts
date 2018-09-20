@@ -83,7 +83,6 @@ export class PermissionsUtil {
     private static checkAndroidPermissionInManifest(nativeBridge: NativeBridge, permission: string): Promise<boolean> {
         return nativeBridge.Permissions.Android.getPermissions()
             .then((permissions: string[]) => permissions.some((key: string) => key === permission))
-            .then((exists: boolean) => exists)
             .catch(() => false);
     }
 
