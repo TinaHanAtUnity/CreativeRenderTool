@@ -55,7 +55,8 @@ export class CustomFeatures {
         return gameId === '1196341';
     }
 
-    public static isSliderEndscreenEnabled(campaignId: string): boolean {
+    /* Following 2 functions could be merged at some point later */
+    public static isSliderEndScreenEnabled(campaignId: string): boolean {
         const targetCampaignIds = [
             'TBD',
             'TBD'
