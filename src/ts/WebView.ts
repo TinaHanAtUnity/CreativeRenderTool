@@ -635,13 +635,14 @@ export class WebView {
                 AdUnitFactory.setForcedPlayableMRAID(TestEnvironment.get('forcedPlayableMRAID'));
             }
 
-            if(TestEnvironment.get('forceCookies')) {
-                // Example: fake-ads-backend.applifier.com|key1=value1; key2=value2|fake-ads-backend.applifier.com|key1=value1; key2=value2
-                const value = TestEnvironment.get('forceCookies');
+            if(TestEnvironment.get('forceAuthorization')) {
+                const value = TestEnvironment.get('forceAuthorization');
                 const params = value.split('|');
 
-                for (let i = 0; i < params.length; i += 2) {
-                    Request.addCookiesForHost(params[i + 0], params[i + 1]);
+                if (params.length % 2 === 0) {
+                    for (let i = 0; i < params.length; i += 2) {
+                        Request.setAuthorizationHeaderForHost(params[i + 0], params[i + 1]);
+                    }
                 }
             }
 

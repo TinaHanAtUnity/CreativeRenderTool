@@ -71,7 +71,7 @@ export class Request {
     private static _callbackId: number = 1;
     private static _callbacks: { [key: number]: CallbackContainer<INativeResponse> } = {};
     private static _requests: { [key: number]: INativeRequest } = {};
-    private static _cookies: Array<{ host: RegExp; cookies: string }> = [];
+    private static _authorizations: Array<{ host: RegExp; authorizationHeader: string }> = [];
 
     private static getDefaultRequestOptions(): IRequestOptions {
         return {
@@ -94,39 +94,39 @@ export class Request {
         this._wakeUpManager.onNetworkConnected.subscribe(() => this.onNetworkConnected());
     }
 
-    public static addCookiesForHost(hostRegex: string, cookies: string) {
-        Request._cookies.push({
+    public static setAuthorizationHeaderForHost(hostRegex: string, authorizationHeader: string) {
+        Request._authorizations.push({
             host: new RegExp(hostRegex),
-            cookies: cookies.trim()
+            authorizationHeader: authorizationHeader.trim()
         });
     }
 
-    public static clearCookies() {
-        Request._cookies = [];
+    public static clearAllAuthorization() {
+        Request._authorizations = [];
     }
 
-    public static applyCookies(url: string, headers: Array<[string, string]> = []): Array<[string, string]> {
-        if (this._cookies.length === 0) {
+    public static applyAuthorizationHeader(url: string, headers: Array<[string, string]> = []): Array<[string, string]> {
+        if (this._authorizations.length === 0) {
             return headers;
         }
 
-        let cookies = '';
+        let authorizationHeader = '';
 
-        for (const pair of Request._cookies) {
+        for (const pair of Request._authorizations) {
             if (pair.host.test(url)) {
-                if (cookies.length !== 0) {
-                    cookies += '; ';
-                }
-                cookies += pair.cookies;
+                authorizationHeader = pair.authorizationHeader;
+                break;
             }
         }
 
-        if (cookies.length !== 0) {
-            return [
-                ...headers,
-                ['Cookie', cookies]
-            ];
+        if (authorizationHeader.length === 0) {
+            return headers;
         }
+
+        return [
+            ...headers,
+            ['Authorization', authorizationHeader]
+        ];
 
         return headers;
     }
@@ -141,7 +141,7 @@ export class Request {
         this.invokeRequest(id, {
             method: RequestMethod.GET,
             url: url,
-            headers: Request.applyCookies(url, headers),
+            headers: Request.applyAuthorizationHeader(url, headers),
             retryCount: 0,
             options: options
         });

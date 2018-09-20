@@ -14,8 +14,8 @@ class TestRequestApi extends RequestApi {
     private _toggleUrl: boolean = false;
 
     public get(id: string, url: string, headers: Array<[string, string]>): Promise<string> {
-        if(url.indexOf('/cookies') !== -1) {
-            const header = headers.find((x) => x[0] === 'COOKIES');
+        if(url.indexOf('/auth') !== -1) {
+            const header = headers.find((x) => x[0] === 'Authorization');
             const cookies = header === undefined ? '' : header[1];
             this.sendSuccessResponse(id, url, cookies, 200, []);
         } else if(url.indexOf('/success') !== -1) {
@@ -389,19 +389,19 @@ describe('RequestTest', () => {
         });
     });
 
-    describe('Request Cookies', () => {
+    describe('Request Authorization', () => {
         afterEach(() => {
-            Request.resetCookiesForHost();
+            Request.clearAllAuthorization();
         });
 
         it('get', () => {
-            const successUrl: string = 'http://www.example.org/cookies';
-            const expectedCookies = 'key1=value1; key2=value2';
+            const successUrl: string = 'http://www.example.org/auth';
+            const expectedToken = 'Bearer 1234567890';
 
-            Request.addCookiesForHost('www.example.org', expectedCookies);
+            Request.setAuthorizationHeaderForHost('www.example.org', expectedToken);
 
             return request.get(successUrl).then((response) => {
-                assert.equal(expectedCookies, response.response, 'Did not receive correct response');
+                assert.equal(expectedToken, response.response, 'Did not receive correct response');
             }).catch(error => {
                 error = <RequestError>error;
                 throw new Error('Get without headers failed: ' + error.message);
@@ -409,13 +409,13 @@ describe('RequestTest', () => {
         });
 
         it('get for https', () => {
-            const successUrl: string = 'https://www.example.org/cookies';
-            const expectedCookies = 'key1=value1; key2=value2';
+            const successUrl: string = 'https://www.example.org/auth';
+            const expectedToken = 'Bearer 1234567890';
 
-            Request.addCookiesForHost('www.example.org', expectedCookies);
+            Request.setAuthorizationHeaderForHost('www.example.org', expectedToken);
 
             return request.get(successUrl).then((response) => {
-                assert.equal(expectedCookies, response.response, 'Did not receive correct response');
+                assert.equal(expectedToken, response.response, 'Did not receive correct response');
             }).catch(error => {
                 error = <RequestError>error;
                 throw new Error('Get without headers failed: ' + error.message);
@@ -423,29 +423,28 @@ describe('RequestTest', () => {
         });
 
         it('get multiple cookies', () => {
-            const successUrl: string = 'http://www.example.org/cookies';
-            const expectedCookies = 'key1=value1; key3=value3';
+            const successUrl: string = 'http://www.example.org/auth';
+            const expectedToken = 'Bearer 0987654321';
 
-            Request.addCookiesForHost('www.example.org', 'key1=value1');
-            Request.addCookiesForHost('www.example.org', 'key3=value3');
+            Request.setAuthorizationHeaderForHost('www.example.org', expectedToken);
+            Request.setAuthorizationHeaderForHost('www.example.org', 'Bearer 1234567890');
 
             return request.get(successUrl).then((response) => {
-                assert.equal(expectedCookies, response.response, 'Did not receive correct response');
+                assert.equal(expectedToken, response.response, 'Did not receive correct response');
             }).catch(error => {
                 error = <RequestError>error;
                 throw new Error('Get without headers failed: ' + error.message);
             });
         });
 
-        it('get trim cookies string', () => {
-            const successUrl: string = 'http://www.example.org/cookies';
-            const expectedCookies = 'key1=value1; key3=value3';
+        it('get trim token string', () => {
+            const successUrl: string = 'http://www.example.org/auth';
+            const expectedToken = '   Bearer 0987654321   ';
 
-            Request.addCookiesForHost('www.example.org', '   key1=value1  ');
-            Request.addCookiesForHost('www.example.org', ' key3=value3 ');
+            Request.setAuthorizationHeaderForHost('www.example.org', expectedToken);
 
             return request.get(successUrl).then((response) => {
-                assert.equal(expectedCookies, response.response, 'Did not receive correct response');
+                assert.equal(expectedToken.trim(), response.response, 'Did not receive correct response');
             }).catch(error => {
                 error = <RequestError>error;
                 throw new Error('Get without headers failed: ' + error.message);
@@ -453,14 +452,14 @@ describe('RequestTest', () => {
         });
 
         it('get ignore host', () => {
-            const successUrl: string = 'http://www.example.org/cookies';
-            const expectedCookies = 'key1=value1';
+            const successUrl: string = 'http://www.example.org/auth';
+            const expectedToken = 'Bearer 0987654321';
 
-            Request.addCookiesForHost('www.example.org', 'key1=value1');
-            Request.addCookiesForHost('www.not-example.org', 'key3=value3');
+            Request.setAuthorizationHeaderForHost('www.not-example.org', 'Bearer 1234567890');
+            Request.setAuthorizationHeaderForHost('www.example.org', expectedToken);
 
             return request.get(successUrl).then((response) => {
-                assert.equal(expectedCookies, response.response, 'Did not receive correct response');
+                assert.equal(expectedToken, response.response, 'Did not receive correct response');
             }).catch(error => {
                 error = <RequestError>error;
                 throw new Error('Get without headers failed: ' + error.message);
@@ -468,14 +467,14 @@ describe('RequestTest', () => {
         });
 
         it('get no cookies for host', () => {
-            const successUrl: string = 'http://www.example.org/cookies';
-            const expectedCookies = '';
+            const successUrl: string = 'http://www.example.org/auth';
+            const expectedToken = '';
 
-            Request.addCookiesForHost('www.google.com', 'key1=value1');
-            Request.addCookiesForHost('www.not-example.org', 'key3=value3');
+            Request.setAuthorizationHeaderForHost('www.not-example.org', 'Bearer 1234567890');
+            Request.setAuthorizationHeaderForHost('www.google.org', 'Bearer 1');
 
             return request.get(successUrl).then((response) => {
-                assert.equal(expectedCookies, response.response, 'Did not receive correct response');
+                assert.equal(expectedToken, response.response, 'Did not receive correct response');
             }).catch(error => {
                 error = <RequestError>error;
                 throw new Error('Get without headers failed: ' + error.message);
