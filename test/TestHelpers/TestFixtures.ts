@@ -61,7 +61,8 @@ export class TestFixtures {
             skipInSeconds: 0,
             disableBackButton: false,
             useDeviceOrientationForVideo: false,
-            muteVideo: false
+            muteVideo: false,
+            adTypes: ['TEST']
         });
     }
 
