@@ -280,14 +280,14 @@ export class WebView {
             });
             return Promise.all([analyticsPromise, gdprConsentPromise]);
         }).then(() => {
-            if(this._sessionManager.getGameSessionId() % 10000 === 0) {
-                this._assetManager.setCacheDiagnostics(true);
-            }
-
             const defaultPlacement = this._adsConfig.getDefaultPlacement();
             this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
 
             this._assetManager = new AssetManager(this._cache, this._coreConfig.getCacheMode(), this._deviceInfo, this._cacheBookkeeping, this._programmaticTrackingService, this._nativeBridge);
+            if(this._sessionManager.getGameSessionId() % 10000 === 0) {
+                this._assetManager.setCacheDiagnostics(true);
+            }
+
             this._campaignManager = new CampaignManager(this._nativeBridge, this._coreConfig, this._adsConfig, this._assetManager, this._sessionManager, this._adMobSignalFactory, this._request, this._clientInfo, this._deviceInfo, this._metadataManager, this._cacheBookkeeping, this._jaegerManager);
             this._refreshManager = new OldCampaignRefreshManager(this._nativeBridge, this._wakeUpManager, this._campaignManager, this._adsConfig, this._focusManager, this._sessionManager, this._clientInfo, this._request, this._cache);
 
