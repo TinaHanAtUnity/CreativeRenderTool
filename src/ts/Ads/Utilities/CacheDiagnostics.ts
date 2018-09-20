@@ -29,6 +29,7 @@ export class CacheDiagnostics {
     private readonly _errorObserver: IObserver3<ICacheEvent, string, string>;
 
     constructor(cache: Cache, data: ICacheDiagnostics) {
+        this._cache = cache;
         this._data = data;
         this._startObserver = cache.onStart.subscribe((event, size) => this.sendDiagnostic(size === 0 ? CacheDiagnosticEvent.STARTED : CacheDiagnosticEvent.RESUMED, event));
         this._redirectObserver = cache.onRedirect.subscribe((event) => this.sendDiagnostic(CacheDiagnosticEvent.REDIRECTED, event));
