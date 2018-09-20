@@ -6,7 +6,7 @@ import { BackupCampaignManager } from 'Ads/Managers/BackupCampaignManager';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { Placement } from 'Ads/Models/Placement';
-import { StorageType } from 'Core/Native/Storage';
+import { StorageError, StorageType } from 'Core/Native/Storage';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 
 describe('BackupCampaignManagerTest', () => {
@@ -132,4 +132,18 @@ describe('BackupCampaignManagerTest', () => {
             assert.isUndefined(campaign, 'campaign was loaded when test mode is active');
         });
     });
+
+    it('should not load campaign when storage is empty', () => {
+        const nativeBridge: NativeBridge = <NativeBridge><any>{
+            Storage: {
+                get: sinon.stub().returns(Promise.reject(StorageError.COULDNT_GET_VALUE)),
+            }
+        };
+
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, TestFixtures.getConfiguration());
+
+        return backupCampaignManager.loadCampaign(TestFixtures.getPlacement()).then(campaign => {
+            assert.isUndefined(campaign, 'campaign was loaded when storage is empty');
+        });
+    })
 });
