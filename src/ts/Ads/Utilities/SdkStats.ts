@@ -229,7 +229,7 @@ export class SdkStats {
             const cacheInfo: ICacheInfo = {
                 cachedCampaigns: cachedCampaigns,
                 isVideoCached: SdkStats.isCampaignCached(campaign),
-                cachingMode: CacheMode[SdkStats._coreConfig.getCacheMode()],
+                cachingMode: CacheMode[SdkStats._adsConfig.getCacheMode()],
                 videoCachedMsAgo: SdkStats.getCachedMsAgo(campaign),
                 cacheDuration: SdkStats.getCachingDuration(campaign),
                 size: assetSize > 0 ? assetSize : undefined

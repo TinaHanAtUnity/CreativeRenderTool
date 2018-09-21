@@ -283,7 +283,7 @@ export class WebView {
             const defaultPlacement = this._adsConfig.getDefaultPlacement();
             this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
 
-            this._assetManager = new AssetManager(this._cache, this._coreConfig.getCacheMode(), this._deviceInfo, this._cacheBookkeeping, this._programmaticTrackingService, this._nativeBridge);
+            this._assetManager = new AssetManager(this._cache, this._adsConfig.getCacheMode(), this._deviceInfo, this._cacheBookkeeping, this._programmaticTrackingService, this._nativeBridge);
             if(this._sessionManager.getGameSessionId() % 10000 === 0) {
                 this._assetManager.setCacheDiagnostics(true);
             }
@@ -450,7 +450,7 @@ export class WebView {
 
         this._showing = true;
 
-        if(this._coreConfig.getCacheMode() !== CacheMode.DISABLED) {
+        if(this._adsConfig.getCacheMode() !== CacheMode.DISABLED) {
             this._assetManager.stopCaching();
         }
 

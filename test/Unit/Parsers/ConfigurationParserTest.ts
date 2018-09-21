@@ -46,7 +46,7 @@ describe('configurationParserTest', () => {
         });
 
         it('should have forced cache mode', () => {
-            assert.equal(coreConfig.getCacheMode(), CacheMode.FORCED);
+            assert.equal(adsConfig.getCacheMode(), CacheMode.FORCED);
         });
 
         it('should have projectId parameter from configuration', () => {

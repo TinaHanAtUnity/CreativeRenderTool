@@ -3,6 +3,7 @@ import { Placement } from 'Ads/Models/Placement';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
 import { MixedPlacementUtility } from 'Ads/Utilities/MixedPlacementUtility';
 import { ClientInfo } from 'Core/Models/ClientInfo';
+import { CacheMode } from 'Core/Models/CoreConfiguration';
 
 export class AdsConfigurationParser {
     public static parse(configJson: any, clientInfo?: ClientInfo): AdsConfiguration {
@@ -41,6 +42,7 @@ export class AdsConfigurationParser {
         }
 
         const configurationParams: IAdsConfiguration = {
+            cacheMode: this.parseCacheMode(configJson),
             placements: placements,
             defaultPlacement: defaultPlacement,
             gdprEnabled: configJson.gdprEnabled,
@@ -49,6 +51,22 @@ export class AdsConfigurationParser {
             defaultBannerPlacement: defaultBannerPlacement
         };
         return new AdsConfiguration(configurationParams);
+    }
+
+
+    private static parseCacheMode(configJson: any): CacheMode {
+        switch(configJson.assetCaching) {
+            case 'forced':
+                return CacheMode.FORCED;
+            case 'allowed':
+                return CacheMode.ALLOWED;
+            case 'disabled':
+                return CacheMode.DISABLED;
+            case 'adaptive':
+                return CacheMode.ADAPTIVE;
+            default:
+                throw new Error('Unknown assetCaching value "' + configJson.assetCaching + '"');
+        }
     }
 
 }

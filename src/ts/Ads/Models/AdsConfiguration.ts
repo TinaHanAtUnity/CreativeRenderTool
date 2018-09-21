@@ -1,7 +1,9 @@
 import { Placement } from 'Ads/Models/Placement';
 import { ISchema, Model } from 'Core/Models/Model';
+import { CacheMode } from 'Core/Models/CoreConfiguration';
 
 export interface IAdsConfiguration {
+    cacheMode: CacheMode;
     placements: { [id: string]: Placement };
     defaultPlacement: Placement;
     gdprEnabled: boolean;
@@ -12,6 +14,7 @@ export interface IAdsConfiguration {
 
 export class AdsConfiguration extends Model<IAdsConfiguration> {
     public static Schema: ISchema<IAdsConfiguration> = {
+        cacheMode: ['number'],
         placements: ['object'],
         defaultPlacement: ['object'],
         gdprEnabled: ['boolean'],
@@ -22,6 +25,10 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
 
     constructor(data: IAdsConfiguration) {
         super('Configuration', AdsConfiguration.Schema, data);
+    }
+
+    public getCacheMode(): CacheMode {
+        return this.get('cacheMode');
     }
 
     public getPlacement(placementId: string): Placement {
@@ -112,6 +119,7 @@ export class AdsConfiguration extends Model<IAdsConfiguration> {
             defaultPlacementId = defaultPlacement.getId();
         }
         return {
+            'cacheMode': CacheMode[this.getCacheMode()].toLowerCase(),
             'placements': placements,
             'defaultPlacement': defaultPlacementId
         };
