@@ -1,3 +1,8 @@
+# Fri Sep 21 09:07:42 UTC 2018
+
+* Use 'display' style to hide and show video-overlay content [#6382](https://github.com/Applifier/unity-ads-webview/pull/6382)
+* Fix audio route change handling on iOS [#6383](https://github.com/Applifier/unity-ads-webview/pull/6383)
+
 # Wed Sep 19 06:56:59 UTC 2018
 
 * Recognize standalone_android store type and appDownloadUrl parameter from Auction [#6029](https://github.com/Applifier/unity-ads-webview/pull/6029)
