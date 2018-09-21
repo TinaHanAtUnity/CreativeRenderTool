@@ -234,7 +234,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     }
 
     public choosePrivacyShown(): void {
-        if (this._showPrivacyDuringVideo) {
+        if (!this._showPrivacyDuringVideo) {
             this._container.classList.remove('show-gdpr-banner');
             this._container.classList.remove('show-gdpr-button');
         } else if (!this._gdprPopupClicked && this._showGDPRBanner) {

@@ -97,6 +97,10 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
             }
         }
 
+        if (!this._showPrivacyDuringEndscreen) {
+            (<HTMLElement>this._container.querySelector('.privacy-button')).style.display = 'none';
+        }
+
         if(this._isSwipeToCloseEnabled) {
             (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';
         }
