@@ -35,16 +35,16 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _privacy: AbstractPrivacy;
     private _gdprPopupClicked: boolean = false;
     private _showGDPRBanner: boolean = false;
-    private _disablePrivacyDuringVideo: boolean | undefined;
+    private _showPrivacyDuringVideo: boolean | undefined;
     private _gameId: string;
     private _seatId: number | undefined;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, disablePrivacyDuringVideo?: boolean, seatId?: number) {
+    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, showPrivacyDuringVideo?: boolean, seatId?: number) {
         super(nativeBridge, 'new-video-overlay', muted);
 
         this._localization = new Localization(language, 'overlay');
         this._showGDPRBanner = showGDPRBanner;
-        this._disablePrivacyDuringVideo = disablePrivacyDuringVideo;
+        this._showPrivacyDuringVideo = showPrivacyDuringVideo;
         this._gameId = gameId;
         this._template = new Template(NewVideoOverlayTemplate, this._localization);
         this._seatId = seatId;
@@ -97,7 +97,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
             });
         }
 
-        if (!disablePrivacyDuringVideo) {
+        if (showPrivacyDuringVideo) {
             this._privacy = privacy;
             this._privacy.render();
             this._privacy.hide();
@@ -234,7 +234,7 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     }
 
     public choosePrivacyShown(): void {
-        if (this._disablePrivacyDuringVideo) {
+        if (this._showPrivacyDuringVideo) {
             this._container.classList.remove('show-gdpr-banner');
             this._container.classList.remove('show-gdpr-button');
         } else if (!this._gdprPopupClicked && this._showGDPRBanner) {
