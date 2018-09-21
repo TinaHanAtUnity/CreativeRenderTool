@@ -16,18 +16,19 @@ import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { Logger } from 'Core/Utilities/Logger';
 import { Url } from 'Core/Utilities/Url';
+import { Core } from 'Core/Core';
 
 export class ConfigManager {
 
-    public static fetch(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, jaegerSpan: JaegerSpan): Promise<any> {
+    public static fetch(core: Core, jaegerSpan: JaegerSpan): Promise<any> {
         return Promise.all([
-            metaDataManager.fetch(FrameworkMetaData),
-            metaDataManager.fetch(AdapterMetaData),
+            core.MetaDataManager.fetch(FrameworkMetaData),
+            core.MetaDataManager.fetch(AdapterMetaData),
             ConfigManager.fetchGamerToken(storage)
         ]).then(([framework, adapter, storedGamerToken]) => {
             let gamerToken: string | undefined;
 
-            if(platform === Platform.IOS && deviceInfo.getLimitAdTracking()) {
+            if(core.getPlatform() === Platform.IOS && core.Api.DeviceInfo.getLimitAdTrackingFlag()) {
                 // only use stored gamerToken for iOS when ad tracking is limited
                 gamerToken = storedGamerToken;
             } else if(storedGamerToken) {
@@ -35,7 +36,7 @@ export class ConfigManager {
                 ConfigManager.deleteGamerToken(storage);
             }
 
-            const url: string = ConfigManager.createConfigUrl(clientInfo, deviceInfo, framework, adapter, gamerToken);
+            const url: string = ConfigManager.createConfigUrl(core.clientInfo, deviceInfo, framework, adapter, gamerToken);
             jaegerSpan.addTag(JaegerTags.DeviceType, Platform[platform]);
             Logger.Info('Requesting configuration from ' + url);
             return request.get(url, [], {

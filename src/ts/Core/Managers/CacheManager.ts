@@ -1,11 +1,12 @@
-import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { CacheApi, CacheError } from 'Core/Native/Cache';
-import { StorageApi, StorageType } from 'Core/Native/Storage';
+import { CacheError } from 'Core/Native/Cache';
+import { StorageType } from 'Core/Native/Storage';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { FileId } from 'Core/Utilities/FileId';
 import { FileInfo } from 'Core/Utilities/FileInfo';
 import { Observable0, Observable1, Observable2, Observable3, Observable5 } from 'Core/Utilities/Observable';
-import { Request } from 'Core/Utilities/Request';
+import { Request } from 'Core/Managers/Request';
+import { Core } from 'Core/Core';
+import { Logger } from 'Core/Utilities/Logger';
 
 export enum CacheStatus {
     OK,
@@ -50,7 +51,7 @@ export interface ICacheEvent {
     contentLength: number;
 }
 
-export class Cache {
+export class CacheManager {
 
     public readonly onFastConnectionDetected = new Observable0();
 
@@ -63,10 +64,7 @@ export class Cache {
 
     public readonly onTooLargeFile = new Observable5<ICacheEvent, number, number, number, HeadersType>();
 
-    private _nativeBridge: NativeBridge;
-    private _wakeUpManager: WakeUpManager;
-    private _request: Request;
-    private _cacheBookkeeping: CacheBookkeeping;
+    private _core: Core;
 
     private _callbacks: { [url: string]: ICallbackObject } = {};
 
@@ -82,11 +80,8 @@ export class Cache {
     private _lastProgressEvent: number;
     private _fastConnectionDetected: boolean = false;
 
-    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, request: Request, cacheBookkeeping: CacheBookkeeping, options?: ICacheOptions) {
-        this._nativeBridge = nativeBridge;
-        this._cacheBookkeeping = cacheBookkeeping;
-        this._wakeUpManager = wakeUpManager;
-        this._request = request;
+    constructor(core: Core, options?: ICacheOptions) {
+        this._core = core;
 
         if(options) {
             this._maxRetries = options.retries;
@@ -248,14 +243,14 @@ export class Cache {
         if(callback) {
             callback.startTimestamp = Date.now();
             callback.contentLength = totalSize;
-            this.onStart.trigger(Cache.getCacheEvent(callback), size);
+            this.onStart.trigger(CacheManager.getCacheEvent(callback), size);
             if(size === 0) {
-                this._cacheBookkeeping.writeFileEntry(callback.fileId, this._cacheBookkeeping.createFileInfo(false, size, totalSize, FileId.getFileIdExtension(callback.fileId)));
+                this._core.CacheBookkeeping.writeFileEntry(callback.fileId, this._core.CacheBookkeeping.createFileInfo(false, size, totalSize, FileId.getFileIdExtension(callback.fileId)));
             }
             // reject all files larger than 20 megabytes
             if(totalSize > this._maxFileSize) {
-                this._nativeBridge.Cache.stop();
-                this.onTooLargeFile.trigger(Cache.getCacheEvent(callback), size, totalSize, responseCode, headers);
+                this._core.Api.Cache.stop();
+                this.onTooLargeFile.trigger(CacheManager.getCacheEvent(callback), size, totalSize, responseCode, headers);
             }
         } else {
             Diagnostics.trigger('cache_callback_error', {
@@ -282,14 +277,14 @@ export class Cache {
         const callback = this._callbacks[url];
         if(callback) {
             if(Request.AllowedResponseCodes.exec(responseCode.toString())) {
-                this._cacheBookkeeping.writeFileEntry(callback.fileId, this._cacheBookkeeping.createFileInfo(true, size, totalSize, FileId.getFileIdExtension(callback.fileId)));
+                this._core.CacheBookkeeping.writeFileEntry(callback.fileId, this._core.CacheBookkeeping.createFileInfo(true, size, totalSize, FileId.getFileIdExtension(callback.fileId)));
                 this.fulfillCallback(url, CacheStatus.OK);
-                this.onFinish.trigger(Cache.getCacheEvent(callback));
+                this.onFinish.trigger(CacheManager.getCacheEvent(callback));
                 return;
             } else if(Request.RedirectResponseCodes.exec(responseCode.toString())) {
-                this.onRedirect.trigger(Cache.getCacheEvent(callback));
-                this._cacheBookkeeping.removeFileEntry(callback.fileId);
-                this._nativeBridge.Cache.deleteFile(callback.fileId);
+                this.onRedirect.trigger(CacheManager.getCacheEvent(callback));
+                this._core.CacheBookkeeping.removeFileEntry(callback.fileId);
+                this._core.Api.Cache.deleteFile(callback.fileId);
                 const location = Request.getHeader(headers, 'location');
                 if(location) {
                     let fileId = callback.fileId;
@@ -303,13 +298,13 @@ export class Cache {
                     return;
                 }
             } else if(responseCode === 416) {
-                this.onFinishError.trigger(Cache.getCacheEvent(callback), size, totalSize, responseCode, headers);
+                this.onFinishError.trigger(CacheManager.getCacheEvent(callback), size, totalSize, responseCode, headers);
                 this.handleRequestRangeError(callback, url);
                 return;
             }
 
-            this.onFinishError.trigger(Cache.getCacheEvent(callback), size, totalSize, responseCode, headers);
-            this._cacheBookkeeping.removeFileEntry(callback.fileId);
+            this.onFinishError.trigger(CacheManager.getCacheEvent(callback), size, totalSize, responseCode, headers);
+            this._core.CacheBookkeeping.removeFileEntry(callback.fileId);
             if(size > 0) {
                 this._core.Api.Cache.deleteFile(callback.fileId);
             }
@@ -323,8 +318,8 @@ export class Cache {
 
         const callback = this._callbacks[url];
         if(callback) {
-            this._cacheBookkeeping.writeFileEntry(callback.fileId, this._cacheBookkeeping.createFileInfo(false, size, totalSize, FileId.getFileIdExtension(callback.fileId)));
-            this.onStop.trigger(Cache.getCacheEvent(callback));
+            this._core.CacheBookkeeping.writeFileEntry(callback.fileId, this._core.CacheBookkeeping.createFileInfo(false, size, totalSize, FileId.getFileIdExtension(callback.fileId)));
+            this.onStop.trigger(CacheManager.getCacheEvent(callback));
             if(callback.contentLength > this._maxFileSize) {
                 // files larger than 20 megabytes should be handled as failures
                 this.fulfillCallback(url, CacheStatus.FAILED);
@@ -337,7 +332,7 @@ export class Cache {
     private onDownloadError(error: string, url: string, message: string): void {
         const callback = this._callbacks[url];
         if(callback) {
-            this.onError.trigger(Cache.getCacheEvent(callback), url, message);
+            this.onError.trigger(CacheManager.getCacheEvent(callback), url, message);
 
             switch (error) {
                 case CacheError[CacheError.NETWORK_ERROR]:
@@ -383,17 +378,17 @@ export class Cache {
             const contentLength = Request.getHeader(response.headers, 'Content-Length');
 
             if(response.responseCode === 200 && fileInfo.found && contentLength && fileInfo.size === parseInt(contentLength, 10) && fileInfo.size > 0) {
-                this._cacheBookkeeping.writeFileEntry(callback.fileId, this._cacheBookkeeping.createFileInfo(true, fileInfo.size, fileInfo.size, FileId.getFileIdExtension(callback.fileId)));
+                this._core.CacheBookkeeping.writeFileEntry(callback.fileId, this._core.CacheBookkeeping.createFileInfo(true, fileInfo.size, fileInfo.size, FileId.getFileIdExtension(callback.fileId)));
                 this.fulfillCallback(url, CacheStatus.OK);
             } else {
-                this._cacheBookkeeping.removeFileEntry(callback.fileId);
+                this._core.CacheBookkeeping.removeFileEntry(callback.fileId);
                 if(fileInfo.found) {
                     this._core.Api.Cache.deleteFile(callback.fileId);
                 }
                 this.fulfillCallback(url, CacheStatus.FAILED);
             }
         }).catch((error) => {
-            this._cacheBookkeeping.removeFileEntry(callback.fileId);
+            this._core.CacheBookkeeping.removeFileEntry(callback.fileId);
             this.fulfillCallback(url, CacheStatus.FAILED);
         });
     }

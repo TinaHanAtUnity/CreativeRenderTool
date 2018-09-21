@@ -1,11 +1,10 @@
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { IFileInfo } from 'Core/Native/Cache';
-import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
+import { CacheApi, IFileInfo } from 'Core/Native/Cache';
+import { CacheBookkeeping } from 'Core/Managers/CacheBookkeeping';
 import { FileId } from 'Core/Utilities/FileId';
 
 export class FileInfo {
-    public static getFileInfo(nativeBridge: NativeBridge, fileId: string): Promise<IFileInfo | undefined> {
-        return nativeBridge.Cache.getFileInfo(fileId).catch(() => {
+    public static getFileInfo(cache: CacheApi, fileId: string): Promise<IFileInfo | undefined> {
+        return cache.getFileInfo(fileId).catch(() => {
             return Promise.resolve(undefined);
         });
     }
