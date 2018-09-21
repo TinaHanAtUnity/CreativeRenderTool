@@ -148,8 +148,8 @@ export class AdUnitFactory {
         const performanceAdUnit = new PerformanceAdUnit(nativeBridge, performanceAdUnitParameters);
 
         let performanceOverlayEventHandler;
-        // TODO: Or check the overlay type?
-        if (PerformanceVideoOverlayCTAButtonTest.isValid(parameters.coreConfig.getAbGroup())) {
+
+        if (overlay instanceof PerformanceVideoOverlayWithCTAButton) {
             performanceOverlayEventHandler = new PerformanceOverlayEventHandlerWithCTAButton(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
         } else {
             performanceOverlayEventHandler = new PerformanceOverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
@@ -522,9 +522,11 @@ export class AdUnitFactory {
         const showGDPRBanner = (parameters.campaign instanceof VastCampaign) ? this.showGDPRBanner(parameters) : false;
         let overlay: AbstractVideoOverlay;
 
-        if (parameters.placement.allowSkip() && parameters.placement.skipEndCardOnClose()) {
+        const skipAllowed = parameters.placement.allowSkip();
+        const CTAButtonTestEnabled = PerformanceVideoOverlayCTAButtonTest.isValid(parameters.configuration.getAbGroup());
+        if (skipAllowed && parameters.placement.skipEndCardOnClose()) {
             overlay = new ClosableVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
-        } else if (parameters.campaign instanceof PerformanceCampaign && PerformanceVideoOverlayCTAButtonTest.isValid(parameters.configuration.getAbGroup())) {
+        } else if (skipAllowed && isPerformanceCampaign && CTAButtonTestEnabled) {
             overlay = new PerformanceVideoOverlayWithCTAButton(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, parameters.campaign, disablePrivacyDuringVideo);
         } else {
             overlay = new NewVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, showPrivacyDuringVideo, parameters.campaign.getSeatId());
