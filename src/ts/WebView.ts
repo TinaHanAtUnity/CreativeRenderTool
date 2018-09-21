@@ -217,7 +217,7 @@ export class WebView {
                 this._jaegerManager.stop(configSpan);
             });
 
-            configPromise = configPromise.then((configJson) => {
+            configPromise = configPromise.then((configJson): [CoreConfiguration, AdsConfiguration] => {
                 const coreConfig = CoreConfigurationParser.parse(configJson);
                 const adsConfig = AdsConfigurationParser.parse(configJson);
                 this._nativeBridge.Sdk.logInfo('Received configuration with ' + adsConfig.getPlacementCount() + ' placements for token ' + coreConfig.getToken() + ' (A/B group ' + coreConfig.getAbGroup() + ')');
@@ -242,11 +242,11 @@ export class WebView {
 
             return Promise.all([configPromise, cachedCampaignResponsePromise, cachePromise]);
         }).then(([[coreConfig, adsConfig], cachedCampaignResponse]) => {
-            this._coreConfig = <CoreConfiguration>coreConfig;
-            this._adsConfig = <AdsConfiguration>adsConfig;
+            this._coreConfig = coreConfig;
+            this._adsConfig = adsConfig;
 
             this._gdprManager = new GdprManager(this._nativeBridge, this._deviceInfo, this._clientInfo, this._coreConfig, this._adsConfig, this._request);
-            this._cachedCampaignResponse = <any>cachedCampaignResponse;
+            this._cachedCampaignResponse = cachedCampaignResponse;
             HttpKafka.setConfiguration(this._coreConfig);
             this._jaegerManager.setJaegerTracingEnabled(this._coreConfig.isJaegerTracingEnabled());
 
@@ -283,7 +283,7 @@ export class WebView {
             const defaultPlacement = this._adsConfig.getDefaultPlacement();
             this._nativeBridge.Placement.setDefaultPlacement(defaultPlacement.getId());
 
-            this._assetManager = new AssetManager(this._cache, this._coreConfig.getCacheMode(), this._deviceInfo, this._cacheBookkeeping, this._programmaticTrackingService, this._nativeBridge);
+            this._assetManager = new AssetManager(this._cache, this._adsConfig.getCacheMode(), this._deviceInfo, this._cacheBookkeeping, this._programmaticTrackingService, this._nativeBridge);
             if(this._sessionManager.getGameSessionId() % 10000 === 0) {
                 this._assetManager.setCacheDiagnostics(true);
             }
@@ -450,7 +450,7 @@ export class WebView {
 
         this._showing = true;
 
-        if(this._coreConfig.getCacheMode() !== CacheMode.DISABLED) {
+        if(this._adsConfig.getCacheMode() !== CacheMode.DISABLED) {
             this._assetManager.stopCaching();
         }
 

@@ -9,7 +9,7 @@ import { WebViewError } from 'Core/Errors/WebViewError';
 import { CacheMode } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Cache, CacheStatus } from 'Core/Utilities/Cache';
+import { Cache, CacheStatus, HeadersType } from 'Core/Utilities/Cache';
 import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
@@ -266,23 +266,7 @@ export class AssetManager {
                 const asset: IAssetQueueObject = currentAsset;
                 this._caching = true;
                 const tooLargeFileObserver = this._cache.onTooLargeFile.subscribe((callback, size, totalSize, responseCode, headers) => {
-                    SessionDiagnostics.trigger('too_large_file', {
-                        url: asset.url,
-                        size: size,
-                        totalSize: totalSize,
-                        responseCode: responseCode,
-                        headers: headers
-                    }, campaign.getSession());
-                    const seatId = campaign.getSeatId();
-                    if (seatId !== undefined) {
-                        let adType: string = '';
-                        const maybeAdType: string | undefined = campaign.getAdType();
-                        if (maybeAdType !== undefined) {
-                            adType = maybeAdType;
-                        }
-                        const errorData = this._pts.buildErrorData(ProgrammaticTrackingError.TooLargeFile, adType, seatId);
-                        this._pts.reportError(errorData);
-                    }
+                    this.handleTooLargeFile(asset.url, campaign, size, totalSize, responseCode, headers);
                 });
                 let cacheDiagnostics: CacheDiagnostics | undefined;
                 if(currentAsset.diagnostics) {
@@ -392,5 +376,25 @@ export class AssetManager {
             };
         }
         return undefined;
+    }
+
+    private handleTooLargeFile(url: string, campaign: Campaign, size: number, totalSize: number, responseCode: number, headers: HeadersType) {
+        SessionDiagnostics.trigger('too_large_file', {
+            url: url,
+            size: size,
+            totalSize: totalSize,
+            responseCode: responseCode,
+            headers: headers
+        }, campaign.getSession());
+        const seatId = campaign.getSeatId();
+        if (seatId !== undefined) {
+            let adType: string = '';
+            const maybeAdType: string | undefined = campaign.getAdType();
+            if (maybeAdType !== undefined) {
+                adType = maybeAdType;
+            }
+            const errorData = this._pts.buildErrorData(ProgrammaticTrackingError.TooLargeFile, adType, seatId);
+            this._pts.reportError(errorData);
+        }
     }
 }

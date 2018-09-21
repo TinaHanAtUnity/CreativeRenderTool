@@ -1,6 +1,6 @@
-import { Cache, ICacheEvent } from 'Core/Utilities/Cache';
+import { Cache, HeadersType, ICacheEvent } from 'Core/Utilities/Cache';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
-import { IObserver1, IObserver2, IObserver3 } from 'Core/Utilities/IObserver';
+import { IObserver1, IObserver2, IObserver3, IObserver5 } from 'Core/Utilities/IObserver';
 
 enum CacheDiagnosticEvent {
     STARTED,
@@ -26,6 +26,7 @@ export class CacheDiagnostics {
     private readonly _redirectObserver: IObserver1<ICacheEvent>;
     private readonly _finishObserver: IObserver1<ICacheEvent>;
     private readonly _stopObserver: IObserver1<ICacheEvent>;
+    private readonly _finishErrorObserver: IObserver5<ICacheEvent, number, number, number, HeadersType>;
     private readonly _errorObserver: IObserver3<ICacheEvent, string, string>;
 
     constructor(cache: Cache, data: ICacheDiagnostics) {
@@ -35,6 +36,7 @@ export class CacheDiagnostics {
         this._redirectObserver = cache.onRedirect.subscribe((event) => this.sendDiagnostic(CacheDiagnosticEvent.REDIRECTED, event));
         this._finishObserver = cache.onFinish.subscribe((event) => this.sendDiagnostic(CacheDiagnosticEvent.FINISHED, event));
         this._stopObserver = cache.onStop.subscribe((event) => this.sendDiagnostic(CacheDiagnosticEvent.STOPPED, event));
+        this._finishErrorObserver = cache.onFinishError.subscribe((event) => this.sendDiagnostic(CacheDiagnosticEvent.ERROR, event));
         this._errorObserver = cache.onError.subscribe((event) => this.sendDiagnostic(CacheDiagnosticEvent.ERROR, event));
     }
 
@@ -43,6 +45,7 @@ export class CacheDiagnostics {
         this._cache.onRedirect.unsubscribe(this._redirectObserver);
         this._cache.onFinish.unsubscribe(this._finishObserver);
         this._cache.onStop.unsubscribe(this._stopObserver);
+        this._cache.onFinishError.unsubscribe(this._finishErrorObserver);
         this._cache.onError.unsubscribe(this._errorObserver);
     }
 

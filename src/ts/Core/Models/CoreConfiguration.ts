@@ -14,7 +14,6 @@ export interface ICoreConfiguration {
     coppaCompliant: boolean;
     abGroup: ABGroup;
     properties: string;
-    cacheMode: CacheMode;
     analytics: boolean;
     test: boolean;
     projectId: string;
@@ -30,7 +29,6 @@ export class CoreConfiguration extends Model<ICoreConfiguration> {
         coppaCompliant: ['boolean'],
         abGroup: ['object'],
         properties: ['string'],
-        cacheMode: ['number'],
         analytics: ['boolean'],
         test: ['boolean'],
         projectId: ['string'],
@@ -75,10 +73,6 @@ export class CoreConfiguration extends Model<ICoreConfiguration> {
         return this.get('token');
     }
 
-    public getCacheMode(): CacheMode {
-        return this.get('cacheMode');
-    }
-
     public getUnityProjectId(): string {
         return this.get('projectId');
     }
@@ -90,7 +84,6 @@ export class CoreConfiguration extends Model<ICoreConfiguration> {
             'coppaCompliant': this.isCoppaCompliant(),
             'abGroup': this.getAbGroup().toNumber(),
             'gamerToken': this.getToken(),
-            'cacheMode': CacheMode[this.getCacheMode()].toLowerCase(),
             'projectId': this.getUnityProjectId()
         };
     }

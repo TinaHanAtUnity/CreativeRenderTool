@@ -87,7 +87,7 @@ export class VideoEventHandler extends BaseVideoEventHandler implements IVideoEv
                         url: this._video.getUrl(),
                         originalUrl: this._video.getOriginalUrl(),
                         cached: this._video.isCached(),
-                        cacheMode: this._coreConfig.getCacheMode(),
+                        cacheMode: this._adsConfig.getCacheMode(),
                         lowMemory: this._adUnit.isLowMemory()
                     };
 
