@@ -31,7 +31,6 @@ export class PerformanceVideoEventHandler extends VideoEventHandler {
         super.onPrepared(url, duration, width, height);
 
         const overlay = this._adUnit.getOverlay();
-
         if (overlay && PerformanceVideoOverlayCTAButtonTest.isValid(this._abGroup)) {
             overlay.setCallButtonVisible(true);
         }
