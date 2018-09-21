@@ -87,8 +87,6 @@ export class BackupCampaignManager {
                     }
 
                     return undefined;
-                }).catch(() => {
-                    return undefined;
                 });
             } else {
                 return undefined;
@@ -122,20 +120,12 @@ export class BackupCampaignManager {
         }
     }
 
-    private getString(key: string): Promise<string | undefined> {
-        return this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, key).then(value => {
-            return value;
-        }).catch(() => {
-            return undefined;
-        });
+    private getString(key: string): Promise<string> {
+        return this._nativeBridge.Storage.get<string>(StorageType.PRIVATE, key);
     }
 
-    private getNumber(key: string): Promise<number | undefined> {
-        return this._nativeBridge.Storage.get<number>(StorageType.PRIVATE, key).then(value => {
-            return value;
-        }).catch(() => {
-            return undefined;
-        });
+    private getNumber(key: string): Promise<number> {
+        return this._nativeBridge.Storage.get<number>(StorageType.PRIVATE, key);
     }
 
     private verifyCachedFiles(campaign: Campaign): Promise<boolean> {
