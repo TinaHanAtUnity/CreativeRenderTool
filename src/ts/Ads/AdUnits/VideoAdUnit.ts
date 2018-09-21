@@ -245,7 +245,8 @@ export abstract class VideoAdUnit<T extends Campaign = Campaign> extends Abstrac
                 }
                 break;
 
-            case AdUnitContainerSystemMessage.AUDIO_SESSION_INTERRUPT_ENDED || AdUnitContainerSystemMessage.AUDIO_SESSION_ROUTE_CHANGED:
+            case AdUnitContainerSystemMessage.AUDIO_SESSION_INTERRUPT_ENDED:
+            case AdUnitContainerSystemMessage.AUDIO_SESSION_ROUTE_CHANGED:
                 if(this.isShowing() && this.isActive() && this.canPlayVideo()) {
                     this.setVideoState(VideoState.PLAYING);
                     this._nativeBridge.VideoPlayer.play();
