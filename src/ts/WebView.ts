@@ -217,7 +217,7 @@ export class WebView {
                 this._jaegerManager.stop(configSpan);
             });
 
-            configPromise = configPromise.then((configJson) => {
+            configPromise = configPromise.then((configJson): [CoreConfiguration, AdsConfiguration] => {
                 const coreConfig = CoreConfigurationParser.parse(configJson);
                 const adsConfig = AdsConfigurationParser.parse(configJson);
                 this._nativeBridge.Sdk.logInfo('Received configuration with ' + adsConfig.getPlacementCount() + ' placements for token ' + coreConfig.getToken() + ' (A/B group ' + coreConfig.getAbGroup() + ')');
@@ -242,11 +242,11 @@ export class WebView {
 
             return Promise.all([configPromise, cachedCampaignResponsePromise, cachePromise]);
         }).then(([[coreConfig, adsConfig], cachedCampaignResponse]) => {
-            this._coreConfig = <CoreConfiguration>coreConfig;
-            this._adsConfig = <AdsConfiguration>adsConfig;
+            this._coreConfig = coreConfig;
+            this._adsConfig = adsConfig;
 
             this._gdprManager = new GdprManager(this._nativeBridge, this._deviceInfo, this._clientInfo, this._coreConfig, this._adsConfig, this._request);
-            this._cachedCampaignResponse = <any>cachedCampaignResponse;
+            this._cachedCampaignResponse = cachedCampaignResponse;
             HttpKafka.setConfiguration(this._coreConfig);
             this._jaegerManager.setJaegerTracingEnabled(this._coreConfig.isJaegerTracingEnabled());
 
