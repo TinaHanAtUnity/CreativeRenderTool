@@ -1,4 +1,3 @@
-
 import { IVideoEventHandlerParams } from 'Ads/EventHandlers/BaseVideoEventHandler';
 import { VideoEventHandler } from 'Ads/EventHandlers/VideoEventHandler';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
