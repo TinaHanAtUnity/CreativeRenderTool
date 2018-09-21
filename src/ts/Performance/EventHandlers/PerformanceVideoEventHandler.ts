@@ -3,16 +3,14 @@ import { VideoEventHandler } from 'Ads/EventHandlers/VideoEventHandler';
 import { TestEnvironment } from 'Core/Utilities/TestEnvironment';
 import { PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { ICometTrackingUrlEvents } from 'Performance/Parsers/CometCampaignParser';
-import { PerformanceVideoOverlayCTAButtonTest, ABGroup } from 'Core/Models/ABGroup';
+import { PerformanceVideoOverlayWithCTAButton } from 'Ads/Views/PerformanceVideoOverlayWithCTAButton';
 
 export class PerformanceVideoEventHandler extends VideoEventHandler {
 
     private _performanceAdUnit: PerformanceAdUnit;
-    private _abGroup: ABGroup;
 
     constructor(parameters: IVideoEventHandlerParams<PerformanceAdUnit>) {
         super(parameters);
-        this._abGroup = parameters.configuration.getAbGroup();
         this._performanceAdUnit = parameters.adUnit;
         this._campaign = parameters.campaign;
     }
@@ -31,7 +29,7 @@ export class PerformanceVideoEventHandler extends VideoEventHandler {
         super.onPrepared(url, duration, width, height);
 
         const overlay = this._adUnit.getOverlay();
-        if (overlay && PerformanceVideoOverlayCTAButtonTest.isValid(this._abGroup)) {
+        if (overlay instanceof PerformanceVideoOverlayWithCTAButton) {
             overlay.setCallButtonVisible(true);
         }
 
