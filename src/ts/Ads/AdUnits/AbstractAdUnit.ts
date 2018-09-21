@@ -33,6 +33,7 @@ export interface IAdUnitParameters<T extends Campaign> {
     adMobSignalFactory?: AdMobSignalFactory;
     webPlayerContainer?: WebPlayerContainer;
     programmaticTrackingService: ProgrammaticTrackingService;
+    gameSessionId?: number;
 }
 
 export abstract class AbstractAdUnit {

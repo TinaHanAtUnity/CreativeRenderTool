@@ -32,6 +32,8 @@ export enum ICometTrackingUrlEvents {
 
 export class CometCampaignParser extends CampaignParser {
     public static ContentType = 'comet/campaign';
+    public static ContentTypeVideo = 'comet/video';
+    public static ContentTypeMRAID = 'comet/mraid-url';
 
     public parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, osVersion?: string): Promise<Campaign> {
         const json = response.getJsonContent();
@@ -47,6 +49,9 @@ export class CometCampaignParser extends CampaignParser {
                 break;
             case 'xiaomi':
                 storeName = StoreName.XIAOMI;
+                break;
+            case 'standalone_android':
+                storeName = StoreName.STANDALONE_ANDROID;
                 break;
             default:
                 throw new Error('Unknown store value "' + json.store + '"');
@@ -137,6 +142,9 @@ export class CometCampaignParser extends CampaignParser {
                 parameters.streamingPortraitVideo = new Video(this.validateAndEncodeUrl(json.trailerPortraitStreaming, session), session, undefined, json.portraitCreativeId);
             }
 
+            if(json.appDownloadUrl) {
+                parameters.appDownloadUrl = json.appDownloadUrl;
+            }
             return Promise.resolve(new PerformanceCampaign(parameters));
         }
     }

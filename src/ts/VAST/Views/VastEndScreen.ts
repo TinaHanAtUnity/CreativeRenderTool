@@ -1,7 +1,6 @@
 import { AbstractAdUnit } from 'Ads/AdUnits/AbstractAdUnit';
 import { CustomFeatures } from 'Ads/Utilities/CustomFeatures';
-import { IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
-import { Privacy } from 'Ads/Views/Privacy';
+import { AbstractPrivacy, IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Template } from 'Core/Utilities/Template';
@@ -20,15 +19,16 @@ export interface IVastEndScreenHandler {
 export class VastEndScreen extends View<IVastEndScreenHandler> implements IPrivacyHandler {
 
     private _isSwipeToCloseEnabled: boolean = false;
-    private _coppaCompliant: boolean;
-    private _privacy: Privacy;
+    private _privacy: AbstractPrivacy;
     private _callButtonEnabled: boolean = true;
+    private _seatId: number | undefined;
 
-    constructor(nativeBridge: NativeBridge, coppaCompliant: boolean, campaign: VastCampaign, gameId: string) {
+    constructor(nativeBridge: NativeBridge, campaign: VastCampaign, gameId: string, privacy: AbstractPrivacy, seatId?: number) {
         super(nativeBridge, 'vast-end-screen');
 
-        this._coppaCompliant = coppaCompliant;
         this._template = new Template(VastEndScreenTemplate);
+        this._privacy = privacy;
+        this._seatId = seatId;
 
         if(campaign) {
             const landscape = campaign.getLandscape();
@@ -67,10 +67,22 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
                 selector: '.campaign-container, .game-background'
             });
         }
+
+        this._privacy.render();
+        this._privacy.hide();
+        document.body.appendChild(this._privacy.container());
+        this._privacy.addEventHandler(this);
     }
 
     public render(): void {
         super.render();
+
+        if (CustomFeatures.isTencentAdvertisement(this._seatId)) {
+            const tencentAdTag = <HTMLElement>this._container.querySelector('.tencent-advertisement');
+            if (tencentAdTag) {
+                tencentAdTag.innerText = '广告';
+            }
+        }
 
         if(this._isSwipeToCloseEnabled) {
             (<HTMLElement>this._container.querySelector('.btn-close-region')).style.display = 'none';
@@ -94,26 +106,30 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
 
         if (this._privacy) {
             this._privacy.hide();
-            this._privacy.container().parentElement!.removeChild(this._privacy.container());
-            delete this._privacy;
         }
     }
 
     public remove(): void {
-        this.container().parentElement!.removeChild(this.container());
+        if (this._privacy) {
+            this._privacy.removeEventHandler(this);
+            if (this._privacy.container().parentElement) {
+                this._privacy.container().parentElement!.removeChild(this._privacy.container());
+            }
+        }
+
+        if (this.container().parentElement) {
+            this.container().parentElement!.removeChild(this.container());
+        }
     }
 
     public onPrivacyClose(): void {
         if (this._privacy) {
-            this._privacy.removeEventHandler(this);
             this._privacy.hide();
-            this._privacy.container().parentElement!.removeChild(this._privacy.container());
-            delete this._privacy;
         }
     }
 
     public onPrivacy(url: string): void {
-        this._handlers.forEach(handler => handler.onOpenUrl(url));
+        // do nothing
     }
 
     public onGDPROptOut(optOutEnabled: boolean) {
@@ -141,10 +157,6 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
 
     private onPrivacyEvent(event: Event): void {
         event.preventDefault();
-        // todo: gdpr privacy
-        this._privacy = new Privacy(this._nativeBridge, this._coppaCompliant);
-        this._privacy.render();
-        document.body.appendChild(this._privacy.container());
-        this._privacy.addEventHandler(this);
+        this._privacy.show();
     }
 }

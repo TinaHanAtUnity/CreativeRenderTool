@@ -1,3 +1,5 @@
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { AndroidARApi } from 'AR/Native/Android/AndroidARApi';
 import { IosARApi } from 'AR/Native/iOS/IosARApi';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 
@@ -41,6 +43,8 @@ export interface IARRect {
 }
 
 export class ARUtil {
+    private static readonly ANDROID_AR_SUPPORTED_RETRY_WAIT = 300;
+
     public static calculateVideoScale(frameInfo: IARFrameInfo): IARFrameScale {
         let videoRect: IARRect = {x: 0, y: 0, width: frameInfo.videoSize.width, height: frameInfo.videoSize.height};
         videoRect = ARUtil.transformRect(videoRect, ARUtil.invertTransform(frameInfo.transform));
@@ -141,5 +145,28 @@ export class ARUtil {
         });
 
         return isAR;
+    }
+
+    public static isARSupported(nativeBridge: NativeBridge): Promise<boolean> {
+        return nativeBridge.AR.Ios ? nativeBridge.AR.Ios.isARSupported() :
+            nativeBridge.AR.Android ? ARUtil.isARSupportedAndroid(nativeBridge.AR.Android) :
+                Promise.resolve<boolean>(false);
+    }
+
+    private static isARSupportedAndroid(api: AndroidARApi, retry: number = 1): Promise<boolean> {
+        if (retry > 5) {
+            return Promise.resolve<boolean>(false);
+        }
+
+        return api.isARSupported().then(([transient, supported]) => {
+            if (!transient) {
+                return supported;
+            }
+
+            const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+            return sleep(this.ANDROID_AR_SUPPORTED_RETRY_WAIT).then(() => {
+                return ARUtil.isARSupportedAndroid(api, retry + 1);
+            });
+        });
     }
 }

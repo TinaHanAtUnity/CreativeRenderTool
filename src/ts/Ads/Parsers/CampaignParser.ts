@@ -2,14 +2,13 @@ import { AuctionResponse } from 'Ads/Models/AuctionResponse';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Session } from 'Ads/Models/Session';
 import { Platform } from 'Core/Constants/Platform';
-import { ABGroup } from 'Core/Models/ABGroup';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { Request } from 'Core/Managers/Request';
 import { Url } from 'Core/Utilities/Url';
 
 export abstract class CampaignParser {
-    public abstract parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string, abgroup?: ABGroup): Promise<Campaign>;
+    public abstract parse(nativeBridge: NativeBridge, request: Request, response: AuctionResponse, session: Session, osVersion?: string, gameId?: string): Promise<Campaign>;
 
     protected getProgrammaticCampaignId(nativeBridge: NativeBridge): string {
         switch (nativeBridge.getPlatform()) {

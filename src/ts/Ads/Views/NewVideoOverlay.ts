@@ -36,15 +36,19 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
     private _gdprPopupClicked: boolean = false;
     private _showGDPRBanner: boolean = false;
     private _disablePrivacyDuringVideo: boolean | undefined;
+    private _gameId: string;
+    private _seatId: number | undefined;
 
-    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, disablePrivacyDuringVideo?: boolean) {
+    constructor(nativeBridge: NativeBridge, muted: boolean, language: string, gameId: string, privacy: AbstractPrivacy, showGDPRBanner: boolean, disablePrivacyDuringVideo?: boolean, seatId?: number) {
         super(nativeBridge, 'new-video-overlay', muted);
 
         this._localization = new Localization(language, 'overlay');
         this._privacy = privacy;
         this._showGDPRBanner = showGDPRBanner;
         this._disablePrivacyDuringVideo = disablePrivacyDuringVideo;
+        this._gameId = gameId;
         this._template = new Template(NewVideoOverlayTemplate, this._localization);
+        this._seatId = seatId;
 
         this._templateData = {
             muted
@@ -122,6 +126,17 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
         super.render();
         this.setupElementReferences();
         this.choosePrivacyShown();
+
+        if (CustomFeatures.isTencentAdvertisement(this._seatId)) {
+            const tencentAdTag = <HTMLElement>this._container.querySelector('.tencent-advertisement');
+            if (tencentAdTag) {
+                tencentAdTag.innerText = '广告';
+            }
+        }
+
+        if(CustomFeatures.isCloseIconSkipApp(this._gameId)) {
+            this._skipButtonElement.classList.add('close-icon-skip');
+        }
     }
 
     public setSpinnerEnabled(value: boolean): void {
@@ -157,7 +172,10 @@ export class NewVideoOverlay extends AbstractVideoOverlay implements IPrivacyHan
 
         this._videoProgress = value;
         this._skipRemaining = this._skipDuration - this._videoProgress;
-        this._timerElement.innerText = String(Math.ceil((this._videoDuration - this._videoProgress) / 1000));
+        const timerCount = Math.ceil((this._videoDuration - this._videoProgress) / 1000);
+        if (typeof timerCount === 'number' && !isNaN(timerCount)) {
+            this._timerElement.innerText = timerCount.toString();
+        }
 
         if (this._skipRemaining <= 0) {
             this.showSkipButton();

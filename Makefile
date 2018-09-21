@@ -259,7 +259,7 @@ clean:
 	rm -rf $(BUILD_DIR)/*
 
 lint:
-	parallel ::: \
+	parallel --ungroup ::: \
 		"$(STYLINT) $(SOURCE_DIR)/styl -c stylintrc.json" \
 		"$(TSLINT) --project tsconfig.json $(TS_SOURCES) $(TESTS)"
 

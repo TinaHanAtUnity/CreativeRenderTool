@@ -110,6 +110,10 @@ export class GdprManager {
         });
     }
 
+    public isOptOutEnabled(): boolean {
+        return this._configuration.isOptOutEnabled();
+    }
+
     private pushConsent(consent: boolean): Promise<void> {
         // get last state of gdpr consent
         return this._storage.get(StorageType.PRIVATE, GdprManager.GdprLastConsentValueStorageKey).then((consentLastSentToKafka) => {
