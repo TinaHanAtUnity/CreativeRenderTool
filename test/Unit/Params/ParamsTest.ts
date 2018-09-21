@@ -22,7 +22,7 @@ import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode, CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { AndroidDeviceInfoApi, IPackageInfo } from 'Core/Native/Android/AndroidDeviceInfo';
+import { AndroidDeviceInfoApi, IPackageInfo } from 'DeviceInfo.ts';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { DeviceInfoApi } from 'Core/Native/DeviceInfo';

@@ -26,16 +26,38 @@ import { SdkApi } from 'Core/Native/Sdk';
 import { SensorInfoApi } from 'Core/Native/SensorInfo';
 import { StorageApi } from 'Core/Native/Storage';
 import { Logger } from 'Core/Utilities/Logger';
+import { AndroidCacheApi } from 'Core/Native/Android/Cache';
+import { AndroidDeviceInfoApi } from 'Core/Native/Android/DeviceInfo';
+import { AndroidPermissionsApi } from 'Core/Native/Android/Permissions';
+import { AndroidPreferencesApi } from 'Core/Native/Android/Preferences';
+import { AndroidRequestApi } from 'Core/Native/Android/Request';
+import { AndroidSensorInfoApi } from 'Core/Native/Android/SensorInfo';
+import { IosCacheApi } from 'Core/Native/iOS/Cache';
+import { IosDeviceInfoApi } from 'Core/Native/iOS/DeviceInfo';
+import { IosPermissionsApi } from 'Core/Native/iOS/Permissions';
+import { IosPreferencesApi } from 'Core/Native/iOS/Preferences';
+import { IosSensorInfoApi } from 'Core/Native/iOS/SensorInfo';
 
 export interface ICoreAndroidApi extends IApi {
     Broadcast: BroadcastApi;
+    Cache: AndroidCacheApi;
+    DeviceInfo: AndroidDeviceInfoApi;
     Intent: IntentApi;
     Lifecycle: LifecycleApi;
+    Permissions: AndroidPermissionsApi;
+    Preferences: AndroidPreferencesApi;
+    Request: AndroidRequestApi;
+    SensorInfo: AndroidSensorInfoApi;
 }
 
 export interface ICoreIosApi extends IApi {
+    Cache: IosCacheApi;
+    DeviceInfo: IosDeviceInfoApi;
     MainBundle: MainBundleApi;
     Notification: NotificationApi;
+    Permissions: IosPermissionsApi;
+    Preferences: IosPreferencesApi;
+    SensorInfo: IosSensorInfoApi;
     UrlScheme: UrlSchemeApi;
 }
 
@@ -89,13 +111,24 @@ export class Core implements IApiModule<ICoreApi> {
         if(platform === Platform.ANDROID) {
             api.Android = {
                 Broadcast: new BroadcastApi(nativeBridge),
+                Cache: new AndroidCacheApi(nativeBridge),
+                DeviceInfo: new AndroidDeviceInfoApi(nativeBridge),
                 Intent: new IntentApi(nativeBridge),
-                Lifecycle: new LifecycleApi(nativeBridge)
+                Lifecycle: new LifecycleApi(nativeBridge),
+                Permissions: new AndroidPermissionsApi(nativeBridge),
+                Preferences: new AndroidPreferencesApi(nativeBridge),
+                Request: new AndroidRequestApi(nativeBridge),
+                SensorInfo: new AndroidSensorInfoApi(nativeBridge)
             };
         } else if(platform === Platform.IOS) {
             api.iOS = {
+                Cache: new IosCacheApi(nativeBridge),
+                DeviceInfo: new IosDeviceInfoApi(nativeBridge),
                 MainBundle: new MainBundleApi(nativeBridge),
                 Notification: new NotificationApi(nativeBridge),
+                Permissions: new IosPermissionsApi(nativeBridge),
+                Preferences: new IosPreferencesApi(nativeBridge),
+                SensorInfo: new IosSensorInfoApi(nativeBridge),
                 UrlScheme: new UrlSchemeApi(nativeBridge)
             };
         }

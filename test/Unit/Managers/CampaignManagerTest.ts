@@ -25,7 +25,7 @@ import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode, CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
-import { StorageType } from 'Core/Native/Android/AndroidDeviceInfo';
+import { StorageType } from 'DeviceInfo.ts';
 
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';

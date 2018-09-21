@@ -1,9 +1,9 @@
 import { AdsPropertiesApi } from 'Ads/Native/AdsProperties';
-import { AndroidAdUnitApi } from 'Ads/Native/Android/AndroidAdUnit';
-import { AndroidVideoPlayerApi } from 'Ads/Native/Android/AndroidVideoPlayer';
+import { AndroidAdUnitApi } from 'Ads/Native/Android/AdUnit';
+import { AndroidVideoPlayerApi } from 'Ads/Native/Android/VideoPlayer';
 import { AppSheetApi } from 'Ads/Native/iOS/AppSheet';
-import { IosAdUnitApi } from 'Ads/Native/iOS/IosAdUnit';
-import { IosVideoPlayerApi } from 'Ads/Native/iOS/IosVideoPlayer';
+import { IosAdUnitApi } from 'Ads/Native/iOS/AdUnit';
+import { IosVideoPlayerApi } from 'Ads/Native/iOS/VideoPlayer';
 import { ListenerApi } from 'Ads/Native/Listener';
 import { PlacementApi } from 'Ads/Native/Placement';
 import { VideoPlayerApi } from 'Ads/Native/VideoPlayer';

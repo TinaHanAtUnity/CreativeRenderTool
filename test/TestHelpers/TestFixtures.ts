@@ -15,7 +15,7 @@ import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { IosDeviceInfo } from 'Core/Models/IosDeviceInfo';
-import { IPackageInfo } from 'Core/Native/Android/AndroidDeviceInfo';
+import { IPackageInfo } from 'DeviceInfo.ts';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
 import { INativeResponse } from 'Core/Utilities/Request';

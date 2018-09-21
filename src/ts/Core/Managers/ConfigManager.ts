@@ -1,22 +1,19 @@
 import { Platform } from 'Core/Constants/Platform';
+import { Core } from 'Core/Core';
 import { ConfigError } from 'Core/Errors/ConfigError';
 import { RequestError } from 'Core/Errors/RequestError';
 import { JaegerSpan, JaegerTags } from 'Core/Jaeger/JaegerSpan';
-import { MetaDataManager } from 'Core/Managers/MetaDataManager';
-import { Request } from 'Core/Managers/Request';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AdapterMetaData } from 'Core/Models/MetaData/AdapterMetaData';
 import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
-import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { StorageType } from 'Core/Native/Storage';
+import { StorageApi, StorageType } from 'Core/Native/Storage';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { Logger } from 'Core/Utilities/Logger';
 import { Url } from 'Core/Utilities/Url';
-import { Core } from 'Core/Core';
 
 export class ConfigManager {
 
@@ -24,7 +21,7 @@ export class ConfigManager {
         return Promise.all([
             core.MetaDataManager.fetch(FrameworkMetaData),
             core.MetaDataManager.fetch(AdapterMetaData),
-            ConfigManager.fetchGamerToken(storage)
+            ConfigManager.fetchGamerToken(core.Api.Storage)
         ]).then(([framework, adapter, storedGamerToken]) => {
             let gamerToken: string | undefined;
 
@@ -37,7 +34,7 @@ export class ConfigManager {
             }
 
             const url: string = ConfigManager.createConfigUrl(core.clientInfo, deviceInfo, framework, adapter, gamerToken);
-            jaegerSpan.addTag(JaegerTags.DeviceType, Platform[platform]);
+            jaegerSpan.addTag(JaegerTags.DeviceType, Platform[core.getPlatform()]);
             Logger.Info('Requesting configuration from ' + url);
             return request.get(url, [], {
                 retries: 2,
@@ -163,8 +160,8 @@ export class ConfigManager {
         return this.fetchValue(storage, 'gamerToken');
     }
 
-    public static storeGamerToken(nativeBridge: NativeBridge, gamerToken: string): Promise<void[]> {
-        return this.storeValue(nativeBridge, 'gamerToken', gamerToken);
+    public static storeGamerToken(storage: StorageApi, gamerToken: string): Promise<void[]> {
+        return this.storeValue(storage, 'gamerToken', gamerToken);
     }
 
     private static deleteGamerToken(storage: StorageApi): Promise<void[]> {

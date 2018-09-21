@@ -1,8 +1,8 @@
 import { Platform } from 'Core/Constants/Platform';
-import { AndroidPermissionsApi } from 'Core/Native/Android/AndroidPermissions';
+import { AndroidPermissionsApi } from 'Core/Native/Android/Permissions';
 import { ApiPackage, NativeApi } from 'Core/Native/Bridge/NativeApi';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { IosPermissionsApi } from 'Core/Native/iOS/IosPermissions';
+import { IosPermissionsApi } from 'Core/Native/iOS/Permissions';
 import { Observable2 } from 'Core/Utilities/Observable';
 import { PermissionsUtil } from 'Core/Utilities/Permissions';
 
