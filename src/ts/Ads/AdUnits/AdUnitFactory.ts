@@ -45,7 +45,7 @@ import { PlayableMRAID } from 'MRAID/Views/PlayableMRAID';
 import { IPerformanceAdUnitParameters, PerformanceAdUnit } from 'Performance/AdUnits/PerformanceAdUnit';
 import { PerformanceEndScreenEventHandler } from 'Performance/EventHandlers/PerformanceEndScreenEventHandler';
 import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/PerformanceOverlayEventHandler';
-import { PerformanceOverlayEventHandlerWithCTAButton } from 'Performance/EventHandlers/PerformanceOverlayWithCTAButtonEventHandler';
+import { PerformanceOverlayWithCTAButtonEventHandler } from 'Performance/EventHandlers/PerformanceOverlayWithCTAButtonEventHandler';
 import { PerformanceVideoEventHandler } from 'Performance/EventHandlers/PerformanceVideoEventHandler';
 import { PerformanceCampaign } from 'Performance/Models/PerformanceCampaign';
 import { PerformanceMRAIDCampaign } from 'Performance/Models/PerformanceMRAIDCampaign';
@@ -150,7 +150,7 @@ export class AdUnitFactory {
         let performanceOverlayEventHandler;
 
         if (overlay instanceof PerformanceVideoOverlayWithCTAButton) {
-            performanceOverlayEventHandler = new PerformanceOverlayEventHandlerWithCTAButton(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
+            performanceOverlayEventHandler = new PerformanceOverlayWithCTAButtonEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
         } else {
             performanceOverlayEventHandler = new PerformanceOverlayEventHandler(nativeBridge, performanceAdUnit, performanceAdUnitParameters);
         }
@@ -527,7 +527,7 @@ export class AdUnitFactory {
         if (skipAllowed && parameters.placement.skipEndCardOnClose()) {
             overlay = new ClosableVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId());
         } else if (skipAllowed && isPerformanceCampaign && CTAButtonTestEnabled) {
-            overlay = new PerformanceVideoOverlayWithCTAButton(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, parameters.campaign, disablePrivacyDuringVideo);
+            overlay = new PerformanceVideoOverlayWithCTAButton(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, <PerformanceCampaign>parameters.campaign, disablePrivacyDuringVideo);
         } else {
             overlay = new NewVideoOverlay(nativeBridge, parameters.placement.muteVideo(), parameters.deviceInfo.getLanguage(), parameters.clientInfo.getGameId(), privacy, showGDPRBanner, showPrivacyDuringVideo, parameters.campaign.getSeatId());
         }

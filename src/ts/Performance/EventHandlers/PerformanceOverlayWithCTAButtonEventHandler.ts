@@ -16,39 +16,23 @@ import { RequestError } from 'Core/Errors/RequestError';
 import { Video } from 'Ads/Models/Assets/Video';
 import { AbstractVideoOverlay } from 'Ads/Views/AbstractVideoOverlay';
 import { IosUtils } from 'Ads/Utilities/IosUtils';
+import { PerformanceOverlayEventHandler } from 'Performance/EventHandlers/PerformanceOverlayEventHandler';
 
 export interface IVideoOverlayDownloadParameters extends IEndScreenDownloadParameters {
     videoProgress: number;
 }
 
-export class PerformanceOverlayEventHandlerWithCTAButton extends OverlayEventHandler<PerformanceCampaign> {
+export class PerformanceOverlayWithCTAButtonEventHandler extends PerformanceOverlayEventHandler {
 
-    private _performanceAdUnit: PerformanceAdUnit;
-    private _thirdPartyEventManager: ThirdPartyEventManager;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
     private _performanceOverlay?: AbstractVideoOverlay;
 
     constructor(nativeBridge: NativeBridge, adUnit: PerformanceAdUnit, parameters: IPerformanceAdUnitParameters) {
-        super(nativeBridge, adUnit, parameters, parameters.adUnitStyle);
-        this._performanceAdUnit = adUnit;
-        this._thirdPartyEventManager = parameters.thirdPartyEventManager;
+        super(nativeBridge, adUnit, parameters);
         this._clientInfo = parameters.clientInfo;
         this._deviceInfo = parameters.deviceInfo;
-        this._adUnit = adUnit;
         this._performanceOverlay = this._performanceAdUnit.getOverlay();
-    }
-
-    public onOverlaySkip(position: number): void {
-        super.onOverlaySkip(position);
-
-        const endScreen = this._performanceAdUnit.getEndScreen();
-        if (endScreen) {
-            endScreen.show();
-        }
-        this._performanceAdUnit.onFinish.trigger();
-
-        this._thirdPartyEventManager.sendPerformanceTrackingEvent(this._campaign, ICometTrackingUrlEvents.SKIP);
     }
 
     public onOverlayDownload(parameters: IVideoOverlayDownloadParameters): void {
@@ -210,11 +194,7 @@ export class PerformanceOverlayEventHandlerWithCTAButton extends OverlayEventHan
     }
 
     private getVideo(): Video | undefined {
-        if (this._adUnit instanceof PerformanceAdUnit) {
-            return this._adUnit.getVideo();
-        }
-
-        return undefined;
+        return this._performanceAdUnit.getVideo();
     }
 
     private getOperativeEventParams(parameters: IVideoOverlayDownloadParameters): IOperativeEventParams {
