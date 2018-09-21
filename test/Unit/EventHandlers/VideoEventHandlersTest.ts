@@ -88,7 +88,8 @@ describe('VideoEventHandlersTest', () => {
         focusManager = new FocusManager(nativeBridge);
         metaDataManager = new MetaDataManager(nativeBridge);
         container = new Activity(nativeBridge, TestFixtures.getAndroidDeviceInfo());
-        const configuration = TestFixtures.getConfiguration();
+        const coreConfig = TestFixtures.getCoreConfiguration();
+        const adsConfig = TestFixtures.getAdsConfiguration();
 
         const wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
         request = new Request(nativeBridge, wakeUpManager);
@@ -108,14 +109,15 @@ describe('VideoEventHandlersTest', () => {
             sessionManager: sessionManager,
             clientInfo: clientInfo,
             deviceInfo: deviceInfo,
-            configuration: configuration,
+            coreConfig: coreConfig,
+            adsConfig: adsConfig,
             campaign: performanceCampaign
         };
 
         operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager(operativeEventManagerParams);
         video = new Video('', TestFixtures.getSession());
         placement = TestFixtures.getPlacement();
-        const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+        const privacy = new Privacy(nativeBridge, coreConfig.isCoppaCompliant());
         overlay = new Overlay(nativeBridge, false, 'en', clientInfo.getGameId(), privacy, false);
 
         const endScreenParams : IEndScreenParameters = {
@@ -124,7 +126,7 @@ describe('VideoEventHandlersTest', () => {
             gameId: '12345',
             privacy: privacy,
             showGDPRBanner: false,
-            abGroup: configuration.getAbGroup(),
+            abGroup: coreConfig.getAbGroup(),
             targetGameName: performanceCampaign.getGameName()
         };
         endScreen = new PerformanceEndScreen(endScreenParams, performanceCampaign);
@@ -140,7 +142,8 @@ describe('VideoEventHandlersTest', () => {
             operativeEventManager: operativeEventManager,
             placement: placement,
             campaign: vastCampaign,
-            configuration: configuration,
+            coreConfig: coreConfig,
+            adsConfig: adsConfig,
             request: request,
             options: {},
             endScreen: undefined,
@@ -160,7 +163,8 @@ describe('VideoEventHandlersTest', () => {
             operativeEventManager: operativeEventManager,
             placement: TestFixtures.getPlacement(),
             campaign: performanceCampaign,
-            configuration: configuration,
+            coreConfig: coreConfig,
+            adsConfig: adsConfig,
             request: request,
             options: {},
             endScreen: endScreen,
@@ -171,7 +175,7 @@ describe('VideoEventHandlersTest', () => {
             programmaticTrackingService: programmaticTrackingService
         };
 
-        const xpromoPrivacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+        const xpromoPrivacy = new Privacy(nativeBridge, coreConfig.isCoppaCompliant());
         xPromoCampaign = TestFixtures.getXPromoCampaign();
         const xpromoEndScreenParams : IEndScreenParameters = {
             nativeBridge: nativeBridge,
@@ -179,7 +183,7 @@ describe('VideoEventHandlersTest', () => {
             gameId: '12345',
             privacy: xpromoPrivacy,
             showGDPRBanner: false,
-            abGroup: configuration.getAbGroup(),
+            abGroup: coreConfig.getAbGroup(),
             targetGameName: xPromoCampaign.getGameName()
         };
         xPromoEndScreen = new XPromoEndScreen(xpromoEndScreenParams, xPromoCampaign);
@@ -193,7 +197,8 @@ describe('VideoEventHandlersTest', () => {
             operativeEventManager: operativeEventManager,
             placement: TestFixtures.getPlacement(),
             campaign: xPromoCampaign,
-            configuration: configuration,
+            coreConfig: coreConfig,
+            adsConfig: adsConfig,
             request: request,
             options: {},
             endScreen: xPromoEndScreen,
@@ -212,7 +217,8 @@ describe('VideoEventHandlersTest', () => {
             campaign: performanceCampaign,
             operativeEventManager: operativeEventManager,
             thirdPartyEventManager: thirdPartyEventManager,
-            configuration: configuration,
+            coreConfig: coreConfig,
+            adsConfig: adsConfig,
             placement: TestFixtures.getPlacement(),
             video: video,
             adUnitStyle: undefined,

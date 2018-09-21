@@ -3,6 +3,7 @@ import { Orientation } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { Closer } from 'Ads/Views/Closer';
 import { Privacy } from 'Ads/Views/Privacy';
@@ -10,7 +11,7 @@ import { FinishState } from 'Core/Constants/FinishState';
 import { Platform } from 'Core/Constants/Platform';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { CoreConfiguration } from 'CoreConfiguration.ts';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { IntentApi } from 'Core/Native/Android/Intent';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
@@ -47,7 +48,8 @@ describe('VPAIDEventHandlerTest', () => {
             operativeEventManager: sinon.createStubInstance(OperativeEventManager),
             placement: TestFixtures.getPlacement(),
             container: sinon.createStubInstance(Activity),
-            configuration: sinon.createStubInstance(CoreConfiguration),
+            coreConfig: sinon.createStubInstance(CoreConfiguration),
+            adsConfig: sinon.createStubInstance(AdsConfiguration),
             request: sinon.createStubInstance(Request),
             privacy: sinon.createStubInstance(Privacy),
             forceOrientation: Orientation.NONE,

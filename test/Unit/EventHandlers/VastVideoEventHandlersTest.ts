@@ -96,7 +96,8 @@ describe('VastVideoEventHandler tests', () => {
         thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
         sessionManager = new SessionManager(nativeBridge, request);
 
-        const configuration = TestFixtures.getConfiguration();
+        const coreConfig = TestFixtures.getCoreConfiguration();
+        const adsConfig = TestFixtures.getAdsConfiguration();
         const operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
             nativeBridge: nativeBridge,
             request: request,
@@ -104,7 +105,8 @@ describe('VastVideoEventHandler tests', () => {
             sessionManager: sessionManager,
             clientInfo: clientInfo,
             deviceInfo: deviceInfo,
-            configuration: configuration,
+            coreConfig: coreConfig,
+            adsConfig: adsConfig,
             campaign: campaign
         });
 
@@ -120,7 +122,8 @@ describe('VastVideoEventHandler tests', () => {
             operativeEventManager: operativeEventManager,
             placement: placement,
             campaign: campaign,
-            configuration: configuration,
+            coreConfig: coreConfig,
+            adsConfig: adsConfig,
             request: request,
             options: {},
             endScreen: undefined,
@@ -142,7 +145,8 @@ describe('VastVideoEventHandler tests', () => {
             campaign: campaign,
             operativeEventManager: operativeEventManager,
             thirdPartyEventManager: thirdPartyEventManager,
-            configuration: configuration,
+            coreConfig: coreConfig,
+            adsConfig: adsConfig,
             placement: placement,
             video: campaign.getVideo(),
             adUnitStyle: undefined,

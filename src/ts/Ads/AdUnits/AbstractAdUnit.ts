@@ -3,6 +3,7 @@ import { AdUnitContainer, Orientation } from 'Ads/AdUnits/Containers/AdUnitConta
 import { GdprManager } from 'Ads/Managers/GdprManager';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
@@ -26,7 +27,8 @@ export interface IAdUnitParameters<T extends Campaign> {
     operativeEventManager: OperativeEventManager;
     placement: Placement;
     campaign: T;
-    configuration: CoreConfiguration;
+    coreConfig: CoreConfiguration;
+    adsConfig: AdsConfiguration;
     request: Request;
     options: any;
     gdprManager: GdprManager;

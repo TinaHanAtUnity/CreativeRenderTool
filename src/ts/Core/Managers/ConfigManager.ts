@@ -7,12 +7,11 @@ import { Request } from 'Core/Managers/Request';
 import { ABGroup } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { AdapterMetaData } from 'Core/Models/MetaData/AdapterMetaData';
 import { FrameworkMetaData } from 'Core/Models/MetaData/FrameworkMetaData';
-import { StorageApi, StorageType } from 'Core/Native/Storage';
-import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { StorageType } from 'Core/Native/Storage';
 import { Diagnostics } from 'Core/Utilities/Diagnostics';
 import { JsonParser } from 'Core/Utilities/JsonParser';
 import { Logger } from 'Core/Utilities/Logger';
@@ -20,7 +19,7 @@ import { Url } from 'Core/Utilities/Url';
 
 export class ConfigManager {
 
-    public static fetch(platform: Platform, storage: StorageApi, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, jaegerSpan: JaegerSpan): Promise<CoreConfiguration> {
+    public static fetch(nativeBridge: NativeBridge, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, metaDataManager: MetaDataManager, jaegerSpan: JaegerSpan): Promise<any> {
         return Promise.all([
             metaDataManager.fetch(FrameworkMetaData),
             metaDataManager.fetch(AdapterMetaData),
@@ -47,22 +46,7 @@ export class ConfigManager {
             }).then(response => {
                 jaegerSpan.addTag(JaegerTags.StatusCode, response.responseCode.toString());
                 try {
-                    const configJson = JsonParser.parse(response.response);
-                    const config: CoreConfiguration = CoreConfigurationParser.parse(configJson);
-                    Logger.Info('Received configuration for token ' + config.getToken() + ' (A/B group ' + config.getAbGroup() + ')');
-                    if(config.getToken()) {
-                        if(platform === Platform.IOS && deviceInfo.getLimitAdTracking()) {
-                            ConfigManager.storeGamerToken(storage, config.getToken());
-                        }
-                    } else {
-                        Diagnostics.trigger('config_failure', {
-                            configUrl: url,
-                            configResponse: response.response
-                        });
-
-                        throw new Error('gamer token missing in PLC config');
-                    }
-                    return config;
+                    return JsonParser.parse(response.response);
                 } catch(error) {
                     Diagnostics.trigger('config_parsing_failed', {
                         configUrl: url,
@@ -82,9 +66,6 @@ export class ConfigManager {
                         error = new ConfigError((new Error(responseObj.error)));
                     }
                 }
-                jaegerSpan.addTag(JaegerTags.Error, 'true');
-                jaegerSpan.addTag(JaegerTags.ErrorMessage, error.message);
-                jaegerSpan.addAnnotation(error.message);
                 throw error;
             });
         });
@@ -181,8 +162,8 @@ export class ConfigManager {
         return this.fetchValue(storage, 'gamerToken');
     }
 
-    private static storeGamerToken(storage: StorageApi, gamerToken: string): Promise<void[]> {
-        return this.storeValue(storage, 'gamerToken', gamerToken);
+    public static storeGamerToken(nativeBridge: NativeBridge, gamerToken: string): Promise<void[]> {
+        return this.storeValue(nativeBridge, 'gamerToken', gamerToken);
     }
 
     private static deleteGamerToken(storage: StorageApi): Promise<void[]> {

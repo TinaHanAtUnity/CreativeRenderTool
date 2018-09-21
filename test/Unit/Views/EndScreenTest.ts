@@ -28,7 +28,7 @@ describe('EndScreen', () => {
         Localization.setLanguageMap('fi.*', 'endscreen', {
             'Download For Free': 'Lataa ilmaiseksi'
         });
-        configuration = TestFixtures.getConfiguration();
+        configuration = TestFixtures.getCoreConfiguration();
     });
 
     const createEndScreen = (language : string) : PerformanceEndScreen => {

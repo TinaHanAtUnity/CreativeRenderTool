@@ -23,7 +23,7 @@ export interface ICoreConfiguration {
     organizationId: string | undefined;
 }
 
-export class CoreConfiguration<T extends ICoreConfiguration = ICoreConfiguration> extends Model<T> {
+export class CoreConfiguration extends Model<ICoreConfiguration> {
     public static Schema: ISchema<ICoreConfiguration> = {
         enabled: ['boolean'],
         country: ['string'],
@@ -39,8 +39,8 @@ export class CoreConfiguration<T extends ICoreConfiguration = ICoreConfiguration
         organizationId: ['string', 'undefined']
     };
 
-    constructor(data: T, name: string, schema: ISchema<T>) {
-        super(name, schema, data);
+    constructor(data: ICoreConfiguration) {
+        super('Configuration', CoreConfiguration.Schema, data);
     }
 
     public isEnabled(): boolean {

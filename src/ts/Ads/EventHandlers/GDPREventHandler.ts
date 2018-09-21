@@ -1,5 +1,6 @@
 import { GDPREventAction, GdprManager } from 'Ads/Managers/GdprManager';
 import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 
 export interface IGDPREventHandler {
     onGDPRPopupSkipped(): void;
@@ -8,16 +9,18 @@ export interface IGDPREventHandler {
 export abstract class GDPREventHandler implements IGDPREventHandler {
 
     private _gdprManager: GdprManager;
-    protected _configuration: AdsConfiguration;
+    protected _coreConfig: CoreConfiguration;
+    protected _adsConfig: AdsConfiguration;
 
-    constructor(gdprManager: GdprManager, configuration: AdsConfiguration) {
+    constructor(gdprManager: GdprManager, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration) {
         this._gdprManager = gdprManager;
-        this._configuration = configuration;
+        this._coreConfig = coreConfig;
+        this._adsConfig = adsConfig;
     }
 
     public onGDPRPopupSkipped(): void {
-        if (!this._configuration.isOptOutRecorded()) {
-            this._configuration.setOptOutRecorded(true);
+        if (!this._adsConfig.isOptOutRecorded()) {
+            this._adsConfig.setOptOutRecorded(true);
             this._gdprManager.sendGDPREvent(GDPREventAction.SKIP);
         }
     }

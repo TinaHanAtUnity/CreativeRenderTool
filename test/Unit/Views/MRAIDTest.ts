@@ -43,7 +43,7 @@ describe('MRAID', () => {
             muteVideo: false
         });
 
-        configuration = TestFixtures.getConfiguration();
+        configuration = TestFixtures.getCoreConfiguration();
         gdprManager = sinon.createStubInstance(GdprManager);
         privacy = new GDPRPrivacy(nativeBridge, gdprManager, true);
     });

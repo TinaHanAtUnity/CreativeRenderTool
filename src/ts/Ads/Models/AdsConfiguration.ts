@@ -1,7 +1,7 @@
 import { Placement } from 'Ads/Models/Placement';
-import { CoreConfiguration, ICoreConfiguration } from 'Core/Models/CoreConfiguration';
+import { ISchema, Model } from 'Core/Models/Model';
 
-export interface IAdsConfiguration extends ICoreConfiguration {
+export interface IAdsConfiguration {
     placements: { [id: string]: Placement };
     defaultPlacement: Placement;
     gdprEnabled: boolean;
@@ -10,18 +10,18 @@ export interface IAdsConfiguration extends ICoreConfiguration {
     defaultBannerPlacement: Placement | undefined;
 }
 
-export class AdsConfiguration extends CoreConfiguration<IAdsConfiguration> {
+export class AdsConfiguration extends Model<IAdsConfiguration> {
+    public static Schema: ISchema<IAdsConfiguration> = {
+        placements: ['object'],
+        defaultPlacement: ['object'],
+        gdprEnabled: ['boolean'],
+        optOutRecorded: ['boolean'],
+        optOutEnabled: ['boolean'],
+        defaultBannerPlacement: ['string', 'undefined']
+    };
 
     constructor(data: IAdsConfiguration) {
-        super(data, 'AdsConfiguration', {
-            ... CoreConfiguration.Schema,
-            placements: ['object'],
-            defaultPlacement: ['object'],
-            gdprEnabled: ['boolean'],
-            optOutRecorded: ['boolean'],
-            optOutEnabled: ['boolean'],
-            defaultBannerPlacement: ['string', 'undefined']
-        });
+        super('Configuration', AdsConfiguration.Schema, data);
     }
 
     public getPlacement(placementId: string): Placement {

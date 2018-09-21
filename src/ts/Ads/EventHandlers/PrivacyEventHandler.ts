@@ -1,23 +1,23 @@
 import { IAdUnitParameters } from 'Ads/AdUnits/AbstractAdUnit';
 import { GDPREventAction, GDPREventSource, GdprManager } from 'Ads/Managers/GdprManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { IPrivacyHandler } from 'Ads/Views/AbstractPrivacy';
 import { Platform } from 'Core/Constants/Platform';
-import { CoreConfiguration } from 'CoreConfiguration.ts';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 export class PrivacyEventHandler implements IPrivacyHandler {
 
     private _nativeBridge: NativeBridge;
     private _gdprManager: GdprManager;
-    private _configuration: CoreConfiguration;
+    private _configuration: AdsConfiguration;
     private _placement: Placement;
 
     constructor(nativeBridge: NativeBridge, parameters: IAdUnitParameters<Campaign>) {
         this._nativeBridge = nativeBridge;
         this._gdprManager = parameters.gdprManager;
-        this._configuration = parameters.configuration;
+        this._configuration = parameters.adsConfig;
         this._placement = parameters.placement;
     }
 

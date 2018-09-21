@@ -1,23 +1,20 @@
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement, PlacementState } from 'Ads/Models/Placement';
 import { SdkStats } from 'Ads/Utilities/SdkStats';
-import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
-import { ListenerApi } from '../Native/Listener';
-import { PlacementApi } from '../Native/Placement';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
 export interface IPlacementIdMap<T> {
     [placementId: string]: T;
 }
 
 export class PlacementManager {
-    private _placement: PlacementApi;
-    private _listener: ListenerApi;
+    private _nativeBridge: NativeBridge;
     private _configuration: AdsConfiguration;
     private _placementCampaignMap: IPlacementIdMap<Campaign>;
 
-    constructor(placement: PlacementApi, listener: ListenerApi, configuration: AdsConfiguration) {
-        this._placement = placement;
-        this._listener = listener;
+    constructor(nativeBridge: NativeBridge, configuration: AdsConfiguration) {
+        this._nativeBridge = nativeBridge;
         this._configuration = configuration;
         this._placementCampaignMap = {};
     }

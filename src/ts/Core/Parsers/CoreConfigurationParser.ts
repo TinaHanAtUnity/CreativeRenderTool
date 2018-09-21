@@ -10,14 +10,20 @@ export class CoreConfigurationParser {
             abGroup: ABGroupBuilder.getAbGroup(configJson.abGroup),
             properties: configJson.properties,
             cacheMode: this.parseCacheMode(configJson),
-            analytics: !!configJson.analytics,
-            test: !!configJson.test,
+            analytics: configJson.analytics ? true : false,
+            test: configJson.test ? true : false,
             projectId: configJson.projectId,
             token: configJson.token,
-            jaegerTracing: !!configJson.jaegerTracing,
+            jaegerTracing: configJson.jaegerTracing ? true : false,
             organizationId: configJson.organizationId
         };
-        return new CoreConfiguration(configurationParams, 'CoreConfiguration', CoreConfiguration.Schema);
+
+        const coreConfig = new CoreConfiguration(configurationParams);
+        if(coreConfig.getToken()) {
+            return coreConfig;
+        } else {
+            throw new Error('gamer token missing in PLC config');
+        }
     }
 
     private static parseCacheMode(configJson: any): CacheMode {

@@ -4,7 +4,7 @@ import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { View } from 'Core/Views/View';
+import { ITemplateData, View } from 'Core/Views/View';
 
 export interface IPrivacyHandler {
     onPrivacy(url: string): void;
@@ -12,7 +12,7 @@ export interface IPrivacyHandler {
     onGDPROptOut(optOutEnabled: boolean): void;
 }
 
-export interface IBuildInformation {
+export interface IBuildInformation extends ITemplateData {
     userAgent: string;
     platform: string;
     campaign: string;

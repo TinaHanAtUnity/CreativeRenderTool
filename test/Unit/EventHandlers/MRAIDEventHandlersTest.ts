@@ -5,6 +5,7 @@ import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { SessionManager } from 'Ads/Managers/SessionManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Placement } from 'Ads/Models/Placement';
 import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
 import { AbstractPrivacy } from 'Ads/Views/AbstractPrivacy';
@@ -15,7 +16,7 @@ import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { CoreConfiguration } from 'CoreConfiguration.ts';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
@@ -93,7 +94,8 @@ describe('MRAIDEventHandlersTest', () => {
                 operativeEventManager: operativeEventManager,
                 placement: TestFixtures.getPlacement(),
                 campaign: playableMraidCampaign,
-                configuration: TestFixtures.getConfiguration(),
+                coreConfig: TestFixtures.getCoreConfiguration(),
+                adsConfig: TestFixtures.getAdsConfiguration(),
                 request: request,
                 options: {},
                 mraid: mraidView,
@@ -139,7 +141,7 @@ describe('MRAIDEventHandlersTest', () => {
                     headers: [['location', 'market://foobar.com']]
                 }));
 
-                mraidView = new MRAID(nativeBridge, placement, playableMraidCampaign, playableMraidAdUnitParams.privacy, true, playableMraidAdUnitParams.configuration.getAbGroup());
+                mraidView = new MRAID(nativeBridge, placement, playableMraidCampaign, playableMraidAdUnitParams.privacy, true, playableMraidAdUnitParams.coreConfig.getAbGroup());
                 sinon.stub(mraidView, 'createMRAID').callsFake(() => {
                     return Promise.resolve();
                 });
@@ -268,7 +270,8 @@ describe('MRAIDEventHandlersTest', () => {
         let programmaticMraidAdUnitParams: IMRAIDAdUnitParameters;
         let metaDataManager: MetaDataManager;
         let sessionManager: SessionManager;
-        let configuration: CoreConfiguration;
+        let coreConfig: CoreConfiguration;
+        let adsConfig: AdsConfiguration;
         let programmaticMraidAdUnit: MRAIDAdUnit;
         let programmaticMraidEventHandler: MRAIDEventHandler;
         let privacy: AbstractPrivacy;
@@ -291,9 +294,10 @@ describe('MRAIDEventHandlersTest', () => {
             deviceInfo = TestFixtures.getAndroidDeviceInfo();
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
             sessionManager = new SessionManager(nativeBridge, request);
-            configuration = TestFixtures.getConfiguration();
+            coreConfig = TestFixtures.getCoreConfiguration();
+            adsConfig = TestFixtures.getAdsConfiguration();
             programmaticMraidCampaign = TestFixtures.getProgrammaticMRAIDCampaign();
-            mraidView = new MRAID(nativeBridge, placement, programmaticMraidCampaign, privacy, true, configuration.getAbGroup());
+            mraidView = new MRAID(nativeBridge, placement, programmaticMraidCampaign, privacy, true, coreConfig.getAbGroup());
 
             operativeEventManager = OperativeEventManagerFactory.createOperativeEventManager({
                 nativeBridge: nativeBridge,
@@ -302,7 +306,8 @@ describe('MRAIDEventHandlersTest', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
-                configuration: configuration,
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
                 campaign: programmaticMraidCampaign
             });
 
@@ -316,7 +321,8 @@ describe('MRAIDEventHandlersTest', () => {
                 operativeEventManager: operativeEventManager,
                 placement: TestFixtures.getPlacement(),
                 campaign: programmaticMraidCampaign,
-                configuration: configuration,
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
                 request: request,
                 options: {},
                 mraid: mraidView,

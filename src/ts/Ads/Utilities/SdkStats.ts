@@ -1,14 +1,17 @@
 import { CampaignManager } from 'Ads/Managers/CampaignManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Asset } from 'Ads/Models/Assets/Asset';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
 import { CampaignAssetInfo } from 'Ads/Utilities/CampaignAssetInfo';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { CacheMode } from 'Core/Models/CoreConfiguration';
+import { CacheMode, CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { MediationMetaData } from 'Core/Models/MetaData/MediationMetaData';
-import { CacheApi, IFileInfo } from 'Core/Native/Cache';
+import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
+import { IFileInfo } from 'Core/Native/Cache';
+import { Cache } from 'Core/Utilities/Cache';
 import { HttpKafka, KafkaCommonObjectType } from 'Core/Utilities/HttpKafka';
 import { Request } from 'Core/Managers/Request';
 import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
@@ -74,14 +77,22 @@ interface IEventInfo {
 }
 
 export class SdkStats {
-    public static initialize(cache: CacheApi, request: Request, configuration: AdsConfiguration, sessionManager: SessionManager, campaignManager: CampaignManager, metaDataManager: MetaDataManager, clientInfo: ClientInfo) {
-        SdkStats._cache = cache;
+    public static initialize(nativeBridge: NativeBridge, request: Request, coreConfig: CoreConfiguration, adsConfig: AdsConfiguration, sessionManager: SessionManager, campaignManager: CampaignManager, metaDataManager: MetaDataManager, clientInfo: ClientInfo, cache: Cache) {
+        SdkStats._nativeBridge = nativeBridge;
         SdkStats._request = request;
-        SdkStats._configuration = configuration;
+        SdkStats._coreConfig = coreConfig;
+        SdkStats._adsConfig = adsConfig;
         SdkStats._sessionManager = sessionManager;
         SdkStats._campaignManager = campaignManager;
         SdkStats._metaDataManager = metaDataManager;
         SdkStats._clientInfo = clientInfo;
+
+        cache.onFinish.subscribe((event) => SdkStats.setCachingFinishTimestamp(event.fileId));
+        cache.onStart.subscribe((event, size) => {
+            if(size === 0) {
+                SdkStats.setCachingStartTimestamp(event.fileId);
+            }
+        });
 
         SdkStats._initialized = true;
     }
@@ -161,7 +172,8 @@ export class SdkStats {
 
     private static _cache: CacheApi;
     private static _request: Request;
-    private static _configuration: AdsConfiguration;
+    private static _coreConfig: CoreConfiguration;
+    private static _adsConfig: AdsConfiguration;
     private static _sessionManager: SessionManager;
     private static _campaignManager: CampaignManager;
     private static _metaDataManager: MetaDataManager;
@@ -190,7 +202,7 @@ export class SdkStats {
     }
 
     private static getSdkStatsEvent(eventType: string, placementId: string): Promise<ISdkStatsEvent> {
-        const placement: Placement = SdkStats._configuration.getPlacement(placementId);
+        const placement: Placement = SdkStats._adsConfig.getPlacement(placementId);
         const campaign: Campaign = <Campaign>(placement.getCurrentCampaign());
 
         const eventTimestamp: number = Date.now();
@@ -199,7 +211,7 @@ export class SdkStats {
             SdkStats.getAssetSize(campaign),
             SdkStats._metaDataManager.fetch(MediationMetaData)]).then(([cachedCampaigns, assetSize, mediationMetaData]: [string[], number, MediationMetaData | undefined]) => {
             const userInfo: IUserInfo = {
-                abGroup: SdkStats._configuration.getAbGroup().toNumber()
+                abGroup: SdkStats._coreConfig.getAbGroup().toNumber()
             };
 
             const placementInfo: IPlacementInfo = {
@@ -218,7 +230,7 @@ export class SdkStats {
             const cacheInfo: ICacheInfo = {
                 cachedCampaigns: cachedCampaigns,
                 isVideoCached: SdkStats.isCampaignCached(campaign),
-                cachingMode: CacheMode[SdkStats._configuration.getCacheMode()],
+                cachingMode: CacheMode[SdkStats._coreConfig.getCacheMode()],
                 videoCachedMsAgo: SdkStats.getCachedMsAgo(campaign),
                 cacheDuration: SdkStats.getCachingDuration(campaign),
                 size: assetSize > 0 ? assetSize : undefined

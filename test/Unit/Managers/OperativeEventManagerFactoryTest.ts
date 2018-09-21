@@ -3,11 +3,12 @@ import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { OperativeEventManagerFactory } from 'Ads/Managers/OperativeEventManagerFactory';
 import { PerformanceOperativeEventManager } from 'Ads/Managers/PerformanceOperativeEventManager';
 import { SessionManager } from 'Ads/Managers/SessionManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { CoreConfiguration } from 'CoreConfiguration.ts';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { Request } from 'Core/Utilities/Request';
@@ -27,7 +28,8 @@ describe('OperativeEventManagerFactoryTest', () => {
     let sessionManager: SessionManager;
     let clientInfo: ClientInfo;
     let deviceInfo: DeviceInfo;
-    let configuration: CoreConfiguration;
+    let coreConfig: CoreConfiguration;
+    let adsConfig: AdsConfiguration;
 
     beforeEach(() => {
         nativeBridge = new NativeBridge({
@@ -40,7 +42,8 @@ describe('OperativeEventManagerFactoryTest', () => {
         metaDataManager = new MetaDataManager(nativeBridge);
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID);
         deviceInfo = TestFixtures.getAndroidDeviceInfo();
-        configuration = TestFixtures.getConfiguration();
+        coreConfig = TestFixtures.getCoreConfiguration();
+        adsConfig = TestFixtures.getAdsConfiguration();
     });
 
     describe('should return correct type of operative manager', () => {
@@ -53,7 +56,8 @@ describe('OperativeEventManagerFactoryTest', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
-                configuration: configuration,
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
                 campaign: campaign
             });
 
@@ -69,7 +73,8 @@ describe('OperativeEventManagerFactoryTest', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
-                configuration: configuration,
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
                 campaign: campaign
             });
 
@@ -85,7 +90,8 @@ describe('OperativeEventManagerFactoryTest', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
-                configuration: configuration,
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
                 campaign: campaign
             });
 
@@ -101,7 +107,8 @@ describe('OperativeEventManagerFactoryTest', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
-                configuration: configuration,
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
                 campaign: campaign
             });
 

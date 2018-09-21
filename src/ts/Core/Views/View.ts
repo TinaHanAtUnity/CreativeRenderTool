@@ -4,6 +4,12 @@ import { Tap } from 'Core/Utilities/Tap';
 import { Template } from 'Core/Utilities/Template';
 import { IViewBinding } from 'Core/Views/IViewBinding';
 
+export type TemplateDataType = string | number | boolean | null | undefined;
+
+export interface ITemplateData {
+    [key: string]: TemplateDataType;
+}
+
 export abstract class View<T extends object> {
 
     private static addEventListener(binding: IViewBinding, element: HTMLElement, attachTap: boolean) {
@@ -19,7 +25,7 @@ export abstract class View<T extends object> {
 
     protected _platform: Platform;
     protected _template: Template;
-    protected _templateData: { [key: string]: string | number | boolean | undefined };
+    protected _templateData: { [key: string]: TemplateDataType | ITemplateData };
     protected _bindings: IViewBinding[];
     protected _container: HTMLElement;
     protected _handlers: T[] = [];

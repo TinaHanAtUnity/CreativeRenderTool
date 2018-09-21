@@ -2,16 +2,17 @@ import { ViewConfiguration } from 'Ads/AdUnits/Containers/AdUnitContainer';
 import { VideoAdUnit, VideoState } from 'Ads/AdUnits/VideoAdUnit';
 import { OperativeEventManager } from 'Ads/Managers/OperativeEventManager';
 import { ThirdPartyEventManager } from 'Ads/Managers/ThirdPartyEventManager';
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { AdUnitStyle } from 'Ads/Models/AdUnitStyle';
 import { Video } from 'Ads/Models/Assets/Video';
 import { Campaign } from 'Ads/Models/Campaign';
 import { Placement } from 'Ads/Models/Placement';
+import { SessionDiagnostics } from 'Ads/Utilities/SessionDiagnostics';
 import { FinishState } from 'Core/Constants/FinishState';
 import { UnityAdsError } from 'Core/Constants/UnityAdsError';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { CoreConfiguration } from 'CoreConfiguration.ts';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
-import { Diagnostics } from 'Core/Utilities/Diagnostics';
 
 export interface IVideoEventHandlerParams<T extends VideoAdUnit = VideoAdUnit, T2 extends Campaign = Campaign, T3 extends OperativeEventManager = OperativeEventManager> {
     nativeBrige: NativeBridge;
@@ -19,7 +20,8 @@ export interface IVideoEventHandlerParams<T extends VideoAdUnit = VideoAdUnit, T
     campaign: T2;
     operativeEventManager: T3;
     thirdPartyEventManager: ThirdPartyEventManager;
-    configuration: CoreConfiguration;
+    coreConfig: CoreConfiguration;
+    adsConfig: AdsConfiguration;
     placement: Placement;
     video: Video;
     adUnitStyle?: AdUnitStyle;
@@ -60,7 +62,7 @@ export abstract class BaseVideoEventHandler {
             this._adUnit.setVideoState(VideoState.ERRORED);
 
             if(errorType && errorData) {
-                Diagnostics.trigger(errorType, errorData, this._campaign.getSession());
+                SessionDiagnostics.trigger(errorType, errorData, this._campaign.getSession());
             }
 
             this._adUnit.setFinishState(FinishState.ERROR);
