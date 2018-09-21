@@ -16,8 +16,8 @@ class TestRequestApi extends RequestApi {
     public get(id: string, url: string, headers: Array<[string, string]>): Promise<string> {
         if(url.indexOf('/auth') !== -1) {
             const header = headers.find((x) => x[0] === 'Authorization');
-            const cookies = header === undefined ? '' : header[1];
-            this.sendSuccessResponse(id, url, cookies, 200, []);
+            const auth = header === undefined ? '' : header[1];
+            this.sendSuccessResponse(id, url, auth, 200, []);
         } else if(url.indexOf('/success') !== -1) {
             this.sendSuccessResponse(id, url, 'Success response', 200, []);
         } else if(url.indexOf('/fail') !== -1) {
@@ -64,7 +64,11 @@ class TestRequestApi extends RequestApi {
     }
 
     public post(id: string, url: string, body: string, headers: Array<[string, string]>): Promise<string> {
-        if(url.indexOf('/success') !== -1) {
+        if(url.indexOf('/auth') !== -1) {
+            const header = headers.find((x) => x[0] === 'Authorization');
+            const auth = header === undefined ? '' : header[1];
+            this.sendSuccessResponse(id, url, auth, 200, []);
+        } else if(url.indexOf('/success') !== -1) {
             this.sendSuccessResponse(id, url, 'Success response', 200, []);
         } else if(url.indexOf('/fail') !== -1) {
             this.sendFailResponse(id, url, 'Fail response');
@@ -408,6 +412,20 @@ describe('RequestTest', () => {
             });
         });
 
+        it('post', () => {
+            const successUrl: string = 'http://www.example.org/auth';
+            const expectedToken = 'Bearer 1234567890';
+
+            Request.setAuthorizationHeaderForHost('www.example.org', expectedToken);
+
+            return request.post(successUrl).then((response) => {
+                assert.equal(expectedToken, response.response, 'Did not receive correct response');
+            }).catch(error => {
+                error = <RequestError>error;
+                throw new Error('Get without headers failed: ' + error.message);
+            });
+        });
+
         it('get for https', () => {
             const successUrl: string = 'https://www.example.org/auth';
             const expectedToken = 'Bearer 1234567890';
@@ -422,7 +440,7 @@ describe('RequestTest', () => {
             });
         });
 
-        it('get multiple cookies', () => {
+        it('get multiple auth', () => {
             const successUrl: string = 'http://www.example.org/auth';
             const expectedToken = 'Bearer 0987654321';
 
@@ -466,7 +484,7 @@ describe('RequestTest', () => {
             });
         });
 
-        it('get no cookies for host', () => {
+        it('get no auth for host', () => {
             const successUrl: string = 'http://www.example.org/auth';
             const expectedToken = '';
 

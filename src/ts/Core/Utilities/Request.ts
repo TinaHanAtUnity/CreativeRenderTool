@@ -127,8 +127,6 @@ export class Request {
             ...headers,
             ['Authorization', authorizationHeader]
         ];
-
-        return headers;
     }
 
     public get(url: string, headers: Array<[string, string]> = [], options?: IRequestOptions): Promise<INativeResponse> {
@@ -161,7 +159,7 @@ export class Request {
             method: RequestMethod.POST,
             url: url,
             data: data,
-            headers: headers,
+            headers: Request.applyAuthorizationHeader(url, headers),
             retryCount: 0,
             options: options
         });
