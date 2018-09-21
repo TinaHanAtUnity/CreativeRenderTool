@@ -219,7 +219,8 @@ export class AdUnitFactory {
 
     private static createVastAdUnit(nativeBridge: NativeBridge, parameters: IAdUnitParameters<VastCampaign>): VastAdUnit {
         const privacy = this.createPrivacy(nativeBridge, parameters);
-        const overlay = this.createOverlay(nativeBridge, parameters, privacy, parameters.campaign.hasEndscreen());
+        const showPrivacyDuringVideo = !parameters.campaign.hasEndscreen() || this.showGDPRBanner(parameters);
+        const overlay = this.createOverlay(nativeBridge, parameters, privacy, showPrivacyDuringVideo);
         let vastEndScreen: VastEndScreen | undefined;
 
         const vastAdUnitParameters: IVastAdUnitParameters = {
@@ -232,7 +233,8 @@ export class AdUnitFactory {
             const vastEndscreenParameters: IVastEndscreenParameters = {
                 campaign: vastAdUnitParameters.campaign,
                 clientInfo: vastAdUnitParameters.clientInfo,
-                seatId: vastAdUnitParameters.campaign.getSeatId()
+                seatId: vastAdUnitParameters.campaign.getSeatId(),
+                showPrivacyDuringEndscreen: !showPrivacyDuringVideo
             };
 
             vastEndScreen = new VastEndScreen(nativeBridge, vastEndscreenParameters, privacy);

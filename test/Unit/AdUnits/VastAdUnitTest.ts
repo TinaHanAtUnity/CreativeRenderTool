@@ -195,7 +195,8 @@ describe('VastAdUnitTest', () => {
             vastEndScreenParameters = {
                 campaign: vastAdUnitParameters.campaign,
                 clientInfo: vastAdUnitParameters.clientInfo,
-                seatId: vastAdUnitParameters.campaign.getSeatId()
+                seatId: vastAdUnitParameters.campaign.getSeatId(),
+                showPrivacyDuringEndscreen: false
             };
 
             const video = new Video('', TestFixtures.getSession());

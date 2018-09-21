@@ -20,6 +20,7 @@ export interface IVastEndscreenParameters {
     campaign: VastCampaign;
     clientInfo: ClientInfo;
     seatId: number | undefined;
+    showPrivacyDuringEndscreen: boolean;
 }
 
 export class VastEndScreen extends View<IVastEndScreenHandler> implements IPrivacyHandler {
@@ -29,14 +30,15 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
     private _callButtonEnabled: boolean = true;
     private _campaign: VastCampaign;
     private _seatId: number | undefined;
+    private _showPrivacyDuringEndscreen: boolean;
 
     constructor(nativeBridge: NativeBridge, parameters: IVastEndscreenParameters, privacy: AbstractPrivacy) {
         super(nativeBridge, 'vast-end-screen');
 
         this._campaign = parameters.campaign;
         this._template = new Template(VastEndScreenTemplate);
-        this._privacy = privacy;
         this._seatId = parameters.seatId;
+        this._showPrivacyDuringEndscreen = parameters.showPrivacyDuringEndscreen;
 
         if(this._campaign) {
             const landscape = this._campaign.getLandscape();
@@ -76,10 +78,13 @@ export class VastEndScreen extends View<IVastEndScreenHandler> implements IPriva
             });
         }
 
-        this._privacy.render();
-        this._privacy.hide();
-        document.body.appendChild(this._privacy.container());
-        this._privacy.addEventHandler(this);
+        if (this._showPrivacyDuringEndscreen) {
+            this._privacy = privacy;
+            this._privacy.render();
+            this._privacy.hide();
+            document.body.appendChild(this._privacy.container());
+            this._privacy.addEventHandler(this);
+        }
     }
 
     public render(): void {

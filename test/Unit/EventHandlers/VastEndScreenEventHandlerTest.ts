@@ -95,7 +95,8 @@ describe('VastEndScreenEventHandlerTest', () => {
         vastEndScreenParameters = {
             campaign: vastAdUnitParameters.campaign,
             clientInfo: vastAdUnitParameters.clientInfo,
-            seatId: vastAdUnitParameters.campaign.getSeatId()
+            seatId: vastAdUnitParameters.campaign.getSeatId(),
+            showPrivacyDuringEndscreen: false
         };
     });
 

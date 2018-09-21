@@ -29,7 +29,8 @@ describe('VastEndScreen', () => {
         vastEndscreenParameters = {
             clientInfo: sinon.createStubInstance(ClientInfo),
             campaign: TestFixtures.getCompanionVastCampaign(),
-            seatId: 0
+            seatId: 0,
+            showPrivacyDuringEndscreen: false
         };
 
         gdprManager = sinon.createStubInstance(GdprManager);
