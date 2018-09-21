@@ -278,4 +278,4 @@ describe('BackupCampaignManagerTest', () => {
             assert.isUndefined(loadedCampaign, 'campaign was loaded when campaign was stored but cached files were deleted');
         });
     });
-};
+});
