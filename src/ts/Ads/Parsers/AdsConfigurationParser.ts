@@ -53,7 +53,6 @@ export class AdsConfigurationParser {
         return new AdsConfiguration(configurationParams);
     }
 
-
     private static parseCacheMode(configJson: any): CacheMode {
         switch(configJson.assetCaching) {
             case 'forced':
