@@ -45,7 +45,7 @@ import { ConfigManager } from 'Core/Managers/ConfigManager';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { MetaDataManager } from 'Core/Managers/MetaDataManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
-import { ABGroupBuilder } from 'Core/Models/ABGroup';
+import { ABGroupBuilder, BackupCampaignTest } from 'Core/Models/ABGroup';
 import { AndroidDeviceInfo } from 'Core/Models/AndroidDeviceInfo';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { CacheMode, Configuration } from 'Core/Models/Configuration';
@@ -287,14 +287,13 @@ export class WebView {
             const refreshSpan = this._jaegerManager.startSpan('Refresh', jaegerInitSpan.id, jaegerInitSpan.traceId);
             refreshSpan.addTag(JaegerTags.DeviceType, Platform[this._nativeBridge.getPlatform()]);
             let refreshPromise;
-            /*
-            if (this._cachedCampaignResponse !== undefined) {
+            if(BackupCampaignTest.isValid(this._configuration.getAbGroup())) {
+                refreshPromise = this._refreshManager.refreshWithBackupCampaigns(this._backupCampaignManager);
+            } else if(this._cachedCampaignResponse !== undefined) {
                 refreshPromise = this._refreshManager.refreshFromCache(this._cachedCampaignResponse, refreshSpan);
             } else {
                 refreshPromise = this._refreshManager.refresh();
             }
-            */
-            refreshPromise = this._refreshManager.refreshWithBackupCampaigns(this._backupCampaignManager); // todo: do not merge to master
             return refreshPromise.then((resp) => {
                 this._jaegerManager.stop(refreshSpan);
                 return resp;
