@@ -15,6 +15,7 @@ import { Request } from 'Core/Utilities/Request';
 import { IMRAIDAdUnitParameters, MRAIDAdUnit } from 'MRAID/AdUnits/MRAIDAdUnit';
 import { MRAIDCampaign } from 'MRAID/Models/MRAIDCampaign';
 import { IMRAIDViewHandler, IOrientationProperties, MRAIDView } from 'MRAID/Views/MRAIDView';
+import { ClickDelayTrackingTest } from 'Core/Models/ABGroup';
 
 export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHandler {
 
@@ -28,6 +29,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
     private _request: Request;
     private _placement: Placement;
     protected _campaign: MRAIDCampaign;
+    private _isAbGroup: boolean;
 
     constructor(nativeBridge: NativeBridge, adUnit: MRAIDAdUnit, parameters: IMRAIDAdUnitParameters) {
         super(parameters.gdprManager, parameters.configuration);
@@ -41,6 +43,7 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
         this._campaign = parameters.campaign;
         this._placement = parameters.placement;
         this._request = parameters.request;
+        this._isAbGroup = ClickDelayTrackingTest.isValid(parameters.configuration.getAbGroup());
     }
 
     public onMraidClick(url: string): Promise<void> {
@@ -56,13 +59,14 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
             }
         } else {    // DSP MRAID
             this.setCallButtonEnabled(false);
+            this.sendTrackingEventsForAbGroup(this._isAbGroup);
             return this._request.followRedirectChain(url).then((storeUrl) => {
                 return this.openUrl(storeUrl).then(() => {
                     this.setCallButtonEnabled(true);
-                    this.sendTrackingEvents();
+                    this.sendTrackingEventsForAbGroup(!this._isAbGroup);
                 }).catch((e) => {
                     this.setCallButtonEnabled(true);
-                    this.sendTrackingEvents();
+                    this.sendTrackingEventsForAbGroup(!this._isAbGroup);
                 });
             });
         }
@@ -138,6 +142,12 @@ export class MRAIDEventHandler extends GDPREventHandler implements IMRAIDViewHan
             if (clickAttributionUrl) {
                 this._thirdPartyEventManager.clickAttributionEvent(clickAttributionUrl, false, useWebViewUA);
             }
+        }
+    }
+
+    private sendTrackingEventsForAbGroup(isAbGroup: boolean) {
+        if (isAbGroup) {
+            this.sendTrackingEvents();
         }
     }
 
