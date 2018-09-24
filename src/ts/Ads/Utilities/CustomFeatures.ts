@@ -52,6 +52,11 @@ export class CustomFeatures {
 
     public static isCloseIconSkipApp(gameId: string) {
         // Clean master (Cheetah)
-        return gameId === '1196341';
+        return gameId === '1196341'
+            || gameId === '1594775'
+            || gameId === '2755671'
+            || gameId === '1451510'
+            || gameId === '1585102'
+            || gameId === '2808037';
     }
 }
