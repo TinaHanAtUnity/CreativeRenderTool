@@ -1,10 +1,10 @@
+import { AdsConfiguration } from 'Ads/Models/AdsConfiguration';
 import { Placement } from 'Ads/Models/Placement';
+import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { MixedPlacementUtility } from 'Ads/Utilities/MixedPlacementUtility';
 import { assert } from 'chai';
 import { Platform } from 'Core/Constants/Platform';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
-import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
 import { DisplayInterstitialCampaign } from 'Display/Models/DisplayInterstitialCampaign';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
 import MixedPlacementAuctionResponse from 'json/MixedPlacementAuctionResponse.json';
@@ -14,7 +14,7 @@ import { TestFixtures } from 'TestHelpers/TestFixtures';
 
 describe('MixedPlacementUtilities', () => {
 
-    let configuration: Configuration;
+    let configuration: AdsConfiguration;
     let promoSkippableCampaign: PromoCampaign;
     let promoNonSkippableCampaign: PromoCampaign;
     let interstitialCampaign: DisplayInterstitialCampaign;
@@ -25,7 +25,7 @@ describe('MixedPlacementUtilities', () => {
     beforeEach(() => {
         clientInfo = TestFixtures.getClientInfo(Platform.ANDROID, '1543512');
         configurationPromoPlacementsJson = JSON.parse(ConfigurationPromoPlacements);
-        configuration = ConfigurationParser.parse(configurationPromoPlacementsJson, clientInfo);
+        configuration = AdsConfigurationParser.parse(configurationPromoPlacementsJson, clientInfo);
         interstitialCampaign = TestFixtures.getDisplayInterstitialCampaign();
         promoSkippableCampaign = TestFixtures.getPromoCampaign('purchasing/iap', true);
         promoNonSkippableCampaign = TestFixtures.getPromoCampaign('purchasing/iap', false);

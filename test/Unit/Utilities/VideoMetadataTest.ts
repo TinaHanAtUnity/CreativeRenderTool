@@ -1,5 +1,5 @@
 import { Video } from 'Ads/Models/Assets/Video';
-import { ProgrammaticTrackingService } from 'Ads/Utilities/ProgrammaticTrackingService';
+import { VideoFileInfo } from 'Ads/Utilities/VideoFileInfo';
 import { assert } from 'chai';
 import { VideoMetadata } from 'Core/Constants/Android/VideoMetadata';
 import { Platform } from 'Core/Constants/Platform';
@@ -10,7 +10,6 @@ import { CacheError } from 'Core/Native/Cache';
 
 import { Cache } from 'Core/Utilities/Cache';
 import { CacheBookkeeping } from 'Core/Utilities/CacheBookkeeping';
-import { FileInfo } from 'Core/Utilities/FileInfo';
 import { Request } from 'Core/Utilities/Request';
 import 'mocha';
 import * as sinon from 'sinon';
@@ -28,7 +27,6 @@ describe('VideoMetadataTest', () => {
     let nativeBridge: NativeBridge;
     let wakeUpManager: WakeUpManager;
     let request: Request;
-    let programmaticTrackingService: ProgrammaticTrackingService;
     let cache: Cache;
     let focusManager: FocusManager;
     let cacheBookkeeping: CacheBookkeeping;
@@ -42,8 +40,7 @@ describe('VideoMetadataTest', () => {
             wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             request = new Request(nativeBridge, wakeUpManager);
             cacheBookkeeping = new CacheBookkeeping(nativeBridge);
-            programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
-            cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService);
+            cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping);
         });
 
         it('should validate valid video', () => {
@@ -55,7 +52,7 @@ describe('VideoMetadataTest', () => {
             ]));
 
             const video: Video = new Video(validVideo, TestFixtures.getSession());
-            return FileInfo.isVideoValid(nativeBridge, video, TestFixtures.getCampaign()).then(valid => {
+            return VideoFileInfo.isVideoValid(nativeBridge, video, TestFixtures.getCampaign()).then(valid => {
                 assert.isTrue(valid, 'Valid video failed to validate on Android');
             });
         });
@@ -65,7 +62,7 @@ describe('VideoMetadataTest', () => {
             sinon.stub(nativeBridge.Cache.Android, 'getMetaData').withArgs(invalidId, metadataKeys).returns(Promise.resolve([CacheError.FILE_IO_ERROR, 'File not found']));
 
             const video: Video = new Video(invalidVideo, TestFixtures.getSession());
-            return FileInfo.isVideoValid(nativeBridge, video, TestFixtures.getCampaign()).then(valid => {
+            return VideoFileInfo.isVideoValid(nativeBridge, video, TestFixtures.getCampaign()).then(valid => {
                 assert.isFalse(valid, 'Invalid video was validated on Android');
             });
         });
@@ -78,8 +75,7 @@ describe('VideoMetadataTest', () => {
             wakeUpManager = new WakeUpManager(nativeBridge, focusManager);
             request = new Request(nativeBridge, wakeUpManager);
             cacheBookkeeping = new CacheBookkeeping(nativeBridge);
-            programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
-            cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping, programmaticTrackingService);
+            cache = new Cache(nativeBridge, wakeUpManager, request, cacheBookkeeping);
         });
 
         it('should validate valid video', () => {
@@ -87,7 +83,7 @@ describe('VideoMetadataTest', () => {
             sinon.stub(nativeBridge.Cache.Ios, 'getVideoInfo').withArgs(validId).returns(Promise.resolve([640, 360, 10000]));
 
             const video: Video = new Video(validVideo, TestFixtures.getSession());
-            return FileInfo.isVideoValid(nativeBridge, video, TestFixtures.getCampaign()).then(valid => {
+            return VideoFileInfo.isVideoValid(nativeBridge, video, TestFixtures.getCampaign()).then(valid => {
                 assert.isTrue(valid, 'Valid video failed to validate on iOS');
             });
         });
@@ -97,7 +93,7 @@ describe('VideoMetadataTest', () => {
             sinon.stub(nativeBridge.Cache.Ios, 'getVideoInfo').withArgs(invalidId).returns(Promise.reject(['INVALID_ARGUMENT']));
 
             const video: Video = new Video(invalidVideo, TestFixtures.getSession());
-            return FileInfo.isVideoValid(nativeBridge, video, TestFixtures.getCampaign()).then(valid => {
+            return VideoFileInfo.isVideoValid(nativeBridge, video, TestFixtures.getCampaign()).then(valid => {
                 assert.isFalse(valid, 'Invalid video was validated on iOS');
             });
         });

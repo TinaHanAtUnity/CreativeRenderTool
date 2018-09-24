@@ -7,23 +7,23 @@ import { AdMobCampaign } from 'AdMob/Models/AdMobCampaign';
 import { CometCampaignLoader } from 'Performance/Parsers/CometCampaignLoader';
 import { ProgrammaticAdMobLoader } from 'AdMob/Parsers/ProgrammaticAdMobLoader';
 import { CampaignLoader } from 'Ads/Parsers/CampaignLoader';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { Asset } from 'Ads/Models/Assets/Asset';
 import { IFileInfo } from 'Core/Native/Cache';
 import { Video } from 'Ads/Models/Assets/Video';
 
 export class BackupCampaignManager {
     private _nativeBridge: NativeBridge;
-    private _configuration: Configuration;
+    private _coreConfiguration: CoreConfiguration;
 
-    constructor(nativeBridge: NativeBridge, configuration: Configuration) {
+    constructor(nativeBridge: NativeBridge, coreConfiguration: CoreConfiguration) {
         this._nativeBridge = nativeBridge;
-        this._configuration = configuration;
+        this._coreConfiguration = coreConfiguration;
     }
 
     public storePlacement(placement: Placement, mediaId: string) {
         // never store data when in test mode
-        if(this._configuration.getTestMode()) {
+        if(this._coreConfiguration.getTestMode()) {
             return;
         }
 
@@ -36,7 +36,7 @@ export class BackupCampaignManager {
 
     public storeCampaign(campaign: Campaign) {
         // never store data when in test mode
-        if(this._configuration.getTestMode()) {
+        if(this._coreConfiguration.getTestMode()) {
             return;
         }
 
@@ -59,7 +59,7 @@ export class BackupCampaignManager {
 
     public loadCampaign(placement: Placement): Promise<Campaign | undefined> {
         // test mode should never use stored production campaigns even when they would be available in storage
-        if(this._configuration.getTestMode()) {
+        if(this._coreConfiguration.getTestMode()) {
             return Promise.resolve(undefined);
         }
 

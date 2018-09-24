@@ -1,3 +1,4 @@
+import { Privacy } from 'Ads/Views/Privacy';
 import { assert } from 'chai';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 
@@ -7,7 +8,6 @@ import * as sinon from 'sinon';
 
 import { TestFixtures } from 'TestHelpers/TestFixtures';
 import { VastEndScreen } from 'VAST/Views/VastEndScreen';
-import { Privacy } from 'Ads/Views/Privacy';
 
 describe('VastEndScreen', () => {
     let handleInvocation: sinon.SinonSpy;

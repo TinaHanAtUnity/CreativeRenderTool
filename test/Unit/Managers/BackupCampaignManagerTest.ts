@@ -21,7 +21,7 @@ describe('BackupCampaignManagerTest', () => {
             }
         };
 
-        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, TestFixtures.getConfiguration());
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, TestFixtures.getCoreConfiguration());
         const placement: Placement = TestFixtures.getPlacement();
         const testMediaId: string = '12345';
 
@@ -52,7 +52,7 @@ describe('BackupCampaignManagerTest', () => {
             }
         };
 
-        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, TestFixtures.getConfiguration());
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, TestFixtures.getCoreConfiguration());
 
         const campaign: PerformanceCampaign = TestFixtures.getCampaign();
         const testMediaId: string = 'beefcace-abcdefg-deadbeef';
@@ -89,7 +89,7 @@ describe('BackupCampaignManagerTest', () => {
             }
         };
 
-        const configuration = TestFixtures.getConfiguration();
+        const configuration = TestFixtures.getCoreConfiguration();
         sinon.stub(configuration, 'getTestMode').returns(true);
         const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, configuration);
         const placement: Placement = TestFixtures.getPlacement();
@@ -112,7 +112,7 @@ describe('BackupCampaignManagerTest', () => {
             }
         };
 
-        const configuration = TestFixtures.getConfiguration();
+        const configuration = TestFixtures.getCoreConfiguration();
         sinon.stub(configuration, 'getTestMode').returns(true);
         const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, configuration);
         const campaign: PerformanceCampaign = TestFixtures.getCampaign();
@@ -124,7 +124,7 @@ describe('BackupCampaignManagerTest', () => {
     });
 
     it('should not load campaigns when test mode is active', () => {
-        const configuration = TestFixtures.getConfiguration();
+        const configuration = TestFixtures.getCoreConfiguration();
         sinon.stub(configuration, 'getTestMode').returns(true);
         const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(TestFixtures.getNativeBridge(), configuration);
 
@@ -140,7 +140,7 @@ describe('BackupCampaignManagerTest', () => {
             }
         };
 
-        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, TestFixtures.getConfiguration());
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, TestFixtures.getCoreConfiguration());
 
         return backupCampaignManager.loadCampaign(TestFixtures.getPlacement()).then(campaign => {
             assert.isUndefined(campaign, 'campaign was loaded when storage is empty');
@@ -206,7 +206,7 @@ describe('BackupCampaignManagerTest', () => {
             }
         };
 
-        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, TestFixtures.getConfiguration());
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, TestFixtures.getCoreConfiguration());
 
         return backupCampaignManager.loadCampaign(placement).then(loadedCampaign => {
             assert.isDefined(loadedCampaign, 'campaign was not loaded when campaign was stored and cached');
@@ -272,7 +272,7 @@ describe('BackupCampaignManagerTest', () => {
             }
         };
 
-        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, TestFixtures.getConfiguration());
+        const backupCampaignManager: BackupCampaignManager = new BackupCampaignManager(nativeBridge, TestFixtures.getCoreConfiguration());
 
         return backupCampaignManager.loadCampaign(placement).then(loadedCampaign => {
             assert.isUndefined(loadedCampaign, 'campaign was loaded when campaign was stored but cached files were deleted');
