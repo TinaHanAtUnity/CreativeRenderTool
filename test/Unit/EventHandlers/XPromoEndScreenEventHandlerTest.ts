@@ -69,7 +69,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             deviceInfo = TestFixtures.getAndroidDeviceInfo();
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
             sessionManager = new SessionManager(nativeBridge, request);
-            const configuration = TestFixtures.getConfiguration();
+            const coreConfig = TestFixtures.getCoreConfiguration();
+            const adsConfig = TestFixtures.getAdsConfiguration();
             programmaticTrackingService = sinon.createStubInstance(ProgrammaticTrackingService);
             operativeEventManager = <XPromoOperativeEventManager>OperativeEventManagerFactory.createOperativeEventManager({
                 nativeBridge: nativeBridge,
@@ -78,7 +79,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
-                configuration: configuration,
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
                 campaign: campaign
             });
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
@@ -89,14 +91,14 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             sinon.spy(nativeBridge.Intent, 'launch');
 
             const video = new Video('', TestFixtures.getSession());
-            const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+            const privacy = new Privacy(nativeBridge, coreConfig.isCoppaCompliant());
             const endScreenParams : IEndScreenParameters = {
                 nativeBridge: nativeBridge,
                 language : deviceInfo.getLanguage(),
                 gameId: clientInfo.getGameId(),
                 privacy: privacy,
                 showGDPRBanner: false,
-                abGroup: configuration.getAbGroup(),
+                abGroup: coreConfig.getAbGroup(),
                 targetGameName: TestFixtures.getXPromoCampaign().getGameName()
             };
             endScreen = new XPromoEndScreen(endScreenParams, TestFixtures.getXPromoCampaign());
@@ -114,7 +116,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 operativeEventManager: operativeEventManager,
                 placement: placement,
                 campaign: campaign,
-                configuration: configuration,
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
                 request: request,
                 options: {},
                 endScreen: endScreen,
@@ -167,7 +170,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             deviceInfo = TestFixtures.getIosDeviceInfo();
             thirdPartyEventManager = new ThirdPartyEventManager(nativeBridge, request);
             sessionManager = new SessionManager(nativeBridge, request);
-            const configuration = TestFixtures.getConfiguration();
+            const coreConfig = TestFixtures.getCoreConfiguration();
+            const adsConfig = TestFixtures.getAdsConfiguration();
             operativeEventManager = <XPromoOperativeEventManager>OperativeEventManagerFactory.createOperativeEventManager({
                 nativeBridge: nativeBridge,
                 request: request,
@@ -175,7 +179,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 sessionManager: sessionManager,
                 clientInfo: clientInfo,
                 deviceInfo: deviceInfo,
-                configuration: configuration,
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
                 campaign: campaign
             });
             resolvedPromise = Promise.resolve(TestFixtures.getOkNativeResponse());
@@ -185,14 +190,14 @@ describe('XPromoEndScreenEventHandlerTest', () => {
             sinon.stub(deviceInfo, 'getOsVersion').returns('9.0');
             const video = new Video('', TestFixtures.getSession());
 
-            const privacy = new Privacy(nativeBridge, configuration.isCoppaCompliant());
+            const privacy = new Privacy(nativeBridge, coreConfig.isCoppaCompliant());
             const endScreenParams : IEndScreenParameters = {
                 nativeBridge: nativeBridge,
                 language : deviceInfo.getLanguage(),
                 gameId: clientInfo.getGameId(),
                 privacy: privacy,
                 showGDPRBanner: false,
-                abGroup: configuration.getAbGroup(),
+                abGroup: coreConfig.getAbGroup(),
                 targetGameName: campaign.getGameName()
             };
             endScreen = new XPromoEndScreen(endScreenParams, campaign);
@@ -209,7 +214,8 @@ describe('XPromoEndScreenEventHandlerTest', () => {
                 operativeEventManager: operativeEventManager,
                 placement: TestFixtures.getPlacement(),
                 campaign: campaign,
-                configuration: configuration,
+                coreConfig: coreConfig,
+                adsConfig: adsConfig,
                 request: request,
                 options: {},
                 endScreen: endScreen,

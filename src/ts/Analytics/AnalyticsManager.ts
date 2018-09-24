@@ -3,7 +3,7 @@ import { AnalyticsStorage } from 'Analytics/AnalyticsStorage';
 import { FocusManager } from 'Core/Managers/FocusManager';
 import { WakeUpManager } from 'Core/Managers/WakeUpManager';
 import { ClientInfo } from 'Core/Models/ClientInfo';
-import { Configuration } from 'Core/Models/Configuration';
+import { CoreConfiguration } from 'Core/Models/CoreConfiguration';
 import { DeviceInfo } from 'Core/Models/DeviceInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { INativeResponse, Request } from 'Core/Utilities/Request';
@@ -14,7 +14,7 @@ export class AnalyticsManager {
     private _request: Request;
     private _clientInfo: ClientInfo;
     private _deviceInfo: DeviceInfo;
-    private _configuration: Configuration;
+    private _configuration: CoreConfiguration;
     private _userId: string;
     private _sessionId: number;
     private _storage: AnalyticsStorage;
@@ -26,7 +26,7 @@ export class AnalyticsManager {
     private _endpoint: string;
     private _newSessionTreshold: number = 1800000; // 30 minutes in milliseconds
 
-    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, configuration: Configuration, focusManager: FocusManager) {
+    constructor(nativeBridge: NativeBridge, wakeUpManager: WakeUpManager, request: Request, clientInfo: ClientInfo, deviceInfo: DeviceInfo, configuration: CoreConfiguration, focusManager: FocusManager) {
         this._nativeBridge = nativeBridge;
         this._focusManager = focusManager;
         this._wakeUpManager = wakeUpManager;

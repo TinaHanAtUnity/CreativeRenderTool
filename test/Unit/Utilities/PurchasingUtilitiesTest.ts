@@ -1,10 +1,11 @@
 import { PlacementManager } from 'Ads/Managers/PlacementManager';
 import { PlacementState } from 'Ads/Models/Placement';
+import { AdsConfigurationParser } from 'Ads/Parsers/AdsConfigurationParser';
 import { assert } from 'chai';
 import { ClientInfo } from 'Core/Models/ClientInfo';
 import { NativeBridge } from 'Core/Native/Bridge/NativeBridge';
 import { SdkApi } from 'Core/Native/Sdk';
-import { ConfigurationParser } from 'Core/Parsers/ConfigurationParser';
+import { CoreConfigurationParser } from 'Core/Parsers/CoreConfigurationParser';
 import { Observable1 } from 'Core/Utilities/Observable';
 import ConfigurationAuctionPlc from 'json/ConfigurationAuctionPlc.json';
 import ConfigurationPromoPlacements from 'json/ConfigurationPromoPlacements.json';
@@ -65,9 +66,10 @@ describe('PurchasingUtilitiesTest', () => {
         (<sinon.SinonStub>purchasing.initiatePurchasingCommand).returns(Promise.resolve());
         (<sinon.SinonStub>purchasing.initializePurchasing).returns(Promise.resolve());
         (<any>nativeBridge).Purchasing = purchasing;
-        const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
-        placementManager = new PlacementManager(nativeBridge, configuration);
-        PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, placementManager);
+        const coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
+        const adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
+        placementManager = new PlacementManager(nativeBridge, adsConfig);
+        PurchasingUtilities.initialize(clientInfo, coreConfig, adsConfig, nativeBridge, placementManager);
     });
 
     afterEach(() => {
@@ -77,8 +79,9 @@ describe('PurchasingUtilitiesTest', () => {
     describe('sendPurchaseInitializationEvent', () => {
 
         it('should resolve without calling sendPurchasingCommand if configuration does not include promo', () => {
-            const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
-            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, placementManager);
+            const coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
+            const adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationAuctionPlc));
+            PurchasingUtilities.initialize(clientInfo, coreConfig, adsConfig, nativeBridge, placementManager);
             return PurchasingUtilities.sendPurchaseInitializationEvent().then(() => {
                 sinon.assert.notCalled(<sinon.SinonSpy>purchasing.initializePurchasing);
                 sinon.assert.notCalled(<sinon.SinonSpy>purchasing.getPromoVersion);
@@ -87,8 +90,9 @@ describe('PurchasingUtilitiesTest', () => {
         });
 
         xit('should fail with IAP Promo was not ready if promo is not ready', () => {
-            const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, placementManager);
+            const coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            const adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            PurchasingUtilities.initialize(clientInfo, coreConfig, adsConfig, nativeBridge, placementManager);
             sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('False'));
             sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.16'));
             sandbox.stub(purchasing.onCommandResult, 'subscribe').callsFake((resolve) => resolve('True'));
@@ -100,9 +104,10 @@ describe('PurchasingUtilitiesTest', () => {
         });
 
         xit('should fail with Promo version not supported if promo version is not 1.16 or above', () => {
-            const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            const coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            const adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            PurchasingUtilities.initialize(clientInfo, coreConfig, adsConfig, nativeBridge, placementManager);
             const promoVersion = '1.15';
-            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, placementManager);
             sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('True'));
             sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve(promoVersion));
             sandbox.stub(purchasing.onCommandResult, 'subscribe').callsFake((resolve) => resolve('True'));
@@ -114,9 +119,10 @@ describe('PurchasingUtilitiesTest', () => {
         });
 
         xit('should fail with Promo version not supported if promo version split length is less than 2', () => {
-            const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            const coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            const adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            PurchasingUtilities.initialize(clientInfo, coreConfig, adsConfig, nativeBridge, placementManager);
             const promoVersion = '1';
-            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, placementManager);
             sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('True'));
             sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve(promoVersion));
             sandbox.stub(purchasing.onCommandResult, 'subscribe').callsFake((resolve) => resolve('True'));
@@ -128,8 +134,9 @@ describe('PurchasingUtilitiesTest', () => {
         });
 
         xit('should fail and not set isInitialized to true if command result is false', () => {
-            const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, placementManager);
+            const coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            const adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            PurchasingUtilities.initialize(clientInfo, coreConfig, adsConfig, nativeBridge, placementManager);
 
             sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('True'));
             sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.16'));
@@ -143,8 +150,9 @@ describe('PurchasingUtilitiesTest', () => {
         });
 
         it('should fail when initializePurchasing rejects', () => {
-            const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, placementManager);
+            const coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            const adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            PurchasingUtilities.initialize(clientInfo, coreConfig, adsConfig, nativeBridge, placementManager);
             (<sinon.SinonStub>purchasing.initializePurchasing).rejects();
 
             return PurchasingUtilities.sendPurchaseInitializationEvent().catch((e: any) => {
@@ -154,8 +162,9 @@ describe('PurchasingUtilitiesTest', () => {
         });
 
         xit('should fail when getPromoVersion rejects', () => {
-            const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, placementManager);
+            const coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            const adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            PurchasingUtilities.initialize(clientInfo, coreConfig, adsConfig, nativeBridge, placementManager);
 
             sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('True'));
             (<sinon.SinonStub>purchasing.getPromoVersion).rejects();
@@ -167,8 +176,9 @@ describe('PurchasingUtilitiesTest', () => {
         });
 
         xit('should fail when initiatePurchasingCommand rejects', () => {
-            const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, placementManager);
+            const coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            const adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            PurchasingUtilities.initialize(clientInfo, coreConfig, adsConfig, nativeBridge, placementManager);
 
             sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('True'));
             sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.16'));
@@ -180,8 +190,9 @@ describe('PurchasingUtilitiesTest', () => {
         });
 
         xit('should call SendPurchasingCommand on successful trigger of all underlying promises', () => {
-            const configuration = ConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
-            PurchasingUtilities.initialize(clientInfo, configuration, nativeBridge, placementManager);
+            const coreConfig = CoreConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            const adsConfig = AdsConfigurationParser.parse(JSON.parse(ConfigurationPromoPlacements));
+            PurchasingUtilities.initialize(clientInfo, coreConfig, adsConfig, nativeBridge, placementManager);
             sandbox.stub(purchasing.onInitialize, 'subscribe').callsFake((resolve) => resolve('True'));
             sandbox.stub(purchasing.onGetPromoVersion, 'subscribe').callsFake((resolve) => resolve('1.16'));
             sandbox.stub(purchasing.onCommandResult, 'subscribe').callsFake((resolve) => resolve('True'));
